@@ -1,0 +1,20 @@
+name: Rust
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Cargo fmt
+        run: cargo fmt --all --check
+
+      - name: Cargo test
+        run: cargo test --workspace --locked
