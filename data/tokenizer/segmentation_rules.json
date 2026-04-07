@@ -1,5 +1,5 @@
 {
-  "version": "0.0.11",
+  "version": "0.0.12",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -837,6 +837,50 @@
       "to_state": "person",
       "label": "person_1pl",
       "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "verb_person_2pl_ndar",
+      "form": "ңдар",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2pl",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "verb_person_2pl_nder",
+      "form": "ңдер",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2pl",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "verb_person_2polite_nyz",
+      "form": "ңыз",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "verb_person_2polite_niz",
+      "form": "ңіз",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite",
+      "allowed_harmonies": ["front"],
       "allowed_final_sound_classes": ["vowel"],
       "terminal": true
     }
