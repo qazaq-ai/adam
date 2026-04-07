@@ -1,7 +1,8 @@
 use std::{env, fs, process::ExitCode};
 
 use adam_tokenizer::{
-    TokenizerDryRunPack, TokenizerExperiment, TokenizerSegmentationDataset, build_experiment_report,
+    SegmentationLexicon, SegmentationRuleSet, TokenizerDryRunPack, TokenizerExperiment,
+    TokenizerSegmentationDataset, build_experiment_report,
 };
 
 fn main() -> ExitCode {
@@ -33,8 +34,22 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
+    let lexicon: SegmentationLexicon = match read_json(&experiment.segmentation_roots_manifest) {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read segmentation roots: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let rules: SegmentationRuleSet = match read_json(&experiment.segmentation_rules_manifest) {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read segmentation rules: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
 
-    match build_experiment_report(&experiment, &pack, &dataset) {
+    match build_experiment_report(&experiment, &pack, &dataset, &lexicon, &rules) {
         Ok(report) => {
             println!(
                 "{}",

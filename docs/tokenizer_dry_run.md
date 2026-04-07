@@ -31,3 +31,6 @@ The full experiment runner now lives separately and combines this dry run with
 segmentation scoring:
 
 - `scripts/run_tokenizer_experiment.sh`
+
+The segmentation side of that experiment is deterministic and uses explicit
+roots and suffix transition rules rather than suffix guessing.

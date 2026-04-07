@@ -11,6 +11,11 @@ The segmentation reference dataset lives in:
 
 - `data/eval/tokenizer_segmentation_eval_dataset.json`
 
+The deterministic segmentation config lives in:
+
+- `data/tokenizer/segmentation_roots.json`
+- `data/tokenizer/segmentation_rules.json`
+
 It stores token-level expected segmentations for cases that are easy to get
 wrong if the system guesses from the suffix tail instead of respecting
 Kazakh morphology.

@@ -1,0 +1,28 @@
+{
+  "version": "0.0.4",
+  "name": "adam-kazakh-segmentation-roots",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "roots": [
+    {
+      "id": "noun_mekeme",
+      "root": "мекеме",
+      "part_of_speech": "noun"
+    },
+    {
+      "id": "noun_anyqtama",
+      "root": "анықтама",
+      "part_of_speech": "noun"
+    },
+    {
+      "id": "verb_kel",
+      "root": "кел",
+      "part_of_speech": "verb"
+    },
+    {
+      "id": "verb_qara",
+      "root": "қара",
+      "part_of_speech": "verb"
+    }
+  ]
+}

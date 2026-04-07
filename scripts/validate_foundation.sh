@@ -16,6 +16,8 @@ jq empty data/eval/benchmark_manifest.json
 jq empty data/eval/kazakh_foundation_eval_dataset.json
 jq empty data/eval/tokenizer_segmentation_eval_dataset.json
 jq empty data/eval/tokenizer_experiment_manifest.json
+jq empty data/tokenizer/segmentation_roots.json
+jq empty data/tokenizer/segmentation_rules.json
 jq empty data/training/baseline_training_manifest.json
 cargo fmt --all --check
 cargo test -p adam-corpus --tests -- --nocapture

@@ -21,5 +21,7 @@
   cleaned Kazakh-only corpora
 - `data/eval`
   held-out benchmark assets
+- `data/tokenizer`
+  deterministic roots and suffix transition rules for tokenizer evaluation
 - `data/training`
   reproducible baseline training plans

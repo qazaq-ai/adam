@@ -1,11 +1,22 @@
 use std::{env, fs, process::ExitCode};
 
-use adam_tokenizer::{TokenizerSegmentationDataset, build_segmentation_report};
+use adam_tokenizer::{
+    SegmentationLexicon, SegmentationRuleSet, TokenizerSegmentationDataset,
+    build_segmentation_report,
+};
 
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
     let Some(dataset_path) = args.next() else {
-        eprintln!("usage: segmentation_eval <dataset-manifest>");
+        eprintln!("usage: segmentation_eval <dataset-manifest> <roots-manifest> <rules-manifest>");
+        return ExitCode::FAILURE;
+    };
+    let Some(roots_path) = args.next() else {
+        eprintln!("usage: segmentation_eval <dataset-manifest> <roots-manifest> <rules-manifest>");
+        return ExitCode::FAILURE;
+    };
+    let Some(rules_path) = args.next() else {
+        eprintln!("usage: segmentation_eval <dataset-manifest> <roots-manifest> <rules-manifest>");
         return ExitCode::FAILURE;
     };
 
@@ -16,8 +27,22 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
+    let lexicon: SegmentationLexicon = match read_json(&roots_path) {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read segmentation roots: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let rules: SegmentationRuleSet = match read_json(&rules_path) {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read segmentation rules: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
 
-    match build_segmentation_report(&dataset) {
+    match build_segmentation_report(&dataset, &lexicon, &rules) {
         Ok(report) => {
             println!(
                 "{}",

@@ -1,0 +1,71 @@
+{
+  "version": "0.0.4",
+  "name": "adam-kazakh-segmentation-rules",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "rules": [
+    {
+      "id": "noun_case_ablative_den",
+      "form": "ден",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ablative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_accusative_ny",
+      "form": "ны",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "accusative",
+      "terminal": true
+    },
+    {
+      "id": "verb_voice_l",
+      "form": "л",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "voice",
+      "label": "voice",
+      "terminal": false
+    },
+    {
+      "id": "verb_tense_di_from_stem",
+      "form": "ді",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "past",
+      "terminal": true
+    },
+    {
+      "id": "verb_tense_dy_from_stem",
+      "form": "ды",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "past",
+      "terminal": true
+    },
+    {
+      "id": "verb_tense_di_from_voice",
+      "form": "ді",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "past",
+      "terminal": true
+    },
+    {
+      "id": "verb_tense_dy_from_voice",
+      "form": "ды",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "past",
+      "terminal": true
+    }
+  ]
+}

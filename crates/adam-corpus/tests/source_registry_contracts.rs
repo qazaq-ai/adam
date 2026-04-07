@@ -100,5 +100,5 @@ fn source_acceptance_report_matches_registry_and_rules() {
     )
     .expect("rebuilt acceptance report");
     assert_eq!(rebuilt, report);
-    assert_eq!(report.version, "0.0.3");
+    assert_eq!(report.version, "0.0.4");
 }

@@ -1,8 +1,9 @@
 use std::fs;
 
 use adam_tokenizer::{
-    TokenizerDryRunPack, TokenizerExperiment, TokenizerSegmentationDataset, build_dry_run_report,
-    build_experiment_report, build_segmentation_report,
+    SegmentationLexicon, SegmentationRuleSet, TokenizerDryRunPack, TokenizerExperiment,
+    TokenizerSegmentationDataset, build_dry_run_report, build_experiment_report,
+    build_segmentation_report,
 };
 
 #[test]
@@ -23,6 +24,14 @@ fn tokenizer_experiment_manifest_stays_kazakh_only_and_valid() {
     assert_eq!(
         experiment.segmentation_eval_manifest,
         "data/eval/tokenizer_segmentation_eval_dataset.json"
+    );
+    assert_eq!(
+        experiment.segmentation_roots_manifest,
+        "data/tokenizer/segmentation_roots.json"
+    );
+    assert_eq!(
+        experiment.segmentation_rules_manifest,
+        "data/tokenizer/segmentation_rules.json"
     );
 }
 
@@ -77,9 +86,28 @@ fn tokenizer_segmentation_dataset_contract_is_valid() {
     dataset
         .validate()
         .expect("tokenizer segmentation dataset contract");
-    let report = build_segmentation_report(&dataset).expect("segmentation report");
+    let roots_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/tokenizer/segmentation_roots.json"
+    );
+    let lexicon: SegmentationLexicon =
+        serde_json::from_str(&fs::read_to_string(roots_path).expect("segmentation roots file"))
+            .expect("valid segmentation roots json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/tokenizer/segmentation_rules.json"
+    );
+    let rules: SegmentationRuleSet =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("segmentation rules file"))
+            .expect("valid segmentation rules json");
+
+    lexicon.validate().expect("segmentation roots contract");
+    rules.validate().expect("segmentation rules contract");
+    let report =
+        build_segmentation_report(&dataset, &lexicon, &rules).expect("segmentation report");
     assert_eq!(report.example_count, dataset.entries.len());
     assert!(report.average_segment_count >= 2);
+    assert_eq!(report.exact_match_count, dataset.entries.len());
 }
 
 #[test]
@@ -105,8 +133,23 @@ fn tokenizer_experiment_report_scores_segmentation_matches() {
     let dataset: TokenizerSegmentationDataset =
         serde_json::from_str(&fs::read_to_string(dataset_path).expect("segmentation dataset file"))
             .expect("valid segmentation dataset json");
+    let roots_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/tokenizer/segmentation_roots.json"
+    );
+    let lexicon: SegmentationLexicon =
+        serde_json::from_str(&fs::read_to_string(roots_path).expect("segmentation roots file"))
+            .expect("valid segmentation roots json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/tokenizer/segmentation_rules.json"
+    );
+    let rules: SegmentationRuleSet =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("segmentation rules file"))
+            .expect("valid segmentation rules json");
 
-    let report = build_experiment_report(&experiment, &pack, &dataset).expect("experiment report");
+    let report = build_experiment_report(&experiment, &pack, &dataset, &lexicon, &rules)
+        .expect("experiment report");
     assert_eq!(report.segmentation_example_count, dataset.entries.len());
     assert_eq!(report.exact_match_count, dataset.entries.len());
     assert!(report.failures.is_empty());

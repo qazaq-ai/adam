@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -25,6 +27,8 @@ pub struct TokenizerExperiment {
     pub training_manifest: String,
     pub sample_pack_manifest: String,
     pub segmentation_eval_manifest: String,
+    pub segmentation_roots_manifest: String,
+    pub segmentation_rules_manifest: String,
     pub objective: String,
 }
 
@@ -69,6 +73,58 @@ pub struct TokenizerSegmentationDataset {
     pub script: String,
     pub profile_name: String,
     pub entries: Vec<TokenizerSegmentationExample>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SegmentationPartOfSpeech {
+    Noun,
+    Verb,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SegmentationState {
+    Stem,
+    Voice,
+    Tense,
+    Case,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SegmentationRootEntry {
+    pub id: String,
+    pub root: String,
+    pub part_of_speech: SegmentationPartOfSpeech,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SegmentationLexicon {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub roots: Vec<SegmentationRootEntry>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SegmentationSuffixRule {
+    pub id: String,
+    pub form: String,
+    pub part_of_speech: SegmentationPartOfSpeech,
+    pub from_state: SegmentationState,
+    pub to_state: SegmentationState,
+    pub label: String,
+    pub terminal: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SegmentationRuleSet {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub rules: Vec<SegmentationSuffixRule>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -129,10 +185,22 @@ pub enum TokenizerError {
     EmptySamplePackManifest,
     #[error("segmentation eval manifest path must not be empty")]
     EmptySegmentationEvalManifest,
+    #[error("segmentation roots manifest path must not be empty")]
+    EmptySegmentationRootsManifest,
+    #[error("segmentation rules manifest path must not be empty")]
+    EmptySegmentationRulesManifest,
     #[error("dry-run sample pack must not be empty")]
     EmptySamplePack,
     #[error("segmentation dataset entries must not be empty")]
     EmptySegmentationDataset,
+    #[error("segmentation lexicon roots must not be empty")]
+    EmptySegmentationLexicon,
+    #[error("segmentation rule set rules must not be empty")]
+    EmptySegmentationRuleSet,
+    #[error("segmentation root ids must be unique and non-empty")]
+    InvalidSegmentationRootId,
+    #[error("segmentation suffix rule ids must be unique and non-empty")]
+    InvalidSegmentationRuleId,
     #[error("segmentation examples must include at least one expected segment")]
     EmptySegmentationSegments,
     #[error("segmentation examples must preserve the original token")]
@@ -198,6 +266,14 @@ impl TokenizerExperiment {
 
         if self.segmentation_eval_manifest.trim().is_empty() {
             return Err(TokenizerError::EmptySegmentationEvalManifest);
+        }
+
+        if self.segmentation_roots_manifest.trim().is_empty() {
+            return Err(TokenizerError::EmptySegmentationRootsManifest);
+        }
+
+        if self.segmentation_rules_manifest.trim().is_empty() {
+            return Err(TokenizerError::EmptySegmentationRulesManifest);
         }
 
         Ok(())
@@ -267,6 +343,65 @@ impl TokenizerSegmentationDataset {
     }
 }
 
+impl SegmentationLexicon {
+    pub fn validate(&self) -> Result<(), TokenizerError> {
+        if self.target_language != "kazakh" {
+            return Err(TokenizerError::NonKazakhLanguage);
+        }
+
+        if self.script != "cyrillic" {
+            return Err(TokenizerError::NonCyrillicScript);
+        }
+
+        if self.roots.is_empty() {
+            return Err(TokenizerError::EmptySegmentationLexicon);
+        }
+
+        let mut seen = HashSet::new();
+        for root in &self.roots {
+            if root.id.trim().is_empty()
+                || root.root.trim().is_empty()
+                || contains_latin(&root.root)
+                || !seen.insert(root.id.clone())
+            {
+                return Err(TokenizerError::InvalidSegmentationRootId);
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl SegmentationRuleSet {
+    pub fn validate(&self) -> Result<(), TokenizerError> {
+        if self.target_language != "kazakh" {
+            return Err(TokenizerError::NonKazakhLanguage);
+        }
+
+        if self.script != "cyrillic" {
+            return Err(TokenizerError::NonCyrillicScript);
+        }
+
+        if self.rules.is_empty() {
+            return Err(TokenizerError::EmptySegmentationRuleSet);
+        }
+
+        let mut seen = HashSet::new();
+        for rule in &self.rules {
+            if rule.id.trim().is_empty()
+                || rule.form.trim().is_empty()
+                || rule.label.trim().is_empty()
+                || contains_latin(&rule.form)
+                || !seen.insert(rule.id.clone())
+            {
+                return Err(TokenizerError::InvalidSegmentationRuleId);
+            }
+        }
+
+        Ok(())
+    }
+}
+
 pub fn build_dry_run_report(
     experiment: &TokenizerExperiment,
     pack: &TokenizerDryRunPack,
@@ -313,8 +448,12 @@ pub fn build_dry_run_report(
 
 pub fn build_segmentation_report(
     dataset: &TokenizerSegmentationDataset,
+    lexicon: &SegmentationLexicon,
+    rules: &SegmentationRuleSet,
 ) -> Result<TokenizerSegmentationReport, TokenizerError> {
     dataset.validate()?;
+    lexicon.validate()?;
+    rules.validate()?;
 
     let example_count = dataset.entries.len();
     let total_segment_count = dataset
@@ -332,7 +471,10 @@ pub fn build_segmentation_report(
     let exact_match_count = dataset
         .entries
         .iter()
-        .filter(|entry| baseline_segment_token(&entry.token) == entry.expected_segments)
+        .filter(|entry| {
+            deterministic_segment_token(&entry.token, lexicon, rules).as_ref()
+                == Some(&entry.expected_segments)
+        })
         .count();
     let exact_match_rate_bps = exact_match_count * 10_000 / example_count;
 
@@ -350,23 +492,27 @@ pub fn build_experiment_report(
     experiment: &TokenizerExperiment,
     pack: &TokenizerDryRunPack,
     dataset: &TokenizerSegmentationDataset,
+    lexicon: &SegmentationLexicon,
+    rules: &SegmentationRuleSet,
 ) -> Result<TokenizerExperimentReport, TokenizerError> {
     let dry_run_report = build_dry_run_report(experiment, pack)?;
     dataset.validate()?;
+    lexicon.validate()?;
+    rules.validate()?;
 
     let failures = dataset
         .entries
         .iter()
         .filter_map(|entry| {
-            let predicted_segments = baseline_segment_token(&entry.token);
-            if predicted_segments == entry.expected_segments {
+            let predicted_segments = deterministic_segment_token(&entry.token, lexicon, rules);
+            if predicted_segments.as_ref() == Some(&entry.expected_segments) {
                 None
             } else {
                 Some(TokenizerSegmentationFailure {
                     id: entry.id.clone(),
                     token: entry.token.clone(),
                     expected_segments: entry.expected_segments.clone(),
-                    predicted_segments,
+                    predicted_segments: predicted_segments.unwrap_or_default(),
                 })
             }
         })
@@ -389,79 +535,83 @@ pub fn build_experiment_report(
     })
 }
 
-pub fn baseline_segment_token(token: &str) -> Vec<String> {
-    const SUFFIXES: &[&str] = &[
-        "ыңдар",
-        "іңдер",
-        "ңыздар",
-        "ңіздер",
-        "лардың",
-        "лердің",
-        "дардың",
-        "дердің",
-        "тардың",
-        "тердің",
-        "лар",
-        "лер",
-        "дар",
-        "дер",
-        "тар",
-        "тер",
-        "дан",
-        "ден",
-        "тан",
-        "тен",
-        "нан",
-        "нен",
-        "ның",
-        "нің",
-        "дың",
-        "дің",
-        "тың",
-        "тің",
-        "ды",
-        "ді",
-        "ты",
-        "ті",
-        "ны",
-        "ні",
-        "ға",
-        "ге",
-        "қа",
-        "ке",
-        "да",
-        "де",
-        "та",
-        "те",
-        "ла",
-        "ле",
-        "л",
-    ];
+pub fn deterministic_segment_token(
+    token: &str,
+    lexicon: &SegmentationLexicon,
+    rules: &SegmentationRuleSet,
+) -> Option<Vec<String>> {
+    let mut candidates = lexicon
+        .roots
+        .iter()
+        .filter(|root| token.starts_with(&root.root))
+        .filter_map(|root| {
+            let remaining = &token[root.root.len()..];
+            if remaining.is_empty() {
+                return Some(vec![root.root.clone()]);
+            }
 
-    let mut remaining = token.to_string();
-    let mut suffixes = Vec::new();
+            let mut parses = Vec::new();
+            let mut suffix_chain = Vec::new();
+            collect_suffix_parses(
+                remaining,
+                &root.part_of_speech,
+                SegmentationState::Stem,
+                rules,
+                &mut suffix_chain,
+                &mut parses,
+            );
 
-    loop {
-        let Some(matched) = SUFFIXES.iter().find(|suffix| {
-            remaining.ends_with(**suffix) && remaining.chars().count() > suffix.chars().count()
-        }) else {
-            break;
-        };
+            if parses.len() == 1 {
+                let mut segments = vec![root.root.clone()];
+                segments.extend(parses.pop().expect("single parse"));
+                Some(segments)
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
 
-        let split_at = remaining.len() - matched.len();
-        let stem = remaining[..split_at].to_string();
-        if stem.is_empty() {
-            break;
+    candidates.sort();
+    candidates.dedup();
+
+    if candidates.len() == 1 {
+        candidates.pop()
+    } else {
+        None
+    }
+}
+
+fn collect_suffix_parses(
+    remaining: &str,
+    part_of_speech: &SegmentationPartOfSpeech,
+    state: SegmentationState,
+    rules: &SegmentationRuleSet,
+    current: &mut Vec<String>,
+    parses: &mut Vec<Vec<String>>,
+) {
+    for rule in rules.rules.iter().filter(|rule| {
+        &rule.part_of_speech == part_of_speech
+            && rule.from_state == state
+            && remaining.starts_with(&rule.form)
+    }) {
+        let next_remaining = &remaining[rule.form.len()..];
+        current.push(rule.form.clone());
+
+        if next_remaining.is_empty() {
+            parses.push(current.clone());
+        } else if !rule.terminal {
+            collect_suffix_parses(
+                next_remaining,
+                part_of_speech,
+                rule.to_state.clone(),
+                rules,
+                current,
+                parses,
+            );
         }
 
-        suffixes.push((*matched).to_string());
-        remaining = stem;
+        current.pop();
     }
-
-    suffixes.reverse();
-    let mut segments = vec![remaining];
-    segments.extend(suffixes);
-    segments
 }
 
 fn contains_latin(value: &str) -> bool {
@@ -475,11 +625,117 @@ pub fn normalize_text(text: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        TokenizerDryRunPack, TokenizerDryRunSample, TokenizerError, TokenizerExperiment,
-        TokenizerProfile, TokenizerSegmentationDataset, TokenizerSegmentationExample,
-        baseline_segment_token, build_dry_run_report, build_experiment_report,
-        build_segmentation_report, normalize_text,
+        SegmentationLexicon, SegmentationPartOfSpeech, SegmentationRootEntry, SegmentationRuleSet,
+        SegmentationState, SegmentationSuffixRule, TokenizerDryRunPack, TokenizerDryRunSample,
+        TokenizerError, TokenizerExperiment, TokenizerProfile, TokenizerSegmentationDataset,
+        TokenizerSegmentationExample, build_dry_run_report, build_experiment_report,
+        build_segmentation_report, deterministic_segment_token, normalize_text,
     };
+
+    fn test_lexicon() -> SegmentationLexicon {
+        SegmentationLexicon {
+            version: "0.0.4".to_string(),
+            name: "adam-kazakh-segmentation-roots".to_string(),
+            target_language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            roots: vec![
+                SegmentationRootEntry {
+                    id: "noun_mekeme".to_string(),
+                    root: "мекеме".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Noun,
+                },
+                SegmentationRootEntry {
+                    id: "noun_anyqtama".to_string(),
+                    root: "анықтама".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Noun,
+                },
+                SegmentationRootEntry {
+                    id: "verb_kel".to_string(),
+                    root: "кел".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                },
+                SegmentationRootEntry {
+                    id: "verb_qara".to_string(),
+                    root: "қара".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                },
+            ],
+        }
+    }
+
+    fn test_rules() -> SegmentationRuleSet {
+        SegmentationRuleSet {
+            version: "0.0.4".to_string(),
+            name: "adam-kazakh-segmentation-rules".to_string(),
+            target_language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            rules: vec![
+                SegmentationSuffixRule {
+                    id: "noun_case_ablative_den".to_string(),
+                    form: "ден".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Noun,
+                    from_state: SegmentationState::Stem,
+                    to_state: SegmentationState::Case,
+                    label: "ablative".to_string(),
+                    terminal: true,
+                },
+                SegmentationSuffixRule {
+                    id: "noun_case_accusative_ny".to_string(),
+                    form: "ны".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Noun,
+                    from_state: SegmentationState::Stem,
+                    to_state: SegmentationState::Case,
+                    label: "accusative".to_string(),
+                    terminal: true,
+                },
+                SegmentationSuffixRule {
+                    id: "verb_voice_l".to_string(),
+                    form: "л".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Stem,
+                    to_state: SegmentationState::Voice,
+                    label: "voice".to_string(),
+                    terminal: false,
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_di_from_stem".to_string(),
+                    form: "ді".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Stem,
+                    to_state: SegmentationState::Tense,
+                    label: "past".to_string(),
+                    terminal: true,
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_dy_from_stem".to_string(),
+                    form: "ды".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Stem,
+                    to_state: SegmentationState::Tense,
+                    label: "past".to_string(),
+                    terminal: true,
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_di_from_voice".to_string(),
+                    form: "ді".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Voice,
+                    to_state: SegmentationState::Tense,
+                    label: "past".to_string(),
+                    terminal: true,
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_dy_from_voice".to_string(),
+                    form: "ды".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Voice,
+                    to_state: SegmentationState::Tense,
+                    label: "past".to_string(),
+                    terminal: true,
+                },
+            ],
+        }
+    }
 
     #[test]
     fn normalizes_basic_input() {
@@ -507,7 +763,7 @@ mod tests {
     #[test]
     fn accepts_kazakh_tokenizer_experiment() {
         let experiment = TokenizerExperiment {
-            version: "0.0.3".to_string(),
+            version: "0.0.4".to_string(),
             name: "adam-tokenizer-baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -516,6 +772,8 @@ mod tests {
             sample_pack_manifest: "data/curated/tokenizer_dry_run_pack.json".to_string(),
             segmentation_eval_manifest: "data/eval/tokenizer_segmentation_eval_dataset.json"
                 .to_string(),
+            segmentation_roots_manifest: "data/tokenizer/segmentation_roots.json".to_string(),
+            segmentation_rules_manifest: "data/tokenizer/segmentation_rules.json".to_string(),
             objective: "measure token efficiency on kazakh text".to_string(),
         };
 
@@ -525,7 +783,7 @@ mod tests {
     #[test]
     fn builds_dry_run_report() {
         let experiment = TokenizerExperiment {
-            version: "0.0.3".to_string(),
+            version: "0.0.4".to_string(),
             name: "adam-tokenizer-baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -534,10 +792,12 @@ mod tests {
             sample_pack_manifest: "data/curated/tokenizer_dry_run_pack.json".to_string(),
             segmentation_eval_manifest: "data/eval/tokenizer_segmentation_eval_dataset.json"
                 .to_string(),
+            segmentation_roots_manifest: "data/tokenizer/segmentation_roots.json".to_string(),
+            segmentation_rules_manifest: "data/tokenizer/segmentation_rules.json".to_string(),
             objective: "measure token efficiency on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.3".to_string(),
+            version: "0.0.4".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -566,7 +826,7 @@ mod tests {
     #[test]
     fn validates_segmentation_dataset_and_builds_report() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.3".to_string(),
+            version: "0.0.4".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -585,7 +845,8 @@ mod tests {
             ],
         };
 
-        let report = build_segmentation_report(&dataset).expect("segmentation report");
+        let report = build_segmentation_report(&dataset, &test_lexicon(), &test_rules())
+            .expect("segmentation report");
         assert_eq!(report.example_count, 2);
         assert_eq!(report.average_segment_count, 2);
         assert_eq!(report.longest_token_length, "мекемеден".chars().count());
@@ -596,7 +857,7 @@ mod tests {
     #[test]
     fn rejects_segmentation_dataset_with_mismatched_segments() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.3".to_string(),
+            version: "0.0.4".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -615,25 +876,29 @@ mod tests {
     }
 
     #[test]
-    fn baseline_segmenter_handles_core_kazakh_examples() {
+    fn deterministic_segmenter_handles_core_kazakh_examples() {
         assert_eq!(
-            baseline_segment_token("мекемеден"),
-            vec!["мекеме".to_string(), "ден".to_string()]
+            deterministic_segment_token("мекемеден", &test_lexicon(), &test_rules()),
+            Some(vec!["мекеме".to_string(), "ден".to_string()])
         );
         assert_eq!(
-            baseline_segment_token("келді"),
-            vec!["кел".to_string(), "ді".to_string()]
+            deterministic_segment_token("келді", &test_lexicon(), &test_rules()),
+            Some(vec!["кел".to_string(), "ді".to_string()])
         );
         assert_eq!(
-            baseline_segment_token("қаралды"),
-            vec!["қара".to_string(), "л".to_string(), "ды".to_string()]
+            deterministic_segment_token("қаралды", &test_lexicon(), &test_rules()),
+            Some(vec!["қара".to_string(), "л".to_string(), "ды".to_string()])
+        );
+        assert_eq!(
+            deterministic_segment_token("өтінішпен", &test_lexicon(), &test_rules()),
+            None
         );
     }
 
     #[test]
     fn builds_experiment_report_with_segmentation_scoring() {
         let experiment = TokenizerExperiment {
-            version: "0.0.3".to_string(),
+            version: "0.0.4".to_string(),
             name: "adam-tokenizer-baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -642,10 +907,12 @@ mod tests {
             sample_pack_manifest: "data/curated/tokenizer_dry_run_pack.json".to_string(),
             segmentation_eval_manifest: "data/eval/tokenizer_segmentation_eval_dataset.json"
                 .to_string(),
+            segmentation_roots_manifest: "data/tokenizer/segmentation_roots.json".to_string(),
+            segmentation_rules_manifest: "data/tokenizer/segmentation_rules.json".to_string(),
             objective: "measure token efficiency on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.3".to_string(),
+            version: "0.0.4".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -656,7 +923,7 @@ mod tests {
             }],
         };
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.3".to_string(),
+            version: "0.0.4".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -676,7 +943,8 @@ mod tests {
         };
 
         let report =
-            build_experiment_report(&experiment, &pack, &dataset).expect("experiment report");
+            build_experiment_report(&experiment, &pack, &dataset, &test_lexicon(), &test_rules())
+                .expect("experiment report");
         assert_eq!(report.sample_count, 1);
         assert_eq!(report.segmentation_example_count, 2);
         assert_eq!(report.exact_match_count, 2);
