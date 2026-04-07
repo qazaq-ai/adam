@@ -1,5 +1,5 @@
 {
-  "version": "0.0.13",
+  "version": "0.0.14",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1061,6 +1061,30 @@
       "allowed_previous_labels": ["future"]
     },
     {
+      "id": "verb_future_person_2sg_sing",
+      "form": "сің",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2sg",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["future"]
+    },
+    {
+      "id": "verb_future_person_2sg_syng",
+      "form": "сың",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2sg",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["future"]
+    },
+    {
       "id": "verb_future_person_2pl_syngdar",
       "form": "сыңдар",
       "part_of_speech": "verb",
@@ -1068,6 +1092,18 @@
       "to_state": "person",
       "label": "person_2pl",
       "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["future"]
+    },
+    {
+      "id": "verb_future_person_2pl_singder",
+      "form": "сіңдер",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2pl",
+      "allowed_harmonies": ["front"],
       "allowed_final_sound_classes": ["vowel"],
       "terminal": true,
       "allowed_previous_labels": ["future"]
@@ -1091,6 +1127,30 @@
       "from_state": "tense",
       "to_state": "person",
       "label": "person_2polite",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["future"]
+    },
+    {
+      "id": "verb_future_person_2polite_plural_sizder",
+      "form": "сіздер",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite_plural",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["future"]
+    },
+    {
+      "id": "verb_future_person_2polite_plural_syzdar",
+      "form": "сыздар",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite_plural",
       "allowed_harmonies": ["back"],
       "allowed_final_sound_classes": ["vowel"],
       "terminal": true,
