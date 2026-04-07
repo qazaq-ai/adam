@@ -1,0 +1,32 @@
+{
+  "version": "0.0.2",
+  "name": "adam-source-acceptance-report",
+  "source_registry_manifest": "data/raw/source_registry.json",
+  "scoring_rules_manifest": "data/raw/source_scoring_rules.json",
+  "records": [
+    {
+      "source_id": "curated_reference_kazakh",
+      "score": 8,
+      "accepted_for_training": true,
+      "positive_signals": [
+        "open_license",
+        "reference_domain",
+        "training_ready_quality"
+      ],
+      "negative_signals": []
+    },
+    {
+      "source_id": "seed_public_admin_text",
+      "score": -7,
+      "accepted_for_training": false,
+      "positive_signals": [
+        "administrative_domain"
+      ],
+      "negative_signals": [
+        "raw_stage",
+        "review_required_license",
+        "seed_quality"
+      ]
+    }
+  ]
+}

@@ -23,3 +23,19 @@ Training acceptance is allowed only when:
 
 - the source is already marked `allowed_for_training`
 - and the computed score reaches the minimum acceptance threshold
+
+## Output Contract
+
+Scoring does not stop at an integer.
+
+Each accepted or rejected source is written into:
+
+- `data/curated/source_acceptance_report.json`
+
+The report preserves:
+
+- source id
+- final score
+- acceptance decision
+- positive signals
+- negative signals

@@ -54,6 +54,31 @@ pub struct TokenizerDryRunReport {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenizerSegmentationExample {
+    pub id: String,
+    pub token: String,
+    pub expected_segments: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenizerSegmentationDataset {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub profile_name: String,
+    pub entries: Vec<TokenizerSegmentationExample>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenizerSegmentationReport {
+    pub dataset_name: String,
+    pub example_count: usize,
+    pub average_segment_count: usize,
+    pub longest_token_length: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TokenizerProfile {
     pub name: String,
     pub language: String,
@@ -78,6 +103,12 @@ pub enum TokenizerError {
     EmptySamplePackManifest,
     #[error("dry-run sample pack must not be empty")]
     EmptySamplePack,
+    #[error("segmentation dataset entries must not be empty")]
+    EmptySegmentationDataset,
+    #[error("segmentation examples must include at least one expected segment")]
+    EmptySegmentationSegments,
+    #[error("segmentation examples must preserve the original token")]
+    SegmentationTokenMismatch,
     #[error("latin characters are not allowed in kazakh-only tokenizer data")]
     LatinCharactersForbidden,
 }
@@ -167,6 +198,43 @@ impl TokenizerDryRunPack {
     }
 }
 
+impl TokenizerSegmentationDataset {
+    pub fn validate(&self) -> Result<(), TokenizerError> {
+        if self.target_language != "kazakh" {
+            return Err(TokenizerError::NonKazakhLanguage);
+        }
+
+        if self.script != "cyrillic" {
+            return Err(TokenizerError::NonCyrillicScript);
+        }
+
+        if self.entries.is_empty() {
+            return Err(TokenizerError::EmptySegmentationDataset);
+        }
+
+        for entry in &self.entries {
+            if entry.expected_segments.is_empty() {
+                return Err(TokenizerError::EmptySegmentationSegments);
+            }
+
+            if contains_latin(&entry.token)
+                || entry
+                    .expected_segments
+                    .iter()
+                    .any(|segment| contains_latin(segment))
+            {
+                return Err(TokenizerError::LatinCharactersForbidden);
+            }
+
+            if entry.expected_segments.concat() != entry.token {
+                return Err(TokenizerError::SegmentationTokenMismatch);
+            }
+        }
+
+        Ok(())
+    }
+}
+
 pub fn build_dry_run_report(
     experiment: &TokenizerExperiment,
     pack: &TokenizerDryRunPack,
@@ -211,6 +279,33 @@ pub fn build_dry_run_report(
     })
 }
 
+pub fn build_segmentation_report(
+    dataset: &TokenizerSegmentationDataset,
+) -> Result<TokenizerSegmentationReport, TokenizerError> {
+    dataset.validate()?;
+
+    let example_count = dataset.entries.len();
+    let total_segment_count = dataset
+        .entries
+        .iter()
+        .map(|entry| entry.expected_segments.len())
+        .sum::<usize>();
+    let average_segment_count = total_segment_count / example_count;
+    let longest_token_length = dataset
+        .entries
+        .iter()
+        .map(|entry| entry.token.chars().count())
+        .max()
+        .unwrap_or(0);
+
+    Ok(TokenizerSegmentationReport {
+        dataset_name: dataset.name.clone(),
+        example_count,
+        average_segment_count,
+        longest_token_length,
+    })
+}
+
 fn contains_latin(value: &str) -> bool {
     value.chars().any(|ch| ch.is_ascii_alphabetic())
 }
@@ -223,7 +318,8 @@ pub fn normalize_text(text: &str) -> String {
 mod tests {
     use super::{
         TokenizerDryRunPack, TokenizerDryRunSample, TokenizerError, TokenizerExperiment,
-        TokenizerProfile, build_dry_run_report, normalize_text,
+        TokenizerProfile, TokenizerSegmentationDataset, TokenizerSegmentationExample,
+        build_dry_run_report, build_segmentation_report, normalize_text,
     };
 
     #[test]
@@ -252,7 +348,7 @@ mod tests {
     #[test]
     fn accepts_kazakh_tokenizer_experiment() {
         let experiment = TokenizerExperiment {
-            version: "0.0.1".to_string(),
+            version: "0.0.2".to_string(),
             name: "adam-tokenizer-baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -268,7 +364,7 @@ mod tests {
     #[test]
     fn builds_dry_run_report() {
         let experiment = TokenizerExperiment {
-            version: "0.0.1".to_string(),
+            version: "0.0.2".to_string(),
             name: "adam-tokenizer-baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -278,7 +374,7 @@ mod tests {
             objective: "measure token efficiency on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.1".to_string(),
+            version: "0.0.2".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -302,5 +398,54 @@ mod tests {
         assert_eq!(report.sample_count, 2);
         assert_eq!(report.normalized_nonempty_count, 2);
         assert_eq!(report.domains.len(), 2);
+    }
+
+    #[test]
+    fn validates_segmentation_dataset_and_builds_report() {
+        let dataset = TokenizerSegmentationDataset {
+            version: "0.0.2".to_string(),
+            name: "adam-tokenizer-segmentation".to_string(),
+            target_language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            profile_name: "adam-kazakh-cyrillic".to_string(),
+            entries: vec![
+                TokenizerSegmentationExample {
+                    id: "seg_01".to_string(),
+                    token: "мекемеден".to_string(),
+                    expected_segments: vec!["мекеме".to_string(), "ден".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_02".to_string(),
+                    token: "келді".to_string(),
+                    expected_segments: vec!["кел".to_string(), "ді".to_string()],
+                },
+            ],
+        };
+
+        let report = build_segmentation_report(&dataset).expect("segmentation report");
+        assert_eq!(report.example_count, 2);
+        assert_eq!(report.average_segment_count, 2);
+        assert_eq!(report.longest_token_length, "мекемеден".chars().count());
+    }
+
+    #[test]
+    fn rejects_segmentation_dataset_with_mismatched_segments() {
+        let dataset = TokenizerSegmentationDataset {
+            version: "0.0.2".to_string(),
+            name: "adam-tokenizer-segmentation".to_string(),
+            target_language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            profile_name: "adam-kazakh-cyrillic".to_string(),
+            entries: vec![TokenizerSegmentationExample {
+                id: "seg_01".to_string(),
+                token: "келді".to_string(),
+                expected_segments: vec!["ке".to_string(), "л".to_string()],
+            }],
+        };
+
+        assert_eq!(
+            dataset.validate(),
+            Err(TokenizerError::SegmentationTokenMismatch)
+        );
     }
 }

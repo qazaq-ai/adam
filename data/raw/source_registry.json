@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "entries": [
     {
       "id": "seed_public_admin_text",
@@ -12,6 +12,18 @@
       "quality_tier": "seed",
       "provenance": "manual_seed",
       "allowed_for_training": false
+    },
+    {
+      "id": "curated_reference_kazakh",
+      "stage": "curated",
+      "language": "kazakh",
+      "script": "cyrillic",
+      "source_type": "reference_text",
+      "domain": "reference",
+      "license_class": "open",
+      "quality_tier": "training_ready",
+      "provenance": "manual_reference_seed",
+      "allowed_for_training": true
     }
   ]
 }

@@ -32,6 +32,8 @@ that prevents early contamination and weak evaluation habits.
   corpus manifests, metadata, and curation contracts
 - `crates/adam-eval`
   evaluation task definitions and benchmark summary types
+- `crates/adam-train`
+  baseline training manifests and planning runners
 - `data/`
   raw, curated, and evaluation dataset roots
 - `docs/`
@@ -62,4 +64,6 @@ The repo should grow from clean data and hard evaluation, not from broad claims.
 - [tokenizer policy](docs/tokenizer_policy.md)
 - [tokenizer experiment plan](docs/tokenizer_experiment_plan.md)
 - [tokenizer dry run](docs/tokenizer_dry_run.md)
+- [tokenizer segmentation eval](docs/tokenizer_segmentation_eval.md)
 - [evaluation policy](docs/evaluation_policy.md)
+- [training baseline](docs/training_baseline.md)

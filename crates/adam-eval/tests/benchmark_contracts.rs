@@ -14,10 +14,17 @@ fn benchmark_manifest_stays_kazakh_only_and_valid() {
 
     suite.validate().expect("benchmark manifest contract");
     assert_eq!(suite.target_language, "kazakh");
+    assert_eq!(suite.tasks.len(), 4);
     assert!(
         suite
             .tasks
             .iter()
             .all(|task| task.target_language == "kazakh")
+    );
+    assert!(
+        suite
+            .tasks
+            .iter()
+            .any(|task| task.name == "kazakh-tokenizer-segmentation")
     );
 }

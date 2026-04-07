@@ -14,6 +14,7 @@ pub enum EvalLayer {
 #[serde(rename_all = "snake_case")]
 pub enum EvalTaskKind {
     TokenEfficiency,
+    TokenizerSegmentation,
     NextTokenPrediction,
     ReadingComprehension,
     MorphologySensitivity,
@@ -84,7 +85,7 @@ pub enum EvalError {
 impl Default for EvalSuite {
     fn default() -> Self {
         Self {
-            version: "0.0.1".to_string(),
+            version: "0.0.2".to_string(),
             name: "kazakh-foundation-baseline".to_string(),
             target_language: "kazakh".to_string(),
             layers: vec![
@@ -100,6 +101,14 @@ impl Default for EvalSuite {
                     kind: EvalTaskKind::TokenEfficiency,
                     source_manifest: "data/eval/benchmark_manifest.json".to_string(),
                     dataset_manifest: "data/eval/kazakh_foundation_eval_dataset.json".to_string(),
+                },
+                EvalTask {
+                    target_language: "kazakh".to_string(),
+                    name: "kazakh-tokenizer-segmentation".to_string(),
+                    kind: EvalTaskKind::TokenizerSegmentation,
+                    source_manifest: "data/eval/benchmark_manifest.json".to_string(),
+                    dataset_manifest: "data/eval/tokenizer_segmentation_eval_dataset.json"
+                        .to_string(),
                 },
                 EvalTask {
                     target_language: "kazakh".to_string(),
@@ -189,9 +198,9 @@ mod tests {
         let suite = EvalSuite::default();
 
         assert_eq!(suite.target_language, "kazakh");
-        assert_eq!(suite.version, "0.0.1");
+        assert_eq!(suite.version, "0.0.2");
         assert_eq!(suite.layers.len(), 4);
-        assert_eq!(suite.tasks.len(), 3);
+        assert_eq!(suite.tasks.len(), 4);
         assert!(suite.validate().is_ok());
     }
 
@@ -206,7 +215,7 @@ mod tests {
     #[test]
     fn dataset_rejects_latin_text() {
         let mut dataset = EvalDataset {
-            version: "0.0.1".to_string(),
+            version: "0.0.2".to_string(),
             name: "test".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

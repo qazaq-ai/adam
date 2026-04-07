@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "name": "adam-kazakh-foundation-benchmark",
   "target_language": "kazakh",
   "layers": [
@@ -15,6 +15,13 @@
       "kind": "token_efficiency",
       "source_manifest": "data/eval/benchmark_manifest.json",
       "dataset_manifest": "data/eval/kazakh_foundation_eval_dataset.json"
+    },
+    {
+      "target_language": "kazakh",
+      "name": "kazakh-tokenizer-segmentation",
+      "kind": "tokenizer_segmentation",
+      "source_manifest": "data/eval/benchmark_manifest.json",
+      "dataset_manifest": "data/eval/tokenizer_segmentation_eval_dataset.json"
     },
     {
       "target_language": "kazakh",

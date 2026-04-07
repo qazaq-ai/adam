@@ -15,6 +15,7 @@ evaluation.
 ## Starter Task Types
 
 - token efficiency
+- tokenizer segmentation
 - next-token prediction
 - reading comprehension
 - morphology sensitivity

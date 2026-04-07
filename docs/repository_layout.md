@@ -10,6 +10,8 @@
   corpus manifests and curation contracts
 - `adam-eval`
   evaluation suite definitions
+- `adam-train`
+  baseline training manifests and planning runners
 
 ## Data
 
@@ -19,4 +21,5 @@
   cleaned Kazakh-only corpora
 - `data/eval`
   held-out benchmark assets
-
+- `data/training`
+  reproducible baseline training plans

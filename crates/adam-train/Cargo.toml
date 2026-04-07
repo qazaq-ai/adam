@@ -1,0 +1,13 @@
+[package]
+name = "adam-train"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+adam-corpus = { path = "../adam-corpus" }
+adam-eval = { path = "../adam-eval" }
+adam-tokenizer = { path = "../adam-tokenizer" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true

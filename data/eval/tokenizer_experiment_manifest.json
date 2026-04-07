@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "name": "adam-tokenizer-baseline",
   "target_language": "kazakh",
   "script": "cyrillic",

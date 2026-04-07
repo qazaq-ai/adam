@@ -22,3 +22,7 @@ The dry run produces a small report with:
 - total character count
 - average character count
 - participating domains
+
+The dry run is available through:
+
+- `scripts/run_tokenizer_dry_run.sh`

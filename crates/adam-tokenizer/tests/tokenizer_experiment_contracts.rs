@@ -1,6 +1,9 @@
 use std::fs;
 
-use adam_tokenizer::{TokenizerDryRunPack, TokenizerExperiment, build_dry_run_report};
+use adam_tokenizer::{
+    TokenizerDryRunPack, TokenizerExperiment, TokenizerSegmentationDataset, build_dry_run_report,
+    build_segmentation_report,
+};
 
 #[test]
 fn tokenizer_experiment_manifest_stays_kazakh_only_and_valid() {
@@ -55,4 +58,22 @@ fn dry_run_report_can_be_built_from_manifests() {
     let report = build_dry_run_report(&experiment, &pack).expect("dry-run report");
     assert_eq!(report.experiment_name, experiment.name);
     assert_eq!(report.sample_count, pack.samples.len());
+}
+
+#[test]
+fn tokenizer_segmentation_dataset_contract_is_valid() {
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_segmentation_eval_dataset.json"
+    );
+    let dataset: TokenizerSegmentationDataset =
+        serde_json::from_str(&fs::read_to_string(path).expect("segmentation dataset file"))
+            .expect("valid segmentation dataset json");
+
+    dataset
+        .validate()
+        .expect("tokenizer segmentation dataset contract");
+    let report = build_segmentation_report(&dataset).expect("segmentation report");
+    assert_eq!(report.example_count, dataset.entries.len());
+    assert!(report.average_segment_count >= 2);
 }

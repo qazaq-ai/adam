@@ -1,0 +1,16 @@
+{
+  "version": "0.0.2",
+  "run_name": "adam-baseline-plan",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "corpus_manifest": "data/curated/corpus_manifest.json",
+  "source_registry_manifest": "data/raw/source_registry.json",
+  "scoring_rules_manifest": "data/raw/source_scoring_rules.json",
+  "acceptance_report_manifest": "data/curated/source_acceptance_report.json",
+  "tokenizer_experiment_manifest": "data/eval/tokenizer_experiment_manifest.json",
+  "eval_suite_manifest": "data/eval/benchmark_manifest.json",
+  "objective": "plan the first kazakh-only baseline training run",
+  "max_steps": 128,
+  "batch_token_budget": 8192,
+  "context_window": 1024
+}
