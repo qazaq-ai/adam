@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "minimum_acceptance_score": 3,
+  "open_license_bonus": 3,
+  "reviewed_quality_bonus": 2,
+  "training_ready_bonus": 4,
+  "administrative_domain_bonus": 1,
+  "reference_domain_bonus": 1,
+  "raw_stage_penalty": 3,
+  "review_required_penalty": 3,
+  "internal_only_penalty": 5,
+  "seed_quality_penalty": 2
+}

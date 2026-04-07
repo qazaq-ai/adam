@@ -1,0 +1,28 @@
+{
+  "version": "0.0.1",
+  "name": "adam-tokenizer-dry-run",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "samples": [
+    {
+      "id": "sample_01",
+      "text": "Анықтама алу үшін өтініш жазылады.",
+      "domain": "administrative"
+    },
+    {
+      "id": "sample_02",
+      "text": "Мекемеден құжат алдым.",
+      "domain": "administrative"
+    },
+    {
+      "id": "sample_03",
+      "text": "Қазақ тілі агглютинативті тіл.",
+      "domain": "general"
+    },
+    {
+      "id": "sample_04",
+      "text": "Шағым беру тәртібі түсінікті болуы керек.",
+      "domain": "reference"
+    }
+  ]
+}

@@ -71,6 +71,27 @@ pub struct SourceRegistry {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceScoringRules {
+    pub version: String,
+    pub minimum_acceptance_score: i32,
+    pub open_license_bonus: i32,
+    pub reviewed_quality_bonus: i32,
+    pub training_ready_bonus: i32,
+    pub administrative_domain_bonus: i32,
+    pub reference_domain_bonus: i32,
+    pub raw_stage_penalty: i32,
+    pub review_required_penalty: i32,
+    pub internal_only_penalty: i32,
+    pub seed_quality_penalty: i32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SourceAcceptance {
+    pub score: i32,
+    pub accepted_for_training: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CorpusManifest {
     pub version: String,
     pub name: String,
@@ -167,11 +188,45 @@ impl SourceRegistry {
     }
 }
 
+impl SourceScoringRules {
+    pub fn score(&self, entry: &SourceRegistryEntry) -> SourceAcceptance {
+        let mut score = 0;
+
+        match entry.license_class {
+            LicenseClass::Open => score += self.open_license_bonus,
+            LicenseClass::ReviewRequired => score -= self.review_required_penalty,
+            LicenseClass::InternalOnly => score -= self.internal_only_penalty,
+        }
+
+        match entry.quality_tier {
+            QualityTier::Seed => score -= self.seed_quality_penalty,
+            QualityTier::Reviewed => score += self.reviewed_quality_bonus,
+            QualityTier::TrainingReady => score += self.training_ready_bonus,
+        }
+
+        match entry.domain {
+            SourceDomain::Administrative => score += self.administrative_domain_bonus,
+            SourceDomain::Reference => score += self.reference_domain_bonus,
+            SourceDomain::General | SourceDomain::Education => {}
+        }
+
+        if entry.stage == CorpusStage::Raw {
+            score -= self.raw_stage_penalty;
+        }
+
+        SourceAcceptance {
+            score,
+            accepted_for_training: entry.allowed_for_training
+                && score >= self.minimum_acceptance_score,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
         CorpusError, CorpusManifest, CorpusStage, LicenseClass, QualityTier, SourceDomain,
-        SourcePolicy, SourceRegistry, SourceRegistryEntry, SourceType,
+        SourcePolicy, SourceRegistry, SourceRegistryEntry, SourceScoringRules, SourceType,
     };
 
     #[test]
@@ -287,5 +342,55 @@ mod tests {
         };
 
         assert_eq!(registry.validate(), Err(CorpusError::RawSourceCannotTrain));
+    }
+
+    #[test]
+    fn scores_reviewed_open_sources_higher_than_seed_raw_sources() {
+        let rules = SourceScoringRules {
+            version: "0.0.1".to_string(),
+            minimum_acceptance_score: 3,
+            open_license_bonus: 3,
+            reviewed_quality_bonus: 2,
+            training_ready_bonus: 4,
+            administrative_domain_bonus: 1,
+            reference_domain_bonus: 1,
+            raw_stage_penalty: 3,
+            review_required_penalty: 3,
+            internal_only_penalty: 5,
+            seed_quality_penalty: 2,
+        };
+
+        let reviewed = SourceRegistryEntry {
+            id: "reviewed".to_string(),
+            stage: CorpusStage::Curated,
+            language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            source_type: SourceType::AdministrativeText,
+            domain: SourceDomain::Administrative,
+            license_class: LicenseClass::Open,
+            quality_tier: QualityTier::Reviewed,
+            provenance: "seed".to_string(),
+            allowed_for_training: true,
+        };
+
+        let seed = SourceRegistryEntry {
+            id: "seed".to_string(),
+            stage: CorpusStage::Raw,
+            language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            source_type: SourceType::AdministrativeText,
+            domain: SourceDomain::Administrative,
+            license_class: LicenseClass::ReviewRequired,
+            quality_tier: QualityTier::Seed,
+            provenance: "seed".to_string(),
+            allowed_for_training: false,
+        };
+
+        let reviewed_score = rules.score(&reviewed);
+        let seed_score = rules.score(&seed);
+
+        assert!(reviewed_score.score > seed_score.score);
+        assert!(reviewed_score.accepted_for_training);
+        assert!(!seed_score.accepted_for_training);
     }
 }

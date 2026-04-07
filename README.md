@@ -58,6 +58,8 @@ The repo should grow from clean data and hard evaluation, not from broad claims.
 - [corpus policy](docs/corpus_policy.md)
 - [curation workflow](docs/curation_workflow.md)
 - [source classification](docs/source_classification.md)
+- [source scoring](docs/source_scoring.md)
 - [tokenizer policy](docs/tokenizer_policy.md)
 - [tokenizer experiment plan](docs/tokenizer_experiment_plan.md)
+- [tokenizer dry run](docs/tokenizer_dry_run.md)
 - [evaluation policy](docs/evaluation_policy.md)

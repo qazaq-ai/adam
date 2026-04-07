@@ -11,3 +11,5 @@ Current starter utility:
 
 - `validate_foundation.sh`
   validates manifests, formatting, and foundation contract tests
+- `run_tokenizer_dry_run.sh`
+  runs the tokenizer dry-run report from machine-readable manifests
