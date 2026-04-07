@@ -1,5 +1,5 @@
 {
-  "version": "0.0.6",
+  "version": "0.0.7",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -68,6 +68,50 @@
       "label": "plural",
       "allowed_harmonies": ["front"],
       "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": false
+    },
+    {
+      "id": "noun_possessive_3sg_sy",
+      "form": "сы",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "possessive",
+      "label": "possessive_3sg",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": false
+    },
+    {
+      "id": "noun_possessive_3sg_si",
+      "form": "сі",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "possessive",
+      "label": "possessive_3sg",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": false
+    },
+    {
+      "id": "noun_possessive_3sg_y",
+      "form": "ы",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "possessive",
+      "label": "possessive_3sg",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant", "voiceless_consonant", "nasal"],
+      "terminal": false
+    },
+    {
+      "id": "noun_possessive_3sg_i",
+      "form": "і",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "possessive",
+      "label": "possessive_3sg",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant", "voiceless_consonant", "nasal"],
       "terminal": false
     },
     {
@@ -464,6 +508,17 @@
       "label": "dative",
       "allowed_harmonies": ["front"],
       "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true
+    },
+    {
+      "id": "noun_possessive_case_accusative_n",
+      "form": "н",
+      "part_of_speech": "noun",
+      "from_state": "possessive",
+      "to_state": "case",
+      "label": "accusative",
+      "allowed_harmonies": ["front", "back"],
+      "allowed_final_sound_classes": ["vowel"],
       "terminal": true
     },
     {
