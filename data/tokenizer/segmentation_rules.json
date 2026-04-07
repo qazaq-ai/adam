@@ -1,5 +1,5 @@
 {
-  "version": "0.0.9",
+  "version": "0.0.10",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -509,6 +509,28 @@
       "allowed_harmonies": ["front"],
       "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
+    },
+    {
+      "id": "noun_number_possessive_3sg_y",
+      "form": "ы",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "possessive",
+      "label": "possessive_3sg",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false
+    },
+    {
+      "id": "noun_number_possessive_3sg_i",
+      "form": "і",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "possessive",
+      "label": "possessive_3sg",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false
     },
     {
       "id": "noun_possessive_case_accusative_n",
