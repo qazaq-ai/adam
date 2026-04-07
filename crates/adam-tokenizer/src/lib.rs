@@ -140,6 +140,8 @@ pub struct SegmentationSuffixRule {
     pub allowed_harmonies: Vec<VowelHarmony>,
     pub allowed_final_sound_classes: Vec<FinalSoundClass>,
     pub terminal: bool,
+    #[serde(default)]
+    pub allowed_previous_labels: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -586,6 +588,7 @@ pub fn deterministic_segment_token(
                 remaining,
                 &root.part_of_speech,
                 SegmentationState::Stem,
+                None,
                 &root.vowel_harmony,
                 &root.final_sound_class,
                 rules,
@@ -617,6 +620,7 @@ fn collect_suffix_parses(
     remaining: &str,
     part_of_speech: &SegmentationPartOfSpeech,
     state: SegmentationState,
+    previous_label: Option<&str>,
     harmony: &VowelHarmony,
     final_sound_class: &FinalSoundClass,
     rules: &SegmentationRuleSet,
@@ -626,6 +630,12 @@ fn collect_suffix_parses(
     for rule in rules.rules.iter().filter(|rule| {
         &rule.part_of_speech == part_of_speech
             && rule.from_state == state
+            && (rule.allowed_previous_labels.is_empty()
+                || previous_label.is_some_and(|label| {
+                    rule.allowed_previous_labels
+                        .iter()
+                        .any(|allowed_label| allowed_label == label)
+                }))
             && rule.allowed_harmonies.contains(harmony)
             && rule.allowed_final_sound_classes.contains(final_sound_class)
             && remaining.starts_with(&rule.form)
@@ -641,6 +651,7 @@ fn collect_suffix_parses(
                 next_remaining,
                 part_of_speech,
                 rule.to_state.clone(),
+                Some(&rule.label),
                 harmony,
                 &next_final_sound_class,
                 rules,
@@ -701,7 +712,7 @@ mod tests {
 
     fn test_lexicon() -> SegmentationLexicon {
         SegmentationLexicon {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-kazakh-segmentation-roots".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -803,7 +814,7 @@ mod tests {
 
     fn test_rules() -> SegmentationRuleSet {
         SegmentationRuleSet {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-kazakh-segmentation-rules".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -818,6 +829,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_number_tar".to_string(),
@@ -829,6 +841,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicelessConsonant],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_3sg_sy".to_string(),
@@ -840,6 +853,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_3sg_si".to_string(),
@@ -851,6 +865,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_3sg_y".to_string(),
@@ -866,6 +881,7 @@ mod tests {
                         FinalSoundClass::Nasal,
                     ],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_3sg_i".to_string(),
@@ -881,6 +897,7 @@ mod tests {
                         FinalSoundClass::Nasal,
                     ],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_case_ablative_den".to_string(),
@@ -895,6 +912,7 @@ mod tests {
                         FinalSoundClass::VoicedConsonant,
                     ],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_case_accusative_ny".to_string(),
@@ -906,6 +924,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_case_accusative_dy".to_string(),
@@ -920,6 +939,7 @@ mod tests {
                         FinalSoundClass::Nasal,
                     ],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_case_dative_ge".to_string(),
@@ -935,6 +955,7 @@ mod tests {
                         FinalSoundClass::Nasal,
                     ],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_case_dative_ke".to_string(),
@@ -946,6 +967,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicelessConsonant],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_case_genitive_nin".to_string(),
@@ -957,6 +979,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_case_locative_te".to_string(),
@@ -968,6 +991,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicelessConsonant],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_number_case_accusative_dy".to_string(),
@@ -979,6 +1003,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_number_case_dative_ge".to_string(),
@@ -990,6 +1015,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_number_possessive_3sg_y".to_string(),
@@ -1001,6 +1027,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_number_possessive_3sg_i".to_string(),
@@ -1012,6 +1039,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_case_accusative_n".to_string(),
@@ -1023,6 +1051,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front, VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_case_dative_na".to_string(),
@@ -1034,6 +1063,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_case_dative_ne".to_string(),
@@ -1045,6 +1075,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_case_locative_nda".to_string(),
@@ -1056,6 +1087,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_case_locative_nde".to_string(),
@@ -1067,6 +1099,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_case_ablative_nan".to_string(),
@@ -1078,6 +1111,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_case_ablative_nen".to_string(),
@@ -1089,6 +1123,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_case_genitive_nyn".to_string(),
@@ -1100,6 +1135,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "noun_possessive_case_genitive_nin".to_string(),
@@ -1111,6 +1147,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_accusative_ny".to_string(),
@@ -1122,6 +1159,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_accusative_di".to_string(),
@@ -1133,6 +1171,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_dative_ghan".to_string(),
@@ -1144,6 +1183,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_dative_ge".to_string(),
@@ -1155,6 +1195,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_locative_nda".to_string(),
@@ -1166,6 +1207,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_locative_de".to_string(),
@@ -1177,6 +1219,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_ablative_dan".to_string(),
@@ -1188,6 +1231,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_ablative_den".to_string(),
@@ -1199,6 +1243,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_genitive_nyn".to_string(),
@@ -1210,6 +1255,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "pron_case_genitive_ding".to_string(),
@@ -1221,6 +1267,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: true,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "verb_voice_l".to_string(),
@@ -1235,6 +1282,7 @@ mod tests {
                         FinalSoundClass::VoicedConsonant,
                     ],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "verb_tense_di_from_stem".to_string(),
@@ -1249,6 +1297,7 @@ mod tests {
                         FinalSoundClass::VoicedConsonant,
                     ],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "verb_tense_dy_from_stem".to_string(),
@@ -1263,6 +1312,7 @@ mod tests {
                         FinalSoundClass::VoicedConsonant,
                     ],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "verb_tense_di_from_voice".to_string(),
@@ -1274,6 +1324,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "verb_tense_dy_from_voice".to_string(),
@@ -1285,6 +1336,61 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: false,
+                    allowed_previous_labels: vec![],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_e_from_stem".to_string(),
+                    form: "е".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Stem,
+                    to_state: SegmentationState::Tense,
+                    label: "future".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Front],
+                    allowed_final_sound_classes: vec![
+                        FinalSoundClass::Vowel,
+                        FinalSoundClass::VoicedConsonant,
+                    ],
+                    terminal: false,
+                    allowed_previous_labels: vec![],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_a_from_stem".to_string(),
+                    form: "а".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Stem,
+                    to_state: SegmentationState::Tense,
+                    label: "future".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![
+                        FinalSoundClass::Vowel,
+                        FinalSoundClass::VoicedConsonant,
+                    ],
+                    terminal: false,
+                    allowed_previous_labels: vec![],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_e_from_voice".to_string(),
+                    form: "е".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Voice,
+                    to_state: SegmentationState::Tense,
+                    label: "future".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Front],
+                    allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
+                    terminal: false,
+                    allowed_previous_labels: vec![],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_a_from_voice".to_string(),
+                    form: "а".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Voice,
+                    to_state: SegmentationState::Tense,
+                    label: "future".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
+                    terminal: false,
+                    allowed_previous_labels: vec![],
                 },
                 SegmentationSuffixRule {
                     id: "verb_person_1sg_m".to_string(),
@@ -1296,6 +1402,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front, VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec!["past".to_string()],
                 },
                 SegmentationSuffixRule {
                     id: "verb_person_2sg_ng".to_string(),
@@ -1307,6 +1414,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front, VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec!["past".to_string()],
                 },
                 SegmentationSuffixRule {
                     id: "verb_person_1pl_k".to_string(),
@@ -1318,6 +1426,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec!["past".to_string()],
                 },
                 SegmentationSuffixRule {
                     id: "verb_person_1pl_q".to_string(),
@@ -1329,6 +1438,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec!["past".to_string()],
                 },
                 SegmentationSuffixRule {
                     id: "verb_person_2pl_ndar".to_string(),
@@ -1340,6 +1450,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec!["past".to_string()],
                 },
                 SegmentationSuffixRule {
                     id: "verb_person_2pl_nder".to_string(),
@@ -1351,6 +1462,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec!["past".to_string()],
                 },
                 SegmentationSuffixRule {
                     id: "verb_person_2polite_nyz".to_string(),
@@ -1362,6 +1474,7 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec!["past".to_string()],
                 },
                 SegmentationSuffixRule {
                     id: "verb_person_2polite_niz".to_string(),
@@ -1373,6 +1486,91 @@ mod tests {
                     allowed_harmonies: vec![VowelHarmony::Front],
                     allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
                     terminal: true,
+                    allowed_previous_labels: vec!["past".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_future_person_1sg_min".to_string(),
+                    form: "мін".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_1sg".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Front],
+                    allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
+                    terminal: true,
+                    allowed_previous_labels: vec!["future".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_future_person_1sg_myn".to_string(),
+                    form: "мын".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_1sg".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
+                    terminal: true,
+                    allowed_previous_labels: vec!["future".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_future_person_1pl_miz".to_string(),
+                    form: "міз".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_1pl".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Front],
+                    allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
+                    terminal: true,
+                    allowed_previous_labels: vec!["future".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_future_person_1pl_myz".to_string(),
+                    form: "мыз".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_1pl".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
+                    terminal: true,
+                    allowed_previous_labels: vec!["future".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_future_person_2pl_syngdar".to_string(),
+                    form: "сыңдар".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_2pl".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
+                    terminal: true,
+                    allowed_previous_labels: vec!["future".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_future_person_2polite_siz".to_string(),
+                    form: "сіз".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_2polite".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Front],
+                    allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
+                    terminal: true,
+                    allowed_previous_labels: vec!["future".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_future_person_2polite_syz".to_string(),
+                    form: "сыз".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_2polite".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![FinalSoundClass::Vowel],
+                    terminal: true,
+                    allowed_previous_labels: vec!["future".to_string()],
                 },
             ],
         }
@@ -1404,7 +1602,7 @@ mod tests {
     #[test]
     fn accepts_kazakh_tokenizer_experiment() {
         let experiment = TokenizerExperiment {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1424,7 +1622,7 @@ mod tests {
     #[test]
     fn builds_dry_run_report() {
         let experiment = TokenizerExperiment {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1438,7 +1636,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1467,7 +1665,7 @@ mod tests {
     #[test]
     fn validates_segmentation_dataset_and_builds_report() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1610,22 +1808,52 @@ mod tests {
                         "ңыз".to_string(),
                     ],
                 },
+                TokenizerSegmentationExample {
+                    id: "seg_19".to_string(),
+                    token: "келемін".to_string(),
+                    expected_segments: vec!["кел".to_string(), "е".to_string(), "мін".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_20".to_string(),
+                    token: "келесіз".to_string(),
+                    expected_segments: vec!["кел".to_string(), "е".to_string(), "сіз".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_21".to_string(),
+                    token: "қараламыз".to_string(),
+                    expected_segments: vec![
+                        "қара".to_string(),
+                        "л".to_string(),
+                        "а".to_string(),
+                        "мыз".to_string(),
+                    ],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_22".to_string(),
+                    token: "қараласыңдар".to_string(),
+                    expected_segments: vec![
+                        "қара".to_string(),
+                        "л".to_string(),
+                        "а".to_string(),
+                        "сыңдар".to_string(),
+                    ],
+                },
             ],
         };
 
         let report = build_segmentation_report(&dataset, &test_lexicon(), &test_rules())
             .expect("segmentation report");
-        assert_eq!(report.example_count, 18);
-        assert_eq!(report.average_segment_count, 2);
+        assert_eq!(report.example_count, 22);
+        assert_eq!(report.average_segment_count, 3);
         assert_eq!(report.longest_token_length, "анықтамасының".chars().count());
-        assert_eq!(report.exact_match_count, 18);
+        assert_eq!(report.exact_match_count, 22);
         assert_eq!(report.exact_match_rate_bps, 10_000);
     }
 
     #[test]
     fn rejects_segmentation_dataset_with_mismatched_segments() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1706,6 +1934,32 @@ mod tests {
                 "л".to_string(),
                 "ды".to_string(),
                 "ңыз".to_string()
+            ])
+        );
+        assert_eq!(
+            deterministic_segment_token("келемін", &test_lexicon(), &test_rules()),
+            Some(vec!["кел".to_string(), "е".to_string(), "мін".to_string()])
+        );
+        assert_eq!(
+            deterministic_segment_token("келесіз", &test_lexicon(), &test_rules()),
+            Some(vec!["кел".to_string(), "е".to_string(), "сіз".to_string()])
+        );
+        assert_eq!(
+            deterministic_segment_token("қараламыз", &test_lexicon(), &test_rules()),
+            Some(vec![
+                "қара".to_string(),
+                "л".to_string(),
+                "а".to_string(),
+                "мыз".to_string()
+            ])
+        );
+        assert_eq!(
+            deterministic_segment_token("қараласыңдар", &test_lexicon(), &test_rules()),
+            Some(vec![
+                "қара".to_string(),
+                "л".to_string(),
+                "а".to_string(),
+                "сыңдар".to_string()
             ])
         );
         assert_eq!(
@@ -1946,12 +2200,24 @@ mod tests {
             deterministic_segment_token("қаралдыңіз", &test_lexicon(), &test_rules()),
             None
         );
+        assert_eq!(
+            deterministic_segment_token("келемын", &test_lexicon(), &test_rules()),
+            None
+        );
+        assert_eq!(
+            deterministic_segment_token("қараласіз", &test_lexicon(), &test_rules()),
+            None
+        );
+        assert_eq!(
+            deterministic_segment_token("келдімін", &test_lexicon(), &test_rules()),
+            None
+        );
     }
 
     #[test]
     fn builds_experiment_report_with_segmentation_scoring() {
         let experiment = TokenizerExperiment {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1965,7 +2231,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1976,7 +2242,7 @@ mod tests {
             }],
         };
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.12".to_string(),
+            version: "0.0.13".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2053,6 +2319,36 @@ mod tests {
                     token: "келдіңіз".to_string(),
                     expected_segments: vec!["кел".to_string(), "ді".to_string(), "ңіз".to_string()],
                 },
+                TokenizerSegmentationExample {
+                    id: "seg_11".to_string(),
+                    token: "келемін".to_string(),
+                    expected_segments: vec!["кел".to_string(), "е".to_string(), "мін".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_12".to_string(),
+                    token: "келесіз".to_string(),
+                    expected_segments: vec!["кел".to_string(), "е".to_string(), "сіз".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_13".to_string(),
+                    token: "қараламыз".to_string(),
+                    expected_segments: vec![
+                        "қара".to_string(),
+                        "л".to_string(),
+                        "а".to_string(),
+                        "мыз".to_string(),
+                    ],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_14".to_string(),
+                    token: "қараласыңдар".to_string(),
+                    expected_segments: vec![
+                        "қара".to_string(),
+                        "л".to_string(),
+                        "а".to_string(),
+                        "сыңдар".to_string(),
+                    ],
+                },
             ],
         };
 
@@ -2060,8 +2356,8 @@ mod tests {
             build_experiment_report(&experiment, &pack, &dataset, &test_lexicon(), &test_rules())
                 .expect("experiment report");
         assert_eq!(report.sample_count, 1);
-        assert_eq!(report.segmentation_example_count, 10);
-        assert_eq!(report.exact_match_count, 10);
+        assert_eq!(report.segmentation_example_count, 14);
+        assert_eq!(report.exact_match_count, 14);
         assert!(report.failures.is_empty());
     }
 }
