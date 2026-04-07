@@ -36,6 +36,7 @@ version = "0.0.1"
 dependencies = [
  "adam-core",
  "serde",
+ "serde_json",
  "thiserror",
 ]
 
