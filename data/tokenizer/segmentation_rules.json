@@ -1,5 +1,5 @@
 {
-  "version": "0.0.8",
+  "version": "0.0.9",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -607,6 +607,116 @@
       "label": "genitive",
       "allowed_harmonies": ["front"],
       "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_accusative_ny",
+      "form": "ны",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "accusative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_accusative_di",
+      "form": "ді",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "accusative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_dative_ghan",
+      "form": "ған",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "dative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_dative_ge",
+      "form": "ге",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "dative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_locative_nda",
+      "form": "нда",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "locative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_locative_de",
+      "form": "де",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "locative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_ablative_dan",
+      "form": "дан",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ablative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_ablative_den",
+      "form": "ден",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ablative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_genitive_nyn",
+      "form": "ның",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "genitive",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "pron_case_genitive_ding",
+      "form": "дің",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "genitive",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {

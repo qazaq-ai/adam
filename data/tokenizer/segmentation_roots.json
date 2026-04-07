@@ -1,5 +1,5 @@
 {
-  "version": "0.0.8",
+  "version": "0.0.9",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -52,6 +52,34 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "pron_ol",
+      "root": "ол",
+      "part_of_speech": "pronoun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "pron_o",
+      "root": "о",
+      "part_of_speech": "pronoun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "pron_biz",
+      "root": "біз",
+      "part_of_speech": "pronoun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "pron_siz",
+      "root": "сіз",
+      "part_of_speech": "pronoun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_kel",
