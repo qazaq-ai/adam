@@ -1,5 +1,5 @@
 {
-  "version": "0.0.10",
+  "version": "0.0.11",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -761,7 +761,7 @@
       "label": "past",
       "allowed_harmonies": ["front"],
       "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
-      "terminal": true
+      "terminal": false
     },
     {
       "id": "verb_tense_dy_from_stem",
@@ -772,7 +772,7 @@
       "label": "past",
       "allowed_harmonies": ["back"],
       "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
-      "terminal": true
+      "terminal": false
     },
     {
       "id": "verb_tense_di_from_voice",
@@ -783,7 +783,7 @@
       "label": "past",
       "allowed_harmonies": ["front"],
       "allowed_final_sound_classes": ["voiced_consonant"],
-      "terminal": true
+      "terminal": false
     },
     {
       "id": "verb_tense_dy_from_voice",
@@ -794,6 +794,50 @@
       "label": "past",
       "allowed_harmonies": ["back"],
       "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false
+    },
+    {
+      "id": "verb_person_1sg_m",
+      "form": "м",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1sg",
+      "allowed_harmonies": ["front", "back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "verb_person_2sg_ng",
+      "form": "ң",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2sg",
+      "allowed_harmonies": ["front", "back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "verb_person_1pl_k",
+      "form": "к",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1pl",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "verb_person_1pl_q",
+      "form": "қ",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1pl",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
       "terminal": true
     }
   ]
