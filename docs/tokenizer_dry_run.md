@@ -26,3 +26,8 @@ The dry run produces a small report with:
 The dry run is available through:
 
 - `scripts/run_tokenizer_dry_run.sh`
+
+The full experiment runner now lives separately and combines this dry run with
+segmentation scoring:
+
+- `scripts/run_tokenizer_experiment.sh`

@@ -39,3 +39,9 @@ The report preserves:
 - acceptance decision
 - positive signals
 - negative signals
+
+## Regeneration
+
+The report is generated from the current registry and scoring rules through:
+
+- `scripts/generate_source_acceptance_report.sh`

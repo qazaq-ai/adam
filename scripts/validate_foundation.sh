@@ -4,6 +4,9 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$repo_root"
 
+tmp_acceptance_report="$(mktemp)"
+trap 'rm -f "$tmp_acceptance_report"' EXIT
+
 jq empty data/curated/corpus_manifest.json
 jq empty data/curated/source_acceptance_report.json
 jq empty data/curated/tokenizer_dry_run_pack.json
@@ -19,8 +22,11 @@ cargo test -p adam-corpus --tests -- --nocapture
 cargo test -p adam-tokenizer --tests -- --nocapture
 cargo test -p adam-eval --tests -- --nocapture
 cargo test -p adam-train --tests -- --nocapture
+./scripts/generate_source_acceptance_report.sh "$tmp_acceptance_report"
+cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_tokenizer_dry_run.sh
 ./scripts/run_tokenizer_segmentation_eval.sh
+./scripts/run_tokenizer_experiment.sh
 ./scripts/run_training_baseline_plan.sh
 
 echo "foundation validation passed"

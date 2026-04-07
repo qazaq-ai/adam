@@ -1,10 +1,11 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "adam-tokenizer-baseline",
   "target_language": "kazakh",
   "script": "cyrillic",
   "profile_name": "adam-kazakh-cyrillic",
   "training_manifest": "data/curated/corpus_manifest.json",
   "sample_pack_manifest": "data/curated/tokenizer_dry_run_pack.json",
+  "segmentation_eval_manifest": "data/eval/tokenizer_segmentation_eval_dataset.json",
   "objective": "measure token efficiency on kazakh text"
 }

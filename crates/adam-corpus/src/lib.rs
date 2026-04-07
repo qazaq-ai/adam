@@ -396,6 +396,18 @@ pub fn build_source_acceptance_report(
     Ok(report)
 }
 
+pub fn default_source_acceptance_report_name(registry: &SourceRegistry) -> String {
+    if registry
+        .entries
+        .iter()
+        .any(|entry| entry.allowed_for_training)
+    {
+        "adam-source-acceptance-report".to_string()
+    } else {
+        "adam-source-review-report".to_string()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
@@ -407,7 +419,7 @@ mod tests {
     #[test]
     fn rejects_non_kazakh_manifests() {
         let manifest = CorpusManifest {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "mixed".to_string(),
             language: "mixed".to_string(),
             script: "cyrillic".to_string(),
@@ -422,7 +434,7 @@ mod tests {
     #[test]
     fn rejects_non_cyrillic_manifests() {
         let manifest = CorpusManifest {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "latin".to_string(),
             language: "kazakh".to_string(),
             script: "latin".to_string(),
@@ -437,7 +449,7 @@ mod tests {
     #[test]
     fn rejects_empty_domains() {
         let manifest = CorpusManifest {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "empty".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -452,7 +464,7 @@ mod tests {
     #[test]
     fn rejects_strict_policy_for_raw_stage() {
         let manifest = CorpusManifest {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "raw".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -470,7 +482,7 @@ mod tests {
     #[test]
     fn rejects_empty_source_registry() {
         let registry = SourceRegistry {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             entries: Vec::new(),
         };
 
@@ -480,7 +492,7 @@ mod tests {
     #[test]
     fn accepts_kazakh_cyrillic_source_registry() {
         let registry = SourceRegistry {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             entries: vec![SourceRegistryEntry {
                 id: "source_01".to_string(),
                 stage: CorpusStage::Raw,
@@ -501,7 +513,7 @@ mod tests {
     #[test]
     fn rejects_training_on_raw_sources() {
         let registry = SourceRegistry {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             entries: vec![SourceRegistryEntry {
                 id: "raw_training".to_string(),
                 stage: CorpusStage::Raw,
@@ -522,7 +534,7 @@ mod tests {
     #[test]
     fn scores_reviewed_open_sources_higher_than_seed_raw_sources() {
         let rules = SourceScoringRules {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -572,7 +584,7 @@ mod tests {
     #[test]
     fn builds_acceptance_report_with_expected_records() {
         let registry = SourceRegistry {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "admin_raw_seed".to_string(),
@@ -601,7 +613,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -639,7 +651,7 @@ mod tests {
     #[test]
     fn rejects_mismatched_acceptance_report() {
         let registry = SourceRegistry {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             entries: vec![SourceRegistryEntry {
                 id: "reference_curated_training".to_string(),
                 stage: CorpusStage::Curated,
@@ -654,7 +666,7 @@ mod tests {
             }],
         };
         let rules = SourceScoringRules {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -667,7 +679,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "bad".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -683,6 +695,30 @@ mod tests {
         assert_eq!(
             report.validate(&registry, &rules),
             Err(CorpusError::AcceptanceScoreMismatch)
+        );
+    }
+
+    #[test]
+    fn chooses_training_report_name_when_training_sources_exist() {
+        let registry = SourceRegistry {
+            version: "0.0.3".to_string(),
+            entries: vec![SourceRegistryEntry {
+                id: "curated_reference_kazakh".to_string(),
+                stage: CorpusStage::Curated,
+                language: "kazakh".to_string(),
+                script: "cyrillic".to_string(),
+                source_type: SourceType::ReferenceText,
+                domain: SourceDomain::Reference,
+                license_class: LicenseClass::Open,
+                quality_tier: QualityTier::TrainingReady,
+                provenance: "manual_reference_seed".to_string(),
+                allowed_for_training: true,
+            }],
+        };
+
+        assert_eq!(
+            super::default_source_acceptance_report_name(&registry),
+            "adam-source-acceptance-report"
         );
     }
 }

@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "adam-source-acceptance-report",
   "source_registry_manifest": "data/raw/source_registry.json",
   "scoring_rules_manifest": "data/raw/source_scoring_rules.json",

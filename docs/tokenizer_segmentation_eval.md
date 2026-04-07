@@ -26,3 +26,8 @@ Kazakh morphology.
 The segmentation contract can be checked with:
 
 - `scripts/run_tokenizer_segmentation_eval.sh`
+
+The full tokenizer experiment runner also scores segmentation exact matches and
+reports failure cases:
+
+- `scripts/run_tokenizer_experiment.sh`

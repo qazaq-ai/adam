@@ -2,7 +2,7 @@ use std::fs;
 
 use adam_tokenizer::{
     TokenizerDryRunPack, TokenizerExperiment, TokenizerSegmentationDataset, build_dry_run_report,
-    build_segmentation_report,
+    build_experiment_report, build_segmentation_report,
 };
 
 #[test]
@@ -20,6 +20,10 @@ fn tokenizer_experiment_manifest_stays_kazakh_only_and_valid() {
         .expect("tokenizer experiment contract");
     assert_eq!(experiment.target_language, "kazakh");
     assert_eq!(experiment.script, "cyrillic");
+    assert_eq!(
+        experiment.segmentation_eval_manifest,
+        "data/eval/tokenizer_segmentation_eval_dataset.json"
+    );
 }
 
 #[test]
@@ -76,4 +80,34 @@ fn tokenizer_segmentation_dataset_contract_is_valid() {
     let report = build_segmentation_report(&dataset).expect("segmentation report");
     assert_eq!(report.example_count, dataset.entries.len());
     assert!(report.average_segment_count >= 2);
+}
+
+#[test]
+fn tokenizer_experiment_report_scores_segmentation_matches() {
+    let experiment_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_manifest.json"
+    );
+    let experiment: TokenizerExperiment =
+        serde_json::from_str(&fs::read_to_string(experiment_path).expect("experiment file"))
+            .expect("valid experiment json");
+    let pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tokenizer_dry_run_pack.json"
+    );
+    let pack: TokenizerDryRunPack =
+        serde_json::from_str(&fs::read_to_string(pack_path).expect("dry-run pack file"))
+            .expect("valid dry-run pack json");
+    let dataset_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_segmentation_eval_dataset.json"
+    );
+    let dataset: TokenizerSegmentationDataset =
+        serde_json::from_str(&fs::read_to_string(dataset_path).expect("segmentation dataset file"))
+            .expect("valid segmentation dataset json");
+
+    let report = build_experiment_report(&experiment, &pack, &dataset).expect("experiment report");
+    assert_eq!(report.segmentation_example_count, dataset.entries.len());
+    assert_eq!(report.exact_match_count, dataset.entries.len());
+    assert!(report.failures.is_empty());
 }

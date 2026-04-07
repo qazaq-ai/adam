@@ -156,7 +156,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -179,7 +179,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -196,7 +196,7 @@ mod tests {
             context_window: 1024,
         };
         let registry = SourceRegistry {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -225,7 +225,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -238,7 +238,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -268,13 +268,15 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "adam-tokenizer-baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
             profile_name: "adam-kazakh-cyrillic".to_string(),
             training_manifest: "data/curated/corpus_manifest.json".to_string(),
             sample_pack_manifest: "data/curated/tokenizer_dry_run_pack.json".to_string(),
+            segmentation_eval_manifest: "data/eval/tokenizer_segmentation_eval_dataset.json"
+                .to_string(),
             objective: "measure token efficiency on kazakh text".to_string(),
         };
         let eval_suite = EvalSuite::default();

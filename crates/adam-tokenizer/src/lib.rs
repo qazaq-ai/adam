@@ -24,6 +24,7 @@ pub struct TokenizerExperiment {
     pub profile_name: String,
     pub training_manifest: String,
     pub sample_pack_manifest: String,
+    pub segmentation_eval_manifest: String,
     pub objective: String,
 }
 
@@ -76,6 +77,31 @@ pub struct TokenizerSegmentationReport {
     pub example_count: usize,
     pub average_segment_count: usize,
     pub longest_token_length: usize,
+    pub exact_match_count: usize,
+    pub exact_match_rate_bps: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenizerSegmentationFailure {
+    pub id: String,
+    pub token: String,
+    pub expected_segments: Vec<String>,
+    pub predicted_segments: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenizerExperimentReport {
+    pub experiment_name: String,
+    pub sample_count: usize,
+    pub normalized_nonempty_count: usize,
+    pub total_character_count: usize,
+    pub average_character_count: usize,
+    pub domains: Vec<String>,
+    pub segmentation_dataset_name: String,
+    pub segmentation_example_count: usize,
+    pub exact_match_count: usize,
+    pub exact_match_rate_bps: usize,
+    pub failures: Vec<TokenizerSegmentationFailure>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -101,6 +127,8 @@ pub enum TokenizerError {
     EmptyObjective,
     #[error("sample pack manifest path must not be empty")]
     EmptySamplePackManifest,
+    #[error("segmentation eval manifest path must not be empty")]
+    EmptySegmentationEvalManifest,
     #[error("dry-run sample pack must not be empty")]
     EmptySamplePack,
     #[error("segmentation dataset entries must not be empty")]
@@ -166,6 +194,10 @@ impl TokenizerExperiment {
 
         if self.sample_pack_manifest.trim().is_empty() {
             return Err(TokenizerError::EmptySamplePackManifest);
+        }
+
+        if self.segmentation_eval_manifest.trim().is_empty() {
+            return Err(TokenizerError::EmptySegmentationEvalManifest);
         }
 
         Ok(())
@@ -297,13 +329,139 @@ pub fn build_segmentation_report(
         .map(|entry| entry.token.chars().count())
         .max()
         .unwrap_or(0);
+    let exact_match_count = dataset
+        .entries
+        .iter()
+        .filter(|entry| baseline_segment_token(&entry.token) == entry.expected_segments)
+        .count();
+    let exact_match_rate_bps = exact_match_count * 10_000 / example_count;
 
     Ok(TokenizerSegmentationReport {
         dataset_name: dataset.name.clone(),
         example_count,
         average_segment_count,
         longest_token_length,
+        exact_match_count,
+        exact_match_rate_bps,
     })
+}
+
+pub fn build_experiment_report(
+    experiment: &TokenizerExperiment,
+    pack: &TokenizerDryRunPack,
+    dataset: &TokenizerSegmentationDataset,
+) -> Result<TokenizerExperimentReport, TokenizerError> {
+    let dry_run_report = build_dry_run_report(experiment, pack)?;
+    dataset.validate()?;
+
+    let failures = dataset
+        .entries
+        .iter()
+        .filter_map(|entry| {
+            let predicted_segments = baseline_segment_token(&entry.token);
+            if predicted_segments == entry.expected_segments {
+                None
+            } else {
+                Some(TokenizerSegmentationFailure {
+                    id: entry.id.clone(),
+                    token: entry.token.clone(),
+                    expected_segments: entry.expected_segments.clone(),
+                    predicted_segments,
+                })
+            }
+        })
+        .collect::<Vec<_>>();
+    let exact_match_count = dataset.entries.len() - failures.len();
+    let exact_match_rate_bps = exact_match_count * 10_000 / dataset.entries.len();
+
+    Ok(TokenizerExperimentReport {
+        experiment_name: experiment.name.clone(),
+        sample_count: dry_run_report.sample_count,
+        normalized_nonempty_count: dry_run_report.normalized_nonempty_count,
+        total_character_count: dry_run_report.total_character_count,
+        average_character_count: dry_run_report.average_character_count,
+        domains: dry_run_report.domains,
+        segmentation_dataset_name: dataset.name.clone(),
+        segmentation_example_count: dataset.entries.len(),
+        exact_match_count,
+        exact_match_rate_bps,
+        failures,
+    })
+}
+
+pub fn baseline_segment_token(token: &str) -> Vec<String> {
+    const SUFFIXES: &[&str] = &[
+        "ыңдар",
+        "іңдер",
+        "ңыздар",
+        "ңіздер",
+        "лардың",
+        "лердің",
+        "дардың",
+        "дердің",
+        "тардың",
+        "тердің",
+        "лар",
+        "лер",
+        "дар",
+        "дер",
+        "тар",
+        "тер",
+        "дан",
+        "ден",
+        "тан",
+        "тен",
+        "нан",
+        "нен",
+        "ның",
+        "нің",
+        "дың",
+        "дің",
+        "тың",
+        "тің",
+        "ды",
+        "ді",
+        "ты",
+        "ті",
+        "ны",
+        "ні",
+        "ға",
+        "ге",
+        "қа",
+        "ке",
+        "да",
+        "де",
+        "та",
+        "те",
+        "ла",
+        "ле",
+        "л",
+    ];
+
+    let mut remaining = token.to_string();
+    let mut suffixes = Vec::new();
+
+    loop {
+        let Some(matched) = SUFFIXES.iter().find(|suffix| {
+            remaining.ends_with(**suffix) && remaining.chars().count() > suffix.chars().count()
+        }) else {
+            break;
+        };
+
+        let split_at = remaining.len() - matched.len();
+        let stem = remaining[..split_at].to_string();
+        if stem.is_empty() {
+            break;
+        }
+
+        suffixes.push((*matched).to_string());
+        remaining = stem;
+    }
+
+    suffixes.reverse();
+    let mut segments = vec![remaining];
+    segments.extend(suffixes);
+    segments
 }
 
 fn contains_latin(value: &str) -> bool {
@@ -319,7 +477,8 @@ mod tests {
     use super::{
         TokenizerDryRunPack, TokenizerDryRunSample, TokenizerError, TokenizerExperiment,
         TokenizerProfile, TokenizerSegmentationDataset, TokenizerSegmentationExample,
-        build_dry_run_report, build_segmentation_report, normalize_text,
+        baseline_segment_token, build_dry_run_report, build_experiment_report,
+        build_segmentation_report, normalize_text,
     };
 
     #[test]
@@ -348,13 +507,15 @@ mod tests {
     #[test]
     fn accepts_kazakh_tokenizer_experiment() {
         let experiment = TokenizerExperiment {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "adam-tokenizer-baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
             profile_name: "adam-kazakh-cyrillic".to_string(),
             training_manifest: "data/curated/corpus_manifest.json".to_string(),
             sample_pack_manifest: "data/curated/tokenizer_dry_run_pack.json".to_string(),
+            segmentation_eval_manifest: "data/eval/tokenizer_segmentation_eval_dataset.json"
+                .to_string(),
             objective: "measure token efficiency on kazakh text".to_string(),
         };
 
@@ -364,17 +525,19 @@ mod tests {
     #[test]
     fn builds_dry_run_report() {
         let experiment = TokenizerExperiment {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "adam-tokenizer-baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
             profile_name: "adam-kazakh-cyrillic".to_string(),
             training_manifest: "data/curated/corpus_manifest.json".to_string(),
             sample_pack_manifest: "data/curated/tokenizer_dry_run_pack.json".to_string(),
+            segmentation_eval_manifest: "data/eval/tokenizer_segmentation_eval_dataset.json"
+                .to_string(),
             objective: "measure token efficiency on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -403,7 +566,7 @@ mod tests {
     #[test]
     fn validates_segmentation_dataset_and_builds_report() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -426,12 +589,14 @@ mod tests {
         assert_eq!(report.example_count, 2);
         assert_eq!(report.average_segment_count, 2);
         assert_eq!(report.longest_token_length, "мекемеден".chars().count());
+        assert_eq!(report.exact_match_count, 2);
+        assert_eq!(report.exact_match_rate_bps, 10_000);
     }
 
     #[test]
     fn rejects_segmentation_dataset_with_mismatched_segments() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.2".to_string(),
+            version: "0.0.3".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -447,5 +612,74 @@ mod tests {
             dataset.validate(),
             Err(TokenizerError::SegmentationTokenMismatch)
         );
+    }
+
+    #[test]
+    fn baseline_segmenter_handles_core_kazakh_examples() {
+        assert_eq!(
+            baseline_segment_token("мекемеден"),
+            vec!["мекеме".to_string(), "ден".to_string()]
+        );
+        assert_eq!(
+            baseline_segment_token("келді"),
+            vec!["кел".to_string(), "ді".to_string()]
+        );
+        assert_eq!(
+            baseline_segment_token("қаралды"),
+            vec!["қара".to_string(), "л".to_string(), "ды".to_string()]
+        );
+    }
+
+    #[test]
+    fn builds_experiment_report_with_segmentation_scoring() {
+        let experiment = TokenizerExperiment {
+            version: "0.0.3".to_string(),
+            name: "adam-tokenizer-baseline".to_string(),
+            target_language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            profile_name: "adam-kazakh-cyrillic".to_string(),
+            training_manifest: "data/curated/corpus_manifest.json".to_string(),
+            sample_pack_manifest: "data/curated/tokenizer_dry_run_pack.json".to_string(),
+            segmentation_eval_manifest: "data/eval/tokenizer_segmentation_eval_dataset.json"
+                .to_string(),
+            objective: "measure token efficiency on kazakh text".to_string(),
+        };
+        let pack = TokenizerDryRunPack {
+            version: "0.0.3".to_string(),
+            name: "adam-tokenizer-dry-run".to_string(),
+            target_language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            samples: vec![TokenizerDryRunSample {
+                id: "sample_01".to_string(),
+                text: "Мекемеден құжат алдым.".to_string(),
+                domain: "administrative".to_string(),
+            }],
+        };
+        let dataset = TokenizerSegmentationDataset {
+            version: "0.0.3".to_string(),
+            name: "adam-tokenizer-segmentation".to_string(),
+            target_language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            profile_name: "adam-kazakh-cyrillic".to_string(),
+            entries: vec![
+                TokenizerSegmentationExample {
+                    id: "seg_01".to_string(),
+                    token: "мекемеден".to_string(),
+                    expected_segments: vec!["мекеме".to_string(), "ден".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_02".to_string(),
+                    token: "келді".to_string(),
+                    expected_segments: vec!["кел".to_string(), "ді".to_string()],
+                },
+            ],
+        };
+
+        let report =
+            build_experiment_report(&experiment, &pack, &dataset).expect("experiment report");
+        assert_eq!(report.sample_count, 1);
+        assert_eq!(report.segmentation_example_count, 2);
+        assert_eq!(report.exact_match_count, 2);
+        assert!(report.failures.is_empty());
     }
 }
