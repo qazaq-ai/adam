@@ -1,5 +1,5 @@
 {
-  "version": "0.0.5",
+  "version": "0.0.6",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -11,6 +11,8 @@
       "from_state": "stem",
       "to_state": "number",
       "label": "plural",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
       "terminal": false
     },
     {
@@ -20,6 +22,8 @@
       "from_state": "stem",
       "to_state": "number",
       "label": "plural",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
       "terminal": false
     },
     {
@@ -29,6 +33,8 @@
       "from_state": "stem",
       "to_state": "number",
       "label": "plural",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant", "nasal"],
       "terminal": false
     },
     {
@@ -38,6 +44,8 @@
       "from_state": "stem",
       "to_state": "number",
       "label": "plural",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant", "nasal"],
       "terminal": false
     },
     {
@@ -47,6 +55,8 @@
       "from_state": "stem",
       "to_state": "number",
       "label": "plural",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": false
     },
     {
@@ -56,6 +66,8 @@
       "from_state": "stem",
       "to_state": "number",
       "label": "plural",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": false
     },
     {
@@ -65,6 +77,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "ablative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
       "terminal": true
     },
     {
@@ -74,6 +88,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "ablative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
       "terminal": true
     },
     {
@@ -83,6 +99,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "ablative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -92,6 +110,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "ablative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -101,6 +121,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "ablative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["nasal"],
       "terminal": true
     },
     {
@@ -110,6 +132,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "ablative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["nasal"],
       "terminal": true
     },
     {
@@ -119,6 +143,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "accusative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
       "terminal": true
     },
     {
@@ -128,6 +154,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "accusative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
       "terminal": true
     },
     {
@@ -137,6 +165,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "accusative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant", "nasal"],
       "terminal": true
     },
     {
@@ -146,6 +176,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "accusative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant", "nasal"],
       "terminal": true
     },
     {
@@ -155,6 +187,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "accusative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -164,6 +198,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "accusative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -173,6 +209,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "dative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant", "nasal"],
       "terminal": true
     },
     {
@@ -182,6 +220,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "dative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant", "nasal"],
       "terminal": true
     },
     {
@@ -191,6 +231,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "dative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -200,6 +242,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "dative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -209,6 +253,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "locative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant", "nasal"],
       "terminal": true
     },
     {
@@ -218,6 +264,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "locative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant", "nasal"],
       "terminal": true
     },
     {
@@ -227,6 +275,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "locative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -236,6 +286,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "locative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -245,6 +297,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "genitive",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel", "nasal"],
       "terminal": true
     },
     {
@@ -254,6 +308,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "genitive",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel", "nasal"],
       "terminal": true
     },
     {
@@ -263,6 +319,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "genitive",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -272,6 +330,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "genitive",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -281,6 +341,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "genitive",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -290,6 +352,8 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "genitive",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true
     },
     {
@@ -299,6 +363,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "ablative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -308,6 +374,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "ablative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -317,6 +385,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "accusative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -326,6 +396,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "accusative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -335,6 +407,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "locative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -344,6 +418,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "locative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -353,6 +429,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "genitive",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -362,6 +440,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "genitive",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -371,6 +451,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "dative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -380,6 +462,8 @@
       "from_state": "number",
       "to_state": "case",
       "label": "dative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -389,6 +473,8 @@
       "from_state": "stem",
       "to_state": "voice",
       "label": "voice",
+      "allowed_harmonies": ["front", "back"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
       "terminal": false
     },
     {
@@ -398,6 +484,8 @@
       "from_state": "stem",
       "to_state": "tense",
       "label": "past",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
       "terminal": true
     },
     {
@@ -407,6 +495,8 @@
       "from_state": "stem",
       "to_state": "tense",
       "label": "past",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
       "terminal": true
     },
     {
@@ -416,6 +506,8 @@
       "from_state": "voice",
       "to_state": "tense",
       "label": "past",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     },
     {
@@ -425,6 +517,8 @@
       "from_state": "voice",
       "to_state": "tense",
       "label": "past",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true
     }
   ]

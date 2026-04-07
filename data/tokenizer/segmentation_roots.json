@@ -1,5 +1,5 @@
 {
-  "version": "0.0.5",
+  "version": "0.0.6",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -7,47 +7,65 @@
     {
       "id": "noun_mekeme",
       "root": "мекеме",
-      "part_of_speech": "noun"
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
     },
     {
       "id": "noun_anyqtama",
       "root": "анықтама",
-      "part_of_speech": "noun"
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
     },
     {
       "id": "noun_qujat",
       "root": "құжат",
-      "part_of_speech": "noun"
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
     },
     {
       "id": "noun_otinish",
       "root": "өтініш",
-      "part_of_speech": "noun"
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
     },
     {
       "id": "noun_shagym",
       "root": "шағым",
-      "part_of_speech": "noun"
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
     },
     {
       "id": "noun_martebe",
       "root": "мәртебе",
-      "part_of_speech": "noun"
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
     },
     {
       "id": "noun_qyzmet",
       "root": "қызмет",
-      "part_of_speech": "noun"
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
     },
     {
       "id": "verb_kel",
       "root": "кел",
-      "part_of_speech": "verb"
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_qara",
       "root": "қара",
-      "part_of_speech": "verb"
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
     }
   ]
 }
