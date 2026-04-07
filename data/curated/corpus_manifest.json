@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "name": "adam-foundation-curated",
+  "language": "kazakh",
+  "script": "cyrillic",
+  "stage": "curated",
+  "source_policy": "kazakh_only",
+  "domains": [
+    "general_text",
+    "administrative_text",
+    "reference_text"
+  ]
+}

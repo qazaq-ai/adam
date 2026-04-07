@@ -6,3 +6,9 @@
 
 No large datasets should be committed until curation policy is defined.
 
+The current machine-readable contracts are:
+
+- `raw/source_registry.json`
+- `curated/corpus_manifest.json`
+- `eval/benchmark_manifest.json`
+- `eval/tokenizer_experiment_manifest.json`

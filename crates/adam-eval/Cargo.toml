@@ -9,4 +9,5 @@ adam-core = { path = "../adam-core" }
 adam-corpus = { path = "../adam-corpus" }
 adam-tokenizer = { path = "../adam-tokenizer" }
 serde.workspace = true
-
+serde_json.workspace = true
+thiserror.workspace = true

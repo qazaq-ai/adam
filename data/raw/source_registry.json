@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "entries": [
+    {
+      "id": "seed_public_admin_text",
+      "stage": "raw",
+      "language": "kazakh",
+      "script": "cyrillic",
+      "source_type": "public_text",
+      "provenance": "manual_seed",
+      "allowed_for_training": false
+    }
+  ]
+}

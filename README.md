@@ -19,6 +19,9 @@ Kazakh-first foundation:
 - small-model training path
 - deterministic linguistic validation hooks
 
+The first practical milestone is not a giant model. It is a strict foundation
+that prevents early contamination and weak evaluation habits.
+
 ## Repository Layout
 
 - `crates/adam-core`
@@ -50,3 +53,10 @@ Out of scope for the current foundation phase:
 
 The repo should grow from clean data and hard evaluation, not from broad claims.
 
+## Foundation Policies
+
+- [corpus policy](docs/corpus_policy.md)
+- [curation workflow](docs/curation_workflow.md)
+- [tokenizer policy](docs/tokenizer_policy.md)
+- [tokenizer experiment plan](docs/tokenizer_experiment_plan.md)
+- [evaluation policy](docs/evaluation_policy.md)

@@ -1,0 +1,31 @@
+{
+  "version": "0.0.1",
+  "name": "adam-kazakh-foundation-benchmark",
+  "target_language": "kazakh",
+  "layers": [
+    "corpus_quality",
+    "tokenizer_quality",
+    "model_eval",
+    "linguistic_audit"
+  ],
+  "tasks": [
+    {
+      "target_language": "kazakh",
+      "name": "kazakh-token-efficiency",
+      "kind": "token_efficiency",
+      "source_manifest": "data/eval/benchmark_manifest.json"
+    },
+    {
+      "target_language": "kazakh",
+      "name": "kazakh-morphology-sensitivity",
+      "kind": "morphology_sensitivity",
+      "source_manifest": "data/eval/benchmark_manifest.json"
+    },
+    {
+      "target_language": "kazakh",
+      "name": "kazakh-hallucination-audit",
+      "kind": "hallucination_audit",
+      "source_manifest": "data/eval/benchmark_manifest.json"
+    }
+  ]
+}
