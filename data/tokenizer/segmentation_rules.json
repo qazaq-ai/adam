@@ -1,5 +1,5 @@
 {
-  "version": "0.0.7",
+  "version": "0.0.8",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -518,6 +518,94 @@
       "to_state": "case",
       "label": "accusative",
       "allowed_harmonies": ["front", "back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "noun_possessive_case_dative_na",
+      "form": "на",
+      "part_of_speech": "noun",
+      "from_state": "possessive",
+      "to_state": "case",
+      "label": "dative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "noun_possessive_case_dative_ne",
+      "form": "не",
+      "part_of_speech": "noun",
+      "from_state": "possessive",
+      "to_state": "case",
+      "label": "dative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "noun_possessive_case_locative_nda",
+      "form": "нда",
+      "part_of_speech": "noun",
+      "from_state": "possessive",
+      "to_state": "case",
+      "label": "locative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "noun_possessive_case_locative_nde",
+      "form": "нде",
+      "part_of_speech": "noun",
+      "from_state": "possessive",
+      "to_state": "case",
+      "label": "locative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "noun_possessive_case_ablative_nan",
+      "form": "нан",
+      "part_of_speech": "noun",
+      "from_state": "possessive",
+      "to_state": "case",
+      "label": "ablative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "noun_possessive_case_ablative_nen",
+      "form": "нен",
+      "part_of_speech": "noun",
+      "from_state": "possessive",
+      "to_state": "case",
+      "label": "ablative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "noun_possessive_case_genitive_nyn",
+      "form": "ның",
+      "part_of_speech": "noun",
+      "from_state": "possessive",
+      "to_state": "case",
+      "label": "genitive",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true
+    },
+    {
+      "id": "noun_possessive_case_genitive_nin",
+      "form": "нің",
+      "part_of_speech": "noun",
+      "from_state": "possessive",
+      "to_state": "case",
+      "label": "genitive",
+      "allowed_harmonies": ["front"],
       "allowed_final_sound_classes": ["vowel"],
       "terminal": true
     },
