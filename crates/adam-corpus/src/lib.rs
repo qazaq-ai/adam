@@ -17,12 +17,49 @@ pub enum SourcePolicy {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SourceType {
+    PublicText,
+    ReferenceText,
+    AdministrativeText,
+    EducationalText,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SourceDomain {
+    General,
+    Reference,
+    Administrative,
+    Education,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LicenseClass {
+    Open,
+    ReviewRequired,
+    InternalOnly,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum QualityTier {
+    Seed,
+    Reviewed,
+    TrainingReady,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SourceRegistryEntry {
     pub id: String,
     pub stage: CorpusStage,
     pub language: String,
     pub script: String,
-    pub source_type: String,
+    pub source_type: SourceType,
+    pub domain: SourceDomain,
+    pub license_class: LicenseClass,
+    pub quality_tier: QualityTier,
     pub provenance: String,
     pub allowed_for_training: bool,
 }
@@ -56,6 +93,16 @@ pub enum CorpusError {
     RawCorpusCannotBeStrict,
     #[error("source registry entries must not be empty")]
     EmptySourceRegistry,
+    #[error("source id must not be empty")]
+    EmptySourceId,
+    #[error("source provenance must not be empty")]
+    EmptyProvenance,
+    #[error("raw sources cannot be allowed for training")]
+    RawSourceCannotTrain,
+    #[error("sources requiring license review cannot be allowed for training")]
+    LicenseReviewRequired,
+    #[error("seed-quality sources cannot be allowed for training")]
+    SeedQualityCannotTrain,
 }
 
 impl CorpusManifest {
@@ -94,6 +141,26 @@ impl SourceRegistry {
             if entry.script != "cyrillic" {
                 return Err(CorpusError::NonCyrillicScript);
             }
+
+            if entry.id.trim().is_empty() {
+                return Err(CorpusError::EmptySourceId);
+            }
+
+            if entry.provenance.trim().is_empty() {
+                return Err(CorpusError::EmptyProvenance);
+            }
+
+            if entry.allowed_for_training && entry.stage == CorpusStage::Raw {
+                return Err(CorpusError::RawSourceCannotTrain);
+            }
+
+            if entry.allowed_for_training && entry.license_class == LicenseClass::ReviewRequired {
+                return Err(CorpusError::LicenseReviewRequired);
+            }
+
+            if entry.allowed_for_training && entry.quality_tier == QualityTier::Seed {
+                return Err(CorpusError::SeedQualityCannotTrain);
+            }
         }
 
         Ok(())
@@ -103,7 +170,8 @@ impl SourceRegistry {
 #[cfg(test)]
 mod tests {
     use super::{
-        CorpusError, CorpusManifest, CorpusStage, SourcePolicy, SourceRegistry, SourceRegistryEntry,
+        CorpusError, CorpusManifest, CorpusStage, LicenseClass, QualityTier, SourceDomain,
+        SourcePolicy, SourceRegistry, SourceRegistryEntry, SourceType,
     };
 
     #[test]
@@ -188,12 +256,36 @@ mod tests {
                 stage: CorpusStage::Raw,
                 language: "kazakh".to_string(),
                 script: "cyrillic".to_string(),
-                source_type: "public_text".to_string(),
+                source_type: SourceType::PublicText,
+                domain: SourceDomain::Administrative,
+                license_class: LicenseClass::Open,
+                quality_tier: QualityTier::Reviewed,
                 provenance: "seed".to_string(),
                 allowed_for_training: false,
             }],
         };
 
         assert!(registry.validate().is_ok());
+    }
+
+    #[test]
+    fn rejects_training_on_raw_sources() {
+        let registry = SourceRegistry {
+            version: "0.0.1".to_string(),
+            entries: vec![SourceRegistryEntry {
+                id: "raw_training".to_string(),
+                stage: CorpusStage::Raw,
+                language: "kazakh".to_string(),
+                script: "cyrillic".to_string(),
+                source_type: SourceType::PublicText,
+                domain: SourceDomain::General,
+                license_class: LicenseClass::Open,
+                quality_tier: QualityTier::TrainingReady,
+                provenance: "seed".to_string(),
+                allowed_for_training: true,
+            }],
+        };
+
+        assert_eq!(registry.validate(), Err(CorpusError::RawSourceCannotTrain));
     }
 }

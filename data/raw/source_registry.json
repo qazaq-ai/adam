@@ -6,7 +6,10 @@
       "stage": "raw",
       "language": "kazakh",
       "script": "cyrillic",
-      "source_type": "public_text",
+      "source_type": "administrative_text",
+      "domain": "administrative",
+      "license_class": "review_required",
+      "quality_tier": "seed",
       "provenance": "manual_seed",
       "allowed_for_training": false
     }

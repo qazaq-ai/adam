@@ -18,4 +18,4 @@ Raw data is not training data.
 - provenance is recorded
 - stage is explicit
 - training permission is explicit
-
+- source classification is explicit

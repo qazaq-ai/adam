@@ -1,0 +1,35 @@
+{
+  "version": "0.0.1",
+  "name": "adam-kazakh-foundation-eval",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "entries": [
+    {
+      "id": "eval_01",
+      "split": "dev",
+      "kind": "reading_comprehension",
+      "prompt": "Мәтінді қазақ тілінде қысқаша түсіндір: Анықтама алу үшін өтініш жазылады.",
+      "reference_answer": "Анықтама алу үшін өтініш жазу керек.",
+      "must_answer_in_kazakh": true,
+      "must_avoid_fabrication": true
+    },
+    {
+      "id": "eval_02",
+      "split": "dev",
+      "kind": "morphology_sensitivity",
+      "prompt": "«Мекемеден құжат алдым» сөйлеміндегі іс-әрекетті ғана жаз.",
+      "reference_answer": "алдым",
+      "must_answer_in_kazakh": true,
+      "must_avoid_fabrication": true
+    },
+    {
+      "id": "eval_03",
+      "split": "test",
+      "kind": "hallucination_audit",
+      "prompt": "Егер дерек жетпесе, ойдан қоспай «жеткіліксіз» деп жауап бер.",
+      "reference_answer": "жеткіліксіз",
+      "must_answer_in_kazakh": true,
+      "must_avoid_fabrication": true
+    }
+  ]
+}

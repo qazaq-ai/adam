@@ -27,4 +27,4 @@ No model claim is accepted unless it is backed by:
 - a manifest
 - a repeatable task definition
 - a language-specific result
-
+- a concrete eval dataset contract
