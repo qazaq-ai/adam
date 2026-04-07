@@ -1,12 +1,111 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
   "rules": [
     {
+      "id": "noun_number_lar",
+      "form": "лар",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "number",
+      "label": "plural",
+      "terminal": false
+    },
+    {
+      "id": "noun_number_ler",
+      "form": "лер",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "number",
+      "label": "plural",
+      "terminal": false
+    },
+    {
+      "id": "noun_number_dar",
+      "form": "дар",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "number",
+      "label": "plural",
+      "terminal": false
+    },
+    {
+      "id": "noun_number_der",
+      "form": "дер",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "number",
+      "label": "plural",
+      "terminal": false
+    },
+    {
+      "id": "noun_number_tar",
+      "form": "тар",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "number",
+      "label": "plural",
+      "terminal": false
+    },
+    {
+      "id": "noun_number_ter",
+      "form": "тер",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "number",
+      "label": "plural",
+      "terminal": false
+    },
+    {
       "id": "noun_case_ablative_den",
       "form": "ден",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ablative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_ablative_dan",
+      "form": "дан",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ablative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_ablative_tan",
+      "form": "тан",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ablative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_ablative_ten",
+      "form": "тен",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ablative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_ablative_nan",
+      "form": "нан",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ablative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_ablative_nen",
+      "form": "нен",
       "part_of_speech": "noun",
       "from_state": "stem",
       "to_state": "case",
@@ -20,6 +119,267 @@
       "from_state": "stem",
       "to_state": "case",
       "label": "accusative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_accusative_ni",
+      "form": "ні",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "accusative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_accusative_dy",
+      "form": "ды",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "accusative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_accusative_di",
+      "form": "ді",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "accusative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_accusative_ty",
+      "form": "ты",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "accusative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_accusative_ti",
+      "form": "ті",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "accusative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_dative_ga",
+      "form": "ға",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "dative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_dative_ge",
+      "form": "ге",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "dative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_dative_qa",
+      "form": "қа",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "dative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_dative_ke",
+      "form": "ке",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "dative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_locative_da",
+      "form": "да",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "locative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_locative_de",
+      "form": "де",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "locative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_locative_ta",
+      "form": "та",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "locative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_locative_te",
+      "form": "те",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "locative",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_genitive_nyn",
+      "form": "ның",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "genitive",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_genitive_nin",
+      "form": "нің",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "genitive",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_genitive_dyn",
+      "form": "дың",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "genitive",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_genitive_din",
+      "form": "дің",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "genitive",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_genitive_tyn",
+      "form": "тың",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "genitive",
+      "terminal": true
+    },
+    {
+      "id": "noun_case_genitive_tin",
+      "form": "тің",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "genitive",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_ablative_dan",
+      "form": "дан",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "ablative",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_ablative_den",
+      "form": "ден",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "ablative",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_accusative_dy",
+      "form": "ды",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "accusative",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_accusative_di",
+      "form": "ді",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "accusative",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_locative_da",
+      "form": "да",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "locative",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_locative_de",
+      "form": "де",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "locative",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_genitive_dyn",
+      "form": "дың",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "genitive",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_genitive_din",
+      "form": "дің",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "genitive",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_dative_ga",
+      "form": "ға",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "dative",
+      "terminal": true
+    },
+    {
+      "id": "noun_number_case_dative_ge",
+      "form": "ге",
+      "part_of_speech": "noun",
+      "from_state": "number",
+      "to_state": "case",
+      "label": "dative",
       "terminal": true
     },
     {

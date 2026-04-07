@@ -1,5 +1,5 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -36,6 +36,72 @@
       "expected_segments": [
         "анықтама",
         "ны"
+      ]
+    },
+    {
+      "id": "seg_05",
+      "token": "мекемеге",
+      "expected_segments": [
+        "мекеме",
+        "ге"
+      ]
+    },
+    {
+      "id": "seg_06",
+      "token": "өтінішке",
+      "expected_segments": [
+        "өтініш",
+        "ке"
+      ]
+    },
+    {
+      "id": "seg_07",
+      "token": "шағымды",
+      "expected_segments": [
+        "шағым",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_08",
+      "token": "мәртебенің",
+      "expected_segments": [
+        "мәртебе",
+        "нің"
+      ]
+    },
+    {
+      "id": "seg_09",
+      "token": "қызметте",
+      "expected_segments": [
+        "қызмет",
+        "те"
+      ]
+    },
+    {
+      "id": "seg_10",
+      "token": "құжаттар",
+      "expected_segments": [
+        "құжат",
+        "тар"
+      ]
+    },
+    {
+      "id": "seg_11",
+      "token": "құжаттарды",
+      "expected_segments": [
+        "құжат",
+        "тар",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_12",
+      "token": "мекемелерге",
+      "expected_segments": [
+        "мекеме",
+        "лер",
+        "ге"
       ]
     }
   ]

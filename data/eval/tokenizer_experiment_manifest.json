@@ -1,6 +1,6 @@
 {
-  "version": "0.0.4",
-  "name": "adam-tokenizer-baseline",
+  "version": "0.0.5",
+  "name": "adam-tokenizer-deterministic",
   "target_language": "kazakh",
   "script": "cyrillic",
   "profile_name": "adam-kazakh-cyrillic",
@@ -9,5 +9,5 @@
   "segmentation_eval_manifest": "data/eval/tokenizer_segmentation_eval_dataset.json",
   "segmentation_roots_manifest": "data/tokenizer/segmentation_roots.json",
   "segmentation_rules_manifest": "data/tokenizer/segmentation_rules.json",
-  "objective": "measure token efficiency on kazakh text"
+  "objective": "measure deterministic segmentation quality on kazakh text"
 }
