@@ -1,5 +1,5 @@
 {
-  "version": "0.0.23",
+  "version": "0.0.24",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -943,6 +943,61 @@
         "л",
         "майтын",
         "сыздар"
+      ]
+    },
+    {
+      "id": "seg_105",
+      "token": "келмесем",
+      "expected_segments": [
+        "кел",
+        "месе",
+        "м"
+      ]
+    },
+    {
+      "id": "seg_106",
+      "token": "келмесеңіз",
+      "expected_segments": [
+        "кел",
+        "месе",
+        "ңіз"
+      ]
+    },
+    {
+      "id": "seg_107",
+      "token": "келмесеңдер",
+      "expected_segments": [
+        "кел",
+        "месе",
+        "ңдер"
+      ]
+    },
+    {
+      "id": "seg_108",
+      "token": "келмесек",
+      "expected_segments": [
+        "кел",
+        "месе",
+        "к"
+      ]
+    },
+    {
+      "id": "seg_109",
+      "token": "қарамасам",
+      "expected_segments": [
+        "қара",
+        "маса",
+        "м"
+      ]
+    },
+    {
+      "id": "seg_110",
+      "token": "қаралмасақ",
+      "expected_segments": [
+        "қара",
+        "л",
+        "маса",
+        "қ"
       ]
     }
   ]
