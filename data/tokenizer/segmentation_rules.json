@@ -1,5 +1,5 @@
 {
-  "version": "0.0.28",
+  "version": "0.0.29",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1418,6 +1418,54 @@
       "allowed_harmonies": ["back"],
       "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_sin_from_stem",
+      "form": "сін",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "third_person_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_syn_from_stem",
+      "form": "сын",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "third_person_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_sin_from_voice",
+      "form": "сін",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "third_person_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_syn_from_voice",
+      "form": "сын",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "third_person_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
       "allowed_previous_labels": []
     },
     {
