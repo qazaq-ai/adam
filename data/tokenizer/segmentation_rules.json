@@ -1733,6 +1733,78 @@
       "allowed_previous_labels": []
     },
     {
+      "id": "verb_tense_me_singular_from_stem",
+      "form": "ме",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_ma_singular_from_stem_consonant",
+      "form": "ма",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_me_singular_from_stem_vowel",
+      "form": "ме",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_ma_singular_from_stem_vowel",
+      "form": "ма",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_me_singular_from_voice",
+      "form": "ме",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_ma_singular_from_voice",
+      "form": "ма",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
       "id": "verb_tense_me_from_stem",
       "form": "ме",
       "part_of_speech": "verb",
