@@ -712,7 +712,7 @@ mod tests {
 
     fn test_lexicon() -> SegmentationLexicon {
         SegmentationLexicon {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-kazakh-segmentation-roots".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -821,7 +821,7 @@ mod tests {
 
     fn test_rules() -> SegmentationRuleSet {
         SegmentationRuleSet {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-kazakh-segmentation-rules".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1967,6 +1967,57 @@ mod tests {
                     from_state: SegmentationState::Voice,
                     to_state: SegmentationState::Tense,
                     label: "volitional_imperative".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
+                    terminal: false,
+                    allowed_previous_labels: vec![],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_mey_from_stem_for_negative_volitional".to_string(),
+                    form: "мей".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Stem,
+                    to_state: SegmentationState::Tense,
+                    label: "negative_volitional_imperative".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Front],
+                    allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
+                    terminal: false,
+                    allowed_previous_labels: vec![],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_mai_from_stem_for_negative_volitional".to_string(),
+                    form: "май".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Stem,
+                    to_state: SegmentationState::Tense,
+                    label: "negative_volitional_imperative".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![
+                        FinalSoundClass::Vowel,
+                        FinalSoundClass::VoicedConsonant,
+                    ],
+                    terminal: false,
+                    allowed_previous_labels: vec![],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_mey_from_voice_for_negative_volitional".to_string(),
+                    form: "мей".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Voice,
+                    to_state: SegmentationState::Tense,
+                    label: "negative_volitional_imperative".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Front],
+                    allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
+                    terminal: false,
+                    allowed_previous_labels: vec![],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_tense_mai_from_voice_for_negative_volitional".to_string(),
+                    form: "май".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Voice,
+                    to_state: SegmentationState::Tense,
+                    label: "negative_volitional_imperative".to_string(),
                     allowed_harmonies: vec![VowelHarmony::Back],
                     allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
                     terminal: false,
@@ -3341,6 +3392,54 @@ mod tests {
                     allowed_previous_labels: vec!["volitional_imperative".to_string()],
                 },
                 SegmentationSuffixRule {
+                    id: "verb_negative_volitional_imperative_person_1sg_in".to_string(),
+                    form: "ін".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_1sg".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Front],
+                    allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
+                    terminal: true,
+                    allowed_previous_labels: vec!["negative_volitional_imperative".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_negative_volitional_imperative_person_1sg_yn".to_string(),
+                    form: "ын".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_1sg".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
+                    terminal: true,
+                    allowed_previous_labels: vec!["negative_volitional_imperative".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_negative_volitional_imperative_person_1pl_ik".to_string(),
+                    form: "ік".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_1pl".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Front],
+                    allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
+                    terminal: true,
+                    allowed_previous_labels: vec!["negative_volitional_imperative".to_string()],
+                },
+                SegmentationSuffixRule {
+                    id: "verb_negative_volitional_imperative_person_1pl_yq".to_string(),
+                    form: "ық".to_string(),
+                    part_of_speech: SegmentationPartOfSpeech::Verb,
+                    from_state: SegmentationState::Tense,
+                    to_state: SegmentationState::Person,
+                    label: "person_1pl".to_string(),
+                    allowed_harmonies: vec![VowelHarmony::Back],
+                    allowed_final_sound_classes: vec![FinalSoundClass::VoicedConsonant],
+                    terminal: true,
+                    allowed_previous_labels: vec!["negative_volitional_imperative".to_string()],
+                },
+                SegmentationSuffixRule {
                     id: "verb_negative_aorist_person_1sg_pin".to_string(),
                     form: "пін".to_string(),
                     part_of_speech: SegmentationPartOfSpeech::Verb,
@@ -3790,7 +3889,7 @@ mod tests {
     #[test]
     fn accepts_kazakh_tokenizer_experiment() {
         let experiment = TokenizerExperiment {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3810,7 +3909,7 @@ mod tests {
     #[test]
     fn builds_dry_run_report() {
         let experiment = TokenizerExperiment {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3824,7 +3923,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3853,7 +3952,7 @@ mod tests {
     #[test]
     fn validates_segmentation_dataset_and_builds_report() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4673,25 +4772,64 @@ mod tests {
                     token: "қарайық".to_string(),
                     expected_segments: vec!["қара".to_string(), "й".to_string(), "ық".to_string()],
                 },
+                TokenizerSegmentationExample {
+                    id: "seg_101".to_string(),
+                    token: "келмейін".to_string(),
+                    expected_segments: vec!["кел".to_string(), "мей".to_string(), "ін".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_102".to_string(),
+                    token: "келмейік".to_string(),
+                    expected_segments: vec!["кел".to_string(), "мей".to_string(), "ік".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_103".to_string(),
+                    token: "бармайын".to_string(),
+                    expected_segments: vec!["бар".to_string(), "май".to_string(), "ын".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_104".to_string(),
+                    token: "бармайық".to_string(),
+                    expected_segments: vec!["бар".to_string(), "май".to_string(), "ық".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_105".to_string(),
+                    token: "қарамайын".to_string(),
+                    expected_segments: vec![
+                        "қара".to_string(),
+                        "май".to_string(),
+                        "ын".to_string(),
+                    ],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_106".to_string(),
+                    token: "қаралмайық".to_string(),
+                    expected_segments: vec![
+                        "қара".to_string(),
+                        "л".to_string(),
+                        "май".to_string(),
+                        "ық".to_string(),
+                    ],
+                },
             ],
         };
 
         let report = build_segmentation_report(&dataset, &test_lexicon(), &test_rules())
             .expect("segmentation report");
-        assert_eq!(report.example_count, 100);
+        assert_eq!(report.example_count, 106);
         assert_eq!(report.average_segment_count, 3);
         assert_eq!(
             report.longest_token_length,
             "қаралмайтынсыздар".chars().count()
         );
-        assert_eq!(report.exact_match_count, 100);
+        assert_eq!(report.exact_match_count, 106);
         assert_eq!(report.exact_match_rate_bps, 10_000);
     }
 
     #[test]
     fn rejects_segmentation_dataset_with_mismatched_segments() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5370,6 +5508,39 @@ mod tests {
             Some(vec!["қара".to_string(), "й".to_string(), "ық".to_string()])
         );
         assert_eq!(
+            deterministic_segment_token("келмейін", &test_lexicon(), &test_rules()),
+            Some(vec!["кел".to_string(), "мей".to_string(), "ін".to_string()])
+        );
+        assert_eq!(
+            deterministic_segment_token("келмейік", &test_lexicon(), &test_rules()),
+            Some(vec!["кел".to_string(), "мей".to_string(), "ік".to_string()])
+        );
+        assert_eq!(
+            deterministic_segment_token("бармайын", &test_lexicon(), &test_rules()),
+            Some(vec!["бар".to_string(), "май".to_string(), "ын".to_string()])
+        );
+        assert_eq!(
+            deterministic_segment_token("бармайық", &test_lexicon(), &test_rules()),
+            Some(vec!["бар".to_string(), "май".to_string(), "ық".to_string()])
+        );
+        assert_eq!(
+            deterministic_segment_token("қарамайын", &test_lexicon(), &test_rules()),
+            Some(vec![
+                "қара".to_string(),
+                "май".to_string(),
+                "ын".to_string()
+            ])
+        );
+        assert_eq!(
+            deterministic_segment_token("қаралмайық", &test_lexicon(), &test_rules()),
+            Some(vec![
+                "қара".to_string(),
+                "л".to_string(),
+                "май".to_string(),
+                "ық".to_string()
+            ])
+        );
+        assert_eq!(
             deterministic_segment_token("мекемеге", &test_lexicon(), &test_rules()),
             Some(vec!["мекеме".to_string(), "ге".to_string()])
         );
@@ -5863,12 +6034,36 @@ mod tests {
             deterministic_segment_token("қарайік", &test_lexicon(), &test_rules()),
             None
         );
+        assert_eq!(
+            deterministic_segment_token("келмайын", &test_lexicon(), &test_rules()),
+            None
+        );
+        assert_eq!(
+            deterministic_segment_token("келмейық", &test_lexicon(), &test_rules()),
+            None
+        );
+        assert_eq!(
+            deterministic_segment_token("бармайін", &test_lexicon(), &test_rules()),
+            None
+        );
+        assert_eq!(
+            deterministic_segment_token("бармайік", &test_lexicon(), &test_rules()),
+            None
+        );
+        assert_eq!(
+            deterministic_segment_token("қарамейін", &test_lexicon(), &test_rules()),
+            None
+        );
+        assert_eq!(
+            deterministic_segment_token("қаралмайік", &test_lexicon(), &test_rules()),
+            None
+        );
     }
 
     #[test]
     fn builds_experiment_report_with_segmentation_scoring() {
         let experiment = TokenizerExperiment {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5882,7 +6077,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5893,7 +6088,7 @@ mod tests {
             }],
         };
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.26".to_string(),
+            version: "0.0.27".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -6637,6 +6832,45 @@ mod tests {
                     token: "қарайық".to_string(),
                     expected_segments: vec!["қара".to_string(), "й".to_string(), "ық".to_string()],
                 },
+                TokenizerSegmentationExample {
+                    id: "seg_92".to_string(),
+                    token: "келмейін".to_string(),
+                    expected_segments: vec!["кел".to_string(), "мей".to_string(), "ін".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_93".to_string(),
+                    token: "келмейік".to_string(),
+                    expected_segments: vec!["кел".to_string(), "мей".to_string(), "ік".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_94".to_string(),
+                    token: "бармайын".to_string(),
+                    expected_segments: vec!["бар".to_string(), "май".to_string(), "ын".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_95".to_string(),
+                    token: "бармайық".to_string(),
+                    expected_segments: vec!["бар".to_string(), "май".to_string(), "ық".to_string()],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_96".to_string(),
+                    token: "қарамайын".to_string(),
+                    expected_segments: vec![
+                        "қара".to_string(),
+                        "май".to_string(),
+                        "ын".to_string(),
+                    ],
+                },
+                TokenizerSegmentationExample {
+                    id: "seg_97".to_string(),
+                    token: "қаралмайық".to_string(),
+                    expected_segments: vec![
+                        "қара".to_string(),
+                        "л".to_string(),
+                        "май".to_string(),
+                        "ық".to_string(),
+                    ],
+                },
             ],
         };
 
@@ -6644,8 +6878,8 @@ mod tests {
             build_experiment_report(&experiment, &pack, &dataset, &test_lexicon(), &test_rules())
                 .expect("experiment report");
         assert_eq!(report.sample_count, 1);
-        assert_eq!(report.segmentation_example_count, 91);
-        assert_eq!(report.exact_match_count, 91);
+        assert_eq!(report.segmentation_example_count, 97);
+        assert_eq!(report.exact_match_count, 97);
         assert!(report.failures.is_empty());
     }
 }
