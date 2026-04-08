@@ -1,5 +1,5 @@
 {
-  "version": "0.0.17",
+  "version": "0.0.18",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1121,6 +1121,54 @@
       "allowed_previous_labels": []
     },
     {
+      "id": "verb_tense_mek_from_stem",
+      "form": "мек",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "intentional_future",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_maq_from_stem",
+      "form": "мақ",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "intentional_future",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_mek_from_voice",
+      "form": "мек",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "intentional_future",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_maq_from_voice",
+      "form": "мақ",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "intentional_future",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
       "id": "verb_person_1sg_m",
       "form": "м",
       "part_of_speech": "verb",
@@ -1791,6 +1839,150 @@
       "allowed_final_sound_classes": ["voiced_consonant"],
       "terminal": true,
       "allowed_previous_labels": ["aorist"]
+    },
+    {
+      "id": "verb_intentional_future_person_1sg_pin",
+      "form": "пін",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1sg",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_1sg_pyn",
+      "form": "пын",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1sg",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_1pl_piz",
+      "form": "піз",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1pl",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_1pl_pyz",
+      "form": "пыз",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1pl",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_2sg_sing",
+      "form": "сің",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2sg",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_2sg_syng",
+      "form": "сың",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2sg",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_2pl_singder",
+      "form": "сіңдер",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2pl",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_2pl_syngdar",
+      "form": "сыңдар",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2pl",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_2polite_siz",
+      "form": "сіз",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_2polite_syz",
+      "form": "сыз",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_2polite_plural_sizder",
+      "form": "сіздер",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite_plural",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_intentional_future_person_2polite_plural_syzdar",
+      "form": "сыздар",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite_plural",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": ["intentional_future"]
     }
   ]
 }
