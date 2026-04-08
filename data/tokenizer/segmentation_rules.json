@@ -1,5 +1,5 @@
 {
-  "version": "0.0.18",
+  "version": "0.0.19",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1169,6 +1169,66 @@
       "allowed_previous_labels": []
     },
     {
+      "id": "verb_tense_se_from_stem",
+      "form": "се",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "conditional",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_sa_from_stem_vowel",
+      "form": "са",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "conditional",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_sa_from_stem_consonant",
+      "form": "са",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "conditional",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_se_from_voice",
+      "form": "се",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "conditional",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_sa_from_voice",
+      "form": "са",
+      "part_of_speech": "verb",
+      "from_state": "voice",
+      "to_state": "tense",
+      "label": "conditional",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
       "id": "verb_person_1sg_m",
       "form": "м",
       "part_of_speech": "verb",
@@ -1983,6 +2043,102 @@
       "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true,
       "allowed_previous_labels": ["intentional_future"]
+    },
+    {
+      "id": "verb_conditional_person_1sg_m",
+      "form": "м",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1sg",
+      "allowed_harmonies": ["front", "back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["conditional"]
+    },
+    {
+      "id": "verb_conditional_person_2sg_ng",
+      "form": "ң",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2sg",
+      "allowed_harmonies": ["front", "back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["conditional"]
+    },
+    {
+      "id": "verb_conditional_person_1pl_k",
+      "form": "к",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1pl",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["conditional"]
+    },
+    {
+      "id": "verb_conditional_person_1pl_q",
+      "form": "қ",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_1pl",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["conditional"]
+    },
+    {
+      "id": "verb_conditional_person_2pl_nder",
+      "form": "ңдер",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2pl",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["conditional"]
+    },
+    {
+      "id": "verb_conditional_person_2pl_ndar",
+      "form": "ңдар",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2pl",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["conditional"]
+    },
+    {
+      "id": "verb_conditional_person_2polite_niz",
+      "form": "ңіз",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["conditional"]
+    },
+    {
+      "id": "verb_conditional_person_2polite_nyz",
+      "form": "ңыз",
+      "part_of_speech": "verb",
+      "from_state": "tense",
+      "to_state": "person",
+      "label": "person_2polite",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": ["conditional"]
     }
   ]
 }
