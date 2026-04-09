@@ -3,7 +3,8 @@
 ## Purpose
 
 Before any real training run, the repository should be able to assemble a
-deterministic baseline plan from validated manifests.
+deterministic baseline plan and a reproducible train/validation dry-run from
+validated manifests.
 
 ## Manifest
 
@@ -19,6 +20,7 @@ It binds together:
 - source acceptance report
 - tokenizer experiment manifest
 - evaluation suite manifest
+- validation split policy
 
 ## Runner
 
@@ -26,16 +28,30 @@ The baseline plan is built through:
 
 - `scripts/run_training_baseline_plan.sh`
 
+The deterministic assembly dry-run is built through:
+
+- `scripts/run_training_baseline_assembly.sh`
+
 ## Output
 
-The current runner does not train a model yet.
+The current runners do not train a model yet.
 
-It produces a reproducible planning report with:
+The planning report captures:
 
 - accepted source count
 - rejected source count
+- corpus name
 - tokenizer experiment name
 - evaluation task count
 - max steps
 - batch token budget
 - context window
+- validation split basis points
+
+The assembly report captures:
+
+- total token budget and full-sequence accounting
+- train and validation sequence budgets
+- train and validation token budgets
+- deterministic per-source allocations weighted by accepted source scores
+- leftover token remainder when the global budget is not divisible by the context window

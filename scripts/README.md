@@ -27,3 +27,5 @@ Current starter utility:
   runs the tokenizer experiment report with deterministic segmentation scoring
 - `run_training_baseline_plan.sh`
   builds the baseline training plan from current manifests
+- `run_training_baseline_assembly.sh`
+  builds the deterministic train/validation assembly report from current manifests

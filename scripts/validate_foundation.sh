@@ -30,5 +30,6 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_tokenizer_segmentation_eval.sh
 ./scripts/run_tokenizer_experiment.sh
 ./scripts/run_training_baseline_plan.sh
+./scripts/run_training_baseline_assembly.sh
 
 echo "foundation validation passed"

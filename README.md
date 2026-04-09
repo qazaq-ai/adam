@@ -18,6 +18,7 @@ Kazakh-first foundation:
 - evaluation harness
 - small-model training path
 - deterministic linguistic validation hooks
+- deterministic train/validation assembly before any real training
 
 The first practical milestone is not a giant model. It is a strict foundation
 that prevents early contamination and weak evaluation habits.

@@ -1,5 +1,5 @@
 {
-  "version": "0.0.39",
+  "version": "0.0.40",
   "run_name": "adam-baseline-plan",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -12,5 +12,6 @@
   "objective": "plan the first kazakh-only baseline training run",
   "max_steps": 128,
   "batch_token_budget": 8192,
-  "context_window": 1024
+  "context_window": 1024,
+  "validation_split_bps": 1000
 }

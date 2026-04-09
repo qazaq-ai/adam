@@ -3,12 +3,12 @@ use std::{env, fs, process::ExitCode};
 use adam_corpus::{CorpusManifest, SourceAcceptanceReport, SourceRegistry, SourceScoringRules};
 use adam_eval::EvalSuite;
 use adam_tokenizer::TokenizerExperiment;
-use adam_train::{BaselineTrainingManifest, build_baseline_training_plan};
+use adam_train::{BaselineTrainingManifest, build_baseline_training_assembly_report};
 
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
     let Some(manifest_path) = args.next() else {
-        eprintln!("usage: plan <training-manifest>");
+        eprintln!("usage: assemble <training-manifest>");
         return ExitCode::FAILURE;
     };
 
@@ -63,7 +63,7 @@ fn main() -> ExitCode {
         }
     };
 
-    match build_baseline_training_plan(
+    match build_baseline_training_assembly_report(
         &manifest,
         &corpus,
         &registry,
@@ -72,15 +72,15 @@ fn main() -> ExitCode {
         &tokenizer_experiment,
         &eval_suite,
     ) {
-        Ok(plan) => {
+        Ok(report) => {
             println!(
                 "{}",
-                serde_json::to_string_pretty(&plan).expect("plan serializes")
+                serde_json::to_string_pretty(&report).expect("assembly report serializes")
             );
             ExitCode::SUCCESS
         }
         Err(error) => {
-            eprintln!("failed to build baseline training plan: {error}");
+            eprintln!("failed to build baseline training assembly: {error}");
             ExitCode::FAILURE
         }
     }
