@@ -110,6 +110,13 @@ fn tokenizer_segmentation_dataset_contract_is_valid() {
     assert_eq!(report.example_count, dataset.entries.len());
     assert!(report.average_segment_count >= 2);
     assert_eq!(report.exact_match_count, dataset.entries.len());
+    assert!(!report.category_breakdown.is_empty());
+    assert!(
+        report
+            .category_breakdown
+            .iter()
+            .any(|entry| entry.category == "verb_negative_plural_imperative")
+    );
 }
 
 #[test]
@@ -154,5 +161,6 @@ fn tokenizer_experiment_report_scores_segmentation_matches() {
         .expect("experiment report");
     assert_eq!(report.segmentation_example_count, dataset.entries.len());
     assert_eq!(report.exact_match_count, dataset.entries.len());
+    assert!(!report.category_breakdown.is_empty());
     assert!(report.failures.is_empty());
 }

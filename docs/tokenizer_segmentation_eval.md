@@ -33,6 +33,13 @@ The segmentation contract can be checked with:
 - `scripts/run_tokenizer_segmentation_eval.sh`
 
 The full tokenizer experiment runner also scores segmentation exact matches and
-reports failure cases:
+reports failure cases and category-level morphology breakdowns:
 
 - `scripts/run_tokenizer_experiment.sh`
+
+## Reporting
+
+Segmentation reports must not stop at a single aggregate score.
+
+- every run should expose exact-match rates by morphology category
+- imperative, negation, tense, and voice chains must be inspectable separately
