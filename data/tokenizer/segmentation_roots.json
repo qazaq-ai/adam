@@ -1,5 +1,5 @@
 {
-  "version": "0.0.33",
+  "version": "0.0.37",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -94,6 +94,34 @@
       "part_of_speech": "verb",
       "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_ket",
+      "root": "кет",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_zhap",
+      "root": "жап",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_min",
+      "root": "мін",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_qon",
+      "root": "қон",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
     },
     {
       "id": "verb_qara",

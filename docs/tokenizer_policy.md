@@ -25,3 +25,9 @@ Tokenizer work must be judged by:
 - morphology-aware segmentation behavior
 - stability on common agglutinative forms
 
+## Deterministic Allomorphy
+
+Agglutinative alternations must be encoded explicitly from root-final sound class.
+
+- suffix choice must follow declared harmony and final-sound constraints
+- imperative and negation variants must not be inferred statistically from tail similarity

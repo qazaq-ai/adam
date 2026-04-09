@@ -1,5 +1,5 @@
 {
-  "version": "0.0.36",
+  "version": "0.0.37",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1442,6 +1442,134 @@
       "expected_segments": [
         "бар",
         "маңыздар"
+      ]
+    },
+    {
+      "id": "seg_163",
+      "token": "кетсін",
+      "expected_segments": [
+        "кет",
+        "сін"
+      ]
+    },
+    {
+      "id": "seg_164",
+      "token": "жапсын",
+      "expected_segments": [
+        "жап",
+        "сын"
+      ]
+    },
+    {
+      "id": "seg_165",
+      "token": "кетіңіз",
+      "expected_segments": [
+        "кет",
+        "іңіз"
+      ]
+    },
+    {
+      "id": "seg_166",
+      "token": "жапыңыз",
+      "expected_segments": [
+        "жап",
+        "ыңыз"
+      ]
+    },
+    {
+      "id": "seg_167",
+      "token": "кетіңдер",
+      "expected_segments": [
+        "кет",
+        "іңдер"
+      ]
+    },
+    {
+      "id": "seg_168",
+      "token": "жапыңдар",
+      "expected_segments": [
+        "жап",
+        "ыңдар"
+      ]
+    },
+    {
+      "id": "seg_169",
+      "token": "кетпе",
+      "expected_segments": [
+        "кет",
+        "пе"
+      ]
+    },
+    {
+      "id": "seg_170",
+      "token": "жаппа",
+      "expected_segments": [
+        "жап",
+        "па"
+      ]
+    },
+    {
+      "id": "seg_171",
+      "token": "мінбе",
+      "expected_segments": [
+        "мін",
+        "бе"
+      ]
+    },
+    {
+      "id": "seg_172",
+      "token": "қонба",
+      "expected_segments": [
+        "қон",
+        "ба"
+      ]
+    },
+    {
+      "id": "seg_173",
+      "token": "кетпеңдер",
+      "expected_segments": [
+        "кет",
+        "пеңдер"
+      ]
+    },
+    {
+      "id": "seg_174",
+      "token": "жаппаңдар",
+      "expected_segments": [
+        "жап",
+        "паңдар"
+      ]
+    },
+    {
+      "id": "seg_175",
+      "token": "мінбеңіз",
+      "expected_segments": [
+        "мін",
+        "беңіз"
+      ]
+    },
+    {
+      "id": "seg_176",
+      "token": "қонбаңыздар",
+      "expected_segments": [
+        "қон",
+        "баңыздар"
+      ]
+    },
+    {
+      "id": "seg_177",
+      "token": "кетпесін",
+      "expected_segments": [
+        "кет",
+        "песін"
+      ]
+    },
+    {
+      "id": "seg_178",
+      "token": "жаппасын",
+      "expected_segments": [
+        "жап",
+        "пасын"
       ]
     }
   ]

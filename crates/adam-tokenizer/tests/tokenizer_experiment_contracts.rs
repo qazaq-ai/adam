@@ -103,6 +103,8 @@ fn tokenizer_segmentation_dataset_contract_is_valid() {
 
     lexicon.validate().expect("segmentation roots contract");
     rules.validate().expect("segmentation rules contract");
+    assert_eq!(lexicon.version, dataset.version);
+    assert_eq!(rules.version, dataset.version);
     let report =
         build_segmentation_report(&dataset, &lexicon, &rules).expect("segmentation report");
     assert_eq!(report.example_count, dataset.entries.len());

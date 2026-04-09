@@ -1,5 +1,5 @@
 {
-  "version": "0.0.33",
+  "version": "0.0.37",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1428,7 +1428,7 @@
       "to_state": "tense",
       "label": "third_person_imperative",
       "allowed_harmonies": ["front"],
-      "allowed_final_sound_classes": ["voiced_consonant"],
+      "allowed_final_sound_classes": ["voiced_consonant", "voiceless_consonant", "nasal"],
       "terminal": true,
       "allowed_previous_labels": []
     },
@@ -1440,7 +1440,7 @@
       "to_state": "tense",
       "label": "third_person_imperative",
       "allowed_harmonies": ["back"],
-      "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
+      "allowed_final_sound_classes": ["vowel", "voiced_consonant", "voiceless_consonant", "nasal"],
       "terminal": true,
       "allowed_previous_labels": []
     },
@@ -1493,6 +1493,54 @@
       "allowed_previous_labels": []
     },
     {
+      "id": "verb_tense_besin_from_stem",
+      "form": "бесін",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_third_person_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_basyn_from_stem",
+      "form": "басын",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_third_person_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_pesin_from_stem",
+      "form": "песін",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_third_person_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_pasyn_from_stem",
+      "form": "пасын",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_third_person_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
       "id": "verb_tense_mesin_from_voice",
       "form": "месін",
       "part_of_speech": "verb",
@@ -1524,7 +1572,7 @@
       "to_state": "tense",
       "label": "polite_imperative",
       "allowed_harmonies": ["front"],
-      "allowed_final_sound_classes": ["voiced_consonant"],
+      "allowed_final_sound_classes": ["voiced_consonant", "voiceless_consonant", "nasal"],
       "terminal": true,
       "allowed_previous_labels": []
     },
@@ -1536,7 +1584,7 @@
       "to_state": "tense",
       "label": "polite_imperative",
       "allowed_harmonies": ["back"],
-      "allowed_final_sound_classes": ["voiced_consonant"],
+      "allowed_final_sound_classes": ["voiced_consonant", "voiceless_consonant", "nasal"],
       "terminal": true,
       "allowed_previous_labels": []
     },
@@ -1596,7 +1644,7 @@
       "to_state": "tense",
       "label": "polite_plural_imperative",
       "allowed_harmonies": ["front"],
-      "allowed_final_sound_classes": ["voiced_consonant"],
+      "allowed_final_sound_classes": ["voiced_consonant", "voiceless_consonant", "nasal"],
       "terminal": true,
       "allowed_previous_labels": []
     },
@@ -1608,7 +1656,7 @@
       "to_state": "tense",
       "label": "polite_plural_imperative",
       "allowed_harmonies": ["back"],
-      "allowed_final_sound_classes": ["voiced_consonant"],
+      "allowed_final_sound_classes": ["voiced_consonant", "voiceless_consonant", "nasal"],
       "terminal": true,
       "allowed_previous_labels": []
     },
@@ -1668,7 +1716,7 @@
       "to_state": "tense",
       "label": "plural_imperative",
       "allowed_harmonies": ["front"],
-      "allowed_final_sound_classes": ["voiced_consonant"],
+      "allowed_final_sound_classes": ["voiced_consonant", "voiceless_consonant", "nasal"],
       "terminal": true,
       "allowed_previous_labels": []
     },
@@ -1680,7 +1728,7 @@
       "to_state": "tense",
       "label": "plural_imperative",
       "allowed_harmonies": ["back"],
-      "allowed_final_sound_classes": ["voiced_consonant"],
+      "allowed_final_sound_classes": ["voiced_consonant", "voiceless_consonant", "nasal"],
       "terminal": true,
       "allowed_previous_labels": []
     },
@@ -1781,6 +1829,54 @@
       "allowed_previous_labels": []
     },
     {
+      "id": "verb_tense_be_singular_from_stem",
+      "form": "бе",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_ba_singular_from_stem",
+      "form": "ба",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_pe_singular_from_stem",
+      "form": "пе",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_pa_singular_from_stem",
+      "form": "па",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_singular_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
       "id": "verb_tense_me_singular_from_voice",
       "form": "ме",
       "part_of_speech": "verb",
@@ -1849,6 +1945,54 @@
       "label": "negative_polite_imperative",
       "allowed_harmonies": ["back"],
       "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_beniz_from_stem",
+      "form": "беңіз",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_polite_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_banyz_from_stem",
+      "form": "баңыз",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_polite_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_peniz_from_stem",
+      "form": "пеңіз",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_polite_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_panyz_from_stem",
+      "form": "паңыз",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_polite_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true,
       "allowed_previous_labels": []
     },
@@ -1925,6 +2069,54 @@
       "allowed_previous_labels": []
     },
     {
+      "id": "verb_tense_bender_from_stem",
+      "form": "беңдер",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_plural_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_bandar_from_stem",
+      "form": "баңдар",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_plural_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_pender_from_stem",
+      "form": "пеңдер",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_plural_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_pandar_from_stem",
+      "form": "паңдар",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_plural_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
       "id": "verb_tense_mender_from_voice",
       "form": "меңдер",
       "part_of_speech": "verb",
@@ -1993,6 +2185,54 @@
       "label": "negative_polite_plural_imperative",
       "allowed_harmonies": ["back"],
       "allowed_final_sound_classes": ["vowel"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_benizder_from_stem",
+      "form": "беңіздер",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_polite_plural_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_banyzdar_from_stem",
+      "form": "баңыздар",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_polite_plural_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["nasal"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_penizder_from_stem",
+      "form": "пеңіздер",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_polite_plural_imperative",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_panyzdar_from_stem",
+      "form": "паңыздар",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "negative_polite_plural_imperative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": true,
       "allowed_previous_labels": []
     },

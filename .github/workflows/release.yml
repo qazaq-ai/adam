@@ -14,7 +14,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify release version matches tag
+        run: bash ./scripts/verify_release_version.sh "${GITHUB_REF_NAME#v}"
+
+      - name: Validate foundation
+        run: bash ./scripts/validate_foundation.sh
+
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
+          name: ${{ github.ref_name }}

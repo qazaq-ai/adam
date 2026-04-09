@@ -55,6 +55,14 @@ Out of scope for the current foundation phase:
 
 The repo should grow from clean data and hard evaluation, not from broad claims.
 
+## Release Flow
+
+Versioning and releases are deterministic.
+
+- bump and validate a new foundation version with `bash ./scripts/bump_foundation_version.sh x.y.z`
+- cut and publish a release with `bash ./scripts/cut_release.sh x.y.z`
+- pushing tag `vX.Y.Z` triggers GitHub Release creation only after version verification and full foundation validation pass
+
 ## Foundation Policies
 
 - [corpus policy](docs/corpus_policy.md)

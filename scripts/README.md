@@ -11,6 +11,12 @@ Current starter utility:
 
 - `validate_foundation.sh`
   validates manifests, formatting, and foundation contract tests
+- `verify_release_version.sh`
+  checks that workspace, manifests, and lockfile versions match a target release
+- `bump_foundation_version.sh`
+  updates the foundation version, verifies it, and runs full validation
+- `cut_release.sh`
+  performs a clean release cut: bump, validate, commit, push, tag, and trigger GitHub Release
 - `run_tokenizer_dry_run.sh`
   runs the tokenizer dry-run report from machine-readable manifests
 - `generate_source_acceptance_report.sh`
