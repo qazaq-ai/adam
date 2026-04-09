@@ -43,3 +43,4 @@ Segmentation reports must not stop at a single aggregate score.
 
 - every run should expose exact-match rates by morphology category
 - imperative, negation, tense, and voice chains must be inspectable separately
+- critical deterministic zones must expose guard buckets for `imperative`, `negation`, `voice`, and their intersections

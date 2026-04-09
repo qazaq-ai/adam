@@ -111,11 +111,30 @@ fn tokenizer_segmentation_dataset_contract_is_valid() {
     assert!(report.average_segment_count >= 2);
     assert_eq!(report.exact_match_count, dataset.entries.len());
     assert!(!report.category_breakdown.is_empty());
+    assert!(!report.critical_breakdown.is_empty());
     assert!(
         report
             .category_breakdown
             .iter()
             .any(|entry| entry.category == "verb_negative_plural_imperative")
+    );
+    assert!(
+        report
+            .critical_breakdown
+            .iter()
+            .any(|entry| entry.guard == "imperative_chain")
+    );
+    assert!(
+        report
+            .critical_breakdown
+            .iter()
+            .any(|entry| entry.guard == "negation_chain")
+    );
+    assert!(
+        report
+            .critical_breakdown
+            .iter()
+            .any(|entry| entry.guard == "voice_chain")
     );
 }
 
@@ -162,5 +181,6 @@ fn tokenizer_experiment_report_scores_segmentation_matches() {
     assert_eq!(report.segmentation_example_count, dataset.entries.len());
     assert_eq!(report.exact_match_count, dataset.entries.len());
     assert!(!report.category_breakdown.is_empty());
+    assert!(!report.critical_breakdown.is_empty());
     assert!(report.failures.is_empty());
 }

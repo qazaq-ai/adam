@@ -162,6 +162,14 @@ pub struct TokenizerSegmentationCategoryReport {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenizerSegmentationGuardReport {
+    pub guard: String,
+    pub example_count: usize,
+    pub exact_match_count: usize,
+    pub exact_match_rate_bps: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TokenizerSegmentationReport {
     pub dataset_name: String,
     pub example_count: usize,
@@ -170,6 +178,7 @@ pub struct TokenizerSegmentationReport {
     pub exact_match_count: usize,
     pub exact_match_rate_bps: usize,
     pub category_breakdown: Vec<TokenizerSegmentationCategoryReport>,
+    pub critical_breakdown: Vec<TokenizerSegmentationGuardReport>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -177,6 +186,7 @@ pub struct TokenizerSegmentationFailure {
     pub id: String,
     pub token: String,
     pub category: String,
+    pub critical_guards: Vec<String>,
     pub expected_segments: Vec<String>,
     pub predicted_segments: Vec<String>,
 }
@@ -194,6 +204,7 @@ pub struct TokenizerExperimentReport {
     pub exact_match_count: usize,
     pub exact_match_rate_bps: usize,
     pub category_breakdown: Vec<TokenizerSegmentationCategoryReport>,
+    pub critical_breakdown: Vec<TokenizerSegmentationGuardReport>,
     pub failures: Vec<TokenizerSegmentationFailure>,
 }
 
@@ -532,6 +543,7 @@ pub fn build_segmentation_report(
         .unwrap_or(0);
     let mut exact_match_count = 0;
     let mut category_stats = BTreeMap::<String, CategoryStats>::new();
+    let mut guard_stats = BTreeMap::<String, CategoryStats>::new();
 
     for entry in &dataset.entries {
         let predicted_parse = deterministic_segment_parse(&entry.token, lexicon, rules);
@@ -547,10 +559,21 @@ pub fn build_segmentation_report(
             .as_ref()
             .map(segmentation_category)
             .unwrap_or_else(|| "unclassified".to_string());
+        let guards = expected_parse
+            .as_ref()
+            .map(segmentation_guards)
+            .unwrap_or_default();
         let stats = category_stats.entry(category).or_default();
         stats.example_count += 1;
         if exact_match {
             stats.exact_match_count += 1;
+        }
+        for guard in guards {
+            let stats = guard_stats.entry(guard).or_default();
+            stats.example_count += 1;
+            if exact_match {
+                stats.exact_match_count += 1;
+            }
         }
     }
 
@@ -564,6 +587,7 @@ pub fn build_segmentation_report(
         exact_match_count,
         exact_match_rate_bps,
         category_breakdown: build_category_breakdown(&category_stats),
+        critical_breakdown: build_guard_breakdown(&guard_stats),
     })
 }
 
@@ -580,6 +604,7 @@ pub fn build_experiment_report(
     rules.validate()?;
 
     let mut category_stats = BTreeMap::<String, CategoryStats>::new();
+    let mut guard_stats = BTreeMap::<String, CategoryStats>::new();
     let failures = dataset
         .entries
         .iter()
@@ -592,12 +617,23 @@ pub fn build_experiment_report(
                 .as_ref()
                 .map(segmentation_category)
                 .unwrap_or_else(|| "unclassified".to_string());
+            let guards = expected_parse
+                .as_ref()
+                .map(segmentation_guards)
+                .unwrap_or_default();
             let exact_match = predicted_segments.as_ref() == Some(&entry.expected_segments);
 
             let stats = category_stats.entry(category.clone()).or_default();
             stats.example_count += 1;
             if exact_match {
                 stats.exact_match_count += 1;
+            }
+            for guard in &guards {
+                let stats = guard_stats.entry(guard.clone()).or_default();
+                stats.example_count += 1;
+                if exact_match {
+                    stats.exact_match_count += 1;
+                }
             }
 
             if exact_match {
@@ -607,6 +643,7 @@ pub fn build_experiment_report(
                     id: entry.id.clone(),
                     token: entry.token.clone(),
                     category,
+                    critical_guards: guards,
                     expected_segments: entry.expected_segments.clone(),
                     predicted_segments: predicted_segments.unwrap_or_default(),
                 })
@@ -628,6 +665,7 @@ pub fn build_experiment_report(
         exact_match_count,
         exact_match_rate_bps,
         category_breakdown: build_category_breakdown(&category_stats),
+        critical_breakdown: build_guard_breakdown(&guard_stats),
         failures,
     })
 }
@@ -907,6 +945,44 @@ fn segmentation_category(parse: &DeterministicSegmentationParse) -> String {
     }
 }
 
+fn segmentation_guards(parse: &DeterministicSegmentationParse) -> Vec<String> {
+    let has_voice = parse.labels.iter().any(|label| label == "voice");
+    let has_negative = parse
+        .labels
+        .iter()
+        .any(|label| label.starts_with("negative_"));
+    let has_imperative = parse
+        .labels
+        .iter()
+        .any(|label| label.contains("imperative"));
+
+    let mut guards = Vec::new();
+
+    if has_imperative {
+        guards.push("imperative_chain".to_string());
+    }
+    if has_negative {
+        guards.push("negation_chain".to_string());
+    }
+    if has_voice {
+        guards.push("voice_chain".to_string());
+    }
+    if has_imperative && has_negative {
+        guards.push("imperative_negation_chain".to_string());
+    }
+    if has_imperative && has_voice {
+        guards.push("imperative_voice_chain".to_string());
+    }
+    if has_negative && has_voice {
+        guards.push("negation_voice_chain".to_string());
+    }
+    if has_imperative && has_negative && has_voice {
+        guards.push("imperative_negation_voice_chain".to_string());
+    }
+
+    guards
+}
+
 fn build_category_breakdown(
     category_stats: &BTreeMap<String, CategoryStats>,
 ) -> Vec<TokenizerSegmentationCategoryReport> {
@@ -914,6 +990,20 @@ fn build_category_breakdown(
         .iter()
         .map(|(category, stats)| TokenizerSegmentationCategoryReport {
             category: category.clone(),
+            example_count: stats.example_count,
+            exact_match_count: stats.exact_match_count,
+            exact_match_rate_bps: stats.exact_match_count * 10_000 / stats.example_count,
+        })
+        .collect()
+}
+
+fn build_guard_breakdown(
+    guard_stats: &BTreeMap<String, CategoryStats>,
+) -> Vec<TokenizerSegmentationGuardReport> {
+    guard_stats
+        .iter()
+        .map(|(guard, stats)| TokenizerSegmentationGuardReport {
+            guard: guard.clone(),
             example_count: stats.example_count,
             exact_match_count: stats.exact_match_count,
             exact_match_rate_bps: stats.exact_match_count * 10_000 / stats.example_count,
@@ -969,7 +1059,7 @@ mod tests {
 
     fn test_lexicon() -> SegmentationLexicon {
         SegmentationLexicon {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-kazakh-segmentation-roots".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1106,7 +1196,7 @@ mod tests {
 
     fn test_rules() -> SegmentationRuleSet {
         SegmentationRuleSet {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-kazakh-segmentation-rules".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5080,7 +5170,7 @@ mod tests {
     #[test]
     fn accepts_kazakh_tokenizer_experiment() {
         let experiment = TokenizerExperiment {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5100,7 +5190,7 @@ mod tests {
     #[test]
     fn builds_dry_run_report() {
         let experiment = TokenizerExperiment {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5114,7 +5204,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5143,7 +5233,7 @@ mod tests {
     #[test]
     fn validates_segmentation_dataset_and_builds_report() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -6281,7 +6371,7 @@ mod tests {
     #[test]
     fn rejects_segmentation_dataset_with_mismatched_segments() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -7942,7 +8032,7 @@ mod tests {
     #[test]
     fn builds_experiment_report_with_segmentation_scoring() {
         let experiment = TokenizerExperiment {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -7956,7 +8046,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -7967,7 +8057,7 @@ mod tests {
             }],
         };
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.38".to_string(),
+            version: "0.0.39".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
