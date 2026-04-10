@@ -128,6 +128,48 @@ pub struct BaselineTrainingConsistencyCheck {
     pub passed: bool,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BaselineTrainingDeltaReport {
+    pub run_name: String,
+    pub assembly_matches_expected: bool,
+    pub consistency_matches_expected: bool,
+    pub field_drifts: Vec<BaselineTrainingFieldDrift>,
+    pub category_drifts: Vec<BaselineTrainingNamedCountDrift>,
+    pub guard_drifts: Vec<BaselineTrainingNamedCountDrift>,
+    pub source_allocation_drifts: Vec<BaselineTrainingSourceAllocationDrift>,
+    pub consistency_check_drifts: Vec<BaselineTrainingNamedBoolDrift>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BaselineTrainingFieldDrift {
+    pub field: String,
+    pub expected: String,
+    pub actual: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BaselineTrainingNamedCountDrift {
+    pub scope: String,
+    pub key: String,
+    pub expected: Option<u64>,
+    pub actual: Option<u64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BaselineTrainingNamedBoolDrift {
+    pub scope: String,
+    pub key: String,
+    pub expected: Option<bool>,
+    pub actual: Option<bool>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BaselineTrainingSourceAllocationDrift {
+    pub source_id: String,
+    pub expected_total_sequence_count: Option<u64>,
+    pub actual_total_sequence_count: Option<u64>,
+}
+
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum TrainingError {
     #[error("training language must be kazakh")]
@@ -441,6 +483,102 @@ pub fn build_baseline_training_consistency_report(
     })
 }
 
+pub fn build_baseline_training_delta_report(
+    manifest: &BaselineTrainingManifest,
+    corpus: &CorpusManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    report: &SourceAcceptanceReport,
+    tokenizer_experiment: &TokenizerExperiment,
+    eval_suite: &EvalSuite,
+    expected_assembly: &BaselineTrainingAssemblyReport,
+    expected_consistency: &BaselineTrainingConsistencyReport,
+) -> Result<BaselineTrainingDeltaReport, TrainingError> {
+    let actual_assembly = build_baseline_training_assembly_report(
+        manifest,
+        corpus,
+        registry,
+        rules,
+        report,
+        tokenizer_experiment,
+        eval_suite,
+    )?;
+    let actual_consistency = build_baseline_training_consistency_report(
+        manifest,
+        corpus,
+        registry,
+        rules,
+        report,
+        tokenizer_experiment,
+        eval_suite,
+    )?;
+
+    Ok(BaselineTrainingDeltaReport {
+        run_name: manifest.run_name.clone(),
+        assembly_matches_expected: expected_assembly == &actual_assembly,
+        consistency_matches_expected: expected_consistency == &actual_consistency,
+        field_drifts: build_field_drifts(
+            expected_assembly,
+            &actual_assembly,
+            expected_consistency,
+            &actual_consistency,
+        ),
+        category_drifts: build_named_count_drifts(
+            "category",
+            expected_assembly
+                .category_breakdown
+                .iter()
+                .map(|entry| {
+                    (
+                        entry.category.as_str(),
+                        entry.train_sequence_count + entry.validation_sequence_count,
+                    )
+                })
+                .collect(),
+            actual_assembly
+                .category_breakdown
+                .iter()
+                .map(|entry| {
+                    (
+                        entry.category.as_str(),
+                        entry.train_sequence_count + entry.validation_sequence_count,
+                    )
+                })
+                .collect(),
+        ),
+        guard_drifts: build_named_count_drifts(
+            "guard",
+            expected_assembly
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.guard.as_str(), entry.total_sequence_count))
+                .collect(),
+            actual_assembly
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.guard.as_str(), entry.total_sequence_count))
+                .collect(),
+        ),
+        source_allocation_drifts: build_source_allocation_drifts(
+            &expected_assembly.source_allocations,
+            &actual_assembly.source_allocations,
+        ),
+        consistency_check_drifts: build_named_bool_drifts(
+            "consistency_check",
+            expected_consistency
+                .consistency_checks
+                .iter()
+                .map(|entry| (entry.check.as_str(), entry.passed))
+                .collect(),
+            actual_consistency
+                .consistency_checks
+                .iter()
+                .map(|entry| (entry.check.as_str(), entry.passed))
+                .collect(),
+        ),
+    })
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct AcceptedTrainingSource<'a> {
     entry: &'a SourceRegistryEntry,
@@ -682,6 +820,192 @@ fn build_guard_breakdown(
         .collect()
 }
 
+fn build_field_drifts(
+    expected_assembly: &BaselineTrainingAssemblyReport,
+    actual_assembly: &BaselineTrainingAssemblyReport,
+    expected_consistency: &BaselineTrainingConsistencyReport,
+    actual_consistency: &BaselineTrainingConsistencyReport,
+) -> Vec<BaselineTrainingFieldDrift> {
+    let mut drifts = Vec::new();
+    push_field_drift(
+        &mut drifts,
+        "accepted_source_count",
+        expected_assembly.accepted_source_count,
+        actual_assembly.accepted_source_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "rejected_source_count",
+        expected_assembly.rejected_source_count,
+        actual_assembly.rejected_source_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "total_token_budget",
+        expected_assembly.total_token_budget,
+        actual_assembly.total_token_budget,
+    );
+    push_field_drift(
+        &mut drifts,
+        "total_sequence_count",
+        expected_assembly.total_sequence_count,
+        actual_assembly.total_sequence_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "train_sequence_count",
+        expected_assembly.train_sequence_count,
+        actual_assembly.train_sequence_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "validation_sequence_count",
+        expected_assembly.validation_sequence_count,
+        actual_assembly.validation_sequence_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "assembly_category_count",
+        expected_consistency.assembly_category_count,
+        actual_consistency.assembly_category_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "assembly_guard_count",
+        expected_consistency.assembly_guard_count,
+        actual_consistency.assembly_guard_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "source_allocation_count",
+        expected_consistency.source_allocation_count,
+        actual_consistency.source_allocation_count,
+    );
+    drifts
+}
+
+fn push_field_drift<T: ToString + PartialEq>(
+    drifts: &mut Vec<BaselineTrainingFieldDrift>,
+    field: &str,
+    expected: T,
+    actual: T,
+) {
+    if expected != actual {
+        drifts.push(BaselineTrainingFieldDrift {
+            field: field.to_string(),
+            expected: expected.to_string(),
+            actual: actual.to_string(),
+        });
+    }
+}
+
+fn build_named_count_drifts(
+    scope: &str,
+    expected: Vec<(&str, u64)>,
+    actual: Vec<(&str, u64)>,
+) -> Vec<BaselineTrainingNamedCountDrift> {
+    let mut expected_map = expected.into_iter().collect::<BTreeMap<_, _>>();
+    let mut actual_map = actual.into_iter().collect::<BTreeMap<_, _>>();
+    let mut keys = expected_map
+        .keys()
+        .chain(actual_map.keys())
+        .copied()
+        .collect::<Vec<_>>();
+    keys.sort_unstable();
+    keys.dedup();
+
+    let mut drifts = Vec::new();
+    for key in keys {
+        let expected_value = expected_map.remove(key);
+        let actual_value = actual_map.remove(key);
+        if expected_value != actual_value {
+            drifts.push(BaselineTrainingNamedCountDrift {
+                scope: scope.to_string(),
+                key: key.to_string(),
+                expected: expected_value,
+                actual: actual_value,
+            });
+        }
+    }
+    drifts
+}
+
+fn build_named_bool_drifts(
+    scope: &str,
+    expected: Vec<(&str, bool)>,
+    actual: Vec<(&str, bool)>,
+) -> Vec<BaselineTrainingNamedBoolDrift> {
+    let mut expected_map = expected.into_iter().collect::<BTreeMap<_, _>>();
+    let mut actual_map = actual.into_iter().collect::<BTreeMap<_, _>>();
+    let mut keys = expected_map
+        .keys()
+        .chain(actual_map.keys())
+        .copied()
+        .collect::<Vec<_>>();
+    keys.sort_unstable();
+    keys.dedup();
+
+    let mut drifts = Vec::new();
+    for key in keys {
+        let expected_value = expected_map.remove(key);
+        let actual_value = actual_map.remove(key);
+        if expected_value != actual_value {
+            drifts.push(BaselineTrainingNamedBoolDrift {
+                scope: scope.to_string(),
+                key: key.to_string(),
+                expected: expected_value,
+                actual: actual_value,
+            });
+        }
+    }
+    drifts
+}
+
+fn build_source_allocation_drifts(
+    expected: &[BaselineTrainingSourceAllocation],
+    actual: &[BaselineTrainingSourceAllocation],
+) -> Vec<BaselineTrainingSourceAllocationDrift> {
+    let mut expected_map = expected
+        .iter()
+        .map(|entry| {
+            (
+                entry.source_id.as_str(),
+                entry.train_sequence_count + entry.validation_sequence_count,
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    let mut actual_map = actual
+        .iter()
+        .map(|entry| {
+            (
+                entry.source_id.as_str(),
+                entry.train_sequence_count + entry.validation_sequence_count,
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    let mut keys = expected_map
+        .keys()
+        .chain(actual_map.keys())
+        .copied()
+        .collect::<Vec<_>>();
+    keys.sort_unstable();
+    keys.dedup();
+
+    let mut drifts = Vec::new();
+    for key in keys {
+        let expected_value = expected_map.remove(key);
+        let actual_value = actual_map.remove(key);
+        if expected_value != actual_value {
+            drifts.push(BaselineTrainingSourceAllocationDrift {
+                source_id: key.to_string(),
+                expected_total_sequence_count: expected_value,
+                actual_total_sequence_count: actual_value,
+            });
+        }
+    }
+    drifts
+}
+
 fn assembly_categories(allocation: &BaselineTrainingSourceAllocation) -> Vec<String> {
     vec![
         format!("domain_{}", source_domain_slug(&allocation.domain)),
@@ -759,7 +1083,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -783,7 +1107,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -801,7 +1125,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -814,7 +1138,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -843,7 +1167,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -856,7 +1180,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -886,7 +1210,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -922,7 +1246,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -940,7 +1264,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -953,7 +1277,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -982,7 +1306,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -995,7 +1319,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -1025,7 +1349,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1095,7 +1419,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1113,7 +1437,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1127,7 +1451,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -1168,7 +1492,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -1189,7 +1513,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.46".to_string(),
+            version: "0.0.47".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

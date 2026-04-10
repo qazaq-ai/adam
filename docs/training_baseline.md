@@ -36,6 +36,10 @@ The deterministic consistency report is built through:
 
 - `scripts/run_training_baseline_consistency.sh`
 
+The deterministic delta report is built through:
+
+- `scripts/run_training_baseline_delta.sh`
+
 ## Output
 
 The current runners do not train a model yet.
@@ -67,3 +71,4 @@ regression artifact:
 
 - `data/training/baseline_training_assembly_report.json`
 - `data/training/baseline_training_consistency_report.json`
+- `data/training/baseline_training_delta_report.json`

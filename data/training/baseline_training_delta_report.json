@@ -1,0 +1,10 @@
+{
+  "run_name": "adam-baseline-plan",
+  "assembly_matches_expected": true,
+  "consistency_matches_expected": true,
+  "field_drifts": [],
+  "category_drifts": [],
+  "guard_drifts": [],
+  "source_allocation_drifts": [],
+  "consistency_check_drifts": []
+}
