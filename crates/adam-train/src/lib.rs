@@ -100,6 +100,34 @@ pub struct BaselineTrainingAssemblyGuardReport {
     pub total_sequence_count: u64,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BaselineTrainingConsistencyReport {
+    pub run_name: String,
+    pub corpus_name: String,
+    pub tokenizer_experiment_name: String,
+    pub accepted_source_count: usize,
+    pub rejected_source_count: usize,
+    pub eval_task_count: usize,
+    pub max_steps: u32,
+    pub batch_token_budget: u32,
+    pub context_window: u32,
+    pub validation_split_bps: u16,
+    pub total_token_budget: u64,
+    pub total_sequence_count: u64,
+    pub train_sequence_count: u64,
+    pub validation_sequence_count: u64,
+    pub assembly_category_count: usize,
+    pub assembly_guard_count: usize,
+    pub source_allocation_count: usize,
+    pub consistency_checks: Vec<BaselineTrainingConsistencyCheck>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BaselineTrainingConsistencyCheck {
+    pub check: String,
+    pub passed: bool,
+}
+
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum TrainingError {
     #[error("training language must be kazakh")]
@@ -297,6 +325,119 @@ pub fn build_baseline_training_assembly_report(
         category_breakdown,
         critical_breakdown,
         source_allocations,
+    })
+}
+
+pub fn build_baseline_training_consistency_report(
+    manifest: &BaselineTrainingManifest,
+    corpus: &CorpusManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    report: &SourceAcceptanceReport,
+    tokenizer_experiment: &TokenizerExperiment,
+    eval_suite: &EvalSuite,
+) -> Result<BaselineTrainingConsistencyReport, TrainingError> {
+    let plan = build_baseline_training_plan(
+        manifest,
+        corpus,
+        registry,
+        rules,
+        report,
+        tokenizer_experiment,
+        eval_suite,
+    )?;
+    let assembly = build_baseline_training_assembly_report(
+        manifest,
+        corpus,
+        registry,
+        rules,
+        report,
+        tokenizer_experiment,
+        eval_suite,
+    )?;
+
+    let consistency_checks = vec![
+        BaselineTrainingConsistencyCheck {
+            check: "run_name_matches".to_string(),
+            passed: plan.run_name == assembly.run_name,
+        },
+        BaselineTrainingConsistencyCheck {
+            check: "corpus_name_matches".to_string(),
+            passed: plan.corpus_name == assembly.corpus_name,
+        },
+        BaselineTrainingConsistencyCheck {
+            check: "tokenizer_experiment_name_matches".to_string(),
+            passed: plan.tokenizer_experiment_name == assembly.tokenizer_experiment_name,
+        },
+        BaselineTrainingConsistencyCheck {
+            check: "accepted_source_count_matches".to_string(),
+            passed: plan.accepted_source_count == assembly.accepted_source_count,
+        },
+        BaselineTrainingConsistencyCheck {
+            check: "rejected_source_count_matches".to_string(),
+            passed: plan.rejected_source_count == assembly.rejected_source_count,
+        },
+        BaselineTrainingConsistencyCheck {
+            check: "eval_task_count_matches".to_string(),
+            passed: plan.eval_task_count == assembly.eval_task_count,
+        },
+        BaselineTrainingConsistencyCheck {
+            check: "training_budget_matches".to_string(),
+            passed: plan.max_steps == assembly.max_steps
+                && plan.batch_token_budget == assembly.batch_token_budget
+                && plan.context_window == assembly.context_window
+                && plan.validation_split_bps == assembly.validation_split_bps,
+        },
+        BaselineTrainingConsistencyCheck {
+            check: "token_budget_matches_sequences".to_string(),
+            passed: assembly.total_token_budget
+                == assembly.max_steps as u64 * assembly.batch_token_budget as u64
+                && assembly.total_sequence_count
+                    == assembly.total_token_budget / assembly.context_window as u64,
+        },
+        BaselineTrainingConsistencyCheck {
+            check: "assigned_budget_matches_split_totals".to_string(),
+            passed: assembly.assigned_token_budget
+                == assembly.train_token_budget + assembly.validation_token_budget
+                && assembly.total_sequence_count
+                    == assembly.train_sequence_count + assembly.validation_sequence_count,
+        },
+        BaselineTrainingConsistencyCheck {
+            check: "source_allocations_match_global_totals".to_string(),
+            passed: assembly
+                .source_allocations
+                .iter()
+                .map(|entry| entry.train_sequence_count)
+                .sum::<u64>()
+                == assembly.train_sequence_count
+                && assembly
+                    .source_allocations
+                    .iter()
+                    .map(|entry| entry.validation_sequence_count)
+                    .sum::<u64>()
+                    == assembly.validation_sequence_count,
+        },
+    ];
+
+    Ok(BaselineTrainingConsistencyReport {
+        run_name: plan.run_name,
+        corpus_name: plan.corpus_name,
+        tokenizer_experiment_name: plan.tokenizer_experiment_name,
+        accepted_source_count: plan.accepted_source_count,
+        rejected_source_count: plan.rejected_source_count,
+        eval_task_count: plan.eval_task_count,
+        max_steps: plan.max_steps,
+        batch_token_budget: plan.batch_token_budget,
+        context_window: plan.context_window,
+        validation_split_bps: plan.validation_split_bps,
+        total_token_budget: assembly.total_token_budget,
+        total_sequence_count: assembly.total_sequence_count,
+        train_sequence_count: assembly.train_sequence_count,
+        validation_sequence_count: assembly.validation_sequence_count,
+        assembly_category_count: assembly.category_breakdown.len(),
+        assembly_guard_count: assembly.critical_breakdown.len(),
+        source_allocation_count: assembly.source_allocations.len(),
+        consistency_checks,
     })
 }
 
@@ -618,7 +759,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -642,7 +783,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -660,7 +801,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -673,7 +814,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -702,7 +843,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -715,7 +856,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -745,7 +886,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -781,7 +922,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -799,7 +940,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -812,7 +953,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -841,7 +982,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -854,7 +995,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -884,7 +1025,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -954,7 +1095,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -972,7 +1113,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -986,7 +1127,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -1027,7 +1168,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -1048,7 +1189,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.44".to_string(),
+            version: "0.0.45".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
