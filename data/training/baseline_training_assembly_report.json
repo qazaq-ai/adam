@@ -1,0 +1,183 @@
+{
+  "run_name": "adam-baseline-plan",
+  "corpus_name": "adam-foundation-curated",
+  "accepted_source_count": 3,
+  "rejected_source_count": 1,
+  "tokenizer_experiment_name": "adam-tokenizer-deterministic",
+  "eval_task_count": 4,
+  "max_steps": 128,
+  "batch_token_budget": 8192,
+  "context_window": 1024,
+  "total_token_budget": 1048576,
+  "assigned_token_budget": 1048576,
+  "remainder_token_budget": 0,
+  "total_sequence_count": 1024,
+  "train_token_budget": 944128,
+  "validation_token_budget": 104448,
+  "train_sequence_count": 922,
+  "validation_sequence_count": 102,
+  "validation_split_bps": 1000,
+  "category_breakdown": [
+    {
+      "category": "domain_education",
+      "source_count": 1,
+      "allocation_weight": 5,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 28,
+      "train_token_budget": 262144,
+      "validation_token_budget": 28672
+    },
+    {
+      "category": "domain_general",
+      "source_count": 1,
+      "allocation_weight": 5,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 29,
+      "train_token_budget": 262144,
+      "validation_token_budget": 29696
+    },
+    {
+      "category": "domain_reference",
+      "source_count": 1,
+      "allocation_weight": 8,
+      "train_sequence_count": 410,
+      "validation_sequence_count": 45,
+      "train_token_budget": 419840,
+      "validation_token_budget": 46080
+    },
+    {
+      "category": "source_type_educational_text",
+      "source_count": 1,
+      "allocation_weight": 5,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 28,
+      "train_token_budget": 262144,
+      "validation_token_budget": 28672
+    },
+    {
+      "category": "source_type_public_text",
+      "source_count": 1,
+      "allocation_weight": 5,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 29,
+      "train_token_budget": 262144,
+      "validation_token_budget": 29696
+    },
+    {
+      "category": "source_type_reference_text",
+      "source_count": 1,
+      "allocation_weight": 8,
+      "train_sequence_count": 410,
+      "validation_sequence_count": 45,
+      "train_token_budget": 419840,
+      "validation_token_budget": 46080
+    }
+  ],
+  "critical_breakdown": [
+    {
+      "guard": "education_domain_allocation",
+      "source_count": 1,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 28,
+      "total_sequence_count": 284
+    },
+    {
+      "guard": "educational_text_source_type_allocation",
+      "source_count": 1,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 28,
+      "total_sequence_count": 284
+    },
+    {
+      "guard": "full_split_coverage",
+      "source_count": 3,
+      "train_sequence_count": 922,
+      "validation_sequence_count": 102,
+      "total_sequence_count": 1024
+    },
+    {
+      "guard": "general_domain_allocation",
+      "source_count": 1,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 29,
+      "total_sequence_count": 285
+    },
+    {
+      "guard": "multi_source_distribution",
+      "source_count": 3,
+      "train_sequence_count": 922,
+      "validation_sequence_count": 102,
+      "total_sequence_count": 1024
+    },
+    {
+      "guard": "public_text_source_type_allocation",
+      "source_count": 1,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 29,
+      "total_sequence_count": 285
+    },
+    {
+      "guard": "reference_domain_allocation",
+      "source_count": 1,
+      "train_sequence_count": 410,
+      "validation_sequence_count": 45,
+      "total_sequence_count": 455
+    },
+    {
+      "guard": "reference_text_source_type_allocation",
+      "source_count": 1,
+      "train_sequence_count": 410,
+      "validation_sequence_count": 45,
+      "total_sequence_count": 455
+    },
+    {
+      "guard": "train_coverage",
+      "source_count": 3,
+      "train_sequence_count": 922,
+      "validation_sequence_count": 102,
+      "total_sequence_count": 1024
+    },
+    {
+      "guard": "validation_coverage",
+      "source_count": 3,
+      "train_sequence_count": 922,
+      "validation_sequence_count": 102,
+      "total_sequence_count": 1024
+    }
+  ],
+  "source_allocations": [
+    {
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "source_type": "public_text",
+      "score": 5,
+      "allocation_weight": 5,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 29,
+      "train_token_budget": 262144,
+      "validation_token_budget": 29696
+    },
+    {
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "source_type": "reference_text",
+      "score": 8,
+      "allocation_weight": 8,
+      "train_sequence_count": 410,
+      "validation_sequence_count": 45,
+      "train_token_budget": 419840,
+      "validation_token_budget": 46080
+    },
+    {
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "source_type": "educational_text",
+      "score": 5,
+      "allocation_weight": 5,
+      "train_sequence_count": 256,
+      "validation_sequence_count": 28,
+      "train_token_budget": 262144,
+      "validation_token_budget": 28672
+    }
+  ]
+}

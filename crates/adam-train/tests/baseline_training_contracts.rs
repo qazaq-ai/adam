@@ -8,7 +8,8 @@ use adam_corpus::{
 use adam_eval::EvalSuite;
 use adam_tokenizer::TokenizerExperiment;
 use adam_train::{
-    BaselineTrainingManifest, build_baseline_training_assembly_report, build_baseline_training_plan,
+    BaselineTrainingAssemblyReport, BaselineTrainingManifest,
+    build_baseline_training_assembly_report, build_baseline_training_plan,
 };
 
 #[test]
@@ -186,6 +187,79 @@ fn baseline_training_assembly_can_be_built_from_manifests() {
             .any(|entry| entry.guard == "multi_source_distribution")
     );
     assert_eq!(report.source_allocations.len(), 3);
+}
+
+#[test]
+fn baseline_training_assembly_report_matches_expected_regression_artifact() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_manifest.json"
+    );
+    let manifest: BaselineTrainingManifest =
+        serde_json::from_str(&fs::read_to_string(manifest_path).expect("training manifest file"))
+            .expect("valid training manifest json");
+    let corpus_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/corpus_manifest.json"
+    );
+    let corpus: CorpusManifest =
+        serde_json::from_str(&fs::read_to_string(corpus_path).expect("corpus manifest file"))
+            .expect("valid corpus manifest json");
+    let registry_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_registry.json"
+    );
+    let registry: SourceRegistry =
+        serde_json::from_str(&fs::read_to_string(registry_path).expect("source registry file"))
+            .expect("valid source registry json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_scoring_rules.json"
+    );
+    let rules: SourceScoringRules =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("source scoring rules file"))
+            .expect("valid source scoring rules json");
+    let report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/source_acceptance_report.json"
+    );
+    let report: SourceAcceptanceReport =
+        serde_json::from_str(&fs::read_to_string(report_path).expect("acceptance report file"))
+            .expect("valid source acceptance report json");
+    let experiment_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_manifest.json"
+    );
+    let experiment: TokenizerExperiment =
+        serde_json::from_str(&fs::read_to_string(experiment_path).expect("experiment file"))
+            .expect("valid tokenizer experiment json");
+    let eval_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/benchmark_manifest.json"
+    );
+    let eval_suite: EvalSuite =
+        serde_json::from_str(&fs::read_to_string(eval_path).expect("eval suite file"))
+            .expect("valid eval suite json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_assembly_report.json"
+    );
+    let expected: BaselineTrainingAssemblyReport =
+        serde_json::from_str(&fs::read_to_string(expected_path).expect("expected assembly report"))
+            .expect("valid expected assembly report json");
+
+    let actual = build_baseline_training_assembly_report(
+        &manifest,
+        &corpus,
+        &registry,
+        &rules,
+        &report,
+        &experiment,
+        &eval_suite,
+    )
+    .expect("baseline training assembly");
+
+    assert_eq!(actual, expected);
 }
 
 #[test]

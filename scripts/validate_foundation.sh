@@ -19,6 +19,7 @@ jq empty data/eval/tokenizer_experiment_manifest.json
 jq empty data/tokenizer/segmentation_roots.json
 jq empty data/tokenizer/segmentation_rules.json
 jq empty data/training/baseline_training_manifest.json
+jq empty data/training/baseline_training_assembly_report.json
 cargo fmt --all --check
 cargo test -p adam-corpus --tests -- --nocapture
 cargo test -p adam-tokenizer --tests -- --nocapture

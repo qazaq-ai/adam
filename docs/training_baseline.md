@@ -57,3 +57,8 @@ The assembly report captures:
 - category-aware breakdown for domain and source-type allocations
 - critical guard buckets for split coverage and concentration zones
 - leftover token remainder when the global budget is not divisible by the context window
+
+The expected production assembly is also stored as a machine-readable
+regression artifact:
+
+- `data/training/baseline_training_assembly_report.json`
