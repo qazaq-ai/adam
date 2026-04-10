@@ -19,6 +19,8 @@ Current starter utility:
   performs a clean release cut: bump, validate, commit, push, tag, and trigger GitHub Release
 - `run_tokenizer_dry_run.sh`
   runs the tokenizer dry-run report from machine-readable manifests
+- `run_eval_benchmark_report.sh`
+  builds the deterministic eval benchmark report from the benchmark manifest
 - `generate_source_acceptance_report.sh`
   regenerates the curated source acceptance report from registry and scoring rules
 - `run_tokenizer_segmentation_eval.sh`

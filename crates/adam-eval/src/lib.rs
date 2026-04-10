@@ -66,6 +66,28 @@ pub struct EvalSuite {
     pub tasks: Vec<EvalTask>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EvalBenchmarkReport {
+    pub suite_name: String,
+    pub target_language: String,
+    pub layer_count: usize,
+    pub task_count: usize,
+    pub category_breakdown: Vec<EvalBenchmarkCategoryReport>,
+    pub critical_breakdown: Vec<EvalBenchmarkGuardReport>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EvalBenchmarkCategoryReport {
+    pub category: String,
+    pub task_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EvalBenchmarkGuardReport {
+    pub guard: String,
+    pub task_count: usize,
+}
+
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum EvalError {
     #[error("evaluation language must be kazakh")]
@@ -85,7 +107,7 @@ pub enum EvalError {
 impl Default for EvalSuite {
     fn default() -> Self {
         Self {
-            version: "0.0.47".to_string(),
+            version: "0.0.48".to_string(),
             name: "kazakh-foundation-baseline".to_string(),
             target_language: "kazakh".to_string(),
             layers: vec![
@@ -185,20 +207,107 @@ impl EvalDataset {
     }
 }
 
+pub fn build_eval_benchmark_report(suite: &EvalSuite) -> Result<EvalBenchmarkReport, EvalError> {
+    suite.validate()?;
+
+    let mut category_breakdown = suite
+        .tasks
+        .iter()
+        .fold(
+            std::collections::BTreeMap::<String, usize>::new(),
+            |mut acc, task| {
+                *acc.entry(task_kind_slug(&task.kind).to_string())
+                    .or_default() += 1;
+                acc
+            },
+        )
+        .into_iter()
+        .map(|(category, task_count)| EvalBenchmarkCategoryReport {
+            category,
+            task_count,
+        })
+        .collect::<Vec<_>>();
+    category_breakdown.sort_by(|left, right| left.category.cmp(&right.category));
+
+    let mut critical_breakdown = suite
+        .tasks
+        .iter()
+        .flat_map(|task| benchmark_guards_for_task(task))
+        .fold(
+            std::collections::BTreeMap::<String, usize>::new(),
+            |mut acc, guard| {
+                *acc.entry(guard).or_default() += 1;
+                acc
+            },
+        )
+        .into_iter()
+        .map(|(guard, task_count)| EvalBenchmarkGuardReport { guard, task_count })
+        .collect::<Vec<_>>();
+    critical_breakdown.sort_by(|left, right| left.guard.cmp(&right.guard));
+
+    Ok(EvalBenchmarkReport {
+        suite_name: suite.name.clone(),
+        target_language: suite.target_language.clone(),
+        layer_count: suite.layers.len(),
+        task_count: suite.tasks.len(),
+        category_breakdown,
+        critical_breakdown,
+    })
+}
+
 fn contains_latin(value: &str) -> bool {
     value.chars().any(|ch| ch.is_ascii_alphabetic())
 }
 
+fn task_kind_slug(kind: &EvalTaskKind) -> &'static str {
+    match kind {
+        EvalTaskKind::TokenEfficiency => "token_efficiency",
+        EvalTaskKind::TokenizerSegmentation => "tokenizer_segmentation",
+        EvalTaskKind::NextTokenPrediction => "next_token_prediction",
+        EvalTaskKind::ReadingComprehension => "reading_comprehension",
+        EvalTaskKind::MorphologySensitivity => "morphology_sensitivity",
+        EvalTaskKind::HallucinationAudit => "hallucination_audit",
+    }
+}
+
+fn benchmark_guards_for_task(task: &EvalTask) -> Vec<String> {
+    let mut guards = vec!["full_suite_coverage".to_string()];
+
+    match task.kind {
+        EvalTaskKind::TokenEfficiency => {
+            guards.push("corpus_quality_task_family".to_string());
+            guards.push("deterministic_efficiency_guard".to_string());
+        }
+        EvalTaskKind::TokenizerSegmentation => {
+            guards.push("tokenizer_quality_task_family".to_string());
+            guards.push("deterministic_segmentation_guard".to_string());
+        }
+        EvalTaskKind::NextTokenPrediction | EvalTaskKind::ReadingComprehension => {
+            guards.push("model_eval_task_family".to_string());
+        }
+        EvalTaskKind::MorphologySensitivity => {
+            guards.push("linguistic_audit_task_family".to_string());
+            guards.push("morphology_guard".to_string());
+        }
+        EvalTaskKind::HallucinationAudit => {
+            guards.push("linguistic_audit_task_family".to_string());
+            guards.push("hallucination_guard".to_string());
+        }
+    }
+
+    guards
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{EvalDataset, EvalError, EvalSuite};
+    use super::{EvalDataset, EvalError, EvalSuite, build_eval_benchmark_report};
 
     #[test]
     fn default_eval_suite_targets_kazakh() {
         let suite = EvalSuite::default();
 
         assert_eq!(suite.target_language, "kazakh");
-        assert_eq!(suite.version, "0.0.47");
+        assert_eq!(suite.version, "0.0.48");
         assert_eq!(suite.layers.len(), 4);
         assert_eq!(suite.tasks.len(), 4);
         assert!(suite.validate().is_ok());
@@ -215,7 +324,7 @@ mod tests {
     #[test]
     fn dataset_rejects_latin_text() {
         let mut dataset = EvalDataset {
-            version: "0.0.47".to_string(),
+            version: "0.0.48".to_string(),
             name: "test".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -234,5 +343,25 @@ mod tests {
 
         dataset.entries[0].prompt = "Сәлем".to_string();
         assert!(dataset.validate().is_ok());
+    }
+
+    #[test]
+    fn builds_eval_benchmark_report_with_task_family_breakdown() {
+        let suite = EvalSuite::default();
+
+        let report = build_eval_benchmark_report(&suite).expect("benchmark report");
+
+        assert_eq!(report.task_count, 4);
+        assert_eq!(report.layer_count, 4);
+        assert!(
+            report
+                .category_breakdown
+                .iter()
+                .any(|entry| entry.category == "tokenizer_segmentation" && entry.task_count == 1)
+        );
+        assert!(report
+            .critical_breakdown
+            .iter()
+            .any(|entry| entry.guard == "linguistic_audit_task_family" && entry.task_count == 2));
     }
 }

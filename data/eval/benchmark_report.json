@@ -1,0 +1,58 @@
+{
+  "suite_name": "adam-kazakh-foundation-benchmark",
+  "target_language": "kazakh",
+  "layer_count": 4,
+  "task_count": 4,
+  "category_breakdown": [
+    {
+      "category": "hallucination_audit",
+      "task_count": 1
+    },
+    {
+      "category": "morphology_sensitivity",
+      "task_count": 1
+    },
+    {
+      "category": "token_efficiency",
+      "task_count": 1
+    },
+    {
+      "category": "tokenizer_segmentation",
+      "task_count": 1
+    }
+  ],
+  "critical_breakdown": [
+    {
+      "guard": "corpus_quality_task_family",
+      "task_count": 1
+    },
+    {
+      "guard": "deterministic_efficiency_guard",
+      "task_count": 1
+    },
+    {
+      "guard": "deterministic_segmentation_guard",
+      "task_count": 1
+    },
+    {
+      "guard": "full_suite_coverage",
+      "task_count": 4
+    },
+    {
+      "guard": "hallucination_guard",
+      "task_count": 1
+    },
+    {
+      "guard": "linguistic_audit_task_family",
+      "task_count": 2
+    },
+    {
+      "guard": "morphology_guard",
+      "task_count": 1
+    },
+    {
+      "guard": "tokenizer_quality_task_family",
+      "task_count": 1
+    }
+  ]
+}

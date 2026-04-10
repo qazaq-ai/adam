@@ -13,6 +13,7 @@ jq empty data/curated/tokenizer_dry_run_pack.json
 jq empty data/raw/source_registry.json
 jq empty data/raw/source_scoring_rules.json
 jq empty data/eval/benchmark_manifest.json
+jq empty data/eval/benchmark_report.json
 jq empty data/eval/kazakh_foundation_eval_dataset.json
 jq empty data/eval/tokenizer_segmentation_eval_dataset.json
 jq empty data/eval/tokenizer_experiment_manifest.json
@@ -30,6 +31,7 @@ cargo test -p adam-train --tests -- --nocapture
 ./scripts/generate_source_acceptance_report.sh "$tmp_acceptance_report"
 cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_tokenizer_dry_run.sh
+./scripts/run_eval_benchmark_report.sh
 ./scripts/run_tokenizer_segmentation_eval.sh
 ./scripts/run_tokenizer_experiment.sh
 ./scripts/run_training_baseline_plan.sh
