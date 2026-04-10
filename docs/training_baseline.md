@@ -54,4 +54,6 @@ The assembly report captures:
 - train and validation sequence budgets
 - train and validation token budgets
 - deterministic per-source allocations weighted by accepted source scores
+- category-aware breakdown for domain and source-type allocations
+- critical guard buckets for split coverage and concentration zones
 - leftover token remainder when the global budget is not divisible by the context window

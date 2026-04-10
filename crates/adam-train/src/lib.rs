@@ -75,7 +75,29 @@ pub struct BaselineTrainingAssemblyReport {
     pub train_sequence_count: u64,
     pub validation_sequence_count: u64,
     pub validation_split_bps: u16,
+    pub category_breakdown: Vec<BaselineTrainingAssemblyCategoryReport>,
+    pub critical_breakdown: Vec<BaselineTrainingAssemblyGuardReport>,
     pub source_allocations: Vec<BaselineTrainingSourceAllocation>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BaselineTrainingAssemblyCategoryReport {
+    pub category: String,
+    pub source_count: usize,
+    pub allocation_weight: u64,
+    pub train_sequence_count: u64,
+    pub validation_sequence_count: u64,
+    pub train_token_budget: u64,
+    pub validation_token_budget: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BaselineTrainingAssemblyGuardReport {
+    pub guard: String,
+    pub source_count: usize,
+    pub train_sequence_count: u64,
+    pub validation_sequence_count: u64,
+    pub total_sequence_count: u64,
 }
 
 #[derive(Debug, Error, PartialEq, Eq)]
@@ -250,6 +272,8 @@ pub fn build_baseline_training_assembly_report(
         .map(|source| source.validation_token_budget)
         .sum();
     let assigned_token_budget = train_token_budget + validation_token_budget;
+    let category_breakdown = build_category_breakdown(&source_allocations);
+    let critical_breakdown = build_guard_breakdown(&source_allocations);
 
     Ok(BaselineTrainingAssemblyReport {
         run_name: manifest.run_name.clone(),
@@ -270,6 +294,8 @@ pub fn build_baseline_training_assembly_report(
         train_sequence_count,
         validation_sequence_count,
         validation_split_bps: manifest.validation_split_bps,
+        category_breakdown,
+        critical_breakdown,
         source_allocations,
     })
 }
@@ -447,6 +473,133 @@ fn allocate_validation_sequences(source_totals: &[u64], split_bps: u16) -> Vec<u
         .collect()
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+struct AssemblyStats {
+    source_count: usize,
+    allocation_weight: u64,
+    train_sequence_count: u64,
+    validation_sequence_count: u64,
+    train_token_budget: u64,
+    validation_token_budget: u64,
+}
+
+fn build_category_breakdown(
+    source_allocations: &[BaselineTrainingSourceAllocation],
+) -> Vec<BaselineTrainingAssemblyCategoryReport> {
+    let mut category_stats = BTreeMap::<String, AssemblyStats>::new();
+
+    for allocation in source_allocations {
+        for category in assembly_categories(allocation) {
+            let stats = category_stats.entry(category).or_default();
+            stats.source_count += 1;
+            stats.allocation_weight += allocation.allocation_weight;
+            stats.train_sequence_count += allocation.train_sequence_count;
+            stats.validation_sequence_count += allocation.validation_sequence_count;
+            stats.train_token_budget += allocation.train_token_budget;
+            stats.validation_token_budget += allocation.validation_token_budget;
+        }
+    }
+
+    category_stats
+        .into_iter()
+        .map(|(category, stats)| BaselineTrainingAssemblyCategoryReport {
+            category,
+            source_count: stats.source_count,
+            allocation_weight: stats.allocation_weight,
+            train_sequence_count: stats.train_sequence_count,
+            validation_sequence_count: stats.validation_sequence_count,
+            train_token_budget: stats.train_token_budget,
+            validation_token_budget: stats.validation_token_budget,
+        })
+        .collect()
+}
+
+fn build_guard_breakdown(
+    source_allocations: &[BaselineTrainingSourceAllocation],
+) -> Vec<BaselineTrainingAssemblyGuardReport> {
+    let mut guard_stats = BTreeMap::<String, AssemblyStats>::new();
+    let source_count = source_allocations.len();
+
+    for allocation in source_allocations {
+        for guard in assembly_guards(allocation, source_count) {
+            let stats = guard_stats.entry(guard).or_default();
+            stats.source_count += 1;
+            stats.train_sequence_count += allocation.train_sequence_count;
+            stats.validation_sequence_count += allocation.validation_sequence_count;
+        }
+    }
+
+    guard_stats
+        .into_iter()
+        .map(|(guard, stats)| BaselineTrainingAssemblyGuardReport {
+            guard,
+            source_count: stats.source_count,
+            train_sequence_count: stats.train_sequence_count,
+            validation_sequence_count: stats.validation_sequence_count,
+            total_sequence_count: stats.train_sequence_count + stats.validation_sequence_count,
+        })
+        .collect()
+}
+
+fn assembly_categories(allocation: &BaselineTrainingSourceAllocation) -> Vec<String> {
+    vec![
+        format!("domain_{}", source_domain_slug(&allocation.domain)),
+        format!("source_type_{}", source_type_slug(&allocation.source_type)),
+    ]
+}
+
+fn assembly_guards(
+    allocation: &BaselineTrainingSourceAllocation,
+    accepted_source_count: usize,
+) -> Vec<String> {
+    let mut guards = Vec::new();
+
+    if accepted_source_count == 1 {
+        guards.push("single_source_concentration".to_string());
+    } else {
+        guards.push("multi_source_distribution".to_string());
+    }
+
+    if allocation.train_sequence_count > 0 {
+        guards.push("train_coverage".to_string());
+    }
+    if allocation.validation_sequence_count > 0 {
+        guards.push("validation_coverage".to_string());
+    }
+    if allocation.train_sequence_count > 0 && allocation.validation_sequence_count > 0 {
+        guards.push("full_split_coverage".to_string());
+    }
+
+    guards.push(format!(
+        "{}_domain_allocation",
+        source_domain_slug(&allocation.domain)
+    ));
+    guards.push(format!(
+        "{}_source_type_allocation",
+        source_type_slug(&allocation.source_type)
+    ));
+
+    guards
+}
+
+fn source_domain_slug(domain: &SourceDomain) -> &'static str {
+    match domain {
+        SourceDomain::General => "general",
+        SourceDomain::Reference => "reference",
+        SourceDomain::Administrative => "administrative",
+        SourceDomain::Education => "education",
+    }
+}
+
+fn source_type_slug(source_type: &SourceType) -> &'static str {
+    match source_type {
+        SourceType::PublicText => "public_text",
+        SourceType::ReferenceText => "reference_text",
+        SourceType::AdministrativeText => "administrative_text",
+        SourceType::EducationalText => "educational_text",
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use adam_corpus::{
@@ -465,7 +618,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -489,7 +642,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -507,7 +660,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -520,7 +673,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -549,7 +702,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -562,7 +715,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -592,7 +745,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -628,7 +781,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -646,7 +799,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -659,7 +812,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -688,7 +841,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -701,7 +854,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -731,7 +884,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.40".to_string(),
+            version: "0.0.41".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -764,6 +917,32 @@ mod tests {
         assert_eq!(report.validation_sequence_count, 102);
         assert_eq!(report.train_sequence_count, 922);
         assert_eq!(report.remainder_token_budget, 0);
+        assert!(!report.category_breakdown.is_empty());
+        assert!(!report.critical_breakdown.is_empty());
+        assert!(
+            report
+                .category_breakdown
+                .iter()
+                .any(|entry| entry.category == "domain_reference")
+        );
+        assert!(
+            report
+                .category_breakdown
+                .iter()
+                .any(|entry| entry.category == "source_type_reference_text")
+        );
+        assert!(
+            report
+                .critical_breakdown
+                .iter()
+                .any(|entry| entry.guard == "single_source_concentration")
+        );
+        assert!(
+            report
+                .critical_breakdown
+                .iter()
+                .any(|entry| entry.guard == "validation_coverage")
+        );
         assert_eq!(report.source_allocations.len(), 1);
         assert_eq!(
             report.source_allocations[0].source_id,

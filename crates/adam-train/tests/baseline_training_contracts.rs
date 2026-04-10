@@ -161,5 +161,19 @@ fn baseline_training_assembly_can_be_built_from_manifests() {
     assert_eq!(report.total_sequence_count, 1024);
     assert_eq!(report.validation_sequence_count, 102);
     assert_eq!(report.train_sequence_count, 922);
+    assert!(!report.category_breakdown.is_empty());
+    assert!(!report.critical_breakdown.is_empty());
+    assert!(
+        report
+            .category_breakdown
+            .iter()
+            .any(|entry| entry.category == "domain_reference")
+    );
+    assert!(
+        report
+            .critical_breakdown
+            .iter()
+            .any(|entry| entry.guard == "single_source_concentration")
+    );
     assert_eq!(report.source_allocations.len(), 1);
 }
