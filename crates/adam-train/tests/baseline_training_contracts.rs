@@ -1,6 +1,10 @@
 use std::fs;
 
-use adam_corpus::{CorpusManifest, SourceAcceptanceReport, SourceRegistry, SourceScoringRules};
+use adam_corpus::{
+    CorpusManifest, CorpusStage, LicenseClass, QualityTier, SourceAcceptanceReport, SourceDomain,
+    SourcePolicy, SourceRegistry, SourceRegistryEntry, SourceScoringRules, SourceType,
+    build_source_acceptance_report,
+};
 use adam_eval::EvalSuite;
 use adam_tokenizer::TokenizerExperiment;
 use adam_train::{
@@ -176,4 +180,132 @@ fn baseline_training_assembly_can_be_built_from_manifests() {
             .any(|entry| entry.guard == "single_source_concentration")
     );
     assert_eq!(report.source_allocations.len(), 1);
+}
+
+#[test]
+fn baseline_training_assembly_tracks_multi_source_distribution() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_manifest.json"
+    );
+    let manifest: BaselineTrainingManifest =
+        serde_json::from_str(&fs::read_to_string(manifest_path).expect("training manifest file"))
+            .expect("valid training manifest json");
+    let corpus = CorpusManifest {
+        version: "0.0.41".to_string(),
+        name: "adam-foundation-curated".to_string(),
+        language: "kazakh".to_string(),
+        script: "cyrillic".to_string(),
+        stage: CorpusStage::Curated,
+        source_policy: SourcePolicy::KazakhOnly,
+        domains: vec![
+            "general_text".to_string(),
+            "administrative_text".to_string(),
+            "reference_text".to_string(),
+            "education_text".to_string(),
+        ],
+    };
+    let registry = SourceRegistry {
+        version: "0.0.41".to_string(),
+        entries: vec![
+            SourceRegistryEntry {
+                id: "curated_general_kazakh".to_string(),
+                stage: CorpusStage::Curated,
+                language: "kazakh".to_string(),
+                script: "cyrillic".to_string(),
+                source_type: SourceType::PublicText,
+                domain: SourceDomain::General,
+                license_class: LicenseClass::Open,
+                quality_tier: QualityTier::Reviewed,
+                provenance: "manual_general_seed".to_string(),
+                allowed_for_training: true,
+            },
+            SourceRegistryEntry {
+                id: "curated_reference_kazakh".to_string(),
+                stage: CorpusStage::Curated,
+                language: "kazakh".to_string(),
+                script: "cyrillic".to_string(),
+                source_type: SourceType::ReferenceText,
+                domain: SourceDomain::Reference,
+                license_class: LicenseClass::Open,
+                quality_tier: QualityTier::TrainingReady,
+                provenance: "manual_reference_seed".to_string(),
+                allowed_for_training: true,
+            },
+            SourceRegistryEntry {
+                id: "reviewed_education_kazakh".to_string(),
+                stage: CorpusStage::Curated,
+                language: "kazakh".to_string(),
+                script: "cyrillic".to_string(),
+                source_type: SourceType::EducationalText,
+                domain: SourceDomain::Education,
+                license_class: LicenseClass::Open,
+                quality_tier: QualityTier::Reviewed,
+                provenance: "manual_education_seed".to_string(),
+                allowed_for_training: true,
+            },
+        ],
+    };
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_scoring_rules.json"
+    );
+    let rules: SourceScoringRules =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("source scoring rules file"))
+            .expect("valid source scoring rules json");
+    let report = build_source_acceptance_report(
+        "adam-source-acceptance-report",
+        "data/raw/source_registry.json",
+        "data/raw/source_scoring_rules.json",
+        &registry,
+        &rules,
+    )
+    .expect("acceptance report");
+    let experiment_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_manifest.json"
+    );
+    let experiment: TokenizerExperiment =
+        serde_json::from_str(&fs::read_to_string(experiment_path).expect("experiment file"))
+            .expect("valid tokenizer experiment json");
+    let eval_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/benchmark_manifest.json"
+    );
+    let eval_suite: EvalSuite =
+        serde_json::from_str(&fs::read_to_string(eval_path).expect("eval suite file"))
+            .expect("valid eval suite json");
+
+    let report = build_baseline_training_assembly_report(
+        &manifest,
+        &corpus,
+        &registry,
+        &rules,
+        &report,
+        &experiment,
+        &eval_suite,
+    )
+    .expect("baseline training assembly");
+
+    assert_eq!(report.accepted_source_count, 3);
+    assert_eq!(report.rejected_source_count, 0);
+    assert_eq!(report.source_allocations.len(), 3);
+    assert!(
+        report
+            .critical_breakdown
+            .iter()
+            .any(|entry| entry.guard == "multi_source_distribution")
+    );
+    assert!(
+        report
+            .category_breakdown
+            .iter()
+            .any(|entry| entry.category == "domain_education")
+    );
+    assert!(
+        report
+            .category_breakdown
+            .iter()
+            .any(|entry| entry.category == "source_type_public_text")
+    );
 }

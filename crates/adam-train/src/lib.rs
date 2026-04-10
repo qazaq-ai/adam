@@ -605,7 +605,7 @@ mod tests {
     use adam_corpus::{
         CorpusManifest, CorpusStage, LicenseClass, QualityTier, SourceAcceptanceRecord,
         SourceAcceptanceReport, SourceDomain, SourcePolicy, SourceRegistry, SourceRegistryEntry,
-        SourceScoringRules, SourceType,
+        SourceScoringRules, SourceType, build_source_acceptance_report,
     };
     use adam_eval::EvalSuite;
     use adam_tokenizer::TokenizerExperiment;
@@ -618,7 +618,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -642,7 +642,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -660,7 +660,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -673,7 +673,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -702,7 +702,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -715,7 +715,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -745,7 +745,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -781,7 +781,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -799,7 +799,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -812,7 +812,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -841,7 +841,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -854,7 +854,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -884,7 +884,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.41".to_string(),
+            version: "0.0.42".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -949,5 +949,189 @@ mod tests {
             "curated_reference_kazakh"
         );
         assert_eq!(report.source_allocations[0].validation_sequence_count, 102);
+    }
+
+    #[test]
+    fn builds_multi_source_training_assembly_distribution() {
+        let manifest = BaselineTrainingManifest {
+            version: "0.0.42".to_string(),
+            run_name: "adam-baseline-plan".to_string(),
+            target_language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            corpus_manifest: "data/curated/corpus_manifest.json".to_string(),
+            source_registry_manifest: "data/raw/source_registry.json".to_string(),
+            scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
+            acceptance_report_manifest: "data/curated/source_acceptance_report.json".to_string(),
+            tokenizer_experiment_manifest: "data/eval/tokenizer_experiment_manifest.json"
+                .to_string(),
+            eval_suite_manifest: "data/eval/benchmark_manifest.json".to_string(),
+            objective: "assemble deterministic multi-source baseline training split".to_string(),
+            max_steps: 128,
+            batch_token_budget: 8192,
+            context_window: 1024,
+            validation_split_bps: 1000,
+        };
+        let corpus = CorpusManifest {
+            version: "0.0.42".to_string(),
+            name: "adam-foundation-curated".to_string(),
+            language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            stage: CorpusStage::Curated,
+            source_policy: SourcePolicy::KazakhOnly,
+            domains: vec![
+                "general_text".to_string(),
+                "administrative_text".to_string(),
+                "reference_text".to_string(),
+                "education_text".to_string(),
+            ],
+        };
+        let registry = SourceRegistry {
+            version: "0.0.42".to_string(),
+            entries: vec![
+                SourceRegistryEntry {
+                    id: "curated_general_kazakh".to_string(),
+                    stage: CorpusStage::Curated,
+                    language: "kazakh".to_string(),
+                    script: "cyrillic".to_string(),
+                    source_type: SourceType::PublicText,
+                    domain: SourceDomain::General,
+                    license_class: LicenseClass::Open,
+                    quality_tier: QualityTier::Reviewed,
+                    provenance: "manual_general_seed".to_string(),
+                    allowed_for_training: true,
+                },
+                SourceRegistryEntry {
+                    id: "curated_reference_kazakh".to_string(),
+                    stage: CorpusStage::Curated,
+                    language: "kazakh".to_string(),
+                    script: "cyrillic".to_string(),
+                    source_type: SourceType::ReferenceText,
+                    domain: SourceDomain::Reference,
+                    license_class: LicenseClass::Open,
+                    quality_tier: QualityTier::TrainingReady,
+                    provenance: "manual_reference_seed".to_string(),
+                    allowed_for_training: true,
+                },
+                SourceRegistryEntry {
+                    id: "reviewed_education_kazakh".to_string(),
+                    stage: CorpusStage::Curated,
+                    language: "kazakh".to_string(),
+                    script: "cyrillic".to_string(),
+                    source_type: SourceType::EducationalText,
+                    domain: SourceDomain::Education,
+                    license_class: LicenseClass::Open,
+                    quality_tier: QualityTier::Reviewed,
+                    provenance: "manual_education_seed".to_string(),
+                    allowed_for_training: true,
+                },
+            ],
+        };
+        let rules = SourceScoringRules {
+            version: "0.0.42".to_string(),
+            minimum_acceptance_score: 3,
+            open_license_bonus: 3,
+            reviewed_quality_bonus: 2,
+            training_ready_bonus: 4,
+            administrative_domain_bonus: 1,
+            reference_domain_bonus: 1,
+            raw_stage_penalty: 3,
+            review_required_penalty: 3,
+            internal_only_penalty: 5,
+            seed_quality_penalty: 2,
+        };
+        let report = build_source_acceptance_report(
+            "adam-source-acceptance-report",
+            "data/raw/source_registry.json",
+            "data/raw/source_scoring_rules.json",
+            &registry,
+            &rules,
+        )
+        .expect("source acceptance report");
+        let experiment = TokenizerExperiment {
+            version: "0.0.42".to_string(),
+            name: "adam-tokenizer-deterministic".to_string(),
+            target_language: "kazakh".to_string(),
+            script: "cyrillic".to_string(),
+            profile_name: "adam-kazakh-cyrillic".to_string(),
+            training_manifest: "data/curated/corpus_manifest.json".to_string(),
+            sample_pack_manifest: "data/curated/tokenizer_dry_run_pack.json".to_string(),
+            segmentation_eval_manifest: "data/eval/tokenizer_segmentation_eval_dataset.json"
+                .to_string(),
+            segmentation_roots_manifest: "data/tokenizer/segmentation_roots.json".to_string(),
+            segmentation_rules_manifest: "data/tokenizer/segmentation_rules.json".to_string(),
+            objective: "measure deterministic segmentation quality on kazakh text".to_string(),
+        };
+        let eval_suite = EvalSuite::default();
+
+        let report = build_baseline_training_assembly_report(
+            &manifest,
+            &corpus,
+            &registry,
+            &rules,
+            &report,
+            &experiment,
+            &eval_suite,
+        )
+        .expect("multi-source baseline training assembly");
+
+        assert_eq!(report.accepted_source_count, 3);
+        assert_eq!(report.rejected_source_count, 0);
+        assert_eq!(report.total_sequence_count, 1024);
+        assert_eq!(
+            report.train_sequence_count + report.validation_sequence_count,
+            1024
+        );
+        assert_eq!(report.source_allocations.len(), 3);
+        assert!(
+            report
+                .critical_breakdown
+                .iter()
+                .any(|entry| entry.guard == "multi_source_distribution")
+        );
+        assert!(
+            !report
+                .critical_breakdown
+                .iter()
+                .any(|entry| entry.guard == "single_source_concentration")
+        );
+        assert!(
+            report
+                .category_breakdown
+                .iter()
+                .any(|entry| entry.category == "domain_general")
+        );
+        assert!(
+            report
+                .category_breakdown
+                .iter()
+                .any(|entry| entry.category == "domain_reference")
+        );
+        assert!(
+            report
+                .category_breakdown
+                .iter()
+                .any(|entry| entry.category == "domain_education")
+        );
+
+        let allocations_by_id = report
+            .source_allocations
+            .iter()
+            .map(|entry| (entry.source_id.as_str(), entry))
+            .collect::<std::collections::BTreeMap<_, _>>();
+        assert_eq!(
+            allocations_by_id["curated_reference_kazakh"].train_sequence_count
+                + allocations_by_id["curated_reference_kazakh"].validation_sequence_count,
+            455
+        );
+        assert_eq!(
+            allocations_by_id["curated_general_kazakh"].train_sequence_count
+                + allocations_by_id["curated_general_kazakh"].validation_sequence_count,
+            285
+        );
+        assert_eq!(
+            allocations_by_id["reviewed_education_kazakh"].train_sequence_count
+                + allocations_by_id["reviewed_education_kazakh"].validation_sequence_count,
+            284
+        );
     }
 }
