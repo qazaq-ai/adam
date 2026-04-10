@@ -20,6 +20,7 @@ jq empty data/tokenizer/segmentation_roots.json
 jq empty data/tokenizer/segmentation_rules.json
 jq empty data/training/baseline_training_manifest.json
 jq empty data/training/baseline_training_assembly_report.json
+jq empty data/training/baseline_training_consistency_report.json
 cargo fmt --all --check
 cargo test -p adam-corpus --tests -- --nocapture
 cargo test -p adam-tokenizer --tests -- --nocapture
@@ -32,5 +33,6 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_tokenizer_experiment.sh
 ./scripts/run_training_baseline_plan.sh
 ./scripts/run_training_baseline_assembly.sh
+./scripts/run_training_baseline_consistency.sh
 
 echo "foundation validation passed"

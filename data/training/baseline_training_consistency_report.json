@@ -1,0 +1,61 @@
+{
+  "run_name": "adam-baseline-plan",
+  "corpus_name": "adam-foundation-curated",
+  "tokenizer_experiment_name": "adam-tokenizer-deterministic",
+  "accepted_source_count": 3,
+  "rejected_source_count": 1,
+  "eval_task_count": 4,
+  "max_steps": 128,
+  "batch_token_budget": 8192,
+  "context_window": 1024,
+  "validation_split_bps": 1000,
+  "total_token_budget": 1048576,
+  "total_sequence_count": 1024,
+  "train_sequence_count": 922,
+  "validation_sequence_count": 102,
+  "assembly_category_count": 6,
+  "assembly_guard_count": 10,
+  "source_allocation_count": 3,
+  "consistency_checks": [
+    {
+      "check": "run_name_matches",
+      "passed": true
+    },
+    {
+      "check": "corpus_name_matches",
+      "passed": true
+    },
+    {
+      "check": "tokenizer_experiment_name_matches",
+      "passed": true
+    },
+    {
+      "check": "accepted_source_count_matches",
+      "passed": true
+    },
+    {
+      "check": "rejected_source_count_matches",
+      "passed": true
+    },
+    {
+      "check": "eval_task_count_matches",
+      "passed": true
+    },
+    {
+      "check": "training_budget_matches",
+      "passed": true
+    },
+    {
+      "check": "token_budget_matches_sequences",
+      "passed": true
+    },
+    {
+      "check": "assigned_budget_matches_split_totals",
+      "passed": true
+    },
+    {
+      "check": "source_allocations_match_global_totals",
+      "passed": true
+    }
+  ]
+}

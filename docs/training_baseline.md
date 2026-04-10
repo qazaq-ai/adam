@@ -32,6 +32,10 @@ The deterministic assembly dry-run is built through:
 
 - `scripts/run_training_baseline_assembly.sh`
 
+The deterministic consistency report is built through:
+
+- `scripts/run_training_baseline_consistency.sh`
+
 ## Output
 
 The current runners do not train a model yet.
@@ -62,3 +66,4 @@ The expected production assembly is also stored as a machine-readable
 regression artifact:
 
 - `data/training/baseline_training_assembly_report.json`
+- `data/training/baseline_training_consistency_report.json`
