@@ -1,6 +1,9 @@
 use std::fs;
 
-use adam_eval::{EvalBenchmarkReport, EvalSuite, build_eval_benchmark_report};
+use adam_eval::{
+    EvalBenchmarkDeltaReport, EvalBenchmarkReport, EvalSuite, build_eval_benchmark_delta_report,
+    build_eval_benchmark_report,
+};
 
 #[test]
 fn benchmark_manifest_stays_kazakh_only_and_valid() {
@@ -49,4 +52,36 @@ fn benchmark_report_matches_expected_regression_artifact() {
     let actual = build_eval_benchmark_report(&suite).expect("benchmark report");
 
     assert_eq!(actual, expected);
+}
+
+#[test]
+fn benchmark_delta_report_matches_expected_regression_artifact() {
+    let suite_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/benchmark_manifest.json"
+    );
+    let suite: EvalSuite =
+        serde_json::from_str(&fs::read_to_string(suite_path).expect("benchmark manifest file"))
+            .expect("valid benchmark manifest json");
+    let expected_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/benchmark_report.json"
+    );
+    let expected_report: EvalBenchmarkReport = serde_json::from_str(
+        &fs::read_to_string(expected_report_path).expect("benchmark report file"),
+    )
+    .expect("valid benchmark report json");
+    let expected_delta_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/benchmark_delta_report.json"
+    );
+    let expected_delta: EvalBenchmarkDeltaReport = serde_json::from_str(
+        &fs::read_to_string(expected_delta_path).expect("benchmark delta report file"),
+    )
+    .expect("valid benchmark delta report json");
+
+    let actual = build_eval_benchmark_delta_report(&suite, &expected_report)
+        .expect("benchmark delta report");
+
+    assert_eq!(actual, expected_delta);
 }

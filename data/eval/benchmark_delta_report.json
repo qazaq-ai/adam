@@ -1,0 +1,7 @@
+{
+  "suite_name": "adam-kazakh-foundation-benchmark",
+  "matches_expected": true,
+  "field_drifts": [],
+  "category_drifts": [],
+  "guard_drifts": []
+}

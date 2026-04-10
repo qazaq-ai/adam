@@ -21,6 +21,8 @@ Current starter utility:
   runs the tokenizer dry-run report from machine-readable manifests
 - `run_eval_benchmark_report.sh`
   builds the deterministic eval benchmark report from the benchmark manifest
+- `run_eval_benchmark_delta.sh`
+  builds the deterministic eval benchmark delta report against the expected benchmark artifact
 - `generate_source_acceptance_report.sh`
   regenerates the curated source acceptance report from registry and scoring rules
 - `run_tokenizer_segmentation_eval.sh`

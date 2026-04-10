@@ -88,6 +88,30 @@ pub struct EvalBenchmarkGuardReport {
     pub task_count: usize,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EvalBenchmarkDeltaReport {
+    pub suite_name: String,
+    pub matches_expected: bool,
+    pub field_drifts: Vec<EvalBenchmarkFieldDrift>,
+    pub category_drifts: Vec<EvalBenchmarkNamedCountDrift>,
+    pub guard_drifts: Vec<EvalBenchmarkNamedCountDrift>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EvalBenchmarkFieldDrift {
+    pub field: String,
+    pub expected: String,
+    pub actual: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EvalBenchmarkNamedCountDrift {
+    pub scope: String,
+    pub key: String,
+    pub expected: Option<u64>,
+    pub actual: Option<u64>,
+}
+
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum EvalError {
     #[error("evaluation language must be kazakh")]
@@ -107,7 +131,7 @@ pub enum EvalError {
 impl Default for EvalSuite {
     fn default() -> Self {
         Self {
-            version: "0.0.48".to_string(),
+            version: "0.0.49".to_string(),
             name: "kazakh-foundation-baseline".to_string(),
             target_language: "kazakh".to_string(),
             layers: vec![
@@ -255,8 +279,117 @@ pub fn build_eval_benchmark_report(suite: &EvalSuite) -> Result<EvalBenchmarkRep
     })
 }
 
+pub fn build_eval_benchmark_delta_report(
+    suite: &EvalSuite,
+    expected: &EvalBenchmarkReport,
+) -> Result<EvalBenchmarkDeltaReport, EvalError> {
+    let actual = build_eval_benchmark_report(suite)?;
+
+    Ok(EvalBenchmarkDeltaReport {
+        suite_name: suite.name.clone(),
+        matches_expected: expected == &actual,
+        field_drifts: build_benchmark_field_drifts(expected, &actual),
+        category_drifts: build_named_count_drifts(
+            "category",
+            expected
+                .category_breakdown
+                .iter()
+                .map(|entry| (entry.category.as_str(), entry.task_count as u64))
+                .collect(),
+            actual
+                .category_breakdown
+                .iter()
+                .map(|entry| (entry.category.as_str(), entry.task_count as u64))
+                .collect(),
+        ),
+        guard_drifts: build_named_count_drifts(
+            "guard",
+            expected
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.guard.as_str(), entry.task_count as u64))
+                .collect(),
+            actual
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.guard.as_str(), entry.task_count as u64))
+                .collect(),
+        ),
+    })
+}
+
 fn contains_latin(value: &str) -> bool {
     value.chars().any(|ch| ch.is_ascii_alphabetic())
+}
+
+fn build_benchmark_field_drifts(
+    expected: &EvalBenchmarkReport,
+    actual: &EvalBenchmarkReport,
+) -> Vec<EvalBenchmarkFieldDrift> {
+    let mut drifts = Vec::new();
+    push_benchmark_field_drift(
+        &mut drifts,
+        "layer_count",
+        expected.layer_count,
+        actual.layer_count,
+    );
+    push_benchmark_field_drift(
+        &mut drifts,
+        "task_count",
+        expected.task_count,
+        actual.task_count,
+    );
+    drifts
+}
+
+fn push_benchmark_field_drift<T: ToString + PartialEq>(
+    drifts: &mut Vec<EvalBenchmarkFieldDrift>,
+    field: &str,
+    expected: T,
+    actual: T,
+) {
+    if expected != actual {
+        drifts.push(EvalBenchmarkFieldDrift {
+            field: field.to_string(),
+            expected: expected.to_string(),
+            actual: actual.to_string(),
+        });
+    }
+}
+
+fn build_named_count_drifts(
+    scope: &str,
+    expected: Vec<(&str, u64)>,
+    actual: Vec<(&str, u64)>,
+) -> Vec<EvalBenchmarkNamedCountDrift> {
+    let mut expected_map = expected
+        .into_iter()
+        .collect::<std::collections::BTreeMap<_, _>>();
+    let mut actual_map = actual
+        .into_iter()
+        .collect::<std::collections::BTreeMap<_, _>>();
+    let mut keys = expected_map
+        .keys()
+        .chain(actual_map.keys())
+        .copied()
+        .collect::<Vec<_>>();
+    keys.sort_unstable();
+    keys.dedup();
+
+    let mut drifts = Vec::new();
+    for key in keys {
+        let expected_value = expected_map.remove(key);
+        let actual_value = actual_map.remove(key);
+        if expected_value != actual_value {
+            drifts.push(EvalBenchmarkNamedCountDrift {
+                scope: scope.to_string(),
+                key: key.to_string(),
+                expected: expected_value,
+                actual: actual_value,
+            });
+        }
+    }
+    drifts
 }
 
 fn task_kind_slug(kind: &EvalTaskKind) -> &'static str {
@@ -300,14 +433,17 @@ fn benchmark_guards_for_task(task: &EvalTask) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{EvalDataset, EvalError, EvalSuite, build_eval_benchmark_report};
+    use super::{
+        EvalBenchmarkReport, EvalDataset, EvalError, EvalSuite, build_eval_benchmark_delta_report,
+        build_eval_benchmark_report,
+    };
 
     #[test]
     fn default_eval_suite_targets_kazakh() {
         let suite = EvalSuite::default();
 
         assert_eq!(suite.target_language, "kazakh");
-        assert_eq!(suite.version, "0.0.48");
+        assert_eq!(suite.version, "0.0.49");
         assert_eq!(suite.layers.len(), 4);
         assert_eq!(suite.tasks.len(), 4);
         assert!(suite.validate().is_ok());
@@ -324,7 +460,7 @@ mod tests {
     #[test]
     fn dataset_rejects_latin_text() {
         let mut dataset = EvalDataset {
-            version: "0.0.48".to_string(),
+            version: "0.0.49".to_string(),
             name: "test".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -363,5 +499,75 @@ mod tests {
             .critical_breakdown
             .iter()
             .any(|entry| entry.guard == "linguistic_audit_task_family" && entry.task_count == 2));
+    }
+
+    #[test]
+    fn builds_eval_benchmark_delta_report_without_drift() {
+        let suite = EvalSuite::default();
+        let expected = EvalBenchmarkReport {
+            suite_name: "kazakh-foundation-baseline".to_string(),
+            target_language: "kazakh".to_string(),
+            layer_count: 4,
+            task_count: 4,
+            category_breakdown: vec![
+                super::EvalBenchmarkCategoryReport {
+                    category: "hallucination_audit".to_string(),
+                    task_count: 1,
+                },
+                super::EvalBenchmarkCategoryReport {
+                    category: "morphology_sensitivity".to_string(),
+                    task_count: 1,
+                },
+                super::EvalBenchmarkCategoryReport {
+                    category: "token_efficiency".to_string(),
+                    task_count: 1,
+                },
+                super::EvalBenchmarkCategoryReport {
+                    category: "tokenizer_segmentation".to_string(),
+                    task_count: 1,
+                },
+            ],
+            critical_breakdown: vec![
+                super::EvalBenchmarkGuardReport {
+                    guard: "corpus_quality_task_family".to_string(),
+                    task_count: 1,
+                },
+                super::EvalBenchmarkGuardReport {
+                    guard: "deterministic_efficiency_guard".to_string(),
+                    task_count: 1,
+                },
+                super::EvalBenchmarkGuardReport {
+                    guard: "deterministic_segmentation_guard".to_string(),
+                    task_count: 1,
+                },
+                super::EvalBenchmarkGuardReport {
+                    guard: "full_suite_coverage".to_string(),
+                    task_count: 4,
+                },
+                super::EvalBenchmarkGuardReport {
+                    guard: "hallucination_guard".to_string(),
+                    task_count: 1,
+                },
+                super::EvalBenchmarkGuardReport {
+                    guard: "linguistic_audit_task_family".to_string(),
+                    task_count: 2,
+                },
+                super::EvalBenchmarkGuardReport {
+                    guard: "morphology_guard".to_string(),
+                    task_count: 1,
+                },
+                super::EvalBenchmarkGuardReport {
+                    guard: "tokenizer_quality_task_family".to_string(),
+                    task_count: 1,
+                },
+            ],
+        };
+
+        let delta = build_eval_benchmark_delta_report(&suite, &expected).expect("delta report");
+
+        assert!(delta.matches_expected);
+        assert!(delta.field_drifts.is_empty());
+        assert!(delta.category_drifts.is_empty());
+        assert!(delta.guard_drifts.is_empty());
     }
 }
