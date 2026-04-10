@@ -8,6 +8,7 @@
   "domains": [
     "general_text",
     "administrative_text",
-    "reference_text"
+    "reference_text",
+    "education_text"
   ]
 }

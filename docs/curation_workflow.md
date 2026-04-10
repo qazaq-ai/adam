@@ -10,6 +10,8 @@ Raw data is not training data.
 2. mark whether it is allowed for training yet
 3. move only reviewed material into curated manifests
 4. keep held-out evaluation material separate from training material
+5. maintain at least a minimal multi-source training baseline so deterministic
+   assembly can validate distribution rather than a single-source fallback
 
 ## Required Checks
 

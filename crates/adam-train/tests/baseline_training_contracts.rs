@@ -91,7 +91,7 @@ fn baseline_training_plan_can_be_built_from_manifests() {
     )
     .expect("baseline training plan");
 
-    assert_eq!(plan.accepted_source_count, 1);
+    assert_eq!(plan.accepted_source_count, 3);
     assert_eq!(plan.rejected_source_count, 1);
     assert_eq!(plan.eval_task_count, 4);
     assert_eq!(plan.corpus_name, "adam-foundation-curated");
@@ -160,7 +160,7 @@ fn baseline_training_assembly_can_be_built_from_manifests() {
     )
     .expect("baseline training assembly");
 
-    assert_eq!(report.accepted_source_count, 1);
+    assert_eq!(report.accepted_source_count, 3);
     assert_eq!(report.rejected_source_count, 1);
     assert_eq!(report.total_sequence_count, 1024);
     assert_eq!(report.validation_sequence_count, 102);
@@ -171,15 +171,21 @@ fn baseline_training_assembly_can_be_built_from_manifests() {
         report
             .category_breakdown
             .iter()
+            .any(|entry| entry.category == "domain_general")
+    );
+    assert!(
+        report
+            .category_breakdown
+            .iter()
             .any(|entry| entry.category == "domain_reference")
     );
     assert!(
         report
             .critical_breakdown
             .iter()
-            .any(|entry| entry.guard == "single_source_concentration")
+            .any(|entry| entry.guard == "multi_source_distribution")
     );
-    assert_eq!(report.source_allocations.len(), 1);
+    assert_eq!(report.source_allocations.len(), 3);
 }
 
 #[test]

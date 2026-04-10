@@ -5,6 +5,16 @@
   "scoring_rules_manifest": "data/raw/source_scoring_rules.json",
   "records": [
     {
+      "source_id": "curated_general_kazakh",
+      "score": 5,
+      "accepted_for_training": true,
+      "positive_signals": [
+        "open_license",
+        "reviewed_quality"
+      ],
+      "negative_signals": []
+    },
+    {
       "source_id": "curated_reference_kazakh",
       "score": 8,
       "accepted_for_training": true,
@@ -12,6 +22,16 @@
         "open_license",
         "reference_domain",
         "training_ready_quality"
+      ],
+      "negative_signals": []
+    },
+    {
+      "source_id": "reviewed_education_kazakh",
+      "score": 5,
+      "accepted_for_training": true,
+      "positive_signals": [
+        "open_license",
+        "reviewed_quality"
       ],
       "negative_signals": []
     },

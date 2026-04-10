@@ -49,18 +49,26 @@ fn source_scoring_rules_manifest_is_present_and_usable() {
 
     assert!(rules.minimum_acceptance_score >= 0);
 
-    let seed_score = rules.score(&registry.entries[0]);
+    let seed_entry = registry
+        .entries
+        .iter()
+        .find(|entry| entry.id == "seed_public_admin_text")
+        .expect("seed source");
+    let seed_score = rules.score(seed_entry);
     assert!(seed_score.score <= rules.minimum_acceptance_score);
     assert!(!seed_score.accepted_for_training);
 
-    let accepted_entry = registry
+    let accepted_entries = registry
         .entries
         .iter()
-        .find(|entry| entry.allowed_for_training)
-        .expect("accepted training source");
-    let accepted_score = rules.score(accepted_entry);
-    assert!(accepted_score.score >= rules.minimum_acceptance_score);
-    assert!(accepted_score.accepted_for_training);
+        .filter(|entry| entry.allowed_for_training)
+        .collect::<Vec<_>>();
+    assert!(accepted_entries.len() >= 2);
+    for accepted_entry in accepted_entries {
+        let accepted_score = rules.score(accepted_entry);
+        assert!(accepted_score.score >= rules.minimum_acceptance_score);
+        assert!(accepted_score.accepted_for_training);
+    }
 }
 
 #[test]

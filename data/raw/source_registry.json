@@ -2,6 +2,18 @@
   "version": "0.0.4",
   "entries": [
     {
+      "id": "curated_general_kazakh",
+      "stage": "curated",
+      "language": "kazakh",
+      "script": "cyrillic",
+      "source_type": "public_text",
+      "domain": "general",
+      "license_class": "open",
+      "quality_tier": "reviewed",
+      "provenance": "manual_general_seed",
+      "allowed_for_training": true
+    },
+    {
       "id": "seed_public_admin_text",
       "stage": "raw",
       "language": "kazakh",
@@ -23,6 +35,18 @@
       "license_class": "open",
       "quality_tier": "training_ready",
       "provenance": "manual_reference_seed",
+      "allowed_for_training": true
+    },
+    {
+      "id": "reviewed_education_kazakh",
+      "stage": "curated",
+      "language": "kazakh",
+      "script": "cyrillic",
+      "source_type": "educational_text",
+      "domain": "education",
+      "license_class": "open",
+      "quality_tier": "reviewed",
+      "provenance": "manual_education_seed",
       "allowed_for_training": true
     }
   ]
