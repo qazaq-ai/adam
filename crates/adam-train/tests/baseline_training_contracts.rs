@@ -14,14 +14,16 @@ use adam_train::{
     BaselineTrainingAssemblyReport, BaselineTrainingConsistencyReport, BaselineTrainingDeltaReport,
     BaselineTrainingManifest, CleanTrainingCorpusManifest, CleanTrainingCorpusPack,
     CleanTrainingCorpusReport, FoundationOverviewDeltaReport, FoundationOverviewReport,
-    TinyCleanTrainingDomainPack, TinyCleanTrainingPack, TinyCleanTrainingProfileComparisonReport,
+    TinyCleanTrainingDomainPack, TinyCleanTrainingPack, TinyCleanTrainingProfileBaselineManifest,
+    TinyCleanTrainingProfileBaselineReport, TinyCleanTrainingProfileComparisonReport,
     TinyCleanTrainingProfileSuiteManifest, TinyCleanTrainingProfileSuiteReport,
     TinyCleanTrainingReport, TinyCleanTrainingSelectionManifest,
     assemble_clean_training_corpus_pack, assemble_tiny_clean_training_pack_from_corpus,
     build_baseline_training_assembly_report, build_baseline_training_consistency_report,
     build_baseline_training_delta_report, build_baseline_training_plan,
     build_clean_training_corpus_report, build_foundation_overview_delta_report,
-    build_foundation_overview_report, build_tiny_clean_training_profile_comparison_report,
+    build_foundation_overview_report, build_tiny_clean_training_profile_baseline_report,
+    build_tiny_clean_training_profile_comparison_report,
     build_tiny_clean_training_profile_suite_report, build_tiny_clean_training_report,
 };
 
@@ -872,6 +874,39 @@ fn tiny_clean_training_profile_comparison_report_matches_expected_regression_art
 
     let actual = build_tiny_clean_training_profile_comparison_report(&suite_report)
         .expect("tiny profile comparison report");
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn tiny_clean_training_profile_baseline_report_matches_expected_regression_artifact() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_training_profile_baseline_manifest.json"
+    );
+    let manifest: TinyCleanTrainingProfileBaselineManifest = serde_json::from_str(
+        &fs::read_to_string(manifest_path).expect("tiny profile baseline manifest"),
+    )
+    .expect("valid tiny profile baseline manifest json");
+    let comparison_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_comparison_report.json"
+    );
+    let comparison_report: TinyCleanTrainingProfileComparisonReport = serde_json::from_str(
+        &fs::read_to_string(comparison_report_path).expect("tiny profile comparison report"),
+    )
+    .expect("valid tiny profile comparison report json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_baseline_report.json"
+    );
+    let expected: TinyCleanTrainingProfileBaselineReport = serde_json::from_str(
+        &fs::read_to_string(expected_path).expect("tiny profile baseline report"),
+    )
+    .expect("valid tiny profile baseline report json");
+
+    let actual = build_tiny_clean_training_profile_baseline_report(&manifest, &comparison_report)
+        .expect("tiny profile baseline report");
 
     assert_eq!(actual, expected);
 }

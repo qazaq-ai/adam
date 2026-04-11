@@ -290,6 +290,35 @@ pub struct TinyCleanTrainingProfileComparisonReport {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileBaselineManifest {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub expected_best_profile: String,
+    pub minimum_validation_exact_match_rate_bps: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileBaselineCheck {
+    pub check: String,
+    pub passed: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileBaselineReport {
+    pub policy_name: String,
+    pub suite_name: String,
+    pub expected_best_profile: String,
+    pub actual_best_profile: String,
+    pub selected_pack_name: String,
+    pub selected_validation_exact_match_rate_bps: usize,
+    pub matches_expected_best_profile: bool,
+    pub meets_minimum_validation_threshold: bool,
+    pub policy_checks: Vec<TinyCleanTrainingProfileBaselineCheck>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TinyCleanTrainingCategoryReport {
     pub category: String,
     pub sample_count: usize,
@@ -634,6 +663,18 @@ impl TinyCleanTrainingProfileSuiteManifest {
     }
 }
 
+impl TinyCleanTrainingProfileBaselineManifest {
+    pub fn validate(&self) -> Result<(), TrainingError> {
+        if self.target_language != "kazakh" {
+            return Err(TrainingError::NonKazakhLanguage);
+        }
+        if self.script != "cyrillic" || self.expected_best_profile.trim().is_empty() {
+            return Err(TrainingError::TinyTrainingProfileSuiteMismatch);
+        }
+        Ok(())
+    }
+}
+
 impl CleanTrainingCorpusManifest {
     pub fn validate(&self) -> Result<(), TrainingError> {
         if self.target_language != "kazakh" {
@@ -878,6 +919,50 @@ pub fn build_tiny_clean_training_profile_comparison_report(
         worst_pack_name: worst.pack_name.clone(),
         worst_validation_exact_match_rate_bps: worst.validation_exact_match_rate_bps,
         profile_gaps,
+    })
+}
+
+pub fn build_tiny_clean_training_profile_baseline_report(
+    manifest: &TinyCleanTrainingProfileBaselineManifest,
+    comparison_report: &TinyCleanTrainingProfileComparisonReport,
+) -> Result<TinyCleanTrainingProfileBaselineReport, TrainingError> {
+    manifest.validate()?;
+
+    let selected_profile = comparison_report
+        .profile_gaps
+        .iter()
+        .find(|entry| entry.profile == comparison_report.best_profile)
+        .ok_or(TrainingError::TinyTrainingProfileSuiteMismatch)?;
+
+    let matches_expected_best_profile =
+        comparison_report.best_profile == manifest.expected_best_profile;
+    let meets_minimum_validation_threshold = comparison_report.best_validation_exact_match_rate_bps
+        >= manifest.minimum_validation_exact_match_rate_bps;
+
+    Ok(TinyCleanTrainingProfileBaselineReport {
+        policy_name: manifest.name.clone(),
+        suite_name: comparison_report.suite_name.clone(),
+        expected_best_profile: manifest.expected_best_profile.clone(),
+        actual_best_profile: comparison_report.best_profile.clone(),
+        selected_pack_name: selected_profile.pack_name.clone(),
+        selected_validation_exact_match_rate_bps: comparison_report
+            .best_validation_exact_match_rate_bps,
+        matches_expected_best_profile,
+        meets_minimum_validation_threshold,
+        policy_checks: vec![
+            TinyCleanTrainingProfileBaselineCheck {
+                check: "expected_best_profile_matches".to_string(),
+                passed: matches_expected_best_profile,
+            },
+            TinyCleanTrainingProfileBaselineCheck {
+                check: "minimum_validation_threshold_met".to_string(),
+                passed: meets_minimum_validation_threshold,
+            },
+            TinyCleanTrainingProfileBaselineCheck {
+                check: "suite_has_profiles".to_string(),
+                passed: comparison_report.profile_count > 0,
+            },
+        ],
     })
 }
 
@@ -2306,7 +2391,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2330,7 +2415,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2348,7 +2433,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2361,7 +2446,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -2390,7 +2475,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -2403,7 +2488,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -2433,7 +2518,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2469,7 +2554,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2487,7 +2572,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2500,7 +2585,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -2529,7 +2614,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -2542,7 +2627,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -2572,7 +2657,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2642,7 +2727,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2660,7 +2745,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2674,7 +2759,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -2715,7 +2800,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -2736,7 +2821,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.54".to_string(),
+            version: "0.0.55".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
