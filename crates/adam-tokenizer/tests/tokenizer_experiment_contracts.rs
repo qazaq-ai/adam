@@ -2,7 +2,8 @@ use std::fs;
 
 use adam_tokenizer::{
     SegmentationLexicon, SegmentationRuleSet, TokenizerDryRunPack, TokenizerExperiment,
-    TokenizerSegmentationDataset, build_dry_run_report, build_experiment_report,
+    TokenizerExperimentDeltaReport, TokenizerExperimentReport, TokenizerSegmentationDataset,
+    build_dry_run_report, build_experiment_delta_report, build_experiment_report,
     build_segmentation_report,
 };
 
@@ -183,4 +184,122 @@ fn tokenizer_experiment_report_scores_segmentation_matches() {
     assert!(!report.category_breakdown.is_empty());
     assert!(!report.critical_breakdown.is_empty());
     assert!(report.failures.is_empty());
+}
+
+#[test]
+fn tokenizer_experiment_report_matches_expected_regression_artifact() {
+    let experiment_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_manifest.json"
+    );
+    let experiment: TokenizerExperiment =
+        serde_json::from_str(&fs::read_to_string(experiment_path).expect("experiment file"))
+            .expect("valid experiment json");
+    let pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tokenizer_dry_run_pack.json"
+    );
+    let pack: TokenizerDryRunPack =
+        serde_json::from_str(&fs::read_to_string(pack_path).expect("dry-run pack file"))
+            .expect("valid dry-run pack json");
+    let dataset_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_segmentation_eval_dataset.json"
+    );
+    let dataset: TokenizerSegmentationDataset =
+        serde_json::from_str(&fs::read_to_string(dataset_path).expect("segmentation dataset file"))
+            .expect("valid segmentation dataset json");
+    let roots_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/tokenizer/segmentation_roots.json"
+    );
+    let lexicon: SegmentationLexicon =
+        serde_json::from_str(&fs::read_to_string(roots_path).expect("segmentation roots file"))
+            .expect("valid segmentation roots json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/tokenizer/segmentation_rules.json"
+    );
+    let rules: SegmentationRuleSet =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("segmentation rules file"))
+            .expect("valid segmentation rules json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_report.json"
+    );
+    let expected: TokenizerExperimentReport =
+        serde_json::from_str(&fs::read_to_string(expected_path).expect("experiment report file"))
+            .expect("valid experiment report json");
+
+    let actual = build_experiment_report(&experiment, &pack, &dataset, &lexicon, &rules)
+        .expect("experiment report");
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn tokenizer_experiment_delta_report_matches_expected_regression_artifact() {
+    let experiment_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_manifest.json"
+    );
+    let experiment: TokenizerExperiment =
+        serde_json::from_str(&fs::read_to_string(experiment_path).expect("experiment file"))
+            .expect("valid experiment json");
+    let pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tokenizer_dry_run_pack.json"
+    );
+    let pack: TokenizerDryRunPack =
+        serde_json::from_str(&fs::read_to_string(pack_path).expect("dry-run pack file"))
+            .expect("valid dry-run pack json");
+    let dataset_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_segmentation_eval_dataset.json"
+    );
+    let dataset: TokenizerSegmentationDataset =
+        serde_json::from_str(&fs::read_to_string(dataset_path).expect("segmentation dataset file"))
+            .expect("valid segmentation dataset json");
+    let roots_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/tokenizer/segmentation_roots.json"
+    );
+    let lexicon: SegmentationLexicon =
+        serde_json::from_str(&fs::read_to_string(roots_path).expect("segmentation roots file"))
+            .expect("valid segmentation roots json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/tokenizer/segmentation_rules.json"
+    );
+    let rules: SegmentationRuleSet =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("segmentation rules file"))
+            .expect("valid segmentation rules json");
+    let expected_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_report.json"
+    );
+    let expected_report: TokenizerExperimentReport = serde_json::from_str(
+        &fs::read_to_string(expected_report_path).expect("experiment report file"),
+    )
+    .expect("valid experiment report json");
+    let expected_delta_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_delta_report.json"
+    );
+    let expected_delta: TokenizerExperimentDeltaReport = serde_json::from_str(
+        &fs::read_to_string(expected_delta_path).expect("experiment delta report file"),
+    )
+    .expect("valid experiment delta report json");
+
+    let actual = build_experiment_delta_report(
+        &experiment,
+        &pack,
+        &dataset,
+        &lexicon,
+        &rules,
+        &expected_report,
+    )
+    .expect("experiment delta report");
+
+    assert_eq!(actual, expected_delta);
 }

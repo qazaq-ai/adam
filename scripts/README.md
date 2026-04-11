@@ -33,6 +33,8 @@ Current starter utility:
   runs the tokenizer segmentation evaluation against deterministic roots and rules
 - `run_tokenizer_experiment.sh`
   runs the tokenizer experiment report with deterministic segmentation scoring
+- `run_tokenizer_experiment_delta.sh`
+  builds the tokenizer experiment drift summary against the expected experiment artifact
 - `run_training_baseline_plan.sh`
   builds the baseline training plan from current manifests
 - `run_training_baseline_assembly.sh`

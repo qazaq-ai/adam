@@ -36,6 +36,7 @@ The full tokenizer experiment runner also scores segmentation exact matches and
 reports failure cases and category-level morphology breakdowns:
 
 - `scripts/run_tokenizer_experiment.sh`
+- `scripts/run_tokenizer_experiment_delta.sh`
 
 ## Reporting
 
@@ -44,3 +45,5 @@ Segmentation reports must not stop at a single aggregate score.
 - every run should expose exact-match rates by morphology category
 - imperative, negation, tense, and voice chains must be inspectable separately
 - critical deterministic zones must expose guard buckets for `imperative`, `negation`, `voice`, and their intersections
+- the production experiment snapshot should be stored as `data/eval/tokenizer_experiment_report.json`
+- drift against that snapshot should be inspectable through `data/eval/tokenizer_experiment_delta_report.json`

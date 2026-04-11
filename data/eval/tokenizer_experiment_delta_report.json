@@ -1,0 +1,8 @@
+{
+  "experiment_name": "adam-tokenizer-deterministic",
+  "matches_expected": true,
+  "field_drifts": [],
+  "category_drifts": [],
+  "guard_drifts": [],
+  "failure_drifts": []
+}

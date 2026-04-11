@@ -1,0 +1,82 @@
+use std::{env, fs, process::ExitCode};
+
+use adam_tokenizer::{
+    SegmentationLexicon, SegmentationRuleSet, TokenizerDryRunPack, TokenizerExperiment,
+    TokenizerExperimentReport, TokenizerSegmentationDataset, build_experiment_delta_report,
+};
+
+fn main() -> ExitCode {
+    let mut args = env::args().skip(1);
+    let Some(experiment_path) = args.next() else {
+        eprintln!("usage: delta <experiment-manifest> <expected-experiment-report>");
+        return ExitCode::FAILURE;
+    };
+    let Some(expected_path) = args.next() else {
+        eprintln!("usage: delta <experiment-manifest> <expected-experiment-report>");
+        return ExitCode::FAILURE;
+    };
+
+    let experiment: TokenizerExperiment = match read_json(&experiment_path) {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read tokenizer experiment: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let pack: TokenizerDryRunPack = match read_json(&experiment.sample_pack_manifest) {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read tokenizer dry-run pack: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let dataset: TokenizerSegmentationDataset =
+        match read_json(&experiment.segmentation_eval_manifest) {
+            Ok(value) => value,
+            Err(error) => {
+                eprintln!("failed to read segmentation eval dataset: {error}");
+                return ExitCode::FAILURE;
+            }
+        };
+    let lexicon: SegmentationLexicon = match read_json(&experiment.segmentation_roots_manifest) {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read segmentation roots: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let rules: SegmentationRuleSet = match read_json(&experiment.segmentation_rules_manifest) {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read segmentation rules: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let expected: TokenizerExperimentReport = match read_json(&expected_path) {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read expected tokenizer experiment report: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    match build_experiment_delta_report(&experiment, &pack, &dataset, &lexicon, &rules, &expected) {
+        Ok(report) => {
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&report).expect("delta report serializes")
+            );
+            ExitCode::SUCCESS
+        }
+        Err(error) => {
+            eprintln!("failed to build tokenizer experiment delta report: {error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn read_json<T: serde::de::DeserializeOwned>(path: &str) -> Result<T, Box<dyn std::error::Error>> {
+    let contents = fs::read_to_string(path)?;
+    let value = serde_json::from_str(&contents)?;
+    Ok(value)
+}

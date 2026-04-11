@@ -1,0 +1,351 @@
+{
+  "experiment_name": "adam-tokenizer-deterministic",
+  "sample_count": 4,
+  "normalized_nonempty_count": 4,
+  "total_character_count": 127,
+  "average_character_count": 31,
+  "domains": [
+    "administrative",
+    "general",
+    "reference"
+  ],
+  "segmentation_dataset_name": "adam-tokenizer-segmentation",
+  "segmentation_example_count": 178,
+  "exact_match_count": 178,
+  "exact_match_rate_bps": 10000,
+  "category_breakdown": [
+    {
+      "category": "noun_inflection",
+      "example_count": 22,
+      "exact_match_count": 22,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "pronoun_inflection",
+      "example_count": 8,
+      "exact_match_count": 8,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_aorist",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_aorist_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_conditional",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_conditional_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_evidential_past",
+      "example_count": 4,
+      "exact_match_count": 4,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_evidential_past_with_voice",
+      "example_count": 2,
+      "exact_match_count": 2,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_future",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_future_with_voice",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_habitual_past",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_habitual_past_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_intentional_future",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_intentional_future_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_aorist",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_aorist_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_conditional",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_conditional_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_evidential_past",
+      "example_count": 4,
+      "exact_match_count": 4,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_evidential_past_with_voice",
+      "example_count": 2,
+      "exact_match_count": 2,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_future",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_future_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_habitual_past",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_habitual_past_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_past",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_past_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_plural_imperative",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_polite_imperative",
+      "example_count": 4,
+      "exact_match_count": 4,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_polite_imperative_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_polite_plural_imperative",
+      "example_count": 3,
+      "exact_match_count": 3,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_polite_plural_imperative_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_singular_imperative",
+      "example_count": 7,
+      "exact_match_count": 7,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_singular_imperative_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_third_person_imperative",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_third_person_imperative_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_volitional_imperative",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_negative_volitional_imperative_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_past",
+      "example_count": 6,
+      "exact_match_count": 6,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_past_with_voice",
+      "example_count": 4,
+      "exact_match_count": 4,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_plural_imperative",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_plural_imperative_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_polite_imperative",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_polite_imperative_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_polite_plural_imperative",
+      "example_count": 3,
+      "exact_match_count": 3,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_polite_plural_imperative_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_third_person_imperative",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_third_person_imperative_with_voice",
+      "example_count": 1,
+      "exact_match_count": 1,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "verb_volitional_imperative",
+      "example_count": 6,
+      "exact_match_count": 6,
+      "exact_match_rate_bps": 10000
+    }
+  ],
+  "critical_breakdown": [
+    {
+      "guard": "imperative_chain",
+      "example_count": 62,
+      "exact_match_count": 62,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "guard": "imperative_negation_chain",
+      "example_count": 34,
+      "exact_match_count": 34,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "guard": "imperative_negation_voice_chain",
+      "example_count": 5,
+      "exact_match_count": 5,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "guard": "imperative_voice_chain",
+      "example_count": 9,
+      "exact_match_count": 9,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "guard": "negation_chain",
+      "example_count": 70,
+      "exact_match_count": 70,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "guard": "negation_voice_chain",
+      "example_count": 12,
+      "exact_match_count": 12,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "guard": "voice_chain",
+      "example_count": 31,
+      "exact_match_count": 31,
+      "exact_match_rate_bps": 10000
+    }
+  ],
+  "failures": []
+}

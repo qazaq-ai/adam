@@ -208,6 +208,31 @@ pub struct TokenizerExperimentReport {
     pub failures: Vec<TokenizerSegmentationFailure>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenizerExperimentDeltaReport {
+    pub experiment_name: String,
+    pub matches_expected: bool,
+    pub field_drifts: Vec<TokenizerExperimentFieldDrift>,
+    pub category_drifts: Vec<TokenizerExperimentNamedCountDrift>,
+    pub guard_drifts: Vec<TokenizerExperimentNamedCountDrift>,
+    pub failure_drifts: Vec<TokenizerExperimentNamedCountDrift>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenizerExperimentFieldDrift {
+    pub field: String,
+    pub expected: String,
+    pub actual: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenizerExperimentNamedCountDrift {
+    pub scope: String,
+    pub key: String,
+    pub expected: Option<usize>,
+    pub actual: Option<usize>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct DeterministicSegmentationParse {
     part_of_speech: SegmentationPartOfSpeech,
@@ -670,6 +695,62 @@ pub fn build_experiment_report(
     })
 }
 
+pub fn build_experiment_delta_report(
+    experiment: &TokenizerExperiment,
+    pack: &TokenizerDryRunPack,
+    dataset: &TokenizerSegmentationDataset,
+    lexicon: &SegmentationLexicon,
+    rules: &SegmentationRuleSet,
+    expected: &TokenizerExperimentReport,
+) -> Result<TokenizerExperimentDeltaReport, TokenizerError> {
+    let actual = build_experiment_report(experiment, pack, dataset, lexicon, rules)?;
+
+    Ok(TokenizerExperimentDeltaReport {
+        experiment_name: experiment.name.clone(),
+        matches_expected: expected == &actual,
+        field_drifts: build_experiment_field_drifts(expected, &actual),
+        category_drifts: build_named_count_drifts(
+            "category",
+            expected
+                .category_breakdown
+                .iter()
+                .map(|entry| (entry.category.as_str(), entry.example_count))
+                .collect(),
+            actual
+                .category_breakdown
+                .iter()
+                .map(|entry| (entry.category.as_str(), entry.example_count))
+                .collect(),
+        ),
+        guard_drifts: build_named_count_drifts(
+            "guard",
+            expected
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.guard.as_str(), entry.example_count))
+                .collect(),
+            actual
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.guard.as_str(), entry.example_count))
+                .collect(),
+        ),
+        failure_drifts: build_named_count_drifts(
+            "failure",
+            expected
+                .failures
+                .iter()
+                .map(|entry| (entry.id.as_str(), entry.predicted_segments.len()))
+                .collect(),
+            actual
+                .failures
+                .iter()
+                .map(|entry| (entry.id.as_str(), entry.predicted_segments.len()))
+                .collect(),
+        ),
+    })
+}
+
 pub fn deterministic_segment_token(
     token: &str,
     lexicon: &SegmentationLexicon,
@@ -1011,6 +1092,103 @@ fn build_guard_breakdown(
         .collect()
 }
 
+fn build_experiment_field_drifts(
+    expected: &TokenizerExperimentReport,
+    actual: &TokenizerExperimentReport,
+) -> Vec<TokenizerExperimentFieldDrift> {
+    let mut drifts = Vec::new();
+    push_experiment_field_drift(
+        &mut drifts,
+        "sample_count",
+        expected.sample_count,
+        actual.sample_count,
+    );
+    push_experiment_field_drift(
+        &mut drifts,
+        "normalized_nonempty_count",
+        expected.normalized_nonempty_count,
+        actual.normalized_nonempty_count,
+    );
+    push_experiment_field_drift(
+        &mut drifts,
+        "total_character_count",
+        expected.total_character_count,
+        actual.total_character_count,
+    );
+    push_experiment_field_drift(
+        &mut drifts,
+        "average_character_count",
+        expected.average_character_count,
+        actual.average_character_count,
+    );
+    push_experiment_field_drift(
+        &mut drifts,
+        "segmentation_example_count",
+        expected.segmentation_example_count,
+        actual.segmentation_example_count,
+    );
+    push_experiment_field_drift(
+        &mut drifts,
+        "exact_match_count",
+        expected.exact_match_count,
+        actual.exact_match_count,
+    );
+    push_experiment_field_drift(
+        &mut drifts,
+        "exact_match_rate_bps",
+        expected.exact_match_rate_bps,
+        actual.exact_match_rate_bps,
+    );
+    drifts
+}
+
+fn push_experiment_field_drift<T: ToString + PartialEq>(
+    drifts: &mut Vec<TokenizerExperimentFieldDrift>,
+    field: &str,
+    expected: T,
+    actual: T,
+) {
+    if expected != actual {
+        drifts.push(TokenizerExperimentFieldDrift {
+            field: field.to_string(),
+            expected: expected.to_string(),
+            actual: actual.to_string(),
+        });
+    }
+}
+
+fn build_named_count_drifts(
+    scope: &str,
+    expected: Vec<(&str, usize)>,
+    actual: Vec<(&str, usize)>,
+) -> Vec<TokenizerExperimentNamedCountDrift> {
+    let mut expected_map = expected.into_iter().collect::<BTreeMap<_, _>>();
+    let mut actual_map = actual.into_iter().collect::<BTreeMap<_, _>>();
+    let mut keys = expected_map
+        .keys()
+        .chain(actual_map.keys())
+        .copied()
+        .collect::<Vec<_>>();
+    keys.sort_unstable();
+    keys.dedup();
+
+    let mut drifts = Vec::new();
+    for key in keys {
+        let expected_value = expected_map.remove(key);
+        let actual_value = actual_map.remove(key);
+        if expected_value != actual_value {
+            drifts.push(TokenizerExperimentNamedCountDrift {
+                scope: scope.to_string(),
+                key: key.to_string(),
+                expected: expected_value,
+                actual: actual_value,
+            });
+        }
+    }
+
+    drifts
+}
+
 fn classify_final_sound(form: &str) -> FinalSoundClass {
     let last = form
         .chars()
@@ -1059,7 +1237,7 @@ mod tests {
 
     fn test_lexicon() -> SegmentationLexicon {
         SegmentationLexicon {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-kazakh-segmentation-roots".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1196,7 +1374,7 @@ mod tests {
 
     fn test_rules() -> SegmentationRuleSet {
         SegmentationRuleSet {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-kazakh-segmentation-rules".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5170,7 +5348,7 @@ mod tests {
     #[test]
     fn accepts_kazakh_tokenizer_experiment() {
         let experiment = TokenizerExperiment {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5190,7 +5368,7 @@ mod tests {
     #[test]
     fn builds_dry_run_report() {
         let experiment = TokenizerExperiment {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5204,7 +5382,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5233,7 +5411,7 @@ mod tests {
     #[test]
     fn validates_segmentation_dataset_and_builds_report() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -6371,7 +6549,7 @@ mod tests {
     #[test]
     fn rejects_segmentation_dataset_with_mismatched_segments() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -8032,7 +8210,7 @@ mod tests {
     #[test]
     fn builds_experiment_report_with_segmentation_scoring() {
         let experiment = TokenizerExperiment {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -8046,7 +8224,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -8057,7 +8235,7 @@ mod tests {
             }],
         };
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.50".to_string(),
+            version: "0.0.51".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

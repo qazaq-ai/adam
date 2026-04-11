@@ -20,6 +20,8 @@ jq empty data/eval/benchmark_delta_report.json
 jq empty data/eval/kazakh_foundation_eval_dataset.json
 jq empty data/eval/tokenizer_segmentation_eval_dataset.json
 jq empty data/eval/tokenizer_experiment_manifest.json
+jq empty data/eval/tokenizer_experiment_report.json
+jq empty data/eval/tokenizer_experiment_delta_report.json
 jq empty data/tokenizer/segmentation_roots.json
 jq empty data/tokenizer/segmentation_rules.json
 jq empty data/training/baseline_training_manifest.json
@@ -40,6 +42,7 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_eval_benchmark_delta.sh
 ./scripts/run_tokenizer_segmentation_eval.sh
 ./scripts/run_tokenizer_experiment.sh
+./scripts/run_tokenizer_experiment_delta.sh
 ./scripts/run_training_baseline_plan.sh
 ./scripts/run_training_baseline_assembly.sh
 ./scripts/run_training_baseline_consistency.sh
