@@ -1,0 +1,69 @@
+{
+  "report_name": "adam-source-acceptance-report",
+  "source_count": 4,
+  "accepted_source_count": 3,
+  "rejected_source_count": 1,
+  "category_breakdown": [
+    {
+      "category": "domain_administrative",
+      "source_count": 1,
+      "accepted_source_count": 0
+    },
+    {
+      "category": "domain_education",
+      "source_count": 1,
+      "accepted_source_count": 1
+    },
+    {
+      "category": "domain_general",
+      "source_count": 1,
+      "accepted_source_count": 1
+    },
+    {
+      "category": "domain_reference",
+      "source_count": 1,
+      "accepted_source_count": 1
+    },
+    {
+      "category": "quality_tier_reviewed",
+      "source_count": 2,
+      "accepted_source_count": 2
+    },
+    {
+      "category": "quality_tier_seed",
+      "source_count": 1,
+      "accepted_source_count": 0
+    },
+    {
+      "category": "quality_tier_training_ready",
+      "source_count": 1,
+      "accepted_source_count": 1
+    }
+  ],
+  "critical_breakdown": [
+    {
+      "guard": "accepted_for_training",
+      "source_count": 3
+    },
+    {
+      "guard": "raw_stage_source",
+      "source_count": 1
+    },
+    {
+      "guard": "rejected_for_training",
+      "source_count": 1
+    },
+    {
+      "guard": "review_required_source",
+      "source_count": 1
+    },
+    {
+      "guard": "seed_quality_source",
+      "source_count": 1
+    },
+    {
+      "guard": "training_allowed_source",
+      "source_count": 3
+    }
+  ]
+}

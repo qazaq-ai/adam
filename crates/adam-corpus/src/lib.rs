@@ -112,6 +112,53 @@ pub struct SourceAcceptanceReport {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceAcceptanceSummaryReport {
+    pub report_name: String,
+    pub source_count: usize,
+    pub accepted_source_count: usize,
+    pub rejected_source_count: usize,
+    pub category_breakdown: Vec<SourceAcceptanceCategoryReport>,
+    pub critical_breakdown: Vec<SourceAcceptanceGuardReport>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceAcceptanceCategoryReport {
+    pub category: String,
+    pub source_count: usize,
+    pub accepted_source_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceAcceptanceGuardReport {
+    pub guard: String,
+    pub source_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceAcceptanceDeltaReport {
+    pub report_name: String,
+    pub matches_expected: bool,
+    pub field_drifts: Vec<SourceAcceptanceFieldDrift>,
+    pub category_drifts: Vec<SourceAcceptanceNamedDrift>,
+    pub guard_drifts: Vec<SourceAcceptanceNamedDrift>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceAcceptanceFieldDrift {
+    pub field: String,
+    pub expected: String,
+    pub actual: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceAcceptanceNamedDrift {
+    pub scope: String,
+    pub key: String,
+    pub expected: Option<usize>,
+    pub actual: Option<usize>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CorpusManifest {
     pub version: String,
     pub name: String,
@@ -406,6 +453,235 @@ pub fn default_source_acceptance_report_name(registry: &SourceRegistry) -> Strin
     } else {
         "adam-source-review-report".to_string()
     }
+}
+
+pub fn build_source_acceptance_summary_report(
+    report: &SourceAcceptanceReport,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+) -> Result<SourceAcceptanceSummaryReport, CorpusError> {
+    report.validate(registry, rules)?;
+
+    let mut category_breakdown = std::collections::BTreeMap::<String, (usize, usize)>::new();
+    let mut critical_breakdown = std::collections::BTreeMap::<String, usize>::new();
+
+    for record in &report.records {
+        let entry = registry
+            .entries
+            .iter()
+            .find(|entry| entry.id == record.source_id)
+            .ok_or(CorpusError::AcceptanceReportCoverageMismatch)?;
+
+        for category in acceptance_categories(entry) {
+            let stats = category_breakdown.entry(category).or_insert((0, 0));
+            stats.0 += 1;
+            if record.accepted_for_training {
+                stats.1 += 1;
+            }
+        }
+
+        for guard in acceptance_guards(entry, record) {
+            *critical_breakdown.entry(guard).or_default() += 1;
+        }
+    }
+
+    Ok(SourceAcceptanceSummaryReport {
+        report_name: report.name.clone(),
+        source_count: report.records.len(),
+        accepted_source_count: report
+            .records
+            .iter()
+            .filter(|record| record.accepted_for_training)
+            .count(),
+        rejected_source_count: report
+            .records
+            .iter()
+            .filter(|record| !record.accepted_for_training)
+            .count(),
+        category_breakdown: category_breakdown
+            .into_iter()
+            .map(|(category, (source_count, accepted_source_count))| {
+                SourceAcceptanceCategoryReport {
+                    category,
+                    source_count,
+                    accepted_source_count,
+                }
+            })
+            .collect(),
+        critical_breakdown: critical_breakdown
+            .into_iter()
+            .map(|(guard, source_count)| SourceAcceptanceGuardReport {
+                guard,
+                source_count,
+            })
+            .collect(),
+    })
+}
+
+pub fn build_source_acceptance_delta_report(
+    report: &SourceAcceptanceReport,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    expected: &SourceAcceptanceSummaryReport,
+) -> Result<SourceAcceptanceDeltaReport, CorpusError> {
+    let actual = build_source_acceptance_summary_report(report, registry, rules)?;
+
+    Ok(SourceAcceptanceDeltaReport {
+        report_name: report.name.clone(),
+        matches_expected: expected == &actual,
+        field_drifts: build_acceptance_field_drifts(expected, &actual),
+        category_drifts: build_acceptance_named_drifts(
+            "category",
+            expected
+                .category_breakdown
+                .iter()
+                .map(|entry| (entry.category.as_str(), entry.source_count))
+                .collect(),
+            actual
+                .category_breakdown
+                .iter()
+                .map(|entry| (entry.category.as_str(), entry.source_count))
+                .collect(),
+        ),
+        guard_drifts: build_acceptance_named_drifts(
+            "guard",
+            expected
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.guard.as_str(), entry.source_count))
+                .collect(),
+            actual
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.guard.as_str(), entry.source_count))
+                .collect(),
+        ),
+    })
+}
+
+fn acceptance_categories(entry: &SourceRegistryEntry) -> Vec<String> {
+    vec![
+        format!("domain_{}", source_domain_slug(&entry.domain)),
+        format!("quality_tier_{}", quality_tier_slug(&entry.quality_tier)),
+    ]
+}
+
+fn acceptance_guards(entry: &SourceRegistryEntry, record: &SourceAcceptanceRecord) -> Vec<String> {
+    let mut guards = Vec::new();
+
+    if record.accepted_for_training {
+        guards.push("accepted_for_training".to_string());
+    } else {
+        guards.push("rejected_for_training".to_string());
+    }
+
+    if entry.stage == CorpusStage::Raw {
+        guards.push("raw_stage_source".to_string());
+    }
+    if entry.license_class == LicenseClass::ReviewRequired {
+        guards.push("review_required_source".to_string());
+    }
+    if entry.quality_tier == QualityTier::Seed {
+        guards.push("seed_quality_source".to_string());
+    }
+    if entry.allowed_for_training {
+        guards.push("training_allowed_source".to_string());
+    }
+
+    guards
+}
+
+fn source_domain_slug(domain: &SourceDomain) -> &'static str {
+    match domain {
+        SourceDomain::General => "general",
+        SourceDomain::Reference => "reference",
+        SourceDomain::Administrative => "administrative",
+        SourceDomain::Education => "education",
+    }
+}
+
+fn quality_tier_slug(tier: &QualityTier) -> &'static str {
+    match tier {
+        QualityTier::Seed => "seed",
+        QualityTier::Reviewed => "reviewed",
+        QualityTier::TrainingReady => "training_ready",
+    }
+}
+
+fn build_acceptance_field_drifts(
+    expected: &SourceAcceptanceSummaryReport,
+    actual: &SourceAcceptanceSummaryReport,
+) -> Vec<SourceAcceptanceFieldDrift> {
+    let mut drifts = Vec::new();
+    push_acceptance_field_drift(
+        &mut drifts,
+        "source_count",
+        expected.source_count,
+        actual.source_count,
+    );
+    push_acceptance_field_drift(
+        &mut drifts,
+        "accepted_source_count",
+        expected.accepted_source_count,
+        actual.accepted_source_count,
+    );
+    push_acceptance_field_drift(
+        &mut drifts,
+        "rejected_source_count",
+        expected.rejected_source_count,
+        actual.rejected_source_count,
+    );
+    drifts
+}
+
+fn push_acceptance_field_drift<T: ToString + PartialEq>(
+    drifts: &mut Vec<SourceAcceptanceFieldDrift>,
+    field: &str,
+    expected: T,
+    actual: T,
+) {
+    if expected != actual {
+        drifts.push(SourceAcceptanceFieldDrift {
+            field: field.to_string(),
+            expected: expected.to_string(),
+            actual: actual.to_string(),
+        });
+    }
+}
+
+fn build_acceptance_named_drifts(
+    scope: &str,
+    expected: Vec<(&str, usize)>,
+    actual: Vec<(&str, usize)>,
+) -> Vec<SourceAcceptanceNamedDrift> {
+    let mut expected_map = expected
+        .into_iter()
+        .collect::<std::collections::BTreeMap<_, _>>();
+    let mut actual_map = actual
+        .into_iter()
+        .collect::<std::collections::BTreeMap<_, _>>();
+    let mut keys = expected_map
+        .keys()
+        .chain(actual_map.keys())
+        .copied()
+        .collect::<Vec<_>>();
+    keys.sort_unstable();
+    keys.dedup();
+
+    let mut drifts = Vec::new();
+    for key in keys {
+        let expected_value = expected_map.remove(key);
+        let actual_value = actual_map.remove(key);
+        if expected_value != actual_value {
+            drifts.push(SourceAcceptanceNamedDrift {
+                scope: scope.to_string(),
+                key: key.to_string(),
+                expected: expected_value,
+                actual: actual_value,
+            });
+        }
+    }
+    drifts
 }
 
 #[cfg(test)]

@@ -21,3 +21,14 @@ Raw data is not training data.
 - stage is explicit
 - training permission is explicit
 - source classification is explicit
+
+## Regression Artifacts
+
+The curated source acceptance layer now keeps deterministic regression artifacts:
+
+- `data/curated/source_acceptance_report.json`
+- `data/curated/source_acceptance_summary_report.json`
+- `data/curated/source_acceptance_delta_report.json`
+
+These artifacts make acceptance decisions observable by domain, quality tier,
+and acceptance guard instead of relying only on full-report equality.

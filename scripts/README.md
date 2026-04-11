@@ -25,6 +25,10 @@ Current starter utility:
   builds the deterministic eval benchmark delta report against the expected benchmark artifact
 - `generate_source_acceptance_report.sh`
   regenerates the curated source acceptance report from registry and scoring rules
+- `run_source_acceptance_summary.sh`
+  builds the deterministic source acceptance summary report from current artifacts
+- `run_source_acceptance_delta.sh`
+  builds the deterministic source acceptance delta report against the expected summary artifact
 - `run_tokenizer_segmentation_eval.sh`
   runs the tokenizer segmentation evaluation against deterministic roots and rules
 - `run_tokenizer_experiment.sh`

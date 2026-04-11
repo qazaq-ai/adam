@@ -9,6 +9,8 @@ trap 'rm -f "$tmp_acceptance_report"' EXIT
 
 jq empty data/curated/corpus_manifest.json
 jq empty data/curated/source_acceptance_report.json
+jq empty data/curated/source_acceptance_summary_report.json
+jq empty data/curated/source_acceptance_delta_report.json
 jq empty data/curated/tokenizer_dry_run_pack.json
 jq empty data/raw/source_registry.json
 jq empty data/raw/source_scoring_rules.json
@@ -31,6 +33,8 @@ cargo test -p adam-eval --tests -- --nocapture
 cargo test -p adam-train --tests -- --nocapture
 ./scripts/generate_source_acceptance_report.sh "$tmp_acceptance_report"
 cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
+./scripts/run_source_acceptance_summary.sh
+./scripts/run_source_acceptance_delta.sh
 ./scripts/run_tokenizer_dry_run.sh
 ./scripts/run_eval_benchmark_report.sh
 ./scripts/run_eval_benchmark_delta.sh
