@@ -218,6 +218,17 @@ pub struct TinyCleanTrainingDomainPack {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingSelectionManifest {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub source_clean_corpus_manifest: String,
+    pub source_clean_corpus_pack: String,
+    pub max_samples_per_domain: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TinyCleanTrainingCategoryReport {
     pub category: String,
     pub sample_count: usize,
@@ -250,6 +261,56 @@ pub struct TinyCleanTrainingReport {
     pub validation_exact_match_rate_bps: usize,
     pub category_breakdown: Vec<TinyCleanTrainingCategoryReport>,
     pub critical_breakdown: Vec<TinyCleanTrainingGuardReport>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CleanTrainingCorpusManifest {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub pack_manifests: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CleanTrainingCorpusSample {
+    pub id: String,
+    pub pack_name: String,
+    pub source_id: String,
+    pub domain: String,
+    pub text: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CleanTrainingCorpusPack {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub samples: Vec<CleanTrainingCorpusSample>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CleanTrainingCorpusCategoryReport {
+    pub category: String,
+    pub sample_count: usize,
+    pub token_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CleanTrainingCorpusGuardReport {
+    pub guard: String,
+    pub sample_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CleanTrainingCorpusReport {
+    pub corpus_name: String,
+    pub pack_count: usize,
+    pub sample_count: usize,
+    pub total_token_count: usize,
+    pub category_breakdown: Vec<CleanTrainingCorpusCategoryReport>,
+    pub critical_breakdown: Vec<CleanTrainingCorpusGuardReport>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -319,6 +380,10 @@ pub enum TrainingError {
     TinyTrainingSourceMismatch,
     #[error("tiny clean training manifest references are invalid or inconsistent")]
     TinyTrainingManifestMismatch,
+    #[error("tiny clean training selection manifest is invalid or inconsistent")]
+    TinyTrainingSelectionMismatch,
+    #[error("clean training corpus manifest references are invalid or inconsistent")]
+    CleanTrainingCorpusManifestMismatch,
 }
 
 impl BaselineTrainingManifest {
@@ -450,6 +515,52 @@ impl TinyCleanTrainingDomainPack {
     }
 }
 
+impl TinyCleanTrainingSelectionManifest {
+    pub fn validate(&self) -> Result<(), TrainingError> {
+        if self.target_language != "kazakh" {
+            return Err(TrainingError::NonKazakhLanguage);
+        }
+
+        if self.script != "cyrillic" {
+            return Err(TrainingError::NonCyrillicScript);
+        }
+
+        if self.source_clean_corpus_manifest.trim().is_empty()
+            || self.source_clean_corpus_pack.trim().is_empty()
+            || self.max_samples_per_domain == 0
+        {
+            return Err(TrainingError::TinyTrainingSelectionMismatch);
+        }
+
+        Ok(())
+    }
+}
+
+impl CleanTrainingCorpusManifest {
+    pub fn validate(&self) -> Result<(), TrainingError> {
+        if self.target_language != "kazakh" {
+            return Err(TrainingError::NonKazakhLanguage);
+        }
+
+        if self.script != "cyrillic" {
+            return Err(TrainingError::NonCyrillicScript);
+        }
+
+        if self.pack_manifests.is_empty() {
+            return Err(TrainingError::CleanTrainingCorpusManifestMismatch);
+        }
+
+        let mut seen_paths = std::collections::BTreeSet::new();
+        for path in &self.pack_manifests {
+            if path.trim().is_empty() || !seen_paths.insert(path.as_str()) {
+                return Err(TrainingError::CleanTrainingCorpusManifestMismatch);
+            }
+        }
+
+        Ok(())
+    }
+}
+
 pub fn assemble_tiny_clean_training_pack(
     manifest: &TinyCleanTrainingManifest,
     domain_packs: &[TinyCleanTrainingDomainPack],
@@ -499,6 +610,198 @@ pub fn assemble_tiny_clean_training_pack(
         target_language: manifest.target_language.clone(),
         script: manifest.script.clone(),
         samples,
+    })
+}
+
+pub fn assemble_tiny_clean_training_pack_from_corpus(
+    manifest: &TinyCleanTrainingSelectionManifest,
+    clean_corpus_manifest: &CleanTrainingCorpusManifest,
+    clean_corpus_pack: &CleanTrainingCorpusPack,
+) -> Result<TinyCleanTrainingPack, TrainingError> {
+    manifest.validate()?;
+    clean_corpus_manifest.validate()?;
+
+    if clean_corpus_manifest.name != clean_corpus_pack.name
+        || clean_corpus_manifest.version != clean_corpus_pack.version
+        || clean_corpus_manifest.target_language != clean_corpus_pack.target_language
+        || clean_corpus_manifest.script != clean_corpus_pack.script
+    {
+        return Err(TrainingError::TinyTrainingSelectionMismatch);
+    }
+
+    if clean_corpus_pack.target_language != manifest.target_language
+        || clean_corpus_pack.script != manifest.script
+        || clean_corpus_pack.samples.is_empty()
+    {
+        return Err(TrainingError::TinyTrainingSelectionMismatch);
+    }
+
+    let mut domain_counts = BTreeMap::<String, usize>::new();
+    let mut samples = Vec::new();
+    let mut next_index = 1usize;
+    for sample in &clean_corpus_pack.samples {
+        let count = domain_counts.entry(sample.domain.clone()).or_default();
+        if *count >= manifest.max_samples_per_domain {
+            continue;
+        }
+        samples.push(TinyCleanTrainingSample {
+            id: format!("clean_sample_{next_index:02}"),
+            source_id: sample.source_id.clone(),
+            domain: sample.domain.clone(),
+            text: sample.text.clone(),
+        });
+        *count += 1;
+        next_index += 1;
+    }
+
+    let distinct_domains = samples
+        .iter()
+        .map(|sample| sample.domain.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    if samples.is_empty() || distinct_domains.len() < 3 {
+        return Err(TrainingError::TinyTrainingSelectionMismatch);
+    }
+
+    Ok(TinyCleanTrainingPack {
+        version: manifest.version.clone(),
+        name: manifest.name.clone(),
+        target_language: manifest.target_language.clone(),
+        script: manifest.script.clone(),
+        samples,
+    })
+}
+
+pub fn assemble_clean_training_corpus_pack(
+    manifest: &CleanTrainingCorpusManifest,
+    packs: &[TinyCleanTrainingDomainPack],
+) -> Result<CleanTrainingCorpusPack, TrainingError> {
+    manifest.validate()?;
+
+    if manifest.pack_manifests.len() != packs.len() {
+        return Err(TrainingError::CleanTrainingCorpusManifestMismatch);
+    }
+
+    let mut seen_pack_names = std::collections::BTreeSet::new();
+    let mut samples = Vec::new();
+    let mut next_index = 1usize;
+    for pack in packs {
+        pack.validate()?;
+        if pack.target_language != manifest.target_language
+            || pack.script != manifest.script
+            || !seen_pack_names.insert(pack.name.as_str())
+        {
+            return Err(TrainingError::CleanTrainingCorpusManifestMismatch);
+        }
+
+        for text in &pack.samples {
+            samples.push(CleanTrainingCorpusSample {
+                id: format!("clean_corpus_sample_{next_index:02}"),
+                pack_name: pack.name.clone(),
+                source_id: pack.source_id.clone(),
+                domain: pack.domain.clone(),
+                text: text.clone(),
+            });
+            next_index += 1;
+        }
+    }
+
+    Ok(CleanTrainingCorpusPack {
+        version: manifest.version.clone(),
+        name: manifest.name.clone(),
+        target_language: manifest.target_language.clone(),
+        script: manifest.script.clone(),
+        samples,
+    })
+}
+
+pub fn build_clean_training_corpus_report(
+    manifest: &CleanTrainingCorpusManifest,
+    pack: &CleanTrainingCorpusPack,
+) -> Result<CleanTrainingCorpusReport, TrainingError> {
+    manifest.validate()?;
+
+    if manifest.name != pack.name
+        || manifest.version != pack.version
+        || manifest.target_language != pack.target_language
+        || manifest.script != pack.script
+        || pack.samples.is_empty()
+    {
+        return Err(TrainingError::CleanTrainingCorpusManifestMismatch);
+    }
+
+    let mut category_stats = BTreeMap::<String, (usize, usize)>::new();
+    let mut pack_counts = BTreeMap::<String, usize>::new();
+    for sample in &pack.samples {
+        if sample.id.trim().is_empty()
+            || sample.pack_name.trim().is_empty()
+            || sample.source_id.trim().is_empty()
+            || sample.domain.trim().is_empty()
+            || sample.text.trim().is_empty()
+            || contains_latin(&sample.text)
+        {
+            return Err(TrainingError::CleanTrainingCorpusManifestMismatch);
+        }
+
+        let token_count = tokenize_clean_training_text(&sample.text).len();
+        for category in [
+            format!("domain_{}", sample.domain),
+            format!("source_{}", sample.source_id),
+            format!("pack_{}", sample.pack_name),
+        ] {
+            let stats = category_stats.entry(category).or_insert((0, 0));
+            stats.0 += 1;
+            stats.1 += token_count;
+        }
+        *pack_counts.entry(sample.pack_name.clone()).or_default() += 1;
+    }
+
+    let mut category_breakdown = category_stats
+        .into_iter()
+        .map(
+            |(category, (sample_count, token_count))| CleanTrainingCorpusCategoryReport {
+                category,
+                sample_count,
+                token_count,
+            },
+        )
+        .collect::<Vec<_>>();
+    category_breakdown.sort_by(|left, right| left.category.cmp(&right.category));
+
+    let mut critical_breakdown = vec![
+        CleanTrainingCorpusGuardReport {
+            guard: "clean_pack_coverage".to_string(),
+            sample_count: pack.samples.len(),
+        },
+        CleanTrainingCorpusGuardReport {
+            guard: "multi_pack_coverage".to_string(),
+            sample_count: usize::from(pack_counts.len() == manifest.pack_manifests.len())
+                * pack.samples.len(),
+        },
+        CleanTrainingCorpusGuardReport {
+            guard: "multi_domain_coverage".to_string(),
+            sample_count: usize::from(
+                pack.samples
+                    .iter()
+                    .map(|sample| sample.domain.as_str())
+                    .collect::<std::collections::BTreeSet<_>>()
+                    .len()
+                    >= 3,
+            ) * pack.samples.len(),
+        },
+    ];
+    critical_breakdown.sort_by(|left, right| left.guard.cmp(&right.guard));
+
+    Ok(CleanTrainingCorpusReport {
+        corpus_name: pack.name.clone(),
+        pack_count: pack_counts.len(),
+        sample_count: pack.samples.len(),
+        total_token_count: pack
+            .samples
+            .iter()
+            .map(|sample| tokenize_clean_training_text(&sample.text).len())
+            .sum(),
+        category_breakdown,
+        critical_breakdown,
     })
 }
 

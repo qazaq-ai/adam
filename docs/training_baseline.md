@@ -44,13 +44,28 @@ The first tiny clean training prototype is built through:
 
 - `scripts/run_tiny_clean_training.sh`
 
+The next clean corpus tier is assembled through:
+
+- `scripts/run_clean_training_corpus_assembly.sh`
+- `scripts/run_clean_training_corpus_report.sh`
+
 Its clean corpus is now sourced through:
 
+- `data/curated/tiny_clean_training_selection_manifest.json`
 - `data/curated/tiny_clean_training_manifest.json`
 - `data/curated/tiny_clean_general_pack.json`
 - `data/curated/tiny_clean_reference_pack.json`
 - `data/curated/tiny_clean_education_pack.json`
 - `data/curated/tiny_clean_training_pack.json` as the assembled regression artifact
+
+The larger clean corpus tier is sourced through:
+
+- `data/curated/clean_training_corpus_manifest.json`
+- `data/curated/clean_general_extension_pack.json`
+- `data/curated/clean_reference_extension_pack.json`
+- `data/curated/clean_education_extension_pack.json`
+- `data/curated/clean_training_corpus_pack.json`
+- `data/training/clean_training_corpus_report.json`
 
 ## Output
 

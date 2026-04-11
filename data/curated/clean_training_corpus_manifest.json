@@ -1,0 +1,14 @@
+{
+  "version": "0.0.54",
+  "name": "adam-clean-training-corpus",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "pack_manifests": [
+    "tiny_clean_general_pack.json",
+    "tiny_clean_reference_pack.json",
+    "tiny_clean_education_pack.json",
+    "clean_general_extension_pack.json",
+    "clean_reference_extension_pack.json",
+    "clean_education_extension_pack.json"
+  ]
+}

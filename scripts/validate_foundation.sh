@@ -11,8 +11,14 @@ jq empty data/curated/corpus_manifest.json
 jq empty data/curated/source_acceptance_report.json
 jq empty data/curated/source_acceptance_summary_report.json
 jq empty data/curated/source_acceptance_delta_report.json
+jq empty data/curated/clean_training_corpus_manifest.json
+jq empty data/curated/clean_training_corpus_pack.json
+jq empty data/curated/clean_general_extension_pack.json
+jq empty data/curated/clean_reference_extension_pack.json
+jq empty data/curated/clean_education_extension_pack.json
 jq empty data/curated/tokenizer_dry_run_pack.json
 jq empty data/curated/tiny_clean_training_manifest.json
+jq empty data/curated/tiny_clean_training_selection_manifest.json
 jq empty data/curated/tiny_clean_general_pack.json
 jq empty data/curated/tiny_clean_reference_pack.json
 jq empty data/curated/tiny_clean_education_pack.json
@@ -33,6 +39,7 @@ jq empty data/training/baseline_training_manifest.json
 jq empty data/training/baseline_training_assembly_report.json
 jq empty data/training/baseline_training_consistency_report.json
 jq empty data/training/baseline_training_delta_report.json
+jq empty data/training/clean_training_corpus_report.json
 jq empty data/training/tiny_clean_training_report.json
 jq empty data/foundation/foundation_overview_report.json
 jq empty data/foundation/foundation_overview_delta_report.json
@@ -55,6 +62,8 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_training_baseline_assembly.sh
 ./scripts/run_training_baseline_consistency.sh
 ./scripts/run_training_baseline_delta.sh
+./scripts/run_clean_training_corpus_assembly.sh
+./scripts/run_clean_training_corpus_report.sh
 ./scripts/run_tiny_clean_training.sh
 ./scripts/run_foundation_overview.sh
 ./scripts/run_foundation_overview_delta.sh

@@ -12,11 +12,13 @@ use adam_tokenizer::{
 };
 use adam_train::{
     BaselineTrainingAssemblyReport, BaselineTrainingConsistencyReport, BaselineTrainingDeltaReport,
-    BaselineTrainingManifest, FoundationOverviewDeltaReport, FoundationOverviewReport,
-    TinyCleanTrainingDomainPack, TinyCleanTrainingManifest, TinyCleanTrainingPack,
-    TinyCleanTrainingReport, assemble_tiny_clean_training_pack,
-    build_baseline_training_assembly_report, build_baseline_training_consistency_report,
-    build_baseline_training_delta_report, build_baseline_training_plan,
+    BaselineTrainingManifest, CleanTrainingCorpusManifest, CleanTrainingCorpusPack,
+    CleanTrainingCorpusReport, FoundationOverviewDeltaReport, FoundationOverviewReport,
+    TinyCleanTrainingDomainPack, TinyCleanTrainingPack, TinyCleanTrainingReport,
+    TinyCleanTrainingSelectionManifest, assemble_clean_training_corpus_pack,
+    assemble_tiny_clean_training_pack_from_corpus, build_baseline_training_assembly_report,
+    build_baseline_training_consistency_report, build_baseline_training_delta_report,
+    build_baseline_training_plan, build_clean_training_corpus_report,
     build_foundation_overview_delta_report, build_foundation_overview_report,
     build_tiny_clean_training_report,
 };
@@ -594,38 +596,36 @@ fn tiny_clean_training_report_matches_expected_regression_artifact() {
     let report: SourceAcceptanceReport =
         serde_json::from_str(&fs::read_to_string(report_path).expect("acceptance report file"))
             .expect("valid source acceptance report json");
-    let tiny_manifest_path = concat!(
+    let selection_manifest_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_training_manifest.json"
+        "/../../data/curated/tiny_clean_training_selection_manifest.json"
     );
-    let tiny_manifest: TinyCleanTrainingManifest = serde_json::from_str(
-        &fs::read_to_string(tiny_manifest_path).expect("tiny training manifest file"),
+    let selection_manifest: TinyCleanTrainingSelectionManifest = serde_json::from_str(
+        &fs::read_to_string(selection_manifest_path)
+            .expect("tiny training selection manifest file"),
     )
-    .expect("valid tiny training manifest json");
-    let general_pack_path = concat!(
+    .expect("valid tiny training selection manifest json");
+    let clean_manifest_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_general_pack.json"
+        "/../../data/curated/clean_training_corpus_manifest.json"
     );
-    let reference_pack_path = concat!(
+    let clean_pack_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_reference_pack.json"
+        "/../../data/curated/clean_training_corpus_pack.json"
     );
-    let education_pack_path = concat!(
-        env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_education_pack.json"
-    );
-    let domain_packs: Vec<TinyCleanTrainingDomainPack> =
-        [general_pack_path, reference_pack_path, education_pack_path]
-            .into_iter()
-            .map(|path| {
-                serde_json::from_str(
-                    &fs::read_to_string(path).expect("tiny training domain pack file"),
-                )
-                .expect("valid tiny training domain pack json")
-            })
-            .collect();
-    let pack = assemble_tiny_clean_training_pack(&tiny_manifest, &domain_packs)
-        .expect("assembled tiny clean training pack");
+    let clean_manifest: CleanTrainingCorpusManifest = serde_json::from_str(
+        &fs::read_to_string(clean_manifest_path).expect("clean corpus manifest file"),
+    )
+    .expect("valid clean corpus manifest json");
+    let clean_pack: CleanTrainingCorpusPack =
+        serde_json::from_str(&fs::read_to_string(clean_pack_path).expect("clean corpus pack file"))
+            .expect("valid clean corpus pack json");
+    let pack = assemble_tiny_clean_training_pack_from_corpus(
+        &selection_manifest,
+        &clean_manifest,
+        &clean_pack,
+    )
+    .expect("assembled tiny clean training pack");
     let expected_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
         "/../../data/training/tiny_clean_training_report.json"
@@ -642,36 +642,30 @@ fn tiny_clean_training_report_matches_expected_regression_artifact() {
 
 #[test]
 fn tiny_clean_training_pack_matches_domain_manifest_assembly() {
-    let tiny_manifest_path = concat!(
+    let selection_manifest_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_training_manifest.json"
+        "/../../data/curated/tiny_clean_training_selection_manifest.json"
     );
-    let tiny_manifest: TinyCleanTrainingManifest = serde_json::from_str(
-        &fs::read_to_string(tiny_manifest_path).expect("tiny training manifest file"),
+    let selection_manifest: TinyCleanTrainingSelectionManifest = serde_json::from_str(
+        &fs::read_to_string(selection_manifest_path)
+            .expect("tiny training selection manifest file"),
     )
-    .expect("valid tiny training manifest json");
-    let general_pack_path = concat!(
+    .expect("valid tiny training selection manifest json");
+    let clean_manifest_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_general_pack.json"
+        "/../../data/curated/clean_training_corpus_manifest.json"
     );
-    let reference_pack_path = concat!(
+    let clean_pack_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_reference_pack.json"
+        "/../../data/curated/clean_training_corpus_pack.json"
     );
-    let education_pack_path = concat!(
-        env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_education_pack.json"
-    );
-    let domain_packs: Vec<TinyCleanTrainingDomainPack> =
-        [general_pack_path, reference_pack_path, education_pack_path]
-            .into_iter()
-            .map(|path| {
-                serde_json::from_str(
-                    &fs::read_to_string(path).expect("tiny training domain pack file"),
-                )
-                .expect("valid tiny training domain pack json")
-            })
-            .collect();
+    let clean_manifest: CleanTrainingCorpusManifest = serde_json::from_str(
+        &fs::read_to_string(clean_manifest_path).expect("clean corpus manifest file"),
+    )
+    .expect("valid clean corpus manifest json");
+    let clean_pack: CleanTrainingCorpusPack =
+        serde_json::from_str(&fs::read_to_string(clean_pack_path).expect("clean corpus pack file"))
+            .expect("valid clean corpus pack json");
     let expected_pack_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
         "/../../data/curated/tiny_clean_training_pack.json"
@@ -681,10 +675,101 @@ fn tiny_clean_training_pack_matches_domain_manifest_assembly() {
     )
     .expect("valid tiny training pack json");
 
-    let actual_pack = assemble_tiny_clean_training_pack(&tiny_manifest, &domain_packs)
-        .expect("assembled tiny clean training pack");
+    let actual_pack = assemble_tiny_clean_training_pack_from_corpus(
+        &selection_manifest,
+        &clean_manifest,
+        &clean_pack,
+    )
+    .expect("assembled tiny clean training pack");
 
     assert_eq!(actual_pack, expected_pack);
+}
+
+#[test]
+fn clean_training_corpus_pack_matches_manifest_assembly() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_manifest.json"
+    );
+    let manifest: CleanTrainingCorpusManifest =
+        serde_json::from_str(&fs::read_to_string(manifest_path).expect("clean corpus manifest"))
+            .expect("valid clean corpus manifest json");
+    let pack_paths = [
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../data/curated/tiny_clean_general_pack.json"
+        ),
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../data/curated/tiny_clean_reference_pack.json"
+        ),
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../data/curated/tiny_clean_education_pack.json"
+        ),
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../data/curated/clean_general_extension_pack.json"
+        ),
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../data/curated/clean_reference_extension_pack.json"
+        ),
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../data/curated/clean_education_extension_pack.json"
+        ),
+    ];
+    let domain_packs: Vec<TinyCleanTrainingDomainPack> = pack_paths
+        .into_iter()
+        .map(|path| {
+            serde_json::from_str(&fs::read_to_string(path).expect("clean corpus domain pack"))
+                .expect("valid clean corpus domain pack json")
+        })
+        .collect();
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_pack.json"
+    );
+    let expected: CleanTrainingCorpusPack =
+        serde_json::from_str(&fs::read_to_string(expected_path).expect("clean corpus pack"))
+            .expect("valid clean corpus pack json");
+
+    let actual = assemble_clean_training_corpus_pack(&manifest, &domain_packs)
+        .expect("assembled clean corpus pack");
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn clean_training_corpus_report_matches_expected_regression_artifact() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_manifest.json"
+    );
+    let manifest: CleanTrainingCorpusManifest =
+        serde_json::from_str(&fs::read_to_string(manifest_path).expect("clean corpus manifest"))
+            .expect("valid clean corpus manifest json");
+    let pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_pack.json"
+    );
+    let pack: CleanTrainingCorpusPack =
+        serde_json::from_str(&fs::read_to_string(pack_path).expect("clean corpus pack"))
+            .expect("valid clean corpus pack json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/clean_training_corpus_report.json"
+    );
+    let expected: CleanTrainingCorpusReport = serde_json::from_str(
+        &fs::read_to_string(expected_path).expect("clean training corpus report"),
+    )
+    .expect("valid clean training corpus report json");
+
+    let actual =
+        build_clean_training_corpus_report(&manifest, &pack).expect("clean training corpus report");
+
+    assert_eq!(actual, expected);
 }
 
 #[test]

@@ -1,0 +1,82 @@
+{
+  "corpus_name": "adam-clean-training-corpus",
+  "pack_count": 6,
+  "sample_count": 45,
+  "total_token_count": 272,
+  "category_breakdown": [
+    {
+      "category": "domain_education",
+      "sample_count": 15,
+      "token_count": 87
+    },
+    {
+      "category": "domain_general",
+      "sample_count": 15,
+      "token_count": 94
+    },
+    {
+      "category": "domain_reference",
+      "sample_count": 15,
+      "token_count": 91
+    },
+    {
+      "category": "pack_adam-clean-education-extension-pack",
+      "sample_count": 6,
+      "token_count": 34
+    },
+    {
+      "category": "pack_adam-clean-general-extension-pack",
+      "sample_count": 6,
+      "token_count": 37
+    },
+    {
+      "category": "pack_adam-clean-reference-extension-pack",
+      "sample_count": 6,
+      "token_count": 36
+    },
+    {
+      "category": "pack_adam-tiny-clean-education-pack",
+      "sample_count": 9,
+      "token_count": 53
+    },
+    {
+      "category": "pack_adam-tiny-clean-general-pack",
+      "sample_count": 9,
+      "token_count": 57
+    },
+    {
+      "category": "pack_adam-tiny-clean-reference-pack",
+      "sample_count": 9,
+      "token_count": 55
+    },
+    {
+      "category": "source_curated_general_kazakh",
+      "sample_count": 15,
+      "token_count": 94
+    },
+    {
+      "category": "source_curated_reference_kazakh",
+      "sample_count": 15,
+      "token_count": 91
+    },
+    {
+      "category": "source_reviewed_education_kazakh",
+      "sample_count": 15,
+      "token_count": 87
+    }
+  ],
+  "critical_breakdown": [
+    {
+      "guard": "clean_pack_coverage",
+      "sample_count": 45
+    },
+    {
+      "guard": "multi_domain_coverage",
+      "sample_count": 45
+    },
+    {
+      "guard": "multi_pack_coverage",
+      "sample_count": 45
+    }
+  ]
+}

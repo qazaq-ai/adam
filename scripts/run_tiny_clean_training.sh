@@ -6,4 +6,4 @@ cd "$repo_root"
 
 cargo run -p adam-train --bin tiny_train -- \
   data/training/baseline_training_manifest.json \
-  data/curated/tiny_clean_training_manifest.json
+  data/curated/tiny_clean_training_selection_manifest.json

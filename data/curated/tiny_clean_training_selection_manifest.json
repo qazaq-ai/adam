@@ -1,0 +1,9 @@
+{
+  "version": "0.0.54",
+  "name": "adam-tiny-clean-training-pack",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "source_clean_corpus_manifest": "clean_training_corpus_manifest.json",
+  "source_clean_corpus_pack": "clean_training_corpus_pack.json",
+  "max_samples_per_domain": 9
+}
