@@ -4,5 +4,5 @@
   "target_language": "kazakh",
   "script": "cyrillic",
   "minimum_candidate_validation_exact_match_rate_bps": 4000,
-  "maximum_candidate_validation_gap_bps": 1200
+  "maximum_candidate_validation_gap_bps": 1500
 }

@@ -14,4 +14,7 @@ cargo run -p adam-train --bin foundation_overview -- \
   data/training/baseline_training_consistency_report.json \
   data/training/baseline_training_delta_report.json \
   data/training/tiny_clean_training_report.json \
-  data/training/tiny_clean_training_profile_baseline_delta_report.json
+  data/training/tiny_clean_training_profile_baseline_report.json \
+  data/training/tiny_clean_training_profile_baseline_delta_report.json \
+  data/training/tiny_clean_training_profile_strategy_report.json \
+  data/training/tiny_clean_training_profile_strategy_delta_report.json

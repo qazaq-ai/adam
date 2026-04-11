@@ -5,69 +5,88 @@ use adam_eval::{EvalBenchmarkDeltaReport, EvalBenchmarkReport};
 use adam_tokenizer::{TokenizerExperimentDeltaReport, TokenizerExperimentReport};
 use adam_train::{
     BaselineTrainingConsistencyReport, BaselineTrainingDeltaReport, FoundationOverviewReport,
-    TinyCleanTrainingProfileBaselineDeltaReport, TinyCleanTrainingReport,
-    build_foundation_overview_report,
+    TinyCleanTrainingProfileBaselineDeltaReport, TinyCleanTrainingProfileBaselineReport,
+    TinyCleanTrainingProfileStrategyDeltaReport, TinyCleanTrainingProfileStrategyReport,
+    TinyCleanTrainingReport, build_foundation_overview_report,
 };
 
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
     let Some(corpus_summary_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-delta>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
     let Some(corpus_delta_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
     let Some(tokenizer_report_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
     let Some(tokenizer_delta_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
     let Some(eval_report_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
     let Some(eval_delta_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
     let Some(training_consistency_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
     let Some(training_delta_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
     let Some(tiny_training_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-delta>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
+        );
+        return ExitCode::FAILURE;
+    };
+    let Some(tiny_profile_policy_report_path) = args.next() else {
+        eprintln!(
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
     let Some(tiny_profile_policy_delta_path) = args.next() else {
         eprintln!(
-            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-delta>"
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
+        );
+        return ExitCode::FAILURE;
+    };
+    let Some(tiny_profile_strategy_report_path) = args.next() else {
+        eprintln!(
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
+        );
+        return ExitCode::FAILURE;
+    };
+    let Some(tiny_profile_strategy_delta_path) = args.next() else {
+        eprintln!(
+            "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta>"
         );
         return ExitCode::FAILURE;
     };
@@ -109,8 +128,23 @@ fn main() -> ExitCode {
         Ok(value) => value,
         Err(code) => return code,
     };
+    let tiny_profile_policy: TinyCleanTrainingProfileBaselineReport =
+        match load(&tiny_profile_policy_report_path) {
+            Ok(value) => value,
+            Err(code) => return code,
+        };
     let tiny_profile_policy_delta: TinyCleanTrainingProfileBaselineDeltaReport =
         match load(&tiny_profile_policy_delta_path) {
+            Ok(value) => value,
+            Err(code) => return code,
+        };
+    let tiny_profile_strategy: TinyCleanTrainingProfileStrategyReport =
+        match load(&tiny_profile_strategy_report_path) {
+            Ok(value) => value,
+            Err(code) => return code,
+        };
+    let tiny_profile_strategy_delta: TinyCleanTrainingProfileStrategyDeltaReport =
+        match load(&tiny_profile_strategy_delta_path) {
             Ok(value) => value,
             Err(code) => return code,
         };
@@ -125,7 +159,10 @@ fn main() -> ExitCode {
         &training_consistency,
         &training_delta,
         &tiny_training,
+        &tiny_profile_policy,
         &tiny_profile_policy_delta,
+        &tiny_profile_strategy,
+        &tiny_profile_strategy_delta,
     );
     println!(
         "{}",

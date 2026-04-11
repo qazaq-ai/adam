@@ -8,6 +8,7 @@
   "tiny_training_vocabulary_size": 95,
   "tiny_training_validation_exact_match_rate_bps": 5000,
   "tiny_profile_policy_matches_expected": true,
+  "tiny_profile_strategy_matches_expected": true,
   "layer_breakdown": [
     {
       "layer": "corpus",
@@ -44,6 +45,12 @@
       "ready": true,
       "primary_metric_name": "policy_matches_expected",
       "primary_metric_value": "true"
+    },
+    {
+      "layer": "tiny_profile_strategy",
+      "ready": true,
+      "primary_metric_name": "strategy_matches_expected",
+      "primary_metric_value": "true"
     }
   ],
   "critical_breakdown": [
@@ -73,6 +80,10 @@
     },
     {
       "check": "tiny_profile_policy_matches_expected",
+      "passed": true
+    },
+    {
+      "check": "tiny_profile_strategy_matches_expected",
       "passed": true
     }
   ]
