@@ -7,6 +7,7 @@
   "training_total_sequence_count": 1024,
   "tiny_training_vocabulary_size": 95,
   "tiny_training_validation_exact_match_rate_bps": 5000,
+  "tiny_profile_policy_matches_expected": true,
   "layer_breakdown": [
     {
       "layer": "corpus",
@@ -37,6 +38,12 @@
       "ready": true,
       "primary_metric_name": "validation_exact_match_rate_bps",
       "primary_metric_value": "5000"
+    },
+    {
+      "layer": "tiny_profile_policy",
+      "ready": true,
+      "primary_metric_name": "policy_matches_expected",
+      "primary_metric_value": "true"
     }
   ],
   "critical_breakdown": [
@@ -62,6 +69,10 @@
     },
     {
       "check": "tiny_training_uses_clean_sources",
+      "passed": true
+    },
+    {
+      "check": "tiny_profile_policy_matches_expected",
       "passed": true
     }
   ]

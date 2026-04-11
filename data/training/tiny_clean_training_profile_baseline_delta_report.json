@@ -1,0 +1,6 @@
+{
+  "policy_name": "adam-tiny-clean-profile-baseline",
+  "matches_expected": true,
+  "field_drifts": [],
+  "check_drifts": []
+}

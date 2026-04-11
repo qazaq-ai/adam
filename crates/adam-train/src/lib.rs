@@ -319,6 +319,46 @@ pub struct TinyCleanTrainingProfileBaselineReport {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileBaselineDeltaReport {
+    pub policy_name: String,
+    pub matches_expected: bool,
+    pub field_drifts: Vec<BaselineTrainingFieldDrift>,
+    pub check_drifts: Vec<BaselineTrainingNamedBoolDrift>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileStrategyManifest {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub minimum_candidate_validation_exact_match_rate_bps: usize,
+    pub maximum_candidate_validation_gap_bps: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileStrategyCandidateReport {
+    pub profile: String,
+    pub pack_name: String,
+    pub validation_exact_match_rate_bps: usize,
+    pub validation_gap_bps: usize,
+    pub meets_minimum_validation_threshold: bool,
+    pub within_gap_budget: bool,
+    pub promotable: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileStrategyReport {
+    pub strategy_name: String,
+    pub suite_name: String,
+    pub baseline_profile: String,
+    pub baseline_validation_exact_match_rate_bps: usize,
+    pub promotable_profile_count: usize,
+    pub promotable_profiles: Vec<String>,
+    pub candidate_reports: Vec<TinyCleanTrainingProfileStrategyCandidateReport>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TinyCleanTrainingCategoryReport {
     pub category: String,
     pub sample_count: usize,
@@ -427,6 +467,7 @@ pub struct FoundationOverviewReport {
     pub training_total_sequence_count: u64,
     pub tiny_training_vocabulary_size: usize,
     pub tiny_training_validation_exact_match_rate_bps: usize,
+    pub tiny_profile_policy_matches_expected: bool,
     pub layer_breakdown: Vec<FoundationOverviewLayerReport>,
     pub critical_breakdown: Vec<FoundationOverviewCheck>,
 }
@@ -669,6 +710,18 @@ impl TinyCleanTrainingProfileBaselineManifest {
             return Err(TrainingError::NonKazakhLanguage);
         }
         if self.script != "cyrillic" || self.expected_best_profile.trim().is_empty() {
+            return Err(TrainingError::TinyTrainingProfileSuiteMismatch);
+        }
+        Ok(())
+    }
+}
+
+impl TinyCleanTrainingProfileStrategyManifest {
+    pub fn validate(&self) -> Result<(), TrainingError> {
+        if self.target_language != "kazakh" {
+            return Err(TrainingError::NonKazakhLanguage);
+        }
+        if self.script != "cyrillic" || self.name.trim().is_empty() {
             return Err(TrainingError::TinyTrainingProfileSuiteMismatch);
         }
         Ok(())
@@ -963,6 +1016,76 @@ pub fn build_tiny_clean_training_profile_baseline_report(
                 passed: comparison_report.profile_count > 0,
             },
         ],
+    })
+}
+
+pub fn build_tiny_clean_training_profile_baseline_delta_report(
+    expected: &TinyCleanTrainingProfileBaselineReport,
+    actual: &TinyCleanTrainingProfileBaselineReport,
+) -> TinyCleanTrainingProfileBaselineDeltaReport {
+    TinyCleanTrainingProfileBaselineDeltaReport {
+        policy_name: actual.policy_name.clone(),
+        matches_expected: expected == actual,
+        field_drifts: build_tiny_profile_baseline_field_drifts(expected, actual),
+        check_drifts: build_named_bool_drifts(
+            "policy_check",
+            expected
+                .policy_checks
+                .iter()
+                .map(|entry| (entry.check.as_str(), entry.passed))
+                .collect(),
+            actual
+                .policy_checks
+                .iter()
+                .map(|entry| (entry.check.as_str(), entry.passed))
+                .collect(),
+        ),
+    }
+}
+
+pub fn build_tiny_clean_training_profile_strategy_report(
+    manifest: &TinyCleanTrainingProfileStrategyManifest,
+    baseline_report: &TinyCleanTrainingProfileBaselineReport,
+    comparison_report: &TinyCleanTrainingProfileComparisonReport,
+) -> Result<TinyCleanTrainingProfileStrategyReport, TrainingError> {
+    manifest.validate()?;
+
+    let mut candidate_reports = comparison_report
+        .profile_gaps
+        .iter()
+        .map(|entry| {
+            let meets_minimum_validation_threshold = entry.validation_exact_match_rate_bps
+                >= manifest.minimum_candidate_validation_exact_match_rate_bps;
+            let within_gap_budget =
+                entry.validation_gap_bps <= manifest.maximum_candidate_validation_gap_bps;
+            TinyCleanTrainingProfileStrategyCandidateReport {
+                profile: entry.profile.clone(),
+                pack_name: entry.pack_name.clone(),
+                validation_exact_match_rate_bps: entry.validation_exact_match_rate_bps,
+                validation_gap_bps: entry.validation_gap_bps,
+                meets_minimum_validation_threshold,
+                within_gap_budget,
+                promotable: meets_minimum_validation_threshold && within_gap_budget,
+            }
+        })
+        .collect::<Vec<_>>();
+    candidate_reports.sort_by(|left, right| left.profile.cmp(&right.profile));
+
+    let promotable_profiles = candidate_reports
+        .iter()
+        .filter(|entry| entry.promotable)
+        .map(|entry| entry.profile.clone())
+        .collect::<Vec<_>>();
+
+    Ok(TinyCleanTrainingProfileStrategyReport {
+        strategy_name: manifest.name.clone(),
+        suite_name: comparison_report.suite_name.clone(),
+        baseline_profile: baseline_report.actual_best_profile.clone(),
+        baseline_validation_exact_match_rate_bps: baseline_report
+            .selected_validation_exact_match_rate_bps,
+        promotable_profile_count: promotable_profiles.len(),
+        promotable_profiles,
+        candidate_reports,
     })
 }
 
@@ -1636,6 +1759,7 @@ pub fn build_foundation_overview_report(
     training_consistency: &BaselineTrainingConsistencyReport,
     training_delta: &BaselineTrainingDeltaReport,
     tiny_training: &TinyCleanTrainingReport,
+    tiny_profile_policy_delta: &TinyCleanTrainingProfileBaselineDeltaReport,
 ) -> FoundationOverviewReport {
     let layer_breakdown = vec![
         FoundationOverviewLayerReport {
@@ -1669,6 +1793,12 @@ pub fn build_foundation_overview_report(
             primary_metric_name: "validation_exact_match_rate_bps".to_string(),
             primary_metric_value: tiny_training.validation_exact_match_rate_bps.to_string(),
         },
+        FoundationOverviewLayerReport {
+            layer: "tiny_profile_policy".to_string(),
+            ready: tiny_profile_policy_delta.matches_expected,
+            primary_metric_name: "policy_matches_expected".to_string(),
+            primary_metric_value: tiny_profile_policy_delta.matches_expected.to_string(),
+        },
     ];
     let critical_breakdown = vec![
         FoundationOverviewCheck {
@@ -1699,6 +1829,10 @@ pub fn build_foundation_overview_report(
                 .iter()
                 .any(|entry| entry.guard == "clean_source_only" && entry.sample_count > 0),
         },
+        FoundationOverviewCheck {
+            check: "tiny_profile_policy_matches_expected".to_string(),
+            passed: tiny_profile_policy_delta.matches_expected,
+        },
     ];
 
     FoundationOverviewReport {
@@ -1711,6 +1845,7 @@ pub fn build_foundation_overview_report(
         tiny_training_vocabulary_size: tiny_training.vocabulary_size,
         tiny_training_validation_exact_match_rate_bps: tiny_training
             .validation_exact_match_rate_bps,
+        tiny_profile_policy_matches_expected: tiny_profile_policy_delta.matches_expected,
         layer_breakdown,
         critical_breakdown,
     }
@@ -2221,6 +2356,68 @@ fn build_foundation_field_drifts(
         expected.tiny_training_validation_exact_match_rate_bps,
         actual.tiny_training_validation_exact_match_rate_bps,
     );
+    push_field_drift(
+        &mut drifts,
+        "tiny_profile_policy_matches_expected",
+        expected.tiny_profile_policy_matches_expected,
+        actual.tiny_profile_policy_matches_expected,
+    );
+    drifts
+}
+
+fn build_tiny_profile_baseline_field_drifts(
+    expected: &TinyCleanTrainingProfileBaselineReport,
+    actual: &TinyCleanTrainingProfileBaselineReport,
+) -> Vec<BaselineTrainingFieldDrift> {
+    let mut drifts = Vec::new();
+    push_field_drift(
+        &mut drifts,
+        "policy_name",
+        expected.policy_name.clone(),
+        actual.policy_name.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "suite_name",
+        expected.suite_name.clone(),
+        actual.suite_name.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "expected_best_profile",
+        expected.expected_best_profile.clone(),
+        actual.expected_best_profile.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "actual_best_profile",
+        expected.actual_best_profile.clone(),
+        actual.actual_best_profile.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "selected_pack_name",
+        expected.selected_pack_name.clone(),
+        actual.selected_pack_name.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "selected_validation_exact_match_rate_bps",
+        expected.selected_validation_exact_match_rate_bps,
+        actual.selected_validation_exact_match_rate_bps,
+    );
+    push_field_drift(
+        &mut drifts,
+        "matches_expected_best_profile",
+        expected.matches_expected_best_profile,
+        actual.matches_expected_best_profile,
+    );
+    push_field_drift(
+        &mut drifts,
+        "meets_minimum_validation_threshold",
+        expected.meets_minimum_validation_threshold,
+        actual.meets_minimum_validation_threshold,
+    );
     drifts
 }
 
@@ -2391,7 +2588,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2415,7 +2612,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2433,7 +2630,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2446,7 +2643,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -2475,7 +2672,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -2488,7 +2685,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -2518,7 +2715,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2554,7 +2751,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2572,7 +2769,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2585,7 +2782,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -2614,7 +2811,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -2627,7 +2824,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -2657,7 +2854,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2727,7 +2924,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2745,7 +2942,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -2759,7 +2956,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -2800,7 +2997,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -2821,7 +3018,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.55".to_string(),
+            version: "0.0.56".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

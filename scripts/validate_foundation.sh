@@ -21,6 +21,7 @@ jq empty data/curated/tiny_clean_training_manifest.json
 jq empty data/curated/tiny_clean_training_selection_manifest.json
 jq empty data/curated/tiny_clean_training_profile_suite_manifest.json
 jq empty data/curated/tiny_clean_training_profile_baseline_manifest.json
+jq empty data/curated/tiny_clean_training_profile_strategy_manifest.json
 jq empty data/curated/tiny_clean_general_pack.json
 jq empty data/curated/tiny_clean_reference_pack.json
 jq empty data/curated/tiny_clean_education_pack.json
@@ -45,6 +46,8 @@ jq empty data/training/clean_training_corpus_report.json
 jq empty data/training/tiny_clean_training_profile_suite_report.json
 jq empty data/training/tiny_clean_training_profile_comparison_report.json
 jq empty data/training/tiny_clean_training_profile_baseline_report.json
+jq empty data/training/tiny_clean_training_profile_baseline_delta_report.json
+jq empty data/training/tiny_clean_training_profile_strategy_report.json
 jq empty data/training/tiny_clean_training_report.json
 jq empty data/foundation/foundation_overview_report.json
 jq empty data/foundation/foundation_overview_delta_report.json
@@ -73,6 +76,8 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_tiny_training_profile_suite.sh
 ./scripts/run_tiny_training_profile_comparison.sh
 ./scripts/run_tiny_training_profile_baseline.sh
+./scripts/run_tiny_training_profile_baseline_delta.sh
+./scripts/run_tiny_training_profile_strategy.sh
 ./scripts/run_foundation_overview.sh
 ./scripts/run_foundation_overview_delta.sh
 

@@ -54,12 +54,15 @@ Controlled tiny profile comparisons are built through:
 - `scripts/run_tiny_training_profile_suite.sh`
 - `scripts/run_tiny_training_profile_comparison.sh`
 - `scripts/run_tiny_training_profile_baseline.sh`
+- `scripts/run_tiny_training_profile_baseline_delta.sh`
+- `scripts/run_tiny_training_profile_strategy.sh`
 
 Its clean corpus is now sourced through:
 
 - `data/curated/tiny_clean_training_selection_manifest.json`
 - `data/curated/tiny_clean_training_profile_suite_manifest.json`
 - `data/curated/tiny_clean_training_profile_baseline_manifest.json`
+- `data/curated/tiny_clean_training_profile_strategy_manifest.json`
 - `data/curated/tiny_clean_training_manifest.json`
 - `data/curated/tiny_clean_general_pack.json`
 - `data/curated/tiny_clean_reference_pack.json`
@@ -77,6 +80,8 @@ The larger clean corpus tier is sourced through:
 - `data/training/tiny_clean_training_profile_suite_report.json`
 - `data/training/tiny_clean_training_profile_comparison_report.json`
 - `data/training/tiny_clean_training_profile_baseline_report.json`
+- `data/training/tiny_clean_training_profile_baseline_delta_report.json`
+- `data/training/tiny_clean_training_profile_strategy_report.json`
 
 ## Output
 
@@ -118,8 +123,14 @@ regression artifact:
 - `data/training/tiny_clean_training_profile_suite_report.json`
 - `data/training/tiny_clean_training_profile_comparison_report.json`
 - `data/training/tiny_clean_training_profile_baseline_report.json`
+- `data/training/tiny_clean_training_profile_baseline_delta_report.json`
+- `data/training/tiny_clean_training_profile_strategy_report.json`
 
 The foundation-wide cross-layer summary is also stored as:
 
 - `data/foundation/foundation_overview_report.json`
 - `data/foundation/foundation_overview_delta_report.json`
+
+The foundation overview now also requires:
+
+- `data/training/tiny_clean_training_profile_baseline_delta_report.json`
