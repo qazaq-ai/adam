@@ -40,9 +40,17 @@ The deterministic delta report is built through:
 
 - `scripts/run_training_baseline_delta.sh`
 
+The first tiny clean training prototype is built through:
+
+- `scripts/run_tiny_clean_training.sh`
+
 ## Output
 
 The current runners do not train a model yet.
+
+The tiny clean prototype is the first exception: it trains a minimal
+deterministic next-token baseline on a curated clean pack that contains only
+accepted training sources.
 
 The planning report captures:
 
@@ -72,3 +80,9 @@ regression artifact:
 - `data/training/baseline_training_assembly_report.json`
 - `data/training/baseline_training_consistency_report.json`
 - `data/training/baseline_training_delta_report.json`
+- `data/training/tiny_clean_training_report.json`
+
+The foundation-wide cross-layer summary is also stored as:
+
+- `data/foundation/foundation_overview_report.json`
+- `data/foundation/foundation_overview_delta_report.json`

@@ -1,11 +1,14 @@
 use std::collections::BTreeMap;
 
 use adam_corpus::{
-    CorpusManifest, SourceAcceptanceRecord, SourceAcceptanceReport, SourceDomain, SourceRegistry,
-    SourceRegistryEntry, SourceScoringRules, SourceType, build_source_acceptance_report,
+    CorpusManifest, SourceAcceptanceDeltaReport, SourceAcceptanceRecord, SourceAcceptanceReport,
+    SourceAcceptanceSummaryReport, SourceDomain, SourceRegistry, SourceRegistryEntry,
+    SourceScoringRules, SourceType, build_source_acceptance_report,
 };
-use adam_eval::EvalSuite;
-use adam_tokenizer::TokenizerExperiment;
+use adam_eval::{EvalBenchmarkDeltaReport, EvalBenchmarkReport, EvalSuite};
+use adam_tokenizer::{
+    TokenizerExperiment, TokenizerExperimentDeltaReport, TokenizerExperimentReport, normalize_text,
+};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -170,6 +173,95 @@ pub struct BaselineTrainingSourceAllocationDrift {
     pub actual_total_sequence_count: Option<u64>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingSample {
+    pub id: String,
+    pub source_id: String,
+    pub domain: String,
+    pub text: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingPack {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub samples: Vec<TinyCleanTrainingSample>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingCategoryReport {
+    pub category: String,
+    pub sample_count: usize,
+    pub token_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingGuardReport {
+    pub guard: String,
+    pub sample_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingReport {
+    pub run_name: String,
+    pub pack_name: String,
+    pub accepted_source_count: usize,
+    pub sample_count: usize,
+    pub train_sample_count: usize,
+    pub validation_sample_count: usize,
+    pub train_token_count: usize,
+    pub validation_token_count: usize,
+    pub vocabulary_size: usize,
+    pub unique_context_count: usize,
+    pub unique_transition_count: usize,
+    pub deterministic_context_count: usize,
+    pub ambiguous_context_count: usize,
+    pub validation_next_token_count: usize,
+    pub validation_exact_match_count: usize,
+    pub validation_exact_match_rate_bps: usize,
+    pub category_breakdown: Vec<TinyCleanTrainingCategoryReport>,
+    pub critical_breakdown: Vec<TinyCleanTrainingGuardReport>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FoundationOverviewLayerReport {
+    pub layer: String,
+    pub ready: bool,
+    pub primary_metric_name: String,
+    pub primary_metric_value: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FoundationOverviewCheck {
+    pub check: String,
+    pub passed: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FoundationOverviewReport {
+    pub foundation_name: String,
+    pub all_layers_match_expected: bool,
+    pub accepted_source_count: usize,
+    pub tokenizer_exact_match_rate_bps: usize,
+    pub eval_task_count: usize,
+    pub training_total_sequence_count: u64,
+    pub tiny_training_vocabulary_size: usize,
+    pub tiny_training_validation_exact_match_rate_bps: usize,
+    pub layer_breakdown: Vec<FoundationOverviewLayerReport>,
+    pub critical_breakdown: Vec<FoundationOverviewCheck>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FoundationOverviewDeltaReport {
+    pub foundation_name: String,
+    pub matches_expected: bool,
+    pub field_drifts: Vec<BaselineTrainingFieldDrift>,
+    pub layer_drifts: Vec<BaselineTrainingNamedBoolDrift>,
+    pub check_drifts: Vec<BaselineTrainingNamedBoolDrift>,
+}
+
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum TrainingError {
     #[error("training language must be kazakh")]
@@ -194,6 +286,10 @@ pub enum TrainingError {
     NoAcceptedTrainingSources,
     #[error("training token budget is insufficient for at least one full sequence")]
     InsufficientSequenceBudget,
+    #[error("tiny clean training pack must not be empty")]
+    EmptyTinyTrainingPack,
+    #[error("tiny clean training pack references non-accepted or inconsistent sources")]
+    TinyTrainingSourceMismatch,
 }
 
 impl BaselineTrainingManifest {
@@ -230,6 +326,35 @@ impl BaselineTrainingManifest {
 
         if self.validation_split_bps == 0 || self.validation_split_bps >= 10_000 {
             return Err(TrainingError::InvalidValidationSplit);
+        }
+
+        Ok(())
+    }
+}
+
+impl TinyCleanTrainingPack {
+    pub fn validate(&self) -> Result<(), TrainingError> {
+        if self.target_language != "kazakh" {
+            return Err(TrainingError::NonKazakhLanguage);
+        }
+
+        if self.script != "cyrillic" {
+            return Err(TrainingError::NonCyrillicScript);
+        }
+
+        if self.samples.is_empty() {
+            return Err(TrainingError::EmptyTinyTrainingPack);
+        }
+
+        for sample in &self.samples {
+            if sample.id.trim().is_empty()
+                || sample.source_id.trim().is_empty()
+                || sample.domain.trim().is_empty()
+                || sample.text.trim().is_empty()
+                || contains_latin(&sample.text)
+            {
+                return Err(TrainingError::TinyTrainingSourceMismatch);
+            }
         }
 
         Ok(())
@@ -577,6 +702,316 @@ pub fn build_baseline_training_delta_report(
                 .collect(),
         ),
     })
+}
+
+pub fn build_tiny_clean_training_report(
+    manifest: &BaselineTrainingManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    report: &SourceAcceptanceReport,
+    pack: &TinyCleanTrainingPack,
+) -> Result<TinyCleanTrainingReport, TrainingError> {
+    manifest.validate()?;
+    registry
+        .validate()
+        .map_err(|_| TrainingError::ReferencedManifestInvalid)?;
+    report
+        .validate(registry, rules)
+        .map_err(|_| TrainingError::AcceptanceReportMismatch)?;
+    pack.validate()?;
+
+    let accepted_sources = report
+        .records
+        .iter()
+        .filter(|record| record.accepted_for_training)
+        .map(|record| record.source_id.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    let registry_by_id = registry
+        .entries
+        .iter()
+        .map(|entry| (entry.id.as_str(), entry))
+        .collect::<BTreeMap<_, _>>();
+
+    for sample in &pack.samples {
+        let Some(entry) = registry_by_id.get(sample.source_id.as_str()) else {
+            return Err(TrainingError::TinyTrainingSourceMismatch);
+        };
+        if !accepted_sources.contains(sample.source_id.as_str())
+            || !entry.allowed_for_training
+            || entry.stage != adam_corpus::CorpusStage::Curated
+            || source_domain_slug(&entry.domain) != sample.domain
+        {
+            return Err(TrainingError::TinyTrainingSourceMismatch);
+        }
+    }
+
+    let mut ordered_samples = pack.samples.clone();
+    ordered_samples.sort_by(|left, right| left.id.cmp(&right.id));
+    let validation_sample_count =
+        ((ordered_samples.len() as u128 * manifest.validation_split_bps as u128) / 10_000) as usize;
+    let validation_sample_count = validation_sample_count
+        .max(1)
+        .min(ordered_samples.len().saturating_sub(1));
+    let train_sample_count = ordered_samples.len() - validation_sample_count;
+    let (train_samples, validation_samples) = ordered_samples.split_at(train_sample_count);
+
+    let train_sequences = train_samples
+        .iter()
+        .map(|sample| tokenize_clean_training_text(&sample.text))
+        .collect::<Vec<_>>();
+    let validation_sequences = validation_samples
+        .iter()
+        .map(|sample| tokenize_clean_training_text(&sample.text))
+        .collect::<Vec<_>>();
+
+    let train_token_count = train_sequences.iter().map(Vec::len).sum::<usize>();
+    let validation_token_count = validation_sequences.iter().map(Vec::len).sum::<usize>();
+    let vocabulary_size = train_sequences
+        .iter()
+        .flat_map(|tokens| tokens.iter().cloned())
+        .collect::<std::collections::BTreeSet<_>>()
+        .len();
+
+    let mut transition_counts = BTreeMap::<String, BTreeMap<String, usize>>::new();
+    for tokens in &train_sequences {
+        for (context, next_token) in bigram_pairs(tokens) {
+            *transition_counts
+                .entry(context)
+                .or_default()
+                .entry(next_token)
+                .or_default() += 1;
+        }
+    }
+
+    let unique_context_count = transition_counts.len();
+    let unique_transition_count = transition_counts
+        .values()
+        .map(|next_tokens| next_tokens.len())
+        .sum::<usize>();
+    let deterministic_context_count = transition_counts
+        .values()
+        .filter(|next_tokens| next_tokens.len() == 1)
+        .count();
+    let ambiguous_context_count = unique_context_count - deterministic_context_count;
+
+    let mut validation_next_token_count = 0usize;
+    let mut validation_exact_match_count = 0usize;
+    for tokens in &validation_sequences {
+        for (context, actual_next_token) in bigram_pairs(tokens) {
+            validation_next_token_count += 1;
+            if transition_counts.get(&context).and_then(|next_tokens| {
+                next_tokens
+                    .iter()
+                    .max_by(|left, right| left.1.cmp(right.1).then_with(|| right.0.cmp(left.0)))
+                    .map(|(token, _)| token.as_str())
+            }) == Some(actual_next_token.as_str())
+            {
+                validation_exact_match_count += 1;
+            }
+        }
+    }
+    let validation_exact_match_rate_bps = if validation_next_token_count == 0 {
+        0
+    } else {
+        validation_exact_match_count * 10_000 / validation_next_token_count
+    };
+
+    let mut category_stats = BTreeMap::<String, (usize, usize)>::new();
+    for sample in &ordered_samples {
+        let token_count = tokenize_clean_training_text(&sample.text).len();
+        for category in [
+            format!("domain_{}", sample.domain),
+            format!("source_{}", sample.source_id),
+        ] {
+            let stats = category_stats.entry(category).or_insert((0, 0));
+            stats.0 += 1;
+            stats.1 += token_count;
+        }
+    }
+    let category_breakdown = category_stats
+        .into_iter()
+        .map(
+            |(category, (sample_count, token_count))| TinyCleanTrainingCategoryReport {
+                category,
+                sample_count,
+                token_count,
+            },
+        )
+        .collect::<Vec<_>>();
+
+    let mut critical_breakdown = vec![
+        FoundationOverviewCheck {
+            check: "accepted_source_only".to_string(),
+            passed: true,
+        },
+        FoundationOverviewCheck {
+            check: "clean_source_only".to_string(),
+            passed: true,
+        },
+        FoundationOverviewCheck {
+            check: "validation_coverage".to_string(),
+            passed: !validation_samples.is_empty() && validation_next_token_count > 0,
+        },
+        FoundationOverviewCheck {
+            check: "deterministic_transition_coverage".to_string(),
+            passed: deterministic_context_count > 0,
+        },
+    ]
+    .into_iter()
+    .map(|check| TinyCleanTrainingGuardReport {
+        guard: check.check,
+        sample_count: usize::from(check.passed) * ordered_samples.len(),
+    })
+    .collect::<Vec<_>>();
+    critical_breakdown.sort_by(|left, right| left.guard.cmp(&right.guard));
+
+    Ok(TinyCleanTrainingReport {
+        run_name: format!("{}-tiny-clean-prototype", manifest.run_name),
+        pack_name: pack.name.clone(),
+        accepted_source_count: accepted_sources.len(),
+        sample_count: ordered_samples.len(),
+        train_sample_count,
+        validation_sample_count,
+        train_token_count,
+        validation_token_count,
+        vocabulary_size,
+        unique_context_count,
+        unique_transition_count,
+        deterministic_context_count,
+        ambiguous_context_count,
+        validation_next_token_count,
+        validation_exact_match_count,
+        validation_exact_match_rate_bps,
+        category_breakdown,
+        critical_breakdown,
+    })
+}
+
+pub fn build_foundation_overview_report(
+    corpus_summary: &SourceAcceptanceSummaryReport,
+    corpus_delta: &SourceAcceptanceDeltaReport,
+    tokenizer_report: &TokenizerExperimentReport,
+    tokenizer_delta: &TokenizerExperimentDeltaReport,
+    eval_report: &EvalBenchmarkReport,
+    eval_delta: &EvalBenchmarkDeltaReport,
+    training_consistency: &BaselineTrainingConsistencyReport,
+    training_delta: &BaselineTrainingDeltaReport,
+    tiny_training: &TinyCleanTrainingReport,
+) -> FoundationOverviewReport {
+    let layer_breakdown = vec![
+        FoundationOverviewLayerReport {
+            layer: "corpus".to_string(),
+            ready: corpus_delta.matches_expected,
+            primary_metric_name: "accepted_source_count".to_string(),
+            primary_metric_value: corpus_summary.accepted_source_count.to_string(),
+        },
+        FoundationOverviewLayerReport {
+            layer: "tokenizer".to_string(),
+            ready: tokenizer_delta.matches_expected,
+            primary_metric_name: "exact_match_rate_bps".to_string(),
+            primary_metric_value: tokenizer_report.exact_match_rate_bps.to_string(),
+        },
+        FoundationOverviewLayerReport {
+            layer: "eval".to_string(),
+            ready: eval_delta.matches_expected,
+            primary_metric_name: "task_count".to_string(),
+            primary_metric_value: eval_report.task_count.to_string(),
+        },
+        FoundationOverviewLayerReport {
+            layer: "train".to_string(),
+            ready: training_delta.assembly_matches_expected
+                && training_delta.consistency_matches_expected,
+            primary_metric_name: "total_sequence_count".to_string(),
+            primary_metric_value: training_consistency.total_sequence_count.to_string(),
+        },
+        FoundationOverviewLayerReport {
+            layer: "tiny_training".to_string(),
+            ready: tiny_training.validation_next_token_count > 0,
+            primary_metric_name: "validation_exact_match_rate_bps".to_string(),
+            primary_metric_value: tiny_training.validation_exact_match_rate_bps.to_string(),
+        },
+    ];
+    let critical_breakdown = vec![
+        FoundationOverviewCheck {
+            check: "corpus_matches_expected".to_string(),
+            passed: corpus_delta.matches_expected,
+        },
+        FoundationOverviewCheck {
+            check: "tokenizer_matches_expected".to_string(),
+            passed: tokenizer_delta.matches_expected,
+        },
+        FoundationOverviewCheck {
+            check: "eval_matches_expected".to_string(),
+            passed: eval_delta.matches_expected,
+        },
+        FoundationOverviewCheck {
+            check: "training_matches_expected".to_string(),
+            passed: training_delta.assembly_matches_expected
+                && training_delta.consistency_matches_expected,
+        },
+        FoundationOverviewCheck {
+            check: "tiny_training_has_validation".to_string(),
+            passed: tiny_training.validation_next_token_count > 0,
+        },
+        FoundationOverviewCheck {
+            check: "tiny_training_uses_clean_sources".to_string(),
+            passed: tiny_training
+                .critical_breakdown
+                .iter()
+                .any(|entry| entry.guard == "clean_source_only" && entry.sample_count > 0),
+        },
+    ];
+
+    FoundationOverviewReport {
+        foundation_name: "adam-foundation-overview".to_string(),
+        all_layers_match_expected: critical_breakdown.iter().all(|check| check.passed),
+        accepted_source_count: corpus_summary.accepted_source_count,
+        tokenizer_exact_match_rate_bps: tokenizer_report.exact_match_rate_bps,
+        eval_task_count: eval_report.task_count,
+        training_total_sequence_count: training_consistency.total_sequence_count,
+        tiny_training_vocabulary_size: tiny_training.vocabulary_size,
+        tiny_training_validation_exact_match_rate_bps: tiny_training
+            .validation_exact_match_rate_bps,
+        layer_breakdown,
+        critical_breakdown,
+    }
+}
+
+pub fn build_foundation_overview_delta_report(
+    expected: &FoundationOverviewReport,
+    actual: &FoundationOverviewReport,
+) -> FoundationOverviewDeltaReport {
+    FoundationOverviewDeltaReport {
+        foundation_name: actual.foundation_name.clone(),
+        matches_expected: expected == actual,
+        field_drifts: build_foundation_field_drifts(expected, actual),
+        layer_drifts: build_named_bool_drifts(
+            "layer",
+            expected
+                .layer_breakdown
+                .iter()
+                .map(|entry| (entry.layer.as_str(), entry.ready))
+                .collect(),
+            actual
+                .layer_breakdown
+                .iter()
+                .map(|entry| (entry.layer.as_str(), entry.ready))
+                .collect(),
+        ),
+        check_drifts: build_named_bool_drifts(
+            "check",
+            expected
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.check.as_str(), entry.passed))
+                .collect(),
+            actual
+                .critical_breakdown
+                .iter()
+                .map(|entry| (entry.check.as_str(), entry.passed))
+                .collect(),
+        ),
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1006,6 +1441,83 @@ fn build_source_allocation_drifts(
     drifts
 }
 
+fn build_foundation_field_drifts(
+    expected: &FoundationOverviewReport,
+    actual: &FoundationOverviewReport,
+) -> Vec<BaselineTrainingFieldDrift> {
+    let mut drifts = Vec::new();
+    push_field_drift(
+        &mut drifts,
+        "accepted_source_count",
+        expected.accepted_source_count,
+        actual.accepted_source_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "tokenizer_exact_match_rate_bps",
+        expected.tokenizer_exact_match_rate_bps,
+        actual.tokenizer_exact_match_rate_bps,
+    );
+    push_field_drift(
+        &mut drifts,
+        "eval_task_count",
+        expected.eval_task_count,
+        actual.eval_task_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "training_total_sequence_count",
+        expected.training_total_sequence_count,
+        actual.training_total_sequence_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "tiny_training_vocabulary_size",
+        expected.tiny_training_vocabulary_size,
+        actual.tiny_training_vocabulary_size,
+    );
+    push_field_drift(
+        &mut drifts,
+        "tiny_training_validation_exact_match_rate_bps",
+        expected.tiny_training_validation_exact_match_rate_bps,
+        actual.tiny_training_validation_exact_match_rate_bps,
+    );
+    drifts
+}
+
+fn tokenize_clean_training_text(text: &str) -> Vec<String> {
+    normalize_text(text)
+        .split_whitespace()
+        .filter_map(|token| {
+            let cleaned = token
+                .chars()
+                .filter(|ch| ch.is_alphabetic() && !ch.is_ascii())
+                .collect::<String>();
+            (!cleaned.is_empty()).then_some(cleaned)
+        })
+        .collect()
+}
+
+fn bigram_pairs(tokens: &[String]) -> Vec<(String, String)> {
+    if tokens.is_empty() {
+        return Vec::new();
+    }
+
+    let mut sequence = Vec::with_capacity(tokens.len() + 2);
+    sequence.push("<bos>".to_string());
+    sequence.extend(tokens.iter().cloned());
+    sequence.push("<eos>".to_string());
+
+    sequence
+        .windows(2)
+        .map(|pair| (pair[0].clone(), pair[1].clone()))
+        .collect()
+}
+
+fn contains_latin(value: &str) -> bool {
+    value.chars().any(|ch| ch.is_ascii_alphabetic())
+}
+
 fn assembly_categories(allocation: &BaselineTrainingSourceAllocation) -> Vec<String> {
     vec![
         format!("domain_{}", source_domain_slug(&allocation.domain)),
@@ -1083,7 +1595,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1107,7 +1619,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1125,7 +1637,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1138,7 +1650,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -1167,7 +1679,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -1180,7 +1692,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -1210,7 +1722,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1246,7 +1758,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1264,7 +1776,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1277,7 +1789,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -1306,7 +1818,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -1319,7 +1831,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -1349,7 +1861,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1419,7 +1931,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1437,7 +1949,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1451,7 +1963,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -1492,7 +2004,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -1513,7 +2025,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.51".to_string(),
+            version: "0.0.52".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

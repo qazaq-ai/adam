@@ -1,0 +1,68 @@
+{
+  "foundation_name": "adam-foundation-overview",
+  "all_layers_match_expected": true,
+  "accepted_source_count": 3,
+  "tokenizer_exact_match_rate_bps": 10000,
+  "eval_task_count": 4,
+  "training_total_sequence_count": 1024,
+  "tiny_training_vocabulary_size": 30,
+  "tiny_training_validation_exact_match_rate_bps": 0,
+  "layer_breakdown": [
+    {
+      "layer": "corpus",
+      "ready": true,
+      "primary_metric_name": "accepted_source_count",
+      "primary_metric_value": "3"
+    },
+    {
+      "layer": "tokenizer",
+      "ready": true,
+      "primary_metric_name": "exact_match_rate_bps",
+      "primary_metric_value": "10000"
+    },
+    {
+      "layer": "eval",
+      "ready": true,
+      "primary_metric_name": "task_count",
+      "primary_metric_value": "4"
+    },
+    {
+      "layer": "train",
+      "ready": true,
+      "primary_metric_name": "total_sequence_count",
+      "primary_metric_value": "1024"
+    },
+    {
+      "layer": "tiny_training",
+      "ready": true,
+      "primary_metric_name": "validation_exact_match_rate_bps",
+      "primary_metric_value": "0"
+    }
+  ],
+  "critical_breakdown": [
+    {
+      "check": "corpus_matches_expected",
+      "passed": true
+    },
+    {
+      "check": "tokenizer_matches_expected",
+      "passed": true
+    },
+    {
+      "check": "eval_matches_expected",
+      "passed": true
+    },
+    {
+      "check": "training_matches_expected",
+      "passed": true
+    },
+    {
+      "check": "tiny_training_has_validation",
+      "passed": true
+    },
+    {
+      "check": "tiny_training_uses_clean_sources",
+      "passed": true
+    }
+  ]
+}

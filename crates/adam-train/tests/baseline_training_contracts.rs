@@ -1,17 +1,22 @@
 use std::fs;
 
 use adam_corpus::{
-    CorpusManifest, CorpusStage, LicenseClass, QualityTier, SourceAcceptanceReport, SourceDomain,
-    SourcePolicy, SourceRegistry, SourceRegistryEntry, SourceScoringRules, SourceType,
+    CorpusManifest, CorpusStage, LicenseClass, QualityTier, SourceAcceptanceDeltaReport,
+    SourceAcceptanceReport, SourceAcceptanceSummaryReport, SourceDomain, SourcePolicy,
+    SourceRegistry, SourceRegistryEntry, SourceScoringRules, SourceType,
     build_source_acceptance_report,
 };
-use adam_eval::EvalSuite;
-use adam_tokenizer::TokenizerExperiment;
+use adam_eval::{EvalBenchmarkDeltaReport, EvalBenchmarkReport, EvalSuite};
+use adam_tokenizer::{
+    TokenizerExperiment, TokenizerExperimentDeltaReport, TokenizerExperimentReport,
+};
 use adam_train::{
     BaselineTrainingAssemblyReport, BaselineTrainingConsistencyReport, BaselineTrainingDeltaReport,
-    BaselineTrainingManifest, build_baseline_training_assembly_report,
+    BaselineTrainingManifest, FoundationOverviewDeltaReport, FoundationOverviewReport,
+    TinyCleanTrainingPack, TinyCleanTrainingReport, build_baseline_training_assembly_report,
     build_baseline_training_consistency_report, build_baseline_training_delta_report,
-    build_baseline_training_plan,
+    build_baseline_training_plan, build_foundation_overview_delta_report,
+    build_foundation_overview_report, build_tiny_clean_training_report,
 };
 
 #[test]
@@ -555,4 +560,174 @@ fn baseline_training_assembly_tracks_multi_source_distribution() {
             .iter()
             .any(|entry| entry.category == "source_type_public_text")
     );
+}
+
+#[test]
+fn tiny_clean_training_report_matches_expected_regression_artifact() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_manifest.json"
+    );
+    let manifest: BaselineTrainingManifest =
+        serde_json::from_str(&fs::read_to_string(manifest_path).expect("training manifest file"))
+            .expect("valid training manifest json");
+    let registry_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_registry.json"
+    );
+    let registry: SourceRegistry =
+        serde_json::from_str(&fs::read_to_string(registry_path).expect("source registry file"))
+            .expect("valid source registry json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_scoring_rules.json"
+    );
+    let rules: SourceScoringRules =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("source scoring rules file"))
+            .expect("valid source scoring rules json");
+    let report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/source_acceptance_report.json"
+    );
+    let report: SourceAcceptanceReport =
+        serde_json::from_str(&fs::read_to_string(report_path).expect("acceptance report file"))
+            .expect("valid source acceptance report json");
+    let pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_training_pack.json"
+    );
+    let pack: TinyCleanTrainingPack =
+        serde_json::from_str(&fs::read_to_string(pack_path).expect("tiny training pack file"))
+            .expect("valid tiny training pack json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_report.json"
+    );
+    let expected: TinyCleanTrainingReport =
+        serde_json::from_str(&fs::read_to_string(expected_path).expect("tiny training report"))
+            .expect("valid tiny training report json");
+
+    let actual = build_tiny_clean_training_report(&manifest, &registry, &rules, &report, &pack)
+        .expect("tiny clean training report");
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn foundation_overview_report_matches_expected_regression_artifact() {
+    let corpus_summary_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/source_acceptance_summary_report.json"
+    );
+    let corpus_summary: SourceAcceptanceSummaryReport = serde_json::from_str(
+        &fs::read_to_string(corpus_summary_path).expect("source acceptance summary report"),
+    )
+    .expect("valid source acceptance summary report json");
+    let corpus_delta_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/source_acceptance_delta_report.json"
+    );
+    let corpus_delta: SourceAcceptanceDeltaReport = serde_json::from_str(
+        &fs::read_to_string(corpus_delta_path).expect("source acceptance delta report"),
+    )
+    .expect("valid source acceptance delta report json");
+    let tokenizer_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_report.json"
+    );
+    let tokenizer_report: TokenizerExperimentReport = serde_json::from_str(
+        &fs::read_to_string(tokenizer_report_path).expect("tokenizer experiment report"),
+    )
+    .expect("valid tokenizer experiment report json");
+    let tokenizer_delta_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/tokenizer_experiment_delta_report.json"
+    );
+    let tokenizer_delta: TokenizerExperimentDeltaReport = serde_json::from_str(
+        &fs::read_to_string(tokenizer_delta_path).expect("tokenizer experiment delta report"),
+    )
+    .expect("valid tokenizer experiment delta report json");
+    let eval_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/benchmark_report.json"
+    );
+    let eval_report: EvalBenchmarkReport =
+        serde_json::from_str(&fs::read_to_string(eval_report_path).expect("benchmark report"))
+            .expect("valid benchmark report json");
+    let eval_delta_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/eval/benchmark_delta_report.json"
+    );
+    let eval_delta: EvalBenchmarkDeltaReport =
+        serde_json::from_str(&fs::read_to_string(eval_delta_path).expect("benchmark delta report"))
+            .expect("valid benchmark delta report json");
+    let training_consistency_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_consistency_report.json"
+    );
+    let training_consistency: BaselineTrainingConsistencyReport = serde_json::from_str(
+        &fs::read_to_string(training_consistency_path).expect("training consistency report"),
+    )
+    .expect("valid training consistency report json");
+    let training_delta_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_delta_report.json"
+    );
+    let training_delta: BaselineTrainingDeltaReport = serde_json::from_str(
+        &fs::read_to_string(training_delta_path).expect("training delta report"),
+    )
+    .expect("valid training delta report json");
+    let tiny_training_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_report.json"
+    );
+    let tiny_training: TinyCleanTrainingReport = serde_json::from_str(
+        &fs::read_to_string(tiny_training_path).expect("tiny clean training report"),
+    )
+    .expect("valid tiny clean training report json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/foundation/foundation_overview_report.json"
+    );
+    let expected: FoundationOverviewReport = serde_json::from_str(
+        &fs::read_to_string(expected_path).expect("foundation overview report"),
+    )
+    .expect("valid foundation overview report json");
+
+    let actual = build_foundation_overview_report(
+        &corpus_summary,
+        &corpus_delta,
+        &tokenizer_report,
+        &tokenizer_delta,
+        &eval_report,
+        &eval_delta,
+        &training_consistency,
+        &training_delta,
+        &tiny_training,
+    );
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn foundation_overview_delta_report_matches_expected_regression_artifact() {
+    let overview_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/foundation/foundation_overview_report.json"
+    );
+    let overview: FoundationOverviewReport =
+        serde_json::from_str(&fs::read_to_string(overview_path).expect("foundation overview"))
+            .expect("valid foundation overview report json");
+    let expected_delta_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/foundation/foundation_overview_delta_report.json"
+    );
+    let expected_delta: FoundationOverviewDeltaReport = serde_json::from_str(
+        &fs::read_to_string(expected_delta_path).expect("foundation overview delta report"),
+    )
+    .expect("valid foundation overview delta report json");
+
+    let actual = build_foundation_overview_delta_report(&overview, &overview);
+
+    assert_eq!(actual, expected_delta);
 }

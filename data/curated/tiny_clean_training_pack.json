@@ -1,0 +1,44 @@
+{
+  "version": "0.0.51",
+  "name": "adam-tiny-clean-training-pack",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "samples": [
+    {
+      "id": "clean_sample_01",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Қазақ тілі жалғамалы тіл болып саналады."
+    },
+    {
+      "id": "clean_sample_02",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Таза дерек сенімді модель құруға негіз болады."
+    },
+    {
+      "id": "clean_sample_03",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтама берілген ұғымды нақты және қысқа түсіндіреді."
+    },
+    {
+      "id": "clean_sample_04",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Термин сөздігі мағынаны бірізді түрде бекітеді."
+    },
+    {
+      "id": "clean_sample_05",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Оқу материалы ұғымдарды кезең-кезеңімен түсіндіреді."
+    },
+    {
+      "id": "clean_sample_06",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Жаттығу тапсырмасы білімді бекітуге көмектеседі."
+    }
+  ]
+}

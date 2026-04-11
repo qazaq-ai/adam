@@ -41,3 +41,11 @@ Current starter utility:
   builds the deterministic train/validation assembly report from current manifests
 - `run_training_baseline_consistency.sh`
   builds the deterministic training consistency report from current manifests
+- `run_training_baseline_delta.sh`
+  builds the deterministic training delta report against the expected assembly and consistency artifacts
+- `run_tiny_clean_training.sh`
+  trains a tiny deterministic prototype on the accepted clean training pack
+- `run_foundation_overview.sh`
+  builds the unified cross-layer foundation overview from corpus, tokenizer, eval, and training artifacts
+- `run_foundation_overview_delta.sh`
+  builds the unified foundation drift summary against the expected overview artifact

@@ -1,0 +1,7 @@
+{
+  "foundation_name": "adam-foundation-overview",
+  "matches_expected": true,
+  "field_drifts": [],
+  "layer_drifts": [],
+  "check_drifts": []
+}

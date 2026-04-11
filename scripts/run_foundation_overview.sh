@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$repo_root"
+
+cargo run -p adam-train --bin foundation_overview -- \
+  data/curated/source_acceptance_summary_report.json \
+  data/curated/source_acceptance_delta_report.json \
+  data/eval/tokenizer_experiment_report.json \
+  data/eval/tokenizer_experiment_delta_report.json \
+  data/eval/benchmark_report.json \
+  data/eval/benchmark_delta_report.json \
+  data/training/baseline_training_consistency_report.json \
+  data/training/baseline_training_delta_report.json \
+  data/training/tiny_clean_training_report.json
