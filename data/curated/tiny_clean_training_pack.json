@@ -1,5 +1,5 @@
 {
-  "version": "0.0.51",
+  "version": "0.0.52",
   "name": "adam-tiny-clean-training-pack",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -39,6 +39,132 @@
       "source_id": "reviewed_education_kazakh",
       "domain": "education",
       "text": "Жаттығу тапсырмасы білімді бекітуге көмектеседі."
+    },
+    {
+      "id": "clean_sample_07",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Қазақ тілі сөздерді жалғаулар арқылы түрлендіреді."
+    },
+    {
+      "id": "clean_sample_08",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтама мәтіні ұғымның шекарасын дәл көрсетеді."
+    },
+    {
+      "id": "clean_sample_09",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Оқу тапсырмасы ұғымды мысал арқылы бекітеді."
+    },
+    {
+      "id": "clean_sample_10",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Тілдік жүйе мағынаны жалғаулар мен түбір арқылы құрайды."
+    },
+    {
+      "id": "clean_sample_11",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Сөздік баптары терминнің қолданысын тұрақтандырады."
+    },
+    {
+      "id": "clean_sample_12",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Сабақ жоспары білімді жүйелі түрде бекітуге көмектеседі."
+    },
+    {
+      "id": "clean_sample_13",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Ой дәлдігі таза тілдік құрылымнан басталады."
+    },
+    {
+      "id": "clean_sample_14",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Жүйелі мәтін модельдің сенімділігін арттырады."
+    },
+    {
+      "id": "clean_sample_15",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтамалық жазба негізгі белгілерді қысқа түрде береді."
+    },
+    {
+      "id": "clean_sample_16",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Ереже мәтіні терминнің шекарасын нақтылап көрсетеді."
+    },
+    {
+      "id": "clean_sample_17",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Мысалға негізделген түсіндіру ұғымды тез меңгертеді."
+    },
+    {
+      "id": "clean_sample_18",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Оқу тапсырмасы ұғымды мысал арқылы бекітеді."
+    },
+    {
+      "id": "clean_sample_19",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Таза мәтін логикалық модельге орнықты негіз береді."
+    },
+    {
+      "id": "clean_sample_20",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Термин анықтамасы негізгі мағынаны қысқа жеткізеді."
+    },
+    {
+      "id": "clean_sample_21",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Сабақ материалы ұғымдарды мысалмен кезеңдеп түсіндіреді."
+    },
+    {
+      "id": "clean_sample_22",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Дәйекті құрылым тілдік талдаудың анықтығын күшейтеді."
+    },
+    {
+      "id": "clean_sample_23",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтамалық қор терминдердің тұрақты қолданысын сақтайды."
+    },
+    {
+      "id": "clean_sample_24",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Жүйелі жаттығу білімді тұрақты түрде бекітеді."
+    },
+    {
+      "id": "clean_sample_25",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Нақты дерек тілдік талдаудың сенімін арттырады."
+    },
+    {
+      "id": "clean_sample_26",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтама мәтіні негізгі ұғымды қысқа түсіндіреді."
+    },
+    {
+      "id": "clean_sample_27",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Оқу тапсырмасы ұғымды мысал арқылы түсіндіреді."
     }
   ]
 }

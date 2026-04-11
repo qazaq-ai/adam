@@ -5,8 +5,8 @@
   "tokenizer_exact_match_rate_bps": 10000,
   "eval_task_count": 4,
   "training_total_sequence_count": 1024,
-  "tiny_training_vocabulary_size": 30,
-  "tiny_training_validation_exact_match_rate_bps": 0,
+  "tiny_training_vocabulary_size": 95,
+  "tiny_training_validation_exact_match_rate_bps": 5000,
   "layer_breakdown": [
     {
       "layer": "corpus",
@@ -36,7 +36,7 @@
       "layer": "tiny_training",
       "ready": true,
       "primary_metric_name": "validation_exact_match_rate_bps",
-      "primary_metric_value": "0"
+      "primary_metric_value": "5000"
     }
   ],
   "critical_breakdown": [
