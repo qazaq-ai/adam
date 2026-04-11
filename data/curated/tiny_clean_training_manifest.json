@@ -1,0 +1,23 @@
+{
+  "version": "0.0.53",
+  "name": "adam-tiny-clean-training-pack",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "domain_packs": [
+    {
+      "domain": "general",
+      "source_id": "curated_general_kazakh",
+      "pack_manifest": "tiny_clean_general_pack.json"
+    },
+    {
+      "domain": "reference",
+      "source_id": "curated_reference_kazakh",
+      "pack_manifest": "tiny_clean_reference_pack.json"
+    },
+    {
+      "domain": "education",
+      "source_id": "reviewed_education_kazakh",
+      "pack_manifest": "tiny_clean_education_pack.json"
+    }
+  ]
+}

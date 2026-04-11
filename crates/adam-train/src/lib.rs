@@ -191,6 +191,33 @@ pub struct TinyCleanTrainingPack {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingDomainManifestEntry {
+    pub domain: String,
+    pub source_id: String,
+    pub pack_manifest: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingManifest {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub domain_packs: Vec<TinyCleanTrainingDomainManifestEntry>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingDomainPack {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub domain: String,
+    pub source_id: String,
+    pub samples: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TinyCleanTrainingCategoryReport {
     pub category: String,
     pub sample_count: usize,
@@ -290,6 +317,8 @@ pub enum TrainingError {
     EmptyTinyTrainingPack,
     #[error("tiny clean training pack references non-accepted or inconsistent sources")]
     TinyTrainingSourceMismatch,
+    #[error("tiny clean training manifest references are invalid or inconsistent")]
+    TinyTrainingManifestMismatch,
 }
 
 impl BaselineTrainingManifest {
@@ -359,6 +388,118 @@ impl TinyCleanTrainingPack {
 
         Ok(())
     }
+}
+
+impl TinyCleanTrainingManifest {
+    pub fn validate(&self) -> Result<(), TrainingError> {
+        if self.target_language != "kazakh" {
+            return Err(TrainingError::NonKazakhLanguage);
+        }
+
+        if self.script != "cyrillic" {
+            return Err(TrainingError::NonCyrillicScript);
+        }
+
+        if self.domain_packs.is_empty() {
+            return Err(TrainingError::EmptyTinyTrainingPack);
+        }
+
+        let mut seen_domains = std::collections::BTreeSet::new();
+        let mut seen_sources = std::collections::BTreeSet::new();
+        let mut seen_paths = std::collections::BTreeSet::new();
+        for entry in &self.domain_packs {
+            if entry.domain.trim().is_empty()
+                || entry.source_id.trim().is_empty()
+                || entry.pack_manifest.trim().is_empty()
+                || !seen_domains.insert(entry.domain.as_str())
+                || !seen_sources.insert(entry.source_id.as_str())
+                || !seen_paths.insert(entry.pack_manifest.as_str())
+            {
+                return Err(TrainingError::TinyTrainingManifestMismatch);
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl TinyCleanTrainingDomainPack {
+    pub fn validate(&self) -> Result<(), TrainingError> {
+        if self.target_language != "kazakh" {
+            return Err(TrainingError::NonKazakhLanguage);
+        }
+
+        if self.script != "cyrillic" {
+            return Err(TrainingError::NonCyrillicScript);
+        }
+
+        if self.domain.trim().is_empty()
+            || self.source_id.trim().is_empty()
+            || self.samples.is_empty()
+        {
+            return Err(TrainingError::TinyTrainingManifestMismatch);
+        }
+
+        for sample in &self.samples {
+            if sample.trim().is_empty() || contains_latin(sample) {
+                return Err(TrainingError::TinyTrainingManifestMismatch);
+            }
+        }
+
+        Ok(())
+    }
+}
+
+pub fn assemble_tiny_clean_training_pack(
+    manifest: &TinyCleanTrainingManifest,
+    domain_packs: &[TinyCleanTrainingDomainPack],
+) -> Result<TinyCleanTrainingPack, TrainingError> {
+    manifest.validate()?;
+
+    if manifest.domain_packs.len() != domain_packs.len() {
+        return Err(TrainingError::TinyTrainingManifestMismatch);
+    }
+
+    let domain_packs_by_domain = domain_packs
+        .iter()
+        .map(|pack| {
+            pack.validate()?;
+            Ok((pack.domain.as_str(), pack))
+        })
+        .collect::<Result<BTreeMap<_, _>, TrainingError>>()?;
+
+    let mut samples = Vec::new();
+    let mut next_index = 1usize;
+    for entry in &manifest.domain_packs {
+        let Some(pack) = domain_packs_by_domain.get(entry.domain.as_str()) else {
+            return Err(TrainingError::TinyTrainingManifestMismatch);
+        };
+        if pack.source_id != entry.source_id
+            || pack.domain != entry.domain
+            || pack.target_language != manifest.target_language
+            || pack.script != manifest.script
+        {
+            return Err(TrainingError::TinyTrainingManifestMismatch);
+        }
+
+        for text in &pack.samples {
+            samples.push(TinyCleanTrainingSample {
+                id: format!("clean_sample_{next_index:02}"),
+                source_id: pack.source_id.clone(),
+                domain: pack.domain.clone(),
+                text: text.clone(),
+            });
+            next_index += 1;
+        }
+    }
+
+    Ok(TinyCleanTrainingPack {
+        version: manifest.version.clone(),
+        name: manifest.name.clone(),
+        target_language: manifest.target_language.clone(),
+        script: manifest.script.clone(),
+        samples,
+    })
 }
 
 pub fn build_baseline_training_plan(
@@ -1595,7 +1736,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1619,7 +1760,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1637,7 +1778,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1650,7 +1791,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -1679,7 +1820,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -1692,7 +1833,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -1722,7 +1863,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1758,7 +1899,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1776,7 +1917,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1789,7 +1930,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -1818,7 +1959,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -1831,7 +1972,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -1861,7 +2002,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1931,7 +2072,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1949,7 +2090,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1963,7 +2104,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -2004,7 +2145,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -2025,7 +2166,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.53".to_string(),
+            version: "0.0.54".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

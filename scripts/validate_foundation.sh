@@ -12,6 +12,10 @@ jq empty data/curated/source_acceptance_report.json
 jq empty data/curated/source_acceptance_summary_report.json
 jq empty data/curated/source_acceptance_delta_report.json
 jq empty data/curated/tokenizer_dry_run_pack.json
+jq empty data/curated/tiny_clean_training_manifest.json
+jq empty data/curated/tiny_clean_general_pack.json
+jq empty data/curated/tiny_clean_reference_pack.json
+jq empty data/curated/tiny_clean_education_pack.json
 jq empty data/curated/tiny_clean_training_pack.json
 jq empty data/raw/source_registry.json
 jq empty data/raw/source_scoring_rules.json

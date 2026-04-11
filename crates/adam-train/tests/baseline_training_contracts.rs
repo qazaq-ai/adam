@@ -13,10 +13,12 @@ use adam_tokenizer::{
 use adam_train::{
     BaselineTrainingAssemblyReport, BaselineTrainingConsistencyReport, BaselineTrainingDeltaReport,
     BaselineTrainingManifest, FoundationOverviewDeltaReport, FoundationOverviewReport,
-    TinyCleanTrainingPack, TinyCleanTrainingReport, build_baseline_training_assembly_report,
-    build_baseline_training_consistency_report, build_baseline_training_delta_report,
-    build_baseline_training_plan, build_foundation_overview_delta_report,
-    build_foundation_overview_report, build_tiny_clean_training_report,
+    TinyCleanTrainingDomainPack, TinyCleanTrainingManifest, TinyCleanTrainingPack,
+    TinyCleanTrainingReport, assemble_tiny_clean_training_pack,
+    build_baseline_training_assembly_report, build_baseline_training_consistency_report,
+    build_baseline_training_delta_report, build_baseline_training_plan,
+    build_foundation_overview_delta_report, build_foundation_overview_report,
+    build_tiny_clean_training_report,
 };
 
 #[test]
@@ -592,13 +594,38 @@ fn tiny_clean_training_report_matches_expected_regression_artifact() {
     let report: SourceAcceptanceReport =
         serde_json::from_str(&fs::read_to_string(report_path).expect("acceptance report file"))
             .expect("valid source acceptance report json");
-    let pack_path = concat!(
+    let tiny_manifest_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_training_pack.json"
+        "/../../data/curated/tiny_clean_training_manifest.json"
     );
-    let pack: TinyCleanTrainingPack =
-        serde_json::from_str(&fs::read_to_string(pack_path).expect("tiny training pack file"))
-            .expect("valid tiny training pack json");
+    let tiny_manifest: TinyCleanTrainingManifest = serde_json::from_str(
+        &fs::read_to_string(tiny_manifest_path).expect("tiny training manifest file"),
+    )
+    .expect("valid tiny training manifest json");
+    let general_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_general_pack.json"
+    );
+    let reference_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_reference_pack.json"
+    );
+    let education_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_education_pack.json"
+    );
+    let domain_packs: Vec<TinyCleanTrainingDomainPack> =
+        [general_pack_path, reference_pack_path, education_pack_path]
+            .into_iter()
+            .map(|path| {
+                serde_json::from_str(
+                    &fs::read_to_string(path).expect("tiny training domain pack file"),
+                )
+                .expect("valid tiny training domain pack json")
+            })
+            .collect();
+    let pack = assemble_tiny_clean_training_pack(&tiny_manifest, &domain_packs)
+        .expect("assembled tiny clean training pack");
     let expected_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
         "/../../data/training/tiny_clean_training_report.json"
@@ -611,6 +638,53 @@ fn tiny_clean_training_report_matches_expected_regression_artifact() {
         .expect("tiny clean training report");
 
     assert_eq!(actual, expected);
+}
+
+#[test]
+fn tiny_clean_training_pack_matches_domain_manifest_assembly() {
+    let tiny_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_training_manifest.json"
+    );
+    let tiny_manifest: TinyCleanTrainingManifest = serde_json::from_str(
+        &fs::read_to_string(tiny_manifest_path).expect("tiny training manifest file"),
+    )
+    .expect("valid tiny training manifest json");
+    let general_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_general_pack.json"
+    );
+    let reference_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_reference_pack.json"
+    );
+    let education_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_education_pack.json"
+    );
+    let domain_packs: Vec<TinyCleanTrainingDomainPack> =
+        [general_pack_path, reference_pack_path, education_pack_path]
+            .into_iter()
+            .map(|path| {
+                serde_json::from_str(
+                    &fs::read_to_string(path).expect("tiny training domain pack file"),
+                )
+                .expect("valid tiny training domain pack json")
+            })
+            .collect();
+    let expected_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_training_pack.json"
+    );
+    let expected_pack: TinyCleanTrainingPack = serde_json::from_str(
+        &fs::read_to_string(expected_pack_path).expect("tiny training pack file"),
+    )
+    .expect("valid tiny training pack json");
+
+    let actual_pack = assemble_tiny_clean_training_pack(&tiny_manifest, &domain_packs)
+        .expect("assembled tiny clean training pack");
+
+    assert_eq!(actual_pack, expected_pack);
 }
 
 #[test]

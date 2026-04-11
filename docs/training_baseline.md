@@ -44,13 +44,21 @@ The first tiny clean training prototype is built through:
 
 - `scripts/run_tiny_clean_training.sh`
 
+Its clean corpus is now sourced through:
+
+- `data/curated/tiny_clean_training_manifest.json`
+- `data/curated/tiny_clean_general_pack.json`
+- `data/curated/tiny_clean_reference_pack.json`
+- `data/curated/tiny_clean_education_pack.json`
+- `data/curated/tiny_clean_training_pack.json` as the assembled regression artifact
+
 ## Output
 
 The current runners do not train a model yet.
 
 The tiny clean prototype is the first exception: it trains a minimal
-deterministic next-token baseline on a curated clean pack that contains only
-accepted training sources.
+deterministic next-token baseline on a curated clean pack assembled from
+domain-aware clean artifacts that contain only accepted training sources.
 
 The planning report captures:
 
