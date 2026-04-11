@@ -1,0 +1,45 @@
+{
+  "suite_name": "adam-tiny-clean-profile-suite",
+  "profile_count": 3,
+  "best_profile": "balanced",
+  "best_pack_name": "adam-tiny-clean-balanced-pack",
+  "best_validation_exact_match_rate_bps": 5000,
+  "worst_profile": "education_heavy",
+  "worst_pack_name": "adam-tiny-clean-education-heavy-pack",
+  "worst_validation_exact_match_rate_bps": 0,
+  "profile_gaps": [
+    {
+      "profile": "balanced",
+      "pack_name": "adam-tiny-clean-balanced-pack",
+      "validation_exact_match_rate_bps": 5000,
+      "validation_gap_bps": 0,
+      "sample_count": 27,
+      "sample_count_gap": 0,
+      "train_token_count": 153,
+      "train_token_gap": 0,
+      "is_best_profile": true
+    },
+    {
+      "profile": "education_heavy",
+      "pack_name": "adam-tiny-clean-education-heavy-pack",
+      "validation_exact_match_rate_bps": 0,
+      "validation_gap_bps": 5000,
+      "sample_count": 24,
+      "sample_count_gap": 3,
+      "train_token_count": 134,
+      "train_token_gap": 19,
+      "is_best_profile": false
+    },
+    {
+      "profile": "reference_heavy",
+      "pack_name": "adam-tiny-clean-reference-heavy-pack",
+      "validation_exact_match_rate_bps": 1428,
+      "validation_gap_bps": 3572,
+      "sample_count": 24,
+      "sample_count_gap": 3,
+      "train_token_count": 134,
+      "train_token_gap": 19,
+      "is_best_profile": false
+    }
+  ]
+}

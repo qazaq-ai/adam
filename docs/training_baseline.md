@@ -49,9 +49,15 @@ The next clean corpus tier is assembled through:
 - `scripts/run_clean_training_corpus_assembly.sh`
 - `scripts/run_clean_training_corpus_report.sh`
 
+Controlled tiny profile comparisons are built through:
+
+- `scripts/run_tiny_training_profile_suite.sh`
+- `scripts/run_tiny_training_profile_comparison.sh`
+
 Its clean corpus is now sourced through:
 
 - `data/curated/tiny_clean_training_selection_manifest.json`
+- `data/curated/tiny_clean_training_profile_suite_manifest.json`
 - `data/curated/tiny_clean_training_manifest.json`
 - `data/curated/tiny_clean_general_pack.json`
 - `data/curated/tiny_clean_reference_pack.json`
@@ -66,6 +72,8 @@ The larger clean corpus tier is sourced through:
 - `data/curated/clean_education_extension_pack.json`
 - `data/curated/clean_training_corpus_pack.json`
 - `data/training/clean_training_corpus_report.json`
+- `data/training/tiny_clean_training_profile_suite_report.json`
+- `data/training/tiny_clean_training_profile_comparison_report.json`
 
 ## Output
 
@@ -104,6 +112,8 @@ regression artifact:
 - `data/training/baseline_training_consistency_report.json`
 - `data/training/baseline_training_delta_report.json`
 - `data/training/tiny_clean_training_report.json`
+- `data/training/tiny_clean_training_profile_suite_report.json`
+- `data/training/tiny_clean_training_profile_comparison_report.json`
 
 The foundation-wide cross-layer summary is also stored as:
 

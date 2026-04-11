@@ -14,13 +14,15 @@ use adam_train::{
     BaselineTrainingAssemblyReport, BaselineTrainingConsistencyReport, BaselineTrainingDeltaReport,
     BaselineTrainingManifest, CleanTrainingCorpusManifest, CleanTrainingCorpusPack,
     CleanTrainingCorpusReport, FoundationOverviewDeltaReport, FoundationOverviewReport,
-    TinyCleanTrainingDomainPack, TinyCleanTrainingPack, TinyCleanTrainingReport,
-    TinyCleanTrainingSelectionManifest, assemble_clean_training_corpus_pack,
-    assemble_tiny_clean_training_pack_from_corpus, build_baseline_training_assembly_report,
-    build_baseline_training_consistency_report, build_baseline_training_delta_report,
-    build_baseline_training_plan, build_clean_training_corpus_report,
-    build_foundation_overview_delta_report, build_foundation_overview_report,
-    build_tiny_clean_training_report,
+    TinyCleanTrainingDomainPack, TinyCleanTrainingPack, TinyCleanTrainingProfileComparisonReport,
+    TinyCleanTrainingProfileSuiteManifest, TinyCleanTrainingProfileSuiteReport,
+    TinyCleanTrainingReport, TinyCleanTrainingSelectionManifest,
+    assemble_clean_training_corpus_pack, assemble_tiny_clean_training_pack_from_corpus,
+    build_baseline_training_assembly_report, build_baseline_training_consistency_report,
+    build_baseline_training_delta_report, build_baseline_training_plan,
+    build_clean_training_corpus_report, build_foundation_overview_delta_report,
+    build_foundation_overview_report, build_tiny_clean_training_profile_comparison_report,
+    build_tiny_clean_training_profile_suite_report, build_tiny_clean_training_report,
 };
 
 #[test]
@@ -768,6 +770,108 @@ fn clean_training_corpus_report_matches_expected_regression_artifact() {
 
     let actual =
         build_clean_training_corpus_report(&manifest, &pack).expect("clean training corpus report");
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn tiny_clean_training_profile_suite_report_matches_expected_regression_artifact() {
+    let training_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_manifest.json"
+    );
+    let training_manifest: BaselineTrainingManifest = serde_json::from_str(
+        &fs::read_to_string(training_manifest_path).expect("training manifest file"),
+    )
+    .expect("valid training manifest json");
+    let registry_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_registry.json"
+    );
+    let registry: SourceRegistry =
+        serde_json::from_str(&fs::read_to_string(registry_path).expect("source registry file"))
+            .expect("valid source registry json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_scoring_rules.json"
+    );
+    let rules: SourceScoringRules =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("source scoring rules file"))
+            .expect("valid source scoring rules json");
+    let report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/source_acceptance_report.json"
+    );
+    let acceptance_report: SourceAcceptanceReport =
+        serde_json::from_str(&fs::read_to_string(report_path).expect("acceptance report file"))
+            .expect("valid source acceptance report json");
+    let suite_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_training_profile_suite_manifest.json"
+    );
+    let suite_manifest: TinyCleanTrainingProfileSuiteManifest = serde_json::from_str(
+        &fs::read_to_string(suite_manifest_path).expect("tiny profile suite manifest file"),
+    )
+    .expect("valid tiny profile suite manifest json");
+    let clean_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_manifest.json"
+    );
+    let clean_manifest: CleanTrainingCorpusManifest = serde_json::from_str(
+        &fs::read_to_string(clean_manifest_path).expect("clean corpus manifest file"),
+    )
+    .expect("valid clean corpus manifest json");
+    let clean_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_pack.json"
+    );
+    let clean_pack: CleanTrainingCorpusPack =
+        serde_json::from_str(&fs::read_to_string(clean_pack_path).expect("clean corpus pack file"))
+            .expect("valid clean corpus pack json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_suite_report.json"
+    );
+    let expected: TinyCleanTrainingProfileSuiteReport = serde_json::from_str(
+        &fs::read_to_string(expected_path).expect("tiny profile suite report"),
+    )
+    .expect("valid tiny profile suite report json");
+
+    let actual = build_tiny_clean_training_profile_suite_report(
+        &training_manifest,
+        &registry,
+        &rules,
+        &acceptance_report,
+        &suite_manifest,
+        &clean_manifest,
+        &clean_pack,
+    )
+    .expect("tiny profile suite report");
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn tiny_clean_training_profile_comparison_report_matches_expected_regression_artifact() {
+    let suite_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_suite_report.json"
+    );
+    let suite_report: TinyCleanTrainingProfileSuiteReport = serde_json::from_str(
+        &fs::read_to_string(suite_report_path).expect("tiny profile suite report"),
+    )
+    .expect("valid tiny profile suite report json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_comparison_report.json"
+    );
+    let expected: TinyCleanTrainingProfileComparisonReport = serde_json::from_str(
+        &fs::read_to_string(expected_path).expect("tiny profile comparison report"),
+    )
+    .expect("valid tiny profile comparison report json");
+
+    let actual = build_tiny_clean_training_profile_comparison_report(&suite_report)
+        .expect("tiny profile comparison report");
 
     assert_eq!(actual, expected);
 }

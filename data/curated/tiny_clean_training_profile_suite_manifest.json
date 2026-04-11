@@ -1,0 +1,37 @@
+{
+  "version": "0.0.54",
+  "name": "adam-tiny-clean-profile-suite",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "source_clean_corpus_manifest": "clean_training_corpus_manifest.json",
+  "source_clean_corpus_pack": "clean_training_corpus_pack.json",
+  "profiles": [
+    {
+      "profile": "balanced",
+      "pack_name": "adam-tiny-clean-balanced-pack",
+      "domain_sample_limits": {
+        "education": 9,
+        "general": 9,
+        "reference": 9
+      }
+    },
+    {
+      "profile": "education_heavy",
+      "pack_name": "adam-tiny-clean-education-heavy-pack",
+      "domain_sample_limits": {
+        "education": 12,
+        "general": 6,
+        "reference": 6
+      }
+    },
+    {
+      "profile": "reference_heavy",
+      "pack_name": "adam-tiny-clean-reference-heavy-pack",
+      "domain_sample_limits": {
+        "education": 6,
+        "general": 6,
+        "reference": 12
+      }
+    }
+  ]
+}

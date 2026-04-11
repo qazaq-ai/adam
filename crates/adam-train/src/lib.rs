@@ -229,6 +229,67 @@ pub struct TinyCleanTrainingSelectionManifest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileManifest {
+    pub profile: String,
+    pub pack_name: String,
+    pub domain_sample_limits: BTreeMap<String, usize>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileSuiteManifest {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub source_clean_corpus_manifest: String,
+    pub source_clean_corpus_pack: String,
+    pub profiles: Vec<TinyCleanTrainingProfileManifest>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileSummary {
+    pub profile: String,
+    pub pack_name: String,
+    pub sample_count: usize,
+    pub train_token_count: usize,
+    pub validation_exact_match_rate_bps: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileSuiteReport {
+    pub suite_name: String,
+    pub profile_count: usize,
+    pub clean_corpus_sample_count: usize,
+    pub profile_summaries: Vec<TinyCleanTrainingProfileSummary>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileGapReport {
+    pub profile: String,
+    pub pack_name: String,
+    pub validation_exact_match_rate_bps: usize,
+    pub validation_gap_bps: usize,
+    pub sample_count: usize,
+    pub sample_count_gap: usize,
+    pub train_token_count: usize,
+    pub train_token_gap: usize,
+    pub is_best_profile: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileComparisonReport {
+    pub suite_name: String,
+    pub profile_count: usize,
+    pub best_profile: String,
+    pub best_pack_name: String,
+    pub best_validation_exact_match_rate_bps: usize,
+    pub worst_profile: String,
+    pub worst_pack_name: String,
+    pub worst_validation_exact_match_rate_bps: usize,
+    pub profile_gaps: Vec<TinyCleanTrainingProfileGapReport>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TinyCleanTrainingCategoryReport {
     pub category: String,
     pub sample_count: usize,
@@ -382,6 +443,8 @@ pub enum TrainingError {
     TinyTrainingManifestMismatch,
     #[error("tiny clean training selection manifest is invalid or inconsistent")]
     TinyTrainingSelectionMismatch,
+    #[error("tiny clean training profile suite manifest is invalid or inconsistent")]
+    TinyTrainingProfileSuiteMismatch,
     #[error("clean training corpus manifest references are invalid or inconsistent")]
     CleanTrainingCorpusManifestMismatch,
 }
@@ -536,6 +599,41 @@ impl TinyCleanTrainingSelectionManifest {
     }
 }
 
+impl TinyCleanTrainingProfileSuiteManifest {
+    pub fn validate(&self) -> Result<(), TrainingError> {
+        if self.target_language != "kazakh" {
+            return Err(TrainingError::NonKazakhLanguage);
+        }
+        if self.script != "cyrillic" {
+            return Err(TrainingError::NonCyrillicScript);
+        }
+        if self.source_clean_corpus_manifest.trim().is_empty()
+            || self.source_clean_corpus_pack.trim().is_empty()
+            || self.profiles.is_empty()
+        {
+            return Err(TrainingError::TinyTrainingProfileSuiteMismatch);
+        }
+        let mut seen_profiles = std::collections::BTreeSet::new();
+        let mut seen_pack_names = std::collections::BTreeSet::new();
+        for profile in &self.profiles {
+            if profile.profile.trim().is_empty()
+                || profile.pack_name.trim().is_empty()
+                || profile.domain_sample_limits.is_empty()
+                || !seen_profiles.insert(profile.profile.as_str())
+                || !seen_pack_names.insert(profile.pack_name.as_str())
+            {
+                return Err(TrainingError::TinyTrainingProfileSuiteMismatch);
+            }
+            for (domain, limit) in &profile.domain_sample_limits {
+                if domain.trim().is_empty() || *limit == 0 {
+                    return Err(TrainingError::TinyTrainingProfileSuiteMismatch);
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 impl CleanTrainingCorpusManifest {
     pub fn validate(&self) -> Result<(), TrainingError> {
         if self.target_language != "kazakh" {
@@ -636,38 +734,150 @@ pub fn assemble_tiny_clean_training_pack_from_corpus(
         return Err(TrainingError::TinyTrainingSelectionMismatch);
     }
 
-    let mut domain_counts = BTreeMap::<String, usize>::new();
-    let mut samples = Vec::new();
-    let mut next_index = 1usize;
-    for sample in &clean_corpus_pack.samples {
-        let count = domain_counts.entry(sample.domain.clone()).or_default();
-        if *count >= manifest.max_samples_per_domain {
-            continue;
-        }
-        samples.push(TinyCleanTrainingSample {
-            id: format!("clean_sample_{next_index:02}"),
-            source_id: sample.source_id.clone(),
-            domain: sample.domain.clone(),
-            text: sample.text.clone(),
-        });
-        *count += 1;
-        next_index += 1;
-    }
-
-    let distinct_domains = samples
+    let domain_limits = clean_corpus_pack
+        .samples
         .iter()
-        .map(|sample| sample.domain.as_str())
-        .collect::<std::collections::BTreeSet<_>>();
-    if samples.is_empty() || distinct_domains.len() < 3 {
-        return Err(TrainingError::TinyTrainingSelectionMismatch);
+        .map(|sample| (sample.domain.clone(), manifest.max_samples_per_domain))
+        .collect::<BTreeMap<_, _>>();
+
+    assemble_tiny_clean_training_pack_with_domain_limits(
+        &manifest.version,
+        &manifest.name,
+        &manifest.target_language,
+        &manifest.script,
+        clean_corpus_pack,
+        &domain_limits,
+    )
+    .map_err(|_| TrainingError::TinyTrainingSelectionMismatch)
+}
+
+pub fn assemble_tiny_clean_training_pack_from_profile(
+    suite: &TinyCleanTrainingProfileSuiteManifest,
+    profile: &TinyCleanTrainingProfileManifest,
+    clean_corpus_manifest: &CleanTrainingCorpusManifest,
+    clean_corpus_pack: &CleanTrainingCorpusPack,
+) -> Result<TinyCleanTrainingPack, TrainingError> {
+    suite.validate()?;
+    if !suite
+        .profiles
+        .iter()
+        .any(|entry| entry.profile == profile.profile)
+    {
+        return Err(TrainingError::TinyTrainingProfileSuiteMismatch);
+    }
+    if clean_corpus_manifest.name != clean_corpus_pack.name
+        || clean_corpus_manifest.version != clean_corpus_pack.version
+        || clean_corpus_manifest.target_language != clean_corpus_pack.target_language
+        || clean_corpus_manifest.script != clean_corpus_pack.script
+        || clean_corpus_pack.target_language != suite.target_language
+        || clean_corpus_pack.script != suite.script
+    {
+        return Err(TrainingError::TinyTrainingProfileSuiteMismatch);
     }
 
-    Ok(TinyCleanTrainingPack {
-        version: manifest.version.clone(),
-        name: manifest.name.clone(),
-        target_language: manifest.target_language.clone(),
-        script: manifest.script.clone(),
-        samples,
+    assemble_tiny_clean_training_pack_with_domain_limits(
+        &suite.version,
+        &profile.pack_name,
+        &suite.target_language,
+        &suite.script,
+        clean_corpus_pack,
+        &profile.domain_sample_limits,
+    )
+    .map_err(|_| TrainingError::TinyTrainingProfileSuiteMismatch)
+}
+
+pub fn build_tiny_clean_training_profile_suite_report(
+    training_manifest: &BaselineTrainingManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    acceptance_report: &SourceAcceptanceReport,
+    suite: &TinyCleanTrainingProfileSuiteManifest,
+    clean_corpus_manifest: &CleanTrainingCorpusManifest,
+    clean_corpus_pack: &CleanTrainingCorpusPack,
+) -> Result<TinyCleanTrainingProfileSuiteReport, TrainingError> {
+    suite.validate()?;
+    let mut profile_summaries = Vec::new();
+    for profile in &suite.profiles {
+        let pack = assemble_tiny_clean_training_pack_from_profile(
+            suite,
+            profile,
+            clean_corpus_manifest,
+            clean_corpus_pack,
+        )?;
+        let report = build_tiny_clean_training_report(
+            training_manifest,
+            registry,
+            rules,
+            acceptance_report,
+            &pack,
+        )?;
+        profile_summaries.push(TinyCleanTrainingProfileSummary {
+            profile: profile.profile.clone(),
+            pack_name: profile.pack_name.clone(),
+            sample_count: report.sample_count,
+            train_token_count: report.train_token_count,
+            validation_exact_match_rate_bps: report.validation_exact_match_rate_bps,
+        });
+    }
+    profile_summaries.sort_by(|left, right| left.profile.cmp(&right.profile));
+
+    Ok(TinyCleanTrainingProfileSuiteReport {
+        suite_name: suite.name.clone(),
+        profile_count: suite.profiles.len(),
+        clean_corpus_sample_count: clean_corpus_pack.samples.len(),
+        profile_summaries,
+    })
+}
+
+pub fn build_tiny_clean_training_profile_comparison_report(
+    suite_report: &TinyCleanTrainingProfileSuiteReport,
+) -> Result<TinyCleanTrainingProfileComparisonReport, TrainingError> {
+    if suite_report.profile_summaries.is_empty() || suite_report.profile_count == 0 {
+        return Err(TrainingError::TinyTrainingProfileSuiteMismatch);
+    }
+
+    let best = suite_report
+        .profile_summaries
+        .iter()
+        .max_by(|left, right| compare_profile_summaries(left, right))
+        .expect("non-empty profile summaries");
+    let worst = suite_report
+        .profile_summaries
+        .iter()
+        .min_by(|left, right| compare_profile_summaries(left, right))
+        .expect("non-empty profile summaries");
+
+    let mut profile_gaps = suite_report
+        .profile_summaries
+        .iter()
+        .map(|summary| TinyCleanTrainingProfileGapReport {
+            profile: summary.profile.clone(),
+            pack_name: summary.pack_name.clone(),
+            validation_exact_match_rate_bps: summary.validation_exact_match_rate_bps,
+            validation_gap_bps: best
+                .validation_exact_match_rate_bps
+                .saturating_sub(summary.validation_exact_match_rate_bps),
+            sample_count: summary.sample_count,
+            sample_count_gap: best.sample_count.saturating_sub(summary.sample_count),
+            train_token_count: summary.train_token_count,
+            train_token_gap: best
+                .train_token_count
+                .saturating_sub(summary.train_token_count),
+            is_best_profile: summary.profile == best.profile,
+        })
+        .collect::<Vec<_>>();
+    profile_gaps.sort_by(|left, right| left.profile.cmp(&right.profile));
+
+    Ok(TinyCleanTrainingProfileComparisonReport {
+        suite_name: suite_report.suite_name.clone(),
+        profile_count: suite_report.profile_count,
+        best_profile: best.profile.clone(),
+        best_pack_name: best.pack_name.clone(),
+        best_validation_exact_match_rate_bps: best.validation_exact_match_rate_bps,
+        worst_profile: worst.profile.clone(),
+        worst_pack_name: worst.pack_name.clone(),
+        worst_validation_exact_match_rate_bps: worst.validation_exact_match_rate_bps,
+        profile_gaps,
     })
 }
 
@@ -1927,6 +2137,63 @@ fn build_foundation_field_drifts(
         actual.tiny_training_validation_exact_match_rate_bps,
     );
     drifts
+}
+
+fn compare_profile_summaries(
+    left: &TinyCleanTrainingProfileSummary,
+    right: &TinyCleanTrainingProfileSummary,
+) -> std::cmp::Ordering {
+    left.validation_exact_match_rate_bps
+        .cmp(&right.validation_exact_match_rate_bps)
+        .then_with(|| left.sample_count.cmp(&right.sample_count))
+        .then_with(|| left.train_token_count.cmp(&right.train_token_count))
+        .then_with(|| right.profile.cmp(&left.profile))
+}
+
+fn assemble_tiny_clean_training_pack_with_domain_limits(
+    version: &str,
+    name: &str,
+    target_language: &str,
+    script: &str,
+    clean_corpus_pack: &CleanTrainingCorpusPack,
+    domain_limits: &BTreeMap<String, usize>,
+) -> Result<TinyCleanTrainingPack, TrainingError> {
+    let mut domain_counts = BTreeMap::<String, usize>::new();
+    let mut samples = Vec::new();
+    let mut next_index = 1usize;
+    for sample in &clean_corpus_pack.samples {
+        let Some(limit) = domain_limits.get(&sample.domain) else {
+            continue;
+        };
+        let count = domain_counts.entry(sample.domain.clone()).or_default();
+        if *count >= *limit {
+            continue;
+        }
+        samples.push(TinyCleanTrainingSample {
+            id: format!("clean_sample_{next_index:02}"),
+            source_id: sample.source_id.clone(),
+            domain: sample.domain.clone(),
+            text: sample.text.clone(),
+        });
+        *count += 1;
+        next_index += 1;
+    }
+
+    let distinct_domains = samples
+        .iter()
+        .map(|sample| sample.domain.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    if samples.is_empty() || distinct_domains.len() < 3 {
+        return Err(TrainingError::TinyTrainingSelectionMismatch);
+    }
+
+    Ok(TinyCleanTrainingPack {
+        version: version.to_string(),
+        name: name.to_string(),
+        target_language: target_language.to_string(),
+        script: script.to_string(),
+        samples,
+    })
 }
 
 fn tokenize_clean_training_text(text: &str) -> Vec<String> {

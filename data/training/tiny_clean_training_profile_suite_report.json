@@ -1,0 +1,28 @@
+{
+  "suite_name": "adam-tiny-clean-profile-suite",
+  "profile_count": 3,
+  "clean_corpus_sample_count": 45,
+  "profile_summaries": [
+    {
+      "profile": "balanced",
+      "pack_name": "adam-tiny-clean-balanced-pack",
+      "sample_count": 27,
+      "train_token_count": 153,
+      "validation_exact_match_rate_bps": 5000
+    },
+    {
+      "profile": "education_heavy",
+      "pack_name": "adam-tiny-clean-education-heavy-pack",
+      "sample_count": 24,
+      "train_token_count": 134,
+      "validation_exact_match_rate_bps": 0
+    },
+    {
+      "profile": "reference_heavy",
+      "pack_name": "adam-tiny-clean-reference-heavy-pack",
+      "sample_count": 24,
+      "train_token_count": 134,
+      "validation_exact_match_rate_bps": 1428
+    }
+  ]
+}
