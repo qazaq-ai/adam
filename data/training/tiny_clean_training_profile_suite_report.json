@@ -7,36 +7,36 @@
       "profile": "balanced",
       "pack_name": "adam-tiny-clean-balanced-pack",
       "sample_count": 27,
-      "train_token_count": 157,
+      "train_token_count": 158,
       "validation_exact_match_rate_bps": 3333
     },
     {
       "profile": "education_heavy",
       "pack_name": "adam-tiny-clean-education-heavy-pack",
       "sample_count": 24,
-      "train_token_count": 139,
+      "train_token_count": 140,
       "validation_exact_match_rate_bps": 4615
     },
     {
       "profile": "education_max",
       "pack_name": "adam-tiny-clean-education-max-pack",
       "sample_count": 24,
-      "train_token_count": 138,
-      "validation_exact_match_rate_bps": 3333
+      "train_token_count": 139,
+      "validation_exact_match_rate_bps": 4000
     },
     {
       "profile": "general_heavy",
       "pack_name": "adam-tiny-clean-general-heavy-pack",
       "sample_count": 24,
-      "train_token_count": 139,
-      "validation_exact_match_rate_bps": 5000
+      "train_token_count": 140,
+      "validation_exact_match_rate_bps": 5714
     },
     {
       "profile": "reference_heavy",
       "pack_name": "adam-tiny-clean-reference-heavy-pack",
       "sample_count": 24,
-      "train_token_count": 139,
-      "validation_exact_match_rate_bps": 7857
+      "train_token_count": 140,
+      "validation_exact_match_rate_bps": 10000
     }
   ]
 }

@@ -4,7 +4,7 @@
   "expected_best_profile": "reference_heavy",
   "actual_best_profile": "reference_heavy",
   "selected_pack_name": "adam-tiny-clean-reference-heavy-pack",
-  "selected_validation_exact_match_rate_bps": 7857,
+  "selected_validation_exact_match_rate_bps": 10000,
   "matches_expected_best_profile": true,
   "meets_minimum_validation_threshold": true,
   "policy_checks": [

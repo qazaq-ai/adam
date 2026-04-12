@@ -2,7 +2,7 @@
   "corpus_name": "adam-clean-training-corpus",
   "pack_count": 9,
   "sample_count": 82,
-  "total_token_count": 506,
+  "total_token_count": 507,
   "category_breakdown": [
     {
       "category": "domain_education",
@@ -17,7 +17,7 @@
     {
       "category": "domain_reference",
       "sample_count": 27,
-      "token_count": 167
+      "token_count": 168
     },
     {
       "category": "pack_adam-clean-education-core-pack",
@@ -42,7 +42,7 @@
     {
       "category": "pack_adam-clean-reference-core-pack",
       "sample_count": 9,
-      "token_count": 58
+      "token_count": 59
     },
     {
       "category": "pack_adam-clean-reference-extension-pack",
@@ -72,7 +72,7 @@
     {
       "category": "source_curated_reference_kazakh",
       "sample_count": 27,
-      "token_count": 167
+      "token_count": 168
     },
     {
       "category": "source_reviewed_education_kazakh",

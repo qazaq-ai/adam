@@ -7,16 +7,16 @@
   "train_sample_count": 22,
   "validation_sample_count": 2,
   "validation_domain_count": 2,
-  "train_token_count": 139,
+  "train_token_count": 140,
   "validation_token_count": 12,
-  "vocabulary_size": 77,
-  "unique_context_count": 78,
-  "unique_transition_count": 122,
-  "deterministic_context_count": 57,
+  "vocabulary_size": 71,
+  "unique_context_count": 74,
+  "unique_transition_count": 115,
+  "deterministic_context_count": 53,
   "ambiguous_context_count": 21,
   "validation_next_token_count": 14,
-  "validation_exact_match_count": 11,
-  "validation_exact_match_rate_bps": 7857,
+  "validation_exact_match_count": 14,
+  "validation_exact_match_rate_bps": 10000,
   "category_breakdown": [
     {
       "category": "domain_education",
@@ -31,7 +31,7 @@
     {
       "category": "domain_reference",
       "sample_count": 12,
-      "token_count": 77
+      "token_count": 78
     },
     {
       "category": "source_curated_general_kazakh",
@@ -41,7 +41,7 @@
     {
       "category": "source_curated_reference_kazakh",
       "sample_count": 12,
-      "token_count": 77
+      "token_count": 78
     },
     {
       "category": "source_reviewed_education_kazakh",

@@ -72,28 +72,28 @@
       "pack_name": "adam-clean-reference-core-pack",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Термин анықтамасы ұғымның негізгі шекарасын дәл белгілейді."
+      "text": "Сөздік бабы ұғымның ресми қолданысын дәл белгілейді."
     },
     {
       "id": "clean_corpus_sample_11",
       "pack_name": "adam-clean-reference-core-pack",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Анықтамалық жазба негізгі белгілерді қысқа және нақты береді."
+      "text": "Сөздік жазбасы ұғымның ресми белгілерін қысқа және нақты береді."
     },
     {
       "id": "clean_corpus_sample_12",
       "pack_name": "adam-clean-reference-core-pack",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Ереже мәтіні қолдану аясын бірмәнді түрде айқындайды."
+      "text": "Сөздік түсіндірмесі ұғымның ресми аясын бірмәнді айқындайды."
     },
     {
       "id": "clean_corpus_sample_13",
       "pack_name": "adam-clean-reference-core-pack",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Терминдік қор ұғымдар арасындағы айырманы нақтылайды."
+      "text": "Сөздік анықтамасы ұғымның ресми мағынасын нақтылайды."
     },
     {
       "id": "clean_corpus_sample_14",
@@ -135,7 +135,7 @@
       "pack_name": "adam-clean-education-core-pack",
       "source_id": "reviewed_education_kazakh",
       "domain": "education",
-      "text": "Оқу түсіндірмесі ұғымның негізгі мағынасын кезеңдеп ашады."
+      "text": "Сабақ түсіндірмесі ұғымның негізгі мағынасын кезеңдеп ашады."
     },
     {
       "id": "clean_corpus_sample_20",
@@ -163,7 +163,7 @@
       "pack_name": "adam-clean-education-core-pack",
       "source_id": "reviewed_education_kazakh",
       "domain": "education",
-      "text": "Оқу тапсырмасы негізгі белгілерді салыстыру арқылы бекітеді."
+      "text": "Сабақ тапсырмасы негізгі белгілерді салыстыру арқылы бекітеді."
     },
     {
       "id": "clean_corpus_sample_24",

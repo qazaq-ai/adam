@@ -2,7 +2,7 @@
   "strategy_name": "adam-tiny-clean-profile-strategy",
   "suite_name": "adam-tiny-clean-profile-suite",
   "baseline_profile": "reference_heavy",
-  "baseline_validation_exact_match_rate_bps": 7857,
+  "baseline_validation_exact_match_rate_bps": 10000,
   "promotable_profile_count": 1,
   "promotable_profiles": [
     "reference_heavy"
@@ -12,7 +12,7 @@
       "profile": "balanced",
       "pack_name": "adam-tiny-clean-balanced-pack",
       "validation_exact_match_rate_bps": 3333,
-      "validation_gap_bps": 4524,
+      "validation_gap_bps": 6667,
       "meets_minimum_validation_threshold": false,
       "within_gap_budget": false,
       "promotable": false
@@ -21,7 +21,7 @@
       "profile": "education_heavy",
       "pack_name": "adam-tiny-clean-education-heavy-pack",
       "validation_exact_match_rate_bps": 4615,
-      "validation_gap_bps": 3242,
+      "validation_gap_bps": 5385,
       "meets_minimum_validation_threshold": true,
       "within_gap_budget": false,
       "promotable": false
@@ -29,17 +29,17 @@
     {
       "profile": "education_max",
       "pack_name": "adam-tiny-clean-education-max-pack",
-      "validation_exact_match_rate_bps": 3333,
-      "validation_gap_bps": 4524,
-      "meets_minimum_validation_threshold": false,
+      "validation_exact_match_rate_bps": 4000,
+      "validation_gap_bps": 6000,
+      "meets_minimum_validation_threshold": true,
       "within_gap_budget": false,
       "promotable": false
     },
     {
       "profile": "general_heavy",
       "pack_name": "adam-tiny-clean-general-heavy-pack",
-      "validation_exact_match_rate_bps": 5000,
-      "validation_gap_bps": 2857,
+      "validation_exact_match_rate_bps": 5714,
+      "validation_gap_bps": 4286,
       "meets_minimum_validation_threshold": true,
       "within_gap_budget": false,
       "promotable": false
@@ -47,7 +47,7 @@
     {
       "profile": "reference_heavy",
       "pack_name": "adam-tiny-clean-reference-heavy-pack",
-      "validation_exact_match_rate_bps": 7857,
+      "validation_exact_match_rate_bps": 10000,
       "validation_gap_bps": 0,
       "meets_minimum_validation_threshold": true,
       "within_gap_budget": true,

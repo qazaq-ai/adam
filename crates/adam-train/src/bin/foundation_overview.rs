@@ -5,6 +5,7 @@ use adam_eval::{EvalBenchmarkDeltaReport, EvalBenchmarkReport};
 use adam_tokenizer::{TokenizerExperimentDeltaReport, TokenizerExperimentReport};
 use adam_train::{
     BaselineTrainingConsistencyReport, BaselineTrainingDeltaReport, FoundationOverviewReport,
+    TinyCleanTrainingMissAuditDeltaReport, TinyCleanTrainingMissAuditReport,
     TinyCleanTrainingProfileBaselineDeltaReport, TinyCleanTrainingProfileBaselineReport,
     TinyCleanTrainingProfileExperimentMatrixDeltaReport,
     TinyCleanTrainingProfileExperimentMatrixPolicyDeltaReport,
@@ -15,7 +16,7 @@ use adam_train::{
     build_foundation_overview_report,
 };
 
-const USAGE: &str = "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta> <tiny-profile-experiment-matrix-report> <tiny-profile-experiment-matrix-delta> <tiny-profile-experiment-matrix-policy-report> <tiny-profile-experiment-matrix-policy-delta> <tiny-profile-promotion-report> <tiny-profile-promotion-delta>";
+const USAGE: &str = "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-training-miss-audit-report> <tiny-training-miss-audit-delta> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta> <tiny-profile-experiment-matrix-report> <tiny-profile-experiment-matrix-delta> <tiny-profile-experiment-matrix-policy-report> <tiny-profile-experiment-matrix-policy-delta> <tiny-profile-promotion-report> <tiny-profile-promotion-delta>";
 
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
@@ -52,6 +53,14 @@ fn main() -> ExitCode {
         return ExitCode::FAILURE;
     };
     let Some(tiny_training_path) = args.next() else {
+        eprintln!("{USAGE}");
+        return ExitCode::FAILURE;
+    };
+    let Some(tiny_training_miss_audit_path) = args.next() else {
+        eprintln!("{USAGE}");
+        return ExitCode::FAILURE;
+    };
+    let Some(tiny_training_miss_audit_delta_path) = args.next() else {
         eprintln!("{USAGE}");
         return ExitCode::FAILURE;
     };
@@ -133,6 +142,16 @@ fn main() -> ExitCode {
         Ok(value) => value,
         Err(code) => return code,
     };
+    let tiny_training_miss_audit: TinyCleanTrainingMissAuditReport =
+        match load(&tiny_training_miss_audit_path) {
+            Ok(value) => value,
+            Err(code) => return code,
+        };
+    let tiny_training_miss_audit_delta: TinyCleanTrainingMissAuditDeltaReport =
+        match load(&tiny_training_miss_audit_delta_path) {
+            Ok(value) => value,
+            Err(code) => return code,
+        };
     let tiny_profile_policy: TinyCleanTrainingProfileBaselineReport =
         match load(&tiny_profile_policy_report_path) {
             Ok(value) => value,
@@ -195,6 +214,8 @@ fn main() -> ExitCode {
         &training_consistency,
         &training_delta,
         &tiny_training,
+        &tiny_training_miss_audit,
+        &tiny_training_miss_audit_delta,
         &tiny_profile_policy,
         &tiny_profile_policy_delta,
         &tiny_profile_strategy,

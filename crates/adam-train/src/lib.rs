@@ -565,6 +565,54 @@ pub struct TinyCleanTrainingReport {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingMissAuditCategoryReport {
+    pub category: String,
+    pub miss_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingMissAuditGuardReport {
+    pub guard: String,
+    pub miss_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingMissAuditEntry {
+    pub sample_id: String,
+    pub source_id: String,
+    pub domain: String,
+    pub context: String,
+    pub actual_next_token: String,
+    pub predicted_next_token: Option<String>,
+    pub predicted_transition_count: usize,
+    pub candidate_count: usize,
+    pub unseen_context: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingMissAuditReport {
+    pub run_name: String,
+    pub pack_name: String,
+    pub validation_next_token_count: usize,
+    pub validation_exact_match_count: usize,
+    pub validation_miss_count: usize,
+    pub validation_miss_rate_bps: usize,
+    pub unseen_context_miss_count: usize,
+    pub ambiguous_context_miss_count: usize,
+    pub category_breakdown: Vec<TinyCleanTrainingMissAuditCategoryReport>,
+    pub critical_breakdown: Vec<TinyCleanTrainingMissAuditGuardReport>,
+    pub misses: Vec<TinyCleanTrainingMissAuditEntry>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingMissAuditDeltaReport {
+    pub run_name: String,
+    pub matches_expected: bool,
+    pub field_drifts: Vec<BaselineTrainingFieldDrift>,
+    pub miss_drifts: Vec<BaselineTrainingNamedBoolDrift>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CleanTrainingCorpusManifest {
     pub version: String,
     pub name: String,
@@ -638,6 +686,8 @@ pub struct FoundationOverviewReport {
     pub training_total_sequence_count: u64,
     pub tiny_training_vocabulary_size: usize,
     pub tiny_training_validation_exact_match_rate_bps: usize,
+    pub tiny_training_validation_miss_count: usize,
+    pub tiny_training_miss_audit_matches_expected: bool,
     pub tiny_profile_policy_matches_expected: bool,
     pub tiny_profile_strategy_matches_expected: bool,
     pub tiny_profile_experiment_matrix_policy_matches_expected: bool,
@@ -2270,195 +2320,140 @@ pub fn build_tiny_clean_training_report(
     report: &SourceAcceptanceReport,
     pack: &TinyCleanTrainingPack,
 ) -> Result<TinyCleanTrainingReport, TrainingError> {
-    manifest.validate()?;
-    registry
-        .validate()
-        .map_err(|_| TrainingError::ReferencedManifestInvalid)?;
-    report
-        .validate(registry, rules)
-        .map_err(|_| TrainingError::AcceptanceReportMismatch)?;
-    pack.validate()?;
-
-    let accepted_sources = report
+    let analysis = analyze_tiny_clean_training(manifest, registry, rules, report, pack)?;
+    let accepted_source_count = report
         .records
         .iter()
         .filter(|record| record.accepted_for_training)
-        .map(|record| record.source_id.as_str())
-        .collect::<std::collections::BTreeSet<_>>();
-    let registry_by_id = registry
-        .entries
-        .iter()
-        .map(|entry| (entry.id.as_str(), entry))
-        .collect::<BTreeMap<_, _>>();
-
-    for sample in &pack.samples {
-        let Some(entry) = registry_by_id.get(sample.source_id.as_str()) else {
-            return Err(TrainingError::TinyTrainingSourceMismatch);
-        };
-        if !accepted_sources.contains(sample.source_id.as_str())
-            || !entry.allowed_for_training
-            || entry.stage != adam_corpus::CorpusStage::Curated
-            || source_domain_slug(&entry.domain) != sample.domain
-        {
-            return Err(TrainingError::TinyTrainingSourceMismatch);
-        }
-    }
-
-    let ordered_samples = deterministic_round_robin_tiny_samples(&pack.samples);
-    let validation_sample_count =
-        ((ordered_samples.len() as u128 * manifest.validation_split_bps as u128) / 10_000) as usize;
-    let validation_sample_count = validation_sample_count
-        .max(1)
-        .min(ordered_samples.len().saturating_sub(1));
-    let (train_samples, validation_samples) =
-        split_tiny_training_samples(&ordered_samples, validation_sample_count);
-    let train_sample_count = train_samples.len();
-    let validation_domain_count = validation_samples
-        .iter()
-        .map(|sample| sample.domain.as_str())
-        .collect::<std::collections::BTreeSet<_>>()
-        .len();
-
-    let train_sequences = train_samples
-        .iter()
-        .map(|sample| tokenize_clean_training_text(&sample.text))
-        .collect::<Vec<_>>();
-    let validation_sequences = validation_samples
-        .iter()
-        .map(|sample| tokenize_clean_training_text(&sample.text))
-        .collect::<Vec<_>>();
-
-    let train_token_count = train_sequences.iter().map(Vec::len).sum::<usize>();
-    let validation_token_count = validation_sequences.iter().map(Vec::len).sum::<usize>();
-    let vocabulary_size = train_sequences
-        .iter()
-        .flat_map(|tokens| tokens.iter().cloned())
-        .collect::<std::collections::BTreeSet<_>>()
-        .len();
-
-    let mut transition_counts = BTreeMap::<String, BTreeMap<String, usize>>::new();
-    for tokens in &train_sequences {
-        for (context, next_token) in bigram_pairs(tokens) {
-            *transition_counts
-                .entry(context)
-                .or_default()
-                .entry(next_token)
-                .or_default() += 1;
-        }
-    }
-
-    let unique_context_count = transition_counts.len();
-    let unique_transition_count = transition_counts
-        .values()
-        .map(|next_tokens| next_tokens.len())
-        .sum::<usize>();
-    let deterministic_context_count = transition_counts
-        .values()
-        .filter(|next_tokens| next_tokens.len() == 1)
         .count();
-    let ambiguous_context_count = unique_context_count - deterministic_context_count;
-
-    let mut validation_next_token_count = 0usize;
-    let mut validation_exact_match_count = 0usize;
-    for tokens in &validation_sequences {
-        for (context, actual_next_token) in bigram_pairs(tokens) {
-            validation_next_token_count += 1;
-            if transition_counts.get(&context).and_then(|next_tokens| {
-                next_tokens
-                    .iter()
-                    .max_by(|left, right| left.1.cmp(right.1).then_with(|| right.0.cmp(left.0)))
-                    .map(|(token, _)| token.as_str())
-            }) == Some(actual_next_token.as_str())
-            {
-                validation_exact_match_count += 1;
-            }
-        }
-    }
-    let validation_exact_match_rate_bps = if validation_next_token_count == 0 {
-        0
-    } else {
-        validation_exact_match_count * 10_000 / validation_next_token_count
-    };
-
-    let mut category_stats = BTreeMap::<String, (usize, usize)>::new();
-    for sample in &ordered_samples {
-        let token_count = tokenize_clean_training_text(&sample.text).len();
-        for category in [
-            format!("domain_{}", sample.domain),
-            format!("source_{}", sample.source_id),
-        ] {
-            let stats = category_stats.entry(category).or_insert((0, 0));
-            stats.0 += 1;
-            stats.1 += token_count;
-        }
-    }
-    let category_breakdown = category_stats
-        .into_iter()
-        .map(
-            |(category, (sample_count, token_count))| TinyCleanTrainingCategoryReport {
-                category,
-                sample_count,
-                token_count,
-            },
-        )
-        .collect::<Vec<_>>();
-
-    let mut critical_breakdown = vec![
-        FoundationOverviewCheck {
-            check: "accepted_source_only".to_string(),
-            passed: true,
-        },
-        FoundationOverviewCheck {
-            check: "clean_source_only".to_string(),
-            passed: true,
-        },
-        FoundationOverviewCheck {
-            check: "validation_coverage".to_string(),
-            passed: !validation_samples.is_empty() && validation_next_token_count > 0,
-        },
-        FoundationOverviewCheck {
-            check: "validation_multi_domain_coverage".to_string(),
-            passed: validation_domain_count > 1,
-        },
-        FoundationOverviewCheck {
-            check: "deterministic_transition_coverage".to_string(),
-            passed: deterministic_context_count > 0,
-        },
-        FoundationOverviewCheck {
-            check: "round_robin_domain_ordering".to_string(),
-            passed: ordered_samples.len() == pack.samples.len(),
-        },
-    ]
-    .into_iter()
-    .map(|check| TinyCleanTrainingGuardReport {
-        guard: check.check,
-        sample_count: usize::from(check.passed) * ordered_samples.len(),
-    })
-    .collect::<Vec<_>>();
-    critical_breakdown.sort_by(|left, right| left.guard.cmp(&right.guard));
 
     Ok(TinyCleanTrainingReport {
         run_name: format!("{}-tiny-clean-prototype", manifest.run_name),
         pack_name: pack.name.clone(),
         sample_ordering_strategy: "round_robin_by_domain_with_stratified_validation".to_string(),
-        accepted_source_count: accepted_sources.len(),
-        sample_count: ordered_samples.len(),
-        train_sample_count,
-        validation_sample_count,
-        validation_domain_count,
-        train_token_count,
-        validation_token_count,
-        vocabulary_size,
-        unique_context_count,
-        unique_transition_count,
-        deterministic_context_count,
-        ambiguous_context_count,
-        validation_next_token_count,
-        validation_exact_match_count,
-        validation_exact_match_rate_bps,
+        accepted_source_count,
+        sample_count: analysis.ordered_samples.len(),
+        train_sample_count: analysis.train_sample_count,
+        validation_sample_count: analysis.validation_sample_count,
+        validation_domain_count: analysis.validation_domain_count,
+        train_token_count: analysis.train_token_count,
+        validation_token_count: analysis.validation_token_count,
+        vocabulary_size: analysis.vocabulary_size,
+        unique_context_count: analysis.unique_context_count,
+        unique_transition_count: analysis.unique_transition_count,
+        deterministic_context_count: analysis.deterministic_context_count,
+        ambiguous_context_count: analysis.ambiguous_context_count,
+        validation_next_token_count: analysis.validation_next_token_count,
+        validation_exact_match_count: analysis.validation_exact_match_count,
+        validation_exact_match_rate_bps: analysis.validation_exact_match_rate_bps,
+        category_breakdown: analysis.category_breakdown,
+        critical_breakdown: analysis.critical_breakdown,
+    })
+}
+
+pub fn build_tiny_clean_training_miss_audit_report(
+    manifest: &BaselineTrainingManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    report: &SourceAcceptanceReport,
+    pack: &TinyCleanTrainingPack,
+) -> Result<TinyCleanTrainingMissAuditReport, TrainingError> {
+    let analysis = analyze_tiny_clean_training(manifest, registry, rules, report, pack)?;
+    let validation_miss_count = analysis.validation_misses.len();
+    let validation_miss_rate_bps = if analysis.validation_next_token_count == 0 {
+        0
+    } else {
+        validation_miss_count * 10_000 / analysis.validation_next_token_count
+    };
+    let unseen_context_miss_count = analysis
+        .validation_misses
+        .iter()
+        .filter(|entry| entry.unseen_context)
+        .count();
+    let ambiguous_context_miss_count = analysis
+        .validation_misses
+        .iter()
+        .filter(|entry| !entry.unseen_context && entry.candidate_count > 1)
+        .count();
+
+    let mut category_counts = BTreeMap::<String, usize>::new();
+    for miss in &analysis.validation_misses {
+        for category in [
+            format!("domain_{}", miss.domain),
+            format!("source_{}", miss.source_id),
+        ] {
+            *category_counts.entry(category).or_default() += 1;
+        }
+    }
+    let category_breakdown = category_counts
+        .into_iter()
+        .map(
+            |(category, miss_count)| TinyCleanTrainingMissAuditCategoryReport {
+                category,
+                miss_count,
+            },
+        )
+        .collect::<Vec<_>>();
+
+    let mut critical_breakdown = vec![
+        TinyCleanTrainingMissAuditGuardReport {
+            guard: "validation_miss_coverage".to_string(),
+            miss_count: validation_miss_count,
+        },
+        TinyCleanTrainingMissAuditGuardReport {
+            guard: "unseen_context_miss".to_string(),
+            miss_count: unseen_context_miss_count,
+        },
+        TinyCleanTrainingMissAuditGuardReport {
+            guard: "ambiguous_context_miss".to_string(),
+            miss_count: ambiguous_context_miss_count,
+        },
+    ];
+    critical_breakdown.sort_by(|left, right| left.guard.cmp(&right.guard));
+
+    Ok(TinyCleanTrainingMissAuditReport {
+        run_name: format!("{}-tiny-clean-miss-audit", manifest.run_name),
+        pack_name: pack.name.clone(),
+        validation_next_token_count: analysis.validation_next_token_count,
+        validation_exact_match_count: analysis.validation_exact_match_count,
+        validation_miss_count,
+        validation_miss_rate_bps,
+        unseen_context_miss_count,
+        ambiguous_context_miss_count,
         category_breakdown,
         critical_breakdown,
+        misses: analysis
+            .validation_misses
+            .into_iter()
+            .map(|entry| TinyCleanTrainingMissAuditEntry {
+                sample_id: entry.sample_id,
+                source_id: entry.source_id,
+                domain: entry.domain,
+                context: entry.context,
+                actual_next_token: entry.actual_next_token,
+                predicted_next_token: entry.predicted_next_token,
+                predicted_transition_count: entry.predicted_transition_count,
+                candidate_count: entry.candidate_count,
+                unseen_context: entry.unseen_context,
+            })
+            .collect(),
     })
+}
+
+pub fn build_tiny_clean_training_miss_audit_delta_report(
+    expected: &TinyCleanTrainingMissAuditReport,
+    actual: &TinyCleanTrainingMissAuditReport,
+) -> TinyCleanTrainingMissAuditDeltaReport {
+    TinyCleanTrainingMissAuditDeltaReport {
+        run_name: actual.run_name.clone(),
+        matches_expected: expected == actual,
+        field_drifts: build_tiny_training_miss_audit_field_drifts(expected, actual),
+        miss_drifts: build_named_bool_drifts(
+            "tiny_training_miss",
+            build_tiny_training_miss_presence(expected),
+            build_tiny_training_miss_presence(actual),
+        ),
+    }
 }
 
 pub fn build_foundation_overview_report(
@@ -2471,6 +2466,8 @@ pub fn build_foundation_overview_report(
     training_consistency: &BaselineTrainingConsistencyReport,
     training_delta: &BaselineTrainingDeltaReport,
     tiny_training: &TinyCleanTrainingReport,
+    tiny_training_miss_audit: &TinyCleanTrainingMissAuditReport,
+    tiny_training_miss_audit_delta: &TinyCleanTrainingMissAuditDeltaReport,
     tiny_profile_policy: &TinyCleanTrainingProfileBaselineReport,
     tiny_profile_policy_delta: &TinyCleanTrainingProfileBaselineDeltaReport,
     tiny_profile_strategy: &TinyCleanTrainingProfileStrategyReport,
@@ -2482,6 +2479,10 @@ pub fn build_foundation_overview_report(
     tiny_profile_promotion: &TinyCleanTrainingProfilePromotionReport,
     tiny_profile_promotion_delta: &TinyCleanTrainingProfilePromotionDeltaReport,
 ) -> FoundationOverviewReport {
+    let tiny_training_miss_audit_ready = tiny_training_miss_audit_delta.matches_expected
+        && tiny_training_miss_audit.validation_miss_count
+            + tiny_training_miss_audit.validation_exact_match_count
+            == tiny_training_miss_audit.validation_next_token_count;
     let tiny_profile_policy_ready = tiny_profile_policy_delta.matches_expected
         && tiny_profile_policy.matches_expected_best_profile
         && tiny_profile_policy.meets_minimum_validation_threshold;
@@ -2536,6 +2537,12 @@ pub fn build_foundation_overview_report(
             ready: tiny_training.validation_next_token_count > 0,
             primary_metric_name: "validation_exact_match_rate_bps".to_string(),
             primary_metric_value: tiny_training.validation_exact_match_rate_bps.to_string(),
+        },
+        FoundationOverviewLayerReport {
+            layer: "tiny_training_miss_audit".to_string(),
+            ready: tiny_training_miss_audit_ready,
+            primary_metric_name: "validation_miss_count".to_string(),
+            primary_metric_value: tiny_training_miss_audit.validation_miss_count.to_string(),
         },
         FoundationOverviewLayerReport {
             layer: "tiny_profile_policy".to_string(),
@@ -2598,6 +2605,10 @@ pub fn build_foundation_overview_report(
                 .any(|entry| entry.guard == "clean_source_only" && entry.sample_count > 0),
         },
         FoundationOverviewCheck {
+            check: "tiny_training_miss_audit_matches_expected".to_string(),
+            passed: tiny_training_miss_audit_ready,
+        },
+        FoundationOverviewCheck {
             check: "tiny_profile_policy_matches_expected".to_string(),
             passed: tiny_profile_policy_ready,
         },
@@ -2629,6 +2640,8 @@ pub fn build_foundation_overview_report(
         tiny_training_vocabulary_size: tiny_training.vocabulary_size,
         tiny_training_validation_exact_match_rate_bps: tiny_training
             .validation_exact_match_rate_bps,
+        tiny_training_validation_miss_count: tiny_training_miss_audit.validation_miss_count,
+        tiny_training_miss_audit_matches_expected: tiny_training_miss_audit_ready,
         tiny_profile_policy_matches_expected: tiny_profile_policy_ready,
         tiny_profile_strategy_matches_expected: tiny_profile_strategy_ready,
         tiny_profile_experiment_matrix_matches_expected: tiny_profile_experiment_matrix_ready,
@@ -3147,6 +3160,18 @@ fn build_foundation_field_drifts(
     );
     push_field_drift(
         &mut drifts,
+        "tiny_training_validation_miss_count",
+        expected.tiny_training_validation_miss_count,
+        actual.tiny_training_validation_miss_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "tiny_training_miss_audit_matches_expected",
+        expected.tiny_training_miss_audit_matches_expected,
+        actual.tiny_training_miss_audit_matches_expected,
+    );
+    push_field_drift(
+        &mut drifts,
         "tiny_profile_policy_matches_expected",
         expected.tiny_profile_policy_matches_expected,
         actual.tiny_profile_policy_matches_expected,
@@ -3176,6 +3201,80 @@ fn build_foundation_field_drifts(
         actual.tiny_profile_promotion_matches_expected,
     );
     drifts
+}
+
+fn build_tiny_training_miss_audit_field_drifts(
+    expected: &TinyCleanTrainingMissAuditReport,
+    actual: &TinyCleanTrainingMissAuditReport,
+) -> Vec<BaselineTrainingFieldDrift> {
+    let mut drifts = Vec::new();
+    push_field_drift(
+        &mut drifts,
+        "run_name",
+        expected.run_name.clone(),
+        actual.run_name.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "pack_name",
+        expected.pack_name.clone(),
+        actual.pack_name.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "validation_next_token_count",
+        expected.validation_next_token_count,
+        actual.validation_next_token_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "validation_exact_match_count",
+        expected.validation_exact_match_count,
+        actual.validation_exact_match_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "validation_miss_count",
+        expected.validation_miss_count,
+        actual.validation_miss_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "validation_miss_rate_bps",
+        expected.validation_miss_rate_bps,
+        actual.validation_miss_rate_bps,
+    );
+    push_field_drift(
+        &mut drifts,
+        "unseen_context_miss_count",
+        expected.unseen_context_miss_count,
+        actual.unseen_context_miss_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "ambiguous_context_miss_count",
+        expected.ambiguous_context_miss_count,
+        actual.ambiguous_context_miss_count,
+    );
+    drifts
+}
+
+fn build_tiny_training_miss_presence(
+    report: &TinyCleanTrainingMissAuditReport,
+) -> Vec<(String, bool)> {
+    report
+        .misses
+        .iter()
+        .map(|entry| {
+            (
+                format!(
+                    "{}::{}::{}",
+                    entry.sample_id, entry.context, entry.actual_next_token
+                ),
+                true,
+            )
+        })
+        .collect()
 }
 
 fn build_tiny_profile_baseline_field_drifts(
@@ -3838,6 +3937,235 @@ fn split_tiny_training_samples(
     (train_samples, validation_samples)
 }
 
+fn best_transition_prediction(next_tokens: &BTreeMap<String, usize>) -> Option<(&str, usize)> {
+    next_tokens
+        .iter()
+        .max_by(|left, right| left.1.cmp(right.1).then_with(|| right.0.cmp(left.0)))
+        .map(|(token, count)| (token.as_str(), *count))
+}
+
+fn analyze_tiny_clean_training(
+    manifest: &BaselineTrainingManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    report: &SourceAcceptanceReport,
+    pack: &TinyCleanTrainingPack,
+) -> Result<TinyTrainingAnalysis, TrainingError> {
+    manifest.validate()?;
+    registry
+        .validate()
+        .map_err(|_| TrainingError::ReferencedManifestInvalid)?;
+    report
+        .validate(registry, rules)
+        .map_err(|_| TrainingError::AcceptanceReportMismatch)?;
+    pack.validate()?;
+
+    let accepted_sources = report
+        .records
+        .iter()
+        .filter(|record| record.accepted_for_training)
+        .map(|record| record.source_id.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    let registry_by_id = registry
+        .entries
+        .iter()
+        .map(|entry| (entry.id.as_str(), entry))
+        .collect::<BTreeMap<_, _>>();
+
+    for sample in &pack.samples {
+        let Some(entry) = registry_by_id.get(sample.source_id.as_str()) else {
+            return Err(TrainingError::TinyTrainingSourceMismatch);
+        };
+        if !accepted_sources.contains(sample.source_id.as_str())
+            || !entry.allowed_for_training
+            || entry.stage != adam_corpus::CorpusStage::Curated
+            || source_domain_slug(&entry.domain) != sample.domain
+        {
+            return Err(TrainingError::TinyTrainingSourceMismatch);
+        }
+    }
+
+    let ordered_samples = deterministic_round_robin_tiny_samples(&pack.samples);
+    let validation_sample_count =
+        ((ordered_samples.len() as u128 * manifest.validation_split_bps as u128) / 10_000) as usize;
+    let validation_sample_count = validation_sample_count
+        .max(1)
+        .min(ordered_samples.len().saturating_sub(1));
+    let (train_samples, validation_samples) =
+        split_tiny_training_samples(&ordered_samples, validation_sample_count);
+    let train_sample_count = train_samples.len();
+    let validation_domain_count = validation_samples
+        .iter()
+        .map(|sample| sample.domain.as_str())
+        .collect::<std::collections::BTreeSet<_>>()
+        .len();
+
+    let train_sequences = train_samples
+        .iter()
+        .map(|sample| (sample, tokenize_clean_training_text(&sample.text)))
+        .collect::<Vec<_>>();
+    let validation_sequences = validation_samples
+        .iter()
+        .map(|sample| (sample, tokenize_clean_training_text(&sample.text)))
+        .collect::<Vec<_>>();
+
+    let train_token_count = train_sequences
+        .iter()
+        .map(|(_, tokens)| tokens.len())
+        .sum::<usize>();
+    let validation_token_count = validation_sequences
+        .iter()
+        .map(|(_, tokens)| tokens.len())
+        .sum::<usize>();
+    let vocabulary_size = train_sequences
+        .iter()
+        .flat_map(|(_, tokens)| tokens.iter().cloned())
+        .collect::<std::collections::BTreeSet<_>>()
+        .len();
+
+    let mut transition_counts = BTreeMap::<String, BTreeMap<String, usize>>::new();
+    for (sample, tokens) in &train_sequences {
+        for (context, next_token) in sample_bigram_pairs(&sample.domain, tokens) {
+            *transition_counts
+                .entry(context)
+                .or_default()
+                .entry(next_token)
+                .or_default() += 1;
+        }
+    }
+
+    let unique_context_count = transition_counts.len();
+    let unique_transition_count = transition_counts
+        .values()
+        .map(|next_tokens| next_tokens.len())
+        .sum::<usize>();
+    let deterministic_context_count = transition_counts
+        .values()
+        .filter(|next_tokens| next_tokens.len() == 1)
+        .count();
+    let ambiguous_context_count = unique_context_count - deterministic_context_count;
+
+    let mut validation_next_token_count = 0usize;
+    let mut validation_exact_match_count = 0usize;
+    let mut validation_misses = Vec::new();
+    for (sample, tokens) in &validation_sequences {
+        for (context, actual_next_token) in sample_bigram_pairs(&sample.domain, tokens) {
+            validation_next_token_count += 1;
+            let prediction = transition_counts
+                .get(&context)
+                .and_then(best_transition_prediction);
+            if prediction.map(|(token, _)| token) == Some(actual_next_token.as_str()) {
+                validation_exact_match_count += 1;
+            } else {
+                let candidate_count = transition_counts
+                    .get(&context)
+                    .map(|next_tokens| next_tokens.len())
+                    .unwrap_or_default();
+                validation_misses.push(TinyTrainingValidationMiss {
+                    sample_id: sample.id.clone(),
+                    source_id: sample.source_id.clone(),
+                    domain: sample.domain.clone(),
+                    context,
+                    actual_next_token,
+                    predicted_next_token: prediction.map(|(token, _)| token.to_string()),
+                    predicted_transition_count: prediction.map(|(_, count)| count).unwrap_or(0),
+                    candidate_count,
+                    unseen_context: candidate_count == 0,
+                });
+            }
+        }
+    }
+    validation_misses.sort_by(|left, right| {
+        left.sample_id
+            .cmp(&right.sample_id)
+            .then_with(|| left.context.cmp(&right.context))
+            .then_with(|| left.actual_next_token.cmp(&right.actual_next_token))
+    });
+
+    let validation_exact_match_rate_bps = if validation_next_token_count == 0 {
+        0
+    } else {
+        validation_exact_match_count * 10_000 / validation_next_token_count
+    };
+
+    let mut category_stats = BTreeMap::<String, (usize, usize)>::new();
+    for sample in &ordered_samples {
+        let token_count = tokenize_clean_training_text(&sample.text).len();
+        for category in [
+            format!("domain_{}", sample.domain),
+            format!("source_{}", sample.source_id),
+        ] {
+            let stats = category_stats.entry(category).or_insert((0, 0));
+            stats.0 += 1;
+            stats.1 += token_count;
+        }
+    }
+    let category_breakdown = category_stats
+        .into_iter()
+        .map(
+            |(category, (sample_count, token_count))| TinyCleanTrainingCategoryReport {
+                category,
+                sample_count,
+                token_count,
+            },
+        )
+        .collect::<Vec<_>>();
+
+    let mut critical_breakdown = vec![
+        FoundationOverviewCheck {
+            check: "accepted_source_only".to_string(),
+            passed: true,
+        },
+        FoundationOverviewCheck {
+            check: "clean_source_only".to_string(),
+            passed: true,
+        },
+        FoundationOverviewCheck {
+            check: "validation_coverage".to_string(),
+            passed: !validation_samples.is_empty() && validation_next_token_count > 0,
+        },
+        FoundationOverviewCheck {
+            check: "validation_multi_domain_coverage".to_string(),
+            passed: validation_domain_count > 1,
+        },
+        FoundationOverviewCheck {
+            check: "deterministic_transition_coverage".to_string(),
+            passed: deterministic_context_count > 0,
+        },
+        FoundationOverviewCheck {
+            check: "round_robin_domain_ordering".to_string(),
+            passed: ordered_samples.len() == pack.samples.len(),
+        },
+    ]
+    .into_iter()
+    .map(|check| TinyCleanTrainingGuardReport {
+        guard: check.check,
+        sample_count: usize::from(check.passed) * ordered_samples.len(),
+    })
+    .collect::<Vec<_>>();
+    critical_breakdown.sort_by(|left, right| left.guard.cmp(&right.guard));
+
+    Ok(TinyTrainingAnalysis {
+        ordered_samples,
+        train_sample_count,
+        validation_sample_count,
+        validation_domain_count,
+        train_token_count,
+        validation_token_count,
+        vocabulary_size,
+        unique_context_count,
+        unique_transition_count,
+        deterministic_context_count,
+        ambiguous_context_count,
+        validation_next_token_count,
+        validation_exact_match_count,
+        validation_exact_match_rate_bps,
+        category_breakdown,
+        critical_breakdown,
+        validation_misses,
+    })
+}
+
 fn tokenize_clean_training_text(text: &str) -> Vec<String> {
     normalize_text(text)
         .split_whitespace()
@@ -3851,13 +4179,57 @@ fn tokenize_clean_training_text(text: &str) -> Vec<String> {
         .collect()
 }
 
+fn sample_bigram_pairs(domain: &str, tokens: &[String]) -> Vec<(String, String)> {
+    if tokens.is_empty() {
+        return Vec::new();
+    }
+
+    let mut pairs = Vec::with_capacity(tokens.len());
+    pairs.push((format!("<bos>::{domain}"), tokens[0].clone()));
+    pairs.extend(bigram_pairs(tokens));
+    pairs
+}
+
+#[derive(Debug, Clone)]
+struct TinyTrainingValidationMiss {
+    sample_id: String,
+    source_id: String,
+    domain: String,
+    context: String,
+    actual_next_token: String,
+    predicted_next_token: Option<String>,
+    predicted_transition_count: usize,
+    candidate_count: usize,
+    unseen_context: bool,
+}
+
+#[derive(Debug, Clone)]
+struct TinyTrainingAnalysis {
+    ordered_samples: Vec<TinyCleanTrainingSample>,
+    train_sample_count: usize,
+    validation_sample_count: usize,
+    validation_domain_count: usize,
+    train_token_count: usize,
+    validation_token_count: usize,
+    vocabulary_size: usize,
+    unique_context_count: usize,
+    unique_transition_count: usize,
+    deterministic_context_count: usize,
+    ambiguous_context_count: usize,
+    validation_next_token_count: usize,
+    validation_exact_match_count: usize,
+    validation_exact_match_rate_bps: usize,
+    category_breakdown: Vec<TinyCleanTrainingCategoryReport>,
+    critical_breakdown: Vec<TinyCleanTrainingGuardReport>,
+    validation_misses: Vec<TinyTrainingValidationMiss>,
+}
+
 fn bigram_pairs(tokens: &[String]) -> Vec<(String, String)> {
     if tokens.is_empty() {
         return Vec::new();
     }
 
-    let mut sequence = Vec::with_capacity(tokens.len() + 2);
-    sequence.push("<bos>".to_string());
+    let mut sequence = Vec::with_capacity(tokens.len() + 1);
     sequence.extend(tokens.iter().cloned());
     sequence.push("<eos>".to_string());
 
@@ -3948,7 +4320,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3972,7 +4344,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3990,7 +4362,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4003,7 +4375,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -4032,7 +4404,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -4045,7 +4417,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -4075,7 +4447,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4111,7 +4483,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4129,7 +4501,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4142,7 +4514,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -4171,7 +4543,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -4184,7 +4556,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -4214,7 +4586,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4284,7 +4656,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4302,7 +4674,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4316,7 +4688,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -4357,7 +4729,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -4378,7 +4750,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.62".to_string(),
+            version: "0.0.63".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

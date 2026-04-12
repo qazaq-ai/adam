@@ -44,6 +44,8 @@ The first tiny clean training prototype is built through:
 
 - `scripts/run_tiny_clean_training_assembly.sh`
 - `scripts/run_tiny_clean_training.sh`
+- `scripts/run_tiny_training_miss_audit.sh`
+- `scripts/run_tiny_training_miss_audit_delta.sh`
 
 The next clean corpus tier is assembled through:
 
@@ -100,6 +102,8 @@ The larger clean corpus tier is sourced through:
 - `data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_policy_report.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_policy_delta_report.json`
+- `data/training/tiny_clean_training_miss_audit_report.json`
+- `data/training/tiny_clean_training_miss_audit_delta_report.json`
 
 ## Output
 
@@ -158,6 +162,8 @@ The foundation-wide cross-layer summary is also stored as:
 
 The foundation overview now also requires:
 
+- `data/training/tiny_clean_training_miss_audit_report.json`
+- `data/training/tiny_clean_training_miss_audit_delta_report.json`
 - `data/training/tiny_clean_training_profile_baseline_delta_report.json`
 - `data/training/tiny_clean_training_profile_strategy_delta_report.json`
 - `data/training/tiny_clean_training_profile_promotion_delta_report.json`
@@ -191,3 +197,10 @@ The tiny clean training split now uses deterministic round-robin domain
 ordering together with a stratified validation split. This keeps the tiny
 training holdout reproducible while preventing the old tail-only validation
 bias from collapsing the evaluation into a single dominant domain.
+
+The tiny training layer now also publishes a miss-audit artifact. This keeps
+the `validation_exact_match_rate_bps` metric tied to concrete next-token misses
+instead of hiding them behind a single aggregate score. The miss audit is
+promoted into the foundation overview, so cross-layer readiness now tracks not
+only tiny training quality, but also whether the exact miss set still matches
+the expected deterministic baseline.

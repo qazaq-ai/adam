@@ -71,6 +71,10 @@ Current starter utility:
   assembles the deterministic tiny clean training pack from the selection manifest and clean corpus pack
 - `run_tiny_clean_training.sh`
   trains a tiny deterministic prototype on the accepted clean training pack
+- `run_tiny_training_miss_audit.sh`
+  builds a machine-readable audit of validation misses for the active tiny training profile
+- `run_tiny_training_miss_audit_delta.sh`
+  builds the deterministic drift report for the tiny training miss audit layer
 - `run_foundation_overview.sh`
   builds the unified cross-layer foundation overview from corpus, tokenizer, eval, and training artifacts
 - `run_foundation_overview_delta.sh`

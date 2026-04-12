@@ -62,25 +62,25 @@
       "id": "clean_sample_10",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Термин анықтамасы ұғымның негізгі шекарасын дәл белгілейді."
+      "text": "Сөздік бабы ұғымның ресми қолданысын дәл белгілейді."
     },
     {
       "id": "clean_sample_11",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Анықтамалық жазба негізгі белгілерді қысқа және нақты береді."
+      "text": "Сөздік жазбасы ұғымның ресми белгілерін қысқа және нақты береді."
     },
     {
       "id": "clean_sample_12",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Ереже мәтіні қолдану аясын бірмәнді түрде айқындайды."
+      "text": "Сөздік түсіндірмесі ұғымның ресми аясын бірмәнді айқындайды."
     },
     {
       "id": "clean_sample_13",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Терминдік қор ұғымдар арасындағы айырманы нақтылайды."
+      "text": "Сөздік анықтамасы ұғымның ресми мағынасын нақтылайды."
     },
     {
       "id": "clean_sample_14",
@@ -116,7 +116,7 @@
       "id": "clean_sample_19",
       "source_id": "reviewed_education_kazakh",
       "domain": "education",
-      "text": "Оқу түсіндірмесі ұғымның негізгі мағынасын кезеңдеп ашады."
+      "text": "Сабақ түсіндірмесі ұғымның негізгі мағынасын кезеңдеп ашады."
     },
     {
       "id": "clean_sample_20",
@@ -140,7 +140,7 @@
       "id": "clean_sample_23",
       "source_id": "reviewed_education_kazakh",
       "domain": "education",
-      "text": "Оқу тапсырмасы негізгі белгілерді салыстыру арқылы бекітеді."
+      "text": "Сабақ тапсырмасы негізгі белгілерді салыстыру арқылы бекітеді."
     },
     {
       "id": "clean_sample_24",
