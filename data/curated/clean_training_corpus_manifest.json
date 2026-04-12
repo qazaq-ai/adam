@@ -4,6 +4,7 @@
   "target_language": "kazakh",
   "script": "cyrillic",
   "pack_manifests": [
+    "clean_general_core_pack.json",
     "tiny_clean_general_pack.json",
     "tiny_clean_reference_pack.json",
     "tiny_clean_education_pack.json",

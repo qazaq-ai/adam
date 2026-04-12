@@ -3,5 +3,7 @@
   "matches_expected": true,
   "field_drifts": [],
   "check_drifts": [],
-  "eligible_profile_drifts": []
+  "eligible_profile_drifts": [],
+  "candidate_flag_drifts": [],
+  "candidate_reason_drifts": []
 }

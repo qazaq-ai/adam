@@ -13,6 +13,7 @@ jq empty data/curated/source_acceptance_summary_report.json
 jq empty data/curated/source_acceptance_delta_report.json
 jq empty data/curated/clean_training_corpus_manifest.json
 jq empty data/curated/clean_training_corpus_pack.json
+jq empty data/curated/clean_general_core_pack.json
 jq empty data/curated/clean_general_extension_pack.json
 jq empty data/curated/clean_reference_extension_pack.json
 jq empty data/curated/clean_education_extension_pack.json
@@ -82,6 +83,7 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_training_baseline_delta.sh
 ./scripts/run_clean_training_corpus_assembly.sh
 ./scripts/run_clean_training_corpus_report.sh
+./scripts/run_tiny_clean_training_assembly.sh
 ./scripts/run_tiny_training_profile_suite.sh
 ./scripts/run_tiny_training_profile_comparison.sh
 ./scripts/run_tiny_training_profile_baseline.sh

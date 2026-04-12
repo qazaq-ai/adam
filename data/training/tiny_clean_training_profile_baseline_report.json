@@ -4,7 +4,7 @@
   "expected_best_profile": "education_heavy",
   "actual_best_profile": "education_heavy",
   "selected_pack_name": "adam-tiny-clean-education-heavy-pack",
-  "selected_validation_exact_match_rate_bps": 10000,
+  "selected_validation_exact_match_rate_bps": 8571,
   "matches_expected_best_profile": true,
   "meets_minimum_validation_threshold": true,
   "policy_checks": [

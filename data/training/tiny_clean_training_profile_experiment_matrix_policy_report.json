@@ -5,18 +5,18 @@
   "expected_selected_profile": "education_heavy",
   "selected_profile": "education_heavy",
   "selected_pack_name": "adam-tiny-clean-education-heavy-pack",
-  "selected_validation_exact_match_rate_bps": 10000,
+  "selected_validation_exact_match_rate_bps": 8571,
   "selected_validation_gap_bps": 0,
   "best_profile": "education_heavy",
-  "best_validation_exact_match_rate_bps": 10000,
-  "candidate_count": 2,
-  "eligible_profile_count": 2,
+  "best_validation_exact_match_rate_bps": 8571,
+  "candidate_count": 5,
+  "eligible_profile_count": 1,
   "eligible_profiles": [
-    "education_heavy",
-    "reference_heavy"
+    "education_heavy"
   ],
   "matches_expected_selected_profile": true,
   "selected_profile_is_best": true,
+  "selected_profile_is_promotable": true,
   "meets_minimum_validation_threshold": true,
   "within_gap_budget": true,
   "policy_checks": [
@@ -37,8 +37,73 @@
       "passed": true
     },
     {
+      "check": "selected_profile_is_promotable",
+      "passed": true
+    },
+    {
       "check": "eligible_profile_available",
       "passed": true
+    }
+  ],
+  "candidate_decisions": [
+    {
+      "profile": "balanced",
+      "pack_name": "adam-tiny-clean-balanced-pack",
+      "is_promotable_profile": false,
+      "meets_minimum_validation_threshold": false,
+      "within_gap_budget": false,
+      "is_eligible": false,
+      "rejection_reasons": [
+        "not_promotable_profile",
+        "below_minimum_validation_threshold",
+        "exceeds_validation_gap_budget"
+      ]
+    },
+    {
+      "profile": "education_heavy",
+      "pack_name": "adam-tiny-clean-education-heavy-pack",
+      "is_promotable_profile": true,
+      "meets_minimum_validation_threshold": true,
+      "within_gap_budget": true,
+      "is_eligible": true,
+      "rejection_reasons": []
+    },
+    {
+      "profile": "education_max",
+      "pack_name": "adam-tiny-clean-education-max-pack",
+      "is_promotable_profile": false,
+      "meets_minimum_validation_threshold": false,
+      "within_gap_budget": false,
+      "is_eligible": false,
+      "rejection_reasons": [
+        "not_promotable_profile",
+        "below_minimum_validation_threshold",
+        "exceeds_validation_gap_budget"
+      ]
+    },
+    {
+      "profile": "general_heavy",
+      "pack_name": "adam-tiny-clean-general-heavy-pack",
+      "is_promotable_profile": false,
+      "meets_minimum_validation_threshold": false,
+      "within_gap_budget": false,
+      "is_eligible": false,
+      "rejection_reasons": [
+        "not_promotable_profile",
+        "below_minimum_validation_threshold",
+        "exceeds_validation_gap_budget"
+      ]
+    },
+    {
+      "profile": "reference_heavy",
+      "pack_name": "adam-tiny-clean-reference-heavy-pack",
+      "is_promotable_profile": true,
+      "meets_minimum_validation_threshold": false,
+      "within_gap_budget": true,
+      "is_eligible": false,
+      "rejection_reasons": [
+        "below_minimum_validation_threshold"
+      ]
     }
   ]
 }

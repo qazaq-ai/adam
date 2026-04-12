@@ -4,9 +4,12 @@
   "target_language": "kazakh",
   "script": "cyrillic",
   "expected_active_profile": "education_heavy",
-  "require_promotable_profiles": true,
+  "require_promotable_profiles": false,
   "candidate_profiles": [
+    "balanced",
     "education_heavy",
+    "education_max",
+    "general_heavy",
     "reference_heavy"
   ]
 }

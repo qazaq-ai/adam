@@ -2,7 +2,7 @@
   "strategy_name": "adam-tiny-clean-profile-strategy",
   "suite_name": "adam-tiny-clean-profile-suite",
   "baseline_profile": "education_heavy",
-  "baseline_validation_exact_match_rate_bps": 10000,
+  "baseline_validation_exact_match_rate_bps": 8571,
   "promotable_profile_count": 2,
   "promotable_profiles": [
     "education_heavy",
@@ -12,8 +12,8 @@
     {
       "profile": "balanced",
       "pack_name": "adam-tiny-clean-balanced-pack",
-      "validation_exact_match_rate_bps": 5000,
-      "validation_gap_bps": 5000,
+      "validation_exact_match_rate_bps": 6428,
+      "validation_gap_bps": 2143,
       "meets_minimum_validation_threshold": true,
       "within_gap_budget": false,
       "promotable": false
@@ -21,16 +21,34 @@
     {
       "profile": "education_heavy",
       "pack_name": "adam-tiny-clean-education-heavy-pack",
-      "validation_exact_match_rate_bps": 10000,
+      "validation_exact_match_rate_bps": 8571,
       "validation_gap_bps": 0,
       "meets_minimum_validation_threshold": true,
       "within_gap_budget": true,
       "promotable": true
     },
     {
+      "profile": "education_max",
+      "pack_name": "adam-tiny-clean-education-max-pack",
+      "validation_exact_match_rate_bps": 3076,
+      "validation_gap_bps": 5495,
+      "meets_minimum_validation_threshold": false,
+      "within_gap_budget": false,
+      "promotable": false
+    },
+    {
+      "profile": "general_heavy",
+      "pack_name": "adam-tiny-clean-general-heavy-pack",
+      "validation_exact_match_rate_bps": 3571,
+      "validation_gap_bps": 5000,
+      "meets_minimum_validation_threshold": false,
+      "within_gap_budget": false,
+      "promotable": false
+    },
+    {
       "profile": "reference_heavy",
       "pack_name": "adam-tiny-clean-reference-heavy-pack",
-      "validation_exact_match_rate_bps": 8571,
+      "validation_exact_match_rate_bps": 7142,
       "validation_gap_bps": 1429,
       "meets_minimum_validation_threshold": true,
       "within_gap_budget": true,

@@ -482,6 +482,17 @@ pub struct TinyCleanTrainingProfileExperimentMatrixPolicyCheck {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileExperimentMatrixPolicyCandidateDecision {
+    pub profile: String,
+    pub pack_name: String,
+    pub is_promotable_profile: bool,
+    pub meets_minimum_validation_threshold: bool,
+    pub within_gap_budget: bool,
+    pub is_eligible: bool,
+    pub rejection_reasons: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TinyCleanTrainingProfileExperimentMatrixPolicyReport {
     pub policy_name: String,
     pub matrix_name: String,
@@ -498,9 +509,11 @@ pub struct TinyCleanTrainingProfileExperimentMatrixPolicyReport {
     pub eligible_profiles: Vec<String>,
     pub matches_expected_selected_profile: bool,
     pub selected_profile_is_best: bool,
+    pub selected_profile_is_promotable: bool,
     pub meets_minimum_validation_threshold: bool,
     pub within_gap_budget: bool,
     pub policy_checks: Vec<TinyCleanTrainingProfileExperimentMatrixPolicyCheck>,
+    pub candidate_decisions: Vec<TinyCleanTrainingProfileExperimentMatrixPolicyCandidateDecision>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -510,6 +523,8 @@ pub struct TinyCleanTrainingProfileExperimentMatrixPolicyDeltaReport {
     pub field_drifts: Vec<BaselineTrainingFieldDrift>,
     pub check_drifts: Vec<BaselineTrainingNamedBoolDrift>,
     pub eligible_profile_drifts: Vec<BaselineTrainingNamedBoolDrift>,
+    pub candidate_flag_drifts: Vec<BaselineTrainingNamedBoolDrift>,
+    pub candidate_reason_drifts: Vec<BaselineTrainingNamedBoolDrift>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -529,10 +544,12 @@ pub struct TinyCleanTrainingGuardReport {
 pub struct TinyCleanTrainingReport {
     pub run_name: String,
     pub pack_name: String,
+    pub sample_ordering_strategy: String,
     pub accepted_source_count: usize,
     pub sample_count: usize,
     pub train_sample_count: usize,
     pub validation_sample_count: usize,
+    pub validation_domain_count: usize,
     pub train_token_count: usize,
     pub validation_token_count: usize,
     pub vocabulary_size: usize,
@@ -1613,14 +1630,47 @@ pub fn build_tiny_clean_training_profile_experiment_matrix_policy_report(
 ) -> Result<TinyCleanTrainingProfileExperimentMatrixPolicyReport, TrainingError> {
     manifest.validate()?;
 
+    let candidate_decisions = matrix_report
+        .entry_reports
+        .iter()
+        .map(|entry| {
+            let meets_minimum_validation_threshold = entry.validation_exact_match_rate_bps
+                >= manifest.minimum_validation_exact_match_rate_bps;
+            let within_gap_budget = entry.validation_gap_bps <= manifest.maximum_validation_gap_bps;
+            let is_eligible = entry.is_promotable_profile
+                && meets_minimum_validation_threshold
+                && within_gap_budget;
+            let mut rejection_reasons = Vec::new();
+            if !entry.is_promotable_profile {
+                rejection_reasons.push("not_promotable_profile".to_string());
+            }
+            if !meets_minimum_validation_threshold {
+                rejection_reasons.push("below_minimum_validation_threshold".to_string());
+            }
+            if !within_gap_budget {
+                rejection_reasons.push("exceeds_validation_gap_budget".to_string());
+            }
+
+            TinyCleanTrainingProfileExperimentMatrixPolicyCandidateDecision {
+                profile: entry.profile.clone(),
+                pack_name: entry.pack_name.clone(),
+                is_promotable_profile: entry.is_promotable_profile,
+                meets_minimum_validation_threshold,
+                within_gap_budget,
+                is_eligible,
+                rejection_reasons,
+            }
+        })
+        .collect::<Vec<_>>();
+    let eligible_profiles = candidate_decisions
+        .iter()
+        .filter(|entry| entry.is_eligible)
+        .map(|entry| entry.profile.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
     let eligible_entries = matrix_report
         .entry_reports
         .iter()
-        .filter(|entry| {
-            entry.validation_exact_match_rate_bps
-                >= manifest.minimum_validation_exact_match_rate_bps
-                && entry.validation_gap_bps <= manifest.maximum_validation_gap_bps
-        })
+        .filter(|entry| eligible_profiles.contains(entry.profile.as_str()))
         .collect::<Vec<_>>();
     let selected_entry = eligible_entries
         .iter()
@@ -1634,6 +1684,7 @@ pub fn build_tiny_clean_training_profile_experiment_matrix_policy_report(
     let matches_expected_selected_profile =
         selected_entry.profile == manifest.expected_selected_profile;
     let selected_profile_is_best = selected_entry.profile == matrix_report.best_profile;
+    let selected_profile_is_promotable = selected_entry.is_promotable_profile;
     let meets_minimum_validation_threshold = selected_entry.validation_exact_match_rate_bps
         >= manifest.minimum_validation_exact_match_rate_bps;
     let within_gap_budget =
@@ -1655,6 +1706,7 @@ pub fn build_tiny_clean_training_profile_experiment_matrix_policy_report(
         eligible_profiles,
         matches_expected_selected_profile,
         selected_profile_is_best,
+        selected_profile_is_promotable,
         meets_minimum_validation_threshold,
         within_gap_budget,
         policy_checks: vec![
@@ -1675,10 +1727,15 @@ pub fn build_tiny_clean_training_profile_experiment_matrix_policy_report(
                 passed: !manifest.require_selected_profile_is_best || selected_profile_is_best,
             },
             TinyCleanTrainingProfileExperimentMatrixPolicyCheck {
+                check: "selected_profile_is_promotable".to_string(),
+                passed: selected_profile_is_promotable,
+            },
+            TinyCleanTrainingProfileExperimentMatrixPolicyCheck {
                 check: "eligible_profile_available".to_string(),
                 passed: !eligible_entries.is_empty(),
             },
         ],
+        candidate_decisions,
     })
 }
 
@@ -1715,6 +1772,16 @@ pub fn build_tiny_clean_training_profile_experiment_matrix_policy_delta_report(
                 .iter()
                 .map(|entry| (entry.clone(), true))
                 .collect(),
+        ),
+        candidate_flag_drifts: build_named_bool_drifts(
+            "matrix_policy_candidate_flag",
+            build_experiment_matrix_policy_candidate_flags(expected),
+            build_experiment_matrix_policy_candidate_flags(actual),
+        ),
+        candidate_reason_drifts: build_named_bool_drifts(
+            "matrix_policy_candidate_reason",
+            build_experiment_matrix_policy_candidate_reasons(expected),
+            build_experiment_matrix_policy_candidate_reasons(actual),
         ),
     }
 }
@@ -2237,15 +2304,20 @@ pub fn build_tiny_clean_training_report(
         }
     }
 
-    let mut ordered_samples = pack.samples.clone();
-    ordered_samples.sort_by(|left, right| left.id.cmp(&right.id));
+    let ordered_samples = deterministic_round_robin_tiny_samples(&pack.samples);
     let validation_sample_count =
         ((ordered_samples.len() as u128 * manifest.validation_split_bps as u128) / 10_000) as usize;
     let validation_sample_count = validation_sample_count
         .max(1)
         .min(ordered_samples.len().saturating_sub(1));
-    let train_sample_count = ordered_samples.len() - validation_sample_count;
-    let (train_samples, validation_samples) = ordered_samples.split_at(train_sample_count);
+    let (train_samples, validation_samples) =
+        split_tiny_training_samples(&ordered_samples, validation_sample_count);
+    let train_sample_count = train_samples.len();
+    let validation_domain_count = validation_samples
+        .iter()
+        .map(|sample| sample.domain.as_str())
+        .collect::<std::collections::BTreeSet<_>>()
+        .len();
 
     let train_sequences = train_samples
         .iter()
@@ -2345,8 +2417,16 @@ pub fn build_tiny_clean_training_report(
             passed: !validation_samples.is_empty() && validation_next_token_count > 0,
         },
         FoundationOverviewCheck {
+            check: "validation_multi_domain_coverage".to_string(),
+            passed: validation_domain_count > 1,
+        },
+        FoundationOverviewCheck {
             check: "deterministic_transition_coverage".to_string(),
             passed: deterministic_context_count > 0,
+        },
+        FoundationOverviewCheck {
+            check: "round_robin_domain_ordering".to_string(),
+            passed: ordered_samples.len() == pack.samples.len(),
         },
     ]
     .into_iter()
@@ -2360,10 +2440,12 @@ pub fn build_tiny_clean_training_report(
     Ok(TinyCleanTrainingReport {
         run_name: format!("{}-tiny-clean-prototype", manifest.run_name),
         pack_name: pack.name.clone(),
+        sample_ordering_strategy: "round_robin_by_domain_with_stratified_validation".to_string(),
         accepted_source_count: accepted_sources.len(),
         sample_count: ordered_samples.len(),
         train_sample_count,
         validation_sample_count,
+        validation_domain_count,
         train_token_count,
         validation_token_count,
         vocabulary_size,
@@ -3399,6 +3481,12 @@ fn build_tiny_profile_experiment_matrix_policy_field_drifts(
     );
     push_field_drift(
         &mut drifts,
+        "selected_profile_is_promotable",
+        expected.selected_profile_is_promotable,
+        actual.selected_profile_is_promotable,
+    );
+    push_field_drift(
+        &mut drifts,
         "meets_minimum_validation_threshold",
         expected.meets_minimum_validation_threshold,
         actual.meets_minimum_validation_threshold,
@@ -3511,6 +3599,40 @@ fn build_experiment_matrix_entry_metrics(
     metrics
 }
 
+fn build_experiment_matrix_policy_candidate_flags(
+    report: &TinyCleanTrainingProfileExperimentMatrixPolicyReport,
+) -> Vec<(String, bool)> {
+    let mut flags = Vec::new();
+    for entry in &report.candidate_decisions {
+        flags.push((
+            format!("{}::is_promotable_profile", entry.profile),
+            entry.is_promotable_profile,
+        ));
+        flags.push((
+            format!("{}::meets_minimum_validation_threshold", entry.profile),
+            entry.meets_minimum_validation_threshold,
+        ));
+        flags.push((
+            format!("{}::within_gap_budget", entry.profile),
+            entry.within_gap_budget,
+        ));
+        flags.push((format!("{}::is_eligible", entry.profile), entry.is_eligible));
+    }
+    flags
+}
+
+fn build_experiment_matrix_policy_candidate_reasons(
+    report: &TinyCleanTrainingProfileExperimentMatrixPolicyReport,
+) -> Vec<(String, bool)> {
+    let mut reasons = Vec::new();
+    for entry in &report.candidate_decisions {
+        for reason in &entry.rejection_reasons {
+            reasons.push((format!("{}::{}", entry.profile, reason), true));
+        }
+    }
+    reasons
+}
+
 fn compare_profile_summaries(
     left: &TinyCleanTrainingProfileSummary,
     right: &TinyCleanTrainingProfileSummary,
@@ -3578,6 +3700,142 @@ fn assemble_tiny_clean_training_pack_with_domain_limits(
         script: script.to_string(),
         samples,
     })
+}
+
+fn deterministic_round_robin_tiny_samples(
+    samples: &[TinyCleanTrainingSample],
+) -> Vec<TinyCleanTrainingSample> {
+    let mut ordered_samples = samples.to_vec();
+    ordered_samples.sort_by(|left, right| left.id.cmp(&right.id));
+
+    let mut buckets =
+        BTreeMap::<String, std::collections::VecDeque<TinyCleanTrainingSample>>::new();
+    for sample in ordered_samples {
+        buckets
+            .entry(sample.domain.clone())
+            .or_default()
+            .push_back(sample);
+    }
+
+    let mut round_robin = Vec::new();
+    loop {
+        let mut pushed_any = false;
+        for bucket in buckets.values_mut() {
+            if let Some(sample) = bucket.pop_front() {
+                round_robin.push(sample);
+                pushed_any = true;
+            }
+        }
+        if !pushed_any {
+            break;
+        }
+    }
+
+    round_robin
+}
+
+fn split_tiny_training_samples(
+    ordered_samples: &[TinyCleanTrainingSample],
+    validation_sample_count: usize,
+) -> (Vec<TinyCleanTrainingSample>, Vec<TinyCleanTrainingSample>) {
+    let mut domain_buckets = BTreeMap::<String, Vec<TinyCleanTrainingSample>>::new();
+    for sample in ordered_samples {
+        domain_buckets
+            .entry(sample.domain.clone())
+            .or_default()
+            .push(sample.clone());
+    }
+
+    let total_sample_count = ordered_samples.len();
+    let mut allocations = BTreeMap::<String, usize>::new();
+    let mut remainders = Vec::new();
+    let mut allocated_total = 0usize;
+    for (domain, samples) in &domain_buckets {
+        let numerator = samples.len() as u128 * validation_sample_count as u128;
+        let allocation = (numerator / total_sample_count as u128) as usize;
+        allocations.insert(domain.clone(), allocation);
+        allocated_total += allocation;
+        remainders.push((
+            domain.clone(),
+            numerator % total_sample_count as u128,
+            samples.len(),
+        ));
+    }
+
+    remainders.sort_by(|left, right| {
+        right
+            .1
+            .cmp(&left.1)
+            .then_with(|| right.2.cmp(&left.2))
+            .then_with(|| left.0.cmp(&right.0))
+    });
+    let mut remainder_index = 0usize;
+    while allocated_total < validation_sample_count && !remainders.is_empty() {
+        let domain = &remainders[remainder_index % remainders.len()].0;
+        let current = allocations.get(domain).copied().unwrap_or_default();
+        let domain_total = domain_buckets.get(domain).map(Vec::len).unwrap_or_default();
+        if current < domain_total {
+            allocations.insert(domain.clone(), current + 1);
+            allocated_total += 1;
+        }
+        remainder_index += 1;
+    }
+
+    let desired_domain_coverage = validation_sample_count.min(domain_buckets.len());
+    if desired_domain_coverage > 1 {
+        let mut zero_domains = allocations
+            .iter()
+            .filter(|(_, count)| **count == 0)
+            .map(|(domain, _)| domain.clone())
+            .collect::<Vec<_>>();
+        zero_domains.sort_unstable();
+        for zero_domain in zero_domains {
+            let allocated_domains = allocations.values().filter(|count| **count > 0).count();
+            if allocated_domains >= desired_domain_coverage {
+                break;
+            }
+
+            let donor_domain = allocations
+                .iter()
+                .filter_map(|(domain, count)| {
+                    (*count > 1).then_some((
+                        domain.clone(),
+                        *count,
+                        domain_buckets.get(domain).map(Vec::len).unwrap_or_default(),
+                    ))
+                })
+                .max_by(|left, right| {
+                    left.1
+                        .cmp(&right.1)
+                        .then_with(|| left.2.cmp(&right.2))
+                        .then_with(|| right.0.cmp(&left.0))
+                })
+                .map(|entry| entry.0);
+
+            let Some(donor_domain) = donor_domain else {
+                break;
+            };
+
+            if let Some(donor_count) = allocations.get_mut(&donor_domain) {
+                *donor_count -= 1;
+            }
+            if let Some(zero_count) = allocations.get_mut(&zero_domain) {
+                *zero_count += 1;
+            }
+        }
+    }
+
+    let mut train_samples = Vec::new();
+    let mut validation_samples = Vec::new();
+    for (domain, samples) in domain_buckets {
+        let validation_count = allocations.get(&domain).copied().unwrap_or_default();
+        let train_count = samples.len().saturating_sub(validation_count);
+        let (train_bucket, validation_bucket) = samples.split_at(train_count);
+        train_samples.extend(train_bucket.iter().cloned());
+        validation_samples.extend(validation_bucket.iter().cloned());
+    }
+
+    (train_samples, validation_samples)
 }
 
 fn tokenize_clean_training_text(text: &str) -> Vec<String> {
@@ -3690,7 +3948,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3714,7 +3972,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3732,7 +3990,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3745,7 +4003,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -3774,7 +4032,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -3787,7 +4045,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -3817,7 +4075,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3853,7 +4111,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3871,7 +4129,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3884,7 +4142,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -3913,7 +4171,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -3926,7 +4184,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -3956,7 +4214,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4026,7 +4284,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4044,7 +4302,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4058,7 +4316,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -4099,7 +4357,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -4120,7 +4378,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.60".to_string(),
+            version: "0.0.61".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

@@ -67,6 +67,8 @@ Current starter utility:
   applies threshold and ranking rules to the experiment matrix to select the active profile
 - `run_tiny_training_profile_experiment_matrix_policy_delta.sh`
   builds the deterministic drift report for the experiment matrix policy layer
+- `run_tiny_clean_training_assembly.sh`
+  assembles the deterministic tiny clean training pack from the selection manifest and clean corpus pack
 - `run_tiny_clean_training.sh`
   trains a tiny deterministic prototype on the accepted clean training pack
 - `run_foundation_overview.sh`

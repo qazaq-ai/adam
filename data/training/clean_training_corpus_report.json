@@ -1,8 +1,8 @@
 {
   "corpus_name": "adam-clean-training-corpus",
-  "pack_count": 6,
-  "sample_count": 54,
-  "total_token_count": 330,
+  "pack_count": 7,
+  "sample_count": 63,
+  "total_token_count": 384,
   "category_breakdown": [
     {
       "category": "domain_education",
@@ -11,8 +11,8 @@
     },
     {
       "category": "domain_general",
-      "sample_count": 18,
-      "token_count": 114
+      "sample_count": 27,
+      "token_count": 168
     },
     {
       "category": "domain_reference",
@@ -23,6 +23,11 @@
       "category": "pack_adam-clean-education-extension-pack",
       "sample_count": 9,
       "token_count": 53
+    },
+    {
+      "category": "pack_adam-clean-general-core-pack",
+      "sample_count": 9,
+      "token_count": 54
     },
     {
       "category": "pack_adam-clean-general-extension-pack",
@@ -51,8 +56,8 @@
     },
     {
       "category": "source_curated_general_kazakh",
-      "sample_count": 18,
-      "token_count": 114
+      "sample_count": 27,
+      "token_count": 168
     },
     {
       "category": "source_curated_reference_kazakh",
@@ -68,15 +73,15 @@
   "critical_breakdown": [
     {
       "guard": "clean_pack_coverage",
-      "sample_count": 54
+      "sample_count": 63
     },
     {
       "guard": "multi_domain_coverage",
-      "sample_count": 54
+      "sample_count": 63
     },
     {
       "guard": "multi_pack_coverage",
-      "sample_count": 54
+      "sample_count": 63
     }
   ]
 }

@@ -42,6 +42,7 @@ The deterministic delta report is built through:
 
 The first tiny clean training prototype is built through:
 
+- `scripts/run_tiny_clean_training_assembly.sh`
 - `scripts/run_tiny_clean_training.sh`
 
 The next clean corpus tier is assembled through:
@@ -180,3 +181,13 @@ for the promotable profile set through:
 - `data/training/tiny_clean_training_profile_experiment_matrix_report.json`
 - `data/curated/tiny_clean_training_profile_experiment_matrix_policy_manifest.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_policy_report.json`
+
+The experiment matrix policy report now records per-candidate eligibility
+decisions and explicit rejection reasons, so weak profiles are preserved as
+machine-readable contract data instead of disappearing behind the selected
+profile summary.
+
+The tiny clean training split now uses deterministic round-robin domain
+ordering together with a stratified validation split. This keeps the tiny
+training holdout reproducible while preventing the old tail-only validation
+bias from collapsing the evaluation into a single dominant domain.

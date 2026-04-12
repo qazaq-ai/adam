@@ -8,55 +8,55 @@
       "id": "clean_sample_01",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Қазақ тілі жалғамалы тіл болып саналады."
+      "text": "Таза дерек тұрақты қорытынды жасауға көмектеседі."
     },
     {
       "id": "clean_sample_02",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Таза дерек сенімді модель құруға негіз болады."
+      "text": "Таза дерек тұрақты талдау жасауға көмектеседі."
     },
     {
       "id": "clean_sample_03",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Қазақ тілі сөздерді жалғаулар арқылы түрлендіреді."
+      "text": "Таза дерек тұрақты модель құруға көмектеседі."
     },
     {
       "id": "clean_sample_04",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Тілдік жүйе мағынаны жалғаулар мен түбір арқылы құрайды."
+      "text": "Жүйелі мәтін нақты қорытынды жасауға көмектеседі."
     },
     {
       "id": "clean_sample_05",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Ой дәлдігі таза тілдік құрылымнан басталады."
+      "text": "Жүйелі мәтін нақты талдау жасауға көмектеседі."
     },
     {
       "id": "clean_sample_06",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Жүйелі мәтін модельдің сенімділігін арттырады."
+      "text": "Жүйелі мәтін нақты модель құруға көмектеседі."
     },
     {
       "id": "clean_sample_07",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Таза мәтін логикалық модельге орнықты негіз береді."
+      "text": "Дәйекті мәтін сенімді қорытынды жасауға көмектеседі."
     },
     {
       "id": "clean_sample_08",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Дәйекті құрылым тілдік талдаудың анықтығын күшейтеді."
+      "text": "Дәйекті мәтін сенімді талдау жасауға көмектеседі."
     },
     {
       "id": "clean_sample_09",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Нақты дерек тілдік талдаудың сенімін арттырады."
+      "text": "Дәйекті мәтін сенімді модель құруға көмектеседі."
     },
     {
       "id": "clean_sample_10",

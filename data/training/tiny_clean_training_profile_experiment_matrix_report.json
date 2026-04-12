@@ -5,9 +5,9 @@
   "promotion_name": "unselected",
   "expected_active_profile": "education_heavy",
   "active_profile": "education_heavy",
-  "candidate_count": 2,
+  "candidate_count": 5,
   "best_profile": "education_heavy",
-  "best_validation_exact_match_rate_bps": 10000,
+  "best_validation_exact_match_rate_bps": 8571,
   "matrix_checks": [
     {
       "check": "expected_active_profile_included",
@@ -28,17 +28,56 @@
   ],
   "entry_reports": [
     {
+      "profile": "balanced",
+      "pack_name": "adam-tiny-clean-balanced-pack",
+      "is_active_profile": false,
+      "is_promotable_profile": false,
+      "sample_count": 27,
+      "train_token_count": 150,
+      "vocabulary_size": 67,
+      "deterministic_context_count": 44,
+      "ambiguous_context_count": 24,
+      "validation_exact_match_rate_bps": 6428,
+      "validation_gap_bps": 2143
+    },
+    {
       "profile": "education_heavy",
       "pack_name": "adam-tiny-clean-education-heavy-pack",
       "is_active_profile": true,
       "is_promotable_profile": true,
       "sample_count": 24,
-      "train_token_count": 134,
-      "vocabulary_size": 81,
-      "deterministic_context_count": 61,
-      "ambiguous_context_count": 21,
-      "validation_exact_match_rate_bps": 10000,
+      "train_token_count": 132,
+      "vocabulary_size": 60,
+      "deterministic_context_count": 43,
+      "ambiguous_context_count": 18,
+      "validation_exact_match_rate_bps": 8571,
       "validation_gap_bps": 0
+    },
+    {
+      "profile": "education_max",
+      "pack_name": "adam-tiny-clean-education-max-pack",
+      "is_active_profile": false,
+      "is_promotable_profile": false,
+      "sample_count": 24,
+      "train_token_count": 132,
+      "vocabulary_size": 60,
+      "deterministic_context_count": 46,
+      "ambiguous_context_count": 15,
+      "validation_exact_match_rate_bps": 3076,
+      "validation_gap_bps": 5495
+    },
+    {
+      "profile": "general_heavy",
+      "pack_name": "adam-tiny-clean-general-heavy-pack",
+      "is_active_profile": false,
+      "is_promotable_profile": false,
+      "sample_count": 24,
+      "train_token_count": 133,
+      "vocabulary_size": 68,
+      "deterministic_context_count": 51,
+      "ambiguous_context_count": 18,
+      "validation_exact_match_rate_bps": 3571,
+      "validation_gap_bps": 5000
     },
     {
       "profile": "reference_heavy",
@@ -46,11 +85,11 @@
       "is_active_profile": false,
       "is_promotable_profile": true,
       "sample_count": 24,
-      "train_token_count": 134,
-      "vocabulary_size": 84,
-      "deterministic_context_count": 63,
-      "ambiguous_context_count": 22,
-      "validation_exact_match_rate_bps": 8571,
+      "train_token_count": 132,
+      "vocabulary_size": 63,
+      "deterministic_context_count": 45,
+      "ambiguous_context_count": 19,
+      "validation_exact_match_rate_bps": 7142,
       "validation_gap_bps": 1429
     }
   ]

@@ -5,10 +5,9 @@
   "expected_active_profile": "education_heavy",
   "active_profile": "education_heavy",
   "active_pack_name": "adam-tiny-clean-education-heavy-pack",
-  "promotable_profile_count": 2,
+  "promotable_profile_count": 1,
   "promotable_profiles": [
-    "education_heavy",
-    "reference_heavy"
+    "education_heavy"
   ],
   "matches_expected_active_profile": true,
   "promotion_checks": [

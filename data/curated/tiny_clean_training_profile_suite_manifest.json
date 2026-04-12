@@ -25,6 +25,24 @@
       }
     },
     {
+      "profile": "education_max",
+      "pack_name": "adam-tiny-clean-education-max-pack",
+      "domain_sample_limits": {
+        "education": 14,
+        "general": 5,
+        "reference": 5
+      }
+    },
+    {
+      "profile": "general_heavy",
+      "pack_name": "adam-tiny-clean-general-heavy-pack",
+      "domain_sample_limits": {
+        "education": 6,
+        "general": 12,
+        "reference": 6
+      }
+    },
+    {
       "profile": "reference_heavy",
       "pack_name": "adam-tiny-clean-reference-heavy-pack",
       "domain_sample_limits": {

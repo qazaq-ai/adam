@@ -669,6 +669,17 @@ fn tiny_clean_training_report_matches_expected_regression_artifact() {
     let actual = build_tiny_clean_training_report(&manifest, &registry, &rules, &report, &pack)
         .expect("tiny clean training report");
 
+    assert_eq!(
+        actual.sample_ordering_strategy,
+        "round_robin_by_domain_with_stratified_validation"
+    );
+    assert!(actual.validation_domain_count > 1);
+    assert!(
+        actual.critical_breakdown.iter().any(|entry| entry.guard
+            == "validation_multi_domain_coverage"
+            && entry.sample_count > 0)
+    );
+
     assert_eq!(actual, expected);
 }
 
@@ -727,6 +738,10 @@ fn clean_training_corpus_pack_matches_manifest_assembly() {
         serde_json::from_str(&fs::read_to_string(manifest_path).expect("clean corpus manifest"))
             .expect("valid clean corpus manifest json");
     let pack_paths = [
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../data/curated/clean_general_core_pack.json"
+        ),
         concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/../../data/curated/tiny_clean_general_pack.json"
@@ -1255,6 +1270,33 @@ fn tiny_clean_training_profile_experiment_matrix_policy_report_matches_expected_
         &matrix_report,
     )
     .expect("tiny profile experiment matrix policy report");
+
+    let rejected_general_heavy = actual
+        .candidate_decisions
+        .iter()
+        .find(|entry| entry.profile == "general_heavy")
+        .expect("general_heavy candidate decision");
+    assert!(!rejected_general_heavy.is_eligible);
+    assert!(
+        rejected_general_heavy
+            .rejection_reasons
+            .iter()
+            .any(|entry| entry == "below_minimum_validation_threshold")
+    );
+    assert!(
+        rejected_general_heavy
+            .rejection_reasons
+            .iter()
+            .any(|entry| entry == "exceeds_validation_gap_budget")
+    );
+
+    let selected_education_heavy = actual
+        .candidate_decisions
+        .iter()
+        .find(|entry| entry.profile == "education_heavy")
+        .expect("education_heavy candidate decision");
+    assert!(selected_education_heavy.is_eligible);
+    assert!(selected_education_heavy.rejection_reasons.is_empty());
 
     assert_eq!(actual, expected);
 }
