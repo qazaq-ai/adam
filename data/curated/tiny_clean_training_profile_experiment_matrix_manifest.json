@@ -3,7 +3,7 @@
   "name": "adam-tiny-clean-profile-experiment-matrix",
   "target_language": "kazakh",
   "script": "cyrillic",
-  "expected_active_profile": "education_heavy",
+  "expected_active_profile": "reference_heavy",
   "require_promotable_profiles": false,
   "candidate_profiles": [
     "balanced",

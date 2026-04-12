@@ -1,27 +1,27 @@
 {
   "run_name": "adam-baseline-plan-tiny-clean-prototype",
-  "pack_name": "adam-tiny-clean-education-heavy-pack",
+  "pack_name": "adam-tiny-clean-reference-heavy-pack",
   "sample_ordering_strategy": "round_robin_by_domain_with_stratified_validation",
   "accepted_source_count": 3,
   "sample_count": 24,
   "train_sample_count": 22,
   "validation_sample_count": 2,
   "validation_domain_count": 2,
-  "train_token_count": 132,
+  "train_token_count": 139,
   "validation_token_count": 12,
-  "vocabulary_size": 60,
-  "unique_context_count": 61,
-  "unique_transition_count": 95,
-  "deterministic_context_count": 43,
-  "ambiguous_context_count": 18,
+  "vocabulary_size": 77,
+  "unique_context_count": 78,
+  "unique_transition_count": 122,
+  "deterministic_context_count": 57,
+  "ambiguous_context_count": 21,
   "validation_next_token_count": 14,
-  "validation_exact_match_count": 12,
-  "validation_exact_match_rate_bps": 8571,
+  "validation_exact_match_count": 11,
+  "validation_exact_match_rate_bps": 7857,
   "category_breakdown": [
     {
       "category": "domain_education",
-      "sample_count": 12,
-      "token_count": 71
+      "sample_count": 6,
+      "token_count": 38
     },
     {
       "category": "domain_general",
@@ -30,8 +30,8 @@
     },
     {
       "category": "domain_reference",
-      "sample_count": 6,
-      "token_count": 37
+      "sample_count": 12,
+      "token_count": 77
     },
     {
       "category": "source_curated_general_kazakh",
@@ -40,13 +40,13 @@
     },
     {
       "category": "source_curated_reference_kazakh",
-      "sample_count": 6,
-      "token_count": 37
+      "sample_count": 12,
+      "token_count": 77
     },
     {
       "category": "source_reviewed_education_kazakh",
-      "sample_count": 12,
-      "token_count": 71
+      "sample_count": 6,
+      "token_count": 38
     }
   ],
   "critical_breakdown": [

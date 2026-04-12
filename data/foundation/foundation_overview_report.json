@@ -5,8 +5,8 @@
   "tokenizer_exact_match_rate_bps": 10000,
   "eval_task_count": 4,
   "training_total_sequence_count": 1024,
-  "tiny_training_vocabulary_size": 60,
-  "tiny_training_validation_exact_match_rate_bps": 8571,
+  "tiny_training_vocabulary_size": 77,
+  "tiny_training_validation_exact_match_rate_bps": 7857,
   "tiny_profile_policy_matches_expected": true,
   "tiny_profile_strategy_matches_expected": true,
   "tiny_profile_experiment_matrix_policy_matches_expected": true,
@@ -41,7 +41,7 @@
       "layer": "tiny_training",
       "ready": true,
       "primary_metric_name": "validation_exact_match_rate_bps",
-      "primary_metric_value": "8571"
+      "primary_metric_value": "7857"
     },
     {
       "layer": "tiny_profile_policy",

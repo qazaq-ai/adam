@@ -1,13 +1,13 @@
 {
   "corpus_name": "adam-clean-training-corpus",
-  "pack_count": 7,
-  "sample_count": 63,
-  "total_token_count": 384,
+  "pack_count": 9,
+  "sample_count": 82,
+  "total_token_count": 506,
   "category_breakdown": [
     {
       "category": "domain_education",
-      "sample_count": 18,
-      "token_count": 106
+      "sample_count": 28,
+      "token_count": 171
     },
     {
       "category": "domain_general",
@@ -16,13 +16,18 @@
     },
     {
       "category": "domain_reference",
-      "sample_count": 18,
-      "token_count": 110
+      "sample_count": 27,
+      "token_count": 167
+    },
+    {
+      "category": "pack_adam-clean-education-core-pack",
+      "sample_count": 10,
+      "token_count": 64
     },
     {
       "category": "pack_adam-clean-education-extension-pack",
       "sample_count": 9,
-      "token_count": 53
+      "token_count": 54
     },
     {
       "category": "pack_adam-clean-general-core-pack",
@@ -35,9 +40,14 @@
       "token_count": 57
     },
     {
+      "category": "pack_adam-clean-reference-core-pack",
+      "sample_count": 9,
+      "token_count": 58
+    },
+    {
       "category": "pack_adam-clean-reference-extension-pack",
       "sample_count": 9,
-      "token_count": 55
+      "token_count": 54
     },
     {
       "category": "pack_adam-tiny-clean-education-pack",
@@ -61,27 +71,27 @@
     },
     {
       "category": "source_curated_reference_kazakh",
-      "sample_count": 18,
-      "token_count": 110
+      "sample_count": 27,
+      "token_count": 167
     },
     {
       "category": "source_reviewed_education_kazakh",
-      "sample_count": 18,
-      "token_count": 106
+      "sample_count": 28,
+      "token_count": 171
     }
   ],
   "critical_breakdown": [
     {
       "guard": "clean_pack_coverage",
-      "sample_count": 63
+      "sample_count": 82
     },
     {
       "guard": "multi_domain_coverage",
-      "sample_count": 63
+      "sample_count": 82
     },
     {
       "guard": "multi_pack_coverage",
-      "sample_count": 63
+      "sample_count": 82
     }
   ]
 }

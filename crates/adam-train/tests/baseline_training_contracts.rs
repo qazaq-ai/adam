@@ -744,6 +744,14 @@ fn clean_training_corpus_pack_matches_manifest_assembly() {
         ),
         concat!(
             env!("CARGO_MANIFEST_DIR"),
+            "/../../data/curated/clean_reference_core_pack.json"
+        ),
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../data/curated/clean_education_core_pack.json"
+        ),
+        concat!(
+            env!("CARGO_MANIFEST_DIR"),
             "/../../data/curated/tiny_clean_general_pack.json"
         ),
         concat!(
@@ -1290,13 +1298,13 @@ fn tiny_clean_training_profile_experiment_matrix_policy_report_matches_expected_
             .any(|entry| entry == "exceeds_validation_gap_budget")
     );
 
-    let selected_education_heavy = actual
+    let selected_reference_heavy = actual
         .candidate_decisions
         .iter()
-        .find(|entry| entry.profile == "education_heavy")
-        .expect("education_heavy candidate decision");
-    assert!(selected_education_heavy.is_eligible);
-    assert!(selected_education_heavy.rejection_reasons.is_empty());
+        .find(|entry| entry.profile == "reference_heavy")
+        .expect("reference_heavy candidate decision");
+    assert!(selected_reference_heavy.is_eligible);
+    assert!(selected_reference_heavy.rejection_reasons.is_empty());
 
     assert_eq!(actual, expected);
 }

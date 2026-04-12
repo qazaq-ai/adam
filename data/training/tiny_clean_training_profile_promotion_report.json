@@ -2,12 +2,12 @@
   "promotion_name": "adam-tiny-clean-profile-promotion",
   "policy_name": "adam-tiny-clean-profile-experiment-matrix-policy",
   "suite_name": "adam-tiny-clean-profile-suite",
-  "expected_active_profile": "education_heavy",
-  "active_profile": "education_heavy",
-  "active_pack_name": "adam-tiny-clean-education-heavy-pack",
+  "expected_active_profile": "reference_heavy",
+  "active_profile": "reference_heavy",
+  "active_pack_name": "adam-tiny-clean-reference-heavy-pack",
   "promotable_profile_count": 1,
   "promotable_profiles": [
-    "education_heavy"
+    "reference_heavy"
   ],
   "matches_expected_active_profile": true,
   "promotion_checks": [

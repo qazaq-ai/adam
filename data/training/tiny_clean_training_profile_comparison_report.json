@@ -1,67 +1,67 @@
 {
   "suite_name": "adam-tiny-clean-profile-suite",
   "profile_count": 5,
-  "best_profile": "education_heavy",
-  "best_pack_name": "adam-tiny-clean-education-heavy-pack",
-  "best_validation_exact_match_rate_bps": 8571,
+  "best_profile": "reference_heavy",
+  "best_pack_name": "adam-tiny-clean-reference-heavy-pack",
+  "best_validation_exact_match_rate_bps": 7857,
   "worst_profile": "education_max",
   "worst_pack_name": "adam-tiny-clean-education-max-pack",
-  "worst_validation_exact_match_rate_bps": 3076,
+  "worst_validation_exact_match_rate_bps": 3333,
   "profile_gaps": [
     {
       "profile": "balanced",
       "pack_name": "adam-tiny-clean-balanced-pack",
-      "validation_exact_match_rate_bps": 6428,
-      "validation_gap_bps": 2143,
+      "validation_exact_match_rate_bps": 3333,
+      "validation_gap_bps": 4524,
       "sample_count": 27,
       "sample_count_gap": 0,
-      "train_token_count": 150,
+      "train_token_count": 157,
       "train_token_gap": 0,
       "is_best_profile": false
     },
     {
       "profile": "education_heavy",
       "pack_name": "adam-tiny-clean-education-heavy-pack",
-      "validation_exact_match_rate_bps": 8571,
-      "validation_gap_bps": 0,
+      "validation_exact_match_rate_bps": 4615,
+      "validation_gap_bps": 3242,
       "sample_count": 24,
       "sample_count_gap": 0,
-      "train_token_count": 132,
+      "train_token_count": 139,
       "train_token_gap": 0,
-      "is_best_profile": true
+      "is_best_profile": false
     },
     {
       "profile": "education_max",
       "pack_name": "adam-tiny-clean-education-max-pack",
-      "validation_exact_match_rate_bps": 3076,
-      "validation_gap_bps": 5495,
+      "validation_exact_match_rate_bps": 3333,
+      "validation_gap_bps": 4524,
       "sample_count": 24,
       "sample_count_gap": 0,
-      "train_token_count": 132,
-      "train_token_gap": 0,
+      "train_token_count": 138,
+      "train_token_gap": 1,
       "is_best_profile": false
     },
     {
       "profile": "general_heavy",
       "pack_name": "adam-tiny-clean-general-heavy-pack",
-      "validation_exact_match_rate_bps": 3571,
-      "validation_gap_bps": 5000,
+      "validation_exact_match_rate_bps": 5000,
+      "validation_gap_bps": 2857,
       "sample_count": 24,
       "sample_count_gap": 0,
-      "train_token_count": 133,
+      "train_token_count": 139,
       "train_token_gap": 0,
       "is_best_profile": false
     },
     {
       "profile": "reference_heavy",
       "pack_name": "adam-tiny-clean-reference-heavy-pack",
-      "validation_exact_match_rate_bps": 7142,
-      "validation_gap_bps": 1429,
+      "validation_exact_match_rate_bps": 7857,
+      "validation_gap_bps": 0,
       "sample_count": 24,
       "sample_count_gap": 0,
-      "train_token_count": 132,
+      "train_token_count": 139,
       "train_token_gap": 0,
-      "is_best_profile": false
+      "is_best_profile": true
     }
   ]
 }

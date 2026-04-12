@@ -1,10 +1,10 @@
 {
   "policy_name": "adam-tiny-clean-profile-baseline",
   "suite_name": "adam-tiny-clean-profile-suite",
-  "expected_best_profile": "education_heavy",
-  "actual_best_profile": "education_heavy",
-  "selected_pack_name": "adam-tiny-clean-education-heavy-pack",
-  "selected_validation_exact_match_rate_bps": 8571,
+  "expected_best_profile": "reference_heavy",
+  "actual_best_profile": "reference_heavy",
+  "selected_pack_name": "adam-tiny-clean-reference-heavy-pack",
+  "selected_validation_exact_match_rate_bps": 7857,
   "matches_expected_best_profile": true,
   "meets_minimum_validation_threshold": true,
   "policy_checks": [
