@@ -3,8 +3,8 @@ use std::{env, fs, path::Path, process::ExitCode};
 use adam_corpus::{SourceAcceptanceReport, SourceRegistry, SourceScoringRules};
 use adam_train::{
     BaselineTrainingManifest, CleanTrainingCorpusManifest, CleanTrainingCorpusPack,
-    TinyCleanTrainingProfileExperimentMatrixManifest, TinyCleanTrainingProfilePromotionReport,
-    TinyCleanTrainingProfileStrategyReport, TinyCleanTrainingProfileSuiteManifest,
+    TinyCleanTrainingProfileExperimentMatrixManifest, TinyCleanTrainingProfileStrategyReport,
+    TinyCleanTrainingProfileSuiteManifest,
     build_tiny_clean_training_profile_experiment_matrix_report,
 };
 
@@ -12,31 +12,25 @@ fn main() -> ExitCode {
     let mut args = env::args().skip(1);
     let Some(training_manifest_path) = args.next() else {
         eprintln!(
-            "usage: tiny_profile_experiment_matrix <training-manifest> <profile-suite-manifest> <experiment-matrix-manifest> <strategy-report> <promotion-report>"
+            "usage: tiny_profile_experiment_matrix <training-manifest> <profile-suite-manifest> <experiment-matrix-manifest> <strategy-report>"
         );
         return ExitCode::FAILURE;
     };
     let Some(profile_suite_path) = args.next() else {
         eprintln!(
-            "usage: tiny_profile_experiment_matrix <training-manifest> <profile-suite-manifest> <experiment-matrix-manifest> <strategy-report> <promotion-report>"
+            "usage: tiny_profile_experiment_matrix <training-manifest> <profile-suite-manifest> <experiment-matrix-manifest> <strategy-report>"
         );
         return ExitCode::FAILURE;
     };
     let Some(matrix_manifest_path) = args.next() else {
         eprintln!(
-            "usage: tiny_profile_experiment_matrix <training-manifest> <profile-suite-manifest> <experiment-matrix-manifest> <strategy-report> <promotion-report>"
+            "usage: tiny_profile_experiment_matrix <training-manifest> <profile-suite-manifest> <experiment-matrix-manifest> <strategy-report>"
         );
         return ExitCode::FAILURE;
     };
     let Some(strategy_report_path) = args.next() else {
         eprintln!(
-            "usage: tiny_profile_experiment_matrix <training-manifest> <profile-suite-manifest> <experiment-matrix-manifest> <strategy-report> <promotion-report>"
-        );
-        return ExitCode::FAILURE;
-    };
-    let Some(promotion_report_path) = args.next() else {
-        eprintln!(
-            "usage: tiny_profile_experiment_matrix <training-manifest> <profile-suite-manifest> <experiment-matrix-manifest> <strategy-report> <promotion-report>"
+            "usage: tiny_profile_experiment_matrix <training-manifest> <profile-suite-manifest> <experiment-matrix-manifest> <strategy-report>"
         );
         return ExitCode::FAILURE;
     };
@@ -93,15 +87,6 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    let promotion_report: TinyCleanTrainingProfilePromotionReport =
-        match read_json(&promotion_report_path) {
-            Ok(value) => value,
-            Err(error) => {
-                eprintln!("failed to read tiny profile promotion report: {error}");
-                return ExitCode::FAILURE;
-            }
-        };
-
     let suite_dir = Path::new(&profile_suite_path)
         .parent()
         .unwrap_or_else(|| Path::new("."));
@@ -137,7 +122,6 @@ fn main() -> ExitCode {
         &acceptance_report,
         &suite,
         &strategy_report,
-        &promotion_report,
         &clean_corpus_manifest,
         &clean_corpus_pack,
     ) {

@@ -61,6 +61,8 @@ Controlled tiny profile comparisons are built through:
 - `scripts/run_tiny_training_profile_promotion_delta.sh`
 - `scripts/run_tiny_training_profile_experiment_matrix.sh`
 - `scripts/run_tiny_training_profile_experiment_matrix_delta.sh`
+- `scripts/run_tiny_training_profile_experiment_matrix_policy.sh`
+- `scripts/run_tiny_training_profile_experiment_matrix_policy_delta.sh`
 
 Its clean corpus is now sourced through:
 
@@ -70,6 +72,7 @@ Its clean corpus is now sourced through:
 - `data/curated/tiny_clean_training_profile_strategy_manifest.json`
 - `data/curated/tiny_clean_training_profile_promotion_manifest.json`
 - `data/curated/tiny_clean_training_profile_experiment_matrix_manifest.json`
+- `data/curated/tiny_clean_training_profile_experiment_matrix_policy_manifest.json`
 - `data/curated/tiny_clean_training_manifest.json`
 - `data/curated/tiny_clean_general_pack.json`
 - `data/curated/tiny_clean_reference_pack.json`
@@ -94,6 +97,8 @@ The larger clean corpus tier is sourced through:
 - `data/training/tiny_clean_training_profile_promotion_delta_report.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_report.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json`
+- `data/training/tiny_clean_training_profile_experiment_matrix_policy_report.json`
+- `data/training/tiny_clean_training_profile_experiment_matrix_policy_delta_report.json`
 
 ## Output
 
@@ -142,6 +147,8 @@ regression artifact:
 - `data/training/tiny_clean_training_profile_promotion_delta_report.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_report.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json`
+- `data/training/tiny_clean_training_profile_experiment_matrix_policy_report.json`
+- `data/training/tiny_clean_training_profile_experiment_matrix_policy_delta_report.json`
 
 The foundation-wide cross-layer summary is also stored as:
 
@@ -154,6 +161,7 @@ The foundation overview now also requires:
 - `data/training/tiny_clean_training_profile_strategy_delta_report.json`
 - `data/training/tiny_clean_training_profile_promotion_delta_report.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json`
+- `data/training/tiny_clean_training_profile_experiment_matrix_policy_delta_report.json`
 
 The active tiny training pack is no longer selected from the static
 `tiny_clean_training_selection_manifest.json` path. It is now promoted from the
@@ -163,10 +171,12 @@ profile suite through:
 - `data/training/tiny_clean_training_profile_promotion_report.json`
 
 This means the tiny training report reflects the currently promoted profile from
-the clean profile strategy layer.
+the matrix-based profile policy layer.
 
 The next controlled experiment layer now fixes downstream tiny training behavior
 for the promotable profile set through:
 
 - `data/curated/tiny_clean_training_profile_experiment_matrix_manifest.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_report.json`
+- `data/curated/tiny_clean_training_profile_experiment_matrix_policy_manifest.json`
+- `data/training/tiny_clean_training_profile_experiment_matrix_policy_report.json`

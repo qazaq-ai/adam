@@ -1,0 +1,44 @@
+{
+  "policy_name": "adam-tiny-clean-profile-experiment-matrix-policy",
+  "matrix_name": "adam-tiny-clean-profile-experiment-matrix",
+  "suite_name": "adam-tiny-clean-profile-suite",
+  "expected_selected_profile": "education_heavy",
+  "selected_profile": "education_heavy",
+  "selected_pack_name": "adam-tiny-clean-education-heavy-pack",
+  "selected_validation_exact_match_rate_bps": 10000,
+  "selected_validation_gap_bps": 0,
+  "best_profile": "education_heavy",
+  "best_validation_exact_match_rate_bps": 10000,
+  "candidate_count": 2,
+  "eligible_profile_count": 2,
+  "eligible_profiles": [
+    "education_heavy",
+    "reference_heavy"
+  ],
+  "matches_expected_selected_profile": true,
+  "selected_profile_is_best": true,
+  "meets_minimum_validation_threshold": true,
+  "within_gap_budget": true,
+  "policy_checks": [
+    {
+      "check": "expected_selected_profile_matches",
+      "passed": true
+    },
+    {
+      "check": "selected_profile_meets_minimum_validation_threshold",
+      "passed": true
+    },
+    {
+      "check": "selected_profile_within_gap_budget",
+      "passed": true
+    },
+    {
+      "check": "selected_profile_is_best",
+      "passed": true
+    },
+    {
+      "check": "eligible_profile_available",
+      "passed": true
+    }
+  ]
+}

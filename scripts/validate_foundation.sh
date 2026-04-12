@@ -24,6 +24,7 @@ jq empty data/curated/tiny_clean_training_profile_baseline_manifest.json
 jq empty data/curated/tiny_clean_training_profile_strategy_manifest.json
 jq empty data/curated/tiny_clean_training_profile_promotion_manifest.json
 jq empty data/curated/tiny_clean_training_profile_experiment_matrix_manifest.json
+jq empty data/curated/tiny_clean_training_profile_experiment_matrix_policy_manifest.json
 jq empty data/curated/tiny_clean_general_pack.json
 jq empty data/curated/tiny_clean_reference_pack.json
 jq empty data/curated/tiny_clean_education_pack.json
@@ -55,6 +56,8 @@ jq empty data/training/tiny_clean_training_profile_promotion_report.json
 jq empty data/training/tiny_clean_training_profile_promotion_delta_report.json
 jq empty data/training/tiny_clean_training_profile_experiment_matrix_report.json
 jq empty data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json
+jq empty data/training/tiny_clean_training_profile_experiment_matrix_policy_report.json
+jq empty data/training/tiny_clean_training_profile_experiment_matrix_policy_delta_report.json
 jq empty data/training/tiny_clean_training_report.json
 jq empty data/foundation/foundation_overview_report.json
 jq empty data/foundation/foundation_overview_delta_report.json
@@ -85,10 +88,12 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_tiny_training_profile_baseline_delta.sh
 ./scripts/run_tiny_training_profile_strategy.sh
 ./scripts/run_tiny_training_profile_strategy_delta.sh
-./scripts/run_tiny_training_profile_promotion.sh
-./scripts/run_tiny_training_profile_promotion_delta.sh
 ./scripts/run_tiny_training_profile_experiment_matrix.sh
 ./scripts/run_tiny_training_profile_experiment_matrix_delta.sh
+./scripts/run_tiny_training_profile_experiment_matrix_policy.sh
+./scripts/run_tiny_training_profile_experiment_matrix_policy_delta.sh
+./scripts/run_tiny_training_profile_promotion.sh
+./scripts/run_tiny_training_profile_promotion_delta.sh
 ./scripts/run_tiny_clean_training.sh
 ./scripts/run_foundation_overview.sh
 ./scripts/run_foundation_overview_delta.sh

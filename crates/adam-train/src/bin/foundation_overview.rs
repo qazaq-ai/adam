@@ -7,13 +7,15 @@ use adam_train::{
     BaselineTrainingConsistencyReport, BaselineTrainingDeltaReport, FoundationOverviewReport,
     TinyCleanTrainingProfileBaselineDeltaReport, TinyCleanTrainingProfileBaselineReport,
     TinyCleanTrainingProfileExperimentMatrixDeltaReport,
+    TinyCleanTrainingProfileExperimentMatrixPolicyDeltaReport,
+    TinyCleanTrainingProfileExperimentMatrixPolicyReport,
     TinyCleanTrainingProfileExperimentMatrixReport, TinyCleanTrainingProfilePromotionDeltaReport,
     TinyCleanTrainingProfilePromotionReport, TinyCleanTrainingProfileStrategyDeltaReport,
     TinyCleanTrainingProfileStrategyReport, TinyCleanTrainingReport,
     build_foundation_overview_report,
 };
 
-const USAGE: &str = "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta> <tiny-profile-promotion-report> <tiny-profile-promotion-delta> <tiny-profile-experiment-matrix-report> <tiny-profile-experiment-matrix-delta>";
+const USAGE: &str = "usage: foundation_overview <corpus-summary> <corpus-delta> <tokenizer-report> <tokenizer-delta> <eval-report> <eval-delta> <training-consistency> <training-delta> <tiny-training-report> <tiny-profile-policy-report> <tiny-profile-policy-delta> <tiny-profile-strategy-report> <tiny-profile-strategy-delta> <tiny-profile-experiment-matrix-report> <tiny-profile-experiment-matrix-delta> <tiny-profile-experiment-matrix-policy-report> <tiny-profile-experiment-matrix-policy-delta> <tiny-profile-promotion-report> <tiny-profile-promotion-delta>";
 
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
@@ -69,19 +71,27 @@ fn main() -> ExitCode {
         eprintln!("{USAGE}");
         return ExitCode::FAILURE;
     };
-    let Some(tiny_profile_promotion_report_path) = args.next() else {
-        eprintln!("{USAGE}");
-        return ExitCode::FAILURE;
-    };
-    let Some(tiny_profile_promotion_delta_path) = args.next() else {
-        eprintln!("{USAGE}");
-        return ExitCode::FAILURE;
-    };
     let Some(tiny_profile_experiment_matrix_report_path) = args.next() else {
         eprintln!("{USAGE}");
         return ExitCode::FAILURE;
     };
     let Some(tiny_profile_experiment_matrix_delta_path) = args.next() else {
+        eprintln!("{USAGE}");
+        return ExitCode::FAILURE;
+    };
+    let Some(tiny_profile_experiment_matrix_policy_report_path) = args.next() else {
+        eprintln!("{USAGE}");
+        return ExitCode::FAILURE;
+    };
+    let Some(tiny_profile_experiment_matrix_policy_delta_path) = args.next() else {
+        eprintln!("{USAGE}");
+        return ExitCode::FAILURE;
+    };
+    let Some(tiny_profile_promotion_report_path) = args.next() else {
+        eprintln!("{USAGE}");
+        return ExitCode::FAILURE;
+    };
+    let Some(tiny_profile_promotion_delta_path) = args.next() else {
         eprintln!("{USAGE}");
         return ExitCode::FAILURE;
     };
@@ -143,16 +153,6 @@ fn main() -> ExitCode {
             Ok(value) => value,
             Err(code) => return code,
         };
-    let tiny_profile_promotion: TinyCleanTrainingProfilePromotionReport =
-        match load(&tiny_profile_promotion_report_path) {
-            Ok(value) => value,
-            Err(code) => return code,
-        };
-    let tiny_profile_promotion_delta: TinyCleanTrainingProfilePromotionDeltaReport =
-        match load(&tiny_profile_promotion_delta_path) {
-            Ok(value) => value,
-            Err(code) => return code,
-        };
     let tiny_profile_experiment_matrix: TinyCleanTrainingProfileExperimentMatrixReport =
         match load(&tiny_profile_experiment_matrix_report_path) {
             Ok(value) => value,
@@ -160,6 +160,27 @@ fn main() -> ExitCode {
         };
     let tiny_profile_experiment_matrix_delta: TinyCleanTrainingProfileExperimentMatrixDeltaReport =
         match load(&tiny_profile_experiment_matrix_delta_path) {
+            Ok(value) => value,
+            Err(code) => return code,
+        };
+    let tiny_profile_experiment_matrix_policy: TinyCleanTrainingProfileExperimentMatrixPolicyReport =
+        match load(&tiny_profile_experiment_matrix_policy_report_path) {
+            Ok(value) => value,
+            Err(code) => return code,
+        };
+    let tiny_profile_experiment_matrix_policy_delta:
+        TinyCleanTrainingProfileExperimentMatrixPolicyDeltaReport =
+        match load(&tiny_profile_experiment_matrix_policy_delta_path) {
+            Ok(value) => value,
+            Err(code) => return code,
+        };
+    let tiny_profile_promotion: TinyCleanTrainingProfilePromotionReport =
+        match load(&tiny_profile_promotion_report_path) {
+            Ok(value) => value,
+            Err(code) => return code,
+        };
+    let tiny_profile_promotion_delta: TinyCleanTrainingProfilePromotionDeltaReport =
+        match load(&tiny_profile_promotion_delta_path) {
             Ok(value) => value,
             Err(code) => return code,
         };
@@ -178,10 +199,12 @@ fn main() -> ExitCode {
         &tiny_profile_policy_delta,
         &tiny_profile_strategy,
         &tiny_profile_strategy_delta,
-        &tiny_profile_promotion,
-        &tiny_profile_promotion_delta,
         &tiny_profile_experiment_matrix,
         &tiny_profile_experiment_matrix_delta,
+        &tiny_profile_experiment_matrix_policy,
+        &tiny_profile_experiment_matrix_policy_delta,
+        &tiny_profile_promotion,
+        &tiny_profile_promotion_delta,
     );
     println!(
         "{}",

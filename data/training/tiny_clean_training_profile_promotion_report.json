@@ -1,6 +1,6 @@
 {
   "promotion_name": "adam-tiny-clean-profile-promotion",
-  "strategy_name": "adam-tiny-clean-profile-strategy",
+  "policy_name": "adam-tiny-clean-profile-experiment-matrix-policy",
   "suite_name": "adam-tiny-clean-profile-suite",
   "expected_active_profile": "education_heavy",
   "active_profile": "education_heavy",

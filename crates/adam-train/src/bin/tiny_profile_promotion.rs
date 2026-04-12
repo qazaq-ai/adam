@@ -1,18 +1,18 @@
 use std::{env, fs, process::ExitCode};
 
 use adam_train::{
-    TinyCleanTrainingProfilePromotionManifest, TinyCleanTrainingProfileStrategyReport,
-    build_tiny_clean_training_profile_promotion_report,
+    TinyCleanTrainingProfileExperimentMatrixPolicyReport,
+    TinyCleanTrainingProfilePromotionManifest, build_tiny_clean_training_profile_promotion_report,
 };
 
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
     let Some(promotion_manifest_path) = args.next() else {
-        eprintln!("usage: tiny_profile_promotion <promotion-manifest> <strategy-report>");
+        eprintln!("usage: tiny_profile_promotion <promotion-manifest> <matrix-policy-report>");
         return ExitCode::FAILURE;
     };
-    let Some(strategy_report_path) = args.next() else {
-        eprintln!("usage: tiny_profile_promotion <promotion-manifest> <strategy-report>");
+    let Some(matrix_policy_report_path) = args.next() else {
+        eprintln!("usage: tiny_profile_promotion <promotion-manifest> <matrix-policy-report>");
         return ExitCode::FAILURE;
     };
 
@@ -24,17 +24,19 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    let strategy_report: TinyCleanTrainingProfileStrategyReport =
-        match read_json(&strategy_report_path) {
+    let matrix_policy_report: TinyCleanTrainingProfileExperimentMatrixPolicyReport =
+        match read_json(&matrix_policy_report_path) {
             Ok(value) => value,
             Err(error) => {
-                eprintln!("failed to read tiny profile strategy report: {error}");
+                eprintln!("failed to read tiny profile experiment matrix policy report: {error}");
                 return ExitCode::FAILURE;
             }
         };
 
-    match build_tiny_clean_training_profile_promotion_report(&promotion_manifest, &strategy_report)
-    {
+    match build_tiny_clean_training_profile_promotion_report(
+        &promotion_manifest,
+        &matrix_policy_report,
+    ) {
         Ok(report) => {
             println!(
                 "{}",

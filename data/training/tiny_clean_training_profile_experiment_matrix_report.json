@@ -2,7 +2,7 @@
   "matrix_name": "adam-tiny-clean-profile-experiment-matrix",
   "suite_name": "adam-tiny-clean-profile-suite",
   "strategy_name": "adam-tiny-clean-profile-strategy",
-  "promotion_name": "adam-tiny-clean-profile-promotion",
+  "promotion_name": "unselected",
   "expected_active_profile": "education_heavy",
   "active_profile": "education_heavy",
   "candidate_count": 2,
@@ -10,11 +10,11 @@
   "best_validation_exact_match_rate_bps": 10000,
   "matrix_checks": [
     {
-      "check": "active_profile_matches_expected",
+      "check": "expected_active_profile_included",
       "passed": true
     },
     {
-      "check": "active_profile_included",
+      "check": "reference_profile_is_promotable",
       "passed": true
     },
     {

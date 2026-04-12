@@ -18,7 +18,9 @@ cargo run -p adam-train --bin foundation_overview -- \
   data/training/tiny_clean_training_profile_baseline_delta_report.json \
   data/training/tiny_clean_training_profile_strategy_report.json \
   data/training/tiny_clean_training_profile_strategy_delta_report.json \
-  data/training/tiny_clean_training_profile_promotion_report.json \
-  data/training/tiny_clean_training_profile_promotion_delta_report.json \
   data/training/tiny_clean_training_profile_experiment_matrix_report.json \
-  data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json
+  data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json \
+  data/training/tiny_clean_training_profile_experiment_matrix_policy_report.json \
+  data/training/tiny_clean_training_profile_experiment_matrix_policy_delta_report.json \
+  data/training/tiny_clean_training_profile_promotion_report.json \
+  data/training/tiny_clean_training_profile_promotion_delta_report.json

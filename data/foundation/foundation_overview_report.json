@@ -9,6 +9,7 @@
   "tiny_training_validation_exact_match_rate_bps": 10000,
   "tiny_profile_policy_matches_expected": true,
   "tiny_profile_strategy_matches_expected": true,
+  "tiny_profile_experiment_matrix_policy_matches_expected": true,
   "tiny_profile_promotion_matches_expected": true,
   "tiny_profile_experiment_matrix_matches_expected": true,
   "layer_breakdown": [
@@ -55,15 +56,21 @@
       "primary_metric_value": "true"
     },
     {
-      "layer": "tiny_profile_promotion",
-      "ready": true,
-      "primary_metric_name": "promotion_matches_expected",
-      "primary_metric_value": "true"
-    },
-    {
       "layer": "tiny_profile_experiment_matrix",
       "ready": true,
       "primary_metric_name": "matrix_matches_expected",
+      "primary_metric_value": "true"
+    },
+    {
+      "layer": "tiny_profile_experiment_matrix_policy",
+      "ready": true,
+      "primary_metric_name": "matrix_policy_matches_expected",
+      "primary_metric_value": "true"
+    },
+    {
+      "layer": "tiny_profile_promotion",
+      "ready": true,
+      "primary_metric_name": "promotion_matches_expected",
       "primary_metric_value": "true"
     }
   ],
@@ -101,11 +108,15 @@
       "passed": true
     },
     {
-      "check": "tiny_profile_promotion_matches_expected",
+      "check": "tiny_profile_experiment_matrix_matches_expected",
       "passed": true
     },
     {
-      "check": "tiny_profile_experiment_matrix_matches_expected",
+      "check": "tiny_profile_experiment_matrix_policy_matches_expected",
+      "passed": true
+    },
+    {
+      "check": "tiny_profile_promotion_matches_expected",
       "passed": true
     }
   ]

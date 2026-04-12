@@ -56,13 +56,17 @@ Current starter utility:
 - `run_tiny_training_profile_strategy_delta.sh`
   builds the deterministic tiny profile strategy drift report
 - `run_tiny_training_profile_promotion.sh`
-  promotes the active tiny training profile from the strategy report
+  promotes the active tiny training profile from the matrix policy report
 - `run_tiny_training_profile_promotion_delta.sh`
   builds the deterministic tiny profile promotion drift report
 - `run_tiny_training_profile_experiment_matrix.sh`
   builds the downstream tiny training experiment matrix for promotable profiles
 - `run_tiny_training_profile_experiment_matrix_delta.sh`
   builds the deterministic drift report for the tiny training experiment matrix
+- `run_tiny_training_profile_experiment_matrix_policy.sh`
+  applies threshold and ranking rules to the experiment matrix to select the active profile
+- `run_tiny_training_profile_experiment_matrix_policy_delta.sh`
+  builds the deterministic drift report for the experiment matrix policy layer
 - `run_tiny_clean_training.sh`
   trains a tiny deterministic prototype on the accepted clean training pack
 - `run_foundation_overview.sh`

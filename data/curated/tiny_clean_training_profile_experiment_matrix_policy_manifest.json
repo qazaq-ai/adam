@@ -1,0 +1,10 @@
+{
+  "version": "0.0.59",
+  "name": "adam-tiny-clean-profile-experiment-matrix-policy",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "expected_selected_profile": "education_heavy",
+  "minimum_validation_exact_match_rate_bps": 8000,
+  "maximum_validation_gap_bps": 2000,
+  "require_selected_profile_is_best": true
+}
