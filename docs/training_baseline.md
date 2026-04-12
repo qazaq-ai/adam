@@ -60,6 +60,7 @@ Controlled tiny profile comparisons are built through:
 - `scripts/run_tiny_training_profile_promotion.sh`
 - `scripts/run_tiny_training_profile_promotion_delta.sh`
 - `scripts/run_tiny_training_profile_experiment_matrix.sh`
+- `scripts/run_tiny_training_profile_experiment_matrix_delta.sh`
 
 Its clean corpus is now sourced through:
 
@@ -92,6 +93,7 @@ The larger clean corpus tier is sourced through:
 - `data/training/tiny_clean_training_profile_promotion_report.json`
 - `data/training/tiny_clean_training_profile_promotion_delta_report.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_report.json`
+- `data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json`
 
 ## Output
 
@@ -139,6 +141,7 @@ regression artifact:
 - `data/training/tiny_clean_training_profile_promotion_report.json`
 - `data/training/tiny_clean_training_profile_promotion_delta_report.json`
 - `data/training/tiny_clean_training_profile_experiment_matrix_report.json`
+- `data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json`
 
 The foundation-wide cross-layer summary is also stored as:
 
@@ -150,6 +153,7 @@ The foundation overview now also requires:
 - `data/training/tiny_clean_training_profile_baseline_delta_report.json`
 - `data/training/tiny_clean_training_profile_strategy_delta_report.json`
 - `data/training/tiny_clean_training_profile_promotion_delta_report.json`
+- `data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json`
 
 The active tiny training pack is no longer selected from the static
 `tiny_clean_training_selection_manifest.json` path. It is now promoted from the

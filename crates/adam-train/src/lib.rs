@@ -454,6 +454,16 @@ pub struct TinyCleanTrainingProfileExperimentMatrixReport {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TinyCleanTrainingProfileExperimentMatrixDeltaReport {
+    pub matrix_name: String,
+    pub matches_expected: bool,
+    pub field_drifts: Vec<BaselineTrainingFieldDrift>,
+    pub check_drifts: Vec<BaselineTrainingNamedBoolDrift>,
+    pub entry_flag_drifts: Vec<BaselineTrainingNamedBoolDrift>,
+    pub entry_metric_drifts: Vec<BaselineTrainingNamedCountDrift>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TinyCleanTrainingCategoryReport {
     pub category: String,
     pub sample_count: usize,
@@ -565,6 +575,7 @@ pub struct FoundationOverviewReport {
     pub tiny_profile_policy_matches_expected: bool,
     pub tiny_profile_strategy_matches_expected: bool,
     pub tiny_profile_promotion_matches_expected: bool,
+    pub tiny_profile_experiment_matrix_matches_expected: bool,
     pub layer_breakdown: Vec<FoundationOverviewLayerReport>,
     pub critical_breakdown: Vec<FoundationOverviewCheck>,
 }
@@ -1498,6 +1509,40 @@ pub fn build_tiny_clean_training_profile_experiment_matrix_report(
     })
 }
 
+pub fn build_tiny_clean_training_profile_experiment_matrix_delta_report(
+    expected: &TinyCleanTrainingProfileExperimentMatrixReport,
+    actual: &TinyCleanTrainingProfileExperimentMatrixReport,
+) -> TinyCleanTrainingProfileExperimentMatrixDeltaReport {
+    TinyCleanTrainingProfileExperimentMatrixDeltaReport {
+        matrix_name: actual.matrix_name.clone(),
+        matches_expected: expected == actual,
+        field_drifts: build_tiny_profile_experiment_matrix_field_drifts(expected, actual),
+        check_drifts: build_named_bool_drifts(
+            "matrix_check",
+            expected
+                .matrix_checks
+                .iter()
+                .map(|entry| (entry.check.clone(), entry.passed))
+                .collect(),
+            actual
+                .matrix_checks
+                .iter()
+                .map(|entry| (entry.check.clone(), entry.passed))
+                .collect(),
+        ),
+        entry_flag_drifts: build_named_bool_drifts(
+            "matrix_entry_flag",
+            build_experiment_matrix_entry_flags(expected),
+            build_experiment_matrix_entry_flags(actual),
+        ),
+        entry_metric_drifts: build_named_count_drifts(
+            "matrix_entry_metric",
+            build_experiment_matrix_entry_metrics(expected),
+            build_experiment_matrix_entry_metrics(actual),
+        ),
+    }
+}
+
 pub fn assemble_clean_training_corpus_pack(
     manifest: &CleanTrainingCorpusManifest,
     packs: &[TinyCleanTrainingDomainPack],
@@ -2174,6 +2219,8 @@ pub fn build_foundation_overview_report(
     tiny_profile_strategy_delta: &TinyCleanTrainingProfileStrategyDeltaReport,
     tiny_profile_promotion: &TinyCleanTrainingProfilePromotionReport,
     tiny_profile_promotion_delta: &TinyCleanTrainingProfilePromotionDeltaReport,
+    tiny_profile_experiment_matrix: &TinyCleanTrainingProfileExperimentMatrixReport,
+    tiny_profile_experiment_matrix_delta: &TinyCleanTrainingProfileExperimentMatrixDeltaReport,
 ) -> FoundationOverviewReport {
     let tiny_profile_policy_ready = tiny_profile_policy_delta.matches_expected
         && tiny_profile_policy.matches_expected_best_profile
@@ -2183,6 +2230,15 @@ pub fn build_foundation_overview_report(
     let tiny_profile_promotion_ready = tiny_profile_promotion_delta.matches_expected
         && tiny_profile_promotion.matches_expected_active_profile
         && tiny_profile_promotion.promotable_profile_count > 0;
+    let tiny_profile_experiment_matrix_ready = tiny_profile_experiment_matrix_delta
+        .matches_expected
+        && tiny_profile_experiment_matrix
+            .matrix_checks
+            .iter()
+            .all(|entry| entry.passed)
+        && tiny_profile_experiment_matrix.candidate_count > 0
+        && tiny_profile_experiment_matrix.best_profile
+            == tiny_profile_experiment_matrix.active_profile;
 
     let layer_breakdown = vec![
         FoundationOverviewLayerReport {
@@ -2234,6 +2290,12 @@ pub fn build_foundation_overview_report(
             primary_metric_name: "promotion_matches_expected".to_string(),
             primary_metric_value: tiny_profile_promotion_ready.to_string(),
         },
+        FoundationOverviewLayerReport {
+            layer: "tiny_profile_experiment_matrix".to_string(),
+            ready: tiny_profile_experiment_matrix_ready,
+            primary_metric_name: "matrix_matches_expected".to_string(),
+            primary_metric_value: tiny_profile_experiment_matrix_ready.to_string(),
+        },
     ];
     let critical_breakdown = vec![
         FoundationOverviewCheck {
@@ -2276,6 +2338,10 @@ pub fn build_foundation_overview_report(
             check: "tiny_profile_promotion_matches_expected".to_string(),
             passed: tiny_profile_promotion_ready,
         },
+        FoundationOverviewCheck {
+            check: "tiny_profile_experiment_matrix_matches_expected".to_string(),
+            passed: tiny_profile_experiment_matrix_ready,
+        },
     ];
 
     FoundationOverviewReport {
@@ -2291,6 +2357,7 @@ pub fn build_foundation_overview_report(
         tiny_profile_policy_matches_expected: tiny_profile_policy_ready,
         tiny_profile_strategy_matches_expected: tiny_profile_strategy_ready,
         tiny_profile_promotion_matches_expected: tiny_profile_promotion_ready,
+        tiny_profile_experiment_matrix_matches_expected: tiny_profile_experiment_matrix_ready,
         layer_breakdown,
         critical_breakdown,
     }
@@ -2819,6 +2886,12 @@ fn build_foundation_field_drifts(
         expected.tiny_profile_promotion_matches_expected,
         actual.tiny_profile_promotion_matches_expected,
     );
+    push_field_drift(
+        &mut drifts,
+        "tiny_profile_experiment_matrix_matches_expected",
+        expected.tiny_profile_experiment_matrix_matches_expected,
+        actual.tiny_profile_experiment_matrix_matches_expected,
+    );
     drifts
 }
 
@@ -2972,6 +3045,68 @@ fn build_tiny_profile_promotion_field_drifts(
     drifts
 }
 
+fn build_tiny_profile_experiment_matrix_field_drifts(
+    expected: &TinyCleanTrainingProfileExperimentMatrixReport,
+    actual: &TinyCleanTrainingProfileExperimentMatrixReport,
+) -> Vec<BaselineTrainingFieldDrift> {
+    let mut drifts = Vec::new();
+    push_field_drift(
+        &mut drifts,
+        "matrix_name",
+        expected.matrix_name.clone(),
+        actual.matrix_name.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "suite_name",
+        expected.suite_name.clone(),
+        actual.suite_name.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "strategy_name",
+        expected.strategy_name.clone(),
+        actual.strategy_name.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "promotion_name",
+        expected.promotion_name.clone(),
+        actual.promotion_name.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "expected_active_profile",
+        expected.expected_active_profile.clone(),
+        actual.expected_active_profile.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "active_profile",
+        expected.active_profile.clone(),
+        actual.active_profile.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "candidate_count",
+        expected.candidate_count,
+        actual.candidate_count,
+    );
+    push_field_drift(
+        &mut drifts,
+        "best_profile",
+        expected.best_profile.clone(),
+        actual.best_profile.clone(),
+    );
+    push_field_drift(
+        &mut drifts,
+        "best_validation_exact_match_rate_bps",
+        expected.best_validation_exact_match_rate_bps,
+        actual.best_validation_exact_match_rate_bps,
+    );
+    drifts
+}
+
 fn build_promotable_profile_bools(
     report: &TinyCleanTrainingProfileStrategyReport,
 ) -> Vec<(String, bool)> {
@@ -3005,6 +3140,60 @@ fn build_strategy_candidate_metrics(
 ) -> Vec<(String, u64)> {
     let mut metrics = Vec::new();
     for entry in &report.candidate_reports {
+        metrics.push((
+            format!("{}::validation_exact_match_rate_bps", entry.profile),
+            entry.validation_exact_match_rate_bps as u64,
+        ));
+        metrics.push((
+            format!("{}::validation_gap_bps", entry.profile),
+            entry.validation_gap_bps as u64,
+        ));
+    }
+    metrics
+}
+
+fn build_experiment_matrix_entry_flags(
+    report: &TinyCleanTrainingProfileExperimentMatrixReport,
+) -> Vec<(String, bool)> {
+    let mut flags = Vec::new();
+    for entry in &report.entry_reports {
+        flags.push((
+            format!("{}::is_active_profile", entry.profile),
+            entry.is_active_profile,
+        ));
+        flags.push((
+            format!("{}::is_promotable_profile", entry.profile),
+            entry.is_promotable_profile,
+        ));
+    }
+    flags
+}
+
+fn build_experiment_matrix_entry_metrics(
+    report: &TinyCleanTrainingProfileExperimentMatrixReport,
+) -> Vec<(String, u64)> {
+    let mut metrics = Vec::new();
+    for entry in &report.entry_reports {
+        metrics.push((
+            format!("{}::sample_count", entry.profile),
+            entry.sample_count as u64,
+        ));
+        metrics.push((
+            format!("{}::train_token_count", entry.profile),
+            entry.train_token_count as u64,
+        ));
+        metrics.push((
+            format!("{}::vocabulary_size", entry.profile),
+            entry.vocabulary_size as u64,
+        ));
+        metrics.push((
+            format!("{}::deterministic_context_count", entry.profile),
+            entry.deterministic_context_count as u64,
+        ));
+        metrics.push((
+            format!("{}::ambiguous_context_count", entry.profile),
+            entry.ambiguous_context_count as u64,
+        ));
         metrics.push((
             format!("{}::validation_exact_match_rate_bps", entry.profile),
             entry.validation_exact_match_rate_bps as u64,
@@ -3206,7 +3395,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3230,7 +3419,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3248,7 +3437,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3261,7 +3450,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -3290,7 +3479,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -3303,7 +3492,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -3333,7 +3522,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3369,7 +3558,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3387,7 +3576,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3400,7 +3589,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -3429,7 +3618,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -3442,7 +3631,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -3472,7 +3661,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3542,7 +3731,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3560,7 +3749,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -3574,7 +3763,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -3615,7 +3804,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -3636,7 +3825,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.58".to_string(),
+            version: "0.0.59".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

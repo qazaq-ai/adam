@@ -54,6 +54,7 @@ jq empty data/training/tiny_clean_training_profile_strategy_delta_report.json
 jq empty data/training/tiny_clean_training_profile_promotion_report.json
 jq empty data/training/tiny_clean_training_profile_promotion_delta_report.json
 jq empty data/training/tiny_clean_training_profile_experiment_matrix_report.json
+jq empty data/training/tiny_clean_training_profile_experiment_matrix_delta_report.json
 jq empty data/training/tiny_clean_training_report.json
 jq empty data/foundation/foundation_overview_report.json
 jq empty data/foundation/foundation_overview_delta_report.json
@@ -87,6 +88,7 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_tiny_training_profile_promotion.sh
 ./scripts/run_tiny_training_profile_promotion_delta.sh
 ./scripts/run_tiny_training_profile_experiment_matrix.sh
+./scripts/run_tiny_training_profile_experiment_matrix_delta.sh
 ./scripts/run_tiny_clean_training.sh
 ./scripts/run_foundation_overview.sh
 ./scripts/run_foundation_overview_delta.sh

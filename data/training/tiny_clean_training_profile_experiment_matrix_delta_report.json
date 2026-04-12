@@ -1,0 +1,8 @@
+{
+  "matrix_name": "adam-tiny-clean-profile-experiment-matrix",
+  "matches_expected": true,
+  "field_drifts": [],
+  "check_drifts": [],
+  "entry_flag_drifts": [],
+  "entry_metric_drifts": []
+}
