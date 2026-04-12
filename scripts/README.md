@@ -43,6 +43,24 @@ Current starter utility:
   builds the deterministic training consistency report from current manifests
 - `run_training_baseline_delta.sh`
   builds the deterministic training delta report against the expected assembly and consistency artifacts
+- `run_tiny_training_profile_suite.sh`
+  builds the deterministic tiny clean profile suite report from the clean corpus
+- `run_tiny_training_profile_comparison.sh`
+  compares the deterministic tiny profile suite and records profile gaps
+- `run_tiny_training_profile_baseline.sh`
+  checks the expected baseline tiny profile policy against the comparison report
+- `run_tiny_training_profile_baseline_delta.sh`
+  builds the deterministic tiny profile baseline drift report
+- `run_tiny_training_profile_strategy.sh`
+  derives promotable tiny profile candidates from the current comparison and baseline reports
+- `run_tiny_training_profile_strategy_delta.sh`
+  builds the deterministic tiny profile strategy drift report
+- `run_tiny_training_profile_promotion.sh`
+  promotes the active tiny training profile from the strategy report
+- `run_tiny_training_profile_promotion_delta.sh`
+  builds the deterministic tiny profile promotion drift report
+- `run_tiny_training_profile_experiment_matrix.sh`
+  builds the downstream tiny training experiment matrix for promotable profiles
 - `run_tiny_clean_training.sh`
   trains a tiny deterministic prototype on the accepted clean training pack
 - `run_foundation_overview.sh`

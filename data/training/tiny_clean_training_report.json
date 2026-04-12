@@ -1,68 +1,68 @@
 {
   "run_name": "adam-baseline-plan-tiny-clean-prototype",
-  "pack_name": "adam-tiny-clean-training-pack",
+  "pack_name": "adam-tiny-clean-education-heavy-pack",
   "accepted_source_count": 3,
-  "sample_count": 27,
-  "train_sample_count": 25,
+  "sample_count": 24,
+  "train_sample_count": 22,
   "validation_sample_count": 2,
-  "train_token_count": 153,
+  "train_token_count": 134,
   "validation_token_count": 12,
-  "vocabulary_size": 95,
-  "unique_context_count": 96,
-  "unique_transition_count": 149,
-  "deterministic_context_count": 67,
-  "ambiguous_context_count": 29,
+  "vocabulary_size": 81,
+  "unique_context_count": 82,
+  "unique_transition_count": 121,
+  "deterministic_context_count": 61,
+  "ambiguous_context_count": 21,
   "validation_next_token_count": 14,
-  "validation_exact_match_count": 7,
-  "validation_exact_match_rate_bps": 5000,
+  "validation_exact_match_count": 14,
+  "validation_exact_match_rate_bps": 10000,
   "category_breakdown": [
     {
       "category": "domain_education",
-      "sample_count": 9,
-      "token_count": 53
+      "sample_count": 12,
+      "token_count": 71
     },
     {
       "category": "domain_general",
-      "sample_count": 9,
-      "token_count": 57
+      "sample_count": 6,
+      "token_count": 38
     },
     {
       "category": "domain_reference",
-      "sample_count": 9,
-      "token_count": 55
+      "sample_count": 6,
+      "token_count": 37
     },
     {
       "category": "source_curated_general_kazakh",
-      "sample_count": 9,
-      "token_count": 57
+      "sample_count": 6,
+      "token_count": 38
     },
     {
       "category": "source_curated_reference_kazakh",
-      "sample_count": 9,
-      "token_count": 55
+      "sample_count": 6,
+      "token_count": 37
     },
     {
       "category": "source_reviewed_education_kazakh",
-      "sample_count": 9,
-      "token_count": 53
+      "sample_count": 12,
+      "token_count": 71
     }
   ],
   "critical_breakdown": [
     {
       "guard": "accepted_source_only",
-      "sample_count": 27
+      "sample_count": 24
     },
     {
       "guard": "clean_source_only",
-      "sample_count": 27
+      "sample_count": 24
     },
     {
       "guard": "deterministic_transition_coverage",
-      "sample_count": 27
+      "sample_count": 24
     },
     {
       "guard": "validation_coverage",
-      "sample_count": 27
+      "sample_count": 24
     }
   ]
 }

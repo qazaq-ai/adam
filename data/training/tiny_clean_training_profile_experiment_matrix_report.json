@@ -1,0 +1,57 @@
+{
+  "matrix_name": "adam-tiny-clean-profile-experiment-matrix",
+  "suite_name": "adam-tiny-clean-profile-suite",
+  "strategy_name": "adam-tiny-clean-profile-strategy",
+  "promotion_name": "adam-tiny-clean-profile-promotion",
+  "expected_active_profile": "education_heavy",
+  "active_profile": "education_heavy",
+  "candidate_count": 2,
+  "best_profile": "education_heavy",
+  "best_validation_exact_match_rate_bps": 10000,
+  "matrix_checks": [
+    {
+      "check": "active_profile_matches_expected",
+      "passed": true
+    },
+    {
+      "check": "active_profile_included",
+      "passed": true
+    },
+    {
+      "check": "candidate_profiles_are_promotable",
+      "passed": true
+    },
+    {
+      "check": "candidate_count_matches_manifest",
+      "passed": true
+    }
+  ],
+  "entry_reports": [
+    {
+      "profile": "education_heavy",
+      "pack_name": "adam-tiny-clean-education-heavy-pack",
+      "is_active_profile": true,
+      "is_promotable_profile": true,
+      "sample_count": 24,
+      "train_token_count": 134,
+      "vocabulary_size": 81,
+      "deterministic_context_count": 61,
+      "ambiguous_context_count": 21,
+      "validation_exact_match_rate_bps": 10000,
+      "validation_gap_bps": 0
+    },
+    {
+      "profile": "reference_heavy",
+      "pack_name": "adam-tiny-clean-reference-heavy-pack",
+      "is_active_profile": false,
+      "is_promotable_profile": true,
+      "sample_count": 24,
+      "train_token_count": 134,
+      "vocabulary_size": 84,
+      "deterministic_context_count": 63,
+      "ambiguous_context_count": 22,
+      "validation_exact_match_rate_bps": 8571,
+      "validation_gap_bps": 1429
+    }
+  ]
+}

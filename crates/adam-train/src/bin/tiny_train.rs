@@ -3,18 +3,28 @@ use std::{env, fs, process::ExitCode};
 use adam_corpus::{SourceAcceptanceReport, SourceRegistry, SourceScoringRules};
 use adam_train::{
     BaselineTrainingManifest, CleanTrainingCorpusManifest, CleanTrainingCorpusPack,
-    TinyCleanTrainingSelectionManifest, assemble_tiny_clean_training_pack_from_corpus,
-    build_tiny_clean_training_report,
+    TinyCleanTrainingProfilePromotionReport, TinyCleanTrainingProfileSuiteManifest,
+    assemble_tiny_clean_training_pack_from_promotion, build_tiny_clean_training_report,
 };
 
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
     let Some(manifest_path) = args.next() else {
-        eprintln!("usage: tiny_train <training-manifest> <tiny-clean-selection-manifest>");
+        eprintln!(
+            "usage: tiny_train <training-manifest> <tiny-profile-suite-manifest> <tiny-profile-promotion-report>"
+        );
         return ExitCode::FAILURE;
     };
-    let Some(selection_manifest_path) = args.next() else {
-        eprintln!("usage: tiny_train <training-manifest> <tiny-clean-selection-manifest>");
+    let Some(profile_suite_path) = args.next() else {
+        eprintln!(
+            "usage: tiny_train <training-manifest> <tiny-profile-suite-manifest> <tiny-profile-promotion-report>"
+        );
+        return ExitCode::FAILURE;
+    };
+    let Some(promotion_report_path) = args.next() else {
+        eprintln!(
+            "usage: tiny_train <training-manifest> <tiny-profile-suite-manifest> <tiny-profile-promotion-report>"
+        );
         return ExitCode::FAILURE;
     };
 
@@ -46,19 +56,26 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    let selection_manifest: TinyCleanTrainingSelectionManifest =
-        match read_json(&selection_manifest_path) {
+    let profile_suite: TinyCleanTrainingProfileSuiteManifest = match read_json(&profile_suite_path)
+    {
+        Ok(value) => value,
+        Err(error) => {
+            eprintln!("failed to read tiny clean training profile suite manifest: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let promotion_report: TinyCleanTrainingProfilePromotionReport =
+        match read_json(&promotion_report_path) {
             Ok(value) => value,
             Err(error) => {
-                eprintln!("failed to read tiny clean training selection manifest: {error}");
+                eprintln!("failed to read tiny clean training profile promotion report: {error}");
                 return ExitCode::FAILURE;
             }
         };
-    let manifest_dir = std::path::Path::new(&selection_manifest_path)
+    let manifest_dir = std::path::Path::new(&profile_suite_path)
         .parent()
         .unwrap_or_else(|| std::path::Path::new("."));
-    let clean_corpus_manifest_path =
-        manifest_dir.join(&selection_manifest.source_clean_corpus_manifest);
+    let clean_corpus_manifest_path = manifest_dir.join(&profile_suite.source_clean_corpus_manifest);
     let clean_corpus_manifest: CleanTrainingCorpusManifest =
         match read_json_path(&clean_corpus_manifest_path) {
             Ok(value) => value,
@@ -70,7 +87,7 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    let clean_corpus_pack_path = manifest_dir.join(&selection_manifest.source_clean_corpus_pack);
+    let clean_corpus_pack_path = manifest_dir.join(&profile_suite.source_clean_corpus_pack);
     let clean_corpus_pack: CleanTrainingCorpusPack = match read_json_path(&clean_corpus_pack_path) {
         Ok(value) => value,
         Err(error) => {
@@ -81,14 +98,15 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    let pack = match assemble_tiny_clean_training_pack_from_corpus(
-        &selection_manifest,
+    let pack = match assemble_tiny_clean_training_pack_from_promotion(
+        &profile_suite,
+        &promotion_report,
         &clean_corpus_manifest,
         &clean_corpus_pack,
     ) {
         Ok(value) => value,
         Err(error) => {
-            eprintln!("failed to assemble tiny clean training pack from corpus: {error}");
+            eprintln!("failed to assemble tiny clean training pack from promoted profile: {error}");
             return ExitCode::FAILURE;
         }
     };

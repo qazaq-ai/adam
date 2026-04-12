@@ -1,0 +1,12 @@
+{
+  "version": "0.0.57",
+  "name": "adam-tiny-clean-profile-experiment-matrix",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "expected_active_profile": "education_heavy",
+  "require_promotable_profiles": true,
+  "candidate_profiles": [
+    "education_heavy",
+    "reference_heavy"
+  ]
+}

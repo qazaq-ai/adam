@@ -1,0 +1,28 @@
+{
+  "promotion_name": "adam-tiny-clean-profile-promotion",
+  "strategy_name": "adam-tiny-clean-profile-strategy",
+  "suite_name": "adam-tiny-clean-profile-suite",
+  "expected_active_profile": "education_heavy",
+  "active_profile": "education_heavy",
+  "active_pack_name": "adam-tiny-clean-education-heavy-pack",
+  "promotable_profile_count": 2,
+  "promotable_profiles": [
+    "education_heavy",
+    "reference_heavy"
+  ],
+  "matches_expected_active_profile": true,
+  "promotion_checks": [
+    {
+      "check": "expected_active_profile_matches",
+      "passed": true
+    },
+    {
+      "check": "active_profile_is_promotable",
+      "passed": true
+    },
+    {
+      "check": "promotable_profile_available",
+      "passed": true
+    }
+  ]
+}

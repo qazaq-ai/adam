@@ -17,17 +17,24 @@ use adam_train::{
     TinyCleanTrainingDomainPack, TinyCleanTrainingPack,
     TinyCleanTrainingProfileBaselineDeltaReport, TinyCleanTrainingProfileBaselineManifest,
     TinyCleanTrainingProfileBaselineReport, TinyCleanTrainingProfileComparisonReport,
+    TinyCleanTrainingProfileExperimentMatrixManifest,
+    TinyCleanTrainingProfileExperimentMatrixReport, TinyCleanTrainingProfilePromotionDeltaReport,
+    TinyCleanTrainingProfilePromotionManifest, TinyCleanTrainingProfilePromotionReport,
     TinyCleanTrainingProfileStrategyDeltaReport, TinyCleanTrainingProfileStrategyManifest,
     TinyCleanTrainingProfileStrategyReport, TinyCleanTrainingProfileSuiteManifest,
     TinyCleanTrainingProfileSuiteReport, TinyCleanTrainingReport,
     TinyCleanTrainingSelectionManifest, assemble_clean_training_corpus_pack,
-    assemble_tiny_clean_training_pack_from_corpus, build_baseline_training_assembly_report,
+    assemble_tiny_clean_training_pack_from_corpus,
+    assemble_tiny_clean_training_pack_from_promotion, build_baseline_training_assembly_report,
     build_baseline_training_consistency_report, build_baseline_training_delta_report,
     build_baseline_training_plan, build_clean_training_corpus_report,
     build_foundation_overview_delta_report, build_foundation_overview_report,
     build_tiny_clean_training_profile_baseline_delta_report,
     build_tiny_clean_training_profile_baseline_report,
     build_tiny_clean_training_profile_comparison_report,
+    build_tiny_clean_training_profile_experiment_matrix_report,
+    build_tiny_clean_training_profile_promotion_delta_report,
+    build_tiny_clean_training_profile_promotion_report,
     build_tiny_clean_training_profile_strategy_delta_report,
     build_tiny_clean_training_profile_strategy_report,
     build_tiny_clean_training_profile_suite_report, build_tiny_clean_training_report,
@@ -606,15 +613,22 @@ fn tiny_clean_training_report_matches_expected_regression_artifact() {
     let report: SourceAcceptanceReport =
         serde_json::from_str(&fs::read_to_string(report_path).expect("acceptance report file"))
             .expect("valid source acceptance report json");
-    let selection_manifest_path = concat!(
+    let profile_suite_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../data/curated/tiny_clean_training_selection_manifest.json"
+        "/../../data/curated/tiny_clean_training_profile_suite_manifest.json"
     );
-    let selection_manifest: TinyCleanTrainingSelectionManifest = serde_json::from_str(
-        &fs::read_to_string(selection_manifest_path)
-            .expect("tiny training selection manifest file"),
+    let profile_suite: TinyCleanTrainingProfileSuiteManifest = serde_json::from_str(
+        &fs::read_to_string(profile_suite_path).expect("tiny training profile suite manifest file"),
     )
-    .expect("valid tiny training selection manifest json");
+    .expect("valid tiny training profile suite manifest json");
+    let promotion_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_promotion_report.json"
+    );
+    let promotion_report: TinyCleanTrainingProfilePromotionReport = serde_json::from_str(
+        &fs::read_to_string(promotion_report_path).expect("tiny training profile promotion report"),
+    )
+    .expect("valid tiny training profile promotion report json");
     let clean_manifest_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
         "/../../data/curated/clean_training_corpus_manifest.json"
@@ -630,12 +644,13 @@ fn tiny_clean_training_report_matches_expected_regression_artifact() {
     let clean_pack: CleanTrainingCorpusPack =
         serde_json::from_str(&fs::read_to_string(clean_pack_path).expect("clean corpus pack file"))
             .expect("valid clean corpus pack json");
-    let pack = assemble_tiny_clean_training_pack_from_corpus(
-        &selection_manifest,
+    let pack = assemble_tiny_clean_training_pack_from_promotion(
+        &profile_suite,
+        &promotion_report,
         &clean_manifest,
         &clean_pack,
     )
-    .expect("assembled tiny clean training pack");
+    .expect("assembled tiny clean training pack from promotion");
     let expected_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
         "/../../data/training/tiny_clean_training_report.json"
@@ -1013,6 +1028,172 @@ fn tiny_clean_training_profile_strategy_delta_report_matches_expected_regression
 }
 
 #[test]
+fn tiny_clean_training_profile_promotion_report_matches_expected_regression_artifact() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_training_profile_promotion_manifest.json"
+    );
+    let manifest: TinyCleanTrainingProfilePromotionManifest = serde_json::from_str(
+        &fs::read_to_string(manifest_path).expect("tiny profile promotion manifest"),
+    )
+    .expect("valid tiny profile promotion manifest json");
+    let strategy_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_strategy_report.json"
+    );
+    let strategy_report: TinyCleanTrainingProfileStrategyReport = serde_json::from_str(
+        &fs::read_to_string(strategy_report_path).expect("tiny profile strategy report"),
+    )
+    .expect("valid tiny profile strategy report json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_promotion_report.json"
+    );
+    let expected: TinyCleanTrainingProfilePromotionReport = serde_json::from_str(
+        &fs::read_to_string(expected_path).expect("tiny profile promotion report"),
+    )
+    .expect("valid tiny profile promotion report json");
+
+    let actual = build_tiny_clean_training_profile_promotion_report(&manifest, &strategy_report)
+        .expect("tiny profile promotion report");
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn tiny_clean_training_profile_promotion_delta_report_matches_expected_regression_artifact() {
+    let promotion_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_promotion_report.json"
+    );
+    let promotion_report: TinyCleanTrainingProfilePromotionReport = serde_json::from_str(
+        &fs::read_to_string(promotion_report_path).expect("tiny profile promotion report"),
+    )
+    .expect("valid tiny profile promotion report json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_promotion_delta_report.json"
+    );
+    let expected: TinyCleanTrainingProfilePromotionDeltaReport = serde_json::from_str(
+        &fs::read_to_string(expected_path).expect("tiny profile promotion delta report"),
+    )
+    .expect("valid tiny profile promotion delta report json");
+
+    let actual = build_tiny_clean_training_profile_promotion_delta_report(
+        &promotion_report,
+        &promotion_report,
+    );
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn tiny_clean_training_profile_experiment_matrix_report_matches_expected_regression_artifact() {
+    let training_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_manifest.json"
+    );
+    let training_manifest: BaselineTrainingManifest = serde_json::from_str(
+        &fs::read_to_string(training_manifest_path).expect("baseline training manifest"),
+    )
+    .expect("valid baseline training manifest json");
+    let registry_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_registry.json"
+    );
+    let registry: SourceRegistry =
+        serde_json::from_str(&fs::read_to_string(registry_path).expect("source registry"))
+            .expect("valid source registry json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_scoring_rules.json"
+    );
+    let rules: SourceScoringRules =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("source scoring rules"))
+            .expect("valid source scoring rules json");
+    let acceptance_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/source_acceptance_report.json"
+    );
+    let acceptance_report: SourceAcceptanceReport = serde_json::from_str(
+        &fs::read_to_string(acceptance_report_path).expect("source acceptance report"),
+    )
+    .expect("valid source acceptance report json");
+    let suite_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_training_profile_suite_manifest.json"
+    );
+    let suite_manifest: TinyCleanTrainingProfileSuiteManifest = serde_json::from_str(
+        &fs::read_to_string(suite_manifest_path).expect("tiny profile suite manifest"),
+    )
+    .expect("valid tiny profile suite manifest json");
+    let clean_corpus_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_manifest.json"
+    );
+    let clean_corpus_manifest: CleanTrainingCorpusManifest = serde_json::from_str(
+        &fs::read_to_string(clean_corpus_manifest_path).expect("clean training corpus manifest"),
+    )
+    .expect("valid clean training corpus manifest json");
+    let clean_corpus_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_pack.json"
+    );
+    let clean_corpus_pack: CleanTrainingCorpusPack = serde_json::from_str(
+        &fs::read_to_string(clean_corpus_pack_path).expect("clean training corpus pack"),
+    )
+    .expect("valid clean training corpus pack json");
+    let strategy_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_strategy_report.json"
+    );
+    let strategy_report: TinyCleanTrainingProfileStrategyReport = serde_json::from_str(
+        &fs::read_to_string(strategy_report_path).expect("tiny profile strategy report"),
+    )
+    .expect("valid tiny profile strategy report json");
+    let promotion_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_promotion_report.json"
+    );
+    let promotion_report: TinyCleanTrainingProfilePromotionReport = serde_json::from_str(
+        &fs::read_to_string(promotion_report_path).expect("tiny profile promotion report"),
+    )
+    .expect("valid tiny profile promotion report json");
+    let matrix_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/tiny_clean_training_profile_experiment_matrix_manifest.json"
+    );
+    let matrix_manifest: TinyCleanTrainingProfileExperimentMatrixManifest = serde_json::from_str(
+        &fs::read_to_string(matrix_manifest_path).expect("tiny profile experiment matrix manifest"),
+    )
+    .expect("valid tiny profile experiment matrix manifest json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_experiment_matrix_report.json"
+    );
+    let expected: TinyCleanTrainingProfileExperimentMatrixReport = serde_json::from_str(
+        &fs::read_to_string(expected_path).expect("tiny profile experiment matrix report"),
+    )
+    .expect("valid tiny profile experiment matrix report json");
+
+    let actual = build_tiny_clean_training_profile_experiment_matrix_report(
+        &matrix_manifest,
+        &training_manifest,
+        &registry,
+        &rules,
+        &acceptance_report,
+        &suite_manifest,
+        &strategy_report,
+        &promotion_report,
+        &clean_corpus_manifest,
+        &clean_corpus_pack,
+    )
+    .expect("tiny profile experiment matrix report");
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn foundation_overview_report_matches_expected_regression_artifact() {
     let corpus_summary_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
@@ -1120,6 +1301,24 @@ fn foundation_overview_report_matches_expected_regression_artifact() {
                 .expect("tiny profile strategy delta report"),
         )
         .expect("valid tiny profile strategy delta report json");
+    let tiny_profile_promotion_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_promotion_report.json"
+    );
+    let tiny_profile_promotion: TinyCleanTrainingProfilePromotionReport = serde_json::from_str(
+        &fs::read_to_string(tiny_profile_promotion_path).expect("tiny profile promotion report"),
+    )
+    .expect("valid tiny profile promotion report json");
+    let tiny_profile_promotion_delta_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_promotion_delta_report.json"
+    );
+    let tiny_profile_promotion_delta: TinyCleanTrainingProfilePromotionDeltaReport =
+        serde_json::from_str(
+            &fs::read_to_string(tiny_profile_promotion_delta_path)
+                .expect("tiny profile promotion delta report"),
+        )
+        .expect("valid tiny profile promotion delta report json");
     let expected_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
         "/../../data/foundation/foundation_overview_report.json"
@@ -1143,6 +1342,8 @@ fn foundation_overview_report_matches_expected_regression_artifact() {
         &tiny_profile_policy_delta,
         &tiny_profile_strategy,
         &tiny_profile_strategy_delta,
+        &tiny_profile_promotion,
+        &tiny_profile_promotion_delta,
     );
 
     assert_eq!(actual, expected);
@@ -1254,6 +1455,22 @@ fn foundation_overview_policy_readiness_tracks_substantive_policy_checks() {
         &fs::read_to_string(strategy_delta_path).expect("tiny profile strategy delta report"),
     )
     .expect("valid tiny profile strategy delta report json");
+    let promotion_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_promotion_report.json"
+    );
+    let promotion_report: TinyCleanTrainingProfilePromotionReport = serde_json::from_str(
+        &fs::read_to_string(promotion_report_path).expect("tiny profile promotion report"),
+    )
+    .expect("valid tiny profile promotion report json");
+    let promotion_delta_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/tiny_clean_training_profile_promotion_delta_report.json"
+    );
+    let promotion_delta: TinyCleanTrainingProfilePromotionDeltaReport = serde_json::from_str(
+        &fs::read_to_string(promotion_delta_path).expect("tiny profile promotion delta report"),
+    )
+    .expect("valid tiny profile promotion delta report json");
 
     let actual = build_foundation_overview_report(
         &corpus_summary,
@@ -1269,10 +1486,13 @@ fn foundation_overview_policy_readiness_tracks_substantive_policy_checks() {
         &baseline_delta,
         &strategy_report,
         &strategy_delta,
+        &promotion_report,
+        &promotion_delta,
     );
 
     assert!(!actual.tiny_profile_policy_matches_expected);
     assert!(actual.tiny_profile_strategy_matches_expected);
+    assert!(actual.tiny_profile_promotion_matches_expected);
     assert!(!actual.all_layers_match_expected);
 }
 

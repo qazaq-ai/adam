@@ -5,10 +5,11 @@
   "tokenizer_exact_match_rate_bps": 10000,
   "eval_task_count": 4,
   "training_total_sequence_count": 1024,
-  "tiny_training_vocabulary_size": 95,
-  "tiny_training_validation_exact_match_rate_bps": 5000,
+  "tiny_training_vocabulary_size": 81,
+  "tiny_training_validation_exact_match_rate_bps": 10000,
   "tiny_profile_policy_matches_expected": true,
   "tiny_profile_strategy_matches_expected": true,
+  "tiny_profile_promotion_matches_expected": true,
   "layer_breakdown": [
     {
       "layer": "corpus",
@@ -38,7 +39,7 @@
       "layer": "tiny_training",
       "ready": true,
       "primary_metric_name": "validation_exact_match_rate_bps",
-      "primary_metric_value": "5000"
+      "primary_metric_value": "10000"
     },
     {
       "layer": "tiny_profile_policy",
@@ -50,6 +51,12 @@
       "layer": "tiny_profile_strategy",
       "ready": true,
       "primary_metric_name": "strategy_matches_expected",
+      "primary_metric_value": "true"
+    },
+    {
+      "layer": "tiny_profile_promotion",
+      "ready": true,
+      "primary_metric_name": "promotion_matches_expected",
       "primary_metric_value": "true"
     }
   ],
@@ -84,6 +91,10 @@
     },
     {
       "check": "tiny_profile_strategy_matches_expected",
+      "passed": true
+    },
+    {
+      "check": "tiny_profile_promotion_matches_expected",
       "passed": true
     }
   ]

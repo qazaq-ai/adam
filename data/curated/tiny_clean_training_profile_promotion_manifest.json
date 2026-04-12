@@ -1,0 +1,7 @@
+{
+  "version": "0.0.57",
+  "name": "adam-tiny-clean-profile-promotion",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "expected_active_profile": "education_heavy"
+}
