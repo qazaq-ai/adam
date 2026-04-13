@@ -1,0 +1,78 @@
+{
+  "run_name": "adam-baseline-plan-mini-clean-prototype",
+  "pack_name": "adam-mini-clean-reference-heavy-pack",
+  "sample_ordering_strategy": "round_robin_by_domain_with_stratified_validation",
+  "accepted_source_count": 3,
+  "sample_count": 36,
+  "train_sample_count": 33,
+  "validation_sample_count": 3,
+  "validation_domain_count": 3,
+  "train_token_count": 212,
+  "validation_token_count": 20,
+  "vocabulary_size": 85,
+  "unique_context_count": 88,
+  "unique_transition_count": 151,
+  "deterministic_context_count": 55,
+  "ambiguous_context_count": 33,
+  "validation_next_token_count": 23,
+  "validation_exact_match_count": 22,
+  "validation_exact_match_rate_bps": 9565,
+  "category_breakdown": [
+    {
+      "category": "domain_education",
+      "sample_count": 9,
+      "token_count": 60
+    },
+    {
+      "category": "domain_general",
+      "sample_count": 9,
+      "token_count": 56
+    },
+    {
+      "category": "domain_reference",
+      "sample_count": 18,
+      "token_count": 116
+    },
+    {
+      "category": "source_curated_general_kazakh",
+      "sample_count": 9,
+      "token_count": 56
+    },
+    {
+      "category": "source_curated_reference_kazakh",
+      "sample_count": 18,
+      "token_count": 116
+    },
+    {
+      "category": "source_reviewed_education_kazakh",
+      "sample_count": 9,
+      "token_count": 60
+    }
+  ],
+  "critical_breakdown": [
+    {
+      "guard": "accepted_source_only",
+      "sample_count": 36
+    },
+    {
+      "guard": "clean_source_only",
+      "sample_count": 36
+    },
+    {
+      "guard": "deterministic_transition_coverage",
+      "sample_count": 36
+    },
+    {
+      "guard": "round_robin_domain_ordering",
+      "sample_count": 36
+    },
+    {
+      "guard": "validation_coverage",
+      "sample_count": 36
+    },
+    {
+      "guard": "validation_multi_domain_coverage",
+      "sample_count": 36
+    }
+  ]
+}

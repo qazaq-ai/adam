@@ -52,7 +52,7 @@ for file in "${manifest_files[@]}"; do
 done
 
 lock_packages=(
-  "adam-core"
+  "adam-kernel"
   "adam-corpus"
   "adam-eval"
   "adam-tokenizer"

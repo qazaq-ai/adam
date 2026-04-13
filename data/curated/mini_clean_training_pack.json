@@ -1,0 +1,224 @@
+{
+  "version": "0.0.64",
+  "name": "adam-mini-clean-reference-heavy-pack",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "samples": [
+    {
+      "id": "clean_sample_01",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Таза дерек тұрақты қорытынды жасауға көмектеседі."
+    },
+    {
+      "id": "clean_sample_02",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Таза дерек тұрақты талдау жасауға көмектеседі."
+    },
+    {
+      "id": "clean_sample_03",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Таза дерек тұрақты модель құруға көмектеседі."
+    },
+    {
+      "id": "clean_sample_04",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Жүйелі мәтін нақты қорытынды жасауға көмектеседі."
+    },
+    {
+      "id": "clean_sample_05",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Жүйелі мәтін нақты талдау жасауға көмектеседі."
+    },
+    {
+      "id": "clean_sample_06",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Дәйекті мәтін сенімді модель құруға мүмкіндік береді."
+    },
+    {
+      "id": "clean_sample_07",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Дәйекті мәтін сенімді қорытынды жасауға көмектеседі."
+    },
+    {
+      "id": "clean_sample_08",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Дәйекті мәтін сенімді модель сапасын арттыруға көмектеседі."
+    },
+    {
+      "id": "clean_sample_09",
+      "source_id": "curated_general_kazakh",
+      "domain": "general",
+      "text": "Дәйекті мәтін сенімді модель құруға көмектеседі."
+    },
+    {
+      "id": "clean_sample_10",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Сөздік бабы ұғымның ресми қолданысын дәл белгілейді."
+    },
+    {
+      "id": "clean_sample_11",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтамалық жазба ұғымның ресми белгілерін қысқа және нақты береді."
+    },
+    {
+      "id": "clean_sample_12",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Сөздік түсіндірмесі ұғымның ресми аясын бірмәнді айқындайды."
+    },
+    {
+      "id": "clean_sample_13",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Термин анықтамасы ұғымның ресми мағынасын нақтылайды."
+    },
+    {
+      "id": "clean_sample_14",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтама мәтіні мағынаны артық сөзсіз түсіндіреді."
+    },
+    {
+      "id": "clean_sample_15",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтамалық қор ұғымның тұрақты қолданысын бекітеді."
+    },
+    {
+      "id": "clean_sample_16",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтамалық жүйе терминдердің байланысын айқын көрсетеді."
+    },
+    {
+      "id": "clean_sample_17",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Термин түсіндірмесі негізгі мағынаны қысқа жеткізеді."
+    },
+    {
+      "id": "clean_sample_18",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Ереже жинағы ұғымның шекарасын нақты сипаттайды."
+    },
+    {
+      "id": "clean_sample_19",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтамалық жазба негізгі белгілерді қысқа түрде береді."
+    },
+    {
+      "id": "clean_sample_20",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтамалық мәтін негізгі белгілерді қысқа түрде береді."
+    },
+    {
+      "id": "clean_sample_21",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтама мәтіні негізгі ұғымды қысқа жеткізеді."
+    },
+    {
+      "id": "clean_sample_22",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтамалық жазба негізгі белгілерді қысқа жеткізеді."
+    },
+    {
+      "id": "clean_sample_23",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Сабақ түсіндірмесі ұғымның негізгі мағынасын кезеңдеп ашады."
+    },
+    {
+      "id": "clean_sample_24",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Сабақ материалы ұғымды мысал арқылы нақтылайды."
+    },
+    {
+      "id": "clean_sample_25",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Жаттығу үлгісі ұғымды қолдану ретімен бекітеді."
+    },
+    {
+      "id": "clean_sample_26",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Түсіндірме мәтін ережені қарапайым мысалмен көрсетеді."
+    },
+    {
+      "id": "clean_sample_27",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Оқу тапсырмасы негізгі белгілерді салыстыру арқылы бекітеді."
+    },
+    {
+      "id": "clean_sample_28",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Оқу материалы терминнің қызметін қысқа түрде түсіндіреді."
+    },
+    {
+      "id": "clean_sample_29",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Оқу баяндауы терминнің қызметін ықшам түрде түсіндіреді."
+    },
+    {
+      "id": "clean_sample_30",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Оқу баяндауы терминнің қызметін қысқа түрде сипаттайды."
+    },
+    {
+      "id": "clean_sample_31",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "text": "Оқу баяндауы терминнің қызметін қысқа түрде түсіндіреді."
+    },
+    {
+      "id": "clean_sample_32",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтама берілген ұғымды нақты және қысқа түсіндіреді."
+    },
+    {
+      "id": "clean_sample_33",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Термин сөздігі ұғымның ресми қолданысын бекітеді."
+    },
+    {
+      "id": "clean_sample_34",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Сөздік бабы ұғымның ресми қолданысын бекітеді."
+    },
+    {
+      "id": "clean_sample_35",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Сөздік баптары терминнің қолданысын тұрақтандырады."
+    },
+    {
+      "id": "clean_sample_36",
+      "source_id": "curated_reference_kazakh",
+      "domain": "reference",
+      "text": "Анықтамалық жазба негізгі белгілерді қысқа түрде береді."
+    }
+  ]
+}

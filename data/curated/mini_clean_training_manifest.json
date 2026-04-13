@@ -1,0 +1,13 @@
+{
+  "version": "0.0.64",
+  "name": "adam-mini-clean-reference-heavy-pack",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "source_clean_corpus_manifest": "clean_training_corpus_manifest.json",
+  "source_clean_corpus_pack": "clean_training_corpus_pack.json",
+  "domain_sample_limits": {
+    "education": 9,
+    "general": 9,
+    "reference": 18
+  }
+}

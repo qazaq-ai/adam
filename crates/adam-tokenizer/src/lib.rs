@@ -84,7 +84,6 @@ pub struct TokenizerSegmentationDataset {
     pub entries: Vec<TokenizerSegmentationExample>,
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TokenizerSegmentationCategoryReport {
     pub category: String,

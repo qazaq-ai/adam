@@ -1,0 +1,47 @@
+{
+  "run_name": "adam-baseline-plan-mini-clean-miss-audit",
+  "pack_name": "adam-mini-clean-reference-heavy-pack",
+  "validation_next_token_count": 23,
+  "validation_exact_match_count": 22,
+  "validation_miss_count": 1,
+  "validation_miss_rate_bps": 434,
+  "unseen_context_miss_count": 0,
+  "ambiguous_context_miss_count": 1,
+  "category_breakdown": [
+    {
+      "category": "domain_education",
+      "miss_count": 1
+    },
+    {
+      "category": "source_reviewed_education_kazakh",
+      "miss_count": 1
+    }
+  ],
+  "critical_breakdown": [
+    {
+      "guard": "ambiguous_context_miss",
+      "miss_count": 1
+    },
+    {
+      "guard": "unseen_context_miss",
+      "miss_count": 0
+    },
+    {
+      "guard": "validation_miss_coverage",
+      "miss_count": 1
+    }
+  ],
+  "misses": [
+    {
+      "sample_id": "clean_sample_31",
+      "source_id": "reviewed_education_kazakh",
+      "domain": "education",
+      "context": "түрде",
+      "actual_next_token": "түсіндіреді",
+      "predicted_next_token": "береді",
+      "predicted_transition_count": 2,
+      "candidate_count": 3,
+      "unseen_context": false
+    }
+  ]
+}
