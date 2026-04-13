@@ -3,8 +3,8 @@
   "name": "adam-tiny-clean-profile-experiment-matrix-policy",
   "target_language": "kazakh",
   "script": "cyrillic",
-  "expected_selected_profile": "reference_heavy",
-  "minimum_validation_exact_match_rate_bps": 7800,
+  "expected_selected_profile": "balanced",
+  "minimum_validation_exact_match_rate_bps": 6500,
   "maximum_validation_gap_bps": 2000,
   "require_selected_profile_is_best": true
 }

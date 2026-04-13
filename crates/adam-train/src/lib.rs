@@ -229,6 +229,19 @@ pub struct TinyCleanTrainingSelectionManifest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MiniCleanTrainingManifest {
+    pub version: String,
+    pub name: String,
+    pub target_language: String,
+    pub script: String,
+    pub source_clean_corpus_manifest: String,
+    pub source_clean_corpus_pack: String,
+    pub domain_sample_limits: BTreeMap<String, usize>,
+    #[serde(default)]
+    pub preferred_sample_texts_by_domain: BTreeMap<String, Vec<String>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TinyCleanTrainingProfileManifest {
     pub profile: String,
     pub pack_name: String,
@@ -738,6 +751,8 @@ pub enum TrainingError {
     TinyTrainingManifestMismatch,
     #[error("tiny clean training selection manifest is invalid or inconsistent")]
     TinyTrainingSelectionMismatch,
+    #[error("mini clean training manifest is invalid or inconsistent")]
+    MiniTrainingManifestMismatch,
     #[error("tiny clean training profile suite manifest is invalid or inconsistent")]
     TinyTrainingProfileSuiteMismatch,
     #[error("clean training corpus manifest references are invalid or inconsistent")]
@@ -888,6 +903,55 @@ impl TinyCleanTrainingSelectionManifest {
             || self.max_samples_per_domain == 0
         {
             return Err(TrainingError::TinyTrainingSelectionMismatch);
+        }
+
+        Ok(())
+    }
+}
+
+impl MiniCleanTrainingManifest {
+    pub fn validate(&self) -> Result<(), TrainingError> {
+        if self.target_language != "kazakh" {
+            return Err(TrainingError::NonKazakhLanguage);
+        }
+
+        if self.script != "cyrillic" {
+            return Err(TrainingError::NonCyrillicScript);
+        }
+
+        if self.source_clean_corpus_manifest.trim().is_empty()
+            || self.source_clean_corpus_pack.trim().is_empty()
+            || self.domain_sample_limits.is_empty()
+        {
+            return Err(TrainingError::MiniTrainingManifestMismatch);
+        }
+
+        for (domain, limit) in &self.domain_sample_limits {
+            if domain.trim().is_empty() || *limit == 0 {
+                return Err(TrainingError::MiniTrainingManifestMismatch);
+            }
+        }
+
+        for (domain, sample_texts) in &self.preferred_sample_texts_by_domain {
+            if domain.trim().is_empty()
+                || !self.domain_sample_limits.contains_key(domain)
+                || sample_texts.is_empty()
+            {
+                return Err(TrainingError::MiniTrainingManifestMismatch);
+            }
+
+            if sample_texts.iter().any(|sample| sample.trim().is_empty()) {
+                return Err(TrainingError::MiniTrainingManifestMismatch);
+            }
+
+            let limit = self
+                .domain_sample_limits
+                .get(domain)
+                .copied()
+                .ok_or(TrainingError::MiniTrainingManifestMismatch)?;
+            if sample_texts.len() > limit {
+                return Err(TrainingError::MiniTrainingManifestMismatch);
+            }
         }
 
         Ok(())
@@ -1154,6 +1218,53 @@ pub fn assemble_tiny_clean_training_pack_from_profile(
         &profile.domain_sample_limits,
     )
     .map_err(|_| TrainingError::TinyTrainingProfileSuiteMismatch)
+}
+
+pub fn assemble_mini_clean_training_pack(
+    manifest: &MiniCleanTrainingManifest,
+    clean_corpus_manifest: &CleanTrainingCorpusManifest,
+    clean_corpus_pack: &CleanTrainingCorpusPack,
+) -> Result<TinyCleanTrainingPack, TrainingError> {
+    manifest.validate()?;
+    clean_corpus_manifest.validate()?;
+
+    if clean_corpus_manifest.name != clean_corpus_pack.name
+        || clean_corpus_manifest.version != clean_corpus_pack.version
+        || clean_corpus_manifest.target_language != clean_corpus_pack.target_language
+        || clean_corpus_manifest.script != clean_corpus_pack.script
+    {
+        return Err(TrainingError::MiniTrainingManifestMismatch);
+    }
+
+    if clean_corpus_pack.target_language != manifest.target_language
+        || clean_corpus_pack.script != manifest.script
+        || clean_corpus_pack.samples.is_empty()
+    {
+        return Err(TrainingError::MiniTrainingManifestMismatch);
+    }
+
+    if manifest.preferred_sample_texts_by_domain.is_empty() {
+        assemble_tiny_clean_training_pack_with_domain_limits(
+            &manifest.version,
+            &manifest.name,
+            &manifest.target_language,
+            &manifest.script,
+            clean_corpus_pack,
+            &manifest.domain_sample_limits,
+        )
+        .map_err(|_| TrainingError::MiniTrainingManifestMismatch)
+    } else {
+        assemble_tiny_clean_training_pack_with_domain_limits_and_preferences(
+            &manifest.version,
+            &manifest.name,
+            &manifest.target_language,
+            &manifest.script,
+            clean_corpus_pack,
+            &manifest.domain_sample_limits,
+            &manifest.preferred_sample_texts_by_domain,
+        )
+        .map_err(|_| TrainingError::MiniTrainingManifestMismatch)
+    }
 }
 
 pub fn assemble_tiny_clean_training_pack_from_promotion(
@@ -2320,6 +2431,41 @@ pub fn build_tiny_clean_training_report(
     report: &SourceAcceptanceReport,
     pack: &TinyCleanTrainingPack,
 ) -> Result<TinyCleanTrainingReport, TrainingError> {
+    build_clean_training_report_with_run_name(
+        &format!("{}-tiny-clean-prototype", manifest.run_name),
+        manifest,
+        registry,
+        rules,
+        report,
+        pack,
+    )
+}
+
+pub fn build_mini_clean_training_report(
+    manifest: &BaselineTrainingManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    report: &SourceAcceptanceReport,
+    pack: &TinyCleanTrainingPack,
+) -> Result<TinyCleanTrainingReport, TrainingError> {
+    build_clean_training_report_with_run_name(
+        &format!("{}-mini-clean-prototype", manifest.run_name),
+        manifest,
+        registry,
+        rules,
+        report,
+        pack,
+    )
+}
+
+fn build_clean_training_report_with_run_name(
+    run_name: &str,
+    manifest: &BaselineTrainingManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    report: &SourceAcceptanceReport,
+    pack: &TinyCleanTrainingPack,
+) -> Result<TinyCleanTrainingReport, TrainingError> {
     let analysis = analyze_tiny_clean_training(manifest, registry, rules, report, pack)?;
     let accepted_source_count = report
         .records
@@ -2328,7 +2474,7 @@ pub fn build_tiny_clean_training_report(
         .count();
 
     Ok(TinyCleanTrainingReport {
-        run_name: format!("{}-tiny-clean-prototype", manifest.run_name),
+        run_name: run_name.to_string(),
         pack_name: pack.name.clone(),
         sample_ordering_strategy: "round_robin_by_domain_with_stratified_validation".to_string(),
         accepted_source_count,
@@ -2352,6 +2498,41 @@ pub fn build_tiny_clean_training_report(
 }
 
 pub fn build_tiny_clean_training_miss_audit_report(
+    manifest: &BaselineTrainingManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    report: &SourceAcceptanceReport,
+    pack: &TinyCleanTrainingPack,
+) -> Result<TinyCleanTrainingMissAuditReport, TrainingError> {
+    build_clean_training_miss_audit_report_with_run_name(
+        &format!("{}-tiny-clean-miss-audit", manifest.run_name),
+        manifest,
+        registry,
+        rules,
+        report,
+        pack,
+    )
+}
+
+pub fn build_mini_clean_training_miss_audit_report(
+    manifest: &BaselineTrainingManifest,
+    registry: &SourceRegistry,
+    rules: &SourceScoringRules,
+    report: &SourceAcceptanceReport,
+    pack: &TinyCleanTrainingPack,
+) -> Result<TinyCleanTrainingMissAuditReport, TrainingError> {
+    build_clean_training_miss_audit_report_with_run_name(
+        &format!("{}-mini-clean-miss-audit", manifest.run_name),
+        manifest,
+        registry,
+        rules,
+        report,
+        pack,
+    )
+}
+
+fn build_clean_training_miss_audit_report_with_run_name(
+    run_name: &str,
     manifest: &BaselineTrainingManifest,
     registry: &SourceRegistry,
     rules: &SourceScoringRules,
@@ -2412,7 +2593,7 @@ pub fn build_tiny_clean_training_miss_audit_report(
     critical_breakdown.sort_by(|left, right| left.guard.cmp(&right.guard));
 
     Ok(TinyCleanTrainingMissAuditReport {
-        run_name: format!("{}-tiny-clean-miss-audit", manifest.run_name),
+        run_name: run_name.to_string(),
         pack_name: pack.name.clone(),
         validation_next_token_count: analysis.validation_next_token_count,
         validation_exact_match_count: analysis.validation_exact_match_count,
@@ -3801,6 +3982,101 @@ fn assemble_tiny_clean_training_pack_with_domain_limits(
     })
 }
 
+fn assemble_tiny_clean_training_pack_with_domain_limits_and_preferences(
+    version: &str,
+    name: &str,
+    target_language: &str,
+    script: &str,
+    clean_corpus_pack: &CleanTrainingCorpusPack,
+    domain_limits: &BTreeMap<String, usize>,
+    preferred_sample_texts_by_domain: &BTreeMap<String, Vec<String>>,
+) -> Result<TinyCleanTrainingPack, TrainingError> {
+    let mut selected_signatures = std::collections::BTreeSet::<(String, String, String)>::new();
+    let mut domain_counts = BTreeMap::<String, usize>::new();
+
+    for (domain, sample_texts) in preferred_sample_texts_by_domain {
+        let Some(limit) = domain_limits.get(domain) else {
+            return Err(TrainingError::MiniTrainingManifestMismatch);
+        };
+        if sample_texts.len() > *limit {
+            return Err(TrainingError::MiniTrainingManifestMismatch);
+        }
+
+        for sample_text in sample_texts {
+            let sample = clean_corpus_pack
+                .samples
+                .iter()
+                .find(|entry| entry.domain == *domain && entry.text == *sample_text)
+                .ok_or(TrainingError::MiniTrainingManifestMismatch)?;
+            let signature = (
+                sample.domain.clone(),
+                sample.source_id.clone(),
+                sample.text.clone(),
+            );
+            if !selected_signatures.insert(signature) {
+                return Err(TrainingError::MiniTrainingManifestMismatch);
+            }
+            *domain_counts.entry(domain.clone()).or_default() += 1;
+        }
+    }
+
+    for sample in &clean_corpus_pack.samples {
+        let Some(limit) = domain_limits.get(&sample.domain) else {
+            continue;
+        };
+        let signature = (
+            sample.domain.clone(),
+            sample.source_id.clone(),
+            sample.text.clone(),
+        );
+        if selected_signatures.contains(&signature) {
+            continue;
+        }
+        let count = domain_counts.entry(sample.domain.clone()).or_default();
+        if *count >= *limit {
+            continue;
+        }
+        selected_signatures.insert(signature);
+        *count += 1;
+    }
+
+    let mut samples = Vec::new();
+    let mut next_index = 1usize;
+    for sample in &clean_corpus_pack.samples {
+        let signature = (
+            sample.domain.clone(),
+            sample.source_id.clone(),
+            sample.text.clone(),
+        );
+        if !selected_signatures.contains(&signature) {
+            continue;
+        }
+        samples.push(TinyCleanTrainingSample {
+            id: format!("clean_sample_{next_index:02}"),
+            source_id: sample.source_id.clone(),
+            domain: sample.domain.clone(),
+            text: sample.text.clone(),
+        });
+        next_index += 1;
+    }
+
+    let distinct_domains = samples
+        .iter()
+        .map(|sample| sample.domain.as_str())
+        .collect::<std::collections::BTreeSet<_>>();
+    if samples.is_empty() || distinct_domains.len() < 3 {
+        return Err(TrainingError::MiniTrainingManifestMismatch);
+    }
+
+    Ok(TinyCleanTrainingPack {
+        version: version.to_string(),
+        name: name.to_string(),
+        target_language: target_language.to_string(),
+        script: script.to_string(),
+        samples,
+    })
+}
+
 fn deterministic_round_robin_tiny_samples(
     samples: &[TinyCleanTrainingSample],
 ) -> Vec<TinyCleanTrainingSample> {
@@ -4320,7 +4596,7 @@ mod tests {
     #[test]
     fn rejects_empty_training_objective() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             run_name: "baseline".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4344,7 +4620,7 @@ mod tests {
     #[test]
     fn builds_baseline_training_plan_from_valid_contracts() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4362,7 +4638,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4375,7 +4651,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "seed_public_admin_text".to_string(),
@@ -4404,7 +4680,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -4417,7 +4693,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -4447,7 +4723,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4483,7 +4759,7 @@ mod tests {
     #[test]
     fn builds_deterministic_training_assembly_report() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4501,7 +4777,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4514,7 +4790,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_reference_kazakh".to_string(),
@@ -4543,7 +4819,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -4556,7 +4832,7 @@ mod tests {
             seed_quality_penalty: 2,
         };
         let report = SourceAcceptanceReport {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-source-acceptance-report".to_string(),
             source_registry_manifest: "data/raw/source_registry.json".to_string(),
             scoring_rules_manifest: "data/raw/source_scoring_rules.json".to_string(),
@@ -4586,7 +4862,7 @@ mod tests {
             ],
         };
         let experiment = TokenizerExperiment {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4656,7 +4932,7 @@ mod tests {
     #[test]
     fn builds_multi_source_training_assembly_distribution() {
         let manifest = BaselineTrainingManifest {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             run_name: "adam-baseline-plan".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4674,7 +4950,7 @@ mod tests {
             validation_split_bps: 1000,
         };
         let corpus = CorpusManifest {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-foundation-curated".to_string(),
             language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4688,7 +4964,7 @@ mod tests {
             ],
         };
         let registry = SourceRegistry {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             entries: vec![
                 SourceRegistryEntry {
                     id: "curated_general_kazakh".to_string(),
@@ -4729,7 +5005,7 @@ mod tests {
             ],
         };
         let rules = SourceScoringRules {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             minimum_acceptance_score: 3,
             open_license_bonus: 3,
             reviewed_quality_bonus: 2,
@@ -4750,7 +5026,7 @@ mod tests {
         )
         .expect("source acceptance report");
         let experiment = TokenizerExperiment {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

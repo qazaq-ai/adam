@@ -38,7 +38,7 @@
       "id": "clean_sample_06",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Жүйелі мәтін нақты модель құруға көмектеседі."
+      "text": "Дәйекті мәтін сенімді модель құруға мүмкіндік береді."
     },
     {
       "id": "clean_sample_07",
@@ -50,7 +50,7 @@
       "id": "clean_sample_08",
       "source_id": "curated_general_kazakh",
       "domain": "general",
-      "text": "Дәйекті мәтін сенімді талдау жасауға көмектеседі."
+      "text": "Дәйекті мәтін сенімді модель сапасын арттыруға көмектеседі."
     },
     {
       "id": "clean_sample_09",
@@ -68,7 +68,7 @@
       "id": "clean_sample_11",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Сөздік жазбасы ұғымның ресми белгілерін қысқа және нақты береді."
+      "text": "Анықтамалық жазба ұғымның ресми белгілерін қысқа және нақты береді."
     },
     {
       "id": "clean_sample_12",
@@ -80,7 +80,7 @@
       "id": "clean_sample_13",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Сөздік анықтамасы ұғымның ресми мағынасын нақтылайды."
+      "text": "Термин анықтамасы ұғымның ресми мағынасын нақтылайды."
     },
     {
       "id": "clean_sample_14",
@@ -92,7 +92,7 @@
       "id": "clean_sample_15",
       "source_id": "curated_reference_kazakh",
       "domain": "reference",
-      "text": "Сөздік бабы ұғымның тұрақты қолданысын бекітеді."
+      "text": "Анықтамалық қор ұғымның тұрақты қолданысын бекітеді."
     },
     {
       "id": "clean_sample_16",
@@ -140,25 +140,25 @@
       "id": "clean_sample_23",
       "source_id": "reviewed_education_kazakh",
       "domain": "education",
-      "text": "Сабақ тапсырмасы негізгі белгілерді салыстыру арқылы бекітеді."
+      "text": "Оқу тапсырмасы негізгі белгілерді салыстыру арқылы бекітеді."
     },
     {
       "id": "clean_sample_24",
       "source_id": "reviewed_education_kazakh",
       "domain": "education",
-      "text": "Сабақ материалы ұғымды мысал арқылы бекітеді."
+      "text": "Оқу материалы терминнің қызметін қысқа түрде түсіндіреді."
     },
     {
       "id": "clean_sample_25",
       "source_id": "reviewed_education_kazakh",
       "domain": "education",
-      "text": "Сабақ құрылымы ұғымдар арасындағы байланысты анық түсіндіреді."
+      "text": "Оқу баяндауы терминнің қызметін ықшам түрде түсіндіреді."
     },
     {
       "id": "clean_sample_26",
       "source_id": "reviewed_education_kazakh",
       "domain": "education",
-      "text": "Мысалды талдау ереженің қолданылуын бірмәнді көрсетеді."
+      "text": "Оқу баяндауы терминнің қызметін қысқа түрде сипаттайды."
     },
     {
       "id": "clean_sample_27",

@@ -10,20 +10,20 @@
     "reference"
   ],
   "segmentation_dataset_name": "adam-tokenizer-segmentation",
-  "segmentation_example_count": 178,
-  "exact_match_count": 178,
+  "segmentation_example_count": 280,
+  "exact_match_count": 280,
   "exact_match_rate_bps": 10000,
   "category_breakdown": [
     {
       "category": "noun_inflection",
-      "example_count": 22,
-      "exact_match_count": 22,
+      "example_count": 82,
+      "exact_match_count": 82,
       "exact_match_rate_bps": 10000
     },
     {
       "category": "pronoun_inflection",
-      "example_count": 8,
-      "exact_match_count": 8,
+      "example_count": 11,
+      "exact_match_count": 11,
       "exact_match_rate_bps": 10000
     },
     {
@@ -64,8 +64,8 @@
     },
     {
       "category": "verb_future",
-      "example_count": 5,
-      "exact_match_count": 5,
+      "example_count": 12,
+      "exact_match_count": 12,
       "exact_match_rate_bps": 10000
     },
     {
@@ -238,8 +238,8 @@
     },
     {
       "category": "verb_past",
-      "example_count": 6,
-      "exact_match_count": 6,
+      "example_count": 38,
+      "exact_match_count": 38,
       "exact_match_rate_bps": 10000
     },
     {

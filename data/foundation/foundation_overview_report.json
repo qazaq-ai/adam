@@ -5,7 +5,7 @@
   "tokenizer_exact_match_rate_bps": 10000,
   "eval_task_count": 4,
   "training_total_sequence_count": 1024,
-  "tiny_training_vocabulary_size": 71,
+  "tiny_training_vocabulary_size": 81,
   "tiny_training_validation_exact_match_rate_bps": 10000,
   "tiny_training_validation_miss_count": 0,
   "tiny_training_miss_audit_matches_expected": true,

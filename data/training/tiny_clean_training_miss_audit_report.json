@@ -1,8 +1,8 @@
 {
   "run_name": "adam-baseline-plan-tiny-clean-miss-audit",
-  "pack_name": "adam-tiny-clean-reference-heavy-pack",
-  "validation_next_token_count": 14,
-  "validation_exact_match_count": 14,
+  "pack_name": "adam-tiny-clean-balanced-pack",
+  "validation_next_token_count": 15,
+  "validation_exact_match_count": 15,
   "validation_miss_count": 0,
   "validation_miss_rate_bps": 0,
   "unseen_context_miss_count": 0,

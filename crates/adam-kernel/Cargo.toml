@@ -1,12 +1,14 @@
 [package]
-name = "adam-eval"
+name = "adam-kernel"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [dependencies]
-adam-corpus = { path = "../adam-corpus" }
-adam-tokenizer = { path = "../adam-tokenizer" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+
+[[bin]]
+name = "coverage_report"
+path = "src/bin/coverage_report.rs"

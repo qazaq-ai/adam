@@ -1,5 +1,14 @@
-use std::collections::{BTreeMap, HashSet};
+use std::collections::BTreeMap;
 
+use adam_kernel::{
+    DeterministicSegmentationParse, KernelError, contains_latin, deterministic_segment_parse,
+    expected_segmentation_parse,
+};
+pub use adam_kernel::{
+    FinalSoundClass, SegmentationLexicon, SegmentationPartOfSpeech, SegmentationRootEntry,
+    SegmentationRuleSet, SegmentationState, SegmentationSuffixRule, VowelHarmony,
+    deterministic_segment_token, normalize_text,
+};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -75,83 +84,6 @@ pub struct TokenizerSegmentationDataset {
     pub entries: Vec<TokenizerSegmentationExample>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum SegmentationPartOfSpeech {
-    Noun,
-    Pronoun,
-    Verb,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum VowelHarmony {
-    Front,
-    Back,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum FinalSoundClass {
-    Vowel,
-    VoicedConsonant,
-    VoicelessConsonant,
-    Nasal,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum SegmentationState {
-    Stem,
-    Number,
-    Possessive,
-    Voice,
-    Tense,
-    Person,
-    Case,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SegmentationRootEntry {
-    pub id: String,
-    pub root: String,
-    pub part_of_speech: SegmentationPartOfSpeech,
-    pub vowel_harmony: VowelHarmony,
-    pub final_sound_class: FinalSoundClass,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SegmentationLexicon {
-    pub version: String,
-    pub name: String,
-    pub target_language: String,
-    pub script: String,
-    pub roots: Vec<SegmentationRootEntry>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SegmentationSuffixRule {
-    pub id: String,
-    pub form: String,
-    pub part_of_speech: SegmentationPartOfSpeech,
-    pub from_state: SegmentationState,
-    pub to_state: SegmentationState,
-    pub label: String,
-    pub allowed_harmonies: Vec<VowelHarmony>,
-    pub allowed_final_sound_classes: Vec<FinalSoundClass>,
-    pub terminal: bool,
-    #[serde(default)]
-    pub allowed_previous_labels: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SegmentationRuleSet {
-    pub version: String,
-    pub name: String,
-    pub target_language: String,
-    pub script: String,
-    pub rules: Vec<SegmentationSuffixRule>,
-}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TokenizerSegmentationCategoryReport {
@@ -233,19 +165,6 @@ pub struct TokenizerExperimentNamedCountDrift {
     pub actual: Option<usize>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-struct DeterministicSegmentationParse {
-    part_of_speech: SegmentationPartOfSpeech,
-    segments: Vec<String>,
-    labels: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-struct SuffixParse {
-    segments: Vec<String>,
-    labels: Vec<String>,
-}
-
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 struct CategoryStats {
     example_count: usize,
@@ -301,6 +220,22 @@ pub enum TokenizerError {
     SegmentationTokenMismatch,
     #[error("latin characters are not allowed in kazakh-only tokenizer data")]
     LatinCharactersForbidden,
+}
+
+impl From<KernelError> for TokenizerError {
+    fn from(err: KernelError) -> Self {
+        match err {
+            KernelError::NonKazakhLanguage => TokenizerError::NonKazakhLanguage,
+            KernelError::NonCyrillicScript => TokenizerError::NonCyrillicScript,
+            KernelError::EmptySegmentationLexicon => TokenizerError::EmptySegmentationLexicon,
+            KernelError::InvalidSegmentationRootId => TokenizerError::InvalidSegmentationRootId,
+            KernelError::EmptySegmentationRuleSet => TokenizerError::EmptySegmentationRuleSet,
+            KernelError::InvalidSegmentationRuleId => TokenizerError::InvalidSegmentationRuleId,
+            KernelError::EmptySegmentationRuleConstraint => {
+                TokenizerError::EmptySegmentationRuleConstraint
+            }
+        }
+    }
 }
 
 impl Default for TokenizerProfile {
@@ -430,69 +365,6 @@ impl TokenizerSegmentationDataset {
 
             if entry.expected_segments.concat() != entry.token {
                 return Err(TokenizerError::SegmentationTokenMismatch);
-            }
-        }
-
-        Ok(())
-    }
-}
-
-impl SegmentationLexicon {
-    pub fn validate(&self) -> Result<(), TokenizerError> {
-        if self.target_language != "kazakh" {
-            return Err(TokenizerError::NonKazakhLanguage);
-        }
-
-        if self.script != "cyrillic" {
-            return Err(TokenizerError::NonCyrillicScript);
-        }
-
-        if self.roots.is_empty() {
-            return Err(TokenizerError::EmptySegmentationLexicon);
-        }
-
-        let mut seen = HashSet::new();
-        for root in &self.roots {
-            if root.id.trim().is_empty()
-                || root.root.trim().is_empty()
-                || contains_latin(&root.root)
-                || !seen.insert(root.id.clone())
-            {
-                return Err(TokenizerError::InvalidSegmentationRootId);
-            }
-        }
-
-        Ok(())
-    }
-}
-
-impl SegmentationRuleSet {
-    pub fn validate(&self) -> Result<(), TokenizerError> {
-        if self.target_language != "kazakh" {
-            return Err(TokenizerError::NonKazakhLanguage);
-        }
-
-        if self.script != "cyrillic" {
-            return Err(TokenizerError::NonCyrillicScript);
-        }
-
-        if self.rules.is_empty() {
-            return Err(TokenizerError::EmptySegmentationRuleSet);
-        }
-
-        let mut seen = HashSet::new();
-        for rule in &self.rules {
-            if rule.id.trim().is_empty()
-                || rule.form.trim().is_empty()
-                || rule.label.trim().is_empty()
-                || contains_latin(&rule.form)
-                || !seen.insert(rule.id.clone())
-            {
-                return Err(TokenizerError::InvalidSegmentationRuleId);
-            }
-
-            if rule.allowed_harmonies.is_empty() || rule.allowed_final_sound_classes.is_empty() {
-                return Err(TokenizerError::EmptySegmentationRuleConstraint);
             }
         }
 
@@ -751,257 +623,6 @@ pub fn build_experiment_delta_report(
     })
 }
 
-pub fn deterministic_segment_token(
-    token: &str,
-    lexicon: &SegmentationLexicon,
-    rules: &SegmentationRuleSet,
-) -> Option<Vec<String>> {
-    deterministic_segment_parse(token, lexicon, rules).map(|parse| parse.segments)
-}
-
-fn deterministic_segment_parse(
-    token: &str,
-    lexicon: &SegmentationLexicon,
-    rules: &SegmentationRuleSet,
-) -> Option<DeterministicSegmentationParse> {
-    let mut candidates = lexicon
-        .roots
-        .iter()
-        .filter(|root| token.starts_with(&root.root))
-        .filter_map(|root| {
-            let remaining = &token[root.root.len()..];
-            if remaining.is_empty() {
-                return Some(DeterministicSegmentationParse {
-                    part_of_speech: root.part_of_speech.clone(),
-                    segments: vec![root.root.clone()],
-                    labels: Vec::new(),
-                });
-            }
-
-            let mut parses = Vec::new();
-            let mut suffix_segments = Vec::new();
-            let mut suffix_labels = Vec::new();
-            collect_suffix_parses(
-                remaining,
-                &root.part_of_speech,
-                SegmentationState::Stem,
-                None,
-                &root.vowel_harmony,
-                &root.final_sound_class,
-                rules,
-                &mut suffix_segments,
-                &mut suffix_labels,
-                &mut parses,
-            );
-            parses.sort_by(|left, right| {
-                left.segments
-                    .cmp(&right.segments)
-                    .then(left.labels.cmp(&right.labels))
-            });
-            parses.dedup_by(|left, right| {
-                left.segments == right.segments && left.labels == right.labels
-            });
-
-            if parses.len() == 1 {
-                let parse = parses.pop().expect("single parse");
-                let mut segments = vec![root.root.clone()];
-                segments.extend(parse.segments);
-                Some(DeterministicSegmentationParse {
-                    part_of_speech: root.part_of_speech.clone(),
-                    segments,
-                    labels: parse.labels,
-                })
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<_>>();
-
-    candidates.sort_by(|left, right| {
-        left.segments
-            .cmp(&right.segments)
-            .then(left.labels.cmp(&right.labels))
-    });
-    candidates
-        .dedup_by(|left, right| left.segments == right.segments && left.labels == right.labels);
-
-    if candidates.len() == 1 {
-        candidates.pop()
-    } else {
-        None
-    }
-}
-
-fn collect_suffix_parses(
-    remaining: &str,
-    part_of_speech: &SegmentationPartOfSpeech,
-    state: SegmentationState,
-    previous_label: Option<&str>,
-    harmony: &VowelHarmony,
-    final_sound_class: &FinalSoundClass,
-    rules: &SegmentationRuleSet,
-    current_segments: &mut Vec<String>,
-    current_labels: &mut Vec<String>,
-    parses: &mut Vec<SuffixParse>,
-) {
-    for rule in rules.rules.iter().filter(|rule| {
-        &rule.part_of_speech == part_of_speech
-            && rule.from_state == state
-            && (rule.allowed_previous_labels.is_empty()
-                || previous_label.is_some_and(|label| {
-                    rule.allowed_previous_labels
-                        .iter()
-                        .any(|allowed_label| allowed_label == label)
-                }))
-            && rule.allowed_harmonies.contains(harmony)
-            && rule.allowed_final_sound_classes.contains(final_sound_class)
-            && remaining.starts_with(&rule.form)
-    }) {
-        let next_remaining = &remaining[rule.form.len()..];
-        current_segments.push(rule.form.clone());
-        current_labels.push(rule.label.clone());
-        let next_final_sound_class = classify_final_sound(&rule.form);
-
-        if next_remaining.is_empty() {
-            parses.push(SuffixParse {
-                segments: current_segments.clone(),
-                labels: current_labels.clone(),
-            });
-        } else if !rule.terminal {
-            collect_suffix_parses(
-                next_remaining,
-                part_of_speech,
-                rule.to_state.clone(),
-                Some(&rule.label),
-                harmony,
-                &next_final_sound_class,
-                rules,
-                current_segments,
-                current_labels,
-                parses,
-            );
-        }
-
-        current_segments.pop();
-        current_labels.pop();
-    }
-}
-
-fn expected_segmentation_parse(
-    expected_segments: &[String],
-    lexicon: &SegmentationLexicon,
-    rules: &SegmentationRuleSet,
-) -> Option<DeterministicSegmentationParse> {
-    let (root_segment, suffix_segments) = expected_segments.split_first()?;
-    let mut candidates = lexicon
-        .roots
-        .iter()
-        .filter(|root| &root.root == root_segment)
-        .filter_map(|root| {
-            if suffix_segments.is_empty() {
-                return Some(DeterministicSegmentationParse {
-                    part_of_speech: root.part_of_speech.clone(),
-                    segments: expected_segments.to_vec(),
-                    labels: Vec::new(),
-                });
-            }
-
-            let mut labels = Vec::new();
-            let mut parses = Vec::new();
-            collect_expected_labels(
-                suffix_segments,
-                &root.part_of_speech,
-                SegmentationState::Stem,
-                None,
-                &root.vowel_harmony,
-                &root.final_sound_class,
-                rules,
-                &mut labels,
-                &mut parses,
-            );
-
-            parses.sort();
-            parses.dedup();
-
-            if parses.len() == 1 {
-                Some(DeterministicSegmentationParse {
-                    part_of_speech: root.part_of_speech.clone(),
-                    segments: expected_segments.to_vec(),
-                    labels: parses.pop().expect("single expected parse"),
-                })
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<_>>();
-
-    candidates.sort_by(|left, right| {
-        left.segments
-            .cmp(&right.segments)
-            .then(left.labels.cmp(&right.labels))
-    });
-    candidates
-        .dedup_by(|left, right| left.segments == right.segments && left.labels == right.labels);
-
-    if candidates.len() == 1 {
-        candidates.pop()
-    } else {
-        None
-    }
-}
-
-fn collect_expected_labels(
-    remaining_segments: &[String],
-    part_of_speech: &SegmentationPartOfSpeech,
-    state: SegmentationState,
-    previous_label: Option<&str>,
-    harmony: &VowelHarmony,
-    final_sound_class: &FinalSoundClass,
-    rules: &SegmentationRuleSet,
-    current_labels: &mut Vec<String>,
-    parses: &mut Vec<Vec<String>>,
-) {
-    let Some(next_segment) = remaining_segments.first() else {
-        parses.push(current_labels.clone());
-        return;
-    };
-
-    for rule in rules.rules.iter().filter(|rule| {
-        &rule.part_of_speech == part_of_speech
-            && rule.from_state == state
-            && (rule.allowed_previous_labels.is_empty()
-                || previous_label.is_some_and(|label| {
-                    rule.allowed_previous_labels
-                        .iter()
-                        .any(|allowed_label| allowed_label == label)
-                }))
-            && rule.allowed_harmonies.contains(harmony)
-            && rule.allowed_final_sound_classes.contains(final_sound_class)
-            && &rule.form == next_segment
-    }) {
-        current_labels.push(rule.label.clone());
-        let next_final_sound_class = classify_final_sound(&rule.form);
-
-        if remaining_segments.len() == 1 {
-            parses.push(current_labels.clone());
-        } else if !rule.terminal {
-            collect_expected_labels(
-                &remaining_segments[1..],
-                part_of_speech,
-                rule.to_state.clone(),
-                Some(&rule.label),
-                harmony,
-                &next_final_sound_class,
-                rules,
-                current_labels,
-                parses,
-            );
-        }
-
-        current_labels.pop();
-    }
-}
-
 fn segmentation_category(parse: &DeterministicSegmentationParse) -> String {
     match parse.part_of_speech {
         SegmentationPartOfSpeech::Noun => "noun_inflection".to_string(),
@@ -1189,41 +810,6 @@ fn build_named_count_drifts(
     drifts
 }
 
-fn classify_final_sound(form: &str) -> FinalSoundClass {
-    let last = form
-        .chars()
-        .last()
-        .expect("segmentation suffix forms must not be empty");
-
-    if is_kazakh_vowel(last) {
-        FinalSoundClass::Vowel
-    } else if matches!(last, 'м' | 'н' | 'ң') {
-        FinalSoundClass::Nasal
-    } else if matches!(
-        last,
-        'п' | 'ф' | 'к' | 'қ' | 'т' | 'с' | 'ш' | 'щ' | 'ч' | 'ц' | 'х' | 'һ'
-    ) {
-        FinalSoundClass::VoicelessConsonant
-    } else {
-        FinalSoundClass::VoicedConsonant
-    }
-}
-
-fn is_kazakh_vowel(ch: char) -> bool {
-    matches!(
-        ch,
-        'а' | 'ә' | 'е' | 'и' | 'о' | 'ө' | 'ұ' | 'ү' | 'у' | 'ы' | 'і' | 'э'
-    )
-}
-
-fn contains_latin(value: &str) -> bool {
-    value.chars().any(|ch| ch.is_ascii_alphabetic())
-}
-
-pub fn normalize_text(text: &str) -> String {
-    text.trim().to_lowercase()
-}
-
 #[cfg(test)]
 mod tests {
     use super::{
@@ -1237,7 +823,7 @@ mod tests {
 
     fn test_lexicon() -> SegmentationLexicon {
         SegmentationLexicon {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-kazakh-segmentation-roots".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -1374,7 +960,7 @@ mod tests {
 
     fn test_rules() -> SegmentationRuleSet {
         SegmentationRuleSet {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-kazakh-segmentation-rules".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5348,7 +4934,7 @@ mod tests {
     #[test]
     fn accepts_kazakh_tokenizer_experiment() {
         let experiment = TokenizerExperiment {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5368,7 +4954,7 @@ mod tests {
     #[test]
     fn builds_dry_run_report() {
         let experiment = TokenizerExperiment {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5382,7 +4968,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5411,7 +4997,7 @@ mod tests {
     #[test]
     fn validates_segmentation_dataset_and_builds_report() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -6549,7 +6135,7 @@ mod tests {
     #[test]
     fn rejects_segmentation_dataset_with_mismatched_segments() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -8210,7 +7796,7 @@ mod tests {
     #[test]
     fn builds_experiment_report_with_segmentation_scoring() {
         let experiment = TokenizerExperiment {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -8224,7 +7810,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -8235,7 +7821,7 @@ mod tests {
             }],
         };
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.63".to_string(),
+            version: "0.0.64".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),

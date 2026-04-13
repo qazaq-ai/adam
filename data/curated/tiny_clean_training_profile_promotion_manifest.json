@@ -3,5 +3,5 @@
   "name": "adam-tiny-clean-profile-promotion",
   "target_language": "kazakh",
   "script": "cyrillic",
-  "expected_active_profile": "reference_heavy"
+  "expected_active_profile": "balanced"
 }

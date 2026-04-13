@@ -1,38 +1,38 @@
 {
   "corpus_name": "adam-clean-training-corpus",
   "pack_count": 9,
-  "sample_count": 82,
-  "total_token_count": 507,
+  "sample_count": 94,
+  "total_token_count": 591,
   "category_breakdown": [
     {
       "category": "domain_education",
-      "sample_count": 28,
-      "token_count": 171
+      "sample_count": 32,
+      "token_count": 201
     },
     {
       "category": "domain_general",
-      "sample_count": 27,
-      "token_count": 168
+      "sample_count": 31,
+      "token_count": 196
     },
     {
       "category": "domain_reference",
-      "sample_count": 27,
-      "token_count": 168
+      "sample_count": 31,
+      "token_count": 194
     },
     {
       "category": "pack_adam-clean-education-core-pack",
-      "sample_count": 10,
-      "token_count": 64
+      "sample_count": 12,
+      "token_count": 80
     },
     {
       "category": "pack_adam-clean-education-extension-pack",
-      "sample_count": 9,
-      "token_count": 54
+      "sample_count": 11,
+      "token_count": 68
     },
     {
       "category": "pack_adam-clean-general-core-pack",
-      "sample_count": 9,
-      "token_count": 54
+      "sample_count": 13,
+      "token_count": 82
     },
     {
       "category": "pack_adam-clean-general-extension-pack",
@@ -41,8 +41,8 @@
     },
     {
       "category": "pack_adam-clean-reference-core-pack",
-      "sample_count": 9,
-      "token_count": 59
+      "sample_count": 13,
+      "token_count": 85
     },
     {
       "category": "pack_adam-clean-reference-extension-pack",
@@ -66,32 +66,32 @@
     },
     {
       "category": "source_curated_general_kazakh",
-      "sample_count": 27,
-      "token_count": 168
+      "sample_count": 31,
+      "token_count": 196
     },
     {
       "category": "source_curated_reference_kazakh",
-      "sample_count": 27,
-      "token_count": 168
+      "sample_count": 31,
+      "token_count": 194
     },
     {
       "category": "source_reviewed_education_kazakh",
-      "sample_count": 28,
-      "token_count": 171
+      "sample_count": 32,
+      "token_count": 201
     }
   ],
   "critical_breakdown": [
     {
       "guard": "clean_pack_coverage",
-      "sample_count": 82
+      "sample_count": 94
     },
     {
       "guard": "multi_domain_coverage",
-      "sample_count": 82
+      "sample_count": 94
     },
     {
       "guard": "multi_pack_coverage",
-      "sample_count": 82
+      "sample_count": 94
     }
   ]
 }

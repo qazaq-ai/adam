@@ -14,7 +14,7 @@ use adam_train::{
     BaselineTrainingAssemblyReport, BaselineTrainingConsistencyReport, BaselineTrainingDeltaReport,
     BaselineTrainingManifest, CleanTrainingCorpusManifest, CleanTrainingCorpusPack,
     CleanTrainingCorpusReport, FoundationOverviewDeltaReport, FoundationOverviewReport,
-    TinyCleanTrainingDomainPack, TinyCleanTrainingMissAuditDeltaReport,
+    MiniCleanTrainingManifest, TinyCleanTrainingDomainPack, TinyCleanTrainingMissAuditDeltaReport,
     TinyCleanTrainingMissAuditReport, TinyCleanTrainingPack,
     TinyCleanTrainingProfileBaselineDeltaReport, TinyCleanTrainingProfileBaselineManifest,
     TinyCleanTrainingProfileBaselineReport, TinyCleanTrainingProfileComparisonReport,
@@ -29,11 +29,12 @@ use adam_train::{
     TinyCleanTrainingProfileStrategyReport, TinyCleanTrainingProfileSuiteManifest,
     TinyCleanTrainingProfileSuiteReport, TinyCleanTrainingReport,
     TinyCleanTrainingSelectionManifest, assemble_clean_training_corpus_pack,
-    assemble_tiny_clean_training_pack_from_corpus,
+    assemble_mini_clean_training_pack, assemble_tiny_clean_training_pack_from_corpus,
     assemble_tiny_clean_training_pack_from_promotion, build_baseline_training_assembly_report,
     build_baseline_training_consistency_report, build_baseline_training_delta_report,
     build_baseline_training_plan, build_clean_training_corpus_report,
     build_foundation_overview_delta_report, build_foundation_overview_report,
+    build_mini_clean_training_miss_audit_report, build_mini_clean_training_report,
     build_tiny_clean_training_miss_audit_delta_report, build_tiny_clean_training_miss_audit_report,
     build_tiny_clean_training_profile_baseline_delta_report,
     build_tiny_clean_training_profile_baseline_report,
@@ -799,6 +800,245 @@ fn tiny_clean_training_miss_audit_delta_report_matches_expected_regression_artif
 }
 
 #[test]
+fn mini_clean_training_pack_matches_manifest_assembly() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/mini_clean_training_manifest.json"
+    );
+    let manifest: MiniCleanTrainingManifest =
+        serde_json::from_str(&fs::read_to_string(manifest_path).expect("mini manifest file"))
+            .expect("valid mini manifest json");
+    let clean_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_manifest.json"
+    );
+    let clean_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_pack.json"
+    );
+    let clean_manifest: CleanTrainingCorpusManifest = serde_json::from_str(
+        &fs::read_to_string(clean_manifest_path).expect("clean corpus manifest file"),
+    )
+    .expect("valid clean corpus manifest json");
+    let clean_pack: CleanTrainingCorpusPack =
+        serde_json::from_str(&fs::read_to_string(clean_pack_path).expect("clean corpus pack file"))
+            .expect("valid clean corpus pack json");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/mini_clean_training_pack.json"
+    );
+    let expected: TinyCleanTrainingPack =
+        serde_json::from_str(&fs::read_to_string(expected_path).expect("mini clean pack file"))
+            .expect("valid mini clean pack json");
+
+    let actual =
+        assemble_mini_clean_training_pack(&manifest, &clean_manifest, &clean_pack).expect("pack");
+
+    for sample_texts in manifest.preferred_sample_texts_by_domain.values() {
+        for sample_text in sample_texts {
+            assert!(
+                actual
+                    .samples
+                    .iter()
+                    .any(|sample| &sample.text == sample_text),
+                "mini pack should include preferred sample `{sample_text}`"
+            );
+        }
+    }
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn mini_clean_training_pack_can_include_preferred_late_clean_sample() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/mini_clean_training_manifest.json"
+    );
+    let mut manifest: MiniCleanTrainingManifest =
+        serde_json::from_str(&fs::read_to_string(manifest_path).expect("mini manifest file"))
+            .expect("valid mini manifest json");
+    manifest.preferred_sample_texts_by_domain.insert(
+        "education".to_string(),
+        vec!["Оқу мазмұны терминнің қызметін қысқа түрде түсіндіреді.".to_string()],
+    );
+    let clean_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_manifest.json"
+    );
+    let clean_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_pack.json"
+    );
+    let clean_manifest: CleanTrainingCorpusManifest = serde_json::from_str(
+        &fs::read_to_string(clean_manifest_path).expect("clean corpus manifest file"),
+    )
+    .expect("valid clean corpus manifest json");
+    let clean_pack: CleanTrainingCorpusPack =
+        serde_json::from_str(&fs::read_to_string(clean_pack_path).expect("clean corpus pack file"))
+            .expect("valid clean corpus pack json");
+
+    let actual =
+        assemble_mini_clean_training_pack(&manifest, &clean_manifest, &clean_pack).expect("pack");
+
+    assert!(actual.samples.iter().any(|sample| {
+        sample.domain == "education"
+            && sample.text == "Оқу мазмұны терминнің қызметін қысқа түрде түсіндіреді."
+    }));
+}
+
+#[test]
+fn mini_clean_training_report_matches_expected_regression_artifact() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_manifest.json"
+    );
+    let manifest: BaselineTrainingManifest =
+        serde_json::from_str(&fs::read_to_string(manifest_path).expect("training manifest file"))
+            .expect("valid training manifest json");
+    let registry_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_registry.json"
+    );
+    let registry: SourceRegistry =
+        serde_json::from_str(&fs::read_to_string(registry_path).expect("source registry file"))
+            .expect("valid source registry json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_scoring_rules.json"
+    );
+    let rules: SourceScoringRules =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("source scoring rules file"))
+            .expect("valid source scoring rules json");
+    let acceptance_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/source_acceptance_report.json"
+    );
+    let acceptance_report: SourceAcceptanceReport = serde_json::from_str(
+        &fs::read_to_string(acceptance_report_path).expect("acceptance report file"),
+    )
+    .expect("valid acceptance report json");
+    let mini_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/mini_clean_training_manifest.json"
+    );
+    let mini_manifest: MiniCleanTrainingManifest =
+        serde_json::from_str(&fs::read_to_string(mini_manifest_path).expect("mini manifest file"))
+            .expect("valid mini manifest json");
+    let clean_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_manifest.json"
+    );
+    let clean_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_pack.json"
+    );
+    let clean_manifest: CleanTrainingCorpusManifest = serde_json::from_str(
+        &fs::read_to_string(clean_manifest_path).expect("clean corpus manifest file"),
+    )
+    .expect("valid clean corpus manifest json");
+    let clean_pack: CleanTrainingCorpusPack =
+        serde_json::from_str(&fs::read_to_string(clean_pack_path).expect("clean corpus pack file"))
+            .expect("valid clean corpus pack json");
+    let pack = assemble_mini_clean_training_pack(&mini_manifest, &clean_manifest, &clean_pack)
+        .expect("mini pack");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/mini_clean_training_report.json"
+    );
+    let expected: TinyCleanTrainingReport =
+        serde_json::from_str(&fs::read_to_string(expected_path).expect("mini training report"))
+            .expect("valid mini training report json");
+
+    let actual =
+        build_mini_clean_training_report(&manifest, &registry, &rules, &acceptance_report, &pack)
+            .expect("mini clean training report");
+
+    assert!(actual.validation_domain_count > 1);
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn mini_clean_training_miss_audit_report_matches_expected_regression_artifact() {
+    let manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/baseline_training_manifest.json"
+    );
+    let manifest: BaselineTrainingManifest =
+        serde_json::from_str(&fs::read_to_string(manifest_path).expect("training manifest file"))
+            .expect("valid training manifest json");
+    let registry_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_registry.json"
+    );
+    let registry: SourceRegistry =
+        serde_json::from_str(&fs::read_to_string(registry_path).expect("source registry file"))
+            .expect("valid source registry json");
+    let rules_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/raw/source_scoring_rules.json"
+    );
+    let rules: SourceScoringRules =
+        serde_json::from_str(&fs::read_to_string(rules_path).expect("source scoring rules file"))
+            .expect("valid source scoring rules json");
+    let acceptance_report_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/source_acceptance_report.json"
+    );
+    let acceptance_report: SourceAcceptanceReport = serde_json::from_str(
+        &fs::read_to_string(acceptance_report_path).expect("acceptance report file"),
+    )
+    .expect("valid acceptance report json");
+    let mini_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/mini_clean_training_manifest.json"
+    );
+    let mini_manifest: MiniCleanTrainingManifest =
+        serde_json::from_str(&fs::read_to_string(mini_manifest_path).expect("mini manifest file"))
+            .expect("valid mini manifest json");
+    let clean_manifest_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_manifest.json"
+    );
+    let clean_pack_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/curated/clean_training_corpus_pack.json"
+    );
+    let clean_manifest: CleanTrainingCorpusManifest = serde_json::from_str(
+        &fs::read_to_string(clean_manifest_path).expect("clean corpus manifest file"),
+    )
+    .expect("valid clean corpus manifest json");
+    let clean_pack: CleanTrainingCorpusPack =
+        serde_json::from_str(&fs::read_to_string(clean_pack_path).expect("clean corpus pack file"))
+            .expect("valid clean corpus pack json");
+    let pack = assemble_mini_clean_training_pack(&mini_manifest, &clean_manifest, &clean_pack)
+        .expect("mini pack");
+    let expected_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../data/training/mini_clean_training_miss_audit_report.json"
+    );
+    let expected: TinyCleanTrainingMissAuditReport = serde_json::from_str(
+        &fs::read_to_string(expected_path).expect("mini training miss audit report"),
+    )
+    .expect("valid mini training miss audit report json");
+
+    let actual = build_mini_clean_training_miss_audit_report(
+        &manifest,
+        &registry,
+        &rules,
+        &acceptance_report,
+        &pack,
+    )
+    .expect("mini clean training miss audit report");
+
+    assert_eq!(
+        actual.validation_exact_match_count + actual.validation_miss_count,
+        actual.validation_next_token_count
+    );
+    assert_eq!(actual, expected);
+}
+
+#[test]
 fn tiny_clean_training_pack_matches_domain_manifest_assembly() {
     let selection_manifest_path = concat!(
         env!("CARGO_MANIFEST_DIR"),
@@ -1413,13 +1653,13 @@ fn tiny_clean_training_profile_experiment_matrix_policy_report_matches_expected_
             .any(|entry| entry == "exceeds_validation_gap_budget")
     );
 
-    let selected_reference_heavy = actual
+    let selected_balanced = actual
         .candidate_decisions
         .iter()
-        .find(|entry| entry.profile == "reference_heavy")
-        .expect("reference_heavy candidate decision");
-    assert!(selected_reference_heavy.is_eligible);
-    assert!(selected_reference_heavy.rejection_reasons.is_empty());
+        .find(|entry| entry.profile == "balanced")
+        .expect("balanced candidate decision");
+    assert!(selected_balanced.is_eligible);
+    assert!(selected_balanced.rejection_reasons.is_empty());
 
     assert_eq!(actual, expected);
 }

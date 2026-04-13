@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "crates/adam-core",
+  "crates/adam-kernel",
   "crates/adam-tokenizer",
   "crates/adam-corpus",
   "crates/adam-eval",
@@ -9,7 +9,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.0.63"
+version = "0.0.64"
 edition = "2024"
 license = "MIT"
 

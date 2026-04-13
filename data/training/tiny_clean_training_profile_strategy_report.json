@@ -1,27 +1,27 @@
 {
   "strategy_name": "adam-tiny-clean-profile-strategy",
   "suite_name": "adam-tiny-clean-profile-suite",
-  "baseline_profile": "reference_heavy",
+  "baseline_profile": "balanced",
   "baseline_validation_exact_match_rate_bps": 10000,
   "promotable_profile_count": 1,
   "promotable_profiles": [
-    "reference_heavy"
+    "balanced"
   ],
   "candidate_reports": [
     {
       "profile": "balanced",
       "pack_name": "adam-tiny-clean-balanced-pack",
-      "validation_exact_match_rate_bps": 3333,
-      "validation_gap_bps": 6667,
-      "meets_minimum_validation_threshold": false,
-      "within_gap_budget": false,
-      "promotable": false
+      "validation_exact_match_rate_bps": 10000,
+      "validation_gap_bps": 0,
+      "meets_minimum_validation_threshold": true,
+      "within_gap_budget": true,
+      "promotable": true
     },
     {
       "profile": "education_heavy",
       "pack_name": "adam-tiny-clean-education-heavy-pack",
-      "validation_exact_match_rate_bps": 4615,
-      "validation_gap_bps": 5385,
+      "validation_exact_match_rate_bps": 5625,
+      "validation_gap_bps": 4375,
       "meets_minimum_validation_threshold": true,
       "within_gap_budget": false,
       "promotable": false
@@ -29,17 +29,17 @@
     {
       "profile": "education_max",
       "pack_name": "adam-tiny-clean-education-max-pack",
-      "validation_exact_match_rate_bps": 4000,
-      "validation_gap_bps": 6000,
-      "meets_minimum_validation_threshold": true,
+      "validation_exact_match_rate_bps": 3846,
+      "validation_gap_bps": 6154,
+      "meets_minimum_validation_threshold": false,
       "within_gap_budget": false,
       "promotable": false
     },
     {
       "profile": "general_heavy",
       "pack_name": "adam-tiny-clean-general-heavy-pack",
-      "validation_exact_match_rate_bps": 5714,
-      "validation_gap_bps": 4286,
+      "validation_exact_match_rate_bps": 5000,
+      "validation_gap_bps": 5000,
       "meets_minimum_validation_threshold": true,
       "within_gap_budget": false,
       "promotable": false
@@ -47,11 +47,11 @@
     {
       "profile": "reference_heavy",
       "pack_name": "adam-tiny-clean-reference-heavy-pack",
-      "validation_exact_match_rate_bps": 10000,
-      "validation_gap_bps": 0,
-      "meets_minimum_validation_threshold": true,
-      "within_gap_budget": true,
-      "promotable": true
+      "validation_exact_match_rate_bps": 2666,
+      "validation_gap_bps": 7334,
+      "meets_minimum_validation_threshold": false,
+      "within_gap_budget": false,
+      "promotable": false
     }
   ]
 }

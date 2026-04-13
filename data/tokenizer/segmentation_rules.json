@@ -1,5 +1,5 @@
 {
-  "version": "0.0.63",
+  "version": "0.0.64",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -809,6 +809,66 @@
       "allowed_previous_labels": []
     },
     {
+      "id": "pron_case_genitive_dyn",
+      "form": "дың",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "genitive",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "pron_case_accusative_dy",
+      "form": "ды",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "accusative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "pron_case_dative_ga",
+      "form": "ға",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "dative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "pron_case_locative_da",
+      "form": "да",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "locative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "pron_case_ablative_dan_voiced",
+      "form": "дан",
+      "part_of_speech": "pronoun",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ablative",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiced_consonant"],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
       "id": "verb_voice_l",
       "form": "л",
       "part_of_speech": "verb",
@@ -841,6 +901,30 @@
       "label": "past",
       "allowed_harmonies": ["back"],
       "allowed_final_sound_classes": ["vowel", "voiced_consonant"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_ty_from_stem",
+      "form": "ты",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "past",
+      "allowed_harmonies": ["back"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
+      "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "verb_tense_ti_from_stem",
+      "form": "ті",
+      "part_of_speech": "verb",
+      "from_state": "stem",
+      "to_state": "tense",
+      "label": "past",
+      "allowed_harmonies": ["front"],
+      "allowed_final_sound_classes": ["voiceless_consonant"],
       "terminal": false,
       "allowed_previous_labels": []
     },

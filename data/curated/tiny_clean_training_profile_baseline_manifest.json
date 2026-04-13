@@ -3,6 +3,6 @@
   "name": "adam-tiny-clean-profile-baseline",
   "target_language": "kazakh",
   "script": "cyrillic",
-  "expected_best_profile": "reference_heavy",
-  "minimum_validation_exact_match_rate_bps": 5000
+  "expected_best_profile": "balanced",
+  "minimum_validation_exact_match_rate_bps": 6500
 }

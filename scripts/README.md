@@ -75,6 +75,12 @@ Current starter utility:
   builds a machine-readable audit of validation misses for the active tiny training profile
 - `run_tiny_training_miss_audit_delta.sh`
   builds the deterministic drift report for the tiny training miss audit layer
+- `run_mini_clean_training_assembly.sh`
+  assembles the deterministic mini clean training pack from the clean corpus manifest
+- `run_mini_clean_training.sh`
+  trains the larger deterministic mini clean prototype on the accepted clean corpus subset
+- `run_mini_training_miss_audit.sh`
+  builds a machine-readable audit of validation misses for the mini clean training prototype
 - `run_foundation_overview.sh`
   builds the unified cross-layer foundation overview from corpus, tokenizer, eval, and training artifacts
 - `run_foundation_overview_delta.sh`

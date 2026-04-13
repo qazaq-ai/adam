@@ -47,6 +47,12 @@ The first tiny clean training prototype is built through:
 - `scripts/run_tiny_training_miss_audit.sh`
 - `scripts/run_tiny_training_miss_audit_delta.sh`
 
+The next deterministic mini clean prototype is built through:
+
+- `scripts/run_mini_clean_training_assembly.sh`
+- `scripts/run_mini_clean_training.sh`
+- `scripts/run_mini_training_miss_audit.sh`
+
 The next clean corpus tier is assembled through:
 
 - `scripts/run_clean_training_corpus_assembly.sh`
@@ -89,7 +95,11 @@ The larger clean corpus tier is sourced through:
 - `data/curated/clean_reference_extension_pack.json`
 - `data/curated/clean_education_extension_pack.json`
 - `data/curated/clean_training_corpus_pack.json`
+- `data/curated/mini_clean_training_manifest.json`
+- `data/curated/mini_clean_training_pack.json`
 - `data/training/clean_training_corpus_report.json`
+- `data/training/mini_clean_training_report.json`
+- `data/training/mini_clean_training_miss_audit_report.json`
 - `data/training/tiny_clean_training_profile_suite_report.json`
 - `data/training/tiny_clean_training_profile_comparison_report.json`
 - `data/training/tiny_clean_training_profile_baseline_report.json`
@@ -112,6 +122,12 @@ The current runners do not train a model yet.
 The tiny clean prototype is the first exception: it trains a minimal
 deterministic next-token baseline on a curated clean pack assembled from
 domain-aware clean artifacts that contain only accepted training sources.
+
+The new mini clean prototype takes the next step: it trains on a larger
+reference-heavy clean subset from the same corpus, using the same deterministic
+ordering and stratified validation discipline. This gives a more honest
+downstream signal than the tiny tier and exposes unresolved ambiguity and
+unseen-context misses as explicit clean-corpus targets.
 
 The planning report captures:
 

@@ -30,6 +30,8 @@ jq empty data/curated/tiny_clean_general_pack.json
 jq empty data/curated/tiny_clean_reference_pack.json
 jq empty data/curated/tiny_clean_education_pack.json
 jq empty data/curated/tiny_clean_training_pack.json
+jq empty data/curated/mini_clean_training_manifest.json
+jq empty data/curated/mini_clean_training_pack.json
 jq empty data/raw/source_registry.json
 jq empty data/raw/source_scoring_rules.json
 jq empty data/eval/benchmark_manifest.json
@@ -62,6 +64,8 @@ jq empty data/training/tiny_clean_training_profile_experiment_matrix_policy_delt
 jq empty data/training/tiny_clean_training_report.json
 jq empty data/training/tiny_clean_training_miss_audit_report.json
 jq empty data/training/tiny_clean_training_miss_audit_delta_report.json
+jq empty data/training/mini_clean_training_report.json
+jq empty data/training/mini_clean_training_miss_audit_report.json
 jq empty data/foundation/foundation_overview_report.json
 jq empty data/foundation/foundation_overview_delta_report.json
 cargo fmt --all --check
@@ -86,6 +90,7 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_clean_training_corpus_assembly.sh
 ./scripts/run_clean_training_corpus_report.sh
 ./scripts/run_tiny_clean_training_assembly.sh
+./scripts/run_mini_clean_training_assembly.sh
 ./scripts/run_tiny_training_profile_suite.sh
 ./scripts/run_tiny_training_profile_comparison.sh
 ./scripts/run_tiny_training_profile_baseline.sh
@@ -101,6 +106,8 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_tiny_clean_training.sh
 ./scripts/run_tiny_training_miss_audit.sh
 ./scripts/run_tiny_training_miss_audit_delta.sh
+./scripts/run_mini_clean_training.sh
+./scripts/run_mini_training_miss_audit.sh
 ./scripts/run_foundation_overview.sh
 ./scripts/run_foundation_overview_delta.sh
 

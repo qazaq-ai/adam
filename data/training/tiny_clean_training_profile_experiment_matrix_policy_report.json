@@ -2,17 +2,17 @@
   "policy_name": "adam-tiny-clean-profile-experiment-matrix-policy",
   "matrix_name": "adam-tiny-clean-profile-experiment-matrix",
   "suite_name": "adam-tiny-clean-profile-suite",
-  "expected_selected_profile": "reference_heavy",
-  "selected_profile": "reference_heavy",
-  "selected_pack_name": "adam-tiny-clean-reference-heavy-pack",
+  "expected_selected_profile": "balanced",
+  "selected_profile": "balanced",
+  "selected_pack_name": "adam-tiny-clean-balanced-pack",
   "selected_validation_exact_match_rate_bps": 10000,
   "selected_validation_gap_bps": 0,
-  "best_profile": "reference_heavy",
+  "best_profile": "balanced",
   "best_validation_exact_match_rate_bps": 10000,
   "candidate_count": 5,
   "eligible_profile_count": 1,
   "eligible_profiles": [
-    "reference_heavy"
+    "balanced"
   ],
   "matches_expected_selected_profile": true,
   "selected_profile_is_best": true,
@@ -49,15 +49,11 @@
     {
       "profile": "balanced",
       "pack_name": "adam-tiny-clean-balanced-pack",
-      "is_promotable_profile": false,
-      "meets_minimum_validation_threshold": false,
-      "within_gap_budget": false,
-      "is_eligible": false,
-      "rejection_reasons": [
-        "not_promotable_profile",
-        "below_minimum_validation_threshold",
-        "exceeds_validation_gap_budget"
-      ]
+      "is_promotable_profile": true,
+      "meets_minimum_validation_threshold": true,
+      "within_gap_budget": true,
+      "is_eligible": true,
+      "rejection_reasons": []
     },
     {
       "profile": "education_heavy",
@@ -101,11 +97,15 @@
     {
       "profile": "reference_heavy",
       "pack_name": "adam-tiny-clean-reference-heavy-pack",
-      "is_promotable_profile": true,
-      "meets_minimum_validation_threshold": true,
-      "within_gap_budget": true,
-      "is_eligible": true,
-      "rejection_reasons": []
+      "is_promotable_profile": false,
+      "meets_minimum_validation_threshold": false,
+      "within_gap_budget": false,
+      "is_eligible": false,
+      "rejection_reasons": [
+        "not_promotable_profile",
+        "below_minimum_validation_threshold",
+        "exceeds_validation_gap_budget"
+      ]
     }
   ]
 }

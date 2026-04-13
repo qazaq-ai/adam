@@ -1,78 +1,78 @@
 {
   "run_name": "adam-baseline-plan-tiny-clean-prototype",
-  "pack_name": "adam-tiny-clean-reference-heavy-pack",
+  "pack_name": "adam-tiny-clean-balanced-pack",
   "sample_ordering_strategy": "round_robin_by_domain_with_stratified_validation",
   "accepted_source_count": 3,
-  "sample_count": 24,
-  "train_sample_count": 22,
+  "sample_count": 27,
+  "train_sample_count": 25,
   "validation_sample_count": 2,
   "validation_domain_count": 2,
-  "train_token_count": 140,
-  "validation_token_count": 12,
-  "vocabulary_size": 71,
-  "unique_context_count": 74,
-  "unique_transition_count": 115,
-  "deterministic_context_count": 53,
-  "ambiguous_context_count": 21,
-  "validation_next_token_count": 14,
-  "validation_exact_match_count": 14,
+  "train_token_count": 162,
+  "validation_token_count": 13,
+  "vocabulary_size": 81,
+  "unique_context_count": 84,
+  "unique_transition_count": 130,
+  "deterministic_context_count": 57,
+  "ambiguous_context_count": 27,
+  "validation_next_token_count": 15,
+  "validation_exact_match_count": 15,
   "validation_exact_match_rate_bps": 10000,
   "category_breakdown": [
     {
       "category": "domain_education",
-      "sample_count": 6,
-      "token_count": 38
+      "sample_count": 9,
+      "token_count": 60
     },
     {
       "category": "domain_general",
-      "sample_count": 6,
-      "token_count": 36
+      "sample_count": 9,
+      "token_count": 56
     },
     {
       "category": "domain_reference",
-      "sample_count": 12,
-      "token_count": 78
+      "sample_count": 9,
+      "token_count": 59
     },
     {
       "category": "source_curated_general_kazakh",
-      "sample_count": 6,
-      "token_count": 36
+      "sample_count": 9,
+      "token_count": 56
     },
     {
       "category": "source_curated_reference_kazakh",
-      "sample_count": 12,
-      "token_count": 78
+      "sample_count": 9,
+      "token_count": 59
     },
     {
       "category": "source_reviewed_education_kazakh",
-      "sample_count": 6,
-      "token_count": 38
+      "sample_count": 9,
+      "token_count": 60
     }
   ],
   "critical_breakdown": [
     {
       "guard": "accepted_source_only",
-      "sample_count": 24
+      "sample_count": 27
     },
     {
       "guard": "clean_source_only",
-      "sample_count": 24
+      "sample_count": 27
     },
     {
       "guard": "deterministic_transition_coverage",
-      "sample_count": 24
+      "sample_count": 27
     },
     {
       "guard": "round_robin_domain_ordering",
-      "sample_count": 24
+      "sample_count": 27
     },
     {
       "guard": "validation_coverage",
-      "sample_count": 24
+      "sample_count": 27
     },
     {
       "guard": "validation_multi_domain_coverage",
-      "sample_count": 24
+      "sample_count": 27
     }
   ]
 }
