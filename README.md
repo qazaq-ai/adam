@@ -95,6 +95,16 @@ Versioning is deterministic and script-enforced.
 - cut and publish a release: `bash ./scripts/cut_release.sh x.y.z`
 - pushing tag `vX.Y.Z` triggers CI: format check → version verification → full foundation validation
 
+## License
+
+This project is licensed under the [Business Source License 1.1](LICENSE).
+
+- **Non-commercial and research use** is permitted without restriction.
+- **Commercial use** that does not compete directly with qazaq-ai products is permitted.
+- **On 2029-01-01** the license converts automatically to the Apache License 2.0.
+
+For commercial licensing inquiries: hello@qazaq.ai
+
 ## Foundation Policies
 
 - [corpus policy](docs/corpus_policy.md)
