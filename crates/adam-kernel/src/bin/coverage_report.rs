@@ -6,7 +6,7 @@ use std::{
 };
 
 use adam_kernel::{
-    SegmentationLexicon, SegmentationRuleSet, deterministic_segment_token, normalize_text,
+    SegmentationLexicon, SegmentationRuleSet, deterministic_segment_token, normalize_token,
 };
 use serde::Serialize;
 
@@ -83,7 +83,7 @@ fn main() -> ExitCode {
 
     let words: Vec<String> = raw_text
         .split_whitespace()
-        .map(normalize_text)
+        .map(normalize_token)
         .filter(|w| !w.is_empty())
         .collect();
 

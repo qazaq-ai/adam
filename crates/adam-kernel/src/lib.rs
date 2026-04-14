@@ -520,6 +520,19 @@ pub fn normalize_text(text: &str) -> String {
     text.trim().to_lowercase()
 }
 
+pub fn normalize_token(token: &str) -> String {
+    let lowercased = token.trim().to_lowercase();
+    lowercased
+        .trim_matches(|c: char| {
+            c.is_ascii_punctuation()
+                || matches!(
+                    c,
+                    '«' | '»' | '…' | '—' | '–' | '\u{201C}' | '\u{201D}' | '\u{2018}' | '\u{2019}'
+                )
+        })
+        .to_string()
+}
+
 #[cfg(test)]
 mod tests {
     use super::{FoundationPrinciples, ModelIdentity};
