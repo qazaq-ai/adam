@@ -1,11 +1,12 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "adam-training-corpus",
   "target_language": "kazakh",
   "script": "cyrillic",
   "pack_manifests": [
     "synthetic_sentences_pack.json",
     "clean_training_corpus_pack.json",
-    "kazakh_proverbs_pack.json"
+    "kazakh_proverbs_pack.json",
+    "tatoeba_kazakh_pack.json"
   ]
 }

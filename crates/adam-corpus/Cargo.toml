@@ -25,3 +25,7 @@ path = "src/bin/report.rs"
 [[bin]]
 name = "generate_acceptance_report"
 path = "src/bin/generate_acceptance_report.rs"
+
+[[bin]]
+name = "process_tatoeba_kazakh"
+path = "src/bin/process_tatoeba_kazakh.rs"
