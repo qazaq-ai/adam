@@ -9,3 +9,7 @@ adam-kernel = { path = "../adam-kernel" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+
+[[bin]]
+name = "tokenizer_delta"
+path = "src/bin/delta.rs"

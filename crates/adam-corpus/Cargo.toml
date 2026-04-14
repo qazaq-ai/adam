@@ -13,3 +13,15 @@ thiserror.workspace = true
 [[bin]]
 name = "synth_sentences"
 path = "src/bin/synth_sentences.rs"
+
+[[bin]]
+name = "corpus_delta"
+path = "src/bin/delta.rs"
+
+[[bin]]
+name = "corpus_report"
+path = "src/bin/report.rs"
+
+[[bin]]
+name = "generate_acceptance_report"
+path = "src/bin/generate_acceptance_report.rs"

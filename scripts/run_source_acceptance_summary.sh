@@ -4,7 +4,7 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$repo_root"
 
-cargo run -p adam-corpus --bin report -- \
+cargo run -p adam-corpus --bin corpus_report -- \
   data/curated/source_acceptance_report.json \
   data/raw/source_registry.json \
   data/raw/source_scoring_rules.json

@@ -190,9 +190,11 @@ fn causal_mask(seq_len: usize, device: &Device) -> Result<Tensor> {
 }
 
 pub fn default_device() -> Result<Device> {
-    if candle_core::utils::metal_is_available() {
-        Device::new_metal(0)
-    } else {
-        Ok(Device::Cpu)
+    #[cfg(target_os = "macos")]
+    {
+        if candle_core::utils::metal_is_available() {
+            return Device::new_metal(0);
+        }
     }
+    Ok(Device::Cpu)
 }
