@@ -10,8 +10,8 @@
     "reference"
   ],
   "segmentation_dataset_name": "adam-tokenizer-segmentation",
-  "segmentation_example_count": 311,
-  "exact_match_count": 311,
+  "segmentation_example_count": 326,
+  "exact_match_count": 326,
   "exact_match_rate_bps": 10000,
   "category_breakdown": [
     {
@@ -24,6 +24,12 @@
       "category": "noun_inflection",
       "example_count": 82,
       "exact_match_count": 82,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "postposition_use",
+      "example_count": 15,
+      "exact_match_count": 15,
       "exact_match_rate_bps": 10000
     },
     {

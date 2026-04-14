@@ -1,5 +1,5 @@
 {
-  "version": "0.0.66",
+  "version": "0.0.67",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -2647,6 +2647,111 @@
       "expected_segments": [
         "үлкен",
         "нен"
+      ]
+    },
+    {
+      "id": "seg_312",
+      "token": "арқылы",
+      "expected_segments": [
+        "арқылы"
+      ]
+    },
+    {
+      "id": "seg_313",
+      "token": "үшін",
+      "expected_segments": [
+        "үшін"
+      ]
+    },
+    {
+      "id": "seg_314",
+      "token": "туралы",
+      "expected_segments": [
+        "туралы"
+      ]
+    },
+    {
+      "id": "seg_315",
+      "token": "кейін",
+      "expected_segments": [
+        "кейін"
+      ]
+    },
+    {
+      "id": "seg_316",
+      "token": "бойынша",
+      "expected_segments": [
+        "бойынша"
+      ]
+    },
+    {
+      "id": "seg_317",
+      "token": "бұрын",
+      "expected_segments": [
+        "бұрын"
+      ]
+    },
+    {
+      "id": "seg_318",
+      "token": "дейін",
+      "expected_segments": [
+        "дейін"
+      ]
+    },
+    {
+      "id": "seg_319",
+      "token": "бірге",
+      "expected_segments": [
+        "бірге"
+      ]
+    },
+    {
+      "id": "seg_320",
+      "token": "басқа",
+      "expected_segments": [
+        "басқа"
+      ]
+    },
+    {
+      "id": "seg_321",
+      "token": "жайлы",
+      "expected_segments": [
+        "жайлы"
+      ]
+    },
+    {
+      "id": "seg_322",
+      "token": "соң",
+      "expected_segments": [
+        "соң"
+      ]
+    },
+    {
+      "id": "seg_323",
+      "token": "бастап",
+      "expected_segments": [
+        "бастап"
+      ]
+    },
+    {
+      "id": "seg_324",
+      "token": "сайын",
+      "expected_segments": [
+        "сайын"
+      ]
+    },
+    {
+      "id": "seg_325",
+      "token": "жөнінде",
+      "expected_segments": [
+        "жөнінде"
+      ]
+    },
+    {
+      "id": "seg_326",
+      "token": "қарсы",
+      "expected_segments": [
+        "қарсы"
       ]
     }
   ]

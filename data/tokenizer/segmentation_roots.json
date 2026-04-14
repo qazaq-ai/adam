@@ -1,5 +1,5 @@
 {
-  "version": "0.0.66",
+  "version": "0.0.67",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -556,6 +556,111 @@
       "part_of_speech": "adjective",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
+    },
+    {
+      "id": "postp_arqyly",
+      "root": "арқылы",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "postp_ushin",
+      "root": "үшін",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "postp_turaly",
+      "root": "туралы",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "postp_keyin",
+      "root": "кейін",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "postp_boyynsha",
+      "root": "бойынша",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "postp_buryn",
+      "root": "бұрын",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "postp_deyin",
+      "root": "дейін",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "postp_birge",
+      "root": "бірге",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "postp_basqa",
+      "root": "басқа",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "postp_zhayly",
+      "root": "жайлы",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "postp_son",
+      "root": "соң",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "postp_bastap",
+      "root": "бастап",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "postp_sayyn",
+      "root": "сайын",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "postp_zhoninde",
+      "root": "жөнінде",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "postp_qarsy",
+      "root": "қарсы",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
     }
   ]
 }

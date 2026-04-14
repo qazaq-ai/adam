@@ -81,6 +81,7 @@ pub enum SegmentationPartOfSpeech {
     Pronoun,
     Verb,
     Adjective,
+    Postposition,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
