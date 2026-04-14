@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "adam-corpus"
-version = "0.0.67"
+version = "0.0.68"
 dependencies = [
  "serde",
  "serde_json",
@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "adam-eval"
-version = "0.0.67"
+version = "0.0.68"
 dependencies = [
  "adam-corpus",
  "adam-tokenizer",
@@ -24,7 +24,7 @@ dependencies = [
 
 [[package]]
 name = "adam-kernel"
-version = "0.0.67"
+version = "0.0.68"
 dependencies = [
  "serde",
  "serde_json",
@@ -33,7 +33,7 @@ dependencies = [
 
 [[package]]
 name = "adam-tokenizer"
-version = "0.0.67"
+version = "0.0.68"
 dependencies = [
  "adam-kernel",
  "serde",
@@ -43,7 +43,7 @@ dependencies = [
 
 [[package]]
 name = "adam-train"
-version = "0.0.67"
+version = "0.0.68"
 dependencies = [
  "adam-corpus",
  "adam-eval",

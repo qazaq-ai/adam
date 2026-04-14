@@ -10,20 +10,20 @@
     "reference"
   ],
   "segmentation_dataset_name": "adam-tokenizer-segmentation",
-  "segmentation_example_count": 326,
-  "exact_match_count": 326,
+  "segmentation_example_count": 382,
+  "exact_match_count": 382,
   "exact_match_rate_bps": 10000,
   "category_breakdown": [
     {
       "category": "adjective_inflection",
-      "example_count": 31,
-      "exact_match_count": 31,
+      "example_count": 36,
+      "exact_match_count": 36,
       "exact_match_rate_bps": 10000
     },
     {
       "category": "noun_inflection",
-      "example_count": 82,
-      "exact_match_count": 82,
+      "example_count": 104,
+      "exact_match_count": 104,
       "exact_match_rate_bps": 10000
     },
     {
@@ -76,8 +76,8 @@
     },
     {
       "category": "verb_future",
-      "example_count": 12,
-      "exact_match_count": 12,
+      "example_count": 34,
+      "exact_match_count": 34,
       "exact_match_rate_bps": 10000
     },
     {
@@ -148,8 +148,8 @@
     },
     {
       "category": "verb_negative_future",
-      "example_count": 5,
-      "exact_match_count": 5,
+      "example_count": 7,
+      "exact_match_count": 7,
       "exact_match_rate_bps": 10000
     },
     {
@@ -250,8 +250,8 @@
     },
     {
       "category": "verb_past",
-      "example_count": 38,
-      "exact_match_count": 38,
+      "example_count": 40,
+      "exact_match_count": 40,
       "exact_match_rate_bps": 10000
     },
     {
@@ -309,6 +309,12 @@
       "exact_match_rate_bps": 10000
     },
     {
+      "category": "verb_unclassified",
+      "example_count": 3,
+      "exact_match_count": 3,
+      "exact_match_rate_bps": 10000
+    },
+    {
       "category": "verb_volitional_imperative",
       "example_count": 6,
       "exact_match_count": 6,
@@ -342,8 +348,8 @@
     },
     {
       "guard": "negation_chain",
-      "example_count": 70,
-      "exact_match_count": 70,
+      "example_count": 72,
+      "exact_match_count": 72,
       "exact_match_rate_bps": 10000
     },
     {

@@ -1,5 +1,5 @@
 {
-  "version": "0.0.67",
+  "version": "0.0.68",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -2752,6 +2752,457 @@
       "token": "қарсы",
       "expected_segments": [
         "қарсы"
+      ]
+    },
+    {
+      "id": "seg_327",
+      "token": "береді",
+      "expected_segments": [
+        "бер",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_328",
+      "token": "келеді",
+      "expected_segments": [
+        "кел",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_329",
+      "token": "барады",
+      "expected_segments": [
+        "бар",
+        "а",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_330",
+      "token": "кетеді",
+      "expected_segments": [
+        "кет",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_331",
+      "token": "қонады",
+      "expected_segments": [
+        "қон",
+        "а",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_332",
+      "token": "көреді",
+      "expected_segments": [
+        "көр",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_333",
+      "token": "алады",
+      "expected_segments": [
+        "ал",
+        "а",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_334",
+      "token": "біледі",
+      "expected_segments": [
+        "біл",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_335",
+      "token": "жазады",
+      "expected_segments": [
+        "жаз",
+        "а",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_336",
+      "token": "тұрады",
+      "expected_segments": [
+        "тұр",
+        "а",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_337",
+      "token": "келмейді",
+      "expected_segments": [
+        "кел",
+        "мей",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_339",
+      "token": "бермейді",
+      "expected_segments": [
+        "бер",
+        "мей",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_340",
+      "token": "мәтін",
+      "expected_segments": [
+        "мәтін"
+      ]
+    },
+    {
+      "id": "seg_341",
+      "token": "оқу",
+      "expected_segments": [
+        "оқу"
+      ]
+    },
+    {
+      "id": "seg_342",
+      "token": "ұғым",
+      "expected_segments": [
+        "ұғым"
+      ]
+    },
+    {
+      "id": "seg_343",
+      "token": "түр",
+      "expected_segments": [
+        "түр"
+      ]
+    },
+    {
+      "id": "seg_344",
+      "token": "термин",
+      "expected_segments": [
+        "термин"
+      ]
+    },
+    {
+      "id": "seg_345",
+      "token": "модель",
+      "expected_segments": [
+        "модель"
+      ]
+    },
+    {
+      "id": "seg_346",
+      "token": "дерек",
+      "expected_segments": [
+        "дерек"
+      ]
+    },
+    {
+      "id": "seg_347",
+      "token": "сабақ",
+      "expected_segments": [
+        "сабақ"
+      ]
+    },
+    {
+      "id": "seg_348",
+      "token": "сөздік",
+      "expected_segments": [
+        "сөздік"
+      ]
+    },
+    {
+      "id": "seg_349",
+      "token": "мысал",
+      "expected_segments": [
+        "мысал"
+      ]
+    },
+    {
+      "id": "seg_350",
+      "token": "қазақ",
+      "expected_segments": [
+        "қазақ"
+      ]
+    },
+    {
+      "id": "seg_351",
+      "token": "ереже",
+      "expected_segments": [
+        "ереже"
+      ]
+    },
+    {
+      "id": "seg_352",
+      "token": "ұғымды",
+      "expected_segments": [
+        "ұғым",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_353",
+      "token": "ұғымның",
+      "expected_segments": [
+        "ұғым",
+        "ның"
+      ]
+    },
+    {
+      "id": "seg_354",
+      "token": "түрде",
+      "expected_segments": [
+        "түр",
+        "де"
+      ]
+    },
+    {
+      "id": "seg_355",
+      "token": "терминнің",
+      "expected_segments": [
+        "термин",
+        "нің"
+      ]
+    },
+    {
+      "id": "seg_356",
+      "token": "модельдің",
+      "expected_segments": [
+        "модель",
+        "дің"
+      ]
+    },
+    {
+      "id": "seg_357",
+      "token": "мәтіні",
+      "expected_segments": [
+        "мәтін",
+        "і"
+      ]
+    },
+    {
+      "id": "seg_358",
+      "token": "сабақтың",
+      "expected_segments": [
+        "сабақ",
+        "тың"
+      ]
+    },
+    {
+      "id": "seg_359",
+      "token": "ережені",
+      "expected_segments": [
+        "ереже",
+        "ні"
+      ]
+    },
+    {
+      "id": "seg_360",
+      "token": "көмектес",
+      "expected_segments": [
+        "көмектес"
+      ]
+    },
+    {
+      "id": "seg_361",
+      "token": "түсіндір",
+      "expected_segments": [
+        "түсіндір"
+      ]
+    },
+    {
+      "id": "seg_362",
+      "token": "бекіт",
+      "expected_segments": [
+        "бекіт"
+      ]
+    },
+    {
+      "id": "seg_363",
+      "token": "көмектеседі",
+      "expected_segments": [
+        "көмектес",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_364",
+      "token": "түсіндіреді",
+      "expected_segments": [
+        "түсіндір",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_365",
+      "token": "бекітеді",
+      "expected_segments": [
+        "бекіт",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_366",
+      "token": "жеткізеді",
+      "expected_segments": [
+        "жеткіз",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_367",
+      "token": "көрсетеді",
+      "expected_segments": [
+        "көрсет",
+        "е",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_368",
+      "token": "қолданады",
+      "expected_segments": [
+        "қолдан",
+        "а",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_369",
+      "token": "көмектесті",
+      "expected_segments": [
+        "көмектес",
+        "ті"
+      ]
+    },
+    {
+      "id": "seg_370",
+      "token": "бекітті",
+      "expected_segments": [
+        "бекіт",
+        "ті"
+      ]
+    },
+    {
+      "id": "seg_371",
+      "token": "жасайды",
+      "expected_segments": [
+        "жаса",
+        "й",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_372",
+      "token": "сөйлейді",
+      "expected_segments": [
+        "сөйле",
+        "й",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_373",
+      "token": "тыңдайды",
+      "expected_segments": [
+        "тыңда",
+        "й",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_374",
+      "token": "сақтайды",
+      "expected_segments": [
+        "сақта",
+        "й",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_375",
+      "token": "сипаттайды",
+      "expected_segments": [
+        "сипатта",
+        "й",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_376",
+      "token": "нақтылайды",
+      "expected_segments": [
+        "нақтыла",
+        "й",
+        "ды"
+      ]
+    },
+    {
+      "id": "seg_377",
+      "token": "нақты",
+      "expected_segments": [
+        "нақты"
+      ]
+    },
+    {
+      "id": "seg_378",
+      "token": "дәл",
+      "expected_segments": [
+        "дәл"
+      ]
+    },
+    {
+      "id": "seg_379",
+      "token": "айқын",
+      "expected_segments": [
+        "айқын"
+      ]
+    },
+    {
+      "id": "seg_380",
+      "token": "анық",
+      "expected_segments": [
+        "анық"
+      ]
+    },
+    {
+      "id": "seg_381",
+      "token": "ресми",
+      "expected_segments": [
+        "ресми"
+      ]
+    },
+    {
+      "id": "seg_382",
+      "token": "тапсырма",
+      "expected_segments": [
+        "тапсырма"
+      ]
+    },
+    {
+      "id": "seg_383",
+      "token": "тапсырмасы",
+      "expected_segments": [
+        "тапсырма",
+        "сы"
       ]
     }
   ]
