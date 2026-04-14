@@ -1,5 +1,5 @@
 {
-  "version": "0.0.70",
+  "version": "0.0.71",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -3530,6 +3530,139 @@
       "expected_segments": [
         "мың",
         "ыншы"
+      ]
+    },
+    {
+      "id": "seg_429",
+      "token": "қазір",
+      "expected_segments": [
+        "қазір"
+      ]
+    },
+    {
+      "id": "seg_430",
+      "token": "бүгін",
+      "expected_segments": [
+        "бүгін"
+      ]
+    },
+    {
+      "id": "seg_431",
+      "token": "ертең",
+      "expected_segments": [
+        "ертең"
+      ]
+    },
+    {
+      "id": "seg_432",
+      "token": "кеше",
+      "expected_segments": [
+        "кеше"
+      ]
+    },
+    {
+      "id": "seg_433",
+      "token": "әлі",
+      "expected_segments": [
+        "әлі"
+      ]
+    },
+    {
+      "id": "seg_434",
+      "token": "жиі",
+      "expected_segments": [
+        "жиі"
+      ]
+    },
+    {
+      "id": "seg_435",
+      "token": "кейде",
+      "expected_segments": [
+        "кейде"
+      ]
+    },
+    {
+      "id": "seg_436",
+      "token": "тез",
+      "expected_segments": [
+        "тез"
+      ]
+    },
+    {
+      "id": "seg_437",
+      "token": "баяу",
+      "expected_segments": [
+        "баяу"
+      ]
+    },
+    {
+      "id": "seg_438",
+      "token": "иә",
+      "expected_segments": [
+        "иә"
+      ]
+    },
+    {
+      "id": "seg_439",
+      "token": "жоқ",
+      "expected_segments": [
+        "жоқ"
+      ]
+    },
+    {
+      "id": "seg_440",
+      "token": "біраз",
+      "expected_segments": [
+        "біраз"
+      ]
+    },
+    {
+      "id": "seg_441",
+      "token": "тіпті",
+      "expected_segments": [
+        "тіпті"
+      ]
+    },
+    {
+      "id": "seg_442",
+      "token": "қайда",
+      "expected_segments": [
+        "қайда"
+      ]
+    },
+    {
+      "id": "seg_443",
+      "token": "әлбетте",
+      "expected_segments": [
+        "әлбетте"
+      ]
+    },
+    {
+      "id": "seg_444",
+      "token": "бірден",
+      "expected_segments": [
+        "бірден"
+      ]
+    },
+    {
+      "id": "seg_445",
+      "token": "әлдеқашан",
+      "expected_segments": [
+        "әлдеқашан"
+      ]
+    },
+    {
+      "id": "seg_446",
+      "token": "осылай",
+      "expected_segments": [
+        "осылай"
+      ]
+    },
+    {
+      "id": "seg_447",
+      "token": "солай",
+      "expected_segments": [
+        "солай"
       ]
     }
   ]

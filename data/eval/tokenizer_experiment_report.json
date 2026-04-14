@@ -10,14 +10,20 @@
     "reference"
   ],
   "segmentation_dataset_name": "adam-tokenizer-segmentation",
-  "segmentation_example_count": 427,
-  "exact_match_count": 427,
+  "segmentation_example_count": 446,
+  "exact_match_count": 446,
   "exact_match_rate_bps": 10000,
   "category_breakdown": [
     {
       "category": "adjective_inflection",
       "example_count": 36,
       "exact_match_count": 36,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "adverb_use",
+      "example_count": 19,
+      "exact_match_count": 19,
       "exact_match_rate_bps": 10000
     },
     {

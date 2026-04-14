@@ -1,5 +1,5 @@
 {
-  "version": "0.0.70",
+  "version": "0.0.71",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1284,6 +1284,139 @@
       "part_of_speech": "numeral",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
+    },
+    {
+      "id": "adv_qazir",
+      "root": "қазір",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adv_bugin",
+      "root": "бүгін",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adv_erten",
+      "root": "ертең",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adv_keshe",
+      "root": "кеше",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_ali",
+      "root": "әлі",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_zhii",
+      "root": "жиі",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_keyde",
+      "root": "кейде",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_tez",
+      "root": "тез",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adv_bayau",
+      "root": "баяу",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_iya",
+      "root": "иә",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_zhoq",
+      "root": "жоқ",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "adv_biraz",
+      "root": "біраз",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adv_tipti",
+      "root": "тіпті",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_qayda",
+      "root": "қайда",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_albette",
+      "root": "әлбетте",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_birden",
+      "root": "бірден",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adv_aldeqashan",
+      "root": "әлдеқашан",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adv_osylay",
+      "root": "осылай",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adv_solay",
+      "root": "солай",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
     }
   ]
 }
