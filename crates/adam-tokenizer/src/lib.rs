@@ -822,6 +822,79 @@ fn build_named_count_drifts(
     drifts
 }
 
+// ── Pre-tokenization for BPE training ────────────────────────────────────────
+
+/// Morpheme-aware pre-tokenization: splits raw text into a stream of units
+/// where each word starts with a `▁` marker (SentencePiece convention) on its
+/// first morpheme. Words that the FSM can segment are split into morphemes;
+/// words it cannot segment remain as a single whole-word token. Punctuation is
+/// always emitted as its own token without the `▁` marker.
+pub fn pretokenize(
+    text: &str,
+    lexicon: &SegmentationLexicon,
+    rules: &SegmentationRuleSet,
+) -> Vec<String> {
+    let mut tokens: Vec<String> = Vec::new();
+    for word in text.split_whitespace() {
+        let (leading, rest) = split_leading_punct(word);
+        for c in leading.chars() {
+            tokens.push(c.to_string());
+        }
+        let (core, trailing) = split_trailing_punct(rest);
+        let core_lower = core.to_lowercase();
+        if !core_lower.is_empty() {
+            if let Some(morphs) = deterministic_segment_token(&core_lower, lexicon, rules) {
+                for (i, m) in morphs.iter().enumerate() {
+                    if i == 0 {
+                        tokens.push(format!("▁{}", m));
+                    } else {
+                        tokens.push(m.clone());
+                    }
+                }
+            } else {
+                tokens.push(format!("▁{}", core_lower));
+            }
+        }
+        for c in trailing.chars() {
+            tokens.push(c.to_string());
+        }
+    }
+    tokens
+}
+
+fn split_leading_punct(word: &str) -> (&str, &str) {
+    let mut byte_pos = 0usize;
+    for c in word.chars() {
+        if is_token_punctuation(c) {
+            byte_pos += c.len_utf8();
+        } else {
+            break;
+        }
+    }
+    (&word[..byte_pos], &word[byte_pos..])
+}
+
+fn split_trailing_punct(word: &str) -> (&str, &str) {
+    let mut end = word.len();
+    while end > 0 {
+        let c = word[..end].chars().next_back().expect("non-empty prefix");
+        if is_token_punctuation(c) {
+            end -= c.len_utf8();
+        } else {
+            break;
+        }
+    }
+    (&word[..end], &word[end..])
+}
+
+fn is_token_punctuation(c: char) -> bool {
+    c.is_ascii_punctuation()
+        || matches!(
+            c,
+            '«' | '»' | '…' | '—' | '–' | '\u{201C}' | '\u{201D}' | '\u{2018}' | '\u{2019}'
+        )
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
@@ -835,7 +908,7 @@ mod tests {
 
     fn test_lexicon() -> SegmentationLexicon {
         SegmentationLexicon {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-kazakh-segmentation-roots".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -972,7 +1045,7 @@ mod tests {
 
     fn test_rules() -> SegmentationRuleSet {
         SegmentationRuleSet {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-kazakh-segmentation-rules".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4946,7 +5019,7 @@ mod tests {
     #[test]
     fn accepts_kazakh_tokenizer_experiment() {
         let experiment = TokenizerExperiment {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4966,7 +5039,7 @@ mod tests {
     #[test]
     fn builds_dry_run_report() {
         let experiment = TokenizerExperiment {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -4980,7 +5053,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -5009,7 +5082,7 @@ mod tests {
     #[test]
     fn validates_segmentation_dataset_and_builds_report() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -6147,7 +6220,7 @@ mod tests {
     #[test]
     fn rejects_segmentation_dataset_with_mismatched_segments() {
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -7808,7 +7881,7 @@ mod tests {
     #[test]
     fn builds_experiment_report_with_segmentation_scoring() {
         let experiment = TokenizerExperiment {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-tokenizer-deterministic".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -7822,7 +7895,7 @@ mod tests {
             objective: "measure deterministic segmentation quality on kazakh text".to_string(),
         };
         let pack = TokenizerDryRunPack {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-tokenizer-dry-run".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
@@ -7833,7 +7906,7 @@ mod tests {
             }],
         };
         let dataset = TokenizerSegmentationDataset {
-            version: "0.0.77".to_string(),
+            version: "0.0.78".to_string(),
             name: "adam-tokenizer-segmentation".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
