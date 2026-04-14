@@ -1,5 +1,5 @@
 {
-  "version": "0.0.92",
+  "version": "0.1.0",
   "name": "adam-pretokenized-corpus-pack",
   "target_language": "kazakh",
   "script": "cyrillic",

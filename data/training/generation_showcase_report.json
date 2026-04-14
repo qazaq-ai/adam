@@ -1,5 +1,5 @@
 {
-  "version": "0.0.92",
+  "version": "0.1.0",
   "run_name": "adam-generation-showcase",
   "checkpoint_path": "data/training/adam_baseline_checkpoint.safetensors",
   "model_param_count": 3063872,

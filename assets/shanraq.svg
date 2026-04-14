@@ -1,0 +1,128 @@
+<!-- static/brand/shaman.svg -->
+<svg class="rounded-circle" width="128" height="128" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <g style="transform: scale(0.85); transform-origin: 200px 200px;">
+    <g class="heartbeat">
+      <!-- Stroke lines -->
+      <line class="stroke" x1="76" y1="76" x2="324" y2="324" />
+      <line class="stroke" x1="137" y1="37" x2="363" y2="263" />
+      <line class="stroke" x1="37" y1="137" x2="263" y2="363" />
+      
+      <line class="stroke" x1="76" y1="324" x2="324" y2="76" />
+      <line class="stroke" x1="137" y1="363" x2="363" y2="137" />
+      <line class="stroke" x1="37" y1="263" x2="263" y2="37" />
+
+      <!-- Blood flow particles -->
+      <line class="flow flow-1" x1="76" y1="76" x2="324" y2="324" />
+      <line class="flow flow-2" x1="137" y1="37" x2="363" y2="263" />
+      <line class="flow flow-3" x1="37" y1="137" x2="263" y2="363" />
+      
+      <line class="flow flow-4" x1="76" y1="324" x2="324" y2="76" />
+      <line class="flow flow-5" x1="137" y1="363" x2="363" y2="137" />
+      <line class="flow flow-6" x1="37" y1="263" x2="263" y2="37" />
+    </g>
+  </g>
+
+  <style>
+    .stroke {
+      fill: none;
+      stroke: rgba(229, 57, 53, .35);
+      stroke-width: 45;
+      stroke-linecap: round;
+    }
+
+    .flow {
+      fill: none;
+      stroke: #e53935;
+      stroke-width: 30;
+      stroke-linecap: round;
+      stroke-dasharray: 60;
+      stroke-dashoffset: 120; 
+      animation-duration: 1.83s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+    }
+
+    .flow-1, .flow-4 {
+      animation-name: bloodFlowForward;
+    }
+
+    .flow-2, .flow-3, .flow-5, .flow-6 {
+      animation-name: bloodFlowReverse;
+    }
+
+    @keyframes bloodFlowForward {
+      0% {
+        stroke-dashoffset: 180;
+        opacity: 0.7;
+      }
+      5% {
+        opacity: 0.8;
+      }
+      12% {
+        opacity: 1.0;
+      }
+      20% {
+        opacity: 0.7;
+      }
+      35% {
+        opacity: 0.8;
+      }
+      42% {
+        opacity: 1.0;
+      }
+      55% {
+        stroke-dashoffset: 40; 
+        opacity: 0.7;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 0.7;
+      }
+    }
+
+    @keyframes bloodFlowReverse {
+      0% {
+        stroke-dashoffset: 0;
+        opacity: 0.7;
+      }
+      5% {
+        opacity: 0.8;
+      }
+      12% {
+        opacity: 1.0;
+      }
+      20% {
+        opacity: 0.7;
+      }
+      35% {
+        opacity: 0.8;
+      }
+      42% {
+        opacity: 1.0;
+      }
+      55% {
+        stroke-dashoffset: 140; 
+        opacity: 0.7;
+      }
+      100% {
+        stroke-dashoffset: 180;
+        opacity: 0.7;
+      }
+    }
+
+    .heartbeat {
+      animation: heartbeat 1.83s ease-in-out infinite;
+      transform-origin: 200px 200px;
+    }
+
+    @keyframes heartbeat {
+      0%   { transform: scale(1); }
+      12%  { transform: scale(1.08); }
+      25%  { transform: scale(1); }
+      32%  { transform: scale(1); }
+      42%  { transform: scale(1.05); }
+      55%  { transform: scale(1); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</svg>

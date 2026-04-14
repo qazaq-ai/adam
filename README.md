@@ -1,109 +1,142 @@
-# adam
+<p align="center">
+  <img src="assets/shanraq.svg" alt="adam logo" width="160" height="160">
+</p>
 
-Core repository for a Kazakh-first language model foundation.
+<h1 align="center">adam</h1>
 
-## Purpose
+<p align="center">
+  <i>A Kazakh-first foundation language model, built in pure Rust.</i><br>
+  <i>Қазақ тіліне арналған тіл моделінің іргетасы — таза Rust тілінде.</i>
+</p>
 
-`adam` is a foundation repository for a Kazakh-only text model stack built entirely in Rust.
-The immediate goal is not scale theater. The goal is a clean, deterministic Kazakh-first
-foundation that prevents early contamination and weak evaluation habits.
+<p align="center">
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.1.0-blue?style=for-the-badge" alt="version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
+  <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
+  <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey?style=for-the-badge" alt="platform">
+</p>
 
-- strict corpus policy before any training data is accepted
-- deterministic morphological segmentation with a finite-state machine
-- hard evaluation harness that must pass before any version is released
-- small-model training path with validated train/validation splits
-- every layer produces a golden artifact that is regression-tested
+<p align="center">
+  <img src="https://img.shields.io/badge/params-3.06M-2EA44F?style=flat-square" alt="params">
+  <img src="https://img.shields.io/badge/perplexity-129.49-2EA44F?style=flat-square" alt="perplexity">
+  <img src="https://img.shields.io/badge/corpus-13.9k%20samples-9CCC65?style=flat-square" alt="corpus">
+  <img src="https://img.shields.io/badge/vocab-1390-FBC02D?style=flat-square" alt="vocab">
+  <img src="https://img.shields.io/badge/lexicon-211%20roots-FBC02D?style=flat-square" alt="lexicon">
+  <img src="https://img.shields.io/badge/rules-422%20FSM-FBC02D?style=flat-square" alt="rules">
+  <img src="https://img.shields.io/badge/foundation-validated-2EA44F?style=flat-square" alt="foundation">
+</p>
+
+---
+
+## What is adam?
+
+`adam` is a foundation language model for Kazakh, built **entirely in Rust** — no Python, no external ML pipelines. The whole stack — lexicon definition, finite-state morphological engine, synthetic corpus generation, BPE tokenizer, model training, and inference — runs on a single MacBook Air M2 8GB.
+
+The name *adam* (Kazakh: **адам**) means "human".
+
+The mission is small but precise: build a culturally and linguistically grounded foundation that the Kazakh NLP community can reuse — from the morphological analyzer up to a working transformer language model.
 
 ## Architecture
 
-The stack is organized into three layers:
+Three layers, five Rust crates:
 
-| Layer | Crate | Responsibility |
-|-------|-------|----------------|
-| L0 | `adam-kernel` | Kazakh identity types, FSM morphological engine, `KernelError` |
-| L1 | `adam-tokenizer` | Tokenizer pipeline, segmentation experiments, experiment reports |
-| L1 | `adam-corpus` | Corpus manifests, source acceptance, curation contracts |
-| L1 | `adam-eval` | Evaluation task definitions and benchmark summary types |
-| L2 | `adam-train` | Training profiles, sequence packs, baseline planning runners |
+| Layer | Crate | Role |
+|---|---|---|
+| **L0** | [`adam-kernel`](crates/adam-kernel) | Identity + Kazakh FSM morphological engine |
+| **L1** | [`adam-tokenizer`](crates/adam-tokenizer) | Pre-tokenizer + BPE trainer + encoder/decoder |
+| **L1** | [`adam-corpus`](crates/adam-corpus) | Source acceptance + synthetic sentence generator |
+| **L1** | [`adam-eval`](crates/adam-eval) | Evaluation suite + benchmark reports |
+| **L2** | [`adam-train`](crates/adam-train) | Transformer model + training loop + inference |
 
-## Repository Layout
+Every layer outputs deterministic, regression-tested JSON artifacts. `bash ./scripts/validate_foundation.sh` runs the full pipeline end-to-end.
 
-- `crates/adam-kernel`
-  L0 foundation: model identity constants, `ModelIdentity`, `FoundationPrinciples`,
-  all FSM morphological types (`SegmentationLexicon`, `SegmentationRuleSet`, etc.),
-  `deterministic_segment_token`, `KernelError`, and the `coverage_report` binary
-- `crates/adam-tokenizer`
-  L1 tokenizer: tokenizer configuration, segmentation eval, experiment reports;
-  depends on `adam-kernel` and re-exports its FSM types
-- `crates/adam-corpus`
-  corpus manifests, source metadata, and curation contracts
-- `crates/adam-eval`
-  evaluation task definitions and benchmark summary types
-- `crates/adam-train`
-  baseline training manifests, profile selection, and training runners
-- `data/`
-  raw, curated, evaluation, tokenizer, and training dataset roots
-- `docs/`
-  scope, architecture, and policy documents
-- `scripts/`
-  shell runners for every pipeline step and foundation validation
-
-## Key Binaries
-
-| Binary | Crate | Purpose |
-|--------|-------|---------|
-| `coverage_report` | adam-kernel | Measure FSM segmentation coverage on real Kazakh text |
-| `run_experiment` | adam-tokenizer | Run a full tokenizer segmentation experiment |
-| `segmentation_eval` | adam-tokenizer | Evaluate segmentation against the eval dataset |
-| `delta` | adam-tokenizer | Detect drift in experiment golden artifacts |
-| `report` | adam-eval | Build the eval benchmark report |
-| `report` | adam-corpus | Build the corpus acceptance report |
-
-## Current Scope
-
-This repository targets a Kazakh-first text model only.
-
-Out of scope for the current foundation phase:
-
-- multilingual expansion
-- speech or multimodal
-- cloud platform work
-- chat product features
-
-## First Principle
-
-The repo grows from clean data and hard evaluation, not from broad claims.
-
-## Foundation Validation
-
-The full foundation validation is a single command:
+## Quickstart
 
 ```bash
+# 1. Build everything
+cargo build --release
+
+# 2. Validate the foundation (all golden artifacts + tests)
 bash ./scripts/validate_foundation.sh
+
+# 3. Generate text with the v0.1.0 checkpoint
+bash ./scripts/run_generate.sh "жақсы адам" 24 1.0 0 0.9 1.2
+#                              prompt        ^^  ^   ^   ^   ^
+#                                            new temp tk topp rep_pen
 ```
 
-It verifies every layer in order: corpus → tokenizer → eval → train → tiny training →
-miss audit → profile policy → strategy → experiment matrix → promotion.
-All layers must be green before a release is cut.
+## Sample generations
 
-## Release Flow
+From the v0.1.0 checkpoint (3.06M params, 7000 training steps), nucleus sampling `top_p=0.9, repetition_penalty=1.2`:
 
-Versioning is deterministic and script-enforced.
+| Prompt | Generated |
+|---|---|
+| жақсы адам | жақсы адам қолданады. |
+| үлкен жақсы адам | үлкен жақсы адам біледі. |
+| бала мектепке | бала мектепке сақтайды. |
+| ол | ол жасайды. |
+| олар | олар жасайды. |
+| мен қазір | мен қазір айтады. |
+| адам және | адам және оқыйды. |
 
-- validate the foundation: `bash ./scripts/validate_foundation.sh`
-- verify the version across all manifests and Cargo.lock: `bash ./scripts/verify_release_version.sh x.y.z`
-- cut and publish a release: `bash ./scripts/cut_release.sh x.y.z`
-- pushing tag `vX.Y.Z` triggers CI: format check → version verification → full foundation validation
+Reproducible via `bash ./scripts/run_generation_showcase.sh` → `data/training/generation_showcase_report.json`.
 
-## License
+## Full training pipeline
 
-This project is licensed under the [Business Source License 1.1](LICENSE).
+```bash
+# 1. Generate 18,000 grammatically-validated synthetic sentences
+bash ./scripts/run_synth_sentences.sh 18000
 
-- **Non-commercial and research use** is permitted without restriction.
-- **Commercial use** that does not compete directly with qazaq-ai products is permitted.
-- **On 2029-01-01** the license converts automatically to the Apache License 2.0.
+# 2. Combine with curated text + classical Kazakh proverbs
+bash ./scripts/run_unified_corpus_assembly.sh
 
-For commercial licensing inquiries: hello@qazaq.ai
+# 3. FSM-segment every word into morphemes
+bash ./scripts/run_pretokenize_corpus.sh
+
+# 4. Learn BPE merges (lexicon-seeded vocab)
+bash ./scripts/run_train_bpe.sh 4096
+
+# 5. Encode with deterministic train/val split
+bash ./scripts/run_encode_corpus.sh
+
+# 6. Train the transformer (~25 min on Metal)
+bash ./scripts/run_train_baseline.sh 7000
+
+# 7. Evaluate held-out perplexity
+bash ./scripts/run_eval_perplexity.sh
+
+# 8. Run the 60-generation showcase
+bash ./scripts/run_generation_showcase.sh
+```
+
+## Key binaries
+
+| Binary | Crate | Purpose |
+|---|---|---|
+| `coverage_report` | adam-kernel | Measure FSM coverage on real Kazakh text |
+| `synth_sentences` | adam-corpus | Generate FSM-validated synthetic sentences |
+| `pretokenize_corpus` | adam-tokenizer | Morpheme-aware pre-tokenization |
+| `train_bpe` | adam-tokenizer | BPE trainer over morpheme stream |
+| `encode_corpus` | adam-tokenizer | Encode pack to token IDs (with train/val split) |
+| `train_baseline` | adam-train | AdamW training loop with grad clipping |
+| `eval_perplexity` | adam-train | Held-out perplexity evaluation |
+| `generate` | adam-train | Inference with greedy/temperature/top-k/top-p/repetition-penalty |
+| `generation_showcase` | adam-train | Multi-prompt × multi-config quality report |
+
+## Stats (v0.1.0)
+
+| Component | Value |
+|---|---|
+| Lexicon roots | **211** (10 POS) |
+| FSM rules | **422** |
+| Eval segmentation examples | **464** (100% match rate) |
+| Training samples | **13,929** unique |
+| Training tokens (encoded) | **60,936** |
+| BPE vocabulary | **1,390** |
+| Model parameters | **3.06M** |
+| Wall time (M2 Metal, 7k steps) | **~25 min** |
+| **Validation perplexity** | **129.49** |
 
 ## Foundation Policies
 
@@ -117,3 +150,23 @@ For commercial licensing inquiries: hello@qazaq.ai
 - [tokenizer segmentation eval](docs/tokenizer_segmentation_eval.md)
 - [evaluation policy](docs/evaluation_policy.md)
 - [training baseline](docs/training_baseline.md)
+
+## Out of scope (foundation phase)
+
+- Multilingual expansion
+- Speech / multimodal
+- Cloud platform work
+- Chat product features
+
+The repo grows from clean data and hard evaluation, not from broad claims.
+
+## License
+
+Business Source License 1.1. Converts automatically to Apache License 2.0 on **2029-01-01**.
+See [LICENSE](LICENSE) for full terms.
+
+Non-commercial and research use is unrestricted today. Commercial use is permitted unless it competes directly with Qazna Technologies LLP products or services.
+
+Copyright © 2024–2026 Qazna Technologies LLP.
+
+For commercial licensing inquiries: hello@qazaq.ai
