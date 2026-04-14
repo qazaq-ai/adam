@@ -16,6 +16,8 @@ struct Args {
     max_new_tokens: usize,
     temperature: f32,
     top_k: usize,
+    top_p: f32,
+    repetition_penalty: f32,
     seed: u64,
     checkpoint: PathBuf,
 }
@@ -24,7 +26,8 @@ fn parse_args() -> Result<Args, String> {
     let mut iter = env::args().skip(1);
     let prompt = iter.next().ok_or_else(|| {
         "usage: generate <prompt> [max_new_tokens=32] [temperature=0.0] [top_k=0] \
-         [seed=42] [checkpoint=data/training/adam_baseline_checkpoint.safetensors]"
+         [top_p=0.0] [repetition_penalty=1.0] [seed=42] \
+         [checkpoint=data/training/adam_baseline_checkpoint.safetensors]"
             .to_string()
     })?;
     let max_new_tokens = iter
@@ -45,6 +48,18 @@ fn parse_args() -> Result<Args, String> {
         .transpose()
         .map_err(|e: std::num::ParseIntError| format!("top_k: {e}"))?
         .unwrap_or(0);
+    let top_p = iter
+        .next()
+        .map(|s| s.parse())
+        .transpose()
+        .map_err(|e: std::num::ParseFloatError| format!("top_p: {e}"))?
+        .unwrap_or(0.0_f32);
+    let repetition_penalty = iter
+        .next()
+        .map(|s| s.parse())
+        .transpose()
+        .map_err(|e: std::num::ParseFloatError| format!("repetition_penalty: {e}"))?
+        .unwrap_or(1.0_f32);
     let seed = iter
         .next()
         .map(|s| s.parse())
@@ -60,6 +75,8 @@ fn parse_args() -> Result<Args, String> {
         max_new_tokens,
         temperature,
         top_k,
+        top_p,
+        repetition_penalty,
         seed,
         checkpoint,
     })
@@ -79,7 +96,35 @@ impl Lcg {
     }
 }
 
-fn sample_next(logits: &[f32], temperature: f32, top_k: usize, rng: &mut Lcg) -> u32 {
+fn sample_next(
+    logits: &[f32],
+    history: &[u32],
+    temperature: f32,
+    top_k: usize,
+    top_p: f32,
+    repetition_penalty: f32,
+    rng: &mut Lcg,
+) -> u32 {
+    // Work on a copy so we can modify in place.
+    let mut logits: Vec<f32> = logits.to_vec();
+
+    // Step 1: repetition penalty (GPT-2 style).
+    // Scales positive logits down and negative logits further negative for
+    // tokens that already appear in `history`.
+    if repetition_penalty > 1.0 && !history.is_empty() {
+        for &tok in history {
+            let idx = tok as usize;
+            if let Some(l) = logits.get_mut(idx) {
+                if *l > 0.0 {
+                    *l /= repetition_penalty;
+                } else {
+                    *l *= repetition_penalty;
+                }
+            }
+        }
+    }
+
+    // Step 2: greedy fallback when temperature is disabled.
     if temperature <= 0.0 {
         let (idx, _) =
             logits
@@ -91,36 +136,57 @@ fn sample_next(logits: &[f32], temperature: f32, top_k: usize, rng: &mut Lcg) ->
         return idx as u32;
     }
 
-    // Temperature scaling
-    let scaled: Vec<f32> = logits.iter().map(|l| l / temperature).collect();
-
-    // Optional top-k truncation
-    let mut filtered: Vec<(usize, f32)> = scaled.iter().enumerate().map(|(i, v)| (i, *v)).collect();
-    if top_k > 0 && top_k < filtered.len() {
-        filtered.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
-        filtered.truncate(top_k);
+    // Step 3: temperature scaling.
+    for l in logits.iter_mut() {
+        *l /= temperature;
     }
 
-    // Softmax
-    let max = filtered
+    // Step 4: softmax over the full vocabulary.
+    let max = logits.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+    let exp_sum: f32 = logits.iter().map(|l| (l - max).exp()).sum();
+    let mut idx_probs: Vec<(usize, f32)> = logits
         .iter()
-        .map(|(_, v)| *v)
-        .fold(f32::NEG_INFINITY, f32::max);
-    let exp_sum: f32 = filtered.iter().map(|(_, v)| (v - max).exp()).sum();
-    let probs: Vec<(usize, f32)> = filtered
-        .iter()
-        .map(|(i, v)| (*i, (v - max).exp() / exp_sum))
+        .enumerate()
+        .map(|(i, l)| (i, (l - max).exp() / exp_sum))
         .collect();
 
-    let u = rng.unit();
+    // Step 5: sort descending by probability.
+    idx_probs.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+
+    // Step 6: top-p (nucleus) truncation — keep the smallest prefix whose
+    // cumulative probability ≥ top_p.
+    if top_p > 0.0 && top_p < 1.0 {
+        let mut cum = 0.0_f32;
+        let mut cutoff = idx_probs.len();
+        for (i, (_, p)) in idx_probs.iter().enumerate() {
+            cum += *p;
+            if cum >= top_p {
+                cutoff = i + 1;
+                break;
+            }
+        }
+        idx_probs.truncate(cutoff);
+    }
+
+    // Step 7: top-k truncation (applied on top of top-p if both set).
+    if top_k > 0 && top_k < idx_probs.len() {
+        idx_probs.truncate(top_k);
+    }
+
+    // Step 8: renormalize and sample.
+    let total: f32 = idx_probs.iter().map(|(_, p)| *p).sum();
+    if total <= 0.0 {
+        return idx_probs.first().map(|(i, _)| *i as u32).unwrap_or(0);
+    }
+    let u = rng.unit() * total;
     let mut acc = 0.0_f32;
-    for (i, p) in &probs {
+    for (i, p) in &idx_probs {
         acc += p;
         if u <= acc {
             return *i as u32;
         }
     }
-    probs.last().map(|(i, _)| *i as u32).unwrap_or(0)
+    idx_probs.last().map(|(i, _)| *i as u32).unwrap_or(0)
 }
 
 fn main() -> ExitCode {
@@ -229,7 +295,15 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-        let next = sample_next(&last_host, args.temperature, args.top_k, &mut rng);
+        let next = sample_next(
+            &last_host,
+            &sequence,
+            args.temperature,
+            args.top_k,
+            args.top_p,
+            args.repetition_penalty,
+            &mut rng,
+        );
         if next == bpe.eos_id {
             generated_eos = true;
             break;
