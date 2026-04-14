@@ -8,6 +8,8 @@ license.workspace = true
 adam-corpus = { path = "../adam-corpus" }
 adam-eval = { path = "../adam-eval" }
 adam-tokenizer = { path = "../adam-tokenizer" }
+candle-core = { version = "0.8", features = ["metal"] }
+candle-nn = { version = "0.8", features = ["metal"] }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
