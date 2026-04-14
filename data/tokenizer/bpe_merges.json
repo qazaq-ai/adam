@@ -1,9 +1,9 @@
 {
-  "version": "0.0.79",
+  "version": "0.0.80",
   "name": "adam-bpe-tokenizer-merges",
   "target_language": "kazakh",
   "script": "cyrillic",
-  "merge_count": 567,
+  "merge_count": 559,
   "merges": [
     {
       "rank": 1,
@@ -3752,223 +3752,167 @@
     },
     {
       "rank": 536,
-      "left": "▁жерде",
-      "right": "—",
-      "merged": "▁жерде—",
-      "frequency": 4
-    },
-    {
-      "rank": 537,
       "left": "▁материал",
       "right": "ы",
       "merged": "▁материалы",
       "frequency": 4
     },
     {
-      "rank": 538,
+      "rank": 537,
       "left": "▁мемлекет",
       "right": "ке",
       "merged": "▁мемлекетке",
       "frequency": 4
     },
     {
-      "rank": 539,
-      "left": "▁сөз",
-      "right": "—",
-      "merged": "▁сөз—",
-      "frequency": 4
-    },
-    {
-      "rank": 540,
+      "rank": 538,
       "left": "▁анықтама",
       "right": "сы",
       "merged": "▁анықтамасы",
       "frequency": 3
     },
     {
-      "rank": 541,
+      "rank": 539,
       "left": "▁білім",
       "right": "сіз",
       "merged": "▁білімсіз",
       "frequency": 3
     },
     {
-      "rank": 542,
-      "left": "▁жер",
-      "right": "—",
-      "merged": "▁жер—",
-      "frequency": 3
-    },
-    {
-      "rank": 543,
+      "rank": 540,
       "left": "▁мысал",
       "right": "дың",
       "merged": "▁мысалдың",
       "frequency": 3
     },
     {
-      "rank": 544,
+      "rank": 541,
       "left": "▁тіл",
       "right": "і",
       "merged": "▁тілі",
       "frequency": 3
     },
     {
-      "rank": 545,
+      "rank": 542,
       "left": "▁шекара",
       "right": "сын",
       "merged": "▁шекарасын",
       "frequency": 3
     },
     {
-      "rank": 546,
+      "rank": 543,
       "left": "▁ұғымдар",
       "right": "ды",
       "merged": "▁ұғымдарды",
       "frequency": 3
     },
     {
-      "rank": 547,
+      "rank": 544,
       "left": "▁алтын",
       "right": ".",
       "merged": "▁алтын.",
       "frequency": 2
     },
     {
-      "rank": 548,
+      "rank": 545,
       "left": "▁бар",
       "right": ".",
       "merged": "▁бар.",
       "frequency": 2
     },
     {
-      "rank": 549,
+      "rank": 546,
       "left": "▁бастауы",
       "right": ".",
       "merged": "▁бастауы.",
       "frequency": 2
     },
     {
-      "rank": 550,
+      "rank": 547,
       "left": "▁болады",
       "right": ".",
       "merged": "▁болады.",
       "frequency": 2
     },
     {
-      "rank": 551,
+      "rank": 548,
       "left": "▁болса",
       "right": ",",
       "merged": "▁болса,",
       "frequency": 2
     },
     {
-      "rank": 552,
-      "left": "▁білім",
-      "right": "—",
-      "merged": "▁білім—",
-      "frequency": 2
-    },
-    {
-      "rank": 553,
-      "left": "▁денсаулық",
-      "right": "—",
-      "merged": "▁денсаулық—",
-      "frequency": 2
-    },
-    {
-      "rank": 554,
-      "left": "▁ел",
-      "right": "—",
-      "merged": "▁ел—",
-      "frequency": 2
-    },
-    {
-      "rank": 555,
+      "rank": 549,
       "left": "▁жеткіз",
       "right": "ер",
       "merged": "▁жеткізер",
       "frequency": 2
     },
     {
-      "rank": 556,
+      "rank": 550,
       "left": "▁жоқ",
       "right": ".",
       "merged": "▁жоқ.",
       "frequency": 2
     },
     {
-      "rank": 557,
+      "rank": 551,
       "left": "▁күшейтеді",
       "right": ".",
       "merged": "▁күшейтеді.",
       "frequency": 2
     },
     {
-      "rank": 558,
+      "rank": 552,
       "left": "▁көп",
       "right": ".",
       "merged": "▁көп.",
       "frequency": 2
     },
     {
-      "rank": 559,
+      "rank": 553,
       "left": "▁мағына",
       "right": "сын",
       "merged": "▁мағынасын",
       "frequency": 2
     },
     {
-      "rank": 560,
+      "rank": 554,
       "left": "▁озар",
       "right": ",",
       "merged": "▁озар,",
       "frequency": 2
     },
     {
-      "rank": 561,
+      "rank": 555,
       "left": "▁оқы",
       "right": "ған",
       "merged": "▁оқыған",
       "frequency": 2
     },
     {
-      "rank": 562,
+      "rank": 556,
       "left": "▁терминдер",
       "right": "дің",
       "merged": "▁терминдердің",
       "frequency": 2
     },
     {
-      "rank": 563,
-      "left": "▁түбі",
-      "right": "—",
-      "merged": "▁түбі—",
-      "frequency": 2
-    },
-    {
-      "rank": 564,
+      "rank": 557,
       "left": "▁ыстық",
       "right": ".",
       "merged": "▁ыстық.",
       "frequency": 2
     },
     {
-      "rank": 565,
+      "rank": 558,
       "left": "▁қазына",
       "right": ".",
       "merged": "▁қазына.",
       "frequency": 2
     },
     {
-      "rank": 566,
-      "left": "▁қолы",
-      "right": "—",
-      "merged": "▁қолы—",
-      "frequency": 2
-    },
-    {
-      "rank": 567,
+      "rank": 559,
       "left": "▁үлгі",
       "right": "сі",
       "merged": "▁үлгісі",
