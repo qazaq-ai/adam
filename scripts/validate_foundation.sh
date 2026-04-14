@@ -40,8 +40,11 @@ jq empty data/curated/adam_training_corpus_pack.json
 jq empty data/curated/adam_pretokenized_corpus_pack.json
 jq empty data/curated/adam_training_ids_pack.json
 jq empty data/curated/adam_validation_ids_pack.json
-jq empty data/training/validation_perplexity_report.json
-jq empty data/training/generation_showcase_report.json
+# validation_perplexity_report.json and generation_showcase_report.json are
+# regenerated whenever the model is retrained; they are dropped between
+# tokenizer-only releases (e.g. v0.1.2). Re-run scripts/run_train_baseline.sh
+# + run_eval_perplexity.sh + run_generation_showcase.sh after a model retrain
+# to produce them.
 jq empty data/raw/source_registry.json
 jq empty data/raw/source_scoring_rules.json
 jq empty data/eval/benchmark_manifest.json

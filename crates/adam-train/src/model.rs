@@ -19,8 +19,9 @@ impl ModelConfig {
     pub fn tiny() -> Self {
         Self {
             // Must match the BPE vocab size written by train_bpe.
-            // Bumped to 1390 in v0.0.87 (lexicon-seeded vocab retrain).
-            vocab_size: 1390,
+            // 1390 in v0.0.87 (lexicon-seeded), 4096 in v0.1.2 (char fallback +
+            // Tatoeba real text saturate the target vocab).
+            vocab_size: 4096,
             // Scaled up in v0.0.89 to ~3.06M params.
             hidden_dim: 224,
             num_heads: 8,
