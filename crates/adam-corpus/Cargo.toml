@@ -5,6 +5,11 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+adam-kernel = { path = "../adam-kernel" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+
+[[bin]]
+name = "synth_sentences"
+path = "src/bin/synth_sentences.rs"

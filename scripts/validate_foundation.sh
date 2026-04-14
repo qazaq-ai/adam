@@ -32,6 +32,7 @@ jq empty data/curated/tiny_clean_education_pack.json
 jq empty data/curated/tiny_clean_training_pack.json
 jq empty data/curated/mini_clean_training_manifest.json
 jq empty data/curated/mini_clean_training_pack.json
+jq empty data/curated/synthetic_sentences_pack.json
 jq empty data/raw/source_registry.json
 jq empty data/raw/source_scoring_rules.json
 jq empty data/eval/benchmark_manifest.json
@@ -108,6 +109,7 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_tiny_training_miss_audit_delta.sh
 ./scripts/run_mini_clean_training.sh
 ./scripts/run_mini_training_miss_audit.sh
+./scripts/run_synth_sentences.sh
 ./scripts/run_foundation_overview.sh
 ./scripts/run_foundation_overview_delta.sh
 
