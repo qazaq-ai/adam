@@ -1,5 +1,5 @@
 {
-  "version": "0.0.65",
+  "version": "0.0.66",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -2412,6 +2412,241 @@
       "expected_segments": [
         "олар",
         "да"
+      ]
+    },
+    {
+      "id": "seg_281",
+      "token": "жақсы",
+      "expected_segments": [
+        "жақсы"
+      ]
+    },
+    {
+      "id": "seg_282",
+      "token": "қысқа",
+      "expected_segments": [
+        "қысқа"
+      ]
+    },
+    {
+      "id": "seg_283",
+      "token": "үлкен",
+      "expected_segments": [
+        "үлкен"
+      ]
+    },
+    {
+      "id": "seg_284",
+      "token": "жаман",
+      "expected_segments": [
+        "жаман"
+      ]
+    },
+    {
+      "id": "seg_285",
+      "token": "кіші",
+      "expected_segments": [
+        "кіші"
+      ]
+    },
+    {
+      "id": "seg_286",
+      "token": "жаңа",
+      "expected_segments": [
+        "жаңа"
+      ]
+    },
+    {
+      "id": "seg_287",
+      "token": "ескі",
+      "expected_segments": [
+        "ескі"
+      ]
+    },
+    {
+      "id": "seg_288",
+      "token": "көп",
+      "expected_segments": [
+        "көп"
+      ]
+    },
+    {
+      "id": "seg_289",
+      "token": "аз",
+      "expected_segments": [
+        "аз"
+      ]
+    },
+    {
+      "id": "seg_290",
+      "token": "жас",
+      "expected_segments": [
+        "жас"
+      ]
+    },
+    {
+      "id": "seg_291",
+      "token": "таза",
+      "expected_segments": [
+        "таза"
+      ]
+    },
+    {
+      "id": "seg_292",
+      "token": "тұрақты",
+      "expected_segments": [
+        "тұрақты"
+      ]
+    },
+    {
+      "id": "seg_293",
+      "token": "анықтамалық",
+      "expected_segments": [
+        "анықтамалық"
+      ]
+    },
+    {
+      "id": "seg_294",
+      "token": "жақсылар",
+      "expected_segments": [
+        "жақсы",
+        "лар"
+      ]
+    },
+    {
+      "id": "seg_295",
+      "token": "қысқалар",
+      "expected_segments": [
+        "қысқа",
+        "лар"
+      ]
+    },
+    {
+      "id": "seg_296",
+      "token": "кішілер",
+      "expected_segments": [
+        "кіші",
+        "лер"
+      ]
+    },
+    {
+      "id": "seg_297",
+      "token": "үлкендер",
+      "expected_segments": [
+        "үлкен",
+        "дер"
+      ]
+    },
+    {
+      "id": "seg_298",
+      "token": "жамандар",
+      "expected_segments": [
+        "жаман",
+        "дар"
+      ]
+    },
+    {
+      "id": "seg_299",
+      "token": "жастар",
+      "expected_segments": [
+        "жас",
+        "тар"
+      ]
+    },
+    {
+      "id": "seg_300",
+      "token": "аздар",
+      "expected_segments": [
+        "аз",
+        "дар"
+      ]
+    },
+    {
+      "id": "seg_301",
+      "token": "жақсының",
+      "expected_segments": [
+        "жақсы",
+        "ның"
+      ]
+    },
+    {
+      "id": "seg_302",
+      "token": "үлкеннің",
+      "expected_segments": [
+        "үлкен",
+        "нің"
+      ]
+    },
+    {
+      "id": "seg_303",
+      "token": "жастың",
+      "expected_segments": [
+        "жас",
+        "тың"
+      ]
+    },
+    {
+      "id": "seg_304",
+      "token": "жақсыны",
+      "expected_segments": [
+        "жақсы",
+        "ны"
+      ]
+    },
+    {
+      "id": "seg_305",
+      "token": "үлкенді",
+      "expected_segments": [
+        "үлкен",
+        "ді"
+      ]
+    },
+    {
+      "id": "seg_306",
+      "token": "жақсыға",
+      "expected_segments": [
+        "жақсы",
+        "ға"
+      ]
+    },
+    {
+      "id": "seg_307",
+      "token": "үлкенге",
+      "expected_segments": [
+        "үлкен",
+        "ге"
+      ]
+    },
+    {
+      "id": "seg_308",
+      "token": "жақсыда",
+      "expected_segments": [
+        "жақсы",
+        "да"
+      ]
+    },
+    {
+      "id": "seg_309",
+      "token": "үлкенде",
+      "expected_segments": [
+        "үлкен",
+        "де"
+      ]
+    },
+    {
+      "id": "seg_310",
+      "token": "жақсыдан",
+      "expected_segments": [
+        "жақсы",
+        "дан"
+      ]
+    },
+    {
+      "id": "seg_311",
+      "token": "үлкеннен",
+      "expected_segments": [
+        "үлкен",
+        "нен"
       ]
     }
   ]

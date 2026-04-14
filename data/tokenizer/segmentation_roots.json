@@ -1,5 +1,5 @@
 {
-  "version": "0.0.65",
+  "version": "0.0.66",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -381,6 +381,181 @@
       "part_of_speech": "pronoun",
       "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adj_qysqa",
+      "root": "қысқа",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_negizgi",
+      "root": "негізгі",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_senimdi",
+      "root": "сенімді",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_anyqtamalyq",
+      "root": "анықтамалық",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "adj_dayekti",
+      "root": "дәйекті",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_taza",
+      "root": "таза",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_turaqty",
+      "root": "тұрақты",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_zhaqsy",
+      "root": "жақсы",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_zhaman",
+      "root": "жаман",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adj_ulken",
+      "root": "үлкен",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adj_kishi",
+      "root": "кіші",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_teren",
+      "root": "терең",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adj_zhana",
+      "root": "жаңа",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_eski",
+      "root": "ескі",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_kop",
+      "root": "көп",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "adj_az",
+      "root": "аз",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adj_uzyn",
+      "root": "ұзын",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adj_zhas",
+      "root": "жас",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "adj_ademi",
+      "root": "әдемі",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_auyr",
+      "root": "ауыр",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adj_zhenil",
+      "root": "жеңіл",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adj_suyq",
+      "root": "суық",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "adj_ystyq",
+      "root": "ыстық",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "adj_qiyn",
+      "root": "қиын",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "adj_zhyldam",
+      "root": "жылдам",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
     }
   ]
 }
