@@ -4,7 +4,7 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$repo_root"
 
-target_n="${1:-10000}"
+target_n="${1:-18000}"
 seed="${2:-42}"
 
 cargo run --quiet -p adam-corpus --bin synth_sentences -- "$target_n" "$seed" \

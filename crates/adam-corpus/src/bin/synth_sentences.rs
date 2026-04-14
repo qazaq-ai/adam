@@ -127,6 +127,7 @@ fn inflect(
     Some(word)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn generate_one(
     rng: &mut Lcg,
     nouns: &[&SegmentationRootEntry],
@@ -134,22 +135,29 @@ fn generate_one(
     adjectives: &[&SegmentationRootEntry],
     postpositions: &[&SegmentationRootEntry],
     numerals: &[&SegmentationRootEntry],
+    adverbs: &[&SegmentationRootEntry],
+    conjunctions: &[&SegmentationRootEntry],
+    particles: &[&SegmentationRootEntry],
+    modals: &[&SegmentationRootEntry],
     rules: &SegmentationRuleSet,
 ) -> Option<String> {
-    let template_idx = rng.range(15);
+    let template_idx = rng.range(30);
     match template_idx {
         0 => {
+            // N + V(aorist 3sg)
             let subj = *rng.pick(nouns)?;
             let verb = *rng.pick(verbs)?;
             let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
             Some(format!("{} {}.", subj.root, v))
         }
         1 => {
+            // Adj + N
             let adj = *rng.pick(adjectives)?;
             let n = *rng.pick(nouns)?;
             Some(format!("{} {}.", adj.root, n.root))
         }
         2 => {
+            // N(acc) + V(aorist 3sg)
             let obj = *rng.pick(nouns)?;
             let verb = *rng.pick(verbs)?;
             let o = inflect(obj, &["accusative"], rules, rng)?;
@@ -157,29 +165,32 @@ fn generate_one(
             Some(format!("{} {}.", o, v))
         }
         3 => {
+            // N + postposition
             let n = *rng.pick(nouns)?;
             let p = *rng.pick(postpositions)?;
             Some(format!("{} {}.", n.root, p.root))
         }
         4 => {
+            // Num + N
             let num = *rng.pick(numerals)?;
             let n = *rng.pick(nouns)?;
             Some(format!("{} {}.", num.root, n.root))
         }
         5 => {
+            // Adj + predicative_1sg
             let adj = *rng.pick(adjectives)?;
             let text = inflect(adj, &["predicative_1sg"], rules, rng)?;
             Some(format!("{}.", text))
         }
         6 => {
-            // N + V(past): "адам келді"
+            // N + V(past)
             let subj = *rng.pick(nouns)?;
             let verb = *rng.pick(verbs)?;
             let v = inflect(verb, &["past"], rules, rng)?;
             Some(format!("{} {}.", subj.root, v))
         }
         7 => {
-            // N(plural) + V(aorist 3sg): "адамдар келеді"
+            // N(plural) + V(aorist 3sg)
             let subj = *rng.pick(nouns)?;
             let verb = *rng.pick(verbs)?;
             let s = inflect(subj, &["plural"], rules, rng)?;
@@ -187,7 +198,7 @@ fn generate_one(
             Some(format!("{} {}.", s, v))
         }
         8 => {
-            // N(dat) + V(aorist 3sg): "мектепке барады"
+            // N(dat) + V(aorist 3sg)
             let np = *rng.pick(nouns)?;
             let verb = *rng.pick(verbs)?;
             let n = inflect(np, &["dative"], rules, rng)?;
@@ -195,7 +206,7 @@ fn generate_one(
             Some(format!("{} {}.", n, v))
         }
         9 => {
-            // N(loc) + V(aorist 3sg): "қалада тұрады"
+            // N(loc) + V(aorist 3sg)
             let np = *rng.pick(nouns)?;
             let verb = *rng.pick(verbs)?;
             let n = inflect(np, &["locative"], rules, rng)?;
@@ -203,7 +214,7 @@ fn generate_one(
             Some(format!("{} {}.", n, v))
         }
         10 => {
-            // N(gen) + N(poss_3sg): "баланың кітабы"
+            // N(gen) + N(poss_3sg)
             let owner = *rng.pick(nouns)?;
             let thing = *rng.pick(nouns)?;
             let og = inflect(owner, &["genitive"], rules, rng)?;
@@ -211,7 +222,7 @@ fn generate_one(
             Some(format!("{} {}.", og, tp))
         }
         11 => {
-            // Adj + N + V(aorist 3sg): "үлкен адам келеді"
+            // Adj + N + V(aorist 3sg)
             let adj = *rng.pick(adjectives)?;
             let subj = *rng.pick(nouns)?;
             let verb = *rng.pick(verbs)?;
@@ -219,38 +230,163 @@ fn generate_one(
             Some(format!("{} {} {}.", adj.root, subj.root, v))
         }
         12 => {
-            // Pronoun + V(matched person): "мен келемін", "сен келесің", etc.
-            let subjects: &[(&str, &str, &str)] = &[
-                ("мен", "person_1sg", "front"),
-                ("сен", "person_2sg", "front"),
-                ("сіз", "person_2polite", "front"),
-                ("біз", "person_1pl", "front"),
+            // Pronoun (1/2) + V(matched person)
+            let subjects: &[(&str, &str)] = &[
+                ("мен", "person_1sg"),
+                ("сен", "person_2sg"),
+                ("сіз", "person_2polite"),
+                ("біз", "person_1pl"),
             ];
-            let (pron, person_label, _) = subjects[rng.range(subjects.len())];
+            let (pron, person_label) = subjects[rng.range(subjects.len())];
             let verb = *rng.pick(verbs)?;
             let v = inflect(verb, &["future", person_label], rules, rng)?;
             Some(format!("{} {}.", pron, v))
         }
         13 => {
-            // N + V(negative_past): "адам келмеді"
+            // N + V(negative_past)
             let subj = *rng.pick(nouns)?;
             let verb = *rng.pick(verbs)?;
             let v = inflect(verb, &["negative_past"], rules, rng)?;
             Some(format!("{} {}.", subj.root, v))
         }
-        _ => {
-            // Adj + N + postposition: "үлкен қала туралы"
+        14 => {
+            // Adj + N + postposition
             let adj = *rng.pick(adjectives)?;
             let n = *rng.pick(nouns)?;
             let p = *rng.pick(postpositions)?;
             Some(format!("{} {} {}.", adj.root, n.root, p.root))
+        }
+
+        // ─── New in v0.0.86: full POS coverage ─────────────────────────
+        15 => {
+            // N + Adverb + V(aorist 3sg): "адам тез келеді"
+            let subj = *rng.pick(nouns)?;
+            let adv = *rng.pick(adverbs)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {}.", subj.root, adv.root, v))
+        }
+        16 => {
+            // Adverb + N + V(aorist 3sg): "қазір адам келеді"
+            let adv = *rng.pick(adverbs)?;
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {}.", adv.root, subj.root, v))
+        }
+        17 => {
+            // ол + V(aorist 3sg): "ол келеді"
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("ол {}.", v))
+        }
+        18 => {
+            // олар + V(aorist 3sg): "олар жасайды"
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("олар {}.", v))
+        }
+        19 => {
+            // N + V(aorist 3sg) + particle: "адам келеді ме"
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            let p = *rng.pick(particles)?;
+            Some(format!("{} {} {}.", subj.root, v, p.root))
+        }
+        20 => {
+            // Num + N + V(aorist 3sg): "екі адам келеді"
+            let num = *rng.pick(numerals)?;
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {}.", num.root, subj.root, v))
+        }
+        21 => {
+            // N + V(past) + conj + V(past): "адам келді және кетті"
+            let subj = *rng.pick(nouns)?;
+            let v1 = *rng.pick(verbs)?;
+            let v2 = *rng.pick(verbs)?;
+            let iv1 = inflect(v1, &["past"], rules, rng)?;
+            let iv2 = inflect(v2, &["past"], rules, rng)?;
+            let c = *rng.pick(conjunctions)?;
+            Some(format!("{} {} {} {}.", subj.root, iv1, c.root, iv2))
+        }
+        22 => {
+            // N + particle: "адам ғой"
+            let subj = *rng.pick(nouns)?;
+            let p = *rng.pick(particles)?;
+            Some(format!("{} {}.", subj.root, p.root))
+        }
+        23 => {
+            // N + modal: "адам керек"
+            let subj = *rng.pick(nouns)?;
+            let m = *rng.pick(modals)?;
+            Some(format!("{} {}.", subj.root, m.root))
+        }
+        24 => {
+            // Adj + Adj + N: "үлкен жақсы адам"
+            let a1 = *rng.pick(adjectives)?;
+            let a2 = *rng.pick(adjectives)?;
+            let n = *rng.pick(nouns)?;
+            Some(format!("{} {} {}.", a1.root, a2.root, n.root))
+        }
+        25 => {
+            // Pronoun + Adverb + V(matched): "мен қазір келемін"
+            let subjects: &[(&str, &str)] = &[
+                ("мен", "person_1sg"),
+                ("сен", "person_2sg"),
+                ("сіз", "person_2polite"),
+                ("біз", "person_1pl"),
+            ];
+            let (pron, person_label) = subjects[rng.range(subjects.len())];
+            let adv = *rng.pick(adverbs)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", person_label], rules, rng)?;
+            Some(format!("{} {} {}.", pron, adv.root, v))
+        }
+        26 => {
+            // N(gen) + N(poss_3sg) + V(aorist 3sg): "баланың кітабы келеді"
+            let owner = *rng.pick(nouns)?;
+            let thing = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let og = inflect(owner, &["genitive"], rules, rng)?;
+            let tp = inflect(thing, &["possessive_3sg"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {}.", og, tp, v))
+        }
+        27 => {
+            // N(plural) + V(past): "адамдар келді"
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let s = inflect(subj, &["plural"], rules, rng)?;
+            let v = inflect(verb, &["past"], rules, rng)?;
+            Some(format!("{} {}.", s, v))
+        }
+        28 => {
+            // N(dat) + N + V(aorist 3sg): "мектепке бала барады"
+            let dat_n = *rng.pick(nouns)?;
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let d = inflect(dat_n, &["dative"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {}.", d, subj.root, v))
+        }
+        _ => {
+            // N(loc) + N + V(aorist 3sg): "қалада адам тұрады"
+            let loc_n = *rng.pick(nouns)?;
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let l = inflect(loc_n, &["locative"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {}.", l, subj.root, v))
         }
     }
 }
 
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
-    let target_n: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(10_000);
+    let target_n: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(18_000);
     let seed: u64 = args.next().and_then(|s| s.parse().ok()).unwrap_or(42);
 
     let lexicon: SegmentationLexicon = match load("data/tokenizer/segmentation_roots.json") {
@@ -301,6 +437,26 @@ fn main() -> ExitCode {
         .iter()
         .filter(|r| matches!(r.part_of_speech, SegmentationPartOfSpeech::Numeral))
         .collect();
+    let adverbs: Vec<&SegmentationRootEntry> = lexicon
+        .roots
+        .iter()
+        .filter(|r| matches!(r.part_of_speech, SegmentationPartOfSpeech::Adverb))
+        .collect();
+    let conjunctions: Vec<&SegmentationRootEntry> = lexicon
+        .roots
+        .iter()
+        .filter(|r| matches!(r.part_of_speech, SegmentationPartOfSpeech::Conjunction))
+        .collect();
+    let particles: Vec<&SegmentationRootEntry> = lexicon
+        .roots
+        .iter()
+        .filter(|r| matches!(r.part_of_speech, SegmentationPartOfSpeech::Particle))
+        .collect();
+    let modals: Vec<&SegmentationRootEntry> = lexicon
+        .roots
+        .iter()
+        .filter(|r| matches!(r.part_of_speech, SegmentationPartOfSpeech::Modal))
+        .collect();
 
     let mut rng = Lcg::new(seed);
     let mut samples: Vec<SynthSample> = Vec::new();
@@ -316,6 +472,10 @@ fn main() -> ExitCode {
             &adjectives,
             &postpositions,
             &numerals,
+            &adverbs,
+            &conjunctions,
+            &particles,
+            &modals,
             &rules,
         ) else {
             continue;
@@ -336,7 +496,7 @@ fn main() -> ExitCode {
     }
 
     let pack = SynthPack {
-        version: "0.0.85".to_string(),
+        version: "0.0.86".to_string(),
         name: "adam-synthetic-sentences-pack".to_string(),
         target_language: "kazakh".to_string(),
         script: "cyrillic".to_string(),

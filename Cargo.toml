@@ -9,7 +9,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.0.85"
+version = "0.0.86"
 edition = "2024"
 license = "BUSL-1.1"
 
