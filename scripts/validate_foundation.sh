@@ -49,6 +49,8 @@ jq empty data/eval/tokenizer_experiment_report.json
 jq empty data/eval/tokenizer_experiment_delta_report.json
 jq empty data/tokenizer/segmentation_roots.json
 jq empty data/tokenizer/segmentation_rules.json
+jq empty data/tokenizer/bpe_vocab.json
+jq empty data/tokenizer/bpe_merges.json
 jq empty data/training/baseline_training_manifest.json
 jq empty data/training/baseline_training_assembly_report.json
 jq empty data/training/baseline_training_consistency_report.json
