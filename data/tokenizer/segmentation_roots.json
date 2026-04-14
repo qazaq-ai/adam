@@ -1,5 +1,5 @@
 {
-  "version": "0.0.69",
+  "version": "0.0.70",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1144,6 +1144,146 @@
       "part_of_speech": "particle",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
+    },
+    {
+      "id": "num_bir",
+      "root": "бір",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "num_eki",
+      "root": "екі",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "num_ush",
+      "root": "үш",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "num_tort",
+      "root": "төрт",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "num_bes",
+      "root": "бес",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "num_alty",
+      "root": "алты",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "num_zheti",
+      "root": "жеті",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "num_segiz",
+      "root": "сегіз",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "num_toghyz",
+      "root": "тоғыз",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "num_on",
+      "root": "он",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "num_zhiyrma",
+      "root": "жиырма",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "num_otyz",
+      "root": "отыз",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "num_qyryq",
+      "root": "қырық",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "num_elu",
+      "root": "елу",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "num_alpys",
+      "root": "алпыс",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "num_zhetpis",
+      "root": "жетпіс",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "num_seksen",
+      "root": "сексен",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "num_toqsan",
+      "root": "тоқсан",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "num_zhuz",
+      "root": "жүз",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "num_myng",
+      "root": "мың",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
     }
   ]
 }

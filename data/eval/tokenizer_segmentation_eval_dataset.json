@@ -1,5 +1,5 @@
 {
-  "version": "0.0.69",
+  "version": "0.0.70",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -3350,6 +3350,186 @@
       "token": "өте",
       "expected_segments": [
         "өте"
+      ]
+    },
+    {
+      "id": "seg_405",
+      "token": "бір",
+      "expected_segments": [
+        "бір"
+      ]
+    },
+    {
+      "id": "seg_406",
+      "token": "екі",
+      "expected_segments": [
+        "екі"
+      ]
+    },
+    {
+      "id": "seg_407",
+      "token": "үш",
+      "expected_segments": [
+        "үш"
+      ]
+    },
+    {
+      "id": "seg_408",
+      "token": "төрт",
+      "expected_segments": [
+        "төрт"
+      ]
+    },
+    {
+      "id": "seg_409",
+      "token": "бес",
+      "expected_segments": [
+        "бес"
+      ]
+    },
+    {
+      "id": "seg_410",
+      "token": "алты",
+      "expected_segments": [
+        "алты"
+      ]
+    },
+    {
+      "id": "seg_411",
+      "token": "жеті",
+      "expected_segments": [
+        "жеті"
+      ]
+    },
+    {
+      "id": "seg_412",
+      "token": "сегіз",
+      "expected_segments": [
+        "сегіз"
+      ]
+    },
+    {
+      "id": "seg_413",
+      "token": "тоғыз",
+      "expected_segments": [
+        "тоғыз"
+      ]
+    },
+    {
+      "id": "seg_414",
+      "token": "он",
+      "expected_segments": [
+        "он"
+      ]
+    },
+    {
+      "id": "seg_415",
+      "token": "жүз",
+      "expected_segments": [
+        "жүз"
+      ]
+    },
+    {
+      "id": "seg_416",
+      "token": "мың",
+      "expected_segments": [
+        "мың"
+      ]
+    },
+    {
+      "id": "seg_417",
+      "token": "бірінші",
+      "expected_segments": [
+        "бір",
+        "інші"
+      ]
+    },
+    {
+      "id": "seg_418",
+      "token": "екінші",
+      "expected_segments": [
+        "екі",
+        "нші"
+      ]
+    },
+    {
+      "id": "seg_419",
+      "token": "үшінші",
+      "expected_segments": [
+        "үш",
+        "інші"
+      ]
+    },
+    {
+      "id": "seg_420",
+      "token": "бесінші",
+      "expected_segments": [
+        "бес",
+        "інші"
+      ]
+    },
+    {
+      "id": "seg_421",
+      "token": "алтыншы",
+      "expected_segments": [
+        "алты",
+        "ншы"
+      ]
+    },
+    {
+      "id": "seg_422",
+      "token": "жетінші",
+      "expected_segments": [
+        "жеті",
+        "нші"
+      ]
+    },
+    {
+      "id": "seg_423",
+      "token": "сегізінші",
+      "expected_segments": [
+        "сегіз",
+        "інші"
+      ]
+    },
+    {
+      "id": "seg_424",
+      "token": "тоғызыншы",
+      "expected_segments": [
+        "тоғыз",
+        "ыншы"
+      ]
+    },
+    {
+      "id": "seg_425",
+      "token": "оныншы",
+      "expected_segments": [
+        "он",
+        "ыншы"
+      ]
+    },
+    {
+      "id": "seg_426",
+      "token": "отызыншы",
+      "expected_segments": [
+        "отыз",
+        "ыншы"
+      ]
+    },
+    {
+      "id": "seg_427",
+      "token": "жүзінші",
+      "expected_segments": [
+        "жүз",
+        "інші"
+      ]
+    },
+    {
+      "id": "seg_428",
+      "token": "мыңыншы",
+      "expected_segments": [
+        "мың",
+        "ыншы"
       ]
     }
   ]

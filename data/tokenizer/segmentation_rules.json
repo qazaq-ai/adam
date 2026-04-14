@@ -1,5 +1,5 @@
 {
-  "version": "0.0.69",
+  "version": "0.0.70",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -7101,6 +7101,74 @@
         "vowel"
       ],
       "terminal": false,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "num_ordinal_nshy",
+      "form": "ншы",
+      "part_of_speech": "numeral",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ordinal",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "num_ordinal_nshi",
+      "form": "нші",
+      "part_of_speech": "numeral",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ordinal",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "num_ordinal_ynshy",
+      "form": "ыншы",
+      "part_of_speech": "numeral",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ordinal",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "voiced_consonant",
+        "voiceless_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "num_ordinal_inshi",
+      "form": "інші",
+      "part_of_speech": "numeral",
+      "from_state": "stem",
+      "to_state": "case",
+      "label": "ordinal",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "voiced_consonant",
+        "voiceless_consonant",
+        "nasal"
+      ],
+      "terminal": true,
       "allowed_previous_labels": []
     }
   ]
