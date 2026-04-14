@@ -39,6 +39,8 @@ jq empty data/curated/adam_training_corpus_pack.json
 jq empty data/curated/adam_pretokenized_corpus_pack.json
 jq empty data/curated/adam_training_ids_pack.json
 jq empty data/curated/adam_validation_ids_pack.json
+jq empty data/training/validation_perplexity_report.json
+jq empty data/training/generation_showcase_report.json
 jq empty data/raw/source_registry.json
 jq empty data/raw/source_scoring_rules.json
 jq empty data/eval/benchmark_manifest.json

@@ -1,5 +1,5 @@
 {
-  "version": "0.0.91",
+  "version": "0.0.92",
   "run_name": "adam-baseline-perplexity",
   "checkpoint_path": "data/training/adam_baseline_checkpoint.safetensors",
   "val_pack_path": "data/curated/adam_validation_ids_pack.json",
