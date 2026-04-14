@@ -1,5 +1,5 @@
 {
-  "version": "0.0.68",
+  "version": "0.0.69",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -996,6 +996,153 @@
       "root": "тапсырма",
       "part_of_speech": "noun",
       "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "conj_zhane",
+      "root": "және",
+      "part_of_speech": "conjunction",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "conj_biraq",
+      "root": "бірақ",
+      "part_of_speech": "conjunction",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "conj_sebebi",
+      "root": "себебі",
+      "part_of_speech": "conjunction",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "conj_oytkeni",
+      "root": "өйткені",
+      "part_of_speech": "conjunction",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "conj_nemese",
+      "root": "немесе",
+      "part_of_speech": "conjunction",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "conj_ari",
+      "root": "әрі",
+      "part_of_speech": "conjunction",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "conj_sondyqtan",
+      "root": "сондықтан",
+      "part_of_speech": "conjunction",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "conj_aytpese",
+      "root": "әйтпесе",
+      "part_of_speech": "conjunction",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "conj_soytip",
+      "root": "сөйтіп",
+      "part_of_speech": "conjunction",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "part_ma",
+      "root": "ма",
+      "part_of_speech": "particle",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_me",
+      "root": "ме",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_ba",
+      "root": "ба",
+      "part_of_speech": "particle",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_be",
+      "root": "бе",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_pa",
+      "root": "па",
+      "part_of_speech": "particle",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_pe",
+      "root": "пе",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_ghoy",
+      "root": "ғой",
+      "part_of_speech": "particle",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "part_da",
+      "root": "да",
+      "part_of_speech": "particle",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_de",
+      "root": "де",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_tek",
+      "root": "тек",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "part_qana",
+      "root": "қана",
+      "part_of_speech": "particle",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_ote",
+      "root": "өте",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
       "final_sound_class": "vowel"
     }
   ]

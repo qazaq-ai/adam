@@ -10,8 +10,8 @@
     "reference"
   ],
   "segmentation_dataset_name": "adam-tokenizer-segmentation",
-  "segmentation_example_count": 382,
-  "exact_match_count": 382,
+  "segmentation_example_count": 403,
+  "exact_match_count": 403,
   "exact_match_rate_bps": 10000,
   "category_breakdown": [
     {
@@ -21,9 +21,21 @@
       "exact_match_rate_bps": 10000
     },
     {
+      "category": "conjunction_use",
+      "example_count": 9,
+      "exact_match_count": 9,
+      "exact_match_rate_bps": 10000
+    },
+    {
       "category": "noun_inflection",
       "example_count": 104,
       "exact_match_count": 104,
+      "exact_match_rate_bps": 10000
+    },
+    {
+      "category": "particle_use",
+      "example_count": 12,
+      "exact_match_count": 12,
       "exact_match_rate_bps": 10000
     },
     {

@@ -131,7 +131,7 @@ pub enum EvalError {
 impl Default for EvalSuite {
     fn default() -> Self {
         Self {
-            version: "0.0.68".to_string(),
+            version: "0.0.69".to_string(),
             name: "kazakh-foundation-baseline".to_string(),
             target_language: "kazakh".to_string(),
             layers: vec![
@@ -443,7 +443,7 @@ mod tests {
         let suite = EvalSuite::default();
 
         assert_eq!(suite.target_language, "kazakh");
-        assert_eq!(suite.version, "0.0.68");
+        assert_eq!(suite.version, "0.0.69");
         assert_eq!(suite.layers.len(), 4);
         assert_eq!(suite.tasks.len(), 4);
         assert!(suite.validate().is_ok());
@@ -460,7 +460,7 @@ mod tests {
     #[test]
     fn dataset_rejects_latin_text() {
         let mut dataset = EvalDataset {
-            version: "0.0.68".to_string(),
+            version: "0.0.69".to_string(),
             name: "test".to_string(),
             target_language: "kazakh".to_string(),
             script: "cyrillic".to_string(),
