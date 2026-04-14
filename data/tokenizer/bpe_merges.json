@@ -1,5 +1,5 @@
 {
-  "version": "0.0.87",
+  "version": "0.0.88",
   "name": "adam-bpe-tokenizer-merges",
   "target_language": "kazakh",
   "script": "cyrillic",
