@@ -136,7 +136,7 @@ fn generate_one(
     numerals: &[&SegmentationRootEntry],
     rules: &SegmentationRuleSet,
 ) -> Option<String> {
-    let template_idx = rng.range(6);
+    let template_idx = rng.range(15);
     match template_idx {
         0 => {
             let subj = *rng.pick(nouns)?;
@@ -166,17 +166,91 @@ fn generate_one(
             let n = *rng.pick(nouns)?;
             Some(format!("{} {}.", num.root, n.root))
         }
-        _ => {
+        5 => {
             let adj = *rng.pick(adjectives)?;
             let text = inflect(adj, &["predicative_1sg"], rules, rng)?;
             Some(format!("{}.", text))
+        }
+        6 => {
+            // N + V(past): "адам келді"
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["past"], rules, rng)?;
+            Some(format!("{} {}.", subj.root, v))
+        }
+        7 => {
+            // N(plural) + V(aorist 3sg): "адамдар келеді"
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let s = inflect(subj, &["plural"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {}.", s, v))
+        }
+        8 => {
+            // N(dat) + V(aorist 3sg): "мектепке барады"
+            let np = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let n = inflect(np, &["dative"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {}.", n, v))
+        }
+        9 => {
+            // N(loc) + V(aorist 3sg): "қалада тұрады"
+            let np = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let n = inflect(np, &["locative"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {}.", n, v))
+        }
+        10 => {
+            // N(gen) + N(poss_3sg): "баланың кітабы"
+            let owner = *rng.pick(nouns)?;
+            let thing = *rng.pick(nouns)?;
+            let og = inflect(owner, &["genitive"], rules, rng)?;
+            let tp = inflect(thing, &["possessive_3sg"], rules, rng)?;
+            Some(format!("{} {}.", og, tp))
+        }
+        11 => {
+            // Adj + N + V(aorist 3sg): "үлкен адам келеді"
+            let adj = *rng.pick(adjectives)?;
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {}.", adj.root, subj.root, v))
+        }
+        12 => {
+            // Pronoun + V(matched person): "мен келемін", "сен келесің", etc.
+            let subjects: &[(&str, &str, &str)] = &[
+                ("мен", "person_1sg", "front"),
+                ("сен", "person_2sg", "front"),
+                ("сіз", "person_2polite", "front"),
+                ("біз", "person_1pl", "front"),
+            ];
+            let (pron, person_label, _) = subjects[rng.range(subjects.len())];
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", person_label], rules, rng)?;
+            Some(format!("{} {}.", pron, v))
+        }
+        13 => {
+            // N + V(negative_past): "адам келмеді"
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["negative_past"], rules, rng)?;
+            Some(format!("{} {}.", subj.root, v))
+        }
+        _ => {
+            // Adj + N + postposition: "үлкен қала туралы"
+            let adj = *rng.pick(adjectives)?;
+            let n = *rng.pick(nouns)?;
+            let p = *rng.pick(postpositions)?;
+            Some(format!("{} {} {}.", adj.root, n.root, p.root))
         }
     }
 }
 
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
-    let target_n: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(1000);
+    let target_n: usize = args.next().and_then(|s| s.parse().ok()).unwrap_or(10_000);
     let seed: u64 = args.next().and_then(|s| s.parse().ok()).unwrap_or(42);
 
     let lexicon: SegmentationLexicon = match load("data/tokenizer/segmentation_roots.json") {
@@ -262,7 +336,7 @@ fn main() -> ExitCode {
     }
 
     let pack = SynthPack {
-        version: "0.0.74".to_string(),
+        version: "0.0.75".to_string(),
         name: "adam-synthetic-sentences-pack".to_string(),
         target_language: "kazakh".to_string(),
         script: "cyrillic".to_string(),
