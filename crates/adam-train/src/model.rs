@@ -27,7 +27,9 @@ impl ModelConfig {
             num_layers: 4,
             ffn_dim: 896,
             max_seq_len: 128,
-            dropout: 0.1,
+            // Tuned in v0.0.90: 0.1 was too heavy for the current corpus size;
+            // with grad clipping + longer training, 0.05 generalizes better.
+            dropout: 0.05,
         }
     }
 

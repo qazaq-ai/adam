@@ -4,7 +4,7 @@ use adam_train::{
     data::DataLoader,
     model::{AdamBaseline, ModelConfig, default_device},
 };
-use candle_core::DType;
+use candle_core::{DType, backprop::GradStore};
 use candle_nn::{AdamW, Optimizer, ParamsAdamW, VarBuilder, VarMap, loss};
 
 const PACK_PATH: &str = "data/curated/adam_training_ids_pack.json";
@@ -134,8 +134,19 @@ fn main() -> ExitCode {
             }
         };
 
-        if let Err(e) = opt.backward_step(&loss_t) {
-            eprintln!("backward: {e}");
+        let mut grads = match loss_t.backward() {
+            Ok(g) => g,
+            Err(e) => {
+                eprintln!("backward: {e}");
+                return ExitCode::FAILURE;
+            }
+        };
+        if let Err(e) = clip_grad_norm(&varmap, &mut grads, 1.0) {
+            eprintln!("clip_grad_norm: {e}");
+            return ExitCode::FAILURE;
+        }
+        if let Err(e) = opt.step(&grads) {
+            eprintln!("opt step: {e}");
             return ExitCode::FAILURE;
         }
 
@@ -198,4 +209,35 @@ fn compute_lr(step: usize, warmup: usize, max_steps: usize, peak_lr: f64) -> f64
         // minimum lr = 10% of peak
         peak_lr * (0.1 + 0.9 * cos)
     }
+}
+
+/// Clip the global L2 norm of all gradients in `grads` to `max_norm`.
+/// Returns the pre-clip global norm (for logging).
+fn clip_grad_norm(
+    varmap: &VarMap,
+    grads: &mut GradStore,
+    max_norm: f32,
+) -> candle_core::Result<f32> {
+    let vars = varmap.all_vars();
+    let mut sum_sq = 0.0_f64;
+    for v in &vars {
+        if let Some(g) = grads.get(v.as_tensor()) {
+            sum_sq += g.sqr()?.sum_all()?.to_scalar::<f32>()? as f64;
+        }
+    }
+    let total_norm = sum_sq.sqrt() as f32;
+    if total_norm > max_norm && max_norm > 0.0 {
+        let scale = (max_norm / total_norm) as f64;
+        let mut updates: Vec<(usize, candle_core::Tensor)> = Vec::new();
+        for (idx, v) in vars.iter().enumerate() {
+            if let Some(g) = grads.get(v.as_tensor()) {
+                let scaled = (g * scale)?;
+                updates.push((idx, scaled));
+            }
+        }
+        for (idx, scaled) in updates {
+            grads.insert(vars[idx].as_tensor(), scaled);
+        }
+    }
+    Ok(total_norm)
 }
