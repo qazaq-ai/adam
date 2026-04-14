@@ -1,5 +1,5 @@
 {
-  "version": "0.0.71",
+  "version": "0.0.72",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1417,6 +1417,27 @@
       "part_of_speech": "adverb",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_edi",
+      "root": "еді",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "part_eken",
+      "root": "екен",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "part_emes",
+      "root": "емес",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
     }
   ]
 }

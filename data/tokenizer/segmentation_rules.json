@@ -1,5 +1,5 @@
 {
-  "version": "0.0.71",
+  "version": "0.0.72",
   "name": "adam-kazakh-segmentation-rules",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -7166,6 +7166,294 @@
       "allowed_final_sound_classes": [
         "voiced_consonant",
         "voiceless_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "noun_predicative_1sg_мын",
+      "form": "мын",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_1sg",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "noun_predicative_1sg_мін",
+      "form": "мін",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_1sg",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "noun_predicative_2sg_сың",
+      "form": "сың",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_2sg",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "noun_predicative_2sg_сің",
+      "form": "сің",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_2sg",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "noun_predicative_2polite_сыз",
+      "form": "сыз",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_2polite",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "noun_predicative_2polite_сіз",
+      "form": "сіз",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_2polite",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "noun_predicative_1pl_мыз",
+      "form": "мыз",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_1pl",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "noun_predicative_1pl_міз",
+      "form": "міз",
+      "part_of_speech": "noun",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_1pl",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "adjective_predicative_1sg_мын",
+      "form": "мын",
+      "part_of_speech": "adjective",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_1sg",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "adjective_predicative_1sg_мін",
+      "form": "мін",
+      "part_of_speech": "adjective",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_1sg",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "adjective_predicative_2sg_сың",
+      "form": "сың",
+      "part_of_speech": "adjective",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_2sg",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "adjective_predicative_2sg_сің",
+      "form": "сің",
+      "part_of_speech": "adjective",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_2sg",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "adjective_predicative_2polite_сыз",
+      "form": "сыз",
+      "part_of_speech": "adjective",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_2polite",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "adjective_predicative_2polite_сіз",
+      "form": "сіз",
+      "part_of_speech": "adjective",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_2polite",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "adjective_predicative_1pl_мыз",
+      "form": "мыз",
+      "part_of_speech": "adjective",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_1pl",
+      "allowed_harmonies": [
+        "back"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
+        "nasal"
+      ],
+      "terminal": true,
+      "allowed_previous_labels": []
+    },
+    {
+      "id": "adjective_predicative_1pl_міз",
+      "form": "міз",
+      "part_of_speech": "adjective",
+      "from_state": "stem",
+      "to_state": "person",
+      "label": "predicative_1pl",
+      "allowed_harmonies": [
+        "front"
+      ],
+      "allowed_final_sound_classes": [
+        "vowel",
+        "voiced_consonant",
         "nasal"
       ],
       "terminal": true,

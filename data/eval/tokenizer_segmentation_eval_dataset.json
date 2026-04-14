@@ -1,5 +1,5 @@
 {
-  "version": "0.0.71",
+  "version": "0.0.72",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -3663,6 +3663,99 @@
       "token": "солай",
       "expected_segments": [
         "солай"
+      ]
+    },
+    {
+      "id": "seg_448",
+      "token": "жақсымын",
+      "expected_segments": [
+        "жақсы",
+        "мын"
+      ]
+    },
+    {
+      "id": "seg_449",
+      "token": "қысқамын",
+      "expected_segments": [
+        "қысқа",
+        "мын"
+      ]
+    },
+    {
+      "id": "seg_450",
+      "token": "кішімін",
+      "expected_segments": [
+        "кіші",
+        "мін"
+      ]
+    },
+    {
+      "id": "seg_451",
+      "token": "әдемімін",
+      "expected_segments": [
+        "әдемі",
+        "мін"
+      ]
+    },
+    {
+      "id": "seg_452",
+      "token": "үлкенсің",
+      "expected_segments": [
+        "үлкен",
+        "сің"
+      ]
+    },
+    {
+      "id": "seg_453",
+      "token": "жақсысыз",
+      "expected_segments": [
+        "жақсы",
+        "сыз"
+      ]
+    },
+    {
+      "id": "seg_454",
+      "token": "жеңілсіз",
+      "expected_segments": [
+        "жеңіл",
+        "сіз"
+      ]
+    },
+    {
+      "id": "seg_455",
+      "token": "кішіміз",
+      "expected_segments": [
+        "кіші",
+        "міз"
+      ]
+    },
+    {
+      "id": "seg_456",
+      "token": "адаммын",
+      "expected_segments": [
+        "адам",
+        "мын"
+      ]
+    },
+    {
+      "id": "seg_457",
+      "token": "еді",
+      "expected_segments": [
+        "еді"
+      ]
+    },
+    {
+      "id": "seg_458",
+      "token": "екен",
+      "expected_segments": [
+        "екен"
+      ]
+    },
+    {
+      "id": "seg_459",
+      "token": "емес",
+      "expected_segments": [
+        "емес"
       ]
     }
   ]
