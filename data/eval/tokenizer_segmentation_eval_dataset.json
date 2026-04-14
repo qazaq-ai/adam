@@ -1,5 +1,5 @@
 {
-  "version": "0.0.72",
+  "version": "0.0.73",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -3756,6 +3756,48 @@
       "token": "емес",
       "expected_segments": [
         "емес"
+      ]
+    },
+    {
+      "id": "seg_460",
+      "token": "керек",
+      "expected_segments": [
+        "керек"
+      ]
+    },
+    {
+      "id": "seg_461",
+      "token": "мүмкін",
+      "expected_segments": [
+        "мүмкін"
+      ]
+    },
+    {
+      "id": "seg_462",
+      "token": "тиіс",
+      "expected_segments": [
+        "тиіс"
+      ]
+    },
+    {
+      "id": "seg_463",
+      "token": "шығар",
+      "expected_segments": [
+        "шығар"
+      ]
+    },
+    {
+      "id": "seg_464",
+      "token": "қажет",
+      "expected_segments": [
+        "қажет"
+      ]
+    },
+    {
+      "id": "seg_465",
+      "token": "лайық",
+      "expected_segments": [
+        "лайық"
       ]
     }
   ]

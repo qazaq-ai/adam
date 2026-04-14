@@ -1,5 +1,5 @@
 {
-  "version": "0.0.72",
+  "version": "0.0.73",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1437,6 +1437,48 @@
       "root": "емес",
       "part_of_speech": "particle",
       "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "modal_kerek",
+      "root": "керек",
+      "part_of_speech": "modal",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "modal_mumkin",
+      "root": "мүмкін",
+      "part_of_speech": "modal",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "modal_tiis",
+      "root": "тиіс",
+      "part_of_speech": "modal",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "modal_shyghar",
+      "root": "шығар",
+      "part_of_speech": "modal",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "modal_qazhet",
+      "root": "қажет",
+      "part_of_speech": "modal",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "modal_laiyq",
+      "root": "лайық",
+      "part_of_speech": "modal",
+      "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
     }
   ]

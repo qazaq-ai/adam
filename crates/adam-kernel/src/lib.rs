@@ -86,6 +86,7 @@ pub enum SegmentationPartOfSpeech {
     Particle,
     Numeral,
     Adverb,
+    Modal,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
