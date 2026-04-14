@@ -4,3 +4,4 @@
 /.vscode
 *.log
 data/external/
+.claude/
