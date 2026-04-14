@@ -1,0 +1,10 @@
+{
+  "version": "0.0.76",
+  "name": "adam-training-corpus",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "pack_manifests": [
+    "synthetic_sentences_pack.json",
+    "clean_training_corpus_pack.json"
+  ]
+}
