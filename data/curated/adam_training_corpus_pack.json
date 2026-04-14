@@ -1,5 +1,5 @@
 {
-  "version": "0.0.76",
+  "version": "0.0.77",
   "name": "adam-training-corpus",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -53602,6 +53602,646 @@
       "pack_name": "adam-clean-education-extension-pack",
       "source_id": "reviewed_education_kazakh",
       "text": "Оқу баяндауы ұғымның қызметін қысқа түрде түсіндіреді."
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007658",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Білекті бірді жығады, білімді мыңды жығады.",
+      "theme": "knowledge"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007659",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Оқу — білім бұлағы, білім — өмір шырағы.",
+      "theme": "knowledge"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007660",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Кітап — білім бұлағы.",
+      "theme": "knowledge"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007661",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Білімсіз өмір — тұзсыз ас.",
+      "theme": "knowledge"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007662",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ұстазсыз шәкірт болмас.",
+      "theme": "knowledge"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007663",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Оқыған озар, оқымаған тозар.",
+      "theme": "knowledge"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007664",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ғылым — таусылмас қазына.",
+      "theme": "knowledge"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007665",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Еңбек ерлікке жеткізер, ерлік елдікке жеткізер.",
+      "theme": "labor"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007666",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Еңбек түбі — береке.",
+      "theme": "labor"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007667",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Еңбегіне қарай — өнбегі.",
+      "theme": "labor"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007668",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Еңбексіз өмір жоқ, өнерсіз күнкөріс жоқ.",
+      "theme": "labor"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007669",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Кім еңбек етсе, сол тояды.",
+      "theme": "labor"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007670",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Еңбекке бастаған, ерлікке жеткен.",
+      "theme": "labor"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007671",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Досы көппен сыйлас, досы жоқпен сырлас.",
+      "theme": "friendship"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007672",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ескі дос жау болмас.",
+      "theme": "friendship"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007673",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Дос басқа, дұшпан басқа.",
+      "theme": "friendship"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007674",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Жақсы дос — алтын күрек.",
+      "theme": "friendship"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007675",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Достық жоқ жерде — табыс жоқ.",
+      "theme": "friendship"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007676",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Аз сөйлеп, көп тыңда.",
+      "theme": "speech"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007677",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Тіл — жүректің айнасы.",
+      "theme": "speech"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007678",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Сөз сүйектен өтер, таяқ еттен өтер.",
+      "theme": "speech"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007679",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Жақсы сөз — жарым ырыс.",
+      "theme": "speech"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007680",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ойнап айтсаң да, ойлап айт.",
+      "theme": "speech"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007681",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Жақсы сөз — жан азығы.",
+      "theme": "speech"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007682",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Тілі татудың — ісі тату.",
+      "theme": "speech"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007683",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Отан оттан да ыстық.",
+      "theme": "homeland"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007684",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Туған жердей жер болмас, туған елдей ел болмас.",
+      "theme": "homeland"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007685",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ел — анаң, жер — атаң.",
+      "theme": "homeland"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007686",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Туған жер — тұғырың, туған ел — қорғаның.",
+      "theme": "homeland"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007687",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ер туғанын сыйлар, ел туғанын қорғар.",
+      "theme": "homeland"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007688",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Жеті өлшеп, бір кес.",
+      "theme": "measure"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007689",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ойласып істеген іс өкінбейді.",
+      "theme": "measure"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007690",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Сабырлы жетер мұратына, сабырсыз қалар ұятына.",
+      "theme": "measure"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007691",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Бірлік бар жерде — тірлік бар.",
+      "theme": "unity"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007692",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ынтымақ болмаған жерде — берекет болмас.",
+      "theme": "unity"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007693",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Көппен көрген — ұлы той.",
+      "theme": "unity"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007694",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Жеке жүрген ат озбас.",
+      "theme": "unity"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007695",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Адамды адам жасайды.",
+      "theme": "character"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007696",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ағаш тамырымен, адам атымен.",
+      "theme": "character"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007697",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ар — адамның асыл қазынасы.",
+      "theme": "character"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007698",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Жаман адам дос болмас.",
+      "theme": "character"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007699",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ақылды — жаманнан қашар, ақылсыз — жақсыдан қашар.",
+      "theme": "character"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007700",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Сабыр түбі — сары алтын.",
+      "theme": "patience"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007701",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Асыққан шайтанның ісі.",
+      "theme": "patience"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007702",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Сабыр сақтағанның мақсаты асар.",
+      "theme": "patience"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007703",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Кәрінің тілін ал, жастың пілін.",
+      "theme": "age_wisdom"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007704",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ақыл кеңестен туады.",
+      "theme": "age_wisdom"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007705",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ақылды адам асықпас.",
+      "theme": "age_wisdom"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007706",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ақиқат — тіршіліктің тірегі.",
+      "theme": "truth"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007707",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Шындық оттан да ыстық.",
+      "theme": "truth"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007708",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Байлық — бір жылдық, білім — мәңгілік.",
+      "theme": "wealth"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007709",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Денсаулық — зор байлық.",
+      "theme": "wealth"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007710",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ынтымақ — халықтың байлығы.",
+      "theme": "wealth"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007711",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ананың ақ сүтімен сіңген.",
+      "theme": "family"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007712",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ананың қолы — бақ, әкенің қолы — тақ.",
+      "theme": "family"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007713",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Бала — елдің болашағы.",
+      "theme": "family"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007714",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Атаның ізінен ұл шығады.",
+      "theme": "family"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007715",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ана — бала жанашыры.",
+      "theme": "family"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007716",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Су бар жерде — тіршілік бар.",
+      "theme": "nature"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007717",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Жер — анасы, тіршіліктің бастауы.",
+      "theme": "nature"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007718",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Қонақ — үйдің берекесі.",
+      "theme": "hospitality"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007719",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Дастархан — достықтың нышаны.",
+      "theme": "hospitality"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007720",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ұяда не көрсе, ұшқанда соны алады.",
+      "theme": "learning"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007721",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Білімсіз бір күн қараңғылықта өмір сүру.",
+      "theme": "learning"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007722",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Оқыған — озады, білімді — үздік болады.",
+      "theme": "learning"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007723",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Істің басы жеңіл, аяғы ауыр.",
+      "theme": "perseverance"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007724",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Талап — жетістіктің бастауы.",
+      "theme": "perseverance"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007725",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Еңбек — табыстың қайнары.",
+      "theme": "perseverance"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007726",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ақылды адам сөзін де, ісін де өлшеп айтар.",
+      "theme": "wisdom"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007727",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Білгіш көптен озар, білімсіз жалғыз қалар.",
+      "theme": "wisdom"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007728",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ой — адамның қаруы.",
+      "theme": "wisdom"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007729",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Денсаулық — байлықтың басы.",
+      "theme": "health"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007730",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ауруын жасырған — өлімге жақын.",
+      "theme": "health"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007731",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Аз да болса, саз болсын.",
+      "theme": "brevity"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007732",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Көп сөз — күміс, аз сөз — алтын.",
+      "theme": "brevity"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007733",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ар тазалығы — жанның тазалығы.",
+      "theme": "honor"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007734",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Жақсы есім — асыл қазына.",
+      "theme": "honor"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007735",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ағайын тату болса, ат көп.",
+      "theme": "community"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007736",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ел ішінде — ер көп.",
+      "theme": "community"
+    },
+    {
+      "domain": "proverb",
+      "id": "adam_train_007737",
+      "pack_name": "adam-kazakh-proverbs-pack",
+      "source_id": "classical_kazakh_proverbs",
+      "text": "Ер қорықпас, ел жасымас.",
+      "theme": "courage"
     }
   ]
 }
