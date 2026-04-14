@@ -336,7 +336,7 @@ fn main() -> ExitCode {
     }
 
     let pack = SynthPack {
-        version: "0.0.84".to_string(),
+        version: "0.0.85".to_string(),
         name: "adam-synthetic-sentences-pack".to_string(),
         target_language: "kazakh".to_string(),
         script: "cyrillic".to_string(),
