@@ -142,7 +142,7 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-        let logits = match model.forward(&input) {
+        let logits = match model.forward(&input, false) {
             Ok(l) => l,
             Err(e) => {
                 eprintln!("forward: {e}");

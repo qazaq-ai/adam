@@ -4,7 +4,7 @@ use candle_nn::{
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ModelConfig {
     pub vocab_size: usize,
     pub hidden_dim: usize,
@@ -12,19 +12,22 @@ pub struct ModelConfig {
     pub num_layers: usize,
     pub ffn_dim: usize,
     pub max_seq_len: usize,
+    pub dropout: f32,
 }
 
 impl ModelConfig {
     pub fn tiny() -> Self {
         Self {
             // Must match the BPE vocab size written by train_bpe.
-            // Updated in v0.0.87 after lexicon-seeded vocab retrain (was 1066).
+            // Bumped to 1390 in v0.0.87 (lexicon-seeded vocab retrain).
             vocab_size: 1390,
-            hidden_dim: 192,
-            num_heads: 6,
+            // Scaled up in v0.0.89 to ~3.06M params.
+            hidden_dim: 224,
+            num_heads: 8,
             num_layers: 4,
-            ffn_dim: 768,
+            ffn_dim: 896,
             max_seq_len: 128,
+            dropout: 0.1,
         }
     }
 
@@ -141,6 +144,7 @@ pub struct AdamBaseline {
     final_ln: LayerNorm,
     head: Linear,
     max_seq_len: usize,
+    dropout: f32,
 }
 
 impl AdamBaseline {
@@ -160,10 +164,11 @@ impl AdamBaseline {
             final_ln,
             head,
             max_seq_len: cfg.max_seq_len,
+            dropout: cfg.dropout,
         })
     }
 
-    pub fn forward(&self, ids: &Tensor) -> Result<Tensor> {
+    pub fn forward(&self, ids: &Tensor, train: bool) -> Result<Tensor> {
         let (_b, t) = ids.dims2()?;
         if t > self.max_seq_len {
             candle_core::bail!("sequence length {t} > max_seq_len {}", self.max_seq_len);
@@ -176,8 +181,14 @@ impl AdamBaseline {
             .unsqueeze(0)?
             .broadcast_as(tok.shape())?;
         let mut x = (tok + pos)?;
+        if train && self.dropout > 0.0 {
+            x = candle_nn::ops::dropout(&x, self.dropout)?;
+        }
         for block in &self.blocks {
             x = block.forward(&x)?;
+            if train && self.dropout > 0.0 {
+                x = candle_nn::ops::dropout(&x, self.dropout)?;
+            }
         }
         let x = self.final_ln.forward(&x)?;
         self.head.forward(&x)

@@ -62,7 +62,7 @@ fn main() -> ExitCode {
         }
     };
 
-    let logits = match model.forward(&ids_tensor) {
+    let logits = match model.forward(&ids_tensor, false) {
         Ok(t) => t,
         Err(e) => {
             eprintln!("forward: {e}");
