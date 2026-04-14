@@ -4,7 +4,11 @@ use std::{
     process::ExitCode,
 };
 
+use adam_tokenizer::{SegmentationLexicon, SegmentationRuleSet};
 use serde::{Deserialize, Serialize};
+
+const LEXICON_PATH: &str = "data/tokenizer/segmentation_roots.json";
+const RULES_PATH: &str = "data/tokenizer/segmentation_rules.json";
 
 #[derive(Debug, Deserialize)]
 struct PretokSample {
@@ -104,13 +108,43 @@ fn main() -> ExitCode {
     let sentence_count = corpus.len();
     let initial_tokens: usize = corpus.iter().map(|s| s.len()).sum();
 
-    // Build initial vocabulary from unique pretokens.
+    // Build initial vocabulary. Seeds from the FSM lexicon and rules so every
+    // lexicon root (as word-start "▁<root>") and every suffix form appears in
+    // vocab even if that specific token is rare or absent in the training
+    // corpus — guarantees no <unk> at inference for any parseable lexicon word.
+    let lexicon: SegmentationLexicon = match load_json(LEXICON_PATH) {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("lexicon: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let rules: SegmentationRuleSet = match load_json(RULES_PATH) {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("rules: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
     let mut base_tokens: HashSet<String> = HashSet::new();
+    for root in &lexicon.roots {
+        base_tokens.insert(format!("\u{2581}{}", root.root));
+    }
+    for rule in &rules.rules {
+        base_tokens.insert(rule.form.clone());
+    }
+    let seeded_lexicon_count = base_tokens.len();
     for sentence in &corpus {
         for t in sentence {
             base_tokens.insert(t.clone());
         }
     }
+    let seeded_total = base_tokens.len();
+    eprintln!(
+        "vocab seed: {} lexicon/rule forms, {} total unique after corpus union",
+        seeded_lexicon_count, seeded_total
+    );
     let mut vocab_tokens: Vec<String> = base_tokens.into_iter().collect();
     vocab_tokens.sort();
 
@@ -296,4 +330,9 @@ fn main() -> ExitCode {
 
     eprintln!("wrote {} and {}", vocab_out, merges_out);
     ExitCode::SUCCESS
+}
+
+fn load_json<T: serde::de::DeserializeOwned>(path: &str) -> Result<T, Box<dyn std::error::Error>> {
+    let contents = fs::read_to_string(path)?;
+    Ok(serde_json::from_str(&contents)?)
 }

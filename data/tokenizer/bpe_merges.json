@@ -1,3921 +1,5195 @@
 {
-  "version": "0.0.86",
+  "version": "0.0.87",
   "name": "adam-bpe-tokenizer-merges",
   "target_language": "kazakh",
   "script": "cyrillic",
-  "merge_count": 559,
+  "merge_count": 741,
   "merges": [
     {
       "rank": 1,
       "left": "ды",
       "right": ".",
       "merged": "ды.",
-      "frequency": 2442
+      "frequency": 5118
     },
     {
       "rank": 2,
       "left": "ді",
       "right": ".",
       "merged": "ді.",
-      "frequency": 1608
+      "frequency": 3195
     },
     {
       "rank": 3,
       "left": "а",
       "right": "ды.",
       "merged": "ады.",
-      "frequency": 1435
+      "frequency": 2872
     },
     {
       "rank": 4,
       "left": "е",
       "right": "ді.",
       "merged": "еді.",
-      "frequency": 1361
+      "frequency": 2600
     },
     {
       "rank": 5,
       "left": "й",
       "right": "ды.",
       "merged": "йды.",
-      "frequency": 764
+      "frequency": 1572
     },
     {
       "rank": 6,
-      "left": "мады",
-      "right": ".",
-      "merged": "мады.",
-      "frequency": 253
+      "left": "▁қара",
+      "right": "йды.",
+      "merged": "▁қарайды.",
+      "frequency": 246
     },
     {
       "rank": 7,
-      "left": "ы",
-      "right": ".",
-      "merged": "ы.",
-      "frequency": 200
+      "left": "▁сөйле",
+      "right": "й",
+      "merged": "▁сөйлей",
+      "frequency": 238
     },
     {
       "rank": 8,
-      "left": "і",
-      "right": ".",
-      "merged": "і.",
-      "frequency": 184
+      "left": "▁аш",
+      "right": "ады.",
+      "merged": "▁ашады.",
+      "frequency": 237
     },
     {
       "rank": 9,
-      "left": "сы",
-      "right": ".",
-      "merged": "сы.",
-      "frequency": 183
+      "left": "▁біл",
+      "right": "еді.",
+      "merged": "▁біледі.",
+      "frequency": 236
     },
     {
       "rank": 10,
-      "left": "меді",
-      "right": ".",
-      "merged": "меді.",
-      "frequency": 145
+      "left": "▁құр",
+      "right": "ады.",
+      "merged": "▁құрады.",
+      "frequency": 236
     },
     {
       "rank": 11,
-      "left": "▁жеткіз",
-      "right": "еді.",
-      "merged": "▁жеткізеді.",
-      "frequency": 133
+      "left": "▁арттыр",
+      "right": "ады.",
+      "merged": "▁арттырады.",
+      "frequency": 235
     },
     {
       "rank": 12,
-      "left": "▁түсіндір",
-      "right": "еді.",
-      "merged": "▁түсіндіреді.",
-      "frequency": 131
-    },
-    {
-      "rank": 13,
-      "left": "▁бар",
-      "right": "ады.",
-      "merged": "▁барады.",
-      "frequency": 126
-    },
-    {
-      "rank": 14,
-      "left": "▁тұр",
-      "right": "ады.",
-      "merged": "▁тұрады.",
-      "frequency": 125
-    },
-    {
-      "rank": 15,
-      "left": "▁көрсет",
-      "right": "еді.",
-      "merged": "▁көрсетеді.",
-      "frequency": 124
-    },
-    {
-      "rank": 16,
-      "left": "▁ал",
-      "right": "ады.",
-      "merged": "▁алады.",
-      "frequency": 122
-    },
-    {
-      "rank": 17,
-      "left": "▁кет",
-      "right": "еді.",
-      "merged": "▁кетеді.",
-      "frequency": 122
-    },
-    {
-      "rank": 18,
-      "left": "▁нақтыла",
-      "right": "йды.",
-      "merged": "▁нақтылайды.",
-      "frequency": 120
-    },
-    {
-      "rank": 19,
-      "left": "▁бер",
-      "right": "еді.",
-      "merged": "▁береді.",
-      "frequency": 116
-    },
-    {
-      "rank": 20,
-      "left": "▁жаса",
-      "right": "йды.",
-      "merged": "▁жасайды.",
-      "frequency": 114
-    },
-    {
-      "rank": 21,
       "left": "▁қон",
       "right": "ады.",
       "merged": "▁қонады.",
-      "frequency": 114
+      "frequency": 235
+    },
+    {
+      "rank": 13,
+      "left": "▁нақтыла",
+      "right": "йды.",
+      "merged": "▁нақтылайды.",
+      "frequency": 233
+    },
+    {
+      "rank": 14,
+      "left": "▁ал",
+      "right": "ады.",
+      "merged": "▁алады.",
+      "frequency": 231
+    },
+    {
+      "rank": 15,
+      "left": "▁сақта",
+      "right": "йды.",
+      "merged": "▁сақтайды.",
+      "frequency": 231
+    },
+    {
+      "rank": 16,
+      "left": "▁жап",
+      "right": "ады.",
+      "merged": "▁жапады.",
+      "frequency": 227
+    },
+    {
+      "rank": 17,
+      "left": "▁жаса",
+      "right": "йды.",
+      "merged": "▁жасайды.",
+      "frequency": 227
+    },
+    {
+      "rank": 18,
+      "left": "▁көрсет",
+      "right": "еді.",
+      "merged": "▁көрсетеді.",
+      "frequency": 223
+    },
+    {
+      "rank": 19,
+      "left": "▁айт",
+      "right": "ады.",
+      "merged": "▁айтады.",
+      "frequency": 222
+    },
+    {
+      "rank": 20,
+      "left": "▁жеткіз",
+      "right": "еді.",
+      "merged": "▁жеткізеді.",
+      "frequency": 222
+    },
+    {
+      "rank": 21,
+      "left": "▁кел",
+      "right": "еді.",
+      "merged": "▁келеді.",
+      "frequency": 220
     },
     {
       "rank": 22,
-      "left": "й",
-      "right": "ді.",
-      "merged": "йді.",
-      "frequency": 113
+      "left": "мады",
+      "right": ".",
+      "merged": "мады.",
+      "frequency": 219
     },
     {
       "rank": 23,
-      "left": "▁жүр",
+      "left": "▁кет",
       "right": "еді.",
-      "merged": "▁жүреді.",
-      "frequency": 113
+      "merged": "▁кетеді.",
+      "frequency": 217
     },
     {
       "rank": 24,
-      "left": "▁сөйле",
-      "right": "йді.",
-      "merged": "▁сөйлейді.",
-      "frequency": 113
+      "left": "▁көмектес",
+      "right": "еді.",
+      "merged": "▁көмектеседі.",
+      "frequency": 217
     },
     {
       "rank": 25,
-      "left": "▁тап",
-      "right": "ады.",
-      "merged": "▁тапады.",
-      "frequency": 113
+      "left": "▁оқы",
+      "right": "йды.",
+      "merged": "▁оқыйды.",
+      "frequency": 217
     },
     {
       "rank": 26,
-      "left": "▁қолдан",
-      "right": "ады.",
-      "merged": "▁қолданады.",
-      "frequency": 113
+      "left": "▁бер",
+      "right": "еді.",
+      "merged": "▁береді.",
+      "frequency": 216
     },
     {
       "rank": 27,
       "left": "▁жаз",
       "right": "ады.",
       "merged": "▁жазады.",
-      "frequency": 112
+      "frequency": 216
     },
     {
       "rank": 28,
-      "left": "▁бекіт",
-      "right": "еді.",
-      "merged": "▁бекітеді.",
-      "frequency": 110
-    },
-    {
-      "rank": 29,
-      "left": "▁кел",
-      "right": "еді.",
-      "merged": "▁келеді.",
-      "frequency": 110
-    },
-    {
-      "rank": 30,
-      "left": "▁сипатта",
-      "right": "йды.",
-      "merged": "▁сипаттайды.",
-      "frequency": 110
-    },
-    {
-      "rank": 31,
-      "left": "▁көмектес",
-      "right": "еді.",
-      "merged": "▁көмектеседі.",
-      "frequency": 109
-    },
-    {
-      "rank": 32,
-      "left": "▁оқы",
-      "right": "йды.",
-      "merged": "▁оқыйды.",
-      "frequency": 108
-    },
-    {
-      "rank": 33,
-      "left": "▁сақта",
-      "right": "йды.",
-      "merged": "▁сақтайды.",
-      "frequency": 108
-    },
-    {
-      "rank": 34,
-      "left": "▁салыстыр",
-      "right": "ады.",
-      "merged": "▁салыстырады.",
-      "frequency": 107
-    },
-    {
-      "rank": 35,
-      "left": "▁мін",
-      "right": "еді.",
-      "merged": "▁мінеді.",
-      "frequency": 106
-    },
-    {
-      "rank": 36,
-      "left": "▁қара",
-      "right": "йды.",
-      "merged": "▁қарайды.",
-      "frequency": 106
-    },
-    {
-      "rank": 37,
-      "left": "▁арттыр",
-      "right": "ады.",
-      "merged": "▁арттырады.",
-      "frequency": 103
-    },
-    {
-      "rank": 38,
-      "left": "▁жап",
-      "right": "ады.",
-      "merged": "▁жапады.",
-      "frequency": 101
-    },
-    {
-      "rank": 39,
-      "left": "▁құр",
-      "right": "ады.",
-      "merged": "▁құрады.",
-      "frequency": 101
-    },
-    {
-      "rank": 40,
-      "left": "▁аш",
-      "right": "ады.",
-      "merged": "▁ашады.",
-      "frequency": 100
-    },
-    {
-      "rank": 41,
       "left": "▁көр",
       "right": "еді.",
       "merged": "▁көреді.",
-      "frequency": 99
+      "frequency": 216
     },
     {
-      "rank": 42,
-      "left": "▁айт",
-      "right": "ады.",
-      "merged": "▁айтады.",
-      "frequency": 98
+      "rank": 29,
+      "left": "▁сөйлей",
+      "right": "ді.",
+      "merged": "▁сөйлейді.",
+      "frequency": 216
     },
     {
-      "rank": 43,
+      "rank": 30,
+      "left": "ы",
+      "right": ".",
+      "merged": "ы.",
+      "frequency": 215
+    },
+    {
+      "rank": 31,
+      "left": "▁жүр",
+      "right": "еді.",
+      "merged": "▁жүреді.",
+      "frequency": 215
+    },
+    {
+      "rank": 32,
       "left": "▁тыңда",
       "right": "йды.",
       "merged": "▁тыңдайды.",
-      "frequency": 98
+      "frequency": 214
     },
     {
-      "rank": 44,
-      "left": "▁соң",
-      "right": ".",
-      "merged": "▁соң.",
-      "frequency": 93
-    },
-    {
-      "rank": 45,
-      "left": "▁бастап",
-      "right": ".",
-      "merged": "▁бастап.",
-      "frequency": 89
-    },
-    {
-      "rank": 46,
-      "left": "ты",
-      "right": ".",
-      "merged": "ты.",
-      "frequency": 88
-    },
-    {
-      "rank": 47,
-      "left": "▁біл",
+      "rank": 33,
+      "left": "▁түсіндір",
       "right": "еді.",
-      "merged": "▁біледі.",
-      "frequency": 88
+      "merged": "▁түсіндіреді.",
+      "frequency": 214
     },
     {
-      "rank": 48,
-      "left": "▁дейін",
-      "right": ".",
-      "merged": "▁дейін.",
-      "frequency": 84
+      "rank": 34,
+      "left": "а",
+      "right": "ды",
+      "merged": "ады",
+      "frequency": 212
     },
     {
-      "rank": 49,
-      "left": "▁үшін",
-      "right": ".",
-      "merged": "▁үшін.",
-      "frequency": 84
+      "rank": 35,
+      "left": "▁қолдан",
+      "right": "ады.",
+      "merged": "▁қолданады.",
+      "frequency": 212
     },
     {
-      "rank": 50,
-      "left": "▁бірге",
-      "right": ".",
-      "merged": "▁бірге.",
-      "frequency": 83
+      "rank": 36,
+      "left": "▁бекіт",
+      "right": "еді.",
+      "merged": "▁бекітеді.",
+      "frequency": 208
     },
     {
-      "rank": 51,
-      "left": "▁бұрын",
-      "right": ".",
-      "merged": "▁бұрын.",
-      "frequency": 80
+      "rank": 37,
+      "left": "▁тап",
+      "right": "ады.",
+      "merged": "▁тапады.",
+      "frequency": 208
     },
     {
-      "rank": 52,
-      "left": "▁қарсы",
-      "right": ".",
-      "merged": "▁қарсы.",
-      "frequency": 80
+      "rank": 38,
+      "left": "▁тұр",
+      "right": "ады.",
+      "merged": "▁тұрады.",
+      "frequency": 207
     },
     {
-      "rank": 53,
-      "left": "▁арқылы",
-      "right": ".",
-      "merged": "▁арқылы.",
-      "frequency": 78
+      "rank": 39,
+      "left": "▁сипатта",
+      "right": "йды.",
+      "merged": "▁сипаттайды.",
+      "frequency": 204
     },
     {
-      "rank": 54,
-      "left": "▁кейін",
-      "right": ".",
-      "merged": "▁кейін.",
-      "frequency": 78
+      "rank": 40,
+      "left": "▁бар",
+      "right": "ады.",
+      "merged": "▁барады.",
+      "frequency": 203
     },
     {
-      "rank": 55,
-      "left": "▁басқа",
-      "right": ".",
-      "merged": "▁басқа.",
-      "frequency": 77
+      "rank": 41,
+      "left": "▁салыстыр",
+      "right": "ады.",
+      "merged": "▁салыстырады.",
+      "frequency": 203
     },
     {
-      "rank": 56,
-      "left": "▁жайлы",
-      "right": ".",
-      "merged": "▁жайлы.",
-      "frequency": 77
+      "rank": 42,
+      "left": "▁мін",
+      "right": "еді.",
+      "merged": "▁мінеді.",
+      "frequency": 196
     },
     {
-      "rank": 57,
-      "left": "▁сайын",
-      "right": ".",
-      "merged": "▁сайын.",
-      "frequency": 77
-    },
-    {
-      "rank": 58,
+      "rank": 43,
       "left": "ті",
       "right": ".",
       "merged": "ті.",
-      "frequency": 72
+      "frequency": 193
     },
     {
-      "rank": 59,
-      "left": "▁бойынша",
+      "rank": 44,
+      "left": "сы",
       "right": ".",
-      "merged": "▁бойынша.",
-      "frequency": 72
+      "merged": "сы.",
+      "frequency": 187
     },
     {
-      "rank": 60,
-      "left": "▁туралы",
+      "rank": 45,
+      "left": "ты",
       "right": ".",
-      "merged": "▁туралы.",
-      "frequency": 71
+      "merged": "ты.",
+      "frequency": 186
     },
     {
-      "rank": 61,
-      "left": "сі",
+      "rank": 46,
+      "left": "е",
+      "right": "ді",
+      "merged": "еді",
+      "frequency": 180
+    },
+    {
+      "rank": 47,
+      "left": "і",
       "right": ".",
-      "merged": "сі.",
-      "frequency": 67
+      "merged": "і.",
+      "frequency": 170
     },
     {
-      "rank": 62,
-      "left": "▁жөнінде",
-      "right": ".",
-      "merged": "▁жөнінде.",
-      "frequency": 67
-    },
-    {
-      "rank": 63,
-      "left": "▁ұғым",
+      "rank": 48,
+      "left": "й",
       "right": "ды",
-      "merged": "▁ұғымды",
-      "frequency": 27
+      "merged": "йды",
+      "frequency": 115
     },
     {
-      "rank": 64,
+      "rank": 49,
       "left": "мын",
       "right": ".",
       "merged": "мын.",
-      "frequency": 26
+      "frequency": 103
     },
     {
-      "rank": 65,
-      "left": "▁белгі",
+      "rank": 50,
+      "left": "меді",
       "right": ".",
-      "merged": "▁белгі.",
-      "frequency": 26
+      "merged": "меді.",
+      "frequency": 99
     },
     {
-      "rank": 66,
-      "left": "▁термин",
-      "right": ".",
-      "merged": "▁термин.",
-      "frequency": 26
+      "rank": 51,
+      "left": "а",
+      "right": "мын.",
+      "merged": "амын.",
+      "frequency": 97
     },
     {
-      "rank": 67,
-      "left": "▁қорытынды",
-      "right": ".",
-      "merged": "▁қорытынды.",
-      "frequency": 26
-    },
-    {
-      "rank": 68,
-      "left": "▁ұғым",
-      "right": "ның",
-      "merged": "▁ұғымның",
-      "frequency": 26
-    },
-    {
-      "rank": 69,
-      "left": "▁адам",
-      "right": ".",
-      "merged": "▁адам.",
-      "frequency": 25
-    },
-    {
-      "rank": 70,
-      "left": "▁мемлекет",
-      "right": ".",
-      "merged": "▁мемлекет.",
-      "frequency": 25
-    },
-    {
-      "rank": 71,
-      "left": "▁үлгі",
-      "right": ".",
-      "merged": "▁үлгі.",
-      "frequency": 25
-    },
-    {
-      "rank": 72,
-      "left": "▁заң",
-      "right": ".",
-      "merged": "▁заң.",
-      "frequency": 24
-    },
-    {
-      "rank": 73,
-      "left": "▁түр",
-      "right": "де",
-      "merged": "▁түрде",
-      "frequency": 24
-    },
-    {
-      "rank": 74,
-      "left": "▁құр",
-      "right": "ды.",
-      "merged": "▁құрды.",
-      "frequency": 24
-    },
-    {
-      "rank": 75,
+      "rank": 52,
       "left": "мін",
       "right": ".",
       "merged": "мін.",
-      "frequency": 23
+      "frequency": 95
+    },
+    {
+      "rank": 53,
+      "left": "а",
+      "right": "сыз",
+      "merged": "асыз",
+      "frequency": 92
+    },
+    {
+      "rank": 54,
+      "left": "асыз",
+      "right": ".",
+      "merged": "асыз.",
+      "frequency": 92
+    },
+    {
+      "rank": 55,
+      "left": "е",
+      "right": "мін.",
+      "merged": "емін.",
+      "frequency": 89
+    },
+    {
+      "rank": 56,
+      "left": "▁арқылы",
+      "right": ".",
+      "merged": "▁арқылы.",
+      "frequency": 87
+    },
+    {
+      "rank": 57,
+      "left": "▁жөнінде",
+      "right": ".",
+      "merged": "▁жөнінде.",
+      "frequency": 81
+    },
+    {
+      "rank": 58,
+      "left": "▁қарсы",
+      "right": ".",
+      "merged": "▁қарсы.",
+      "frequency": 81
+    },
+    {
+      "rank": 59,
+      "left": "▁жайлы",
+      "right": ".",
+      "merged": "▁жайлы.",
+      "frequency": 78
+    },
+    {
+      "rank": 60,
+      "left": "е",
+      "right": "сіз",
+      "merged": "есіз",
+      "frequency": 77
+    },
+    {
+      "rank": 61,
+      "left": "есіз",
+      "right": ".",
+      "merged": "есіз.",
+      "frequency": 77
+    },
+    {
+      "rank": 62,
+      "left": "сі",
+      "right": ".",
+      "merged": "сі.",
+      "frequency": 77
+    },
+    {
+      "rank": 63,
+      "left": "▁бірге",
+      "right": ".",
+      "merged": "▁бірге.",
+      "frequency": 77
+    },
+    {
+      "rank": 64,
+      "left": "▁басқа",
+      "right": ".",
+      "merged": "▁басқа.",
+      "frequency": 76
+    },
+    {
+      "rank": 65,
+      "left": "▁емес",
+      "right": ".",
+      "merged": "▁емес.",
+      "frequency": 76
+    },
+    {
+      "rank": 66,
+      "left": "▁бастап",
+      "right": ".",
+      "merged": "▁бастап.",
+      "frequency": 73
+    },
+    {
+      "rank": 67,
+      "left": "▁дейін",
+      "right": ".",
+      "merged": "▁дейін.",
+      "frequency": 73
+    },
+    {
+      "rank": 68,
+      "left": "▁соң",
+      "right": ".",
+      "merged": "▁соң.",
+      "frequency": 73
+    },
+    {
+      "rank": 69,
+      "left": "▁де",
+      "right": ".",
+      "merged": "▁де.",
+      "frequency": 72
+    },
+    {
+      "rank": 70,
+      "left": "▁ма",
+      "right": ".",
+      "merged": "▁ма.",
+      "frequency": 71
+    },
+    {
+      "rank": 71,
+      "left": "▁ме",
+      "right": ".",
+      "merged": "▁ме.",
+      "frequency": 71
+    },
+    {
+      "rank": 72,
+      "left": "▁өте",
+      "right": ".",
+      "merged": "▁өте.",
+      "frequency": 71
+    },
+    {
+      "rank": 73,
+      "left": "▁сайын",
+      "right": ".",
+      "merged": "▁сайын.",
+      "frequency": 70
+    },
+    {
+      "rank": 74,
+      "left": "▁бұрын",
+      "right": ".",
+      "merged": "▁бұрын.",
+      "frequency": 69
+    },
+    {
+      "rank": 75,
+      "left": "▁па",
+      "right": ".",
+      "merged": "▁па.",
+      "frequency": 69
     },
     {
       "rank": 76,
-      "left": "▁аш",
-      "right": "ты.",
-      "merged": "▁ашты.",
-      "frequency": 23
+      "left": "▁ғой",
+      "right": ".",
+      "merged": "▁ғой.",
+      "frequency": 69
     },
     {
       "rank": 77,
-      "left": "▁жаз",
-      "right": "мады.",
-      "merged": "▁жазмады.",
-      "frequency": 23
+      "left": "▁ба",
+      "right": ".",
+      "merged": "▁ба.",
+      "frequency": 68
     },
     {
       "rank": 78,
-      "left": "▁жап",
-      "right": "ты.",
-      "merged": "▁жапты.",
-      "frequency": 23
+      "left": "▁туралы",
+      "right": ".",
+      "merged": "▁туралы.",
+      "frequency": 68
     },
     {
       "rank": 79,
-      "left": "▁жауап",
+      "left": "▁кейін",
       "right": ".",
-      "merged": "▁жауап.",
-      "frequency": 23
+      "merged": "▁кейін.",
+      "frequency": 67
     },
     {
       "rank": 80,
-      "left": "▁көр",
-      "right": "меді.",
-      "merged": "▁көрмеді.",
-      "frequency": 23
+      "left": "▁үшін",
+      "right": ".",
+      "merged": "▁үшін.",
+      "frequency": 66
     },
     {
       "rank": 81,
-      "left": "▁мәтін",
+      "left": "▁қана",
       "right": ".",
-      "merged": "▁мәтін.",
-      "frequency": 23
+      "merged": "▁қана.",
+      "frequency": 65
     },
     {
       "rank": 82,
-      "left": "▁нәтиже",
+      "left": "▁да",
       "right": ".",
-      "merged": "▁нәтиже.",
-      "frequency": 23
+      "merged": "▁да.",
+      "frequency": 64
     },
     {
       "rank": 83,
-      "left": "▁тіл",
+      "left": "▁бе",
       "right": ".",
-      "merged": "▁тіл.",
-      "frequency": 23
+      "merged": "▁бе.",
+      "frequency": 63
     },
     {
       "rank": 84,
+      "left": "▁бойынша",
+      "right": ".",
+      "merged": "▁бойынша.",
+      "frequency": 63
+    },
+    {
+      "rank": 85,
+      "left": "▁екен",
+      "right": ".",
+      "merged": "▁екен.",
+      "frequency": 63
+    },
+    {
+      "rank": 86,
+      "left": "▁пе",
+      "right": ".",
+      "merged": "▁пе.",
+      "frequency": 62
+    },
+    {
+      "rank": 87,
+      "left": "▁жаз",
+      "right": "ды.",
+      "merged": "▁жазды.",
+      "frequency": 61
+    },
+    {
+      "rank": 88,
+      "left": "▁тек",
+      "right": ".",
+      "merged": "▁тек.",
+      "frequency": 58
+    },
+    {
+      "rank": 89,
+      "left": "▁ал",
+      "right": "ды.",
+      "merged": "▁алды.",
+      "frequency": 56
+    },
+    {
+      "rank": 90,
+      "left": "▁шығар",
+      "right": ".",
+      "merged": "▁шығар.",
+      "frequency": 56
+    },
+    {
+      "rank": 91,
+      "left": "▁айт",
+      "right": "ты.",
+      "merged": "▁айтты.",
+      "frequency": 55
+    },
+    {
+      "rank": 92,
+      "left": "▁нақтыла",
+      "right": "ды.",
+      "merged": "▁нақтылады.",
+      "frequency": 55
+    },
+    {
+      "rank": 93,
+      "left": "▁еді",
+      "right": ".",
+      "merged": "▁еді.",
+      "frequency": 54
+    },
+    {
+      "rank": 94,
+      "left": "▁жаса",
+      "right": "ды.",
+      "merged": "▁жасады.",
+      "frequency": 54
+    },
+    {
+      "rank": 95,
+      "left": "▁мүмкін",
+      "right": ".",
+      "merged": "▁мүмкін.",
+      "frequency": 54
+    },
+    {
+      "rank": 96,
+      "left": "▁лайық",
+      "right": ".",
+      "merged": "▁лайық.",
+      "frequency": 53
+    },
+    {
+      "rank": 97,
+      "left": "▁оқы",
+      "right": "ды.",
+      "merged": "▁оқыды.",
+      "frequency": 53
+    },
+    {
+      "rank": 98,
+      "left": "▁жүр",
+      "right": "ді.",
+      "merged": "▁жүрді.",
+      "frequency": 52
+    },
+    {
+      "rank": 99,
+      "left": "▁көр",
+      "right": "ді.",
+      "merged": "▁көрді.",
+      "frequency": 51
+    },
+    {
+      "rank": 100,
+      "left": "▁көрсет",
+      "right": "ті.",
+      "merged": "▁көрсетті.",
+      "frequency": 51
+    },
+    {
+      "rank": 101,
+      "left": "▁сөйле",
+      "right": "ді.",
+      "merged": "▁сөйледі.",
+      "frequency": 51
+    },
+    {
+      "rank": 102,
+      "left": "▁тұр",
+      "right": "ды.",
+      "merged": "▁тұрды.",
+      "frequency": 51
+    },
+    {
+      "rank": 103,
+      "left": "▁бар",
+      "right": "ды.",
+      "merged": "▁барды.",
+      "frequency": 49
+    },
+    {
+      "rank": 104,
+      "left": "▁бер",
+      "right": "ді.",
+      "merged": "▁берді.",
+      "frequency": 48
+    },
+    {
+      "rank": 105,
+      "left": "▁жеткіз",
+      "right": "ді.",
+      "merged": "▁жеткізді.",
+      "frequency": 48
+    },
+    {
+      "rank": 106,
+      "left": "▁көмектес",
+      "right": "ті.",
+      "merged": "▁көмектесті.",
+      "frequency": 48
+    },
+    {
+      "rank": 107,
+      "left": "▁құр",
+      "right": "ды.",
+      "merged": "▁құрды.",
+      "frequency": 48
+    },
+    {
+      "rank": 108,
+      "left": "▁бекіт",
+      "right": "ті.",
+      "merged": "▁бекітті.",
+      "frequency": 47
+    },
+    {
+      "rank": 109,
+      "left": "▁кет",
+      "right": "ті.",
+      "merged": "▁кетті.",
+      "frequency": 47
+    },
+    {
+      "rank": 110,
+      "left": "▁жап",
+      "right": "ты.",
+      "merged": "▁жапты.",
+      "frequency": 45
+    },
+    {
+      "rank": 111,
+      "left": "▁кел",
+      "right": "ді.",
+      "merged": "▁келді.",
+      "frequency": 45
+    },
+    {
+      "rank": 112,
+      "left": "▁тыңда",
+      "right": "ды.",
+      "merged": "▁тыңдады.",
+      "frequency": 44
+    },
+    {
+      "rank": 113,
+      "left": "▁қара",
+      "right": "ды.",
+      "merged": "▁қарады.",
+      "frequency": 44
+    },
+    {
+      "rank": 114,
+      "left": "▁арттыр",
+      "right": "ды.",
+      "merged": "▁арттырды.",
+      "frequency": 43
+    },
+    {
+      "rank": 115,
+      "left": "▁аш",
+      "right": "ты.",
+      "merged": "▁ашты.",
+      "frequency": 43
+    },
+    {
+      "rank": 116,
+      "left": "▁сипатта",
+      "right": "ды.",
+      "merged": "▁сипаттады.",
+      "frequency": 43
+    },
+    {
+      "rank": 117,
+      "left": "▁тап",
+      "right": "ты.",
+      "merged": "▁тапты.",
+      "frequency": 43
+    },
+    {
+      "rank": 118,
+      "left": "▁түсіндір",
+      "right": "ді.",
+      "merged": "▁түсіндірді.",
+      "frequency": 43
+    },
+    {
+      "rank": 119,
+      "left": "▁біл",
+      "right": "ді.",
+      "merged": "▁білді.",
+      "frequency": 41
+    },
+    {
+      "rank": 120,
+      "left": "▁ана",
+      "right": ".",
+      "merged": "▁ана.",
+      "frequency": 39
+    },
+    {
+      "rank": 121,
+      "left": "▁сақта",
+      "right": "ды.",
+      "merged": "▁сақтады.",
+      "frequency": 38
+    },
+    {
+      "rank": 122,
+      "left": "▁қала",
+      "right": "ға",
+      "merged": "▁қалаға",
+      "frequency": 37
+    },
+    {
+      "rank": 123,
+      "left": "▁термин",
+      "right": "ге",
+      "merged": "▁терминге",
+      "frequency": 36
+    },
+    {
+      "rank": 124,
+      "left": "▁модель",
+      "right": "ге",
+      "merged": "▁модельге",
+      "frequency": 35
+    },
+    {
+      "rank": 125,
+      "left": "▁салыстыр",
+      "right": "ды.",
+      "merged": "▁салыстырды.",
+      "frequency": 35
+    },
+    {
+      "rank": 126,
+      "left": "▁ұғым",
+      "right": "ның",
+      "merged": "▁ұғымның",
+      "frequency": 35
+    },
+    {
+      "rank": 127,
+      "left": "▁жаттығу",
+      "right": "ға",
+      "merged": "▁жаттығуға",
+      "frequency": 34
+    },
+    {
+      "rank": 128,
+      "left": "▁түр",
+      "right": ".",
+      "merged": "▁түр.",
+      "frequency": 34
+    },
+    {
+      "rank": 129,
+      "left": "▁нәтиже",
+      "right": ".",
+      "merged": "▁нәтиже.",
+      "frequency": 33
+    },
+    {
+      "rank": 130,
+      "left": "▁нәтиже",
+      "right": "нің",
+      "merged": "▁нәтиженің",
+      "frequency": 33
+    },
+    {
+      "rank": 131,
+      "left": "▁қолдану",
+      "right": ".",
+      "merged": "▁қолдану.",
+      "frequency": 33
+    },
+    {
+      "rank": 132,
+      "left": "▁адам",
+      "right": "ға",
+      "merged": "▁адамға",
+      "frequency": 32
+    },
+    {
+      "rank": 133,
+      "left": "▁баяндау",
+      "right": "ның",
+      "merged": "▁баяндауның",
+      "frequency": 32
+    },
+    {
+      "rank": 134,
+      "left": "▁белгі",
+      "right": ".",
+      "merged": "▁белгі.",
+      "frequency": 32
+    },
+    {
+      "rank": 135,
+      "left": "▁дерек",
+      "right": ".",
+      "merged": "▁дерек.",
+      "frequency": 32
+    },
+    {
+      "rank": 136,
+      "left": "▁жазба",
+      "right": ".",
+      "merged": "▁жазба.",
+      "frequency": 32
+    },
+    {
+      "rank": 137,
+      "left": "▁жыл",
+      "right": ".",
+      "merged": "▁жыл.",
+      "frequency": 32
+    },
+    {
+      "rank": 138,
+      "left": "▁кітап",
+      "right": "қа",
+      "merged": "▁кітапқа",
+      "frequency": 32
+    },
+    {
+      "rank": 139,
+      "left": "▁міндет",
+      "right": ".",
+      "merged": "▁міндет.",
+      "frequency": 32
+    },
+    {
+      "rank": 140,
+      "left": "▁хат",
+      "right": ".",
+      "merged": "▁хат.",
+      "frequency": 32
+    },
+    {
+      "rank": 141,
+      "left": "▁қазақ",
+      "right": ".",
+      "merged": "▁қазақ.",
+      "frequency": 32
+    },
+    {
+      "rank": 142,
+      "left": "▁қолданыс",
+      "right": "тың",
+      "merged": "▁қолданыстың",
+      "frequency": 32
+    },
+    {
+      "rank": 143,
+      "left": "▁термин",
+      "right": ".",
+      "merged": "▁термин.",
+      "frequency": 31
+    },
+    {
+      "rank": 144,
+      "left": "▁термин",
+      "right": "нің",
+      "merged": "▁терминнің",
+      "frequency": 31
+    },
+    {
+      "rank": 145,
+      "left": "▁халық",
+      "right": ".",
+      "merged": "▁халық.",
+      "frequency": 31
+    },
+    {
+      "rank": 146,
+      "left": "▁өтініш",
+      "right": ".",
+      "merged": "▁өтініш.",
+      "frequency": 31
+    },
+    {
+      "rank": 147,
+      "left": "▁дерек",
+      "right": "тің",
+      "merged": "▁деректің",
+      "frequency": 30
+    },
+    {
+      "rank": 148,
+      "left": "▁ел",
+      "right": "дің",
+      "merged": "▁елдің",
+      "frequency": 30
+    },
+    {
+      "rank": 149,
+      "left": "▁мектеп",
+      "right": ".",
+      "merged": "▁мектеп.",
+      "frequency": 30
+    },
+    {
+      "rank": 150,
+      "left": "▁мысал",
+      "right": "ға",
+      "merged": "▁мысалға",
+      "frequency": 30
+    },
+    {
+      "rank": 151,
+      "left": "▁іс",
+      "right": ".",
+      "merged": "▁іс.",
+      "frequency": 30
+    },
+    {
+      "rank": 152,
+      "left": "▁қор",
+      "right": ".",
+      "merged": "▁қор.",
+      "frequency": 30
+    },
+    {
+      "rank": 153,
+      "left": "▁бап",
+      "right": "қа",
+      "merged": "▁бапқа",
+      "frequency": 29
+    },
+    {
+      "rank": 154,
+      "left": "▁мағына",
+      "right": ".",
+      "merged": "▁мағына.",
+      "frequency": 29
+    },
+    {
+      "rank": 155,
+      "left": "▁мағына",
+      "right": "ға",
+      "merged": "▁мағынаға",
+      "frequency": 29
+    },
+    {
+      "rank": 156,
+      "left": "▁модель",
+      "right": ".",
+      "merged": "▁модель.",
+      "frequency": 29
+    },
+    {
+      "rank": 157,
+      "left": "▁сабақ",
+      "right": "тың",
+      "merged": "▁сабақтың",
+      "frequency": 29
+    },
+    {
+      "rank": 158,
+      "left": "▁түр",
+      "right": "дің",
+      "merged": "▁түрдің",
+      "frequency": 29
+    },
+    {
+      "rank": 159,
+      "left": "▁халық",
+      "right": "тың",
+      "merged": "▁халықтың",
+      "frequency": 29
+    },
+    {
+      "rank": 160,
+      "left": "▁қызмет",
+      "right": "ке",
+      "merged": "▁қызметке",
+      "frequency": 29
+    },
+    {
+      "rank": 161,
+      "left": "▁ана",
+      "right": "ның",
+      "merged": "▁ананың",
+      "frequency": 28
+    },
+    {
+      "rank": 162,
+      "left": "▁жүйе",
+      "right": ".",
+      "merged": "▁жүйе.",
+      "frequency": 28
+    },
+    {
+      "rank": 163,
+      "left": "▁мекеме",
+      "right": ".",
+      "merged": "▁мекеме.",
+      "frequency": 28
+    },
+    {
+      "rank": 164,
+      "left": "▁мемлекет",
+      "right": "ке",
+      "merged": "▁мемлекетке",
+      "frequency": 28
+    },
+    {
+      "rank": 165,
+      "left": "▁модель",
+      "right": "дің",
+      "merged": "▁модельдің",
+      "frequency": 28
+    },
+    {
+      "rank": 166,
+      "left": "▁мәртебе",
+      "right": ".",
+      "merged": "▁мәртебе.",
+      "frequency": 28
+    },
+    {
+      "rank": 167,
+      "left": "▁мәтін",
+      "right": ".",
+      "merged": "▁мәтін.",
+      "frequency": 28
+    },
+    {
+      "rank": 168,
+      "left": "▁оқу",
+      "right": ".",
+      "merged": "▁оқу.",
+      "frequency": 28
+    },
+    {
+      "rank": 169,
+      "left": "▁талдау",
+      "right": ".",
+      "merged": "▁талдау.",
+      "frequency": 28
+    },
+    {
+      "rank": 170,
+      "left": "▁тіл",
+      "right": ".",
+      "merged": "▁тіл.",
+      "frequency": 28
+    },
+    {
+      "rank": 171,
+      "left": "▁тіл",
+      "right": "дің",
+      "merged": "▁тілдің",
+      "frequency": 28
+    },
+    {
+      "rank": 172,
+      "left": "▁хат",
+      "right": "тың",
+      "merged": "▁хаттың",
+      "frequency": 28
+    },
+    {
+      "rank": 173,
+      "left": "▁қолданыс",
+      "right": ".",
+      "merged": "▁қолданыс.",
+      "frequency": 28
+    },
+    {
+      "rank": 174,
+      "left": "▁қорытынды",
+      "right": ".",
+      "merged": "▁қорытынды.",
+      "frequency": 28
+    },
+    {
+      "rank": 175,
+      "left": "▁адам",
+      "right": ".",
+      "merged": "▁адам.",
+      "frequency": 27
+    },
+    {
+      "rank": 176,
+      "left": "▁анықтама",
+      "right": ".",
+      "merged": "▁анықтама.",
+      "frequency": 27
+    },
+    {
+      "rank": 177,
+      "left": "▁баяндау",
+      "right": ".",
+      "merged": "▁баяндау.",
+      "frequency": 27
+    },
+    {
+      "rank": 178,
+      "left": "▁ереже",
+      "right": "нің",
+      "merged": "▁ереженің",
+      "frequency": 27
+    },
+    {
+      "rank": 179,
+      "left": "▁мектеп",
+      "right": "ке",
+      "merged": "▁мектепке",
+      "frequency": 27
+    },
+    {
+      "rank": 180,
+      "left": "▁талдау",
+      "right": "ға",
+      "merged": "▁талдауға",
+      "frequency": 27
+    },
+    {
+      "rank": 181,
+      "left": "▁түр",
+      "right": "де",
+      "merged": "▁түрде",
+      "frequency": 27
+    },
+    {
+      "rank": 182,
+      "left": "▁құжат",
+      "right": "тың",
+      "merged": "▁құжаттың",
+      "frequency": 27
+    },
+    {
+      "rank": 183,
+      "left": "▁ұғым",
+      "right": "ға",
+      "merged": "▁ұғымға",
+      "frequency": 27
+    },
+    {
+      "rank": 184,
+      "left": "▁ел",
+      "right": ".",
+      "merged": "▁ел.",
+      "frequency": 26
+    },
+    {
+      "rank": 185,
+      "left": "▁жауап",
+      "right": ".",
+      "merged": "▁жауап.",
+      "frequency": 26
+    },
+    {
+      "rank": 186,
+      "left": "▁заң",
+      "right": ".",
+      "merged": "▁заң.",
+      "frequency": 26
+    },
+    {
+      "rank": 187,
+      "left": "▁күн",
+      "right": ".",
+      "merged": "▁күн.",
+      "frequency": 26
+    },
+    {
+      "rank": 188,
+      "left": "▁оқу",
+      "right": "да",
+      "merged": "▁оқуда",
+      "frequency": 26
+    },
+    {
+      "rank": 189,
+      "left": "▁сапа",
+      "right": "ның",
+      "merged": "▁сапаның",
+      "frequency": 26
+    },
+    {
+      "rank": 190,
+      "left": "▁түр",
+      "right": "ге",
+      "merged": "▁түрге",
+      "frequency": 26
+    },
+    {
+      "rank": 191,
+      "left": "▁қала",
+      "right": ".",
+      "merged": "▁қала.",
+      "frequency": 26
+    },
+    {
+      "rank": 192,
+      "left": "▁құжат",
+      "right": ".",
+      "merged": "▁құжат.",
+      "frequency": 26
+    },
+    {
+      "rank": 193,
+      "left": "▁құжат",
+      "right": "қа",
+      "merged": "▁құжатқа",
+      "frequency": 26
+    },
+    {
+      "rank": 194,
+      "left": "▁үлгі",
+      "right": ".",
+      "merged": "▁үлгі.",
+      "frequency": 26
+    },
+    {
+      "rank": 195,
+      "left": "▁ақпарат",
+      "right": ".",
+      "merged": "▁ақпарат.",
+      "frequency": 25
+    },
+    {
+      "rank": 196,
+      "left": "▁бар",
+      "right": "ады",
+      "merged": "▁барады",
+      "frequency": 25
+    },
+    {
+      "rank": 197,
+      "left": "▁белгі",
+      "right": "ге",
+      "merged": "▁белгіге",
+      "frequency": 25
+    },
+    {
+      "rank": 198,
+      "left": "▁белгі",
+      "right": "нің",
+      "merged": "▁белгінің",
+      "frequency": 25
+    },
+    {
+      "rank": 199,
+      "left": "▁білім",
+      "right": "ге",
+      "merged": "▁білімге",
+      "frequency": 25
+    },
+    {
+      "rank": 200,
+      "left": "▁жауап",
+      "right": "қа",
+      "merged": "▁жауапқа",
+      "frequency": 25
+    },
+    {
+      "rank": 201,
+      "left": "▁кітап",
+      "right": "та",
+      "merged": "▁кітапта",
+      "frequency": 25
+    },
+    {
+      "rank": 202,
+      "left": "▁мектеп",
+      "right": "тің",
+      "merged": "▁мектептің",
+      "frequency": 25
+    },
+    {
+      "rank": 203,
+      "left": "▁мемлекет",
+      "right": "тің",
+      "merged": "▁мемлекеттің",
+      "frequency": 25
+    },
+    {
+      "rank": 204,
+      "left": "▁қолдану",
+      "right": "ға",
+      "merged": "▁қолдануға",
+      "frequency": 25
+    },
+    {
+      "rank": 205,
+      "left": "▁қор",
+      "right": "ға",
+      "merged": "▁қорға",
+      "frequency": 25
+    },
+    {
+      "rank": 206,
+      "left": "▁анықтама",
+      "right": "ның",
+      "merged": "▁анықтаманың",
+      "frequency": 24
+    },
+    {
+      "rank": 207,
+      "left": "▁ақпарат",
+      "right": "қа",
+      "merged": "▁ақпаратқа",
+      "frequency": 24
+    },
+    {
+      "rank": 208,
+      "left": "▁бала",
+      "right": "ның",
+      "merged": "▁баланың",
+      "frequency": 24
+    },
+    {
+      "rank": 209,
+      "left": "▁бап",
+      "right": "тың",
+      "merged": "▁баптың",
+      "frequency": 24
+    },
+    {
+      "rank": 210,
+      "left": "▁ереже",
+      "right": ".",
+      "merged": "▁ереже.",
+      "frequency": 24
+    },
+    {
+      "rank": 211,
+      "left": "▁ереже",
+      "right": "ге",
+      "merged": "▁ережеге",
+      "frequency": 24
+    },
+    {
+      "rank": 212,
+      "left": "▁кітап",
+      "right": ".",
+      "merged": "▁кітап.",
+      "frequency": 24
+    },
+    {
+      "rank": 213,
+      "left": "▁кітап",
+      "right": "тың",
+      "merged": "▁кітаптың",
+      "frequency": 24
+    },
+    {
+      "rank": 214,
+      "left": "▁материал",
+      "right": "ға",
+      "merged": "▁материалға",
+      "frequency": 24
+    },
+    {
+      "rank": 215,
+      "left": "▁мағына",
+      "right": "да",
+      "merged": "▁мағынада",
+      "frequency": 24
+    },
+    {
+      "rank": 216,
+      "left": "▁мемлекет",
+      "right": ".",
+      "merged": "▁мемлекет.",
+      "frequency": 24
+    },
+    {
+      "rank": 217,
+      "left": "▁мысал",
+      "right": "дың",
+      "merged": "▁мысалдың",
+      "frequency": 24
+    },
+    {
+      "rank": 218,
+      "left": "▁нәтиже",
+      "right": "ге",
+      "merged": "▁нәтижеге",
+      "frequency": 24
+    },
+    {
+      "rank": 219,
+      "left": "▁оқу",
+      "right": "ға",
+      "merged": "▁оқуға",
+      "frequency": 24
+    },
+    {
+      "rank": 220,
+      "left": "▁талдау",
+      "right": "ның",
+      "merged": "▁талдауның",
+      "frequency": 24
+    },
+    {
+      "rank": 221,
+      "left": "▁тапсырма",
+      "right": "ның",
+      "merged": "▁тапсырманың",
+      "frequency": 24
+    },
+    {
+      "rank": 222,
+      "left": "▁шағым",
+      "right": ".",
+      "merged": "▁шағым.",
+      "frequency": 24
+    },
+    {
+      "rank": 223,
+      "left": "▁іс",
+      "right": "тің",
+      "merged": "▁істің",
+      "frequency": 24
+    },
+    {
+      "rank": 224,
+      "left": "▁қала",
+      "right": "ның",
+      "merged": "▁қаланың",
+      "frequency": 24
+    },
+    {
+      "rank": 225,
+      "left": "▁қорытынды",
+      "right": "ға",
+      "merged": "▁қорытындыға",
+      "frequency": 24
+    },
+    {
+      "rank": 226,
+      "left": "▁қызмет",
+      "right": "і",
+      "merged": "▁қызметі",
+      "frequency": 24
+    },
+    {
+      "rank": 227,
+      "left": "▁ұғым",
+      "right": "ды",
+      "merged": "▁ұғымды",
+      "frequency": 24
+    },
+    {
+      "rank": 228,
+      "left": "▁өтініш",
+      "right": "тің",
+      "merged": "▁өтініштің",
+      "frequency": 24
+    },
+    {
+      "rank": 229,
+      "left": "▁адам",
+      "right": "ның",
+      "merged": "▁адамның",
+      "frequency": 23
+    },
+    {
+      "rank": 230,
+      "left": "▁бала",
+      "right": ".",
+      "merged": "▁бала.",
+      "frequency": 23
+    },
+    {
+      "rank": 231,
+      "left": "▁бала",
+      "right": "ға",
+      "merged": "▁балаға",
+      "frequency": 23
+    },
+    {
+      "rank": 232,
+      "left": "▁жыл",
+      "right": "да",
+      "merged": "▁жылда",
+      "frequency": 23
+    },
+    {
+      "rank": 233,
+      "left": "▁жүйе",
+      "right": "ге",
+      "merged": "▁жүйеге",
+      "frequency": 23
+    },
+    {
+      "rank": 234,
+      "left": "▁жүйе",
+      "right": "нің",
+      "merged": "▁жүйенің",
+      "frequency": 23
+    },
+    {
+      "rank": 235,
+      "left": "▁материал",
+      "right": "дың",
+      "merged": "▁материалдың",
+      "frequency": 23
+    },
+    {
+      "rank": 236,
+      "left": "▁мекеме",
+      "right": "ге",
+      "merged": "▁мекемеге",
+      "frequency": 23
+    },
+    {
+      "rank": 237,
+      "left": "▁мекеме",
+      "right": "де",
+      "merged": "▁мекемеде",
+      "frequency": 23
+    },
+    {
+      "rank": 238,
+      "left": "▁міндет",
+      "right": "тің",
+      "merged": "▁міндеттің",
+      "frequency": 23
+    },
+    {
+      "rank": 239,
+      "left": "▁мәртебе",
+      "right": "нің",
+      "merged": "▁мәртебенің",
+      "frequency": 23
+    },
+    {
+      "rank": 240,
+      "left": "▁сабақ",
+      "right": ".",
+      "merged": "▁сабақ.",
+      "frequency": 23
+    },
+    {
+      "rank": 241,
+      "left": "▁салыстыр",
+      "right": "ды",
+      "merged": "▁салыстырды",
+      "frequency": 23
+    },
+    {
+      "rank": 242,
+      "left": "▁талдау",
+      "right": "да",
+      "merged": "▁талдауда",
+      "frequency": 23
+    },
+    {
+      "rank": 243,
+      "left": "▁хат",
+      "right": "қа",
+      "merged": "▁хатқа",
+      "frequency": 23
+    },
+    {
+      "rank": 244,
+      "left": "▁іс",
+      "right": "ке",
+      "merged": "▁іске",
+      "frequency": 23
+    },
+    {
+      "rank": 245,
+      "left": "▁қазақ",
+      "right": "тың",
+      "merged": "▁қазақтың",
+      "frequency": 23
+    },
+    {
+      "rank": 246,
       "left": "▁ұғым",
       "right": ".",
       "merged": "▁ұғым.",
       "frequency": 23
     },
     {
-      "rank": 85,
-      "left": "▁көмектес",
-      "right": "ті.",
-      "merged": "▁көмектесті.",
+      "rank": 247,
+      "left": "▁өтініш",
+      "right": "ке",
+      "merged": "▁өтінішке",
+      "frequency": 23
+    },
+    {
+      "rank": 248,
+      "left": "▁ал",
+      "right": "ады",
+      "merged": "▁алады",
       "frequency": 22
     },
     {
-      "rank": 86,
-      "left": "▁мағына",
+      "rank": 249,
+      "left": "▁баяндау",
+      "right": "да",
+      "merged": "▁баяндауда",
+      "frequency": 22
+    },
+    {
+      "rank": 250,
+      "left": "▁білім",
+      "right": "нің",
+      "merged": "▁білімнің",
+      "frequency": 22
+    },
+    {
+      "rank": 251,
+      "left": "▁дерек",
+      "right": "ке",
+      "merged": "▁дерекке",
+      "frequency": 22
+    },
+    {
+      "rank": 252,
+      "left": "▁дерек",
+      "right": "те",
+      "merged": "▁деректе",
+      "frequency": 22
+    },
+    {
+      "rank": 253,
+      "left": "▁жазба",
+      "right": "ның",
+      "merged": "▁жазбаның",
+      "frequency": 22
+    },
+    {
+      "rank": 254,
+      "left": "▁жауап",
+      "right": "та",
+      "merged": "▁жауапта",
+      "frequency": 22
+    },
+    {
+      "rank": 255,
+      "left": "▁жыл",
+      "right": "дың",
+      "merged": "▁жылдың",
+      "frequency": 22
+    },
+    {
+      "rank": 256,
+      "left": "▁жыл",
+      "right": "ға",
+      "merged": "▁жылға",
+      "frequency": 22
+    },
+    {
+      "rank": 257,
+      "left": "▁көрсет",
+      "right": "ті",
+      "merged": "▁көрсетті",
+      "frequency": 22
+    },
+    {
+      "rank": 258,
+      "left": "▁материал",
       "right": ".",
-      "merged": "▁мағына.",
+      "merged": "▁материал.",
       "frequency": 22
     },
     {
-      "rank": 87,
+      "rank": 259,
       "left": "▁міндет",
+      "right": "тер",
+      "merged": "▁міндеттер",
+      "frequency": 22
+    },
+    {
+      "rank": 260,
+      "left": "▁мәтін",
+      "right": "нің",
+      "merged": "▁мәтіннің",
+      "frequency": 22
+    },
+    {
+      "rank": 261,
+      "left": "▁нақтыла",
+      "right": "йды",
+      "merged": "▁нақтылайды",
+      "frequency": 22
+    },
+    {
+      "rank": 262,
+      "left": "▁сабақ",
+      "right": "қа",
+      "merged": "▁сабаққа",
+      "frequency": 22
+    },
+    {
+      "rank": 263,
+      "left": "▁сөздік",
+      "right": "тің",
+      "merged": "▁сөздіктің",
+      "frequency": 22
+    },
+    {
+      "rank": 264,
+      "left": "▁сөйлей",
+      "right": "ді",
+      "merged": "▁сөйлейді",
+      "frequency": 22
+    },
+    {
+      "rank": 265,
+      "left": "▁тапсырма",
       "right": ".",
-      "merged": "▁міндет.",
+      "merged": "▁тапсырма.",
       "frequency": 22
     },
     {
-      "rank": 88,
-      "left": "▁тап",
-      "right": "ты.",
-      "merged": "▁тапты.",
+      "rank": 266,
+      "left": "▁қолданыс",
+      "right": "қа",
+      "merged": "▁қолданысқа",
       "frequency": 22
     },
     {
-      "rank": 89,
-      "left": "▁арттыр",
-      "right": "мады.",
-      "merged": "▁арттырмады.",
+      "rank": 267,
+      "left": "▁қорытынды",
+      "right": "ның",
+      "merged": "▁қорытындының",
+      "frequency": 22
+    },
+    {
+      "rank": 268,
+      "left": "▁қызмет",
+      "right": "те",
+      "merged": "▁қызметте",
+      "frequency": 22
+    },
+    {
+      "rank": 269,
+      "left": "▁үлгі",
+      "right": "ге",
+      "merged": "▁үлгіге",
+      "frequency": 22
+    },
+    {
+      "rank": 270,
+      "left": "▁ана",
+      "right": "ға",
+      "merged": "▁анаға",
       "frequency": 21
     },
     {
-      "rank": 90,
+      "rank": 271,
       "left": "▁ақпарат",
-      "right": ".",
-      "merged": "▁ақпарат.",
+      "right": "тың",
+      "merged": "▁ақпараттың",
       "frequency": 21
     },
     {
-      "rank": 91,
+      "rank": 272,
+      "left": "▁бап",
+      "right": "та",
+      "merged": "▁бапта",
+      "frequency": 21
+    },
+    {
+      "rank": 273,
+      "left": "▁баяндау",
+      "right": "лар",
+      "merged": "▁баяндаулар",
+      "frequency": 21
+    },
+    {
+      "rank": 274,
+      "left": "▁ел",
+      "right": "ге",
+      "merged": "▁елге",
+      "frequency": 21
+    },
+    {
+      "rank": 275,
       "left": "▁жаттығу",
-      "right": ".",
-      "merged": "▁жаттығу.",
+      "right": "лар",
+      "merged": "▁жаттығулар",
       "frequency": 21
     },
     {
-      "rank": 92,
+      "rank": 276,
+      "left": "▁жауап",
+      "right": "тың",
+      "merged": "▁жауаптың",
+      "frequency": 21
+    },
+    {
+      "rank": 277,
+      "left": "▁материал",
+      "right": "да",
+      "merged": "▁материалда",
+      "frequency": 21
+    },
+    {
+      "rank": 278,
       "left": "▁мысал",
       "right": ".",
       "merged": "▁мысал.",
       "frequency": 21
     },
     {
-      "rank": 93,
+      "rank": 279,
+      "left": "▁нәтиже",
+      "right": "де",
+      "merged": "▁нәтижеде",
+      "frequency": 21
+    },
+    {
+      "rank": 280,
       "left": "▁оқу",
-      "right": ".",
-      "merged": "▁оқу.",
+      "right": "ның",
+      "merged": "▁оқуның",
       "frequency": 21
     },
     {
-      "rank": 94,
-      "left": "▁оқы",
-      "right": "мады.",
-      "merged": "▁оқымады.",
+      "rank": 281,
+      "left": "▁сипаттама",
+      "right": "ның",
+      "merged": "▁сипаттаманың",
       "frequency": 21
     },
     {
-      "rank": 95,
-      "left": "▁сабақ",
-      "right": ".",
-      "merged": "▁сабақ.",
+      "rank": 282,
+      "left": "▁сипаттама",
+      "right": "ға",
+      "merged": "▁сипаттамаға",
       "frequency": 21
     },
     {
-      "rank": 96,
-      "left": "▁талдау",
-      "right": ".",
-      "merged": "▁талдау.",
+      "rank": 283,
+      "left": "▁сөздік",
+      "right": "і",
+      "merged": "▁сөздікі",
       "frequency": 21
     },
     {
-      "rank": 97,
-      "left": "▁тыңда",
-      "right": "ды.",
-      "merged": "▁тыңдады.",
+      "rank": 284,
+      "left": "▁тапсырма",
+      "right": "да",
+      "merged": "▁тапсырмада",
       "frequency": 21
     },
     {
-      "rank": 98,
+      "rank": 285,
       "left": "▁тұр",
-      "right": "ды.",
-      "merged": "▁тұрды.",
+      "right": "ды",
+      "merged": "▁тұрды",
       "frequency": 21
     },
     {
-      "rank": 99,
-      "left": "▁халық",
-      "right": ".",
-      "merged": "▁халық.",
+      "rank": 286,
+      "left": "▁шағым",
+      "right": "дар",
+      "merged": "▁шағымдар",
       "frequency": 21
     },
     {
-      "rank": 100,
+      "rank": 287,
+      "left": "▁шағым",
+      "right": "ның",
+      "merged": "▁шағымның",
+      "frequency": 21
+    },
+    {
+      "rank": 288,
       "left": "▁қазақ",
-      "right": ".",
-      "merged": "▁қазақ.",
+      "right": "тар",
+      "merged": "▁қазақтар",
       "frequency": 21
     },
     {
-      "rank": 101,
-      "left": "▁өтініш",
-      "right": ".",
-      "merged": "▁өтініш.",
+      "rank": 289,
+      "left": "▁қолдану",
+      "right": "ның",
+      "merged": "▁қолдануның",
       "frequency": 21
     },
     {
-      "rank": 102,
-      "left": "▁айт",
-      "right": "ты.",
-      "merged": "▁айтты.",
+      "rank": 290,
+      "left": "▁қызмет",
+      "right": "тің",
+      "merged": "▁қызметтің",
+      "frequency": 21
+    },
+    {
+      "rank": 291,
+      "left": "▁ұғым",
+      "right": "дар",
+      "merged": "▁ұғымдар",
+      "frequency": 21
+    },
+    {
+      "rank": 292,
+      "left": "▁белгі",
+      "right": "лер",
+      "merged": "▁белгілер",
       "frequency": 20
     },
     {
-      "rank": 103,
-      "left": "▁арттыр",
-      "right": "ды.",
-      "merged": "▁арттырды.",
-      "frequency": 20
-    },
-    {
-      "rank": 104,
-      "left": "▁баяндау",
-      "right": ".",
-      "merged": "▁баяндау.",
-      "frequency": 20
-    },
-    {
-      "rank": 105,
-      "left": "▁біл",
-      "right": "ді.",
-      "merged": "▁білді.",
-      "frequency": 20
-    },
-    {
-      "rank": 106,
-      "left": "▁біл",
-      "right": "меді.",
-      "merged": "▁білмеді.",
-      "frequency": 20
-    },
-    {
-      "rank": 107,
+      "rank": 293,
       "left": "▁білім",
       "right": "ді",
       "merged": "▁білімді",
       "frequency": 20
     },
     {
-      "rank": 108,
-      "left": "▁ереже",
+      "rank": 294,
+      "left": "▁ел",
+      "right": "де",
+      "merged": "▁елде",
+      "frequency": 20
+    },
+    {
+      "rank": 295,
+      "left": "▁жаттығу",
       "right": ".",
-      "merged": "▁ереже.",
+      "merged": "▁жаттығу.",
       "frequency": 20
     },
     {
-      "rank": 109,
-      "left": "▁жеткіз",
-      "right": "ді.",
-      "merged": "▁жеткізді.",
-      "frequency": 20
-    },
-    {
-      "rank": 110,
+      "rank": 296,
       "left": "▁кет",
-      "right": "ті.",
-      "merged": "▁кетті.",
+      "right": "ті",
+      "merged": "▁кетті",
       "frequency": 20
     },
     {
-      "rank": 111,
-      "left": "▁көрсет",
-      "right": "ті.",
-      "merged": "▁көрсетті.",
+      "rank": 297,
+      "left": "▁модель",
+      "right": "де",
+      "merged": "▁модельде",
       "frequency": 20
     },
     {
-      "rank": 112,
-      "left": "▁мектеп",
-      "right": ".",
-      "merged": "▁мектеп.",
+      "rank": 298,
+      "left": "▁міндет",
+      "right": "те",
+      "merged": "▁міндетте",
       "frequency": 20
     },
     {
-      "rank": 113,
-      "left": "▁нақтыла",
-      "right": "мады.",
-      "merged": "▁нақтыламады.",
+      "rank": 299,
+      "left": "▁мәтін",
+      "right": "ге",
+      "merged": "▁мәтінге",
       "frequency": 20
     },
     {
-      "rank": 114,
-      "left": "▁шекара",
-      "right": ".",
-      "merged": "▁шекара.",
+      "rank": 300,
+      "left": "▁мәтін",
+      "right": "де",
+      "merged": "▁мәтінде",
       "frequency": 20
     },
     {
-      "rank": 115,
-      "left": "▁қолданыс",
-      "right": ".",
-      "merged": "▁қолданыс.",
+      "rank": 301,
+      "left": "▁нәтиже",
+      "right": "лер",
+      "merged": "▁нәтижелер",
       "frequency": 20
     },
     {
-      "rank": 116,
-      "left": "▁қызмет",
-      "right": ".",
-      "merged": "▁қызмет.",
+      "rank": 302,
+      "left": "▁сапа",
+      "right": "ға",
+      "merged": "▁сапаға",
       "frequency": 20
     },
     {
-      "rank": 117,
-      "left": "▁бап",
-      "right": ".",
-      "merged": "▁бап.",
-      "frequency": 19
+      "rank": 303,
+      "left": "▁сақта",
+      "right": "йды",
+      "merged": "▁сақтайды",
+      "frequency": 20
     },
     {
-      "rank": 118,
-      "left": "▁бар",
-      "right": "ды.",
-      "merged": "▁барды.",
-      "frequency": 19
-    },
-    {
-      "rank": 119,
-      "left": "▁жаз",
-      "right": "ды.",
-      "merged": "▁жазды.",
-      "frequency": 19
-    },
-    {
-      "rank": 120,
-      "left": "▁жүйе",
-      "right": ".",
-      "merged": "▁жүйе.",
-      "frequency": 19
-    },
-    {
-      "rank": 121,
-      "left": "▁мәртебе",
-      "right": ".",
-      "merged": "▁мәртебе.",
-      "frequency": 19
-    },
-    {
-      "rank": 122,
-      "left": "▁салыстыр",
-      "right": "мады.",
-      "merged": "▁салыстырмады.",
-      "frequency": 19
-    },
-    {
-      "rank": 123,
+      "rank": 304,
       "left": "▁сөздік",
       "right": ".",
       "merged": "▁сөздік.",
+      "frequency": 20
+    },
+    {
+      "rank": 305,
+      "left": "▁тапсырма",
+      "right": "сы",
+      "merged": "▁тапсырмасы",
+      "frequency": 20
+    },
+    {
+      "rank": 306,
+      "left": "▁тапсырма",
+      "right": "ға",
+      "merged": "▁тапсырмаға",
+      "frequency": 20
+    },
+    {
+      "rank": 307,
+      "left": "▁термин",
+      "right": "дер",
+      "merged": "▁терминдер",
+      "frequency": 20
+    },
+    {
+      "rank": 308,
+      "left": "▁тыңда",
+      "right": "ды",
+      "merged": "▁тыңдады",
+      "frequency": 20
+    },
+    {
+      "rank": 309,
+      "left": "▁шағым",
+      "right": "да",
+      "merged": "▁шағымда",
+      "frequency": 20
+    },
+    {
+      "rank": 310,
+      "left": "▁шекара",
+      "right": "сы",
+      "merged": "▁шекарасы",
+      "frequency": 20
+    },
+    {
+      "rank": 311,
+      "left": "▁қара",
+      "right": "ды",
+      "merged": "▁қарады",
+      "frequency": 20
+    },
+    {
+      "rank": 312,
+      "left": "▁қара",
+      "right": "мады.",
+      "merged": "▁қарамады.",
+      "frequency": 20
+    },
+    {
+      "rank": 313,
+      "left": "▁қолданыс",
+      "right": "тар",
+      "merged": "▁қолданыстар",
+      "frequency": 20
+    },
+    {
+      "rank": 314,
+      "left": "▁қорытынды",
+      "right": "да",
+      "merged": "▁қорытындыда",
+      "frequency": 20
+    },
+    {
+      "rank": 315,
+      "left": "▁айт",
+      "right": "ады",
+      "merged": "▁айтады",
       "frequency": 19
     },
     {
-      "rank": 124,
-      "left": "▁сөздік",
-      "right": "і.",
-      "merged": "▁сөздікі.",
+      "rank": 316,
+      "left": "▁ал",
+      "right": "ды",
+      "merged": "▁алды",
       "frequency": 19
     },
     {
-      "rank": 125,
-      "left": "▁түсіндір",
-      "right": "меді.",
-      "merged": "▁түсіндірмеді.",
+      "rank": 317,
+      "left": "▁ана",
+      "right": "да",
+      "merged": "▁анада",
       "frequency": 19
     },
     {
-      "rank": 126,
-      "left": "▁іс",
+      "rank": 318,
+      "left": "▁арттыр",
+      "right": "ады",
+      "merged": "▁арттырады",
+      "frequency": 19
+    },
+    {
+      "rank": 319,
+      "left": "▁баяндау",
+      "right": "ға",
+      "merged": "▁баяндауға",
+      "frequency": 19
+    },
+    {
+      "rank": 320,
+      "left": "▁білім",
       "right": ".",
-      "merged": "▁іс.",
+      "merged": "▁білім.",
       "frequency": 19
     },
     {
-      "rank": 127,
+      "rank": 321,
+      "left": "▁ел",
+      "right": "дер",
+      "merged": "▁елдер",
+      "frequency": 19
+    },
+    {
+      "rank": 322,
+      "left": "▁жаса",
+      "right": "ды",
+      "merged": "▁жасады",
+      "frequency": 19
+    },
+    {
+      "rank": 323,
+      "left": "▁жаса",
+      "right": "мады.",
+      "merged": "▁жасамады.",
+      "frequency": 19
+    },
+    {
+      "rank": 324,
+      "left": "▁күн",
+      "right": "ге",
+      "merged": "▁күнге",
+      "frequency": 19
+    },
+    {
+      "rank": 325,
+      "left": "▁көмектес",
+      "right": "еді",
+      "merged": "▁көмектеседі",
+      "frequency": 19
+    },
+    {
+      "rank": 326,
+      "left": "▁модель",
+      "right": "дер",
+      "merged": "▁модельдер",
+      "frequency": 19
+    },
+    {
+      "rank": 327,
+      "left": "▁сапа",
+      "right": ".",
+      "merged": "▁сапа.",
+      "frequency": 19
+    },
+    {
+      "rank": 328,
+      "left": "▁сақта",
+      "right": "ды",
+      "merged": "▁сақтады",
+      "frequency": 19
+    },
+    {
+      "rank": 329,
+      "left": "▁сипаттама",
+      "right": "лар",
+      "merged": "▁сипаттамалар",
+      "frequency": 19
+    },
+    {
+      "rank": 330,
+      "left": "▁сөздік",
+      "right": "тер",
+      "merged": "▁сөздіктер",
+      "frequency": 19
+    },
+    {
+      "rank": 331,
+      "left": "▁тіл",
+      "right": "де",
+      "merged": "▁тілде",
+      "frequency": 19
+    },
+    {
+      "rank": 332,
+      "left": "▁шағым",
+      "right": "ға",
+      "merged": "▁шағымға",
+      "frequency": 19
+    },
+    {
+      "rank": 333,
+      "left": "▁шекара",
+      "right": "ға",
+      "merged": "▁шекараға",
+      "frequency": 19
+    },
+    {
+      "rank": 334,
+      "left": "▁қолдан",
+      "right": "ады",
+      "merged": "▁қолданады",
+      "frequency": 19
+    },
+    {
+      "rank": 335,
+      "left": "▁қолданыс",
+      "right": "ы",
+      "merged": "▁қолданысы",
+      "frequency": 19
+    },
+    {
+      "rank": 336,
+      "left": "▁қор",
+      "right": "да",
+      "merged": "▁қорда",
+      "frequency": 19
+    },
+    {
+      "rank": 337,
+      "left": "▁қор",
+      "right": "дың",
+      "merged": "▁қордың",
+      "frequency": 19
+    },
+    {
+      "rank": 338,
+      "left": "▁құр",
+      "right": "ады",
+      "merged": "▁құрады",
+      "frequency": 19
+    },
+    {
+      "rank": 339,
+      "left": "▁үлгі",
+      "right": "лер",
+      "merged": "▁үлгілер",
+      "frequency": 19
+    },
+    {
+      "rank": 340,
       "left": "▁ұғым",
       "right": "ы.",
       "merged": "▁ұғымы.",
       "frequency": 19
     },
     {
-      "rank": 128,
-      "left": "▁бер",
-      "right": "меді.",
-      "merged": "▁бермеді.",
-      "frequency": 18
-    },
-    {
-      "rank": 129,
-      "left": "▁білім",
-      "right": ".",
-      "merged": "▁білім.",
-      "frequency": 18
-    },
-    {
-      "rank": 130,
-      "left": "▁жазба",
-      "right": ".",
-      "merged": "▁жазба.",
-      "frequency": 18
-    },
-    {
-      "rank": 131,
-      "left": "▁материал",
-      "right": ".",
-      "merged": "▁материал.",
-      "frequency": 18
-    },
-    {
-      "rank": 132,
-      "left": "▁сақта",
-      "right": "ды.",
-      "merged": "▁сақтады.",
-      "frequency": 18
-    },
-    {
-      "rank": 133,
-      "left": "▁сипатта",
-      "right": "мады.",
-      "merged": "▁сипаттамады.",
-      "frequency": 18
-    },
-    {
-      "rank": 134,
-      "left": "▁түсіндір",
-      "right": "ді.",
-      "merged": "▁түсіндірді.",
-      "frequency": 18
-    },
-    {
-      "rank": 135,
-      "left": "▁шағым",
-      "right": ".",
-      "merged": "▁шағым.",
-      "frequency": 18
-    },
-    {
-      "rank": 136,
-      "left": "▁қара",
-      "right": "мады.",
-      "merged": "▁қарамады.",
-      "frequency": 18
-    },
-    {
-      "rank": 137,
+      "rank": 341,
       "left": "▁ал",
       "right": "мады.",
       "merged": "▁алмады.",
-      "frequency": 17
+      "frequency": 18
     },
     {
-      "rank": 138,
-      "left": "▁ана",
-      "right": "ның",
-      "merged": "▁ананың",
-      "frequency": 17
-    },
-    {
-      "rank": 139,
-      "left": "▁анықтама",
-      "right": "сы.",
-      "merged": "▁анықтамасы.",
-      "frequency": 17
-    },
-    {
-      "rank": 140,
-      "left": "▁жаса",
-      "right": "мады.",
-      "merged": "▁жасамады.",
-      "frequency": 17
-    },
-    {
-      "rank": 141,
-      "left": "▁кел",
-      "right": "ді.",
-      "merged": "▁келді.",
-      "frequency": 17
-    },
-    {
-      "rank": 142,
-      "left": "▁кел",
-      "right": "меді.",
-      "merged": "▁келмеді.",
-      "frequency": 17
-    },
-    {
-      "rank": 143,
-      "left": "▁кітап",
-      "right": ".",
-      "merged": "▁кітап.",
-      "frequency": 17
-    },
-    {
-      "rank": 144,
-      "left": "▁мекеме",
-      "right": "нің",
-      "merged": "▁мекеменің",
-      "frequency": 17
-    },
-    {
-      "rank": 145,
-      "left": "▁нақтыла",
-      "right": "ды.",
-      "merged": "▁нақтылады.",
-      "frequency": 17
-    },
-    {
-      "rank": 146,
-      "left": "▁оқы",
-      "right": "ды.",
-      "merged": "▁оқыды.",
-      "frequency": 17
-    },
-    {
-      "rank": 147,
-      "left": "▁сапа",
-      "right": ".",
-      "merged": "▁сапа.",
-      "frequency": 17
-    },
-    {
-      "rank": 148,
-      "left": "▁сөйле",
-      "right": "меді.",
-      "merged": "▁сөйлемеді.",
-      "frequency": 17
-    },
-    {
-      "rank": 149,
-      "left": "▁тыңда",
-      "right": "мады.",
-      "merged": "▁тыңдамады.",
-      "frequency": 17
-    },
-    {
-      "rank": 150,
-      "left": "▁қазақ",
-      "right": "қа",
-      "merged": "▁қазаққа",
-      "frequency": 17
-    },
-    {
-      "rank": 151,
-      "left": "▁қолдану",
-      "right": "ны",
-      "merged": "▁қолдануны",
-      "frequency": 17
-    },
-    {
-      "rank": 152,
-      "left": "▁қолданыс",
-      "right": "тар",
-      "merged": "▁қолданыстар",
-      "frequency": 17
-    },
-    {
-      "rank": 153,
-      "left": "▁ана",
-      "right": ".",
-      "merged": "▁ана.",
-      "frequency": 16
-    },
-    {
-      "rank": 154,
-      "left": "▁бала",
-      "right": ".",
-      "merged": "▁бала.",
-      "frequency": 16
-    },
-    {
-      "rank": 155,
+      "rank": 342,
       "left": "▁бар",
       "right": "мады.",
       "merged": "▁бармады.",
-      "frequency": 16
+      "frequency": 18
     },
     {
-      "rank": 156,
+      "rank": 343,
       "left": "▁бер",
-      "right": "ді.",
-      "merged": "▁берді.",
-      "frequency": 16
+      "right": "ді",
+      "merged": "▁берді",
+      "frequency": 18
     },
     {
-      "rank": 157,
+      "rank": 344,
+      "left": "▁біл",
+      "right": "ді",
+      "merged": "▁білді",
+      "frequency": 18
+    },
+    {
+      "rank": 345,
       "left": "▁дерек",
-      "right": ".",
-      "merged": "▁дерек.",
-      "frequency": 16
+      "right": "тер",
+      "merged": "▁деректер",
+      "frequency": 18
     },
     {
-      "rank": 158,
-      "left": "▁ел",
-      "right": ".",
-      "merged": "▁ел.",
-      "frequency": 16
+      "rank": 346,
+      "left": "▁ереже",
+      "right": "де",
+      "merged": "▁ережеде",
+      "frequency": 18
     },
     {
-      "rank": 159,
-      "left": "▁жауап",
-      "right": "тың",
-      "merged": "▁жауаптың",
-      "frequency": 16
+      "rank": 347,
+      "left": "▁жүйе",
+      "right": "лер",
+      "merged": "▁жүйелер",
+      "frequency": 18
     },
     {
-      "rank": 160,
-      "left": "▁жеткіз",
-      "right": "меді.",
-      "merged": "▁жеткізмеді.",
-      "frequency": 16
+      "rank": 348,
+      "left": "▁кітап",
+      "right": "тар",
+      "merged": "▁кітаптар",
+      "frequency": 18
     },
     {
-      "rank": 161,
-      "left": "▁жыл",
-      "right": ".",
-      "merged": "▁жыл.",
-      "frequency": 16
-    },
-    {
-      "rank": 162,
-      "left": "▁заң",
-      "right": "ға",
-      "merged": "▁заңға",
-      "frequency": 16
-    },
-    {
-      "rank": 163,
+      "rank": 349,
       "left": "▁мағына",
-      "right": "ны",
-      "merged": "▁мағынаны",
-      "frequency": 16
+      "right": "ның",
+      "merged": "▁мағынаның",
+      "frequency": 18
     },
     {
-      "rank": 164,
-      "left": "▁мекеме",
-      "right": ".",
-      "merged": "▁мекеме.",
-      "frequency": 16
-    },
-    {
-      "rank": 165,
-      "left": "▁мектеп",
-      "right": "тің",
-      "merged": "▁мектептің",
-      "frequency": 16
-    },
-    {
-      "rank": 166,
+      "rank": 350,
       "left": "▁мемлекет",
-      "right": "тің",
-      "merged": "▁мемлекеттің",
-      "frequency": 16
+      "right": "те",
+      "merged": "▁мемлекетте",
+      "frequency": 18
     },
     {
-      "rank": 167,
-      "left": "▁модель",
-      "right": ".",
-      "merged": "▁модель.",
-      "frequency": 16
-    },
-    {
-      "rank": 168,
-      "left": "▁міндет",
-      "right": "тің",
-      "merged": "▁міндеттің",
-      "frequency": 16
-    },
-    {
-      "rank": 169,
+      "rank": 351,
       "left": "▁мәртебе",
       "right": "ге",
       "merged": "▁мәртебеге",
-      "frequency": 16
+      "frequency": 18
     },
     {
-      "rank": 170,
-      "left": "▁сөйле",
-      "right": "ді.",
-      "merged": "▁сөйледі.",
-      "frequency": 16
+      "rank": 352,
+      "left": "▁сапа",
+      "right": "лар",
+      "merged": "▁сапалар",
+      "frequency": 18
     },
     {
-      "rank": 171,
-      "left": "▁термин",
-      "right": "нің",
-      "merged": "▁терминнің",
-      "frequency": 16
+      "rank": 353,
+      "left": "▁сипаттама",
+      "right": "да",
+      "merged": "▁сипаттамада",
+      "frequency": 18
     },
     {
-      "rank": 172,
-      "left": "▁тіл",
-      "right": "дің",
-      "merged": "▁тілдің",
-      "frequency": 16
+      "rank": 354,
+      "left": "▁тап",
+      "right": "ты",
+      "merged": "▁тапты",
+      "frequency": 18
     },
     {
-      "rank": 173,
-      "left": "▁тұр",
-      "right": "мады.",
-      "merged": "▁тұрмады.",
-      "frequency": 16
-    },
-    {
-      "rank": 174,
-      "left": "▁шағым",
-      "right": "ның",
-      "merged": "▁шағымның",
-      "frequency": 16
-    },
-    {
-      "rank": 175,
-      "left": "▁шағым",
-      "right": "ы.",
-      "merged": "▁шағымы.",
-      "frequency": 16
-    },
-    {
-      "rank": 176,
-      "left": "▁іс",
-      "right": "тің",
-      "merged": "▁істің",
-      "frequency": 16
-    },
-    {
-      "rank": 177,
-      "left": "▁қала",
-      "right": ".",
-      "merged": "▁қала.",
-      "frequency": 16
-    },
-    {
-      "rank": 178,
-      "left": "▁қолдану",
-      "right": ".",
-      "merged": "▁қолдану.",
-      "frequency": 16
-    },
-    {
-      "rank": 179,
-      "left": "▁қолданыс",
-      "right": "тың",
-      "merged": "▁қолданыстың",
-      "frequency": 16
-    },
-    {
-      "rank": 180,
-      "left": "▁қор",
-      "right": ".",
-      "merged": "▁қор.",
-      "frequency": 16
-    },
-    {
-      "rank": 181,
-      "left": "▁ал",
-      "right": "ды.",
-      "merged": "▁алды.",
-      "frequency": 15
-    },
-    {
-      "rank": 182,
-      "left": "▁жыл",
-      "right": "ға",
-      "merged": "▁жылға",
-      "frequency": 15
-    },
-    {
-      "rank": 183,
-      "left": "▁жүр",
+      "rank": 355,
+      "left": "▁түсіндір",
       "right": "меді.",
-      "merged": "▁жүрмеді.",
-      "frequency": 15
+      "merged": "▁түсіндірмеді.",
+      "frequency": 18
     },
     {
-      "rank": 184,
+      "rank": 356,
+      "left": "▁шекара",
+      "right": "да",
+      "merged": "▁шекарада",
+      "frequency": 18
+    },
+    {
+      "rank": 357,
+      "left": "▁қор",
+      "right": "ы",
+      "merged": "▁қоры",
+      "frequency": 18
+    },
+    {
+      "rank": 358,
+      "left": "▁қызмет",
+      "right": ".",
+      "merged": "▁қызмет.",
+      "frequency": 18
+    },
+    {
+      "rank": 359,
+      "left": "▁құжат",
+      "right": "тар",
+      "merged": "▁құжаттар",
+      "frequency": 18
+    },
+    {
+      "rank": 360,
+      "left": "▁үлгі",
+      "right": "нің",
+      "merged": "▁үлгінің",
+      "frequency": 18
+    },
+    {
+      "rank": 361,
+      "left": "▁ұғым",
+      "right": "ы",
+      "merged": "▁ұғымы",
+      "frequency": 18
+    },
+    {
+      "rank": 362,
+      "left": "▁бап",
+      "right": "тар",
+      "merged": "▁баптар",
+      "frequency": 17
+    },
+    {
+      "rank": 363,
+      "left": "▁белгі",
+      "right": "де",
+      "merged": "▁белгіде",
+      "frequency": 17
+    },
+    {
+      "rank": 364,
+      "left": "▁біл",
+      "right": "еді",
+      "merged": "▁біледі",
+      "frequency": 17
+    },
+    {
+      "rank": 365,
+      "left": "▁жаз",
+      "right": "ды",
+      "merged": "▁жазды",
+      "frequency": 17
+    },
+    {
+      "rank": 366,
+      "left": "▁жаз",
+      "right": "мады.",
+      "merged": "▁жазмады.",
+      "frequency": 17
+    },
+    {
+      "rank": 367,
+      "left": "▁жазба",
+      "right": "сы",
+      "merged": "▁жазбасы",
+      "frequency": 17
+    },
+    {
+      "rank": 368,
+      "left": "▁жазба",
+      "right": "ға",
+      "merged": "▁жазбаға",
+      "frequency": 17
+    },
+    {
+      "rank": 369,
+      "left": "▁жауап",
+      "right": "ы.",
+      "merged": "▁жауапы.",
+      "frequency": 17
+    },
+    {
+      "rank": 370,
+      "left": "▁жүр",
+      "right": "еді",
+      "merged": "▁жүреді",
+      "frequency": 17
+    },
+    {
+      "rank": 371,
       "left": "▁заң",
       "right": "да",
       "merged": "▁заңда",
-      "frequency": 15
+      "frequency": 17
     },
     {
-      "rank": 185,
+      "rank": 372,
+      "left": "▁заң",
+      "right": "ға",
+      "merged": "▁заңға",
+      "frequency": 17
+    },
+    {
+      "rank": 373,
+      "left": "▁күн",
+      "right": "де",
+      "merged": "▁күнде",
+      "frequency": 17
+    },
+    {
+      "rank": 374,
+      "left": "▁көрсет",
+      "right": "еді",
+      "merged": "▁көрсетеді",
+      "frequency": 17
+    },
+    {
+      "rank": 375,
+      "left": "▁материал",
+      "right": "дар",
+      "merged": "▁материалдар",
+      "frequency": 17
+    },
+    {
+      "rank": 376,
+      "left": "▁мағына",
+      "right": "лар",
+      "merged": "▁мағыналар",
+      "frequency": 17
+    },
+    {
+      "rank": 377,
+      "left": "▁мысал",
+      "right": "да",
+      "merged": "▁мысалда",
+      "frequency": 17
+    },
+    {
+      "rank": 378,
+      "left": "▁мәртебе",
+      "right": "де",
+      "merged": "▁мәртебеде",
+      "frequency": 17
+    },
+    {
+      "rank": 379,
+      "left": "▁нақтыла",
+      "right": "мады.",
+      "merged": "▁нақтыламады.",
+      "frequency": 17
+    },
+    {
+      "rank": 380,
+      "left": "▁сипатта",
+      "right": "мады.",
+      "merged": "▁сипаттамады.",
+      "frequency": 17
+    },
+    {
+      "rank": 381,
+      "left": "▁сөздік",
+      "right": "те",
+      "merged": "▁сөздікте",
+      "frequency": 17
+    },
+    {
+      "rank": 382,
+      "left": "▁сөйле",
+      "right": "ді",
+      "merged": "▁сөйледі",
+      "frequency": 17
+    },
+    {
+      "rank": 383,
+      "left": "▁термин",
+      "right": "де",
+      "merged": "▁терминде",
+      "frequency": 17
+    },
+    {
+      "rank": 384,
+      "left": "▁тыңда",
+      "right": "йды",
+      "merged": "▁тыңдайды",
+      "frequency": 17
+    },
+    {
+      "rank": 385,
+      "left": "▁тіл",
+      "right": "ге",
+      "merged": "▁тілге",
+      "frequency": 17
+    },
+    {
+      "rank": 386,
+      "left": "▁шекара",
+      "right": ".",
+      "merged": "▁шекара.",
+      "frequency": 17
+    },
+    {
+      "rank": 387,
+      "left": "▁шекара",
+      "right": "ның",
+      "merged": "▁шекараның",
+      "frequency": 17
+    },
+    {
+      "rank": 388,
+      "left": "▁іс",
+      "right": "те",
+      "merged": "▁істе",
+      "frequency": 17
+    },
+    {
+      "rank": 389,
+      "left": "▁қор",
+      "right": "дар",
+      "merged": "▁қордар",
+      "frequency": 17
+    },
+    {
+      "rank": 390,
+      "left": "▁құжат",
+      "right": "ы",
+      "merged": "▁құжаты",
+      "frequency": 17
+    },
+    {
+      "rank": 391,
+      "left": "▁анықтама",
+      "right": "ға",
+      "merged": "▁анықтамаға",
+      "frequency": 16
+    },
+    {
+      "rank": 392,
+      "left": "▁аш",
+      "right": "ты",
+      "merged": "▁ашты",
+      "frequency": 16
+    },
+    {
+      "rank": 393,
+      "left": "▁ақпарат",
+      "right": "тар",
+      "merged": "▁ақпараттар",
+      "frequency": 16
+    },
+    {
+      "rank": 394,
+      "left": "▁баяндау",
+      "right": "сы.",
+      "merged": "▁баяндаусы.",
+      "frequency": 16
+    },
+    {
+      "rank": 395,
+      "left": "▁бекіт",
+      "right": "ті",
+      "merged": "▁бекітті",
+      "frequency": 16
+    },
+    {
+      "rank": 396,
+      "left": "▁білім",
+      "right": "де",
+      "merged": "▁білімде",
+      "frequency": 16
+    },
+    {
+      "rank": 397,
+      "left": "▁жаз",
+      "right": "ады",
+      "merged": "▁жазады",
+      "frequency": 16
+    },
+    {
+      "rank": 398,
+      "left": "▁жаса",
+      "right": "йды",
+      "merged": "▁жасайды",
+      "frequency": 16
+    },
+    {
+      "rank": 399,
+      "left": "▁жаттығу",
+      "right": "ның",
+      "merged": "▁жаттығуның",
+      "frequency": 16
+    },
+    {
+      "rank": 400,
+      "left": "▁жауап",
+      "right": "тар",
+      "merged": "▁жауаптар",
+      "frequency": 16
+    },
+    {
+      "rank": 401,
+      "left": "▁жеткіз",
+      "right": "еді",
+      "merged": "▁жеткізеді",
+      "frequency": 16
+    },
+    {
+      "rank": 402,
+      "left": "▁жыл",
+      "right": "ы",
+      "merged": "▁жылы",
+      "frequency": 16
+    },
+    {
+      "rank": 403,
       "left": "▁заң",
       "right": "дар",
       "merged": "▁заңдар",
-      "frequency": 15
+      "frequency": 16
     },
     {
-      "rank": 186,
+      "rank": 404,
       "left": "▁заң",
       "right": "ның",
       "merged": "▁заңның",
-      "frequency": 15
+      "frequency": 16
     },
     {
-      "rank": 187,
-      "left": "▁күн",
-      "right": "ді",
-      "merged": "▁күнді",
-      "frequency": 15
+      "rank": 405,
+      "left": "▁мағына",
+      "right": "сы",
+      "merged": "▁мағынасы",
+      "frequency": 16
     },
     {
-      "rank": 188,
-      "left": "▁көр",
-      "right": "ді.",
-      "merged": "▁көрді.",
-      "frequency": 15
+      "rank": 406,
+      "left": "▁мекеме",
+      "right": "лер",
+      "merged": "▁мекемелер",
+      "frequency": 16
     },
     {
-      "rank": 189,
-      "left": "▁модель",
-      "right": "дің",
-      "merged": "▁модельдің",
-      "frequency": 15
+      "rank": 407,
+      "left": "▁мекеме",
+      "right": "нің",
+      "merged": "▁мекеменің",
+      "frequency": 16
     },
     {
-      "rank": 190,
+      "rank": 408,
       "left": "▁мәтін",
-      "right": "і.",
-      "merged": "▁мәтіні.",
+      "right": "і",
+      "merged": "▁мәтіні",
+      "frequency": 16
+    },
+    {
+      "rank": 409,
+      "left": "▁түр",
+      "right": "дер",
+      "merged": "▁түрдер",
+      "frequency": 16
+    },
+    {
+      "rank": 410,
+      "left": "▁халық",
+      "right": "қа",
+      "merged": "▁халыққа",
+      "frequency": 16
+    },
+    {
+      "rank": 411,
+      "left": "▁хат",
+      "right": "та",
+      "merged": "▁хатта",
+      "frequency": 16
+    },
+    {
+      "rank": 412,
+      "left": "▁іс",
+      "right": "тер",
+      "merged": "▁істер",
+      "frequency": 16
+    },
+    {
+      "rank": 413,
+      "left": "▁қазақ",
+      "right": "та",
+      "merged": "▁қазақта",
+      "frequency": 16
+    },
+    {
+      "rank": 414,
+      "left": "▁қара",
+      "right": "йды",
+      "merged": "▁қарайды",
+      "frequency": 16
+    },
+    {
+      "rank": 415,
+      "left": "▁қолданыс",
+      "right": "та",
+      "merged": "▁қолданыста",
+      "frequency": 16
+    },
+    {
+      "rank": 416,
+      "left": "▁қорытынды",
+      "right": "сы",
+      "merged": "▁қорытындысы",
+      "frequency": 16
+    },
+    {
+      "rank": 417,
+      "left": "▁ана",
+      "right": "лар",
+      "merged": "▁аналар",
       "frequency": 15
     },
     {
-      "rank": 191,
+      "rank": 418,
+      "left": "▁анықтама",
+      "right": "да",
+      "merged": "▁анықтамада",
+      "frequency": 15
+    },
+    {
+      "rank": 419,
+      "left": "▁анықтама",
+      "right": "лар",
+      "merged": "▁анықтамалар",
+      "frequency": 15
+    },
+    {
+      "rank": 420,
+      "left": "▁анықтама",
+      "right": "сы",
+      "merged": "▁анықтамасы",
+      "frequency": 15
+    },
+    {
+      "rank": 421,
+      "left": "▁анықтама",
+      "right": "сы.",
+      "merged": "▁анықтамасы.",
+      "frequency": 15
+    },
+    {
+      "rank": 422,
+      "left": "▁арттыр",
+      "right": "ды",
+      "merged": "▁арттырды",
+      "frequency": 15
+    },
+    {
+      "rank": 423,
+      "left": "▁арттыр",
+      "right": "мады.",
+      "merged": "▁арттырмады.",
+      "frequency": 15
+    },
+    {
+      "rank": 424,
+      "left": "▁бала",
+      "right": "да",
+      "merged": "▁балада",
+      "frequency": 15
+    },
+    {
+      "rank": 425,
+      "left": "▁бала",
+      "right": "лар",
+      "merged": "▁балалар",
+      "frequency": 15
+    },
+    {
+      "rank": 426,
+      "left": "▁бап",
+      "right": "ы.",
+      "merged": "▁бапы.",
+      "frequency": 15
+    },
+    {
+      "rank": 427,
+      "left": "▁ереже",
+      "right": "сі",
+      "merged": "▁ережесі",
+      "frequency": 15
+    },
+    {
+      "rank": 428,
+      "left": "▁жап",
+      "right": "ты",
+      "merged": "▁жапты",
+      "frequency": 15
+    },
+    {
+      "rank": 429,
+      "left": "▁жаттығу",
+      "right": "да",
+      "merged": "▁жаттығуда",
+      "frequency": 15
+    },
+    {
+      "rank": 430,
+      "left": "▁күн",
+      "right": "нің",
+      "merged": "▁күннің",
+      "frequency": 15
+    },
+    {
+      "rank": 431,
+      "left": "▁көр",
+      "right": "еді",
+      "merged": "▁көреді",
+      "frequency": 15
+    },
+    {
+      "rank": 432,
+      "left": "▁материал",
+      "right": "ы",
+      "merged": "▁материалы",
+      "frequency": 15
+    },
+    {
+      "rank": 433,
+      "left": "▁мағына",
+      "right": "ны",
+      "merged": "▁мағынаны",
+      "frequency": 15
+    },
+    {
+      "rank": 434,
+      "left": "▁модель",
+      "right": "і",
+      "merged": "▁модельі",
+      "frequency": 15
+    },
+    {
+      "rank": 435,
+      "left": "▁мысал",
+      "right": "дар",
+      "merged": "▁мысалдар",
+      "frequency": 15
+    },
+    {
+      "rank": 436,
+      "left": "▁нақтыла",
+      "right": "ды",
+      "merged": "▁нақтылады",
+      "frequency": 15
+    },
+    {
+      "rank": 437,
+      "left": "▁сабақ",
+      "right": "тар",
+      "merged": "▁сабақтар",
+      "frequency": 15
+    },
+    {
+      "rank": 438,
+      "left": "▁сапа",
+      "right": "да",
+      "merged": "▁сапада",
+      "frequency": 15
+    },
+    {
+      "rank": 439,
       "left": "▁сақта",
       "right": "мады.",
       "merged": "▁сақтамады.",
       "frequency": 15
     },
     {
-      "rank": 192,
-      "left": "▁сипатта",
-      "right": "ды.",
-      "merged": "▁сипаттады.",
+      "rank": 440,
+      "left": "▁сипаттама",
+      "right": "сы",
+      "merged": "▁сипаттамасы",
       "frequency": 15
     },
     {
-      "rank": 193,
-      "left": "▁тапсырма",
-      "right": "да",
-      "merged": "▁тапсырмада",
+      "rank": 441,
+      "left": "▁сөздік",
+      "right": "ке",
+      "merged": "▁сөздікке",
       "frequency": 15
     },
     {
-      "rank": 194,
-      "left": "▁түр",
-      "right": ".",
-      "merged": "▁түр.",
+      "rank": 442,
+      "left": "▁талдау",
+      "right": "лар",
+      "merged": "▁талдаулар",
       "frequency": 15
     },
     {
-      "rank": 195,
+      "rank": 443,
       "left": "▁хат",
-      "right": ".",
-      "merged": "▁хат.",
+      "right": "тар",
+      "merged": "▁хаттар",
       "frequency": 15
     },
     {
-      "rank": 196,
+      "rank": 444,
       "left": "▁хат",
       "right": "ы.",
       "merged": "▁хаты.",
       "frequency": 15
     },
     {
-      "rank": 197,
-      "left": "▁қолдану",
-      "right": "ға",
-      "merged": "▁қолдануға",
+      "rank": 445,
+      "left": "▁қазақ",
+      "right": "қа",
+      "merged": "▁қазаққа",
       "frequency": 15
     },
     {
-      "rank": 198,
+      "rank": 446,
+      "left": "▁қорытынды",
+      "right": "лар",
+      "merged": "▁қорытындылар",
+      "frequency": 15
+    },
+    {
+      "rank": 447,
       "left": "▁қорытынды",
       "right": "сы.",
       "merged": "▁қорытындысы.",
       "frequency": 15
     },
     {
-      "rank": 199,
-      "left": "▁құжат",
-      "right": ".",
-      "merged": "▁құжат.",
+      "rank": 448,
+      "left": "▁қызмет",
+      "right": "тер",
+      "merged": "▁қызметтер",
       "frequency": 15
     },
     {
-      "rank": 200,
-      "left": "▁құжат",
-      "right": "тың",
-      "merged": "▁құжаттың",
+      "rank": 449,
+      "left": "▁өтініш",
+      "right": "те",
+      "merged": "▁өтініште",
       "frequency": 15
     },
     {
-      "rank": 201,
-      "left": "▁құр",
-      "right": "мады.",
-      "merged": "▁құрмады.",
-      "frequency": 15
-    },
-    {
-      "rank": 202,
-      "left": "▁бала",
-      "right": "ға",
-      "merged": "▁балаға",
+      "rank": 450,
+      "left": "▁адам",
+      "right": "дар",
+      "merged": "▁адамдар",
       "frequency": 14
     },
     {
-      "rank": 203,
-      "left": "▁бап",
-      "right": "тар",
-      "merged": "▁баптар",
+      "rank": 451,
+      "left": "▁адам",
+      "right": "ы",
+      "merged": "▁адамы",
       "frequency": 14
     },
     {
-      "rank": 204,
-      "left": "▁бап",
+      "rank": 452,
+      "left": "▁айт",
       "right": "ты",
-      "merged": "▁бапты",
+      "merged": "▁айтты",
       "frequency": 14
     },
     {
-      "rank": 205,
+      "rank": 453,
+      "left": "▁ана",
+      "right": "сы.",
+      "merged": "▁анасы.",
+      "frequency": 14
+    },
+    {
+      "rank": 454,
+      "left": "▁ақпарат",
+      "right": "та",
+      "merged": "▁ақпаратта",
+      "frequency": 14
+    },
+    {
+      "rank": 455,
+      "left": "▁бап",
+      "right": ".",
+      "merged": "▁бап.",
+      "frequency": 14
+    },
+    {
+      "rank": 456,
+      "left": "▁бар",
+      "right": "ды",
+      "merged": "▁барды",
+      "frequency": 14
+    },
+    {
+      "rank": 457,
+      "left": "▁баяндау",
+      "right": "сы",
+      "merged": "▁баяндаусы",
+      "frequency": 14
+    },
+    {
+      "rank": 458,
       "left": "▁белгі",
-      "right": "лер",
-      "merged": "▁белгілер",
+      "right": "сі",
+      "merged": "▁белгісі",
       "frequency": 14
     },
     {
-      "rank": 206,
-      "left": "▁ел",
-      "right": "де",
-      "merged": "▁елде",
-      "frequency": 14
-    },
-    {
-      "rank": 207,
-      "left": "▁ел",
-      "right": "і.",
-      "merged": "▁елі.",
-      "frequency": 14
-    },
-    {
-      "rank": 208,
-      "left": "▁ереже",
-      "right": "ні",
-      "merged": "▁ережені",
-      "frequency": 14
-    },
-    {
-      "rank": 209,
+      "rank": 459,
       "left": "▁жыл",
-      "right": "дың",
-      "merged": "▁жылдың",
+      "right": "дар",
+      "merged": "▁жылдар",
       "frequency": 14
     },
     {
-      "rank": 210,
-      "left": "▁жүйе",
-      "right": "ге",
-      "merged": "▁жүйеге",
+      "rank": 460,
+      "left": "▁жүр",
+      "right": "ді",
+      "merged": "▁жүрді",
       "frequency": 14
     },
     {
-      "rank": 211,
-      "left": "▁жүйе",
-      "right": "нің",
-      "merged": "▁жүйенің",
+      "rank": 461,
+      "left": "▁кел",
+      "right": "еді",
+      "merged": "▁келеді",
       "frequency": 14
     },
     {
-      "rank": 212,
-      "left": "▁кітап",
-      "right": "қа",
-      "merged": "▁кітапқа",
+      "rank": 462,
+      "left": "▁кет",
+      "right": "еді",
+      "merged": "▁кетеді",
       "frequency": 14
     },
     {
-      "rank": 213,
-      "left": "▁материал",
-      "right": "ы.",
-      "merged": "▁материалы.",
+      "rank": 463,
+      "left": "▁көр",
+      "right": "ді",
+      "merged": "▁көрді",
       "frequency": 14
     },
     {
-      "rank": 214,
-      "left": "▁мағына",
-      "right": "ның",
-      "merged": "▁мағынаның",
+      "rank": 464,
+      "left": "▁міндет",
+      "right": "ке",
+      "merged": "▁міндетке",
       "frequency": 14
     },
     {
-      "rank": 215,
-      "left": "▁мекеме",
-      "right": "лер",
-      "merged": "▁мекемелер",
-      "frequency": 14
-    },
-    {
-      "rank": 216,
+      "rank": 465,
       "left": "▁мәртебе",
       "right": "лер",
       "merged": "▁мәртебелер",
       "frequency": 14
     },
     {
-      "rank": 217,
-      "left": "▁мәтін",
-      "right": "ді",
-      "merged": "▁мәтінді",
+      "rank": 466,
+      "left": "▁оқу",
+      "right": "сы",
+      "merged": "▁оқусы",
       "frequency": 14
     },
     {
-      "rank": 218,
-      "left": "▁сабақ",
-      "right": "қа",
-      "merged": "▁сабаққа",
-      "frequency": 14
-    },
-    {
-      "rank": 219,
-      "left": "▁сапа",
-      "right": "ға",
-      "merged": "▁сапаға",
-      "frequency": 14
-    },
-    {
-      "rank": 220,
-      "left": "▁тапсырма",
-      "right": ".",
-      "merged": "▁тапсырма.",
-      "frequency": 14
-    },
-    {
-      "rank": 221,
-      "left": "▁тапсырма",
+      "rank": 467,
+      "left": "▁оқу",
       "right": "сы.",
-      "merged": "▁тапсырмасы.",
+      "merged": "▁оқусы.",
       "frequency": 14
     },
     {
-      "rank": 222,
+      "rank": 468,
+      "left": "▁оқы",
+      "right": "ды",
+      "merged": "▁оқыды",
+      "frequency": 14
+    },
+    {
+      "rank": 469,
+      "left": "▁оқы",
+      "right": "йды",
+      "merged": "▁оқыйды",
+      "frequency": 14
+    },
+    {
+      "rank": 470,
+      "left": "▁сабақ",
+      "right": "та",
+      "merged": "▁сабақта",
+      "frequency": 14
+    },
+    {
+      "rank": 471,
+      "left": "▁тыңда",
+      "right": "мады.",
+      "merged": "▁тыңдамады.",
+      "frequency": 14
+    },
+    {
+      "rank": 472,
       "left": "▁тіл",
-      "right": "ге",
-      "merged": "▁тілге",
+      "right": "і",
+      "merged": "▁тілі",
       "frequency": 14
     },
     {
-      "rank": 223,
-      "left": "▁тіл",
-      "right": "дер",
-      "merged": "▁тілдер",
+      "rank": 473,
+      "left": "▁түр",
+      "right": "і",
+      "merged": "▁түрі",
       "frequency": 14
     },
     {
-      "rank": 224,
-      "left": "▁қазақ",
+      "rank": 474,
+      "left": "▁түсіндір",
+      "right": "ді",
+      "merged": "▁түсіндірді",
+      "frequency": 14
+    },
+    {
+      "rank": 475,
+      "left": "▁тұр",
+      "right": "мады.",
+      "merged": "▁тұрмады.",
+      "frequency": 14
+    },
+    {
+      "rank": 476,
+      "left": "▁халық",
+      "right": "та",
+      "merged": "▁халықта",
+      "frequency": 14
+    },
+    {
+      "rank": 477,
+      "left": "▁халық",
       "right": "ты",
-      "merged": "▁қазақты",
+      "merged": "▁халықты",
       "frequency": 14
     },
     {
-      "rank": 225,
-      "left": "▁қызмет",
-      "right": "ке",
-      "merged": "▁қызметке",
+      "rank": 478,
+      "left": "▁халық",
+      "right": "ы",
+      "merged": "▁халықы",
       "frequency": 14
     },
     {
-      "rank": 226,
+      "rank": 479,
+      "left": "▁қазақ",
+      "right": "ы",
+      "merged": "▁қазақы",
+      "frequency": 14
+    },
+    {
+      "rank": 480,
+      "left": "▁қала",
+      "right": "лар",
+      "merged": "▁қалалар",
+      "frequency": 14
+    },
+    {
+      "rank": 481,
+      "left": "▁қолдану",
+      "right": "да",
+      "merged": "▁қолдануда",
+      "frequency": 14
+    },
+    {
+      "rank": 482,
+      "left": "▁қолдану",
+      "right": "лар",
+      "merged": "▁қолданулар",
+      "frequency": 14
+    },
+    {
+      "rank": 483,
+      "left": "▁құжат",
+      "right": "та",
+      "merged": "▁құжатта",
+      "frequency": 14
+    },
+    {
+      "rank": 484,
+      "left": "▁өтініш",
+      "right": "тер",
+      "merged": "▁өтініштер",
+      "frequency": 14
+    },
+    {
+      "rank": 485,
+      "left": "▁өтініш",
+      "right": "і.",
+      "merged": "▁өтініші.",
+      "frequency": 14
+    },
+    {
+      "rank": 486,
       "left": "а",
       "right": "мыз",
       "merged": "амыз",
       "frequency": 13
     },
     {
-      "rank": 227,
-      "left": "а",
-      "right": "мын.",
-      "merged": "амын.",
-      "frequency": 13
-    },
-    {
-      "rank": 228,
-      "left": "а",
-      "right": "сыз",
-      "merged": "асыз",
-      "frequency": 13
-    },
-    {
-      "rank": 229,
+      "rank": 487,
       "left": "а",
       "right": "сың",
       "merged": "асың",
       "frequency": 13
     },
     {
-      "rank": 230,
+      "rank": 488,
       "left": "амыз",
       "right": ".",
       "merged": "амыз.",
       "frequency": 13
     },
     {
-      "rank": 231,
-      "left": "асыз",
-      "right": ".",
-      "merged": "асыз.",
-      "frequency": 13
-    },
-    {
-      "rank": 232,
+      "rank": 489,
       "left": "асың",
       "right": ".",
       "merged": "асың.",
       "frequency": 13
     },
     {
-      "rank": 233,
-      "left": "▁адам",
-      "right": "дар",
-      "merged": "▁адамдар",
+      "rank": 490,
+      "left": "▁аш",
+      "right": "ады",
+      "merged": "▁ашады",
       "frequency": 13
     },
     {
-      "rank": 234,
-      "left": "▁баяндау",
-      "right": "ның",
-      "merged": "▁баяндауның",
+      "rank": 491,
+      "left": "▁бап",
+      "right": "ы",
+      "merged": "▁бапы",
       "frequency": 13
     },
     {
-      "rank": 235,
+      "rank": 492,
+      "left": "▁белгі",
+      "right": "ні",
+      "merged": "▁белгіні",
+      "frequency": 13
+    },
+    {
+      "rank": 493,
+      "left": "▁бер",
+      "right": "еді",
+      "merged": "▁береді",
+      "frequency": 13
+    },
+    {
+      "rank": 494,
+      "left": "▁бер",
+      "right": "меді.",
+      "merged": "▁бермеді.",
+      "frequency": 13
+    },
+    {
+      "rank": 495,
       "left": "▁дерек",
-      "right": "ке",
-      "merged": "▁дерекке",
+      "right": "і",
+      "merged": "▁дерекі",
       "frequency": 13
     },
     {
-      "rank": 236,
+      "rank": 496,
+      "left": "▁ел",
+      "right": "і",
+      "merged": "▁елі",
+      "frequency": 13
+    },
+    {
+      "rank": 497,
+      "left": "▁ереже",
+      "right": "лер",
+      "merged": "▁ережелер",
+      "frequency": 13
+    },
+    {
+      "rank": 498,
       "left": "▁жазба",
-      "right": "ны",
-      "merged": "▁жазбаны",
-      "frequency": 13
-    },
-    {
-      "rank": 237,
-      "left": "▁жаттығу",
       "right": "да",
-      "merged": "▁жаттығуда",
+      "merged": "▁жазбада",
       "frequency": 13
     },
     {
-      "rank": 238,
-      "left": "▁кітап",
-      "right": "тар",
-      "merged": "▁кітаптар",
+      "rank": 499,
+      "left": "▁жауап",
+      "right": "ты",
+      "merged": "▁жауапты",
       "frequency": 13
     },
     {
-      "rank": 239,
+      "rank": 500,
+      "left": "▁жеткіз",
+      "right": "ді",
+      "merged": "▁жеткізді",
+      "frequency": 13
+    },
+    {
+      "rank": 501,
+      "left": "▁жүйе",
+      "right": "де",
+      "merged": "▁жүйеде",
+      "frequency": 13
+    },
+    {
+      "rank": 502,
       "left": "▁күн",
-      "right": ".",
-      "merged": "▁күн.",
+      "right": "дер",
+      "merged": "▁күндер",
       "frequency": 13
     },
     {
-      "rank": 240,
-      "left": "▁күн",
-      "right": "ге",
-      "merged": "▁күнге",
+      "rank": 503,
+      "left": "▁материал",
+      "right": "ы.",
+      "merged": "▁материалы.",
       "frequency": 13
     },
     {
-      "rank": 241,
+      "rank": 504,
       "left": "▁мектеп",
       "right": "те",
       "merged": "▁мектепте",
       "frequency": 13
     },
     {
-      "rank": 242,
-      "left": "▁міндет",
-      "right": "те",
-      "merged": "▁міндетте",
+      "rank": 505,
+      "left": "▁мектеп",
+      "right": "ті",
+      "merged": "▁мектепті",
       "frequency": 13
     },
     {
-      "rank": 243,
-      "left": "▁нәтиже",
-      "right": "ні",
-      "merged": "▁нәтижені",
+      "rank": 506,
+      "left": "▁модель",
+      "right": "і.",
+      "merged": "▁модельі.",
       "frequency": 13
     },
     {
-      "rank": 244,
+      "rank": 507,
+      "left": "▁мысал",
+      "right": "ы",
+      "merged": "▁мысалы",
+      "frequency": 13
+    },
+    {
+      "rank": 508,
+      "left": "▁мін",
+      "right": "еді",
+      "merged": "▁мінеді",
+      "frequency": 13
+    },
+    {
+      "rank": 509,
+      "left": "▁мәтін",
+      "right": "дер",
+      "merged": "▁мәтіндер",
+      "frequency": 13
+    },
+    {
+      "rank": 510,
+      "left": "▁мәтін",
+      "right": "і.",
+      "merged": "▁мәтіні.",
+      "frequency": 13
+    },
+    {
+      "rank": 511,
       "left": "▁оқу",
-      "right": "лар",
-      "merged": "▁оқулар",
+      "right": "ны",
+      "merged": "▁оқуны",
       "frequency": 13
     },
     {
-      "rank": 245,
+      "rank": 512,
+      "left": "▁салыстыр",
+      "right": "ады",
+      "merged": "▁салыстырады",
+      "frequency": 13
+    },
+    {
+      "rank": 513,
+      "left": "▁салыстыр",
+      "right": "мады.",
+      "merged": "▁салыстырмады.",
+      "frequency": 13
+    },
+    {
+      "rank": 514,
       "left": "▁сапа",
       "right": "сы.",
       "merged": "▁сапасы.",
       "frequency": 13
     },
     {
-      "rank": 246,
-      "left": "▁талдау",
-      "right": "лар",
-      "merged": "▁талдаулар",
+      "rank": 515,
+      "left": "▁сипатта",
+      "right": "ды",
+      "merged": "▁сипаттады",
       "frequency": 13
     },
     {
-      "rank": 247,
-      "left": "▁термин",
-      "right": "дер",
-      "merged": "▁терминдер",
+      "rank": 516,
+      "left": "▁сипаттама",
+      "right": "ны",
+      "merged": "▁сипаттаманы",
       "frequency": 13
     },
     {
-      "rank": 248,
-      "left": "▁термин",
+      "rank": 517,
+      "left": "▁сөздік",
       "right": "і.",
-      "merged": "▁термині.",
+      "merged": "▁сөздікі.",
       "frequency": 13
     },
     {
-      "rank": 249,
-      "left": "▁тіл",
-      "right": "ді",
-      "merged": "▁тілді",
+      "rank": 518,
+      "left": "▁тапсырма",
+      "right": "лар",
+      "merged": "▁тапсырмалар",
       "frequency": 13
     },
     {
-      "rank": 250,
+      "rank": 519,
+      "left": "▁тапсырма",
+      "right": "сы.",
+      "merged": "▁тапсырмасы.",
+      "frequency": 13
+    },
+    {
+      "rank": 520,
+      "left": "▁түсіндір",
+      "right": "еді",
+      "merged": "▁түсіндіреді",
+      "frequency": 13
+    },
+    {
+      "rank": 521,
+      "left": "▁тұр",
+      "right": "ады",
+      "merged": "▁тұрады",
+      "frequency": 13
+    },
+    {
+      "rank": 522,
       "left": "▁халық",
-      "right": "қа",
-      "merged": "▁халыққа",
+      "right": "ы.",
+      "merged": "▁халықы.",
       "frequency": 13
     },
     {
-      "rank": 251,
+      "rank": 523,
       "left": "▁шекара",
       "right": "лар",
       "merged": "▁шекаралар",
       "frequency": 13
     },
     {
-      "rank": 252,
-      "left": "▁қала",
-      "right": "сы.",
-      "merged": "▁қаласы.",
+      "rank": 524,
+      "left": "▁құжат",
+      "right": "ы.",
+      "merged": "▁құжаты.",
       "frequency": 13
     },
     {
-      "rank": 253,
-      "left": "▁қара",
-      "right": "ды.",
-      "merged": "▁қарады.",
-      "frequency": 13
-    },
-    {
-      "rank": 254,
-      "left": "▁қолдану",
-      "right": "ның",
-      "merged": "▁қолдануның",
-      "frequency": 13
-    },
-    {
-      "rank": 255,
-      "left": "▁қор",
+      "rank": 525,
+      "left": "▁ұғым",
       "right": "да",
-      "merged": "▁қорда",
+      "merged": "▁ұғымда",
       "frequency": 13
     },
     {
-      "rank": 256,
-      "left": "▁қор",
-      "right": "дың",
-      "merged": "▁қордың",
-      "frequency": 13
-    },
-    {
-      "rank": 257,
-      "left": "▁қор",
-      "right": "ға",
-      "merged": "▁қорға",
-      "frequency": 13
-    },
-    {
-      "rank": 258,
-      "left": "▁өтініш",
-      "right": "ті",
-      "merged": "▁өтінішті",
-      "frequency": 13
-    },
-    {
-      "rank": 259,
+      "rank": 526,
       "left": "е",
       "right": "міз",
       "merged": "еміз",
       "frequency": 12
     },
     {
-      "rank": 260,
-      "left": "е",
-      "right": "мін.",
-      "merged": "емін.",
-      "frequency": 12
-    },
-    {
-      "rank": 261,
-      "left": "е",
-      "right": "сіз",
-      "merged": "есіз",
-      "frequency": 12
-    },
-    {
-      "rank": 262,
+      "rank": 527,
       "left": "е",
       "right": "сің",
       "merged": "есің",
       "frequency": 12
     },
     {
-      "rank": 263,
+      "rank": 528,
       "left": "еміз",
       "right": ".",
       "merged": "еміз.",
       "frequency": 12
     },
     {
-      "rank": 264,
-      "left": "есіз",
-      "right": ".",
-      "merged": "есіз.",
-      "frequency": 12
-    },
-    {
-      "rank": 265,
+      "rank": 529,
       "left": "есің",
       "right": ".",
       "merged": "есің.",
       "frequency": 12
     },
     {
-      "rank": 266,
-      "left": "▁адам",
-      "right": "да",
-      "merged": "▁адамда",
-      "frequency": 12
-    },
-    {
-      "rank": 267,
+      "rank": 530,
       "left": "▁ана",
       "right": "ны",
       "merged": "▁ананы",
       "frequency": 12
     },
     {
-      "rank": 268,
-      "left": "▁анықтама",
-      "right": ".",
-      "merged": "▁анықтама.",
+      "rank": 531,
+      "left": "▁бекіт",
+      "right": "еді",
+      "merged": "▁бекітеді",
       "frequency": 12
     },
     {
-      "rank": 269,
-      "left": "▁ақпарат",
-      "right": "қа",
-      "merged": "▁ақпаратқа",
-      "frequency": 12
-    },
-    {
-      "rank": 270,
-      "left": "▁бала",
-      "right": "лар",
-      "merged": "▁балалар",
-      "frequency": 12
-    },
-    {
-      "rank": 271,
-      "left": "▁белгі",
-      "right": "де",
-      "merged": "▁белгіде",
-      "frequency": 12
-    },
-    {
-      "rank": 272,
-      "left": "▁дерек",
-      "right": "і.",
-      "merged": "▁дерекі.",
-      "frequency": 12
-    },
-    {
-      "rank": 273,
-      "left": "▁ел",
-      "right": "дер",
-      "merged": "▁елдер",
-      "frequency": 12
-    },
-    {
-      "rank": 274,
+      "rank": 532,
       "left": "▁ереже",
-      "right": "ге",
-      "merged": "▁ережеге",
-      "frequency": 12
-    },
-    {
-      "rank": 275,
-      "left": "▁ереже",
-      "right": "нің",
-      "merged": "▁ереженің",
-      "frequency": 12
-    },
-    {
-      "rank": 276,
-      "left": "▁жазба",
-      "right": "ның",
-      "merged": "▁жазбаның",
-      "frequency": 12
-    },
-    {
-      "rank": 277,
-      "left": "▁жаса",
-      "right": "ды.",
-      "merged": "▁жасады.",
-      "frequency": 12
-    },
-    {
-      "rank": 278,
-      "left": "▁жүр",
-      "right": "ді.",
-      "merged": "▁жүрді.",
-      "frequency": 12
-    },
-    {
-      "rank": 279,
-      "left": "▁заң",
-      "right": "ды",
-      "merged": "▁заңды",
-      "frequency": 12
-    },
-    {
-      "rank": 280,
-      "left": "▁мағына",
-      "right": "ға",
-      "merged": "▁мағынаға",
-      "frequency": 12
-    },
-    {
-      "rank": 281,
-      "left": "▁мысал",
-      "right": "дар",
-      "merged": "▁мысалдар",
-      "frequency": 12
-    },
-    {
-      "rank": 282,
-      "left": "▁мысал",
-      "right": "ға",
-      "merged": "▁мысалға",
-      "frequency": 12
-    },
-    {
-      "rank": 283,
-      "left": "▁міндет",
-      "right": "ті",
-      "merged": "▁міндетті",
-      "frequency": 12
-    },
-    {
-      "rank": 284,
-      "left": "▁нәтиже",
-      "right": "лер",
-      "merged": "▁нәтижелер",
-      "frequency": 12
-    },
-    {
-      "rank": 285,
-      "left": "▁нәтиже",
       "right": "сі.",
-      "merged": "▁нәтижесі.",
+      "merged": "▁ережесі.",
       "frequency": 12
     },
     {
-      "rank": 286,
-      "left": "▁салыстыр",
-      "right": "ды.",
-      "merged": "▁салыстырды.",
+      "rank": 533,
+      "left": "▁жап",
+      "right": "амын.",
+      "merged": "▁жапамын.",
       "frequency": 12
     },
     {
-      "rank": 287,
+      "rank": 534,
+      "left": "▁жеткіз",
+      "right": "меді.",
+      "merged": "▁жеткізмеді.",
+      "frequency": 12
+    },
+    {
+      "rank": 535,
+      "left": "▁жүйе",
+      "right": "ні",
+      "merged": "▁жүйені",
+      "frequency": 12
+    },
+    {
+      "rank": 536,
+      "left": "▁жүр",
+      "right": "меді.",
+      "merged": "▁жүрмеді.",
+      "frequency": 12
+    },
+    {
+      "rank": 537,
+      "left": "▁кел",
+      "right": "ді",
+      "merged": "▁келді",
+      "frequency": 12
+    },
+    {
+      "rank": 538,
+      "left": "▁кел",
+      "right": "меді.",
+      "merged": "▁келмеді.",
+      "frequency": 12
+    },
+    {
+      "rank": 539,
+      "left": "▁мекеме",
+      "right": "ні",
+      "merged": "▁мекемені",
+      "frequency": 12
+    },
+    {
+      "rank": 540,
+      "left": "▁мекеме",
+      "right": "сі.",
+      "merged": "▁мекемесі.",
+      "frequency": 12
+    },
+    {
+      "rank": 541,
+      "left": "▁мектеп",
+      "right": "тер",
+      "merged": "▁мектептер",
+      "frequency": 12
+    },
+    {
+      "rank": 542,
+      "left": "▁мектеп",
+      "right": "і",
+      "merged": "▁мектепі",
+      "frequency": 12
+    },
+    {
+      "rank": 543,
+      "left": "▁мысал",
+      "right": "ды",
+      "merged": "▁мысалды",
+      "frequency": 12
+    },
+    {
+      "rank": 544,
+      "left": "▁мысал",
+      "right": "ы.",
+      "merged": "▁мысалы.",
+      "frequency": 12
+    },
+    {
+      "rank": 545,
+      "left": "▁нәтиже",
+      "right": "ні",
+      "merged": "▁нәтижені",
+      "frequency": 12
+    },
+    {
+      "rank": 546,
       "left": "▁сапа",
-      "right": "ны",
-      "merged": "▁сапаны",
+      "right": "сы",
+      "merged": "▁сапасы",
       "frequency": 12
     },
     {
-      "rank": 288,
-      "left": "▁талдау",
-      "right": "ны",
-      "merged": "▁талдауны",
+      "rank": 547,
+      "left": "▁сөйле",
+      "right": "меді.",
+      "merged": "▁сөйлемеді.",
       "frequency": 12
     },
     {
-      "rank": 289,
+      "rank": 548,
       "left": "▁талдау",
       "right": "сы.",
       "merged": "▁талдаусы.",
       "frequency": 12
     },
     {
-      "rank": 290,
-      "left": "▁талдау",
-      "right": "ға",
-      "merged": "▁талдауға",
-      "frequency": 12
-    },
-    {
-      "rank": 291,
-      "left": "▁тапсырма",
-      "right": "ға",
-      "merged": "▁тапсырмаға",
-      "frequency": 12
-    },
-    {
-      "rank": 292,
-      "left": "▁термин",
-      "right": "ді",
-      "merged": "▁терминді",
-      "frequency": 12
-    },
-    {
-      "rank": 293,
+      "rank": 549,
       "left": "▁тіл",
-      "right": "і.",
-      "merged": "▁тілі.",
-      "frequency": 12
-    },
-    {
-      "rank": 294,
-      "left": "▁түр",
       "right": "дер",
-      "merged": "▁түрдер",
+      "merged": "▁тілдер",
       "frequency": 12
     },
     {
-      "rank": 295,
-      "left": "▁түр",
-      "right": "і.",
-      "merged": "▁түрі.",
-      "frequency": 12
-    },
-    {
-      "rank": 296,
-      "left": "▁халық",
-      "right": "тың",
-      "merged": "▁халықтың",
-      "frequency": 12
-    },
-    {
-      "rank": 297,
+      "rank": 550,
       "left": "▁хат",
-      "right": "тар",
-      "merged": "▁хаттар",
+      "right": "ы",
+      "merged": "▁хаты",
       "frequency": 12
     },
     {
-      "rank": 298,
-      "left": "▁шағым",
-      "right": "ды",
-      "merged": "▁шағымды",
+      "rank": 551,
+      "left": "▁шекара",
+      "right": "ны",
+      "merged": "▁шекараны",
       "frequency": 12
     },
     {
-      "rank": 299,
-      "left": "▁қазақ",
-      "right": "ы.",
-      "merged": "▁қазақы.",
+      "rank": 552,
+      "left": "▁іс",
+      "right": "і.",
+      "merged": "▁ісі.",
       "frequency": 12
     },
     {
-      "rank": 300,
-      "left": "▁қолданыс",
-      "right": "қа",
-      "merged": "▁қолданысқа",
+      "rank": 553,
+      "left": "▁қала",
+      "right": "сы",
+      "merged": "▁қаласы",
       "frequency": 12
     },
     {
-      "rank": 301,
+      "rank": 554,
+      "left": "▁қолдану",
+      "right": "сы.",
+      "merged": "▁қолданусы.",
+      "frequency": 12
+    },
+    {
+      "rank": 555,
+      "left": "▁қон",
+      "right": "ады",
+      "merged": "▁қонады",
+      "frequency": 12
+    },
+    {
+      "rank": 556,
       "left": "▁қор",
       "right": "ы.",
       "merged": "▁қоры.",
       "frequency": 12
     },
     {
-      "rank": 302,
+      "rank": 557,
       "left": "▁қорытынды",
-      "right": "лар",
-      "merged": "▁қорытындылар",
+      "right": "ны",
+      "merged": "▁қорытындыны",
       "frequency": 12
     },
     {
-      "rank": 303,
-      "left": "▁қызмет",
-      "right": "і.",
-      "merged": "▁қызметі.",
-      "frequency": 12
-    },
-    {
-      "rank": 304,
-      "left": "▁үлгі",
-      "right": "лер",
-      "merged": "▁үлгілер",
-      "frequency": 12
-    },
-    {
-      "rank": 305,
-      "left": "▁үлгі",
-      "right": "ні",
-      "merged": "▁үлгіні",
-      "frequency": 12
-    },
-    {
-      "rank": 306,
-      "left": "▁ұғым",
-      "right": "дар",
-      "merged": "▁ұғымдар",
-      "frequency": 12
-    },
-    {
-      "rank": 307,
-      "left": "▁өтініш",
-      "right": "те",
-      "merged": "▁өтініште",
-      "frequency": 12
-    },
-    {
-      "rank": 308,
-      "left": "і",
-      "right": "н",
-      "merged": "ін",
-      "frequency": 11
-    },
-    {
-      "rank": 309,
-      "left": "▁адам",
+      "rank": 558,
+      "left": "▁құр",
       "right": "ды",
-      "merged": "▁адамды",
-      "frequency": 11
+      "merged": "▁құрды",
+      "frequency": 12
     },
     {
-      "rank": 310,
-      "left": "▁адам",
-      "right": "ның",
-      "merged": "▁адамның",
-      "frequency": 11
+      "rank": 559,
+      "left": "▁үлгі",
+      "right": "де",
+      "merged": "▁үлгіде",
+      "frequency": 12
     },
     {
-      "rank": 311,
-      "left": "▁ана",
-      "right": "да",
-      "merged": "▁анада",
-      "frequency": 11
+      "rank": 560,
+      "left": "▁үлгі",
+      "right": "сі",
+      "merged": "▁үлгісі",
+      "frequency": 12
     },
     {
-      "rank": 312,
-      "left": "▁ана",
-      "right": "сы.",
-      "merged": "▁анасы.",
-      "frequency": 11
-    },
-    {
-      "rank": 313,
-      "left": "▁ана",
-      "right": "ға",
-      "merged": "▁анаға",
-      "frequency": 11
-    },
-    {
-      "rank": 314,
-      "left": "▁анықтама",
-      "right": "ның",
-      "merged": "▁анықтаманың",
-      "frequency": 11
-    },
-    {
-      "rank": 315,
-      "left": "▁ақпарат",
-      "right": "тар",
-      "merged": "▁ақпараттар",
-      "frequency": 11
-    },
-    {
-      "rank": 316,
-      "left": "▁баяндау",
-      "right": "сы.",
-      "merged": "▁баяндаусы.",
-      "frequency": 11
-    },
-    {
-      "rank": 317,
-      "left": "▁білім",
-      "right": "ге",
-      "merged": "▁білімге",
-      "frequency": 11
-    },
-    {
-      "rank": 318,
-      "left": "▁білім",
-      "right": "нің",
-      "merged": "▁білімнің",
-      "frequency": 11
-    },
-    {
-      "rank": 319,
-      "left": "▁дерек",
-      "right": "те",
-      "merged": "▁деректе",
-      "frequency": 11
-    },
-    {
-      "rank": 320,
-      "left": "▁дерек",
-      "right": "тер",
-      "merged": "▁деректер",
-      "frequency": 11
-    },
-    {
-      "rank": 321,
-      "left": "▁ел",
-      "right": "ге",
-      "merged": "▁елге",
-      "frequency": 11
-    },
-    {
-      "rank": 322,
-      "left": "▁ереже",
-      "right": "лер",
-      "merged": "▁ережелер",
-      "frequency": 11
-    },
-    {
-      "rank": 323,
-      "left": "▁ереже",
+      "rank": 561,
+      "left": "▁үлгі",
       "right": "сі.",
-      "merged": "▁ережесі.",
+      "merged": "▁үлгісі.",
+      "frequency": 12
+    },
+    {
+      "rank": 562,
+      "left": "▁анықтама",
+      "right": "ны",
+      "merged": "▁анықтаманы",
       "frequency": 11
     },
     {
-      "rank": 324,
+      "rank": 563,
+      "left": "▁бала",
+      "right": "ны",
+      "merged": "▁баланы",
+      "frequency": 11
+    },
+    {
+      "rank": 564,
+      "left": "▁бала",
+      "right": "сы",
+      "merged": "▁баласы",
+      "frequency": 11
+    },
+    {
+      "rank": 565,
+      "left": "▁баяндау",
+      "right": "ны",
+      "merged": "▁баяндауны",
+      "frequency": 11
+    },
+    {
+      "rank": 566,
+      "left": "▁біл",
+      "right": "емін.",
+      "merged": "▁білемін.",
+      "frequency": 11
+    },
+    {
+      "rank": 567,
+      "left": "▁білім",
+      "right": "дер",
+      "merged": "▁білімдер",
+      "frequency": 11
+    },
+    {
+      "rank": 568,
+      "left": "▁дерек",
+      "right": "і.",
+      "merged": "▁дерекі.",
+      "frequency": 11
+    },
+    {
+      "rank": 569,
+      "left": "▁ел",
+      "right": "ді",
+      "merged": "▁елді",
+      "frequency": 11
+    },
+    {
+      "rank": 570,
       "left": "▁жазба",
-      "right": "ға",
-      "merged": "▁жазбаға",
-      "frequency": 11
-    },
-    {
-      "rank": 325,
-      "left": "▁жаттығу",
       "right": "лар",
-      "merged": "▁жаттығулар",
+      "merged": "▁жазбалар",
       "frequency": 11
     },
     {
-      "rank": 326,
-      "left": "▁жаттығу",
-      "right": "ның",
-      "merged": "▁жаттығуның",
+      "rank": 571,
+      "left": "▁жап",
+      "right": "ады",
+      "merged": "▁жапады",
       "frequency": 11
     },
     {
-      "rank": 327,
-      "left": "▁жыл",
-      "right": "дар",
-      "merged": "▁жылдар",
+      "rank": 572,
+      "left": "▁заң",
+      "right": "ды",
+      "merged": "▁заңды",
       "frequency": 11
     },
     {
-      "rank": 328,
-      "left": "▁жыл",
-      "right": "ы.",
-      "merged": "▁жылы.",
+      "rank": 573,
+      "left": "▁заң",
+      "right": "ы",
+      "merged": "▁заңы",
       "frequency": 11
     },
     {
-      "rank": 329,
+      "rank": 574,
       "left": "▁заң",
       "right": "ы.",
       "merged": "▁заңы.",
       "frequency": 11
     },
     {
-      "rank": 330,
+      "rank": 575,
+      "left": "▁кітап",
+      "right": "ы",
+      "merged": "▁кітапы",
+      "frequency": 11
+    },
+    {
+      "rank": 576,
       "left": "▁кітап",
       "right": "ы.",
       "merged": "▁кітапы.",
       "frequency": 11
     },
     {
-      "rank": 331,
-      "left": "▁күн",
-      "right": "і.",
-      "merged": "▁күні.",
+      "rank": 577,
+      "left": "▁көр",
+      "right": "меді.",
+      "merged": "▁көрмеді.",
       "frequency": 11
     },
     {
-      "rank": 332,
-      "left": "▁материал",
-      "right": "ға",
-      "merged": "▁материалға",
+      "rank": 578,
+      "left": "▁мағына",
+      "right": "сы.",
+      "merged": "▁мағынасы.",
       "frequency": 11
     },
     {
-      "rank": 333,
+      "rank": 579,
       "left": "▁мектеп",
-      "right": "ті",
-      "merged": "▁мектепті",
-      "frequency": 11
-    },
-    {
-      "rank": 334,
-      "left": "▁мемлекет",
-      "right": "те",
-      "merged": "▁мемлекетте",
-      "frequency": 11
-    },
-    {
-      "rank": 335,
-      "left": "▁мемлекет",
-      "right": "ті",
-      "merged": "▁мемлекетті",
-      "frequency": 11
-    },
-    {
-      "rank": 336,
-      "left": "▁модель",
-      "right": "ге",
-      "merged": "▁модельге",
-      "frequency": 11
-    },
-    {
-      "rank": 337,
-      "left": "▁мысал",
-      "right": "ды",
-      "merged": "▁мысалды",
-      "frequency": 11
-    },
-    {
-      "rank": 338,
-      "left": "▁міндет",
-      "right": "ке",
-      "merged": "▁міндетке",
-      "frequency": 11
-    },
-    {
-      "rank": 339,
-      "left": "▁міндет",
       "right": "і.",
-      "merged": "▁міндеті.",
+      "merged": "▁мектепі.",
       "frequency": 11
     },
     {
-      "rank": 340,
+      "rank": 580,
+      "left": "▁мемлекет",
+      "right": "тер",
+      "merged": "▁мемлекеттер",
+      "frequency": 11
+    },
+    {
+      "rank": 581,
+      "left": "▁мемлекет",
+      "right": "і",
+      "merged": "▁мемлекеті",
+      "frequency": 11
+    },
+    {
+      "rank": 582,
       "left": "▁мәртебе",
       "right": "сі.",
       "merged": "▁мәртебесі.",
       "frequency": 11
     },
     {
-      "rank": 341,
-      "left": "▁мәтін",
-      "right": "нің",
-      "merged": "▁мәтіннің",
+      "rank": 583,
+      "left": "▁нәтиже",
+      "right": "сі.",
+      "merged": "▁нәтижесі.",
       "frequency": 11
     },
     {
-      "rank": 342,
+      "rank": 584,
       "left": "▁оқу",
-      "right": "да",
-      "merged": "▁оқуда",
-      "frequency": 11
-    },
-    {
-      "rank": 343,
-      "left": "▁оқу",
-      "right": "сы.",
-      "merged": "▁оқусы.",
-      "frequency": 11
-    },
-    {
-      "rank": 344,
-      "left": "▁сипаттама",
-      "right": "ның",
-      "merged": "▁сипаттаманың",
-      "frequency": 11
-    },
-    {
-      "rank": 345,
-      "left": "▁шекара",
-      "right": "ны",
-      "merged": "▁шекараны",
-      "frequency": 11
-    },
-    {
-      "rank": 346,
-      "left": "▁шекара",
-      "right": "сы.",
-      "merged": "▁шекарасы.",
-      "frequency": 11
-    },
-    {
-      "rank": 347,
-      "left": "▁шекара",
-      "right": "ға",
-      "merged": "▁шекараға",
-      "frequency": 11
-    },
-    {
-      "rank": 348,
-      "left": "▁іс",
-      "right": "ке",
-      "merged": "▁іске",
-      "frequency": 11
-    },
-    {
-      "rank": 349,
-      "left": "▁іс",
-      "right": "і.",
-      "merged": "▁ісі.",
-      "frequency": 11
-    },
-    {
-      "rank": 350,
-      "left": "▁қазақ",
-      "right": "та",
-      "merged": "▁қазақта",
-      "frequency": 11
-    },
-    {
-      "rank": 351,
-      "left": "▁қала",
-      "right": "ның",
-      "merged": "▁қаланың",
-      "frequency": 11
-    },
-    {
-      "rank": 352,
-      "left": "▁қолданыс",
-      "right": "та",
-      "merged": "▁қолданыста",
-      "frequency": 11
-    },
-    {
-      "rank": 353,
-      "left": "▁қорытынды",
-      "right": "ға",
-      "merged": "▁қорытындыға",
-      "frequency": 11
-    },
-    {
-      "rank": 354,
-      "left": "▁қызмет",
-      "right": "те",
-      "merged": "▁қызметте",
-      "frequency": 11
-    },
-    {
-      "rank": 355,
-      "left": "▁үлгі",
-      "right": "де",
-      "merged": "▁үлгіде",
-      "frequency": 11
-    },
-    {
-      "rank": 356,
-      "left": "▁өтініш",
-      "right": "тер",
-      "merged": "▁өтініштер",
-      "frequency": 11
-    },
-    {
-      "rank": 357,
-      "left": "▁өтініш",
-      "right": "тің",
-      "merged": "▁өтініштің",
-      "frequency": 11
-    },
-    {
-      "rank": 358,
-      "left": "▁адам",
-      "right": "ға",
-      "merged": "▁адамға",
-      "frequency": 10
-    },
-    {
-      "rank": 359,
-      "left": "▁ана",
       "right": "лар",
-      "merged": "▁аналар",
+      "merged": "▁оқулар",
+      "frequency": 11
+    },
+    {
+      "rank": 585,
+      "left": "▁оқы",
+      "right": "мады.",
+      "merged": "▁оқымады.",
+      "frequency": 11
+    },
+    {
+      "rank": 586,
+      "left": "▁сабақ",
+      "right": "ты",
+      "merged": "▁сабақты",
+      "frequency": 11
+    },
+    {
+      "rank": 587,
+      "left": "▁салыстыр",
+      "right": "асыз.",
+      "merged": "▁салыстырасыз.",
+      "frequency": 11
+    },
+    {
+      "rank": 588,
+      "left": "▁тап",
+      "right": "ады",
+      "merged": "▁тапады",
+      "frequency": 11
+    },
+    {
+      "rank": 589,
+      "left": "▁тіл",
+      "right": "і.",
+      "merged": "▁тілі.",
+      "frequency": 11
+    },
+    {
+      "rank": 590,
+      "left": "▁халық",
+      "right": "тар",
+      "merged": "▁халықтар",
+      "frequency": 11
+    },
+    {
+      "rank": 591,
+      "left": "▁қолданыс",
+      "right": "ты",
+      "merged": "▁қолданысты",
+      "frequency": 11
+    },
+    {
+      "rank": 592,
+      "left": "▁құжат",
+      "right": "ты",
+      "merged": "▁құжатты",
+      "frequency": 11
+    },
+    {
+      "rank": 593,
+      "left": "▁құр",
+      "right": "мады.",
+      "merged": "▁құрмады.",
+      "frequency": 11
+    },
+    {
+      "rank": 594,
+      "left": "▁өтініш",
+      "right": "і",
+      "merged": "▁өтініші",
+      "frequency": 11
+    },
+    {
+      "rank": 595,
+      "left": "▁ана",
+      "right": "сы",
+      "merged": "▁анасы",
       "frequency": 10
     },
     {
-      "rank": 360,
-      "left": "▁анықтама",
-      "right": "да",
-      "merged": "▁анықтамада",
-      "frequency": 10
-    },
-    {
-      "rank": 361,
+      "rank": 596,
       "left": "▁ақпарат",
       "right": "ы.",
       "merged": "▁ақпараты.",
       "frequency": 10
     },
     {
-      "rank": 362,
-      "left": "▁бала",
-      "right": "да",
-      "merged": "▁балада",
-      "frequency": 10
-    },
-    {
-      "rank": 363,
-      "left": "▁бала",
-      "right": "ның",
-      "merged": "▁баланың",
-      "frequency": 10
-    },
-    {
-      "rank": 364,
+      "rank": 597,
       "left": "▁бала",
       "right": "сы.",
       "merged": "▁баласы.",
       "frequency": 10
     },
     {
-      "rank": 365,
+      "rank": 598,
       "left": "▁бап",
-      "right": "та",
-      "merged": "▁бапта",
+      "right": "ты",
+      "merged": "▁бапты",
       "frequency": 10
     },
     {
-      "rank": 366,
-      "left": "▁бап",
-      "right": "ы.",
-      "merged": "▁бапы.",
+      "rank": 599,
+      "left": "▁білім",
+      "right": "і",
+      "merged": "▁білімі",
       "frequency": 10
     },
     {
-      "rank": 367,
-      "left": "▁бекіт",
-      "right": "ті.",
-      "merged": "▁бекітті.",
+      "rank": 600,
+      "left": "▁білім",
+      "right": "і.",
+      "merged": "▁білімі.",
       "frequency": 10
     },
     {
-      "rank": 368,
+      "rank": 601,
       "left": "▁ел",
-      "right": "дің",
-      "merged": "▁елдің",
+      "right": "і.",
+      "merged": "▁елі.",
       "frequency": 10
     },
     {
-      "rank": 369,
-      "left": "▁жазба",
-      "right": "да",
-      "merged": "▁жазбада",
-      "frequency": 10
-    },
-    {
-      "rank": 370,
-      "left": "▁жазба",
-      "right": "лар",
-      "merged": "▁жазбалар",
-      "frequency": 10
-    },
-    {
-      "rank": 371,
-      "left": "▁жазба",
-      "right": "сы.",
-      "merged": "▁жазбасы.",
-      "frequency": 10
-    },
-    {
-      "rank": 372,
+      "rank": 602,
       "left": "▁жаттығу",
       "right": "ны",
       "merged": "▁жаттығуны",
       "frequency": 10
     },
     {
-      "rank": 373,
-      "left": "▁жауап",
-      "right": "та",
-      "merged": "▁жауапта",
+      "rank": 603,
+      "left": "▁жаттығу",
+      "right": "сы",
+      "merged": "▁жаттығусы",
       "frequency": 10
     },
     {
-      "rank": 374,
-      "left": "▁жауап",
-      "right": "тар",
-      "merged": "▁жауаптар",
+      "rank": 604,
+      "left": "▁жыл",
+      "right": "ды",
+      "merged": "▁жылды",
       "frequency": 10
     },
     {
-      "rank": 375,
-      "left": "▁жауап",
-      "right": "ы.",
-      "merged": "▁жауапы.",
-      "frequency": 10
-    },
-    {
-      "rank": 376,
-      "left": "▁мағына",
-      "right": "да",
-      "merged": "▁мағынада",
-      "frequency": 10
-    },
-    {
-      "rank": 377,
-      "left": "▁мағына",
-      "right": "лар",
-      "merged": "▁мағыналар",
-      "frequency": 10
-    },
-    {
-      "rank": 378,
-      "left": "▁мағына",
-      "right": "сы.",
-      "merged": "▁мағынасы.",
-      "frequency": 10
-    },
-    {
-      "rank": 379,
-      "left": "▁мекеме",
-      "right": "ге",
-      "merged": "▁мекемеге",
-      "frequency": 10
-    },
-    {
-      "rank": 380,
-      "left": "▁мекеме",
-      "right": "ні",
-      "merged": "▁мекемені",
-      "frequency": 10
-    },
-    {
-      "rank": 381,
-      "left": "▁мекеме",
+      "rank": 605,
+      "left": "▁жүйе",
       "right": "сі.",
-      "merged": "▁мекемесі.",
+      "merged": "▁жүйесі.",
       "frequency": 10
     },
     {
-      "rank": 382,
-      "left": "▁модель",
+      "rank": 606,
+      "left": "▁кет",
+      "right": "есіз.",
+      "merged": "▁кетесіз.",
+      "frequency": 10
+    },
+    {
+      "rank": 607,
+      "left": "▁күн",
+      "right": "ді",
+      "merged": "▁күнді",
+      "frequency": 10
+    },
+    {
+      "rank": 608,
+      "left": "▁көмектес",
+      "right": "ті",
+      "merged": "▁көмектесті",
+      "frequency": 10
+    },
+    {
+      "rank": 609,
+      "left": "▁міндет",
+      "right": "і",
+      "merged": "▁міндеті",
+      "frequency": 10
+    },
+    {
+      "rank": 610,
+      "left": "▁сипатта",
+      "right": "йды",
+      "merged": "▁сипаттайды",
+      "frequency": 10
+    },
+    {
+      "rank": 611,
+      "left": "▁термин",
       "right": "і.",
-      "merged": "▁модельі.",
+      "merged": "▁термині.",
       "frequency": 10
     },
     {
-      "rank": 383,
-      "left": "▁мәртебе",
-      "right": "ні",
-      "merged": "▁мәртебені",
+      "rank": 612,
+      "left": "▁тіл",
+      "right": "ді",
+      "merged": "▁тілді",
       "frequency": 10
     },
     {
-      "rank": 384,
-      "left": "▁мәтін",
-      "right": "де",
-      "merged": "▁мәтінде",
-      "frequency": 10
-    },
-    {
-      "rank": 385,
-      "left": "▁нәтиже",
-      "right": "ге",
-      "merged": "▁нәтижеге",
-      "frequency": 10
-    },
-    {
-      "rank": 386,
-      "left": "▁нәтиже",
-      "right": "нің",
-      "merged": "▁нәтиженің",
-      "frequency": 10
-    },
-    {
-      "rank": 387,
-      "left": "▁оқу",
-      "right": "ның",
-      "merged": "▁оқуның",
-      "frequency": 10
-    },
-    {
-      "rank": 388,
-      "left": "▁оқу",
-      "right": "ға",
-      "merged": "▁оқуға",
-      "frequency": 10
-    },
-    {
-      "rank": 389,
-      "left": "▁сабақ",
-      "right": "тың",
-      "merged": "▁сабақтың",
-      "frequency": 10
-    },
-    {
-      "rank": 390,
-      "left": "▁сапа",
-      "right": "ның",
-      "merged": "▁сапаның",
-      "frequency": 10
-    },
-    {
-      "rank": 391,
-      "left": "▁сипаттама",
-      "right": "да",
-      "merged": "▁сипаттамада",
-      "frequency": 10
-    },
-    {
-      "rank": 392,
-      "left": "▁сипаттама",
-      "right": "ны",
-      "merged": "▁сипаттаманы",
-      "frequency": 10
-    },
-    {
-      "rank": 393,
-      "left": "▁сөздік",
-      "right": "ке",
-      "merged": "▁сөздікке",
-      "frequency": 10
-    },
-    {
-      "rank": 394,
-      "left": "▁тапсырма",
-      "right": "лар",
-      "merged": "▁тапсырмалар",
-      "frequency": 10
-    },
-    {
-      "rank": 395,
-      "left": "▁тапсырма",
-      "right": "ның",
-      "merged": "▁тапсырманың",
-      "frequency": 10
-    },
-    {
-      "rank": 396,
+      "rank": 613,
       "left": "▁түр",
-      "right": "дің",
-      "merged": "▁түрдің",
+      "right": "і.",
+      "merged": "▁түрі.",
       "frequency": 10
     },
     {
-      "rank": 397,
-      "left": "▁халық",
-      "right": "тар",
-      "merged": "▁халықтар",
-      "frequency": 10
-    },
-    {
-      "rank": 398,
-      "left": "▁халық",
-      "right": "ты",
-      "merged": "▁халықты",
-      "frequency": 10
-    },
-    {
-      "rank": 399,
-      "left": "▁хат",
-      "right": "ты",
-      "merged": "▁хатты",
-      "frequency": 10
-    },
-    {
-      "rank": 400,
+      "rank": 614,
       "left": "▁шағым",
-      "right": "дар",
-      "merged": "▁шағымдар",
+      "right": "ы.",
+      "merged": "▁шағымы.",
       "frequency": 10
     },
     {
-      "rank": 401,
-      "left": "▁шағым",
-      "right": "ға",
-      "merged": "▁шағымға",
+      "rank": 615,
+      "left": "▁іс",
+      "right": "ті",
+      "merged": "▁істі",
       "frequency": 10
     },
     {
-      "rank": 402,
-      "left": "▁шекара",
-      "right": "да",
-      "merged": "▁шекарада",
+      "rank": 616,
+      "left": "▁қазақ",
+      "right": "ы.",
+      "merged": "▁қазақы.",
       "frequency": 10
     },
     {
-      "rank": 403,
-      "left": "▁шекара",
-      "right": "ның",
-      "merged": "▁шекараның",
-      "frequency": 10
-    },
-    {
-      "rank": 404,
+      "rank": 617,
       "left": "▁қала",
       "right": "да",
       "merged": "▁қалада",
       "frequency": 10
     },
     {
-      "rank": 405,
+      "rank": 618,
       "left": "▁қолдану",
-      "right": "сы.",
-      "merged": "▁қолданусы.",
+      "right": "сы",
+      "merged": "▁қолданусы",
       "frequency": 10
     },
     {
-      "rank": 406,
-      "left": "▁қор",
-      "right": "дар",
-      "merged": "▁қордар",
+      "rank": 619,
+      "left": "▁қон",
+      "right": "амын.",
+      "merged": "▁қонамын.",
       "frequency": 10
     },
     {
-      "rank": 407,
+      "rank": 620,
       "left": "▁қор",
       "right": "ды",
       "merged": "▁қорды",
       "frequency": 10
     },
     {
-      "rank": 408,
+      "rank": 621,
       "left": "▁қызмет",
-      "right": "тің",
-      "merged": "▁қызметтің",
-      "frequency": 10
-    },
-    {
-      "rank": 409,
-      "left": "▁құжат",
-      "right": "тар",
-      "merged": "▁құжаттар",
-      "frequency": 10
-    },
-    {
-      "rank": 410,
-      "left": "▁құжат",
-      "right": "ы.",
-      "merged": "▁құжаты.",
-      "frequency": 10
-    },
-    {
-      "rank": 411,
-      "left": "▁құжат",
-      "right": "қа",
-      "merged": "▁құжатқа",
-      "frequency": 10
-    },
-    {
-      "rank": 412,
-      "left": "▁үлгі",
-      "right": "ге",
-      "merged": "▁үлгіге",
-      "frequency": 10
-    },
-    {
-      "rank": 413,
-      "left": "▁үлгі",
-      "right": "нің",
-      "merged": "▁үлгінің",
-      "frequency": 10
-    },
-    {
-      "rank": 414,
-      "left": "▁ұғым",
-      "right": "да",
-      "merged": "▁ұғымда",
-      "frequency": 10
-    },
-    {
-      "rank": 415,
-      "left": "▁өтініш",
       "right": "і.",
-      "merged": "▁өтініші.",
+      "merged": "▁қызметі.",
       "frequency": 10
     },
     {
-      "rank": 416,
-      "left": "▁анықтама",
-      "right": "лар",
-      "merged": "▁анықтамалар",
-      "frequency": 9
-    },
-    {
-      "rank": 417,
-      "left": "▁анықтама",
-      "right": "ны",
-      "merged": "▁анықтаманы",
-      "frequency": 9
-    },
-    {
-      "rank": 418,
-      "left": "▁ақпарат",
-      "right": "тың",
-      "merged": "▁ақпараттың",
-      "frequency": 9
-    },
-    {
-      "rank": 419,
-      "left": "▁баяндау",
-      "right": "ны",
-      "merged": "▁баяндауны",
-      "frequency": 9
-    },
-    {
-      "rank": 420,
-      "left": "▁білім",
-      "right": "де",
-      "merged": "▁білімде",
-      "frequency": 9
-    },
-    {
-      "rank": 421,
-      "left": "▁дерек",
+      "rank": 622,
+      "left": "▁өтініш",
       "right": "ті",
-      "merged": "▁деректі",
-      "frequency": 9
+      "merged": "▁өтінішті",
+      "frequency": 10
     },
     {
-      "rank": 422,
-      "left": "▁дерек",
-      "right": "тің",
-      "merged": "▁деректің",
-      "frequency": 9
-    },
-    {
-      "rank": 423,
-      "left": "▁ереже",
-      "right": "де",
-      "merged": "▁ережеде",
-      "frequency": 9
-    },
-    {
-      "rank": 424,
-      "left": "▁жаттығу",
-      "right": "ға",
-      "merged": "▁жаттығуға",
-      "frequency": 9
-    },
-    {
-      "rank": 425,
-      "left": "▁жыл",
+      "rank": 623,
+      "left": "▁адам",
       "right": "да",
-      "merged": "▁жылда",
+      "merged": "▁адамда",
       "frequency": 9
     },
     {
-      "rank": 426,
-      "left": "▁жүйе",
-      "right": "ні",
-      "merged": "▁жүйені",
+      "rank": 624,
+      "left": "▁адам",
+      "right": "ы.",
+      "merged": "▁адамы.",
       "frequency": 9
     },
     {
-      "rank": 427,
+      "rank": 625,
+      "left": "▁ал",
+      "right": "асыз.",
+      "merged": "▁аласыз.",
+      "frequency": 9
+    },
+    {
+      "rank": 626,
+      "left": "▁ақпарат",
+      "right": "ты",
+      "merged": "▁ақпаратты",
+      "frequency": 9
+    },
+    {
+      "rank": 627,
+      "left": "▁бекіт",
+      "right": "есіз.",
+      "merged": "▁бекітесіз.",
+      "frequency": 9
+    },
+    {
+      "rank": 628,
+      "left": "▁белгі",
+      "right": "сі.",
+      "merged": "▁белгісі.",
+      "frequency": 9
+    },
+    {
+      "rank": 629,
+      "left": "▁бер",
+      "right": "емін.",
+      "merged": "▁беремін.",
+      "frequency": 9
+    },
+    {
+      "rank": 630,
+      "left": "▁біл",
+      "right": "меді.",
+      "merged": "▁білмеді.",
+      "frequency": 9
+    },
+    {
+      "rank": 631,
+      "left": "▁жазба",
+      "right": "сы.",
+      "merged": "▁жазбасы.",
+      "frequency": 9
+    },
+    {
+      "rank": 632,
+      "left": "▁жап",
+      "right": "асыз.",
+      "merged": "▁жапасыз.",
+      "frequency": 9
+    },
+    {
+      "rank": 633,
+      "left": "▁жеткіз",
+      "right": "емін.",
+      "merged": "▁жеткіземін.",
+      "frequency": 9
+    },
+    {
+      "rank": 634,
       "left": "▁кітап",
       "right": "ты",
       "merged": "▁кітапты",
       "frequency": 9
     },
     {
-      "rank": 428,
-      "left": "▁кітап",
-      "right": "тың",
-      "merged": "▁кітаптың",
+      "rank": 635,
+      "left": "▁күн",
+      "right": "і",
+      "merged": "▁күні",
       "frequency": 9
     },
     {
-      "rank": 429,
-      "left": "▁материал",
-      "right": "да",
-      "merged": "▁материалда",
+      "rank": 636,
+      "left": "▁көмектес",
+      "right": "емін.",
+      "merged": "▁көмектесемін.",
       "frequency": 9
     },
     {
-      "rank": 430,
+      "rank": 637,
       "left": "▁мекеме",
-      "right": "де",
-      "merged": "▁мекемеде",
+      "right": "сі",
+      "merged": "▁мекемесі",
       "frequency": 9
     },
     {
-      "rank": 431,
-      "left": "▁мектеп",
-      "right": "тер",
-      "merged": "▁мектептер",
+      "rank": 638,
+      "left": "▁мемлекет",
+      "right": "і.",
+      "merged": "▁мемлекеті.",
       "frequency": 9
     },
     {
-      "rank": 432,
-      "left": "▁модель",
-      "right": "де",
-      "merged": "▁модельде",
-      "frequency": 9
-    },
-    {
-      "rank": 433,
+      "rank": 639,
       "left": "▁модель",
       "right": "ді",
       "merged": "▁модельді",
       "frequency": 9
     },
     {
-      "rank": 434,
-      "left": "▁оқу",
-      "right": "ны",
-      "merged": "▁оқуны",
+      "rank": 640,
+      "left": "▁мәртебе",
+      "right": "ні",
+      "merged": "▁мәртебені",
       "frequency": 9
     },
     {
-      "rank": 435,
-      "left": "▁сабақ",
-      "right": "тар",
-      "merged": "▁сабақтар",
+      "rank": 641,
+      "left": "▁мәртебе",
+      "right": "сі",
+      "merged": "▁мәртебесі",
       "frequency": 9
     },
     {
-      "rank": 436,
-      "left": "▁сапа",
-      "right": "да",
-      "merged": "▁сапада",
-      "frequency": 9
-    },
-    {
-      "rank": 437,
-      "left": "▁сипаттама",
-      "right": "лар",
-      "merged": "▁сипаттамалар",
-      "frequency": 9
-    },
-    {
-      "rank": 438,
-      "left": "▁сөздік",
-      "right": "тің",
-      "merged": "▁сөздіктің",
-      "frequency": 9
-    },
-    {
-      "rank": 439,
-      "left": "▁термин",
-      "right": "ге",
-      "merged": "▁терминге",
-      "frequency": 9
-    },
-    {
-      "rank": 440,
-      "left": "▁термин",
-      "right": "де",
-      "merged": "▁терминде",
-      "frequency": 9
-    },
-    {
-      "rank": 441,
-      "left": "▁түр",
+      "rank": 642,
+      "left": "▁мәтін",
       "right": "ді",
-      "merged": "▁түрді",
+      "merged": "▁мәтінді",
       "frequency": 9
     },
     {
-      "rank": 442,
-      "left": "▁шағым",
-      "right": "да",
-      "merged": "▁шағымда",
+      "rank": 643,
+      "left": "▁сабақ",
+      "right": "ы",
+      "merged": "▁сабақы",
       "frequency": 9
     },
     {
-      "rank": 443,
-      "left": "▁іс",
-      "right": "те",
-      "merged": "▁істе",
-      "frequency": 9
-    },
-    {
-      "rank": 444,
-      "left": "▁қазақ",
-      "right": "тың",
-      "merged": "▁қазақтың",
-      "frequency": 9
-    },
-    {
-      "rank": 445,
-      "left": "▁қала",
-      "right": "ны",
-      "merged": "▁қаланы",
-      "frequency": 9
-    },
-    {
-      "rank": 446,
-      "left": "▁қолданыс",
+      "rank": 644,
+      "left": "▁сабақ",
       "right": "ы.",
-      "merged": "▁қолданысы.",
+      "merged": "▁сабақы.",
       "frequency": 9
     },
     {
-      "rank": 447,
-      "left": "▁қорытынды",
-      "right": "ның",
-      "merged": "▁қорытындының",
+      "rank": 645,
+      "left": "▁сипаттама",
+      "right": "сы.",
+      "merged": "▁сипаттамасы.",
       "frequency": 9
     },
     {
-      "rank": 448,
+      "rank": 646,
+      "left": "▁талдау",
+      "right": "ны",
+      "merged": "▁талдауны",
+      "frequency": 9
+    },
+    {
+      "rank": 647,
+      "left": "▁тап",
+      "right": "амын.",
+      "merged": "▁тапамын.",
+      "frequency": 9
+    },
+    {
+      "rank": 648,
+      "left": "▁түсіндір",
+      "right": "емін.",
+      "merged": "▁түсіндіремін.",
+      "frequency": 9
+    },
+    {
+      "rank": 649,
+      "left": "▁тұр",
+      "right": "асыз.",
+      "merged": "▁тұрасыз.",
+      "frequency": 9
+    },
+    {
+      "rank": 650,
+      "left": "▁хат",
+      "right": "ты",
+      "merged": "▁хатты",
+      "frequency": 9
+    },
+    {
+      "rank": 651,
+      "left": "▁қазақ",
+      "right": "ты",
+      "merged": "▁қазақты",
+      "frequency": 9
+    },
+    {
+      "rank": 652,
+      "left": "▁қолдану",
+      "right": "ны",
+      "merged": "▁қолдануны",
+      "frequency": 9
+    },
+    {
+      "rank": 653,
       "left": "▁қызмет",
       "right": "ті",
       "merged": "▁қызметті",
       "frequency": 9
     },
     {
-      "rank": 449,
-      "left": "▁үлгі",
-      "right": "сі.",
-      "merged": "▁үлгісі.",
-      "frequency": 9
-    },
-    {
-      "rank": 450,
-      "left": "▁ұғым",
-      "right": "ға",
-      "merged": "▁ұғымға",
-      "frequency": 9
-    },
-    {
-      "rank": 451,
-      "left": "▁адам",
-      "right": "ы.",
-      "merged": "▁адамы.",
+      "rank": 654,
+      "left": "▁айт",
+      "right": "амын.",
+      "merged": "▁айтамын.",
       "frequency": 8
     },
     {
-      "rank": 452,
-      "left": "▁анықтама",
-      "right": "ға",
-      "merged": "▁анықтамаға",
+      "rank": 655,
+      "left": "▁жазба",
+      "right": "ны",
+      "merged": "▁жазбаны",
       "frequency": 8
     },
     {
-      "rank": 453,
-      "left": "▁ақпарат",
-      "right": "та",
-      "merged": "▁ақпаратта",
+      "rank": 656,
+      "left": "▁жаттығу",
+      "right": "сы.",
+      "merged": "▁жаттығусы.",
       "frequency": 8
     },
     {
-      "rank": 454,
-      "left": "▁баяндау",
-      "right": "лар",
-      "merged": "▁баяндаулар",
-      "frequency": 8
-    },
-    {
-      "rank": 455,
-      "left": "▁баяндау",
-      "right": "ға",
-      "merged": "▁баяндауға",
-      "frequency": 8
-    },
-    {
-      "rank": 456,
-      "left": "▁белгі",
-      "right": "сі.",
-      "merged": "▁белгісі.",
-      "frequency": 8
-    },
-    {
-      "rank": 457,
-      "left": "▁жауап",
-      "right": "қа",
-      "merged": "▁жауапқа",
-      "frequency": 8
-    },
-    {
-      "rank": 458,
+      "rank": 657,
       "left": "▁жыл",
-      "right": "ды",
-      "merged": "▁жылды",
+      "right": "ы.",
+      "merged": "▁жылы.",
       "frequency": 8
     },
     {
-      "rank": 459,
-      "left": "▁кітап",
-      "right": "та",
-      "merged": "▁кітапта",
+      "rank": 658,
+      "left": "▁жүйе",
+      "right": "сі",
+      "merged": "▁жүйесі",
       "frequency": 8
     },
     {
-      "rank": 460,
-      "left": "▁материал",
-      "right": "дар",
-      "merged": "▁материалдар",
+      "rank": 659,
+      "left": "▁жүр",
+      "right": "есіз.",
+      "merged": "▁жүресіз.",
       "frequency": 8
     },
     {
-      "rank": 461,
+      "rank": 660,
+      "left": "▁көр",
+      "right": "емін.",
+      "merged": "▁көремін.",
+      "frequency": 8
+    },
+    {
+      "rank": 661,
+      "left": "▁көр",
+      "right": "есіз.",
+      "merged": "▁көресіз.",
+      "frequency": 8
+    },
+    {
+      "rank": 662,
       "left": "▁материал",
       "right": "ды",
       "merged": "▁материалды",
       "frequency": 8
     },
     {
-      "rank": 462,
-      "left": "▁мемлекет",
-      "right": "тер",
-      "merged": "▁мемлекеттер",
-      "frequency": 8
-    },
-    {
-      "rank": 463,
-      "left": "▁мемлекет",
-      "right": "і.",
-      "merged": "▁мемлекеті.",
-      "frequency": 8
-    },
-    {
-      "rank": 464,
-      "left": "▁міндет",
-      "right": "тер",
-      "merged": "▁міндеттер",
-      "frequency": 8
-    },
-    {
-      "rank": 465,
-      "left": "▁мәртебе",
-      "right": "де",
-      "merged": "▁мәртебеде",
-      "frequency": 8
-    },
-    {
-      "rank": 466,
+      "rank": 663,
       "left": "▁нәтиже",
-      "right": "де",
-      "merged": "▁нәтижеде",
+      "right": "сі",
+      "merged": "▁нәтижесі",
       "frequency": 8
     },
     {
-      "rank": 467,
-      "left": "▁сапа",
-      "right": "лар",
-      "merged": "▁сапалар",
+      "rank": 664,
+      "left": "▁тап",
+      "right": "асыз.",
+      "merged": "▁тапасыз.",
       "frequency": 8
     },
     {
-      "rank": 468,
-      "left": "▁сипаттама",
-      "right": "сы.",
-      "merged": "▁сипаттамасы.",
+      "rank": 665,
+      "left": "▁термин",
+      "right": "ді",
+      "merged": "▁терминді",
       "frequency": 8
     },
     {
-      "rank": 469,
-      "left": "▁сөздік",
-      "right": "те",
-      "merged": "▁сөздікте",
+      "rank": 666,
+      "left": "▁термин",
+      "right": "і",
+      "merged": "▁термині",
       "frequency": 8
     },
     {
-      "rank": 470,
-      "left": "▁талдау",
-      "right": "да",
-      "merged": "▁талдауда",
-      "frequency": 8
-    },
-    {
-      "rank": 471,
-      "left": "▁тапсырма",
-      "right": "ны",
-      "merged": "▁тапсырманы",
-      "frequency": 8
-    },
-    {
-      "rank": 472,
-      "left": "▁тіл",
-      "right": "де",
-      "merged": "▁тілде",
-      "frequency": 8
-    },
-    {
-      "rank": 473,
+      "rank": 667,
       "left": "▁түр",
-      "right": "ге",
-      "merged": "▁түрге",
+      "right": "ді",
+      "merged": "▁түрді",
       "frequency": 8
     },
     {
-      "rank": 474,
-      "left": "▁халық",
-      "right": "ы.",
-      "merged": "▁халықы.",
+      "rank": 668,
+      "left": "▁шағым",
+      "right": "ды",
+      "merged": "▁шағымды",
       "frequency": 8
     },
     {
-      "rank": 475,
-      "left": "▁хат",
-      "right": "та",
-      "merged": "▁хатта",
+      "rank": 669,
+      "left": "▁шағым",
+      "right": "ы",
+      "merged": "▁шағымы",
       "frequency": 8
     },
     {
-      "rank": 476,
-      "left": "▁хат",
-      "right": "қа",
-      "merged": "▁хатқа",
+      "rank": 670,
+      "left": "▁шекара",
+      "right": "сы.",
+      "merged": "▁шекарасы.",
       "frequency": 8
     },
     {
-      "rank": 477,
+      "rank": 671,
       "left": "▁іс",
-      "right": "тер",
-      "merged": "▁істер",
+      "right": "і",
+      "merged": "▁ісі",
       "frequency": 8
     },
     {
-      "rank": 478,
-      "left": "▁қазақ",
-      "right": "тар",
-      "merged": "▁қазақтар",
+      "rank": 672,
+      "left": "▁қала",
+      "right": "сы.",
+      "merged": "▁қаласы.",
       "frequency": 8
     },
     {
-      "rank": 479,
-      "left": "▁қолдану",
-      "right": "лар",
-      "merged": "▁қолданулар",
+      "rank": 673,
+      "left": "▁қолданыс",
+      "right": "ы.",
+      "merged": "▁қолданысы.",
       "frequency": 8
     },
     {
-      "rank": 480,
-      "left": "▁қорытынды",
-      "right": "да",
-      "merged": "▁қорытындыда",
-      "frequency": 8
-    },
-    {
-      "rank": 481,
-      "left": "▁қорытынды",
-      "right": "ны",
-      "merged": "▁қорытындыны",
-      "frequency": 8
-    },
-    {
-      "rank": 482,
-      "left": "▁қызмет",
-      "right": "ін",
+      "rank": 674,
+      "left": "▁қызметі",
+      "right": "н",
       "merged": "▁қызметін",
       "frequency": 8
     },
     {
-      "rank": 483,
-      "left": "▁өтініш",
-      "right": "ке",
-      "merged": "▁өтінішке",
+      "rank": 675,
+      "left": "▁құр",
+      "right": "амын.",
+      "merged": "▁құрамын.",
       "frequency": 8
     },
     {
-      "rank": 484,
-      "left": "▁бала",
-      "right": "ны",
-      "merged": "▁баланы",
-      "frequency": 7
-    },
-    {
-      "rank": 485,
-      "left": "▁бап",
-      "right": "тың",
-      "merged": "▁баптың",
-      "frequency": 7
-    },
-    {
-      "rank": 486,
-      "left": "▁бап",
-      "right": "қа",
-      "merged": "▁бапқа",
-      "frequency": 7
-    },
-    {
-      "rank": 487,
-      "left": "▁баяндау",
-      "right": "да",
-      "merged": "▁баяндауда",
-      "frequency": 7
-    },
-    {
-      "rank": 488,
-      "left": "▁белгі",
-      "right": "ге",
-      "merged": "▁белгіге",
-      "frequency": 7
-    },
-    {
-      "rank": 489,
-      "left": "▁білім",
-      "right": "і.",
-      "merged": "▁білімі.",
-      "frequency": 7
-    },
-    {
-      "rank": 490,
-      "left": "▁жаттығу",
-      "right": "сы.",
-      "merged": "▁жаттығусы.",
-      "frequency": 7
-    },
-    {
-      "rank": 491,
-      "left": "▁жауап",
-      "right": "ты",
-      "merged": "▁жауапты",
-      "frequency": 7
-    },
-    {
-      "rank": 492,
-      "left": "▁жүйе",
-      "right": "де",
-      "merged": "▁жүйеде",
-      "frequency": 7
-    },
-    {
-      "rank": 493,
-      "left": "▁жүйе",
-      "right": "лер",
-      "merged": "▁жүйелер",
-      "frequency": 7
-    },
-    {
-      "rank": 494,
-      "left": "▁күн",
-      "right": "де",
-      "merged": "▁күнде",
-      "frequency": 7
-    },
-    {
-      "rank": 495,
-      "left": "▁күн",
-      "right": "дер",
-      "merged": "▁күндер",
-      "frequency": 7
-    },
-    {
-      "rank": 496,
-      "left": "▁мектеп",
-      "right": "ке",
-      "merged": "▁мектепке",
-      "frequency": 7
-    },
-    {
-      "rank": 497,
-      "left": "▁мектеп",
-      "right": "і.",
-      "merged": "▁мектепі.",
-      "frequency": 7
-    },
-    {
-      "rank": 498,
-      "left": "▁мысал",
-      "right": "ы.",
-      "merged": "▁мысалы.",
-      "frequency": 7
-    },
-    {
-      "rank": 499,
-      "left": "▁мәртебе",
-      "right": "нің",
-      "merged": "▁мәртебенің",
-      "frequency": 7
-    },
-    {
-      "rank": 500,
-      "left": "▁мәтін",
-      "right": "дер",
-      "merged": "▁мәтіндер",
-      "frequency": 7
-    },
-    {
-      "rank": 501,
-      "left": "▁сабақ",
-      "right": "та",
-      "merged": "▁сабақта",
-      "frequency": 7
-    },
-    {
-      "rank": 502,
-      "left": "▁сабақ",
-      "right": "ы.",
-      "merged": "▁сабақы.",
-      "frequency": 7
-    },
-    {
-      "rank": 503,
-      "left": "▁сипаттама",
-      "right": "ға",
-      "merged": "▁сипаттамаға",
-      "frequency": 7
-    },
-    {
-      "rank": 504,
-      "left": "▁сөздік",
-      "right": "тер",
-      "merged": "▁сөздіктер",
-      "frequency": 7
-    },
-    {
-      "rank": 505,
-      "left": "▁халық",
-      "right": "та",
-      "merged": "▁халықта",
-      "frequency": 7
-    },
-    {
-      "rank": 506,
-      "left": "▁қолдану",
-      "right": "да",
-      "merged": "▁қолдануда",
-      "frequency": 7
-    },
-    {
-      "rank": 507,
-      "left": "▁қолданыс",
-      "right": "ы",
-      "merged": "▁қолданысы",
-      "frequency": 7
-    },
-    {
-      "rank": 508,
-      "left": "▁қызмет",
-      "right": "тер",
-      "merged": "▁қызметтер",
-      "frequency": 7
-    },
-    {
-      "rank": 509,
-      "left": "▁құжат",
-      "right": "та",
-      "merged": "▁құжатта",
-      "frequency": 7
-    },
-    {
-      "rank": 510,
-      "left": "▁құжат",
-      "right": "ты",
-      "merged": "▁құжатты",
-      "frequency": 7
-    },
-    {
-      "rank": 511,
-      "left": "сы",
-      "right": "н",
-      "merged": "сын",
-      "frequency": 6
-    },
-    {
-      "rank": 512,
-      "left": "▁ақпарат",
-      "right": "ты",
-      "merged": "▁ақпаратты",
-      "frequency": 6
-    },
-    {
-      "rank": 513,
-      "left": "▁белгі",
+      "rank": 676,
+      "left": "▁үлгі",
       "right": "ні",
-      "merged": "▁белгіні",
+      "merged": "▁үлгіні",
+      "frequency": 8
+    },
+    {
+      "rank": 677,
+      "left": "▁адам",
+      "right": "ды",
+      "merged": "▁адамды",
+      "frequency": 7
+    },
+    {
+      "rank": 678,
+      "left": "▁аш",
+      "right": "асыз.",
+      "merged": "▁ашасыз.",
+      "frequency": 7
+    },
+    {
+      "rank": 679,
+      "left": "▁ақпарат",
+      "right": "ы",
+      "merged": "▁ақпараты",
+      "frequency": 7
+    },
+    {
+      "rank": 680,
+      "left": "▁бар",
+      "right": "амын.",
+      "merged": "▁барамын.",
+      "frequency": 7
+    },
+    {
+      "rank": 681,
+      "left": "▁бар",
+      "right": "асыз.",
+      "merged": "▁барасыз.",
+      "frequency": 7
+    },
+    {
+      "rank": 682,
+      "left": "▁бер",
+      "right": "есіз.",
+      "merged": "▁бересіз.",
+      "frequency": 7
+    },
+    {
+      "rank": 683,
+      "left": "▁ереже",
+      "right": "ні",
+      "merged": "▁ережені",
+      "frequency": 7
+    },
+    {
+      "rank": 684,
+      "left": "▁жаз",
+      "right": "асыз.",
+      "merged": "▁жазасыз.",
+      "frequency": 7
+    },
+    {
+      "rank": 685,
+      "left": "▁жауап",
+      "right": "ы",
+      "merged": "▁жауапы",
+      "frequency": 7
+    },
+    {
+      "rank": 686,
+      "left": "▁көрсет",
+      "right": "емін.",
+      "merged": "▁көрсетемін.",
+      "frequency": 7
+    },
+    {
+      "rank": 687,
+      "left": "▁мемлекет",
+      "right": "ті",
+      "merged": "▁мемлекетті",
+      "frequency": 7
+    },
+    {
+      "rank": 688,
+      "left": "▁мін",
+      "right": "емін.",
+      "merged": "▁мінемін.",
+      "frequency": 7
+    },
+    {
+      "rank": 689,
+      "left": "▁міндет",
+      "right": "ті",
+      "merged": "▁міндетті",
+      "frequency": 7
+    },
+    {
+      "rank": 690,
+      "left": "▁міндет",
+      "right": "і.",
+      "merged": "▁міндеті.",
+      "frequency": 7
+    },
+    {
+      "rank": 691,
+      "left": "▁салыстыр",
+      "right": "амын.",
+      "merged": "▁салыстырамын.",
+      "frequency": 7
+    },
+    {
+      "rank": 692,
+      "left": "▁тұр",
+      "right": "амын.",
+      "merged": "▁тұрамын.",
+      "frequency": 7
+    },
+    {
+      "rank": 693,
+      "left": "▁айт",
+      "right": "асыз.",
+      "merged": "▁айтасыз.",
       "frequency": 6
     },
     {
-      "rank": 514,
-      "left": "▁белгі",
-      "right": "нің",
-      "merged": "▁белгінің",
+      "rank": 694,
+      "left": "▁ал",
+      "right": "амын.",
+      "merged": "▁аламын.",
       "frequency": 6
     },
     {
-      "rank": 515,
-      "left": "▁ел",
-      "right": "ді",
-      "merged": "▁елді",
+      "rank": 695,
+      "left": "▁арттыр",
+      "right": "амын.",
+      "merged": "▁арттырамын.",
       "frequency": 6
     },
     {
-      "rank": 516,
-      "left": "▁жүйе",
-      "right": "сі.",
-      "merged": "▁жүйесі.",
+      "rank": 696,
+      "left": "▁біл",
+      "right": "есіз.",
+      "merged": "▁білесіз.",
       "frequency": 6
     },
     {
-      "rank": 517,
+      "rank": 697,
+      "left": "▁жаз",
+      "right": "амын.",
+      "merged": "▁жазамын.",
+      "frequency": 6
+    },
+    {
+      "rank": 698,
+      "left": "▁жеткіз",
+      "right": "есіз.",
+      "merged": "▁жеткізесіз.",
+      "frequency": 6
+    },
+    {
+      "rank": 699,
+      "left": "▁жүр",
+      "right": "емін.",
+      "merged": "▁жүремін.",
+      "frequency": 6
+    },
+    {
+      "rank": 700,
+      "left": "▁кел",
+      "right": "емін.",
+      "merged": "▁келемін.",
+      "frequency": 6
+    },
+    {
+      "rank": 701,
+      "left": "▁кет",
+      "right": "емін.",
+      "merged": "▁кетемін.",
+      "frequency": 6
+    },
+    {
+      "rank": 702,
       "left": "▁күн",
-      "right": "нің",
-      "merged": "▁күннің",
+      "right": "і.",
+      "merged": "▁күні.",
       "frequency": 6
     },
     {
-      "rank": 518,
-      "left": "▁материал",
-      "right": "дың",
-      "merged": "▁материалдың",
+      "rank": 703,
+      "left": "▁көмектес",
+      "right": "есіз.",
+      "merged": "▁көмектесесіз.",
       "frequency": 6
     },
     {
-      "rank": 519,
-      "left": "▁модель",
-      "right": "дер",
-      "merged": "▁модельдер",
-      "frequency": 6
-    },
-    {
-      "rank": 520,
-      "left": "▁сабақ",
-      "right": "ты",
-      "merged": "▁сабақты",
-      "frequency": 6
-    },
-    {
-      "rank": 521,
+      "rank": 704,
       "left": "▁сөздік",
       "right": "ті",
       "merged": "▁сөздікті",
       "frequency": 6
     },
     {
-      "rank": 522,
+      "rank": 705,
       "left": "▁талдау",
-      "right": "ның",
-      "merged": "▁талдауның",
-      "frequency": 6
-    },
-    {
-      "rank": 523,
-      "left": "▁тапсырма",
       "right": "сы",
-      "merged": "▁тапсырмасы",
+      "merged": "▁талдаусы",
       "frequency": 6
     },
     {
-      "rank": 524,
-      "left": "▁хат",
-      "right": "тың",
-      "merged": "▁хаттың",
+      "rank": 706,
+      "left": "▁тапсырма",
+      "right": "ны",
+      "merged": "▁тапсырманы",
       "frequency": 6
     },
     {
-      "rank": 525,
+      "rank": 707,
+      "left": "▁түсіндір",
+      "right": "есіз.",
+      "merged": "▁түсіндіресіз.",
+      "frequency": 6
+    },
+    {
+      "rank": 708,
       "left": "▁қала",
-      "right": "лар",
-      "merged": "▁қалалар",
+      "right": "ны",
+      "merged": "▁қаланы",
       "frequency": 6
     },
     {
-      "rank": 526,
-      "left": "▁қала",
-      "right": "ға",
-      "merged": "▁қалаға",
+      "rank": 709,
+      "left": "▁қолдан",
+      "right": "амын.",
+      "merged": "▁қолданамын.",
       "frequency": 6
     },
     {
-      "rank": 527,
-      "left": "▁қолданыс",
-      "right": "ты",
-      "merged": "▁қолданысты",
-      "frequency": 6
-    },
-    {
-      "rank": 528,
+      "rank": 710,
       "left": "▁қолданысы",
       "right": "н",
       "merged": "▁қолданысын",
       "frequency": 6
     },
     {
-      "rank": 529,
+      "rank": 711,
+      "left": "▁қон",
+      "right": "асыз.",
+      "merged": "▁қонасыз.",
+      "frequency": 6
+    },
+    {
+      "rank": 712,
+      "left": "▁құр",
+      "right": "асыз.",
+      "merged": "▁құрасыз.",
+      "frequency": 6
+    },
+    {
+      "rank": 713,
+      "left": "▁аш",
+      "right": "амын.",
+      "merged": "▁ашамын.",
+      "frequency": 5
+    },
+    {
+      "rank": 714,
       "left": "▁болмас",
       "right": ".",
       "merged": "▁болмас.",
       "frequency": 5
     },
     {
-      "rank": 530,
-      "left": "▁білім",
-      "right": "дер",
-      "merged": "▁білімдер",
-      "frequency": 5
-    },
-    {
-      "rank": 531,
-      "left": "▁мысал",
-      "right": "да",
-      "merged": "▁мысалда",
-      "frequency": 5
-    },
-    {
-      "rank": 532,
-      "left": "▁мәтін",
-      "right": "ге",
-      "merged": "▁мәтінге",
-      "frequency": 5
-    },
-    {
-      "rank": 533,
-      "left": "▁мәтін",
-      "right": "і",
-      "merged": "▁мәтіні",
-      "frequency": 5
-    },
-    {
-      "rank": 534,
-      "left": "▁іс",
+      "rank": 715,
+      "left": "▁дерек",
       "right": "ті",
-      "merged": "▁істі",
+      "merged": "▁деректі",
       "frequency": 5
     },
     {
-      "rank": 535,
+      "rank": 716,
       "left": "▁белгілер",
       "right": "ді",
       "merged": "▁белгілерді",
       "frequency": 4
     },
     {
-      "rank": 536,
-      "left": "▁материал",
-      "right": "ы",
-      "merged": "▁материалы",
+      "rank": 717,
+      "left": "▁кел",
+      "right": "есіз.",
+      "merged": "▁келесіз.",
       "frequency": 4
     },
     {
-      "rank": 537,
-      "left": "▁мемлекет",
-      "right": "ке",
-      "merged": "▁мемлекетке",
+      "rank": 718,
+      "left": "▁мін",
+      "right": "есіз.",
+      "merged": "▁мінесіз.",
       "frequency": 4
     },
     {
-      "rank": 538,
-      "left": "▁анықтама",
-      "right": "сы",
-      "merged": "▁анықтамасы",
+      "rank": 719,
+      "left": "▁сапа",
+      "right": "ны",
+      "merged": "▁сапаны",
+      "frequency": 4
+    },
+    {
+      "rank": 720,
+      "left": "▁қолдан",
+      "right": "асыз.",
+      "merged": "▁қолданасыз.",
+      "frequency": 4
+    },
+    {
+      "rank": 721,
+      "left": "▁арттыр",
+      "right": "асыз.",
+      "merged": "▁арттырасыз.",
       "frequency": 3
     },
     {
-      "rank": 539,
+      "rank": 722,
       "left": "▁білім",
       "right": "сіз",
       "merged": "▁білімсіз",
       "frequency": 3
     },
     {
-      "rank": 540,
-      "left": "▁мысал",
-      "right": "дың",
-      "merged": "▁мысалдың",
+      "rank": 723,
+      "left": "▁көрсет",
+      "right": "есіз.",
+      "merged": "▁көрсетесіз.",
       "frequency": 3
     },
     {
-      "rank": 541,
-      "left": "▁тіл",
-      "right": "і",
-      "merged": "▁тілі",
-      "frequency": 3
-    },
-    {
-      "rank": 542,
-      "left": "▁шекара",
-      "right": "сын",
+      "rank": 724,
+      "left": "▁шекарасы",
+      "right": "н",
       "merged": "▁шекарасын",
       "frequency": 3
     },
     {
-      "rank": 543,
+      "rank": 725,
       "left": "▁ұғымдар",
       "right": "ды",
       "merged": "▁ұғымдарды",
       "frequency": 3
     },
     {
-      "rank": 544,
+      "rank": 726,
       "left": "▁алтын",
       "right": ".",
       "merged": "▁алтын.",
       "frequency": 2
     },
     {
-      "rank": 545,
+      "rank": 727,
       "left": "▁бар",
       "right": ".",
       "merged": "▁бар.",
       "frequency": 2
     },
     {
-      "rank": 546,
+      "rank": 728,
       "left": "▁бастауы",
       "right": ".",
       "merged": "▁бастауы.",
       "frequency": 2
     },
     {
-      "rank": 547,
+      "rank": 729,
+      "left": "▁бекіт",
+      "right": "емін.",
+      "merged": "▁бекітемін.",
+      "frequency": 2
+    },
+    {
+      "rank": 730,
       "left": "▁болады",
       "right": ".",
       "merged": "▁болады.",
       "frequency": 2
     },
     {
-      "rank": 548,
+      "rank": 731,
       "left": "▁болса",
       "right": ",",
       "merged": "▁болса,",
       "frequency": 2
     },
     {
-      "rank": 549,
+      "rank": 732,
       "left": "▁жеткіз",
       "right": "ер",
       "merged": "▁жеткізер",
       "frequency": 2
     },
     {
-      "rank": 550,
+      "rank": 733,
       "left": "▁жоқ",
       "right": ".",
       "merged": "▁жоқ.",
       "frequency": 2
     },
     {
-      "rank": 551,
+      "rank": 734,
       "left": "▁күшейтеді",
       "right": ".",
       "merged": "▁күшейтеді.",
       "frequency": 2
     },
     {
-      "rank": 552,
+      "rank": 735,
       "left": "▁көп",
       "right": ".",
       "merged": "▁көп.",
       "frequency": 2
     },
     {
-      "rank": 553,
-      "left": "▁мағына",
-      "right": "сын",
+      "rank": 736,
+      "left": "▁мағынасы",
+      "right": "н",
       "merged": "▁мағынасын",
       "frequency": 2
     },
     {
-      "rank": 554,
+      "rank": 737,
       "left": "▁озар",
       "right": ",",
       "merged": "▁озар,",
       "frequency": 2
     },
     {
-      "rank": 555,
+      "rank": 738,
       "left": "▁оқы",
       "right": "ған",
       "merged": "▁оқыған",
       "frequency": 2
     },
     {
-      "rank": 556,
+      "rank": 739,
       "left": "▁терминдер",
       "right": "дің",
       "merged": "▁терминдердің",
       "frequency": 2
     },
     {
-      "rank": 557,
+      "rank": 740,
       "left": "▁ыстық",
       "right": ".",
       "merged": "▁ыстық.",
       "frequency": 2
     },
     {
-      "rank": 558,
+      "rank": 741,
       "left": "▁қазына",
       "right": ".",
       "merged": "▁қазына.",
-      "frequency": 2
-    },
-    {
-      "rank": 559,
-      "left": "▁үлгі",
-      "right": "сі",
-      "merged": "▁үлгісі",
       "frequency": 2
     }
   ]

@@ -17,7 +17,9 @@ pub struct ModelConfig {
 impl ModelConfig {
     pub fn tiny() -> Self {
         Self {
-            vocab_size: 1066,
+            // Must match the BPE vocab size written by train_bpe.
+            // Updated in v0.0.87 after lexicon-seeded vocab retrain (was 1066).
+            vocab_size: 1390,
             hidden_dim: 192,
             num_heads: 6,
             num_layers: 4,
