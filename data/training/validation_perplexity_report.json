@@ -1,0 +1,6273 @@
+{
+  "version": "0.1.3",
+  "run_name": "adam-baseline-perplexity",
+  "checkpoint_path": "data/training/adam_baseline_checkpoint.safetensors",
+  "val_pack_path": "data/curated/adam_validation_ids_pack.json",
+  "sample_count": 894,
+  "token_count": 4888,
+  "skipped_sample_count": 0,
+  "total_cross_entropy": 31481.869914531708,
+  "mean_cross_entropy": 6.440644417866553,
+  "perplexity": 626.8105976383107,
+  "vocab_size": 4096,
+  "per_sample_stats": [
+    {
+      "id": "adam_train_000003",
+      "text": "ол нақтылайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.101709842681885,
+      "perplexity": 60.443548251112304
+    },
+    {
+      "id": "adam_train_000019",
+      "text": "мысалды бекітеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.2668776512146,
+      "perplexity": 193.80987470225213
+    },
+    {
+      "id": "adam_train_000038",
+      "text": "күн мүмкін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.531742095947266,
+      "perplexity": 92.92029623361893
+    },
+    {
+      "id": "adam_train_000044",
+      "text": "ол мінеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.056817531585693,
+      "perplexity": 57.79010293887631
+    },
+    {
+      "id": "adam_train_000050",
+      "text": "қазақтар жасады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.047725200653076,
+      "perplexity": 155.6679480658136
+    },
+    {
+      "id": "adam_train_000068",
+      "text": "біз аламыз.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.566346645355225,
+      "perplexity": 710.7684049845359
+    },
+    {
+      "id": "adam_train_000084",
+      "text": "ескі жүйе бастап.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.2732648849487305,
+      "perplexity": 195.05174550949275
+    },
+    {
+      "id": "adam_train_000089",
+      "text": "қызметтің мәтіні.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.669373512268066,
+      "perplexity": 289.85288821959153
+    },
+    {
+      "id": "adam_train_000093",
+      "text": "қолдану барады.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.776334285736084,
+      "perplexity": 43.65571867518805
+    },
+    {
+      "id": "adam_train_000103",
+      "text": "отыз міндет.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.675091743469238,
+      "perplexity": 107.24240543105962
+    },
+    {
+      "id": "adam_train_000115",
+      "text": "жазба арттырды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.957427024841309,
+      "perplexity": 142.2273771976153
+    },
+    {
+      "id": "adam_train_000131",
+      "text": "таза мәтін бастап.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.014062404632568,
+      "perplexity": 150.51494846909952
+    },
+    {
+      "id": "adam_train_000146",
+      "text": "құжаттар салыстырды.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.120850563049316,
+      "perplexity": 455.2517501854022
+    },
+    {
+      "id": "adam_train_000201",
+      "text": "сабақ емес.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.9185988903045654,
+      "perplexity": 50.32987767390387
+    },
+    {
+      "id": "adam_train_000237",
+      "text": "анықтамалар сақтады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.3459086418151855,
+      "perplexity": 209.74838419035945
+    },
+    {
+      "id": "adam_train_000270",
+      "text": "елдің тапсырмасы.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.625052452087402,
+      "perplexity": 753.7437469506154
+    },
+    {
+      "id": "adam_train_000295",
+      "text": "заң сөйледі.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.232285976409912,
+      "perplexity": 68.87449782985509
+    },
+    {
+      "id": "adam_train_000303",
+      "text": "міндет ғой.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.694362640380859,
+      "perplexity": 109.32910447447283
+    },
+    {
+      "id": "adam_train_000319",
+      "text": "жаттығуға біледі.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.342385292053223,
+      "perplexity": 76.89072761421495
+    },
+    {
+      "id": "adam_train_000331",
+      "text": "баяндауның елі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.632465362548828,
+      "perplexity": 279.3499683339111
+    },
+    {
+      "id": "adam_train_000346",
+      "text": "үлкен жыл дейін.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.811673164367676,
+      "perplexity": 122.93713957462764
+    },
+    {
+      "id": "adam_train_000362",
+      "text": "бірден нәтиже қолданады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.652622222900391,
+      "perplexity": 104.85959060177376
+    },
+    {
+      "id": "adam_train_000372",
+      "text": "шекара оқыды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.456902027130127,
+      "perplexity": 86.21998774047722
+    },
+    {
+      "id": "adam_train_000389",
+      "text": "ескі тұрақты қор.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.024408340454102,
+      "perplexity": 152.08024975722404
+    },
+    {
+      "id": "adam_train_000393",
+      "text": "бап қазір айтады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.516971588134766,
+      "perplexity": 91.55790266371648
+    },
+    {
+      "id": "adam_train_000405",
+      "text": "жылдам ұғым.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.009812355041504,
+      "perplexity": 149.87660992000872
+    },
+    {
+      "id": "adam_train_000408",
+      "text": "ресми жаңа материал.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.683646202087402,
+      "perplexity": 294.0195324649339
+    },
+    {
+      "id": "adam_train_000425",
+      "text": "жазба иә көрсетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.996384620666504,
+      "perplexity": 147.87755801828575
+    },
+    {
+      "id": "adam_train_000438",
+      "text": "термин алады ғой.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.035177230834961,
+      "perplexity": 417.87286303228615
+    },
+    {
+      "id": "adam_train_000440",
+      "text": "кітап сақтады өйткені салыстырды.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.02023458480835,
+      "perplexity": 411.67515713814237
+    },
+    {
+      "id": "adam_train_000454",
+      "text": "он материал бекітеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.512736797332764,
+      "perplexity": 91.17099391668447
+    },
+    {
+      "id": "adam_train_000471",
+      "text": "жүйе лайық.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.511180400848389,
+      "perplexity": 91.02920606995055
+    },
+    {
+      "id": "adam_train_000483",
+      "text": "ереженің анасы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.871014595031738,
+      "perplexity": 354.60858191731904
+    },
+    {
+      "id": "adam_train_000505",
+      "text": "мекеме тұрды әрі жеткізді.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.681981563568115,
+      "perplexity": 293.53050336703257
+    },
+    {
+      "id": "adam_train_000542",
+      "text": "сөздіктер қолданады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.549378871917725,
+      "perplexity": 94.57364771944347
+    },
+    {
+      "id": "adam_train_000556",
+      "text": "сипаттаманы тапады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.148279190063477,
+      "perplexity": 172.13502364949878
+    },
+    {
+      "id": "adam_train_000591",
+      "text": "біз келеміз.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.803928375244141,
+      "perplexity": 901.381309653589
+    },
+    {
+      "id": "adam_train_000628",
+      "text": "қорытынды ертең көреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.464941501617432,
+      "perplexity": 86.91594494883475
+    },
+    {
+      "id": "adam_train_000661",
+      "text": "күн шығар.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.109201431274414,
+      "perplexity": 60.89806685509897
+    },
+    {
+      "id": "adam_train_000700",
+      "text": "анықтамалық білім кейін.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.200717449188232,
+      "perplexity": 181.40234216252577
+    },
+    {
+      "id": "adam_train_000723",
+      "text": "мемлекет жапады ба.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.861559867858887,
+      "perplexity": 351.2716542502948
+    },
+    {
+      "id": "adam_train_000764",
+      "text": "қиын кіші жүйе.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.951079368591309,
+      "perplexity": 141.3274260100057
+    },
+    {
+      "id": "adam_train_000770",
+      "text": "жазбаға дерек тұрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.220526695251465,
+      "perplexity": 185.03161368287172
+    },
+    {
+      "id": "adam_train_000792",
+      "text": "мекеменің адамы сипаттайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.733520030975342,
+      "perplexity": 309.0552399470131
+    },
+    {
+      "id": "adam_train_000800",
+      "text": "мектепке баяндау тапады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.507528781890869,
+      "perplexity": 246.54111677140776
+    },
+    {
+      "id": "adam_train_000814",
+      "text": "мысалдар көмектесті.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.227281093597412,
+      "perplexity": 186.28562117382754
+    },
+    {
+      "id": "adam_train_000825",
+      "text": "жас сенімді баяндау.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.4638237953186035,
+      "perplexity": 235.99810971671678
+    },
+    {
+      "id": "adam_train_000837",
+      "text": "анықтамалық тұрақты материал.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.219736099243164,
+      "perplexity": 184.88538623871793
+    },
+    {
+      "id": "adam_train_000865",
+      "text": "белгіге кетеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.252131462097168,
+      "perplexity": 190.97288642830028
+    },
+    {
+      "id": "adam_train_000895",
+      "text": "мен әлі жеткіземін.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.653458118438721,
+      "perplexity": 104.94727890973579
+    },
+    {
+      "id": "adam_train_000937",
+      "text": "мемлекет туралы.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.549360275268555,
+      "perplexity": 94.57188898284947
+    },
+    {
+      "id": "adam_train_000968",
+      "text": "қазаққа айтады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.853979110717773,
+      "perplexity": 128.2496956203904
+    },
+    {
+      "id": "adam_train_000986",
+      "text": "модель де.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.570276260375977,
+      "perplexity": 96.57078476936145
+    },
+    {
+      "id": "adam_train_001005",
+      "text": "тілдер көмектесті.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.42023229598999,
+      "perplexity": 225.93159941126484
+    },
+    {
+      "id": "adam_train_001040",
+      "text": "жауаптың мемлекеті.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.152678966522217,
+      "perplexity": 469.9747484328794
+    },
+    {
+      "id": "adam_train_001054",
+      "text": "алты термин.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.219844341278076,
+      "perplexity": 184.90539969227885
+    },
+    {
+      "id": "adam_train_001069",
+      "text": "қайда қала құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.80271053314209,
+      "perplexity": 121.84022230400636
+    },
+    {
+      "id": "adam_train_001074",
+      "text": "жаттығу тұрды сондықтан бекітті.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.897145748138428,
+      "perplexity": 363.99704451461264
+    },
+    {
+      "id": "adam_train_001099",
+      "text": "міндет жүрді әрі тапты.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.832152366638184,
+      "perplexity": 341.0920446903237
+    },
+    {
+      "id": "adam_train_001131",
+      "text": "қолданыстың термині.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.840723991394043,
+      "perplexity": 344.028324069103
+    },
+    {
+      "id": "adam_train_001159",
+      "text": "суық түр үшін.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.629116058349609,
+      "perplexity": 102.42348769750507
+    },
+    {
+      "id": "adam_train_001162",
+      "text": "қызметті айтады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.073657035827637,
+      "perplexity": 159.757499251572
+    },
+    {
+      "id": "adam_train_001193",
+      "text": "жүйе жасамады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.187899589538574,
+      "perplexity": 179.0919909116014
+    },
+    {
+      "id": "adam_train_001221",
+      "text": "иә ұғым тапады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.015371799468994,
+      "perplexity": 150.7121610518216
+    },
+    {
+      "id": "adam_train_001250",
+      "text": "қызмет сөйледі.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.724448204040527,
+      "perplexity": 112.66831129942317
+    },
+    {
+      "id": "adam_train_001268",
+      "text": "жаңа құжат мінеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.076783657073975,
+      "perplexity": 160.25778213298315
+    },
+    {
+      "id": "adam_train_001283",
+      "text": "дәйекті модель сөйлейді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.3442535400390625,
+      "perplexity": 77.03451283261057
+    },
+    {
+      "id": "adam_train_001299",
+      "text": "анықтама жүрді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.515907287597656,
+      "perplexity": 91.4605093757926
+    },
+    {
+      "id": "adam_train_001300",
+      "text": "кітаптың мысалы салыстырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.877531051635742,
+      "perplexity": 356.92691881984433
+    },
+    {
+      "id": "adam_train_001324",
+      "text": "біраз ел құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.772512435913086,
+      "perplexity": 118.21587898373215
+    },
+    {
+      "id": "adam_train_001330",
+      "text": "жас дәл термин.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.489389419555664,
+      "perplexity": 242.10933449352817
+    },
+    {
+      "id": "adam_train_001349",
+      "text": "модель туралы.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.79067325592041,
+      "perplexity": 120.38238954273444
+    },
+    {
+      "id": "adam_train_001377",
+      "text": "таза мысал сайын.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.387957572937012,
+      "perplexity": 218.75613552026243
+    },
+    {
+      "id": "adam_train_001381",
+      "text": "жаман тапсырма.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.62473726272583,
+      "perplexity": 101.9759766725042
+    },
+    {
+      "id": "adam_train_001406",
+      "text": "мәртебенің белгісі.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.179105281829834,
+      "perplexity": 482.5600079382556
+    },
+    {
+      "id": "adam_train_001436",
+      "text": "жеңіл қазақ қолданады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.552143573760986,
+      "perplexity": 94.83547743138476
+    },
+    {
+      "id": "adam_train_001447",
+      "text": "белгіге мәртебе салыстырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.577329635620117,
+      "perplexity": 264.3647122637208
+    },
+    {
+      "id": "adam_train_001476",
+      "text": "қысқа мектеп.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.823920249938965,
+      "perplexity": 124.45201873542456
+    },
+    {
+      "id": "adam_train_001502",
+      "text": "оқу жиі арттырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.5907206535339355,
+      "perplexity": 98.56543610338379
+    },
+    {
+      "id": "adam_train_001512",
+      "text": "бала жазады ба.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.504993438720703,
+      "perplexity": 245.91684214444342
+    },
+    {
+      "id": "adam_train_001519",
+      "text": "жазба мүмкін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.760702610015869,
+      "perplexity": 116.82798157903414
+    },
+    {
+      "id": "adam_train_001527",
+      "text": "елдің сипаттамасы көреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.243426322937012,
+      "perplexity": 514.6187436631377
+    },
+    {
+      "id": "adam_train_001551",
+      "text": "халыққа мемлекет біледі.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.171701908111572,
+      "perplexity": 176.21448328540853
+    },
+    {
+      "id": "adam_train_001560",
+      "text": "дерекке мектеп кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.025014877319336,
+      "perplexity": 152.17252001500353
+    },
+    {
+      "id": "adam_train_001603",
+      "text": "кіші сапа.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.45065975189209,
+      "perplexity": 232.91177921578236
+    },
+    {
+      "id": "adam_train_001648",
+      "text": "үлгіге қолданады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.516480445861816,
+      "perplexity": 91.51294574832028
+    },
+    {
+      "id": "adam_train_001650",
+      "text": "модель жоқ береді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.69951057434082,
+      "perplexity": 109.89337465085723
+    },
+    {
+      "id": "adam_train_001680",
+      "text": "сенімді өтініш жүреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.295588493347168,
+      "perplexity": 73.37538266621767
+    },
+    {
+      "id": "adam_train_001769",
+      "text": "құжатқа көрсетеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.368341445922852,
+      "perplexity": 78.91264221853261
+    },
+    {
+      "id": "adam_train_001773",
+      "text": "екі құжат.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.091455936431885,
+      "perplexity": 162.62646356640815
+    },
+    {
+      "id": "adam_train_001780",
+      "text": "қолданыстар көреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.684317111968994,
+      "perplexity": 108.23633376833486
+    },
+    {
+      "id": "adam_train_001798",
+      "text": "сен ашасың.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.089766979217529,
+      "perplexity": 441.3185627667164
+    },
+    {
+      "id": "adam_train_001836",
+      "text": "хаттың қызметі мінеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.416759967803955,
+      "perplexity": 225.14845121116971
+    },
+    {
+      "id": "adam_train_001865",
+      "text": "құжатқа құрады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.573326110839844,
+      "perplexity": 96.86576080984783
+    },
+    {
+      "id": "adam_train_001908",
+      "text": "білімге анықтама мінеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.040435791015625,
+      "perplexity": 154.53734634074803
+    },
+    {
+      "id": "adam_train_001914",
+      "text": "жаңа дерек.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.423518657684326,
+      "perplexity": 226.67531375291853
+    },
+    {
+      "id": "adam_train_001924",
+      "text": "оқуның баласы қонады.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.497040748596191,
+      "perplexity": 663.1762212411494
+    },
+    {
+      "id": "adam_train_001947",
+      "text": "жаман оқу.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.342058181762695,
+      "perplexity": 76.86557997921554
+    },
+    {
+      "id": "adam_train_001955",
+      "text": "сіз ертең ашасыз.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.650986671447754,
+      "perplexity": 284.57210652340456
+    },
+    {
+      "id": "adam_train_001979",
+      "text": "төрт кітап.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.673515796661377,
+      "perplexity": 107.07353020868864
+    },
+    {
+      "id": "adam_train_001986",
+      "text": "қорытынды қана.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.9704742431640625,
+      "perplexity": 53.00966435045471
+    },
+    {
+      "id": "adam_train_001995",
+      "text": "жазбаның оқусы.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.136580944061279,
+      "perplexity": 462.4696550333411
+    },
+    {
+      "id": "adam_train_002012",
+      "text": "қысқа қорытынды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.590827941894531,
+      "perplexity": 98.57601159473813
+    },
+    {
+      "id": "adam_train_002030",
+      "text": "адам шығар.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.352470874786377,
+      "perplexity": 77.6701392123237
+    },
+    {
+      "id": "adam_train_002041",
+      "text": "кітаптың қаласы көрсетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.878288269042969,
+      "perplexity": 357.19729244877277
+    },
+    {
+      "id": "adam_train_002077",
+      "text": "тапсырманың термині алады.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.783388614654541,
+      "perplexity": 883.055996382123
+    },
+    {
+      "id": "adam_train_002086",
+      "text": "жаттығулар жасады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.234193801879883,
+      "perplexity": 187.57782048295553
+    },
+    {
+      "id": "adam_train_002092",
+      "text": "ресми ыстық талдау.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.796274662017822,
+      "perplexity": 121.05859226854615
+    },
+    {
+      "id": "adam_train_002100",
+      "text": "терең жаман қала.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.984451770782471,
+      "perplexity": 146.12344392173392
+    },
+    {
+      "id": "adam_train_002114",
+      "text": "белгінің модельі қарайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.515944480895996,
+      "perplexity": 248.6246876580436
+    },
+    {
+      "id": "adam_train_002138",
+      "text": "анық тапсырма.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.485433578491211,
+      "perplexity": 88.71540756790772
+    },
+    {
+      "id": "adam_train_002149",
+      "text": "мектеп келеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.7580008506774902,
+      "perplexity": 42.86265142869874
+    },
+    {
+      "id": "adam_train_002153",
+      "text": "ескі ұзын анықтама.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.7552337646484375,
+      "perplexity": 315.8393709747312
+    },
+    {
+      "id": "adam_train_002168",
+      "text": "қалаға мектеп көмектеседі.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.751739501953125,
+      "perplexity": 115.78551858865244
+    },
+    {
+      "id": "adam_train_002186",
+      "text": "кітап па.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.5595173835754395,
+      "perplexity": 95.53736080257887
+    },
+    {
+      "id": "adam_train_002207",
+      "text": "мен біраз жазамын.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.733282089233398,
+      "perplexity": 308.98171155294733
+    },
+    {
+      "id": "adam_train_002231",
+      "text": "ұғым алды сондықтан сөйледі.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.817698955535889,
+      "perplexity": 336.19755736840716
+    },
+    {
+      "id": "adam_train_002242",
+      "text": "жылдам қолдану.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.880991458892822,
+      "perplexity": 131.76123499535592
+    },
+    {
+      "id": "adam_train_002305",
+      "text": "бапты арттырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.863187789916992,
+      "perplexity": 129.43616042733322
+    },
+    {
+      "id": "adam_train_002316",
+      "text": "терең ұғым үшін.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.980456829071045,
+      "perplexity": 145.54085376228144
+    },
+    {
+      "id": "adam_train_002322",
+      "text": "белгілер қолданады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.457830429077148,
+      "perplexity": 86.30007171427401
+    },
+    {
+      "id": "adam_train_002342",
+      "text": "хат жүреді тек.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.251893043518066,
+      "perplexity": 518.9943742532708
+    },
+    {
+      "id": "adam_train_002356",
+      "text": "хат тұрмады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.482637405395508,
+      "perplexity": 88.46769042349901
+    },
+    {
+      "id": "adam_train_002367",
+      "text": "мағынада өтініш жеткізеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.609953880310059,
+      "perplexity": 100.47951544542865
+    },
+    {
+      "id": "adam_train_002391",
+      "text": "нәтижеге жүреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.860788345336914,
+      "perplexity": 129.1259578395171
+    },
+    {
+      "id": "adam_train_002401",
+      "text": "ұғым салыстырды немесе айтты.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.703228950500488,
+      "perplexity": 299.8339887031563
+    },
+    {
+      "id": "adam_train_002420",
+      "text": "заң тапты себебі қарады.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.779763221740723,
+      "perplexity": 323.682540354603
+    },
+    {
+      "id": "adam_train_002437",
+      "text": "құжат бекітеді де.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.837972164154053,
+      "perplexity": 932.5960642309765
+    },
+    {
+      "id": "adam_train_002449",
+      "text": "мағына кетеді ба.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.657176971435547,
+      "perplexity": 286.33915687407494
+    },
+    {
+      "id": "adam_train_002470",
+      "text": "мысалдың қазақы жүреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.77993106842041,
+      "perplexity": 323.73687395400395
+    },
+    {
+      "id": "adam_train_002486",
+      "text": "шағымға келеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.686079502105713,
+      "perplexity": 108.42725660624848
+    },
+    {
+      "id": "adam_train_002501",
+      "text": "қиын бап бұрын.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.3703293800354,
+      "perplexity": 214.93365089995189
+    },
+    {
+      "id": "adam_train_002544",
+      "text": "төрт түр.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.508677005767822,
+      "perplexity": 90.80160900483605
+    },
+    {
+      "id": "adam_train_002570",
+      "text": "қордар келді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.325854301452637,
+      "perplexity": 205.58391610355338
+    },
+    {
+      "id": "adam_train_002585",
+      "text": "мен жиі білемін.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.007383823394775,
+      "perplexity": 149.51307144073652
+    },
+    {
+      "id": "adam_train_002595",
+      "text": "бапта мектеп біледі.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.316860198974609,
+      "perplexity": 203.74316366111958
+    },
+    {
+      "id": "adam_train_002643",
+      "text": "ел мінеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.905050277709961,
+      "perplexity": 49.652576267249486
+    },
+    {
+      "id": "adam_train_002686",
+      "text": "баяу қор қолданады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.76668643951416,
+      "perplexity": 117.52915606351527
+    },
+    {
+      "id": "adam_train_002694",
+      "text": "бап бе.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.113760471343994,
+      "perplexity": 61.176337423402785
+    },
+    {
+      "id": "adam_train_002706",
+      "text": "анықтамалық іс бастап.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.665111541748047,
+      "perplexity": 288.6201725198036
+    },
+    {
+      "id": "adam_train_002715",
+      "text": "тоқсан сабақ мінеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.620018005371094,
+      "perplexity": 101.49585958370986
+    },
+    {
+      "id": "adam_train_002718",
+      "text": "төрт сабақ.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.723029136657715,
+      "perplexity": 112.50854076317148
+    },
+    {
+      "id": "adam_train_002746",
+      "text": "жазбаның елі тұрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.935824871063232,
+      "perplexity": 378.3519590721262
+    },
+    {
+      "id": "adam_train_002755",
+      "text": "ел жапты сөйтіп жазды.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.5100016593933105,
+      "perplexity": 247.15153718889096
+    },
+    {
+      "id": "adam_train_002763",
+      "text": "ұзын дерек жеткізеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.651921272277832,
+      "perplexity": 104.78611496086674
+    },
+    {
+      "id": "adam_train_002779",
+      "text": "мектеп сайын.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.61969518661499,
+      "perplexity": 101.46310010454104
+    },
+    {
+      "id": "adam_train_002786",
+      "text": "қазақ қарсы.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.480472564697266,
+      "perplexity": 88.27637912075343
+    },
+    {
+      "id": "adam_train_002792",
+      "text": "қала бармады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.378958702087402,
+      "perplexity": 216.79640820050395
+    },
+    {
+      "id": "adam_train_002825",
+      "text": "күн мінеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.058304786682129,
+      "perplexity": 57.8761155094582
+    },
+    {
+      "id": "adam_train_002859",
+      "text": "дәйекті мемлекет.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.8911638259887695,
+      "perplexity": 133.10839895321
+    },
+    {
+      "id": "adam_train_002862",
+      "text": "адамдар кетеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.006839752197266,
+      "perplexity": 149.43174780984307
+    },
+    {
+      "id": "adam_train_002880",
+      "text": "үлкен нәтиже жөнінде.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.0686540603637695,
+      "perplexity": 158.9602324187982
+    },
+    {
+      "id": "adam_train_002894",
+      "text": "түрдің қаласы.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.252824783325195,
+      "perplexity": 519.4781673210684
+    },
+    {
+      "id": "adam_train_002919",
+      "text": "хат көрді өйткені бекітті.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.452073097229004,
+      "perplexity": 634.01530671476
+    },
+    {
+      "id": "adam_train_002926",
+      "text": "түр құрды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.546856880187988,
+      "perplexity": 94.33543427447499
+    },
+    {
+      "id": "adam_train_002935",
+      "text": "түрдің бапы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.550155162811279,
+      "perplexity": 257.277472704837
+    },
+    {
+      "id": "adam_train_002967",
+      "text": "үлгінің белгісі.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.380712032318115,
+      "perplexity": 590.3479048309036
+    },
+    {
+      "id": "adam_train_002975",
+      "text": "іс арттырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.9344310760498047,
+      "perplexity": 51.1330508625742
+    },
+    {
+      "id": "adam_train_002984",
+      "text": "ресми модель дейін.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.454378604888916,
+      "perplexity": 86.00269258479547
+    },
+    {
+      "id": "adam_train_002998",
+      "text": "шағым сақтайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.9270682334899902,
+      "perplexity": 50.757948862522305
+    },
+    {
+      "id": "adam_train_003013",
+      "text": "мағына солай тапады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.626067161560059,
+      "perplexity": 277.5683367865482
+    },
+    {
+      "id": "adam_train_003040",
+      "text": "үлгі лайық.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.964023590087891,
+      "perplexity": 143.16869067562732
+    },
+    {
+      "id": "adam_train_003070",
+      "text": "сіз жоқ ашасыз.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.098323822021484,
+      "perplexity": 445.1110590918422
+    },
+    {
+      "id": "adam_train_003092",
+      "text": "ресми қызмет бастап.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.7358717918396,
+      "perplexity": 113.96276723423645
+    },
+    {
+      "id": "adam_train_003153",
+      "text": "жүйенің елі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.422091484069824,
+      "perplexity": 226.35203946520932
+    },
+    {
+      "id": "adam_train_003158",
+      "text": "екі белгі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.026894569396973,
+      "perplexity": 152.45882649502173
+    },
+    {
+      "id": "adam_train_003180",
+      "text": "қазақ оқыды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.243309497833252,
+      "perplexity": 69.63793749801526
+    },
+    {
+      "id": "adam_train_003194",
+      "text": "ұғым әлі түсіндіреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.583103179931641,
+      "perplexity": 97.81746892268059
+    },
+    {
+      "id": "adam_train_003207",
+      "text": "шекара жайлы.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.290973663330078,
+      "perplexity": 73.0375478724102
+    },
+    {
+      "id": "adam_train_003225",
+      "text": "қала қана.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.328307151794434,
+      "perplexity": 75.81583317666929
+    },
+    {
+      "id": "adam_train_003233",
+      "text": "жыл көрсетеді да.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.71962833404541,
+      "perplexity": 304.7916212341594
+    },
+    {
+      "id": "adam_train_003246",
+      "text": "хатқа жеткізеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.542902946472168,
+      "perplexity": 93.96317465021974
+    },
+    {
+      "id": "adam_train_003276",
+      "text": "аз анықтама бойынша.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.67753791809082,
+      "perplexity": 292.2290516099412
+    },
+    {
+      "id": "adam_train_003289",
+      "text": "күндер жасады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.175741672515869,
+      "perplexity": 176.9277881041383
+    },
+    {
+      "id": "adam_train_003307",
+      "text": "көп модель тұрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.646545886993408,
+      "perplexity": 104.22436039674947
+    },
+    {
+      "id": "adam_train_003308",
+      "text": "елде келеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.2291364669799805,
+      "perplexity": 68.65791818829835
+    },
+    {
+      "id": "adam_train_003314",
+      "text": "сегіз іс.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.944999694824219,
+      "perplexity": 140.47080798315105
+    },
+    {
+      "id": "adam_train_003331",
+      "text": "бала қолданады.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.733743667602539,
+      "perplexity": 41.83543332310711
+    },
+    {
+      "id": "adam_train_003347",
+      "text": "ескі іс жайлы.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.096497535705566,
+      "perplexity": 163.4484313019302
+    },
+    {
+      "id": "adam_train_003355",
+      "text": "мысалға жазады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.058071613311768,
+      "perplexity": 157.2869136952139
+    },
+    {
+      "id": "adam_train_003376",
+      "text": "тапсырмаға арттырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.7839202880859375,
+      "perplexity": 119.57218984349996
+    },
+    {
+      "id": "adam_train_003379",
+      "text": "анада тапады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.82887077331543,
+      "perplexity": 125.06964889831245
+    },
+    {
+      "id": "adam_train_003386",
+      "text": "шекараның мәтіні құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.225027561187744,
+      "perplexity": 505.2369671958449
+    },
+    {
+      "id": "adam_train_003401",
+      "text": "мысалдың белгісі.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.879537105560303,
+      "perplexity": 972.1762406448961
+    },
+    {
+      "id": "adam_train_003430",
+      "text": "бала сөйлейді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.02601957321167,
+      "perplexity": 56.037413911342284
+    },
+    {
+      "id": "adam_train_003442",
+      "text": "сіз жоқ салыстырасыз.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.619515895843506,
+      "perplexity": 275.75585636069087
+    },
+    {
+      "id": "adam_train_003449",
+      "text": "модель көрсетеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.027610778808594,
+      "perplexity": 56.1266519371895
+    },
+    {
+      "id": "adam_train_003477",
+      "text": "қазақтың халықы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.793975830078125,
+      "perplexity": 328.3157606071162
+    },
+    {
+      "id": "adam_train_003496",
+      "text": "қайда сөздік ашады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.740450859069824,
+      "perplexity": 114.4858070103757
+    },
+    {
+      "id": "adam_train_003513",
+      "text": "тіл кейде бекітеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.989898681640625,
+      "perplexity": 146.92153689248963
+    },
+    {
+      "id": "adam_train_003525",
+      "text": "қолданыстың ақпараты.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.64362096786499,
+      "perplexity": 282.4837333495182
+    },
+    {
+      "id": "adam_train_003554",
+      "text": "түр жайлы.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.356879234313965,
+      "perplexity": 78.013292927277
+    },
+    {
+      "id": "adam_train_003568",
+      "text": "қызмет сипаттамады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.317395210266113,
+      "perplexity": 203.85219771887023
+    },
+    {
+      "id": "adam_train_003593",
+      "text": "төрт білім жүреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.2841949462890625,
+      "perplexity": 72.54412129105376
+    },
+    {
+      "id": "adam_train_003605",
+      "text": "түрдің дерекі көрсетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.686881065368652,
+      "perplexity": 801.8175316771508
+    },
+    {
+      "id": "adam_train_003633",
+      "text": "ресми іс сайын.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.844729900360107,
+      "perplexity": 127.06895607895854
+    },
+    {
+      "id": "adam_train_003642",
+      "text": "жас жазба жөнінде.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.907694339752197,
+      "perplexity": 135.32703625995333
+    },
+    {
+      "id": "adam_train_003695",
+      "text": "жаман ана.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.5072832107543945,
+      "perplexity": 90.67513833256425
+    },
+    {
+      "id": "adam_train_003707",
+      "text": "мектепке айтады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.90610933303833,
+      "perplexity": 135.11271189656065
+    },
+    {
+      "id": "adam_train_003715",
+      "text": "бала тіпті жасайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.340633392333984,
+      "perplexity": 208.64482247633822
+    },
+    {
+      "id": "adam_train_003724",
+      "text": "термин әлі түсіндіреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.784632682800293,
+      "perplexity": 119.65740278855036
+    },
+    {
+      "id": "adam_train_003739",
+      "text": "тұрақты хат.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.587891101837158,
+      "perplexity": 98.2869343098406
+    },
+    {
+      "id": "adam_train_003748",
+      "text": "осылай халық құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.079694747924805,
+      "perplexity": 160.7249868040046
+    },
+    {
+      "id": "adam_train_003754",
+      "text": "мемлекет бірге.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.41718864440918,
+      "perplexity": 82.86300022930276
+    },
+    {
+      "id": "adam_train_003764",
+      "text": "кіші іс.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.2394609451293945,
+      "perplexity": 69.37044728062362
+    },
+    {
+      "id": "adam_train_003786",
+      "text": "қорға мінеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.347736358642578,
+      "perplexity": 77.3032778251977
+    },
+    {
+      "id": "adam_train_003795",
+      "text": "шағымдар арттырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.810603618621826,
+      "perplexity": 122.80572297055119
+    },
+    {
+      "id": "adam_train_003822",
+      "text": "үлгі сөйлемеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.147115230560303,
+      "perplexity": 171.9347820120786
+    },
+    {
+      "id": "adam_train_003848",
+      "text": "айқын дәйекті нәтиже.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.150803565979004,
+      "perplexity": 172.57010608217954
+    },
+    {
+      "id": "adam_train_003853",
+      "text": "сапа қарамады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.99965763092041,
+      "perplexity": 148.36235572314501
+    },
+    {
+      "id": "adam_train_003869",
+      "text": "бап ба.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.479795455932617,
+      "perplexity": 88.21662664248564
+    },
+    {
+      "id": "adam_train_003880",
+      "text": "мәтінді жазады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.237238883972168,
+      "perplexity": 188.1498808884293
+    },
+    {
+      "id": "adam_train_003898",
+      "text": "белгі бермеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.560540199279785,
+      "perplexity": 259.963230348966
+    },
+    {
+      "id": "adam_train_003904",
+      "text": "міндеттің түрі алады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.531803131103516,
+      "perplexity": 252.59896969396897
+    },
+    {
+      "id": "adam_train_003918",
+      "text": "күн жеткізді әрі арттырды.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.206420421600342,
+      "perplexity": 495.9228754549919
+    },
+    {
+      "id": "adam_train_003927",
+      "text": "елу адам.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.655065536499023,
+      "perplexity": 105.11610871492215
+    },
+    {
+      "id": "adam_train_003934",
+      "text": "мағынаның мектепі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.900979042053223,
+      "perplexity": 365.3950299029456
+    },
+    {
+      "id": "adam_train_003974",
+      "text": "мектептің мектепі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.724534511566162,
+      "perplexity": 306.2906572964002
+    },
+    {
+      "id": "adam_train_003985",
+      "text": "мәтін тапады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.042052745819092,
+      "perplexity": 56.94311265148043
+    },
+    {
+      "id": "adam_train_004034",
+      "text": "аз анық ана.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.679120063781738,
+      "perplexity": 292.6917664893615
+    },
+    {
+      "id": "adam_train_004039",
+      "text": "жаттығуда жасайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.802158832550049,
+      "perplexity": 121.77302152028741
+    },
+    {
+      "id": "adam_train_004067",
+      "text": "мен бүгін жеткіземін.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.32281494140625,
+      "perplexity": 204.9600211637251
+    },
+    {
+      "id": "adam_train_004071",
+      "text": "он ел жапады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.73602819442749,
+      "perplexity": 113.9805926998932
+    },
+    {
+      "id": "adam_train_004085",
+      "text": "негізгі дәл қорытынды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.721371173858643,
+      "perplexity": 112.32216033660926
+    },
+    {
+      "id": "adam_train_004088",
+      "text": "мектеп жоқ жазады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.5162577629089355,
+      "perplexity": 91.49256964412393
+    },
+    {
+      "id": "adam_train_004113",
+      "text": "төрт тапсырма арттырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.676058769226074,
+      "perplexity": 107.34616175877161
+    },
+    {
+      "id": "adam_train_004129",
+      "text": "тіпті сапа жүреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.277959823608398,
+      "perplexity": 195.9696545674023
+    },
+    {
+      "id": "adam_train_004136",
+      "text": "бап келді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.757304668426514,
+      "perplexity": 116.43168060671192
+    },
+    {
+      "id": "adam_train_004162",
+      "text": "мәтінде түр оқыйды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.993139743804932,
+      "perplexity": 147.39849122864698
+    },
+    {
+      "id": "adam_train_004190",
+      "text": "термин салыстырады еді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.616742134094238,
+      "perplexity": 274.99203513295447
+    },
+    {
+      "id": "adam_train_004222",
+      "text": "баптар жапты.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.741145133972168,
+      "perplexity": 311.42082543814325
+    },
+    {
+      "id": "adam_train_004267",
+      "text": "күн келмеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.763306617736816,
+      "perplexity": 117.13259898599793
+    },
+    {
+      "id": "adam_train_004293",
+      "text": "білім иә арттырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.343181610107422,
+      "perplexity": 209.17717290565673
+    },
+    {
+      "id": "adam_train_004315",
+      "text": "ресми белгі жөнінде.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.570795059204102,
+      "perplexity": 96.6208985776994
+    },
+    {
+      "id": "adam_train_004335",
+      "text": "мәртебеге жазады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.855767250061035,
+      "perplexity": 128.4792291046575
+    },
+    {
+      "id": "adam_train_004344",
+      "text": "ана емес.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.167609214782715,
+      "perplexity": 64.56091616590571
+    },
+    {
+      "id": "adam_train_004350",
+      "text": "негізгі дәл міндет.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.138673782348633,
+      "perplexity": 170.48951212165392
+    },
+    {
+      "id": "adam_train_004393",
+      "text": "сөздік берді себебі көрсетті.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.050389289855957,
+      "perplexity": 424.27816508575256
+    },
+    {
+      "id": "adam_train_004418",
+      "text": "қорытынды шығар.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.1298322677612305,
+      "perplexity": 62.16749456715608
+    },
+    {
+      "id": "adam_train_004424",
+      "text": "ресми көп жазба.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.137540817260742,
+      "perplexity": 170.29646283626886
+    },
+    {
+      "id": "adam_train_004434",
+      "text": "сапада қызмет біледі.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.041041374206543,
+      "perplexity": 154.6309599025999
+    },
+    {
+      "id": "adam_train_004448",
+      "text": "баяу қорытынды барады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.473882675170898,
+      "perplexity": 87.69656010448918
+    },
+    {
+      "id": "adam_train_004464",
+      "text": "ақпараттар оқыйды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.988973140716553,
+      "perplexity": 146.78561790646265
+    },
+    {
+      "id": "adam_train_004469",
+      "text": "мағына бұрын.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.94423770904541,
+      "perplexity": 140.36381199501784
+    },
+    {
+      "id": "adam_train_004477",
+      "text": "талдау тұрды әйтпесе тапты.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.682234287261963,
+      "perplexity": 293.60469485467894
+    },
+    {
+      "id": "adam_train_004496",
+      "text": "үлгілер жазады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.376692771911621,
+      "perplexity": 79.5744269620745
+    },
+    {
+      "id": "adam_train_004521",
+      "text": "қала біраз береді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.578225612640381,
+      "perplexity": 97.34151931745888
+    },
+    {
+      "id": "adam_train_004550",
+      "text": "істің елі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.734807968139648,
+      "perplexity": 309.45354011410063
+    },
+    {
+      "id": "adam_train_004564",
+      "text": "білімге заң қолданады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.14842414855957,
+      "perplexity": 172.15997789227313
+    },
+    {
+      "id": "adam_train_004569",
+      "text": "қорытындының тапсырмасы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.9413886070251465,
+      "perplexity": 380.4628763208692
+    },
+    {
+      "id": "adam_train_004621",
+      "text": "заң түсіндірмеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.42963981628418,
+      "perplexity": 228.06708457841313
+    },
+    {
+      "id": "adam_train_004664",
+      "text": "жауапта сөйлейді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.853888511657715,
+      "perplexity": 128.23807684484743
+    },
+    {
+      "id": "adam_train_004669",
+      "text": "модельге ана құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.76893424987793,
+      "perplexity": 320.1963014921242
+    },
+    {
+      "id": "adam_train_004690",
+      "text": "өтініште алады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.556993007659912,
+      "perplexity": 95.29649273861598
+    },
+    {
+      "id": "adam_train_004713",
+      "text": "дерек құрды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.6899871826171875,
+      "perplexity": 108.85178460348148
+    },
+    {
+      "id": "adam_train_004728",
+      "text": "оқу өте.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.139822959899902,
+      "perplexity": 62.79170381556842
+    },
+    {
+      "id": "adam_train_004754",
+      "text": "ережеде жүреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.006417274475098,
+      "perplexity": 149.36862955937497
+    },
+    {
+      "id": "adam_train_004783",
+      "text": "белгі бе.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.347840309143066,
+      "perplexity": 77.31131395728976
+    },
+    {
+      "id": "adam_train_004799",
+      "text": "жеңіл сабақ келеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.399198055267334,
+      "perplexity": 81.38557575402342
+    },
+    {
+      "id": "adam_train_004804",
+      "text": "шағымдар жеткізеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.6676130294799805,
+      "perplexity": 106.44336178704317
+    },
+    {
+      "id": "adam_train_004810",
+      "text": "талдауның сөздікі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.986032009124756,
+      "perplexity": 397.8328766264908
+    },
+    {
+      "id": "adam_train_004824",
+      "text": "жас әдемі термин.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.471169471740723,
+      "perplexity": 237.73805819236338
+    },
+    {
+      "id": "adam_train_004855",
+      "text": "міндет көрсетті.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.738748550415039,
+      "perplexity": 114.29108261778485
+    },
+    {
+      "id": "adam_train_004882",
+      "text": "қор ашты.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.796564102172852,
+      "perplexity": 121.09363655762756
+    },
+    {
+      "id": "adam_train_004916",
+      "text": "тапсырма сақтады өйткені түсіндірді.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.980289936065674,
+      "perplexity": 395.55503720241836
+    },
+    {
+      "id": "adam_train_004922",
+      "text": "сөздік мінеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.598353147506714,
+      "perplexity": 36.53801215226079
+    },
+    {
+      "id": "adam_train_004967",
+      "text": "мен иә білемін.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.170500755310059,
+      "perplexity": 176.00294983257552
+    },
+    {
+      "id": "adam_train_005012",
+      "text": "ауыр ана қарсы.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.289837837219238,
+      "perplexity": 198.3112640957255
+    },
+    {
+      "id": "adam_train_005029",
+      "text": "елу сөздік.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.204719066619873,
+      "perplexity": 182.12969926890807
+    },
+    {
+      "id": "adam_train_005045",
+      "text": "жас ұзын ереже.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.859671592712402,
+      "perplexity": 350.6089825660462
+    },
+    {
+      "id": "adam_train_005055",
+      "text": "ресми ұзын модель.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.716390609741211,
+      "perplexity": 111.76412343807654
+    },
+    {
+      "id": "adam_train_005092",
+      "text": "мектеп сөйлейді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.456413269042969,
+      "perplexity": 86.17785732082474
+    },
+    {
+      "id": "adam_train_005100",
+      "text": "екі мәтін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.980639457702637,
+      "perplexity": 145.56743611652035
+    },
+    {
+      "id": "adam_train_005118",
+      "text": "жылдам қорытынды барады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.193723678588867,
+      "perplexity": 66.26909691098169
+    },
+    {
+      "id": "adam_train_005136",
+      "text": "түр тыңдайды өте.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.930065155029297,
+      "perplexity": 138.38852875487044
+    },
+    {
+      "id": "adam_train_005139",
+      "text": "білімде белгі сөйлейді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.818173885345459,
+      "perplexity": 123.73892287800939
+    },
+    {
+      "id": "adam_train_005147",
+      "text": "шағымға мектеп тыңдайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.556766510009766,
+      "perplexity": 258.984058602964
+    },
+    {
+      "id": "adam_train_005171",
+      "text": "кеше ана сақтайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.694418430328369,
+      "perplexity": 109.33520410962032
+    },
+    {
+      "id": "adam_train_005214",
+      "text": "мектеп жазды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.275162696838379,
+      "perplexity": 71.89183493246159
+    },
+    {
+      "id": "adam_train_005224",
+      "text": "тілдер нақтылады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.411431789398193,
+      "perplexity": 223.95201035104003
+    },
+    {
+      "id": "adam_train_005238",
+      "text": "бала жазды немесе бекітті.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.447113037109375,
+      "perplexity": 630.8783388825658
+    },
+    {
+      "id": "adam_train_005265",
+      "text": "мен ертең түсіндіремін.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.150126934051514,
+      "perplexity": 172.45337913371745
+    },
+    {
+      "id": "adam_train_005286",
+      "text": "деректе кетеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.729568004608154,
+      "perplexity": 113.24662975789653
+    },
+    {
+      "id": "adam_train_005295",
+      "text": "қызмет қолданады ғой.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.713249206542969,
+      "perplexity": 302.8535049384659
+    },
+    {
+      "id": "adam_train_005333",
+      "text": "он ана қарайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.726901531219482,
+      "perplexity": 112.94506287200875
+    },
+    {
+      "id": "adam_train_005349",
+      "text": "төрт мағына.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.322339057922363,
+      "perplexity": 75.36470469487472
+    },
+    {
+      "id": "adam_train_005360",
+      "text": "баяндауның сөздікі тыңдайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.648503303527832,
+      "perplexity": 283.8662860518576
+    },
+    {
+      "id": "adam_train_005382",
+      "text": "белгіге сақтайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.887608051300049,
+      "perplexity": 132.63593596113037
+    },
+    {
+      "id": "adam_train_005412",
+      "text": "нәтижеде оқу кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.218389511108398,
+      "perplexity": 184.63658932240034
+    },
+    {
+      "id": "adam_train_005515",
+      "text": "күн жүреді тек.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.591153144836426,
+      "perplexity": 728.6205907178139
+    },
+    {
+      "id": "adam_train_005531",
+      "text": "екі модель айтады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.778807640075684,
+      "perplexity": 118.96241942401629
+    },
+    {
+      "id": "adam_train_005546",
+      "text": "мағына нақтыламады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.264310359954834,
+      "perplexity": 193.31294645757959
+    },
+    {
+      "id": "adam_train_005709",
+      "text": "қалаға оқу мінеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.773709774017334,
+      "perplexity": 118.35750813223446
+    },
+    {
+      "id": "adam_train_005713",
+      "text": "мың жүйе тұрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.045976638793945,
+      "perplexity": 57.16699027985408
+    },
+    {
+      "id": "adam_train_005721",
+      "text": "баланың мекемесі көрсетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.98936128616333,
+      "perplexity": 399.1595797435049
+    },
+    {
+      "id": "adam_train_005756",
+      "text": "үлгіге айтады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.898685455322266,
+      "perplexity": 134.11336574718203
+    },
+    {
+      "id": "adam_train_005762",
+      "text": "мағыналар айтты.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.98069429397583,
+      "perplexity": 145.57541871108117
+    },
+    {
+      "id": "adam_train_005772",
+      "text": "сенімді жүйе айтады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.316533088684082,
+      "perplexity": 74.92840732791488
+    },
+    {
+      "id": "adam_train_005783",
+      "text": "ана берді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.310460567474365,
+      "perplexity": 74.47478170478698
+    },
+    {
+      "id": "adam_train_005799",
+      "text": "мен жоқ білемін.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.301481246948242,
+      "perplexity": 200.63377815049145
+    },
+    {
+      "id": "adam_train_005807",
+      "text": "ақпаратта заң қолданады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.190691947937012,
+      "perplexity": 179.5927788007524
+    },
+    {
+      "id": "adam_train_005831",
+      "text": "мысал оқыйды.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.902966022491455,
+      "perplexity": 49.54919539953363
+    },
+    {
+      "id": "adam_train_005862",
+      "text": "мекеменің ақпараты қарайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.620816707611084,
+      "perplexity": 750.5578331596272
+    },
+    {
+      "id": "adam_train_005913",
+      "text": "құжат нақтылайды еді.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.037777900695801,
+      "perplexity": 418.9610267568234
+    },
+    {
+      "id": "adam_train_005926",
+      "text": "жүйеге көрсетеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.685575008392334,
+      "perplexity": 108.37256953273398
+    },
+    {
+      "id": "adam_train_005956",
+      "text": "мысалдар қарады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.286039352416992,
+      "perplexity": 197.559410628936
+    },
+    {
+      "id": "adam_train_005967",
+      "text": "өтініш сақтады өйткені алды.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.586733341217041,
+      "perplexity": 266.8624457571598
+    },
+    {
+      "id": "adam_train_006016",
+      "text": "адам үшін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.525933265686035,
+      "perplexity": 92.38210265587759
+    },
+    {
+      "id": "adam_train_006045",
+      "text": "хатты қарайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.925154685974121,
+      "perplexity": 137.71064190017978
+    },
+    {
+      "id": "adam_train_006056",
+      "text": "әлдеқашан талдау келеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.412653923034668,
+      "perplexity": 82.48809030948121
+    },
+    {
+      "id": "adam_train_006066",
+      "text": "өтініш жазды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.492513656616211,
+      "perplexity": 89.34574838237003
+    },
+    {
+      "id": "adam_train_006122",
+      "text": "әлбетте сабақ кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.389858722686768,
+      "perplexity": 219.1724192760598
+    },
+    {
+      "id": "adam_train_006136",
+      "text": "дәл мағына кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.224260330200195,
+      "perplexity": 68.32394769283142
+    },
+    {
+      "id": "adam_train_006165",
+      "text": "істе ел жасайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.196727752685547,
+      "perplexity": 180.68004370634253
+    },
+    {
+      "id": "adam_train_006176",
+      "text": "ол жүреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.117406368255615,
+      "perplexity": 61.39978713286363
+    },
+    {
+      "id": "adam_train_006180",
+      "text": "ереже барады емес.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.989440441131592,
+      "perplexity": 146.85422691589287
+    },
+    {
+      "id": "adam_train_006213",
+      "text": "нәтиже мүмкін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.762470245361328,
+      "perplexity": 117.03467347274236
+    },
+    {
+      "id": "adam_train_006218",
+      "text": "күнге жыл сипаттайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.73511266708374,
+      "perplexity": 113.87628810475967
+    },
+    {
+      "id": "adam_train_006248",
+      "text": "ақпараттың ұғымы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.5103349685668945,
+      "perplexity": 247.23392879367748
+    },
+    {
+      "id": "adam_train_006269",
+      "text": "мәртебе сөйлейді емес.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.532618522644043,
+      "perplexity": 252.80502075173175
+    },
+    {
+      "id": "adam_train_006294",
+      "text": "бірден жаттығу көрсетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.866462707519531,
+      "perplexity": 129.86074805278784
+    },
+    {
+      "id": "adam_train_006325",
+      "text": "ақпаратта жазады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.587015151977539,
+      "perplexity": 98.20087757972236
+    },
+    {
+      "id": "adam_train_006354",
+      "text": "сабақ береді.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.5762479305267334,
+      "perplexity": 35.739193028339855
+    },
+    {
+      "id": "adam_train_006373",
+      "text": "шекаралар тұрды.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.098836898803711,
+      "perplexity": 163.83124412508113
+    },
+    {
+      "id": "adam_train_006378",
+      "text": "қорытынды бүгін сақтайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.791194915771484,
+      "perplexity": 120.44520458475351
+    },
+    {
+      "id": "adam_train_006426",
+      "text": "үлгі ғой.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.4925713539123535,
+      "perplexity": 89.3509035391914
+    },
+    {
+      "id": "adam_train_006467",
+      "text": "қиын үлгі жайлы.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.097355842590332,
+      "perplexity": 163.58878043851973
+    },
+    {
+      "id": "adam_train_006562",
+      "text": "істі қолданады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.805527210235596,
+      "perplexity": 122.18389064139198
+    },
+    {
+      "id": "adam_train_006609",
+      "text": "жоқ тіл айтады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.86956787109375,
+      "perplexity": 130.2646136271901
+    },
+    {
+      "id": "adam_train_006614",
+      "text": "үлкен ұзын ана.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.875374794006348,
+      "perplexity": 356.1581215883242
+    },
+    {
+      "id": "adam_train_006620",
+      "text": "халық қарайды ма.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.878970146179199,
+      "perplexity": 357.4409401750835
+    },
+    {
+      "id": "adam_train_006651",
+      "text": "мектепті біледі.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.615684509277344,
+      "perplexity": 101.05697930248195
+    },
+    {
+      "id": "adam_train_006665",
+      "text": "қордың мысалы оқыйды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.511665344238281,
+      "perplexity": 247.5630616843368
+    },
+    {
+      "id": "adam_train_006677",
+      "text": "ереже келеді ғой.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.647434234619141,
+      "perplexity": 283.5629755899941
+    },
+    {
+      "id": "adam_train_006686",
+      "text": "қолданыс бірден сақтайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.825345039367676,
+      "perplexity": 124.62946303646466
+    },
+    {
+      "id": "adam_train_006694",
+      "text": "істің баяндаусы айтады.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.162214279174805,
+      "perplexity": 474.47753823538966
+    },
+    {
+      "id": "adam_train_006737",
+      "text": "жаман қолданыс.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.566806793212891,
+      "perplexity": 96.23631615213846
+    },
+    {
+      "id": "adam_train_006760",
+      "text": "жылдам жазба арттырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.279214382171631,
+      "perplexity": 196.21566426019032
+    },
+    {
+      "id": "adam_train_006772",
+      "text": "елдің жазбасы оқыйды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.996389389038086,
+      "perplexity": 401.9747955586263
+    },
+    {
+      "id": "adam_train_006786",
+      "text": "отыз сөздік.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.164425849914551,
+      "perplexity": 174.93698964488325
+    },
+    {
+      "id": "adam_train_006831",
+      "text": "ыстық қолданыс бекітеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.720855236053467,
+      "perplexity": 112.26422403478198
+    },
+    {
+      "id": "adam_train_006912",
+      "text": "мемлекет сипаттады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.492671966552734,
+      "perplexity": 89.35989382177736
+    },
+    {
+      "id": "adam_train_006941",
+      "text": "нәтиженің қаласы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.4273529052734375,
+      "perplexity": 227.5461113882212
+    },
+    {
+      "id": "adam_train_007043",
+      "text": "тоқсан мектеп.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.867400646209717,
+      "perplexity": 129.982606611718
+    },
+    {
+      "id": "adam_train_007059",
+      "text": "қазақтар көмектеседі.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.785703182220459,
+      "perplexity": 119.78556455516338
+    },
+    {
+      "id": "adam_train_007072",
+      "text": "хаттың ұғымы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.35233211517334,
+      "perplexity": 211.10003384335732
+    },
+    {
+      "id": "adam_train_007090",
+      "text": "шекара оқыйды.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.8354289531707764,
+      "perplexity": 46.31328964015813
+    },
+    {
+      "id": "adam_train_007106",
+      "text": "хат бойынша.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.243817329406738,
+      "perplexity": 69.67331082247452
+    },
+    {
+      "id": "adam_train_007141",
+      "text": "жыл дейін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.014229774475098,
+      "perplexity": 55.3806234013425
+    },
+    {
+      "id": "adam_train_007151",
+      "text": "анықтама шығар.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.235191345214844,
+      "perplexity": 69.07489461963087
+    },
+    {
+      "id": "adam_train_007186",
+      "text": "жауапта қонады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.565608978271484,
+      "perplexity": 96.12111186522783
+    },
+    {
+      "id": "adam_train_007201",
+      "text": "кітап келеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.690002202987671,
+      "perplexity": 40.044935175688025
+    },
+    {
+      "id": "adam_train_007287",
+      "text": "модельдер жүрді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.152947425842285,
+      "perplexity": 172.9404690675277
+    },
+    {
+      "id": "adam_train_007313",
+      "text": "жаттығу нақтылады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.423709392547607,
+      "perplexity": 83.40509449304673
+    },
+    {
+      "id": "adam_train_007389",
+      "text": "түрдер сипаттайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.50625467300415,
+      "perplexity": 90.58192347549787
+    },
+    {
+      "id": "adam_train_007407",
+      "text": "кітапта қор сипаттайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.438169479370117,
+      "perplexity": 84.61990133975443
+    },
+    {
+      "id": "adam_train_007414",
+      "text": "терминге қолдану жеткізеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.995025634765625,
+      "perplexity": 147.67673099333823
+    },
+    {
+      "id": "adam_train_007435",
+      "text": "сөздік кетті әйтпесе сипаттады.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.347571849822998,
+      "perplexity": 210.09752965284954
+    },
+    {
+      "id": "adam_train_007447",
+      "text": "жүйеде міндет көмектеседі.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.35719108581543,
+      "perplexity": 212.12825874465375
+    },
+    {
+      "id": "adam_train_007509",
+      "text": "материалда тапады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.717264175415039,
+      "perplexity": 111.86179939684838
+    },
+    {
+      "id": "adam_train_007516",
+      "text": "аналар көрсетеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.768771171569824,
+      "perplexity": 117.77442843739446
+    },
+    {
+      "id": "adam_train_007542",
+      "text": "төрт іс.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.581743240356445,
+      "perplexity": 97.68453348811437
+    },
+    {
+      "id": "adam_train_007555",
+      "text": "мемлекет салыстырды әрі нақтылады.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.7986016273498535,
+      "perplexity": 329.8380008297253
+    },
+    {
+      "id": "adam_train_007567",
+      "text": "материал кеше келеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.352569580078125,
+      "perplexity": 77.677806044447
+    },
+    {
+      "id": "adam_train_007595",
+      "text": "анық мәтін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.568364143371582,
+      "perplexity": 96.38630655784613
+    },
+    {
+      "id": "adam_train_007598",
+      "text": "түрдің сабақы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.976619243621826,
+      "perplexity": 394.10573790953435
+    },
+    {
+      "id": "adam_train_007602",
+      "text": "құжаттың оқусы түсіндіреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.321309566497803,
+      "perplexity": 556.301028831381
+    },
+    {
+      "id": "adam_train_007624",
+      "text": "сапа арқылы.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.234743595123291,
+      "perplexity": 69.04397325228005
+    },
+    {
+      "id": "adam_train_007634",
+      "text": "түрде көмектеседі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.419635772705078,
+      "perplexity": 225.7968661411803
+    },
+    {
+      "id": "adam_train_007645",
+      "text": "баланың модельі жасайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.803017616271973,
+      "perplexity": 331.29778260529696
+    },
+    {
+      "id": "adam_train_007658",
+      "text": "екі шекара бекітеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.334029197692871,
+      "perplexity": 76.25089839845049
+    },
+    {
+      "id": "adam_train_007667",
+      "text": "үлгінің ұғымы құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.661721229553223,
+      "perplexity": 287.64331688770085
+    },
+    {
+      "id": "adam_train_007673",
+      "text": "қазақ бастап.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.543074607849121,
+      "perplexity": 93.97930588267826
+    },
+    {
+      "id": "adam_train_007686",
+      "text": "жазба да.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.381570816040039,
+      "perplexity": 79.96354281885507
+    },
+    {
+      "id": "adam_train_007700",
+      "text": "жыл өте.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.2562055587768555,
+      "perplexity": 70.54180824334583
+    },
+    {
+      "id": "adam_train_007738",
+      "text": "талдау бе.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.317669868469238,
+      "perplexity": 75.01363285885174
+    },
+    {
+      "id": "adam_train_007745",
+      "text": "күн жүреді па.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.334408283233643,
+      "perplexity": 563.6357915450856
+    },
+    {
+      "id": "adam_train_007748",
+      "text": "міндеттер келді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.742066860198975,
+      "perplexity": 311.70800250951095
+    },
+    {
+      "id": "adam_train_007771",
+      "text": "үлгіде барады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.450682640075684,
+      "perplexity": 85.6854163412451
+    },
+    {
+      "id": "adam_train_007781",
+      "text": "тілге ашады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.991115093231201,
+      "perplexity": 147.10036269370949
+    },
+    {
+      "id": "adam_train_007806",
+      "text": "тапсырмаға барады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.9123382568359375,
+      "perplexity": 135.95694528612748
+    },
+    {
+      "id": "adam_train_007815",
+      "text": "жүйелер бекітеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.590213775634766,
+      "perplexity": 98.51548812203427
+    },
+    {
+      "id": "adam_train_007823",
+      "text": "оқуны жүреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.541007041931152,
+      "perplexity": 93.78519820719609
+    },
+    {
+      "id": "adam_train_007843",
+      "text": "жауап көрсетті.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.522117614746094,
+      "perplexity": 92.03027644890227
+    },
+    {
+      "id": "adam_train_007855",
+      "text": "қолданыста жүреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.2230377197265625,
+      "perplexity": 68.24046516248919
+    },
+    {
+      "id": "adam_train_007858",
+      "text": "қала әлдеқашан құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.312414169311523,
+      "perplexity": 74.62041798648202
+    },
+    {
+      "id": "adam_train_007864",
+      "text": "күн қарайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.7972230911254883,
+      "perplexity": 44.5772255683558
+    },
+    {
+      "id": "adam_train_007881",
+      "text": "оқу бұрын.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.891668319702148,
+      "perplexity": 133.17556824549806
+    },
+    {
+      "id": "adam_train_007915",
+      "text": "әлбетте дерек мінеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.308106422424316,
+      "perplexity": 201.96742508149876
+    },
+    {
+      "id": "adam_train_007927",
+      "text": "сапада жазады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.928382873535156,
+      "perplexity": 138.15591600886296
+    },
+    {
+      "id": "adam_train_007933",
+      "text": "мәртебе сақтайды ма.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.605690002441406,
+      "perplexity": 271.9695203394173
+    },
+    {
+      "id": "adam_train_007956",
+      "text": "жазбада сақтайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.4652605056762695,
+      "perplexity": 86.94367591096074
+    },
+    {
+      "id": "adam_train_007960",
+      "text": "ұзын баяндау бекітеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.658927917480469,
+      "perplexity": 105.52289224485183
+    },
+    {
+      "id": "adam_train_007974",
+      "text": "ертең заң қарайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.257262229919434,
+      "perplexity": 70.61638713220242
+    },
+    {
+      "id": "adam_train_008014",
+      "text": "жақсы ереже дейін.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.124573230743408,
+      "perplexity": 168.10238541120256
+    },
+    {
+      "id": "adam_train_008025",
+      "text": "талдауның оқусы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.189286231994629,
+      "perplexity": 179.34049972635648
+    },
+    {
+      "id": "adam_train_008037",
+      "text": "жауап арттырады па.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.792787075042725,
+      "perplexity": 327.92570547942523
+    },
+    {
+      "id": "adam_train_008049",
+      "text": "күнде адам тұрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.184106826782227,
+      "perplexity": 178.41402397510058
+    },
+    {
+      "id": "adam_train_008054",
+      "text": "шағым жоқ мінеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.795525074005127,
+      "perplexity": 120.96788220078496
+    },
+    {
+      "id": "adam_train_008065",
+      "text": "материал тапты сөйтіп айтты.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.589840888977051,
+      "perplexity": 267.6930234141749
+    },
+    {
+      "id": "adam_train_008076",
+      "text": "ережеде сақтайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.51776123046875,
+      "perplexity": 91.63022921196458
+    },
+    {
+      "id": "adam_train_008095",
+      "text": "нәтиже көрсетеді бе.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.72530460357666,
+      "perplexity": 306.52662012935923
+    },
+    {
+      "id": "adam_train_008120",
+      "text": "нәтиже тез құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.894258499145508,
+      "perplexity": 133.52096399009815
+    },
+    {
+      "id": "adam_train_008137",
+      "text": "ұзын ақпарат.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.959927558898926,
+      "perplexity": 142.5834666195446
+    },
+    {
+      "id": "adam_train_008163",
+      "text": "он қолдану бекітеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.513089179992676,
+      "perplexity": 91.2031266552051
+    },
+    {
+      "id": "adam_train_008168",
+      "text": "белгі жоқ сөйлейді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.602753639221191,
+      "perplexity": 99.75863707316746
+    },
+    {
+      "id": "adam_train_008177",
+      "text": "түрде талдау мінеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.850812911987305,
+      "perplexity": 347.51676623086087
+    },
+    {
+      "id": "adam_train_008186",
+      "text": "әлбетте шағым көрсетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.236103057861328,
+      "perplexity": 187.93629666119799
+    },
+    {
+      "id": "adam_train_008195",
+      "text": "қазақ жүреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.890842914581299,
+      "perplexity": 48.952131603764606
+    },
+    {
+      "id": "adam_train_008215",
+      "text": "халықтың кітапы алады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.694633960723877,
+      "perplexity": 297.2679619193954
+    },
+    {
+      "id": "adam_train_008246",
+      "text": "құжаттың жазбасы біледі.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.776559352874756,
+      "perplexity": 322.6471634327053
+    },
+    {
+      "id": "adam_train_008252",
+      "text": "хат осылай қарайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.346987247467041,
+      "perplexity": 209.97474203649563
+    },
+    {
+      "id": "adam_train_008263",
+      "text": "тұрақты қызмет кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.529653072357178,
+      "perplexity": 92.72638615467251
+    },
+    {
+      "id": "adam_train_008281",
+      "text": "сөздікке жүреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.609411239624023,
+      "perplexity": 100.42500596310387
+    },
+    {
+      "id": "adam_train_008291",
+      "text": "жетпіс жазба тапады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.399196624755859,
+      "perplexity": 81.3854593311067
+    },
+    {
+      "id": "adam_train_008322",
+      "text": "елу тіл қонады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.603689193725586,
+      "perplexity": 99.85201038653496
+    },
+    {
+      "id": "adam_train_008332",
+      "text": "төрт белгі келеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.3123860359191895,
+      "perplexity": 74.61831869051697
+    },
+    {
+      "id": "adam_train_008361",
+      "text": "мен кейде бекітемін.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.02781343460083,
+      "perplexity": 414.80703433986076
+    },
+    {
+      "id": "adam_train_008393",
+      "text": "сегіз жүйе нақтылайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.814670562744141,
+      "perplexity": 123.30618396742436
+    },
+    {
+      "id": "adam_train_008414",
+      "text": "тоқсан қазақ.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.703922748565674,
+      "perplexity": 110.37931460351366
+    },
+    {
+      "id": "adam_train_008424",
+      "text": "ережені оқыйды.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.678423881530762,
+      "perplexity": 292.48807058948677
+    },
+    {
+      "id": "adam_train_008437",
+      "text": "елу жаттығу көмектеседі.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.707803726196289,
+      "perplexity": 110.80852659671274
+    },
+    {
+      "id": "adam_train_008438",
+      "text": "шекараның мектепі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.88367223739624,
+      "perplexity": 359.1256177302898
+    },
+    {
+      "id": "adam_train_008464",
+      "text": "адам жасады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.627959251403809,
+      "perplexity": 102.30507200077902
+    },
+    {
+      "id": "adam_train_008470",
+      "text": "білім барды бірақ көрсетті.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.791621685028076,
+      "perplexity": 890.3562691373543
+    },
+    {
+      "id": "adam_train_008486",
+      "text": "өтінішке айтады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.463967323303223,
+      "perplexity": 86.83131454934959
+    },
+    {
+      "id": "adam_train_008489",
+      "text": "белгіге шағым түсіндіреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.332954406738281,
+      "perplexity": 207.04877773501295
+    },
+    {
+      "id": "adam_train_008510",
+      "text": "нақты жеңіл шағым.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.183473587036133,
+      "perplexity": 178.30108088765914
+    },
+    {
+      "id": "adam_train_008528",
+      "text": "баяу белгі арттырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.366303443908691,
+      "perplexity": 78.75198186342011
+    },
+    {
+      "id": "adam_train_008537",
+      "text": "қолданыс барады.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.8359620571136475,
+      "perplexity": 46.33798601975641
+    },
+    {
+      "id": "adam_train_008561",
+      "text": "сенімді мәртебе.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.280640602111816,
+      "perplexity": 72.28673221161144
+    },
+    {
+      "id": "adam_train_008576",
+      "text": "сіз бірден салыстырасыз.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.462002754211426,
+      "perplexity": 235.56873852765554
+    },
+    {
+      "id": "adam_train_008591",
+      "text": "қолданыстар тұрады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.747516632080078,
+      "perplexity": 115.29760233895396
+    },
+    {
+      "id": "adam_train_008623",
+      "text": "заң туралы.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.547312259674072,
+      "perplexity": 94.37840247873127
+    },
+    {
+      "id": "adam_train_008692",
+      "text": "мемлекетті кетеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.926510334014893,
+      "perplexity": 137.89745566030888
+    },
+    {
+      "id": "adam_train_008699",
+      "text": "аз көп күн.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.479811668395996,
+      "perplexity": 239.80154091241002
+    },
+    {
+      "id": "adam_train_008722",
+      "text": "жауаптар қарайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.97770357131958,
+      "perplexity": 145.14069340359254
+    },
+    {
+      "id": "adam_train_008729",
+      "text": "қалаға өтініш келеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.026939392089844,
+      "perplexity": 152.46566026333
+    },
+    {
+      "id": "adam_train_008732",
+      "text": "тоқсан бала оқыйды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.441306114196777,
+      "perplexity": 84.88573977041143
+    },
+    {
+      "id": "adam_train_008771",
+      "text": "мағыналар ашады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.193185329437256,
+      "perplexity": 66.23343060020709
+    },
+    {
+      "id": "adam_train_008803",
+      "text": "модельде барады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.571568489074707,
+      "perplexity": 96.69565697324558
+    },
+    {
+      "id": "adam_train_008819",
+      "text": "мекемеде қолданыс құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.711501598358154,
+      "perplexity": 111.21904090944678
+    },
+    {
+      "id": "adam_train_008838",
+      "text": "отыз сөздік береді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.158334732055664,
+      "perplexity": 63.964915136837874
+    },
+    {
+      "id": "adam_train_008844",
+      "text": "жаңа ана оқыйды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.953896522521973,
+      "perplexity": 141.72612846310483
+    },
+    {
+      "id": "adam_train_008850",
+      "text": "сіз қайда аласыз.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.274411678314209,
+      "perplexity": 195.27555786590213
+    },
+    {
+      "id": "adam_train_008868",
+      "text": "ыстық адам ашады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.510354042053223,
+      "perplexity": 90.95401435684322
+    },
+    {
+      "id": "adam_train_008889",
+      "text": "дәйекті бап салыстырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.410295009613037,
+      "perplexity": 82.29373736713023
+    },
+    {
+      "id": "adam_train_008893",
+      "text": "ақпаратқа жапады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.97816276550293,
+      "perplexity": 145.20735647024563
+    },
+    {
+      "id": "adam_train_008901",
+      "text": "модель тапты сөйтіп оқыды.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.939980983734131,
+      "perplexity": 379.9277046632041
+    },
+    {
+      "id": "adam_train_008917",
+      "text": "кітап нақтыламады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.931325912475586,
+      "perplexity": 138.56311315414453
+    },
+    {
+      "id": "adam_train_008944",
+      "text": "түр ашады да.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.94378137588501,
+      "perplexity": 381.3743260530686
+    },
+    {
+      "id": "adam_train_008949",
+      "text": "сегіз анықтама сақтайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.689417839050293,
+      "perplexity": 108.78982817909194
+    },
+    {
+      "id": "adam_train_008952",
+      "text": "мың кітап жүреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.199809551239014,
+      "perplexity": 66.67363192110787
+    },
+    {
+      "id": "adam_train_008973",
+      "text": "құжат сайын.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.575263023376465,
+      "perplexity": 97.05356313595595
+    },
+    {
+      "id": "adam_train_008981",
+      "text": "жаңа адам қонады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.784487724304199,
+      "perplexity": 119.64005868851335
+    },
+    {
+      "id": "adam_train_009000",
+      "text": "сегіз қор ашады.",
+      "token_count": 4,
+      "mean_cross_entropy": 3.875412702560425,
+      "perplexity": 48.20258751793685
+    },
+    {
+      "id": "adam_train_009029",
+      "text": "көп жауап.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.784609317779541,
+      "perplexity": 119.65460702351277
+    },
+    {
+      "id": "adam_train_009047",
+      "text": "талдауға қала бекітеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.838958740234375,
+      "perplexity": 126.33773281920371
+    },
+    {
+      "id": "adam_train_009071",
+      "text": "баптар кетті.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.63742208480835,
+      "perplexity": 280.7380659051894
+    },
+    {
+      "id": "adam_train_009098",
+      "text": "жылда көмектеседі.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.732988357543945,
+      "perplexity": 113.63463638198725
+    },
+    {
+      "id": "adam_train_009137",
+      "text": "мағына көмектеседі қана.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.854846477508545,
+      "perplexity": 348.92132867018523
+    },
+    {
+      "id": "adam_train_009168",
+      "text": "жеңіл адам.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.128805160522461,
+      "perplexity": 62.103674664022805
+    },
+    {
+      "id": "adam_train_009201",
+      "text": "анықтама жапады.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.6403331756591797,
+      "perplexity": 38.10453011265578
+    },
+    {
+      "id": "adam_train_009222",
+      "text": "терең қысқа дерек.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.093371391296387,
+      "perplexity": 162.93826574330876
+    },
+    {
+      "id": "adam_train_009253",
+      "text": "терең дәл мысал.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.214284420013428,
+      "perplexity": 183.88019290408582
+    },
+    {
+      "id": "adam_train_009265",
+      "text": "модель жазды сөйтіп білді.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.53051233291626,
+      "perplexity": 685.7494535250464
+    },
+    {
+      "id": "adam_train_009304",
+      "text": "хат кетті әрі ашты.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.42135763168335,
+      "perplexity": 614.8372703172774
+    },
+    {
+      "id": "adam_train_009319",
+      "text": "кеше тіл арттырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.562169075012207,
+      "perplexity": 95.79103258511681
+    },
+    {
+      "id": "adam_train_009327",
+      "text": "сегіз заң жапады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.355701446533203,
+      "perplexity": 77.92146391229149
+    },
+    {
+      "id": "adam_train_009335",
+      "text": "сөздік бүгін құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.753025054931641,
+      "perplexity": 115.93446272421895
+    },
+    {
+      "id": "adam_train_009344",
+      "text": "көп қызмет жеткізеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.414514064788818,
+      "perplexity": 82.64167264866238
+    },
+    {
+      "id": "adam_train_009368",
+      "text": "балалар арттырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.272310256958008,
+      "perplexity": 71.68705998838013
+    },
+    {
+      "id": "adam_train_009374",
+      "text": "мен әлбетте қонамын.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.405920505523682,
+      "perplexity": 222.72114219519383
+    },
+    {
+      "id": "adam_train_009400",
+      "text": "қордар білді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.285675525665283,
+      "perplexity": 197.48754630417199
+    },
+    {
+      "id": "adam_train_009414",
+      "text": "сипаттаманың құжаты.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.682860851287842,
+      "perplexity": 293.788714638372
+    },
+    {
+      "id": "adam_train_009434",
+      "text": "мемлекетте ереже кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.354698181152344,
+      "perplexity": 211.60010181521548
+    },
+    {
+      "id": "adam_train_009439",
+      "text": "жақсы құжат басқа.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.344634056091309,
+      "perplexity": 209.48121219723822
+    },
+    {
+      "id": "adam_train_009445",
+      "text": "анықтама барады екен.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.290241241455078,
+      "perplexity": 198.39127983793603
+    },
+    {
+      "id": "adam_train_009448",
+      "text": "тоқсан жауап құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.618070602416992,
+      "perplexity": 101.29839857740485
+    },
+    {
+      "id": "adam_train_009471",
+      "text": "құжат ашады па.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.971665382385254,
+      "perplexity": 392.1582206193907
+    },
+    {
+      "id": "adam_train_009480",
+      "text": "жазба кеше жүреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.352755069732666,
+      "perplexity": 77.69221581024561
+    },
+    {
+      "id": "adam_train_009492",
+      "text": "аз жаңа күн.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.555574417114258,
+      "perplexity": 258.6755094927943
+    },
+    {
+      "id": "adam_train_009502",
+      "text": "анықтамалық ыстық мәртебе.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.192414283752441,
+      "perplexity": 179.90236440452952
+    },
+    {
+      "id": "adam_train_009516",
+      "text": "жауапты тыңдайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.745944499969482,
+      "perplexity": 115.1164816861441
+    },
+    {
+      "id": "adam_train_009551",
+      "text": "жас жаңа материал.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.483311653137207,
+      "perplexity": 240.6423131332135
+    },
+    {
+      "id": "adam_train_009602",
+      "text": "шағымның дерекі.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.518840312957764,
+      "perplexity": 249.34570647074568
+    },
+    {
+      "id": "adam_train_009612",
+      "text": "мемлекетке қорытынды алады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.662139892578125,
+      "perplexity": 105.86237405867769
+    },
+    {
+      "id": "adam_train_009641",
+      "text": "үлкен материал бұрын.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.270386695861816,
+      "perplexity": 194.4911568312834
+    },
+    {
+      "id": "adam_train_009651",
+      "text": "қорытындының түрі.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.028271675109863,
+      "perplexity": 414.997159284576
+    },
+    {
+      "id": "adam_train_009663",
+      "text": "жаман қор.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.604355812072754,
+      "perplexity": 99.91859575971017
+    },
+    {
+      "id": "adam_train_009688",
+      "text": "талдауға модель көрсетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.91444730758667,
+      "perplexity": 136.2439879710461
+    },
+    {
+      "id": "adam_train_009704",
+      "text": "жақсы кіші мысал.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.599838733673096,
+      "perplexity": 270.3828002690066
+    },
+    {
+      "id": "adam_train_009728",
+      "text": "ереже сөйлемеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.136157989501953,
+      "perplexity": 170.06113490673172
+    },
+    {
+      "id": "adam_train_009735",
+      "text": "елу түр.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.909295082092285,
+      "perplexity": 135.54383344857976
+    },
+    {
+      "id": "adam_train_009743",
+      "text": "жауапқа қонады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.471520900726318,
+      "perplexity": 87.48968500228368
+    },
+    {
+      "id": "adam_train_009759",
+      "text": "нақты өтініш бірге.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.53752326965332,
+      "perplexity": 93.45904039325846
+    },
+    {
+      "id": "adam_train_009766",
+      "text": "солай ереже көрсетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.987450122833252,
+      "perplexity": 146.56223093973276
+    },
+    {
+      "id": "adam_train_009784",
+      "text": "сабақ көрді сөйтіп жазды.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.137439250946045,
+      "perplexity": 462.8667663195479
+    },
+    {
+      "id": "adam_train_009790",
+      "text": "модель жоқ көмектеседі.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.635959148406982,
+      "perplexity": 103.12678446487809
+    },
+    {
+      "id": "adam_train_009850",
+      "text": "үлгілер жүрді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.0076165199279785,
+      "perplexity": 149.54786666233605
+    },
+    {
+      "id": "adam_train_009860",
+      "text": "сіз жиі көресіз.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.581636428833008,
+      "perplexity": 265.50573171596267
+    },
+    {
+      "id": "adam_train_009960",
+      "text": "талдау тез салыстырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.57454252243042,
+      "perplexity": 96.98366113715157
+    },
+    {
+      "id": "adam_train_009974",
+      "text": "сіз қазір аласыз.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.483725547790527,
+      "perplexity": 240.741934314897
+    },
+    {
+      "id": "adam_train_010007",
+      "text": "иә нәтиже тапады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.802685260772705,
+      "perplexity": 121.83714315181126
+    },
+    {
+      "id": "adam_train_010015",
+      "text": "оқу ғой.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.596348762512207,
+      "perplexity": 99.1217371121852
+    },
+    {
+      "id": "adam_train_010024",
+      "text": "жазбаның жазбасы.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.067646026611328,
+      "perplexity": 431.6633606072639
+    },
+    {
+      "id": "adam_train_010046",
+      "text": "кейде ана жапады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.836562156677246,
+      "perplexity": 126.0353164139233
+    },
+    {
+      "id": "adam_train_010055",
+      "text": "екі дерек біледі.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.055910110473633,
+      "perplexity": 156.94730474993352
+    },
+    {
+      "id": "adam_train_010075",
+      "text": "кеше хат жүреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.276691436767578,
+      "perplexity": 72.00182290118542
+    },
+    {
+      "id": "adam_train_010121",
+      "text": "құжат әлі оқыйды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.203506946563721,
+      "perplexity": 181.90906994922793
+    },
+    {
+      "id": "adam_train_010142",
+      "text": "анықтамаға сипаттайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.579639434814453,
+      "perplexity": 97.47924024944072
+    },
+    {
+      "id": "adam_train_010162",
+      "text": "жас жазба бұрын.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.2544264793396,
+      "perplexity": 191.41167581750142
+    },
+    {
+      "id": "adam_train_010172",
+      "text": "жауапқа құжат түсіндіреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.57666015625,
+      "perplexity": 264.18778477393374
+    },
+    {
+      "id": "adam_train_010179",
+      "text": "сабақта халық айтады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.796377182006836,
+      "perplexity": 329.1051096652033
+    },
+    {
+      "id": "adam_train_010241",
+      "text": "баяндауның сипаттамасы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.681047439575195,
+      "perplexity": 293.2564375068602
+    },
+    {
+      "id": "adam_train_010286",
+      "text": "сенімді мағына.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.405196189880371,
+      "perplexity": 81.87520435411072
+    },
+    {
+      "id": "adam_train_010289",
+      "text": "тоқсан ақпарат тұрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.910455703735352,
+      "perplexity": 135.7012398822518
+    },
+    {
+      "id": "adam_train_010307",
+      "text": "адам береді де.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.06719970703125,
+      "perplexity": 431.4707437849496
+    },
+    {
+      "id": "adam_train_010331",
+      "text": "міндет қарайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.868391513824463,
+      "perplexity": 47.865333401283635
+    },
+    {
+      "id": "adam_train_010376",
+      "text": "шекаралар қолданады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.539025783538818,
+      "perplexity": 93.59956944616373
+    },
+    {
+      "id": "adam_train_010407",
+      "text": "шекара емес.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.803683042526245,
+      "perplexity": 44.8661244106801
+    },
+    {
+      "id": "adam_train_010408",
+      "text": "дәйекті қор тыңдайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.344603538513184,
+      "perplexity": 77.06147951342993
+    },
+    {
+      "id": "adam_train_010414",
+      "text": "хаттың қорытындысы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.814187526702881,
+      "perplexity": 335.01909382818786
+    },
+    {
+      "id": "adam_train_010424",
+      "text": "біраз үлгі ашады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.366776466369629,
+      "perplexity": 78.78924213146195
+    },
+    {
+      "id": "adam_train_010438",
+      "text": "баяндау түсіндіреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.9279398918151855,
+      "perplexity": 50.80221173946822
+    },
+    {
+      "id": "adam_train_010447",
+      "text": "жазбаның міндеті.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.079054832458496,
+      "perplexity": 436.6163240555649
+    },
+    {
+      "id": "adam_train_010454",
+      "text": "жылдам жүйе береді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.796451568603516,
+      "perplexity": 121.08001022520615
+    },
+    {
+      "id": "adam_train_010486",
+      "text": "кеше мектеп бекітеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.591527938842773,
+      "perplexity": 98.64503865857277
+    },
+    {
+      "id": "adam_train_010502",
+      "text": "адам көрсетті әйтпесе жазды.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.296807765960693,
+      "perplexity": 199.69830765729395
+    },
+    {
+      "id": "adam_train_010533",
+      "text": "жаттығуға қорытынды жасайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.747756004333496,
+      "perplexity": 115.32520468932614
+    },
+    {
+      "id": "adam_train_010549",
+      "text": "суық мәртебе жайлы.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.19047737121582,
+      "perplexity": 179.55424650534232
+    },
+    {
+      "id": "adam_train_010574",
+      "text": "екі термин.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.24869441986084,
+      "perplexity": 190.31763126654414
+    },
+    {
+      "id": "adam_train_010582",
+      "text": "үлгі бе.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.638613700866699,
+      "perplexity": 103.40090359507927
+    },
+    {
+      "id": "adam_train_010595",
+      "text": "жылдам қазақ.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.458087921142578,
+      "perplexity": 86.32229615917277
+    },
+    {
+      "id": "adam_train_010605",
+      "text": "материал біраз кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.800783157348633,
+      "perplexity": 121.60561656820197
+    },
+    {
+      "id": "adam_train_010633",
+      "text": "бала келді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.803922653198242,
+      "perplexity": 121.98799682324342
+    },
+    {
+      "id": "adam_train_010642",
+      "text": "адамға қор айтады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.565740585327148,
+      "perplexity": 96.13376291421297
+    },
+    {
+      "id": "adam_train_010695",
+      "text": "қорытынды жайлы.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.143177509307861,
+      "perplexity": 63.00269538138643
+    },
+    {
+      "id": "adam_train_010730",
+      "text": "қысқа іс.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.907046318054199,
+      "perplexity": 135.23936981207913
+    },
+    {
+      "id": "adam_train_010741",
+      "text": "термин тапты бірақ сөйледі.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.8633036613464355,
+      "perplexity": 351.88473386009724
+    },
+    {
+      "id": "adam_train_010773",
+      "text": "хатта тыңдайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.348080635070801,
+      "perplexity": 77.32989610333722
+    },
+    {
+      "id": "adam_train_010788",
+      "text": "бапқа дерек нақтылайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.524160385131836,
+      "perplexity": 250.6757785280329
+    },
+    {
+      "id": "adam_train_010824",
+      "text": "мәртебеде бала кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.04847526550293,
+      "perplexity": 155.78475292203888
+    },
+    {
+      "id": "adam_train_010836",
+      "text": "модельге ереже көреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.593753814697266,
+      "perplexity": 268.7425383284731
+    },
+    {
+      "id": "adam_train_010877",
+      "text": "жоқ жүйе мінеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.041762351989746,
+      "perplexity": 154.74248558822484
+    },
+    {
+      "id": "adam_train_010917",
+      "text": "дәл белгі ашады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.265381336212158,
+      "perplexity": 71.19206290937944
+    },
+    {
+      "id": "adam_train_010941",
+      "text": "таза көп талдау.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.260255336761475,
+      "perplexity": 192.53064517300595
+    },
+    {
+      "id": "adam_train_010956",
+      "text": "мәртебе емес.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.101645469665527,
+      "perplexity": 60.43965744282491
+    },
+    {
+      "id": "adam_train_010966",
+      "text": "жыл алады.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.659142017364502,
+      "perplexity": 38.82801481344869
+    },
+    {
+      "id": "adam_train_010996",
+      "text": "сабаққа қызмет алады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.27672815322876,
+      "perplexity": 195.7284331317069
+    },
+    {
+      "id": "adam_train_010999",
+      "text": "мемлекеттің халықы нақтылайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.724526405334473,
+      "perplexity": 306.2881744434311
+    },
+    {
+      "id": "adam_train_011002",
+      "text": "әдемі мектеп.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.397611618041992,
+      "perplexity": 81.25656500782415
+    },
+    {
+      "id": "adam_train_011009",
+      "text": "жүйе оқыйды.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.883558750152588,
+      "perplexity": 48.59685175733626
+    },
+    {
+      "id": "adam_train_011030",
+      "text": "сабақта салыстырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.032983303070068,
+      "perplexity": 153.38993945852064
+    },
+    {
+      "id": "adam_train_011041",
+      "text": "термин еді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.327235221862793,
+      "perplexity": 75.73460745771222
+    },
+    {
+      "id": "adam_train_011077",
+      "text": "міндет бекітті.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.182452201843262,
+      "perplexity": 178.11905977642562
+    },
+    {
+      "id": "adam_train_011086",
+      "text": "мысал тыңдады өйткені құрды.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.980017185211182,
+      "perplexity": 395.4471639399537
+    },
+    {
+      "id": "adam_train_011092",
+      "text": "он анықтама.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.778033256530762,
+      "perplexity": 118.87033254383441
+    },
+    {
+      "id": "adam_train_011104",
+      "text": "ел көрді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.558097839355469,
+      "perplexity": 95.40183750767311
+    },
+    {
+      "id": "adam_train_011116",
+      "text": "материалға алады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.318604469299316,
+      "perplexity": 75.08377343400315
+    },
+    {
+      "id": "adam_train_011128",
+      "text": "қала қарады бірақ айтты.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.105692386627197,
+      "perplexity": 448.40300224050054
+    },
+    {
+      "id": "adam_train_011134",
+      "text": "қолдану тапады емес.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.7783522605896,
+      "perplexity": 323.226158908825
+    },
+    {
+      "id": "adam_train_011145",
+      "text": "анаға тіл алады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.049133777618408,
+      "perplexity": 155.8873728537707
+    },
+    {
+      "id": "adam_train_011184",
+      "text": "қалада тыңдайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.113765716552734,
+      "perplexity": 166.29539860150547
+    },
+    {
+      "id": "adam_train_011199",
+      "text": "тілдің мағынасы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.630629539489746,
+      "perplexity": 278.83760167165667
+    },
+    {
+      "id": "adam_train_011207",
+      "text": "баяндаулар арттырды.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.477313995361328,
+      "perplexity": 239.2033424330888
+    },
+    {
+      "id": "adam_train_011218",
+      "text": "баяндауға ашады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.75144100189209,
+      "perplexity": 115.75096176215074
+    },
+    {
+      "id": "adam_train_011231",
+      "text": "түрге мемлекет сақтайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.14451789855957,
+      "perplexity": 171.4887897464384
+    },
+    {
+      "id": "adam_train_011247",
+      "text": "он талдау сақтайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.389139175415039,
+      "perplexity": 80.5710315947456
+    },
+    {
+      "id": "adam_train_011262",
+      "text": "мектеп де.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.263056755065918,
+      "perplexity": 71.02676338269539
+    },
+    {
+      "id": "adam_train_011276",
+      "text": "мың мекеме береді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.2032670974731445,
+      "perplexity": 66.90455807494638
+    },
+    {
+      "id": "adam_train_011316",
+      "text": "мәртебе дейін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.135149002075195,
+      "perplexity": 62.49890284293261
+    },
+    {
+      "id": "adam_train_011322",
+      "text": "кітапқа береді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.398421764373779,
+      "perplexity": 81.32242138894966
+    },
+    {
+      "id": "adam_train_011342",
+      "text": "сөздік қарады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.286887168884277,
+      "perplexity": 72.73968935179543
+    },
+    {
+      "id": "adam_train_011356",
+      "text": "сапаға сөйлейді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.503109931945801,
+      "perplexity": 90.29751421272948
+    },
+    {
+      "id": "adam_train_011367",
+      "text": "ресми дерек қарсы.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.047691822052002,
+      "perplexity": 155.66275217419135
+    },
+    {
+      "id": "adam_train_011391",
+      "text": "мен иә аламын.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.315517902374268,
+      "perplexity": 203.4698633712545
+    },
+    {
+      "id": "adam_train_011408",
+      "text": "иә нәтиже барады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.7676777839660645,
+      "perplexity": 117.64572571110584
+    },
+    {
+      "id": "adam_train_011430",
+      "text": "материалдар оқыды.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.573850631713867,
+      "perplexity": 263.4465844083224
+    },
+    {
+      "id": "adam_train_011479",
+      "text": "дәл сапа жасайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.647684574127197,
+      "perplexity": 104.34310692970463
+    },
+    {
+      "id": "adam_train_011484",
+      "text": "білімді көреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.413696765899658,
+      "perplexity": 82.57415729527818
+    },
+    {
+      "id": "adam_train_011489",
+      "text": "сіз әлбетте ашасыз.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.24137020111084,
+      "perplexity": 513.5617118975724
+    },
+    {
+      "id": "adam_train_011492",
+      "text": "күнге дерек нақтылайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.46524715423584,
+      "perplexity": 236.33425890435305
+    },
+    {
+      "id": "adam_train_011504",
+      "text": "жылға оқу салыстырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.406393051147461,
+      "perplexity": 222.82641296692364
+    },
+    {
+      "id": "adam_train_011544",
+      "text": "материал жеткізмеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.8722076416015625,
+      "perplexity": 355.0318989378543
+    },
+    {
+      "id": "adam_train_011549",
+      "text": "нәтиженің өтініші тұрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.611025810241699,
+      "perplexity": 273.4245759237344
+    },
+    {
+      "id": "adam_train_011568",
+      "text": "күнде салыстырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.793135643005371,
+      "perplexity": 120.67918284403376
+    },
+    {
+      "id": "adam_train_011575",
+      "text": "тілдер тұрды.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.373226165771484,
+      "perplexity": 215.55717029911918
+    },
+    {
+      "id": "adam_train_011631",
+      "text": "үлкен ереже арқылы.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.073615550994873,
+      "perplexity": 159.75087187590154
+    },
+    {
+      "id": "adam_train_011643",
+      "text": "қорға қазақ көрсетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.969552040100098,
+      "perplexity": 143.962383549511
+    },
+    {
+      "id": "adam_train_011662",
+      "text": "біраз сабақ қолданады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.705877304077148,
+      "perplexity": 110.59526807900225
+    },
+    {
+      "id": "adam_train_011672",
+      "text": "сөздік берді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.299957275390625,
+      "perplexity": 73.69664497196352
+    },
+    {
+      "id": "adam_train_011680",
+      "text": "анықтама біледі.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.80841064453125,
+      "perplexity": 45.07873576534171
+    },
+    {
+      "id": "adam_train_011694",
+      "text": "қаланың адамы келеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.924671173095703,
+      "perplexity": 137.64407312605255
+    },
+    {
+      "id": "adam_train_011706",
+      "text": "жас жаман ереже.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.686561584472656,
+      "perplexity": 108.4795400762113
+    },
+    {
+      "id": "adam_train_011724",
+      "text": "міндет салыстырды.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.31320858001709,
+      "perplexity": 203.00052799867308
+    },
+    {
+      "id": "adam_train_011755",
+      "text": "екі сабақ айтады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.3770527839660645,
+      "perplexity": 79.60307987239334
+    },
+    {
+      "id": "adam_train_011763",
+      "text": "термин жазды өйткені құрды.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.243138313293457,
+      "perplexity": 514.4705498438576
+    },
+    {
+      "id": "adam_train_011779",
+      "text": "мәтін жасады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.473930358886719,
+      "perplexity": 87.70074190204065
+    },
+    {
+      "id": "adam_train_011786",
+      "text": "мен жоқ жүремін.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.487678527832031,
+      "perplexity": 241.69546578016178
+    },
+    {
+      "id": "adam_train_011792",
+      "text": "мектеп көрсетті.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.9352569580078125,
+      "perplexity": 139.10888308143726
+    },
+    {
+      "id": "adam_train_011836",
+      "text": "анада міндет сақтайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.3469648361206055,
+      "perplexity": 209.97003627254057
+    },
+    {
+      "id": "adam_train_011861",
+      "text": "суық адам сайын.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.01677131652832,
+      "perplexity": 150.9232329571764
+    },
+    {
+      "id": "adam_train_011871",
+      "text": "ресми тапсырма қарсы.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.947024345397949,
+      "perplexity": 140.75550038919698
+    },
+    {
+      "id": "adam_train_011883",
+      "text": "тоқсан күн біледі.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.372129440307617,
+      "perplexity": 79.21212973454826
+    },
+    {
+      "id": "adam_train_011927",
+      "text": "отыз қолдану.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.452852249145508,
+      "perplexity": 85.87152201296429
+    },
+    {
+      "id": "adam_train_011939",
+      "text": "жас дәл мәртебе.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.304898738861084,
+      "perplexity": 201.32061542670348
+    },
+    {
+      "id": "adam_train_011948",
+      "text": "ұғымда жеткізеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.657320022583008,
+      "perplexity": 105.35335885730532
+    },
+    {
+      "id": "adam_train_011964",
+      "text": "анықтама па.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.359710216522217,
+      "perplexity": 78.23446008399287
+    },
+    {
+      "id": "adam_train_011974",
+      "text": "жаман тапсырма сипаттайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.782470226287842,
+      "perplexity": 119.39892842913171
+    },
+    {
+      "id": "adam_train_011985",
+      "text": "талдауға мекеме салыстырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.272086143493652,
+      "perplexity": 194.8219653834607
+    },
+    {
+      "id": "adam_train_012075",
+      "text": "баяу нәтиже ашады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.55318546295166,
+      "perplexity": 94.93433698161836
+    },
+    {
+      "id": "adam_train_012083",
+      "text": "мәтінге хат кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.120213508605957,
+      "perplexity": 167.37110097693943
+    },
+    {
+      "id": "adam_train_012088",
+      "text": "мекемеге қорытынды жасайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.729038238525391,
+      "perplexity": 113.18665142310998
+    },
+    {
+      "id": "adam_train_012132",
+      "text": "жас мектеп бұрын.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.984003067016602,
+      "perplexity": 146.05789248985147
+    },
+    {
+      "id": "adam_train_012161",
+      "text": "заң жайлы.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.388454437255859,
+      "perplexity": 80.51588041910033
+    },
+    {
+      "id": "adam_train_012190",
+      "text": "өтініштің оқусы жеткізеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.5503458976745605,
+      "perplexity": 257.32654916856626
+    },
+    {
+      "id": "adam_train_012200",
+      "text": "хаттың жауапы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.601916313171387,
+      "perplexity": 270.9451259674417
+    },
+    {
+      "id": "adam_train_012253",
+      "text": "сабақ түсіндірді немесе жасады.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.5763702392578125,
+      "perplexity": 264.1112033476642
+    },
+    {
+      "id": "adam_train_012269",
+      "text": "жылдам шекара.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.337800025939941,
+      "perplexity": 208.05449195430333
+    },
+    {
+      "id": "adam_train_012280",
+      "text": "мағынада ана жеткізеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.790994644165039,
+      "perplexity": 120.42108524543272
+    },
+    {
+      "id": "adam_train_012298",
+      "text": "кейде құжат сөйлейді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.605929374694824,
+      "perplexity": 100.07594769634215
+    },
+    {
+      "id": "adam_train_012304",
+      "text": "күннің талдаусы жеткізеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 6.326918601989746,
+      "perplexity": 559.4301084017517
+    },
+    {
+      "id": "adam_train_012318",
+      "text": "суық мемлекет бірге.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.301483631134033,
+      "perplexity": 200.63425649926475
+    },
+    {
+      "id": "adam_train_012345",
+      "text": "жаттығуға құжат тыңдайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.078081130981445,
+      "perplexity": 160.4658473741918
+    },
+    {
+      "id": "adam_train_012369",
+      "text": "мемлекет арттырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.8600776195526123,
+      "perplexity": 47.46903575117957
+    },
+    {
+      "id": "adam_train_012374",
+      "text": "анықтаманы айтады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.819976806640625,
+      "perplexity": 123.96221564626563
+    },
+    {
+      "id": "adam_train_012380",
+      "text": "үлкен халық жайлы.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.5083184242248535,
+      "perplexity": 246.73587295802335
+    },
+    {
+      "id": "adam_train_012392",
+      "text": "қиын жауап арқылы.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.7684526443481445,
+      "perplexity": 117.73692004995773
+    },
+    {
+      "id": "adam_train_012406",
+      "text": "баяндау сипаттайды.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.147243976593018,
+      "perplexity": 63.259415399044705
+    },
+    {
+      "id": "adam_train_012436",
+      "text": "қалада сапа жазады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.853384971618652,
+      "perplexity": 348.41175055963447
+    },
+    {
+      "id": "adam_train_012447",
+      "text": "мәртебе жүрмеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.117706775665283,
+      "perplexity": 166.95207174141908
+    },
+    {
+      "id": "adam_train_012502",
+      "text": "нақты анықтама туралы.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.522984504699707,
+      "perplexity": 250.38118702139136
+    },
+    {
+      "id": "adam_train_012527",
+      "text": "жазбалар жүреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.839493751525879,
+      "perplexity": 126.40534301730197
+    },
+    {
+      "id": "adam_train_012551",
+      "text": "мекемеде тіл қолданады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.84473991394043,
+      "perplexity": 127.07022850052743
+    },
+    {
+      "id": "adam_train_012600",
+      "text": "нәтиженің баяндаусы сипаттайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.597107887268066,
+      "perplexity": 269.6454336466491
+    },
+    {
+      "id": "adam_train_012630",
+      "text": "нақты сенімді тіл.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.084586143493652,
+      "perplexity": 161.5130821640229
+    },
+    {
+      "id": "adam_train_012649",
+      "text": "жүйе нақтыламады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.600395202636719,
+      "perplexity": 99.52363987579629
+    },
+    {
+      "id": "adam_train_012653",
+      "text": "мысалда түсіндіреді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.8468017578125,
+      "perplexity": 127.33249775870198
+    },
+    {
+      "id": "adam_train_012681",
+      "text": "халық жазмады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.968517303466797,
+      "perplexity": 143.81349743967516
+    },
+    {
+      "id": "adam_train_012713",
+      "text": "әлі мекеме ашады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.856264114379883,
+      "perplexity": 128.5430817110399
+    },
+    {
+      "id": "adam_train_012718",
+      "text": "жылдың түрі.",
+      "token_count": 3,
+      "mean_cross_entropy": 6.4340362548828125,
+      "perplexity": 622.6821866786378
+    },
+    {
+      "id": "adam_train_012747",
+      "text": "нәтиже үшін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.229436874389648,
+      "perplexity": 68.67854663396832
+    },
+    {
+      "id": "adam_train_012768",
+      "text": "іс ме.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.4544291496276855,
+      "perplexity": 86.00703967828608
+    },
+    {
+      "id": "adam_train_012825",
+      "text": "қолданыс де.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.164542198181152,
+      "perplexity": 64.36321010307955
+    },
+    {
+      "id": "adam_train_012836",
+      "text": "терминге тапады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.9620747566223145,
+      "perplexity": 142.88995043738834
+    },
+    {
+      "id": "adam_train_012865",
+      "text": "жоқ тіл тапады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.780093669891357,
+      "perplexity": 119.11550705887274
+    },
+    {
+      "id": "adam_train_012894",
+      "text": "ақпаратқа жауап тұрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.280599117279053,
+      "perplexity": 196.48755918689645
+    },
+    {
+      "id": "adam_train_012908",
+      "text": "елу нәтиже барады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.812594413757324,
+      "perplexity": 123.05044752385172
+    },
+    {
+      "id": "adam_train_012914",
+      "text": "ереже туралы.",
+      "token_count": 3,
+      "mean_cross_entropy": 3.988853931427002,
+      "perplexity": 53.99297423967609
+    },
+    {
+      "id": "adam_train_012947",
+      "text": "күнге анықтама тұрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.424188613891602,
+      "perplexity": 226.82722716838913
+    },
+    {
+      "id": "adam_train_012955",
+      "text": "ресми бап бұрын.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.9928812980651855,
+      "perplexity": 147.36040163880205
+    },
+    {
+      "id": "adam_train_012979",
+      "text": "қызметте жаттығу салыстырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.072663307189941,
+      "perplexity": 159.59882250335127
+    },
+    {
+      "id": "adam_train_012986",
+      "text": "ұғымның қорытындысы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.845410346984863,
+      "perplexity": 345.6443468000044
+    },
+    {
+      "id": "adam_train_012995",
+      "text": "үлкен анықтама бастап.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.383167266845703,
+      "perplexity": 217.71073257090055
+    },
+    {
+      "id": "adam_train_013005",
+      "text": "ауыр оқу бұрын.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.997699737548828,
+      "perplexity": 148.07216222694473
+    },
+    {
+      "id": "adam_train_013015",
+      "text": "алты жазба келеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.591773986816406,
+      "perplexity": 98.66931305665442
+    },
+    {
+      "id": "adam_train_013046",
+      "text": "қала бекітті себебі оқыды.",
+      "token_count": 5,
+      "mean_cross_entropy": 5.636172771453857,
+      "perplexity": 280.38755508485343
+    },
+    {
+      "id": "adam_train_013054",
+      "text": "баяндауны жазады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.911346435546875,
+      "perplexity": 135.82216714236148
+    },
+    {
+      "id": "adam_train_013064",
+      "text": "баяндау көмектесті немесе нақтылады.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.109743595123291,
+      "perplexity": 450.22326092702866
+    },
+    {
+      "id": "adam_train_013091",
+      "text": "балада тұрады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.2490692138671875,
+      "perplexity": 190.38897454272612
+    },
+    {
+      "id": "adam_train_013103",
+      "text": "жазба қайда қонады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.708243370056152,
+      "perplexity": 110.85725359552954
+    },
+    {
+      "id": "adam_train_013115",
+      "text": "ұғымға бекітеді.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.525611400604248,
+      "perplexity": 92.35237286759761
+    },
+    {
+      "id": "adam_train_013136",
+      "text": "отыз ел тыңдайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.345189571380615,
+      "perplexity": 77.10665330860922
+    },
+    {
+      "id": "adam_train_013146",
+      "text": "жауап бүгін құрады.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.210221290588379,
+      "perplexity": 183.13457966892972
+    },
+    {
+      "id": "adam_train_013201",
+      "text": "мемлекеттің сипаттамасы жасайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.323635101318359,
+      "perplexity": 205.128190109956
+    },
+    {
+      "id": "adam_train_013237",
+      "text": "мағынаға ұғым қарайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.183714866638184,
+      "perplexity": 178.34410649189255
+    },
+    {
+      "id": "adam_train_013270",
+      "text": "ұғымның үлгісі сақтайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.609647274017334,
+      "perplexity": 273.0479099247041
+    },
+    {
+      "id": "adam_train_013286",
+      "text": "мәтінде жапады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.5431928634643555,
+      "perplexity": 93.99042012046228
+    },
+    {
+      "id": "adam_train_013295",
+      "text": "тоқсан мәтін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.886631488800049,
+      "perplexity": 132.50647190507834
+    },
+    {
+      "id": "adam_train_013303",
+      "text": "үлкен жаман адам.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.409143924713135,
+      "perplexity": 223.44022412746153
+    },
+    {
+      "id": "adam_train_013319",
+      "text": "елге материал нақтылайды.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.356536865234375,
+      "perplexity": 211.9895254579936
+    },
+    {
+      "id": "adam_train_013331",
+      "text": "ақпараттың сапасы.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.833440780639648,
+      "perplexity": 341.53179568632856
+    },
+    {
+      "id": "adam_train_013346",
+      "text": "білімде арттырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.360131740570068,
+      "perplexity": 78.26744474171379
+    },
+    {
+      "id": "adam_train_013362",
+      "text": "жүйеге біледі.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.559087753295898,
+      "perplexity": 95.4963238755351
+    },
+    {
+      "id": "adam_train_013372",
+      "text": "сіз осылай тапасыз.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.921549320220947,
+      "perplexity": 372.9891460731924
+    },
+    {
+      "id": "adam_train_013389",
+      "text": "қызметке жазба кетеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.409632205963135,
+      "perplexity": 223.54935243988498
+    },
+    {
+      "id": "adam_train_013393",
+      "text": "сегіз білім айтады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.399835586547852,
+      "perplexity": 81.4374781472912
+    },
+    {
+      "id": "adam_train_013407",
+      "text": "жас тіл туралы.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.50188684463501,
+      "perplexity": 245.15406377191525
+    },
+    {
+      "id": "adam_train_013442",
+      "text": "үлкен жаңа ұғым.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.418436050415039,
+      "perplexity": 225.52613504138998
+    },
+    {
+      "id": "adam_train_013505",
+      "text": "хатты арттырады.",
+      "token_count": 3,
+      "mean_cross_entropy": 5.197223663330078,
+      "perplexity": 180.76966708402765
+    },
+    {
+      "id": "adam_train_013542",
+      "text": "тоқсан түр.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.989382743835449,
+      "perplexity": 146.84575406850527
+    },
+    {
+      "id": "adam_train_013556",
+      "text": "оқу осылай көреді.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.732959747314453,
+      "perplexity": 113.6313853154692
+    },
+    {
+      "id": "adam_train_013591",
+      "text": "жүйеге құжат жеткізеді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.007621765136719,
+      "perplexity": 149.54865107417055
+    },
+    {
+      "id": "adam_train_013686",
+      "text": "мағынада сапа арттырады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.912905693054199,
+      "perplexity": 136.0341140731188
+    },
+    {
+      "id": "adam_train_013692",
+      "text": "оқуға ана береді.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.406135559082031,
+      "perplexity": 222.76904431991917
+    },
+    {
+      "id": "adam_train_013700",
+      "text": "ел тез барады.",
+      "token_count": 4,
+      "mean_cross_entropy": 4.968408584594727,
+      "perplexity": 143.79786304833712
+    },
+    {
+      "id": "adam_train_013714",
+      "text": "жауап бе.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.261540412902832,
+      "perplexity": 70.91914412110333
+    },
+    {
+      "id": "adam_train_013723",
+      "text": "аз сенімді міндет.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.558374881744385,
+      "perplexity": 259.4009363999036
+    },
+    {
+      "id": "adam_train_013738",
+      "text": "үлгі сақтайды тек.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.6621503829956055,
+      "perplexity": 287.766786499131
+    },
+    {
+      "id": "adam_train_013770",
+      "text": "Дәйекті мәтін сенімді модель шешімін нақтылауға көмектеседі.",
+      "token_count": 11,
+      "mean_cross_entropy": 6.908720970153809,
+      "perplexity": 1000.9661576015213
+    },
+    {
+      "id": "adam_train_013786",
+      "text": "Жаттығу үлгісі ұғымды қолдану ретімен бекітеді.",
+      "token_count": 8,
+      "mean_cross_entropy": 7.118844985961914,
+      "perplexity": 1235.023140288086
+    },
+    {
+      "id": "adam_train_013792",
+      "text": "Оқу баяндауы терминнің қызметін қысқа түрде түсіндіреді.",
+      "token_count": 8,
+      "mean_cross_entropy": 5.735219955444336,
+      "perplexity": 309.5810573099475
+    },
+    {
+      "id": "adam_train_013800",
+      "text": "Жүйелі мәтін модельдің сенімділігін арттырады.",
+      "token_count": 8,
+      "mean_cross_entropy": 8.116303443908691,
+      "perplexity": 3348.6194784819436
+    },
+    {
+      "id": "adam_train_013814",
+      "text": "Оқу тапсырмасы ұғымды мысал арқылы бекітеді.",
+      "token_count": 7,
+      "mean_cross_entropy": 5.89220666885376,
+      "perplexity": 362.2036667156504
+    },
+    {
+      "id": "adam_train_013845",
+      "text": "Сабақ түсіндірмесі ұғымдарды салыстыру арқылы кезеңдеп түсіндіреді.",
+      "token_count": 12,
+      "mean_cross_entropy": 7.547245979309082,
+      "perplexity": 1895.5152481318592
+    },
+    {
+      "id": "adam_train_013865",
+      "text": "Дос басқа, дұшпан басқа.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.406968116760254,
+      "perplexity": 1647.4239702613522
+    },
+    {
+      "id": "adam_train_013895",
+      "text": "Кәрінің тілін ал, жастың пілін.",
+      "token_count": 11,
+      "mean_cross_entropy": 8.743380546569824,
+      "perplexity": 6269.052755711697
+    },
+    {
+      "id": "adam_train_013926",
+      "text": "Жақсы есім — асыл қазына.",
+      "token_count": 10,
+      "mean_cross_entropy": 6.941481113433838,
+      "perplexity": 1034.3009981517794
+    },
+    {
+      "id": "adam_train_013957",
+      "text": "Кеш жарық.",
+      "token_count": 4,
+      "mean_cross_entropy": 7.381721019744873,
+      "perplexity": 1606.3519536920546
+    },
+    {
+      "id": "adam_train_013961",
+      "text": "Газет қайда?",
+      "token_count": 3,
+      "mean_cross_entropy": 7.411702632904053,
+      "perplexity": 1655.24221885207
+    },
+    {
+      "id": "adam_train_014036",
+      "text": "Қайырлы күн!",
+      "token_count": 4,
+      "mean_cross_entropy": 6.458806037902832,
+      "perplexity": 638.2984972143047
+    },
+    {
+      "id": "adam_train_014039",
+      "text": "Бір, үш және бес - тақ сандар.",
+      "token_count": 12,
+      "mean_cross_entropy": 6.525502681732178,
+      "perplexity": 682.3226786034313
+    },
+    {
+      "id": "adam_train_014040",
+      "text": "Менде бір аға және екі қарындас бар.",
+      "token_count": 10,
+      "mean_cross_entropy": 7.164229869842529,
+      "perplexity": 1292.3659274762092
+    },
+    {
+      "id": "adam_train_014058",
+      "text": "Мен 24 жастамын.",
+      "token_count": 6,
+      "mean_cross_entropy": 6.917783260345459,
+      "perplexity": 1010.078430060283
+    },
+    {
+      "id": "adam_train_014071",
+      "text": "Мен білмеймін.",
+      "token_count": 3,
+      "mean_cross_entropy": 4.879387378692627,
+      "perplexity": 131.55004883220116
+    },
+    {
+      "id": "adam_train_014087",
+      "text": "Күн бүркіп тұр.",
+      "token_count": 6,
+      "mean_cross_entropy": 8.783907890319824,
+      "perplexity": 6528.339423540016
+    },
+    {
+      "id": "adam_train_014106",
+      "text": "Ол жұмысқа немқұрайды қарайды.",
+      "token_count": 8,
+      "mean_cross_entropy": 7.71290922164917,
+      "perplexity": 2237.040848348721
+    },
+    {
+      "id": "adam_train_014119",
+      "text": "Аттыға жаяу жолдас болмас.",
+      "token_count": 9,
+      "mean_cross_entropy": 8.674450874328613,
+      "perplexity": 5851.485703128222
+    },
+    {
+      "id": "adam_train_014146",
+      "text": "Осакада қар жауып тұрды.",
+      "token_count": 7,
+      "mean_cross_entropy": 9.492919921875,
+      "perplexity": 13265.472976028419
+    },
+    {
+      "id": "adam_train_014186",
+      "text": "Ақпараттық технологиялар саласында жұмыс істейтін мамандар қажет.",
+      "token_count": 11,
+      "mean_cross_entropy": 7.947842121124268,
+      "perplexity": 2829.4627202862985
+    },
+    {
+      "id": "adam_train_014212",
+      "text": "Ол жұмысты бұлжытпай орындады.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.040714740753174,
+      "perplexity": 1142.2036944774732
+    },
+    {
+      "id": "adam_train_014225",
+      "text": "Ол допты торға түсірді.",
+      "token_count": 9,
+      "mean_cross_entropy": 6.975294589996338,
+      "perplexity": 1069.8723165370745
+    },
+    {
+      "id": "adam_train_014259",
+      "text": "Игілікті істен тартынба!",
+      "token_count": 9,
+      "mean_cross_entropy": 8.168257713317871,
+      "perplexity": 3527.193225222264
+    },
+    {
+      "id": "adam_train_014276",
+      "text": "Бізге астық тапсыру жоспарын толтыру керек.",
+      "token_count": 10,
+      "mean_cross_entropy": 7.604032039642334,
+      "perplexity": 2006.2689646974252
+    },
+    {
+      "id": "adam_train_014280",
+      "text": "Топырағы торқа болсын!",
+      "token_count": 7,
+      "mean_cross_entropy": 8.375337600708008,
+      "perplexity": 4338.732790521147
+    },
+    {
+      "id": "adam_train_014294",
+      "text": "Сіздің уақытың өтіп кетті.",
+      "token_count": 6,
+      "mean_cross_entropy": 8.536826133728027,
+      "perplexity": 5099.134679997594
+    },
+    {
+      "id": "adam_train_014304",
+      "text": "Мен бүгін көп жұмыс тындырдым.",
+      "token_count": 8,
+      "mean_cross_entropy": 6.461745262145996,
+      "perplexity": 640.1773594778192
+    },
+    {
+      "id": "adam_train_014310",
+      "text": "Аяғыңы жу.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.575677871704102,
+      "perplexity": 1950.1817877583117
+    },
+    {
+      "id": "adam_train_014320",
+      "text": "Мен сені қатты сағындым.",
+      "token_count": 6,
+      "mean_cross_entropy": 6.146274566650391,
+      "perplexity": 466.97445999276823
+    },
+    {
+      "id": "adam_train_014334",
+      "text": "Мамаң үйде ме?",
+      "token_count": 5,
+      "mean_cross_entropy": 9.203018188476562,
+      "perplexity": 9927.045583765324
+    },
+    {
+      "id": "adam_train_014357",
+      "text": "2012 жылдың 28 сәуір күні жұмыс уақыты 1 сағатқа қысқартылады.",
+      "token_count": 15,
+      "mean_cross_entropy": 7.513800144195557,
+      "perplexity": 1833.1666205927636
+    },
+    {
+      "id": "adam_train_014407",
+      "text": "Ол біреудің ырқымен кетті.",
+      "token_count": 8,
+      "mean_cross_entropy": 6.7837724685668945,
+      "perplexity": 883.3950259459109
+    },
+    {
+      "id": "adam_train_014411",
+      "text": "Жұмысшылар зауытқа бара жатыр.",
+      "token_count": 7,
+      "mean_cross_entropy": 8.1607666015625,
+      "perplexity": 3500.8693472459836
+    },
+    {
+      "id": "adam_train_014435",
+      "text": "Рақмет, жақсы. Сіз қалайсыз?",
+      "token_count": 7,
+      "mean_cross_entropy": 7.613754749298096,
+      "perplexity": 2025.870470796462
+    },
+    {
+      "id": "adam_train_014442",
+      "text": "Мен жапонша сөйлемеймін.",
+      "token_count": 6,
+      "mean_cross_entropy": 6.9639892578125,
+      "perplexity": 1057.845168157575
+    },
+    {
+      "id": "adam_train_014509",
+      "text": "Биылдан бастап біздің зауыттың өндірістік қуаты екі есе артты.",
+      "token_count": 16,
+      "mean_cross_entropy": 8.154695510864258,
+      "perplexity": 3479.679639319901
+    },
+    {
+      "id": "adam_train_014516",
+      "text": "Қазақстанның оңтүстік бөлігінде бұршақ жауады.",
+      "token_count": 9,
+      "mean_cross_entropy": 9.012463569641113,
+      "perplexity": 8204.70927014022
+    },
+    {
+      "id": "adam_train_014542",
+      "text": "Бүгін аптаның қай күні?",
+      "token_count": 8,
+      "mean_cross_entropy": 6.968483924865723,
+      "perplexity": 1062.6105313202067
+    },
+    {
+      "id": "adam_train_014595",
+      "text": "Екі қыз көрпе қабуға отырған.",
+      "token_count": 8,
+      "mean_cross_entropy": 7.665071487426758,
+      "perplexity": 2132.545226669503
+    },
+    {
+      "id": "adam_train_014605",
+      "text": "Науқас асқа қарады.",
+      "token_count": 4,
+      "mean_cross_entropy": 8.767171859741211,
+      "perplexity": 6419.990132834833
+    },
+    {
+      "id": "adam_train_014608",
+      "text": "Ақтан сұрағанның аты азып, тоны тозбас.",
+      "token_count": 15,
+      "mean_cross_entropy": 7.72391414642334,
+      "perplexity": 2261.795275073326
+    },
+    {
+      "id": "adam_train_014624",
+      "text": "Оның соғысы қатты.",
+      "token_count": 6,
+      "mean_cross_entropy": 8.064876556396484,
+      "perplexity": 3180.7635480316685
+    },
+    {
+      "id": "adam_train_014634",
+      "text": "Ол қыртылдатып бірдеме жегендей.",
+      "token_count": 13,
+      "mean_cross_entropy": 7.327907085418701,
+      "perplexity": 1522.1926167168172
+    },
+    {
+      "id": "adam_train_014645",
+      "text": "Мен қойған шартыңа қайылмын.",
+      "token_count": 10,
+      "mean_cross_entropy": 7.26086950302124,
+      "perplexity": 1423.4937313513337
+    },
+    {
+      "id": "adam_train_014674",
+      "text": "Мен оған сәлем айтып жібердім.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.667854309082031,
+      "perplexity": 2138.4879846898775
+    },
+    {
+      "id": "adam_train_014679",
+      "text": "Оның жазуы танылмайды.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.807103633880615,
+      "perplexity": 2458.0008449490383
+    },
+    {
+      "id": "adam_train_014686",
+      "text": "Ол заттарын сыртқа тастап, өзі үйге кірді.",
+      "token_count": 12,
+      "mean_cross_entropy": 7.490324974060059,
+      "perplexity": 1790.6339068719483
+    },
+    {
+      "id": "adam_train_014710",
+      "text": "Бітті дей бер!",
+      "token_count": 7,
+      "mean_cross_entropy": 7.669595241546631,
+      "perplexity": 2142.214190442733
+    },
+    {
+      "id": "adam_train_014731",
+      "text": "Маңдайы күнге тимеген.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.890432357788086,
+      "perplexity": 2671.598757536923
+    },
+    {
+      "id": "adam_train_014743",
+      "text": "Әй, соны қойшы!",
+      "token_count": 8,
+      "mean_cross_entropy": 7.16086483001709,
+      "perplexity": 1288.0243735090082
+    },
+    {
+      "id": "adam_train_014755",
+      "text": "Ойыншықтарды көрген балалардың көздері шырақтай жанды.",
+      "token_count": 15,
+      "mean_cross_entropy": 8.333800315856934,
+      "perplexity": 4162.205228715518
+    },
+    {
+      "id": "adam_train_014788",
+      "text": "Ол маған алма берді.",
+      "token_count": 6,
+      "mean_cross_entropy": 5.795075416564941,
+      "perplexity": 328.676970735382
+    },
+    {
+      "id": "adam_train_014793",
+      "text": "Оның мұрны иіс сезбейді.",
+      "token_count": 7,
+      "mean_cross_entropy": 9.776165008544922,
+      "perplexity": 17608.992861033636
+    },
+    {
+      "id": "adam_train_014815",
+      "text": "”Том!” ”Мэри!”",
+      "token_count": 12,
+      "mean_cross_entropy": 9.001388549804688,
+      "perplexity": 8114.34327845605
+    },
+    {
+      "id": "adam_train_014823",
+      "text": "Қызылқия кен орнында 21 жасар бетоншы мерт болды.",
+      "token_count": 13,
+      "mean_cross_entropy": 9.314804077148438,
+      "perplexity": 11101.15101698629
+    },
+    {
+      "id": "adam_train_014839",
+      "text": "Талдықорғанда Алматының бір топ дәрігері жүрекке оталар жасауда.",
+      "token_count": 19,
+      "mean_cross_entropy": 7.904635906219482,
+      "perplexity": 2709.8157055237325
+    },
+    {
+      "id": "adam_train_014855",
+      "text": "Олар бір-біріне ешқандай шағымдары жоқ.",
+      "token_count": 8,
+      "mean_cross_entropy": 7.254068374633789,
+      "perplexity": 1413.8452153150965
+    },
+    {
+      "id": "adam_train_014858",
+      "text": "Бакудегі мұнай-газ көрмесіне 300-ден астам әлемдік компаниялар қатысады.",
+      "token_count": 20,
+      "mean_cross_entropy": 8.15644645690918,
+      "perplexity": 3485.777707758409
+    },
+    {
+      "id": "adam_train_014864",
+      "text": "Таразда Мемлекет басшысының жұмыс сапары барысында «Еврохим» инвестициялық жобасы мен маневрлік локомотивтер өндірісі бойынша келісімдерге қол қойылды.",
+      "token_count": 41,
+      "mean_cross_entropy": 8.197338104248047,
+      "perplexity": 3631.2713650590185
+    },
+    {
+      "id": "adam_train_014870",
+      "text": "Бұл шөпті медицинада қолданады.",
+      "token_count": 10,
+      "mean_cross_entropy": 6.919200420379639,
+      "perplexity": 1011.5108876138105
+    },
+    {
+      "id": "adam_train_014881",
+      "text": "Маңғыстау облысында тергеу абақтысынан қашып кеткен күдікті ұсталды.",
+      "token_count": 19,
+      "mean_cross_entropy": 7.912256240844727,
+      "perplexity": 2730.5442870281513
+    },
+    {
+      "id": "adam_train_014906",
+      "text": "Шымкентте шенеуніктер ҰБТ-ға дайындық ретінде 350 000 теңгеден жинатып жатыр.",
+      "token_count": 26,
+      "mean_cross_entropy": 7.896522045135498,
+      "perplexity": 2687.917596570834
+    },
+    {
+      "id": "adam_train_014922",
+      "text": "Еуропаға алғаш жеткізілген Испан конкистадорлары бұл тәттіге «қара алтын» деген атау берді және оны дене күшін нығайту үшін пайдаланды.",
+      "token_count": 38,
+      "mean_cross_entropy": 8.375492095947266,
+      "perplexity": 4339.403155864487
+    },
+    {
+      "id": "adam_train_014932",
+      "text": "Қазіргі әлем барлық плюстерімен және минустерімен төтенше деңгейде өзара байланысты болып отыр.",
+      "token_count": 22,
+      "mean_cross_entropy": 8.032358169555664,
+      "perplexity": 3078.9939086083787
+    },
+    {
+      "id": "adam_train_014945",
+      "text": "Бұл жобаның кемшіліктері болды.",
+      "token_count": 9,
+      "mean_cross_entropy": 8.142898559570312,
+      "perplexity": 3438.8712088974253
+    },
+    {
+      "id": "adam_train_014961",
+      "text": "Атырауда облыстың ең сұлу бойжеткені таңдалды.",
+      "token_count": 16,
+      "mean_cross_entropy": 7.843613624572754,
+      "perplexity": 2549.400785786216
+    },
+    {
+      "id": "adam_train_014977",
+      "text": "«Сколково» инновациялық орталығы Қазақстанмен ынтымақтастықты кеңейтпек ниетте.",
+      "token_count": 24,
+      "mean_cross_entropy": 8.247782707214355,
+      "perplexity": 3819.1482564150147
+    },
+    {
+      "id": "adam_train_014983",
+      "text": "Қаза тапқандар мен зардап шеккендер жоқ.",
+      "token_count": 11,
+      "mean_cross_entropy": 8.061800003051758,
+      "perplexity": 3170.9927971242055
+    },
+    {
+      "id": "adam_train_014999",
+      "text": "Бүгін Мемлекет басшысы Қазақстан халқына Жолдауын жариялайды.",
+      "token_count": 12,
+      "mean_cross_entropy": 7.649223327636719,
+      "perplexity": 2099.0147094575045
+    },
+    {
+      "id": "adam_train_015056",
+      "text": "Сөйтіп, империя кезеңінде Қазақстанда телекоммуникацияны дамыту үшін негізі салынды.",
+      "token_count": 24,
+      "mean_cross_entropy": 7.4507598876953125,
+      "perplexity": 1721.170544893207
+    },
+    {
+      "id": "adam_train_015091",
+      "text": "Бұл жақта ор жыландар көп.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.377699375152588,
+      "perplexity": 1599.9047499148378
+    },
+    {
+      "id": "adam_train_015108",
+      "text": "Ол әйелімен ажырасты.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.170943260192871,
+      "perplexity": 1301.0712729183633
+    },
+    {
+      "id": "adam_train_015115",
+      "text": "Католицизм - христиандықтың ең ірі тармағы.",
+      "token_count": 17,
+      "mean_cross_entropy": 8.141738891601562,
+      "perplexity": 3434.8855715624536
+    },
+    {
+      "id": "adam_train_015131",
+      "text": "26 сәуір - зияткерлік меншік құқығының дүниежүзілік күні.",
+      "token_count": 15,
+      "mean_cross_entropy": 8.944783210754395,
+      "perplexity": 7667.786116306361
+    },
+    {
+      "id": "adam_train_015152",
+      "text": "Түйе бұйдасын іріккен жоқ.",
+      "token_count": 9,
+      "mean_cross_entropy": 8.260528564453125,
+      "perplexity": 3868.1381205455896
+    },
+    {
+      "id": "adam_train_015162",
+      "text": "Ол маған ілесе алмады.",
+      "token_count": 6,
+      "mean_cross_entropy": 6.244109153747559,
+      "perplexity": 514.9702611968389
+    },
+    {
+      "id": "adam_train_015169",
+      "text": "Ындыны кеуіп қалған екен.",
+      "token_count": 10,
+      "mean_cross_entropy": 7.738307952880859,
+      "perplexity": 2294.586547983224
+    },
+    {
+      "id": "adam_train_015179",
+      "text": "Мектеп ережелерін ұстануыңызды өтінеміз.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.798892498016357,
+      "perplexity": 2437.9005023137574
+    },
+    {
+      "id": "adam_train_015203",
+      "text": "Ауру асқынды.",
+      "token_count": 5,
+      "mean_cross_entropy": 7.686585903167725,
+      "perplexity": 2178.9227955258993
+    },
+    {
+      "id": "adam_train_015219",
+      "text": "Ауру өлсіздігін сезді.",
+      "token_count": 7,
+      "mean_cross_entropy": 8.542526245117188,
+      "perplexity": 5128.283311963471
+    },
+    {
+      "id": "adam_train_015220",
+      "text": "Ауру әрең қозғалды.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.935992240905762,
+      "perplexity": 2796.1317997018955
+    },
+    {
+      "id": "adam_train_015244",
+      "text": "Командалық жарыста Ресей әлем құрамасынан 4:1 есебімен басым түсті.",
+      "token_count": 17,
+      "mean_cross_entropy": 9.046004295349121,
+      "perplexity": 8484.56827450523
+    },
+    {
+      "id": "adam_train_015250",
+      "text": "Ол жылы шыраймен қарсыланды.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.5926971435546875,
+      "perplexity": 1983.6565114657783
+    },
+    {
+      "id": "adam_train_015268",
+      "text": "Атырау облысында полиция қызметкерлері бір тонна балық тәркіледі.",
+      "token_count": 12,
+      "mean_cross_entropy": 8.44491958618164,
+      "perplexity": 4651.381662568356
+    },
+    {
+      "id": "adam_train_015293",
+      "text": "«Астана» велошабандозы Винченцо Нибали «Вуэльта» қорытындысы бойынша екінші орында.",
+      "token_count": 33,
+      "mean_cross_entropy": 8.08237361907959,
+      "perplexity": 3236.907310328463
+    },
+    {
+      "id": "adam_train_015301",
+      "text": "ҚР ҰҚК Шекара қызметі академиясында болашақ офицерлер әскери ант қабылдады.",
+      "token_count": 23,
+      "mean_cross_entropy": 7.96263313293457,
+      "perplexity": 2871.624374911157
+    },
+    {
+      "id": "adam_train_015325",
+      "text": "Сапа үшін жауапты тұлға – шығарылатын өнімнің қауіпсіздігіне және дайын өнімнің әрбір сериясының белгіленген талаптарға сәйкестігі куәлігін қамтамасыз етуге жауап беретін өндірушінің басшысымен тағайындалатын лауазымды тұлға.",
+      "token_count": 55,
+      "mean_cross_entropy": 7.561894416809082,
+      "perplexity": 1923.4859481466115
+    },
+    {
+      "id": "adam_train_015373",
+      "text": "Жоғары Еуразиялық экономикалық кеңестің 2012 жылғы 19 желтоқсандағы «Трансшекаралық нарықтарға жататын өлшемдерді бекіту туралы» шешімінің тапсырмаларын орындау мақсатында Еуразиялық экономикалық комиссия Қазақстан, Беларусь және Ресей аумақтарын қамтитын трансшекаралық нарықтарға талдау жүргізуде.",
+      "token_count": 63,
+      "mean_cross_entropy": 8.58506965637207,
+      "perplexity": 5351.165445100765
+    },
+    {
+      "id": "adam_train_015426",
+      "text": "Тағы төрт баланы емдеуді ҚР Денсаулық сақтау министрлігі өз бақылауына алып отыр.",
+      "token_count": 16,
+      "mean_cross_entropy": 8.560660362243652,
+      "perplexity": 5222.128530587222
+    },
+    {
+      "id": "adam_train_015467",
+      "text": "Университеттің ұлттық рейтинг агенттіктеріндегі ұстанымына қатысты айтар болсам, онда бұл жерде елдің үздік университеттері көшбасшылығын осымен 2 жыл қатарынан 1996 жылы Мемлекет басшысы Нұрсұлтан Назарбаевтың бастамасымен құрылған Л.Н.Гумилев атындағы Еуразия ұлттық университеті ұстап тұр.",
+      "token_count": 60,
+      "mean_cross_entropy": 8.125767707824707,
+      "perplexity": 3380.462142986256
+    },
+    {
+      "id": "adam_train_015507",
+      "text": "Қаптамасында көрсетілген мерзімінен кешіктіріп пайдалануға болайды.",
+      "token_count": 16,
+      "mean_cross_entropy": 8.115382194519043,
+      "perplexity": 3345.5359853823757
+    },
+    {
+      "id": "adam_train_015521",
+      "text": "Қолданылған уақыт мерзімі белгісіз табылған зат, көптеген болжам тудыруда.",
+      "token_count": 16,
+      "mean_cross_entropy": 8.337063789367676,
+      "perplexity": 4175.810663638827
+    },
+    {
+      "id": "adam_train_015531",
+      "text": "Ол шаруаның тұрмысы мен кәсіпқой шаруашылығын бейнелейді.",
+      "token_count": 15,
+      "mean_cross_entropy": 8.678444862365723,
+      "perplexity": 5874.903200498475
+    },
+    {
+      "id": "adam_train_015562",
+      "text": "Бүгін Бельгияда «Кристиан» дауылы соқты.",
+      "token_count": 17,
+      "mean_cross_entropy": 8.663246154785156,
+      "perplexity": 5786.287393412401
+    },
+    {
+      "id": "adam_train_015572",
+      "text": "Табиғи түрпілік материалдар – алмас, корунд, зімпара, анартас, кварц, көбіктас; жасандылары – электрокорунд, карборунд, синтетикалық алмас және т.б.",
+      "token_count": 56,
+      "mean_cross_entropy": 7.821234703063965,
+      "perplexity": 2492.9816005821326
+    },
+    {
+      "id": "adam_train_015590",
+      "text": "Жиналғандардың алдында сөз алған Кәріпбек Күйіков өз басынан кешкен ядролық сынақтардың қасіреті туралы тағы да тыңдаушылардың есіне салып, ядролық сынақтарға біржола және үзілді-кесілді тыйым салу мақсатында іс-шараға қатысушыларды \"АТОМ\" Жобасын қолдауға шақырды.",
+      "token_count": 68,
+      "mean_cross_entropy": 7.773230075836182,
+      "perplexity": 2376.133999138692
+    },
+    {
+      "id": "adam_train_015614",
+      "text": "Қылмыс беделдісі дәмханалардың бірінде ұсталған.",
+      "token_count": 15,
+      "mean_cross_entropy": 9.107686996459961,
+      "perplexity": 9024.397269788802
+    },
+    {
+      "id": "adam_train_015625",
+      "text": "Жамбыл облысы полициясы 10 жастағы баланы қағып кетіп, оқиға орнынан ізін суытқан жүргізушіні іздестіруде.",
+      "token_count": 27,
+      "mean_cross_entropy": 8.722224235534668,
+      "perplexity": 6137.815864940914
+    },
+    {
+      "id": "adam_train_015654",
+      "text": "Атырауда облыстық мәдениет және облыстық туризм, дене шынықтыру және спорт басқармаларының жаңа жетекшілері тағайындалды.",
+      "token_count": 26,
+      "mean_cross_entropy": 7.506631851196289,
+      "perplexity": 1820.0729309095175
+    },
+    {
+      "id": "adam_train_015677",
+      "text": "Ұзақ уақыт қолданған жағдайда аминогликозидтердің жағымсыз әсерлері жүйелі байқалуы мүмкін.",
+      "token_count": 23,
+      "mean_cross_entropy": 8.35195255279541,
+      "perplexity": 4238.4484633192715
+    },
+    {
+      "id": "adam_train_015683",
+      "text": "Бейсбол ойнау ұнатамыз.",
+      "token_count": 6,
+      "mean_cross_entropy": 8.296142578125,
+      "perplexity": 4008.3805189861473
+    },
+    {
+      "id": "adam_train_015688",
+      "text": "Ту – мемлекеттің егемендік пен біртұтастықты білдіретін басты рәміздерінің бірі.",
+      "token_count": 23,
+      "mean_cross_entropy": 7.76092529296875,
+      "perplexity": 2347.075333144286
+    },
+    {
+      "id": "adam_train_015694",
+      "text": "Қазақстан Республикасының Мемлекеттік туы – ортасында шұғылалы күн, оның астында қалықтап ұшқан қыран бейнеленген тік бұрышты көгілдір түсті мата.",
+      "token_count": 36,
+      "mean_cross_entropy": 8.521588325500488,
+      "perplexity": 5022.024034259526
+    },
+    {
+      "id": "adam_train_015728",
+      "text": "Инициативаға ие болуға ұмтыла отырып, батыл түрде соққылар жасай білді.",
+      "token_count": 22,
+      "mean_cross_entropy": 8.864850044250488,
+      "perplexity": 7078.73178514302
+    },
+    {
+      "id": "adam_train_015737",
+      "text": "Спортқа және зияткерлік ойындарға қоғамдық көзқарас өзгерді.",
+      "token_count": 14,
+      "mean_cross_entropy": 8.084771156311035,
+      "perplexity": 3244.6772267297324
+    },
+    {
+      "id": "adam_train_015777",
+      "text": "Көпұлтты еліміздегі татулық пен келісім, мәдениеттер мен діндердің үндесуі әлемдік эталон ретінде танылған.",
+      "token_count": 30,
+      "mean_cross_entropy": 8.357647895812988,
+      "perplexity": 4262.65675300015
+    },
+    {
+      "id": "adam_train_015786",
+      "text": "Шешесі ұлының жанына келіп, қатар отырды.",
+      "token_count": 12,
+      "mean_cross_entropy": 8.129273414611816,
+      "perplexity": 3392.333849266546
+    },
+    {
+      "id": "adam_train_015815",
+      "text": "Ал Алматының маңайында орналасқан аудандарда, атап айтқанда, Талғар ауданында ылғал мөлшері жылдағыдан көп түсті.",
+      "token_count": 26,
+      "mean_cross_entropy": 8.147775650024414,
+      "perplexity": 3455.6838599276684
+    },
+    {
+      "id": "adam_train_015863",
+      "text": "Мұндай жедел әрі табысты даму тек таңданыс пен қызығушылық қана туғызады.",
+      "token_count": 18,
+      "mean_cross_entropy": 7.772010803222656,
+      "perplexity": 2373.2386095208058
+    },
+    {
+      "id": "adam_train_015912",
+      "text": "Темекі шегу- өзіңізге және айналаңыздағы адамдарға едәуір зиянын тигізеді.",
+      "token_count": 24,
+      "mean_cross_entropy": 7.523953914642334,
+      "perplexity": 1851.8749931749226
+    },
+    {
+      "id": "adam_train_015922",
+      "text": "Сенің кітабың бар ма?",
+      "token_count": 6,
+      "mean_cross_entropy": 7.052180290222168,
+      "perplexity": 1155.3750515727365
+    },
+    {
+      "id": "adam_train_015929",
+      "text": "Менің атым Эмили.",
+      "token_count": 8,
+      "mean_cross_entropy": 6.881180763244629,
+      "perplexity": 973.7754795339525
+    },
+    {
+      "id": "adam_train_015993",
+      "text": "Асыл сөз майданда да, сайранда да серік.",
+      "token_count": 14,
+      "mean_cross_entropy": 7.35439395904541,
+      "perplexity": 1563.0494363210055
+    },
+    {
+      "id": "adam_train_015998",
+      "text": "Байға жағынамын деп, жарлының тоқтылы қойы шығыпты.",
+      "token_count": 20,
+      "mean_cross_entropy": 6.553272247314453,
+      "perplexity": 701.5360213868153
+    },
+    {
+      "id": "adam_train_016012",
+      "text": "Өсекшінің тілі қышып тұрады.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.49092960357666,
+      "perplexity": 1791.7169043586007
+    },
+    {
+      "id": "adam_train_016029",
+      "text": "Тіл ащы да болар, тәтті де болар, жұмсақ та болар, қатты да болар.",
+      "token_count": 23,
+      "mean_cross_entropy": 7.365592002868652,
+      "perplexity": 1580.650899455277
+    },
+    {
+      "id": "adam_train_016092",
+      "text": "Жоқ, менің махаббатым.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.927374362945557,
+      "perplexity": 2772.1386107717576
+    },
+    {
+      "id": "adam_train_016118",
+      "text": "Ол поезбен келді.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.563076972961426,
+      "perplexity": 1925.7619237577856
+    },
+    {
+      "id": "adam_train_016171",
+      "text": "Мен сенімдімін.",
+      "token_count": 4,
+      "mean_cross_entropy": 5.378049850463867,
+      "perplexity": 216.59946194395351
+    },
+    {
+      "id": "adam_train_016210",
+      "text": "Хабарландыруларды көргім келмейді.",
+      "token_count": 7,
+      "mean_cross_entropy": 8.684927940368652,
+      "perplexity": 5913.114385417638
+    },
+    {
+      "id": "adam_train_016228",
+      "text": "Әли таңсәріде үйден кетті.",
+      "token_count": 10,
+      "mean_cross_entropy": 8.189078330993652,
+      "perplexity": 3601.40141628053
+    },
+    {
+      "id": "adam_train_016261",
+      "text": "Сушиді жек көремін.",
+      "token_count": 7,
+      "mean_cross_entropy": 6.948184967041016,
+      "perplexity": 1041.2580942507723
+    },
+    {
+      "id": "adam_train_016366",
+      "text": "Мейірімділігіңіз үшін рахмет!",
+      "token_count": 9,
+      "mean_cross_entropy": 8.392821311950684,
+      "perplexity": 4415.256955676429
+    },
+    {
+      "id": "adam_train_016412",
+      "text": "Мэри мәңгі жас болғысы келеді.",
+      "token_count": 8,
+      "mean_cross_entropy": 6.997952461242676,
+      "perplexity": 1094.3900567365026
+    },
+    {
+      "id": "adam_train_016422",
+      "text": "Келесі жексенбіде концерт болады.",
+      "token_count": 9,
+      "mean_cross_entropy": 8.240226745605469,
+      "perplexity": 3790.399667206487
+    },
+    {
+      "id": "adam_train_016429",
+      "text": "Сіз бізді жеңе алмайсыз.",
+      "token_count": 7,
+      "mean_cross_entropy": 6.952095031738281,
+      "perplexity": 1045.337450842638
+    },
+    {
+      "id": "adam_train_016493",
+      "text": "Сізде жасыл кітап бар.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.105830192565918,
+      "perplexity": 1219.0537140835795
+    },
+    {
+      "id": "adam_train_016515",
+      "text": "Мен сені бөлмеңе көрсетейін.",
+      "token_count": 9,
+      "mean_cross_entropy": 6.921899795532227,
+      "perplexity": 1014.2450235394793
+    },
+    {
+      "id": "adam_train_016546",
+      "text": "Мотоцикл телефон бағанына соғылды.",
+      "token_count": 14,
+      "mean_cross_entropy": 7.9997878074646,
+      "perplexity": 2980.325517113608
+    },
+    {
+      "id": "adam_train_016552",
+      "text": "Мен сіздің қолдауыңызды бағалаймын.",
+      "token_count": 8,
+      "mean_cross_entropy": 8.42204475402832,
+      "perplexity": 4546.189797715535
+    },
+    {
+      "id": "adam_train_016563",
+      "text": "Жиналыс сағат нешеде екені есіңізде ме?",
+      "token_count": 11,
+      "mean_cross_entropy": 8.622591972351074,
+      "perplexity": 5555.768144495198
+    },
+    {
+      "id": "adam_train_016620",
+      "text": "Ол жыл сайын Ресейге анасымен бірге барады.",
+      "token_count": 10,
+      "mean_cross_entropy": 7.64499044418335,
+      "perplexity": 2090.1486026618945
+    },
+    {
+      "id": "adam_train_016632",
+      "text": "Қар мені мазаламайды.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.934401512145996,
+      "perplexity": 2791.687448248025
+    },
+    {
+      "id": "adam_train_016651",
+      "text": "Егер біз мұны жасасақ, бұл одан әрі нашарлай түседі.",
+      "token_count": 16,
+      "mean_cross_entropy": 7.330440521240234,
+      "perplexity": 1526.0538830893238
+    },
+    {
+      "id": "adam_train_016677",
+      "text": "Сіз оларды тоқтата алмайсыз.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.984007358551025,
+      "perplexity": 2933.6637824199815
+    },
+    {
+      "id": "adam_train_016725",
+      "text": "Мен сізбен келіспеуім керек.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.213440418243408,
+      "perplexity": 1357.5547985419473
+    },
+    {
+      "id": "adam_train_016737",
+      "text": "Маған станцияға көтеру бере аласыз ба?",
+      "token_count": 9,
+      "mean_cross_entropy": 7.84473180770874,
+      "perplexity": 2552.2530771466086
+    },
+    {
+      "id": "adam_train_016749",
+      "text": "Осының бәрін біз бекер бастадық.",
+      "token_count": 10,
+      "mean_cross_entropy": 8.349377632141113,
+      "perplexity": 4227.548833691865
+    },
+    {
+      "id": "adam_train_016760",
+      "text": "Ол өзінің алғашқы жоспарын орындай алмады.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.616179466247559,
+      "perplexity": 2030.7885933824423
+    },
+    {
+      "id": "adam_train_016776",
+      "text": "Маған француз тілі де ұнайды.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.705499649047852,
+      "perplexity": 2220.526589127193
+    },
+    {
+      "id": "adam_train_016795",
+      "text": "Мен Томның фотосуретін газетте көрдім.",
+      "token_count": 8,
+      "mean_cross_entropy": 8.189334869384766,
+      "perplexity": 3602.3254325233684
+    },
+    {
+      "id": "adam_train_016807",
+      "text": "Сіз бұл жобаны аяқтамайсыз.",
+      "token_count": 10,
+      "mean_cross_entropy": 7.742684364318848,
+      "perplexity": 2304.650608970024
+    },
+    {
+      "id": "adam_train_016821",
+      "text": "Том үйін бояйды.",
+      "token_count": 7,
+      "mean_cross_entropy": 6.379027366638184,
+      "perplexity": 589.354203238918
+    },
+    {
+      "id": "adam_train_016831",
+      "text": "Сіз қазір хат жазып отырсыз ба?",
+      "token_count": 8,
+      "mean_cross_entropy": 6.421533584594727,
+      "perplexity": 614.9454622430758
+    },
+    {
+      "id": "adam_train_016840",
+      "text": "Мен олармен көп уақыт өткіздім.",
+      "token_count": 9,
+      "mean_cross_entropy": 6.946394920349121,
+      "perplexity": 1039.3958608833473
+    },
+    {
+      "id": "adam_train_016862",
+      "text": "Ол баруы керек.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.283273220062256,
+      "perplexity": 535.5387342092284
+    },
+    {
+      "id": "adam_train_016872",
+      "text": "Сіз біз үшін әрқашан кішкентай боласыз.",
+      "token_count": 9,
+      "mean_cross_entropy": 6.503706932067871,
+      "perplexity": 667.6118435161089
+    },
+    {
+      "id": "adam_train_016879",
+      "text": "Оның үйінің есіктері қандай түсті?",
+      "token_count": 10,
+      "mean_cross_entropy": 8.627827644348145,
+      "perplexity": 5584.932605345082
+    },
+    {
+      "id": "adam_train_016905",
+      "text": "Мен ол жаққа жиі барамын.",
+      "token_count": 6,
+      "mean_cross_entropy": 6.854115962982178,
+      "perplexity": 947.7738917382661
+    },
+    {
+      "id": "adam_train_016916",
+      "text": "Мен төсекте болуым керек.",
+      "token_count": 8,
+      "mean_cross_entropy": 6.775779724121094,
+      "perplexity": 876.3624176186089
+    },
+    {
+      "id": "adam_train_016926",
+      "text": "Мен алдын-ала төлеймін.",
+      "token_count": 8,
+      "mean_cross_entropy": 7.425015926361084,
+      "perplexity": 1677.4262881013808
+    },
+    {
+      "id": "adam_train_016956",
+      "text": "Ол сіздің телефоныңызды біле ме?",
+      "token_count": 8,
+      "mean_cross_entropy": 7.527657508850098,
+      "perplexity": 1858.746303090695
+    },
+    {
+      "id": "adam_train_016967",
+      "text": "Тек маған бәрі оңай сияқты.",
+      "token_count": 8,
+      "mean_cross_entropy": 7.813466548919678,
+      "perplexity": 2473.69075935153
+    },
+    {
+      "id": "adam_train_017015",
+      "text": "Маған сіздің не айтатыныңыз маңызды емес.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.46370267868042,
+      "perplexity": 1743.5920811380781
+    },
+    {
+      "id": "adam_train_017027",
+      "text": "Су - тіршілік көзі.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.412444591522217,
+      "perplexity": 1656.470795801763
+    },
+    {
+      "id": "adam_train_017034",
+      "text": "Сізге телефон керек пе?",
+      "token_count": 5,
+      "mean_cross_entropy": 7.145352363586426,
+      "perplexity": 1268.1981133262545
+    },
+    {
+      "id": "adam_train_017039",
+      "text": "Том уақыт машинасын жасады.",
+      "token_count": 6,
+      "mean_cross_entropy": 8.821965217590332,
+      "perplexity": 6781.578816322964
+    },
+    {
+      "id": "adam_train_017067",
+      "text": "Джим менің үйімде қалды.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.443868160247803,
+      "perplexity": 1709.3494871487974
+    },
+    {
+      "id": "adam_train_017074",
+      "text": "Бізге шабуыл жасалды!",
+      "token_count": 6,
+      "mean_cross_entropy": 8.078433990478516,
+      "perplexity": 3224.1801842457558
+    },
+    {
+      "id": "adam_train_017085",
+      "text": "Оған ешқашан есік ашпаңыз.",
+      "token_count": 7,
+      "mean_cross_entropy": 8.199963569641113,
+      "perplexity": 3640.8176686220227
+    },
+    {
+      "id": "adam_train_017088",
+      "text": "Фото және видео түсірілімге тыйым салынады.",
+      "token_count": 14,
+      "mean_cross_entropy": 7.739109992980957,
+      "perplexity": 2296.427636622617
+    },
+    {
+      "id": "adam_train_017109",
+      "text": "Мен бұған бірінші рет тап болдым.",
+      "token_count": 7,
+      "mean_cross_entropy": 8.408293724060059,
+      "perplexity": 4484.1028635479815
+    },
+    {
+      "id": "adam_train_017112",
+      "text": "Бұл сізге қиын екенін білемін.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.318734645843506,
+      "perplexity": 1508.29423539294
+    },
+    {
+      "id": "adam_train_017163",
+      "text": "Маған көмектескендердің барлығына алғыс айтамын.",
+      "token_count": 11,
+      "mean_cross_entropy": 7.520140647888184,
+      "perplexity": 1844.82674679312
+    },
+    {
+      "id": "adam_train_017188",
+      "text": "Екеуіңіз не таластырдыңыздар?",
+      "token_count": 9,
+      "mean_cross_entropy": 8.514430046081543,
+      "perplexity": 4986.203343188569
+    },
+    {
+      "id": "adam_train_017193",
+      "text": "Маған саған айқайлаудың қажеті жоқ еді.",
+      "token_count": 10,
+      "mean_cross_entropy": 7.1946306228637695,
+      "perplexity": 1332.2581289971433
+    },
+    {
+      "id": "adam_train_017206",
+      "text": "Олар оның адалдығына сенді.",
+      "token_count": 8,
+      "mean_cross_entropy": 8.038972854614258,
+      "perplexity": 3099.4279916168152
+    },
+    {
+      "id": "adam_train_017212",
+      "text": "Мен сізді күте алмаймын.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.084250450134277,
+      "perplexity": 1193.0286657917688
+    },
+    {
+      "id": "adam_train_017228",
+      "text": "Томның не айтарын білмеймін.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.289407253265381,
+      "perplexity": 1464.702242371174
+    },
+    {
+      "id": "adam_train_017277",
+      "text": "Ол өзінің оқуына ден қойды.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.569403171539307,
+      "perplexity": 1937.9832927457132
+    },
+    {
+      "id": "adam_train_017299",
+      "text": "Менің көлігім жылдамдықты бұзған кезде әрдайым сүрінеді.",
+      "token_count": 14,
+      "mean_cross_entropy": 8.162921905517578,
+      "perplexity": 3508.4229219970093
+    },
+    {
+      "id": "adam_train_017300",
+      "text": "Бұл затты иесіне қайтарыңыз.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.524362564086914,
+      "perplexity": 1852.6319155097276
+    },
+    {
+      "id": "adam_train_017314",
+      "text": "Бұл жер депрессияны тудырады.",
+      "token_count": 10,
+      "mean_cross_entropy": 7.934068202972412,
+      "perplexity": 2790.757108265783
+    },
+    {
+      "id": "adam_train_017343",
+      "text": "Том сыртта жоқ.",
+      "token_count": 5,
+      "mean_cross_entropy": 7.778190612792969,
+      "perplexity": 2387.9501827334157
+    },
+    {
+      "id": "adam_train_017380",
+      "text": "Есікті кім ашқан?",
+      "token_count": 6,
+      "mean_cross_entropy": 7.369260787963867,
+      "perplexity": 1586.4606187050729
+    },
+    {
+      "id": "adam_train_017394",
+      "text": "Сен де ашсың ба?",
+      "token_count": 6,
+      "mean_cross_entropy": 7.00367546081543,
+      "perplexity": 1100.671206929846
+    },
+    {
+      "id": "adam_train_017415",
+      "text": "Чехияның астанасы - Прага.",
+      "token_count": 11,
+      "mean_cross_entropy": 8.776817321777344,
+      "perplexity": 6482.21350812392
+    },
+    {
+      "id": "adam_train_017418",
+      "text": "Балалар йогуртты жақсы көреді.",
+      "token_count": 9,
+      "mean_cross_entropy": 8.15546989440918,
+      "perplexity": 3482.375289573081
+    },
+    {
+      "id": "adam_train_017424",
+      "text": "Жүзім жүзімдіктерде өседі.",
+      "token_count": 9,
+      "mean_cross_entropy": 7.993161678314209,
+      "perplexity": 2960.642777529402
+    },
+    {
+      "id": "adam_train_017434",
+      "text": "Шаштаразға барамын.",
+      "token_count": 6,
+      "mean_cross_entropy": 7.855363845825195,
+      "perplexity": 2579.5334953873667
+    },
+    {
+      "id": "adam_train_017450",
+      "text": "Менде өте ұзын пароль бар.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.714127063751221,
+      "perplexity": 2239.766870473182
+    },
+    {
+      "id": "adam_train_017464",
+      "text": "Бұл ғимаратта ма тұрады?",
+      "token_count": 6,
+      "mean_cross_entropy": 8.51746654510498,
+      "perplexity": 5001.366955266336
+    },
+    {
+      "id": "adam_train_017469",
+      "text": "Компьютерім үшін жаңа файл жүктеп алдым.",
+      "token_count": 10,
+      "mean_cross_entropy": 8.37804126739502,
+      "perplexity": 4350.479149795548
+    },
+    {
+      "id": "adam_train_017477",
+      "text": "Бұл сенің атың ба?",
+      "token_count": 5,
+      "mean_cross_entropy": 6.733221530914307,
+      "perplexity": 839.8485104864407
+    },
+    {
+      "id": "adam_train_017496",
+      "text": "Ол өте семіз.",
+      "token_count": 5,
+      "mean_cross_entropy": 6.211061000823975,
+      "perplexity": 498.2295929604272
+    },
+    {
+      "id": "adam_train_017509",
+      "text": "Оларды кім жетелеп жүр?",
+      "token_count": 8,
+      "mean_cross_entropy": 7.835099697113037,
+      "perplexity": 2527.7875099183057
+    },
+    {
+      "id": "adam_train_017527",
+      "text": "Ертең түстен кейін боссың ба?",
+      "token_count": 8,
+      "mean_cross_entropy": 8.041553497314453,
+      "perplexity": 3107.4368373781176
+    },
+    {
+      "id": "adam_train_017556",
+      "text": "Мен жол бойы жаңбыр астында жаурап келгеніме қарамастан, ол үйде болмады.",
+      "token_count": 18,
+      "mean_cross_entropy": 8.14292049407959,
+      "perplexity": 3438.946639677126
+    },
+    {
+      "id": "adam_train_017562",
+      "text": "Ол бұл әңгімені көзіне жас алып айтты.",
+      "token_count": 11,
+      "mean_cross_entropy": 7.096774101257324,
+      "perplexity": 1208.0636907761393
+    },
+    {
+      "id": "adam_train_017599",
+      "text": "Күндер тез өтіп жатыр.",
+      "token_count": 5,
+      "mean_cross_entropy": 7.194924831390381,
+      "perplexity": 1332.650148363234
+    },
+    {
+      "id": "adam_train_017621",
+      "text": "Бұл көптеген адамдар ойлағаннан да қиын.",
+      "token_count": 8,
+      "mean_cross_entropy": 7.061544418334961,
+      "perplexity": 1166.2449456856887
+    },
+    {
+      "id": "adam_train_017664",
+      "text": "Сені құшақтасам бола ма?",
+      "token_count": 8,
+      "mean_cross_entropy": 8.222908020019531,
+      "perplexity": 3725.319951031844
+    },
+    {
+      "id": "adam_train_017690",
+      "text": "Сен алманы алуың керек.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.418914794921875,
+      "perplexity": 1667.2232465365726
+    },
+    {
+      "id": "adam_train_017718",
+      "text": "Мен келесі бекетте түспекпін.",
+      "token_count": 9,
+      "mean_cross_entropy": 8.338714599609375,
+      "perplexity": 4182.709827688309
+    },
+    {
+      "id": "adam_train_017728",
+      "text": "Қайрат кімге үйленеді?",
+      "token_count": 5,
+      "mean_cross_entropy": 7.945788860321045,
+      "perplexity": 2823.659055646078
+    },
+    {
+      "id": "adam_train_017751",
+      "text": "Немен төлей аламын?",
+      "token_count": 7,
+      "mean_cross_entropy": 7.959455490112305,
+      "perplexity": 2862.513860973639
+    },
+    {
+      "id": "adam_train_017786",
+      "text": "Он тоғыз жасымда тұрмысқа шықтым.",
+      "token_count": 8,
+      "mean_cross_entropy": 7.311280250549316,
+      "perplexity": 1497.0926164610244
+    },
+    {
+      "id": "adam_train_017794",
+      "text": "Көздерім көк.",
+      "token_count": 5,
+      "mean_cross_entropy": 7.64630126953125,
+      "perplexity": 2092.8902189286227
+    },
+    {
+      "id": "adam_train_017799",
+      "text": "Өз көзіме сене алмадым.",
+      "token_count": 7,
+      "mean_cross_entropy": 7.389340400695801,
+      "perplexity": 1618.6381081749157
+    },
+    {
+      "id": "adam_train_017889",
+      "text": "Сәлем, достар.",
+      "token_count": 5,
+      "mean_cross_entropy": 8.268733024597168,
+      "perplexity": 3900.0046506725507
+    },
+    {
+      "id": "adam_train_017922",
+      "text": "Біз бұған дайын емеспіз",
+      "token_count": 6,
+      "mean_cross_entropy": 7.978494167327881,
+      "perplexity": 2917.534435943444
+    },
+    {
+      "id": "adam_train_017943",
+      "text": "Ол маған қарай келе жатыр.",
+      "token_count": 6,
+      "mean_cross_entropy": 6.441472053527832,
+      "perplexity": 627.3295831776294
+    },
+    {
+      "id": "adam_train_017959",
+      "text": "Мен оқушымын.",
+      "token_count": 5,
+      "mean_cross_entropy": 7.352470397949219,
+      "perplexity": 1560.045705090316
+    }
+  ]
+}
