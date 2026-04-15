@@ -22,14 +22,15 @@ impl ModelConfig {
             // 1390 in v0.0.87 (lexicon-seeded), 4096 in v0.1.2 (char fallback +
             // Tatoeba real text saturate the target vocab).
             vocab_size: 4096,
-            // Scaled up in v0.0.89 to ~3.06M params.
-            hidden_dim: 224,
+            // v0.3.0: scaled from 4.28M (H=224, L=4) to ~20.0M (H=512, L=5).
+            // 39k-sample unified corpus saturated the 4.28M envelope — val PPL
+            // plateaued around 1100. 20M is the largest config that fits M2 8GB
+            // training comfortably (AdamW state 16·20M = 320 MB, plus activations).
+            hidden_dim: 512,
             num_heads: 8,
-            num_layers: 4,
-            ffn_dim: 896,
+            num_layers: 5,
+            ffn_dim: 2048,
             max_seq_len: 128,
-            // Tuned in v0.0.90: 0.1 was too heavy for the current corpus size;
-            // with grad clipping + longer training, 0.05 generalizes better.
             dropout: 0.05,
         }
     }

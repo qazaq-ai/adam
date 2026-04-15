@@ -1,13 +1,13 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "run_name": "adam-generation-showcase",
   "checkpoint_path": "data/training/adam_baseline_checkpoint.safetensors",
-  "model_param_count": 4276160,
+  "model_param_count": 19999744,
   "vocab_size": 4096,
   "prompt_count": 20,
   "config_count": 3,
   "generation_count": 60,
-  "total_wall_ms": 361,
+  "total_wall_ms": 534,
   "seed": 42,
   "max_new_tokens": 24,
   "generations": [
@@ -23,7 +23,7 @@
       "output_text": "жақсы адам",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 8
+      "wall_ms": 12
     },
     {
       "prompt_id": "p01",
@@ -37,7 +37,7 @@
       "output_text": "жақсы адам",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p01",
@@ -48,10 +48,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "жақсы адамдарнің",
-      "generated_token_count": 2,
+      "output_text": "жақсы адамніңгеем сал кісі",
+      "generated_token_count": 5,
       "hit_eos": true,
-      "wall_ms": 8
+      "wall_ms": 20
     },
     {
       "prompt_id": "p02",
@@ -90,10 +90,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "үлкен қалаас.",
+      "output_text": "үлкен қала ме..",
       "generated_token_count": 2,
       "hit_eos": true,
-      "wall_ms": 8
+      "wall_ms": 9
     },
     {
       "prompt_id": "p03",
@@ -132,10 +132,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "бала мектепке",
-      "generated_token_count": 0,
+      "output_text": "бала мектепке мінеді..",
+      "generated_token_count": 2,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 9
     },
     {
       "prompt_id": "p04",
@@ -160,7 +160,7 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "ол қазақ",
+      "output_text": "ол қор",
       "generated_token_count": 1,
       "hit_eos": true,
       "wall_ms": 5
@@ -174,10 +174,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "ол негізгі",
+      "output_text": "ол өте",
       "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 5
+      "wall_ms": 6
     },
     {
       "prompt_id": "p05",
@@ -191,7 +191,7 @@
       "output_text": "олар",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p05",
@@ -202,10 +202,10 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "олар",
-      "generated_token_count": 0,
+      "output_text": "олар нақтылайды.",
+      "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 5
     },
     {
       "prompt_id": "p05",
@@ -216,7 +216,7 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "олар екі",
+      "output_text": "олар тұрады.",
       "generated_token_count": 1,
       "hit_eos": true,
       "wall_ms": 5
@@ -233,7 +233,7 @@
       "output_text": "мен қазір",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p06",
@@ -247,7 +247,7 @@
       "output_text": "мен қазір",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p06",
@@ -258,7 +258,7 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "мен қазірдық",
+      "output_text": "мен қазірі.",
       "generated_token_count": 1,
       "hit_eos": true,
       "wall_ms": 5
@@ -289,7 +289,7 @@
       "output_text": "адам және",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p07",
@@ -300,10 +300,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "адам және басқаға атақ",
+      "output_text": "адам және тапты.тар батыр» қара",
       "generated_token_count": 5,
       "hit_eos": true,
-      "wall_ms": 17
+      "wall_ms": 21
     },
     {
       "prompt_id": "p08",
@@ -317,7 +317,7 @@
       "output_text": "екі адам",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p08",
@@ -328,10 +328,10 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "екі адам.",
-      "generated_token_count": 1,
+      "output_text": "екі адам",
+      "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 5
+      "wall_ms": 3
     },
     {
       "prompt_id": "p08",
@@ -342,10 +342,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "екі адамсы жылтіат орны",
-      "generated_token_count": 5,
+      "output_text": "екі адамде",
+      "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 19
+      "wall_ms": 7
     },
     {
       "prompt_id": "p09",
@@ -359,7 +359,7 @@
       "output_text": "үлкен жақсы адам",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p09",
@@ -370,10 +370,10 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "үлкен жақсы адам білім",
+      "output_text": "үлкен жақсы адам.",
       "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 6
+      "wall_ms": 7
     },
     {
       "prompt_id": "p09",
@@ -384,10 +384,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "үлкен жақсы адамалдаас үш адам",
-      "generated_token_count": 5,
+      "output_text": "үлкен жақсы адам аз",
+      "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 19
+      "wall_ms": 7
     },
     {
       "prompt_id": "p10",
@@ -401,7 +401,7 @@
       "output_text": "мектеп туралы",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p10",
@@ -412,10 +412,10 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "мектеп туралы",
-      "generated_token_count": 0,
+      "output_text": "мектеп туралы шешім",
+      "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 3
+      "wall_ms": 7
     },
     {
       "prompt_id": "p10",
@@ -426,10 +426,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "мектеп туралы қызмет,ш көр бірі",
+      "output_text": "мектеп туралы қазаққа талдау қолданады. ыр",
       "generated_token_count": 5,
       "hit_eos": true,
-      "wall_ms": 20
+      "wall_ms": 24
     },
     {
       "prompt_id": "p11",
@@ -457,7 +457,7 @@
       "output_text": "жақсымын",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p11",
@@ -468,10 +468,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "жақсымынк",
+      "output_text": "жақсымынте",
       "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 6
+      "wall_ms": 7
     },
     {
       "prompt_id": "p12",
@@ -485,7 +485,7 @@
       "output_text": "кітап",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p12",
@@ -510,10 +510,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "кітап",
-      "generated_token_count": 0,
+      "output_text": "кітап соң.",
+      "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 3
+      "wall_ms": 7
     },
     {
       "prompt_id": "p13",
@@ -527,7 +527,7 @@
       "output_text": "баланың кітабы",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 3
+      "wall_ms": 5
     },
     {
       "prompt_id": "p13",
@@ -538,10 +538,10 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "баланың кітабыға",
-      "generated_token_count": 1,
+      "output_text": "баланың кітабы —.",
+      "generated_token_count": 2,
       "hit_eos": true,
-      "wall_ms": 6
+      "wall_ms": 12
     },
     {
       "prompt_id": "p13",
@@ -552,10 +552,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "баланың кітабыының",
+      "output_text": "баланың кітабы сөйлейді.",
       "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 7
+      "wall_ms": 8
     },
     {
       "prompt_id": "p14",
@@ -569,7 +569,7 @@
       "output_text": "қалада",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 3
     },
     {
       "prompt_id": "p14",
@@ -580,10 +580,10 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "қалада",
-      "generated_token_count": 0,
+      "output_text": "қаладаның",
+      "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 3
+      "wall_ms": 8
     },
     {
       "prompt_id": "p14",
@@ -594,52 +594,52 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "қаладаа-әр «икалық",
+      "output_text": "қалада шекара.",
+      "generated_token_count": 2,
+      "hit_eos": true,
+      "wall_ms": 14
+    },
+    {
+      "prompt_id": "p15",
+      "prompt": "тез",
+      "category": "Adverb bare",
+      "config": "greedy",
+      "temperature": 0.0,
+      "top_k": 0,
+      "top_p": 0.0,
+      "repetition_penalty": 1.0,
+      "output_text": "тез",
+      "generated_token_count": 0,
+      "hit_eos": true,
+      "wall_ms": 4
+    },
+    {
+      "prompt_id": "p15",
+      "prompt": "тез",
+      "category": "Adverb bare",
+      "config": "temp_0.8",
+      "temperature": 0.8,
+      "top_k": 0,
+      "top_p": 0.0,
+      "repetition_penalty": 1.0,
+      "output_text": "тез,",
+      "generated_token_count": 1,
+      "hit_eos": true,
+      "wall_ms": 8
+    },
+    {
+      "prompt_id": "p15",
+      "prompt": "тез",
+      "category": "Adverb bare",
+      "config": "nucleus_p0.9_rp1.2",
+      "temperature": 1.0,
+      "top_k": 0,
+      "top_p": 0.9,
+      "repetition_penalty": 1.2,
+      "output_text": "тез құ, іс жыш",
       "generated_token_count": 5,
       "hit_eos": true,
-      "wall_ms": 19
-    },
-    {
-      "prompt_id": "p15",
-      "prompt": "тез",
-      "category": "Adverb bare",
-      "config": "greedy",
-      "temperature": 0.0,
-      "top_k": 0,
-      "top_p": 0.0,
-      "repetition_penalty": 1.0,
-      "output_text": "тез",
-      "generated_token_count": 0,
-      "hit_eos": true,
-      "wall_ms": 2
-    },
-    {
-      "prompt_id": "p15",
-      "prompt": "тез",
-      "category": "Adverb bare",
-      "config": "temp_0.8",
-      "temperature": 0.8,
-      "top_k": 0,
-      "top_p": 0.0,
-      "repetition_penalty": 1.0,
-      "output_text": "тез",
-      "generated_token_count": 0,
-      "hit_eos": true,
-      "wall_ms": 3
-    },
-    {
-      "prompt_id": "p15",
-      "prompt": "тез",
-      "category": "Adverb bare",
-      "config": "nucleus_p0.9_rp1.2",
-      "temperature": 1.0,
-      "top_k": 0,
-      "top_p": 0.9,
-      "repetition_penalty": 1.2,
-      "output_text": "тез",
-      "generated_token_count": 0,
-      "hit_eos": true,
-      "wall_ms": 2
+      "wall_ms": 31
     },
     {
       "prompt_id": "p16",
@@ -653,7 +653,7 @@
       "output_text": "керек",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 3
+      "wall_ms": 4
     },
     {
       "prompt_id": "p16",
@@ -664,8 +664,8 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "керек жапады.",
-      "generated_token_count": 1,
+      "output_text": "керек",
+      "generated_token_count": 0,
       "hit_eos": true,
       "wall_ms": 6
     },
@@ -678,10 +678,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "керек оқыйды.",
-      "generated_token_count": 1,
+      "output_text": "керек үй.",
+      "generated_token_count": 2,
       "hit_eos": true,
-      "wall_ms": 6
+      "wall_ms": 18
     },
     {
       "prompt_id": "p17",
@@ -695,7 +695,7 @@
       "output_text": "мен",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 3
+      "wall_ms": 6
     },
     {
       "prompt_id": "p17",
@@ -709,7 +709,7 @@
       "output_text": "мен",
       "generated_token_count": 0,
       "hit_eos": true,
-      "wall_ms": 3
+      "wall_ms": 7
     },
     {
       "prompt_id": "p17",
@@ -720,10 +720,10 @@
       "top_k": 0,
       "top_p": 0.9,
       "repetition_penalty": 1.2,
-      "output_text": "мен екі",
+      "output_text": "мен білім",
       "generated_token_count": 1,
       "hit_eos": true,
-      "wall_ms": 6
+      "wall_ms": 12
     },
     {
       "prompt_id": "p18",
@@ -734,8 +734,8 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "адамдар келді.",
-      "generated_token_count": 1,
+      "output_text": "адамдар келді",
+      "generated_token_count": 0,
       "hit_eos": true,
       "wall_ms": 6
     },
@@ -748,108 +748,108 @@
       "top_k": 0,
       "top_p": 0.0,
       "repetition_penalty": 1.0,
-      "output_text": "адамдар келді тапады.тдадардың жал",
+      "output_text": "адамдар келдіа",
+      "generated_token_count": 1,
+      "hit_eos": true,
+      "wall_ms": 13
+    },
+    {
+      "prompt_id": "p18",
+      "prompt": "адамдар келді",
+      "category": "N(pl)+V(past)",
+      "config": "nucleus_p0.9_rp1.2",
+      "temperature": 1.0,
+      "top_k": 0,
+      "top_p": 0.9,
+      "repetition_penalty": 1.2,
+      "output_text": "адамдар келді жоқда біл бап жасайды.",
+      "generated_token_count": 5,
+      "hit_eos": true,
+      "wall_ms": 41
+    },
+    {
+      "prompt_id": "p19",
+      "prompt": "жаңа кітап",
+      "category": "Adj+N",
+      "config": "greedy",
+      "temperature": 0.0,
+      "top_k": 0,
+      "top_p": 0.0,
+      "repetition_penalty": 1.0,
+      "output_text": "жаңа кітап",
+      "generated_token_count": 0,
+      "hit_eos": true,
+      "wall_ms": 5
+    },
+    {
+      "prompt_id": "p19",
+      "prompt": "жаңа кітап",
+      "category": "Adj+N",
+      "config": "temp_0.8",
+      "temperature": 0.8,
+      "top_k": 0,
+      "top_p": 0.0,
+      "repetition_penalty": 1.0,
+      "output_text": "жаңа кітапді»",
+      "generated_token_count": 2,
+      "hit_eos": true,
+      "wall_ms": 19
+    },
+    {
+      "prompt_id": "p19",
+      "prompt": "жаңа кітап",
+      "category": "Adj+N",
+      "config": "nucleus_p0.9_rp1.2",
+      "temperature": 1.0,
+      "top_k": 0,
+      "top_p": 0.9,
+      "repetition_penalty": 1.2,
+      "output_text": "жаңа кітап – жапады.қапас жерде",
+      "generated_token_count": 5,
+      "hit_eos": true,
+      "wall_ms": 31
+    },
+    {
+      "prompt_id": "p20",
+      "prompt": "ол тез",
+      "category": "Pron+Adv",
+      "config": "greedy",
+      "temperature": 0.0,
+      "top_k": 0,
+      "top_p": 0.0,
+      "repetition_penalty": 1.0,
+      "output_text": "ол тез",
+      "generated_token_count": 0,
+      "hit_eos": true,
+      "wall_ms": 2
+    },
+    {
+      "prompt_id": "p20",
+      "prompt": "ол тез",
+      "category": "Pron+Adv",
+      "config": "temp_0.8",
+      "temperature": 0.8,
+      "top_k": 0,
+      "top_p": 0.0,
+      "repetition_penalty": 1.0,
+      "output_text": "ол тезда",
+      "generated_token_count": 1,
+      "hit_eos": true,
+      "wall_ms": 6
+    },
+    {
+      "prompt_id": "p20",
+      "prompt": "ол тез",
+      "category": "Pron+Adv",
+      "config": "nucleus_p0.9_rp1.2",
+      "temperature": 1.0,
+      "top_k": 0,
+      "top_p": 0.9,
+      "repetition_penalty": 1.2,
+      "output_text": "ол тезңға айнал болса, кең",
       "generated_token_count": 5,
       "hit_eos": true,
       "wall_ms": 21
-    },
-    {
-      "prompt_id": "p18",
-      "prompt": "адамдар келді",
-      "category": "N(pl)+V(past)",
-      "config": "nucleus_p0.9_rp1.2",
-      "temperature": 1.0,
-      "top_k": 0,
-      "top_p": 0.9,
-      "repetition_penalty": 1.2,
-      "output_text": "адамдар келдіь-шж созығы,",
-      "generated_token_count": 6,
-      "hit_eos": true,
-      "wall_ms": 25
-    },
-    {
-      "prompt_id": "p19",
-      "prompt": "жаңа кітап",
-      "category": "Adj+N",
-      "config": "greedy",
-      "temperature": 0.0,
-      "top_k": 0,
-      "top_p": 0.0,
-      "repetition_penalty": 1.0,
-      "output_text": "жаңа кітап",
-      "generated_token_count": 0,
-      "hit_eos": true,
-      "wall_ms": 2
-    },
-    {
-      "prompt_id": "p19",
-      "prompt": "жаңа кітап",
-      "category": "Adj+N",
-      "config": "temp_0.8",
-      "temperature": 0.8,
-      "top_k": 0,
-      "top_p": 0.0,
-      "repetition_penalty": 1.0,
-      "output_text": "жаңа кітап",
-      "generated_token_count": 0,
-      "hit_eos": true,
-      "wall_ms": 2
-    },
-    {
-      "prompt_id": "p19",
-      "prompt": "жаңа кітап",
-      "category": "Adj+N",
-      "config": "nucleus_p0.9_rp1.2",
-      "temperature": 1.0,
-      "top_k": 0,
-      "top_p": 0.9,
-      "repetition_penalty": 1.2,
-      "output_text": "жаңа кітап тыңдайды.",
-      "generated_token_count": 1,
-      "hit_eos": true,
-      "wall_ms": 6
-    },
-    {
-      "prompt_id": "p20",
-      "prompt": "ол тез",
-      "category": "Pron+Adv",
-      "config": "greedy",
-      "temperature": 0.0,
-      "top_k": 0,
-      "top_p": 0.0,
-      "repetition_penalty": 1.0,
-      "output_text": "ол тез",
-      "generated_token_count": 0,
-      "hit_eos": true,
-      "wall_ms": 3
-    },
-    {
-      "prompt_id": "p20",
-      "prompt": "ол тез",
-      "category": "Pron+Adv",
-      "config": "temp_0.8",
-      "temperature": 0.8,
-      "top_k": 0,
-      "top_p": 0.0,
-      "repetition_penalty": 1.0,
-      "output_text": "ол тез",
-      "generated_token_count": 0,
-      "hit_eos": true,
-      "wall_ms": 2
-    },
-    {
-      "prompt_id": "p20",
-      "prompt": "ол тез",
-      "category": "Pron+Adv",
-      "config": "nucleus_p0.9_rp1.2",
-      "temperature": 1.0,
-      "top_k": 0,
-      "top_p": 0.9,
-      "repetition_penalty": 1.2,
-      "output_text": "ол тез кіші",
-      "generated_token_count": 1,
-      "hit_eos": true,
-      "wall_ms": 6
     }
   ]
 }
