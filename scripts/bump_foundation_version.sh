@@ -31,9 +31,13 @@ current_version="$(
 if [[ "$current_version" == "$target_version" ]]; then
   echo "workspace is already at version $target_version"
 else
+  # Files where the workspace version string is safe to replace as a plain
+  # substring (either it appears only as "version = \"x.y.z\"" or it is the
+  # only x.y.z triple in a data file). Do NOT add Cargo.lock here: it contains
+  # transitive dep versions (num-integer 0.1.46, etc.) whose suffixes collide
+  # with short workspace versions like 0.1.4 under a naive substring replace.
   versioned_files=(
     "Cargo.toml"
-    "Cargo.lock"
     "crates/adam-eval/src/lib.rs"
     "crates/adam-tokenizer/src/lib.rs"
     "crates/adam-train/src/lib.rs"
@@ -49,6 +53,11 @@ else
   for file in "${versioned_files[@]}"; do
     perl -0pi -e "s/\\Q${current_version}\\E/${target_version}/g" "$file"
   done
+
+  # Regenerate Cargo.lock so workspace-member version entries (adam-corpus,
+  # adam-eval, etc.) match the new Cargo.toml without disturbing transitive
+  # dep versions.
+  cargo build --quiet --workspace >/dev/null
 fi
 
 bash ./scripts/verify_release_version.sh "$target_version"

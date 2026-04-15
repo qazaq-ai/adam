@@ -36,6 +36,7 @@ jq empty data/curated/synthetic_sentences_pack.json
 jq empty data/curated/kazakh_proverbs_pack.json
 jq empty data/curated/tatoeba_kazakh_pack.json
 jq empty data/curated/wikipedia_kz_pack.json
+jq empty data/curated/common_voice_kk_pack.json
 jq empty data/curated/adam_training_corpus_manifest.json
 jq empty data/curated/adam_training_corpus_pack.json
 jq empty data/curated/adam_pretokenized_corpus_pack.json

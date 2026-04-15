@@ -47,18 +47,25 @@ Sources incompatible with the policy are documented in [corpus_policy.md](corpus
 - **License**: Same as this repo.
 - **source_id** in packs: e.g. `curated_general_kazakh`.
 
-## Under consideration (not yet integrated)
-
 ### Kazakh Wikipedia (CC-BY-SA 4.0)
 
-- **Blocker**: larger scale (~200k articles) needs the character-level fallback in `pretokenize` (planned for v0.1.2 Phase 6b) to keep the `<unk>` rate acceptable on proper nouns and technical vocabulary.
-- **Planned**: v0.1.3 Phase 6c.
+- **Scope**: Kazakh-language Wikipedia article body text, plain-text extracted from the XML dump.
+- **Download**: `scripts/fetch_wikipedia_kz.sh` → `data/external/wikipedia_kz_plain.txt` (~668 MB).
+- **License**: Creative Commons Attribution-ShareAlike 4.0 — <https://creativecommons.org/licenses/by-sa/4.0/>.
+- **Attribution**: "Wikipedia contributors, Kazakh Wikipedia (CC-BY-SA 4.0) — <https://kk.wikipedia.org>".
+- **source_id** in packs: `wikipedia_kz_article_<n>`.
+- **Added in**: v0.1.4 (Phase 6c).
 
-### Common Voice Kazakh (CC0)
+### Common Voice Kazakh (CC0-1.0)
 
-- **Scope**: Mozilla Common Voice sentence transcripts.
-- **Appeal**: CC0 means no attribution requirement, smaller operational burden.
-- **Planned**: v0.1.3 or v0.1.4.
+- **Scope**: Mozilla Common Voice Kazakh sentence-collector prompts (text only; audio is not used).
+- **Download**: `scripts/fetch_common_voice_kk.sh` → `data/external/common_voice_kk_sentences.txt`.
+- **License**: CC0-1.0 (public domain dedication) — <https://github.com/common-voice/common-voice/blob/main/LICENSE>.
+- **Attribution**: none required; acknowledgement retained as good practice — "Mozilla Common Voice contributors".
+- **source_id** in packs: `common_voice_kk_line_<n>`.
+- **Added in**: v0.1.6 (Phase 6d).
+
+## Under consideration (not yet integrated)
 
 ### Adilet.zan.kz government documents
 
