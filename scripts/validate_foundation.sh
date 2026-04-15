@@ -35,13 +35,15 @@ jq empty data/curated/mini_clean_training_pack.json
 jq empty data/curated/synthetic_sentences_pack.json
 jq empty data/curated/kazakh_proverbs_pack.json
 jq empty data/curated/tatoeba_kazakh_pack.json
+jq empty data/curated/wikipedia_kz_pack.json
 jq empty data/curated/adam_training_corpus_manifest.json
 jq empty data/curated/adam_training_corpus_pack.json
 jq empty data/curated/adam_pretokenized_corpus_pack.json
 jq empty data/curated/adam_training_ids_pack.json
 jq empty data/curated/adam_validation_ids_pack.json
-jq empty data/training/validation_perplexity_report.json
-jq empty data/training/generation_showcase_report.json
+# validation_perplexity_report.json + generation_showcase_report.json regenerate
+# whenever the model is retrained; they are dropped between corpus-only releases.
+# Phase 7.1 (v0.1.5) will retrain on the enlarged Wikipedia-augmented corpus.
 jq empty data/raw/source_registry.json
 jq empty data/raw/source_scoring_rules.json
 jq empty data/eval/benchmark_manifest.json

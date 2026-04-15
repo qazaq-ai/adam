@@ -29,3 +29,7 @@ path = "src/bin/generate_acceptance_report.rs"
 [[bin]]
 name = "process_tatoeba_kazakh"
 path = "src/bin/process_tatoeba_kazakh.rs"
+
+[[bin]]
+name = "process_wikipedia_kz"
+path = "src/bin/process_wikipedia_kz.rs"

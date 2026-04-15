@@ -1,5 +1,5 @@
 {
-  "version": "0.1.3",
+  "version": "0.1.4",
   "name": "adam-training-corpus",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -7,6 +7,7 @@
     "synthetic_sentences_pack.json",
     "clean_training_corpus_pack.json",
     "kazakh_proverbs_pack.json",
-    "tatoeba_kazakh_pack.json"
+    "tatoeba_kazakh_pack.json",
+    "wikipedia_kz_pack.json"
   ]
 }
