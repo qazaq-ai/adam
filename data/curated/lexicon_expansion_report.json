@@ -1,0 +1,13 @@
+{
+  "version": "0.4.0",
+  "curated_root_count": 211,
+  "candidate_pool_size": 5000,
+  "added_count": 3000,
+  "skipped_already_curated": 147,
+  "skipped_over_stripped": 0,
+  "skipped_loanword": 1201,
+  "skipped_no_vowel": 12,
+  "final_root_count": 3211,
+  "min_candidate_frequency": 51,
+  "max_candidate_frequency": 14166
+}
