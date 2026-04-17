@@ -6,15 +6,13 @@
 data/external/
 .claude/
 
-# Large regenerable corpus artifacts (re-created by the pipeline).
-# Source packs (≤50 MB) stay in git; derived packs do not.
-data/curated/adam_pretokenized_corpus_pack.json
+# Derived corpus artifacts that exceed GitHub's 50 MB warning threshold.
+# All regenerable from source packs via:
+#   run_unified_corpus_assembly.sh → run_pretokenize_corpus.sh →
+#   run_train_bpe.sh 8192 → run_encode_corpus.sh
 data/curated/adam_training_corpus_pack.json
+data/curated/adam_pretokenized_corpus_pack.json
 data/curated/adam_training_ids_pack.json
-data/curated/adam_validation_ids_pack.json
-data/curated/wikipedia_kz_pack.json
-data/curated/cc100_kk_pack.json
-data/curated/synthetic_sentences_pack.json
 
 # Checkpoints (regeneratable via `bash scripts/run_train_baseline.sh`).
 # Each v0.4.0 checkpoint is ~92 MB. Distribute via release attachments if needed.
