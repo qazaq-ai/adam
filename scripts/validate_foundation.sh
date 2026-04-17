@@ -7,6 +7,24 @@ cd "$repo_root"
 tmp_acceptance_report="$(mktemp)"
 trap 'rm -f "$tmp_acceptance_report"' EXIT
 
+# Regenerate derived corpus artifacts if missing. The unified pack (72 MB),
+# pretokenized pack (227 MB), and encoded ids pack (104 MB) exceed GitHub's
+# size limits and are `.gitignore`d — CI (and a clean checkout) must rebuild
+# them from the committed source packs + BPE artifacts before validation.
+# The BPE vocab/merges are committed, so no `run_train_bpe.sh` is needed here.
+if [[ ! -f data/curated/adam_training_corpus_pack.json ]]; then
+    echo "regenerating adam_training_corpus_pack.json..."
+    bash scripts/run_unified_corpus_assembly.sh
+fi
+if [[ ! -f data/curated/adam_pretokenized_corpus_pack.json ]]; then
+    echo "regenerating adam_pretokenized_corpus_pack.json..."
+    bash scripts/run_pretokenize_corpus.sh
+fi
+if [[ ! -f data/curated/adam_training_ids_pack.json ]]; then
+    echo "regenerating adam_training_ids_pack.json + validation ids..."
+    bash scripts/run_encode_corpus.sh
+fi
+
 jq empty data/curated/corpus_manifest.json
 jq empty data/curated/source_acceptance_report.json
 jq empty data/curated/source_acceptance_summary_report.json
