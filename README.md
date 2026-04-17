@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.3.0-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.4.0-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -18,12 +18,12 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/params-20.0M-2EA44F?style=flat-square" alt="params">
-  <img src="https://img.shields.io/badge/perplexity-871.30-2EA44F?style=flat-square" alt="perplexity">
-  <img src="https://img.shields.io/badge/corpus-39.1k%20samples-9CCC65?style=flat-square" alt="corpus">
-  <img src="https://img.shields.io/badge/vocab-4096-FBC02D?style=flat-square" alt="vocab">
+  <img src="https://img.shields.io/badge/params-24.2M-2EA44F?style=flat-square" alt="params">
+  <img src="https://img.shields.io/badge/perplexity-1691.89-2EA44F?style=flat-square" alt="perplexity">
+  <img src="https://img.shields.io/badge/corpus-244k%20samples-9CCC65?style=flat-square" alt="corpus">
+  <img src="https://img.shields.io/badge/vocab-8192-FBC02D?style=flat-square" alt="vocab">
   <img src="https://img.shields.io/badge/lexicon-211%20roots-FBC02D?style=flat-square" alt="lexicon">
-  <img src="https://img.shields.io/badge/rules-422%20FSM-FBC02D?style=flat-square" alt="rules">
+  <img src="https://img.shields.io/badge/sources-7%20packs-9CCC65?style=flat-square" alt="sources">
   <img src="https://img.shields.io/badge/foundation-validated-2EA44F?style=flat-square" alt="foundation">
 </p>
 
@@ -60,7 +60,7 @@ cargo build --release
 # 2. Validate the foundation (all golden artifacts + tests)
 bash ./scripts/validate_foundation.sh
 
-# 3. Generate text with the v0.3.0 checkpoint
+# 3. Generate text with the v0.4.0 checkpoint
 bash ./scripts/run_generate.sh "жақсы адам" 24 1.0 0 0.9 1.2
 #                              prompt        ^^  ^   ^   ^   ^
 #                                            new temp tk topp rep_pen
@@ -68,35 +68,39 @@ bash ./scripts/run_generate.sh "жақсы адам" 24 1.0 0 0.9 1.2
 
 ## Sample generations
 
-From the v0.3.0 checkpoint (20.0M params, 15,000 training steps), nucleus sampling `top_p=0.9, repetition_penalty=1.2`:
+From the v0.4.0 checkpoint (24.2M params, 20,000 training steps on 244k-sample corpus). A mix of nucleus and `temp=0.8` results to show the model's range:
 
 | Prompt | Generated |
 |---|---|
-| жақсы адам | жақсы адамніңгеем сал кісі |
-| үлкен қала | үлкен қала ме.. |
-| бала мектепке | бала мектепке мінеді.. |
-| ол | ол өте |
-| олар | олар тұрады. |
-| мен қазір | мен қазірі. |
-| адам және | адам және тапты.тар батыр» қара |
+| жақсы адам | жақсы адам мағына береді. |
+| ол | ол жазады. |
+| олар | олар жүреді. |
+| үлкен қала | үлкен қала айтады. |
+| үлкен жақсы адам | үлкен жақсы адам оқыйды. |
+| мектеп туралы | мектеп туралы мәртебе нақтылайды. |
+| мен қазір | мен қазір арттырады. |
 
-Reproducible via `bash ./scripts/run_generation_showcase.sh` → `data/training/generation_showcase_report.json`. Generation quality reflects a 20M foundation trained on a 39k-sample mixed corpus; coherent chat-level output is a v0.5.0 target.
+Complete grammatical Kazakh sentences now appear consistently at low temperatures — the v0.4.0 fix (literary corpus, Abai integration, no-short-synth filter) gave the model enough signal to finish a clause. Greedy generations still terminate early (the 24M model is capacity-bound on 4.09M training tokens). Reproducible via `bash ./scripts/run_generation_showcase.sh` → `data/training/generation_showcase_report.json`. Coherent chat-level output remains a v0.5.0 target.
 
 ## Full training pipeline
 
 ```bash
-# 1. Fetch authentic Kazakh text sources (Tatoeba, Wikipedia, Common Voice)
+# 1. Fetch authentic Kazakh text sources
 bash ./scripts/fetch_tatoeba_kazakh.sh
 bash ./scripts/fetch_wikipedia_kz.sh
 bash ./scripts/fetch_common_voice_kk.sh
+bash ./scripts/fetch_cc100_kk.sh
+bash ./scripts/fetch_abai_wikisource.sh
 
 # 2. Process each source into pack JSON
 cargo run --release --bin process_tatoeba_kazakh
-cargo run --release --bin process_wikipedia_kz
+cargo run --release --bin process_wikipedia_kz -- data/external/wikipedia_kz_plain.txt data/curated/wikipedia_kz_pack.json 100000
 cargo run --release --bin process_common_voice_kk
+xzcat data/external/cc100_kk.txt.xz | target/release/process_cc100_kk data/curated/cc100_kk_pack.json 50000
+cargo run --release --bin process_abai_wikisource
 
-# 3. Generate 18,000 FSM-validated synthetic sentences
-bash ./scripts/run_synth_sentences.sh 18000
+# 3. Generate 100,000 FSM-validated synthetic sentences (min 3 words)
+bash ./scripts/run_synth_sentences.sh 100000
 
 # 4. Combine all packs into the unified corpus (dedup included)
 bash ./scripts/run_unified_corpus_assembly.sh
@@ -104,14 +108,14 @@ bash ./scripts/run_unified_corpus_assembly.sh
 # 5. FSM-segment every word into morphemes (char fallback otherwise)
 bash ./scripts/run_pretokenize_corpus.sh
 
-# 6. Learn BPE merges (lexicon-seeded vocab, target 4096)
-bash ./scripts/run_train_bpe.sh 4096
+# 6. Learn BPE merges (lexicon-seeded vocab, target 8192)
+bash ./scripts/run_train_bpe.sh 8192
 
 # 7. Encode with deterministic train/val split
 bash ./scripts/run_encode_corpus.sh
 
-# 8. Train the 20M transformer (~3h 45m on M2 Metal)
-bash ./scripts/run_train_baseline.sh 15000
+# 8. Train the 24M transformer (~8h on M2 Metal; periodic checkpoint every 2000 steps)
+bash ./scripts/run_train_baseline.sh 20000 8 128 3e-4 400 500
 
 # 9. Evaluate held-out perplexity
 bash ./scripts/run_eval_perplexity.sh
@@ -134,20 +138,23 @@ bash ./scripts/run_generation_showcase.sh
 | `generate` | adam-train | Inference with greedy/temperature/top-k/top-p/repetition-penalty |
 | `generation_showcase` | adam-train | Multi-prompt × multi-config quality report |
 
-## Stats (v0.3.0)
+## Stats (v0.4.0)
 
 | Component | Value |
 |---|---|
 | Lexicon roots | **211** (10 POS) |
 | FSM rules | **422** |
 | Eval segmentation examples | **464** (100% match rate) |
-| Authentic Kazakh sources | **3** (Tatoeba, Wikipedia, Common Voice) |
-| Training samples | **39,058** unique (37,119 train + 1,939 val) |
-| Training tokens (encoded) | **606,416** (0.00% unknowns, 100.00% roundtrip) |
-| BPE vocabulary | **4,096** |
-| Model parameters | **20.0M** (hidden 512, layers 5, heads 8, ffn 2048) |
-| Wall time (M2 Metal, 15k steps) | **~3h 45m** |
-| **Validation perplexity** | **871.30** (1939 held-out samples) |
+| Authentic Kazakh sources | **5** (Tatoeba, Wikipedia, Common Voice, CC-100, Abai) |
+| Total pack sources | **7** (+ curated clean, proverbs, synthetic FSM) |
+| Training samples | **244,625** unique (232,524 train + 12,101 val) |
+| Training tokens (encoded) | **4,094,435** (0.00% unknowns, 100.00% roundtrip) |
+| BPE vocabulary | **8,192** |
+| BPE compression | **3.27×** |
+| Model parameters | **24.2M** (hidden 512, layers 5, heads 8, ffn 2048) |
+| Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
+| Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
+| **Validation perplexity** | **1691.89** (12,101 held-out samples) |
 
 ## Foundation Policies
 

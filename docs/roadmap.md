@@ -23,22 +23,38 @@ Unified corpus after Phase 6d: **39,058 unique samples**, three authentic Kazakh
 
 By v0.2.0 the 4.28M parameter envelope was saturated — PPL stopped improving with more data. Capacity, not data, was the bottleneck.
 
-## Phase 8 — Capacity scale-up (current)
+## Phase 8 — Capacity scale-up
 
 | Release | Model | Corpus | Steps | Val PPL |
 |---|---|---|---|---|
-| v0.3.0 | **20.0M** (H=512, L=5) | 39k | 15,000 | **871.30** (−21.7%) |
+| v0.3.0 | 20.0M (H=512, L=5, vocab 4k) | 39k / 606k tokens | 15,000 | 871.30 |
 
 First non-flat PPL delta since real-text onset. 20M is the largest config that fits MacBook Air M2 8GB training comfortably (peak RSS ~2.5 GB of 8 GB unified memory).
 
+## Phase 9 — Data + infra maturity (current)
+
+| Release | Model | Corpus | Steps | Val PPL | Notes |
+|---|---|---|---|---|---|
+| v0.4.0 attempted | 27.3M (H=512, L=6, vocab 8k) | 214k / 3.9M tokens | 20,000 | 1811.34 | rolled back — too aggressive scale-up |
+| **v0.4.0 (shipped)** | **24.2M (H=512, L=5, vocab 8k)** | **244k / 4.09M tokens** | **20,000** | **1691.89** | 7 packs incl. Abai + CC-100 |
+
+Key v0.4.0 additions:
+- Abai Qunanbayuly's public-domain works (Wikisource, 2,253 samples) — first literary source
+- CC-100 Kazakh web-crawl (50,000 filtered samples) — first web source
+- Synthetic generator minimum length raised to 3 words (was dominated by 2-word noise)
+- BPE vocab 4k → 8k with 2.80× → 3.27× compression
+- Periodic checkpoint every 2,000 steps (crash recovery)
+
+Capacity limit confirmed: 24M params × 4M tokens ≈ 25× below Chinchilla-optimal data. Further improvement needs an order-of-magnitude more training data, not more parameters.
+
 ## Near-term
 
-- **v0.4.0** — quality work on the 20M model (longer training, schedule tuning) and/or first public inference surface.
-- **v0.5.0** — working Kazakh chat-bot. Minimum viable: coherent short-turn dialogue with instruction-following on common Kazakh prompts. This is the current project target before considering hardware upgrades (M5 24 GB) or investor conversations.
+- **v0.5.0** — attack the data bottleneck. Target: 30–50M training tokens via (a) FSM curriculum expansion to L2/L3 difficulty, (b) CC-100 sample 50k → 500k, (c) classical literature expansion (Ауэзов, Нурпеисов, Бөкей; stored gitignored, trained on privately), (d) first SFT pass on translated Alpaca for basic instruction-following.
+- **v0.6.0** — minimum viable Kazakh chat prototype. Short-turn Q&A, not multi-turn dialogue.
 
 ## Out of near-term scope
 
 - Multilingual expansion
 - Speech / multimodal
 - Cloud platform work
-- 25M+ parameter models on M2 8GB (plausible but untested; future work on M5 24GB)
+- 50M+ parameter models on M2 8GB (plausible but untested; future work on M5 24GB or cloud GPU rental)

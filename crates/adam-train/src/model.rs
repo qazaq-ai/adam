@@ -19,13 +19,14 @@ impl ModelConfig {
     pub fn tiny() -> Self {
         Self {
             // Must match the BPE vocab size written by train_bpe.
-            // 1390 in v0.0.87 (lexicon-seeded), 4096 in v0.1.2 (char fallback +
-            // Tatoeba real text saturate the target vocab).
-            vocab_size: 4096,
-            // v0.3.0: scaled from 4.28M (H=224, L=4) to ~20.0M (H=512, L=5).
-            // 39k-sample unified corpus saturated the 4.28M envelope — val PPL
-            // plateaued around 1100. 20M is the largest config that fits M2 8GB
-            // training comfortably (AdamW state 16·20M = 320 MB, plus activations).
+            // 1390 in v0.0.87 (lexicon-seeded), 4096 in v0.1.2, 8192 in v0.4.0
+            // (12M-token corpus supports a larger vocab with 3.32× compression).
+            vocab_size: 8192,
+            // v0.4.0: rolled back from 27.3M (H=512, L=6) to ~23M-class (H=512, L=5).
+            // The L=6 / vocab-8192 experiment degraded against v0.3.0 — too aggressive
+            // a scale-up on 3.9M training tokens (138× below Chinchilla). L=5 here
+            // with vocab=8192 keeps the tokenizer/corpus wins at a proven depth.
+            // Actual param count: embed+pos+head dominate at vocab=8192, so ~23.1M.
             hidden_dim: 512,
             num_heads: 8,
             num_layers: 5,

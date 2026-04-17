@@ -2,6 +2,23 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.4.0] — 2026-04-17
+
+Corpus and infrastructure maturity release. Adds the first classical-literature source (Abai Qunanbayuly via Wikisource, 146 works, 2,253 samples), the first web-crawl source (CC-100 Kazakh, 50,000 samples filtered for Cyrillic-ratio and repetition), and fixes a data-composition bug in the synthetic generator (1- and 2-word outputs dominated the corpus, teaching the model early EOS). BPE retrained at vocab **8,192** with **3.27× compression** on a 12.5M-token pretokenized corpus. Model rolled back from the v0.4.0-failed experiment (27.3M, H=512 L=6) to **24.2M params** (H=512 L=5) after confirming that the L=6 scale-up was undertrained at 3.9M tokens.
+
+Training: 20,000 steps, batch 8, seq 128, 3e-4 peak lr with cosine decay, 8h on M2 Metal at 0.64–0.70 steps/s throughput. First-class reliability: `train_baseline` now writes a periodic checkpoint every 2000 steps after a reboot lost 13k uncheckpointed steps mid-run.
+
+Validation (honest):
+- 12,101 held-out samples (larger/harder distribution vs v0.3.0's 1,939)
+- mean_ce: 7.43, **perplexity: 1691.89**
+- bits/char: **3.28** (v0.4.0-failed: 3.26; v0.3.0: 3.49 — val sets not directly comparable)
+
+Qualitative:
+- Complete grammatical Kazakh sentences now appear in `temp=0.8` and nucleus samples (6 of 30 showcase outputs): `жақсы адам мағына береді`, `ол жазады`, `олар жүреді`, `үлкен жақсы адам оқыйды`, `мектеп туралы мәртебе нақтылайды`.
+- Greedy still terminates early — expected for a capacity-bound model (24M params × 4M training tokens is ~25× below Chinchilla-optimal data).
+
+v0.5.0 will address the data bottleneck: curriculum-style FSM expansion (L1/L2/L3 difficulty), larger CC-100 sample (50k → 500k), classical-literature expansion (Ауэзов, Нурпеисов, Бөкей locally), and SFT on translated Alpaca for the first instruction-following pass.
+
 ## [0.3.0] — 2026-04-15
 
 First capacity scale-up. `ModelConfig::tiny` grows from 4.28M → **20.0M params** (hidden 224→512, layers 4→5, ffn 896→2048, head_dim 28→64). 15,000 training steps on the 39k unified corpus, 3h 45m on MacBook Air M2 Metal. Validation perplexity drops from **1112.31 → 871.30 (−21.7%)** — first meaningful delta since Phase 6a real-text onset. The 4.28M envelope was saturated at Phase 6d; Wikipedia + Common Voice distribution breadth required more model capacity. Peak RSS ~2.5 GB of 8 GB unified memory — headroom confirmed.

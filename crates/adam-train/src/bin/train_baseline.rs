@@ -169,6 +169,17 @@ fn main() -> ExitCode {
             running_loss = 0.0;
             running_count = 0;
         }
+
+        // Periodic checkpoint — added v0.4.0 after a reboot lost 13k steps
+        // of an uncheckpointed run. Save every 2000 steps (plus log_every=500
+        // schedule this aligns with) so a crash at most loses ~45 min of work.
+        if step > 0 && step % 2000 == 0 {
+            if let Err(e) = varmap.save(&checkpoint_path) {
+                eprintln!("periodic checkpoint failed at step {}: {}", step, e);
+            } else {
+                eprintln!("periodic checkpoint saved at step {}", step);
+            }
+        }
     }
 
     let elapsed = start.elapsed().as_secs_f64();

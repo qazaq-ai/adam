@@ -481,6 +481,13 @@ fn main() -> ExitCode {
             continue;
         };
         let words: Vec<&str> = text.trim_end_matches('.').split_whitespace().collect();
+        // v0.4.0: drop 1- and 2-word outputs. They taught the v0.3.0/v0.4.0 model
+        // to emit EOS after 2-3 tokens — observed as empty greedy generations and
+        // truncated nucleus outputs. Minimum 3 words keeps pronoun+verb and similar
+        // minimally-sentence-like fragments while removing sub-phrase noise.
+        if words.len() < 3 {
+            continue;
+        }
         if words
             .iter()
             .all(|w| deterministic_segment_token(w, &lexicon, &rules).is_some())

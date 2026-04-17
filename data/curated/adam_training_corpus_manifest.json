@@ -9,6 +9,8 @@
     "kazakh_proverbs_pack.json",
     "tatoeba_kazakh_pack.json",
     "wikipedia_kz_pack.json",
-    "common_voice_kk_pack.json"
+    "common_voice_kk_pack.json",
+    "cc100_kk_pack.json",
+    "abai_wikisource_pack.json"
   ]
 }
