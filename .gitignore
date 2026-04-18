@@ -6,6 +6,10 @@
 data/external/
 .claude/
 
+# External reference material (Apertium-kaz source repo, etc.) — 39+ MB each.
+# We commit the DERIVED lexicon in data/lexicon_v1/, not the raw Apertium repo.
+data/external/apertium/
+
 # Derived corpus artifacts that exceed GitHub's 50 MB warning threshold.
 # All regenerable from source packs via:
 #   run_unified_corpus_assembly.sh → run_pretokenize_corpus.sh →

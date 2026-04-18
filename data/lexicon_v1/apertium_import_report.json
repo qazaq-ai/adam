@@ -1,0 +1,20 @@
+{
+  "source": "apertium-kaz tests/vocabulary/input.csv",
+  "input_rows": 27758,
+  "added": 11919,
+  "skipped_duplicate_lemma": 1902,
+  "skipped_prefix_conflict": 3817,
+  "skipped_loanword": 9693,
+  "skipped_fsm_derivable": 108,
+  "skipped_unknown_pos": 316,
+  "skipped_malformed": 3,
+  "by_pos_noun": 5740,
+  "by_pos_verb": 2412,
+  "by_pos_adjective": 3378,
+  "by_pos_adverb": 335,
+  "by_pos_numeral": 1,
+  "by_pos_postposition": 14,
+  "by_pos_pronoun": 21,
+  "by_pos_conjunction": 18,
+  "final_root_count": 11919
+}
