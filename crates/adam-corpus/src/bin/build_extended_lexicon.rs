@@ -1,40 +1,59 @@
 // Build an extended segmentation_roots.json from root_candidates_report.json.
 //
-// Strategy (minimal first pass):
-//   * Keep all existing curated roots (211 entries) exactly as-is.
-//   * For each new candidate (not already curated):
-//     - Determine vowel_harmony from vowel classes present
-//     - Determine final_sound_class from last character
-//     - Default POS to Noun (conservative — to be refined in a later pass)
-//     - Skip if root is too short or looks over-stripped
-//     - Skip if root has no Kazakh-specific letter AND length >= 5 (loanword)
-//
-// Output: data/tokenizer/segmentation_roots.json (replaces existing)
-//         Plus: data/curated/lexicon_expansion_report.json (audit trail)
-//
-// The point of this minimal pass is to MEASURE whether lexicon expansion
-// moves the needle on FSM coverage. If coverage jumps significantly, we
-// iterate on POS heuristics. If it doesn't, we pivot.
+// v2 strategy (POS-aware + FSM-filter):
+//   * Keep all curated roots (211 entries) exactly as-is.
+//   * For each new candidate:
+//     1. If the existing FSM (curated lexicon + rules) can already segment the
+//        candidate's root form, skip it — it's an inflected form of a known
+//        root, not a new root. This is the single most important filter; it
+//        prevents the regression we hit when qарай/келе/жазып were added as
+//        nouns and shadowed the existing qара/кел/жаз verbs.
+//     2. Classify POS from example_forms:
+//          - Verb if any form ends in ды/ді/ты/ті/ған/ген/қан/кен/ып/іп/ады/еді
+//          - Adjective if any form ends in лы/лі/дай/дей/рақ/рек
+//          - Default Noun otherwise
+//     3. Compute vowel_harmony (deterministic from vowel classes).
+//     4. Compute final_sound_class (deterministic from last character).
+//     5. Skip obvious garbage (length < 3, no vowels, loanword signal).
 
 use std::{collections::HashSet, env, fs, process::ExitCode};
 
+use adam_kernel::{SegmentationLexicon, SegmentationRuleSet, deterministic_segment_token};
 use serde::{Deserialize, Serialize};
 
 const CANDIDATES_PATH: &str = "data/curated/root_candidates_report.json";
 const EXISTING_ROOTS_PATH: &str = "data/tokenizer/segmentation_roots.json";
+const RULES_PATH: &str = "data/tokenizer/segmentation_rules.json";
 const OUTPUT_ROOTS_PATH: &str = "data/tokenizer/segmentation_roots.json";
 const REPORT_PATH: &str = "data/curated/lexicon_expansion_report.json";
 
 const KAZAKH_SPECIFIC: &[char] = &['ә', 'ғ', 'қ', 'ң', 'ө', 'ұ', 'ү', 'һ', 'і'];
 
-// Vowel classification for Kazakh vowel harmony.
-// Front: ә, е, ө, і, ү + borrowed и, э. Back: а, о, ы, ұ, у + borrowed я, ю.
 const FRONT_VOWELS: &[char] = &['ә', 'е', 'ө', 'і', 'ү', 'и', 'э'];
 const BACK_VOWELS: &[char] = &['а', 'о', 'ы', 'ұ', 'у', 'я', 'ю', 'ё'];
 
 const NASAL_CONSONANTS: &[char] = &['м', 'н', 'ң'];
 const VOICELESS_CONSONANTS: &[char] = &['к', 'қ', 'п', 'с', 'т', 'ф', 'х', 'ш', 'щ', 'ц', 'ч', 'һ'];
 const VOICED_CONSONANTS: &[char] = &['б', 'в', 'г', 'ғ', 'д', 'ж', 'з', 'й', 'л', 'р'];
+
+/// Verb-signature suffixes on example_forms. Presence of any of these on a
+/// non-root form is strong evidence the candidate is a verb.
+const VERB_SUFFIX_MARKERS: &[&str] = &[
+    "ды",
+    "ді",
+    "ты",
+    "ті",
+    "ған",
+    "ген",
+    "қан",
+    "кен",
+    "ып",
+    "іп",
+    "ады",
+    "еді",
+    "майды",
+    "мейді",
+];
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct RootEntry {
@@ -58,6 +77,7 @@ struct RootsFile {
 struct Candidate {
     root: String,
     frequency: usize,
+    example_forms: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -72,9 +92,13 @@ struct ExpansionReport {
     candidate_pool_size: usize,
     added_count: usize,
     skipped_already_curated: usize,
-    skipped_over_stripped: usize,
+    skipped_already_segmentable: usize,
     skipped_loanword: usize,
     skipped_no_vowel: usize,
+    skipped_too_short: usize,
+    classified_as_noun: usize,
+    classified_as_verb: usize,
+    classified_as_adjective: usize,
     final_root_count: usize,
     min_candidate_frequency: usize,
     max_candidate_frequency: usize,
@@ -105,6 +129,29 @@ fn main() -> ExitCode {
     let curated_surfaces: HashSet<String> = existing.roots.iter().map(|r| r.root.clone()).collect();
     let curated_ids: HashSet<String> = existing.roots.iter().map(|r| r.id.clone()).collect();
 
+    // Load lexicon + rules through kernel types for FSM-based filter
+    let kernel_lexicon: SegmentationLexicon = match serde_json::from_str(&existing_raw) {
+        Ok(l) => l,
+        Err(e) => {
+            eprintln!("cannot parse lexicon as kernel SegmentationLexicon: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let rules_raw = match fs::read_to_string(RULES_PATH) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("cannot read {RULES_PATH}: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let kernel_rules: SegmentationRuleSet = match serde_json::from_str(&rules_raw) {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("cannot parse rules: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
     // Load candidates
     let cand_raw = match fs::read_to_string(CANDIDATES_PATH) {
         Ok(s) => s,
@@ -123,15 +170,18 @@ fn main() -> ExitCode {
 
     let mut new_roots: Vec<RootEntry> = Vec::new();
     let mut skipped_already = 0usize;
-    let mut skipped_over_strip = 0usize;
+    let mut skipped_segmentable = 0usize;
     let mut skipped_loanword = 0usize;
     let mut skipped_no_vowel = 0usize;
+    let mut skipped_too_short = 0usize;
+    let mut classified_noun = 0usize;
+    let mut classified_verb = 0usize;
+    let mut classified_adj = 0usize;
     let mut min_freq = usize::MAX;
     let mut max_freq = 0usize;
     let candidate_pool_size = cand_report.candidates.len();
 
-    for cand in cand_report.candidates.iter().take(target_n * 2) {
-        // try up to 2× target to compensate for skips
+    for cand in cand_report.candidates.iter() {
         if new_roots.len() >= target_n {
             break;
         }
@@ -140,47 +190,68 @@ fn main() -> ExitCode {
             continue;
         }
         if cand.root.chars().count() < 3 {
-            skipped_over_strip += 1;
+            skipped_too_short += 1;
             continue;
         }
-        // Loanword heuristic: no Kazakh-specific letter AND length >= 5.
-        // Short common words (кел, бар) often lack specific letters but are native.
+        // Filter #1a (critical): if the existing FSM can already segment this
+        // candidate, it's not a new root — it's an inflected form.
+        if deterministic_segment_token(&cand.root, &kernel_lexicon, &kernel_rules).is_some() {
+            skipped_segmentable += 1;
+            continue;
+        }
+        // Filter #1b (mutual-prefix): even if FSM can't segment candidate, a
+        // curated root may still conflict via surface-prefix overlap. Two
+        // failure modes observed:
+        //   - "алд" candidate (over-stripped from ал+ды) shadows "ал" verb on
+        //     "алды" segmentation: curated root is prefix of candidate.
+        //   - "арқы" candidate (over-stripped from арқылы) shadows "арқылы"
+        //     postposition: candidate is prefix of curated root.
+        // Skip both directions.
+        let candidate_conflicts = curated_surfaces.iter().any(|c| {
+            c != &cand.root
+                && (cand.root.starts_with(c.as_str()) || c.starts_with(cand.root.as_str()))
+        });
+        if candidate_conflicts {
+            skipped_segmentable += 1;
+            continue;
+        }
+        // Filter #2: loanword signal — no Kazakh-specific letters AND length ≥ 5.
         let has_kz_specific = cand.root.chars().any(|c| KAZAKH_SPECIFIC.contains(&c));
         if !has_kz_specific && cand.root.chars().count() >= 5 {
             skipped_loanword += 1;
             continue;
         }
-        // Determine vowel harmony. If no vowels at all, skip (likely garbage).
+        // Filter #3: no vowels at all = garbage.
         let (front_count, back_count) = count_vowels(&cand.root);
         if front_count == 0 && back_count == 0 {
             skipped_no_vowel += 1;
             continue;
         }
+
         let harmony = if front_count >= back_count {
             "front"
         } else {
             "back"
         };
-        // Determine final sound class from last char.
         let last_char = cand.root.chars().last().unwrap_or('а');
         let fsc = classify_final(last_char);
-
-        // Build a unique ID. Some roots produce colliding IDs (e.g. identical
-        // transliteration after diacritic strip); append freq-rank suffix.
-        let mut base_id = format!("noun_{}", transliterate(&cand.root));
-        if curated_ids.contains(&base_id) {
-            base_id.push_str(&format!("_auto{}", new_roots.len() + 1));
+        let pos = classify_pos(&cand.root, &cand.example_forms);
+        match pos {
+            "verb" => classified_verb += 1,
+            "adjective" => classified_adj += 1,
+            _ => classified_noun += 1,
         }
-        // Also guard against collisions with previously-added auto entries
-        while new_roots.iter().any(|r| r.id == base_id) {
-            base_id.push('_');
-            base_id.push_str(&(new_roots.len() + 1).to_string());
+
+        // Unique id
+        let mut base_id = format!("{}_{}", pos, transliterate(&cand.root));
+        if curated_ids.contains(&base_id) || new_roots.iter().any(|r| r.id == base_id) {
+            base_id.push_str(&format!("_auto{}", new_roots.len() + 1));
         }
 
         new_roots.push(RootEntry {
             id: base_id,
             root: cand.root.clone(),
-            part_of_speech: "noun".to_string(),
+            part_of_speech: pos.to_string(),
             vowel_harmony: harmony.to_string(),
             final_sound_class: fsc.to_string(),
         });
@@ -193,7 +264,6 @@ fn main() -> ExitCode {
         }
     }
 
-    // Merge: preserve curated order, then append new
     let added_count = new_roots.len();
     let mut all_roots = existing.roots.clone();
     all_roots.extend(new_roots);
@@ -221,9 +291,13 @@ fn main() -> ExitCode {
         candidate_pool_size,
         added_count,
         skipped_already_curated: skipped_already,
-        skipped_over_stripped: skipped_over_strip,
+        skipped_already_segmentable: skipped_segmentable,
         skipped_loanword,
         skipped_no_vowel,
+        skipped_too_short,
+        classified_as_noun: classified_noun,
+        classified_as_verb: classified_verb,
+        classified_as_adjective: classified_adj,
         final_root_count: final_count,
         min_candidate_frequency: if min_freq == usize::MAX { 0 } else { min_freq },
         max_candidate_frequency: max_freq,
@@ -236,14 +310,18 @@ fn main() -> ExitCode {
         return ExitCode::FAILURE;
     }
 
-    eprintln!("curated: {curated_count}");
-    eprintln!("candidate pool: {candidate_pool_size}");
-    eprintln!("added: {added_count}");
-    eprintln!("  skipped already curated: {skipped_already}");
-    eprintln!("  skipped over-stripped: {skipped_over_strip}");
-    eprintln!("  skipped loanword: {skipped_loanword}");
-    eprintln!("  skipped no vowel: {skipped_no_vowel}");
-    eprintln!("final: {final_count}");
+    eprintln!("curated:                {curated_count}");
+    eprintln!("candidate pool:         {candidate_pool_size}");
+    eprintln!("added:                  {added_count}");
+    eprintln!("  as noun:              {classified_noun}");
+    eprintln!("  as verb:              {classified_verb}");
+    eprintln!("  as adjective:         {classified_adj}");
+    eprintln!("skipped already curated: {skipped_already}");
+    eprintln!("skipped already segmentable (FSM-derivable): {skipped_segmentable}");
+    eprintln!("skipped loanword:       {skipped_loanword}");
+    eprintln!("skipped no-vowel:       {skipped_no_vowel}");
+    eprintln!("skipped too short:      {skipped_too_short}");
+    eprintln!("final roots:            {final_count}");
     eprintln!("wrote {OUTPUT_ROOTS_PATH}");
     eprintln!("wrote {REPORT_PATH}");
     ExitCode::SUCCESS
@@ -274,13 +352,76 @@ fn classify_final(c: char) -> &'static str {
     } else if VOICED_CONSONANTS.contains(&lower) {
         "voiced_consonant"
     } else {
-        // Fallback: ь, ъ, or unusual chars — treat as voiced so FSM still tries.
         "voiced_consonant"
     }
 }
 
-/// Best-effort ASCII transliteration for use in IDs. Only needs to be stable
-/// and mostly unique across the candidate pool.
+/// Classify POS from example_forms.
+///
+/// Rule order:
+/// 1. Strong verb signal: a non-root form ends in a verb inflection suffix
+///    (-ды/-ді/-ған/-ген/-ып/-іп/-ады/-еді).
+/// 2. Strong adjective signal: a non-root form ends in a derivational adj
+///    suffix (-дай/-дей/-рақ/-рек).
+/// 3. Fall through to noun.
+fn classify_pos(root: &str, example_forms: &[String]) -> &'static str {
+    // Collect forms that are strictly longer than the root (inflected).
+    let inflected: Vec<&String> = example_forms.iter().filter(|f| *f != root).collect();
+
+    if inflected.is_empty() {
+        // No observed inflection — defaulting noun is safe enough.
+        return "noun";
+    }
+
+    // Verb check first (strongest signal, more distinctive suffixes).
+    for form in &inflected {
+        for marker in VERB_SUFFIX_MARKERS {
+            if form.ends_with(marker) {
+                // But guard: -ды/-ді are also noun accusative / ablative.
+                // We need a stronger test. If root doesn't end in vowel AND form
+                // ends -ып/-іп/-ған/-ген/-қан/-кен — those are unambiguously
+                // verb converb/past-participle markers.
+                if *marker == "ып"
+                    || *marker == "іп"
+                    || *marker == "ған"
+                    || *marker == "ген"
+                    || *marker == "қан"
+                    || *marker == "кен"
+                    || *marker == "ады"
+                    || *marker == "еді"
+                    || *marker == "майды"
+                    || *marker == "мейді"
+                {
+                    return "verb";
+                }
+                // Weaker markers (-ды/-ді/-ты/-ті) need corroborating evidence.
+                // If ANOTHER form shows a strong verb marker, we already returned.
+                // If the only evidence is -ды, keep looking for stronger marker
+                // among other forms.
+            }
+        }
+    }
+    // Second pass: strong adj markers.
+    for form in &inflected {
+        for marker in &["дай", "дей", "рақ", "рек"] {
+            if form.ends_with(marker) {
+                return "adjective";
+            }
+        }
+    }
+    // Weak adj: -лы/-лі is derivational ("with-X"). Check this separately from
+    // nouns where -лы could mark a derived adjective form.
+    for form in &inflected {
+        if (form.ends_with("лы") || form.ends_with("лі"))
+            && form.chars().count() == root.chars().count() + 2
+        {
+            return "adjective";
+        }
+    }
+
+    "noun"
+}
+
 fn transliterate(word: &str) -> String {
     let mut out = String::with_capacity(word.len());
     for c in word.chars() {
