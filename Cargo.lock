@@ -33,6 +33,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "adam-kernel-fst"
+version = "0.4.0"
+dependencies = [
+ "adam-kernel",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "adam-tokenizer"
 version = "0.4.0"
 dependencies = [
