@@ -9,8 +9,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::phonology::{
-    Archiphoneme, ConsonantClass, PhonologicalContext, classify_char, realise_archiphoneme,
-    stem_vowel_harmony,
+    Archiphoneme, ConsonantClass, PhonologicalContext, apply_intervocalic_voicing, classify_char,
+    is_vowel, realise_archiphoneme, stem_vowel_harmony,
 };
 
 /// Partial feature bundle for a noun-like word.
@@ -167,6 +167,35 @@ const VERB_PERS_2SG: SuffixTemplate = &[SuffixAtom::Literal('ң')];
 /// 1pl (attached after past-definite): `-{K}` → қ/к.
 const VERB_PERS_1PL: SuffixTemplate = &[SuffixAtom::Arch(Archiphoneme::K)];
 
+// -------------------------------------------------------------------------
+// Possessive suffix templates (week 1 day 1 extension).
+// The common pattern is `-{Y}PERSON` where `{Y}` is a buffer ы/і that
+// appears only on consonant-final stems.  3rd person also prefixes `{S}`
+// (buffer с) that appears only on vowel-final stems.
+// -------------------------------------------------------------------------
+
+/// 1sg possessive: `-{Y}м` (мектеп → мектебім, бала → балам).
+const POSS_1SG: SuffixTemplate = &[SuffixAtom::Arch(Archiphoneme::Y), SuffixAtom::Literal('м')];
+
+/// 2sg informal possessive: `-{Y}ң`.
+const POSS_2SG: SuffixTemplate = &[SuffixAtom::Arch(Archiphoneme::Y), SuffixAtom::Literal('ң')];
+
+/// 3rd-person possessive (sg/pl syncretic): `-{S}{I}`.
+/// After vowel-final stem: бала → баласы. After consonant: мектеп → мектебі.
+const POSS_3: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::S),
+    SuffixAtom::Arch(Archiphoneme::I),
+];
+
+/// 1pl possessive: `-{Y}м{I}з`.
+/// Back: `-ымыз`; front: `-іміз`. After vowel drops the buffer ы/і.
+const POSS_1PL: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::Y),
+    SuffixAtom::Literal('м'),
+    SuffixAtom::Arch(Archiphoneme::I),
+    SuffixAtom::Literal('з'),
+];
+
 /// Runtime accumulator: output string + live phonological context.
 struct Accumulator {
     out: String,
@@ -194,28 +223,31 @@ impl Accumulator {
 
     fn apply(&mut self, template: SuffixTemplate) {
         for atom in template {
-            match atom {
-                SuffixAtom::Literal(c) => {
-                    self.out.push(*c);
-                    if let Some(class) = classify_char(*c) {
-                        self.ctx.preceding = class;
-                        if matches!(class, ConsonantClass::Nasal) {
-                            self.ctx.stem_has_nasal = true;
-                        }
-                        self.ctx.preceded_by_y_or_i = matches!(*c, 'й' | 'и');
+            let realised: Option<char> = match atom {
+                SuffixAtom::Literal(c) => Some(*c),
+                SuffixAtom::Arch(arch) => realise_archiphoneme(*arch, self.ctx),
+            };
+            if let Some(c) = realised {
+                self.out.push(c);
+                if let Some(class) = classify_char(c) {
+                    self.ctx.preceding = class;
+                    if matches!(class, ConsonantClass::Nasal) {
+                        self.ctx.stem_has_nasal = true;
                     }
+                    self.ctx.preceded_by_y_or_i = matches!(c, 'й' | 'и');
                 }
-                SuffixAtom::Arch(arch) => {
-                    if let Some(c) = realise_archiphoneme(*arch, self.ctx) {
-                        self.out.push(c);
-                        if let Some(class) = classify_char(c) {
-                            self.ctx.preceding = class;
-                            if matches!(class, ConsonantClass::Nasal) {
-                                self.ctx.stem_has_nasal = true;
-                            }
-                            self.ctx.preceded_by_y_or_i = matches!(c, 'й' | 'и');
-                        }
-                    }
+                // After appending a vowel we may have just created an
+                // intervocalic V+voiceless-obstruent+V pattern. Rules 10-12:
+                // п→б, к→г, қ→ғ. Apply in place and update `preceding` if the
+                // stem's final char changed as a side-effect.
+                if is_vowel(c) {
+                    let before = self.out.chars().nth(self.out.chars().count() - 2);
+                    apply_intervocalic_voicing(&mut self.out);
+                    let after = self.out.chars().nth(self.out.chars().count() - 2);
+                    // The voicing does NOT shift `self.ctx.preceding` because
+                    // that field tracks the character we just appended (the
+                    // vowel), not the one voiced two positions back.
+                    let _ = (before, after);
                 }
             }
         }
@@ -231,8 +263,36 @@ pub fn synthesise_noun(root: &str, features: NounFeatures) -> String {
     if matches!(features.number, Some(Number::Plural)) {
         acc.apply(PLURAL);
     }
-    // Possessive suffixes will be added in a later iteration; the week-1 test
-    // matrix doesn't exercise them yet.
+    // Possessive. Only P1SG / P2SG / P3 / P1PL implemented in day 1.
+    if let Some(poss) = features.possessive {
+        match poss {
+            Possessive::P1Sg => acc.apply(POSS_1SG),
+            Possessive::P2SgInformal => acc.apply(POSS_2SG),
+            Possessive::P3 => acc.apply(POSS_3),
+            Possessive::P1Pl => acc.apply(POSS_1PL),
+            // P2 polite + plural forms land in week 2.
+            _ => {}
+        }
+    }
+    // Pronominal-н buffer: in classical Kazakh, a 3rd-person possessive
+    // noun takes a buffer `н` before accusative / dative / ablative /
+    // locative / instrumental (catalogue rules 39-42, 44). With only P3
+    // implemented, we inject `н` once here if the feature combination is
+    // P3 + non-nominative case.
+    let needs_pronominal_n = matches!(features.possessive, Some(Possessive::P3))
+        && matches!(
+            features.case,
+            Some(Case::Accusative)
+                | Some(Case::Dative)
+                | Some(Case::Ablative)
+                | Some(Case::Locative)
+                | Some(Case::Instrumental)
+        );
+    if needs_pronominal_n {
+        acc.out.push('н');
+        acc.ctx.preceding = ConsonantClass::Nasal;
+        acc.ctx.stem_has_nasal = true;
+    }
     if let Some(case) = features.case {
         match case {
             Case::Nominative => {}
@@ -455,5 +515,93 @@ mod tests {
             },
         );
         assert_eq!(out, "жаздық");
+    }
+
+    // -----------------------------------------------------------------
+    // Possessive + intervocalic-voicing tests.
+    // -----------------------------------------------------------------
+
+    #[test]
+    fn poss_1sg_бала_vowel_final() {
+        // бала + POSS.1SG = балам ({Y} buffer ы/і drops after vowel)
+        let out = synthesise_noun(
+            "бала",
+            NounFeatures {
+                possessive: Some(Possessive::P1Sg),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "балам");
+    }
+
+    #[test]
+    fn poss_1sg_мектеп_intervocalic_voicing() {
+        // мектеп + POSS.1SG = мектебім
+        //   - {Y} → і (front, buffer inserted after consonant)
+        //   - intervocalic voicing п → б (е-п-і)
+        let out = synthesise_noun(
+            "мектеп",
+            NounFeatures {
+                possessive: Some(Possessive::P1Sg),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "мектебім");
+    }
+
+    #[test]
+    fn poss_3_бала_vowel_final_с_buffer() {
+        // бала + POSS.3 = баласы ({S} buffer inserted after vowel)
+        let out = synthesise_noun(
+            "бала",
+            NounFeatures {
+                possessive: Some(Possessive::P3),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "баласы");
+    }
+
+    #[test]
+    fn poss_3_мектеп_consonant_final() {
+        // мектеп + POSS.3 = мектебі
+        //   - {S} drops after consonant
+        //   - {I} → і front
+        //   - intervocalic voicing п → б
+        let out = synthesise_noun(
+            "мектеп",
+            NounFeatures {
+                possessive: Some(Possessive::P3),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "мектебі");
+    }
+
+    #[test]
+    fn poss_1pl_мектеп_chain() {
+        // мектеп + POSS.1PL = мектебіміз
+        let out = synthesise_noun(
+            "мектеп",
+            NounFeatures {
+                possessive: Some(Possessive::P1Pl),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "мектебіміз");
+    }
+
+    #[test]
+    fn poss_3_case_loc_бала_pronominal_n() {
+        // бала + POSS.3 + LOC = баласында (pronominal н before locative)
+        let out = synthesise_noun(
+            "бала",
+            NounFeatures {
+                possessive: Some(Possessive::P3),
+                case: Some(Case::Locative),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "баласында");
     }
 }

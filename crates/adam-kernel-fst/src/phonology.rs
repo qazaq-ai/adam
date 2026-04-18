@@ -303,6 +303,57 @@ pub fn classify_char(c: char) -> Option<ConsonantClass> {
     })
 }
 
+/// Test whether a character is a vowel.
+pub fn is_vowel(c: char) -> bool {
+    matches!(
+        c.to_lowercase().next().unwrap_or(c),
+        'а' | 'ә' | 'е' | 'ё' | 'и' | 'і' | 'о' | 'ө' | 'у' | 'ұ' | 'ү' | 'ы' | 'э' | 'ю' | 'я'
+    )
+}
+
+/// Catalogue rules 10–12 — intervocalic voicing of `п`, `к`, `қ`.
+///
+/// When we just appended a vowel to `out` and the character *before* the
+/// last consonant is also a vowel, the now-intervocalic voiceless obstruent
+/// at position `out[-2]` voices:
+///   - п → б  (мектеп + ім → мектебім)
+///   - к → г  (білек + ім → білегім)
+///   - қ → ғ  (тарақ + ым → тарағым)
+///
+/// Apply *in place* to an existing string. Idempotent for any already-voiced
+/// forms. Called from `Accumulator` whenever a vowel-initial atom lands.
+pub fn apply_intervocalic_voicing(out: &mut String) {
+    let chars: Vec<char> = out.chars().collect();
+    let n = chars.len();
+    if n < 3 {
+        return;
+    }
+    let last = chars[n - 1];
+    let mid = chars[n - 2];
+    let before_mid = chars[n - 3];
+    if !is_vowel(last) || !is_vowel(before_mid) {
+        return;
+    }
+    let voiced = match mid {
+        'п' => Some('б'),
+        'к' => Some('г'),
+        'қ' => Some('ғ'),
+        _ => None,
+    };
+    if let Some(v) = voiced {
+        // Rebuild string with the swap.
+        let mut rebuilt = String::with_capacity(out.len());
+        for (i, c) in chars.iter().enumerate() {
+            if i == n - 2 {
+                rebuilt.push(v);
+            } else {
+                rebuilt.push(*c);
+            }
+        }
+        *out = rebuilt;
+    }
+}
+
 /// Determine vowel harmony from a stem by looking at its last vowel.
 pub fn stem_vowel_harmony(stem: &str) -> VowelClass {
     for c in stem.chars().rev() {
