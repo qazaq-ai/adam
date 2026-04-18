@@ -1,0 +1,4946 @@
+{
+  "attribution": "Abai Qunanbayuly (1845–1904), classical Kazakh literature; text via Kazakh Wikisource contributors (CC-BY-SA 4.0)",
+  "name": "filtered-adam-abai-wikisource-pack",
+  "paragraphs_scanned": 297,
+  "sample_count": 704,
+  "samples": [
+    {
+      "domain": "classical_literature",
+      "id": "abai_00004",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_0",
+      "text": "Мұндай ма едің ана күн, Мұның қалай, батыр-ау?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00010",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_0",
+      "text": "Топ болғанда көрерсің Түрлі дауды жүз тарау."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00012",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_0",
+      "text": "Қайтып келер есікті, Қатты серіппе, жарқын-ау!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00013",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_0",
+      "text": "Жетілсең де, жетсең де, Керек күні бір бар-ау."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00015",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_2",
+      "text": "Мен жасымнан көп көрдім Мұсылманды, кәпірді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00020",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_2",
+      "text": "Жер ұшық берген кісідей, Тоңқаңдай ма, не етеді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00024",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_2",
+      "text": "Тегін ойлап байқасаң, Мұнда ми жоқ, құлақ бар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00025",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_3",
+      "text": "Адамның кейбір кездері Көңілде алаң басылса; Тәңірінің берген өнері Көк бұлттан ашылса."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00027",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_3",
+      "text": "Тәңірінің күні жарқырап, Ұйқыдан көңіл ашар көз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00036",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_4",
+      "text": "Менімен сен тең бе деп мақтанасың, Білімсіздік белгісі — ол баяғы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00037",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_4",
+      "text": "Кеше бала ең, келдің ғой талай жасқа, Көз жетті бір қалыпта тұра алмасқа."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00038",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_4",
+      "text": "Адамды сүй, Алланың хикметін сез, Не қызық бар өмірде онан басқа?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00039",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_5",
+      "text": "Адасқанның алды – жөн, арты – соқпақ, Оларға жөн – арамның сөзін ұқпақ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00054",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_6",
+      "text": "Сағынғаннан бір сені ойлап, Келер көзден ыстық жас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00055",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_6",
+      "text": "Сенен артық жан тумас, Туса туар артылмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00057",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_6",
+      "text": "Асыл адам айнымас, Бір бетінен қайырылмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00058",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_6",
+      "text": "Көрмесем де, көрсем де, Көңілім сенен айырылмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00059",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Алланың өзі де рас, сөзі де рас, Рас сөз ешуақытта жалған болмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00061",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Аманту оқымаған кісі бар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00062",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Уәктубиһи дегенмен ісі бар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00063",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Алла өзгермес, адамзат күнде өзгерер, Жарлық берді ол сіздерге, сөзді ұғарға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00065",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Қағида шариғаты өзгерсе де, Тағриф алла еш жерде өзгемеді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00068",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Махаббатпен жаратқан адамзатты, Сен де сүй ол алланы жаннан тәтті."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00072",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Дін де осы, шын ойласаң, тағат та осы, Екі дүние бұл тасдиқ— хақтың досы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00073",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Осыларды бұзатын және үш іс бар: Пайда, мақтан, әуесқой — онан шошы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00079",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Иманның тазалығын жақсы ұқтырмай, Сыртын қанша жуса да, іші оңбаған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00084",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_7",
+      "text": "Мү'мин болсаң, әуелі иманды бол, Пендеге иман өзі ашады жол, Шын илан да, таза ойла бір имаңды, Мұнафиқ намаз қылмап па, мағлұм ғой ол."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00087",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_8",
+      "text": "Алла деген сөз жеңіл, Аллаға ауыз қол емес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00088",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_8",
+      "text": "Ынталы жүрек, шын көңіл, Өзгесі хаққа жол емес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00089",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_8",
+      "text": "Дененің барша қуаты Өнерге салар бар күшін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00090",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_8",
+      "text": "Жүректің ақыл суаты, Махаббат қылса тәңірі үшін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00091",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_8",
+      "text": "Ақылға сыймас ол алла, Тағрипқа тілім қысқа аһ!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00098",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_9",
+      "text": "Өзі қысқа, өзі асау, тентек өмір Арттағыға бір белгі қойса нетер?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00099",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_9",
+      "text": "Кім біледі, кез болса арттағылар Ойға салып оқыр да, сөзін сынар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00101",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_9",
+      "text": "Кім білер, жабырқаңқы жазған сөзім Жібермей, көп тоқтатар оның көзін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00102",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_9",
+      "text": "Жолаушы жол үстінде тамаша еткен Сықылды өткен жанның бір күмбезін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00106",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_10",
+      "text": "Кім анттан шалқайды Амал жоқ жемеске."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00122",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_11",
+      "text": "Қолға кетті жауға бір күн, Тірі адамның ісі – үміт."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00124",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_11",
+      "text": "Қалыңдығы қала берді, Жатыр еді алғалы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00129",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_11",
+      "text": "Сен асыққан екен деп, Алла әмірін өзгертпес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00132",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_11",
+      "text": "Ескермей өзге дүниені, \"Аһ!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00133",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_11",
+      "text": "\" деп өтті жар үшін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00136",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_11",
+      "text": "Қол жетпеген некені Сүйіп кеткен жан екен."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00137",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_11",
+      "text": "Көзің неге жетеді, Қосылмақ онда бар ма екен?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00138",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_11",
+      "text": "Шыны ғашық жар болса, Неге өлдім деп налымас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00139",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_11",
+      "text": "Онда екеуі кез келсе, Бірін бірі танымас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00140",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_12",
+      "text": "Ата-анаға көз қуаныш – Алдына алған еркесі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00146",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_12",
+      "text": "Ата көңіл жанбаса бір, Артық өнер шықпаса."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00147",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_12",
+      "text": "Ел танымай, үй танып құр, Шаруасын да ұқпаса – Үміті қайда?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00149",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_12",
+      "text": "Сүйер ұлың болса, сен сүй, Сүйінерге жарар ол."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00153",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_12",
+      "text": "Құрбылардан қорланарсың, Тәңірі ісіне сен де көн."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00157",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_12",
+      "text": "Бір жаман мен бе, Дедің бе, Көңіліңде?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00159",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_13",
+      "text": "Кейде ыстық қан басып кетеді оны, Дөңбекшіген түндерде тыншыға алмай."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00161",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_13",
+      "text": "Ақылы жоқ, ары жоқ шуылдақты Күнде көріп, тұл бойы жиіркенген."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00163",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_13",
+      "text": "Кейде тілеп бақ пенен тағы тыныштық, Кейде қайғы, азапты тағы да іздеп."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00167",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_13",
+      "text": "Кейде ыстық тағы да қан басады, Кейде бір сәт тыншығар үн шығармай."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00171",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_14",
+      "text": "Еңбек жоқ, харекет жоқ қазақ кедей, Тамақ аңдып қайтеді тентіремей?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00173",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_14",
+      "text": "Ет, қымыз тамақ болса әркімге арзан, Тәтті, дәмді іздер ең онан да әрман."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00176",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_14",
+      "text": "Бір жілік пен бір аяқ қымыз берген Дереу сені жұмсайды бір жұмысқа."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00177",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_14",
+      "text": "Жалға жүр, жат жерге кет, мал тауып кел, Малың болса, сыйламай тұра алмас ел."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00178",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_14",
+      "text": "Қаруыңның барында қайрат қылмай, Қаңғып өткен өмірдің бәрі де — жел."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00183",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_14",
+      "text": "Асаған, ұрттағанға ез жұбанар, Сенімді дәулет емес сен қуанар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00189",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_15",
+      "text": "Біреу астық алады, біреу - маржан, Әркімге бірдей нәрсе бермес базар Әркімнің өзі іздеген нәрсесі бар, Сомалап ақшасына сонан алар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00191",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_15",
+      "text": "Сөзді ұғар осы күнде кісі бар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00194",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_15",
+      "text": "Бір кісі емес жазғаным, жалпақ жұрт қой, Шамданбай-ақ, шырақтар, ұқсаң жарар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00195",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_15",
+      "text": "«Ит маржанды не қылсын» деген сөз бар, Сәулесі бар жігіттер бір ойланар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00207",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_18",
+      "text": "Бай сейілді, Бір пейілді Елде жақсы қалмады."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00212",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_18",
+      "text": "Танымадық, Жарымадық Жақсыға бір іргелі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00214",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_18",
+      "text": "Шашты барын, Берді малын Боларында жұртына."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00216",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_18",
+      "text": "Ел де жаман, Ер де жаман - Аңдығаны өз елі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00220",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_18",
+      "text": "Өтті өмірім, Қайтты көңілім Бұл дүниенің ісіне."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00221",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_18",
+      "text": "Жасы құрбы, Жаны тұрғы, Дос па деген кісіге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00223",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_18",
+      "text": "Пейілі шикі, Ақылы күйкі, Осы жұрт па тапқаның?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00224",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_19",
+      "text": "Балалық өлді, білдің бе?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00226",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_19",
+      "text": "Жігіттік өтті, көрдің бе?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00228",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_19",
+      "text": "Кім біледі, сен кәпір, Баяндыдан сөндің бе, Баянсызға төндің бе?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00229",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_19",
+      "text": "Әлде, айналып, кім білер, Боталы түйе секілді, Қорадан шықпай өлдің бе?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00230",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_20",
+      "text": "Болды да партия, Ел іші жарылды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00232",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_20",
+      "text": "Құрбыдай хош тұттым Жасың мен кәрінді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00233",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_20",
+      "text": "Жоқтамай, ұмыттым, Ақыл мен нәріңді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00241",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_20",
+      "text": "Ұрыңнан асырдың Сұм тілді қарынды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00244",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Түйеде қом, атта жал Қалмады елге тығындап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00249",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Сыртқыларға сыр бермей, Құр күлемін жымыңдап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00260",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Әрлі-берлі тартысып, Ісі арамы жеңілді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00277",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Оязға кірсе, өзгеден Мерейі үстем жарқылдап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00280",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Антұрғанмын өзім де, Бір мінезбен өтпеймін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00290",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Сүйегім жасық, буын бос, Біраз ғана айлам бар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00291",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Айлам құрсын, білемін – Болыстықтың жолы тар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00294",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Ендігі сайлау болғанда, Түсе ме деп тағы шар, Бұл күніме бір күні Боламын ғой деймін зар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00295",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Ақыл айтар туғандар, Бұл сөзімді ойлаңдар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00297",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Мынау елді ұстарлық Кісі емеспін, кел, құтқар!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00299",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Ел жайылды, жетпей ме, Оязға да бір хабар?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00300",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Тағы бүйтіп кеттің деп Қозғау салар, қолға алар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00301",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Қатты қысым қылған соң, Басым сотқа айналар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00305",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Бұрынғыдай дәурен жоқ, Ұлық жолы тарайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00306",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_21",
+      "text": "Өтірік берген қағаздың Алды-артына қарайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00313",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_22",
+      "text": "Бір тәуір дос Тым-ақ керек, Ойы мен тілі бөлінбес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00318",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_23",
+      "text": "Піскен алма секілді тәтті қызды Боламын да тұрамын көргендей-ақ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00322",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_24",
+      "text": "Нұрын, сырын көруге, Көкірегінде болсын көз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00323",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_24",
+      "text": "Жүрегі - айна, көңілі - ояу, Сөз тыңдамас ол баяу."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00339",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_25",
+      "text": "Ақыл жоқ, қайғы жоқ онда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00340",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_25",
+      "text": "Ісі жоқ теріс пе, оң ба?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00342",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_25",
+      "text": "Ит көрген ешкі көзденіп, Елерме, жынды сөзденіп, Жасынан үлгісіз шіркін, Не қылсын өнер ізденіп."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00345",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_25",
+      "text": "Кісіде бар болса талап, Отырмас ол бойын балап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00350",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_26",
+      "text": "Қынаменде, жар-жар мен беташар бар, Өлеңсіз солар қызық бола ма гүл?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00351",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_26",
+      "text": "Бала туса, күзетер шілдехана, Олар да өлең айтар шулап жаңа."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00352",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_26",
+      "text": "Бұрынғы жақсылардан өрнек қалған, Биде тақпақ, мақал бар, байқап қара."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00353",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_26",
+      "text": "Туғанда дүние есігін ашады өлең, Өлеңмен жер қойнына кірер денең."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00358",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_26",
+      "text": "Сөзі тәтті, мағынасы түзу келсе, Оған кімнің ұнасар таласуы?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00360",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_26",
+      "text": "Қадірін жақсы сөздің білер жанға Таппай айтпа оған да айтар кезді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00361",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_26",
+      "text": "Сый дәметпе, берсе алма еш адамнан, Нең кетеді жақсы өлең сөз айтқаннан?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00362",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_26",
+      "text": "Сүйенерлік адамды құрмет қыл, Аулақ бол әнін сатып нәрсе алғаннан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00368",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_26",
+      "text": "Үлгі алсын деймін ойлы жас жігіттер, Думан–сауық ойда жоқ әуел баста–ақ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00372",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_27",
+      "text": "Қызды ауылға қырындап үйір болса – Көңіліне зор қуаныш бір бадалық."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00375",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_27",
+      "text": "Жастықта бір күлгенің – бір қаралық, Күлкі баққан бір көрер бишаралық."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00379",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_27",
+      "text": "Уайым – ер қорғаны, есі барлық, Қиыны бұл дүниенің – қолы тарлық."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00383",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_27",
+      "text": "Ұрлық қылар, тентіреп тамақ асырар, Болмаған соң жұмыс қып мал табарлық."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00387",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_28",
+      "text": "Бір сұлу қыз тұрыпты хан қолында, Хан да жанын қыяды қыз жолында."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00392",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_28",
+      "text": "Мезгілі өткен дәуренді қуалаған, Не қылсын бір қартайған өу сүйекті."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00393",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_28",
+      "text": "Кәрі, жас дәурені өзге тату емес, Епке көнер ет жүрек сату емес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00394",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_28",
+      "text": "Кімде кім үлкен болса екі мүшел, Мал беріп алғанменен сатын емес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00395",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_28",
+      "text": "Есерлер жас қатынды тұтады екен, Жас қайғысын білдірмей жұтады екен."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00401",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_28",
+      "text": "Қартаң бай, қатты сақ бол, тілге көнсең, Мүйіз шығар қатынның тіліне ерсең."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00406",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_28",
+      "text": "Екі көңіл арасы жылшылық жер, Оны қайтып қосады ол ант атқан?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00407",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_29",
+      "text": "Бөстегім, құтылдың ба Көтібақтан?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00409",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_29",
+      "text": "Құл табан, кескіл тұмсық Бөстекбайым, Кісіге бос берермін бір мін тапқан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00412",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Ашып берер жауыңа Өзі көрген қоймасын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00417",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Кеселді болып бітеді Жақсыға біткен жақындар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00427",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Ауыр жұмыс кез болса, Араздығы сөз болса, Араз кісі болғансып, Сылтау етер бекерді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00435",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Біреу білер жер келсе, Сөз таба алмас қалтылдап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00441",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Қалжыңы теріс, сөзі ұрыс, Айтқан сөзге көнбейді, Өз тентегін көрмейді, Қазан бұзар бір қырыс."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00442",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Сондай кесел туысқан Қай жерінен болады Көңілге медеу, ол тыныс?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00444",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Шыныменен тамам ел Кете ме екен ит бола?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00446",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Келелі кеңес жоғалды, Ел сыбырды қолға алды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00447",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Ел ішінде бітімші Түгел алып қайтпайды Сұрай келген бір малды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00448",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Ел жамаған билер жоқ, Ел қыдырып сандалды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00452",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Орыссыз жерде топ болса, Шақырған кісі бармайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00455",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Бас қосылса арысқа, Кім шабады намысқа?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00457",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "жоқ, Ісі кетер шалысқа."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00459",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Малдының малын көре алмай, Борышын түгел бере алмай, Көрінгенге обықты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00461",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Өзінен шыққан жақсылар Түзей алмай зорықты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00462",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Бөтен елдің адамы, Тынбаған соң арамы, Көңілі әбден торықты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00463",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Саудагер қашты бұл елден, Несиесін жия алмай."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00466",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Нанымы жоқ, анты бар, Ел нұсқасы кетті ғой, Елмін деген салты бар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00467",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_30",
+      "text": "Әлі күнге уайым Қылған жан жоқ, ұялмай."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00468",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Өткен дәурен секілді нұры жайнап Арттағы мұнараға береді рең."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00471",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Ұзын қара бешпентті, ұзын шашты Жамағатты итеріп бір жол ашты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00473",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Томсарған, күлкісі жоқ, бір қансыз сұр, Бір үлкен іс қылғансып асығып жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00476",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Тас күмбезде сыбдыры күңгірлейді, Ішкі үйіне кіруге тимей рұқсат."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00477",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Мұнан басқа қақпада бірқатар жан, Жанашырсыз дүниеде жетім қалған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00478",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Құдайдан да жұрттан да күдер үзген, Амал жоқ, өлмес үшін сұрайды нан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00481",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Ұяттан, ар-намыстан не біледі?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00483",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Аш итше бір тиынға топыр қағып, Бір таласып, бір ұрысып, бір күледі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00484",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Ұялғаннан тастаған бір мыс тиын – Аш кедейге ол дағы - қымбат бұйым."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00487",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Арық қара, кең маңдай, қыр мұрынды, Екі көзден от жанған не қылған жас?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00489",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Кең жауырын, білегі бұлшық етті, Үйренген жан секілді қызмет істеп."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00493",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Жиырма сегіз жасында әжім түскен, Көк тамырда қан ойнап, дірілдейді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00494",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Көзге бүкір, қайраты – болат қырлы, Сақтап жүрген секілді бұл бір сырды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00499",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "» - Дүниені ескермейтін паң секілді, Жатырқап тірі жанды аң секілді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00500",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Сыпатын, түрін көрсе сол бүкірдің, Бір үлкен мақсұты бар жан секілді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00502",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Жүріс-тұрыс сүйтсе де жас жігіттей, Қуатына жарамас шал деп айтқан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00507",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Кердең басып шіркеуге жақын барды, Қалтадан бір теңгелік күміс алды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00508",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Есікте шегелеулі құлыбы бар Бір сандық бар, барды да соған салды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00511",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Қызмет қылса,тамағы тоймас па еді?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00513",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "» деп кедейді әлгі тұрған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00516",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "» - деп, Бір теңгелік күмісті лақтырды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00521",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "– деп әлгі шал бір күңк етті."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00522",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "-Сенен менің сұрауым тым аз ғана, Өзің айтқан жұмысты берші!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00533",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Жаман көзбен қарады Вадим сонда, Ертіп жүрген екеуге байды жолда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00534",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Көзіне шыдай алмай, к."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00539",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Шіркеудегі сертті ойлап, айтқан сөзі: «Әділет қайда болса, сонда күнә»."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00540",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Дүбірлетті есікті бай да болмай, Аз кешікті, ашуға жан табылмай."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00545",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Бұл қылық – бұрынғыдан бір қалған жол, Осындай бәйбішелер жұртта бек мол."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00546",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Өзге қызық суиын деген шақта Қартаң тартқан қатынның қуаты – сол."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00547",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Соққан боран секілді біздің өмір, Не тыныштық тауып берді, өзің де көр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00548",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Сол қатынға келеді күншілігім, Сондай өмір қолыма бір тимей жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00550",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_31",
+      "text": "Көршілері: «Адамға залалы жоқ, Тым-ақ жақсы кісі еді, байғұс!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00554",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_32",
+      "text": "Жүрегім, соқпа, кел тоқта, Жас келер көзге жүр-жүрлеп."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00557",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_32",
+      "text": "Онан да жылы жүзіңмен Кел, жарым, қара бетіме."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00558",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_32",
+      "text": "Жылы, тәтті жауап айт Іштегі қайғы дертіме."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00560",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_32",
+      "text": "Сөйлесші жақсы, жағымды Мендей көңілі сынықпен."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00570",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_34",
+      "text": "Бір көрмеге тәп-тәтті Қазаны мен қалбаңы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00572",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_34",
+      "text": "Сенен аяр түгі жоқ, Бүгін сыйлас көрініп, Бүгін жалын, ертең шоқ, Сөзі мен өзі бөлініп."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00573",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_34",
+      "text": "Әлі үміт, әлі серт, Жын сықылды бұзылып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00574",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_34",
+      "text": "Қулық емес, бұл — бір дерт, Тұрлауы жоқ құбылып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00575",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_35",
+      "text": "Ем таба алмай, От жалындай, Толды қайғы кеудеге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00576",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_35",
+      "text": "Сырласа алмай, Сөз аша алмай Пендеге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00579",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_35",
+      "text": "Ұйқы, тамақ Қалды тым-ақ Керегі жоқ іс болып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00581",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_35",
+      "text": "Жас жүрегім Жанды менің, Жай таба алмай, япырым!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00582",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_35",
+      "text": "Өзің оңда Жақсы жолға Ақырын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00586",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_35",
+      "text": "Тез дерттендім, Кейде өртендім, Кейде мұз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00591",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_36",
+      "text": "Арттағыға сөзің мен ісің қалса, Өлсең де, өлмегенмен боласың тең."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00592",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_36",
+      "text": "Жүректен ізі кетпес қызық көрсек, Жақсылықты аянбай жұртқа бөлсек, Жақынның да, жардың да, асықтың да, Бәрінің де қызығын көріп білсек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00593",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_37",
+      "text": "Қырық-елу қос бір жерден Қайтқан екен керуендер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00595",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_37",
+      "text": "Алтын артқан бір есек Соларменен келеді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00596",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_37",
+      "text": "Ол жай жүрсе, жұрт та жай, Ол желсе, жұрт желеді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00601",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_37",
+      "text": "Сылап-сыйпап, қадірлеп, Беретұғын жем де артық."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00603",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_37",
+      "text": "Көш бойы жұрт қасында, Өзгеменен жұмыс жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00605",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_37",
+      "text": "\"Құдай аман сақта,— деп — Жарда, суда!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00609",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_37",
+      "text": "Өз ойында көк есек Өзгеше тудым деп жүрген."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00610",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_37",
+      "text": "Алтынды бір күн бай алды, Есектен жұрт та түңілді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00612",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_37",
+      "text": "Қарасаңшы бойыңа, Ұзын құлақ қалпың ғой."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00614",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Осы жұрт Ескендірді біле ме екен?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00615",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Македония шаһары – оған мекен."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00617",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Филипп өлді, Ескендір патша болды, Жасы әрең жиырма бірге толды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00620",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Көп елді күтінбеген қырды, жойды, Ханды өлтіріп, қаласын тартып алды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00623",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Ескендір елде алмаған хан қоймады, Алған сайын көңілі бір тоймады."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00624",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Араны барған сайын қатты ашылып, Жердің жүзін алуға ой ойлады."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00625",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Қан ішер қаһарлы хан ашуы көп, Атағынан қорқады жұрт қайғы жеп."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00626",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Сол күнде қошеметші айтады екен, Ханның ханы, патшаның патшасы деп."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00636",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Жалтырап сәуле берген бір нәрсеге Патшаның ат үстінде көзі түсті."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00637",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Барса, бір сылдыр қаққан мөлдір бұлақ, Таспадай бейне арықтан шыққан құлап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00638",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Түсе сала Ескендір басты қойды, Ішсе, суы өзгеше, тәтті тым-ақ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00641",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Ескендір қолына айтты: «Бұл неткен су?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00644",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Бұл салқын, тәтті суға қаныңыздар, Шақ келер маған жан жоқ наныңыздар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00651",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Аша алмады қақпаны, үміт үзді, Ақылдасып тәуір-ақ амал қылды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00654",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Долдықпен хан Ескендір ашуланды, Ашуланып қақпаға жетіп барды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00655",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Қақпаны дүбірлетіп қағып-қағып: - Қақпаны аш!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00662",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Іші тар, көре алмастың біреуі – сен, Ондай кісі бұл жерге келмейді тең."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00663",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "- Талпынған талаппенен мен де бір ер, Көп жүрдім, кездей келді көрмеген жер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00665",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Қақпадан лақтырды бір орамал, Сыйым – осы, падиша, мынаны ал!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00666",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Ішінде бір нәрсе бар ақыл берер, Апар дағы ойланып, көзіңді сал!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00672",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Жолдасы Аристотель ақылы мол, Лақтырған сүйекті алады сол."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00673",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Ханға айтты: «Қасиет бар бұл сүйекте, Көзіңе көрсетейін, хабардар бол»."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00676",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Қанша алтынды күміс пен салса дағы, Бір кішкентай сүйекті аудармады."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00680",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Бұл сүйекті басарлық, нәрсе бар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00682",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Хәкім жерден топырақ алып барды, Бір уыстап сүйекке шаша салды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00684",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Ескендір мұны көріп аз тұрады, Хәкімді аулақ жерге шақырады."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00687",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Тоя ма адам көзі мың мен санға?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00689",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Кәпір көздің дүниеде араны үлкен, Алған сайын дүниеге тоя ма екен?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00690",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Қанша тірі жүрсе де, өлген күні Өзге көзбен бірдей-ақ болады екен."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00692",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Сый сұрадың, бергені – бір қу сүйек, Мұны көріп,алыңыз сіз де ғибрат!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00695",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Аз-ақ сөз айттым, бітті бұл әңгіме, Мұны бір өзге сөздің бірі деме."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00701",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_38",
+      "text": "Жақсы болсаң, жарықты кім көрмейді, Өз бағаңды өзіңнен кім сұрайды?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00704",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_39",
+      "text": "Үміт жақын, көңіл ақ, Болар ма сондай қызық шақ?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00705",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_39",
+      "text": "Құдай-ау, қайда сол жылдар, Махаббат, қызық мол жылдар?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00708",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_39",
+      "text": "Махаббат кетті, дос кетті — Жете алмайсың, тоқтайсың."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00718",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_40",
+      "text": "Ақ көйлекті, таяқты Ақсақал шығар бір шеттен Малыңды әрі қайтар деп, Малшыларға қаңқылдап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00723",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_40",
+      "text": "Өткен күннің бәрі ұмыт, Қолдан келер қайрат жок, Бағанағы байғұс шал Ауылда тұрып күледі, Қошемет қылып қарқылдап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00726",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_41",
+      "text": "Жаздың көркі енеді жыл құсымен, Жайраңдасып жас күлер құрбысымен."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00738",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_41",
+      "text": "Шаруаның бір малы екеу болып, Жаңа төлмен көбейіп, дәулет өнер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00741",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_41",
+      "text": "Жаз жіберіп, жан берген қара жерге Рахметіне алланың көңіл сенер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00748",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_41",
+      "text": "Күн - күйеу, жер - қалыңдық сағынышты, Құмары екеуінің сондай күшті."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00757",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_42",
+      "text": "Жайына біреу келсе кез, Белгілі жұмыс, сор қайнар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00758",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_42",
+      "text": "Қуаты күшті нұрлы сөз, Қуатын білген абайлар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00763",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_42",
+      "text": "Несі өмір, Несі жұрт?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00769",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_44",
+      "text": "Ол дәурен өмір емес, бір көрген түс, Ойға түйме қызықты қиялдан күс."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00770",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_44",
+      "text": "Қарашы, өз бойыңда түгел ме екен Ыстық жүрек, өң-шырай, қуат пен күш?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00772",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_44",
+      "text": "Көптің аузын күзетсең күн көрмейсің, Өзіңді өзің күзет, кел, шырағым!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00779",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_46",
+      "text": "Махаббат, қызық кім көрер, Оның да дәмін татпаса?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00781",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_46",
+      "text": "Аямай жанын дос ерер, Жолдастықты ақтаса."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00785",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_46",
+      "text": "Енді нені істейміз, Бәрінен де бос қалдық?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00790",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_47",
+      "text": "Бүгін-ертең жетем деп, Көңілге алған дәулетке."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00798",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_47",
+      "text": "Жылмаңы сыртта, іші арам, Кез болар қайда сорлыға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00799",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_47",
+      "text": "Досыңа достық – қарыз іс, Дұшпаныңа әділ бол."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00804",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_47",
+      "text": "Қызықты өмір жайнаған, Кеудесі толып үмітке."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00805",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_47",
+      "text": "Бір нәрсені ұнатса, Қайта ойланып қарамас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00811",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_47",
+      "text": "Сені жақсы көрмесе, Сенер ме еді сөзіңе?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00816",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_48",
+      "text": "Адамның бір қызығы – бала деген, Баланы оқытуды жек көрмедім."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00817",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_48",
+      "text": "Баламды медресеге біл деп бердім, Қызмет қылсын, шен алсын деп бермедім."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00818",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_48",
+      "text": "Өзім де басқа шауып, төске өрледім, Қазаққа қара сөзге дес бермедім."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00829",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Жігіттер, ойын арзан, күлкі қымбат, Екі түрлі нәрсе ғой сыр мен сымбат."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00830",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Арзан, жалған күлмейтін, шын күлерлік Ер табылса жарайды, қылса сұхбат."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00833",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Шын көңілмен сүйсе екен, кімді сүйсе, Бір сөзімен тұрса екен, жанса-күйсе."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00836",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Кейбір жігіт жүреді мақтан күйлеп, Сыртқа пысық келеді, сөзге сынық."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00837",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Кемді күн қызық дәурен тату өткіз, Жетпесе, біріңдікін бірің жеткіз!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00841",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Жолдастық, сұхбаттастық – бір үлкен іс, Оның қадірін жетесіз адам білмес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00842",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Сүйікті ер білген сырын сыртқа жаймас, Артыңнан бір ауыз сөз айтып күлмес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00850",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Жар көңіліне бір жанын пида қылып, Білместігің бар болса, қылар сабыр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00853",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Ақыл керек, ес керек, мінез керек, Ер ұялар іс қылмас қатын зерек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00855",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Қатының сені сүйсе, сен де оны сүй, Қоржаң суық келеді кей сасық ми."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00860",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Ары бар, ақылы бар, ұяты бар, Ата-ананың қызынан ғапыл қалма."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00862",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Ері сүйген кісіні о да сүйіп, Қызмет қылсын көңілі таза жүріп."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00869",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Асық ұтыс секілді алыс-беріс – Тірі жанның қылғаны бүгін тегіс."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00875",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Ары бар, ұяты бар үлкенге сен, Өзі зордың болады иығы да зор."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00876",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Қазақтың қайсысының бар санасы?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00878",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_51",
+      "text": "Пысықтықтың белгісі – арыз беру, Жоқ тұрса бес бересі, алты аласы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00880",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_52",
+      "text": "Сағынғаннан сені ойлап, Келер көзге ыстық жас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00881",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_52",
+      "text": "Сенен артық жан тумас, Туса туар – артылмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00883",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_52",
+      "text": "Асыл адам айнымас, Бір бетінен қайрылмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00884",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_52",
+      "text": "Көрмесем де, көрсем де, Көңілім сенен айрылмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00887",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_52",
+      "text": "Иығымда сіздің шаш, Айқаласып тай-талас, Ләззат алсақ болмай ма, Көз жұмулы, көңіл мас?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00888",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_52",
+      "text": "Сізде сымбат, бізде ықылас, Осы сөзім бәрі рас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00893",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_52",
+      "text": "Ыстық тартып барасың, Бір сағаттан бір сағат."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00896",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_53",
+      "text": "Жүрегім, нені сезесің, Сенен басқа жан жоқ па?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00897",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_53",
+      "text": "Дүниені, көңілім, кезесің, Тиянақ жоқ па, қой, тоқта!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00899",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_53",
+      "text": "Тірі жаннан бездіріп, Апарасың қай жаққа?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00900",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_53",
+      "text": "Ортақтық, тыныштық достық қой, Оның қадірін кім білер?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00902",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_53",
+      "text": "Халықтың аты керек қой Я мақтауға, боқтауға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00904",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_53",
+      "text": "Досты қайдан табасың, Кеңесерге адам жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00908",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_53",
+      "text": "Құлағын сатқан тәңірі атқан Оңдырар ма, оңар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00910",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_53",
+      "text": "Дүниеде нені сүйесің, Өмір қайда, дос қайда?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00914",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_54",
+      "text": "Кімі — қастық, кімі — дау, Сүйенерге жоқ тірек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00921",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_55",
+      "text": "Аспаса ақыл қайраттан, Тереңге бармас, үстірттер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00924",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_55",
+      "text": "Бере берсең бер десе, Үміт етер таласып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00925",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_55",
+      "text": "Малда да бар жан мен тән, Ақыл, сезім болмаса."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00926",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_55",
+      "text": "Тіршіліктің несі сән, Тереңге бет қоймаса?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00930",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_56",
+      "text": "Жүректен қызу-қызба кете қалса, Өзге тәннен еш қызық іс табылмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00931",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_56",
+      "text": "Достық, қастық, бар қызық — жүрек ісі, Ар, ұяттың бір ақыл — күзетшісі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00932",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_56",
+      "text": "Ар мен ұят сынбаса, өзге қылық, Арын, алқын — бұл күннің мәртебесі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00935",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_57",
+      "text": "Заман ақыр жастары, Қосылмас ешбір бастары."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00939",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_57",
+      "text": "Өнімсіз іске шеп-шебер, Майданға түспей несі өнер?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00941",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_57",
+      "text": "Күлмеңдеп келер көздері, Қалжыңбас келер өздері."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00948",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Нан таппаймыз демейді, Бүлінсе елдің арасы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00950",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Аз білгенін көпсінсе, Көп қазаққа епсінсе, Кімге тиер панасы?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00951",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Орыс теріс айтпайды, Жаман бол деп оларды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00953",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Бұл іске кім виноват: Я Семейдің қаласы, Я қазақтың аласы?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00955",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Ақылы кімнің бар болса, Демес мұны тілі ащы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00958",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Артық ғылым кітапта, Ерінбей оқып көруге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00959",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Военный қызмет іздеме, Оқалы киім киюге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00964",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Аз ақшаға жалданып, Өнбес іске алданып, Жол таба алмай жүруге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00970",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Ол да оязной емес қой, Алуға теңдік сенуге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00972",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_58",
+      "text": "Жеңіл көрме, бек керек Оған да ғылым, оған да ой, Қалайынша қайда енуге?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00976",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_59",
+      "text": "Махаббат – өмір көркі, рас, Өлген соң ол да үндемес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00977",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_59",
+      "text": "Махаббатсыз – дүние дос, Хайуанға оны қосыңдар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00978",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_59",
+      "text": "Қызықтан өзге қалсаң бос, Қатының, балаң, досың бар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00979",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_59",
+      "text": "Жүрегі жұмсақ білген құл, Шын дос таппай тыншымас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00983",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_60",
+      "text": "Осы жасқа келгенше, Өршеленіп өлгенше, Таба алмадық бір адам Біздің сөзге ергенді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00992",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_60",
+      "text": "Туған жерді қия алмай, Тентекті жеңіп, тыя алмай, Әлі отырмыз ұялмай, Таба алмадық өңге елді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_00999",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_62",
+      "text": "Сұр бұлт түсі суық қаптайды аспан, Күз болып, дымқыл тұман жерді басқан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01000",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_62",
+      "text": "Білмеймін тойғаны ма, тоңғаны ма, Жылқы ойнап, бие қашқан, тай жарысқан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01001",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_62",
+      "text": "Жасыл шөп, бәйшешек жоқ бұрынғыдай, Жастар күлмес, жүгірмес бала шулай."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01007",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_62",
+      "text": "Кемпір-шал құржаң қағып, бала бүрсең, Көңілсіз қара суық қырда жүрсең."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01008",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_62",
+      "text": "Кемік сүйек, сорпа-су тимеген соң, Үйде ит жоқ, тышқан аулап, қайда көрсең."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01015",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_64",
+      "text": "Ел билеген адам жоқ, Ата менен бабаңда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01017",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_64",
+      "text": "Қалжыңдаймын әншейін, Оған келе де бермес шамаң да Орныңнан тұра шабасың, Атшабар келсе қышқырып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01021",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_65",
+      "text": "Күн артынан күн туар, Бір күн дамыл еткізбес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01028",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Қазақтың данасы, Жасы үлкен ағасы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01029",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Бар демес сендей бір Адамның баласы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01033",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Өзі де білмей ме, Көп сөйлеп созбайын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01040",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Шын ғашық сый болмас, Сый болса, сыр болмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01043",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Ақ тамақ, қызыл жүз, Қарағым, бетіңді аш!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01044",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Қара көз, имек қас, Қараса жан тоймас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01047",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Ақ етің үлбіреп, Өзгеше біткен гүл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01056",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Қызыл тіл шыға алмас, Мақтаудың шартынан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01059",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Көрік – тәңірі дәулеті, Қылса ұнар құрметі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01062",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Ғашығың да қайғы жеп."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01070",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_68",
+      "text": "Құдай-ау, бұл көңілім, Күн бар ма бір тынар?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01071",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_69",
+      "text": "Көзінен басқа ойы жоқ, Адамның надан әуресі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01073",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_69",
+      "text": "Білмейсің десе, жел өкпе, Дейді дағы – тәңірі ісі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01077",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_69",
+      "text": "Кітапты молда теріс оқыр, Дағарадай боп сәлдесі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01078",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_69",
+      "text": "Малқұмар көңілі – бек соқыр, Бүркіттен кем бе жем жесі?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01080",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_69",
+      "text": "Тыңдағыш қанша көп болса, Сөз ұғарлық кем кісі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01087",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_70",
+      "text": "болмаған соң Жылауына зорлайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01088",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_71",
+      "text": "Көк ала бұлт сөгіліп, Күн жауады кей шақта."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01089",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_71",
+      "text": "Өне бойы егіліп, Жас ағады аулақта."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01092",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_72",
+      "text": "Көк тұман — алдыңдағы келер заман, Үмітті сәуле етіп көз көп қадалған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01093",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_72",
+      "text": "Көп жылдар көп күнді айдап келе жатыр, Сипат жоқ, сурет те жоқ, көзім талған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01096",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_72",
+      "text": "Ақыл мен жан — мен өзім, тән — менікі, \"Мені\" мен \"менікінің\" мағынасы — екі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01104",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_72",
+      "text": "Көптің қамын әуелден тәңірі ойлаған, Мен сүйгенді сүйді деп иең сүйсін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01105",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_72",
+      "text": "Көптің бәрін көп деме, көп те бөлек, Көп ит жеңіп көк итті күнде жемек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01109",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_73",
+      "text": "Өткен өмір — қу соқпақ, Қыдырады талайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01110",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_73",
+      "text": "Кім алдады, кім тоқпақ Салды, соны санайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01116",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Көңілім қайтты достан да, дұшпаннан да Алдамаған кім қалды тірі жанда?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01119",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Ендігі жұрттың сөзі – ұрлық-қарлық, Саналы жан көрмедім сөзді ұғарлық."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01121",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Байлар да мал қызығын біле алмай жүр, Жаз жіберіп, күз атын міне алмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01123",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Саудагер тыныштық сауда қыла алмай жүр, Қолдан беріп, қор болып, ала алмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01124",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Ел аулақта күш айтқан, топта танған, Арсыз жұрттан көңілі тына алмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01125",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Естілер де ісіне қуанбай жүр, \"Ел азды\" деп надандар мұңаймай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01126",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Ала жылан, аш бақа күпілдектер, Кісі екен деп ұлықтан ұялмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01127",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Бектікте біреу бекіп тұра алмай жүр, О дағы ұры-қарды тыя алмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01128",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Қарсылық күнде қылған телі-тентек, Жаза тартып ешбірі сұралмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01129",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Қарындас қара жерге тыға алмай жүр, Бірінің бірі сөзін құп алмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01130",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Құда-тамыр, дос-жаран, қатын-балаң – Олар да бір қалыпты бола алмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01131",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Бір күшті көп тентекті жыға алмай жүр, Іште жалын дерт болып, шыға алмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01133",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Жетілтіп жаз жайлауға қона алмай жүр, Күз күзеу де жанжалсыз бола алмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01135",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Жасы кіші үлкеннен ұялмай жүр, Сұрамсақтар нәпсісін тыя алмай жүр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01136",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_74",
+      "text": "Сәлем – борыш, сөз – қулық болғаннан соң, Қандай жан сырттан сөз боп, сыналмай жүр?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01145",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_75",
+      "text": "Көбінесе ән басы келеді ащы, \"Кел тыңда!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01153",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_76",
+      "text": "Малға достың мұңы жоқ малдан басқа, Аларында шара жоқ алдамасқа."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01160",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_76",
+      "text": "Еңбекті сат, ар сатып неге керек?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01161",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_76",
+      "text": "Үш ақ нәрсе адамның қасиеті: Ыстық қайрат, нұрлы ақыл, жылы жүрек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01164",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Шаһардан бір күн Масғұт шықты тысқа, Барды ма кезі келіп бір жұмысқа?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01173",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Бай емен, батыр емен, хан емеспін, Атақты артық туған жан емеспін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01175",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Мен - бір шал дүниеде жиһан кезген, Ертең түсте кетемін шаһаріңізден."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01178",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Бір құданың хақы үшін мен тілеймін, Қабыл көр, сертім үшін қолыңды бер!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01179",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "- Ұрыға жібермедім мен намысты, Кім бұлдар мұндай-мұндай қылған істі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01180",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Алла хақы деген соң амал да жоқ, Барайын, - деп уәде етіп қол қағысты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01181",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Ол жерге ерте тұрып жігіт барды, Шал да душар алдынан бола қалды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01185",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Ол жігіт шал сөзіне құлақ салды, Көзін төмен жіберіп, аз ойланды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01189",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "- Мен болсам егер ағын жемек дедім, Ақылды болдым елден бөлек дедім."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01190",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Мен ақылды билемен не қылсам да, Ақыл мені билесе керек дедім."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01192",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Әділетсіз, ақылсыз, арсыздарды Көре тұра, көңілде тыныштық тұрмас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01193",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Адам дертті болмай ма құса тартып, Тұщы ұйқы ұйықтай алмай түнде жатып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01194",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Ептеп бағып, есерге ем таба алмай, Тәтті тамақ жей алман дәмін татып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01195",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Сарыны жеп, мен болсам байдың өзі, Аузына тамам жанның болдым сөзі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01200",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Оны ойларлық бұл күнде адам бар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01203",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Бермесең, сен дағы ит бірге болдың."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01206",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Ұрғашы да көп жан ғой, досым болса, Деп едім бір пайдасы маған тиер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01207",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Еркектің еркек адам болса қасы, Қатын, шеше, қызы жоқ кімнің басы?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01208",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Хан қаһар, қара кісі қастық қылса, Сонда ұрғашы болмай ма арашашы?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01209",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Тегінде адам басы сау бола ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01212",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Соны ойлап, қызыл жеміс мен таңдадым, Берсеңіз, жемек болып бел байладым."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01215",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Ақыл, дәулет әуелден өзіңде екен, Өміріңмен артылсын, жаным, бағың!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01216",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Бұл шал бөтен шал емес, қыдыр2 еді, Ебін тауып даруға кезі келді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01217",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Сөзіне, ақылына, қылығына Разы болғаннан соң, бата берді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01219",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Мағынасы: «бұл дүниенің күні» деген, Жетіліп бізге ғибрат сөз қалыпты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01222",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Ақыл-ой, ар-намыс жоқ еш адамда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01223",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Өлген мола, туған жер жібермейді, Әйтпесе тұрмас едім осы маңда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01225",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Бағанағы қыдыр шал бір уақытта Түсіне аян беріп жолығыпты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01229",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Бұл сөзбен халифаға Масғұт барды, Хабарын естіген соң хан да аңғарды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01230",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Айтқан кезі жақындап келген шақта, Ертерек таза судан құйып алды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01233",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Бұлар шулап бір күні келді ордаға, Хан мен уәзір қарайды тамашаға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01234",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Бәрі де есі шығып, жынды болған, Бос шулап жүр кіші іні, үлкен аға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01239",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "- Құтылар хал болмады мына дудан, Біз де ішпесек болмайды жынды судан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01240",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Өлтірер өңкей жынды бізді келіп, Жынды деп есі дұрыс бізді қуған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01244",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_77",
+      "text": "Көрдің бе көп тентектің қылған ісін - Еріксіз есті екеуін есер етті."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01247",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_78",
+      "text": "Мен боламын демеңдер, Аяқты алшаң басқанға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01249",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_78",
+      "text": "Бір ғылымнан басқаның, Бәрі де кесел асқанға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01251",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_79",
+      "text": "Мен жазбаймын өлеңді ермек үшін, Жоқ-барды, ертегіні термек үшін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01252",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_79",
+      "text": "Көкірегі сезімді, тілі орамды, Жаздым үлгі жастарға бермек үшін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01256",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_79",
+      "text": "Өскен соң мұндай сөзді бұрын көрмей."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01257",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_79",
+      "text": "Таң қаламын алдыңғы айтқанды ұқпай, Және айта бер дейді жұрт тыным бермей."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01263",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_79",
+      "text": "Бес-алты мисыз бәңгі күлсе мәз боп, Қинамай қызыл тілді кел, тілді ал, қой!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01264",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_79",
+      "text": "Өлеңі бар өнерлі інім, сізге Жалынамын, мұндай сөз айтпа бізге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01267",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_80",
+      "text": "Мен сәлем жазамын, Қарағым қалқама."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01269",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_80",
+      "text": "Күн бойы күтемін Келер деп хабарың."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01274",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_81",
+      "text": "Күнде жақсы бола ма, Бір қылығы жаққанға?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01275",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_81",
+      "text": "Оқалы тон тола ма, Ар-ұятын сатқанға?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01284",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_81",
+      "text": "Өзгелерді, біз емес, Түсірмекші қақпанға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01292",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_81",
+      "text": "Бір ғылымнан басқаның Кеселі көп асқанға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01293",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_81",
+      "text": "Одан үміт кім қылар, Жол табар деп сасқанда?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01295",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_82",
+      "text": "Мынау келген Назар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01296",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_82",
+      "text": "Ақсақалды ауыл азар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01304",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_83",
+      "text": "Ажал келіп бас салса, жанды үрласа, Өмір қайда, сен қайда, соны да ойлан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01305",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_83",
+      "text": "Адамзат — бүгін адам, ертең топырақ, Бүгінгі өмір жарқылдап алдар бірақ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01310",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_84",
+      "text": "Бойдағы мінді санасам, Тау тасынан аз емес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01319",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_85",
+      "text": "Осы қымыз қазаққа Мақтаның ба, асың ба?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01322",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_85",
+      "text": "Қызылшыл семіз, жаз қымыз Бір үлкен борыш басыңда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01330",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_86",
+      "text": "Жеңіл көрме, бек керек Оған да ғылым, оған да ой, Калайынша қайда енуге?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01340",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_88",
+      "text": "Үлкен қожа ортан қол, Өзгелері аты жоқ пенен шынашақ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01344",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_89",
+      "text": "Өмір сүрегн кісіге Дәулет қызық, бала бал."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01345",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_89",
+      "text": "Бал болатын бала бар, Бал болар ма Рахымшал?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01346",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_89",
+      "text": "Бүйтіп берген балаңды, Берген құдай, өзің ал!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01348",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_90",
+      "text": "Өзін-өзі күндейді, Жақынын жалған міндейді, Ол – арсыздық белгісі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01349",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_90",
+      "text": "Ұятсынбай, ойланбай, Қой дегенге тіл алмай, Іс қылмай ма ол кісі?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01359",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_90",
+      "text": "Бір сөз үшін жау болып, Бір күн үшін дос болып, Жүз құбылған салт шықты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01360",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_90",
+      "text": "Пысық кім деп сұрасаң – Қалаға шапса дем алмай, Өтірік арыз көп берсе, Көргендерден ұялмай."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01362",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_90",
+      "text": "Ат-шапаннан кем көрмес, Біреу атын қойса «қу»."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01364",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_90",
+      "text": "Ел тыныш болса азады, Ерігіп өле жазады."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01366",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_90",
+      "text": "Ақылы бар кісіні Ғайбаттайды, даттайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01369",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_90",
+      "text": "Қу тілменен құтыртып, Кетер бір күн отыртып, Қызмет қылған кісісін Құрытуға таяйды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01373",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_90",
+      "text": "Расы жоқ сөзінің, Ырысы жоқ өзінің, Өңкей жалған мақтанмен Шынның бетін бояйды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01381",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_91",
+      "text": "Сабыр қылсын, жайыңды Білер ме екен бекзатым?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01382",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_91",
+      "text": "Көңіл аулап, сөз айтар Арадағы тілхатым, Ағын судай екпіндеп, Лайы жоқ суатым, Ауру да емес, сау да емес, Құрыды әл-қуатым."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01385",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_91",
+      "text": "Қош, қыз алсын қойнына, Бейнет көрмей, дәулет жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01387",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_91",
+      "text": "Адалды сатсаң арамға, Құдай қабыл етер ме?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01390",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_91",
+      "text": "Бәрін өзің білсең де, Әлі-ақ өзің танасың."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01395",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_91",
+      "text": "Киіміңді тонасын, Елге де күлкі боласың."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01397",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_91",
+      "text": "Қыз іздесең, қалың бер, Мұным ақыл болмай ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01398",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_91",
+      "text": "Көріп алсаң көріктіні, Таңдап алсаң тектіні, Сонда да көңіл толмай ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01400",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_92",
+      "text": "Бір минут бір кісінің өміріне ұқсас, Өтті, өлді, тағдыр жоқ қайтаоалвдвлв келмек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01405",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_92",
+      "text": "Сүйенген, сенген дәурен жалған болса, Жалғаны жоқ бір тәңірім, кеңшілік қыл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01413",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Бойда қайрат, ойда көз Болмаған соң, айтпа сөз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01421",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Ынсап, ұят, терең ой Ойлаған жан жоқ, жауып қой."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01426",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Адал бол – бай тап, Адам бол – мал тап, Қуансаң қуан сол кезде."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01427",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Біріңді қазақ, бірің дос Көрмесең, істің бәрі бос."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01433",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Өтірік шағым толды ғой, Өкінер уақытың болды ғой."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01441",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Өткен соң базар, Қайтқан соң ажар, Не болады құр қожақ?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01442",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Кеш деп қайтар жол емес, Жол азығым мол емес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01443",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Бір кісі мыңға, Жөн кісі сұмға, Әлі жетер заман жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01444",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Қадірлі басым, Қайратты жасым Айғаймен кетті, амал жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01453",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Бауырыңа тартқан, Сырыңды айтқан Сырласың сырт айналар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01459",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Оны білсең, мұның не?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01460",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Мен де ұят іс қылдым де."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01463",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Не ол емес, бұл емес, Менің де күнім – күн емес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01472",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_93",
+      "text": "Күйдірген соң шыдатпай, Қоя ма екен жылатпай?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01480",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_94",
+      "text": "Өзіңе сен, өзіңді алып шығар, Еңбегің мен ақылың екі жақтап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01483",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_94",
+      "text": "Қайғы келсе қарсы тұр, құлай берме, Қызық келсе, қызықпа, оңғаққа ерме."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01490",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_95",
+      "text": "Иттей қормын, Зармын, Сен үздің ғой бұл желкемді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01492",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_95",
+      "text": "Өлім айтпас, Келсе қайтпас Кісіге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01499",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_95",
+      "text": "Ажал уақыты Жетті, Мен өлейін, сен сау-ақ бол."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01503",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_95",
+      "text": "Шын ғашық мен саған!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01506",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_95",
+      "text": "Ішіңде ыстық Қан жоқ, Тас бауыр жар, бол қош аман!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01514",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_98",
+      "text": "Баяғы күш, баяғы түсің бар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01515",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_98",
+      "text": "Алды үміт, арты өкініш алдамшы өмір, Желігін жерге тықпас кісің бар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01516",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_98",
+      "text": "Дәмі қайтпас, бұзылмас тәтті бар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01517",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_98",
+      "text": "Бір бес күннің орны жоқ аптығарға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01521",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_99",
+      "text": "Сәулең болса кеудеңде, Мына сөзге көңіл бөл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01523",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_99",
+      "text": "Танымассың, көрмессің, Қаптаған соң көзді шел."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01526",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_99",
+      "text": "Берекелі болса ел — Жағасы жайлау ол бір көл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01532",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_99",
+      "text": "Көл деп оны кім жайлар, Суы құрсын, ол бір – шөл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01540",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_100",
+      "text": "Күйкентай күтті, Құс етті, Не бітті?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01542",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_100",
+      "text": "Арт жағында, Біз соған зар, Боламыз деп білмедік."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01544",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_100",
+      "text": "Жазу жаздық, Хат таныдық, Болдық азат молдадан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01545",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_100",
+      "text": "Шала оқудан, Не жарыдық, Қалғаннан соң құр надан?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01549",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_100",
+      "text": "Көңілге келер, Кім жолар, Кім көнер?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01558",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_102",
+      "text": "Туғызған ата ана жоқ, Туғызарлық бала жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01559",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_102",
+      "text": "Туысқан туған, құрбылас Қызығымен және жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01560",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_102",
+      "text": "Тулайын десе шара жоқ, Толықсып жүрер шама жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01561",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_102",
+      "text": "Ұйқы мен астан дәм кетіп, Сақалда, шашта қара жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01563",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_102",
+      "text": "Жастарға жаппас жала жоқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01565",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_103",
+      "text": "Түбінде баянды еңбек егін салған, Жасынан оқу оқып, білім алған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01567",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_104",
+      "text": "Тұлпардан тұғыр озбас шабылса да, Оған да үкі, тұмар тағылса да."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01570",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_104",
+      "text": "Тәңірі сақтар, табандап тап ұрса да."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01577",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_106",
+      "text": "Теке мұрын, салпы ерін, ұзын тісті, Қабырғалы, жотасы болса күшті."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01579",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_106",
+      "text": "Жуан, тақыр бақайлы, жұмыр тұяқ, Шынтағы қабырғадан тұрса аулақ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01581",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_106",
+      "text": "Кең сауырлы, тар мықын, қалбағайлы, Алды-арты бірдей келсе ерге жайлы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01583",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_106",
+      "text": "Ұршығы төмен біткен, шақпақ етті, Өзі санды, дөңгелек келсе көтті."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01597",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_108",
+      "text": "Сен – шыққан жол үстінде жалғыз түп ши, Көрінген ит кетеді бір бір сарып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01599",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_109",
+      "text": "Дүниені ұмытқан Құмарың тозар, біл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01601",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_109",
+      "text": "Бір ақымақ әңгіме Сықылды көрінер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01604",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_109",
+      "text": "Білген кісі айтса оған, Надандығы кемімес."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01605",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_110",
+      "text": "Жазғытұрым қылтиған бір жауқазын, Қайдан білсін өмірдің көбін азын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01607",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_110",
+      "text": "Күз келген соң тамырынтүсік шалып, Бетегеге жете алмай болар жазым."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01613",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_112",
+      "text": "Сенен артық жан жоқ деп ғашық болдым, Мен не болсам болайын, сен аман бол."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01615",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_112",
+      "text": "Бірге жаққан біреуге жақпаушы еді, Сүйкімді тірі жанға неткен жансың?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01618",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_113",
+      "text": "Ғашықтың тілі - тілсіз тіл, Көзбен көр де ішпен біл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01626",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Бес нәрседен қашық бол, Бес нәрсеге асық бол, Адам болам десеңіз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01629",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Талап, еңбек, терең ой, Қанағат, рақым, ойлап қой – Бес асыл іс, көнсеңіз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01633",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Болмасаң да ұқсап бақ, Бір ғалымды көрсеңіз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01634",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Ондай болмақ қайда деп, Айтпа ғылым сүйсеңіз, Сізге ғылым кім берер, Жанбай жатып сөнсеңіз?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01635",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Дүние де өзі, мал да өзі, Ғылымға көңіл берсеңіз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01637",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Ақыл сенбей сенбеңіз, Бір іске кез келсеңіз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01638",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Ақсақал айтты, бай айтты, Кім болса, мейлі, сол айтты – Ақылменен жеңсеңіз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01640",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Аят, хадис емес қой, Күпір болдың демес қой, Қанша қарсы келсеңіз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01642",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Мұны жазған кісінің Атын білме, сөзін біл!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01643",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Осы жалған дүниеден Шешен де өткен не бұлбұл, Көсем де өткен не дүлдүл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01647",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Ақымақ көп, ақылды аз, Деме көптің сөзі пұл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01648",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Жақынның сөзі тәтті деп, Жақыным айтты дей көрме."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01650",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Сізге айтамын, қаупім - бұл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01653",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Сөзіне қарай кісіні ал, Кісіге қарап сөз алма."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01654",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Шын сөз қайсы біле алмай, Әр нәрседен құр қалма."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01655",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Мұны жазған білген құл – Ғұламаһи Дауани, Солай депті ол шыншыл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01656",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Сөзін оқы және ойла."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01657",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_114",
+      "text": "Тез үйреніп, тез жойма, Жас уақытта көңіл - гүл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01658",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_115",
+      "text": "Қажымас дос халықта жоқ, Айнымас серт қайда бар?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01659",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_115",
+      "text": "Алда көрген артта жоқ, Мысқыл, өсек, айла бар."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01664",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_115",
+      "text": "Кімге достық көп еттім, Түбі болды бір кейіс."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01665",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_115",
+      "text": "Жақсы өмірім әуре еттің, Жар таба алмай бір тегіс."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01667",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_115",
+      "text": "Кімі тентек, кімде айып, Тексере алмай өмір өтер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01669",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_115",
+      "text": "Күнде өзімшіл ептінің, Несін адам ұстасын?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01675",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_116",
+      "text": "Көрсеқызар келеді байлауы жоқ, Бір күн тыртың етеді, бір күн – бұртың."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01678",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_116",
+      "text": "Ағайын жоқ нәрседен етер бұртың, Оның да алған жоқ па құдай құлқын?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01684",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_116",
+      "text": "Ұғындырар кісіге кез келгенде, Пыш-пыш демей қала ма ол да астыртын?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01689",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_117",
+      "text": "Ішімде қайғым қалың, көз жасым кем, Адам жоқ, кімді дос деп мен шағушы ем?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01690",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_117",
+      "text": "Әйел адам гүлмен тең, дымды сүймек, Көзінен жасы шықса, бойына ем."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01693",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_118",
+      "text": "Қандай қызда ләззат бар жан татпаған?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01695",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_118",
+      "text": "Он сегіз, он тоғызға келгеннен соң."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01699",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_118",
+      "text": "Әуелден сұлу жайы бізге мәлім: Жігітті жұрт мақтаған қыз жақтаған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01700",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_118",
+      "text": "Кей жігіт мақтан үшін қылық қылмай, Бойына майдалықпен сыр сақтаған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01702",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_118",
+      "text": "Қасиетті болмайды ондай жігіт."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01708",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "Төмен ұшсам түлкі өрлеп құтылар деп, Қандыкөз қайқаң қағып шықса аспанға, Көре тұра қалады қашқан түлкі Құтылмасын білген соң құр қашқанға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01711",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "Қырық пышақпен қыржыңдап тұрған түлкі, О дағы осал жау емес қыран паңға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01712",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "Сегіз найза қолында, көз аудармай, Батыр да аял қылмайды ертең таңға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01715",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "Біреуі – көк, біреуі – жер тағысы, Адам үшін батысып қызыл қанға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01716",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "Қар – аппақ, бүркіт – қара, түлкі – қызыл, Ұқсайды хасса сұлу шомылғанға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01720",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "Құсы да иесіне қоразданар, Алпыс екі айлалы түлкі алғанда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01721",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "«Үйірімен үш тоғыз» деп жымыңдап, Жасы үлкені жанына байланғанда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01725",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "Ешкімге зияны жоқ, өзім көрген Бір қызық ісім екен сұм жалғанда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01726",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "Көкірегі сезімді, көңілі ойлыға Бәрі де анық тұрмай ма ойланғанда."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01729",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_119",
+      "text": "Мұны оқыса, жігіттер, аңшы оқысын, Біле алмассың, құс салып дәм татпасаң."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01734",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_120",
+      "text": "Жас балаға от та жоқ тұрған маздап, Талтайып қақтана алмай, өле жаздап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01735",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_120",
+      "text": "Кемпір-шалы бар болса, қандай қиын, Бір жағынан қысқанда о да азынап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01737",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_120",
+      "text": "Қара қидан орта қап ұрыспай берсе, О да қылған кедейге үлкен сыйы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01745",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_120",
+      "text": "Алса да аяншақтау кедей сорлы, Еңбек білмес байдың да жоқ қой орны."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01746",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_120",
+      "text": "Жас бала, кемпір-шалын тентіретпей, Бір қыс сақта, тас болма сен де о құрлы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01747",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_121",
+      "text": "Қара қатын дегенге, қара қатын, Үзіп-жұлып алып жүр қанағатын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01751",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Жас қартаймақ, жоқ тумақ, туған өлмек, Тағдыр жоқ өткен өмір қайта келмек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01752",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Басқан із, көрген қызық артта қалмақ, Бір құдайдан басқаның бәрі өзгермек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01755",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Жамандар қыла алмай жүр адал еңбек, Ұрлық, қулық қылдым деп қағар көлбек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01757",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Адамзат тірілікті дәулет білмек, Ақыл таппақ, мал таппақ, адал жүрмек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01759",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Наданға арам – ақылды құлаққа ілмек, Бұл сөзден ертегіні тез үйренбек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01760",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Рас сөздің кім білер қасиетін, Ақылсыз шынға сенбей, жоққа сенбек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01761",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Қызыл арай, ақ күміс, алтын бергек Қызықты ертегіге көтерілмек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01763",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Ақылды қара қылды қырыққа бөлмек, Әр нәрсеге өзіндей баға бермек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01770",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Арамдықпен бар ма екен жаннан аспақ, Өзімен өзі бір күн болмай ма әлек?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01771",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_122",
+      "text": "Қолдан келе бере ме жұрт меңгермек, Адалдық, арамдықты кім теңгермек?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01779",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_123",
+      "text": "Сөзінің жөні жоқ, Ақылсыз томырық, Қатынның күні жоқ Қамшы мен жұдырық."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01782",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_124",
+      "text": "Жіңішке қара қасы сызып қойған, Бір жаңа ұқсатамын туған айды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01788",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_124",
+      "text": "Сорақы ұзын да емес, қысқа да емес, Нәзік бел тал шыбықтай бұраңдайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01789",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_124",
+      "text": "Етіндей жас баланың білегі бар, Әжімсіз ақ саусағы іске ыңғайлы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01793",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_124",
+      "text": "Әуелде сұлу жайы бізге мәлім, Жігітті жұрт мақтаған қыз жақтаған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01798",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_125",
+      "text": "Тағдыр етсе алла, Не көрмейді пәнде?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01804",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_125",
+      "text": "Жай таба алмай жүрек, Жасыған соң сүйек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01805",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_125",
+      "text": "Бұл қылған зарым Барса жардың маңына, Ол - қылған дәрім Ғашығымның жанына."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01810",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_126",
+      "text": "Адалдан тапқан тыйынды Сал да сақта қапшыққа."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01814",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_126",
+      "text": "Елу бесте біз дағы Сенісер адам таптық па?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01815",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_126",
+      "text": "Арсыз құмар болғандар Опыр-топыр, шақ-шұққа Түспей жүр ме, көрдің бе, Жалаң-жүлаң, тақ-тұққа?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01826",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_128",
+      "text": "Екі асық құмарлы, Бір жолдан қайта алмай."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01833",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_128",
+      "text": "Жанында жапырақ, Үстінде жұлдыз да."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01834",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_128",
+      "text": "Елбіреп-қалтырап, Жігіт пен ол қыз да."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01836",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_128",
+      "text": "Жүрекке құйылып Жан рахат бір сәуле."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01839",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_128",
+      "text": "Жүйрік тіл, терең ой, Сол күнде қайда едің?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01840",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_128",
+      "text": "Ғашыққа мойын қой, Жеңілдің, жеңілдің!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01842",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_129",
+      "text": "Бізде ерік жоқ, өзің біл, Әлде неге бастайсыз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01846",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_129",
+      "text": "Ыстық сөзің кірді ішке, Май тұра ма шыжымай."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01849",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_129",
+      "text": "Үйір қылма бойыңа, Шыны жақсы көрмесең."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01852",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_129",
+      "text": "Сіз – бір сұңқар шаһбаз, Жер жүзінен алған баж."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01863",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_130",
+      "text": "Қыран шықса қияға, жібереді Олар да екі құсын екі жақтап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01869",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_131",
+      "text": "Ақ киімді, денелі, ақ сақалды, Соқыр, мылқау, танымас тірі жанды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01879",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_131",
+      "text": "Соныға малды жайып, күзетіңдер, Ұйқы өлтірмес, қайрат қыл, бұз қамалды!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01881",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_132",
+      "text": "Құлақтан кіріп, бойды алар Жақсы ән мен тәтті күй."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01882",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_132",
+      "text": "Көңілге түрлі ой салар, Әнді сүйсең, менше сүй."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01886",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_132",
+      "text": "Бір күйгізіп, сүйгізіп, Ескі өмірді тіргізер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01890",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_132",
+      "text": "Ішіп, терең бойлаймын, Өткен күннің уларын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01891",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_132",
+      "text": "Және шын деп ойлаймын Жұрттың жалған шуларын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01893",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_132",
+      "text": "Есім шығып қашпаймын, Мен ішпеген у бар ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01894",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_133",
+      "text": "Құр айғай бақырған Құлаққа ән бе екен?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01895",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_133",
+      "text": "Өнерсіз шатылған Кісіге сән бе екен?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01896",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_133",
+      "text": "Өңкей надан антұрған, Қанша айтса, жан ба екен?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01897",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_133",
+      "text": "Бос жүріп құр қалған Өміріңе кән бе екен?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01898",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_134",
+      "text": "Ұяламын дегені көңіл үшін, Ұсақ қулық бір ғана өмір үшін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01899",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_134",
+      "text": "Татымды достық та жоқ, қастық та жоқ, Жігері жоқ, маңызы жеңіл үшін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01905",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_134",
+      "text": "Әкесі ұрысса балаға, ол да — достық, Баласы ұрысса әкеге, жараса ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01906",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Бір сөзім Мың бір түннен оқып жүрген, Өлең қып сол сөзімді айтқым келген."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01907",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Болыпты ағайынды екі жігіт, Бағдатта Мұстапа мен Сапа деген."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01908",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Екеуі жетім еді әкесі өлген, Талаптан жетеміз деп, бос жүрмеген."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01910",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Екеуі екі айрылмақ қамын жеген, Бір шетке кетпек болып жұрт көрмеген."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01912",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Екеуін екі жаққа тағдыр бөлген Жандар емес қатерден әсте именген."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01913",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Шынмашынға1 Сапасы кете тұрсын, Мұстапа Балсураға2 бұрын келген."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01915",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Аздан соң қатын алып, үй салғызып, Шаһарда сенімдінің бірі болған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01919",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Аз жылда жақсы ғылым нәсіп етіп, Жас жігіт жүзі нұрлы, көңлі масты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01920",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Оқудан шыға ұстады ата өнерін, Асырды атасынан әрбір жерін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01922",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Атаның харекетін ұстай алды, Өнері артық шығып, жан таң қалды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01924",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Бір күні ләпкесінде отыр еді, Торғын тон, алтын кемер бір шал келді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01925",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Не қылса бір құрметті адам ғой деп, Әзім тұрып, иіліп сәлем берді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01932",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Тесілген күні бойы сендей жасты Аяймын, өнімі жоқ бұл өнерге!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01939",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Өзі үлкен, өзі оңай, артық өнер, Аз жұмыспен көп алтын хасил2 етсе."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01943",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Ертең ерте сол жерден табыспаққа, Екеуі уәде байлап, қойды сөзін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01944",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Шал кетті, аң-таң бала үйге қайтты, Көргенін апасына келіп айтты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01950",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Не қылса, сол күн бала шала ұйықтайды, Өтірік, расын ойланып таба алмайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01953",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Екеуі сәлемдесіп болғаннан соң: - Мысың қайда, балам?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01956",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Мыс былқылдап еріген кезінде шал Шөншіктен3 ұсақ қара алды қырып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01963",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Үш мың үш ділдаға кетті сатып, Шешесіне ап келді таңырқатып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01972",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Күн батпай біттей алаң болма бізге, Қас қарая келермін мен де сізге."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01973",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Ішіп, жеу арасында сөйлер сөз көп, Ол үйде жан болмасын сенен өзге!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01978",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Көз байлана сып етіп шал да келді, Әзім де есік ашты, дайын еді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01980",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Шал кіріп үйді тегіс аралады, Бір Әзімнен басқа жан таба алмады."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01981",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Біротала бейілді беріп алған, Әзім де бұл қылықты шам алмады."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01984",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Бар іс қой әуелден-ақ ел салтында, Орыс, неміс болса да, қай халқың да."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01992",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Сонда шал терезеден бір ысқырды, Төрт жігіт табыт алған үйге кірді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01996",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Теңіздің жағасында қалың қамыс, Ішінде бір кеме бар шалға таныс."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_01999",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Ел тұрды, ертең кемпір үйге кірді, Бала жазым болғанын іші білді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02004",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Түрегеліп антұрған шалды көрді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02005",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "- Ақсақал адам мұндай қыла ма екен, Анамнан мені айырып бұл нең?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02012",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Баланың бар киімін шешіп алды, Жүз қамшы арқасына дүре салды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02016",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Түн бойы ұйықтамады бір де мызғып, Су сарылдап құйылды кемені ырғап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02019",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Бір шеттен бір жағаға келе жатқан Кәрі иттің ұстай алды алдын тосып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02021",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Құдай сүймей, бұл істі бізге салды, Қолын шеш, ризалық ал мына жастан."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02022",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Қолын шеш, ризалық ал, кісенді бұз, Шапсаң айт, көнесің бе, уақыт тығыз."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02025",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Пішінін отызының байқаған соң, Баланың қол-аяғын шешіп алды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02029",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Мастықпен қылса, қылған шығар-ау деп, Іс көрмеген жастықпен және сенді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02031",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Жел тынып, күн айығып баяғыдай, Хикметімен тоқтатты бір жасаған."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02033",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Отыз құл мынау тек жан емес қой деп, Әлінше қызметінде жүр тырбаңдап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02034",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Бір мезгілде шал айтты: - Балам, тоқта, Мысты алтын қылатын дәрі осы жақта."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02035",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Алыс емес, аз күндік жақын жерде, Болмай ма молықтырып ап қайтсақ та?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02036",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Бала айтты: - Өзің біл!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02038",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Төбесінен тік тұрып қылды қызмет, Титтей шәргез келмейді мінезіне."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02044",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Шал айтады балаға: - Көрдің бе?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02046",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Ол өзі - бұлт емес, Қаптың тауы, Бір бөлек үлкен таудың бергі бауры."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02053",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Соны айтты да, шал сабап жүре берді, Бір өзен жатыр екен, соны өрледі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02059",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Бұл жерге мен кеткен соң самұрық келер, Маяны іліп алып, биікке өрлер."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02061",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Тау басында бар қара ұсақ топырақ, Қапқа толтыр кешікпей жылдамырақ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02075",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Жіберді әлгі қапты жерге атып, Антұрған шал дәулетке қалды батып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02080",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Сұм шалдың дінсіздігін сонда білді, Қарамай, бір қайрылмай, жүре берді."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02084",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Күн де батты, бір жерге Әзім жатты, Күн батқан соң жан-жағы салдыр."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02088",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Өзі де бір тарапқа ыршып кетті, Бір биік ағаш көрген, соған жетті."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02091",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Қараса басқа айдаһар жоғалыпты, Өзі шапқан таныды айдаһарды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02092",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Ойлады тірі болса кетпес пе еді?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02093",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Өлген ғой мына айдаһар деп ойлады."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02095",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Көрді, білді айдаһар тірі емесін, Тәңірі ұзын жаратқан сом денесін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02101",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Үш қонып, төртінші күн белден асты, Ол күні алтынды үйге душарласты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02103",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Қақпадан кірді ішкері қадам басып, Бір үйінен өрледі бір үйге асып."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02110",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Әуелде өзі көрген бар қысаны Сөйледі бірін қоймай бастан аяқ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02119",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Көңілінде қара жоқ, ақ ниетпен Тым жақын дос болуға ыңғайласты."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02125",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Кірсе, ар жағы дөңгелек қалың ағаш, Ішінде бір қауыз бар ернеуі тас."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02127",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_135",
+      "text": "Тас ернеуі - меруерт, ол көрінген, Кеткісі келмес жанның мұны көрген."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02135",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_137",
+      "text": "Зәл, зәлиллік көрген соң, сайрай бер, тіл, Ре, риза қылмағыңды, яр, өзің біл."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02137",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_137",
+      "text": "Шын шикәр ләб есіме түскен сайын, Сат, сабырым қалмады, мен не әйләйін."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02146",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_138",
+      "text": "Кұлақтан кіріп, бойды алар Жақсы ән мен тәтті күй."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02149",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_139",
+      "text": "Сен де — бір кірпіш, дүниеге Кетігін тап та, бар қалан!"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02150",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_139",
+      "text": "Қайрат пен ақыл жол табар Қашқанға да, қуғанға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02151",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_139",
+      "text": "Әділет, шапқат кімде бар, Сол жарасар туғанға."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02152",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_139",
+      "text": "Бастапқы екеу соңғысыз Біте қалса қазаққа, Алдың — жалын, артың — мұз, Барар едің қай жаққа?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02160",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_139",
+      "text": "Өткен өмір — қу, соқпақ; Қыдырады, талайды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02163",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_140",
+      "text": "Әуелде бір суық мұз – ақыл зерек, Жылытқан тұла бойды ыстық жүрек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02164",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_140",
+      "text": "Тоқтаулылық, қалыпты, шыдамдылық, Бұл – қайраттан шығады, білсең керек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02165",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_140",
+      "text": "Ақыл, қайрат, жүректі бірдей ұста, Сонда толық боласың елден бөлек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02167",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_140",
+      "text": "Ақыл да, ашу да жоқ, күлкі де жоқ, Тулап, қайнап бір жүрек қылады әлек."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02171",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_141",
+      "text": "Сайра да зарла, қызыл тіл, Қара көңілім оянсын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02172",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_141",
+      "text": "Жыласын, көзден жас ақсын, Омырауым боялсын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02180",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_141",
+      "text": "Қабыл көрсе сөзімді, Кім таныса, сол алсын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02182",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_141",
+      "text": "Онан дағы бір есті Ішкі сырын аңғарсын."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02184",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_141",
+      "text": "Ғылым да жоқ, ми да жоқ, Даладағы аңдарсың."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02187",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_142",
+      "text": "Өкінішті көп өмір кеткен өтіп, Өткіздік бір нәрсеге болмай жетік."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02189",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_142",
+      "text": "Үлгісіз жұртты үйретіп, қалдық кейін, Көп надандар өзіне тартар бейім."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02193",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_142",
+      "text": "Сенімі жоқ серменде сырды бұзды, Анық таза көрмейміз досымызды."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02197",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_142",
+      "text": "Сеніскен досым да жоқ, асығым да, Ақыры өлең қылдым, жасыдым да."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02198",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_142",
+      "text": "Көрмеген көп дүние көл көрінді, Кірлемеген көңілдің ашығында."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02199",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_142",
+      "text": "Құдай берген бұл достық – кәннің бірі, Мұңдасқанда қалмайды көңіл кірі."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02210",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_143",
+      "text": "Бір сөзін бір сөзіне қиыстырар, Әрбірі келгенінше өз шамасы."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02212",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_143",
+      "text": "Іші алтын, сырты күміс сөз жақсысын Қазақтың келістірер қай баласы?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02222",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_143",
+      "text": "Сөз түзелді, тыңдаушы, сен де түзел, Сендерге де келейін енді аяңдап."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02232",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_144",
+      "text": "Өлсем, орным қара жер сыз болмай ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02233",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_144",
+      "text": "Өткір тіл бір ұялшақ қыз болмай ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02235",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_144",
+      "text": "Амалсыз тағдыр бір күн кез болмай ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02236",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_144",
+      "text": "Біреуге жай, біреуге тез болмай ма?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02238",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_144",
+      "text": "Сонда жауап бере алман мен бишара, Сіздерге еркін тиер, байқап қара."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02239",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_144",
+      "text": "Екі күймек бір жанға әділет пе?"
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02240",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_144",
+      "text": "Қаны қара бір жанмын, жаны жара."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02241",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_144",
+      "text": "Жүрегіңнің түбіне терең бойла, Мен бір жұмбақ адаммын, оны да ойла."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02244",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_144",
+      "text": "Ерте ояндым, ойландым, жете алмадым, Етекбасты көп көрдім елден бірақ."
+    },
+    {
+      "domain": "classical_literature",
+      "id": "abai_02251",
+      "pack_name": "adam-abai-wikisource-pack",
+      "source_id": "abai_work_145",
+      "text": "Кім жүрер тіршілікке көңіл бермей?"
+    }
+  ],
+  "script": "cyrillic",
+  "sentences_scanned": 2508,
+  "skipped_duplicate": 40,
+  "skipped_latin": 4,
+  "skipped_length": 211,
+  "source_license": "public domain (Abai Qunanbayuly, d. 1904) / CC-BY-SA 4.0 (Wikisource presentation)",
+  "source_url": "https://kk.wikisource.org/wiki/Абай_Құнанбайұлы",
+  "target_language": "kazakh",
+  "version": "0.3.0",
+  "works_scanned": 146
+}
