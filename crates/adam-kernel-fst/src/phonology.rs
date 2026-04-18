@@ -163,11 +163,13 @@ pub fn realise_e(ctx: PhonologicalContext) -> Option<char> {
 
 /// Archiphoneme `{D}` — catalogue rules 4, 5, 7.
 pub fn realise_d(ctx: PhonologicalContext) -> char {
-    // Rule 4 (D nasal harmony): if stem contains a nasal in context → н.
-    // TODO: full condition — this is a simplification.
-    if ctx.stem_has_nasal && matches!(ctx.preceding, ConsonantClass::Nasal) {
-        return 'н';
-    }
+    // Rule 4 (D nasal harmony) full condition is `:Nasals _ :Vow :Nasals` —
+    // the abstract {D} becomes н only when flanked on the LEFT by a nasal
+    // AND on the RIGHT by Vow+Nasal. Since we walk atoms left-to-right we
+    // don't have forward lookahead yet; in the vast majority of real cases
+    // the left-only "nasal→нn" heuristic produces the wrong output (e.g.
+    // адам+LOC → *адамна, should be адамда). Disable it for now and revisit
+    // when we implement two-pass FST with lookahead (week 2 target).
     // Rule 5 (forward voicing): after voiceless → т.
     if matches!(ctx.preceding, ConsonantClass::Voiceless) {
         return 'т';
@@ -232,20 +234,18 @@ pub fn realise_g(ctx: PhonologicalContext) -> char {
 }
 
 /// Archiphoneme `{K}` — catalogue rules 27, 28, 29.
+///
+/// Simplification for week 1: {K} stays voiceless by default (`қ`/`к`). The
+/// intervocalic-voicing rule (29 "Voicing of K") applies only when the {K}
+/// is followed by a vowel (`_ V`), which we cannot see yet with single-pass
+/// left-to-right realisation. The single-sided heuristic (voice after any
+/// preceding vowel) breaks word-final `{K}` (e.g., 1pl past `жаздық`). We
+/// prefer the under-voicing default; the intervocalic case will be handled
+/// by a post-pass in week 2.
 pub fn realise_k(ctx: PhonologicalContext) -> char {
-    let voiced = matches!(
-        ctx.preceding,
-        ConsonantClass::Nasal
-            | ConsonantClass::Liquid
-            | ConsonantClass::HighSonorant
-            | ConsonantClass::VoicedObstruent
-            | ConsonantClass::VowelPreceding
-    );
-    match (ctx.harmony, voiced) {
-        (VowelClass::Back, false) => 'қ',
-        (VowelClass::Back, true) => 'ғ',
-        (VowelClass::Front, false) => 'к',
-        (VowelClass::Front, true) => 'г',
+    match ctx.harmony {
+        VowelClass::Back => 'қ',
+        VowelClass::Front => 'к',
     }
 }
 
