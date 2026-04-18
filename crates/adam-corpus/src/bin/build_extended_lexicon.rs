@@ -1,20 +1,18 @@
 // Build an extended segmentation_roots.json from root_candidates_report.json.
 //
-// v2 strategy (POS-aware + FSM-filter):
-//   * Keep all curated roots (211 entries) exactly as-is.
+// v3 strategy (LCP + POS-aware mutual-prefix):
+//   * Keep all curated roots exactly as-is.
 //   * For each new candidate:
-//     1. If the existing FSM (curated lexicon + rules) can already segment the
-//        candidate's root form, skip it — it's an inflected form of a known
-//        root, not a new root. This is the single most important filter; it
-//        prevents the regression we hit when qарай/келе/жазып were added as
-//        nouns and shadowed the existing qара/кел/жаз verbs.
-//     2. Classify POS from example_forms:
-//          - Verb if any form ends in ды/ді/ты/ті/ған/ген/қан/кен/ып/іп/ады/еді
-//          - Adjective if any form ends in лы/лі/дай/дей/рақ/рек
-//          - Default Noun otherwise
-//     3. Compute vowel_harmony (deterministic from vowel classes).
-//     4. Compute final_sound_class (deterministic from last character).
-//     5. Skip obvious garbage (length < 3, no vowels, loanword signal).
+//     1. Recompute root via longest-common-prefix of example_forms. The
+//        extractor's greedy suffix-strip sometimes leaves a suffix on the
+//        root (e.g. "қарай" instead of "қара" because "-й" isn't in the
+//        strip list). LCP gives us the true stem.
+//     2. If the FSM can segment the LCP root, skip (already derivable).
+//     3. POS classification from example_forms inflection markers.
+//     4. POS-aware mutual-prefix: skip only if a curated root with the SAME
+//        POS has prefix overlap. Different POS can coexist (verb ал + noun
+//        алғашқы do not conflict in segmentation).
+//     5. Vowel harmony / final sound class / loanword / length filters.
 
 use std::{collections::HashSet, env, fs, process::ExitCode};
 
@@ -185,44 +183,51 @@ fn main() -> ExitCode {
         if new_roots.len() >= target_n {
             break;
         }
-        if curated_surfaces.contains(&cand.root) {
-            skipped_already += 1;
-            continue;
-        }
-        if cand.root.chars().count() < 3 {
+        // Step 1: recompute root via longest-common-prefix of example_forms.
+        // The extractor's suffix-strip can leave residual suffix characters.
+        let lcp_root = longest_common_prefix(&cand.root, &cand.example_forms);
+        if lcp_root.chars().count() < 3 {
             skipped_too_short += 1;
             continue;
         }
-        // Filter #1a (critical): if the existing FSM can already segment this
-        // candidate, it's not a new root — it's an inflected form.
-        if deterministic_segment_token(&cand.root, &kernel_lexicon, &kernel_rules).is_some() {
+        if curated_surfaces.contains(&lcp_root) {
+            skipped_already += 1;
+            continue;
+        }
+        // Dedup new roots: multiple candidates (e.g. кел and келе) can LCP to
+        // the same root (кел); keep only the first occurrence.
+        if new_roots.iter().any(|r| r.root == lcp_root) {
+            skipped_already += 1;
+            continue;
+        }
+        // Filter #1: FSM already segments it — skip.
+        if deterministic_segment_token(&lcp_root, &kernel_lexicon, &kernel_rules).is_some() {
             skipped_segmentable += 1;
             continue;
         }
-        // Filter #1b (mutual-prefix): even if FSM can't segment candidate, a
-        // curated root may still conflict via surface-prefix overlap. Two
-        // failure modes observed:
-        //   - "алд" candidate (over-stripped from ал+ды) shadows "ал" verb on
-        //     "алды" segmentation: curated root is prefix of candidate.
-        //   - "арқы" candidate (over-stripped from арқылы) shadows "арқылы"
-        //     postposition: candidate is prefix of curated root.
-        // Skip both directions.
-        let candidate_conflicts = curated_surfaces.iter().any(|c| {
-            c != &cand.root
-                && (cand.root.starts_with(c.as_str()) || c.starts_with(cand.root.as_str()))
+        // Step 2: POS classification from example_forms.
+        let pos = classify_pos(&lcp_root, &cand.example_forms);
+
+        // Filter #1b (mutual-prefix over ALL curated POS): any curated root
+        // that is a surface-prefix of candidate (or vice versa) can break
+        // segmentation regardless of POS, because the longest-match root
+        // lookup in the FSM path is POS-agnostic. POS-aware relaxation
+        // regressed 442/464. Revert to "any POS" check — safer with LCP fix.
+        let has_prefix_conflict = curated_surfaces.iter().any(|c| {
+            c != &lcp_root && (lcp_root.starts_with(c.as_str()) || c.starts_with(lcp_root.as_str()))
         });
-        if candidate_conflicts {
+        if has_prefix_conflict {
             skipped_segmentable += 1;
             continue;
         }
         // Filter #2: loanword signal — no Kazakh-specific letters AND length ≥ 5.
-        let has_kz_specific = cand.root.chars().any(|c| KAZAKH_SPECIFIC.contains(&c));
-        if !has_kz_specific && cand.root.chars().count() >= 5 {
+        let has_kz_specific = lcp_root.chars().any(|c| KAZAKH_SPECIFIC.contains(&c));
+        if !has_kz_specific && lcp_root.chars().count() >= 5 {
             skipped_loanword += 1;
             continue;
         }
         // Filter #3: no vowels at all = garbage.
-        let (front_count, back_count) = count_vowels(&cand.root);
+        let (front_count, back_count) = count_vowels(&lcp_root);
         if front_count == 0 && back_count == 0 {
             skipped_no_vowel += 1;
             continue;
@@ -233,9 +238,8 @@ fn main() -> ExitCode {
         } else {
             "back"
         };
-        let last_char = cand.root.chars().last().unwrap_or('а');
+        let last_char = lcp_root.chars().last().unwrap_or('а');
         let fsc = classify_final(last_char);
-        let pos = classify_pos(&cand.root, &cand.example_forms);
         match pos {
             "verb" => classified_verb += 1,
             "adjective" => classified_adj += 1,
@@ -243,14 +247,14 @@ fn main() -> ExitCode {
         }
 
         // Unique id
-        let mut base_id = format!("{}_{}", pos, transliterate(&cand.root));
+        let mut base_id = format!("{}_{}", pos, transliterate(&lcp_root));
         if curated_ids.contains(&base_id) || new_roots.iter().any(|r| r.id == base_id) {
             base_id.push_str(&format!("_auto{}", new_roots.len() + 1));
         }
 
         new_roots.push(RootEntry {
             id: base_id,
-            root: cand.root.clone(),
+            root: lcp_root.clone(),
             part_of_speech: pos.to_string(),
             vowel_harmony: harmony.to_string(),
             final_sound_class: fsc.to_string(),
@@ -325,6 +329,32 @@ fn main() -> ExitCode {
     eprintln!("wrote {OUTPUT_ROOTS_PATH}");
     eprintln!("wrote {REPORT_PATH}");
     ExitCode::SUCCESS
+}
+
+/// Compute the longest prefix common to `candidate_root` and every form in
+/// `example_forms`. If the candidate is already a prefix of all forms, we keep
+/// it. Otherwise, we trim it down to what actually matches the evidence. This
+/// corrects the "greedy suffix strip" over-stripping (and, symmetrically, the
+/// under-stripping when the extractor's suffix list doesn't cover a form).
+fn longest_common_prefix(candidate_root: &str, example_forms: &[String]) -> String {
+    if example_forms.is_empty() {
+        return candidate_root.to_string();
+    }
+    // Start with the candidate as the initial guess.
+    let mut prefix_chars: Vec<char> = candidate_root.chars().collect();
+    for form in example_forms {
+        let form_chars: Vec<char> = form.chars().collect();
+        let common_len = prefix_chars
+            .iter()
+            .zip(form_chars.iter())
+            .take_while(|(a, b)| a == b)
+            .count();
+        prefix_chars.truncate(common_len);
+        if prefix_chars.is_empty() {
+            break;
+        }
+    }
+    prefix_chars.iter().collect()
 }
 
 fn count_vowels(word: &str) -> (usize, usize) {
