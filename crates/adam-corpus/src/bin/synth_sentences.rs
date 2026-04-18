@@ -141,7 +141,14 @@ fn generate_one(
     modals: &[&SegmentationRootEntry],
     rules: &SegmentationRuleSet,
 ) -> Option<String> {
-    let template_idx = rng.range(30);
+    // Template indices:
+    //   0..30  — L1 (2-4 words, simple subject-verb / noun phrases)
+    //   30..45 — L2 (5-7 words, sentences with adjectives, objects, postpositions)
+    //   45..55 — L3 (7-10 words, two clauses joined with conjunctions)
+    //
+    // v0.5.0 Phase 3: added L2/L3 templates. The filter_pack min-words=4 cutoff
+    // gutted the old 3-word pool; L2 and L3 provide the structural replacement.
+    let template_idx = rng.range(55);
     match template_idx {
         0 => {
             // N + V(aorist 3sg)
@@ -372,8 +379,318 @@ fn generate_one(
             let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
             Some(format!("{} {} {}.", d, subj.root, v))
         }
+        // L2 — 5-7 word sentences
+        30 => {
+            // Adj + N + N(acc) + V(past): "үлкен адам кітапты оқыды"
+            let adj = *rng.pick(adjectives)?;
+            let subj = *rng.pick(nouns)?;
+            let obj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let o = inflect(obj, &["accusative"], rules, rng)?;
+            let v = inflect(verb, &["past"], rules, rng)?;
+            Some(format!("{} {} {} {}.", adj.root, subj.root, o, v))
+        }
+        31 => {
+            // Adj + N + N(dat) + V(aorist 3sg): "жас бала мектепке барады"
+            let adj = *rng.pick(adjectives)?;
+            let subj = *rng.pick(nouns)?;
+            let dest = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let d = inflect(dest, &["dative"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {} {}.", adj.root, subj.root, d, v))
+        }
+        32 => {
+            // N(loc) + Adj + N + V(aorist 3sg): "қалада үлкен адам тұрады"
+            let loc = *rng.pick(nouns)?;
+            let adj = *rng.pick(adjectives)?;
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let l = inflect(loc, &["locative"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {} {}.", l, adj.root, subj.root, v))
+        }
+        33 => {
+            // Num + N + N(acc) + V(aorist 3sg): "екі адам кітапты оқыйды"
+            let num = *rng.pick(numerals)?;
+            let subj = *rng.pick(nouns)?;
+            let obj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let o = inflect(obj, &["accusative"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {} {}.", num.root, subj.root, o, v))
+        }
+        34 => {
+            // Adv + N + V(past): "кеше бала келді"
+            let adv = *rng.pick(adverbs)?;
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["past"], rules, rng)?;
+            Some(format!("{} {} {}.", adv.root, subj.root, v))
+        }
+        35 => {
+            // N + postp + N + V(aorist 3sg): "мектеп туралы адам айтады"
+            let np = *rng.pick(nouns)?;
+            let p = *rng.pick(postpositions)?;
+            let subj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {} {}.", np.root, p.root, subj.root, v))
+        }
+        36 => {
+            // N + N(gen) + N(acc) + V(aorist 3sg):
+            // "адам баланың кітабын оқыйды"
+            let poss = *rng.pick(nouns)?;
+            let subj = *rng.pick(nouns)?;
+            let obj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let p = inflect(poss, &["genitive"], rules, rng)?;
+            let o = inflect(obj, &["accusative"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {} {}.", subj.root, p, o, v))
+        }
+        37 => {
+            // Adj + N + Adv + V(aorist 3sg): "үлкен адам жиі жұмыс істейді"
+            let adj = *rng.pick(adjectives)?;
+            let subj = *rng.pick(nouns)?;
+            let adv = *rng.pick(adverbs)?;
+            let verb = *rng.pick(verbs)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {} {}.", adj.root, subj.root, adv.root, v))
+        }
+        38 => {
+            // N + Adj + N(acc) + V(past): "адам жаңа кітапты берді"
+            let subj = *rng.pick(nouns)?;
+            let adj = *rng.pick(adjectives)?;
+            let obj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let o = inflect(obj, &["accusative"], rules, rng)?;
+            let v = inflect(verb, &["past"], rules, rng)?;
+            Some(format!("{} {} {} {}.", subj.root, adj.root, o, v))
+        }
+        39 => {
+            // N(loc) + N + N(acc) + V(past): "қалада адам кітапты оқыды"
+            let loc = *rng.pick(nouns)?;
+            let subj = *rng.pick(nouns)?;
+            let obj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let l = inflect(loc, &["locative"], rules, rng)?;
+            let o = inflect(obj, &["accusative"], rules, rng)?;
+            let v = inflect(verb, &["past"], rules, rng)?;
+            Some(format!("{} {} {} {}.", l, subj.root, o, v))
+        }
+        40 => {
+            // Adv + N + N(acc) + V(aorist 3sg): "кеше адам кітапты оқыды"
+            let adv = *rng.pick(adverbs)?;
+            let subj = *rng.pick(nouns)?;
+            let obj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let o = inflect(obj, &["accusative"], rules, rng)?;
+            let v = inflect(verb, &["past"], rules, rng)?;
+            Some(format!("{} {} {} {}.", adv.root, subj.root, o, v))
+        }
+        41 => {
+            // N(pl) + Adj + N + V(aorist 3sg)
+            let subj_n = *rng.pick(nouns)?;
+            let adj = *rng.pick(adjectives)?;
+            let obj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let s = inflect(subj_n, &["plural"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {} {}.", s, adj.root, obj.root, v))
+        }
+        42 => {
+            // Adj + N + N(instr/com) + V(aorist 3sg): "жас бала досымен ойнайды"
+            let adj = *rng.pick(adjectives)?;
+            let subj = *rng.pick(nouns)?;
+            let comp = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let c = inflect(comp, &["instrumental"], rules, rng)?;
+            let v = inflect(verb, &["future", "person_3sg"], rules, rng)?;
+            Some(format!("{} {} {} {}.", adj.root, subj.root, c, v))
+        }
+        43 => {
+            // N + N(dat) + Adj + N(acc) + V(past)
+            let subj = *rng.pick(nouns)?;
+            let recipient = *rng.pick(nouns)?;
+            let adj = *rng.pick(adjectives)?;
+            let obj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let r = inflect(recipient, &["dative"], rules, rng)?;
+            let o = inflect(obj, &["accusative"], rules, rng)?;
+            let v = inflect(verb, &["past"], rules, rng)?;
+            Some(format!("{} {} {} {} {}.", subj.root, r, adj.root, o, v))
+        }
+        44 => {
+            // N + N(abl) + N(acc) + V(past): "адам үйден кітапты алды"
+            let subj = *rng.pick(nouns)?;
+            let src = *rng.pick(nouns)?;
+            let obj = *rng.pick(nouns)?;
+            let verb = *rng.pick(verbs)?;
+            let s = inflect(src, &["ablative"], rules, rng)?;
+            let o = inflect(obj, &["accusative"], rules, rng)?;
+            let v = inflect(verb, &["past"], rules, rng)?;
+            Some(format!("{} {} {} {}.", subj.root, s, o, v))
+        }
+        // L3 — two-clause sentences (7-10 words)
+        45 => {
+            // [Adj + N + V(aorist 3sg)] conj [N + V(aorist 3sg)]
+            // "үлкен адам жұмыс істейді және бала оқиды"
+            let adj = *rng.pick(adjectives)?;
+            let s1 = *rng.pick(nouns)?;
+            let v1_r = *rng.pick(verbs)?;
+            let conj = *rng.pick(conjunctions)?;
+            let s2 = *rng.pick(nouns)?;
+            let v2_r = *rng.pick(verbs)?;
+            let v1 = inflect(v1_r, &["future", "person_3sg"], rules, rng)?;
+            let v2 = inflect(v2_r, &["future", "person_3sg"], rules, rng)?;
+            Some(format!(
+                "{} {} {} {} {} {}.",
+                adj.root, s1.root, v1, conj.root, s2.root, v2
+            ))
+        }
+        46 => {
+            // [N(loc) + N + V(past)] conj [Adv + N + V(aorist 3sg)]
+            let loc = *rng.pick(nouns)?;
+            let s1 = *rng.pick(nouns)?;
+            let v1_r = *rng.pick(verbs)?;
+            let conj = *rng.pick(conjunctions)?;
+            let adv = *rng.pick(adverbs)?;
+            let s2 = *rng.pick(nouns)?;
+            let v2_r = *rng.pick(verbs)?;
+            let l = inflect(loc, &["locative"], rules, rng)?;
+            let v1 = inflect(v1_r, &["past"], rules, rng)?;
+            let v2 = inflect(v2_r, &["future", "person_3sg"], rules, rng)?;
+            Some(format!(
+                "{} {} {} {} {} {} {}.",
+                l, s1.root, v1, conj.root, adv.root, s2.root, v2
+            ))
+        }
+        47 => {
+            // [N + N(acc) + V(past)] conj [N + N(acc) + V(aorist 3sg)]
+            let s1 = *rng.pick(nouns)?;
+            let o1 = *rng.pick(nouns)?;
+            let v1_r = *rng.pick(verbs)?;
+            let conj = *rng.pick(conjunctions)?;
+            let s2 = *rng.pick(nouns)?;
+            let o2 = *rng.pick(nouns)?;
+            let v2_r = *rng.pick(verbs)?;
+            let acc1 = inflect(o1, &["accusative"], rules, rng)?;
+            let acc2 = inflect(o2, &["accusative"], rules, rng)?;
+            let v1 = inflect(v1_r, &["past"], rules, rng)?;
+            let v2 = inflect(v2_r, &["future", "person_3sg"], rules, rng)?;
+            Some(format!(
+                "{} {} {} {} {} {} {}.",
+                s1.root, acc1, v1, conj.root, s2.root, acc2, v2
+            ))
+        }
+        48 => {
+            // [Adj + N + N(acc) + V(past)] conj [N + V(past)]
+            let adj = *rng.pick(adjectives)?;
+            let s1 = *rng.pick(nouns)?;
+            let o1 = *rng.pick(nouns)?;
+            let v1_r = *rng.pick(verbs)?;
+            let conj = *rng.pick(conjunctions)?;
+            let s2 = *rng.pick(nouns)?;
+            let v2_r = *rng.pick(verbs)?;
+            let acc1 = inflect(o1, &["accusative"], rules, rng)?;
+            let v1 = inflect(v1_r, &["past"], rules, rng)?;
+            let v2 = inflect(v2_r, &["past"], rules, rng)?;
+            Some(format!(
+                "{} {} {} {} {} {} {}.",
+                adj.root, s1.root, acc1, v1, conj.root, s2.root, v2
+            ))
+        }
+        49 => {
+            // [N + N(gen) + N(acc) + V(past)] conj [N + V(aorist 3sg)]
+            let s1 = *rng.pick(nouns)?;
+            let poss = *rng.pick(nouns)?;
+            let o1 = *rng.pick(nouns)?;
+            let v1_r = *rng.pick(verbs)?;
+            let conj = *rng.pick(conjunctions)?;
+            let s2 = *rng.pick(nouns)?;
+            let v2_r = *rng.pick(verbs)?;
+            let gen_form = inflect(poss, &["genitive"], rules, rng)?;
+            let acc = inflect(o1, &["accusative"], rules, rng)?;
+            let v1 = inflect(v1_r, &["past"], rules, rng)?;
+            let v2 = inflect(v2_r, &["future", "person_3sg"], rules, rng)?;
+            Some(format!(
+                "{} {} {} {} {} {} {}.",
+                s1.root, gen_form, acc, v1, conj.root, s2.root, v2
+            ))
+        }
+        50 => {
+            // [Adv + N + N(acc) + V(past)] conj [Adj + N + V(aorist 3sg)]
+            let adv = *rng.pick(adverbs)?;
+            let s1 = *rng.pick(nouns)?;
+            let o1 = *rng.pick(nouns)?;
+            let v1_r = *rng.pick(verbs)?;
+            let conj = *rng.pick(conjunctions)?;
+            let adj = *rng.pick(adjectives)?;
+            let s2 = *rng.pick(nouns)?;
+            let v2_r = *rng.pick(verbs)?;
+            let acc = inflect(o1, &["accusative"], rules, rng)?;
+            let v1 = inflect(v1_r, &["past"], rules, rng)?;
+            let v2 = inflect(v2_r, &["future", "person_3sg"], rules, rng)?;
+            Some(format!(
+                "{} {} {} {} {} {} {} {}.",
+                adv.root, s1.root, acc, v1, conj.root, adj.root, s2.root, v2
+            ))
+        }
+        51 => {
+            // [N + N(dat) + V(aorist 3sg)] conj [N + N(abl) + V(past)]
+            let s1 = *rng.pick(nouns)?;
+            let dest = *rng.pick(nouns)?;
+            let v1_r = *rng.pick(verbs)?;
+            let conj = *rng.pick(conjunctions)?;
+            let s2 = *rng.pick(nouns)?;
+            let src = *rng.pick(nouns)?;
+            let v2_r = *rng.pick(verbs)?;
+            let dat = inflect(dest, &["dative"], rules, rng)?;
+            let abl = inflect(src, &["ablative"], rules, rng)?;
+            let v1 = inflect(v1_r, &["future", "person_3sg"], rules, rng)?;
+            let v2 = inflect(v2_r, &["past"], rules, rng)?;
+            Some(format!(
+                "{} {} {} {} {} {} {}.",
+                s1.root, dat, v1, conj.root, s2.root, abl, v2
+            ))
+        }
+        52 => {
+            // N + N(acc) + V(past) + conj + Adv + V(aorist 3sg)
+            // "адам кітапты оқыды және жиі жазады"
+            let s1 = *rng.pick(nouns)?;
+            let o1 = *rng.pick(nouns)?;
+            let v1_r = *rng.pick(verbs)?;
+            let conj = *rng.pick(conjunctions)?;
+            let adv = *rng.pick(adverbs)?;
+            let v2_r = *rng.pick(verbs)?;
+            let acc = inflect(o1, &["accusative"], rules, rng)?;
+            let v1 = inflect(v1_r, &["past"], rules, rng)?;
+            let v2 = inflect(v2_r, &["future", "person_3sg"], rules, rng)?;
+            Some(format!(
+                "{} {} {} {} {} {}.",
+                s1.root, acc, v1, conj.root, adv.root, v2
+            ))
+        }
+        53 => {
+            // Adj + N + N(acc) + V(aorist 3sg) + , + Adj + N + V(aorist 3sg)
+            let adj1 = *rng.pick(adjectives)?;
+            let s1 = *rng.pick(nouns)?;
+            let o1 = *rng.pick(nouns)?;
+            let v1_r = *rng.pick(verbs)?;
+            let adj2 = *rng.pick(adjectives)?;
+            let s2 = *rng.pick(nouns)?;
+            let v2_r = *rng.pick(verbs)?;
+            let acc = inflect(o1, &["accusative"], rules, rng)?;
+            let v1 = inflect(v1_r, &["future", "person_3sg"], rules, rng)?;
+            let v2 = inflect(v2_r, &["future", "person_3sg"], rules, rng)?;
+            Some(format!(
+                "{} {} {} {}, {} {} {}.",
+                adj1.root, s1.root, acc, v1, adj2.root, s2.root, v2
+            ))
+        }
         _ => {
-            // N(loc) + N + V(aorist 3sg): "қалада адам тұрады"
+            // N(loc) + N + V(aorist 3sg): "қалада адам тұрады"  [original default]
             let loc_n = *rng.pick(nouns)?;
             let subj = *rng.pick(nouns)?;
             let verb = *rng.pick(verbs)?;
