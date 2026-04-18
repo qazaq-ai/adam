@@ -1,0 +1,12 @@
+[package]
+name = "adam-kernel-fst"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Deterministic finite-state transducer for Kazakh morphology (adam v1.0.0)"
+
+[dependencies]
+adam-kernel = { path = "../adam-kernel" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true

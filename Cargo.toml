@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "crates/adam-kernel",
+  "crates/adam-kernel-fst",
   "crates/adam-tokenizer",
   "crates/adam-corpus",
   "crates/adam-eval",
