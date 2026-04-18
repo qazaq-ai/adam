@@ -29,6 +29,9 @@ pub struct VerbFeatures {
     pub tense: Option<Tense>,
     pub person: Option<Person>,
     pub number: Option<Number>,
+    /// `true` selects the polite (V-form) personal ending instead of the
+    /// informal (T-form). Only matters for 2nd person.
+    pub polite: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -166,6 +169,31 @@ const VERB_PERS_1SG: SuffixTemplate = &[SuffixAtom::Literal('м')];
 const VERB_PERS_2SG: SuffixTemplate = &[SuffixAtom::Literal('ң')];
 /// 1pl (attached after past-definite): `-{K}` → қ/к.
 const VERB_PERS_1PL: SuffixTemplate = &[SuffixAtom::Arch(Archiphoneme::K)];
+
+/// 2sg polite past: `-ң{I}з` (жаздыңыз / бердіңіз).
+const VERB_PERS_2SG_POLITE: SuffixTemplate = &[
+    SuffixAtom::Literal('ң'),
+    SuffixAtom::Arch(Archiphoneme::I),
+    SuffixAtom::Literal('з'),
+];
+
+/// 2pl informal past: `-ң{D}{A}р` (жаздыңдар / бердіңдер).
+const VERB_PERS_2PL_INFORMAL: SuffixTemplate = &[
+    SuffixAtom::Literal('ң'),
+    SuffixAtom::Arch(Archiphoneme::D),
+    SuffixAtom::Arch(Archiphoneme::A),
+    SuffixAtom::Literal('р'),
+];
+
+/// 2pl polite past: `-ң{I}з{D}{A}р` (жаздыңыздар).
+const VERB_PERS_2PL_POLITE: SuffixTemplate = &[
+    SuffixAtom::Literal('ң'),
+    SuffixAtom::Arch(Archiphoneme::I),
+    SuffixAtom::Literal('з'),
+    SuffixAtom::Arch(Archiphoneme::D),
+    SuffixAtom::Arch(Archiphoneme::A),
+    SuffixAtom::Literal('р'),
+];
 
 // -------------------------------------------------------------------------
 // Possessive suffix templates (week 1 day 1 extension).
@@ -316,18 +344,28 @@ pub fn synthesise_verb(root: &str, features: VerbFeatures) -> String {
         Some(Tense::PastDefinite) => acc.apply(VERB_PAST),
         Some(_) | None => {}
     }
-    match (features.person, features.number) {
-        (Some(Person::First), Some(Number::Singular)) | (Some(Person::First), None) => {
+    match (features.person, features.number, features.polite) {
+        (Some(Person::First), Some(Number::Singular), _) | (Some(Person::First), None, _) => {
             acc.apply(VERB_PERS_1SG);
         }
-        (Some(Person::Second), Some(Number::Singular)) | (Some(Person::Second), None) => {
+        (Some(Person::Second), Some(Number::Singular), false)
+        | (Some(Person::Second), None, false) => {
             acc.apply(VERB_PERS_2SG);
         }
-        (Some(Person::First), Some(Number::Plural)) => {
+        (Some(Person::Second), Some(Number::Singular), true)
+        | (Some(Person::Second), None, true) => {
+            acc.apply(VERB_PERS_2SG_POLITE);
+        }
+        (Some(Person::First), Some(Number::Plural), _) => {
             acc.apply(VERB_PERS_1PL);
         }
-        // Remaining combinations (3rd person, 2nd plural, etc.) are either
-        // unmarked or not in the week-1 target test matrix; silently skip.
+        (Some(Person::Second), Some(Number::Plural), false) => {
+            acc.apply(VERB_PERS_2PL_INFORMAL);
+        }
+        (Some(Person::Second), Some(Number::Plural), true) => {
+            acc.apply(VERB_PERS_2PL_POLITE);
+        }
+        // 3rd person past is unmarked (жазды, келді).
         _ => {}
     }
     acc.out
@@ -603,5 +641,73 @@ mod tests {
             },
         );
         assert_eq!(out, "баласында");
+    }
+
+    // -----------------------------------------------------------------
+    // Extended verb paradigm (past tense, all persons + politeness).
+    // -----------------------------------------------------------------
+
+    #[test]
+    fn verb_past_2sg_informal_жаз() {
+        // жаз + PAST + 2SG informal = жаздың
+        let out = synthesise_verb(
+            "жаз",
+            VerbFeatures {
+                tense: Some(Tense::PastDefinite),
+                person: Some(Person::Second),
+                number: Some(Number::Singular),
+                polite: false,
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жаздың");
+    }
+
+    #[test]
+    fn verb_past_2sg_polite_жаз() {
+        // жаз + PAST + 2SG polite = жаздыңыз
+        let out = synthesise_verb(
+            "жаз",
+            VerbFeatures {
+                tense: Some(Tense::PastDefinite),
+                person: Some(Person::Second),
+                number: Some(Number::Singular),
+                polite: true,
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жаздыңыз");
+    }
+
+    #[test]
+    fn verb_past_2pl_informal_бер() {
+        // бер + PAST + 2PL informal = бердіңдер (front harmony throughout)
+        let out = synthesise_verb(
+            "бер",
+            VerbFeatures {
+                tense: Some(Tense::PastDefinite),
+                person: Some(Person::Second),
+                number: Some(Number::Plural),
+                polite: false,
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "бердіңдер");
+    }
+
+    #[test]
+    fn verb_past_2pl_polite_жаз() {
+        // жаз + PAST + 2PL polite = жаздыңыздар
+        let out = synthesise_verb(
+            "жаз",
+            VerbFeatures {
+                tense: Some(Tense::PastDefinite),
+                person: Some(Person::Second),
+                number: Some(Number::Plural),
+                polite: true,
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жаздыңыздар");
     }
 }
