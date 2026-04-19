@@ -2,6 +2,27 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.4.5] — 2026-04-19
+
+Introduces **adam-kernel-fst**, a pure-Rust deterministic finite-state transducer for Kazakh morphology. This is Phase 1 of the architecture pivot from stochastic transformers to deterministic morphology + small LM (v1.0.0 track). v0.4.0 transformer stack stays untouched; v0.4.5 adds the new FST layer alongside.
+
+Highlights:
+
+- **New crate `adam-kernel-fst`** — phonology module (12 archiphonemes, 20+ of 54 Apertium twol rules implemented), morphotactics module (25 suffix templates covering noun plural/possessive/case and verb tense/voice/negation/person), parser module (`analyse(surface) → Vec<(root, features)>`), lexicon loader (union of 4,454 curated + 11,919 Apertium-imported entries).
+- **55 unit tests + 1 smoke test + 4 ignored slow roundtrips**. Slow tests (manual: `cargo test --test roundtrip -- --ignored`) roundtrip the full 14k lexicon on 4 feature combinations: **36,238 / 36,238 = 100.0 %** success.
+- **CLI binary `adam_fst`** — `synth`, `analyse`, `stats` subcommands. Hand-rolled arg parsing (no CLI-framework dep).
+- **Apertium-kaz import pipeline** (`import_apertium_lexicon` binary) with POS mapping, loanword filter, and prefix-conflict guard.
+- **Grammar study notes**: `docs/kazakh_grammar/00_architecture_v1.md`, `01_phonology.md`, `02_morphology.md`, `03_syntax.md`, `04_lexicon_sources.md`, `05_work_plan.md`, `06_apertium_twol_catalogue.md`.
+
+Not yet:
+
+- Vowel-final-stem edge cases (rule 17 coalescence, semivowel у).
+- Participles, converbs, infinitive.
+- LM over root + feature-bundle sequences (v0.5+ target).
+- Replacement of v0.4.0 pipeline (deliberately left untouched).
+
+Workspace totals: 137 tests passing, 4 ignored, 0 failing. CI green.
+
 ## [0.4.0] — 2026-04-17
 
 Corpus and infrastructure maturity release. Adds the first classical-literature source (Abai Qunanbayuly via Wikisource, 146 works, 2,253 samples), the first web-crawl source (CC-100 Kazakh, 50,000 samples filtered for Cyrillic-ratio and repetition), and fixes a data-composition bug in the synthetic generator (1- and 2-word outputs dominated the corpus, teaching the model early EOS). BPE retrained at vocab **8,192** with **3.27× compression** on a 12.5M-token pretokenized corpus. Model rolled back from the v0.4.0-failed experiment (27.3M, H=512 L=6) to **24.2M params** (H=512 L=5) after confirming that the L=6 scale-up was undertrained at 3.9M tokens.

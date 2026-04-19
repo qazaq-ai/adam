@@ -19,14 +19,6 @@
     },
     {
       "domain": "proverb",
-      "id": "proverb_006",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Оқыған озар, оқымаған тозар.",
-      "theme": "knowledge"
-    },
-    {
-      "domain": "proverb",
       "id": "proverb_008",
       "pack_name": "adam-kazakh-proverbs-pack",
       "source_id": "classical_kazakh_proverbs",
@@ -35,42 +27,10 @@
     },
     {
       "domain": "proverb",
-      "id": "proverb_011",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Еңбексіз өмір жоқ, өнерсіз күнкөріс жоқ.",
-      "theme": "labor"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_013",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Еңбекке бастаған, ерлікке жеткен.",
-      "theme": "labor"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_015",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Ескі дос жау болмас.",
-      "theme": "friendship"
-    },
-    {
-      "domain": "proverb",
       "id": "proverb_016",
       "pack_name": "adam-kazakh-proverbs-pack",
       "source_id": "classical_kazakh_proverbs",
       "text": "Дос басқа, дұшпан басқа.",
-      "theme": "friendship"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_017",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Жақсы дос — алтын күрек.",
       "theme": "friendship"
     },
     {
@@ -91,70 +51,6 @@
     },
     {
       "domain": "proverb",
-      "id": "proverb_022",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Жақсы сөз — жарым ырыс.",
-      "theme": "speech"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_024",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Жақсы сөз — жан азығы.",
-      "theme": "speech"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_025",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Тілі татудың — ісі тату.",
-      "theme": "speech"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_026",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Отан оттан да ыстық.",
-      "theme": "homeland"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_027",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Туған жердей жер болмас, туған елдей ел болмас.",
-      "theme": "homeland"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_028",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Ел — анаң, жер — атаң.",
-      "theme": "homeland"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_029",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Туған жер — тұғырың, туған ел — қорғаның.",
-      "theme": "homeland"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_030",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Ер туғанын сыйлар, ел туғанын қорғар.",
-      "theme": "homeland"
-    },
-    {
-      "domain": "proverb",
       "id": "proverb_031",
       "pack_name": "adam-kazakh-proverbs-pack",
       "source_id": "classical_kazakh_proverbs",
@@ -163,51 +59,11 @@
     },
     {
       "domain": "proverb",
-      "id": "proverb_033",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Сабырлы жетер мұратына, сабырсыз қалар ұятына.",
-      "theme": "measure"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_034",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Бірлік бар жерде — тірлік бар.",
-      "theme": "unity"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_035",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Ынтымақ болмаған жерде — берекет болмас.",
-      "theme": "unity"
-    },
-    {
-      "domain": "proverb",
       "id": "proverb_036",
       "pack_name": "adam-kazakh-proverbs-pack",
       "source_id": "classical_kazakh_proverbs",
       "text": "Көппен көрген — ұлы той.",
       "theme": "unity"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_037",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Жеке жүрген ат озбас.",
-      "theme": "unity"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_039",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Ағаш тамырымен, адам атымен.",
-      "theme": "character"
     },
     {
       "domain": "proverb",
@@ -251,14 +107,6 @@
     },
     {
       "domain": "proverb",
-      "id": "proverb_051",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Байлық — бір жылдық, білім — мәңгілік.",
-      "theme": "wealth"
-    },
-    {
-      "domain": "proverb",
       "id": "proverb_055",
       "pack_name": "adam-kazakh-proverbs-pack",
       "source_id": "classical_kazakh_proverbs",
@@ -283,35 +131,11 @@
     },
     {
       "domain": "proverb",
-      "id": "proverb_063",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Ұяда не көрсе, ұшқанда соны алады.",
-      "theme": "learning"
-    },
-    {
-      "domain": "proverb",
       "id": "proverb_064",
       "pack_name": "adam-kazakh-proverbs-pack",
       "source_id": "classical_kazakh_proverbs",
       "text": "Білімсіз бір күн қараңғылықта өмір сүру.",
       "theme": "learning"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_065",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Оқыған — озады, білімді — үздік болады.",
-      "theme": "learning"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_066",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Істің басы жеңіл, аяғы ауыр.",
-      "theme": "perseverance"
     },
     {
       "domain": "proverb",
@@ -323,34 +147,10 @@
     },
     {
       "domain": "proverb",
-      "id": "proverb_070",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Білгіш көптен озар, білімсіз жалғыз қалар.",
-      "theme": "wisdom"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_073",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Ауруын жасырған — өлімге жақын.",
-      "theme": "health"
-    },
-    {
-      "domain": "proverb",
       "id": "proverb_074",
       "pack_name": "adam-kazakh-proverbs-pack",
       "source_id": "classical_kazakh_proverbs",
       "text": "Аз да болса, саз болсын.",
-      "theme": "brevity"
-    },
-    {
-      "domain": "proverb",
-      "id": "proverb_075",
-      "pack_name": "adam-kazakh-proverbs-pack",
-      "source_id": "classical_kazakh_proverbs",
-      "text": "Көп сөз — күміс, аз сөз — алтын.",
       "theme": "brevity"
     },
     {

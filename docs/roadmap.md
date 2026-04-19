@@ -47,10 +47,21 @@ Key v0.4.0 additions:
 
 Capacity limit confirmed: 24M params × 4M tokens ≈ 25× below Chinchilla-optimal data. Further improvement needs an order-of-magnitude more training data, not more parameters.
 
+## Phase 10 — Deterministic FST (current)
+
+| Release | Scope | Result |
+|---|---|---|
+| v0.4.5 | `adam-kernel-fst` crate — phonology + morphotactics + parser + lexicon (4,454 curated + 11,919 Apertium) + CLI | 55 unit tests, 100% roundtrip on 36,238 full-lexicon cycles |
+
+Phase 10 pivots the project from pure-stochastic transformers (v0.3–v0.4 line) to a deterministic morphology layer + small LM-over-roots. The v0.4.0 transformer baseline stays as reference; new work layers on top.
+
 ## Near-term
 
-- **v0.5.0** — attack the data bottleneck. Target: 30–50M training tokens via (a) FSM curriculum expansion to L2/L3 difficulty, (b) CC-100 sample 50k → 500k, (c) classical literature expansion (Ауэзов, Нурпеисов, Бөкей; stored gitignored, trained on privately), (d) first SFT pass on translated Alpaca for basic instruction-following.
-- **v0.6.0** — minimum viable Kazakh chat prototype. Short-turn Q&A, not multi-turn dialogue.
+- **v0.5.0** — extend FST to cover the remaining week-2 morphology: participles, converbs, vowel-final-stem edge cases, irregular verbs, proper-noun sub-lexicon. Target: 99% coverage of Apertium's morphology test corpus.
+- **v0.5.5** — small LM over `(root, feature-bundle)` sequences, trained in pure Rust. 5–20M params. Replaces the v0.4.0 transformer as the primary generation model. Factorised representation means the LM doesn't re-learn morphology.
+- **v0.6.0** — first SFT pass on translated instruction pairs. Target: short-turn Q&A in Kazakh.
+- **v0.6.5** — minimum viable chat prototype for demo.
+- **v1.0.0** — investor-demoable MVP: native-speaker review of 50+ generations rates ≥40 as natural, FST-guaranteed morphology, end-to-end Rust stack.
 
 ## Out of near-term scope
 

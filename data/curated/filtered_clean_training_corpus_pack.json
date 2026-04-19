@@ -24,20 +24,6 @@
     },
     {
       "domain": "general",
-      "id": "clean_corpus_sample_04",
-      "pack_name": "adam-clean-general-core-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Жүйелі мәтін нақты қорытынды жасауға көмектеседі."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_05",
-      "pack_name": "adam-clean-general-core-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Жүйелі мәтін нақты талдау жасауға көмектеседі."
-    },
-    {
-      "domain": "general",
       "id": "clean_corpus_sample_06",
       "pack_name": "adam-clean-general-core-pack",
       "source_id": "curated_general_kazakh",
@@ -199,13 +185,6 @@
     },
     {
       "domain": "education",
-      "id": "clean_corpus_sample_30",
-      "pack_name": "adam-clean-education-core-pack",
-      "source_id": "reviewed_education_kazakh",
-      "text": "Түсіндірме мәтін ережені қарапайым мысалмен көрсетеді."
-    },
-    {
-      "domain": "education",
       "id": "clean_corpus_sample_31",
       "pack_name": "adam-clean-education-core-pack",
       "source_id": "reviewed_education_kazakh",
@@ -241,13 +220,6 @@
     },
     {
       "domain": "education",
-      "id": "clean_corpus_sample_36",
-      "pack_name": "adam-clean-education-core-pack",
-      "source_id": "reviewed_education_kazakh",
-      "text": "Жүйелі түсіндіру ұғымды есте сақтауға көмектеседі."
-    },
-    {
-      "domain": "education",
       "id": "clean_corpus_sample_37",
       "pack_name": "adam-clean-education-core-pack",
       "source_id": "reviewed_education_kazakh",
@@ -262,52 +234,10 @@
     },
     {
       "domain": "general",
-      "id": "clean_corpus_sample_39",
-      "pack_name": "adam-tiny-clean-general-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Қазақ тілі жалғамалы тіл болып саналады."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_40",
-      "pack_name": "adam-tiny-clean-general-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Таза дерек сенімді модель құруға негіз болады."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_41",
-      "pack_name": "adam-tiny-clean-general-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Қазақ тілі сөздерді жалғаулар арқылы түрлендіреді."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_42",
-      "pack_name": "adam-tiny-clean-general-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Тілдік жүйе мағынаны жалғаулар мен түбір арқылы құрайды."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_44",
-      "pack_name": "adam-tiny-clean-general-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Жүйелі мәтін модельдің сенімділігін арттырады."
-    },
-    {
-      "domain": "general",
       "id": "clean_corpus_sample_45",
       "pack_name": "adam-tiny-clean-general-pack",
       "source_id": "curated_general_kazakh",
       "text": "Таза мәтін логикалық модельге орнықты негіз береді."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_47",
-      "pack_name": "adam-tiny-clean-general-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Нақты дерек тілдік талдаудың сенімін арттырады."
     },
     {
       "domain": "reference",
@@ -395,34 +325,6 @@
     },
     {
       "domain": "education",
-      "id": "clean_corpus_sample_60",
-      "pack_name": "adam-tiny-clean-education-pack",
-      "source_id": "reviewed_education_kazakh",
-      "text": "Сабақ жоспары білімді жүйелі түрде бекітуге көмектеседі."
-    },
-    {
-      "domain": "education",
-      "id": "clean_corpus_sample_61",
-      "pack_name": "adam-tiny-clean-education-pack",
-      "source_id": "reviewed_education_kazakh",
-      "text": "Мысалға негізделген түсіндіру ұғымды тез меңгертеді."
-    },
-    {
-      "domain": "education",
-      "id": "clean_corpus_sample_62",
-      "pack_name": "adam-tiny-clean-education-pack",
-      "source_id": "reviewed_education_kazakh",
-      "text": "Оқу түсіндірмесі ережені қарапайым үлгімен нақтылайды."
-    },
-    {
-      "domain": "education",
-      "id": "clean_corpus_sample_63",
-      "pack_name": "adam-tiny-clean-education-pack",
-      "source_id": "reviewed_education_kazakh",
-      "text": "Сабақ материалы ұғымдарды мысалмен кезеңдеп түсіндіреді."
-    },
-    {
-      "domain": "education",
       "id": "clean_corpus_sample_64",
       "pack_name": "adam-tiny-clean-education-pack",
       "source_id": "reviewed_education_kazakh",
@@ -434,34 +336,6 @@
       "pack_name": "adam-tiny-clean-education-pack",
       "source_id": "reviewed_education_kazakh",
       "text": "Оқу тапсырмасы ұғымды мысал арқылы түсіндіреді."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_66",
-      "pack_name": "adam-clean-general-extension-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Жинақы мәтін тілдік құрылымды айқын көрсетеді."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_67",
-      "pack_name": "adam-clean-general-extension-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Тұрақты термин қолданысы ой дәлдігін сақтайды."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_68",
-      "pack_name": "adam-clean-general-extension-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Сапалы дерек модельдің ішкі тәртібін күшейтеді."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_69",
-      "pack_name": "adam-clean-general-extension-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Қысқа сөйлем мағынаны анық беруге көмектеседі."
     },
     {
       "domain": "general",
@@ -478,32 +352,11 @@
       "text": "Таза мәтін анық құрылым арқылы сенімді қорытындыға жеткізеді."
     },
     {
-      "domain": "general",
-      "id": "clean_corpus_sample_73",
-      "pack_name": "adam-clean-general-extension-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Жинақы баяндау логикалық байланыстарды анық көрсетеді."
-    },
-    {
-      "domain": "general",
-      "id": "clean_corpus_sample_74",
-      "pack_name": "adam-clean-general-extension-pack",
-      "source_id": "curated_general_kazakh",
-      "text": "Дәйекті дерек тілдік модельдің тәртібін сақтайды."
-    },
-    {
       "domain": "reference",
       "id": "clean_corpus_sample_75",
       "pack_name": "adam-clean-reference-extension-pack",
       "source_id": "curated_reference_kazakh",
       "text": "Анықтама мәтіні басты ұғымды қысқа түсіндіреді."
-    },
-    {
-      "domain": "reference",
-      "id": "clean_corpus_sample_76",
-      "pack_name": "adam-clean-reference-extension-pack",
-      "source_id": "curated_reference_kazakh",
-      "text": "Термин сөздігі ұғымның ресми қолданылуын нақтылайды."
     },
     {
       "domain": "reference",
@@ -532,13 +385,6 @@
       "pack_name": "adam-clean-reference-extension-pack",
       "source_id": "curated_reference_kazakh",
       "text": "Термин анықтамасы мағынаның өзегін қысқа жеткізеді."
-    },
-    {
-      "domain": "reference",
-      "id": "clean_corpus_sample_82",
-      "pack_name": "adam-clean-reference-extension-pack",
-      "source_id": "curated_reference_kazakh",
-      "text": "Сөздік түсіндірмесі ұғымның мәнін нақтылайды."
     },
     {
       "domain": "reference",
@@ -581,27 +427,6 @@
       "pack_name": "adam-clean-education-extension-pack",
       "source_id": "reviewed_education_kazakh",
       "text": "Қайталау тапсырмасы білімді тұрақты етеді."
-    },
-    {
-      "domain": "education",
-      "id": "clean_corpus_sample_89",
-      "pack_name": "adam-clean-education-extension-pack",
-      "source_id": "reviewed_education_kazakh",
-      "text": "Мысалды талдау ұғымды саналы меңгеруге көмектеседі."
-    },
-    {
-      "domain": "education",
-      "id": "clean_corpus_sample_90",
-      "pack_name": "adam-clean-education-extension-pack",
-      "source_id": "reviewed_education_kazakh",
-      "text": "Сабақ түсіндірмесі ұғымдарды салыстыру арқылы кезеңдеп түсіндіреді."
-    },
-    {
-      "domain": "education",
-      "id": "clean_corpus_sample_91",
-      "pack_name": "adam-clean-education-extension-pack",
-      "source_id": "reviewed_education_kazakh",
-      "text": "Қайталау жаттығуы білімді бірізді түрде бекітеді."
     },
     {
       "domain": "education",

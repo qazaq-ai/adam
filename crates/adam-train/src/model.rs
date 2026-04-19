@@ -21,16 +21,17 @@ impl ModelConfig {
             // Must match the BPE vocab size written by train_bpe.
             // 1390 in v0.0.87 (lexicon-seeded), 4096 in v0.1.2, 8192 in v0.4.0
             // (12M-token corpus supports a larger vocab with 3.32× compression).
-            vocab_size: 8192,
-            // v0.4.0: rolled back from 27.3M (H=512, L=6) to ~23M-class (H=512, L=5).
-            // The L=6 / vocab-8192 experiment degraded against v0.3.0 — too aggressive
-            // a scale-up on 3.9M training tokens (138× below Chinchilla). L=5 here
-            // with vocab=8192 keeps the tokenizer/corpus wins at a proven depth.
-            // Actual param count: embed+pos+head dominate at vocab=8192, so ~23.1M.
-            hidden_dim: 512,
+            vocab_size: 2048,
+            // v0.5.1 fast-iter: rolled back to v0.3.0 tiny arch (H=224, L=4)
+            // for 2h training cycles. On the filtered pure-Kazakh corpus
+            // (848k train ids, 93% FSM coverage) a 24M model massively over-
+            // parameterizes. v0.3.0 trained this arch on 606k ids to PPL 871;
+            // the same arch on our richer signal should do better or flag a
+            // pivot quickly.
+            hidden_dim: 224,
             num_heads: 8,
-            num_layers: 5,
-            ffn_dim: 2048,
+            num_layers: 4,
+            ffn_dim: 896,
             max_seq_len: 128,
             dropout: 0.05,
         }
