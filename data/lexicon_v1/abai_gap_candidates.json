@@ -1,0 +1,3643 @@
+{
+  "abai_total_words": 8200,
+  "abai_covered_by_lexicon": 7292,
+  "abai_uncovered": 908,
+  "unique_candidate_roots": 715,
+  "top_candidates": [
+    {
+      "root_guess": "сөз",
+      "frequency": 123,
+      "example_forms": [
+        "сөз",
+        "сөзді",
+        "сөзге",
+        "сөздің"
+      ]
+    },
+    {
+      "root_guess": "сол",
+      "frequency": 59,
+      "example_forms": [
+        "сол",
+        "солар"
+      ]
+    },
+    {
+      "root_guess": "сал",
+      "frequency": 46,
+      "example_forms": [
+        "салды",
+        "салып",
+        "сал"
+      ]
+    },
+    {
+      "root_guess": "боп",
+      "frequency": 43,
+      "example_forms": [
+        "боп",
+        "бопты"
+      ]
+    },
+    {
+      "root_guess": "бой",
+      "frequency": 39,
+      "example_forms": [
+        "бойы",
+        "бой",
+        "бойды",
+        "бойым"
+      ]
+    },
+    {
+      "root_guess": "қыз",
+      "frequency": 37,
+      "example_forms": [
+        "қыз",
+        "қызды",
+        "қыздан",
+        "қыздың"
+      ]
+    },
+    {
+      "root_guess": "жау",
+      "frequency": 36,
+      "example_forms": [
+        "жау",
+        "жауға",
+        "жауып",
+        "жауды"
+      ]
+    },
+    {
+      "root_guess": "надан",
+      "frequency": 34,
+      "example_forms": [
+        "надан",
+        "надандар",
+        "наданның",
+        "наданға"
+      ]
+    },
+    {
+      "root_guess": "қал",
+      "frequency": 29,
+      "example_forms": [
+        "қалды",
+        "қал",
+        "қалдың"
+      ]
+    },
+    {
+      "root_guess": "жай",
+      "frequency": 28,
+      "example_forms": [
+        "жай",
+        "жайы",
+        "жайды",
+        "жайым"
+      ]
+    },
+    {
+      "root_guess": "жат",
+      "frequency": 25,
+      "example_forms": [
+        "жат",
+        "жатып",
+        "жатқа",
+        "жаттан"
+      ]
+    },
+    {
+      "root_guess": "сон",
+      "frequency": 24,
+      "example_forms": [
+        "сонда"
+      ]
+    },
+    {
+      "root_guess": "қан",
+      "frequency": 20,
+      "example_forms": [
+        "қан",
+        "қаны",
+        "қанып",
+        "қандар"
+      ]
+    },
+    {
+      "root_guess": "қол",
+      "frequency": 19,
+      "example_forms": [
+        "қол",
+        "қолда",
+        "қолдың"
+      ]
+    },
+    {
+      "root_guess": "түс",
+      "frequency": 14,
+      "example_forms": [
+        "түсіп",
+        "түсің",
+        "түсі",
+        "түс"
+      ]
+    },
+    {
+      "root_guess": "қай",
+      "frequency": 14,
+      "example_forms": [
+        "қай"
+      ]
+    },
+    {
+      "root_guess": "қыс",
+      "frequency": 12,
+      "example_forms": [
+        "қыс",
+        "қысып",
+        "қыстың",
+        "қысты"
+      ]
+    },
+    {
+      "root_guess": "кедей",
+      "frequency": 12,
+      "example_forms": [
+        "кедей",
+        "кедейдің",
+        "кедейге",
+        "кедейді"
+      ]
+    },
+    {
+      "root_guess": "жет",
+      "frequency": 12,
+      "example_forms": [
+        "жетті",
+        "жеткен",
+        "жеттің"
+      ]
+    },
+    {
+      "root_guess": "мыс",
+      "frequency": 11,
+      "example_forms": [
+        "мыс",
+        "мысты",
+        "мысың",
+        "мысқа"
+      ]
+    },
+    {
+      "root_guess": "кей",
+      "frequency": 11,
+      "example_forms": [
+        "кей",
+        "кейі"
+      ]
+    },
+    {
+      "root_guess": "жақ",
+      "frequency": 10,
+      "example_forms": [
+        "жаққа",
+        "жаққан",
+        "жақ"
+      ]
+    },
+    {
+      "root_guess": "қар",
+      "frequency": 10,
+      "example_forms": [
+        "қар",
+        "қарның",
+        "қардан",
+        "қардың"
+      ]
+    },
+    {
+      "root_guess": "жеп",
+      "frequency": 10,
+      "example_forms": [
+        "жеп"
+      ]
+    },
+    {
+      "root_guess": "шыға",
+      "frequency": 9,
+      "example_forms": [
+        "шыға",
+        "шығам"
+      ]
+    },
+    {
+      "root_guess": "жатыр",
+      "frequency": 9,
+      "example_forms": [
+        "жатыр"
+      ]
+    },
+    {
+      "root_guess": "өтт",
+      "frequency": 9,
+      "example_forms": [
+        "өтті",
+        "өттің"
+      ]
+    },
+    {
+      "root_guess": "қыр",
+      "frequency": 8,
+      "example_forms": [
+        "қыр",
+        "қырда",
+        "қыры",
+        "қырды"
+      ]
+    },
+    {
+      "root_guess": "ерт",
+      "frequency": 8,
+      "example_forms": [
+        "ертіп"
+      ]
+    },
+    {
+      "root_guess": "ерте",
+      "frequency": 8,
+      "example_forms": [
+        "ерте"
+      ]
+    },
+    {
+      "root_guess": "бойын",
+      "frequency": 8,
+      "example_forms": [
+        "бойын",
+        "бойында"
+      ]
+    },
+    {
+      "root_guess": "жөн",
+      "frequency": 8,
+      "example_forms": [
+        "жөн",
+        "жөні"
+      ]
+    },
+    {
+      "root_guess": "судан",
+      "frequency": 7,
+      "example_forms": [
+        "судан"
+      ]
+    },
+    {
+      "root_guess": "суға",
+      "frequency": 7,
+      "example_forms": [
+        "суға"
+      ]
+    },
+    {
+      "root_guess": "нен",
+      "frequency": 7,
+      "example_forms": [
+        "нені"
+      ]
+    },
+    {
+      "root_guess": "тыя",
+      "frequency": 7,
+      "example_forms": [
+        "тыя"
+      ]
+    },
+    {
+      "root_guess": "нес",
+      "frequency": 7,
+      "example_forms": [
+        "несі"
+      ]
+    },
+    {
+      "root_guess": "сондай",
+      "frequency": 7,
+      "example_forms": [
+        "сондай",
+        "сондайды"
+      ]
+    },
+    {
+      "root_guess": "ерме",
+      "frequency": 7,
+      "example_forms": [
+        "ермек",
+        "ерме"
+      ]
+    },
+    {
+      "root_guess": "жиы",
+      "frequency": 7,
+      "example_forms": [
+        "жиып"
+      ]
+    },
+    {
+      "root_guess": "жең",
+      "frequency": 6,
+      "example_forms": [
+        "жеңіп",
+        "жеңген",
+        "жең"
+      ]
+    },
+    {
+      "root_guess": "арзан",
+      "frequency": 6,
+      "example_forms": [
+        "арзан"
+      ]
+    },
+    {
+      "root_guess": "арт",
+      "frequency": 6,
+      "example_forms": [
+        "арт",
+        "артта",
+        "артты"
+      ]
+    },
+    {
+      "root_guess": "қаз",
+      "frequency": 6,
+      "example_forms": [
+        "қаз",
+        "қазады"
+      ]
+    },
+    {
+      "root_guess": "сай",
+      "frequency": 6,
+      "example_forms": [
+        "сай",
+        "сайда"
+      ]
+    },
+    {
+      "root_guess": "бұр",
+      "frequency": 6,
+      "example_forms": [
+        "бұртың",
+        "бұрып",
+        "бұрқ",
+        "бұрды"
+      ]
+    },
+    {
+      "root_guess": "жайын",
+      "frequency": 6,
+      "example_forms": [
+        "жайын"
+      ]
+    },
+    {
+      "root_guess": "керде",
+      "frequency": 5,
+      "example_forms": [
+        "кердең"
+      ]
+    },
+    {
+      "root_guess": "мұстапа",
+      "frequency": 5,
+      "example_forms": [
+        "мұстапа"
+      ]
+    },
+    {
+      "root_guess": "тиі",
+      "frequency": 5,
+      "example_forms": [
+        "тиіп"
+      ]
+    },
+    {
+      "root_guess": "тоқ",
+      "frequency": 5,
+      "example_forms": [
+        "тоқ"
+      ]
+    },
+    {
+      "root_guess": "шығ",
+      "frequency": 5,
+      "example_forms": [
+        "шығады"
+      ]
+    },
+    {
+      "root_guess": "харекет",
+      "frequency": 5,
+      "example_forms": [
+        "харекет",
+        "харекетім"
+      ]
+    },
+    {
+      "root_guess": "суд",
+      "frequency": 5,
+      "example_forms": [
+        "суды",
+        "судың"
+      ]
+    },
+    {
+      "root_guess": "суы",
+      "frequency": 5,
+      "example_forms": [
+        "суы",
+        "суып"
+      ]
+    },
+    {
+      "root_guess": "тура",
+      "frequency": 5,
+      "example_forms": [
+        "тура"
+      ]
+    },
+    {
+      "root_guess": "сыяз",
+      "frequency": 5,
+      "example_forms": [
+        "сыяз",
+        "сыяздан"
+      ]
+    },
+    {
+      "root_guess": "сап",
+      "frequency": 5,
+      "example_forms": [
+        "сап"
+      ]
+    },
+    {
+      "root_guess": "саба",
+      "frequency": 4,
+      "example_forms": [
+        "сабап",
+        "сабау",
+        "сабадан"
+      ]
+    },
+    {
+      "root_guess": "айрыл",
+      "frequency": 4,
+      "example_forms": [
+        "айрылған",
+        "айрылып"
+      ]
+    },
+    {
+      "root_guess": "сыбыр",
+      "frequency": 4,
+      "example_forms": [
+        "сыбырды",
+        "сыбырдан",
+        "сыбыр"
+      ]
+    },
+    {
+      "root_guess": "жәдігөй",
+      "frequency": 4,
+      "example_forms": [
+        "жәдігөй",
+        "жәдігөйге"
+      ]
+    },
+    {
+      "root_guess": "ертере",
+      "frequency": 4,
+      "example_forms": [
+        "ертерек"
+      ]
+    },
+    {
+      "root_guess": "солар",
+      "frequency": 4,
+      "example_forms": [
+        "солардың",
+        "соларға"
+      ]
+    },
+    {
+      "root_guess": "ерге",
+      "frequency": 4,
+      "example_forms": [
+        "ерге"
+      ]
+    },
+    {
+      "root_guess": "жама",
+      "frequency": 4,
+      "example_forms": [
+        "жамау",
+        "жамаған",
+        "жамап"
+      ]
+    },
+    {
+      "root_guess": "нең",
+      "frequency": 4,
+      "example_forms": [
+        "нең",
+        "неңді"
+      ]
+    },
+    {
+      "root_guess": "жетпей",
+      "frequency": 4,
+      "example_forms": [
+        "жетпей"
+      ]
+    },
+    {
+      "root_guess": "тояр",
+      "frequency": 4,
+      "example_forms": [
+        "тояр",
+        "тоярсың",
+        "тоярға"
+      ]
+    },
+    {
+      "root_guess": "салпылда",
+      "frequency": 4,
+      "example_forms": [
+        "салпылдап"
+      ]
+    },
+    {
+      "root_guess": "арттағы",
+      "frequency": 4,
+      "example_forms": [
+        "арттағыға",
+        "арттағылар"
+      ]
+    },
+    {
+      "root_guess": "хал",
+      "frequency": 4,
+      "example_forms": [
+        "хал",
+        "халім",
+        "халің"
+      ]
+    },
+    {
+      "root_guess": "тал",
+      "frequency": 4,
+      "example_forms": [
+        "тал",
+        "талды"
+      ]
+    },
+    {
+      "root_guess": "жетсе",
+      "frequency": 4,
+      "example_forms": [
+        "жетсең",
+        "жетсе"
+      ]
+    },
+    {
+      "root_guess": "жетпес",
+      "frequency": 4,
+      "example_forms": [
+        "жетпес",
+        "жетпеске"
+      ]
+    },
+    {
+      "root_guess": "жия",
+      "frequency": 3,
+      "example_forms": [
+        "жиям",
+        "жияды",
+        "жия"
+      ]
+    },
+    {
+      "root_guess": "кеш",
+      "frequency": 3,
+      "example_forms": [
+        "кеш"
+      ]
+    },
+    {
+      "root_guess": "жайыл",
+      "frequency": 3,
+      "example_forms": [
+        "жайылды",
+        "жайылып",
+        "жайылған"
+      ]
+    },
+    {
+      "root_guess": "лүпілде",
+      "frequency": 3,
+      "example_forms": [
+        "лүпілдеп"
+      ]
+    },
+    {
+      "root_guess": "единица",
+      "frequency": 3,
+      "example_forms": [
+        "единица"
+      ]
+    },
+    {
+      "root_guess": "салсын",
+      "frequency": 3,
+      "example_forms": [
+        "салсын"
+      ]
+    },
+    {
+      "root_guess": "бойы",
+      "frequency": 3,
+      "example_forms": [
+        "бойының"
+      ]
+    },
+    {
+      "root_guess": "жиған",
+      "frequency": 3,
+      "example_forms": [
+        "жиған",
+        "жиғаны"
+      ]
+    },
+    {
+      "root_guess": "қалсын",
+      "frequency": 3,
+      "example_forms": [
+        "қалсын"
+      ]
+    },
+    {
+      "root_guess": "вади",
+      "frequency": 3,
+      "example_forms": [
+        "вадим"
+      ]
+    },
+    {
+      "root_guess": "сыбырлас",
+      "frequency": 3,
+      "example_forms": [
+        "сыбырласып",
+        "сыбырлас"
+      ]
+    },
+    {
+      "root_guess": "халифа",
+      "frequency": 3,
+      "example_forms": [
+        "халифаға",
+        "халифа"
+      ]
+    },
+    {
+      "root_guess": "бойың",
+      "frequency": 3,
+      "example_forms": [
+        "бойыңды",
+        "бойыңда"
+      ]
+    },
+    {
+      "root_guess": "суда",
+      "frequency": 3,
+      "example_forms": [
+        "суда"
+      ]
+    },
+    {
+      "root_guess": "жөнін",
+      "frequency": 3,
+      "example_forms": [
+        "жөнін"
+      ]
+    },
+    {
+      "root_guess": "көме",
+      "frequency": 3,
+      "example_forms": [
+        "көмек"
+      ]
+    },
+    {
+      "root_guess": "ебін",
+      "frequency": 3,
+      "example_forms": [
+        "ебін"
+      ]
+    },
+    {
+      "root_guess": "ғапыл",
+      "frequency": 3,
+      "example_forms": [
+        "ғапыл"
+      ]
+    },
+    {
+      "root_guess": "ащы",
+      "frequency": 3,
+      "example_forms": [
+        "ащы"
+      ]
+    },
+    {
+      "root_guess": "әлде",
+      "frequency": 3,
+      "example_forms": [
+        "әлде"
+      ]
+    },
+    {
+      "root_guess": "ғар",
+      "frequency": 3,
+      "example_forms": [
+        "ғаріп"
+      ]
+    },
+    {
+      "root_guess": "әле",
+      "frequency": 3,
+      "example_forms": [
+        "әлек"
+      ]
+    },
+    {
+      "root_guess": "әрне",
+      "frequency": 3,
+      "example_forms": [
+        "әрнеге",
+        "әрнеден"
+      ]
+    },
+    {
+      "root_guess": "қалд",
+      "frequency": 3,
+      "example_forms": [
+        "қалдым"
+      ]
+    },
+    {
+      "root_guess": "ар-намыс",
+      "frequency": 3,
+      "example_forms": [
+        "ар-намыс",
+        "ар-намыстан"
+      ]
+    },
+    {
+      "root_guess": "бойына",
+      "frequency": 3,
+      "example_forms": [
+        "бойына"
+      ]
+    },
+    {
+      "root_guess": "аристотель",
+      "frequency": 3,
+      "example_forms": [
+        "аристотель"
+      ]
+    },
+    {
+      "root_guess": "хабар",
+      "frequency": 3,
+      "example_forms": [
+        "хабардар",
+        "хабарым",
+        "хабарың"
+      ]
+    },
+    {
+      "root_guess": "тоя",
+      "frequency": 3,
+      "example_forms": [
+        "тоя",
+        "тояды"
+      ]
+    },
+    {
+      "root_guess": "кән",
+      "frequency": 3,
+      "example_forms": [
+        "кәннің",
+        "кән",
+        "кәні"
+      ]
+    },
+    {
+      "root_guess": "иығ",
+      "frequency": 3,
+      "example_forms": [
+        "иығы"
+      ]
+    },
+    {
+      "root_guess": "сып",
+      "frequency": 3,
+      "example_forms": [
+        "сып",
+        "сыпатын"
+      ]
+    },
+    {
+      "root_guess": "жатпа",
+      "frequency": 3,
+      "example_forms": [
+        "жатпа",
+        "жатпаған"
+      ]
+    },
+    {
+      "root_guess": "сайрай",
+      "frequency": 3,
+      "example_forms": [
+        "сайрай",
+        "сайрайды"
+      ]
+    },
+    {
+      "root_guess": "ерген",
+      "frequency": 3,
+      "example_forms": [
+        "ергені",
+        "ерген",
+        "ергенді"
+      ]
+    },
+    {
+      "root_guess": "сыбдыр",
+      "frequency": 3,
+      "example_forms": [
+        "сыбдыр",
+        "сыбдыры"
+      ]
+    },
+    {
+      "root_guess": "салса",
+      "frequency": 3,
+      "example_forms": [
+        "салса"
+      ]
+    },
+    {
+      "root_guess": "қарн",
+      "frequency": 3,
+      "example_forms": [
+        "қарны"
+      ]
+    },
+    {
+      "root_guess": "тәңр",
+      "frequency": 3,
+      "example_forms": [
+        "тәңрі",
+        "тәңрім"
+      ]
+    },
+    {
+      "root_guess": "салд",
+      "frequency": 3,
+      "example_forms": [
+        "салдым"
+      ]
+    },
+    {
+      "root_guess": "ерсе",
+      "frequency": 3,
+      "example_forms": [
+        "ерсеңіз",
+        "ерсең"
+      ]
+    },
+    {
+      "root_guess": "жауын",
+      "frequency": 3,
+      "example_forms": [
+        "жауын",
+        "жауынның"
+      ]
+    },
+    {
+      "root_guess": "ақт",
+      "frequency": 2,
+      "example_forms": [
+        "ақты"
+      ]
+    },
+    {
+      "root_guess": "төрдег",
+      "frequency": 2,
+      "example_forms": [
+        "төрдегі"
+      ]
+    },
+    {
+      "root_guess": "жесін",
+      "frequency": 2,
+      "example_forms": [
+        "жесін"
+      ]
+    },
+    {
+      "root_guess": "бұртақта",
+      "frequency": 2,
+      "example_forms": [
+        "бұртақтаған"
+      ]
+    },
+    {
+      "root_guess": "дорба",
+      "frequency": 2,
+      "example_forms": [
+        "дорбаға",
+        "дорбадан"
+      ]
+    },
+    {
+      "root_guess": "старшын",
+      "frequency": 2,
+      "example_forms": [
+        "старшын"
+      ]
+    },
+    {
+      "root_guess": "япырмай",
+      "frequency": 2,
+      "example_forms": [
+        "япырмай"
+      ]
+    },
+    {
+      "root_guess": "сөзбе",
+      "frequency": 2,
+      "example_forms": [
+        "сөзбенен"
+      ]
+    },
+    {
+      "root_guess": "химия",
+      "frequency": 2,
+      "example_forms": [
+        "химия"
+      ]
+    },
+    {
+      "root_guess": "өзді-өз",
+      "frequency": 2,
+      "example_forms": [
+        "өзді-өзі"
+      ]
+    },
+    {
+      "root_guess": "тербе",
+      "frequency": 2,
+      "example_forms": [
+        "тербеп"
+      ]
+    },
+    {
+      "root_guess": "жиса",
+      "frequency": 2,
+      "example_forms": [
+        "жиса",
+        "жисаңыз"
+      ]
+    },
+    {
+      "root_guess": "ермей",
+      "frequency": 2,
+      "example_forms": [
+        "ермей"
+      ]
+    },
+    {
+      "root_guess": "уды",
+      "frequency": 2,
+      "example_forms": [
+        "уды"
+      ]
+    },
+    {
+      "root_guess": "ғишы",
+      "frequency": 2,
+      "example_forms": [
+        "ғишық"
+      ]
+    },
+    {
+      "root_guess": "ләм",
+      "frequency": 2,
+      "example_forms": [
+        "ләм"
+      ]
+    },
+    {
+      "root_guess": "хәкім",
+      "frequency": 2,
+      "example_forms": [
+        "хәкімге",
+        "хәкімді"
+      ]
+    },
+    {
+      "root_guess": "қайрыл",
+      "frequency": 2,
+      "example_forms": [
+        "қайрылып"
+      ]
+    },
+    {
+      "root_guess": "шыбын",
+      "frequency": 2,
+      "example_forms": [
+        "шыбын",
+        "шыбынсыз"
+      ]
+    },
+    {
+      "root_guess": "салбыра",
+      "frequency": 2,
+      "example_forms": [
+        "салбырап"
+      ]
+    },
+    {
+      "root_guess": "жауқазын",
+      "frequency": 2,
+      "example_forms": [
+        "жауқазын"
+      ]
+    },
+    {
+      "root_guess": "харек",
+      "frequency": 2,
+      "example_forms": [
+        "харекетін"
+      ]
+    },
+    {
+      "root_guess": "ыржа",
+      "frequency": 2,
+      "example_forms": [
+        "ыржаң"
+      ]
+    },
+    {
+      "root_guess": "жайыңа",
+      "frequency": 2,
+      "example_forms": [
+        "жайыңа"
+      ]
+    },
+    {
+      "root_guess": "найза",
+      "frequency": 2,
+      "example_forms": [
+        "найза"
+      ]
+    },
+    {
+      "root_guess": "талпын",
+      "frequency": 2,
+      "example_forms": [
+        "талпынған",
+        "талпынар"
+      ]
+    },
+    {
+      "root_guess": "абұйыр",
+      "frequency": 2,
+      "example_forms": [
+        "абұйыр"
+      ]
+    },
+    {
+      "root_guess": "үңірей",
+      "frequency": 2,
+      "example_forms": [
+        "үңірейген"
+      ]
+    },
+    {
+      "root_guess": "семей",
+      "frequency": 2,
+      "example_forms": [
+        "семейдің"
+      ]
+    },
+    {
+      "root_guess": "шырай",
+      "frequency": 2,
+      "example_forms": [
+        "шырайың",
+        "шырай"
+      ]
+    },
+    {
+      "root_guess": "филип",
+      "frequency": 2,
+      "example_forms": [
+        "филипп"
+      ]
+    },
+    {
+      "root_guess": "домбыра",
+      "frequency": 2,
+      "example_forms": [
+        "домбыраға",
+        "домбыра"
+      ]
+    },
+    {
+      "root_guess": "жауырын",
+      "frequency": 2,
+      "example_forms": [
+        "жауырын",
+        "жауырыны"
+      ]
+    },
+    {
+      "root_guess": "закон",
+      "frequency": 2,
+      "example_forms": [
+        "закон"
+      ]
+    },
+    {
+      "root_guess": "дөп",
+      "frequency": 2,
+      "example_forms": [
+        "дөп"
+      ]
+    },
+    {
+      "root_guess": "суылда",
+      "frequency": 2,
+      "example_forms": [
+        "суылдап"
+      ]
+    },
+    {
+      "root_guess": "файда",
+      "frequency": 2,
+      "example_forms": [
+        "файдаң"
+      ]
+    },
+    {
+      "root_guess": "сайла",
+      "frequency": 2,
+      "example_forms": [
+        "сайлау",
+        "сайла"
+      ]
+    },
+    {
+      "root_guess": "жақпа",
+      "frequency": 2,
+      "example_forms": [
+        "жақпаған",
+        "жақпақ"
+      ]
+    },
+    {
+      "root_guess": "уерд",
+      "frequency": 2,
+      "example_forms": [
+        "уерд"
+      ]
+    },
+    {
+      "root_guess": "сайра",
+      "frequency": 2,
+      "example_forms": [
+        "сайра",
+        "сайрап"
+      ]
+    },
+    {
+      "root_guess": "шек",
+      "frequency": 2,
+      "example_forms": [
+        "шекпен"
+      ]
+    },
+    {
+      "root_guess": "ернеу",
+      "frequency": 2,
+      "example_forms": [
+        "ернеуі"
+      ]
+    },
+    {
+      "root_guess": "ынтықтығ",
+      "frequency": 2,
+      "example_forms": [
+        "ынтықтығым"
+      ]
+    },
+    {
+      "root_guess": "немене",
+      "frequency": 2,
+      "example_forms": [
+        "немене"
+      ]
+    },
+    {
+      "root_guess": "тіг",
+      "frequency": 2,
+      "example_forms": [
+        "тігіп"
+      ]
+    },
+    {
+      "root_guess": "ерд",
+      "frequency": 2,
+      "example_forms": [
+        "ерді",
+        "ердің"
+      ]
+    },
+    {
+      "root_guess": "салын",
+      "frequency": 2,
+      "example_forms": [
+        "салынып"
+      ]
+    },
+    {
+      "root_guess": "бәс",
+      "frequency": 2,
+      "example_forms": [
+        "бәс"
+      ]
+    },
+    {
+      "root_guess": "себе",
+      "frequency": 2,
+      "example_forms": [
+        "себеп"
+      ]
+    },
+    {
+      "root_guess": "самородный",
+      "frequency": 2,
+      "example_forms": [
+        "самородный"
+      ]
+    },
+    {
+      "root_guess": "жаурын",
+      "frequency": 2,
+      "example_forms": [
+        "жаурыны"
+      ]
+    },
+    {
+      "root_guess": "жабылса",
+      "frequency": 2,
+      "example_forms": [
+        "жабылса"
+      ]
+    },
+    {
+      "root_guess": "ләззә",
+      "frequency": 2,
+      "example_forms": [
+        "ләззәті"
+      ]
+    },
+    {
+      "root_guess": "неме",
+      "frequency": 2,
+      "example_forms": [
+        "немеге"
+      ]
+    },
+    {
+      "root_guess": "жирен",
+      "frequency": 2,
+      "example_forms": [
+        "жиреніп"
+      ]
+    },
+    {
+      "root_guess": "жеңбе",
+      "frequency": 2,
+      "example_forms": [
+        "жеңбек"
+      ]
+    },
+    {
+      "root_guess": "қайқай",
+      "frequency": 2,
+      "example_forms": [
+        "қайқайып",
+        "қайқайды"
+      ]
+    },
+    {
+      "root_guess": "мүмин",
+      "frequency": 2,
+      "example_forms": [
+        "мүмин"
+      ]
+    },
+    {
+      "root_guess": "себ",
+      "frequency": 2,
+      "example_forms": [
+        "себеді"
+      ]
+    },
+    {
+      "root_guess": "туд",
+      "frequency": 2,
+      "example_forms": [
+        "тудым",
+        "туды"
+      ]
+    },
+    {
+      "root_guess": "судай",
+      "frequency": 2,
+      "example_forms": [
+        "судай"
+      ]
+    },
+    {
+      "root_guess": "сыпыр",
+      "frequency": 2,
+      "example_forms": [
+        "сыпырып"
+      ]
+    },
+    {
+      "root_guess": "бәйг",
+      "frequency": 2,
+      "example_forms": [
+        "бәйгі"
+      ]
+    },
+    {
+      "root_guess": "керег",
+      "frequency": 2,
+      "example_forms": [
+        "керегі"
+      ]
+    },
+    {
+      "root_guess": "шыбында",
+      "frequency": 2,
+      "example_forms": [
+        "шыбындап"
+      ]
+    },
+    {
+      "root_guess": "әрқай",
+      "frequency": 2,
+      "example_forms": [
+        "әрқайда",
+        "әрқайдан"
+      ]
+    },
+    {
+      "root_guess": "сақ",
+      "frequency": 2,
+      "example_forms": [
+        "сақ"
+      ]
+    },
+    {
+      "root_guess": "пыс",
+      "frequency": 2,
+      "example_forms": [
+        "пысу",
+        "пысып"
+      ]
+    },
+    {
+      "root_guess": "жиренбе",
+      "frequency": 2,
+      "example_forms": [
+        "жиренбеңіз",
+        "жиренбек"
+      ]
+    },
+    {
+      "root_guess": "кереге",
+      "frequency": 2,
+      "example_forms": [
+        "керегеге"
+      ]
+    },
+    {
+      "root_guess": "салмай",
+      "frequency": 2,
+      "example_forms": [
+        "салмай"
+      ]
+    },
+    {
+      "root_guess": "тиген",
+      "frequency": 2,
+      "example_forms": [
+        "тигенде",
+        "тиген"
+      ]
+    },
+    {
+      "root_guess": "салма",
+      "frequency": 2,
+      "example_forms": [
+        "салмадың",
+        "салма"
+      ]
+    },
+    {
+      "root_guess": "хаб",
+      "frequency": 2,
+      "example_forms": [
+        "хабар"
+      ]
+    },
+    {
+      "root_guess": "керме",
+      "frequency": 2,
+      "example_forms": [
+        "кермек"
+      ]
+    },
+    {
+      "root_guess": "сыя",
+      "frequency": 2,
+      "example_forms": [
+        "сыя"
+      ]
+    },
+    {
+      "root_guess": "бұдан",
+      "frequency": 2,
+      "example_forms": [
+        "бұдан"
+      ]
+    },
+    {
+      "root_guess": "бойдағ",
+      "frequency": 2,
+      "example_forms": [
+        "бойдағы"
+      ]
+    },
+    {
+      "root_guess": "ғишқ",
+      "frequency": 2,
+      "example_forms": [
+        "ғишқың"
+      ]
+    },
+    {
+      "root_guess": "салды",
+      "frequency": 2,
+      "example_forms": [
+        "салдық"
+      ]
+    },
+    {
+      "root_guess": "өті",
+      "frequency": 2,
+      "example_forms": [
+        "өтіп"
+      ]
+    },
+    {
+      "root_guess": "ажы",
+      "frequency": 2,
+      "example_forms": [
+        "ажым"
+      ]
+    },
+    {
+      "root_guess": "мәужүт",
+      "frequency": 1,
+      "example_forms": [
+        "мәужүт"
+      ]
+    },
+    {
+      "root_guess": "ләм-ми",
+      "frequency": 1,
+      "example_forms": [
+        "ләм-мим"
+      ]
+    },
+    {
+      "root_guess": "надан-а",
+      "frequency": 1,
+      "example_forms": [
+        "надан-ақ"
+      ]
+    },
+    {
+      "root_guess": "сәйхали",
+      "frequency": 1,
+      "example_forms": [
+        "сәйхали"
+      ]
+    },
+    {
+      "root_guess": "женде",
+      "frequency": 1,
+      "example_forms": [
+        "жендетің"
+      ]
+    },
+    {
+      "root_guess": "ғашығым",
+      "frequency": 1,
+      "example_forms": [
+        "ғашығымның"
+      ]
+    },
+    {
+      "root_guess": "кәкір-шүкір",
+      "frequency": 1,
+      "example_forms": [
+        "кәкір-шүкір"
+      ]
+    },
+    {
+      "root_guess": "аймалат",
+      "frequency": 1,
+      "example_forms": [
+        "аймалат"
+      ]
+    },
+    {
+      "root_guess": "ғашығ",
+      "frequency": 1,
+      "example_forms": [
+        "ғашығың"
+      ]
+    },
+    {
+      "root_guess": "ду-д",
+      "frequency": 1,
+      "example_forms": [
+        "ду-ду"
+      ]
+    },
+    {
+      "root_guess": "жеңсе",
+      "frequency": 1,
+      "example_forms": [
+        "жеңсеңіз"
+      ]
+    },
+    {
+      "root_guess": "ынтыз",
+      "frequency": 1,
+      "example_forms": [
+        "ынтызар"
+      ]
+    },
+    {
+      "root_guess": "сәс",
+      "frequency": 1,
+      "example_forms": [
+        "сәске"
+      ]
+    },
+    {
+      "root_guess": "жаймас",
+      "frequency": 1,
+      "example_forms": [
+        "жаймас"
+      ]
+    },
+    {
+      "root_guess": "дұспандығын",
+      "frequency": 1,
+      "example_forms": [
+        "дұспандығын"
+      ]
+    },
+    {
+      "root_guess": "ысын",
+      "frequency": 1,
+      "example_forms": [
+        "ысынып"
+      ]
+    },
+    {
+      "root_guess": "талмаусыра",
+      "frequency": 1,
+      "example_forms": [
+        "талмаусырап"
+      ]
+    },
+    {
+      "root_guess": "суыс",
+      "frequency": 1,
+      "example_forms": [
+        "суысқан"
+      ]
+    },
+    {
+      "root_guess": "надандай",
+      "frequency": 1,
+      "example_forms": [
+        "надандай"
+      ]
+    },
+    {
+      "root_guess": "былжыра",
+      "frequency": 1,
+      "example_forms": [
+        "былжырақ"
+      ]
+    },
+    {
+      "root_guess": "артпас",
+      "frequency": 1,
+      "example_forms": [
+        "артпас"
+      ]
+    },
+    {
+      "root_guess": "кешу",
+      "frequency": 1,
+      "example_forms": [
+        "кешуі"
+      ]
+    },
+    {
+      "root_guess": "жетпе",
+      "frequency": 1,
+      "example_forms": [
+        "жетпеген"
+      ]
+    },
+    {
+      "root_guess": "пәруардиг",
+      "frequency": 1,
+      "example_forms": [
+        "пәруардигер"
+      ]
+    },
+    {
+      "root_guess": "салмаң",
+      "frequency": 1,
+      "example_forms": [
+        "салмаңдар"
+      ]
+    },
+    {
+      "root_guess": "кәтелеш",
+      "frequency": 1,
+      "example_forms": [
+        "кәтелешке"
+      ]
+    },
+    {
+      "root_guess": "бәңг",
+      "frequency": 1,
+      "example_forms": [
+        "бәңгі"
+      ]
+    },
+    {
+      "root_guess": "сайласын",
+      "frequency": 1,
+      "example_forms": [
+        "сайласын"
+      ]
+    },
+    {
+      "root_guess": "арттағ",
+      "frequency": 1,
+      "example_forms": [
+        "арттағы"
+      ]
+    },
+    {
+      "root_guess": "халат",
+      "frequency": 1,
+      "example_forms": [
+        "халатқа"
+      ]
+    },
+    {
+      "root_guess": "түг",
+      "frequency": 1,
+      "example_forms": [
+        "түгі"
+      ]
+    },
+    {
+      "root_guess": "өзә",
+      "frequency": 1,
+      "example_forms": [
+        "өзәң"
+      ]
+    },
+    {
+      "root_guess": "сусынын",
+      "frequency": 1,
+      "example_forms": [
+        "сусынын"
+      ]
+    },
+    {
+      "root_guess": "талтай",
+      "frequency": 1,
+      "example_forms": [
+        "талтайып"
+      ]
+    },
+    {
+      "root_guess": "түңлікбай",
+      "frequency": 1,
+      "example_forms": [
+        "түңлікбайдың"
+      ]
+    },
+    {
+      "root_guess": "көйт",
+      "frequency": 1,
+      "example_forms": [
+        "көйтке"
+      ]
+    },
+    {
+      "root_guess": "хожа",
+      "frequency": 1,
+      "example_forms": [
+        "хожа"
+      ]
+    },
+    {
+      "root_guess": "шыжымай",
+      "frequency": 1,
+      "example_forms": [
+        "шыжымай"
+      ]
+    },
+    {
+      "root_guess": "пысығын",
+      "frequency": 1,
+      "example_forms": [
+        "пысығын"
+      ]
+    },
+    {
+      "root_guess": "қүшақтас",
+      "frequency": 1,
+      "example_forms": [
+        "қүшақтасып"
+      ]
+    },
+    {
+      "root_guess": "-егер",
+      "frequency": 1,
+      "example_forms": [
+        "-егерде"
+      ]
+    },
+    {
+      "root_guess": "салдыр",
+      "frequency": 1,
+      "example_forms": [
+        "салдыр"
+      ]
+    },
+    {
+      "root_guess": "ыржың-қылжа",
+      "frequency": 1,
+      "example_forms": [
+        "ыржың-қылжаң"
+      ]
+    },
+    {
+      "root_guess": "ләбің",
+      "frequency": 1,
+      "example_forms": [
+        "ләбіңнен"
+      ]
+    },
+    {
+      "root_guess": "терме",
+      "frequency": 1,
+      "example_forms": [
+        "термек"
+      ]
+    },
+    {
+      "root_guess": "еһе-еһе",
+      "frequency": 1,
+      "example_forms": [
+        "еһе-еһеге"
+      ]
+    },
+    {
+      "root_guess": "тербен",
+      "frequency": 1,
+      "example_forms": [
+        "тербенді"
+      ]
+    },
+    {
+      "root_guess": "сөгу",
+      "frequency": 1,
+      "example_forms": [
+        "сөгуге"
+      ]
+    },
+    {
+      "root_guess": "жүг",
+      "frequency": 1,
+      "example_forms": [
+        "жүгі"
+      ]
+    },
+    {
+      "root_guess": "жауған",
+      "frequency": 1,
+      "example_forms": [
+        "жауғанда"
+      ]
+    },
+    {
+      "root_guess": "айрылып",
+      "frequency": 1,
+      "example_forms": [
+        "айрылыпты"
+      ]
+    },
+    {
+      "root_guess": "кәф",
+      "frequency": 1,
+      "example_forms": [
+        "кәф"
+      ]
+    },
+    {
+      "root_guess": "сида",
+      "frequency": 1,
+      "example_forms": [
+        "сидаң"
+      ]
+    },
+    {
+      "root_guess": "қаза",
+      "frequency": 1,
+      "example_forms": [
+        "қаза"
+      ]
+    },
+    {
+      "root_guess": "бәһра",
+      "frequency": 1,
+      "example_forms": [
+        "бәһра"
+      ]
+    },
+    {
+      "root_guess": "сүі",
+      "frequency": 1,
+      "example_forms": [
+        "сүіп"
+      ]
+    },
+    {
+      "root_guess": "ард",
+      "frequency": 1,
+      "example_forms": [
+        "ардың"
+      ]
+    },
+    {
+      "root_guess": "зәһәрдай",
+      "frequency": 1,
+      "example_forms": [
+        "зәһәрдай"
+      ]
+    },
+    {
+      "root_guess": "судья",
+      "frequency": 1,
+      "example_forms": [
+        "судьяға"
+      ]
+    },
+    {
+      "root_guess": "хареке",
+      "frequency": 1,
+      "example_forms": [
+        "харекеті"
+      ]
+    },
+    {
+      "root_guess": "сайысып-а",
+      "frequency": 1,
+      "example_forms": [
+        "сайысып-ақ"
+      ]
+    },
+    {
+      "root_guess": "ғаділет",
+      "frequency": 1,
+      "example_forms": [
+        "ғаділетті"
+      ]
+    },
+    {
+      "root_guess": "тулай",
+      "frequency": 1,
+      "example_forms": [
+        "тулай"
+      ]
+    },
+    {
+      "root_guess": "жаққан",
+      "frequency": 1,
+      "example_forms": [
+        "жаққанға"
+      ]
+    },
+    {
+      "root_guess": "иүзи",
+      "frequency": 1,
+      "example_forms": [
+        "иүзи"
+      ]
+    },
+    {
+      "root_guess": "коренной",
+      "frequency": 1,
+      "example_forms": [
+        "кореннойға"
+      ]
+    },
+    {
+      "root_guess": "жаура",
+      "frequency": 1,
+      "example_forms": [
+        "жаурап"
+      ]
+    },
+    {
+      "root_guess": "жайн",
+      "frequency": 1,
+      "example_forms": [
+        "жайнар"
+      ]
+    },
+    {
+      "root_guess": "тәштит",
+      "frequency": 1,
+      "example_forms": [
+        "тәштит"
+      ]
+    },
+    {
+      "root_guess": "қарбаңдад",
+      "frequency": 1,
+      "example_forms": [
+        "қарбаңдадым"
+      ]
+    },
+    {
+      "root_guess": "дікілде",
+      "frequency": 1,
+      "example_forms": [
+        "дікілдеп"
+      ]
+    },
+    {
+      "root_guess": "дулат",
+      "frequency": 1,
+      "example_forms": [
+        "дулат"
+      ]
+    },
+    {
+      "root_guess": "зай",
+      "frequency": 1,
+      "example_forms": [
+        "зай"
+      ]
+    },
+    {
+      "root_guess": "мүнәжәт",
+      "frequency": 1,
+      "example_forms": [
+        "мүнәжәт"
+      ]
+    },
+    {
+      "root_guess": "түсп",
+      "frequency": 1,
+      "example_forms": [
+        "түспеді"
+      ]
+    },
+    {
+      "root_guess": "иген",
+      "frequency": 1,
+      "example_forms": [
+        "игенде"
+      ]
+    },
+    {
+      "root_guess": "қырыс",
+      "frequency": 1,
+      "example_forms": [
+        "қырыс"
+      ]
+    },
+    {
+      "root_guess": "жиренсе",
+      "frequency": 1,
+      "example_forms": [
+        "жиренсең"
+      ]
+    },
+    {
+      "root_guess": "ар-ұя",
+      "frequency": 1,
+      "example_forms": [
+        "ар-ұятын"
+      ]
+    },
+    {
+      "root_guess": "хәк",
+      "frequency": 1,
+      "example_forms": [
+        "хәкім"
+      ]
+    },
+    {
+      "root_guess": "қаф",
+      "frequency": 1,
+      "example_forms": [
+        "қаф"
+      ]
+    },
+    {
+      "root_guess": "кегін",
+      "frequency": 1,
+      "example_forms": [
+        "кегін"
+      ]
+    },
+    {
+      "root_guess": "шұрқыра",
+      "frequency": 1,
+      "example_forms": [
+        "шұрқырап"
+      ]
+    },
+    {
+      "root_guess": "хауас",
+      "frequency": 1,
+      "example_forms": [
+        "хауас"
+      ]
+    },
+    {
+      "root_guess": "ямшид",
+      "frequency": 1,
+      "example_forms": [
+        "ямшид"
+      ]
+    },
+    {
+      "root_guess": "укөңіл",
+      "frequency": 1,
+      "example_forms": [
+        "укөңілді"
+      ]
+    },
+    {
+      "root_guess": "көйлегін",
+      "frequency": 1,
+      "example_forms": [
+        "көйлегін"
+      ]
+    },
+    {
+      "root_guess": "жамай",
+      "frequency": 1,
+      "example_forms": [
+        "жамайды"
+      ]
+    },
+    {
+      "root_guess": "емекс",
+      "frequency": 1,
+      "example_forms": [
+        "емексіп"
+      ]
+    },
+    {
+      "root_guess": "тоятта",
+      "frequency": 1,
+      "example_forms": [
+        "тояттаған"
+      ]
+    },
+    {
+      "root_guess": "сөзден",
+      "frequency": 1,
+      "example_forms": [
+        "сөзденіп"
+      ]
+    },
+    {
+      "root_guess": "фәни",
+      "frequency": 1,
+      "example_forms": [
+        "фәнидің"
+      ]
+    },
+    {
+      "root_guess": "тергендей",
+      "frequency": 1,
+      "example_forms": [
+        "тергендей"
+      ]
+    },
+    {
+      "root_guess": "зайғ",
+      "frequency": 1,
+      "example_forms": [
+        "зайғ"
+      ]
+    },
+    {
+      "root_guess": "ескермед",
+      "frequency": 1,
+      "example_forms": [
+        "ескермедім"
+      ]
+    },
+    {
+      "root_guess": "қоқақта",
+      "frequency": 1,
+      "example_forms": [
+        "қоқақтап"
+      ]
+    },
+    {
+      "root_guess": "ауд",
+      "frequency": 1,
+      "example_forms": [
+        "ауды"
+      ]
+    },
+    {
+      "root_guess": "шырқын",
+      "frequency": 1,
+      "example_forms": [
+        "шырқын"
+      ]
+    },
+    {
+      "root_guess": "әр-бер",
+      "frequency": 1,
+      "example_forms": [
+        "әр-бері"
+      ]
+    },
+    {
+      "root_guess": "тыяр",
+      "frequency": 1,
+      "example_forms": [
+        "тыяр"
+      ]
+    },
+    {
+      "root_guess": "жақт",
+      "frequency": 1,
+      "example_forms": [
+        "жақтым"
+      ]
+    },
+    {
+      "root_guess": "ып-ықша",
+      "frequency": 1,
+      "example_forms": [
+        "ып-ықшам"
+      ]
+    },
+    {
+      "root_guess": "сайраса",
+      "frequency": 1,
+      "example_forms": [
+        "сайраса"
+      ]
+    },
+    {
+      "root_guess": "рағит",
+      "frequency": 1,
+      "example_forms": [
+        "рағит"
+      ]
+    },
+    {
+      "root_guess": "хамір",
+      "frequency": 1,
+      "example_forms": [
+        "хамір"
+      ]
+    },
+    {
+      "root_guess": "надандығ",
+      "frequency": 1,
+      "example_forms": [
+        "надандығы"
+      ]
+    },
+    {
+      "root_guess": "айбын",
+      "frequency": 1,
+      "example_forms": [
+        "айбынар"
+      ]
+    },
+    {
+      "root_guess": "жайнасын",
+      "frequency": 1,
+      "example_forms": [
+        "жайнасын"
+      ]
+    },
+    {
+      "root_guess": "тыңтуя",
+      "frequency": 1,
+      "example_forms": [
+        "тыңтуяқ"
+      ]
+    },
+    {
+      "root_guess": "туйе",
+      "frequency": 1,
+      "example_forms": [
+        "туйе"
+      ]
+    },
+    {
+      "root_guess": "ынса",
+      "frequency": 1,
+      "example_forms": [
+        "ынсап"
+      ]
+    },
+    {
+      "root_guess": "мүбә",
+      "frequency": 1,
+      "example_forms": [
+        "мүбәда"
+      ]
+    },
+    {
+      "root_guess": "ыржаңд",
+      "frequency": 1,
+      "example_forms": [
+        "ыржаңдады"
+      ]
+    },
+    {
+      "root_guess": "қом",
+      "frequency": 1,
+      "example_forms": [
+        "қом"
+      ]
+    },
+    {
+      "root_guess": "ләпкесін",
+      "frequency": 1,
+      "example_forms": [
+        "ләпкесінде"
+      ]
+    },
+    {
+      "root_guess": "-се",
+      "frequency": 1,
+      "example_forms": [
+        "-сенен"
+      ]
+    },
+    {
+      "root_guess": "тыға",
+      "frequency": 1,
+      "example_forms": [
+        "тыға"
+      ]
+    },
+    {
+      "root_guess": "талмай",
+      "frequency": 1,
+      "example_forms": [
+        "талмайды"
+      ]
+    },
+    {
+      "root_guess": "науаи",
+      "frequency": 1,
+      "example_forms": [
+        "науаи"
+      ]
+    },
+    {
+      "root_guess": "қит",
+      "frequency": 1,
+      "example_forms": [
+        "қит"
+      ]
+    },
+    {
+      "root_guess": "сыбдырын",
+      "frequency": 1,
+      "example_forms": [
+        "сыбдырын"
+      ]
+    },
+    {
+      "root_guess": "жүмырт",
+      "frequency": 1,
+      "example_forms": [
+        "жүмыртқа"
+      ]
+    },
+    {
+      "root_guess": "хикметі",
+      "frequency": 1,
+      "example_forms": [
+        "хикметімен"
+      ]
+    },
+    {
+      "root_guess": "қайқа",
+      "frequency": 1,
+      "example_forms": [
+        "қайқаң"
+      ]
+    },
+    {
+      "root_guess": "ескен",
+      "frequency": 1,
+      "example_forms": [
+        "ескенде"
+      ]
+    },
+    {
+      "root_guess": "ғапіл",
+      "frequency": 1,
+      "example_forms": [
+        "ғапіл"
+      ]
+    },
+    {
+      "root_guess": "нашал",
+      "frequency": 1,
+      "example_forms": [
+        "нашалы"
+      ]
+    },
+    {
+      "root_guess": "дуға",
+      "frequency": 1,
+      "example_forms": [
+        "дуға"
+      ]
+    },
+    {
+      "root_guess": "ғадәләт",
+      "frequency": 1,
+      "example_forms": [
+        "ғадәләт"
+      ]
+    },
+    {
+      "root_guess": "диханшы",
+      "frequency": 1,
+      "example_forms": [
+        "диханшылар"
+      ]
+    },
+    {
+      "root_guess": "қоқы",
+      "frequency": 1,
+      "example_forms": [
+        "қоқымын"
+      ]
+    },
+    {
+      "root_guess": "аңға",
+      "frequency": 1,
+      "example_forms": [
+        "аңға"
+      ]
+    },
+    {
+      "root_guess": "имаң",
+      "frequency": 1,
+      "example_forms": [
+        "имаңды"
+      ]
+    },
+    {
+      "root_guess": "бөстег",
+      "frequency": 1,
+      "example_forms": [
+        "бөстегім"
+      ]
+    },
+    {
+      "root_guess": "мұтәкәллимин",
+      "frequency": 1,
+      "example_forms": [
+        "мұтәкәллимин"
+      ]
+    },
+    {
+      "root_guess": "көмек",
+      "frequency": 1,
+      "example_forms": [
+        "көмексіз"
+      ]
+    },
+    {
+      "root_guess": "мызғ",
+      "frequency": 1,
+      "example_forms": [
+        "мызғып"
+      ]
+    },
+    {
+      "root_guess": "жамбасың",
+      "frequency": 1,
+      "example_forms": [
+        "жамбасыңнан"
+      ]
+    },
+    {
+      "root_guess": "риаз",
+      "frequency": 1,
+      "example_forms": [
+        "риаз"
+      ]
+    },
+    {
+      "root_guess": "қиса",
+      "frequency": 1,
+      "example_forms": [
+        "қисаңыз"
+      ]
+    },
+    {
+      "root_guess": "бұртай",
+      "frequency": 1,
+      "example_forms": [
+        "бұртайып"
+      ]
+    },
+    {
+      "root_guess": "ғып",
+      "frequency": 1,
+      "example_forms": [
+        "ғып"
+      ]
+    },
+    {
+      "root_guess": "жамал",
+      "frequency": 1,
+      "example_forms": [
+        "жамалың"
+      ]
+    },
+    {
+      "root_guess": "әл-қуат",
+      "frequency": 1,
+      "example_forms": [
+        "әл-қуатым"
+      ]
+    },
+    {
+      "root_guess": "айрылмас",
+      "frequency": 1,
+      "example_forms": [
+        "айрылмас"
+      ]
+    },
+    {
+      "root_guess": "салдыра",
+      "frequency": 1,
+      "example_forms": [
+        "салдырап"
+      ]
+    },
+    {
+      "root_guess": "сол-а",
+      "frequency": 1,
+      "example_forms": [
+        "сол-ақ"
+      ]
+    },
+    {
+      "root_guess": "жаттай",
+      "frequency": 1,
+      "example_forms": [
+        "жаттайды"
+      ]
+    },
+    {
+      "root_guess": "жиып-а",
+      "frequency": 1,
+      "example_forms": [
+        "жиып-ап"
+      ]
+    },
+    {
+      "root_guess": "налә",
+      "frequency": 1,
+      "example_forms": [
+        "налә"
+      ]
+    },
+    {
+      "root_guess": "айран",
+      "frequency": 1,
+      "example_forms": [
+        "айран"
+      ]
+    },
+    {
+      "root_guess": "рәһб",
+      "frequency": 1,
+      "example_forms": [
+        "рәһбар"
+      ]
+    },
+    {
+      "root_guess": "тұшымас",
+      "frequency": 1,
+      "example_forms": [
+        "тұшымас"
+      ]
+    },
+    {
+      "root_guess": "хасса",
+      "frequency": 1,
+      "example_forms": [
+        "хасса"
+      ]
+    },
+    {
+      "root_guess": "сөзу",
+      "frequency": 1,
+      "example_forms": [
+        "сөзуар"
+      ]
+    },
+    {
+      "root_guess": "түгеншен",
+      "frequency": 1,
+      "example_forms": [
+        "түгеншені"
+      ]
+    },
+    {
+      "root_guess": "әуріл",
+      "frequency": 1,
+      "example_forms": [
+        "әурілді"
+      ]
+    },
+    {
+      "root_guess": "кұлын-тай",
+      "frequency": 1,
+      "example_forms": [
+        "кұлын-тай"
+      ]
+    },
+    {
+      "root_guess": "ләғилде",
+      "frequency": 1,
+      "example_forms": [
+        "ләғилдек"
+      ]
+    },
+    {
+      "root_guess": "әрман",
+      "frequency": 1,
+      "example_forms": [
+        "әрман"
+      ]
+    },
+    {
+      "root_guess": "ажын",
+      "frequency": 1,
+      "example_forms": [
+        "ажынның"
+      ]
+    },
+    {
+      "root_guess": "былжырай",
+      "frequency": 1,
+      "example_forms": [
+        "былжырайды"
+      ]
+    },
+    {
+      "root_guess": "кұйрығы",
+      "frequency": 1,
+      "example_forms": [
+        "кұйрығымен"
+      ]
+    },
+    {
+      "root_guess": "дүпілде",
+      "frequency": 1,
+      "example_forms": [
+        "дүпілдеп"
+      ]
+    },
+    {
+      "root_guess": "сипат",
+      "frequency": 1,
+      "example_forms": [
+        "сипат"
+      ]
+    },
+    {
+      "root_guess": "әсіре",
+      "frequency": 1,
+      "example_forms": [
+        "әсіре"
+      ]
+    },
+    {
+      "root_guess": "мысқыл",
+      "frequency": 1,
+      "example_forms": [
+        "мысқыл"
+      ]
+    },
+    {
+      "root_guess": "тұғр",
+      "frequency": 1,
+      "example_forms": [
+        "тұғры"
+      ]
+    },
+    {
+      "root_guess": "уәктубиһи",
+      "frequency": 1,
+      "example_forms": [
+        "уәктубиһи"
+      ]
+    },
+    {
+      "root_guess": "тәхқи",
+      "frequency": 1,
+      "example_forms": [
+        "тәхқиқ"
+      ]
+    },
+    {
+      "root_guess": "ққыш-а",
+      "frequency": 1,
+      "example_forms": [
+        "ққыш-ақ"
+      ]
+    },
+    {
+      "root_guess": "фәрияд",
+      "frequency": 1,
+      "example_forms": [
+        "фәрияд"
+      ]
+    },
+    {
+      "root_guess": "ылайла",
+      "frequency": 1,
+      "example_forms": [
+        "ылайла"
+      ]
+    },
+    {
+      "root_guess": "хәдис",
+      "frequency": 1,
+      "example_forms": [
+        "хәдис"
+      ]
+    },
+    {
+      "root_guess": "жеңген-",
+      "frequency": 1,
+      "example_forms": [
+        "жеңген-ді"
+      ]
+    },
+    {
+      "root_guess": "һаруан-рашид",
+      "frequency": 1,
+      "example_forms": [
+        "һаруан-рашид"
+      ]
+    },
+    {
+      "root_guess": "нисбәт",
+      "frequency": 1,
+      "example_forms": [
+        "нисбәт"
+      ]
+    },
+    {
+      "root_guess": "ескерме",
+      "frequency": 1,
+      "example_forms": [
+        "ескермейтін"
+      ]
+    },
+    {
+      "root_guess": "шел",
+      "frequency": 1,
+      "example_forms": [
+        "шел"
+      ]
+    },
+    {
+      "root_guess": "іңкәр",
+      "frequency": 1,
+      "example_forms": [
+        "іңкәр"
+      ]
+    },
+    {
+      "root_guess": "дүшпан",
+      "frequency": 1,
+      "example_forms": [
+        "дүшпан"
+      ]
+    },
+    {
+      "root_guess": "жатпағ",
+      "frequency": 1,
+      "example_forms": [
+        "жатпағым"
+      ]
+    },
+    {
+      "root_guess": "боғы",
+      "frequency": 1,
+      "example_forms": [
+        "боғынан"
+      ]
+    },
+    {
+      "root_guess": "нашарлан",
+      "frequency": 1,
+      "example_forms": [
+        "нашарланды"
+      ]
+    },
+    {
+      "root_guess": "жайына",
+      "frequency": 1,
+      "example_forms": [
+        "жайына"
+      ]
+    },
+    {
+      "root_guess": "сыяма",
+      "frequency": 1,
+      "example_forms": [
+        "сыяма"
+      ]
+    },
+    {
+      "root_guess": "сче",
+      "frequency": 1,
+      "example_forms": [
+        "счетың"
+      ]
+    },
+    {
+      "root_guess": "сиқ",
+      "frequency": 1,
+      "example_forms": [
+        "сиқы"
+      ]
+    },
+    {
+      "root_guess": "прошение",
+      "frequency": 1,
+      "example_forms": [
+        "прошение"
+      ]
+    },
+    {
+      "root_guess": "апт",
+      "frequency": 1,
+      "example_forms": [
+        "апты"
+      ]
+    },
+    {
+      "root_guess": "жайланған",
+      "frequency": 1,
+      "example_forms": [
+        "жайланғанда"
+      ]
+    },
+    {
+      "root_guess": "қыңқылда",
+      "frequency": 1,
+      "example_forms": [
+        "қыңқылдап"
+      ]
+    },
+    {
+      "root_guess": "кой",
+      "frequency": 1,
+      "example_forms": [
+        "кой"
+      ]
+    },
+    {
+      "root_guess": "қомдығына",
+      "frequency": 1,
+      "example_forms": [
+        "қомдығына"
+      ]
+    },
+    {
+      "root_guess": "ұса",
+      "frequency": 1,
+      "example_forms": [
+        "ұсап"
+      ]
+    },
+    {
+      "root_guess": "халайы",
+      "frequency": 1,
+      "example_forms": [
+        "халайық"
+      ]
+    },
+    {
+      "root_guess": "дігір",
+      "frequency": 1,
+      "example_forms": [
+        "дігір"
+      ]
+    },
+    {
+      "root_guess": "наданшылы",
+      "frequency": 1,
+      "example_forms": [
+        "наданшылық"
+      ]
+    },
+    {
+      "root_guess": "закүнші",
+      "frequency": 1,
+      "example_forms": [
+        "закүншік"
+      ]
+    },
+    {
+      "root_guess": "ұмсын",
+      "frequency": 1,
+      "example_forms": [
+        "ұмсынар"
+      ]
+    },
+    {
+      "root_guess": "илалла",
+      "frequency": 1,
+      "example_forms": [
+        "илалла"
+      ]
+    },
+    {
+      "root_guess": "интернат",
+      "frequency": 1,
+      "example_forms": [
+        "интернатта"
+      ]
+    },
+    {
+      "root_guess": "жайлау",
+      "frequency": 1,
+      "example_forms": [
+        "жайлауға"
+      ]
+    },
+    {
+      "root_guess": "жүлдыз",
+      "frequency": 1,
+      "example_forms": [
+        "жүлдыз"
+      ]
+    },
+    {
+      "root_guess": "қиуа",
+      "frequency": 1,
+      "example_forms": [
+        "қиуадан"
+      ]
+    },
+    {
+      "root_guess": "жақпад",
+      "frequency": 1,
+      "example_forms": [
+        "жақпадым"
+      ]
+    },
+    {
+      "root_guess": "ермен",
+      "frequency": 1,
+      "example_forms": [
+        "ермен"
+      ]
+    },
+    {
+      "root_guess": "әбиат",
+      "frequency": 1,
+      "example_forms": [
+        "әбиат"
+      ]
+    },
+    {
+      "root_guess": "рәушан",
+      "frequency": 1,
+      "example_forms": [
+        "рәушан"
+      ]
+    },
+    {
+      "root_guess": "ылай",
+      "frequency": 1,
+      "example_forms": [
+        "ылай"
+      ]
+    },
+    {
+      "root_guess": "тояттай",
+      "frequency": 1,
+      "example_forms": [
+        "тояттай"
+      ]
+    },
+    {
+      "root_guess": "қанған",
+      "frequency": 1,
+      "example_forms": [
+        "қанғанда"
+      ]
+    },
+    {
+      "root_guess": "титығ",
+      "frequency": 1,
+      "example_forms": [
+        "титығы"
+      ]
+    },
+    {
+      "root_guess": "несиесін",
+      "frequency": 1,
+      "example_forms": [
+        "несиесін"
+      ]
+    },
+    {
+      "root_guess": "ерде",
+      "frequency": 1,
+      "example_forms": [
+        "ерде"
+      ]
+    },
+    {
+      "root_guess": "гәуһ",
+      "frequency": 1,
+      "example_forms": [
+        "гәуһар"
+      ]
+    },
+    {
+      "root_guess": "йүзіңе",
+      "frequency": 1,
+      "example_forms": [
+        "йүзіңе"
+      ]
+    },
+    {
+      "root_guess": "ысы",
+      "frequency": 1,
+      "example_forms": [
+        "ысып"
+      ]
+    },
+    {
+      "root_guess": "несін",
+      "frequency": 1,
+      "example_forms": [
+        "несін"
+      ]
+    },
+    {
+      "root_guess": "ыржаңда",
+      "frequency": 1,
+      "example_forms": [
+        "ыржаңдап"
+      ]
+    },
+    {
+      "root_guess": "ерер",
+      "frequency": 1,
+      "example_forms": [
+        "ерер"
+      ]
+    },
+    {
+      "root_guess": "ғапылдық",
+      "frequency": 1,
+      "example_forms": [
+        "ғапылдықтан"
+      ]
+    },
+    {
+      "root_guess": "салқ",
+      "frequency": 1,
+      "example_forms": [
+        "салқы"
+      ]
+    },
+    {
+      "root_guess": "әхмәр",
+      "frequency": 1,
+      "example_forms": [
+        "әхмәр"
+      ]
+    },
+    {
+      "root_guess": "сыпыра",
+      "frequency": 1,
+      "example_forms": [
+        "сыпыра"
+      ]
+    },
+    {
+      "root_guess": "сыпырса",
+      "frequency": 1,
+      "example_forms": [
+        "сыпырса"
+      ]
+    },
+    {
+      "root_guess": "ләб",
+      "frequency": 1,
+      "example_forms": [
+        "ләб"
+      ]
+    },
+    {
+      "root_guess": "жыбыр",
+      "frequency": 1,
+      "example_forms": [
+        "жыбыр"
+      ]
+    },
+    {
+      "root_guess": "соларме",
+      "frequency": 1,
+      "example_forms": [
+        "соларменен"
+      ]
+    },
+    {
+      "root_guess": "ырылдас",
+      "frequency": 1,
+      "example_forms": [
+        "ырылдасып"
+      ]
+    },
+    {
+      "root_guess": "айрылғанын",
+      "frequency": 1,
+      "example_forms": [
+        "айрылғанын"
+      ]
+    },
+    {
+      "root_guess": "қол-аяғын",
+      "frequency": 1,
+      "example_forms": [
+        "қол-аяғын"
+      ]
+    },
+    {
+      "root_guess": "сыбырла",
+      "frequency": 1,
+      "example_forms": [
+        "сыбырлап"
+      ]
+    },
+    {
+      "root_guess": "ғибрәтл",
+      "frequency": 1,
+      "example_forms": [
+        "ғибрәтлі"
+      ]
+    },
+    {
+      "root_guess": "ынтымағын",
+      "frequency": 1,
+      "example_forms": [
+        "ынтымағын"
+      ]
+    },
+    {
+      "root_guess": "жайдай",
+      "frequency": 1,
+      "example_forms": [
+        "жайдай"
+      ]
+    },
+    {
+      "root_guess": "нәфрәтл",
+      "frequency": 1,
+      "example_forms": [
+        "нәфрәтлі"
+      ]
+    },
+    {
+      "root_guess": "жетпесе",
+      "frequency": 1,
+      "example_forms": [
+        "жетпесе"
+      ]
+    },
+    {
+      "root_guess": "қоли",
+      "frequency": 1,
+      "example_forms": [
+        "қоли"
+      ]
+    },
+    {
+      "root_guess": "ыржаңдама",
+      "frequency": 1,
+      "example_forms": [
+        "ыржаңдамақ"
+      ]
+    },
+    {
+      "root_guess": "ырға",
+      "frequency": 1,
+      "example_forms": [
+        "ырғап"
+      ]
+    },
+    {
+      "root_guess": "жимас",
+      "frequency": 1,
+      "example_forms": [
+        "жимас"
+      ]
+    },
+    {
+      "root_guess": "тұшын",
+      "frequency": 1,
+      "example_forms": [
+        "тұшынып"
+      ]
+    },
+    {
+      "root_guess": "мүсіркей",
+      "frequency": 1,
+      "example_forms": [
+        "мүсіркейді"
+      ]
+    },
+    {
+      "root_guess": "мәт",
+      "frequency": 1,
+      "example_forms": [
+        "мәт"
+      ]
+    },
+    {
+      "root_guess": "ыржықта",
+      "frequency": 1,
+      "example_forms": [
+        "ыржықтап"
+      ]
+    },
+    {
+      "root_guess": "қомдан",
+      "frequency": 1,
+      "example_forms": [
+        "қомданып"
+      ]
+    },
+    {
+      "root_guess": "сәкін",
+      "frequency": 1,
+      "example_forms": [
+        "сәкін"
+      ]
+    },
+    {
+      "root_guess": "қалды",
+      "frequency": 1,
+      "example_forms": [
+        "қалдыңыз"
+      ]
+    },
+    {
+      "root_guess": "ғиззәт",
+      "frequency": 1,
+      "example_forms": [
+        "ғиззәт"
+      ]
+    },
+    {
+      "root_guess": "ұғылына",
+      "frequency": 1,
+      "example_forms": [
+        "ұғылына"
+      ]
+    },
+    {
+      "root_guess": "зәл",
+      "frequency": 1,
+      "example_forms": [
+        "зәл"
+      ]
+    },
+    {
+      "root_guess": "титтей",
+      "frequency": 1,
+      "example_forms": [
+        "титтей"
+      ]
+    },
+    {
+      "root_guess": "уларын",
+      "frequency": 1,
+      "example_forms": [
+        "уларын"
+      ]
+    },
+    {
+      "root_guess": "виноват",
+      "frequency": 1,
+      "example_forms": [
+        "виноват"
+      ]
+    },
+    {
+      "root_guess": "жайла",
+      "frequency": 1,
+      "example_forms": [
+        "жайлау"
+      ]
+    },
+    {
+      "root_guess": "түспес",
+      "frequency": 1,
+      "example_forms": [
+        "түспес"
+      ]
+    },
+    {
+      "root_guess": "дірдекте",
+      "frequency": 1,
+      "example_forms": [
+        "дірдектеп"
+      ]
+    },
+    {
+      "root_guess": "үлпершек",
+      "frequency": 1,
+      "example_forms": [
+        "үлпершекті"
+      ]
+    },
+    {
+      "root_guess": "уәйлана",
+      "frequency": 1,
+      "example_forms": [
+        "уәйлана"
+      ]
+    },
+    {
+      "root_guess": "сал-сал",
+      "frequency": 1,
+      "example_forms": [
+        "сал-сал"
+      ]
+    },
+    {
+      "root_guess": "нон",
+      "frequency": 1,
+      "example_forms": [
+        "нон"
+      ]
+    },
+    {
+      "root_guess": "хүрмәт",
+      "frequency": 1,
+      "example_forms": [
+        "хүрмәт"
+      ]
+    },
+    {
+      "root_guess": "қырдағ",
+      "frequency": 1,
+      "example_forms": [
+        "қырдағы"
+      ]
+    },
+    {
+      "root_guess": "сыбырме",
+      "frequency": 1,
+      "example_forms": [
+        "сыбырменен"
+      ]
+    },
+    {
+      "root_guess": "адвокат",
+      "frequency": 1,
+      "example_forms": [
+        "адвокат"
+      ]
+    },
+    {
+      "root_guess": "айрылмай",
+      "frequency": 1,
+      "example_forms": [
+        "айрылмай"
+      ]
+    },
+    {
+      "root_guess": "қаныңыз",
+      "frequency": 1,
+      "example_forms": [
+        "қаныңыздар"
+      ]
+    },
+    {
+      "root_guess": "түспе",
+      "frequency": 1,
+      "example_forms": [
+        "түспе"
+      ]
+    },
+    {
+      "root_guess": "шонтай",
+      "frequency": 1,
+      "example_forms": [
+        "шонтайды"
+      ]
+    },
+    {
+      "root_guess": "искандәр",
+      "frequency": 1,
+      "example_forms": [
+        "искандәр"
+      ]
+    },
+    {
+      "root_guess": "жамырай",
+      "frequency": 1,
+      "example_forms": [
+        "жамырайды"
+      ]
+    },
+    {
+      "root_guess": "қәдір",
+      "frequency": 1,
+      "example_forms": [
+        "қәдірі"
+      ]
+    },
+    {
+      "root_guess": "кәз",
+      "frequency": 1,
+      "example_forms": [
+        "кәз"
+      ]
+    },
+    {
+      "root_guess": "терлет",
+      "frequency": 1,
+      "example_forms": [
+        "терлетіп"
+      ]
+    },
+    {
+      "root_guess": "прямотой",
+      "frequency": 1,
+      "example_forms": [
+        "прямотой"
+      ]
+    },
+    {
+      "root_guess": "салғыз",
+      "frequency": 1,
+      "example_forms": [
+        "салғызып"
+      ]
+    },
+    {
+      "root_guess": "кәмил",
+      "frequency": 1,
+      "example_forms": [
+        "кәмил"
+      ]
+    },
+    {
+      "root_guess": "хаж",
+      "frequency": 1,
+      "example_forms": [
+        "хаж"
+      ]
+    },
+    {
+      "root_guess": "ынтиз",
+      "frequency": 1,
+      "example_forms": [
+        "ынтизар"
+      ]
+    },
+    {
+      "root_guess": "кәлкәус",
+      "frequency": 1,
+      "example_forms": [
+        "кәлкәусар"
+      ]
+    },
+    {
+      "root_guess": "кыл",
+      "frequency": 1,
+      "example_forms": [
+        "кылған"
+      ]
+    },
+    {
+      "root_guess": "пида",
+      "frequency": 1,
+      "example_forms": [
+        "пида"
+      ]
+    },
+    {
+      "root_guess": "сайлар",
+      "frequency": 1,
+      "example_forms": [
+        "сайларда"
+      ]
+    },
+    {
+      "root_guess": "тула",
+      "frequency": 1,
+      "example_forms": [
+        "тулап"
+      ]
+    },
+    {
+      "root_guess": "кәм",
+      "frequency": 1,
+      "example_forms": [
+        "кәмтар"
+      ]
+    },
+    {
+      "root_guess": "терезе",
+      "frequency": 1,
+      "example_forms": [
+        "терезеден"
+      ]
+    },
+    {
+      "root_guess": "хикмет",
+      "frequency": 1,
+      "example_forms": [
+        "хикмет"
+      ]
+    },
+    {
+      "root_guess": "бұрқ-сар",
+      "frequency": 1,
+      "example_forms": [
+        "бұрқ-сарқ"
+      ]
+    },
+    {
+      "root_guess": "жақса",
+      "frequency": 1,
+      "example_forms": [
+        "жақса"
+      ]
+    },
+    {
+      "root_guess": "йузмә-йуз",
+      "frequency": 1,
+      "example_forms": [
+        "йузмә-йуз"
+      ]
+    },
+    {
+      "root_guess": "салдуарлы",
+      "frequency": 1,
+      "example_forms": [
+        "салдуарлық"
+      ]
+    },
+    {
+      "root_guess": "жайлан",
+      "frequency": 1,
+      "example_forms": [
+        "жайланып"
+      ]
+    },
+    {
+      "root_guess": "кос",
+      "frequency": 1,
+      "example_forms": [
+        "косар"
+      ]
+    },
+    {
+      "root_guess": "ерттей",
+      "frequency": 1,
+      "example_forms": [
+        "ерттейді"
+      ]
+    },
+    {
+      "root_guess": "жамыра",
+      "frequency": 1,
+      "example_forms": [
+        "жамырап"
+      ]
+    },
+    {
+      "root_guess": "кешт",
+      "frequency": 1,
+      "example_forms": [
+        "кештім"
+      ]
+    },
+    {
+      "root_guess": "секе",
+      "frequency": 1,
+      "example_forms": [
+        "секек"
+      ]
+    },
+    {
+      "root_guess": "салынба",
+      "frequency": 1,
+      "example_forms": [
+        "салынба"
+      ]
+    },
+    {
+      "root_guess": "салынбай",
+      "frequency": 1,
+      "example_forms": [
+        "салынбай"
+      ]
+    }
+  ]
+}
