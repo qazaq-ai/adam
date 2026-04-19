@@ -62,13 +62,13 @@ Capacity limit confirmed: 24M params × 4M tokens ≈ 25× below Chinchilla-opti
 | v0.9.0 | Full entity absorption — Kazakh numeral parser (1–99), ablative/locative city stripping, 1sg-copula occupation stripping; `{age}/{city}/{occupation}` slots; `StatementOf*` variants carry `Option<T>` payloads | 215 workspace tests; every social-topic statement contributes a remembered entity |
 | v0.9.5 | FST-backed slot expansion — `{slot\|features}` syntax parsed and rendered via `synthesise_noun`; cross-slot templates | 229 workspace tests; Kazakh case/number agreement becomes FST-guaranteed |
 | v0.9.6 | Multilingual recogniser surface — Kazakh / Russian / English input triggers for all 25 intents; name extraction from 3 languages; Latin-root safety guard in realiser | 245 workspace tests; input any language, response always Kazakh |
+| v0.9.7 | Lexicon-backed occupation recognition — generic 1sg-copula stripping + POS=noun lookup against 14 k Lexicon replaces the fixed 6-form table | 251 workspace tests; any Lexicon noun works, adjectives correctly rejected |
 
 Phase 10 pivots the project from pure-stochastic transformers (v0.3–v0.4 line) to a deterministic morphology layer + small LM-over-roots. The v0.4.0 transformer baseline stays as reference; new work layers on top.
 
 ## Near-term
 
-- **v0.9.7** — generic 1sg-copula stripping via FST lookup (replaces the fixed-table occupation recogniser); expanded occupation/city vocabulary; transliteration helper for Latin names (optional inflection).
-- **v0.9.8** — Derivation + Possessive in slot syntax (`{name|p1sg+dative}` = "менің Дәулетіме"); more cross-slot templates exploiting age + city + occupation combinations.
+- **v0.9.8** — Derivation + Possessive in slot syntax (`{name|p1sg+dative}` = "менің Дәулетіме"); more cross-slot templates exploiting age + city + occupation combinations; Latin→Cyrillic transliteration helper (optional FST synthesis on Latin names).
 - **v0.9.9** — native-speaker review of the MVP template set (~100 templates × 2–5 variants); correct phrasing, tighten politeness/register.
 - **v1.0.0** — investor-demoable MVP: 25-intent trilingual-input predictable Kazakh dialog, multi-turn session state, FST-guaranteed morphology, native-speaker-reviewed templates, end-to-end Rust stack.
 

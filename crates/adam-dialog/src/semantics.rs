@@ -7,6 +7,7 @@
 //! also get the parse sequence; for now we work directly on the
 //! lowercased-cleaned token list.
 
+use adam_kernel_fst::lexicon::LexiconV1;
 use adam_kernel_fst::parser::Analysis;
 
 use crate::intent::{GreetingKind, Intent, TimeOfDay};
@@ -17,7 +18,20 @@ use crate::intent::{GreetingKind, Intent, TimeOfDay};
 /// The `_parses` argument is kept so callers stay forward-compatible:
 /// v0.7.5 intents can start using morphological info without changing
 /// the call site.
-pub fn interpret_text(input: &str, _parses: &[Analysis]) -> Intent {
+pub fn interpret_text(input: &str, parses: &[Analysis]) -> Intent {
+    interpret_text_with_lexicon(input, parses, None)
+}
+
+/// Lexicon-aware variant used by `Conversation::turn` and
+/// `respond_with_repo`. When a lexicon is supplied, the occupation
+/// recogniser does a generic 1sg-copula strip + noun lookup instead
+/// of consulting a fixed 6-form table — giving full Lexicon reach
+/// (e.g. `философпын` → `философ` if present).
+pub fn interpret_text_with_lexicon(
+    input: &str,
+    _parses: &[Analysis],
+    lexicon: Option<&LexiconV1>,
+) -> Intent {
     // Keep two parallel token streams:
     //   `tokens`  — cleaned lowercase, used for keyword matching
     //   `raw_tokens` — case-preserving, used for PersonName extraction
@@ -89,7 +103,8 @@ pub fn interpret_text(input: &str, _parses: &[Analysis]) -> Intent {
     if detect_ask_location(&joined) {
         return Intent::AskLocation;
     }
-    if let Some(occupation) = detect_statement_of_occupation(&tokens, &raw_tokens, &joined) {
+    if let Some(occupation) = detect_statement_of_occupation(&tokens, &raw_tokens, &joined, lexicon)
+    {
         return Intent::StatementOfOccupation { occupation };
     }
     if detect_ask_occupation(&joined) {
@@ -730,28 +745,40 @@ fn detect_ask_occupation(joined: &str) -> bool {
     joined.contains("what do you do") || joined.contains("whats your job")
 }
 
-/// User states occupation: "мен мұғаліммін", "дәрігермін",
-/// "мен жұмыс істеймін". Returns `Some(Some(root))` when a known
-/// occupation token + 1sg copula matched, with `root` being the
-/// stripped occupation noun (nominative). Falls back to
-/// `Some(None)` for "жұмыс істеймін" (no specific occupation parseable).
+/// User states occupation.
+///
+/// Strategy:
+/// 1. If a `LexiconV1` is supplied: for every token, try stripping
+///    each 1sg-copula suffix (`-мын/-мін/-пын/-пін/-бын/-бін`) and
+///    look up the residue. If it's tagged `noun`, that's the occupation.
+/// 2. Otherwise fall back to a fixed 6-form table for the most common
+///    occupations — keeps `interpret_text` working without a lexicon.
+/// 3. In both paths, bare "жұмыс істеймін" ("I work") fires the intent
+///    with no specific occupation.
 fn detect_statement_of_occupation(
     tokens: &[String],
     _raw_tokens: &[String],
     joined: &str,
+    lexicon: Option<&LexiconV1>,
 ) -> Option<Option<String>> {
-    const OCCUPATIONS: &[(&str, &str)] = &[
-        ("мұғаліммін", "мұғалім"),
-        ("дәрігермін", "дәрігер"),
-        ("студентпін", "студент"),
-        ("инженермін", "инженер"),
-        ("оқушымын", "оқушы"),
-        ("жұмысшымын", "жұмысшы"),
-    ];
-    for t in tokens {
-        for (form, root) in OCCUPATIONS {
-            if t == form {
-                return Some(Some((*root).to_string()));
+    if let Some(lex) = lexicon {
+        if let Some(root) = strip_copula_and_lookup_noun(tokens, lex) {
+            return Some(Some(root));
+        }
+    } else {
+        const OCCUPATIONS: &[(&str, &str)] = &[
+            ("мұғаліммін", "мұғалім"),
+            ("дәрігермін", "дәрігер"),
+            ("студентпін", "студент"),
+            ("инженермін", "инженер"),
+            ("оқушымын", "оқушы"),
+            ("жұмысшымын", "жұмысшы"),
+        ];
+        for t in tokens {
+            for (form, root) in OCCUPATIONS {
+                if t == form {
+                    return Some(Some((*root).to_string()));
+                }
             }
         }
     }
@@ -759,6 +786,43 @@ fn detect_statement_of_occupation(
         return Some(None);
     }
     None
+}
+
+/// For every token ending in a Kazakh 1sg-copula suffix, strip the
+/// suffix and check whether the residue is a `noun` in the lexicon.
+/// Returns the first hit. Skips residues that are tagged as adjectives
+/// (otherwise `"жақсымын"` — adj "жақсы" + 1sg — would falsely register
+/// as an occupation statement).
+fn strip_copula_and_lookup_noun(tokens: &[String], lex: &LexiconV1) -> Option<String> {
+    const COPULA_SUFFIXES: &[&str] = &["мын", "мін", "пын", "пін", "бын", "бін"];
+    for t in tokens {
+        for suffix in COPULA_SUFFIXES {
+            let Some(root) = strip_suffix_chars(t, suffix) else {
+                continue;
+            };
+            // Minimum stem length of 2 chars — guards against stripping
+            // short function words.
+            if root.chars().count() < 2 {
+                continue;
+            }
+            if let Some(entry) = lex.get(&root) {
+                if entry.part_of_speech == "noun" {
+                    return Some(root);
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Strip `suffix` from the end of `token` using Unicode-aware
+/// character counting (avoids byte-slicing into a UTF-8 codepoint).
+fn strip_suffix_chars(token: &str, suffix: &str) -> Option<String> {
+    if !token.ends_with(suffix) {
+        return None;
+    }
+    let take = token.chars().count() - suffix.chars().count();
+    Some(token.chars().take(take).collect())
 }
 
 /// "Family question" — үйлендің бе, балаларың бар ма, отбасың бар ма.

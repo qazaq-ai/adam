@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.6-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.7-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,38 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.9.7 — Lexicon-backed occupation recognition
+
+The hand-written 6-form occupation table is replaced with generic 1sg-copula stripping against the 14 k-entry Lexicon. Any noun in the Lexicon ending in `-мын / -мін / -пын / -пін / -бын / -бін` now routes to `StatementOfOccupation` — Lexicon coverage becomes the cap, not the recogniser.
+
+```
+$ adam_chat
+> мен ақынмын              сіз ақын екенсіз            ← new: ақын was NOT in old table
+> мен әншімін              әншілер — қажетті мамандық  ← FST plural on new extract
+> мен ғалыммын             сіз ғалым екенсіз
+> мен суретшімін           сіз суретші екенсіз
+> мен мұғаліммін           жақсы кәсіп
+> жақсымын                 жақсы екен                  ← POS filter → wellbeing
+```
+
+### POS filter
+
+The Lexicon entry for `жақсы` is tagged `adjective`, so `жақсымын` is rejected from occupation extraction and routes correctly to `StatementOfWellbeing`. Same guard against `жаман` and other common adjective-predicate confounds.
+
+### Public API addition
+
+```rust
+pub fn interpret_text_with_lexicon(
+    input: &str,
+    parses: &[Analysis],
+    lexicon: Option<&LexiconV1>,
+) -> Intent
+```
+
+The original `interpret_text(input, parses)` is now a thin wrapper that calls the lexicon-aware variant with `None` — existing callers keep working.
+
+78 dialog end-to-end tests (up from 73). Workspace totals: **251 passing**, 4 ignored, 0 failing.
 
 ## v0.9.6 — Multilingual recogniser surface
 

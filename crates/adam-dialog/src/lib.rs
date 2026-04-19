@@ -27,7 +27,7 @@ pub use planner::{
     ResponsePlan, intent_key, plan_response, plan_response_with_repo, plan_response_with_session,
 };
 pub use realiser::realise;
-pub use semantics::{interpret, interpret_text};
+pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
 pub use templates::{TemplateError, TemplateRepository};
 
 /// End-to-end entry point: Kazakh text in, Kazakh text out.
@@ -42,7 +42,7 @@ pub fn respond(
     rng_seed: u64,
 ) -> String {
     let parses = parse_input(input, lexicon);
-    let intent = interpret_text(input, &parses);
+    let intent = interpret_text_with_lexicon(input, &parses, Some(lexicon));
     let plan = plan_response(&intent, rng_seed);
     realise(&plan)
 }
@@ -55,7 +55,7 @@ pub fn respond_with_repo(
     rng_seed: u64,
 ) -> String {
     let parses = parse_input(input, lexicon);
-    let intent = interpret_text(input, &parses);
+    let intent = interpret_text_with_lexicon(input, &parses, Some(lexicon));
     let plan = plan_response_with_repo(&intent, rng_seed, repo);
     realise(&plan)
 }

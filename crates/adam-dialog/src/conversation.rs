@@ -33,7 +33,7 @@ use adam_kernel_fst::lexicon::LexiconV1;
 use crate::intent::Intent;
 use crate::planner::plan_response_with_session;
 use crate::realiser::realise;
-use crate::semantics::interpret_text;
+use crate::semantics::interpret_text_with_lexicon;
 use crate::templates::TemplateRepository;
 
 /// A running multi-turn dialog. Holds accumulated session entities
@@ -66,7 +66,7 @@ impl Conversation {
         rng_seed: u64,
     ) -> String {
         let parses = crate::parse_input_public(input, lexicon);
-        let intent = interpret_text(input, &parses);
+        let intent = interpret_text_with_lexicon(input, &parses, Some(lexicon));
         self.absorb_entities(&intent);
         let plan = plan_response_with_session(&intent, rng_seed, repo, &self.session);
         realise(&plan)

@@ -1,6 +1,6 @@
 //! `adam-chat` — interactive REPL demo of the predictable Kazakh dialog
-//! pipeline (v0.9.6 MVP — 25 intents + session state + FST slot expansion
-//! + multilingual recogniser surface for Kazakh / Russian / English input).
+//! pipeline (v0.9.7 MVP — 25 intents + session state + FST slot expansion
+//! + trilingual input + Lexicon-backed occupation extraction).
 //!
 //! Usage:
 //!   adam_chat                — interactive REPL on stdin
@@ -17,7 +17,8 @@ use std::{
 };
 
 use adam_dialog::{
-    Conversation, TemplateRepository, interpret_text, plan_response_with_session, realise,
+    Conversation, TemplateRepository, interpret_text_with_lexicon, plan_response_with_session,
+    realise,
 };
 use adam_kernel_fst::lexicon::LexiconV1;
 
@@ -59,7 +60,7 @@ fn main() -> ExitCode {
     }
 
     eprintln!(
-        "adam-chat v0.9.6 — пікірлесейік! Type a sentence in Kazakh / Russian / English; ^D to quit."
+        "adam-chat v0.9.7 — пікірлесейік! Type a sentence in Kazakh / Russian / English; ^D to quit."
     );
     let stdin = io::stdin();
     let stdout = io::stdout();
@@ -103,7 +104,7 @@ fn run_turn(
                     .next()
             })
             .collect();
-        let intent = interpret_text(input, &parses);
+        let intent = interpret_text_with_lexicon(input, &parses, Some(lex));
         // Fold entities BEFORE planning so "менің атым X" immediately
         // allows the very same turn's response to reference {name}.
         absorb_into(conv, &intent);

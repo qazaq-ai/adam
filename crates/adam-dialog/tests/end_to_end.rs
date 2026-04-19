@@ -719,6 +719,76 @@ fn intent_statement_of_occupation_extracts_root() {
     );
 }
 
+// --- v0.9.7 lexicon-backed generic 1sg-copula stripping --------------------
+
+#[test]
+fn lexicon_path_extracts_occupation_outside_fixed_table() {
+    let Some(lex) = load_lexicon() else { return };
+    // `ақын` (poet) is in the curated lexicon as a noun but NOT in
+    // the 6-form fixed table. Without lexicon, v0.9.6 returned None
+    // for this utterance — it fell through to StatementOfWellbeing.
+    let got = adam_dialog::interpret_text_with_lexicon("мен ақынмын", &[], Some(&lex));
+    assert_eq!(
+        got,
+        Intent::StatementOfOccupation {
+            occupation: Some("ақын".into())
+        }
+    );
+}
+
+#[test]
+fn lexicon_path_extracts_multiple_new_occupations() {
+    let Some(lex) = load_lexicon() else { return };
+    // Each of these nouns lives in the curated lexicon and should
+    // round-trip through the copula-strip + POS=noun lookup.
+    for (input, expected_root) in [
+        ("мен әншімін", "әнші"),
+        ("мен ғалыммын", "ғалым"),
+        ("мен суретшімін", "суретші"),
+    ] {
+        let got = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert_eq!(
+            got,
+            Intent::StatementOfOccupation {
+                occupation: Some(expected_root.to_string())
+            },
+            "input={input:?}"
+        );
+    }
+}
+
+#[test]
+fn lexicon_path_rejects_adjectives_from_occupation_extraction() {
+    let Some(lex) = load_lexicon() else { return };
+    // "жақсымын" = "I'm good" — "жақсы" is an adjective in the lexicon.
+    // The POS filter must reject it from occupation extraction and let
+    // wellbeing fire instead.
+    let got = adam_dialog::interpret_text_with_lexicon("жақсымын", &[], Some(&lex));
+    assert_eq!(got, Intent::StatementOfWellbeing);
+}
+
+#[test]
+fn lexicon_path_rejects_unknown_roots() {
+    let Some(lex) = load_lexicon() else { return };
+    // `xyzzyмын` — copula suffix stripping succeeds but "xyzzy" is not
+    // in the lexicon, so occupation-extraction should decline and the
+    // utterance falls through to the generic pipeline.
+    let got = adam_dialog::interpret_text_with_lexicon("xyzzyмын", &[], Some(&lex));
+    assert!(
+        !matches!(got, Intent::StatementOfOccupation { .. }),
+        "unknown root should not become an occupation, got {got:?}"
+    );
+}
+
+#[test]
+fn conversation_absorbs_lexicon_derived_occupation() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен әншімін", &lex, &repo, 0);
+    assert_eq!(conv.session.get("occupation"), Some(&"әнші".to_string()));
+}
+
 #[test]
 fn conversation_absorbs_age_city_occupation() {
     let Some(lex) = load_lexicon() else { return };

@@ -2,6 +2,70 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.9.7] — 2026-04-19
+
+Lexicon-backed occupation recognition. The fixed 6-form table (`мұғаліммін → мұғалім` and five others) is replaced with generic 1sg-copula stripping + noun lookup against the 14 k-entry Lexicon. Any noun in the Lexicon ending in a 1sg predicate suffix (`-мын/-мін/-пын/-пін/-бын/-бін`) is now recognised.
+
+### What now works
+
+```
+$ adam_chat
+> мен ақынмын           → сіз ақын екенсіз            (new: ақын is in Lexicon, not in the old table)
+> мен әншімін           → әншілер — қажетті мамандық  (FST plural on the new extract)
+> мен ғалыммын          → сіз ғалым екенсіз
+> мен суретшімін        → сіз суретші екенсіз
+> жақсымын              → жақсы екен                  (POS filter → wellbeing, not occupation)
+```
+
+### Public API additions
+
+- `adam_dialog::interpret_text_with_lexicon(input, parses, Option<&LexiconV1>) -> Intent`
+- `adam_dialog::semantics::interpret_text_with_lexicon` (module-level)
+
+The original `interpret_text(input, parses)` is now a thin wrapper that calls the lexicon-aware variant with `None` — existing callers keep working.
+
+### Implementation detail
+
+```rust
+fn strip_copula_and_lookup_noun(tokens: &[String], lex: &LexiconV1) -> Option<String> {
+    const COPULA_SUFFIXES: &[&str] = &["мын", "мін", "пын", "пін", "бын", "бін"];
+    for t in tokens {
+        for suffix in COPULA_SUFFIXES {
+            let Some(root) = strip_suffix_chars(t, suffix) else { continue };
+            if root.chars().count() < 2 { continue; }
+            if let Some(entry) = lex.get(&root) {
+                if entry.part_of_speech == "noun" {
+                    return Some(root);
+                }
+            }
+        }
+    }
+    None
+}
+```
+
+- **POS filter** rejects adjectives (`жақсы`, `жаман`) so "жақсымын" still routes to StatementOfWellbeing.
+- **Min-length 2** guards against stripping into short function words.
+- **Char-count indexing** keeps UTF-8 boundaries safe.
+
+`respond`, `respond_with_repo`, and `Conversation::turn` all pass the lexicon into the new recogniser automatically.
+
+### Tests
+
+78 dialog end-to-end pairs (up from 73), 5 new:
+- 1 positive case covering `ақын` (out-of-table noun)
+- 1 bulk test for `әнші / ғалым / суретші`
+- 1 adjective-negative-case ensuring `жақсымын` stays wellbeing
+- 1 unknown-root case (`xyzzyмын` → must not become occupation)
+- 1 multi-turn absorption test (lexicon-derived occupation persists to session)
+
+Workspace: **251 passing**, 4 ignored, 0 failing. Foundation CI green.
+
+### Known v0.9.7 limitations
+
+- Latin→Cyrillic transliteration is intentionally NOT shipped. Latin names ("John") continue to bypass `{name|features}` FST synthesis via the v0.9.6 safety guard. Transliteration lands in v0.9.8 alongside broader slot-syntax enrichment.
+- Lexicon coverage is the cap — occupations not in the 14 k-entry Lexicon (`философ`, `программист`) still don't extract. Data-layer expansion is orthogonal work.
+
 ## [0.9.6] — 2026-04-19
 
 Multilingual recogniser surface. The model now reads Kazakh, Russian, and English input across all 25 intents and replies exclusively in Kazakh. This is NOT translation — the core pipeline stays deterministic Kazakh-only. The expansion is purely at the recogniser layer: more surface forms map to the same Intent taxonomy.
