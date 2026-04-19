@@ -7,6 +7,51 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.2.0] — 2026-04-19 — Kazakh classical literature expansion
+
+First significant post-v1.0 corpus addition. Ingests the classical Kazakh Wikisource holdings for **Ыбырай Алтынсарин** (1841–1889, children's literature + fables) and **Мағжан Жұмабаев** (1893–1938, early 20c poet). Both authors are fully in the public domain.
+
+### Scope — honest framing
+
+The original v1.2.0 label was "classical literature OCR". In practice:
+
+1. **OCR requires scanned PDFs we don't have** and a Kazakh-trained Tesseract model. Neither is available in this release cycle. Deferred to a later minor release (v1.3.x+) once sources are found.
+2. **Kazakh Wikisource is already digitised** — no OCR needed. This release uses that path instead.
+3. Other classical authors (Шәкәрім, Жамбыл, Сәкен Сейфуллин, Міржақып Дулатов) are public domain but their pages don't exist on kk.wikisource yet. They'll be added when sources arrive.
+
+### Yield
+
+| pack | samples | words | unique | purity |
+|---|---:|---:|---:|---:|
+| **kazakh_classics** (new) | **111** | **926** | **710** | **100.00 %** |
+
+Small in absolute terms (926 words ≈ 0.04 % of the existing corpus) but **pristine literary Kazakh** — zero loanword contamination, from two canonical pre-Soviet authors. This is the literary quality core the LM should weight highly in training.
+
+### New corpus total
+
+- **Before (v1.1.5):** 2,237,926 words, 193,020 unique, 96.74 % purity
+- **After (v1.2.0):** 2,238,852 words, 193,132 unique, 96.74 % purity
+- **Gap to target:** still 97.76 M words (~45× expansion)
+
+### Added
+
+- `scripts/fetch_kazakh_classics.sh` — universal Kazakh Wikisource fetcher. Takes an author list; downloads each author's work-index page; extracts and cleans `<p>` bodies from each linked work; writes `data/external/kazakh_classics_plain.txt` with `0x1e`-separated work records. Rate-limited and UA-identified per Wikimedia policy.
+- `crates/adam-corpus/src/bin/process_kazakh_classics.rs` — processor that reads the raw text, applies the v1.x purity filter (Russian-only letter detection + loanword suffix detection + density threshold of 10 %), deduplicates, and writes `data/curated/kazakh_classics_pack.json`.
+- `data/curated/kazakh_classics_pack.json` — 111 clean samples.
+- `corpus_audit` updated to include the new pack.
+
+### Strategic note
+
+v1.2.0 is the slow, honest start of the corpus expansion path. The big-volume releases are:
+
+- **v1.3.0** — full Kazakh Wikipedia dump (~35 M words from 243k articles; currently we have only 1.15 M from a 100k-sample subset)
+- **v1.4.0** — Kazakh government corpora (egov.kz, akorda.kz, bnews.kz — select long-form content)
+- **v1.5.0** — reach 100 M+ target with additional classical literature (from OCR once pipeline arrives) and filtered news
+
+### Tests
+
+Workspace: **256 passing**, 4 ignored, 0 failing. Foundation CI green. No behavioural change to the dialog layer.
+
 ## [1.1.5] — 2026-04-19 — Corpus audit baseline
 
 First step on the v1.x corpus engineering path toward the v2.0 LM. No dialog / FST behavioural change; tooling + baseline numbers only.

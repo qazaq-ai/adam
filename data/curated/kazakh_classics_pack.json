@@ -1,0 +1,796 @@
+{
+  "version": "1.2.0",
+  "name": "adam-kazakh-classics-pack",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "source_license": "CC-BY-SA 4.0",
+  "source_url": "https://kk.wikisource.org",
+  "attribution": "Kazakh Wikisource contributors; works by Ыбырай Алтынсарин (1841–1889) and Мағжан Жұмабаев (1893–1938), public domain",
+  "works_scanned": 15,
+  "paragraphs_scanned": 29,
+  "sentences_scanned": 248,
+  "sample_count": 111,
+  "skipped_latin": 63,
+  "skipped_length": 15,
+  "skipped_duplicate": 7,
+  "skipped_loanword_heavy": 0,
+  "samples": [
+    {
+      "id": "kz_classics_00001",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Кім сендерді балалар, сүйе-тұғын, Қуанышыңа қуанып, қайғыңа күйе-тұғын"
+    },
+    {
+      "id": "kz_classics_00002",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Түн ұйқысын төрт бөліп кірпік қақпай, Шешең байғұс дамылсыз жүре-тұғын"
+    },
+    {
+      "id": "kz_classics_00003",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Кім сендерді, балалар, тербететін, Еркелеп, ойнатып, сергітетін"
+    },
+    {
+      "id": "kz_classics_00004",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жалқау болсаң, балалар, жаман болсаң, Қамқор анаң көз жасын көлдететін"
+    },
+    {
+      "id": "kz_classics_00005",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Кім сендерді сағынар шетке кетсең, Ғылым іздеп, тез қайтпай, көпке кетсең"
+    },
+    {
+      "id": "kz_classics_00006",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Ұмытпа, ең кемінде жұлдыз сайын, Хат жазып тұр, төбесі көкке жетсін"
+    },
+    {
+      "id": "kz_classics_00007",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Кім сендерді сағынар келгеніңше, Құлындарын көзбен көргенінше"
+    },
+    {
+      "id": "kz_classics_00008",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сендер қайтып келгенде адам болып, Еш арманым болмас ер өле-өлгенше"
+    },
+    {
+      "id": "kz_classics_00009",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "\"Бала, бала, бала\" деп, Түнде шошып оянған"
+    },
+    {
+      "id": "kz_classics_00010",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Түн ұйқысын төртке бөліп, Түнде бесік оянған"
+    },
+    {
+      "id": "kz_classics_00011",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Аялы қолда жылытқан , Қаймақты сүттей қалқытқап"
+    },
+    {
+      "id": "kz_classics_00012",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Суық болса жылытқан, Қорғасын оқтай балықтай"
+    },
+    {
+      "id": "kz_classics_00013",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Айналасына ас қойып, Изені көлдей шалқытқан Кірлі көйлек кигізбей"
+    },
+    {
+      "id": "kz_classics_00014",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сәуірде көтерілер рақмет туы, Көрінер көк жүзінде қаз бен қуы"
+    },
+    {
+      "id": "kz_classics_00015",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Көктен жаңбыр, таулардан сулар жүріп, Жайылар жер жүзіне қардың суы"
+    },
+    {
+      "id": "kz_classics_00016",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Ұшпақтың бір сәулесі жерге түсіп, Өсірер жердан шөпті нұрдың буы"
+    },
+    {
+      "id": "kz_classics_00017",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жақындар құдайымның көктен күні, Тең болар жарлықпенен күн мен түні"
+    },
+    {
+      "id": "kz_classics_00018",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Аспаннан рақымменен күн төнгенде Қуанып қыбырлайды ыныс-жыны"
+    },
+    {
+      "id": "kz_classics_00019",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Ұйқыдан көзін ашқан жас балаша, Жайқалып шыға келер жердің гүлі"
+    },
+    {
+      "id": "kz_classics_00020",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Шапақтан бұлты шығар мұнарланып, Жаңбыры күндер түсер тұманданып"
+    },
+    {
+      "id": "kz_classics_00021",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Адамзат нәр ауасын судай жұтар, Жетпеген үлкендікке жас балалар, Шөл тартқан айуандарша құмарланып, Жүгірер ойдан-қырға жұмарланып"
+    },
+    {
+      "id": "kz_classics_00022",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сәуірде алуан-алуан жауар нөсер, Нөсердің қуатымен жер шөбі өсер"
+    },
+    {
+      "id": "kz_classics_00023",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Көкорай дүниежүзі шалғын болып, Жын, айуан, адамзат баурын төсер"
+    },
+    {
+      "id": "kz_classics_00024",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жан-жәндік рақат тауып тқұру үшін, Ұшпақтан хош иісті желдер есер"
+    },
+    {
+      "id": "kz_classics_00025",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сәуірдің әрбір күні дертке дәрмен, Құдайым дәрмен бол деп етер пәрмен"
+    },
+    {
+      "id": "kz_classics_00026",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Бір малы шаруаның екеу болып, Қыстаудан ел шығады алуан-алуан"
+    },
+    {
+      "id": "kz_classics_00027",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Күлісіп, құшақтасып әзіл етер, Әйелдер көш жөнелтіп кейін қалған"
+    },
+    {
+      "id": "kz_classics_00028",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жүгірер киік, құлан тау мен қырда, Қуанып, ықыласпен келген жылға"
+    },
+    {
+      "id": "kz_classics_00029",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Алыстан мұнарланған сағымдары Шақырып тұрар күліп кел деп мұнда"
+    },
+    {
+      "id": "kz_classics_00030",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Көл бұзылып, көк шығып қойнын ашса, Қаңқылдап қонар оған қаз бен тырна"
+    },
+    {
+      "id": "kz_classics_00031",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Адамзат сайран етер көңілі жай, Секіріп ойын салар құлан мен тай"
+    },
+    {
+      "id": "kz_classics_00032",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қой маңырап, сиыр мөңіреп шат болады, Тасиды күркіреп өзен мен сай"
+    },
+    {
+      "id": "kz_classics_00033",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Аяғын алшақ басып түйе шығар, Жаратқан мұнша таңсық жаббар құдай"
+    },
+    {
+      "id": "kz_classics_00034",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Кеш болса күн қонады таудан асып, Шапаққа қызыл алтын нұрын шашып, Аһ ұрып шүкірлікпен құшақтасар Рақатпен кеш уақытында неше асық"
+    },
+    {
+      "id": "kz_classics_00035",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Боз үйден таң алдында күйеу шықса, Артынан қарар жары жүзін басып"
+    },
+    {
+      "id": "kz_classics_00036",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Құдайға шүкір етер жас пен кәрі, Бердің деп жанға рақат мұндай дәрі"
+    },
+    {
+      "id": "kz_classics_00037",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жын-айуан, адамзат, құрт-құмырсқа Разылық бір құдайға асар зары"
+    },
+    {
+      "id": "kz_classics_00038",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қырда орман, жер жүзінде бәйшешектер, Шуылдап шүкір етер мұның бәрі"
+    },
+    {
+      "id": "kz_classics_00039",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Бір Аллаға сыйынып, Кел, балалар, оқылық, Оқығанды көңілге Ықыласпен тоқылық"
+    },
+    {
+      "id": "kz_classics_00040",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Істің болар қайыры Бастасаңыз Аллалап, Оқымаған жүреді Қараңғыны қармалап"
+    },
+    {
+      "id": "kz_classics_00041",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Кел, балалар, оқылық, Оқығанды көңілге Ықыласпен тоқылық"
+    },
+    {
+      "id": "kz_classics_00042",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Оқысаңыз, балалар, Шамнан шырақ жағылар"
+    },
+    {
+      "id": "kz_classics_00043",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Тілегенің алдыңнан Іздемей-ақ табылар"
+    },
+    {
+      "id": "kz_classics_00044",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Мал дәулеттің байлығы Бір жұтсаң жоқ болар, Оқымыстың байлығы Күннен-күнге көп болар, Еш жұтамақ жоқ болар"
+    },
+    {
+      "id": "kz_classics_00045",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сиса көйлек үстіңде Тоқуменен табылған"
+    },
+    {
+      "id": "kz_classics_00046",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сауысқанның тамағы Шоқуменен табылған"
+    },
+    {
+      "id": "kz_classics_00047",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Өнер-білім бәрі де Оқуменен табылған"
+    },
+    {
+      "id": "kz_classics_00048",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Надандықтың белгісі — Еш ақылға жарымас"
+    },
+    {
+      "id": "kz_classics_00049",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жайылып жүрген айуандай Ақ, қараны танымас"
+    },
+    {
+      "id": "kz_classics_00050",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Аяңшыл ат арымас, Білім деген қарымас"
+    },
+    {
+      "id": "kz_classics_00051",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жөн білмеген наданға Қыдыр-ата дарымас"
+    },
+    {
+      "id": "kz_classics_00052",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Оқу деген шыны-ды, Тұрған сайын шыныққан"
+    },
+    {
+      "id": "kz_classics_00053",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Оқу білген адамдар Май тамызған қылыштан"
+    },
+    {
+      "id": "kz_classics_00054",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Білмегенді білуге Есті бала тырысқан, Есер бала ұрысқан"
+    },
+    {
+      "id": "kz_classics_00055",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Әлпештеген ата-ене Қартаятын күн болар"
+    },
+    {
+      "id": "kz_classics_00056",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қартайғанда жабығып, Мал таятын күн болар"
+    },
+    {
+      "id": "kz_classics_00057",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Ата-енең қартайса — Тіреу болар бұл оқу"
+    },
+    {
+      "id": "kz_classics_00058",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қартайғанда мал тайса — Сүйеу болар бұл оқу"
+    },
+    {
+      "id": "kz_classics_00059",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Оқу білген таниды Бір жаратқан құдайды, Танымаған құдайды Неғылғанда ұнайды"
+    },
+    {
+      "id": "kz_classics_00060",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Шырағым адам болғай деп, Ата-енең жылайды"
+    },
+    {
+      "id": "kz_classics_00061",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Баладан қайыр болмаса, Баланы неге сұрайды"
+    },
+    {
+      "id": "kz_classics_00062",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Ыбырай Алтынсарин (2 қараша 1841 — 29 шілде 1889)"
+    },
+    {
+      "id": "kz_classics_00063",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Әй, достарым, жігіттерім, Болмасқа болушы болма, Қолыңнан келсе қыл қайыр, Кісіден алушы болма"
+    },
+    {
+      "id": "kz_classics_00064",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жақсының жүзі жәндетті&#91;1&#93;, Бір көруің қаныбетті, Жаманның ісі міндетті, Зар берсе&#91;2&#93; алушы болма"
+    },
+    {
+      "id": "kz_classics_00065",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жоғары қарап оқ атпа, Өзіңнің түсер қасыңа"
+    },
+    {
+      "id": "kz_classics_00066",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Ақылсыз жанды досым деп, Басыңды қосып сыр айтпа"
+    },
+    {
+      "id": "kz_classics_00067",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Күндердің күні болғанда, Ол жаман айғақ болар басыңа"
+    },
+    {
+      "id": "kz_classics_00068",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Бар күшіңді сынаспай, Балуандармен күреспе"
+    },
+    {
+      "id": "kz_classics_00069",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Таң боларсың әлемге"
+    },
+    {
+      "id": "kz_classics_00070",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сөз боласың көлемге"
+    },
+    {
+      "id": "kz_classics_00071",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Ақылсыз достан — ақылды дұшпан артық, Дұшпаныңнан бір сақтан"
+    },
+    {
+      "id": "kz_classics_00072",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сырты майда, іші қан, Ел ішіне жар-жора, Достарыңнан бір сақтанғанда, мың сақтан"
+    },
+    {
+      "id": "kz_classics_00073",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Әй, жігіттер, үлгі алмаңыз, Азған елдің ішінен"
+    },
+    {
+      "id": "kz_classics_00074",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Алыс-алыс қашыңыздар, Зияндасты кісіден"
+    },
+    {
+      "id": "kz_classics_00075",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жақсыны көзден салмаңыздар, Жақсыдан қапыл қалмаңыздар"
+    },
+    {
+      "id": "kz_classics_00076",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Өзі болған ерлердің Аяғынан алмағыздар"
+    },
+    {
+      "id": "kz_classics_00077",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Әр елге, әр жұртқа алтын сақа табылмас"
+    },
+    {
+      "id": "kz_classics_00078",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Бас ауырса бақсыларды, Алып келіп бақтырарсың"
+    },
+    {
+      "id": "kz_classics_00079",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жазықсыз жануарды сойып, Өкпеменен қақтырарсың"
+    },
+    {
+      "id": "kz_classics_00080",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жын-бәлекет қашады деп, Тұмар алып тақтырарсың"
+    },
+    {
+      "id": "kz_classics_00081",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Білмес надан ескен істен Ешбір қайыр табылмас"
+    },
+    {
+      "id": "kz_classics_00082",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Алған жарың жаман болса, Бір тәңірге налынарсың"
+    },
+    {
+      "id": "kz_classics_00083",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жарым сондай болса екен деп, Көрінгенге көз саларсың"
+    },
+    {
+      "id": "kz_classics_00084",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Әзелде маңдайыңа нені жазса соны аларсың, Бәріңізге қасы қара, қызыл жүзді табылмас"
+    },
+    {
+      "id": "kz_classics_00085",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қатының өлсе қарыс ұрып қаларсың, Аны мұны қармалап, Және біреуді аларсың, Бір кеткен соң қамқор әке-шешең табылмас"
+    },
+    {
+      "id": "kz_classics_00086",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Таулардан өзен ағар сарқыраған, Айнадай сәуле беріп жарқыраған"
+    },
+    {
+      "id": "kz_classics_00087",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жел соқса, ыстық соқса бір қалыпта, Аралап тау мен тасты сарқыраған"
+    },
+    {
+      "id": "kz_classics_00088",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Көңілің суын ішсең ашылады, Денеңде бар дертіңді қашырады"
+    },
+    {
+      "id": "kz_classics_00089",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Өксіген оттай жанып жануарлар, Өзеннен рақат тауып басылады"
+    },
+    {
+      "id": "kz_classics_00090",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қынарда&#91;1&#93; тілсіз тұрған тоғайлары Шуылдап желмен бірге бас ұрады"
+    },
+    {
+      "id": "kz_classics_00091",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Он мың мал айдап өтсең де лай қалмайды, Тасыса су бармаған сай қалмайды"
+    },
+    {
+      "id": "kz_classics_00092",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Тасыған өзен судың қуатымен Көк шалғын шөп бітпеген жай қалмайды"
+    },
+    {
+      "id": "kz_classics_00093",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Ел қыстап күн көреді жанабында&#91;2&#93;, Дәм болар алуан-алуан балығында"
+    },
+    {
+      "id": "kz_classics_00094",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Тас таста, алтын таста сынамаққа, Сонда да аққан өзен қалыбында"
+    },
+    {
+      "id": "kz_classics_00095",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Құдіретін құдайымның көресің бе, Не нәжіс тоқтар өзен денесінде"
+    },
+    {
+      "id": "kz_classics_00096",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Арыстан демалуға суға кірсе, Балықтар шымшып ойнар терісінде"
+    },
+    {
+      "id": "kz_classics_00097",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Тайынба, қорықпа, тартынба"
+    },
+    {
+      "id": "kz_classics_00098",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Ұстасын, жапсын, уайым жоқ: “Қоймай қуса қорқақты – Батыр болар” деген көп, Батыр ғып, одан не тапты"
+    },
+    {
+      "id": "kz_classics_00099",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қараңғы болса қанша түн, Жұлдыз сонша жарқырар"
+    },
+    {
+      "id": "kz_classics_00100",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Келешек күнде қағазға, Алтынмен жазар атыңды"
+    },
+    {
+      "id": "kz_classics_00101",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Құшақтап сүйер, қағазда Көрсе жазған хатыңды"
+    },
+    {
+      "id": "kz_classics_00102",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сорлы жұртты бастасын, Жасаған, соған көмек бер"
+    },
+    {
+      "id": "kz_classics_00103",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қайраты мол қандыбалақ қыранмын, Күн болған жоқ жаудан жүрек шайылған"
+    },
+    {
+      "id": "kz_classics_00104",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Талмай, қайтпай қамал бұзған кемеңгер, Арыстанға қарсы ұмтылған мендей ер"
+    },
+    {
+      "id": "kz_classics_00105",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қазақша Уикипедиядағы мақала"
+    },
+    {
+      "id": "kz_classics_00106",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жас қырандар – балапан, Жайып қанат ұмтылған"
+    },
+    {
+      "id": "kz_classics_00107",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сүттей таза жүректер"
+    },
+    {
+      "id": "kz_classics_00108",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Сабан төсек, дым, қараңғы жатағы, Наны қара, шайы қара, қарны аш"
+    },
+    {
+      "id": "kz_classics_00109",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жанында жоқ жаны ашитын жақын жүз, Тасбауырлар ыңғайына қарамас"
+    },
+    {
+      "id": "kz_classics_00110",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Жарық сәуле – не Ай, не Күн көрсетпес, Жақынының “Ой, бауырымын"
+    },
+    {
+      "id": "kz_classics_00111",
+      "pack_name": "adam-kazakh-classics-pack",
+      "source_id": "kk.wikisource.org",
+      "domain": "literature",
+      "text": "Қайғыланба, сорлы тұтқын, еш нетпес, Күн батқанмен, таң атпайтын түн жетпес"
+    }
+  ]
+}

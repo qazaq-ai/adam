@@ -58,6 +58,8 @@ const SOURCE_PACKS: &[&str] = &[
     "abai_wikisource_pack.json",
     "kazakh_proverbs_pack.json",
     "synthetic_sentences_pack.json",
+    // v1.2.0 — classical Kazakh literature expansion (Ыбырай + Мағжан)
+    "kazakh_classics_pack.json",
 ];
 
 const CURATED_DIR: &str = "data/curated";

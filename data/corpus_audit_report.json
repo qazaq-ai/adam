@@ -1,10 +1,10 @@
 {
   "version": "1.1.5",
-  "starting_position_words": 2237926,
+  "starting_position_words": 2238852,
   "target_words": 100000000,
-  "expansion_factor": 44.68423,
-  "unique_words_total": 193020,
-  "overall_purity_score": 0.967427,
+  "expansion_factor": 44.66575,
+  "unique_words_total": 193132,
+  "overall_purity_score": 0.9674405,
   "packs": [
     {
       "pack": "tatoeba_kazakh_pack.json",
@@ -89,6 +89,18 @@
       "loanword_suffix_words": 0,
       "purity_score": 0.9878803,
       "avg_sentence_length": 4.03558
+    },
+    {
+      "pack": "kazakh_classics_pack.json",
+      "sample_count": 111,
+      "total_words": 926,
+      "unique_words": 710,
+      "duplicate_samples": 0,
+      "loanword_words": 0,
+      "russian_only_letter_words": 0,
+      "loanword_suffix_words": 0,
+      "purity_score": 1.0,
+      "avg_sentence_length": 8.459459
     }
   ]
 }
