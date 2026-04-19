@@ -7,6 +7,60 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.3.0] — 2026-04-19 — Wikipedia re-extract (+27 % corpus, 2.85 M words)
+
+Unlocks the Kazakh Wikipedia pack after realising the existing 100 k-sample slice was only 3 % of what the already-downloaded 638 MB source file can yield. The v1.3.0 rewrite of `process_wikipedia_kz` is 100× faster and applies the v1.x purity gate.
+
+### The problem
+
+User observed: "all the raw material is already in `data/external/` — we just need to extract it better. And we learned the lesson at v0.4.0: no 2-word fragments." Investigation confirmed:
+
+- `data/external/wikipedia_kz_plain.txt` = **638 MB** raw Kazakh Wikipedia
+- `data/curated/wikipedia_kz_pack.json` (v1.2.0) used only **100 k samples / 1.15 M words** — ~3 % of the source
+- Old processor did byte-by-byte reads → estimated hours for full scan (never run to completion)
+- Old processor had no loanword-density filter → 3–4 % contamination in committed pack
+
+### The fix
+
+Rewrote `crates/adam-corpus/src/bin/process_wikipedia_kz.rs`:
+
+- **Chunked streaming** (64 KB reads) replaces byte-by-byte I/O → full 638 MB scan in **26 s** (measured on M2 8 GB)
+- **Loanword-density filter** (10 % cap) drops Russian-loanword-saturated articles
+- **Optional `target-cap` CLI arg** — default now processes the full file; cap is available for dev runs
+- **Wikipedia purity 95.92 % → 99.99 %** after the new filter
+- Min/max word bounds unchanged (4–40 words per sample), still honours the v0.4.0 lesson
+
+### Full-dump numbers (measured, not committed)
+
+When run uncapped on the full 638 MB source:
+
+```
+articles=296,342  sentences_scanned=5,726,108  accepted=1,395,801
+skipped_latin=2,711,431  skipped_length=922,051  skipped_dup=276,059  skipped_loanword=420,766
+```
+
+**1.4 M clean samples / ~15 M words** available locally. JSON size: ~440 MB.
+
+### What's committed in v1.3.0
+
+GitHub's 100 MB hard file-size limit (and the project's 50 MB convention from `feedback_git_ignore_policy`) mean we can't commit the 440 MB full pack. v1.3.0 commits the first 150 k samples (~49 MB) as the canonical pack; the uncapped output is regenerable locally from the `data/external/wikipedia_kz_plain.txt` source.
+
+| measure | v1.2.0 | v1.3.0 committed | v1.3.0 local (uncapped) |
+|---|---:|---:|---:|
+| Wikipedia samples | 100,000 | 150,036 | 1,395,801 |
+| Wikipedia words | 1,150,532 | 1,613,306 | ~15,138,291 |
+| Wikipedia purity | 95.92 % | 99.99 % | 98.06 % |
+| **Corpus total words** | **2,238,852** | **2,851,629** | ~16,226,611 |
+| **Expansion gap to 100 M** | **45×** | **35×** | 6.2× |
+
+### Sharding plan (v1.3.5)
+
+To expose the full 1.4 M samples without blowing the file-size limit, v1.3.5 will shard the pack into ~10 files of ~40 MB each (`wikipedia_kz_shard_01_pack.json` … `wikipedia_kz_shard_10_pack.json`). `corpus_audit` will glob-merge them. Downstream consumers (future LM training) will read all shards.
+
+### Tests
+
+Workspace: **256 passing**, 4 ignored, 0 failing. Foundation CI green (pack validated via `jq empty`).
+
 ## [1.2.0] — 2026-04-19 — Kazakh classical literature expansion
 
 First significant post-v1.0 corpus addition. Ingests the classical Kazakh Wikisource holdings for **Ыбырай Алтынсарин** (1841–1889, children's literature + fables) and **Мағжан Жұмабаев** (1893–1938, early 20c poet). Both authors are fully in the public domain.

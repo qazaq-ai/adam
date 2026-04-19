@@ -4,24 +4,33 @@ This page documents the starting position for the v1.x corpus expansion toward a
 
 Run `cargo run --release -p adam-corpus --bin corpus_audit` to regenerate `data/corpus_audit_report.json`.
 
-## Baseline
+## Baseline (current)
 
 | pack | samples | words | unique words | Kazakh purity | dup samples | added |
 |---|---:|---:|---:|---:|---:|---|
 | tatoeba_kazakh | 4,058 | 24,643 | 9,709 | 98.12 % | 0 | v0.1.1 |
-| wikipedia_kz | 100,000 | 1,150,532 | 138,128 | 95.92 % | 0 | v0.1.4 |
+| **wikipedia_kz** | **150,036** | **1,613,306** | **155,917** | **99.99 %** | **0** | **v1.3.0 (re-extract)** |
 | common_voice_kk | 6,108 | 36,397 | 10,575 | 99.91 % | 0 | v0.1.6 |
 | cc100_kk | 50,000 | 602,144 | 74,333 | 96.59 % | 0 | v0.4.0 |
 | abai_wikisource | 2,253 | 20,303 | 8,209 | 99.81 % | 0 | v0.4.0 |
 | kazakh_proverbs | 80 | 349 | 245 | 100.00 % | 0 | v0.4.0 |
 | synthetic_sentences | 100,000 | 403,558 | 15,880 | 98.79 % | 207 | v0.4.0 |
-| **kazakh_classics** | **111** | **926** | **710** | **100.00 %** | **0** | **v1.2.0** |
-| **TOTAL** | **262,610** | **2,238,852** | **193,132** | **96.74 %** | **207** | |
+| kazakh_classics | 111 | 926 | 710 | 100.00 % | 0 | v1.2.0 |
+| **TOTAL** | **312,646** | **2,851,629** | **224,301** | **97.99 %** | **207** | |
 
 - **Target:** 100 M words
-- **Gap:** 97.76 M words
-- **Expansion factor needed:** **~45×**
-- **v1.2.0 contribution:** +926 clean words (100% Kazakh purity) from Ыбырай Алтынсарин + Мағжан Жұмабаев
+- **Gap:** 97.15 M words
+- **Expansion factor needed:** **~35×** (was 45× at v1.1.5 baseline)
+- **v1.3.0 contribution:** +613k words from re-extracting the full Wikipedia dump with the loanword-density filter; Wikipedia purity jumped from 95.92 % → 99.99 % because the filter now catches high-density Russian-loanword articles that slipped through before.
+
+## File size constraint
+
+The full reprocess of `wikipedia_kz_plain.txt` (638 MB source) yields **1,395,801 samples / ~15 M words**, but that JSON file exceeds GitHub's 100 MB hard limit. v1.3.0 commits the first 150 k samples (~49 MB) as the canonical pack. The remaining ~1.25 M samples will be exposed via sharding (`wikipedia_kz_shard_N_pack.json`, each ≤ 50 MB) in v1.3.5. Local users can regenerate the uncapped pack any time:
+
+```bash
+cargo run --release -p adam-corpus --bin process_wikipedia_kz
+# → data/curated/wikipedia_kz_pack.json (~440 MB, do not commit)
+```
 
 ## Interpretation
 
