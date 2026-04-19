@@ -13,9 +13,44 @@ use crate::phonology::{
     is_vowel, realise_archiphoneme, stem_vowel_harmony,
 };
 
+/// Derivational suffixes that attach directly to the root and change the
+/// semantic/syntactic category (before inflection). They are OPTIONAL and
+/// FSM-checked at lexicon-time; not every root accepts every derivation.
+///
+/// In v0.6.0 these live on `NounFeatures` because most derivations result
+/// in a noun-like form that then takes noun inflection. Verbal derivations
+/// (participles, converbs) are already handled under `Tense`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Derivation {
+    /// `-шы/-ші` — agent noun (жазушы "writer")
+    Agent,
+    /// `-лық/-лік` — abstract noun (жақсылық "goodness")
+    Abstract,
+    /// `-сыз/-сіз` — privative (тұзсыз "saltless")
+    Privative,
+    /// `-лы/-лі` — endowed-with (күшті "strong")
+    Endowed,
+    /// `-дай/-дей` — similative (балaдай "child-like")
+    Similative,
+    /// `-ырақ/-ірек` — comparative (жақсырақ "better")
+    Comparative,
+    /// `-у` — verbal noun / gerund (жазу "writing")
+    VerbalNoun,
+    /// `-ым/-ім` — result-of-action noun (айтым "saying")
+    ActionNoun,
+    /// `-шық/-шік` — diminutive (үйшік "little house")
+    Diminutive,
+    /// `-ншы/-нші` — ordinal (бірінші "first")
+    Ordinal,
+    /// `-еу/-ау` — collective numeral (біреу "one-of-them")
+    Collective,
+}
+
 /// Partial feature bundle for a noun-like word.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NounFeatures {
+    /// Derivational suffix applied BEFORE inflection. Optional.
+    pub derivation: Option<Derivation>,
     pub number: Option<Number>,
     pub possessive: Option<Possessive>,
     pub case: Option<Case>,
@@ -280,6 +315,126 @@ const VERB_CAUSATIVE: SuffixTemplate = &[
     SuffixAtom::Literal('р'),
 ];
 
+// =========================================================================
+// DERIVATIONAL SUFFIXES — v0.6.0 word-formation layer.
+//
+// These attach directly to the root (not after inflection) and change the
+// part of speech or nuance of meaning. They bridge `root → new root` which
+// can then take any inflectional suffix from the existing FST.
+//
+// Each derivational suffix has its own `Derivation` variant. Unlike
+// inflection, derivation is NOT strictly productive — not every root
+// accepts every derivational suffix, and many derivations are lexicalised.
+// The FST applies them freely; the application-level code should use the
+// lexicon to check whether a derived form is attested.
+// =========================================================================
+
+/// Agent-noun `-шы / -ші`: derives a noun meaning "one who does X".
+///   жазу (writing) → жазушы (writer)
+///   оқу (reading)  → оқушы (student, reader)
+///   қала (city)    → қалашы (city-dweller)
+const DERIV_AGENT: SuffixTemplate = &[SuffixAtom::Literal('ш'), SuffixAtom::Arch(Archiphoneme::Y)];
+
+/// Abstract-noun `-лық / -лік / -дық / -дік / -тық / -тік`: forms an
+/// abstract noun from a noun or adjective.
+///   жақсы (good)     → жақсылық (goodness)
+///   адам (person)    → адамдық (humanity, adulthood)
+///   бала (child)     → балалық (childhood)
+///   ел (country)     → елдік (national identity)
+const DERIV_ABSTRACT: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::L),
+    SuffixAtom::Arch(Archiphoneme::Y),
+    SuffixAtom::Arch(Archiphoneme::K),
+];
+
+/// Privative `-сыз / -сіз`: "without X" — adjective from noun.
+///   тұз (salt)       → тұзсыз (salt-less)
+///   су (water)       → сусыз (water-less)
+///   күш (strength)   → күшсіз (power-less)
+const DERIV_PRIVATIVE: SuffixTemplate = &[
+    SuffixAtom::Literal('с'),
+    SuffixAtom::Arch(Archiphoneme::Y),
+    SuffixAtom::Literal('з'),
+];
+
+/// Possessive-adjective `-лы / -лі / -ды / -ді / -ты / -ті`: "having X".
+///   күш (strength)   → күшті (strong — "having strength")
+///   бала (child)     → балалы (having children)
+///   дәмді (taste)    → дәмді (tasty — already lexicalised but template works)
+const DERIV_ENDOWED: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::L),
+    SuffixAtom::Arch(Archiphoneme::Y),
+];
+
+/// Similative `-дай / -дей / -тай / -тей`: "like X", forms a comparative
+/// adjective.
+///   бала (child)     → балaдай (child-like)
+///   тау (mountain)   → таудай (mountain-like, huge)
+///   ақ (white)       → ақтай (like snow/white)
+const DERIV_SIMILATIVE: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::D),
+    SuffixAtom::Arch(Archiphoneme::A),
+    SuffixAtom::Literal('й'),
+];
+
+/// Comparative `-ырақ / -ірек / -рақ / -рек`: "more X".
+///   жақсы (good)     → жақсырақ (better)
+///   үлкен (big)      → үлкенірек (bigger)
+///   тез (fast)       → тезірек (faster)
+///
+/// Simplified: {Y}рақ / {Y}рек. Buffer {Y} → ы/і after consonants, drops
+/// after vowels.
+const DERIV_COMPARATIVE: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::Y),
+    SuffixAtom::Literal('р'),
+    SuffixAtom::Arch(Archiphoneme::A),
+    SuffixAtom::Literal('қ'),
+];
+
+/// Verbal-noun (gerund) `-у`: turns a verb into a noun of action.
+///   жазу (write→writing), оқу (read→reading), бару (go→going)
+/// Simple literal; no archiphoneme allomorphy.
+const DERIV_VERBAL_NOUN: SuffixTemplate = &[SuffixAtom::Literal('у')];
+
+/// Place-of-action `-ым / -ім` verbal-noun: result/product form.
+///   айт (say) → айтым (saying, expression)
+///   жаз (write) → жазым (writing)
+/// Used less widely than -у but attested.
+const DERIV_ACTION_NOUN: SuffixTemplate =
+    &[SuffixAtom::Arch(Archiphoneme::Y), SuffixAtom::Literal('м')];
+
+/// Diminutive `-шық / -шік`: "small X". The `қ/к` alternates by vowel
+/// harmony — use the {K} archiphoneme.
+///   үй (house)       → үйшік (little house)
+///   тау (mountain)   → таушық (little mountain, hill)
+const DERIV_DIMINUTIVE: SuffixTemplate = &[
+    SuffixAtom::Literal('ш'),
+    SuffixAtom::Arch(Archiphoneme::Y),
+    SuffixAtom::Arch(Archiphoneme::K),
+];
+
+/// Ordinal `-(ы/і)ншы / -(ы/і)нші`: derives ordinal from cardinal numeral.
+/// Consonant-final: buffer Y inserted before -нші (бірінші).
+/// Vowel-final: buffer drops (жетінші).
+/// Template: `{Y} н ш {Y}`  —  front/back harmony picks ы/і for each Y.
+///   бір (one)        → бірінші (first)
+///   екі (two)        → екінші (second)
+///   үш (three)       → үшінші (third)
+///   жеті (seven)     → жетінші (seventh)
+const DERIV_ORDINAL: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::Y),
+    SuffixAtom::Literal('н'),
+    SuffixAtom::Literal('ш'),
+    SuffixAtom::Arch(Archiphoneme::Y),
+];
+
+/// Collective numeral `-еу / -ау`: "as a group of X".
+///   бір → біреу (someone, one-of-them),
+///   екі → екеу (the two of them),
+///   үш → үшеу (the three of them).
+const DERIV_COLLECTIVE: SuffixTemplate =
+    &[SuffixAtom::Arch(Archiphoneme::A), SuffixAtom::Literal('у')];
+
 /// 1sg personal ending (attached after past-definite): `-м`.
 const VERB_PERS_1SG: SuffixTemplate = &[SuffixAtom::Literal('м')];
 /// 2sg informal: `-ң`.
@@ -468,6 +623,23 @@ impl Accumulator {
 /// suffix template, with phonological realisation happening atom-by-atom.
 pub fn synthesise_noun(root: &str, features: NounFeatures) -> String {
     let mut acc = Accumulator::from_stem(root);
+    // Derivation slot — applied first, before inflection.
+    if let Some(d) = features.derivation {
+        let template: SuffixTemplate = match d {
+            Derivation::Agent => DERIV_AGENT,
+            Derivation::Abstract => DERIV_ABSTRACT,
+            Derivation::Privative => DERIV_PRIVATIVE,
+            Derivation::Endowed => DERIV_ENDOWED,
+            Derivation::Similative => DERIV_SIMILATIVE,
+            Derivation::Comparative => DERIV_COMPARATIVE,
+            Derivation::VerbalNoun => DERIV_VERBAL_NOUN,
+            Derivation::ActionNoun => DERIV_ACTION_NOUN,
+            Derivation::Diminutive => DERIV_DIMINUTIVE,
+            Derivation::Ordinal => DERIV_ORDINAL,
+            Derivation::Collective => DERIV_COLLECTIVE,
+        };
+        acc.apply(template);
+    }
     if matches!(features.number, Some(Number::Plural)) {
         acc.apply(PLURAL);
     }
@@ -1448,6 +1620,142 @@ mod tests {
             },
         );
         assert_eq!(out, "жаза");
+    }
+
+    // -----------------------------------------------------------------
+    // Derivational morphology (v0.6.0).
+    // -----------------------------------------------------------------
+
+    #[test]
+    fn deriv_agent_жазу() {
+        // The agent suffix -шы on the verbal noun "жазу" (writing) gives
+        // "жазушы" (writer).  We pass "жазу" as the root — derivation
+        // assumes the caller has already built the verbal noun; FST
+        // doesn't stack derivation on derivation at this layer.
+        let out = synthesise_noun(
+            "жазу",
+            NounFeatures {
+                derivation: Some(Derivation::Agent),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жазушы");
+    }
+
+    #[test]
+    fn deriv_agent_front_оқу() {
+        let out = synthesise_noun(
+            "оқу",
+            NounFeatures {
+                derivation: Some(Derivation::Agent),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "оқушы");
+    }
+
+    #[test]
+    fn deriv_abstract_жақсы() {
+        // жақсы + -лық = жақсылық (goodness)
+        let out = synthesise_noun(
+            "жақсы",
+            NounFeatures {
+                derivation: Some(Derivation::Abstract),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жақсылық");
+    }
+
+    #[test]
+    fn deriv_privative_тұз() {
+        // тұз + -сыз = тұзсыз (saltless)
+        let out = synthesise_noun(
+            "тұз",
+            NounFeatures {
+                derivation: Some(Derivation::Privative),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "тұзсыз");
+    }
+
+    #[test]
+    fn deriv_privative_front_күш() {
+        let out = synthesise_noun(
+            "күш",
+            NounFeatures {
+                derivation: Some(Derivation::Privative),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "күшсіз");
+    }
+
+    #[test]
+    fn deriv_similative_тау() {
+        // тау + -дай = таудай (mountain-like, huge)
+        let out = synthesise_noun(
+            "тау",
+            NounFeatures {
+                derivation: Some(Derivation::Similative),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "таудай");
+    }
+
+    #[test]
+    fn deriv_verbal_noun_жаз() {
+        // жаз + -у = жазу (writing)
+        let out = synthesise_noun(
+            "жаз",
+            NounFeatures {
+                derivation: Some(Derivation::VerbalNoun),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жазу");
+    }
+
+    #[test]
+    fn deriv_ordinal_бір() {
+        // бір + -інші = бірінші (first)
+        let out = synthesise_noun(
+            "бір",
+            NounFeatures {
+                derivation: Some(Derivation::Ordinal),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "бірінші");
+    }
+
+    #[test]
+    fn deriv_diminutive_үй() {
+        // үй + -шік = үйшік (little house)
+        let out = synthesise_noun(
+            "үй",
+            NounFeatures {
+                derivation: Some(Derivation::Diminutive),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "үйшік");
+    }
+
+    #[test]
+    fn deriv_then_case_жазушы_dat() {
+        // Chained: root жазу → Agent → жазушы → DAT = жазушыға
+        let out = synthesise_noun(
+            "жазу",
+            NounFeatures {
+                derivation: Some(Derivation::Agent),
+                case: Some(Case::Dative),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жазушыға");
     }
 
     #[test]

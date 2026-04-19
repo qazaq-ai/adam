@@ -2,6 +2,28 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.6.0] — 2026-04-19
+
+Derivational morphology — the "word-formation layer" the user flagged as a v1.0.0-path requirement. The FST now transforms a root into a new root via a derivational suffix before applying inflection. Eleven derivation types covered:
+
+- `Agent` `-шы/-ші` (жазу → жазушы)
+- `Abstract` `-лық/-лік` (жақсы → жақсылық)
+- `Privative` `-сыз/-сіз` (тұз → тұзсыз)
+- `Endowed` `-лы/-лі` (күш → күшті)
+- `Similative` `-дай/-дей` (тау → таудай)
+- `Comparative` `-рақ/-рек` (жақсы → жақсырақ)
+- `VerbalNoun` `-у` (жаз → жазу)
+- `ActionNoun` `-ым/-ім` (айт → айтым)
+- `Diminutive` `-шық/-шік` (үй → үйшік)
+- `Ordinal` `-ншы/-нші` (бір → бірінші)
+- `Collective` `-еу/-ау` (бір → біреу)
+
+`NounFeatures` gains a `derivation: Option<Derivation>` field; `synthesise_noun` applies the derivation BEFORE inflection so the two pipelines chain correctly (жазу → Agent → жазушы → Dative → жазушыға).
+
+Tests added: 10. `adam-kernel-fst` lib now at **78 passing**. Workspace at **160 passing**, 4 ignored, 0 failing.
+
+No other code changes.
+
 ## [0.5.5] — 2026-04-19
 
 Pure Kazakh lexicon milestone. Enforces the "no loanwords" directive at the lexicon level and augments coverage from classical 19th-century sources.

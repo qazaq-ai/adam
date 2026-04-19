@@ -119,6 +119,7 @@ fn try_noun_analyses(surface: &str, entry: &RootEntry, out: &mut Vec<Analysis>) 
         for &possessive in &possessives {
             for &case in &cases {
                 let features = NounFeatures {
+                    derivation: None,
                     number,
                     possessive,
                     case,

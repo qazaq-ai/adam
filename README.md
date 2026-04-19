@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.5.5-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.6.0-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,28 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.6.0 — Derivational morphology
+
+Adds the "word-formation" layer per the user's directive. The FST can now derive new word classes from roots before applying inflection, closing the `root → new root → inflected form` pipeline.
+
+| suffix | meaning | example |
+|---|---|---|
+| `-шы / -ші` | agent noun | жазу → жазушы (writer) |
+| `-лық / -лік` | abstract noun | жақсы → жақсылық (goodness) |
+| `-сыз / -сіз` | privative (without) | тұз → тұзсыз (saltless) |
+| `-лы / -лі` | endowed-with | күш → күшті (strong) |
+| `-дай / -дей` | similative | тау → таудай (mountain-like) |
+| `-рақ / -рек` | comparative | жақсы → жақсырақ (better) |
+| `-у` | verbal noun | жаз → жазу (writing) |
+| `-ым / -ім` | action-result | айт → айтым (saying) |
+| `-шық / -шік` | diminutive | үй → үйшік (little house) |
+| `-ншы / -нші` | ordinal | бір → бірінші (first) |
+| `-еу / -ау` | collective | бір → біреу (someone) |
+
+These derivations chain cleanly with existing inflection (e.g., жазу → жазушы → жазушыға, "writer" in dative).
+
+`adam-kernel-fst` unit tests: **78 passing** (up from 68 in v0.5.0). Workspace totals: 160 tests passing, 4 ignored, 0 failing.
 
 ## v0.5.5 — Pure Kazakh lexicon
 
