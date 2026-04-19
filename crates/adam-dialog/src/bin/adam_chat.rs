@@ -1,19 +1,24 @@
-//! `adam-chat` — interactive REPL for the adam v1.0.0 Kazakh dialog
+//! `adam-chat` — interactive REPL for the adam v1.1.0 Kazakh dialog
 //! pipeline.
 //!
+//! **Kazakh-only surface (v1.1.0).** Input and output are both Kazakh.
+//! The v0.9.6 multilingual recogniser (Russian / English triggers) and
+//! the v0.9.8 Latin→Cyrillic transliteration were reverted per the
+//! Kazakh-first directive. The roadmap commits to a real Kazakh LM
+//! trained on a 100 M+ token corpus as the Unknown-intent fallback in
+//! v2.0; multilingual / multimodal work is deferred until that ships.
+//!
 //! Capabilities:
-//!   - 25 intents across greeting / farewell / affirmation / negation /
-//!     thanks / apology / wellbeing / name / age / location /
-//!     occupation / family / weather / time / compliment / request /
-//!     well-wishes.
-//!   - Trilingual input surface: Kazakh, Russian, English.
+//!   - 26 intents (25 conversational + Insult for polite
+//!     non-engagement), all Kazakh-triggered.
 //!   - Kazakh-only output, FST-guaranteed morphology.
 //!   - Multi-turn session state (`Conversation`): `name`, `age`,
 //!     `city`, `occupation` persist across turns.
 //!   - `{slot|features}` template expansion with case / number /
 //!     derivation / possessive feature tokens.
-//!   - Latin → Cyrillic transliteration for foreign names before FST
-//!     synthesis.
+//!   - Smart Unknown handler — when no intent matches, the parser
+//!     extracts a noun hint and the fallback response acknowledges
+//!     the topic: "ах, {noun} туралы айтасыз ба".
 //!
 //! See `docs/kazakh_grammar/07_dialog_architecture.md` for the full
 //! architectural commitment.
@@ -75,9 +80,7 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!(
-        "adam-chat v1.0.0 — пікірлесейік! Type a sentence in Kazakh / Russian / English; ^D to quit."
-    );
+    eprintln!("adam-chat v1.1.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut conv = Conversation::new();

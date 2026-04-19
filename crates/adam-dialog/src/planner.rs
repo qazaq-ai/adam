@@ -157,6 +157,12 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
         } => {
             slots.insert("occupation".into(), occupation.clone());
         }
+        Intent::Unknown {
+            noun_hint: Some(noun),
+            ..
+        } => {
+            slots.insert("noun".into(), noun.clone());
+        }
         _ => {}
     }
     slots
@@ -238,6 +244,16 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::Compliment => "compliment",
         Intent::Request => "request",
         Intent::WellWishes => "well_wishes",
-        Intent::Unknown { .. } => "unknown",
+        Intent::Insult => "insult",
+        Intent::Unknown { noun_hint, .. } => {
+            // If the FST parser surfaced any noun, route to the
+            // context-aware fallback family. Otherwise the generic
+            // unknown family (bare "түсінбедім", etc.)
+            if noun_hint.is_some() {
+                "unknown.with_noun"
+            } else {
+                "unknown"
+            }
+        }
     }
 }

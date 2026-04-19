@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.0.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.1.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -18,11 +18,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/intents-25-2EA44F?style=flat-square" alt="intents">
-  <img src="https://img.shields.io/badge/input--langs-kk%20%7C%20ru%20%7C%20en-9CCC65?style=flat-square" alt="input languages">
+  <img src="https://img.shields.io/badge/intents-26-2EA44F?style=flat-square" alt="intents">
+  <img src="https://img.shields.io/badge/surface-Kazakh--only-9CCC65?style=flat-square" alt="Kazakh only">
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
-  <img src="https://img.shields.io/badge/templates-29%20families-FBC02D?style=flat-square" alt="templates">
-  <img src="https://img.shields.io/badge/tests-271%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/templates-31%20families-FBC02D?style=flat-square" alt="templates">
+  <img src="https://img.shields.io/badge/tests-253%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
 </p>
 
@@ -53,27 +53,29 @@ The name *adam* (Kazakh: **адам**) means "human".
 
 ```
 $ cargo run --release -p adam-dialog --bin adam_chat
-adam-chat v1.0.0 — пікірлесейік! Type a sentence in Kazakh / Russian / English; ^D to quit.
+adam-chat v1.1.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
 
-> hello
+> сәлем
 сәлем
-> меня зовут Дәулет
+> менің атым Дәулет
 Дәулетпен танысқаныма қуаныштымын
 > мен Алматыданмын
 Алматы — әдемі қала
-> мен мұғаліммін
-Дәулет, сіз Алматыда мұғалім екенсіз          # triple-slot template
-> how are you
-жақсымын Дәулет, ал сіз қалайсыз              # cross-slot with remembered name
-> менің жасым отыз
-Дәулет, 30 жас — керемет кезең
-> рахмет
-оқасы жоқ
+> мен бағдарламашымын
+бағдарламашыға сәттілік тілеймін         # new modern profession via Lexicon + FST dative
+> мен әзірлеушімін
+Дәулет, әзірлеуші — құрметті кәсіп
+> қалайсыз
+жақсы, ал сіз қалайсыз
+> кітап оқимын
+кітап — қызықты тақырып                  # smart Unknown handler: noun-hint acknowledgement
+> сен ақымақсың
+сізге ренжімеймін                        # Insult intent: polite non-engagement
 > сау бол
 сау болыңыз
 ```
 
-Input in Kazakh / Russian / English. Output always Kazakh. Entities (name, age, city, occupation) persist across turns. Personalised templates fire when the session has the right slots filled.
+Kazakh-only input and output. Entities (name, age, city, occupation) persist across turns. Personalised templates fire when the session has the right slots filled. When no intent matches, the parser extracts a noun hint so the fallback response can acknowledge the topic instead of blank "түсінбедім".
 
 ## Architecture
 
@@ -123,24 +125,27 @@ bash ./scripts/validate_foundation.sh
 
 ## Capabilities (v1.0.0)
 
-### 25 intents
+### 26 intents
 
 | family | intents |
 |---|---|
 | Social | Greeting (Casual / Polite / Morning / Day / Evening), Farewell, Affirmation, Negation, Thanks, Apology, Compliment, Request, WellWishes |
 | Conversational | AskHowAreYou, StatementOfWellbeing, AskName, StatementOfName { name } |
 | Social topics | AskAge, StatementOfAge { years }, AskLocation, StatementOfLocation { city }, AskOccupation, StatementOfOccupation { occupation }, AskFamily, StatementOfFamily, AskWeather, StatementOfWeather, AskTime |
-| Fallback | Unknown { raw_tokens } |
+| Boundary | **Insult** (v1.1.0) — polite non-engagement for rude input |
+| Fallback | Unknown { raw_tokens, noun_hint } — v1.1.0 smart handler acknowledges the topic when a noun is parseable |
 
 Every `Statement*` intent with an `Option<T>` payload carries an extracted entity that persists into the session and feeds downstream templates.
 
-### Trilingual recognition, Kazakh response
+### Kazakh-only recogniser (v1.1.0 revert)
 
-All 25 intents are triggered by keyword patterns in **Kazakh, Russian, and English**. The recogniser widens — the core pipeline stays Kazakh-only. Example self-introduction patterns:
+v0.9.6 shipped Russian / English trigger phrasings for all 25 intents. Post-v1.0.0 testing showed the multilingual path diluted the Kazakh-first thesis without delivering real generalisation — a Russian speaker typing "Я разработчик" got "түсінбедім" because "разработчик" isn't in the Kazakh Lexicon. **The multilingual surface was removed in v1.1.0.** Non-Kazakh input now falls through to `Intent::Unknown`.
 
-- Kazakh: `менің атым X`, `атым X`, `мені X деп атайды`, `есімім X`
-- Russian: `меня зовут X`, `моё имя X`
-- English: `my name is X`, `call me X`, `hi i am X`
+The project's path to handling unbounded inputs is **not translation** — it is training a compact Kazakh LM on a 100 M+ token corpus and plugging it in as the Unknown fallback. See [History](#history).
+
+Self-introduction patterns (Kazakh only):
+
+- `менің атым X`, `атым X`, `мені X деп атайды`, `есімім X`
 
 ### Slot syntax for FST-backed templates
 
@@ -212,10 +217,11 @@ See [data/README.md](data/README.md) for a top-level map of the `data/` tree, an
 
 ## History
 
-`adam` went through two major architectural eras:
+`adam` went through two major architectural eras and a v1.1.0 course-correction:
 
-- **v0.1.0 – v0.4.0 (transformer era)** — authentic Kazakh corpus curation (Tatoeba, Wikipedia KZ, Common Voice KK, CC-100, Abai Wikisource), BPE tokenizer, baseline transformer training. The v0.4.0 checkpoint (24.2 M parameters, PPL 1691.89 on 12 k held-out samples) is preserved in `data/training/` as a regression reference but is not on the v1.0.0 codepath.
-- **v0.4.5 – v1.0.0 (FST + dialog era)** — deterministic FST morphology (v0.4.5), participles / converbs (v0.5.0), pure Kazakh lexicon with Abai augmentation (v0.5.5), derivational morphology (v0.6.0), dialog architecture (v0.7.0), 5 → 10 → 25 intents (v0.7.5 – v0.8.0), session state (v0.8.5), full entity absorption (v0.9.0), FST-backed slot expansion (v0.9.5), multilingual input (v0.9.6), Lexicon-backed occupation recognition (v0.9.7), full slot syntax + transliteration (v0.9.8), morphology correctness + phrasing polish (v0.9.9), v1.0.0 MVP cut.
+- **v0.1.0 – v0.4.0 (transformer era)** — authentic Kazakh corpus curation (Tatoeba, Wikipedia KZ, Common Voice KK, CC-100, Abai Wikisource), BPE tokenizer, baseline transformer training. The v0.4.0 checkpoint (24.2 M parameters, PPL 1691.89 on 12 k held-out samples) is preserved in `data/training/` as a regression reference but is not on the current codepath.
+- **v0.4.5 – v1.0.0 (FST + dialog era)** — deterministic FST morphology, 14 k-entry pure Kazakh Lexicon, 25-intent dialog pipeline with multi-turn session state, FST-backed slot expansion, trilingual input recogniser (briefly — see v1.1.0).
+- **v1.1.0 course-correction** — Post-v1.0.0 testing showed the v0.9.6 multilingual surface was a mistake. Removing it and committing to a Kazakh-only input surface is the honest path toward a thinking Kazakh model. See [roadmap](docs/roadmap.md#post-v10-direction) for the full rationale and path to v2.0 (a compact Kazakh LM trained on 100 M+ tokens, plugged in as the `Unknown`-intent fallback).
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version-by-version history and [docs/roadmap.md](docs/roadmap.md) for the phase-by-phase overview.
 

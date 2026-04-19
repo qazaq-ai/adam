@@ -1,6 +1,10 @@
 # Predictable Dialog Layer
 
-Status: **shipped in v1.0.0** (originally drafted pre-v0.7.0 as a design document, updated progressively from v0.7.0 through v0.9.9; this page now describes the as-built system). Aligned with the user's directive: "we must know the input, know how it thinks through every layer, know the output."
+Status: **shipped in v1.0.0**, **course-corrected in v1.1.0** (Kazakh-only surface). Originally drafted pre-v0.7.0 as a design document, updated progressively from v0.7.0 through v1.1.0; this page describes the as-built system.
+
+**v1.1.0 correction:** The v0.9.6 Russian / English recogniser triggers were removed — they diluted the Kazakh-first thesis without adding real generalisation. `adam` accepts and produces only Kazakh. The path to handling unbounded inputs is a trained Kazakh LM as an Unknown-intent fallback (v2.0), not multilingual triggers.
+
+Aligned with the user's directive: "we must know the input, know how it thinks through every layer, know the output."
 
 The dialog pipeline is the **L1 product of `adam-dialog`**. Its commitments:
 
@@ -126,7 +130,7 @@ The dialog pipeline is the **L1 product of `adam-dialog`**. Its commitments:
 - There is no free generation, no "hallucinate a fact", no unbounded attention over arbitrary text.
 - If the parser doesn't recognise the input, we emit a clearly-tagged `Intent::Unknown` and respond with a fallback ("түсінбедім"), not with a confabulation.
 
-## 5. Intent taxonomy (v1.0.0 shipped set — 25 intents)
+## 5. Intent taxonomy (v1.1.0 shipped set — 26 intents)
 
 Each intent is a variant of `adam_dialog::Intent`. Variants that carry a payload use `Option<T>` so the intent matches on keywords alone (`years = None`) even when the entity wasn't extractable.
 
@@ -160,9 +164,10 @@ Each intent is a variant of `adam_dialog::Intent`. Variants that carry a payload
 | `Compliment` | жарайсың, керемет | — |
 | `Request` | өтінемін, көмектесіңізші | — |
 | `WellWishes` | сәттілік, жақсы күн тілеймін | — |
-| `Unknown { raw_tokens }` | anything else | raw tokens |
+| `Insult` **(v1.1.0)** | ақымақ, надан, түкке тұрмайсың | — |
+| `Unknown { raw_tokens, noun_hint }` | anything else | raw tokens + optional noun hint (v1.1.0) |
 
-Every intent also accepts Russian and English trigger phrasings (see [recogniser surface](#recogniser-surface)). Triggers map to the same Intent; the response is always Kazakh.
+**v1.1.0 Kazakh-only surface.** Every intent triggers on Kazakh keywords only. The v0.9.6 Russian / English triggers were reverted; non-Kazakh input falls through to `Intent::Unknown`.
 
 ## 6. Data structures (Rust sketch)
 
@@ -262,31 +267,32 @@ This is the single point where "predictability" has a bounded exception. We argu
 | v0.9.9 | 25 | 29 | FST Instrumental harmony fix + phrasing polish |
 | **v1.0.0** | **25** | **29** | **MVP cut** — no new features; documentation refresh |
 
-## Recogniser surface
+## Recogniser surface (v1.1.0 — Kazakh only)
 
-| intent family | Kazakh triggers | Russian triggers | English triggers |
-|---|---|---|---|
-| Greeting | сәлем / сәлеметсіз бе / қайырлы таң/күн/кеш | привет / здравствуйте / доброе утро / добрый день / добрый вечер | hi / hello / hey / good morning / good afternoon / good evening / good day |
-| Farewell | сау бол / кездескенше / қош | до свидания / пока | bye / goodbye / see you |
-| Affirmation | иә / дұрыс / рас / мақұл | да / конечно / ага | yes / yeah / yep / sure / ok |
-| Negation | жоқ / қате / емес | нет | no / nope / nah |
-| Thanks | рахмет / көп рахмет | спасибо / большое спасибо | thanks / thank you |
-| Apology | кешіріңіз / ғафу ет | извини / извините / прости | sorry / excuse me |
-| AskHowAreYou | қалайсың / қалайсыз / жағдайыңыз қалай | как дела / как ты / как вы | how are you / how's it |
-| AskName | атың кім / есіміңіз қалай | как тебя / вас зовут | what is / what's your name |
-| StatementOfName | атым X / мені X деп атайды / есімім X | меня зовут X / моё имя X | my name is X / call me X / hi i am X |
-| AskAge | жасың неше | сколько тебе / вам лет | how old are you |
-| StatementOfAge | жасым N / N жастамын | — | — |
-| AskLocation | қайда тұрасыз / қай жерден / қайдан | откуда ты / вы, где живёшь | where are you from / where do you live |
-| StatementOfLocation | X-данмын / X-да тұрамын | — | — |
-| AskOccupation | немен айналысасың / жұмысың не | кем работаешь / чем занимаешься | what do you do / what's your job |
-| StatementOfOccupation | X-мын / X-пын / X-бын (Lexicon-backed noun stripping) | — | — |
-| AskFamily | балаларың бар ма / отбасың бар ма | — | — |
-| AskWeather | ауа райы қалай | какая погода | how's / what's the weather |
-| AskTime | сағат неше | сколько времени / который час | what time is it / what's the time |
-| Compliment | жарайсың / керемет / тамаша | молодец / отлично / здорово | great / awesome / wonderful / well done |
-| Request | өтінемін / көмектесіңізші | пожалуйста / помогите / помоги | please / need help / can you help |
-| WellWishes | сәттілік / жақсы күн тілеймін | удачи / всего наилучшего | good luck / all the best |
+| intent family | Kazakh triggers |
+|---|---|
+| Greeting | сәлем / сәлеметсіз бе / қайырлы таң/күн/кеш |
+| Farewell | сау бол / кездескенше / қош / аман бол |
+| Affirmation | иә / ия / дұрыс / рас / мақұл / әрине |
+| Negation | жоқ / қате / емес |
+| Thanks | рахмет / рақмет / көп рахмет |
+| Apology | кешіріңіз / кешір / ғафу / ғафу ет |
+| AskHowAreYou | қалайсың / қалайсыз / жағдайыңыз қалай / халіңіз қалай |
+| AskName | атың кім / атыңыз кім / есімің / есіміңіз |
+| StatementOfName | атым X / мені X деп атайды / есімім X |
+| AskAge | жасың неше / жасыңыз қанша / қанша жастасың |
+| StatementOfAge | менің жасым N / N жастамын / N жаспын |
+| AskLocation | қайда тұрасыз / қай жерден / қайдан / қай қала |
+| StatementOfLocation | X-данмын / X-да тұрамын |
+| AskOccupation | немен айналысасың / жұмысың не / кәсібіңіз / мамандығыңыз |
+| StatementOfOccupation | X-мын / X-пын / X-бын (Lexicon-backed noun stripping — v0.9.7+) |
+| AskFamily | балаларың бар ма / отбасың бар ма / үйлендің |
+| AskWeather | ауа райы қалай / бүгін ауа райы / сыртта қалай |
+| AskTime | сағат неше / қазір уақыт / қандай күн |
+| Compliment | жарайсың / керемет / тамаша / мықты / өте жақсы |
+| Request | өтінемін / сұраймын / көмектесіңізші / көмек керек |
+| WellWishes | сәттілік / жақсы күн тілеймін / табысты бол |
+| Insult **(v1.1.0)** | ақымақ / надан / ақылсыз / өтірік / түкке тұрмайсың |
 
 ## 10. Measurement
 

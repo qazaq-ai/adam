@@ -121,6 +121,12 @@ impl TemplateRepository {
         by_key.insert("compliment".into(), vec!["рахмет".into()]);
         by_key.insert("request".into(), vec!["әрине, айтыңыз".into()]);
         by_key.insert("well_wishes".into(), vec!["сізге де".into()]);
+        // v1.1.0 intents
+        by_key.insert("insult".into(), vec!["сізге ренжімеймін".into()]);
+        by_key.insert(
+            "unknown.with_noun".into(),
+            vec!["ах, {noun} туралы айтасыз ба".into()],
+        );
         // fallback
         by_key.insert("unknown".into(), vec!["түсінбедім".into()]);
         Self { by_key }

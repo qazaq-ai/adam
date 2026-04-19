@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -31181,6 +31181,90 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_v1_0001_n",
+      "root": "бағдарламашы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v1_0002_n",
+      "root": "аудармашы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v1_0003_n",
+      "root": "жазушы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v1_0004_n",
+      "root": "заңгер",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v1_0005_n",
+      "root": "басқарушы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v1_0007_n",
+      "root": "журналшы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v1_0010_n",
+      "root": "емші",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v1_0011_n",
+      "root": "деректер",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v1_0012_n",
+      "root": "бағдарлама",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v1_0015_n",
+      "root": "алгоритм",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v1_0018_n",
+      "root": "ой",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_v1_0001",
+      "root": "жасанды",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
     }
   ]
 }

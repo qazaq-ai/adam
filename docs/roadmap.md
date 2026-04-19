@@ -38,7 +38,8 @@ The MVP path. Each release is strictly additive — no rollbacks, no feature gat
 | v0.9.7 | Lexicon-backed occupation recognition via generic 1sg-copula stripping + POS lookup | 251 workspace tests |
 | v0.9.8 | Full slot syntax (Derivation + Possessive) + Latin→Cyrillic transliteration + triple-slot templates | 265 workspace tests; demo-ready UX |
 | v0.9.9 | FST Instrumental harmony fix (`Алматыман → Алматымен`, `мұғалімбен → мұғаліммен`); 6 regression tests; template polish | 271 workspace tests; last stretch before MVP |
-| **v1.0.0** | **MVP cut** — no new features; full documentation refresh; transformer-era narrative compressed into history section | **271 workspace tests**; investor-demoable |
+| v1.0.0 | **MVP cut** — no new features; full documentation refresh; transformer-era narrative compressed into history section | 271 workspace tests; investor-demoable |
+| **v1.1.0** | **Kazakh-only revert + modern Lexicon + smart Unknown** — reverted v0.9.6 multilingual triggers, removed transliteration module; added Insult intent (polite non-engagement); Unknown handler extracts noun hint via FST and responds contextually; +12 modern Kazakh Lexicon roots (бағдарламашы, әзірлеуші, зерттеуші, жазушы, …) | **253 workspace tests**; course-correction toward thinking Kazakh model |
 
 ## Pre-Phase-10 — transformer era (v0.1.0 → v0.4.0)
 
@@ -51,20 +52,33 @@ Historical context for readers who want the full lineage. None of the code or da
 
 The post-v0.4.0 pivot was a deliberate choice: further transformer scaling required an order-of-magnitude more data that didn't exist for Kazakh at the quality bar required. The deterministic FST + dialog path delivered MVP-grade predictable Kazakh in pure Rust on the same hardware.
 
-## Post-v1.0.0 candidates
+## Post-v1.0 direction
 
-Not promised, not scheduled. Any of these would ship as v1.1.0+.
+Post-v1.0.0 testing exposed that the MVP was a programmed toy — it answered only the 25 scenarios we enumerated, with no generalisation. The user approved a honest course correction and a long-term commitment to a truly thinking Kazakh model.
+
+### Course-correction rationale
+
+- **v0.9.6 multilingual was a mistake.** The Russian / English triggers diluted the Kazakh-first thesis. A Russian speaker writing "Я разработчик" got "түсінбедім" because "разработчик" wasn't in the Lexicon — the recogniser widened the surface without adding real coverage.
+- **Fundamental trade-off acknowledged.** Rule-based systems can't generalise; neural systems can but hallucinate. You can't have both. The v1.0.0 predictable pipeline is kept, and generalisation will come as a neural **fallback** for `Intent::Unknown` only — the 26-intent deterministic backbone stays as the 0-hallucination guarantee.
+
+### Committed sequence
+
+- **v1.1.0 (done)** — Kazakh-only revert; modern Lexicon expansion (+12 roots); Insult intent; smart Unknown handler with noun-hint. Incremental coverage without abandoning thesis.
+- **v1.x** — Kazakh corpus engineering. Current corpus is ~4 M tokens. Chinchilla-optimal for a 24 M param LM is ~480 M tokens. Target: **100 M+ Kazakh tokens** from native-text sources (Qazaq Wikipedia, literature, government Kazakh, OCR books). Pure data engineering, not ML.
+- **v2.0** — compact Kazakh LM (transformer or SSM), trained in pure Rust (GGML-style, no PyTorch). Plugged in as the `Intent::Unknown` fallback only. The 26-intent pipeline continues to handle everything it recognises at 0 hallucinations.
+- **post-v2.0** — multimodality (speech / vision) only after a truly thinking Kazakh LM exists. Not before.
+
+### Post-v1.1.0 candidates (not promised, not scheduled)
 
 - Native-speaker review of the template set (phrasing, register, naturalness).
-- Lexicon expansion: proper-noun sub-lexicon, modern-vocabulary tier (loanword-allowed, explicitly separated).
-- Polished Latin→Cyrillic transliteration (silent-h handling for English names, alternate jh-cluster conventions).
+- Further modern Lexicon expansion (50+ new professions + tech vocabulary).
 - Verb slot expansion (`{root|verb_features}` with verb synthesiser dispatch).
-- Additional intents beyond the 25-intent surface.
+- Additional intents beyond the current 26.
 
 ## Out of scope (permanent)
 
-- Multilingual output — the response is always Kazakh, by design.
-- Speech / multimodal.
-- Cloud platform work.
-- 50 M+ parameter transformer experiments on current hardware (M2 8 GB).
-- Probabilistic / LLM-style free generation. The project's value proposition is predictability; any path that breaks that is explicitly out of scope.
+- **Multilingual input and output** (v1.1.0 revert). The v0.9.6 Russian / English triggers were removed. `adam` accepts and produces only Kazakh. Generalisation comes via the v2.0 Kazakh LM, not translation.
+- **Speech / multimodal** — deferred until a thinking Kazakh LM exists.
+- **Cloud platform work.**
+- **50 M+ parameter transformer experiments on current hardware** (M2 8 GB). Target for v2.0 is a compact model that fits on this hardware.
+- **Probabilistic / LLM-style free generation in the recognised-intent path.** The 26-intent deterministic backbone never hallucinates. Only the `Unknown`-fallback path (v2.0) is allowed to be generative, and responses from that path will be explicitly marked in traces.

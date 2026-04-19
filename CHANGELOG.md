@@ -2,6 +2,48 @@
 
 All notable changes are tagged in git as `vX.Y.Z`.
 
+## [1.1.0] — 2026-04-19 — Kazakh-only revert + modern Lexicon + smart Unknown
+
+Strategic revert of v0.9.6 multilingual. Post-v1.0.0 testing revealed that the Russian / English recogniser triggers diluted the Kazakh-first thesis — users typing in the wrong language received shallow coverage, and the cross-language tests added noise without adding generalisation. This release restores the Kazakh-only surface and sets up the path to a real Kazakh LM.
+
+### Breaking changes (input surface)
+
+- **All Russian / English recogniser triggers removed.** Input that previously matched via "hi / hello / привет / меня зовут X / how are you" etc. now falls through to `Intent::Unknown`.
+- **Latin → Cyrillic transliteration module removed.** `adam_dialog::transliteration` is gone; non-Cyrillic slot values are no longer silently rewritten before FST synthesis.
+
+### Breaking changes (Intent enum)
+
+- **`Intent::Unknown`** gains a `noun_hint: Option<String>` field (was unit-struct-like with only `raw_tokens`).
+- **`Intent::Insult`** (new variant) — polite non-engagement for rude input (ақымақ, надан, түкке тұрмайсың, ақылсыз).
+
+### Additions
+
+- **Modern Kazakh Lexicon expansion** (12 new curated roots, all native Kazakh formations — no Russian loanwords):
+  - Professions: бағдарламашы (programmer), аудармашы (translator), жазушы (writer), заңгер (lawyer), басқарушы (manager), журналшы (journalist), зерттеуші (researcher), ұстаз (teacher/mentor), емші (healer)
+  - Tech concepts: бағдарлама (program), қосымша (application), есептеуіш (computer, native)
+  - AI / cognition: ақыл (mind), сана (consciousness), ой (thought), жасанды (artificial, adjective)
+- **Smart Unknown handler.** When no intent matches, the FST parser extracts a noun from the input (filtered against pronouns / postpositions / quantifiers) and routes to the new `unknown.with_noun` template family — responses like `"ах, {noun} туралы айтасыз ба"` acknowledge the topic instead of blank `түсінбедім`.
+- **Insult templates** (4 variants) for polite non-engagement — the model doesn't escalate or retaliate.
+- **`detect_insult`** recogniser + `detect_ask_location` / `detect_compliment` stricter bounds.
+
+### FST tightening
+
+- `strip_ablative_copula` now requires a stem of at least 3 characters. Prevents greedy match on `наданмын` (1sg predicate of "ignorant") from being misrecognised as a city.
+
+### Tests
+
+69 dialog end-to-end pairs (was 81 — multilingual block deleted; +5 new for Kazakh-only revert, Insult, Unknown-with-noun, and modern Lexicon coverage). Workspace: **253 passing**, 4 ignored, 0 failing. Foundation CI green.
+
+### Roadmap commitment (v2.0)
+
+This release is the bridge between the v1.0.0 rule-based MVP and a future **thinking Kazakh LM**. The plan:
+
+- **v1.x (now)** — Lexicon expansion, smart Unknown handler. Incremental.
+- **v1.x (data engineering)** — expand Kazakh corpus from ~4 M to **100 M+ tokens**. This is the real bottleneck for any trained model — Chinchilla-optimal data for a 24 M param LM is ~480 M tokens; we're currently ~100× short.
+- **v2.0** — compact Kazakh LM (transformer or SSM), trained in pure Rust, plugged in as the `Intent::Unknown` fallback only. The deterministic 26-intent pipeline stays as the 0-hallucination backbone for everything it recognises; the LM handles the long tail.
+
+Multimodality (speech, vision) is deferred until the thinking Kazakh LM is real.
+
 ## [1.0.0] — 2026-04-19 — MVP cut
 
 The investor-demoable MVP. No new features since v0.9.9 — the delta is documentation, housekeeping, and a formal cut of the v1.0.0 line.

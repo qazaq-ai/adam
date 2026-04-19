@@ -13,7 +13,7 @@
 #   key = "intent_identifier"
 #   templates = ["phrase 1", "phrase 2", ...]
 
-version = "0.9.9"
+version = "1.1.0"
 
 # ---------- Greetings ----------
 
@@ -277,12 +277,41 @@ templates = [
     "тілегіңіз қабыл болсын",
 ]
 
+# ---------- Insult / rudeness (v1.1.0) ----------
+# User was rude — respond with dignity, don't escalate, don't retaliate.
+[[families]]
+key = "insult"
+templates = [
+    "сізге ренжімеймін",
+    "мен адамды құрметтеймін",
+    "мейлі, сіз өз пікіріңізді айттыңыз",
+    "мен жауап бермеймін",
+]
+
 # ---------- Fallback ----------
 
+# Bare Unknown — parser found no nouns; we genuinely don't know what
+# the user meant.
 [[families]]
 key = "unknown"
 templates = [
     "түсінбедім",
     "қайта айтыңызшы",
     "кешіріңіз, мен мұны білмеймін",
+    "бұл туралы білмеймін",
+    "басқа сұрақ қойсаңыз",
+]
+
+# Unknown with noun hint — parser surfaced a noun from the input.
+# Acknowledge what the user is talking about even if we don't
+# recognise the full intent. {noun} is filled from Intent::Unknown
+# { noun_hint }.
+[[families]]
+key = "unknown.with_noun"
+templates = [
+    "ах, {noun} туралы айтасыз ба",
+    "{noun} — қызықты тақырып",
+    "{noun} туралы не білгіңіз келеді",
+    "{noun} жайында көбірек айтыңызшы",
+    "{noun} туралы ойланып көрейін",
 ]

@@ -4,6 +4,9 @@
 //! v0.9.5: `{slot|features}` FST-backed expansion. `features` is a
 //! `+`-separated spec (see `slot_syntax`) that describes the noun
 //! case + number to synthesise via `adam_kernel_fst::morphotactics`.
+//! v1.1.0: transliteration module removed (Kazakh-only surface
+//! reverts the v0.9.6 multilingual decision). Non-Cyrillic slots are
+//! now a bug and return the raw value unchanged.
 //!
 //! Examples:
 //! ```text
@@ -20,7 +23,6 @@ use adam_kernel_fst::morphotactics::synthesise_noun;
 
 use crate::planner::ResponsePlan;
 use crate::slot_syntax::{parse_noun_features, parse_placeholder};
-use crate::transliteration::latin_to_cyrillic;
 
 /// Render a response plan into the final output string. Scans the
 /// template left-to-right, expanding `{...}` placeholders as they
@@ -60,23 +62,13 @@ fn expand_placeholder(inner: &str, slots: &std::collections::HashMap<String, Str
     match feature_spec {
         None => root.clone(),
         Some(spec) => {
-            // FST phonology is tuned for Kazakh Cyrillic roots. For a
-            // Latin-only entity (v0.9.6 multilingual inputs like
-            // "John" from `my name is John`), we transliterate to
-            // Cyrillic BEFORE running `synthesise_noun`. This makes
-            // Kazakh morphology work on foreign names without the
-            // mixed-script garbling that v0.9.6 guarded against.
-            let kazakh_root = if root.chars().any(is_cyrillic) {
-                root.clone()
-            } else {
-                latin_to_cyrillic(root)
-            };
+            // Kazakh-only surface (v1.1.0): non-Cyrillic roots aren't
+            // expected. FST phonology operates directly on whatever
+            // glyphs are passed in; if a Latin-only root leaks through
+            // from an upstream bug it's better surfaced as visibly
+            // wrong output than silently transliterated.
             let features = parse_noun_features(spec);
-            synthesise_noun(&kazakh_root, features)
+            synthesise_noun(root, features)
         }
     }
-}
-
-fn is_cyrillic(c: char) -> bool {
-    matches!(c, '\u{0400}'..='\u{04FF}' | '\u{0500}'..='\u{052F}')
 }

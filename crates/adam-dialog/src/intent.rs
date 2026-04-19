@@ -102,9 +102,21 @@ pub enum Intent {
     /// Well-wishes: жақсы күн тілеймін, сәттілік, табысты болыңыз.
     WellWishes,
 
-    /// Nothing matched. Fallback response is a polite
-    /// "түсінбедім" (I didn't understand).
-    Unknown { raw_tokens: Vec<String> },
+    /// User is rude / insulting (ақымақ, надан, түкке тұрмайсың). The
+    /// response is polite non-engagement — the model does not escalate
+    /// or retaliate. Added v1.1.0.
+    Insult,
+
+    /// Nothing matched. Fallback may carry a `noun_hint` extracted from
+    /// the input by the FST parser so the response can at least
+    /// acknowledge what the user is talking about, rather than blank
+    /// "түсінбедім". Field added v1.1.0.
+    Unknown {
+        raw_tokens: Vec<String>,
+        /// First parsed noun root, if any — populated by the lexicon-aware
+        /// `interpret_text_with_lexicon` path.
+        noun_hint: Option<String>,
+    },
 }
 
 /// Which flavour of greeting the user used. Determines whether the

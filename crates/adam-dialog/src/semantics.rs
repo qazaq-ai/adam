@@ -1,11 +1,11 @@
 //! Layer 2 — semantic interpreter.
 //!
-//! For MVP social intents the FST parser is more than we need — we just
-//! want to match on surface keywords (сәлем, жоқ, иә, т.б.) regardless
-//! of whether the word is in the lexicon. Later intents that need
-//! morphological info (person/number/tense for "где ты живёшь") will
-//! also get the parse sequence; for now we work directly on the
-//! lowercased-cleaned token list.
+//! **Kazakh-only surface (post-v1.1.0).** The v0.9.6 multilingual
+//! recogniser (Russian / English triggers) was reverted in v1.1.0 per
+//! the Kazakh-first directive — `adam` accepts and produces only
+//! Kazakh. All detectors below match Kazakh keywords / phrases
+//! exclusively. For MVP social intents the FST parser is more than we
+//! need; we work directly on the lowercased-cleaned token list.
 
 use adam_kernel_fst::lexicon::LexiconV1;
 use adam_kernel_fst::parser::Analysis;
@@ -134,6 +134,9 @@ pub fn interpret_text_with_lexicon(
     if detect_well_wishes(&joined) {
         return Intent::WellWishes;
     }
+    if detect_insult(&tokens, &joined) {
+        return Intent::Insult;
+    }
     if detect_statement_of_wellbeing(&tokens, &joined) {
         return Intent::StatementOfWellbeing;
     }
@@ -144,7 +147,58 @@ pub fn interpret_text_with_lexicon(
         return Intent::Negation;
     }
 
-    Intent::Unknown { raw_tokens: tokens }
+    // Unknown — but try to extract a noun hint from the parses so the
+    // fallback response can at least acknowledge context.
+    let noun_hint = first_noun_root(_parses);
+    Intent::Unknown {
+        raw_tokens: tokens,
+        noun_hint,
+    }
+}
+
+/// Return the root of the first content-noun Analysis in the parse list.
+/// Skips Kazakh pronouns, demonstratives, and postpositions that the
+/// FST parser may tag as Noun but which aren't informative as a
+/// "topic hint" for the unknown.with_noun template.
+fn first_noun_root(parses: &[Analysis]) -> Option<String> {
+    const NOT_A_TOPIC: &[&str] = &[
+        // pronouns
+        "мен",
+        "сен",
+        "сіз",
+        "ол",
+        "біз",
+        "сендер",
+        "сіздер",
+        "олар",
+        // demonstratives
+        "бұл",
+        "мына",
+        "сол",
+        "осы",
+        "ана",
+        // postpositions
+        "туралы",
+        "бойынша",
+        "үшін",
+        "кейін",
+        "дейін",
+        "сияқты",
+        "ретінде",
+        "арқылы",
+        "мен",
+        // quantifiers / closed-class
+        "көп",
+        "аз",
+        "бәрі",
+        "барлық",
+    ];
+    parses.iter().find_map(|a| match a {
+        Analysis::Noun { root, .. } if !NOT_A_TOPIC.contains(&root.root.as_str()) => {
+            Some(root.root.clone())
+        }
+        _ => None,
+    })
 }
 
 /// Legacy-compatible wrapper: runs intent recognition on parse surface
@@ -181,7 +235,10 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         return Intent::Negation;
     }
 
-    Intent::Unknown { raw_tokens: tokens }
+    Intent::Unknown {
+        raw_tokens: tokens,
+        noun_hint: first_noun_root(parses),
+    }
 }
 
 fn surface_tokens(parses: &[Analysis]) -> Vec<String> {
@@ -200,30 +257,27 @@ fn surface_tokens(parses: &[Analysis]) -> Vec<String> {
 // ---------------------------------------------------------------------------
 
 fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
-    // Time-of-day: "доброе утро" / "good morning" etc. — check BEFORE
-    // generic casual so that "доброе утро" isn't ambiguously parsed.
-    if let Some(tod) = detect_time_of_day(joined) {
+    // Time-of-day: "қайырлы таң / күн / кеш".
+    if joined.contains("қайырлы") {
+        let tod = if joined.contains("таң") {
+            TimeOfDay::Morning
+        } else if joined.contains("кеш") {
+            TimeOfDay::Evening
+        } else {
+            TimeOfDay::Day
+        };
         return Some(Intent::Greeting {
             kind: GreetingKind::TimeOfDay(tod),
         });
     }
-    // Polite multi-word: "сәлеметсіз бе" / "здравствуйте" / "good day".
-    if joined.contains("сәлеметсіз")
-        || joined.contains("сәлеметсің")
-        || tokens
-            .iter()
-            .any(|t| t == "здравствуйте" || t == "здравствуй")
-        || joined == "good day"
-    {
+    // Polite: "сәлеметсіз бе" / "сәлеметсің бе".
+    if joined.contains("сәлеметсіз") || joined.contains("сәлеметсің") {
         return Some(Intent::Greeting {
             kind: GreetingKind::Polite,
         });
     }
-    // Casual: "сәлем" / "hi" / "hello" / "hey" / "привет".
-    if tokens
-        .first()
-        .is_some_and(|t| matches!(t.as_str(), "сәлем" | "hi" | "hello" | "hey" | "привет"))
-    {
+    // Casual: "сәлем".
+    if tokens.first().is_some_and(|t| t == "сәлем") {
         return Some(Intent::Greeting {
             kind: GreetingKind::Casual,
         });
@@ -231,96 +285,31 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
     None
 }
 
-/// Time-of-day greeting detection across Kazakh / Russian / English.
-fn detect_time_of_day(joined: &str) -> Option<TimeOfDay> {
-    // Kazakh canonical: "қайырлы таң/күн/кеш".
-    if joined.contains("қайырлы") {
-        if joined.contains("таң") {
-            return Some(TimeOfDay::Morning);
-        }
-        if joined.contains("кеш") {
-            return Some(TimeOfDay::Evening);
-        }
-        return Some(TimeOfDay::Day);
-    }
-    // Russian: "доброе утро / добрый день / добрый вечер".
-    if joined.contains("доброе утро") || joined.contains("добрый утро") {
-        return Some(TimeOfDay::Morning);
-    }
-    if joined.contains("добрый день") {
-        return Some(TimeOfDay::Day);
-    }
-    if joined.contains("добрый вечер") {
-        return Some(TimeOfDay::Evening);
-    }
-    // English: "good morning / good afternoon / good evening".
-    if joined.contains("good morning") {
-        return Some(TimeOfDay::Morning);
-    }
-    if joined.contains("good afternoon") {
-        return Some(TimeOfDay::Day);
-    }
-    if joined.contains("good evening") {
-        return Some(TimeOfDay::Evening);
-    }
-    None
-}
-
 fn detect_farewell(tokens: &[String], joined: &str) -> bool {
-    // Kazakh: сау/қош leading + standard phrases.
-    if tokens.first().is_some_and(|t| t == "сау" || t == "қош")
+    tokens.first().is_some_and(|t| t == "сау" || t == "қош")
         || joined.contains("кездескенше")
         || joined.contains("сау бол")
         || joined.contains("қош бол")
-    {
-        return true;
-    }
-    // Russian farewells.
-    if joined.contains("до свидания") || joined == "пока" || joined.contains("пока пока")
-    {
-        return true;
-    }
-    // English farewells.
-    if joined == "bye" || joined == "goodbye" || joined == "bye bye" || joined.contains("see you") {
-        return true;
-    }
-    false
+        || joined.contains("аман бол")
 }
 
 fn detect_affirmation(tokens: &[String], joined: &str) -> bool {
-    let single = tokens.len() == 1;
-    if single {
+    if tokens.len() == 1 {
         let w = &tokens[0];
-        matches!(
+        return matches!(
             w.as_str(),
-            // Kazakh
-            "иә" | "ия" | "дұрыс" | "рас" | "мақұл"
-            // Russian
-            | "да" | "ага" | "угу" | "конечно"
-            // English
-            | "yes" | "yeah" | "yep" | "yup" | "sure" | "ok" | "okay"
-        )
-    } else {
-        joined.contains("дұрыс айтасыз") || joined == "иә дұрыс" || joined == "of course"
+            "иә" | "ия" | "дұрыс" | "рас" | "мақұл" | "әрине"
+        );
     }
+    joined.contains("дұрыс айтасыз") || joined == "иә дұрыс"
 }
 
 fn detect_negation(tokens: &[String], joined: &str) -> bool {
-    let single = tokens.len() == 1;
-    if single {
+    if tokens.len() == 1 {
         let w = &tokens[0];
-        matches!(
-            w.as_str(),
-            // Kazakh
-            "жоқ" | "қате" | "емес"
-            // Russian
-            | "нет" | "неправда"
-            // English
-            | "no" | "nope" | "nah"
-        )
-    } else {
-        joined.contains("жоқ емес") || joined.starts_with("жоқ") || joined == "no way"
+        return matches!(w.as_str(), "жоқ" | "қате" | "емес");
     }
+    joined.contains("жоқ емес") || joined.starts_with("жоқ")
 }
 
 // --- v0.7.5 new recognisers ------------------------------------------------
@@ -328,131 +317,73 @@ fn detect_negation(tokens: &[String], joined: &str) -> bool {
 fn detect_thanks(tokens: &[String], joined: &str) -> bool {
     tokens
         .iter()
-        .any(|t| matches!(t.as_str(), "рахмет" | "рахметім" | "спасибо" | "thanks"))
+        .any(|t| matches!(t.as_str(), "рахмет" | "рахметім" | "рақмет"))
         || joined.contains("көп рахмет")
-        || joined.contains("рақмет")
-        || joined.contains("большое спасибо")
-        || joined.contains("thank you")
+        || joined.contains("көп рақмет")
 }
 
 fn detect_apology(tokens: &[String], joined: &str) -> bool {
-    tokens.iter().any(|t| {
-        matches!(
-            t.as_str(),
-            "кешіріңіз"
-                | "ғафу"
-                | "извини"
-                | "извините"
-                | "прости"
-                | "простите"
-                | "sorry"
-        )
-    }) || joined.contains("кешір")
+    tokens
+        .iter()
+        .any(|t| matches!(t.as_str(), "кешіріңіз" | "кешір" | "ғафу"))
+        || joined.contains("кешір")
         || joined.contains("ғафу ет")
-        || joined.contains("my apologies")
-        || joined.contains("excuse me")
 }
 
-/// "How are you?" — Kazakh / Russian / English.
 fn detect_ask_how_are_you(joined: &str) -> bool {
-    // Kazakh
-    if joined.contains("қалайсың")
+    joined.contains("қалайсың")
         || joined.contains("қалайсыз")
         || joined.contains("жағдайың қалай")
         || joined.contains("жағдайыңыз қалай")
         || joined.contains("халің қалай")
         || joined.contains("халіңіз қалай")
         || joined == "қалың қалай"
-    {
-        return true;
-    }
-    // Russian
-    if joined.contains("как дела") || joined.contains("как ты") || joined.contains("как вы")
-    {
-        return true;
-    }
-    // English
-    joined.contains("how are you") || joined.contains("how r u") || joined.contains("hows it")
 }
 
-/// "What's your name?" — Kazakh / Russian / English.
 fn detect_ask_name(joined: &str) -> bool {
-    // Kazakh
-    if (joined.contains("атың") && joined.contains("кім"))
+    (joined.contains("атың") && joined.contains("кім"))
         || (joined.contains("атыңыз") && joined.contains("кім"))
         || joined.contains("есімің")
         || joined.contains("есіміңіз")
-    {
-        return true;
-    }
-    // Russian
-    if joined.contains("как тебя зовут") || joined.contains("как вас зовут")
-    {
-        return true;
-    }
-    // English — the tokeniser strips `'` so "what's your name" becomes
-    // "whats your name" by the time we see the joined string.
-    joined.contains("what is your name") || joined.contains("whats your name")
 }
 
-/// User is saying how they are — Kazakh / Russian / English.
 fn detect_statement_of_wellbeing(tokens: &[String], joined: &str) -> bool {
     let wellbeing_token = tokens.iter().any(|t| {
         matches!(
             t.as_str(),
-            // Kazakh
             "жақсымын" | "жаманмын" | "жақсы" | "жаман" | "дұрысмын"
-            // Russian
-            | "хорошо" | "нормально" | "плохо" | "отлично"
-            // English
-            | "fine" | "great"
         )
     });
-    wellbeing_token
-        || joined.contains("жаман емес")
-        || joined.contains("im good")
-        || joined.contains("i am good")
-        || joined.contains("im fine")
-        || joined.contains("i am fine")
-        || joined.contains("у меня всё хорошо")
-        || joined.contains("все хорошо")
+    wellbeing_token || joined.contains("жаман емес")
 }
 
 // --- v0.8.0 new recognisers ------------------------------------------------
 
-/// User introduces self in Kazakh / Russian / English. Returns the
-/// extracted name (case preserved, first-letter title-cased) or None.
+/// User introduces self. Kazakh patterns only (v1.1.0):
+///   1. [менің] атым <NAME>
+///   2. мені <NAME> деп атайды
+///   3. есімім <NAME>
 ///
-/// Supported patterns:
-///   Kazakh:
-///     1. [менің] атым <NAME>
-///     2. мені <NAME> деп атайды
-///     3. есімім <NAME>
-///   Russian:
-///     4. меня зовут <NAME>
-///     5. моё имя <NAME> / мое имя <NAME>
-///   English:
-///     6. my name is <NAME>
-///     7. i am <NAME> / i'm <NAME>   (only when preceded by "hi/hello")
-///     8. call me <NAME>
+/// Returns the extracted name (case-preserved, first-letter title-
+/// cased) or `None` when none of the three patterns fire.
 fn detect_statement_of_name(
     tokens: &[String],
     raw_tokens: &[String],
     joined: &str,
 ) -> Option<String> {
-    // Kazakh pattern 1: "атым X".
+    // Pattern 1: "атым X".
     if let Some(i) = tokens.iter().position(|t| t == "атым") {
         if let Some(name) = raw_tokens.get(i + 1) {
             return Some(capitalise(name));
         }
     }
-    // Kazakh pattern 3: "есімім X".
+    // Pattern 3: "есімім X".
     if let Some(i) = tokens.iter().position(|t| t == "есімім") {
         if let Some(name) = raw_tokens.get(i + 1) {
             return Some(capitalise(name));
         }
     }
-    // Kazakh pattern 2: "мені X деп атайды".
+    // Pattern 2: "мені X деп атайды".
     if joined.contains("деп атайды") {
         if let (Some(start), Some(end)) = (
             tokens.iter().position(|t| t == "мені"),
@@ -460,51 +391,6 @@ fn detect_statement_of_name(
         ) {
             if end > start + 1 {
                 if let Some(name) = raw_tokens.get(start + 1) {
-                    return Some(capitalise(name));
-                }
-            }
-        }
-    }
-    // Russian pattern 4: "меня зовут X".
-    if let Some(i) = tokens.iter().position(|t| t == "зовут") {
-        if let Some(name) = raw_tokens.get(i + 1) {
-            return Some(capitalise(name));
-        }
-    }
-    // Russian pattern 5: "моё имя X" / "мое имя X".
-    if let Some(i) = tokens.iter().position(|t| t == "имя") {
-        if let Some(name) = raw_tokens.get(i + 1) {
-            return Some(capitalise(name));
-        }
-    }
-    // English pattern 6: "my name is X".
-    if let Some(i) = tokens
-        .windows(3)
-        .position(|w| w[0] == "my" && w[1] == "name" && w[2] == "is")
-    {
-        if let Some(name) = raw_tokens.get(i + 3) {
-            return Some(capitalise(name));
-        }
-    }
-    // English pattern 8: "call me X".
-    if let Some(i) = tokens
-        .windows(2)
-        .position(|w| w[0] == "call" && w[1] == "me")
-    {
-        if let Some(name) = raw_tokens.get(i + 2) {
-            return Some(capitalise(name));
-        }
-    }
-    // English pattern 7: "hi/hello/hey, i am/i'm X" — the leading greet
-    // token disambiguates self-intro from a bare first-person "I am X"
-    // (which is too generic — could be occupation, age, etc.)
-    if let Some(leader) = tokens.first() {
-        if matches!(leader.as_str(), "hi" | "hello" | "hey" | "привет") {
-            if let Some(i) = tokens
-                .windows(2)
-                .position(|w| w[0] == "i" && (w[1] == "am" || w[1] == "m"))
-            {
-                if let Some(name) = raw_tokens.get(i + 2) {
                     return Some(capitalise(name));
                 }
             }
@@ -523,23 +409,11 @@ fn capitalise(s: &str) -> String {
     }
 }
 
-/// "How old are you?" — Kazakh / Russian / English.
 fn detect_ask_age(joined: &str) -> bool {
-    // Kazakh
-    if (joined.contains("жасың") && (joined.contains("неше") || joined.contains("қанша")))
+    (joined.contains("жасың") && (joined.contains("неше") || joined.contains("қанша")))
         || (joined.contains("жасыңыз") && (joined.contains("неше") || joined.contains("қанша")))
         || joined.contains("қанша жастасың")
         || joined.contains("қанша жастасыз")
-    {
-        return true;
-    }
-    // Russian
-    if joined.contains("сколько тебе лет") || joined.contains("сколько вам лет")
-    {
-        return true;
-    }
-    // English
-    joined.contains("how old are you")
 }
 
 /// User reports age: "менің жасым N", "N жастамын", "N жасында".
@@ -616,24 +490,12 @@ fn kazakh_units_value(token: &str) -> Option<u32> {
     }
 }
 
-/// "Where are you from / where do you live?" — Kazakh / Russian / English.
 fn detect_ask_location(joined: &str) -> bool {
-    // Kazakh
-    if joined.contains("қай жерден")
+    joined.contains("қай жерден")
         || joined.contains("қайдан")
         || joined.contains("қайда тұра")
         || joined.contains("қай қала")
         || joined.contains("қай аудан")
-    {
-        return true;
-    }
-    // Russian
-    if joined.contains("откуда ты") || joined.contains("откуда вы") || joined.contains("где живёшь")
-    {
-        return true;
-    }
-    // English
-    joined.contains("where are you from") || joined.contains("where do you live")
 }
 
 /// User states location: "мен Алматыданмын", "астанада тұрамын",
@@ -700,9 +562,13 @@ fn strip_locative_preserving(token: &str) -> String {
 }
 
 /// Strip ablative + 1sg copula: `-данмын / -денмін / -танмын / -тенмін`.
+/// Requires a root stem of at least 3 characters — prevents a greedy
+/// match on short words like "наданмын" ("I am ignorant") leaving
+/// stem "на" that would be misrecognised as a city.
 fn strip_ablative_copula(token: &str) -> Option<String> {
+    const MIN_STEM: usize = 3;
     for suffix in ["данмын", "денмін", "танмын", "тенмін"] {
-        if token.ends_with(suffix) && token.chars().count() > suffix.chars().count() + 1 {
+        if token.ends_with(suffix) && token.chars().count() >= suffix.chars().count() + MIN_STEM {
             let take = token.chars().count() - suffix.chars().count();
             return Some(token.chars().take(take).collect());
         }
@@ -711,9 +577,10 @@ fn strip_ablative_copula(token: &str) -> Option<String> {
 }
 
 fn strip_ablative_copula_preserving(token: &str) -> Option<String> {
+    const MIN_STEM: usize = 3;
     let lower = token.to_lowercase();
     for suffix in ["данмын", "денмін", "танмын", "тенмін"] {
-        if lower.ends_with(suffix) && lower.chars().count() > suffix.chars().count() + 1 {
+        if lower.ends_with(suffix) && lower.chars().count() >= suffix.chars().count() + MIN_STEM {
             let take = token.chars().count() - suffix.chars().count();
             return Some(token.chars().take(take).collect());
         }
@@ -721,28 +588,14 @@ fn strip_ablative_copula_preserving(token: &str) -> Option<String> {
     None
 }
 
-/// "What do you do for work?" — Kazakh / Russian / English.
 fn detect_ask_occupation(joined: &str) -> bool {
-    // Kazakh
-    if joined.contains("немен айналыс")
+    joined.contains("немен айналыс")
         || (joined.contains("жұмысың") && joined.contains("не"))
         || (joined.contains("жұмысыңыз") && joined.contains("не"))
         || joined.contains("кәсібің")
         || joined.contains("кәсібіңіз")
         || joined.contains("мамандығың")
         || joined.contains("мамандығыңыз")
-    {
-        return true;
-    }
-    // Russian
-    if joined.contains("кем работаешь")
-        || joined.contains("кем вы работаете")
-        || joined.contains("чем занимаешься")
-    {
-        return true;
-    }
-    // English
-    joined.contains("what do you do") || joined.contains("whats your job")
 }
 
 /// User states occupation.
@@ -845,24 +698,10 @@ fn detect_statement_of_family(joined: &str) -> bool {
         || joined.contains("отбасым жақсы")
 }
 
-/// "What's the weather?" — Kazakh / Russian / English.
 fn detect_ask_weather(joined: &str) -> bool {
-    // Kazakh
-    if (joined.contains("ауа райы") && joined.contains("қалай"))
+    (joined.contains("ауа райы") && joined.contains("қалай"))
         || (joined.contains("бүгін") && joined.contains("ауа райы"))
         || (joined.contains("сыртта") && joined.contains("қалай"))
-    {
-        return true;
-    }
-    // Russian
-    if joined.contains("какая погода") || joined.contains("какая сегодня погода")
-    {
-        return true;
-    }
-    // English
-    joined.contains("how is the weather")
-        || joined.contains("hows the weather")
-        || joined.contains("whats the weather")
 }
 
 /// User describes weather: "бүгін суық", "жылы", "қар жауып тұр",
@@ -884,80 +723,52 @@ fn detect_statement_of_weather(tokens: &[String], joined: &str) -> bool {
     (weather_token && (joined.contains("бүгін") || joined.contains("қазір"))) || weather_phrase
 }
 
-/// "What time / day is it?" — Kazakh / Russian / English.
 fn detect_ask_time(joined: &str) -> bool {
-    // Kazakh
-    if (joined.contains("сағат") && (joined.contains("неше") || joined.contains("қанша")))
+    (joined.contains("сағат") && (joined.contains("неше") || joined.contains("қанша")))
         || joined.contains("қазір уақыт")
         || joined.contains("қандай күн")
         || joined.contains("қай күн")
-    {
-        return true;
-    }
-    // Russian
-    if joined.contains("сколько времени") || joined.contains("который час")
-    {
-        return true;
-    }
-    // English
-    joined.contains("what time is it") || joined.contains("whats the time")
 }
 
-/// Compliments — Kazakh / Russian / English.
 fn detect_compliment(tokens: &[String], joined: &str) -> bool {
-    let token = tokens.iter().any(|t| {
+    tokens.iter().any(|t| {
         matches!(
             t.as_str(),
-            // Kazakh
             "жарайсың" | "жарайсыз" | "керемет" | "тамаша" | "мықты"
-            // Russian
-            | "молодец" | "отлично" | "здорово" | "прекрасно"
-            // English
-            | "great" | "awesome" | "wonderful" | "excellent" | "perfect"
         )
-    });
-    token
-        || joined.contains("өте жақсы")
-        || joined.contains("well done")
-        || joined.contains("good job")
+    }) || joined.contains("өте жақсы")
 }
 
-/// Polite request / please — Kazakh / Russian / English.
 fn detect_request(tokens: &[String], joined: &str) -> bool {
-    let token = tokens.iter().any(|t| {
+    tokens.iter().any(|t| {
         matches!(
             t.as_str(),
-            // Kazakh
             "өтінемін" | "сұраймын" | "көмектесіңізші" | "көмектесіңіз" | "көмектес"
-            // Russian
-            | "пожалуйста" | "помогите" | "помоги"
-            // English
-            | "please"
         )
-    });
-    token
-        || joined.contains("көмек керек")
-        || joined.contains("need help")
-        || joined.contains("can you help")
+    }) || joined.contains("көмек керек")
 }
 
-/// Well-wishes — Kazakh / Russian / English.
 fn detect_well_wishes(joined: &str) -> bool {
-    // Kazakh
-    if joined.contains("жақсы күн тіле")
+    joined.contains("жақсы күн тіле")
         || joined.contains("сәттілік")
         || joined.contains("табысты бол")
         || joined.contains("денсаулық тіле")
-    {
-        return true;
-    }
-    // Russian
-    if joined.contains("удачи")
-        || joined.contains("всего наилучшего")
-        || joined.contains("всего хорошего")
-    {
-        return true;
-    }
-    // English
-    joined.contains("good luck") || joined.contains("all the best")
+}
+
+/// Insult / rudeness — polite non-engagement (v1.1.0).
+/// The model doesn't escalate or retaliate; responds with dignity.
+fn detect_insult(tokens: &[String], joined: &str) -> bool {
+    tokens.iter().any(|t| {
+        matches!(
+            t.as_str(),
+            "ақымақ"
+                | "ақымақсың"
+                | "ақымақсыз"
+                | "надан"
+                | "наданмын"
+                | "надансың"
+                | "өтірік"
+        )
+    }) || joined.contains("ақылсыз")
+        || joined.contains("түкке тұрмайсың")
 }

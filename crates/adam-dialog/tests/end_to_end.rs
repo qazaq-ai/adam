@@ -420,219 +420,97 @@ fn response_well_wishes() {
     );
 }
 
-// --- v0.9.6 multilingual recogniser surface --------------------------------
+// --- v1.1.0 Kazakh-only surface (reverted v0.9.6 multilingual) -------------
 
 #[test]
-fn greeting_casual_triggers_from_russian_and_english() {
-    for input in ["hi", "hello", "hey", "привет"] {
-        let got = interpret_text(input, &[]);
-        assert_eq!(
-            got,
-            Intent::Greeting {
-                kind: GreetingKind::Casual
-            },
-            "input={input:?}"
-        );
-    }
-}
-
-#[test]
-fn greeting_polite_from_russian() {
-    let got = interpret_text("здравствуйте", &[]);
-    assert_eq!(
-        got,
-        Intent::Greeting {
-            kind: GreetingKind::Polite
-        }
-    );
-}
-
-#[test]
-fn greeting_time_of_day_cross_language() {
-    for (input, expected_tod) in [
-        ("доброе утро", TimeOfDay::Morning),
-        ("good morning", TimeOfDay::Morning),
-        ("добрый день", TimeOfDay::Day),
-        ("good afternoon", TimeOfDay::Day),
-        ("добрый вечер", TimeOfDay::Evening),
-        ("good evening", TimeOfDay::Evening),
-    ] {
-        let got = interpret_text(input, &[]);
-        assert_eq!(
-            got,
-            Intent::Greeting {
-                kind: GreetingKind::TimeOfDay(expected_tod)
-            },
-            "input={input:?}"
-        );
-    }
-}
-
-#[test]
-fn farewell_triggers_ru_en() {
-    for input in ["bye", "goodbye", "до свидания", "пока"] {
-        let got = interpret_text(input, &[]);
-        assert_eq!(got, Intent::Farewell, "input={input:?}");
-    }
-}
-
-#[test]
-fn affirmation_triggers_ru_en() {
-    for input in ["yes", "yeah", "ok", "да", "конечно"] {
-        let got = interpret_text(input, &[]);
-        assert_eq!(got, Intent::Affirmation, "input={input:?}");
-    }
-}
-
-#[test]
-fn negation_triggers_ru_en() {
-    for input in ["no", "nope", "нет"] {
-        let got = interpret_text(input, &[]);
-        assert_eq!(got, Intent::Negation, "input={input:?}");
-    }
-}
-
-#[test]
-fn thanks_triggers_ru_en() {
-    for input in ["thanks", "thank you", "спасибо", "большое спасибо"] {
-        let got = interpret_text(input, &[]);
-        assert_eq!(got, Intent::Thanks, "input={input:?}");
-    }
-}
-
-#[test]
-fn apology_triggers_ru_en() {
-    for input in ["sorry", "извини", "извините", "excuse me"] {
-        let got = interpret_text(input, &[]);
-        assert_eq!(got, Intent::Apology, "input={input:?}");
-    }
-}
-
-#[test]
-fn ask_how_are_you_triggers_ru_en() {
-    for input in ["how are you", "как дела", "как ты"] {
-        let got = interpret_text(input, &[]);
-        assert_eq!(got, Intent::AskHowAreYou, "input={input:?}");
-    }
-}
-
-#[test]
-fn ask_name_triggers_ru_en() {
+fn kazakh_only_rejects_latin_input_as_unknown() {
+    // v1.1.0 dropped all RU/EN triggers. Foreign-script input falls
+    // through the 25 Kazakh intents and lands on Unknown.
     for input in [
-        "what's your name",
-        "what is your name",
-        "как тебя зовут",
-        "как вас зовут",
+        "hello",
+        "hi",
+        "bye",
+        "thanks",
+        "my name is John",
+        "как дела",
     ] {
         let got = interpret_text(input, &[]);
-        assert_eq!(got, Intent::AskName, "input={input:?}");
-    }
-}
-
-#[test]
-fn statement_of_name_from_russian_zovut() {
-    let got = interpret_text("меня зовут Дәулет", &[]);
-    assert_eq!(
-        got,
-        Intent::StatementOfName {
-            name: "Дәулет".into()
-        }
-    );
-}
-
-#[test]
-fn statement_of_name_from_english_my_name_is() {
-    let got = interpret_text("my name is John", &[]);
-    assert_eq!(
-        got,
-        Intent::StatementOfName {
-            name: "John".into()
-        }
-    );
-}
-
-#[test]
-fn statement_of_name_from_english_call_me() {
-    let got = interpret_text("call me Anna", &[]);
-    assert_eq!(
-        got,
-        Intent::StatementOfName {
-            name: "Anna".into()
-        }
-    );
-}
-
-#[test]
-fn statement_of_name_from_english_hi_i_am() {
-    let got = interpret_text("hi i am John", &[]);
-    assert_eq!(
-        got,
-        Intent::StatementOfName {
-            name: "John".into()
-        }
-    );
-}
-
-#[test]
-fn response_to_russian_input_is_kazakh() {
-    // "Привет" in → Kazakh greeting out. Output never contains Latin
-    // or Russian-only tokens.
-    let Some(lex) = load_lexicon() else { return };
-    let repo = load_repo();
-    for seed in 0..8u64 {
-        let out = respond_with_repo("привет", &lex, &repo, seed);
         assert!(
-            !out.chars().any(|c| c.is_ascii_alphabetic()),
-            "response should be Kazakh (no ASCII letters), got {out:?}"
+            matches!(got, Intent::Unknown { .. }),
+            "input={input:?} should be Unknown after Kazakh-only revert, got {got:?}"
         );
     }
 }
 
+// --- v1.1.0 Insult intent ---------------------------------------------------
+
 #[test]
-fn latin_name_is_transliterated_for_fst_synthesis() {
-    // v0.9.8 policy: plain `{name}` substitution stays verbatim
-    // (Latin in → Latin out — user's spelling is preserved), but
-    // morphology-requesting `{name|features}` transliterates to
-    // Cyrillic first so `synthesise_noun` can work. No template
-    // should ever produce a garbled "Johnм…"/"Johnп…"/"Johnб…".
+fn intent_insult_detects_rude_forms() {
+    for input in ["сен ақымақсың", "ақымақ", "түкке тұрмайсың"] {
+        let got = interpret_text(input, &[]);
+        assert_eq!(got, Intent::Insult, "input={input:?}");
+    }
+}
+
+#[test]
+fn response_insult_is_polite_non_engagement() {
+    assert_response_with_toml(
+        "сен ақымақсың",
+        &[
+            "сізге ренжімеймін",
+            "мен адамды құрметтеймін",
+            "мейлі, сіз өз пікіріңізді айттыңыз",
+            "мен жауап бермеймін",
+        ],
+    );
+}
+
+// --- v1.1.0 Smarter Unknown handler (context-aware fallback) ----------------
+
+#[test]
+fn unknown_acknowledges_topic_when_noun_in_parse() {
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
-    let mut saw_transliterated_synth = false;
+    // "кітап оқимын" (I read a book) — "оқимын" isn't a StatementOf*
+    // pattern we recognise, but the FST parser should surface "кітап"
+    // as a noun, which routes us to unknown.with_noun.
+    let mut saw_topic_acknowledged = false;
     for seed in 0..32u64 {
-        let out = respond_with_repo("my name is John", &lex, &repo, seed);
-        assert!(
-            !out.contains("Johnм") && !out.contains("Johnп") && !out.contains("Johnб"),
-            "FST suffix attached to un-transliterated Latin root: {out:?}"
-        );
-        // Transliteration maps `John` → `Джохн`; the Instrumental
-        // variant should therefore start with "Джохн" at least once.
-        if out.contains("Джохн") {
-            saw_transliterated_synth = true;
+        let out = respond_with_repo("кітап оқимын", &lex, &repo, seed);
+        if out.contains("кітап") {
+            saw_topic_acknowledged = true;
         }
     }
     assert!(
-        saw_transliterated_synth,
-        "expected at least one seed in 0..32 to produce a transliterated FST-synthesised form"
+        saw_topic_acknowledged,
+        "expected at least one unknown.with_noun template to mention 'кітап'"
     );
 }
 
-#[test]
-fn multilingual_conversation_flow_answers_in_kazakh() {
-    let Some(lex) = load_lexicon() else { return };
-    let repo = load_repo();
-    let mut conv = Conversation::new();
-    // English intro + Kazakh response with absorbed name.
-    let intro = conv.turn("my name is John", &lex, &repo, 0);
-    assert!(
-        intro.contains("John"),
-        "expected introduction response to reference John, got {intro:?}"
-    );
-    assert_eq!(conv.session.get("name"), Some(&"John".to_string()));
+// --- v1.1.0 Modern Lexicon coverage ----------------------------------------
 
-    // Russian greeting next — response should be Kazakh and may include John.
-    let greet = conv.turn("привет", &lex, &repo, 2);
-    assert!(!greet.contains("{"), "unfilled slot leaked: {greet:?}");
-    // Either plain or personalised — both are valid paths.
+#[test]
+fn lexicon_extracts_modern_occupations() {
+    let Some(lex) = load_lexicon() else { return };
+    // New curated roots added in v1.1.0 (бағдарламашы, әзірлеуші,
+    // зерттеуші, аудармашы, жазушы) must all route to
+    // StatementOfOccupation via the lexicon-backed 1sg-copula stripper.
+    for (input, expected_root) in [
+        ("мен бағдарламашымын", "бағдарламашы"),
+        ("мен әзірлеушімін", "әзірлеуші"),
+        ("мен зерттеушімін", "зерттеуші"),
+        ("мен аудармашымын", "аудармашы"),
+        ("мен жазушымын", "жазушы"),
+    ] {
+        let got = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert_eq!(
+            got,
+            Intent::StatementOfOccupation {
+                occupation: Some(expected_root.to_string())
+            },
+            "input={input:?}"
+        );
+    }
 }
 
 // --- v0.8.5 session state (Conversation) -----------------------------------
