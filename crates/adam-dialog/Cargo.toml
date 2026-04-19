@@ -1,0 +1,13 @@
+[package]
+name = "adam-dialog"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Predictable Kazakh dialog layer (intent recognition + templated response) — adam v1.0.0"
+
+[dependencies]
+adam-kernel = { path = "../adam-kernel" }
+adam-kernel-fst = { path = "../adam-kernel-fst" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true

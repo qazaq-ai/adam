@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.6.0-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.7.0-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,33 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.7.0 — First dialog layer
+
+First crack at the MVP dialog pipeline. New crate [`adam-dialog`](crates/adam-dialog/) with the 5-layer architecture locked down in [`docs/kazakh_grammar/07_dialog_architecture.md`](docs/kazakh_grammar/07_dialog_architecture.md).
+
+Recognises 5 intents and produces ≥2 candidate responses per intent:
+
+| intent | example input | example response |
+|---|---|---|
+| `Greeting` (Casual) | `сәлем` | `сәлем` / `сәлем достым` |
+| `Greeting` (Polite) | `сәлеметсіз бе` | `сәлеметсіз бе` / `армысыз` |
+| `Greeting` (TimeOfDay) | `қайырлы таң` | `қайырлы таң` / `қайырлы таң болсын` |
+| `Farewell` | `сау бол` | `сау бол` / `кездескенше` / `аман бол` |
+| `Affirmation` | `иә` / `дұрыс` | `иә` / `дұрыс айтасыз` / `рас` / `мақұл` |
+| `Negation` | `жоқ` | `жоқ` / `дұрыс емес` |
+| `Unknown` (fallback) | `xyz` | `түсінбедім` / `қайта айтыңызшы` |
+
+CLI:
+
+```bash
+cargo build --release -p adam-dialog --bin adam_chat
+./target/release/adam_chat          # REPL
+./target/release/adam_chat --once "сәлем"
+./target/release/adam_chat --trace  # full Layer 1..5 pipeline trace
+```
+
+15 end-to-end tests verify the pipeline against the v1.0.0 lexicon. Workspace totals: 175 passing, 4 ignored, 0 failing.
 
 ## v0.6.0 — Derivational morphology
 

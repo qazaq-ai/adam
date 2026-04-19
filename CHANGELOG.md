@@ -2,6 +2,32 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.7.0] — 2026-04-19
+
+First iteration of the predictable dialog layer. New crate `adam-dialog` implements a 5-layer pipeline (FST parser → semantics → planner → realiser → FST synthesiser) against the architectural spec in `docs/kazakh_grammar/07_dialog_architecture.md`.
+
+Recognises 5 intents from raw Kazakh input:
+- `Greeting` with kind `Casual` / `Polite` / `TimeOfDay(Morning|Day|Evening)`
+- `Farewell`
+- `Affirmation`
+- `Negation`
+- `Unknown` (fallback)
+
+Each intent has 2–4 hand-written response variants; planner picks one by seeded PRNG mod count. The entire output space is enumerable per input — no free generation.
+
+New binary `adam_chat` with three modes:
+- `--once "<input>"` — single-shot stdout response
+- default — interactive REPL over stdin
+- `--trace` — dump each layer's state (parses, intent, trace lines, output)
+
+Tests: 15 end-to-end pairs cover the full pipeline. Workspace totals: 175 passing, 4 ignored, 0 failing.
+
+Known v0.7.0 limitations (by design, not bugs):
+- Only 5 social intents; ~150 templates needed for v1.0.0 MVP.
+- Templates are hardcoded in `planner.rs`, not data-driven TOML (v0.7.5).
+- No morphological info used for intent classification yet (v0.7.5+).
+- No multi-turn state.
+
 ## [0.6.0] — 2026-04-19
 
 Derivational morphology — the "word-formation layer" the user flagged as a v1.0.0-path requirement. The FST now transforms a root into a new root via a derivational suffix before applying inflection. Eleven derivation types covered:
