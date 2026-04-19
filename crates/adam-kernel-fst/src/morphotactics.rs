@@ -197,10 +197,15 @@ const GENITIVE: SuffixTemplate = &[
     SuffixAtom::Literal('ң'),
 ];
 
-/// Instrumental suffix: `-{M}{E}н`.
+/// Instrumental suffix: `-{M}ен`. The vowel is LITERAL `е`, not harmony-
+/// alternating — Kazakh instrumental stays `-мен/-бен/-пен` regardless
+/// of stem vowel harmony. Only the initial consonant alternates via
+/// archiphoneme `M` (sonorant → м, voiced obstruent → б, voiceless → п).
+/// Fixed in v0.9.9 (previously used `{E}` which produced wrong
+/// `-ман/-бан/-пан` on back-vowel stems like `Алматыман`).
 const INSTRUMENTAL: SuffixTemplate = &[
     SuffixAtom::Arch(Archiphoneme::M),
-    SuffixAtom::Arch(Archiphoneme::E),
+    SuffixAtom::Literal('е'),
     SuffixAtom::Literal('н'),
 ];
 
@@ -878,6 +883,76 @@ mod tests {
             },
         );
         assert_eq!(out, "мектептер");
+    }
+
+    // Regression tests for v0.9.9 Instrumental fix.
+    // Kazakh Instrumental is invariant in vowel (-мен/-бен/-пен) and
+    // only the initial consonant alternates by phonological context.
+
+    #[test]
+    fn noun_instrumental_front_consonant_final() {
+        // Дәулет (т voiceless) → пен
+        let f = NounFeatures {
+            case: Some(Case::Instrumental),
+            ..Default::default()
+        };
+        assert_eq!(synthesise_noun("Дәулет", f), "Дәулетпен");
+    }
+
+    #[test]
+    fn noun_instrumental_back_consonant_final() {
+        // Джохн (н nasal) → мен — stays мен (no harmony alternation,
+        // no nasal→б flip after v0.9.9 `realise_m` fix)
+        let f = NounFeatures {
+            case: Some(Case::Instrumental),
+            ..Default::default()
+        };
+        assert_eq!(synthesise_noun("Джохн", f), "Джохнмен");
+    }
+
+    #[test]
+    fn noun_instrumental_back_vowel_stem_stays_е_not_а() {
+        // Алматы (back-harmonic у) → мен, NOT ман. This was broken
+        // pre-v0.9.9 (the INSTRUMENTAL template used Arch(E) which
+        // harmony-alternated to а).
+        let f = NounFeatures {
+            case: Some(Case::Instrumental),
+            ..Default::default()
+        };
+        assert_eq!(synthesise_noun("Алматы", f), "Алматымен");
+        assert_eq!(synthesise_noun("Астана", f), "Астанамен");
+    }
+
+    #[test]
+    fn noun_instrumental_vowel_final_stem() {
+        let f = NounFeatures {
+            case: Some(Case::Instrumental),
+            ..Default::default()
+        };
+        // бала (vowel-final) → баламен
+        assert_eq!(synthesise_noun("бала", f), "баламен");
+        // тау (vowel-final) → таумен
+        assert_eq!(synthesise_noun("тау", f), "таумен");
+    }
+
+    #[test]
+    fn noun_instrumental_voiceless_final_gives_пен() {
+        let f = NounFeatures {
+            case: Some(Case::Instrumental),
+            ..Default::default()
+        };
+        assert_eq!(synthesise_noun("мектеп", f), "мектеппен");
+    }
+
+    #[test]
+    fn noun_instrumental_nasal_final_gives_мен_not_бен() {
+        // мұғалім ends in nasal м — post-v0.9.9 `realise_m` returns
+        // м after nasals (standard Kazakh). Pre-v0.9.9 this was бен.
+        let f = NounFeatures {
+            case: Some(Case::Instrumental),
+            ..Default::default()
+        };
+        assert_eq!(synthesise_noun("мұғалім", f), "мұғаліммен");
     }
 
     #[test]

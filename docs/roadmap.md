@@ -64,13 +64,13 @@ Capacity limit confirmed: 24M params × 4M tokens ≈ 25× below Chinchilla-opti
 | v0.9.6 | Multilingual recogniser surface — Kazakh / Russian / English input triggers for all 25 intents; name extraction from 3 languages; Latin-root safety guard in realiser | 245 workspace tests; input any language, response always Kazakh |
 | v0.9.7 | Lexicon-backed occupation recognition — generic 1sg-copula stripping + POS=noun lookup against 14 k Lexicon replaces the fixed 6-form table | 251 workspace tests; any Lexicon noun works, adjectives correctly rejected |
 | v0.9.8 | Full slot syntax + transliteration + cross-slot templates — Derivation (11 tokens) + Possessive (7) complete NounFeatures coverage; Latin→Cyrillic for FST synthesis; triple-slot templates (name+city+occupation) | 265 workspace tests; demo-ready UX |
+| v0.9.9 | Morphology correctness + phrasing polish — FST Instrumental now produces `-мен/-бен/-пен` correctly across harmony classes; `realise_m` no longer flips nasal→б; 6 regression tests; filler templates replaced with topic-specific acknowledgements | 271 workspace tests; last stretch before v1.0.0 |
 
 Phase 10 pivots the project from pure-stochastic transformers (v0.3–v0.4 line) to a deterministic morphology layer + small LM-over-roots. The v0.4.0 transformer baseline stays as reference; new work layers on top.
 
 ## Near-term
 
-- **v0.9.9** — native-speaker review of the MVP template set (~100 templates × 2–5 variants); correct phrasing, tighten politeness/register; fix the back-vowel instrumental harmony quirk (`Алматыман` → `Алматымен`) in the FST.
-- **v1.0.0** — investor-demoable MVP: 25-intent trilingual-input predictable Kazakh dialog, multi-turn session state, FST-guaranteed morphology, native-speaker-reviewed templates, end-to-end Rust stack.
+- **v1.0.0** — investor-demoable MVP: 25-intent trilingual-input predictable Kazakh dialog, multi-turn session state, FST-guaranteed morphology, end-to-end Rust stack. Final polish + demo-ready documentation.
 
 ## Out of near-term scope
 

@@ -13,7 +13,7 @@
 #   key = "intent_identifier"
 #   templates = ["phrase 1", "phrase 2", ...]
 
-version = "0.9.8"
+version = "0.9.9"
 
 # ---------- Greetings ----------
 
@@ -160,9 +160,8 @@ templates = [
 [[families]]
 key = "statement_of_age"
 templates = [
-    "түсіндім",
-    "жасыңыз келісті",
     "жақсы жас",
+    "қуатты кезеңіңіз",
     "{age} жас — тамаша кезең",
     "жасыңыз {age} екен",
     "{name}, {age} жастасыз, тамаша",
@@ -180,9 +179,9 @@ templates = [
 [[families]]
 key = "statement_of_location"
 templates = [
-    "түсіндім",
     "жақсы жер",
     "әдемі аймақ",
+    "тамаша өлке",
     "{city} — әдемі қала",
     "{city} туралы көп естідім",
     "{city|locative} тұрасыз ба",
@@ -202,8 +201,8 @@ templates = [
 key = "statement_of_occupation"
 templates = [
     "жақсы кәсіп",
-    "мақтанышпен",
     "сәттілік тілеймін",
+    "мақтанатын жұмыс",
     "{occupation} — құрметті кәсіп",
     "сіз {occupation} екенсіз",
     "{occupation|plural} — қажетті мамандық",
@@ -239,9 +238,9 @@ templates = [
 [[families]]
 key = "statement_of_weather"
 templates = [
-    "түсіндім",
     "ауа райы мейірімді болсын",
     "жақсы күн болсын",
+    "табиғат мезгіліне лайық",
 ]
 
 [[families]]

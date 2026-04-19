@@ -1,8 +1,8 @@
 //! `adam-chat` — interactive REPL demo of the predictable Kazakh dialog
-//! pipeline (v0.9.8 MVP — 25 intents + session state + full slot syntax
-//! (case/number/derivation/possessive) + Latin→Cyrillic transliteration
-//! + trilingual input + Lexicon-backed occupation extraction
-//! + cross-slot templates).
+//! pipeline (v0.9.9 MVP — 25 intents + session state + full slot syntax
+//! + Latin→Cyrillic transliteration + trilingual input + Lexicon-backed
+//! occupation extraction + cross-slot templates + polished Kazakh
+//! Instrumental harmony + phrasing pass).
 //!
 //! Usage:
 //!   adam_chat                — interactive REPL on stdin
@@ -62,7 +62,7 @@ fn main() -> ExitCode {
     }
 
     eprintln!(
-        "adam-chat v0.9.8 — пікірлесейік! Type a sentence in Kazakh / Russian / English; ^D to quit."
+        "adam-chat v0.9.9 — пікірлесейік! Type a sentence in Kazakh / Russian / English; ^D to quit."
     );
     let stdin = io::stdin();
     let stdout = io::stdout();

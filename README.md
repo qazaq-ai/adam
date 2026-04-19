@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.8-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.9-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,33 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.9.9 — Morphology correctness + phrasing polish
+
+Last stretch before the v1.0.0 MVP cut.
+
+**Fixed two FST morphology bugs** in the Instrumental suffix:
+
+| root | pre-v0.9.9 | v0.9.9 |
+|---|---|---|
+| Алматы | Алматы**ман** ❌ | Алматы**мен** ✓ |
+| мұғалім | мұғалім**бен** ❌ | мұғалім**мен** ✓ |
+| Джохн | Джохн**бан** ❌ | Джохн**мен** ✓ |
+| Дәулет | Дәулетпен ✓ | Дәулетпен ✓ |
+
+- The Instrumental suffix is invariant in vowel (`-мен/-бен/-пен` regardless of harmony) — the old template used harmony-alternating archiphoneme `{E}` which produced wrong `-ман/-бан/-пан` on back-vowel stems. Changed to literal `е`.
+- `realise_m` flipped nasal consonants to `б` instead of `м`, so `мұғалімен` became `мұғалімбен`. Fixed to preserve `м` after nasals.
+
+6 new FST unit tests lock in the fix across every consonant-class path.
+
+**Template polish pass.** Dropped generic filler ("түсіндім" appeared in 3 statement families) in favour of topic-specific acknowledgements:
+
+- `statement_of_age` → `қуатты кезеңіңіз` (vigorous period)
+- `statement_of_location` → `тамаша өлке` (wonderful region)
+- `statement_of_occupation` → `мақтанатын жұмыс` (work to be proud of)
+- `statement_of_weather` → `табиғат мезгіліне лайық` (fitting for the season)
+
+Workspace totals: **271 passing**, 4 ignored, 0 failing. Foundation CI green.
 
 ## v0.9.8 — Full slot syntax + transliteration + cross-slot templates
 

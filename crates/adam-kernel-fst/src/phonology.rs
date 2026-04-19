@@ -26,9 +26,6 @@ pub enum Archiphoneme {
     /// Abstract `I` — realises as `ы` (back) or `і` (front). Used in buffer
     /// vowels and in possessive `-{I}m`, etc.
     I,
-    /// Abstract `E` — realises as `а`/`е` but with special deletion/glide
-    /// behaviour after vowels (may turn into `й`).
-    E,
     /// Abstract `D` — realises as `д` (voiced), `т` (voiceless), or `н` (nasal
     /// harmony context).
     D,
@@ -110,7 +107,6 @@ pub fn realise_archiphoneme(arch: Archiphoneme, ctx: PhonologicalContext) -> Opt
     match arch {
         Archiphoneme::A => Some(realise_a(ctx)),
         Archiphoneme::I => Some(realise_i(ctx)),
-        Archiphoneme::E => realise_e(ctx),
         Archiphoneme::D => Some(realise_d(ctx)),
         Archiphoneme::L => Some(realise_l(ctx)),
         Archiphoneme::M => Some(realise_m(ctx)),
@@ -143,18 +139,6 @@ pub fn realise_i(ctx: PhonologicalContext) -> char {
         VowelClass::Back => 'ы',
         VowelClass::Front => 'і',
     }
-}
-
-/// Archiphoneme `{E}` — catalogue rules 15–20.
-/// May return `None` because rule 17 deletes `{E}` after a vowel (and instead
-/// triggers `й` epenthesis handled at assembly level).
-pub fn realise_e(ctx: PhonologicalContext) -> Option<char> {
-    // Rule 17: {E} → 0 (and й inserted) after a vowel.
-    if matches!(ctx.preceding, ConsonantClass::VowelPreceding) {
-        return None;
-    }
-    // Otherwise behave like {A}.
-    Some(realise_a(ctx))
 }
 
 // ---------------------------------------------------------------------------
@@ -196,10 +180,11 @@ pub fn realise_m(ctx: PhonologicalContext) -> char {
     if matches!(ctx.preceding, ConsonantClass::Voiceless) {
         return 'п';
     }
-    if matches!(
-        ctx.preceding,
-        ConsonantClass::Nasal | ConsonantClass::VoicedObstruent
-    ) {
+    // After voiced obstruent the stop becomes `б` (мектеб+мен → doesn't
+    // happen — voiced obstruent finals are rare). After a nasal (м/н/ң)
+    // the suffix stays `м`: мұғалім+инстр = мұғаліммен (NOT
+    // мұғалімбен, fixed in v0.9.9). Vowels, sonorants → also `м`.
+    if matches!(ctx.preceding, ConsonantClass::VoicedObstruent) {
         return 'б';
     }
     'м'

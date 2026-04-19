@@ -2,6 +2,72 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.9.9] — 2026-04-19
+
+Morphology correctness pass + template phrasing polish. The last stretch before the v1.0.0 MVP cut.
+
+### FST Instrumental fix (two bugs, one mechanism)
+
+The `INSTRUMENTAL` suffix template previously used the harmony-alternating archiphoneme `{E}`, but Kazakh Instrumental is actually invariant in vowel — always `-мен/-бен/-пен`, never `-ман/-бан/-пан`. Replaced with a literal `е`:
+
+```diff
+- const INSTRUMENTAL: SuffixTemplate = &[Arch(M), Arch(E), Literal('н')];
++ const INSTRUMENTAL: SuffixTemplate = &[Arch(M), Literal('е'), Literal('н')];
+```
+
+Separately, `realise_m` flipped `Nasal → 'б'` which produced `мұғалімбен`. Fixed to `Nasal → 'м'`, giving standard `мұғаліммен`. Voiced obstruent → `б` (rare but preserved).
+
+Before / after samples:
+
+| root | pre-v0.9.9 | v0.9.9 |
+|---|---|---|
+| Алматы | Алматыман ❌ | Алматымен ✓ |
+| Астана | Астанаман ❌ | Астанамен ✓ |
+| мұғалім | мұғалімбен ❌ | мұғаліммен ✓ |
+| Джохн | Джохнбан ❌ | Джохнмен ✓ |
+| Дәулет | Дәулетпен ✓ | Дәулетпен ✓ |
+| мектеп | мектеппен ✓ | мектеппен ✓ |
+
+### Cleanup
+
+`Archiphoneme::E` and `realise_e` were only used by the Instrumental template and are now dead. Removed both per YAGNI.
+
+### FST regression tests
+
+Added 6 unit tests to `morphotactics` covering every consonant-class path of the new Instrumental + the back/front vowel invariance. These lock in the fix so future archiphoneme refactors can't re-break it.
+
+- `noun_instrumental_front_consonant_final` (Дәулет → пен)
+- `noun_instrumental_back_consonant_final` (Джохн → мен)
+- `noun_instrumental_back_vowel_stem_stays_е_not_а` (Алматы → мен, regression)
+- `noun_instrumental_vowel_final_stem` (бала, тау → мен)
+- `noun_instrumental_voiceless_final_gives_пен` (мектеп → пен)
+- `noun_instrumental_nasal_final_gives_мен_not_бен` (мұғалім → мен, regression)
+
+### Template polish pass
+
+Dropped awkward / filler templates and replaced with context-specific acknowledgements:
+
+| key | removed | added |
+|---|---|---|
+| `statement_of_age` | `түсіндім`, `жасыңыз келісті` | `қуатты кезеңіңіз` |
+| `statement_of_location` | `түсіндім` | `тамаша өлке` |
+| `statement_of_occupation` | `мақтанышпен` (solo) | `мақтанатын жұмыс` |
+| `statement_of_weather` | `түсіндім` | `табиғат мезгіліне лайық` |
+
+"түсіндім" as a solo response felt generic/repetitive. Replaced with phrases that match the topic of the user's statement.
+
+### Numbers
+
+- **FST unit tests:** 84 (was 78) — 6 new Instrumental regressions
+- **Dialog end-to-end tests:** 81 (unchanged, assertion sets updated)
+- **Workspace tests:** **271 passing**, 4 ignored, 0 failing
+- **Foundation CI:** passing
+
+### Known v0.9.9 limitations
+
+- Silent English `h` still not special-cased in transliteration (`John → Джохн` rather than the conventional `Джон`). Cosmetic; FST synthesis works fine on either.
+- Native-speaker review has NOT been conducted — the polish was a phrasing pass by inspection, not formal review. A real review is queued for post-v1.0.0 refinement.
+
 ## [0.9.8] — 2026-04-19
 
 Slot syntax completes the noun-feature surface (Derivation + Possessive), Latin names get transliterated before FST synthesis, and templates gain a layer of cross-slot personalisation that uses multiple remembered entities in a single response.
