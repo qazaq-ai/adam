@@ -14,7 +14,6 @@
 //! intent. That is the ONLY source of randomness in the system.
 
 pub mod conversation;
-pub mod entities;
 pub mod intent;
 pub mod planner;
 pub mod realiser;
