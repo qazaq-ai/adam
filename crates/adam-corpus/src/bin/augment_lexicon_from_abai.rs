@@ -38,6 +38,9 @@ const VERB_MARKERS: &[&str] = &[
 #[derive(Debug, Clone, Deserialize)]
 struct GapCandidate {
     root_guess: String,
+    /// Parsed from the gap report for schema-compatibility; not used
+    /// by this augmenter (candidates are ranked upstream).
+    #[allow(dead_code)]
     frequency: usize,
     example_forms: Vec<String>,
 }

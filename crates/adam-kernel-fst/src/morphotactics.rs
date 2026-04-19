@@ -288,10 +288,10 @@ const VERB_PART_FUTURE: SuffixTemplate =
 const VERB_CONV_PERFECT: SuffixTemplate =
     &[SuffixAtom::Arch(Archiphoneme::Y), SuffixAtom::Literal('п')];
 
-/// Imperfect converb: `-{A}` — identical shape to aorist; in a non-finite
-/// clause it reads as "while V-ing".
-/// жаз + а = "жаза отыр" ≈ "writing sitting" (posture verb construction).
-const VERB_CONV_IMPERFECT: SuffixTemplate = &[SuffixAtom::Arch(Archiphoneme::A)];
+// Imperfect converb `-{A}` is NOT given its own const — the dispatch
+// at the tense match site routes `Tense::ConverbImperfect` through
+// the same aorist path as `Tense::Present` (see below). Keeping a
+// separate SuffixTemplate for it would be documentation-only dead code.
 
 // -------------------------------------------------------------------------
 // Voice suffixes — attach immediately after the root, before negation,
