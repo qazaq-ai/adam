@@ -1,15 +1,17 @@
-# Kazakh Grammar — Study Notes for adam v1.0.0
+# Kazakh Grammar — Reference Workbook
 
-This directory is a linguistics workbook, not product documentation. It exists so that the deterministic FST + minimal LM architecture planned for adam v1.0.0 is built on **verified** Kazakh grammar, not on informal heuristics picked up during v0.3–v0.5.
+This directory is a linguistics workbook, not product documentation. It is the normative source behind `adam-kernel-fst`'s phonology and morphotactics implementation. The v1.0.0 FST + dialog system ships built on these notes.
 
 ## Reading order
 
-1. [`00_architecture_v1.md`](00_architecture_v1.md) — what we are building and why
+1. [`00_architecture_v1.md`](00_architecture_v1.md) — architectural commitments (deterministic FST + dialog layer)
 2. [`01_phonology.md`](01_phonology.md) — phoneme inventory, vowel harmony, consonant assimilation
 3. [`02_morphology.md`](02_morphology.md) — suffix inventory, ordering constraints, allomorphy
 4. [`03_syntax.md`](03_syntax.md) — word order, case government, clause structure
-5. [`04_lexicon_sources.md`](04_lexicon_sources.md) — catalogue of academic + open-source lexicon resources
-6. [`05_fst_rust_design.md`](05_fst_rust_design.md) — Rust types for two-level morphology (written after studies)
+5. [`04_lexicon_sources.md`](04_lexicon_sources.md) — academic + open-source lexicon resources catalogue
+6. [`05_work_plan.md`](05_work_plan.md) — Phase-10 work plan (delivered v0.4.5 → v1.0.0)
+7. [`06_apertium_twol_catalogue.md`](06_apertium_twol_catalogue.md) — the 54 Apertium-kaz twol phonology rules, 22+ implemented
+8. [`07_dialog_architecture.md`](07_dialog_architecture.md) — **shipped v1.0.0 dialog layer architecture**
 
 ## Source attribution policy
 

@@ -1,80 +1,70 @@
 # Roadmap
 
-The roadmap records phases as executed, plus the near-term target. Earlier foundation phases (1–5) built the deterministic layers — corpus policy, FSM lexicon, synthetic corpus, tokenizer, first model. From Phase 6 onward the project started ingesting authentic Kazakh text.
+Version-by-version history of `adam`, grouped into two architectural eras. The final entry (v1.0.0) is the MVP cut.
 
-## Phase 6 — Authentic Kazakh sources
+## Lifecycle view
 
-| Sub-phase | Release | Source | Size | License |
-|---|---|---|---|---|
-| 6a | v0.1.1 | Tatoeba Kazakh | 4,058 | CC-BY 2.0 FR |
-| 6b | v0.1.2 | *(tokenizer: char fallback + leading-punct ▁, 4096 vocab)* | — | — |
-| 6c | v0.1.4 | Kazakh Wikipedia | 15,000 | CC-BY-SA 4.0 |
-| 6d | v0.1.6 | Mozilla Common Voice KK | 6,108 | CC0-1.0 |
+```
+  v0.1.0 ────────────────── v0.4.0           v0.4.5 ──────────────── v1.0.0
+  ├─ transformer era ───────────┤            ├─ FST + dialog era ────────┤
+  │                              │            │                            │
+  corpus curation                │            deterministic FST morphology │
+  BPE tokenizer                  │            14 k-entry pure Kazakh Lexicon
+  24.2 M transformer             │            25-intent dialog pipeline    │
+  (archived as reference)        │            trilingual input, KZ output  │
+                                 v            FST-guaranteed morphology    v
+                              pivot                                       MVP
+```
 
-Unified corpus after Phase 6d: **39,058 unique samples**, three authentic Kazakh sources plus synthetic + proverbs. Lossless tokenization confirmed (0 unknowns, 100% roundtrip).
+The transformer era (v0.1–v0.4) established the corpus, tokenizer, and training infrastructure. The FST + dialog era (v0.4.5+) replaced the stochastic model with a deterministic pipeline that holds predictability as a hard constraint. The v0.4.0 checkpoint is preserved in `data/training/` as a regression reference but is not on the v1.0.0 codepath.
 
-## Phase 7 — Baselines on real text
+## Phase 10 — FST + dialog layer (v0.4.5 → v1.0.0)
 
-| Sub-phase | Release | Model | Corpus | Steps | Val PPL |
-|---|---|---|---|---|---|
-| 7 | v0.1.3 | 4.28M | 17k (Tatoeba added) | 7,000 | 626.81 |
-| 7.1 | v0.1.5 | 4.28M | 32k (Wikipedia added) | 14,000 | 1078.68 |
-| 7.2 | v0.2.0 | 4.28M | 39k (Common Voice added) | 15,000 | 1112.31 |
-
-By v0.2.0 the 4.28M parameter envelope was saturated — PPL stopped improving with more data. Capacity, not data, was the bottleneck.
-
-## Phase 8 — Capacity scale-up
-
-| Release | Model | Corpus | Steps | Val PPL |
-|---|---|---|---|---|
-| v0.3.0 | 20.0M (H=512, L=5, vocab 4k) | 39k / 606k tokens | 15,000 | 871.30 |
-
-First non-flat PPL delta since real-text onset. 20M is the largest config that fits MacBook Air M2 8GB training comfortably (peak RSS ~2.5 GB of 8 GB unified memory).
-
-## Phase 9 — Data + infra maturity (current)
-
-| Release | Model | Corpus | Steps | Val PPL | Notes |
-|---|---|---|---|---|---|
-| v0.4.0 attempted | 27.3M (H=512, L=6, vocab 8k) | 214k / 3.9M tokens | 20,000 | 1811.34 | rolled back — too aggressive scale-up |
-| **v0.4.0 (shipped)** | **24.2M (H=512, L=5, vocab 8k)** | **244k / 4.09M tokens** | **20,000** | **1691.89** | 7 packs incl. Abai + CC-100 |
-
-Key v0.4.0 additions:
-- Abai Qunanbayuly's public-domain works (Wikisource, 2,253 samples) — first literary source
-- CC-100 Kazakh web-crawl (50,000 filtered samples) — first web source
-- Synthetic generator minimum length raised to 3 words (was dominated by 2-word noise)
-- BPE vocab 4k → 8k with 2.80× → 3.27× compression
-- Periodic checkpoint every 2,000 steps (crash recovery)
-
-Capacity limit confirmed: 24M params × 4M tokens ≈ 25× below Chinchilla-optimal data. Further improvement needs an order-of-magnitude more training data, not more parameters.
-
-## Phase 10 — Deterministic FST (current)
+The MVP path. Each release is strictly additive — no rollbacks, no feature gating.
 
 | Release | Scope | Result |
 |---|---|---|
-| v0.4.5 | `adam-kernel-fst` crate — phonology + morphotactics + parser + lexicon (4,454 curated + 11,919 Apertium) + CLI | 55 unit tests, 100% roundtrip on 36,238 full-lexicon cycles |
-| v0.5.0 | Participles (`-{G}{A}н`, `-{A}тын`, `-{A}р`), converbs (`-{Y}п`, `-{A}`), vowel-final-stem aorist coalescence | 68 unit tests, covers most non-finite Kazakh verb forms |
+| v0.4.5 | `adam-kernel-fst` crate — phonology + morphotactics + parser + lexicon + CLI | 55 unit tests, 100% roundtrip on 36,238 full-lexicon cycles |
+| v0.5.0 | Participles, converbs, vowel-final-stem aorist coalescence | 68 unit tests; most non-finite Kazakh verb forms covered |
 | v0.5.5 | Pure Kazakh lexicon — drop 1,500 loanwords, add 500 Abai-attested classical roots | 14,106 entries, Abai coverage 88.8% → 97.8% |
-| v0.6.0 | Derivational morphology — 11 word-formation suffixes (agent, abstract, privative, similative, ordinal, diminutive, verbal-noun, …) | 78 unit tests; root→derived→inflected chains work end-to-end |
-| v0.7.0 | First dialog layer — 5-intent MVP (`adam-dialog` crate + `adam_chat` CLI + 15 end-to-end tests) | 175 workspace tests; predictable 5-layer pipeline documented |
-| v0.7.5 | Dialog widening — 10 intents (+Thanks, Apology, AskHowAreYou, StatementOfWellbeing, AskName), templates moved to `data/dialog/templates/v1.toml` | 183 workspace tests; data-driven template repo replaces hardcoded planner arrays |
-| v0.8.0 | Dialog widening — 25 intents (+15: age, location, occupation, family, weather, time, compliment, request, well-wishes, statement-of-name), PersonName extraction + slot expansion | 201 workspace tests; first entity extraction lands — user's name is pulled from self-introduction and substituted via `{name}` slot |
-| v0.8.5 | Multi-turn session — `Conversation` struct; name persists across turns; templates filtered by slot availability; greetings gain `{name}` variants | 204 workspace tests; "Say your name once, get greeted by name forever" |
-| v0.9.0 | Full entity absorption — Kazakh numeral parser (1–99), ablative/locative city stripping, 1sg-copula occupation stripping; `{age}/{city}/{occupation}` slots; `StatementOf*` variants carry `Option<T>` payloads | 215 workspace tests; every social-topic statement contributes a remembered entity |
-| v0.9.5 | FST-backed slot expansion — `{slot\|features}` syntax parsed and rendered via `synthesise_noun`; cross-slot templates | 229 workspace tests; Kazakh case/number agreement becomes FST-guaranteed |
-| v0.9.6 | Multilingual recogniser surface — Kazakh / Russian / English input triggers for all 25 intents; name extraction from 3 languages; Latin-root safety guard in realiser | 245 workspace tests; input any language, response always Kazakh |
-| v0.9.7 | Lexicon-backed occupation recognition — generic 1sg-copula stripping + POS=noun lookup against 14 k Lexicon replaces the fixed 6-form table | 251 workspace tests; any Lexicon noun works, adjectives correctly rejected |
-| v0.9.8 | Full slot syntax + transliteration + cross-slot templates — Derivation (11 tokens) + Possessive (7) complete NounFeatures coverage; Latin→Cyrillic for FST synthesis; triple-slot templates (name+city+occupation) | 265 workspace tests; demo-ready UX |
-| v0.9.9 | Morphology correctness + phrasing polish — FST Instrumental now produces `-мен/-бен/-пен` correctly across harmony classes; `realise_m` no longer flips nasal→б; 6 regression tests; filler templates replaced with topic-specific acknowledgements | 271 workspace tests; last stretch before v1.0.0 |
+| v0.6.0 | Derivational morphology — 11 word-formation suffixes | 78 unit tests; root→derived→inflected chains work end-to-end |
+| v0.7.0 | First dialog layer — `adam-dialog` crate, 5-intent MVP, `adam_chat` CLI | 175 workspace tests; 5-layer predictable pipeline |
+| v0.7.5 | Dialog widening to 10 intents; templates moved to `data/dialog/templates/v1.toml` | 183 workspace tests; data-driven template repo |
+| v0.8.0 | 25 intents (+15: age, location, occupation, family, weather, time, compliment, request, well-wishes, statement-of-name); PersonName extraction | 201 workspace tests; first entity extraction lands |
+| v0.8.5 | Multi-turn session state via `Conversation`; greeting `{name}` variants | 204 workspace tests; "Say your name once, get greeted forever" |
+| v0.9.0 | Full entity absorption — Kazakh numeral parser (1–99), ablative/locative city, 1sg-copula occupation; `{age}/{city}/{occupation}` slots | 215 workspace tests; every statement contributes a remembered entity |
+| v0.9.5 | FST-backed slot expansion — `{slot\|features}` parsed and rendered via `synthesise_noun`; cross-slot templates | 229 workspace tests; agreement becomes FST-guaranteed |
+| v0.9.6 | Multilingual recogniser — Kazakh / Russian / English triggers for all 25 intents; Latin-root safety guard | 245 workspace tests |
+| v0.9.7 | Lexicon-backed occupation recognition via generic 1sg-copula stripping + POS lookup | 251 workspace tests |
+| v0.9.8 | Full slot syntax (Derivation + Possessive) + Latin→Cyrillic transliteration + triple-slot templates | 265 workspace tests; demo-ready UX |
+| v0.9.9 | FST Instrumental harmony fix (`Алматыман → Алматымен`, `мұғалімбен → мұғаліммен`); 6 regression tests; template polish | 271 workspace tests; last stretch before MVP |
+| **v1.0.0** | **MVP cut** — no new features; full documentation refresh; transformer-era narrative compressed into history section | **271 workspace tests**; investor-demoable |
 
-Phase 10 pivots the project from pure-stochastic transformers (v0.3–v0.4 line) to a deterministic morphology layer + small LM-over-roots. The v0.4.0 transformer baseline stays as reference; new work layers on top.
+## Pre-Phase-10 — transformer era (v0.1.0 → v0.4.0)
 
-## Near-term
+Historical context for readers who want the full lineage. None of the code or data on this path is load-bearing for v1.0.0 except where explicitly referenced (the v0.4.0 checkpoint, the corpus packs consumed by `validate_foundation.sh`).
 
-- **v1.0.0** — investor-demoable MVP: 25-intent trilingual-input predictable Kazakh dialog, multi-turn session state, FST-guaranteed morphology, end-to-end Rust stack. Final polish + demo-ready documentation.
+- **Phase 6 (v0.1.1 – v0.1.6)** — authentic Kazakh source ingestion: Tatoeba (4,058), Kazakh Wikipedia (15,000), Common Voice KK (6,108). Unified corpus reaches 39 k samples, lossless tokenization at 0 unknowns / 100% roundtrip.
+- **Phase 7 (v0.1.3 – v0.2.0)** — transformer baselines on real text. 4.28 M-parameter envelope saturates by v0.2.0 (PPL ~1100 flat); capacity, not data, is the bottleneck.
+- **Phase 8 (v0.3.0)** — scale to 20 M params. First non-flat PPL delta since real-text onset (PPL 871). 20 M is the largest config fitting M2 8 GB unified memory.
+- **Phase 9 (v0.4.0)** — 24.2 M transformer with literary sources (Abai Wikisource 2,253 samples) + CC-100 web-crawl (50 k filtered) + synthetic-generator min-length raised to 3 words + BPE vocab 4k → 8k. Val PPL 1691.89 on 12,101 held-out samples. Confirmed capacity limit: 24 M × 4 M tokens is ≈ 25× below Chinchilla-optimal.
 
-## Out of near-term scope
+The post-v0.4.0 pivot was a deliberate choice: further transformer scaling required an order-of-magnitude more data that didn't exist for Kazakh at the quality bar required. The deterministic FST + dialog path delivered MVP-grade predictable Kazakh in pure Rust on the same hardware.
 
-- Multilingual expansion
-- Speech / multimodal
-- Cloud platform work
-- 50M+ parameter models on M2 8GB (plausible but untested; future work on M5 24GB or cloud GPU rental)
+## Post-v1.0.0 candidates
+
+Not promised, not scheduled. Any of these would ship as v1.1.0+.
+
+- Native-speaker review of the template set (phrasing, register, naturalness).
+- Lexicon expansion: proper-noun sub-lexicon, modern-vocabulary tier (loanword-allowed, explicitly separated).
+- Polished Latin→Cyrillic transliteration (silent-h handling for English names, alternate jh-cluster conventions).
+- Verb slot expansion (`{root|verb_features}` with verb synthesiser dispatch).
+- Additional intents beyond the 25-intent surface.
+
+## Out of scope (permanent)
+
+- Multilingual output — the response is always Kazakh, by design.
+- Speech / multimodal.
+- Cloud platform work.
+- 50 M+ parameter transformer experiments on current hardware (M2 8 GB).
+- Probabilistic / LLM-style free generation. The project's value proposition is predictability; any path that breaks that is explicitly out of scope.

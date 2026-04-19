@@ -1,5 +1,7 @@
 # Eval Baseline
 
+> **Legacy context (transformer era, v0.1 – v0.4).** Describes benchmark assembly for the pre-v0.4.5 transformer baseline. The v1.0.0 dialog pipeline validates correctness via `cargo test --workspace` (271 passing) + `scripts/validate_foundation.sh`, not via a benchmark perplexity score. For the v1.0.0 architecture see [`docs/kazakh_grammar/07_dialog_architecture.md`](kazakh_grammar/07_dialog_architecture.md).
+
 ## Purpose
 
 The eval layer should produce a deterministic benchmark report from the

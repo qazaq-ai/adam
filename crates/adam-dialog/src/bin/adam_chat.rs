@@ -1,8 +1,22 @@
-//! `adam-chat` — interactive REPL demo of the predictable Kazakh dialog
-//! pipeline (v0.9.9 MVP — 25 intents + session state + full slot syntax
-//! + Latin→Cyrillic transliteration + trilingual input + Lexicon-backed
-//! occupation extraction + cross-slot templates + polished Kazakh
-//! Instrumental harmony + phrasing pass).
+//! `adam-chat` — interactive REPL for the adam v1.0.0 Kazakh dialog
+//! pipeline.
+//!
+//! Capabilities:
+//!   - 25 intents across greeting / farewell / affirmation / negation /
+//!     thanks / apology / wellbeing / name / age / location /
+//!     occupation / family / weather / time / compliment / request /
+//!     well-wishes.
+//!   - Trilingual input surface: Kazakh, Russian, English.
+//!   - Kazakh-only output, FST-guaranteed morphology.
+//!   - Multi-turn session state (`Conversation`): `name`, `age`,
+//!     `city`, `occupation` persist across turns.
+//!   - `{slot|features}` template expansion with case / number /
+//!     derivation / possessive feature tokens.
+//!   - Latin → Cyrillic transliteration for foreign names before FST
+//!     synthesis.
+//!
+//! See `docs/kazakh_grammar/07_dialog_architecture.md` for the full
+//! architectural commitment.
 //!
 //! Usage:
 //!   adam_chat                — interactive REPL on stdin
@@ -62,7 +76,7 @@ fn main() -> ExitCode {
     }
 
     eprintln!(
-        "adam-chat v0.9.9 — пікірлесейік! Type a sentence in Kazakh / Russian / English; ^D to quit."
+        "adam-chat v1.0.0 — пікірлесейік! Type a sentence in Kazakh / Russian / English; ^D to quit."
     );
     let stdin = io::stdin();
     let stdout = io::stdout();

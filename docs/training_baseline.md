@@ -1,5 +1,7 @@
 # Training Baseline
 
+> **Legacy context (transformer era, v0.1 – v0.4).** The v1.0.0 dialog pipeline does not train or evaluate a transformer. The assembly contracts and regression reports documented here are preserved because `scripts/validate_foundation.sh` still exercises them as CI regression surface (see `data/training/README.md`). For the v1.0.0 architecture see [`docs/kazakh_grammar/07_dialog_architecture.md`](kazakh_grammar/07_dialog_architecture.md).
+
 ## Purpose
 
 Before any real training run, the repository should be able to assemble a

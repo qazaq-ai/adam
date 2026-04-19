@@ -1,6 +1,52 @@
 # Changelog
 
-All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
+All notable changes are tagged in git as `vX.Y.Z`.
+
+## [1.0.0] — 2026-04-19 — MVP cut
+
+The investor-demoable MVP. No new features since v0.9.9 — the delta is documentation, housekeeping, and a formal cut of the v1.0.0 line.
+
+### What v1.0.0 delivers
+
+Predictable, auditable Kazakh dialog across 25 intents, trilingual input (kk / ru / en), Kazakh-only output, multi-turn session state, and FST-guaranteed morphology — all in pure Rust running on a MacBook Air M2 8 GB.
+
+| pillar | v1.0.0 state |
+|---|---|
+| Intents recognised | **25** (Greeting × 5 sub-kinds, Farewell, Affirmation / Negation, Thanks / Apology, AskHowAreYou / StatementOfWellbeing, AskName / StatementOfName, AskAge / StatementOfAge, AskLocation / StatementOfLocation, AskOccupation / StatementOfOccupation, AskFamily / StatementOfFamily, AskWeather / StatementOfWeather, AskTime, Compliment, Request, WellWishes, Unknown) |
+| Input languages | Kazakh, Russian, English |
+| Entity extraction | `name` (3 KK + 2 RU + 3 EN patterns), `age` (Kazakh numerals 1–99 + digits), `city` (ablative / locative stripping), `occupation` (Lexicon-backed 1sg-copula stripping, POS-filtered) |
+| Session state | `Conversation` struct, absorb + persist across turns, reset() |
+| Slot syntax | `{slot\|features}` with 4 feature families (case, number, derivation, possessive), 27 tokens total, `+`-combinable |
+| FST morphology | 11 archiphonemes, 22+ twol rules, 30 suffix templates, 100% synth-analyse roundtrip on 36 k forms |
+| Template repository | 29 families, TOML-driven, slot-fillability filtered |
+| Latin name support | transliteration module (digraphs + single-letter map) feeds FST when template requests morphology on a Latin root |
+| Foundation CI | validates every layer; `validate_foundation.sh` green |
+
+### Documentation refresh
+
+- **README.md** fully rewritten as the v1.0.0 MVP story. The pre-v0.4.5 transformer narrative is compressed into a single "History" section; transformer-era sample generations, training pipeline, and PPL stats removed from the forward-looking story.
+- **docs/roadmap.md** capped with a v1.0.0 final entry; earlier phases condensed to a lifecycle view.
+- **docs/repository_layout.md** updated with the full current crate list (was missing `adam-kernel-fst` and `adam-dialog`).
+- **docs/kazakh_grammar/07_dialog_architecture.md** status flipped from "design document, pre-implementation" to "shipped in v1.0.0".
+- **docs/foundation_scope.md** aligned with the v1.0.0 deliverable.
+- **docs/training_baseline.md** and **docs/eval_baseline.md** marked as legacy context (transformer phase v0.1–v0.4).
+- Per-subdirectory READMEs under `data/` (dialog, curated, lexicon_v1, training) were added in v0.8.5's cleanup pass and still accurately reflect the v1.0.0 state.
+
+### Tests
+
+Unchanged from v0.9.9: **271 passing**, 4 ignored, 0 failing. Foundation CI green.
+
+### Post-v1.0.0
+
+The MVP is the release surface. Future work candidates (not promised, not scheduled):
+
+- Native-speaker review of the template set — a real, human review pass.
+- Lexicon expansion beyond the 14 k curated roots (proper nouns, modern vocabulary under a separate "loanword-allowed" tier).
+- Polished Latin-to-Cyrillic transliteration (silent-h handling for English names).
+- Verb slot expansion (`{root|verb_features}` with a different synthesiser dispatch).
+- Additional intents beyond the 25-intent surface.
+
+Any of these would ship as v1.1.0+ and are explicitly out of scope for the v1.0.0 cut.
 
 ## [0.9.9] — 2026-04-19
 
