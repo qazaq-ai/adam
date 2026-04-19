@@ -75,20 +75,20 @@ pub fn interpret_text(input: &str, _parses: &[Analysis]) -> Intent {
     // means the user is stating, not asking. Without this ordering,
     // "қайдан келдім" would hit AskLocation (because of "қайдан")
     // before StatementOfLocation (which keys on "келдім").
-    if detect_statement_of_age(&tokens, &joined) {
-        return Intent::StatementOfAge;
+    if let Some(years) = detect_statement_of_age(&tokens, &joined) {
+        return Intent::StatementOfAge { years };
     }
     if detect_ask_age(&joined) {
         return Intent::AskAge;
     }
-    if detect_statement_of_location(&tokens, &joined) {
-        return Intent::StatementOfLocation;
+    if let Some(city) = detect_statement_of_location(&tokens, &raw_tokens, &joined) {
+        return Intent::StatementOfLocation { city };
     }
     if detect_ask_location(&joined) {
         return Intent::AskLocation;
     }
-    if detect_statement_of_occupation(&tokens, &joined) {
-        return Intent::StatementOfOccupation;
+    if let Some(occupation) = detect_statement_of_occupation(&tokens, &raw_tokens, &joined) {
+        return Intent::StatementOfOccupation { occupation };
     }
     if detect_ask_occupation(&joined) {
         return Intent::AskOccupation;
@@ -345,13 +345,77 @@ fn detect_ask_age(joined: &str) -> bool {
 }
 
 /// User reports age: "менің жасым N", "N жастамын", "N жасында".
-/// For MVP we accept the 1st-person markers; the numeral is left
-/// un-extracted (v0.9.0 numeral extraction will fill this in).
-fn detect_statement_of_age(tokens: &[String], joined: &str) -> bool {
-    joined.contains("жасым")
+/// Returns `Some(Some(n))` when the pattern matched AND a Kazakh
+/// numeral 1–99 was parsed, `Some(None)` when the pattern matched but
+/// no numeral was found, and `None` when the pattern didn't match at
+/// all (so the caller can continue dispatching).
+fn detect_statement_of_age(tokens: &[String], joined: &str) -> Option<Option<u32>> {
+    let matched = joined.contains("жасым")
         || tokens
             .iter()
-            .any(|t| t == "жастамын" || t == "жастаймын" || t == "жаспын")
+            .any(|t| t == "жастамын" || t == "жастаймын" || t == "жаспын");
+    if !matched {
+        return None;
+    }
+    Some(parse_kazakh_age(tokens))
+}
+
+/// Parse a Kazakh numeral in the range 1–99 out of a token stream.
+/// Supports compound forms ("отыз бес" = 35) and bare tens/units, as
+/// well as literal digit strings ("30"). Returns the first hit.
+fn parse_kazakh_age(tokens: &[String]) -> Option<u32> {
+    for (i, t) in tokens.iter().enumerate() {
+        // Literal digit form, e.g. "30".
+        if let Ok(n) = t.parse::<u32>() {
+            if (1..200).contains(&n) {
+                return Some(n);
+            }
+        }
+        // Tens word, maybe followed by a unit word.
+        if let Some(tens) = kazakh_tens_value(t) {
+            if let Some(next) = tokens.get(i + 1) {
+                if let Some(units) = kazakh_units_value(next) {
+                    return Some(tens + units);
+                }
+            }
+            return Some(tens);
+        }
+        // Bare unit word (rare for ages but handle it).
+        if let Some(units) = kazakh_units_value(t) {
+            return Some(units);
+        }
+    }
+    None
+}
+
+fn kazakh_tens_value(token: &str) -> Option<u32> {
+    match token {
+        "он" => Some(10),
+        "жиырма" => Some(20),
+        "отыз" => Some(30),
+        "қырық" => Some(40),
+        "елу" => Some(50),
+        "алпыс" => Some(60),
+        "жетпіс" => Some(70),
+        "сексен" => Some(80),
+        "тоқсан" => Some(90),
+        _ => None,
+    }
+}
+
+fn kazakh_units_value(token: &str) -> Option<u32> {
+    match token {
+        "бір" => Some(1),
+        "екі" => Some(2),
+        "үш" => Some(3),
+        "төрт" => Some(4),
+        "бес" => Some(5),
+        "алты" => Some(6),
+        "жеті" => Some(7),
+        "сегіз" => Some(8),
+        "тоғыз" => Some(9),
+        _ => None,
+    }
 }
 
 /// "Where are you from / where do you live?" — қай жерденсің,
@@ -365,23 +429,88 @@ fn detect_ask_location(joined: &str) -> bool {
 }
 
 /// User states location: "мен Алматыданмын", "астанада тұрамын",
-/// "ауылдан келдім".
-fn detect_statement_of_location(tokens: &[String], joined: &str) -> bool {
-    // 1st-person "live" verb: тұрамын
-    if tokens.iter().any(|t| t == "тұрамын" || t == "тұрамыз") {
-        return true;
+/// "ауылдан келдім". Returns `Some(city)` when the pattern fires,
+/// with `city` being the extracted root (case-preserved, nominative)
+/// — or `None` inside `Some` when the pattern fires without a
+/// parseable city token.
+fn detect_statement_of_location(
+    tokens: &[String],
+    raw_tokens: &[String],
+    joined: &str,
+) -> Option<Option<String>> {
+    // 1st-person "live" verb: `X-да/-де тұрамын` — the city is the
+    // token ending in locative that precedes the verb.
+    if let Some(verb_idx) = tokens.iter().position(|t| t == "тұрамын" || t == "тұрамыз")
+    {
+        let city = (0..verb_idx)
+            .rev()
+            .find_map(|i| strip_locative(&tokens[i]).map(|_| raw_tokens[i].clone()))
+            .map(|raw| strip_locative_preserving(&raw));
+        return Some(city);
     }
-    // Ablative + 1sg copula: "X-данмын" / "X-денмін" — crude but OK
-    // for the MVP template pool.
-    if tokens.iter().any(|t| {
-        t.ends_with("данмын")
-            || t.ends_with("денмін")
-            || t.ends_with("танмын")
-            || t.ends_with("тенмін")
-    }) {
-        return true;
+    // Ablative + 1sg copula: "Алматыданмын" → "Алматы".
+    for (i, t) in tokens.iter().enumerate() {
+        if let Some(root) = strip_ablative_copula(t) {
+            let raw = raw_tokens
+                .get(i)
+                .map(|r| strip_ablative_copula_preserving(r).unwrap_or_else(|| root.clone()))
+                .unwrap_or(root);
+            return Some(Some(capitalise(&raw)));
+        }
     }
-    joined.contains("келдім") && (joined.contains("ауыл") || joined.contains("қала"))
+    // "келдім" + ауыл/қала somewhere — matched but no precise city.
+    if joined.contains("келдім") && (joined.contains("ауыл") || joined.contains("қала"))
+    {
+        return Some(None);
+    }
+    None
+}
+
+/// Strip a trailing locative suffix (`-да/-де/-та/-те`) returning the
+/// root. Lower-case variant; returns `None` when the suffix isn't
+/// present.
+fn strip_locative(token: &str) -> Option<String> {
+    for suffix in ["да", "де", "та", "те"] {
+        if token.ends_with(suffix) && token.chars().count() > suffix.chars().count() + 1 {
+            let take = token.chars().count() - suffix.chars().count();
+            return Some(token.chars().take(take).collect());
+        }
+    }
+    None
+}
+
+/// Case-preserving version used on `raw_tokens` so proper nouns keep
+/// their surface capitalisation.
+fn strip_locative_preserving(token: &str) -> String {
+    for suffix in ["да", "де", "та", "те", "Да", "Де", "Та", "Те"] {
+        if token.ends_with(suffix) && token.chars().count() > suffix.chars().count() + 1 {
+            let take = token.chars().count() - suffix.chars().count();
+            return token.chars().take(take).collect();
+        }
+    }
+    token.to_string()
+}
+
+/// Strip ablative + 1sg copula: `-данмын / -денмін / -танмын / -тенмін`.
+fn strip_ablative_copula(token: &str) -> Option<String> {
+    for suffix in ["данмын", "денмін", "танмын", "тенмін"] {
+        if token.ends_with(suffix) && token.chars().count() > suffix.chars().count() + 1 {
+            let take = token.chars().count() - suffix.chars().count();
+            return Some(token.chars().take(take).collect());
+        }
+    }
+    None
+}
+
+fn strip_ablative_copula_preserving(token: &str) -> Option<String> {
+    let lower = token.to_lowercase();
+    for suffix in ["данмын", "денмін", "танмын", "тенмін"] {
+        if lower.ends_with(suffix) && lower.chars().count() > suffix.chars().count() + 1 {
+            let take = token.chars().count() - suffix.chars().count();
+            return Some(token.chars().take(take).collect());
+        }
+    }
+    None
 }
 
 /// "What do you do for work?" — немен айналысасың, жұмысың не,
@@ -397,20 +526,34 @@ fn detect_ask_occupation(joined: &str) -> bool {
 }
 
 /// User states occupation: "мен мұғаліммін", "дәрігермін",
-/// "мен жұмыс істеймін".
-fn detect_statement_of_occupation(tokens: &[String], joined: &str) -> bool {
-    let occupation_copula = tokens.iter().any(|t| {
-        matches!(
-            t.as_str(),
-            "мұғаліммін"
-                | "дәрігермін"
-                | "студентпін"
-                | "инженермін"
-                | "оқушымын"
-                | "жұмысшымын"
-        )
-    });
-    occupation_copula || joined.contains("жұмыс істеймін")
+/// "мен жұмыс істеймін". Returns `Some(Some(root))` when a known
+/// occupation token + 1sg copula matched, with `root` being the
+/// stripped occupation noun (nominative). Falls back to
+/// `Some(None)` for "жұмыс істеймін" (no specific occupation parseable).
+fn detect_statement_of_occupation(
+    tokens: &[String],
+    _raw_tokens: &[String],
+    joined: &str,
+) -> Option<Option<String>> {
+    const OCCUPATIONS: &[(&str, &str)] = &[
+        ("мұғаліммін", "мұғалім"),
+        ("дәрігермін", "дәрігер"),
+        ("студентпін", "студент"),
+        ("инженермін", "инженер"),
+        ("оқушымын", "оқушы"),
+        ("жұмысшымын", "жұмысшы"),
+    ];
+    for t in tokens {
+        for (form, root) in OCCUPATIONS {
+            if t == form {
+                return Some(Some((*root).to_string()));
+            }
+        }
+    }
+    if joined.contains("жұмыс істеймін") {
+        return Some(None);
+    }
+    None
 }
 
 /// "Family question" — үйлендің бе, балаларың бар ма, отбасың бар ма.

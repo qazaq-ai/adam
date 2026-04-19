@@ -52,24 +52,27 @@ pub enum Intent {
     AskAge,
 
     /// User states age: "менің жасым отыз", "жиырма жастамын".
-    /// Numeric extraction is a v0.9.0 concern — for now literal-template
-    /// response only.
-    StatementOfAge,
+    /// `years` is `Some(n)` when a Kazakh numeral 1–99 was parsed out
+    /// of the utterance, `None` when the intent matched on keywords
+    /// alone ("жасым жасырын").
+    StatementOfAge { years: Option<u32> },
 
     /// "Where are you from / where do you live?":
     /// қай жерденсің, қайда тұрасыз, қай қаладансың.
     AskLocation,
 
     /// User says where they are from / live: "мен Алматыданмын",
-    /// "астанада тұрамын".
-    StatementOfLocation,
+    /// "астанада тұрамын". `city` is the extracted root (nominative
+    /// form, case-preserved) when the case+copula stripping succeeded.
+    StatementOfLocation { city: Option<String> },
 
     /// "What do you do?": немен айналысасың, жұмысың не, кәсібің қандай.
     AskOccupation,
 
     /// User states occupation: "мен мұғаліммін", "дәрігер болып жұмыс
-    /// істеймін".
-    StatementOfOccupation,
+    /// істеймін". `occupation` is the extracted noun root (1sg copula
+    /// stripped) when possible.
+    StatementOfOccupation { occupation: Option<String> },
 
     /// "Are you married? / Do you have children?": үйлендің бе,
     /// балаларың бар ма, отбасың бар ма.

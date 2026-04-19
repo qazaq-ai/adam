@@ -5,6 +5,11 @@ manifests that assemble them into training/validation sets.
 
 ## Source packs (read by `scripts/validate_foundation.sh`)
 
+### Unfiltered (raw per-source imports)
+
+Schema-checked by `jq empty` in CI, consumed by `lexicon_purity_audit`
+and `extract_root_candidates` binaries.
+
 | File | Source | Samples | License |
 |---|---|---:|---|
 | `abai_wikisource_pack.json` | Abai Qunanbayuly (Wikisource) | 2,253 | Public domain |
@@ -15,8 +20,28 @@ manifests that assemble them into training/validation sets.
 | `tatoeba_kazakh_pack.json` | Tatoeba Kazakh | 4,058 | CC-BY 2.0 FR |
 | `wikipedia_kz_pack.json` | Kazakh Wikipedia | 15,000 | CC-BY-SA 4.0 |
 
-Every pack is validated (`jq empty`) on every CI run. Do not delete
-without also updating `scripts/validate_foundation.sh`.
+### Filtered (drop loanwords + 2-3-word fragments)
+
+Produced by `cargo run --bin filter_pack` (v0.5.0 era). These are the
+**actual training inputs** — `adam_training_corpus_manifest.json`
+lists them, so `scripts/run_unified_corpus_assembly.sh` regenerates
+`adam_training_corpus_pack.json` from filtered versions, not raw.
+
+| File | Source |
+|---|---|
+| `filtered_abai_wikisource_pack.json` | abai |
+| `filtered_cc100_kk_pack.json` | cc100 |
+| `filtered_clean_training_corpus_pack.json` | clean |
+| `filtered_common_voice_kk_pack.json` | common voice |
+| `filtered_kazakh_proverbs_pack.json` | proverbs |
+| `filtered_synthetic_sentences_pack.json` | synthetic |
+| `filtered_tatoeba_kazakh_pack.json` | tatoeba |
+| `filtered_wikipedia_kz_pack.json` | wikipedia |
+
+**Do not delete either set without also updating every manifest that
+references them.** Both unfiltered (`jq empty` gates) and filtered
+(`adam_training_corpus_manifest.json` assembly) are load-bearing in
+`validate_foundation.sh`.
 
 ## Manifest hierarchy
 

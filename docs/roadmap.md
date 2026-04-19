@@ -59,13 +59,14 @@ Capacity limit confirmed: 24M params × 4M tokens ≈ 25× below Chinchilla-opti
 | v0.7.5 | Dialog widening — 10 intents (+Thanks, Apology, AskHowAreYou, StatementOfWellbeing, AskName), templates moved to `data/dialog/templates/v1.toml` | 183 workspace tests; data-driven template repo replaces hardcoded planner arrays |
 | v0.8.0 | Dialog widening — 25 intents (+15: age, location, occupation, family, weather, time, compliment, request, well-wishes, statement-of-name), PersonName extraction + slot expansion | 201 workspace tests; first entity extraction lands — user's name is pulled from self-introduction and substituted via `{name}` slot |
 | v0.8.5 | Multi-turn session — `Conversation` struct; name persists across turns; templates filtered by slot availability; greetings gain `{name}` variants | 204 workspace tests; "Say your name once, get greeted by name forever" |
+| v0.9.0 | Full entity absorption — Kazakh numeral parser (1–99), ablative/locative city stripping, 1sg-copula occupation stripping; `{age}/{city}/{occupation}` slots; `StatementOf*` variants carry `Option<T>` payloads | 215 workspace tests; every social-topic statement contributes a remembered entity |
 
 Phase 10 pivots the project from pure-stochastic transformers (v0.3–v0.4 line) to a deterministic morphology layer + small LM-over-roots. The v0.4.0 transformer baseline stays as reference; new work layers on top.
 
 ## Near-term
 
-- **v0.9.0** — FST-backed slot expansion: templates can emit `(root, features)` atoms; realiser synthesises grammatical forms via `adam_kernel_fst::morphotactics`. Numeric extraction (StatementOfAge → numeral → "{age} жаста екенсіз") lands here. All remaining MVP entities (location, occupation, family, age) are absorbed into session.
-- **v0.9.5** — native-speaker review of the MVP template set (~75 templates × 2–4 variants). Correct phrasing, tighten politeness/register, replace any residual stiffness.
+- **v0.9.5** — FST-backed slot expansion: templates can emit `{root|features}` atoms (e.g. `{city|locative}`), realiser synthesises grammatical forms via `adam_kernel_fst::morphotactics`. Cross-slot templates (`"{name}, сіз {age} жастасыз ба?"`). Regular 1sg-copula stripping via FST lookup (vs the fixed table in v0.9.0).
+- **v0.9.8** — native-speaker review of the MVP template set (~90 templates × 2–5 variants). Correct phrasing, tighten politeness/register, replace any residual stiffness.
 - **v1.0.0** — investor-demoable MVP: 25-intent predictable Kazakh dialog, multi-turn session state, FST-guaranteed morphology, native-speaker-reviewed templates, end-to-end Rust stack.
 
 ## Out of near-term scope

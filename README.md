@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.8.5-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.0-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,55 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.9.0 — Full entity absorption (age, city, occupation)
+
+Every MVP social-topic statement now contributes an extractable entity that persists across turns. The user tells the model their age once — it remembers. Says where they're from — remembers. Names their occupation — remembers. Templates personalise accordingly.
+
+```
+$ adam_chat
+> менің атым Дәулет
+сәлем Дәулет
+> менің жасым отыз
+30 жас — тамаша кезең
+> мен Алматыданмын
+Алматы — әдемі қала
+> мен мұғаліммін
+мұғалім — құрметті кәсіп
+```
+
+Session now carries `{name, age, city, occupation}`.
+
+### Kazakh numeral parser
+
+`semantics::parse_kazakh_age` parses 1–99:
+
+| form | value |
+|---|---|
+| `бір` | 1 |
+| `он` | 10 |
+| `отыз` | 30 |
+| `отыз бес` | 35 (compound) |
+| `тоқсан тоғыз` | 99 |
+| `"30"` | 30 (literal digits also accepted) |
+
+### Entity extraction rules
+
+- **Age** — numeral parsed from any token in a 1st-person age statement.
+- **City** — ablative+copula or locative stripped from the token:
+  - `Алматыданмын` → `Алматы`
+  - `астанада тұрамын` → `астана`
+- **Occupation** — 1sg copula stripped from a fixed table of known occupation forms (extensible): `мұғалім, дәрігер, студент, инженер, оқушы, жұмысшы`.
+
+### Intent payload changes (breaking)
+
+```rust
+Intent::StatementOfAge { years: Option<u32> }
+Intent::StatementOfLocation { city: Option<String> }
+Intent::StatementOfOccupation { occupation: Option<String> }
+```
+
+52 dialog end-to-end tests (up from 44). Workspace totals: **215 passing**, 4 ignored, 0 failing.
 
 ## v0.8.5 — Multi-turn session state
 

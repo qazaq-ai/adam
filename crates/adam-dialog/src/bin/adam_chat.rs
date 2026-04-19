@@ -1,5 +1,5 @@
 //! `adam-chat` — interactive REPL demo of the predictable Kazakh dialog
-//! pipeline (v0.8.5 MVP — 25 intents + session state).
+//! pipeline (v0.9.0 MVP — 25 intents + session state + entity absorption).
 //!
 //! Usage:
 //!   adam_chat                — interactive REPL on stdin
@@ -57,7 +57,7 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!("adam-chat v0.8.5 — пікірлесейік! Type a Kazakh sentence; ^D to quit.");
+    eprintln!("adam-chat v0.9.0 — пікірлесейік! Type a Kazakh sentence; ^D to quit.");
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut conv = Conversation::new();
@@ -120,12 +120,27 @@ fn run_turn(
     }
 }
 
-/// Mirror of `Conversation::absorb_entities` — duplicated here for the
-/// trace path. Kept tiny on purpose: when it grows, extract as a
-/// `pub(crate)` helper on Conversation.
+/// Mirror of `Conversation::absorb_entities` for the --trace path
+/// (external binary can't call pub(crate)). Keep in lockstep with the
+/// in-crate version when adding new entity types.
 fn absorb_into(conv: &mut Conversation, intent: &adam_dialog::Intent) {
-    if let adam_dialog::Intent::StatementOfName { name } = intent {
-        conv.session.insert("name".into(), name.clone());
+    use adam_dialog::Intent;
+    match intent {
+        Intent::StatementOfName { name } => {
+            conv.session.insert("name".into(), name.clone());
+        }
+        Intent::StatementOfAge { years: Some(years) } => {
+            conv.session.insert("age".into(), years.to_string());
+        }
+        Intent::StatementOfLocation { city: Some(city) } => {
+            conv.session.insert("city".into(), city.clone());
+        }
+        Intent::StatementOfOccupation {
+            occupation: Some(occupation),
+        } => {
+            conv.session.insert("occupation".into(), occupation.clone());
+        }
+        _ => {}
     }
 }
 

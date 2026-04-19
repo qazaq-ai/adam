@@ -273,7 +273,13 @@ fn response_ask_age() {
 fn response_statement_of_age() {
     assert_response_with_toml(
         "менің жасым отыз",
-        &["түсіндім", "жасыңыз келісті", "жақсы жас"],
+        &[
+            "түсіндім",
+            "жасыңыз келісті",
+            "жақсы жас",
+            "30 жас — тамаша кезең",
+            "жасыңыз 30 екен",
+        ],
     );
 }
 
@@ -293,7 +299,13 @@ fn response_ask_location() {
 fn response_statement_of_location() {
     assert_response_with_toml(
         "мен Алматыданмын",
-        &["түсіндім", "жақсы жер", "әдемі аймақ"],
+        &[
+            "түсіндім",
+            "жақсы жер",
+            "әдемі аймақ",
+            "Алматы — әдемі қала",
+            "Алматы туралы көп естідім",
+        ],
     );
 }
 
@@ -313,7 +325,13 @@ fn response_ask_occupation() {
 fn response_statement_of_occupation() {
     assert_response_with_toml(
         "мен мұғаліммін",
-        &["жақсы кәсіп", "мақтанышпен", "сәттілік тілеймін"],
+        &[
+            "жақсы кәсіп",
+            "мақтанышпен",
+            "сәттілік тілеймін",
+            "мұғалім — құрметті кәсіп",
+            "сіз мұғалім екенсіз",
+        ],
     );
 }
 
@@ -439,6 +457,95 @@ fn conversation_without_name_never_emits_unfilled_greeting() {
             "unexpected greeting w/o name: {out:?}"
         );
     }
+}
+
+#[test]
+fn intent_statement_of_age_parses_kazakh_numeral() {
+    let got = interpret_text("менің жасым отыз", &[]);
+    assert_eq!(got, Intent::StatementOfAge { years: Some(30) });
+}
+
+#[test]
+fn intent_statement_of_age_parses_compound_numeral() {
+    let got = interpret_text("менің жасым отыз бес", &[]);
+    assert_eq!(got, Intent::StatementOfAge { years: Some(35) });
+}
+
+#[test]
+fn intent_statement_of_age_without_numeral_still_fires() {
+    let got = interpret_text("жасым жасырын", &[]);
+    assert_eq!(got, Intent::StatementOfAge { years: None });
+}
+
+#[test]
+fn intent_statement_of_location_extracts_city_from_ablative() {
+    let got = interpret_text("мен Алматыданмын", &[]);
+    assert_eq!(
+        got,
+        Intent::StatementOfLocation {
+            city: Some("Алматы".into())
+        }
+    );
+}
+
+#[test]
+fn intent_statement_of_location_extracts_city_from_locative() {
+    let got = interpret_text("астанада тұрамын", &[]);
+    assert_eq!(
+        got,
+        Intent::StatementOfLocation {
+            city: Some("астана".into())
+        }
+    );
+}
+
+#[test]
+fn intent_statement_of_occupation_extracts_root() {
+    let got = interpret_text("мен мұғаліммін", &[]);
+    assert_eq!(
+        got,
+        Intent::StatementOfOccupation {
+            occupation: Some("мұғалім".into())
+        }
+    );
+}
+
+#[test]
+fn conversation_absorbs_age_city_occupation() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    let _ = conv.turn("менің жасым отыз", &lex, &repo, 0);
+    assert_eq!(conv.session.get("age"), Some(&"30".to_string()));
+
+    let _ = conv.turn("мен Алматыданмын", &lex, &repo, 0);
+    assert_eq!(conv.session.get("city"), Some(&"Алматы".to_string()));
+
+    let _ = conv.turn("мен мұғаліммін", &lex, &repo, 0);
+    assert_eq!(conv.session.get("occupation"), Some(&"мұғалім".to_string()));
+}
+
+#[test]
+fn conversation_age_slot_appears_in_personalised_template() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    // Explore the template space — one seed should pick a
+    // {age}-referencing variant.
+    let mut saw_personalised = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("менің жасым отыз", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        if out.contains("30") {
+            saw_personalised = true;
+        }
+    }
+    assert!(
+        saw_personalised,
+        "expected at least one seed in 0..32 to pick a template containing 30"
+    );
 }
 
 #[test]

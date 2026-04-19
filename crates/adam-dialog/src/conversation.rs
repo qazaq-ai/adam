@@ -73,10 +73,28 @@ impl Conversation {
     }
 
     /// Extract persistent entities from an intent and push them into
-    /// the running session. v0.8.5 covers `{name}` only.
-    fn absorb_entities(&mut self, intent: &Intent) {
-        if let Intent::StatementOfName { name } = intent {
-            self.session.insert("name".into(), name.clone());
+    /// the running session.
+    ///
+    /// v0.8.5: `{name}` only.
+    /// v0.9.0: `{name}`, `{age}`, `{city}`, `{occupation}` — every
+    /// statement intent carrying an extractable entity contributes it.
+    pub(crate) fn absorb_entities(&mut self, intent: &Intent) {
+        match intent {
+            Intent::StatementOfName { name } => {
+                self.session.insert("name".into(), name.clone());
+            }
+            Intent::StatementOfAge { years: Some(years) } => {
+                self.session.insert("age".into(), years.to_string());
+            }
+            Intent::StatementOfLocation { city: Some(city) } => {
+                self.session.insert("city".into(), city.clone());
+            }
+            Intent::StatementOfOccupation {
+                occupation: Some(occupation),
+            } => {
+                self.session.insert("occupation".into(), occupation.clone());
+            }
+            _ => {}
         }
     }
 

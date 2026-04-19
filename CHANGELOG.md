@@ -2,6 +2,65 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.9.0] — 2026-04-19
+
+Full entity absorption: every social-topic statement now contributes an extractable entity to session state. Age is parsed from Kazakh numerals (1–99), city from ablative/locative case stripping, occupation from 1sg-copula stripping.
+
+### Intent payload changes (breaking)
+
+- `StatementOfAge` → `StatementOfAge { years: Option<u32> }`
+- `StatementOfLocation` → `StatementOfLocation { city: Option<String> }`
+- `StatementOfOccupation` → `StatementOfOccupation { occupation: Option<String> }`
+
+`None` means the intent matched on keywords but the entity wasn't parseable ("жасым жасырын").
+
+### Numeral parser
+
+`semantics::parse_kazakh_age` handles:
+
+- Bare tens: он (10), жиырма (20), отыз (30), қырық (40), елу (50), алпыс (60), жетпіс (70), сексен (80), тоқсан (90)
+- Bare units: бір (1) … тоғыз (9)
+- Compound forms: "отыз бес" (35), "жиырма екі" (22)
+- Literal digit strings: "30"
+
+### Entity extraction
+
+- `StatementOfLocation`: strips ablative+copula (`-данмын/-денмін/-танмын/-тенмін`) or locative (`-да/-де/-та/-те`) to recover the city root. Preserves original casing: "Алматыданмын" → "Алматы"; "астанада тұрамын" → "астана".
+- `StatementOfOccupation`: matches a fixed table of 1sg-copula forms and emits the stripped noun root: "мұғаліммін" → "мұғалім".
+
+### Session wiring
+
+- `Conversation::absorb_entities` and `planner::extract_slots` both consume the new fields and populate `{age}`, `{city}`, `{occupation}` slots (in addition to `{name}` from v0.8.5).
+- Once absorbed, the entities persist across turns just like `{name}` does.
+
+### Templates (TOML v0.9.0)
+
+New personalised variants in `statement_of_age`, `statement_of_location`, `statement_of_occupation`:
+
+- `statement_of_age`: `"{age} жас — тамаша кезең"`, `"жасыңыз {age} екен"`
+- `statement_of_location`: `"{city} — әдемі қала"`, `"{city} туралы көп естідім"`
+- `statement_of_occupation`: `"{occupation} — құрметті кәсіп"`, `"сіз {occupation} екенсіз"`
+
+Only eligible when the slot can be filled; untouched by templates stay canonical for utterances without extractable entities.
+
+### Tests
+
+52 dialog end-to-end pairs (up from 44), 8 new:
+
+- 3 intent tests covering age numeral parsing (bare, compound, none)
+- 2 location extraction tests (ablative + locative)
+- 1 occupation extraction test
+- 1 multi-turn absorption test (age+city+occupation into session)
+- 1 multi-turn personalisation test (numeral appears in response)
+
+Workspace: **215 passing**, 4 ignored, 0 failing.
+
+### Known v0.9.0 limitations
+
+- Occupation extraction uses a fixed 6-form table. Regular 1sg-copula stripping via FST lookup lands in v0.9.5 together with `{root|features}` slot expansion.
+- Location extraction is surface-pattern only — no FST lookup yet, so misspelt or inflected cities ("Қызылордаданмын") get a raw root rather than normalised lexicon lemma.
+- No cross-slot templates yet (`"{name}, сіз {age} жастасыз ба?"` — possible but unwritten).
+
 ## [0.8.5] — 2026-04-19
 
 First session state in the dialog layer. The new [`Conversation`] struct accumulates entities across turns, so a user who introduces themselves once gets greeted by name on every subsequent turn.

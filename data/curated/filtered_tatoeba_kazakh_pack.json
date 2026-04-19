@@ -1,0 +1,5880 @@
+{
+  "attribution": "Tatoeba.org contributors (CC-BY 2.0 FR)",
+  "name": "filtered-adam-tatoeba-kazakh-pack",
+  "sample_count": 733,
+  "samples": [
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00011",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_437445",
+      "tatoeba_sentence_id": 437445,
+      "text": "Алдын ала төлемсіз ал да, артық төлемсіз төле."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00015",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_438574",
+      "tatoeba_sentence_id": 438574,
+      "text": "Батар күннің атар таңы бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00030",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1356844",
+      "tatoeba_sentence_id": 1356844,
+      "text": "Ол өзенде батып кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00040",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1356871",
+      "tatoeba_sentence_id": 1356871,
+      "text": "Ол оның қолынан ұстады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00041",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1356872",
+      "tatoeba_sentence_id": 1356872,
+      "text": "Сұрақ қою үшін қолын көтерді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00053",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1358719",
+      "tatoeba_sentence_id": 1358719,
+      "text": "Бұл ештеңені де өзгертпейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00056",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1358739",
+      "tatoeba_sentence_id": 1358739,
+      "text": "Мен оларға ертең соғамын, үйге келген соң."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00058",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1358747",
+      "tatoeba_sentence_id": 1358747,
+      "text": "Өкінішке орай, бұл шындық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00063",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1358777",
+      "tatoeba_sentence_id": 1358777,
+      "text": "Жоқ, мен емес, сен!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00068",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1358811",
+      "tatoeba_sentence_id": 1358811,
+      "text": "Уақытта әрқашан да табуға болады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00070",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1358822",
+      "tatoeba_sentence_id": 1358822,
+      "text": "Қанша жақын достарың бар?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00074",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1358843",
+      "tatoeba_sentence_id": 1358843,
+      "text": "Сен түсінбейтін проблема бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00075",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1358851",
+      "tatoeba_sentence_id": 1358851,
+      "text": "Бұл маған ұнаған жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00090",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1358918",
+      "tatoeba_sentence_id": 1358918,
+      "text": "Бұл маған өте ұнайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00110",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1517424",
+      "tatoeba_sentence_id": 1517424,
+      "text": "Бір, үш және бес - тақ сандар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00111",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1517444",
+      "tatoeba_sentence_id": 1517444,
+      "text": "Менде бір аға және екі қарындас бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00112",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1517447",
+      "tatoeba_sentence_id": 1517447,
+      "text": "Менде бір аға және екі сіңлі бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00114",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1518337",
+      "tatoeba_sentence_id": 1518337,
+      "text": "Бізде төрткіл үстел бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00128",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1518810",
+      "tatoeba_sentence_id": 1518810,
+      "text": "Мен жиырма төрт жастамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00141",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1520175",
+      "tatoeba_sentence_id": 1520175,
+      "text": "Сіз қашан базарға барасыз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00144",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1520206",
+      "tatoeba_sentence_id": 1520206,
+      "text": "Сіз оны білесіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00145",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1520209",
+      "tatoeba_sentence_id": 1520209,
+      "text": "Ол қайда жұмыс істейді?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00165",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1520939",
+      "tatoeba_sentence_id": 1520939,
+      "text": "Індет көп елді жайлады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00170",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1520957",
+      "tatoeba_sentence_id": 1520957,
+      "text": "Мен одан ертерек келдім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00177",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1520984",
+      "tatoeba_sentence_id": 1520984,
+      "text": "Ол жұмысқа немқұрайды қарайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00182",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1521708",
+      "tatoeba_sentence_id": 1521708,
+      "text": "Бүгін мен ерте тұрдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00184",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1521725",
+      "tatoeba_sentence_id": 1521725,
+      "text": "Біз ескі пәтерде тұрамыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00196",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1523006",
+      "tatoeba_sentence_id": 1523006,
+      "text": "Тіл - кілті көңілдің."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00202",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1523036",
+      "tatoeba_sentence_id": 1523036,
+      "text": "Бие көп болса, құлын көп."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00206",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1523051",
+      "tatoeba_sentence_id": 1523051,
+      "text": "Қалтасында тиыны жоқ, түйенің тісін ашып көреді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00211",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1523068",
+      "tatoeba_sentence_id": 1523068,
+      "text": "Жеті рет өлшеп, бір рет кес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00213",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1523077",
+      "tatoeba_sentence_id": 1523077,
+      "text": "Бір жылға қоян терісі де шыдайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00219",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1526951",
+      "tatoeba_sentence_id": 1526951,
+      "text": "Құтты қонақ келсе, қой егіз табады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00224",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1527239",
+      "tatoeba_sentence_id": 1527239,
+      "text": "Олар соғыста қаза болғандарды әскери дәстүр бойынша қойып еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00229",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1527275",
+      "tatoeba_sentence_id": 1527275,
+      "text": "Оның пікіріне мен де қосыламын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00237",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1527330",
+      "tatoeba_sentence_id": 1527330,
+      "text": "Ол уәдесінде тұрмайтын адам екен."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00242",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1527355",
+      "tatoeba_sentence_id": 1527355,
+      "text": "Сазда тұтқырлық қасиет бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00245",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1527372",
+      "tatoeba_sentence_id": 1527372,
+      "text": "Ол айына қанша табады?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00247",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1527381",
+      "tatoeba_sentence_id": 1527381,
+      "text": "Ол сыланып-сыйпанады да жүреді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00256",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1527412",
+      "tatoeba_sentence_id": 1527412,
+      "text": "Ол қонаққа қой сойды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00265",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1528663",
+      "tatoeba_sentence_id": 1528663,
+      "text": "Ол маған ерік берді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00266",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1528669",
+      "tatoeba_sentence_id": 1528669,
+      "text": "Мен оған екі дүркін айттым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00267",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1528678",
+      "tatoeba_sentence_id": 1528678,
+      "text": "Жоқ нәрсеге егеспей-ақ қойыңдар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00279",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1528776",
+      "tatoeba_sentence_id": 1528776,
+      "text": "Ол аузынан сөзі түскен былжыр."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00282",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1528782",
+      "tatoeba_sentence_id": 1528782,
+      "text": "Олар бүктеп кетті ғой."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00283",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1528783",
+      "tatoeba_sentence_id": 1528783,
+      "text": "Күннің батысынан қара бұлт шықты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00295",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1528817",
+      "tatoeba_sentence_id": 1528817,
+      "text": "Бас көтерген екі баласы бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00297",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1529636",
+      "tatoeba_sentence_id": 1529636,
+      "text": "Ол допты торға түсірді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00299",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1529647",
+      "tatoeba_sentence_id": 1529647,
+      "text": "Аяқ киім маған шақ келді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00305",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1529805",
+      "tatoeba_sentence_id": 1529805,
+      "text": "Амалын тапқан қырғыннан да аман шығады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00313",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1530006",
+      "tatoeba_sentence_id": 1530006,
+      "text": "Ер бір рет өледі, қорқақ мың рет өледі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00319",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1533144",
+      "tatoeba_sentence_id": 1533144,
+      "text": "Қарттарға орын берейік, жастар!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00328",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1533910",
+      "tatoeba_sentence_id": 1533910,
+      "text": "Ол басқа мәселеге көшті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00329",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1533940",
+      "tatoeba_sentence_id": 1533940,
+      "text": "Бақыттың кілті достықта, достықтың кілті халықта."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00347",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1534035",
+      "tatoeba_sentence_id": 1534035,
+      "text": "Ақпанда оған он жеті жас толады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00354",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1534058",
+      "tatoeba_sentence_id": 1534058,
+      "text": "Оның төбесі көкке жетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00368",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1535261",
+      "tatoeba_sentence_id": 1535261,
+      "text": "Бүгін жаңбыр болуы мүмкін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00371",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1535264",
+      "tatoeba_sentence_id": 1535264,
+      "text": "Кеше өте суық болды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00374",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1535267",
+      "tatoeba_sentence_id": 1535267,
+      "text": "Таңертең өте суық болды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00376",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1535269",
+      "tatoeba_sentence_id": 1535269,
+      "text": "Мен бүгін көп жұмыс тындырдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00379",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1535277",
+      "tatoeba_sentence_id": 1535277,
+      "text": "Ол халықтың сүйікті әншісі болды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00387",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1545806",
+      "tatoeba_sentence_id": 1545806,
+      "text": "Тұндырманы салқын жерде үш тәуліктен асырмай сақтайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00389",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1547764",
+      "tatoeba_sentence_id": 1547764,
+      "text": "Əрине, көп қателер болатын шығар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00393",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1548633",
+      "tatoeba_sentence_id": 1548633,
+      "text": "Қиын шақта көмектескен сыныптастарыма рақмет!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00394",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1548650",
+      "tatoeba_sentence_id": 1548650,
+      "text": "Өткен жылы маған жақын адам дүниеден өтті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00398",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1549861",
+      "tatoeba_sentence_id": 1549861,
+      "text": "Музыка – құдайдың берген сыйы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00415",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1550936",
+      "tatoeba_sentence_id": 1550936,
+      "text": "Кешкі тамақ ішесің бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00417",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1550942",
+      "tatoeba_sentence_id": 1550942,
+      "text": "Жақын жердегі дүкен қайда?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00419",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1550946",
+      "tatoeba_sentence_id": 1550946,
+      "text": "Сіз қандай тілдерді білесіз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00429",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1553018",
+      "tatoeba_sentence_id": 1553018,
+      "text": "2012 жылдың 28 сәуір күні жұмыс уақыты 1 сағатқа қысқартылады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00431",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1553068",
+      "tatoeba_sentence_id": 1553068,
+      "text": "Ол қазақ тілін білмейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00440",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1556742",
+      "tatoeba_sentence_id": 1556742,
+      "text": "Сен кеше жұмыс істедің бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00441",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1556748",
+      "tatoeba_sentence_id": 1556748,
+      "text": "Бір сағатта алпыс минут бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00443",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1556788",
+      "tatoeba_sentence_id": 1556788,
+      "text": "Осы шай өте жақсы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00448",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558470",
+      "tatoeba_sentence_id": 1558470,
+      "text": "Ол өте сараң адам."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00450",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558476",
+      "tatoeba_sentence_id": 1558476,
+      "text": "Сіз оның күшіне сенбеңіз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00454",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558485",
+      "tatoeba_sentence_id": 1558485,
+      "text": "Оны сұмдар алдап кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00456",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558490",
+      "tatoeba_sentence_id": 1558490,
+      "text": "Ол өте сенімді адам."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00458",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558494",
+      "tatoeba_sentence_id": 1558494,
+      "text": "Оны сұмдар айландырып алды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00460",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558498",
+      "tatoeba_sentence_id": 1558498,
+      "text": "Мен өзіме бір серік таптым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00466",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558510",
+      "tatoeba_sentence_id": 1558510,
+      "text": "Олар өртті сөндіре бастады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00468",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558515",
+      "tatoeba_sentence_id": 1558515,
+      "text": "Ол жорыққа өзі сұранды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00469",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558517",
+      "tatoeba_sentence_id": 1558517,
+      "text": "Ол сұм болып шықты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00477",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1558537",
+      "tatoeba_sentence_id": 1558537,
+      "text": "Бір әйелдің мекерлігі қырық есекке жүк болыпты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00490",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1559096",
+      "tatoeba_sentence_id": 1559096,
+      "text": "Мен үйімде оны шақырдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00495",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1559149",
+      "tatoeba_sentence_id": 1559149,
+      "text": "Мен оның мекен-жайы білмеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00500",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1559611",
+      "tatoeba_sentence_id": 1559611,
+      "text": "Түйе сусыз, жемсіз ұзақ уақыт жүре алады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00507",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1559633",
+      "tatoeba_sentence_id": 1559633,
+      "text": "Рақмет, жақсы. Сіз қалайсыз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00522",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1560487",
+      "tatoeba_sentence_id": 1560487,
+      "text": "Ешкім де, ешнәрсе де ұмытылмақ емес!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00523",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1560490",
+      "tatoeba_sentence_id": 1560490,
+      "text": "Сіздің немерелеріңіз бар ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00562",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1561579",
+      "tatoeba_sentence_id": 1561579,
+      "text": "Венгрия 1955 жылдан БҰҰ мүшесі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00574",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1563817",
+      "tatoeba_sentence_id": 1563817,
+      "text": "Осы тұста құдық болу керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00579",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1563861",
+      "tatoeba_sentence_id": 1563861,
+      "text": "Достың сөзі - үлкен қуат."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00583",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1563905",
+      "tatoeba_sentence_id": 1563905,
+      "text": "Ол көшеде қыдырып жүр."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00587",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1563944",
+      "tatoeba_sentence_id": 1563944,
+      "text": "Ол малға жұқпалы ауруларға қарсы егеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00598",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1564117",
+      "tatoeba_sentence_id": 1564117,
+      "text": "Бос уақытта мен гитар тартамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00599",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1564119",
+      "tatoeba_sentence_id": 1564119,
+      "text": "Терезе әйнектеріне күн шағылысады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00603",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1564132",
+      "tatoeba_sentence_id": 1564132,
+      "text": "Бос уақытта мен тақпақ жазамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00605",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1564139",
+      "tatoeba_sentence_id": 1564139,
+      "text": "Оларға үнемі көңіл бөлуге уақыт болмайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00614",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1564256",
+      "tatoeba_sentence_id": 1564256,
+      "text": "Бүгін аптаның қай күні?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00616",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1564265",
+      "tatoeba_sentence_id": 1564265,
+      "text": "Балалар, біз бүгін ертегілер әлеміне саяхат жасаймыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00626",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1564962",
+      "tatoeba_sentence_id": 1564962,
+      "text": "Жақсы нәрселер туралы ойлаңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00631",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565312",
+      "tatoeba_sentence_id": 1565312,
+      "text": "Бұл тұмар ұрпақтан ұрпаққа жеткізеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00639",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565354",
+      "tatoeba_sentence_id": 1565354,
+      "text": "Ол уақытты зая жібермейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00640",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565356",
+      "tatoeba_sentence_id": 1565356,
+      "text": "Ол қосақ арасында бос кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00642",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565360",
+      "tatoeba_sentence_id": 1565360,
+      "text": "Ол ауызына әлі жетпейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00650",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565379",
+      "tatoeba_sentence_id": 1565379,
+      "text": "Дос басқа қарайды, дұшпан аяққа қарады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00655",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565390",
+      "tatoeba_sentence_id": 1565390,
+      "text": "Тамақ бәрімізге де жетеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00656",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565392",
+      "tatoeba_sentence_id": 1565392,
+      "text": "Оған туған жерінен топырақ бұйырды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00663",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565405",
+      "tatoeba_sentence_id": 1565405,
+      "text": "Ол балаларын мықтап тұтады екен."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00668",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565415",
+      "tatoeba_sentence_id": 1565415,
+      "text": "Өтпес пышақ қол кесер."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00670",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565423",
+      "tatoeba_sentence_id": 1565423,
+      "text": "Жоғалған атын қарап жүр."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00672",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565428",
+      "tatoeba_sentence_id": 1565428,
+      "text": "Ол есік жаққа қарады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00678",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565440",
+      "tatoeba_sentence_id": 1565440,
+      "text": "Қараудың қазынасы қарғаға бұйырар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00686",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565457",
+      "tatoeba_sentence_id": 1565457,
+      "text": "Бұл жерге үлкен зауыт құрамыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00687",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565459",
+      "tatoeba_sentence_id": 1565459,
+      "text": "Сот қылмыстыны жеті жылға кесті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00694",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565484",
+      "tatoeba_sentence_id": 1565484,
+      "text": "Дұшпандар ел шабуға көшті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00695",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565486",
+      "tatoeba_sentence_id": 1565486,
+      "text": "Баланың іші өтіп жүр."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00702",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565590",
+      "tatoeba_sentence_id": 1565590,
+      "text": "Шеге қабырғаға тереңдеп кірді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00712",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565613",
+      "tatoeba_sentence_id": 1565613,
+      "text": "Ол үш үйректі қабаттатып түсірді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00727",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565753",
+      "tatoeba_sentence_id": 1565753,
+      "text": "Оның сөзін ешкім ұқпайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00735",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565783",
+      "tatoeba_sentence_id": 1565783,
+      "text": "\"Кіруге рұқсат па?\" \"Иә, кіріңізші.\""
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00742",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1565806",
+      "tatoeba_sentence_id": 1565806,
+      "text": "Екінші рет қайталап сұраймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00745",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1566442",
+      "tatoeba_sentence_id": 1566442,
+      "text": "Осылай болары айқын еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00746",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1566449",
+      "tatoeba_sentence_id": 1566449,
+      "text": "Мен оған сәлем айтып жібердім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00747",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1566453",
+      "tatoeba_sentence_id": 1566453,
+      "text": "Шын дос қиыншылықта танылады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00758",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1566483",
+      "tatoeba_sentence_id": 1566483,
+      "text": "Ол заттарын сыртқа тастап, өзі үйге кірді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00760",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1566488",
+      "tatoeba_sentence_id": 1566488,
+      "text": "Оның сөзін жерге тастама!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00763",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1566496",
+      "tatoeba_sentence_id": 1566496,
+      "text": "Жарық дүниеде адамның көрері көп."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00764",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1566499",
+      "tatoeba_sentence_id": 1566499,
+      "text": "Оның көретін жарығы бар екен."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00765",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1566501",
+      "tatoeba_sentence_id": 1566501,
+      "text": "Оның тісіне тас тиді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00769",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1566509",
+      "tatoeba_sentence_id": 1566509,
+      "text": "Қатты жерге қақ тұрады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00772",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1567004",
+      "tatoeba_sentence_id": 1567004,
+      "text": "Мен қалжыңдап тұрмын, сен оны шын көрдің."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00774",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1567008",
+      "tatoeba_sentence_id": 1567008,
+      "text": "Соң күлген, оң күледі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00779",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569180",
+      "tatoeba_sentence_id": 1569180,
+      "text": "Мен дүкенде бес кез мата алдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00786",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569207",
+      "tatoeba_sentence_id": 1569207,
+      "text": "Төбе шашы тік тұрды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00791",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569221",
+      "tatoeba_sentence_id": 1569221,
+      "text": "Ол кітапты күтіп ұстады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00802",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569251",
+      "tatoeba_sentence_id": 1569251,
+      "text": "Күн тас төбеге шықты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00826",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569303",
+      "tatoeba_sentence_id": 1569303,
+      "text": "Ол қос шырағынан айырылды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00830",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569447",
+      "tatoeba_sentence_id": 1569447,
+      "text": "Әкімшілігіміз сыйлыққа қаржы бөлді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00834",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569471",
+      "tatoeba_sentence_id": 1569471,
+      "text": "Бүгін Үкімет Үйінде ҚР Премьер-Министрі Кәрім Мәсімов Үкімет отырысын өткізді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00835",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569482",
+      "tatoeba_sentence_id": 1569482,
+      "text": "Мен демалысымды ауылда өткіздім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00838",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569496",
+      "tatoeba_sentence_id": 1569496,
+      "text": "Біздің шаруаларымыз мемлекетке астық өткізді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00839",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1569501",
+      "tatoeba_sentence_id": 1569501,
+      "text": "Ол кітапханаға кітап өткізді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00852",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575385",
+      "tatoeba_sentence_id": 1575385,
+      "text": "Егін ексең тыңға, шықтым дей бер шыңға."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00856",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575393",
+      "tatoeba_sentence_id": 1575393,
+      "text": "Мен өтірік айтсам, атар таңды көрмейін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00857",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575395",
+      "tatoeba_sentence_id": 1575395,
+      "text": "Қасқыр тайдың таңынан тартып кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00858",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575397",
+      "tatoeba_sentence_id": 1575397,
+      "text": "Мен бұл іске мен таңмын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00860",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575401",
+      "tatoeba_sentence_id": 1575401,
+      "text": "Ол маған алма берді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00862",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575405",
+      "tatoeba_sentence_id": 1575405,
+      "text": "Қала шұңқыр жерге салынған."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00871",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575431",
+      "tatoeba_sentence_id": 1575431,
+      "text": "Асқанға да тосқан бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00874",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575439",
+      "tatoeba_sentence_id": 1575439,
+      "text": "Олар етке лықиып тойдық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00880",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575456",
+      "tatoeba_sentence_id": 1575456,
+      "text": "Бұл туралы күдігім бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00888",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1575475",
+      "tatoeba_sentence_id": 1575475,
+      "text": "Сізге ұят емес пе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00901",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1578796",
+      "tatoeba_sentence_id": 1578796,
+      "text": "1977 жылдан бастап жыл Халықаралық мұражай күні сайын әлемнің 150-ден астам елінде атап өтіледі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00906",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1578826",
+      "tatoeba_sentence_id": 1578826,
+      "text": "67 жыл бұрын (1945) Қостанай облысында топографиялық-геодезиялық қызмет ұйымдастырылды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00909",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1578845",
+      "tatoeba_sentence_id": 1578845,
+      "text": "Ол Л.Гумилёв атындағы Еуразия ұлттық университетінің заң факультетін бітірген."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00927",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1585885",
+      "tatoeba_sentence_id": 1585885,
+      "text": "Олар бір-біріне ешқандай шағымдары жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00942",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1598602",
+      "tatoeba_sentence_id": 1598602,
+      "text": "Бұл шөпті медицинада қолданады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_00982",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1664959",
+      "tatoeba_sentence_id": 1664959,
+      "text": "Астанада өрт кезінде үш адамды күйік шалды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01006",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1685220",
+      "tatoeba_sentence_id": 1685220,
+      "text": "Ол өзінің наразылығын білдірді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01008",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1685267",
+      "tatoeba_sentence_id": 1685267,
+      "text": "Екі жасар қыз бала бесінші қабаттан құлап кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01016",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1685340",
+      "tatoeba_sentence_id": 1685340,
+      "text": "Оның жақсы жақтары аз емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01017",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1685344",
+      "tatoeba_sentence_id": 1685344,
+      "text": "Бұл жобаның кемшіліктері болды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01045",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1905698",
+      "tatoeba_sentence_id": 1905698,
+      "text": "Мына әңгіменің авторы кім?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01046",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_1905706",
+      "tatoeba_sentence_id": 1905706,
+      "text": "Мен тасбақаларды жақсы көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01050",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2001074",
+      "tatoeba_sentence_id": 2001074,
+      "text": "Нөл, бір, екі, үш, төрт, бес, алты, жеті, сегіз, тоғыз, он."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01061",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2077897",
+      "tatoeba_sentence_id": 2077897,
+      "text": "Сәби 12 желтоқсанға қараған түні дүние есігін ашты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01076",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2092351",
+      "tatoeba_sentence_id": 2092351,
+      "text": "Біз қателіктерден сабақ аламыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01100",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2102592",
+      "tatoeba_sentence_id": 2102592,
+      "text": "Адамға адам жат емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01101",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2102594",
+      "tatoeba_sentence_id": 2102594,
+      "text": "Кісіні кейде таршылық сынайды, кейде баршылық сынайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01102",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2102596",
+      "tatoeba_sentence_id": 2102596,
+      "text": "Күйесіз қазан жоқ, қайғысыз адам жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01105",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2102602",
+      "tatoeba_sentence_id": 2102602,
+      "text": "Туған жердің жуасы да тәтті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01134",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2137390",
+      "tatoeba_sentence_id": 2137390,
+      "text": "Теңіздің арғы жағы жылырақ, ал бізде жарығырақ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01151",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2229571",
+      "tatoeba_sentence_id": 2229571,
+      "text": "Тіс алты айлық жастан бастап өсе бастайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01152",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2229598",
+      "tatoeba_sentence_id": 2229598,
+      "text": "Тіс дәрігеріне бір жасқа толғанға дейін көрсетіңіз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01173",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2277591",
+      "tatoeba_sentence_id": 2277591,
+      "text": "Мен оның ымына түсіне қойдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01178",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2297402",
+      "tatoeba_sentence_id": 2297402,
+      "text": "Саябақта көп жануарлар бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01182",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2319671",
+      "tatoeba_sentence_id": 2319671,
+      "text": "Егер препаратты кездейсоқ жағдайда жоғарғы дозада қабылдаған болса, онда асқазанды шаю және құсқызу керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01189",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2363138",
+      "tatoeba_sentence_id": 2363138,
+      "text": "Көз - көңілдің айнасы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01190",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2363140",
+      "tatoeba_sentence_id": 2363140,
+      "text": "Көзден кетсе, көңілден кетеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01198",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2402465",
+      "tatoeba_sentence_id": 2402465,
+      "text": "25 сәуір - бүкіләлемдік безгекке қарсы күрес күні."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01212",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2414148",
+      "tatoeba_sentence_id": 2414148,
+      "text": "Өмірдің мәні - еңбекте."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01213",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2414150",
+      "tatoeba_sentence_id": 2414150,
+      "text": "Бұл үлкен өзгеріс - қоғам дамуының заңды құбылысы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01219",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2427110",
+      "tatoeba_sentence_id": 2427110,
+      "text": "Ол үйдің іргесінде тұр."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01225",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2427125",
+      "tatoeba_sentence_id": 2427125,
+      "text": "Олар түлкі індетіп жүр."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01227",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2427130",
+      "tatoeba_sentence_id": 2427130,
+      "text": "Ол сөзін іркілмей айтты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01229",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2427134",
+      "tatoeba_sentence_id": 2427134,
+      "text": "Ол бізді ілтипат еткен жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01233",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2427146",
+      "tatoeba_sentence_id": 2427146,
+      "text": "Ізін суытпай іздеу керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01239",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2427161",
+      "tatoeba_sentence_id": 2427161,
+      "text": "Көзінен жас ыршып-ыршып кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01250",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2428420",
+      "tatoeba_sentence_id": 2428420,
+      "text": "Сен оны білесің бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01253",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2428424",
+      "tatoeba_sentence_id": 2428424,
+      "text": "Ол мүмкіншілігін қолдана білді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01257",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2492273",
+      "tatoeba_sentence_id": 2492273,
+      "text": "Ағылшын тілін үйрену қиын емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01258",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2492277",
+      "tatoeba_sentence_id": 2492277,
+      "text": "Ағылшын тілін мектепте үйреніп алдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01262",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683348",
+      "tatoeba_sentence_id": 2683348,
+      "text": "Арба жолдың шетіне шығып кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01263",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683352",
+      "tatoeba_sentence_id": 2683352,
+      "text": "Арба кейін жылжып кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01264",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683354",
+      "tatoeba_sentence_id": 2683354,
+      "text": "Ол арқанды дуалдан асыра лақтырды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01276",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683389",
+      "tatoeba_sentence_id": 2683389,
+      "text": "Асүйден бір жағымсыз иіс келді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01283",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683410",
+      "tatoeba_sentence_id": 2683410,
+      "text": "Ауаға теңіздің иісі сіңіп кеткен."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01285",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683417",
+      "tatoeba_sentence_id": 2683417,
+      "text": "Ауру ешкімді де тани алмады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01290",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683429",
+      "tatoeba_sentence_id": 2683429,
+      "text": "Олар ауру адамды алма-кезек күзетеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01293",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683438",
+      "tatoeba_sentence_id": 2683438,
+      "text": "Аяз сүйектен өтіп кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01294",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683440",
+      "tatoeba_sentence_id": 2683440,
+      "text": "Аяз теріні қарып барады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01299",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2683780",
+      "tatoeba_sentence_id": 2683780,
+      "text": "Ұлтаралық татулықты бұзатын кез келген әрекет конституциялық емес деп танылады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01317",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2725719",
+      "tatoeba_sentence_id": 2725719,
+      "text": "Оның кітап оқуға көңілі ауды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01324",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2732520",
+      "tatoeba_sentence_id": 2732520,
+      "text": "Қайғы оны қажыта алмады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01326",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2732542",
+      "tatoeba_sentence_id": 2732542,
+      "text": "Ол күшті үш еселді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01327",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2732547",
+      "tatoeba_sentence_id": 2732547,
+      "text": "Сақалын сатқан кәріден, еңбегін сатқан бала артық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01344",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2732637",
+      "tatoeba_sentence_id": 2732637,
+      "text": "Барлығы бес көрме өткізілді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01373",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2743002",
+      "tatoeba_sentence_id": 2743002,
+      "text": "ҚР ҰҚК Шекара қызметі академиясында болашақ офицерлер әскери ант қабылдады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01375",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2743012",
+      "tatoeba_sentence_id": 2743012,
+      "text": "Қоғамдық қозғалыс зиялыларды түгел қамтыды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01378",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2743043",
+      "tatoeba_sentence_id": 2743043,
+      "text": "Бұл жерде ыза жақын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01394",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2744714",
+      "tatoeba_sentence_id": 2744714,
+      "text": "Түзету әрекеті – технологиялық үдеріске әсер ететін сәйкессіздікті, ақауларды немесе болымсыз жағдайларды жоюға арналған әрекет."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01434",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2748293",
+      "tatoeba_sentence_id": 2748293,
+      "text": "Оның қорытындысы бойынша бірқатар шығындарды қысқарту ұсынылды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01452",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2748368",
+      "tatoeba_sentence_id": 2748368,
+      "text": "Ал қазір солтүстікте науқанның нағыз қызған шағы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01459",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2748387",
+      "tatoeba_sentence_id": 2748387,
+      "text": "Қамқорлық және қайырымдылық жасайтын бөлім өкілдері қыз баланы «Кәмелетке толмаған балалар және жасөспірімдерге арналған қамқорлық үйіне» жіберді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01460",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2748389",
+      "tatoeba_sentence_id": 2748389,
+      "text": "Анасына қатысты баланы тәрбиелеу бойынша міндеттерін орындамау бойынша әкімшілік іс қозғалды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01578",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2802665",
+      "tatoeba_sentence_id": 2802665,
+      "text": "Бұл міндетті де шешу қолдан келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01580",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2810272",
+      "tatoeba_sentence_id": 2810272,
+      "text": "Алмастырылатын амин қышқылдарына жатады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01596",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2812441",
+      "tatoeba_sentence_id": 2812441,
+      "text": "Сұраққа жауап беретін бұл дәуірдің басқа шахмат заттары Қазақстанда табылған жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01602",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2812467",
+      "tatoeba_sentence_id": 2812467,
+      "text": "Және бұл кездейсоқ емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01606",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2812482",
+      "tatoeba_sentence_id": 2812482,
+      "text": "Кінәлі адам тоғыз ірі қара төледі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01608",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2812488",
+      "tatoeba_sentence_id": 2812488,
+      "text": "Және де бір таңғаларлығы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01680",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2816413",
+      "tatoeba_sentence_id": 2816413,
+      "text": "Бортта тіршілікті қамтамасыз ету тоқтады, көмірқышқыл газы мөлшерден 30 есе асып кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01756",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2839179",
+      "tatoeba_sentence_id": 2839179,
+      "text": "Ол испанша жақсы сөйледі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01768",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2844399",
+      "tatoeba_sentence_id": 2844399,
+      "text": "Күн, оның шұғыласы, қыран және ұлттық өрнек бейнесі алтын түстес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01774",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2846179",
+      "tatoeba_sentence_id": 2846179,
+      "text": "Техникалық проблемалар туындаған жағдайда техникалық қолдау қызметіне жүгініңіз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01775",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2864642",
+      "tatoeba_sentence_id": 2864642,
+      "text": "Бұрын сен қайда болдың?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01776",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2864645",
+      "tatoeba_sentence_id": 2864645,
+      "text": "Соғыс кезінде сен қайда болдың?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01777",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2864665",
+      "tatoeba_sentence_id": 2864665,
+      "text": "Жалпы, бұл пікір дұрыс."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01803",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2871905",
+      "tatoeba_sentence_id": 2871905,
+      "text": "Олар кенттер мен ауылдар да тарамады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01809",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2871927",
+      "tatoeba_sentence_id": 2871927,
+      "text": "Спортқа және зияткерлік ойындарға қоғамдық көзқарас өзгерді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01821",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2871956",
+      "tatoeba_sentence_id": 2871956,
+      "text": "Мұнда ол 1941 жылдың 22 маусымын қарсы алды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01831",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2903176",
+      "tatoeba_sentence_id": 2903176,
+      "text": "Мықты мемлекет экономикалық жедел өсу жағдайын қамтамасыз ету үшін аса маңызды болмақ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01838",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2903197",
+      "tatoeba_sentence_id": 2903197,
+      "text": "Бүгін дұрыс таңдау жасағанымыз туралы айту мен үшін үлкен абырой."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01847",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2903224",
+      "tatoeba_sentence_id": 2903224,
+      "text": "Біз ел Конституциясында негізгі құқықтар мен бостандықтарды бекіттік."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01851",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2903236",
+      "tatoeba_sentence_id": 2903236,
+      "text": "Кәсіпкерлік қызмет үшін негізгі талаптар мен заманауи салық жүйесі қалыптасты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01860",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_2981193",
+      "tatoeba_sentence_id": 2981193,
+      "text": "Ғарышқа саяхаттау жақын уақытта мүмкін болмақ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01868",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3000797",
+      "tatoeba_sentence_id": 3000797,
+      "text": "Қой шатқалдарда жайылып жүр."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01877",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3015178",
+      "tatoeba_sentence_id": 3015178,
+      "text": "Олар мұражайды аралауға кірісті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01883",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3087948",
+      "tatoeba_sentence_id": 3087948,
+      "text": "Олар шығынды сот арқылы өндіріп алды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01885",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3089328",
+      "tatoeba_sentence_id": 3089328,
+      "text": "Биыл бұл аймақтарда ылғал мөлшері қалыпты жағдайдан аз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01906",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3092424",
+      "tatoeba_sentence_id": 3092424,
+      "text": "Ол жерде ештеңе жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01907",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3092425",
+      "tatoeba_sentence_id": 3092425,
+      "text": "Біз онда бардық, бірақ түк таппады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01908",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3092426",
+      "tatoeba_sentence_id": 3092426,
+      "text": "Вьетнам ұшағы да жоғалған әуе кемесін таба алмаған."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01928",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3093870",
+      "tatoeba_sentence_id": 3093870,
+      "text": "Екі елдің қарым-қатынастары күн сайын қарқынды дамып келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01945",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3093904",
+      "tatoeba_sentence_id": 3093904,
+      "text": "Ұлыбританияда тікұшақ апатынан төрт адам қаза тапты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01950",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3102904",
+      "tatoeba_sentence_id": 3102904,
+      "text": "Бір патшаның алты ұлы бар екен."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01971",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3554470",
+      "tatoeba_sentence_id": 3554470,
+      "text": "Ауа райы өзгерді ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01972",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3554511",
+      "tatoeba_sentence_id": 3554511,
+      "text": "Мен бұл жерде жалғызбын ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01974",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3554514",
+      "tatoeba_sentence_id": 3554514,
+      "text": "Том жайлы көп білесіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01975",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3554515",
+      "tatoeba_sentence_id": 3554515,
+      "text": "Бостон жайлы көп білесіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01986",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3588224",
+      "tatoeba_sentence_id": 3588224,
+      "text": "Мен де өте қуаныштымын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01989",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3621055",
+      "tatoeba_sentence_id": 3621055,
+      "text": "Жаңа жыл құтты болсын!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_01996",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3685939",
+      "tatoeba_sentence_id": 3685939,
+      "text": "Ер бала мектепке барды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02000",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3689734",
+      "tatoeba_sentence_id": 3689734,
+      "text": "Мен бұл күнді ешқашан ұмытпаймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02004",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3817625",
+      "tatoeba_sentence_id": 3817625,
+      "text": "Суретте қанша адам бар?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02008",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3835514",
+      "tatoeba_sentence_id": 3835514,
+      "text": "Оның ақшасы жоқ екен."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02012",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_3839150",
+      "tatoeba_sentence_id": 3839150,
+      "text": "Мен тауықты жақсы көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02018",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4067330",
+      "tatoeba_sentence_id": 4067330,
+      "text": "Жаңа жылыңыз құтты болсын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02019",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4067336",
+      "tatoeba_sentence_id": 4067336,
+      "text": "Ол кітапты бір күнде оқып бітірді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02020",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4067340",
+      "tatoeba_sentence_id": 4067340,
+      "text": "Сен Томды сүйесің ғой, рас па?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02032",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4374869",
+      "tatoeba_sentence_id": 4374869,
+      "text": "Кітап дүкенінен кейбір кітаптар сатып алдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02033",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4374872",
+      "tatoeba_sentence_id": 4374872,
+      "text": "Оның суын ішіп аламын ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02050",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4440654",
+      "tatoeba_sentence_id": 4440654,
+      "text": "Мен барғанша, сен кетпе."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02064",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4452688",
+      "tatoeba_sentence_id": 4452688,
+      "text": "Жоқтық ұят емес, тоқтық мұрат емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02066",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4452695",
+      "tatoeba_sentence_id": 4452695,
+      "text": "Қазарсың арықты, көрерсің жарықты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02073",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4452727",
+      "tatoeba_sentence_id": 4452727,
+      "text": "Құсы жоқ болса, көл жетім, елі жоқ болса, жер жетім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02106",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4678073",
+      "tatoeba_sentence_id": 4678073,
+      "text": "Алма ағашынан алыс түспейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02108",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4685798",
+      "tatoeba_sentence_id": 4685798,
+      "text": "Жігіт кісіге жетпіс өнер де аз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02112",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4685843",
+      "tatoeba_sentence_id": 4685843,
+      "text": "Жақсы туса — елдің ырысы, жаңбыр жауса — жердің ырысы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02119",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4700193",
+      "tatoeba_sentence_id": 4700193,
+      "text": "Ол мәселені өзін шеш."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02120",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4700195",
+      "tatoeba_sentence_id": 4700195,
+      "text": "Ол әрқашан сәнді киімді киеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02125",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4700203",
+      "tatoeba_sentence_id": 4700203,
+      "text": "Таңертең мен ояндым және одан әрі ұйыктай алмадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02127",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4700207",
+      "tatoeba_sentence_id": 4700207,
+      "text": "Ол қарт кісіге орынды берді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02128",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4700210",
+      "tatoeba_sentence_id": 4700210,
+      "text": "Өткен аптада ағам он доллар қарызға берді, және осы күнге дейін қарызды қайтармадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02138",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4700357",
+      "tatoeba_sentence_id": 4700357,
+      "text": "Том тоқсан жасында қайтыс болды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02142",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_4857827",
+      "tatoeba_sentence_id": 4857827,
+      "text": "Оның жиырма баласы бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02153",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_5125289",
+      "tatoeba_sentence_id": 5125289,
+      "text": "Он сегіз нөл нөлде кешкі асты ішеміз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02183",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_5262174",
+      "tatoeba_sentence_id": 5262174,
+      "text": "Оған бұл туралы айтпа."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02199",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_5375988",
+      "tatoeba_sentence_id": 5375988,
+      "text": "Мен әлі жұмыс таппадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02202",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_5375992",
+      "tatoeba_sentence_id": 5375992,
+      "text": "Үш адам жеңіл жарақаттанды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02207",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_5376000",
+      "tatoeba_sentence_id": 5376000,
+      "text": "Ол жерге ешқашан барғым келмеген."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02209",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_5376004",
+      "tatoeba_sentence_id": 5376004,
+      "text": "Мен үшін қашан бір нәрсе жасап едің?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02217",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_5376034",
+      "tatoeba_sentence_id": 5376034,
+      "text": "Ол оған бір кітап берді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02227",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_6887567",
+      "tatoeba_sentence_id": 6887567,
+      "text": "Ол ең әдемі әйел."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02228",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_6887592",
+      "tatoeba_sentence_id": 6887592,
+      "text": "Сен мысыққа тамақты бердің бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02234",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_7889068",
+      "tatoeba_sentence_id": 7889068,
+      "text": "Бүгін Томның туған күні."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02235",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_7889069",
+      "tatoeba_sentence_id": 7889069,
+      "text": "Бүгін Томның туылған күні."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02245",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_7889510",
+      "tatoeba_sentence_id": 7889510,
+      "text": "Мен оны үш сағат бұрын ғана көрдім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02246",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_7889513",
+      "tatoeba_sentence_id": 7889513,
+      "text": "Том, АҚШ азаматтығын алды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02250",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_7889552",
+      "tatoeba_sentence_id": 7889552,
+      "text": "Том өте жақсы жігіт, солай емес пе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02257",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_7889570",
+      "tatoeba_sentence_id": 7889570,
+      "text": "Тек шындықты ғана айт."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02260",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_7889573",
+      "tatoeba_sentence_id": 7889573,
+      "text": "Ол әйел жалғыз өзі жұмыс істейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02277",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_7889669",
+      "tatoeba_sentence_id": 7889669,
+      "text": "Мысыққа тамақ бердің бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02278",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_7889671",
+      "tatoeba_sentence_id": 7889671,
+      "text": "Мен ертең үйге келген соң, оларға соғамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02286",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8008739",
+      "tatoeba_sentence_id": 8008739,
+      "text": "Том таңертең мұнда болуы мүмкін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02287",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8008817",
+      "tatoeba_sentence_id": 8008817,
+      "text": "Бір рет қана дауыс бере аласыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02289",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8008835",
+      "tatoeba_sentence_id": 8008835,
+      "text": "Том шараптың дәмін татты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02290",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8009367",
+      "tatoeba_sentence_id": 8009367,
+      "text": "Қыста жүзу сау адамдар үшін қауіпті емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02294",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8286080",
+      "tatoeba_sentence_id": 8286080,
+      "text": "Бұл оның жазуы емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02299",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8310651",
+      "tatoeba_sentence_id": 8310651,
+      "text": "Бұл қала әкімінің тікелей тапсырмасы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02307",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544860",
+      "tatoeba_sentence_id": 8544860,
+      "text": "Мен одан хат алдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02314",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544871",
+      "tatoeba_sentence_id": 8544871,
+      "text": "Томға ертең хат саламын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02315",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544872",
+      "tatoeba_sentence_id": 8544872,
+      "text": "Томға ертең хат жіберемін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02319",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544877",
+      "tatoeba_sentence_id": 8544877,
+      "text": "Том да ерте тұрды еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02322",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544880",
+      "tatoeba_sentence_id": 8544880,
+      "text": "Мен иттерді жақсы көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02332",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544891",
+      "tatoeba_sentence_id": 8544891,
+      "text": "Оны жек көрмеймін, бірақ жақсы да көрмеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02334",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544893",
+      "tatoeba_sentence_id": 8544893,
+      "text": "Мен сені жек көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02340",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544899",
+      "tatoeba_sentence_id": 8544899,
+      "text": "Мына әйелдің аты кім?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02343",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544902",
+      "tatoeba_sentence_id": 8544902,
+      "text": "Мен ірімшікті жақсы көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02344",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544903",
+      "tatoeba_sentence_id": 8544903,
+      "text": "Мұндай әзілдерді жақсы көрмеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02345",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8544904",
+      "tatoeba_sentence_id": 8544904,
+      "text": "Сушиді жақсы көресің бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02364",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8545369",
+      "tatoeba_sentence_id": 8545369,
+      "text": "Мұнда жұмыс істей аласың."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02368",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8545382",
+      "tatoeba_sentence_id": 8545382,
+      "text": "Сен мұнда тамақ ішпеу керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02375",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8545412",
+      "tatoeba_sentence_id": 8545412,
+      "text": "Ірімшік қанша теңге тұрады?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02388",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8780957",
+      "tatoeba_sentence_id": 8780957,
+      "text": "Спагеттині жақсы көресіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02392",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8780967",
+      "tatoeba_sentence_id": 8780967,
+      "text": "Су суық емес пе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02399",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8781125",
+      "tatoeba_sentence_id": 8781125,
+      "text": "Мұнда суық су бар ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02405",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8781158",
+      "tatoeba_sentence_id": 8781158,
+      "text": "Ол супермаркетке бара ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02406",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8781163",
+      "tatoeba_sentence_id": 8781163,
+      "text": "Үйде тамақ бар ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02407",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8781574",
+      "tatoeba_sentence_id": 8781574,
+      "text": "Шетелдіктерге қазақ тілін үйретемін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02408",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8781601",
+      "tatoeba_sentence_id": 8781601,
+      "text": "Сізде қосымша ақша бар ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02411",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8783151",
+      "tatoeba_sentence_id": 8783151,
+      "text": "Ол кітап оқып жүр."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02415",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8814843",
+      "tatoeba_sentence_id": 8814843,
+      "text": "Жаңа коронавирус өте жұқпалы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02416",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8814925",
+      "tatoeba_sentence_id": 8814925,
+      "text": "Ол он жыл бұрын үйленген."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02417",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_8835795",
+      "tatoeba_sentence_id": 8835795,
+      "text": "Бұл костюм қара емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02419",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9480635",
+      "tatoeba_sentence_id": 9480635,
+      "text": "Уақыт өте жылдам өтеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02424",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9638684",
+      "tatoeba_sentence_id": 9638684,
+      "text": "Шарап балалар үшін емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02429",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9644156",
+      "tatoeba_sentence_id": 9644156,
+      "text": "Сізге олар керек пе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02430",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9644158",
+      "tatoeba_sentence_id": 9644158,
+      "text": "Саған олар керек пе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02439",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868538",
+      "tatoeba_sentence_id": 9868538,
+      "text": "Бұл өте оптимистік көзқарас."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02443",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868548",
+      "tatoeba_sentence_id": 9868548,
+      "text": "Мен бұл жерді сағынатын боламын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02447",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868569",
+      "tatoeba_sentence_id": 9868569,
+      "text": "Олар қате есептеу арқылы құнды уақытты жоғалтты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02451",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868587",
+      "tatoeba_sentence_id": 9868587,
+      "text": "Мэри темекіні тастауға шешім қабылдады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02454",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868605",
+      "tatoeba_sentence_id": 9868605,
+      "text": "Сіз оған шындықты айтуыңыз керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02456",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868609",
+      "tatoeba_sentence_id": 9868609,
+      "text": "Том бізді күтіп тұрған жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02459",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868621",
+      "tatoeba_sentence_id": 9868621,
+      "text": "Ол асыл отбасында дүниеге келген."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02472",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868690",
+      "tatoeba_sentence_id": 9868690,
+      "text": "Ол осы құс туралы кітап жазды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02475",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868698",
+      "tatoeba_sentence_id": 9868698,
+      "text": "Оған күте тұруын айтыңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02481",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868709",
+      "tatoeba_sentence_id": 9868709,
+      "text": "Ешкім жұмыс жасағысы келмейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02482",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868710",
+      "tatoeba_sentence_id": 9868710,
+      "text": "Ол мұны қайдан естіді?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02484",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868712",
+      "tatoeba_sentence_id": 9868712,
+      "text": "Мэри мәңгі жас болғысы келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02485",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868713",
+      "tatoeba_sentence_id": 9868713,
+      "text": "Сіз кофені қашан ішесіз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02486",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868715",
+      "tatoeba_sentence_id": 9868715,
+      "text": "Мен бұл туралы ештеңе айтпауым керек еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02488",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868717",
+      "tatoeba_sentence_id": 9868717,
+      "text": "Мен славян тілдерін жақсы көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02497",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868726",
+      "tatoeba_sentence_id": 9868726,
+      "text": "Ол бізге қарағанда жақсы."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02499",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868729",
+      "tatoeba_sentence_id": 9868729,
+      "text": "Кейбір кемелер Еуропадан келген."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02501",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868732",
+      "tatoeba_sentence_id": 9868732,
+      "text": "Сіз бізді жеңе алмайсыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02503",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868736",
+      "tatoeba_sentence_id": 9868736,
+      "text": "Мен ағылшын тілін білмеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02507",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868745",
+      "tatoeba_sentence_id": 9868745,
+      "text": "Том мен Мэри қауіпсіз жерде."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02509",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868751",
+      "tatoeba_sentence_id": 9868751,
+      "text": "Мен де бейсболды жақсы көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02514",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868760",
+      "tatoeba_sentence_id": 9868760,
+      "text": "Біз бірнеше сағат жүрдік."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02516",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868762",
+      "tatoeba_sentence_id": 9868762,
+      "text": "Қазір Томды көре аламыз ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02519",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868765",
+      "tatoeba_sentence_id": 9868765,
+      "text": "Мен оны көруім керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02526",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868772",
+      "tatoeba_sentence_id": 9868772,
+      "text": "Мен оны өткен аптада сатып алдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02531",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868777",
+      "tatoeba_sentence_id": 9868777,
+      "text": "Сіз тым кеш келдіңіз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02532",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868778",
+      "tatoeba_sentence_id": 9868778,
+      "text": "Кешіріңіз, маған станцияға жол көрсете аласыз ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02539",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868798",
+      "tatoeba_sentence_id": 9868798,
+      "text": "Жақсы көріну үшін ол ағаштың басына шықты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02541",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868801",
+      "tatoeba_sentence_id": 9868801,
+      "text": "Бұл тек қаржылық себептер бойынша жасалды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02545",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868826",
+      "tatoeba_sentence_id": 9868826,
+      "text": "Біз бұл кітапты жаңа ғана оқыдық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02546",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868827",
+      "tatoeba_sentence_id": 9868827,
+      "text": "Ол бүгін бос емес екенін айтады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02547",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868828",
+      "tatoeba_sentence_id": 9868828,
+      "text": "Олардың ұлының аты - Том."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02550",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868837",
+      "tatoeba_sentence_id": 9868837,
+      "text": "Біз дұрыс емес жолда жүрміз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02553",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868847",
+      "tatoeba_sentence_id": 9868847,
+      "text": "Бұл туралы біреу біледі?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02556",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868851",
+      "tatoeba_sentence_id": 9868851,
+      "text": "Мен жасминнің хош иісін жақсы көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02559",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868864",
+      "tatoeba_sentence_id": 9868864,
+      "text": "Том ешкімді ренжіткісі келмеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02565",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868878",
+      "tatoeba_sentence_id": 9868878,
+      "text": "Сізде жасыл кітап бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02569",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868882",
+      "tatoeba_sentence_id": 9868882,
+      "text": "Сіз бұл балықты көрдіңіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02576",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868895",
+      "tatoeba_sentence_id": 9868895,
+      "text": "Мен мұны үйге апарамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02577",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868897",
+      "tatoeba_sentence_id": 9868897,
+      "text": "Мен көптеген қателіктер жібердім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02578",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868898",
+      "tatoeba_sentence_id": 9868898,
+      "text": "Бұл қате болған жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02580",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868901",
+      "tatoeba_sentence_id": 9868901,
+      "text": "Өмір жасыңыз ұзақ болсын!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02585",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868915",
+      "tatoeba_sentence_id": 9868915,
+      "text": "Ол кесеге сүт құйды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02586",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868917",
+      "tatoeba_sentence_id": 9868917,
+      "text": "Мен бүгін ештеңе жей алмаймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02588",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868919",
+      "tatoeba_sentence_id": 9868919,
+      "text": "Ол ештеңе көрмедім дейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02592",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868931",
+      "tatoeba_sentence_id": 9868931,
+      "text": "Бұл гитара өте қымбат болғандықтан, мен оны ала алмаймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02594",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868934",
+      "tatoeba_sentence_id": 9868934,
+      "text": "Мұнда көктемде жиі жаңбыр жауады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02601",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868949",
+      "tatoeba_sentence_id": 9868949,
+      "text": "Біз бұл жағдайдан шығудың жолын іздеуіміз керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02602",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868950",
+      "tatoeba_sentence_id": 9868950,
+      "text": "Сіз оны ұстай алмайсыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02606",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868957",
+      "tatoeba_sentence_id": 9868957,
+      "text": "Сізді адамдар көре алады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02614",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868968",
+      "tatoeba_sentence_id": 9868968,
+      "text": "Сіз мұны әдейі жасадыңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02615",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868969",
+      "tatoeba_sentence_id": 9868969,
+      "text": "Фудзи тауы өте әдемі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02619",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868977",
+      "tatoeba_sentence_id": 9868977,
+      "text": "Том апайына жиі барады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02620",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868978",
+      "tatoeba_sentence_id": 9868978,
+      "text": "Мен Томның әпкелерінің бірімін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02622",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868982",
+      "tatoeba_sentence_id": 9868982,
+      "text": "Том жұмысшылар кварталында тұрады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02623",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868983",
+      "tatoeba_sentence_id": 9868983,
+      "text": "Менде әлі көп нәрсе бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02626",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868996",
+      "tatoeba_sentence_id": 9868996,
+      "text": "Бізді жақын достық байланыстырады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02627",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9868999",
+      "tatoeba_sentence_id": 9868999,
+      "text": "Мен күн сайын бір нәрсені жеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02631",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869007",
+      "tatoeba_sentence_id": 9869007,
+      "text": "Бізге қосымша ақпарат қажет."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02632",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869008",
+      "tatoeba_sentence_id": 9869008,
+      "text": "Мен Томның өтірік айтқанын білдім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02636",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869017",
+      "tatoeba_sentence_id": 9869017,
+      "text": "Ертең оған баруды ұмытпаңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02638",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869019",
+      "tatoeba_sentence_id": 9869019,
+      "text": "Біз тоғанға жүзу үшін бардық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02640",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869021",
+      "tatoeba_sentence_id": 9869021,
+      "text": "Том кетті, бірақ ол қайтып келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02641",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869022",
+      "tatoeba_sentence_id": 9869022,
+      "text": "Томның мәлімдемесі мүлдем бос сөз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02642",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869023",
+      "tatoeba_sentence_id": 9869023,
+      "text": "Оның үйі кішкентай және ескі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02653",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869043",
+      "tatoeba_sentence_id": 9869043,
+      "text": "Мен туралы нақты не білесіз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02656",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869048",
+      "tatoeba_sentence_id": 9869048,
+      "text": "Бұл мүлдем мүмкін емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02661",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869065",
+      "tatoeba_sentence_id": 9869065,
+      "text": "Бүгін сейсенбі емес пе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02662",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869066",
+      "tatoeba_sentence_id": 9869066,
+      "text": "«Кім бұл?» - «Бұл Том.»"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02663",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869067",
+      "tatoeba_sentence_id": 9869067,
+      "text": "Мен өте жаман болдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02676",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869083",
+      "tatoeba_sentence_id": 9869083,
+      "text": "Сіз тақырып таңдадыңыз ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02677",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869084",
+      "tatoeba_sentence_id": 9869084,
+      "text": "Сіздің сүйікті композиторыңыз кім?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02684",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869092",
+      "tatoeba_sentence_id": 9869092,
+      "text": "Мен бұл шындыққа сенбеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02688",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869105",
+      "tatoeba_sentence_id": 9869105,
+      "text": "Сізде бұл кілт болмауы керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02690",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869110",
+      "tatoeba_sentence_id": 9869110,
+      "text": "Онда бір нәрсе латын тілінде жазылған, бірақ оны табу өте қиын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02692",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869114",
+      "tatoeba_sentence_id": 9869114,
+      "text": "Ол жыл сайын Ресейге анасымен бірге барады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02695",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869120",
+      "tatoeba_sentence_id": 9869120,
+      "text": "Біз оны біраз уақытқа жалғыз қалдыруға шешім қабылдадық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02696",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869122",
+      "tatoeba_sentence_id": 9869122,
+      "text": "Сіз өзін-өзі сынай бермейсіз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02703",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869139",
+      "tatoeba_sentence_id": 9869139,
+      "text": "Том мектептен бір сағат бұрын шыққан."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02706",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869170",
+      "tatoeba_sentence_id": 9869170,
+      "text": "Мен кім жеңетінін білмеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02708",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869175",
+      "tatoeba_sentence_id": 9869175,
+      "text": "Ол сабақта ұйықтап кетті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02709",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869191",
+      "tatoeba_sentence_id": 9869191,
+      "text": "Сіз ол жерге бара алмайсыз - бір жақты қозғалыс бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02714",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869354",
+      "tatoeba_sentence_id": 9869354,
+      "text": "Мен бұл сайтты өте пайдалы деп таптым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02715",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869355",
+      "tatoeba_sentence_id": 9869355,
+      "text": "Күн өзі үшін жарқырап тұрған жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02719",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869363",
+      "tatoeba_sentence_id": 9869363,
+      "text": "Том мұны тым жиі жасайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02722",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869367",
+      "tatoeba_sentence_id": 9869367,
+      "text": "Міне тағы бірнеше мысалдары."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02723",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869368",
+      "tatoeba_sentence_id": 9869368,
+      "text": "Егер біз мұны жасасақ, бұл одан әрі нашарлай түседі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02727",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869378",
+      "tatoeba_sentence_id": 9869378,
+      "text": "Ертең сабаққа сөздіктер алып келу керек пе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02729",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869392",
+      "tatoeba_sentence_id": 9869392,
+      "text": "Ол жоғалтқан сағатын тапты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02731",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869395",
+      "tatoeba_sentence_id": 9869395,
+      "text": "Том жарқын жарықта да, қатты дауыстарда да ояна алмады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02734",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869404",
+      "tatoeba_sentence_id": 9869404,
+      "text": "Сіздің сүйікті сусыныңыз қандай?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02736",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869411",
+      "tatoeba_sentence_id": 9869411,
+      "text": "Ол сөмкені үстелдің астына қойды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02739",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869435",
+      "tatoeba_sentence_id": 9869435,
+      "text": "Олар маған керек емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02741",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869443",
+      "tatoeba_sentence_id": 9869443,
+      "text": "Мен оған тәуекел ете алмаймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02744",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869450",
+      "tatoeba_sentence_id": 9869450,
+      "text": "Мен әлі де жалғызбын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02748",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869461",
+      "tatoeba_sentence_id": 9869461,
+      "text": "Өсімдіктер өсу үшін күн сәулесін қажет етеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02749",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869463",
+      "tatoeba_sentence_id": 9869463,
+      "text": "Сіз оларды тоқтата алмайсыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02756",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869484",
+      "tatoeba_sentence_id": 9869484,
+      "text": "Неліктен сіз өзіңіздің жасыңыз туралы өтірік айттыңыз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02757",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869486",
+      "tatoeba_sentence_id": 9869486,
+      "text": "Сіз Аяз Атаға хат жазып үлгердіңіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02760",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9869490",
+      "tatoeba_sentence_id": 9869490,
+      "text": "Биллдің көптеген достары бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02771",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871074",
+      "tatoeba_sentence_id": 9871074,
+      "text": "Мен жақсы кітап оқыдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02780",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871123",
+      "tatoeba_sentence_id": 9871123,
+      "text": "Сізде үлкен отбасы бар ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02787",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871193",
+      "tatoeba_sentence_id": 9871193,
+      "text": "Бізде бір күнде туған күндер болады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02788",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871194",
+      "tatoeba_sentence_id": 9871194,
+      "text": "Килограммында қанша фунт бар?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02789",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871195",
+      "tatoeba_sentence_id": 9871195,
+      "text": "Ол өте алыс жерде тұрады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02791",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871199",
+      "tatoeba_sentence_id": 9871199,
+      "text": "Мен оны ешқашан кездестіре алмадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02792",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871201",
+      "tatoeba_sentence_id": 9871201,
+      "text": "Мен көршіммен қызықты әңгіме өткіздім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02793",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871202",
+      "tatoeba_sentence_id": 9871202,
+      "text": "Том сені ешқашан кешірмейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02799",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871214",
+      "tatoeba_sentence_id": 9871214,
+      "text": "Сіз бірінші хатты кімге жібердіңіз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02800",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871215",
+      "tatoeba_sentence_id": 9871215,
+      "text": "Тек олардан кешірім сұраңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02801",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871217",
+      "tatoeba_sentence_id": 9871217,
+      "text": "Том Мэридің өткені туралы көбірек білгісі келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02804",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871220",
+      "tatoeba_sentence_id": 9871220,
+      "text": "Том өте терең баяндама жазды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02810",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871229",
+      "tatoeba_sentence_id": 9871229,
+      "text": "Неліктен Том сізге ұнамайды?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02811",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871230",
+      "tatoeba_sentence_id": 9871230,
+      "text": "Тек саябақта, ағаштардың көлеңкесінде сіз салқындықты таба аласыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02812",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871231",
+      "tatoeba_sentence_id": 9871231,
+      "text": "Мен ертең осында боламын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02813",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871232",
+      "tatoeba_sentence_id": 9871232,
+      "text": "Бұл кітапты сатып алмаңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02817",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871238",
+      "tatoeba_sentence_id": 9871238,
+      "text": "Біз мұны жасай алмадық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02825",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871251",
+      "tatoeba_sentence_id": 9871251,
+      "text": "Ертең жаңбыр жауып тұрса да барамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02826",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871252",
+      "tatoeba_sentence_id": 9871252,
+      "text": "Барлық сөздіктердің қателіктері бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02829",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871257",
+      "tatoeba_sentence_id": 9871257,
+      "text": "Мен Том үшін төлеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02830",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871260",
+      "tatoeba_sentence_id": 9871260,
+      "text": "Мег тым көп сөйлейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02831",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871263",
+      "tatoeba_sentence_id": 9871263,
+      "text": "Ол қолын маңдайына қойды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02834",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871270",
+      "tatoeba_sentence_id": 9871270,
+      "text": "Мен балаларды тамақтандырып қойдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02835",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871272",
+      "tatoeba_sentence_id": 9871272,
+      "text": "Мен ол жерде қанша отырғанымды білмеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02836",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871273",
+      "tatoeba_sentence_id": 9871273,
+      "text": "Калининградтан Мардинге тікелей рейсті енгізу өте қажет!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02849",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871300",
+      "tatoeba_sentence_id": 9871300,
+      "text": "Мен Сізге сенгім келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02854",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871305",
+      "tatoeba_sentence_id": 9871305,
+      "text": "Мен сізді әрдайым қолдаймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02855",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871306",
+      "tatoeba_sentence_id": 9871306,
+      "text": "Том қарулы болды ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02861",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871319",
+      "tatoeba_sentence_id": 9871319,
+      "text": "Оның теңіз жағасында үйі бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02863",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871324",
+      "tatoeba_sentence_id": 9871324,
+      "text": "Том әдетте олай етпейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02869",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871334",
+      "tatoeba_sentence_id": 9871334,
+      "text": "Ол оны ешқашан сүймейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02879",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871370",
+      "tatoeba_sentence_id": 9871370,
+      "text": "Сіз бұл жобаны аяқтамайсыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02881",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871379",
+      "tatoeba_sentence_id": 9871379,
+      "text": "Сізді бақытты етуге көмектесіңіз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02882",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871381",
+      "tatoeba_sentence_id": 9871381,
+      "text": "Мен барып шай қайнатамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02884",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871385",
+      "tatoeba_sentence_id": 9871385,
+      "text": "Ол маған жақсы жұмыс тапты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02885",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871400",
+      "tatoeba_sentence_id": 9871400,
+      "text": "Біз оны сендіре алмадық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02888",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871404",
+      "tatoeba_sentence_id": 9871404,
+      "text": "Мен оған қарағым да келмейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02889",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871405",
+      "tatoeba_sentence_id": 9871405,
+      "text": "Том хатты неміс тілінен француз тіліне аударды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02891",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871409",
+      "tatoeba_sentence_id": 9871409,
+      "text": "Бұл есікті ешкімге ашпаңыз!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02902",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871431",
+      "tatoeba_sentence_id": 9871431,
+      "text": "Ол бұл сұраққа жауап бере алмады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02908",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871437",
+      "tatoeba_sentence_id": 9871437,
+      "text": "Сіз мұнда қанша уақыт тұрғыңыз келеді?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02911",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871442",
+      "tatoeba_sentence_id": 9871442,
+      "text": "Біз оны әрең көндірдік."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02912",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871445",
+      "tatoeba_sentence_id": 9871445,
+      "text": "Мен олармен көп уақыт өткіздім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02914",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871449",
+      "tatoeba_sentence_id": 9871449,
+      "text": "Сіз бұл хатқа жауап беріп үлгердіңіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02920",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871457",
+      "tatoeba_sentence_id": 9871457,
+      "text": "Мен мұндай үлкен кемені бірінші рет көріп отырмын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02932",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871477",
+      "tatoeba_sentence_id": 9871477,
+      "text": "Олар сондай-ақ көптеген әндерді білетін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02936",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871482",
+      "tatoeba_sentence_id": 9871482,
+      "text": "Сіз мұны қайталауыңыз керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02938",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871485",
+      "tatoeba_sentence_id": 9871485,
+      "text": "Том жағажайдан мәйіт тапты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02939",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871486",
+      "tatoeba_sentence_id": 9871486,
+      "text": "Мен жазды ағамның қасында өткіздім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02942",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871489",
+      "tatoeba_sentence_id": 9871489,
+      "text": "Егер олар барса, мен де барамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02943",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871490",
+      "tatoeba_sentence_id": 9871490,
+      "text": "Олар құсты торға салды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02944",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871492",
+      "tatoeba_sentence_id": 9871492,
+      "text": "Сіз біз үшін әрқашан кішкентай боласыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02945",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871529",
+      "tatoeba_sentence_id": 9871529,
+      "text": "Том ұялшақ емес еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02951",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871540",
+      "tatoeba_sentence_id": 9871540,
+      "text": "Оның үйінің есіктері қандай түсті?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02958",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871552",
+      "tatoeba_sentence_id": 9871552,
+      "text": "Бұл әрекеттер кері нәтиже береді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02964",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871562",
+      "tatoeba_sentence_id": 9871562,
+      "text": "Мен Томнан бізді күтуін сұраймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02970",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871571",
+      "tatoeba_sentence_id": 9871571,
+      "text": "Сіз оны неге өлтірдіңіз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02973",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871575",
+      "tatoeba_sentence_id": 9871575,
+      "text": "Мен оны аптасына бір рет көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02975",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871577",
+      "tatoeba_sentence_id": 9871577,
+      "text": "Мен ештеңе жазған жоқпын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02977",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871582",
+      "tatoeba_sentence_id": 9871582,
+      "text": "Мен ол жаққа жиі барамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02978",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871583",
+      "tatoeba_sentence_id": 9871583,
+      "text": "Мен Томнан бізді күтпеуін сұрадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02980",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871587",
+      "tatoeba_sentence_id": 9871587,
+      "text": "Олар мұны бізге қалдырды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02981",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871588",
+      "tatoeba_sentence_id": 9871588,
+      "text": "Бірақ бұл мені шынымен таң қалдырған жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02983",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871590",
+      "tatoeba_sentence_id": 9871590,
+      "text": "Мен бұл туралы ешқашан айтқан емеспін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02988",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871596",
+      "tatoeba_sentence_id": 9871596,
+      "text": "Мен төсекте болуым керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02994",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871602",
+      "tatoeba_sentence_id": 9871602,
+      "text": "Ол жас жігітке ұялып қарады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_02996",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871605",
+      "tatoeba_sentence_id": 9871605,
+      "text": "Мен жалғыз қалуға қорқатынмын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03007",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871619",
+      "tatoeba_sentence_id": 9871619,
+      "text": "Әрқашан бір нәрсе істеу керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03016",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871629",
+      "tatoeba_sentence_id": 9871629,
+      "text": "Мен оны қайда қоя алатынымды білмеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03017",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871630",
+      "tatoeba_sentence_id": 9871630,
+      "text": "Бұл туралы ешкім шағымданған жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03021",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871635",
+      "tatoeba_sentence_id": 9871635,
+      "text": "Сіз көңіл көтергіңіз келеді ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03028",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871642",
+      "tatoeba_sentence_id": 9871642,
+      "text": "Ол сіздің телефоныңызды біле ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03034",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871650",
+      "tatoeba_sentence_id": 9871650,
+      "text": "Сіз оған көмектесуіңіз керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03037",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871653",
+      "tatoeba_sentence_id": 9871653,
+      "text": "Сіз ауруханаға бара алдыңыз ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03048",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871665",
+      "tatoeba_sentence_id": 9871665,
+      "text": "Том телефонмен бірге қағазды алды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03050",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871670",
+      "tatoeba_sentence_id": 9871670,
+      "text": "Ол сен ағаштан түскенше күтеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03060",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871680",
+      "tatoeba_sentence_id": 9871680,
+      "text": "Мен сені үш күн бұрын күткен едім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03061",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871681",
+      "tatoeba_sentence_id": 9871681,
+      "text": "Мен сені төменгі қабатта күтемін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03064",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871686",
+      "tatoeba_sentence_id": 9871686,
+      "text": "Біз төменге әдемі теңізге қарадық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03065",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871690",
+      "tatoeba_sentence_id": 9871690,
+      "text": "Ол өте жалғыз адам."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03068",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871702",
+      "tatoeba_sentence_id": 9871702,
+      "text": "Ганс - неміс кәсіпкері."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03070",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871705",
+      "tatoeba_sentence_id": 9871705,
+      "text": "Сіз мұнда бір күн ғана боласыз, және сіз бүкіл қаланы білесіз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03072",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871707",
+      "tatoeba_sentence_id": 9871707,
+      "text": "Қытай тілі басқа шет тілдеріне қарағанда әлдеқайда қиын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03074",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871710",
+      "tatoeba_sentence_id": 9871710,
+      "text": "Том өте жақсы мұғалім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03078",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871715",
+      "tatoeba_sentence_id": 9871715,
+      "text": "Мен мұны өзім жасағым келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03088",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871743",
+      "tatoeba_sentence_id": 9871743,
+      "text": "Том әйелдерге төмен қарайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03096",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871762",
+      "tatoeba_sentence_id": 9871762,
+      "text": "Мен мұны ақша үшін жасадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03100",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871769",
+      "tatoeba_sentence_id": 9871769,
+      "text": "Бұл ақшаның ештеңесі сізге тиесілі емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03101",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871770",
+      "tatoeba_sentence_id": 9871770,
+      "text": "Ертең ыстық болады ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03103",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871776",
+      "tatoeba_sentence_id": 9871776,
+      "text": "Мен бауырымен жорғалаушыларды жек көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03104",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871778",
+      "tatoeba_sentence_id": 9871778,
+      "text": "Мен қателесуім мүмкін емес еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03109",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871784",
+      "tatoeba_sentence_id": 9871784,
+      "text": "Ол тағы да келуге уәде берді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03110",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871785",
+      "tatoeba_sentence_id": 9871785,
+      "text": "Бұл жаңалықты естіген Том жетінші көкте болды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03111",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871786",
+      "tatoeba_sentence_id": 9871786,
+      "text": "Том уақыт машинасын жасады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03114",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871789",
+      "tatoeba_sentence_id": 9871789,
+      "text": "Сізді қанша уақыт күте аламыз!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03116",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871794",
+      "tatoeba_sentence_id": 9871794,
+      "text": "Мен оған өте жақсы қараймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03117",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871795",
+      "tatoeba_sentence_id": 9871795,
+      "text": "Сіздің сүйікті журналыңыз қандай?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03130",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9871821",
+      "tatoeba_sentence_id": 9871821,
+      "text": "Көшеден өту кезінде абай болыңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03131",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917289",
+      "tatoeba_sentence_id": 9917289,
+      "text": "Сіз қандай кітаптар сатып алдыңыз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03132",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917293",
+      "tatoeba_sentence_id": 9917293,
+      "text": "Сіз аптасына неше сағат жұмыс жасайсыз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03135",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917314",
+      "tatoeba_sentence_id": 9917314,
+      "text": "Сіз оларды ескертуіңіз керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03137",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917322",
+      "tatoeba_sentence_id": 9917322,
+      "text": "Кеше мен ауруханадан шықтым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03143",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917342",
+      "tatoeba_sentence_id": 9917342,
+      "text": "Мен оларға көмектесемін деп уәде беремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03149",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917362",
+      "tatoeba_sentence_id": 9917362,
+      "text": "Маған айтқан жерге барамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03150",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917365",
+      "tatoeba_sentence_id": 9917365,
+      "text": "Барлығында бар, бірақ менде жоқ. Бұл әділетті ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03153",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917379",
+      "tatoeba_sentence_id": 9917379,
+      "text": "Ол бұны оларға түсіндірмейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03157",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917390",
+      "tatoeba_sentence_id": 9917390,
+      "text": "Оған ешқашан есік ашпаңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03159",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917402",
+      "tatoeba_sentence_id": 9917402,
+      "text": "Мен әрқашан адал болуға тырысамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03161",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917410",
+      "tatoeba_sentence_id": 9917410,
+      "text": "Мэри өзінің жұмысына деген қызығушылықты жоғалтты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03165",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917423",
+      "tatoeba_sentence_id": 9917423,
+      "text": "Ол ақылды балаға ұқсамайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03166",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917426",
+      "tatoeba_sentence_id": 9917426,
+      "text": "Сіз оны жиі көрдіңіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03168",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917455",
+      "tatoeba_sentence_id": 9917455,
+      "text": "Том аралда жалғыз тұрады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03169",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917458",
+      "tatoeba_sentence_id": 9917458,
+      "text": "Маймыл ақша үшін билейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03172",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917467",
+      "tatoeba_sentence_id": 9917467,
+      "text": "Сіз Жапонияда қанша уақыт тұрдыңыз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03176",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9917481",
+      "tatoeba_sentence_id": 9917481,
+      "text": "Том дәл қалағанын ала алмады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03181",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9922039",
+      "tatoeba_sentence_id": 9922039,
+      "text": "Мен бұған бірінші рет тап болдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03184",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9922042",
+      "tatoeba_sentence_id": 9922042,
+      "text": "Бұл сізге қиын екенін білемін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03185",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9922043",
+      "tatoeba_sentence_id": 9922043,
+      "text": "Сіз жауап берген жоқсыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03190",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9922048",
+      "tatoeba_sentence_id": 9922048,
+      "text": "Қыздар Томды жақсы көреді, бірақ мен оны сүймеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03192",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9922050",
+      "tatoeba_sentence_id": 9922050,
+      "text": "Сізде дәлел бар ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03193",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9943174",
+      "tatoeba_sentence_id": 9943174,
+      "text": "Олар мені естімеді деп ойлады және мен туралы сыр шертті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03196",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9943183",
+      "tatoeba_sentence_id": 9943183,
+      "text": "Ол Солтүстік Кореяда тұрды, ал қазір Швейцарияда тұрады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03200",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9943191",
+      "tatoeba_sentence_id": 9943191,
+      "text": "Бұл бізге өте қиын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03203",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9943195",
+      "tatoeba_sentence_id": 9943195,
+      "text": "Айырмашылық аз, бірақ ол бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03204",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9943196",
+      "tatoeba_sentence_id": 9943196,
+      "text": "Бұл оқиға туралы ол бізге ештеңе айтқан жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03207",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9943199",
+      "tatoeba_sentence_id": 9943199,
+      "text": "Ол көңілі қалғанын айтты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03208",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9943200",
+      "tatoeba_sentence_id": 9943200,
+      "text": "Мен оны ешқашан көрген емеспін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03209",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9943201",
+      "tatoeba_sentence_id": 9943201,
+      "text": "Сізде жұқпалы ауру бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03211",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9943203",
+      "tatoeba_sentence_id": 9943203,
+      "text": "Сіз бұл туралы ешқашан айтқыңыз келмеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03220",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9959928",
+      "tatoeba_sentence_id": 9959928,
+      "text": "Бізде бүгін мереке бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03223",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9959932",
+      "tatoeba_sentence_id": 9959932,
+      "text": "Біз бұл туралы кеше кешкілік әңгімелестік."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03228",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9959937",
+      "tatoeba_sentence_id": 9959937,
+      "text": "Олар оны жақсы көреді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03234",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9959944",
+      "tatoeba_sentence_id": 9959944,
+      "text": "Мен тым жас едім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03237",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9959947",
+      "tatoeba_sentence_id": 9959947,
+      "text": "Мен қайық сатып аламын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03240",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9959951",
+      "tatoeba_sentence_id": 9959951,
+      "text": "Сіз өзіңізді таныстыра аласыз ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03246",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9959957",
+      "tatoeba_sentence_id": 9959957,
+      "text": "Мен 1960 жылы 14 ақпанда дүниеге келдім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03247",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9959958",
+      "tatoeba_sentence_id": 9959958,
+      "text": "Мен Томға Мэри келеді деп айттым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03263",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9959992",
+      "tatoeba_sentence_id": 9959992,
+      "text": "Мен сізді ренжітетіндігіңізді білдім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03268",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9960001",
+      "tatoeba_sentence_id": 9960001,
+      "text": "Оның одан кешірім сұрау ниеті жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03270",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9960004",
+      "tatoeba_sentence_id": 9960004,
+      "text": "Кез келген санды атаңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03275",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9960010",
+      "tatoeba_sentence_id": 9960010,
+      "text": "Кейде етістік зат есімнен, кейде керісінше жасалады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03280",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9960017",
+      "tatoeba_sentence_id": 9960017,
+      "text": "Мен сіздің сұрағыңызды түсінбедім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03281",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9960018",
+      "tatoeba_sentence_id": 9960018,
+      "text": "Бізде екі кеме бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03282",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9960019",
+      "tatoeba_sentence_id": 9960019,
+      "text": "Біз сізге ертең көмектесеміз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03284",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_9963025",
+      "tatoeba_sentence_id": 9963025,
+      "text": "Мен сізді күте алмаймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03290",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10130686",
+      "tatoeba_sentence_id": 10130686,
+      "text": "Олар өз нәтижелерін жақсартты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03291",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10130688",
+      "tatoeba_sentence_id": 10130688,
+      "text": "Том сенімді емес екенін айтты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03295",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10130695",
+      "tatoeba_sentence_id": 10130695,
+      "text": "Ол жаңбырдан кейінгі саңырауқұлақ тәрізді өседі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03299",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10130701",
+      "tatoeba_sentence_id": 10130701,
+      "text": "Мен сені ертең шақырамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03304",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10130712",
+      "tatoeba_sentence_id": 10130712,
+      "text": "Ол әскери қызметтен босатылған."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03306",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10130715",
+      "tatoeba_sentence_id": 10130715,
+      "text": "Ол оған көмектеспеуі керек еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03311",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10130725",
+      "tatoeba_sentence_id": 10130725,
+      "text": "Ол оған қарсы куәлік берді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03319",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195598",
+      "tatoeba_sentence_id": 10195598,
+      "text": "Олар жауға қарсы шықты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03322",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195601",
+      "tatoeba_sentence_id": 10195601,
+      "text": "Біз үлкен жетістіктерге жеттік."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03323",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195602",
+      "tatoeba_sentence_id": 10195602,
+      "text": "Сіз оны көргіңіз келе ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03324",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195603",
+      "tatoeba_sentence_id": 10195603,
+      "text": "Мен әлі Томға көп сенбеймін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03325",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195604",
+      "tatoeba_sentence_id": 10195604,
+      "text": "Мен сүйетін жалғыз сенсің."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03326",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195605",
+      "tatoeba_sentence_id": 10195605,
+      "text": "Бұл адам өткен аптада жұмыстан шығарылды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03328",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195607",
+      "tatoeba_sentence_id": 10195607,
+      "text": "Олар өздерінің қайда екенін біледі ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03335",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195620",
+      "tatoeba_sentence_id": 10195620,
+      "text": "Сіз одан да жақсы жасай аласыз!"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03337",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195627",
+      "tatoeba_sentence_id": 10195627,
+      "text": "Құдайды ешқашан ешкім көрген емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03340",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195630",
+      "tatoeba_sentence_id": 10195630,
+      "text": "Жұмыс пен ләззат арасындағы тепе-теңдікті табу оңай емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03341",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195631",
+      "tatoeba_sentence_id": 10195631,
+      "text": "Мұны мүмкіндігінше мұқият болуға тырысыңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03342",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195634",
+      "tatoeba_sentence_id": 10195634,
+      "text": "Ол сөйледі, бірақ әрекет етпеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03344",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195638",
+      "tatoeba_sentence_id": 10195638,
+      "text": "Мен оның ата-анасын жек көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03346",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195642",
+      "tatoeba_sentence_id": 10195642,
+      "text": "Қаржылық проблемаларыңыз бар ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03354",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195652",
+      "tatoeba_sentence_id": 10195652,
+      "text": "Сіз оны неге жалғыз қалдырдыңыз?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03356",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195657",
+      "tatoeba_sentence_id": 10195657,
+      "text": "Мен Томға қаласам да көмектесе алмадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03364",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195667",
+      "tatoeba_sentence_id": 10195667,
+      "text": "Сізде тіс проблемалары бар ма?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03370",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195673",
+      "tatoeba_sentence_id": 10195673,
+      "text": "Кенеттен Мэри өзін-өзі ұстай алмай күліп жіберді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03372",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195675",
+      "tatoeba_sentence_id": 10195675,
+      "text": "Бұл затты иесіне қайтарыңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03373",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195676",
+      "tatoeba_sentence_id": 10195676,
+      "text": "Сіз бір нәрсе білесіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03378",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195682",
+      "tatoeba_sentence_id": 10195682,
+      "text": "Мен сәл күтемін - шай тым ыстық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03384",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195691",
+      "tatoeba_sentence_id": 10195691,
+      "text": "Қараңғы түседі. Жарықты қосыңыз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03391",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195703",
+      "tatoeba_sentence_id": 10195703,
+      "text": "Мен Томның жауабын ұзақ күтуім керек еді, бірақ бұл оған тұрарлық еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03395",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195708",
+      "tatoeba_sentence_id": 10195708,
+      "text": "Том мен Мэри анық бай."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03400",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195717",
+      "tatoeba_sentence_id": 10195717,
+      "text": "Том өте жігерлі емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03402",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195719",
+      "tatoeba_sentence_id": 10195719,
+      "text": "Сіздің ойыңызша оларды кім өлтірді?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03403",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195721",
+      "tatoeba_sentence_id": 10195721,
+      "text": "Мен бұл кітаптарды жақсы көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03405",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195723",
+      "tatoeba_sentence_id": 10195723,
+      "text": "Сіз де солай жасамайсыз ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03407",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195730",
+      "tatoeba_sentence_id": 10195730,
+      "text": "Олардың сізді қорқытуына жол бермеңіз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03413",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195739",
+      "tatoeba_sentence_id": 10195739,
+      "text": "Том өте ерте келмеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03416",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195745",
+      "tatoeba_sentence_id": 10195745,
+      "text": "Ол маған сәлем беру үшін аяғына тұрды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03418",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195749",
+      "tatoeba_sentence_id": 10195749,
+      "text": "Бұл бүгін өзгеруі мүмкін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03423",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10195758",
+      "tatoeba_sentence_id": 10195758,
+      "text": "Ол қазіргі жалақысына риза емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03440",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10330076",
+      "tatoeba_sentence_id": 10330076,
+      "text": "Мен мұны сатып аламын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03442",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10471341",
+      "tatoeba_sentence_id": 10471341,
+      "text": "Ол он жеті жаста."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03466",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10476940",
+      "tatoeba_sentence_id": 10476940,
+      "text": "Сен де ашсың ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03483",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10608313",
+      "tatoeba_sentence_id": 10608313,
+      "text": "Адам мемлекет үшін емес, мемлекет адам үшін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03490",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10817228",
+      "tatoeba_sentence_id": 10817228,
+      "text": "Балалар йогуртты жақсы көреді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03499",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10852439",
+      "tatoeba_sentence_id": 10852439,
+      "text": "Бұл сағат маған ұнайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03500",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10852440",
+      "tatoeba_sentence_id": 10852440,
+      "text": "Маған бұл сағат ұнайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03504",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10858026",
+      "tatoeba_sentence_id": 10858026,
+      "text": "Мен мұны абайсызда жасадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03505",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10858027",
+      "tatoeba_sentence_id": 10858027,
+      "text": "Мен мұны әдейі жасадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03508",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10858032",
+      "tatoeba_sentence_id": 10858032,
+      "text": "Теледидардан ауа райын тыңдадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03530",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10874392",
+      "tatoeba_sentence_id": 10874392,
+      "text": "Мен Томнан бұл дұрыс па, жоқ па деп сұрадым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03536",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10874409",
+      "tatoeba_sentence_id": 10874409,
+      "text": "Бұл ғимаратта ма тұрады?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03540",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10874525",
+      "tatoeba_sentence_id": 10874525,
+      "text": "Менің ескі компьютерім екі жыл бұрын істен шықты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03550",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10875720",
+      "tatoeba_sentence_id": 10875720,
+      "text": "Бұл сіздің атыңыз ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03556",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10875736",
+      "tatoeba_sentence_id": 10875736,
+      "text": "Бұл кітапты осы кітап дүкенінен сатып алдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03560",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10875744",
+      "tatoeba_sentence_id": 10875744,
+      "text": "Оның жасы отыз бесте."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03561",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10875747",
+      "tatoeba_sentence_id": 10875747,
+      "text": "Ол отыз бес жаста."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03563",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10875756",
+      "tatoeba_sentence_id": 10875756,
+      "text": "Жоқ, ол он жаста емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03566",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10875763",
+      "tatoeba_sentence_id": 10875763,
+      "text": "Ол әлі де нәбері сегіз жаста."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03571",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10877153",
+      "tatoeba_sentence_id": 10877153,
+      "text": "Мен кітап оқығанды жақсы көремін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03575",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_10938281",
+      "tatoeba_sentence_id": 10938281,
+      "text": "Цицерон қайда өмір сүрді?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03576",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11055880",
+      "tatoeba_sentence_id": 11055880,
+      "text": "Зиридің бүкіл үйі бос еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03577",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11062265",
+      "tatoeba_sentence_id": 11062265,
+      "text": "Оған жете аласың ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03581",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11065634",
+      "tatoeba_sentence_id": 11065634,
+      "text": "Оларды кім жетелеп жүр?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03582",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11065638",
+      "tatoeba_sentence_id": 11065638,
+      "text": "Мен вазаны оған бердім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03583",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11065639",
+      "tatoeba_sentence_id": 11065639,
+      "text": "Мен оған вазаны бердім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03592",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11065819",
+      "tatoeba_sentence_id": 11065819,
+      "text": "Мен кішкентай болғанда оған ұқсайтынмын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03600",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11066363",
+      "tatoeba_sentence_id": 11066363,
+      "text": "Бірінші дүниежүзілік соғыс 1914 жылы шықты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03612",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11087187",
+      "tatoeba_sentence_id": 11087187,
+      "text": "Менде басқа жол жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03615",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11087193",
+      "tatoeba_sentence_id": 11087193,
+      "text": "Мен тап жаңа үш мың доллардан астам ақша жойдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03620",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11087204",
+      "tatoeba_sentence_id": 11087204,
+      "text": "Сіз бұл қыздарды білесіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03622",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11087213",
+      "tatoeba_sentence_id": 11087213,
+      "text": "Сен жарықты нешеде қосасың?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03634",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11087239",
+      "tatoeba_sentence_id": 11087239,
+      "text": "Ол бұл әңгімені көзіне жас алып айтты."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03635",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11087240",
+      "tatoeba_sentence_id": 11087240,
+      "text": "Кеше ол бұл кітапты оқыды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03643",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11087819",
+      "tatoeba_sentence_id": 11087819,
+      "text": "Томның Мэриден жасы үлкен болуы мүмкін емес."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03653",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11087840",
+      "tatoeba_sentence_id": 11087840,
+      "text": "Ол кеше мектепке кешікті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03656",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11090902",
+      "tatoeba_sentence_id": 11090902,
+      "text": "Сен бұған көп мән бересің."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03660",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11090909",
+      "tatoeba_sentence_id": 11090909,
+      "text": "Сен оған көмектесе аласың ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03666",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11093735",
+      "tatoeba_sentence_id": 11093735,
+      "text": "Сіздің ойыңызда кім бар?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03683",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11130047",
+      "tatoeba_sentence_id": 11130047,
+      "text": "Ол онда күн сайын барады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03694",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11163413",
+      "tatoeba_sentence_id": 11163413,
+      "text": "Мен онда үш күн болдым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03704",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11282087",
+      "tatoeba_sentence_id": 11282087,
+      "text": "Бұл сұрағыңызға жауап берді ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03705",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11282088",
+      "tatoeba_sentence_id": 11282088,
+      "text": "Бұл сұрағыңызға жауап па?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03713",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11284462",
+      "tatoeba_sentence_id": 11284462,
+      "text": "Оған жақын болғаныңызды білемін."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03721",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11284813",
+      "tatoeba_sentence_id": 11284813,
+      "text": "Құдай саған мұрын берген."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03727",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11284834",
+      "tatoeba_sentence_id": 11284834,
+      "text": "Балаларына орыс тілін үйретті."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03728",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11298021",
+      "tatoeba_sentence_id": 11298021,
+      "text": "Бұл сөйлемді кім жазды?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03731",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11302489",
+      "tatoeba_sentence_id": 11302489,
+      "text": "Бұл жерге қашан келген едің?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03735",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11492543",
+      "tatoeba_sentence_id": 11492543,
+      "text": "Бұл көшеде екі шіркеу бар."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03737",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11537603",
+      "tatoeba_sentence_id": 11537603,
+      "text": "Бұл кітапты екі жыл бұрын оқыған едім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03740",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11615741",
+      "tatoeba_sentence_id": 11615741,
+      "text": "Мен Мәскеуде дүниеге келдім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03741",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11615743",
+      "tatoeba_sentence_id": 11615743,
+      "text": "Маған бір шыны кофе бере аласыз ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03745",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11633387",
+      "tatoeba_sentence_id": 11633387,
+      "text": "Тепе-теңдігін жоғалтып, жерге құлады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03747",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11633392",
+      "tatoeba_sentence_id": 11633392,
+      "text": "Бүгін Томның демалыс күні."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03755",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11767912",
+      "tatoeba_sentence_id": 11767912,
+      "text": "Мұны саған кім айтты?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03757",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11904881",
+      "tatoeba_sentence_id": 11904881,
+      "text": "Ол сұраққа жауап берді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03758",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11904892",
+      "tatoeba_sentence_id": 11904892,
+      "text": "Біздің дерекқорымызда мұндай жазба жоқ."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03759",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11906312",
+      "tatoeba_sentence_id": 11906312,
+      "text": "Сен шындықты ескеруің керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03760",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11906315",
+      "tatoeba_sentence_id": 11906315,
+      "text": "Мен салмақ қосуым керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03761",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11906316",
+      "tatoeba_sentence_id": 11906316,
+      "text": "Маған салмақ қосу керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03766",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11906727",
+      "tatoeba_sentence_id": 11906727,
+      "text": "Сіздің атыңыз кім еді?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03772",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11906737",
+      "tatoeba_sentence_id": 11906737,
+      "text": "Мен оның атын ұмытып кеттім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03778",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_11909484",
+      "tatoeba_sentence_id": 11909484,
+      "text": "Мен мысықтарды жақсы көремін, мысықтар да мені жақсы көреді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03785",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12019622",
+      "tatoeba_sentence_id": 12019622,
+      "text": "Бұл қаланың аты қалай?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03789",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12020040",
+      "tatoeba_sentence_id": 12020040,
+      "text": "Бұл пойыз мұнда тоқтамайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03794",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12020066",
+      "tatoeba_sentence_id": 12020066,
+      "text": "Мен ол туралы көбірек ақпарат алғым келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03795",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12020067",
+      "tatoeba_sentence_id": 12020067,
+      "text": "Ол бұл ақпаратты кімнен алған?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03796",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12020068",
+      "tatoeba_sentence_id": 12020068,
+      "text": "Ол бұл ақпаратты кімнен алды?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03797",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12020070",
+      "tatoeba_sentence_id": 12020070,
+      "text": "Ол әйел кімге тұрмысқа шықты?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03798",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12020072",
+      "tatoeba_sentence_id": 12020072,
+      "text": "Ол адам кімге үйленді?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03804",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12020081",
+      "tatoeba_sentence_id": 12020081,
+      "text": "Сіз айтқан сөздерді түсінбедім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03808",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12022079",
+      "tatoeba_sentence_id": 12022079,
+      "text": "Бұл үйде қанша адам тұрады?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03824",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12173830",
+      "tatoeba_sentence_id": 12173830,
+      "text": "Бүгін ауа райы қандай?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03828",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12176565",
+      "tatoeba_sentence_id": 12176565,
+      "text": "Бұл кітапты кім жазған еді?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03837",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12177272",
+      "tatoeba_sentence_id": 12177272,
+      "text": "Ол жүзімші емес пе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03851",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12194035",
+      "tatoeba_sentence_id": 12194035,
+      "text": "Ол жануарлар туралы кітап жазған."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03852",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12194036",
+      "tatoeba_sentence_id": 12194036,
+      "text": "Ол жануарлар туралы кітап жазды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03853",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12194129",
+      "tatoeba_sentence_id": 12194129,
+      "text": "Ол жесір әйелге үйленген."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03855",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12194624",
+      "tatoeba_sentence_id": 12194624,
+      "text": "Ол кімге тұрмысқа шықты?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03876",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12205389",
+      "tatoeba_sentence_id": 12205389,
+      "text": "Бұл кітаптың авторы кім?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03877",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12228762",
+      "tatoeba_sentence_id": 12228762,
+      "text": "Ол сегіз жыл бұрын қайтыс болды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03878",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12304619",
+      "tatoeba_sentence_id": 12304619,
+      "text": "Бұл дүкенде әйелдер киімдері сатылмайды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03879",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12305057",
+      "tatoeba_sentence_id": 12305057,
+      "text": "Бұл фотоларды сен түсірдің бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03885",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12399735",
+      "tatoeba_sentence_id": 12399735,
+      "text": "Мен екі қабатты ғимаратта тұрамын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03886",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12399736",
+      "tatoeba_sentence_id": 12399736,
+      "text": "Біз бүлінген ғимаратты бұздық."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03887",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12428972",
+      "tatoeba_sentence_id": 12428972,
+      "text": "Том бізге айтпаған нәрсені біледі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03888",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12428976",
+      "tatoeba_sentence_id": 12428976,
+      "text": "Мен оларды ешқашан ұмытпаймын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03893",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12428988",
+      "tatoeba_sentence_id": 12428988,
+      "text": "Мен көп нәрсе істеуім керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03898",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12429000",
+      "tatoeba_sentence_id": 12429000,
+      "text": "Бұл рас болуы мүмкін. Біз әлі білмейміз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03910",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12794120",
+      "tatoeba_sentence_id": 12794120,
+      "text": "Біз өмір сүру үшін жұмыс істейміз."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03923",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12887294",
+      "tatoeba_sentence_id": 12887294,
+      "text": "Бұл адамды кім таниды?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03924",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12887402",
+      "tatoeba_sentence_id": 12887402,
+      "text": "Иә, бұл сөйлем дұрыс."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03930",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12897091",
+      "tatoeba_sentence_id": 12897091,
+      "text": "Дүйсенбіден басқа күн сайын боспын."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03946",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_12905722",
+      "tatoeba_sentence_id": 12905722,
+      "text": "Бұл сөйлем табиғи естілмейді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03951",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13154730",
+      "tatoeba_sentence_id": 13154730,
+      "text": "Бұл кітапты балалар да оқи алады."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03955",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13206453",
+      "tatoeba_sentence_id": 13206453,
+      "text": "Сегіз жыл бұрын үйлендім."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03956",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13206454",
+      "tatoeba_sentence_id": 13206454,
+      "text": "Сегіз жыл бұрын тұрмысқа шықтым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03966",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13534912",
+      "tatoeba_sentence_id": 13534912,
+      "text": "Мен де жақсы суретші болғым келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03971",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13538316",
+      "tatoeba_sentence_id": 13538316,
+      "text": "Мен оны оқуым керек."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03972",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13539822",
+      "tatoeba_sentence_id": 13539822,
+      "text": "Жауап дұрыс емес еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03978",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13540006",
+      "tatoeba_sentence_id": 13540006,
+      "text": "Ертең келгілерің келе ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03979",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13540007",
+      "tatoeba_sentence_id": 13540007,
+      "text": "Ертең келгілеріңіз келе ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03980",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13540009",
+      "tatoeba_sentence_id": 13540009,
+      "text": "Ертең келгіңіз келе ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03981",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13540027",
+      "tatoeba_sentence_id": 13540027,
+      "text": "Ертең келгің келе ме?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03983",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13540029",
+      "tatoeba_sentence_id": 13540029,
+      "text": "Сіз шай қалайсыз ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03991",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13572530",
+      "tatoeba_sentence_id": 13572530,
+      "text": "Әлеуметтік желілерді пайдалануды тоқтаттым."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_03995",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13633039",
+      "tatoeba_sentence_id": 13633039,
+      "text": "Біз дұрыс бара жатырмыз"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04007",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13656910",
+      "tatoeba_sentence_id": 13656910,
+      "text": "Сіз бұл отбасыны білесіз бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04011",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13679874",
+      "tatoeba_sentence_id": 13679874,
+      "text": "Лусия латын тілін біледі."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04013",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13717869",
+      "tatoeba_sentence_id": 13717869,
+      "text": "Анаңа хат жаздың ба?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04018",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13718544",
+      "tatoeba_sentence_id": 13718544,
+      "text": "Анасы оның туған күнінде қайтыс болды."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04025",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13757822",
+      "tatoeba_sentence_id": 13757822,
+      "text": "Бөлмеде көп адам бар еді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04034",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13775258",
+      "tatoeba_sentence_id": 13775258,
+      "text": "Мен шай ішкім келеді."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04039",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13778715",
+      "tatoeba_sentence_id": 13778715,
+      "text": "Сен ағаңды көрдің бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04041",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13778720",
+      "tatoeba_sentence_id": 13778720,
+      "text": "Сен пілді көрдің бе?"
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04049",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13844085",
+      "tatoeba_sentence_id": 13844085,
+      "text": "Қазақстан өте үлкен ел."
+    },
+    {
+      "domain": "tatoeba",
+      "id": "tatoeba_kz_04050",
+      "pack_name": "adam-tatoeba-kazakh-pack",
+      "source_id": "tatoeba_kazakh_13844091",
+      "tatoeba_sentence_id": 13844091,
+      "text": "Атамның он жеті немересі бар."
+    }
+  ],
+  "script": "cyrillic",
+  "skipped_duplicate": 0,
+  "skipped_empty": 0,
+  "skipped_latin": 373,
+  "skipped_length": 66,
+  "source_license": "CC-BY 2.0 FR",
+  "source_url": "https://tatoeba.org",
+  "target_language": "kazakh",
+  "version": "0.1.4"
+}

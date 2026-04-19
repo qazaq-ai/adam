@@ -1,0 +1,456 @@
+{
+  "name": "filtered-adam-clean-training-corpus",
+  "samples": [
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_01",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Таза дерек тұрақты қорытынды жасауға көмектеседі."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_02",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Таза дерек тұрақты талдау жасауға көмектеседі."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_03",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Таза дерек тұрақты модель құруға көмектеседі."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_06",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Дәйекті мәтін сенімді модель құруға мүмкіндік береді."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_07",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Дәйекті мәтін сенімді қорытынды жасауға көмектеседі."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_08",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Дәйекті мәтін сенімді модель сапасын арттыруға көмектеседі."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_09",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Дәйекті мәтін сенімді модель құруға көмектеседі."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_10",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Дәйекті мәтін сенімді модель бағалауға көмектеседі."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_11",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Дәйекті мәтін сенімді шешім жасауға көмектеседі."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_12",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Дәйекті мәтін сенімді модель сапасын арттыруға көмектеседі."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_13",
+      "pack_name": "adam-clean-general-core-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Дәйекті мәтін сенімді модель шешімін нақтылауға көмектеседі."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_14",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Сөздік бабы ұғымның ресми қолданысын дәл белгілейді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_15",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық жазба ұғымның ресми белгілерін қысқа және нақты береді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_17",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Термин анықтамасы ұғымның ресми мағынасын нақтылайды."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_18",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтама мәтіні мағынаны артық сөзсіз түсіндіреді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_19",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық қор ұғымның тұрақты қолданысын бекітеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_20",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық жүйе терминдердің байланысын айқын көрсетеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_21",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Термин түсіндірмесі негізгі мағынаны қысқа жеткізеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_22",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Ереже жинағы ұғымның шекарасын нақты сипаттайды."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_23",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық жазба негізгі белгілерді қысқа түрде береді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_24",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық мәтін негізгі белгілерді қысқа түрде береді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_25",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтама мәтіні негізгі ұғымды қысқа жеткізеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_26",
+      "pack_name": "adam-clean-reference-core-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық жазба негізгі белгілерді қысқа жеткізеді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_27",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Сабақ түсіндірмесі ұғымның негізгі мағынасын кезеңдеп ашады."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_28",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Сабақ материалы ұғымды мысал арқылы нақтылайды."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_29",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Жаттығу үлгісі ұғымды қолдану ретімен бекітеді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_31",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу тапсырмасы негізгі белгілерді салыстыру арқылы бекітеді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_32",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу материалы терминнің қызметін қысқа түрде түсіндіреді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_33",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу баяндауы терминнің қызметін ықшам түрде түсіндіреді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_34",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу баяндауы терминнің қызметін қысқа түрде сипаттайды."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_35",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу баяндауы терминнің қызметін қысқа түрде түсіндіреді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_37",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу баяндауы терминнің қызметін ықшам түрде сипаттайды."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_38",
+      "pack_name": "adam-clean-education-core-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу баяндауы терминнің қызметін қысқа түрде сипаттайды."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_45",
+      "pack_name": "adam-tiny-clean-general-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Таза мәтін логикалық модельге орнықты негіз береді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_48",
+      "pack_name": "adam-tiny-clean-reference-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтама берілген ұғымды нақты және қысқа түсіндіреді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_49",
+      "pack_name": "adam-tiny-clean-reference-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Термин сөздігі ұғымның ресми қолданысын бекітеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_50",
+      "pack_name": "adam-tiny-clean-reference-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Сөздік бабы ұғымның ресми қолданысын бекітеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_51",
+      "pack_name": "adam-tiny-clean-reference-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Сөздік баптары терминнің қолданысын тұрақтандырады."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_52",
+      "pack_name": "adam-tiny-clean-reference-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық жазба негізгі белгілерді қысқа түрде береді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_53",
+      "pack_name": "adam-tiny-clean-reference-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Ереже мәтіні терминнің шекарасын нақтылап көрсетеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_54",
+      "pack_name": "adam-tiny-clean-reference-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Термин анықтамасы негізгі мағынаны қысқа жеткізеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_55",
+      "pack_name": "adam-tiny-clean-reference-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық қор терминдердің тұрақты қолданысын сақтайды."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_56",
+      "pack_name": "adam-tiny-clean-reference-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтама мәтіні негізгі ұғымды қысқа түсіндіреді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_57",
+      "pack_name": "adam-tiny-clean-education-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу материалы ұғымдарды кезең-кезеңімен түсіндіреді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_58",
+      "pack_name": "adam-tiny-clean-education-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Жаттығу тапсырмасы білімді бекітуге көмектеседі."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_59",
+      "pack_name": "adam-tiny-clean-education-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу тапсырмасы ұғымды мысал арқылы бекітеді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_64",
+      "pack_name": "adam-tiny-clean-education-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Жүйелі жаттығу білімді тұрақты түрде бекітеді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_65",
+      "pack_name": "adam-tiny-clean-education-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу тапсырмасы ұғымды мысал арқылы түсіндіреді."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_71",
+      "pack_name": "adam-clean-general-extension-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Бірізді мәтін сенімді қорытынды шығаруға жол ашады."
+    },
+    {
+      "domain": "general",
+      "id": "clean_corpus_sample_72",
+      "pack_name": "adam-clean-general-extension-pack",
+      "source_id": "curated_general_kazakh",
+      "text": "Таза мәтін анық құрылым арқылы сенімді қорытындыға жеткізеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_75",
+      "pack_name": "adam-clean-reference-extension-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтама мәтіні басты ұғымды қысқа түсіндіреді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_77",
+      "pack_name": "adam-clean-reference-extension-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық қор мағыналық шекараны дәл сақтайды."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_78",
+      "pack_name": "adam-clean-reference-extension-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтамалық жүйе ұғымдар арасын дәл ажыратады."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_80",
+      "pack_name": "adam-clean-reference-extension-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Ереже жинағы қолдану шекарасын айқын түсіндіреді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_81",
+      "pack_name": "adam-clean-reference-extension-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Термин анықтамасы мағынаның өзегін қысқа жеткізеді."
+    },
+    {
+      "domain": "reference",
+      "id": "clean_corpus_sample_83",
+      "pack_name": "adam-clean-reference-extension-pack",
+      "source_id": "curated_reference_kazakh",
+      "text": "Анықтама берілген ұғымды дәл және қысқа түсіндіреді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_84",
+      "pack_name": "adam-clean-education-extension-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу тапсырмасы ұғымды жүйелі мысал арқылы бекітеді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_85",
+      "pack_name": "adam-clean-education-extension-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Сабақ түсіндірмесі негізгі ережені қысқа көрсетеді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_86",
+      "pack_name": "adam-clean-education-extension-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу мысалы ұғымның қызметін нақтылайды."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_87",
+      "pack_name": "adam-clean-education-extension-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу үлгісі ұғымды қолдану арқылы бекітеді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_88",
+      "pack_name": "adam-clean-education-extension-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Қайталау тапсырмасы білімді тұрақты етеді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_92",
+      "pack_name": "adam-clean-education-extension-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу баяндауы ұғымды мысал арқылы түсіндіреді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_93",
+      "pack_name": "adam-clean-education-extension-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу мазмұны терминнің қызметін қысқа түрде түсіндіреді."
+    },
+    {
+      "domain": "education",
+      "id": "clean_corpus_sample_94",
+      "pack_name": "adam-clean-education-extension-pack",
+      "source_id": "reviewed_education_kazakh",
+      "text": "Оқу баяндауы ұғымның қызметін қысқа түрде түсіндіреді."
+    }
+  ],
+  "script": "cyrillic",
+  "target_language": "kazakh",
+  "version": "0.0.61"
+}

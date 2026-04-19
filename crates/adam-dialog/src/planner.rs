@@ -134,11 +134,30 @@ fn template_is_fillable(template: &str, slots: &HashMap<String, String>) -> bool
 }
 
 /// Pull entity values out of the Intent into a slot map the realiser
-/// can substitute. v0.8.0 covers `{name}` only.
+/// can substitute.
+///
+/// v0.8.0: `{name}` only.
+/// v0.9.0: `{name}`, `{age}`, `{city}`, `{occupation}` — every intent
+/// that carries an optional entity contributes its slot when the
+/// entity is present.
 fn extract_slots(intent: &Intent) -> HashMap<String, String> {
     let mut slots = HashMap::new();
-    if let Intent::StatementOfName { name } = intent {
-        slots.insert("name".into(), name.clone());
+    match intent {
+        Intent::StatementOfName { name } => {
+            slots.insert("name".into(), name.clone());
+        }
+        Intent::StatementOfAge { years: Some(years) } => {
+            slots.insert("age".into(), years.to_string());
+        }
+        Intent::StatementOfLocation { city: Some(city) } => {
+            slots.insert("city".into(), city.clone());
+        }
+        Intent::StatementOfOccupation {
+            occupation: Some(occupation),
+        } => {
+            slots.insert("occupation".into(), occupation.clone());
+        }
+        _ => {}
     }
     slots
 }
@@ -198,11 +217,11 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::AskName => "ask_name",
         Intent::StatementOfName { .. } => "statement_of_name",
         Intent::AskAge => "ask_age",
-        Intent::StatementOfAge => "statement_of_age",
+        Intent::StatementOfAge { .. } => "statement_of_age",
         Intent::AskLocation => "ask_location",
-        Intent::StatementOfLocation => "statement_of_location",
+        Intent::StatementOfLocation { .. } => "statement_of_location",
         Intent::AskOccupation => "ask_occupation",
-        Intent::StatementOfOccupation => "statement_of_occupation",
+        Intent::StatementOfOccupation { .. } => "statement_of_occupation",
         Intent::AskFamily => "ask_family",
         Intent::StatementOfFamily => "statement_of_family",
         Intent::AskWeather => "ask_weather",
