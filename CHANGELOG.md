@@ -2,6 +2,39 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.7.5] — 2026-04-19
+
+Dialog layer widened from 5 to **10 intents** and templates externalised to TOML.
+
+New intents (+recognisers in `semantics.rs`):
+
+- `Thanks` — рахмет / көп рахмет / рақмет → оқасы жоқ, ештеңе емес, ризамын
+- `Apology` — кешіріңіз / ғафу ет → ештеңе емес, мейлі, түк етпейді
+- `AskHowAreYou` — қалайсың / қалайсыз / жағдайыңыз қалай → жақсымын рахмет, жаман емеспін, жақсы ал сіз қалайсыз
+- `StatementOfWellbeing` — жақсымын / жаман емес → жақсы екен, қуанамын, ал сіз қалайсыз
+- `AskName` — атың кім / есіміңіз қалай → менің атым адам, мені адам деп атайды
+
+Templates are now loaded from `data/dialog/templates/v1.toml` (14 families, one per intent-key), not hardcoded in `planner.rs`. `TemplateRepository::load_default()` auto-discovers the TOML file; `hardcoded_fallback()` preserves MVP guarantees when the file is missing.
+
+Public API additions:
+
+- `adam_dialog::TemplateRepository` + `TemplateError`
+- `adam_dialog::respond_with_repo(input, lex, repo, seed)` — explicit-repo variant of `respond`
+- `adam_dialog::plan_response_with_repo(intent, seed, repo)` + `intent_key(intent)`
+
+`adam_chat` REPL now loads the TOML repo at startup (falls back to hardcoded if missing) and prints family count on stderr.
+
+Ordering subtlety in the semantic dispatcher: `Thanks`/`Apology` are checked BEFORE `Affirmation` so "рахмет" (thanks) can't accidentally fall into affirmation if later extended.
+
+Tests: 23 dialog end-to-end pairs (up from 15), 8 new covering all 5 new intents. Workspace totals: **183 passing**, 4 ignored, 0 failing.
+
+Known v0.7.5 limitations (by design, not bugs):
+
+- Templates are still literal phrases; slotted templates with `(root, features)` atoms land in v0.8.0.
+- No entity extraction (own name from "менің атым X" → greeting back by name).
+- 10 intents cover greetings + basic social politeness; v0.8.0 widens to 25.
+- No multi-turn state.
+
 ## [0.7.0] — 2026-04-19
 
 First iteration of the predictable dialog layer. New crate `adam-dialog` implements a 5-layer pipeline (FST parser → semantics → planner → realiser → FST synthesiser) against the architectural spec in `docs/kazakh_grammar/07_dialog_architecture.md`.

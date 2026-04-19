@@ -27,6 +27,21 @@ pub enum Intent {
     /// No / denial: жоқ, қате, емес.
     Negation,
 
+    /// Thank you: рахмет, көп рахмет, рахметім.
+    Thanks,
+
+    /// Sorry / excuse me: кешіріңіз, ғафу етіңіз.
+    Apology,
+
+    /// "How are you?": қалайсың, қалайсыз, жағдайыңыз қалай.
+    AskHowAreYou,
+
+    /// User is reporting their wellbeing: жақсымын, жаман емеспін.
+    StatementOfWellbeing,
+
+    /// "What's your name?": атың кім, есіміңіз қалай.
+    AskName,
+
     /// Nothing matched. Fallback response is a polite
     /// "түсінбедім" (I didn't understand).
     Unknown { raw_tokens: Vec<String> },

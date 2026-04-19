@@ -1,0 +1,136 @@
+# adam-dialog v1 template repository.
+#
+# Each entry is a TEMPLATE FAMILY: a set of interchangeable responses
+# for a specific intent (or intent + sub-kind). The planner picks one
+# deterministically-from-seed and the realiser emits it as-is.
+#
+# For v0.7.5 all templates are literal Kazakh phrases. v0.8.0+ will
+# support slotted templates with (root, features) atoms for true
+# morphology-driven generation.
+#
+# Format:
+#   [[families]]
+#   key = "intent_identifier"
+#   templates = ["phrase 1", "phrase 2", ...]
+
+version = "0.7.5"
+
+# ---------- Greetings ----------
+
+[[families]]
+key = "greeting.casual"
+templates = [
+    "сәлем",
+    "сәлем достым",
+]
+
+[[families]]
+key = "greeting.polite"
+templates = [
+    "сәлеметсіз бе",
+    "армысыз",
+]
+
+[[families]]
+key = "greeting.morning"
+templates = [
+    "қайырлы таң",
+    "қайырлы таң болсын",
+]
+
+[[families]]
+key = "greeting.day"
+templates = [
+    "қайырлы күн",
+]
+
+[[families]]
+key = "greeting.evening"
+templates = [
+    "қайырлы кеш",
+]
+
+# ---------- Farewell ----------
+
+[[families]]
+key = "farewell"
+templates = [
+    "сау бол",
+    "кездескенше",
+    "аман бол",
+    "сау болыңыз",
+]
+
+# ---------- Affirmation / Negation ----------
+
+[[families]]
+key = "affirmation"
+templates = [
+    "иә",
+    "дұрыс айтасыз",
+    "рас",
+    "мақұл",
+]
+
+[[families]]
+key = "negation"
+templates = [
+    "жоқ",
+    "дұрыс емес",
+]
+
+# ---------- Social politeness (v0.7.5 new) ----------
+
+# User said "рахмет" (thank you) → respond "not at all"
+[[families]]
+key = "thanks"
+templates = [
+    "оқасы жоқ",
+    "ештеңе емес",
+    "ризамын",
+]
+
+# User said "кешіріңіз" (sorry) → respond "it's nothing"
+[[families]]
+key = "apology"
+templates = [
+    "ештеңе емес",
+    "мейлі",
+    "түк етпейді",
+]
+
+# User asked "қалайсың" / "қалайсыз" (how are you) → respond about self
+[[families]]
+key = "ask_how_are_you"
+templates = [
+    "жақсымын, рахмет",
+    "жаман емеспін",
+    "жақсы, ал сіз қалайсыз",
+]
+
+# User said a wellbeing statement → acknowledge + mirror
+[[families]]
+key = "statement_of_wellbeing"
+templates = [
+    "жақсы екен",
+    "қуанамын",
+    "ал сіз қалайсыз",
+]
+
+# User asked "атың кім" / "есімің қалай" → introduce self
+[[families]]
+key = "ask_name"
+templates = [
+    "менің атым адам",
+    "мені адам деп атайды",
+]
+
+# ---------- Fallback ----------
+
+[[families]]
+key = "unknown"
+templates = [
+    "түсінбедім",
+    "қайта айтыңызшы",
+    "кешіріңіз, мен мұны білмеймін",
+]

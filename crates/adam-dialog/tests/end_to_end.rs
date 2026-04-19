@@ -8,8 +8,14 @@
 //! pool for that intent is wrong.
 
 use adam_dialog::intent::{GreetingKind, Intent, TimeOfDay};
-use adam_dialog::{interpret_text, plan_response, realise, respond};
+use adam_dialog::{
+    TemplateRepository, interpret_text, plan_response, realise, respond, respond_with_repo,
+};
 use adam_kernel_fst::lexicon::LexiconV1;
+
+fn load_repo() -> TemplateRepository {
+    TemplateRepository::load_default().expect("templates v1.toml must exist")
+}
 
 fn load_lexicon() -> Option<LexiconV1> {
     let curated = "../../data/tokenizer/segmentation_roots.json";
@@ -37,6 +43,23 @@ fn assert_response_in_set(input: &str, allowed: &[&str]) {
     // Cycle seeds 0..8 to sample the planner's output space.
     for seed in 0..8u64 {
         let out = respond(input, &lex, seed);
+        assert!(
+            allowed.contains(&out.as_str()),
+            "input={input:?} seed={seed} output={out:?} not in allowed={allowed:?}",
+        );
+    }
+}
+
+/// Like `assert_response_in_set` but uses the full TOML template
+/// repository so all v0.7.5 templates (including new intents) are
+/// reachable.
+fn assert_response_with_toml(input: &str, allowed: &[&str]) {
+    let Some(lex) = load_lexicon() else {
+        return;
+    };
+    let repo = load_repo();
+    for seed in 0..16u64 {
+        let out = respond_with_repo(input, &lex, &repo, seed);
         assert!(
             allowed.contains(&out.as_str()),
             "input={input:?} seed={seed} output={out:?} not in allowed={allowed:?}",
@@ -127,6 +150,62 @@ fn response_affirmation() {
 #[test]
 fn response_negation() {
     assert_response_in_set("жоқ", &["жоқ", "дұрыс емес"]);
+}
+
+// --- v0.7.5 new intents (require TOML repo) --------------------------------
+
+#[test]
+fn response_thanks() {
+    assert_response_with_toml("рахмет", &["оқасы жоқ", "ештеңе емес", "ризамын"]);
+}
+
+#[test]
+fn response_thanks_emphatic() {
+    assert_response_with_toml("көп рахмет", &["оқасы жоқ", "ештеңе емес", "ризамын"]);
+}
+
+#[test]
+fn response_apology() {
+    assert_response_with_toml("кешіріңіз", &["ештеңе емес", "мейлі", "түк етпейді"]);
+}
+
+#[test]
+fn response_ask_how_are_you_polite() {
+    assert_response_with_toml(
+        "қалайсыз",
+        &[
+            "жақсымын, рахмет",
+            "жаман емеспін",
+            "жақсы, ал сіз қалайсыз",
+        ],
+    );
+}
+
+#[test]
+fn response_ask_how_are_you_casual() {
+    assert_response_with_toml(
+        "қалайсың",
+        &[
+            "жақсымын, рахмет",
+            "жаман емеспін",
+            "жақсы, ал сіз қалайсыз",
+        ],
+    );
+}
+
+#[test]
+fn response_statement_of_wellbeing() {
+    assert_response_with_toml("жақсымын", &["жақсы екен", "қуанамын", "ал сіз қалайсыз"]);
+}
+
+#[test]
+fn response_ask_name() {
+    assert_response_with_toml("атың кім", &["менің атым адам", "мені адам деп атайды"]);
+}
+
+#[test]
+fn response_ask_name_polite() {
+    assert_response_with_toml("атыңыз кім", &["менің атым адам", "мені адам деп атайды"]);
 }
 
 // --- Traceability ----------------------------------------------------------

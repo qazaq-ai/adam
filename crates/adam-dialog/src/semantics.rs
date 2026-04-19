@@ -36,6 +36,24 @@ pub fn interpret_text(input: &str, _parses: &[Analysis]) -> Intent {
     if detect_farewell(&tokens, &joined) {
         return Intent::Farewell;
     }
+    // Order matters: thanks/apology should be checked before affirmation,
+    // because "рахмет" is a single-token thanks and shouldn't accidentally
+    // fall into affirmation if we ever add "рахмет" there.
+    if detect_thanks(&tokens, &joined) {
+        return Intent::Thanks;
+    }
+    if detect_apology(&tokens, &joined) {
+        return Intent::Apology;
+    }
+    if detect_ask_how_are_you(&joined) {
+        return Intent::AskHowAreYou;
+    }
+    if detect_ask_name(&joined) {
+        return Intent::AskName;
+    }
+    if detect_statement_of_wellbeing(&tokens, &joined) {
+        return Intent::StatementOfWellbeing;
+    }
     if detect_affirmation(&tokens, &joined) {
         return Intent::Affirmation;
     }
@@ -57,6 +75,21 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
     }
     if detect_farewell(&tokens, &joined) {
         return Intent::Farewell;
+    }
+    if detect_thanks(&tokens, &joined) {
+        return Intent::Thanks;
+    }
+    if detect_apology(&tokens, &joined) {
+        return Intent::Apology;
+    }
+    if detect_ask_how_are_you(&joined) {
+        return Intent::AskHowAreYou;
+    }
+    if detect_ask_name(&joined) {
+        return Intent::AskName;
+    }
+    if detect_statement_of_wellbeing(&tokens, &joined) {
+        return Intent::StatementOfWellbeing;
     }
     if detect_affirmation(&tokens, &joined) {
         return Intent::Affirmation;
@@ -137,4 +170,47 @@ fn detect_negation(tokens: &[String], joined: &str) -> bool {
     } else {
         joined.contains("жоқ емес") || joined.starts_with("жоқ")
     }
+}
+
+// --- v0.7.5 new recognisers ------------------------------------------------
+
+fn detect_thanks(tokens: &[String], joined: &str) -> bool {
+    tokens.iter().any(|t| t == "рахмет" || t == "рахметім")
+        || joined.contains("көп рахмет")
+        || joined.contains("рақмет")
+}
+
+fn detect_apology(tokens: &[String], joined: &str) -> bool {
+    tokens.iter().any(|t| t == "кешіріңіз" || t == "ғафу")
+        || joined.contains("кешір")
+        || joined.contains("ғафу ет")
+}
+
+/// "How are you?" — қалайсың / қалайсыз / жағдайыңыз қалай / хал қалай.
+fn detect_ask_how_are_you(joined: &str) -> bool {
+    joined.contains("қалайсың")
+        || joined.contains("қалайсыз")
+        || joined.contains("жағдайың қалай")
+        || joined.contains("жағдайыңыз қалай")
+        || joined.contains("халің қалай")
+        || joined.contains("халіңіз қалай")
+        || joined == "қалың қалай"
+}
+
+/// "What's your name?" — атың кім, есімің қалай, атыңыз кім.
+fn detect_ask_name(joined: &str) -> bool {
+    (joined.contains("атың") && joined.contains("кім"))
+        || (joined.contains("атыңыз") && joined.contains("кім"))
+        || joined.contains("есімің")
+        || joined.contains("есіміңіз")
+}
+
+/// User is saying how they are: жақсымын, жаман емеспін, т.б.
+fn detect_statement_of_wellbeing(tokens: &[String], joined: &str) -> bool {
+    tokens.iter().any(|t| {
+        matches!(
+            t.as_str(),
+            "жақсымын" | "жаманмын" | "жақсы" | "жаман" | "дұрысмын"
+        )
+    }) || joined.contains("жаман емес")
 }

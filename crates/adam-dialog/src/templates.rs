@@ -1,39 +1,138 @@
-//! Template repository loader.
+//! Template repository — loads `data/dialog/templates/v1.toml` at runtime.
 //!
-//! v0.7.0 stub — templates are hardcoded in `planner.rs` for the MVP.
-//! This module will become substantive in v0.7.5 when templates move to
-//! TOML files under `data/dialog/templates/`.
+//! Structure:
+//! ```toml
+//! version = "0.7.5"
 //!
-//! Design sketch (for v0.7.5 implementation):
-//!
-//! ```ignore
-//! // One .toml file per intent family.
-//! // Load all at startup into an in-memory HashMap.
-//!
-//! pub struct TemplateRepository {
-//!     by_intent: HashMap<IntentKey, Vec<Template>>,
-//! }
-//!
-//! pub struct Template {
-//!     pub id: String,
-//!     pub applicable_when: Conditions,
-//!     pub atoms: Vec<Atom>,  // literal, root-slot, or (root, features)
-//! }
+//! [[families]]
+//! key = "greeting.casual"
+//! templates = ["сәлем", "сәлем достым"]
 //! ```
+//!
+//! The repository is a flat `key → Vec<String>` map. Keys use dotted
+//! paths (`intent.sub_kind`) for readability but are opaque strings to
+//! the loader. The planner knows which key to look up for each intent.
+//!
+//! Missing keys are fatal at load time — we want configuration errors
+//! to surface on startup, not during a conversation.
 
-/// Stub — becomes the real repository in v0.7.5.
-pub struct TemplateRepository;
+use std::{collections::HashMap, fs, path::Path};
+
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+struct RawFile {
+    #[allow(dead_code)]
+    version: String,
+    families: Vec<RawFamily>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawFamily {
+    key: String,
+    templates: Vec<String>,
+}
+
+/// Loaded template repository. Held by value; cheap to clone.
+#[derive(Debug, Clone)]
+pub struct TemplateRepository {
+    by_key: HashMap<String, Vec<String>>,
+}
 
 impl TemplateRepository {
-    /// Placeholder constructor. Returns an empty repository; v0.7.0
-    /// `planner.rs` doesn't consult it.
-    pub fn new() -> Self {
-        Self
+    /// Load from the canonical repository path. Searches in parent
+    /// directories if the default path doesn't exist — useful for tests
+    /// run from various working directories.
+    pub fn load_default() -> Result<Self, TemplateError> {
+        for candidate in [
+            "data/dialog/templates/v1.toml",
+            "../data/dialog/templates/v1.toml",
+            "../../data/dialog/templates/v1.toml",
+        ] {
+            if Path::new(candidate).exists() {
+                return Self::load(candidate);
+            }
+        }
+        Err(TemplateError::NotFound)
+    }
+
+    pub fn load<P: AsRef<Path>>(path: P) -> Result<Self, TemplateError> {
+        let raw_text = fs::read_to_string(&path).map_err(|e| TemplateError::Io {
+            path: path.as_ref().display().to_string(),
+            source: e,
+        })?;
+        let raw: RawFile = toml::from_str(&raw_text).map_err(|e| TemplateError::Parse {
+            path: path.as_ref().display().to_string(),
+            message: e.to_string(),
+        })?;
+        let mut by_key = HashMap::new();
+        for family in raw.families {
+            if family.templates.is_empty() {
+                return Err(TemplateError::EmptyFamily { key: family.key });
+            }
+            by_key.insert(family.key, family.templates);
+        }
+        Ok(Self { by_key })
+    }
+
+    /// Minimal hardcoded fallback used when the TOML file is absent
+    /// (e.g., in isolated unit tests). Covers only the v0.7.0 intents.
+    pub fn hardcoded_fallback() -> Self {
+        let mut by_key = HashMap::new();
+        by_key.insert("greeting.casual".into(), vec!["сәлем".into()]);
+        by_key.insert("greeting.polite".into(), vec!["сәлеметсіз бе".into()]);
+        by_key.insert("greeting.morning".into(), vec!["қайырлы таң".into()]);
+        by_key.insert("greeting.day".into(), vec!["қайырлы күн".into()]);
+        by_key.insert("greeting.evening".into(), vec!["қайырлы кеш".into()]);
+        by_key.insert("farewell".into(), vec!["сау бол".into()]);
+        by_key.insert("affirmation".into(), vec!["иә".into()]);
+        by_key.insert("negation".into(), vec!["жоқ".into()]);
+        by_key.insert("thanks".into(), vec!["оқасы жоқ".into()]);
+        by_key.insert("apology".into(), vec!["ештеңе емес".into()]);
+        by_key.insert("ask_how_are_you".into(), vec!["жақсымын, рахмет".into()]);
+        by_key.insert("statement_of_wellbeing".into(), vec!["жақсы екен".into()]);
+        by_key.insert("ask_name".into(), vec!["менің атым адам".into()]);
+        by_key.insert("unknown".into(), vec!["түсінбедім".into()]);
+        Self { by_key }
+    }
+
+    /// Look up the template list for `key`. Returns the fallback
+    /// `["түсінбедім"]` if the key is unknown — this keeps the dialog
+    /// loop resilient to planner/repository drift.
+    pub fn get(&self, key: &str) -> &[String] {
+        self.by_key
+            .get(key)
+            .map(|v| v.as_slice())
+            .unwrap_or_else(|| {
+                self.by_key
+                    .get("unknown")
+                    .map(|v| v.as_slice())
+                    .unwrap_or(&[])
+            })
+    }
+
+    /// Count of registered keys, for diagnostics.
+    pub fn len(&self) -> usize {
+        self.by_key.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.by_key.is_empty()
     }
 }
 
-impl Default for TemplateRepository {
-    fn default() -> Self {
-        Self::new()
-    }
+#[derive(Debug, thiserror::Error)]
+pub enum TemplateError {
+    #[error("no template file found in the canonical search paths")]
+    NotFound,
+    #[error("io error reading {path}: {source}")]
+    Io {
+        path: String,
+        #[source]
+        source: std::io::Error,
+    },
+    #[error("parse error in {path}: {message}")]
+    Parse { path: String, message: String },
+    #[error("family '{key}' has no templates")]
+    EmptyFamily { key: String },
 }

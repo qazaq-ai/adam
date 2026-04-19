@@ -21,15 +21,17 @@ pub mod semantics;
 pub mod templates;
 
 pub use intent::{GreetingKind, Intent, SubjectPerson};
-pub use planner::{ResponsePlan, plan_response};
+pub use planner::{ResponsePlan, intent_key, plan_response, plan_response_with_repo};
 pub use realiser::realise;
 pub use semantics::{interpret, interpret_text};
+pub use templates::{TemplateError, TemplateRepository};
 
 /// End-to-end entry point: Kazakh text in, Kazakh text out.
 ///
-/// Runs Layer 1 → 5. Returns a response string. Uses `interpret_text`
-/// which combines raw-token keyword matching with morphological parses,
-/// so tokens that aren't in the lexicon still get classified.
+/// Uses the hardcoded-fallback template repository — convenient but
+/// limited. Production uses should call [`respond_with_repo`] with a
+/// `TemplateRepository` loaded from `data/dialog/templates/v1.toml`
+/// for the full 10-intent template coverage.
 pub fn respond(
     input: &str,
     lexicon: &adam_kernel_fst::lexicon::LexiconV1,
@@ -38,6 +40,19 @@ pub fn respond(
     let parses = parse_input(input, lexicon);
     let intent = interpret_text(input, &parses);
     let plan = plan_response(&intent, rng_seed);
+    realise(&plan)
+}
+
+/// End-to-end entry point with an explicit template repository.
+pub fn respond_with_repo(
+    input: &str,
+    lexicon: &adam_kernel_fst::lexicon::LexiconV1,
+    repo: &TemplateRepository,
+    rng_seed: u64,
+) -> String {
+    let parses = parse_input(input, lexicon);
+    let intent = interpret_text(input, &parses);
+    let plan = plan_response_with_repo(&intent, rng_seed, repo);
     realise(&plan)
 }
 
