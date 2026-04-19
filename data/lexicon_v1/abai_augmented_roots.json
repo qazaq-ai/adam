@@ -1,0 +1,3508 @@
+{
+  "version": "0.5.0",
+  "name": "adam-lexicon-v1-abai-augmented",
+  "target_language": "kazakh",
+  "script": "cyrillic",
+  "roots": [
+    {
+      "id": "verb_abai_soez",
+      "root": "сөз",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_sol",
+      "root": "сол",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_sal",
+      "root": "сал",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_bop",
+      "root": "боп",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_boy",
+      "root": "бой",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_qyz",
+      "root": "қыз",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_jau",
+      "root": "жау",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_nadan",
+      "root": "надан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_qal",
+      "root": "қал",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_jay",
+      "root": "жай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_jat",
+      "root": "жат",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_son",
+      "root": "сон",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_qan",
+      "root": "қан",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_qol",
+      "root": "қол",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_tues",
+      "root": "түс",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_qay",
+      "root": "қай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_qys",
+      "root": "қыс",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_kedey",
+      "root": "кедей",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_jet",
+      "root": "жет",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_mys",
+      "root": "мыс",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_key",
+      "root": "кей",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_jaq",
+      "root": "жақ",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_qar",
+      "root": "қар",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jep",
+      "root": "жеп",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_shygha",
+      "root": "шыға",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jatyr",
+      "root": "жатыр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_oett",
+      "root": "өтт",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_qyr",
+      "root": "қыр",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_ert",
+      "root": "ерт",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_erte",
+      "root": "ерте",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_boyyn",
+      "root": "бойын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_joen",
+      "root": "жөн",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_sudan",
+      "root": "судан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_sugha",
+      "root": "суға",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_nen",
+      "root": "нен",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_ty",
+      "root": "тыя",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_nes",
+      "root": "нес",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_sonday",
+      "root": "сондай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_erme",
+      "root": "ерме",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_jiy",
+      "root": "жиы",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_jeng",
+      "root": "жең",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_arzan",
+      "root": "арзан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_art",
+      "root": "арт",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_qaz",
+      "root": "қаз",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_say",
+      "root": "сай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_buur",
+      "root": "бұр",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jayyn",
+      "root": "жайын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_kerde",
+      "root": "керде",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_muustapa",
+      "root": "мұстапа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_tiih",
+      "root": "тиі",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_toq",
+      "root": "тоқ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_shygh",
+      "root": "шығ",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_khareket",
+      "root": "харекет",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_sud",
+      "root": "суд",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_suy",
+      "root": "суы",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_tura",
+      "root": "тура",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_syz",
+      "root": "сыяз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_sap",
+      "root": "сап",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_saba",
+      "root": "саба",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_ayryl",
+      "root": "айрыл",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_sybyr",
+      "root": "сыбыр",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jaedihgoey",
+      "root": "жәдігөй",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ertere",
+      "root": "ертере",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_solar",
+      "root": "солар",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_erge",
+      "root": "ерге",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_jama",
+      "root": "жама",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_neng",
+      "root": "нең",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_jetpey",
+      "root": "жетпей",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_tor",
+      "root": "тояр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_salpylda",
+      "root": "салпылда",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_arttaghy",
+      "root": "арттағы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_khal",
+      "root": "хал",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_tal",
+      "root": "тал",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jetse",
+      "root": "жетсе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jetpes",
+      "root": "жетпес",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_ji",
+      "root": "жия",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_kesh",
+      "root": "кеш",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_jayyl",
+      "root": "жайыл",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_luepihlde",
+      "root": "лүпілде",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_edinia",
+      "root": "единица",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_salsyn",
+      "root": "салсын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_boyy",
+      "root": "бойы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_jighan",
+      "root": "жиған",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_qalsyn",
+      "root": "қалсын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_vadi",
+      "root": "вади",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_sybyrlas",
+      "root": "сыбырлас",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_khalia",
+      "root": "халифа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_boyyng",
+      "root": "бойың",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_suda",
+      "root": "суда",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_joenihn",
+      "root": "жөнін",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_koeme",
+      "root": "көме",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ebihn",
+      "root": "ебін",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_ghapyl",
+      "root": "ғапыл",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ay",
+      "root": "ащы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_aelde",
+      "root": "әлде",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_ghar",
+      "root": "ғар",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_aele",
+      "root": "әле",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_aerne",
+      "root": "әрне",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_qald",
+      "root": "қалд",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ar_namys",
+      "root": "ар-намыс",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_boyyna",
+      "root": "бойына",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_aristotel",
+      "root": "аристотель",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_khabar",
+      "root": "хабар",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_to",
+      "root": "тоя",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_kaen",
+      "root": "кән",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_iygh",
+      "root": "иығ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_syp",
+      "root": "сып",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_jatpa",
+      "root": "жатпа",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_sayray",
+      "root": "сайрай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_ergen",
+      "root": "ерген",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_sybdyr",
+      "root": "сыбдыр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_salsa",
+      "root": "салса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_qarn",
+      "root": "қарн",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_taengr",
+      "root": "тәңр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_sald",
+      "root": "салд",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_erse",
+      "root": "ерсе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jauyn",
+      "root": "жауын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_aqt",
+      "root": "ақт",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_toerdeg",
+      "root": "төрдег",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jesihn",
+      "root": "жесін",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_buurtaqta",
+      "root": "бұртақта",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_dorba",
+      "root": "дорба",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_starshyn",
+      "root": "старшын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_pyrmay",
+      "root": "япырмай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_soezbe",
+      "root": "сөзбе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_khimi",
+      "root": "химия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_oezdih_oez",
+      "root": "өзді-өз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_terbe",
+      "root": "тербе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jisa",
+      "root": "жиса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ermey",
+      "root": "ермей",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_udy",
+      "root": "уды",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ghishy",
+      "root": "ғишы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_laem",
+      "root": "ләм",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_khaekihm",
+      "root": "хәкім",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_qayryl",
+      "root": "қайрыл",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_shybyn",
+      "root": "шыбын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_salbyra",
+      "root": "салбыра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jauqazyn",
+      "root": "жауқазын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_kharek",
+      "root": "харек",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_yrja",
+      "root": "ыржа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jayynga",
+      "root": "жайыңа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_nayza",
+      "root": "найза",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_talpyn",
+      "root": "талпын",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_abuuyyr",
+      "root": "абұйыр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_uengihrey",
+      "root": "үңірей",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_semey",
+      "root": "семей",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_shyray",
+      "root": "шырай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ilip",
+      "root": "филип",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_dombyra",
+      "root": "домбыра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jauyryn",
+      "root": "жауырын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_zakon",
+      "root": "закон",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_doep",
+      "root": "дөп",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_suylda",
+      "root": "суылда",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ayda",
+      "root": "файда",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_sayla",
+      "root": "сайла",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_jaqpa",
+      "root": "жақпа",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_uerd",
+      "root": "уерд",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_sayra",
+      "root": "сайра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_shek",
+      "root": "шек",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_erneu",
+      "root": "ернеу",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_yntyqtygh",
+      "root": "ынтықтығ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_nemene",
+      "root": "немене",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_tihg",
+      "root": "тіг",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_erd",
+      "root": "ерд",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_salyn",
+      "root": "салын",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_baes",
+      "root": "бәс",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_sebe",
+      "root": "себе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_samorodnyy",
+      "root": "самородный",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jauryn",
+      "root": "жаурын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_jabylsa",
+      "root": "жабылса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_laezzae",
+      "root": "ләззә",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_neme",
+      "root": "неме",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_jiren",
+      "root": "жирен",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_jengbe",
+      "root": "жеңбе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_qayqay",
+      "root": "қайқай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_muemin",
+      "root": "мүмин",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_seb",
+      "root": "себ",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_tud",
+      "root": "туд",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_suday",
+      "root": "судай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_sypyr",
+      "root": "сыпыр",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_baeyg",
+      "root": "бәйг",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_kereg",
+      "root": "керег",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_shybynda",
+      "root": "шыбында",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_aerqay",
+      "root": "әрқай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_saq",
+      "root": "сақ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_pys",
+      "root": "пыс",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_jirenbe",
+      "root": "жиренбе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_kerege",
+      "root": "кереге",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_salmay",
+      "root": "салмай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_tigen",
+      "root": "тиген",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_salma",
+      "root": "салма",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_khab",
+      "root": "хаб",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_kerme",
+      "root": "керме",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_sy",
+      "root": "сыя",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_buudan",
+      "root": "бұдан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_boydagh",
+      "root": "бойдағ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ghishq",
+      "root": "ғишқ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_saldy",
+      "root": "салды",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_oetih",
+      "root": "өті",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ajy",
+      "root": "ажы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_maeujuet",
+      "root": "мәужүт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_laem_mi",
+      "root": "ләм-ми",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_nadan_a",
+      "root": "надан-а",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_saeykhali",
+      "root": "сәйхали",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jende",
+      "root": "женде",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ghashyghym",
+      "root": "ғашығым",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_kaekihr_shuekihr",
+      "root": "кәкір-шүкір",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_aymalat",
+      "root": "аймалат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_ghashygh",
+      "root": "ғашығ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_du_d",
+      "root": "ду-д",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jengse",
+      "root": "жеңсе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_yntyz",
+      "root": "ынтыз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_saes",
+      "root": "сәс",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_jaymas",
+      "root": "жаймас",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_duuspandyghyn",
+      "root": "дұспандығын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_ysyn",
+      "root": "ысын",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_talmausyra",
+      "root": "талмаусыра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_suys",
+      "root": "суыс",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_nadanday",
+      "root": "надандай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_byljyra",
+      "root": "былжыра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_artpas",
+      "root": "артпас",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_keshu",
+      "root": "кешу",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_jetpe",
+      "root": "жетпе",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_paeruardig",
+      "root": "пәруардиг",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_salmang",
+      "root": "салмаң",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_kaetelesh",
+      "root": "кәтелеш",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_baengg",
+      "root": "бәңг",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_saylasyn",
+      "root": "сайласын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_arttagh",
+      "root": "арттағ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_khalat",
+      "root": "халат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_tueg",
+      "root": "түг",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_oezae",
+      "root": "өзә",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_susynyn",
+      "root": "сусынын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_taltay",
+      "root": "талтай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_tuenglihkbay",
+      "root": "түңлікбай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_koeyt",
+      "root": "көйт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_khoja",
+      "root": "хожа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_shyjymay",
+      "root": "шыжымай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_pysyghyn",
+      "root": "пысығын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_queshaqtas",
+      "root": "қүшақтас",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai__eger",
+      "root": "-егер",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_saldyr",
+      "root": "салдыр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_yrjyng_qylja",
+      "root": "ыржың-қылжа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_laebihng",
+      "root": "ләбің",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_terme",
+      "root": "терме",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ehe_ehe",
+      "root": "еһе-еһе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_terben",
+      "root": "тербен",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_soegu",
+      "root": "сөгу",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jueg",
+      "root": "жүг",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jaughan",
+      "root": "жауған",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_ayrylyp",
+      "root": "айрылып",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_kae",
+      "root": "кәф",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_sida",
+      "root": "сида",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_qaza",
+      "root": "қаза",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_baehra",
+      "root": "бәһра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_sueih",
+      "root": "сүі",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ard",
+      "root": "ард",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_zaehaerday",
+      "root": "зәһәрдай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_sud",
+      "root": "судья",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_khareke",
+      "root": "хареке",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_sayysyp_a",
+      "root": "сайысып-а",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_ghadihlet",
+      "root": "ғаділет",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_tulay",
+      "root": "тулай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jaqqan",
+      "root": "жаққан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_iuezi",
+      "root": "иүзи",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_korennoy",
+      "root": "коренной",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jaura",
+      "root": "жаура",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jayn",
+      "root": "жайн",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_taeshtit",
+      "root": "тәштит",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_qarbangdad",
+      "root": "қарбаңдад",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_dihkihlde",
+      "root": "дікілде",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_dulat",
+      "root": "дулат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_zay",
+      "root": "зай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_muenaejaet",
+      "root": "мүнәжәт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_tuesp",
+      "root": "түсп",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_igen",
+      "root": "иген",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_qyrys",
+      "root": "қырыс",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_jirense",
+      "root": "жиренсе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ar_uu",
+      "root": "ар-ұя",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_khaek",
+      "root": "хәк",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_qa",
+      "root": "қаф",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_kegihn",
+      "root": "кегін",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_shuurqyra",
+      "root": "шұрқыра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_khauas",
+      "root": "хауас",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_mshid",
+      "root": "ямшид",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_ukoengihl",
+      "root": "укөңіл",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_koeylegihn",
+      "root": "көйлегін",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_jamay",
+      "root": "жамай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_emeks",
+      "root": "емекс",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_totta",
+      "root": "тоятта",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_soezden",
+      "root": "сөзден",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_aeni",
+      "root": "фәни",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_tergendey",
+      "root": "тергендей",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_zaygh",
+      "root": "зайғ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_eskermed",
+      "root": "ескермед",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_qoqaqta",
+      "root": "қоқақта",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_aud",
+      "root": "ауд",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_shyrqyn",
+      "root": "шырқын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_aer_ber",
+      "root": "әр-бер",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_tyr",
+      "root": "тыяр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jaqt",
+      "root": "жақт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_yp_yqsha",
+      "root": "ып-ықша",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_sayrasa",
+      "root": "сайраса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_raghit",
+      "root": "рағит",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_khamihr",
+      "root": "хамір",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_nadandygh",
+      "root": "надандығ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_aybyn",
+      "root": "айбын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_jaynasyn",
+      "root": "жайнасын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_tyngtu",
+      "root": "тыңтуя",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_tuye",
+      "root": "туйе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ynsa",
+      "root": "ынса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_muebae",
+      "root": "мүбә",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_yrjangd",
+      "root": "ыржаңд",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_qom",
+      "root": "қом",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_laepkesihn",
+      "root": "ләпкесін",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai__se",
+      "root": "-се",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_tygha",
+      "root": "тыға",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_talmay",
+      "root": "талмай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_nauai",
+      "root": "науаи",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_qit",
+      "root": "қит",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_sybdyryn",
+      "root": "сыбдырын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_juemyrt",
+      "root": "жүмырт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_khikmetih",
+      "root": "хикметі",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_qayqa",
+      "root": "қайқа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_esken",
+      "root": "ескен",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_ghapihl",
+      "root": "ғапіл",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_nashal",
+      "root": "нашал",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_dugha",
+      "root": "дуға",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ghadaelaet",
+      "root": "ғадәләт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_dikhanshy",
+      "root": "диханшы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_qoqy",
+      "root": "қоқы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_anggha",
+      "root": "аңға",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_imang",
+      "root": "имаң",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_boesteg",
+      "root": "бөстег",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_muutaekaellimin",
+      "root": "мұтәкәллимин",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_koemek",
+      "root": "көмек",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_myzgh",
+      "root": "мызғ",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jambasyng",
+      "root": "жамбасың",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_riaz",
+      "root": "риаз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_qisa",
+      "root": "қиса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_buurtay",
+      "root": "бұртай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_ghyp",
+      "root": "ғып",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_jamal",
+      "root": "жамал",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ael_quat",
+      "root": "әл-қуат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_ayrylmas",
+      "root": "айрылмас",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_saldyra",
+      "root": "салдыра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_sol_a",
+      "root": "сол-а",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_jattay",
+      "root": "жаттай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jiyp_a",
+      "root": "жиып-а",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_nalae",
+      "root": "налә",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ayran",
+      "root": "айран",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_raehb",
+      "root": "рәһб",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_tuushymas",
+      "root": "тұшымас",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_khassa",
+      "root": "хасса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_soezu",
+      "root": "сөзу",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_tuegenshen",
+      "root": "түгеншен",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_aeurihl",
+      "root": "әуріл",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_kuulyn_tay",
+      "root": "кұлын-тай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_laeghilde",
+      "root": "ләғилде",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_aerman",
+      "root": "әрман",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_ajyn",
+      "root": "ажын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_byljyray",
+      "root": "былжырай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_kuuyryghy",
+      "root": "кұйрығы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_duepihlde",
+      "root": "дүпілде",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_sipat",
+      "root": "сипат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_aesihre",
+      "root": "әсіре",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_mysqyl",
+      "root": "мысқыл",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_tuughr",
+      "root": "тұғр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_uaektubihi",
+      "root": "уәктубиһи",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_taekhqi",
+      "root": "тәхқи",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_qqysh_a",
+      "root": "ққыш-а",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_aerid",
+      "root": "фәрияд",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ylayla",
+      "root": "ылайла",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_khaedis",
+      "root": "хәдис",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_jenggen_",
+      "root": "жеңген-",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_haruan_rashid",
+      "root": "һаруан-рашид",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_nisbaet",
+      "root": "нисбәт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_eskerme",
+      "root": "ескерме",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_shel",
+      "root": "шел",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ihngkaer",
+      "root": "іңкәр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_dueshpan",
+      "root": "дүшпан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_jatpagh",
+      "root": "жатпағ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_boghy",
+      "root": "боғы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_nasharlan",
+      "root": "нашарлан",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_jayyna",
+      "root": "жайына",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_syma",
+      "root": "сыяма",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_se",
+      "root": "сче",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_siq",
+      "root": "сиқ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_proshenie",
+      "root": "прошение",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_apt",
+      "root": "апт",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_jaylanghan",
+      "root": "жайланған",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_qyngqylda",
+      "root": "қыңқылда",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_koy",
+      "root": "кой",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_qomdyghyna",
+      "root": "қомдығына",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_uusa",
+      "root": "ұса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_khalayy",
+      "root": "халайы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_dihgihr",
+      "root": "дігір",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_nadanshyly",
+      "root": "наданшылы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_zakuenshih",
+      "root": "закүнші",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_uumsyn",
+      "root": "ұмсын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_ilalla",
+      "root": "илалла",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_internat",
+      "root": "интернат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_jaylau",
+      "root": "жайлау",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jueldyz",
+      "root": "жүлдыз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_qiua",
+      "root": "қиуа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jaqpad",
+      "root": "жақпад",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ermen",
+      "root": "ермен",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_aebiat",
+      "root": "әбиат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_raeushan",
+      "root": "рәушан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_ylay",
+      "root": "ылай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_tottay",
+      "root": "тояттай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_qanghan",
+      "root": "қанған",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_titygh",
+      "root": "титығ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_nesiesihn",
+      "root": "несиесін",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_erde",
+      "root": "ерде",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_gaeuh",
+      "root": "гәуһ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_yuezihnge",
+      "root": "йүзіңе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_ysy",
+      "root": "ысы",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_nesihn",
+      "root": "несін",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_yrjangda",
+      "root": "ыржаңда",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_erer",
+      "root": "ерер",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ghapyldyq",
+      "root": "ғапылдық",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_salq",
+      "root": "салқ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_aekhmaer",
+      "root": "әхмәр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_sypyra",
+      "root": "сыпыра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_sypyrsa",
+      "root": "сыпырса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_laeb",
+      "root": "ләб",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jybyr",
+      "root": "жыбыр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_solarme",
+      "root": "соларме",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_yryldas",
+      "root": "ырылдас",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_ayrylghanyn",
+      "root": "айрылғанын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_qol_aghyn",
+      "root": "қол-аяғын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_sybyrla",
+      "root": "сыбырла",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ghibraetl",
+      "root": "ғибрәтл",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_yntymaghyn",
+      "root": "ынтымағын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_jayday",
+      "root": "жайдай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_naeraetl",
+      "root": "нәфрәтл",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jetpese",
+      "root": "жетпесе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_qoli",
+      "root": "қоли",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_yrjangdama",
+      "root": "ыржаңдама",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_yrgha",
+      "root": "ырға",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_jimas",
+      "root": "жимас",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_tuushyn",
+      "root": "тұшын",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_abai_muesihrkey",
+      "root": "мүсіркей",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_maet",
+      "root": "мәт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_yrjyqta",
+      "root": "ыржықта",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_qomdan",
+      "root": "қомдан",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_saekihn",
+      "root": "сәкін",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_qaldy",
+      "root": "қалды",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_ghizzaet",
+      "root": "ғиззәт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_uughylyna",
+      "root": "ұғылына",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_zael",
+      "root": "зәл",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_tittey",
+      "root": "титтей",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_ularyn",
+      "root": "уларын",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_vinovat",
+      "root": "виноват",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_jayla",
+      "root": "жайла",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_tuespes",
+      "root": "түспес",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_dihrdekte",
+      "root": "дірдекте",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_uelpershek",
+      "root": "үлпершек",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_uaeylana",
+      "root": "уәйлана",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_sal_sal",
+      "root": "сал-сал",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_non",
+      "root": "нон",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_khuermaet",
+      "root": "хүрмәт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_qyrdagh",
+      "root": "қырдағ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_sybyrme",
+      "root": "сыбырме",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_advokat",
+      "root": "адвокат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_ayrylmay",
+      "root": "айрылмай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_qanyngyz",
+      "root": "қаныңыз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_tuespe",
+      "root": "түспе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_shontay",
+      "root": "шонтай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_iskandaer",
+      "root": "искандәр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_jamyray",
+      "root": "жамырай",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_qaedihr",
+      "root": "қәдір",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_kaez",
+      "root": "кәз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_terlet",
+      "root": "терлет",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_prmotoy",
+      "root": "прямотой",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "verb_abai_salghyz",
+      "root": "салғыз",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_kaemil",
+      "root": "кәмил",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_khaj",
+      "root": "хаж",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_yntiz",
+      "root": "ынтиз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_kaelkaeus",
+      "root": "кәлкәус",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_kyl",
+      "root": "кыл",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_pida",
+      "root": "пида",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_saylar",
+      "root": "сайлар",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_tula",
+      "root": "тула",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_kaem",
+      "root": "кәм",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_tereze",
+      "root": "терезе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_khikmet",
+      "root": "хикмет",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_buurq_sar",
+      "root": "бұрқ-сар",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jaqsa",
+      "root": "жақса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_yuzmae_yuz",
+      "root": "йузмә-йуз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_salduarly",
+      "root": "салдуарлы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_abai_jaylan",
+      "root": "жайлан",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_abai_kos",
+      "root": "кос",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "verb_abai_erttey",
+      "root": "ерттей",
+      "part_of_speech": "verb",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_abai_jamyra",
+      "root": "жамыра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_kesht",
+      "root": "кешт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_abai_seke",
+      "root": "секе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_salynba",
+      "root": "салынба",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_abai_salynbay",
+      "root": "салынбай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    }
+  ]
+}

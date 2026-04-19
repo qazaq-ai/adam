@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.5.0-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.5.5-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,30 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.5.5 — Pure Kazakh lexicon
+
+Phase v0.5.5 enforces the "pure pre-modern Kazakh" directive at the lexicon level. The combined v0.4.5 lexicon (16,373 entries) was audited against strict purity criteria, filtered to the 13,606-entry pure-Kazakh subset, and then augmented with 500 missing classical roots extracted from Abai Qunanbayuly's corpus.
+
+| step | result |
+|---|---|
+| Total entries (v0.4.5) | 16,373 |
+| Dropped: Russian-only letters (ё,ф,ц,ч,щ,ъ,ь,э) | 824 |
+| Dropped: loanword suffix (-ция, -изм, -лог, …) | 128 |
+| Dropped: no Kazakh signal | 681 |
+| **Pure Kazakh retained** | **13,606** |
+| Augmented from Abai corpus | +500 |
+| **Final v1 lexicon** | **14,106** |
+| **Abai coverage** (word forms → root prefix match) | **97.8%** (was 88.8%) |
+
+Missing-vocabulary highlights that were added from Abai:
+- `сөз` (word, speech — used 123× in Abai!)
+- `бой` (body, self), `қан` (blood), `қол` (hand), `қар` (snow)
+- `жау` (enemy / rain), `жат` (lie down / stranger), `жет` (reach)
+- `надан` (ignorant — Abai's key concept)
+- `сал`, `қал`, `түс`, `қыс`, `жай` and ~480 others
+
+These are fundamental proto-Kazakh vocabulary that the Apertium import had NO entries for — it over-indexes modern technical terminology and under-indexes the literary semantic core.
 
 ## v0.5.0 — FST participles + converbs + vowel-stem coalescence
 

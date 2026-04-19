@@ -2,6 +2,36 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.5.5] — 2026-04-19
+
+Pure Kazakh lexicon milestone. Enforces the "no loanwords" directive at the lexicon level and augments coverage from classical 19th-century sources.
+
+Pipeline:
+
+1. **Purity audit** (`lexicon_purity_audit` binary) — classified all 16,373 entries from v0.4.0 curated + v0.4.5 Apertium-imported against strict pre-modern-Kazakh criteria (Russian-only letters, loanword suffixes, no Kazakh-specific letter).
+2. **Pure Kazakh build** (`build_pure_kazakh_lexicon`) — filtered out 1,500 contaminated entries (824 Russian letters, 128 loanword suffixes, 681 no-Kazakh-signal). Retained 13,606.
+3. **Abai gap analysis** (`extract_abai_gap`) — identified 715 unique root candidates missing from the lexicon but present as word forms in Abai's corpus.
+4. **Augmentation** (`augment_lexicon_from_abai`) — automatically classified the top 500 gap candidates (393 nouns + 107 verbs) with POS, vowel harmony, and final sound class. Output: `data/lexicon_v1/abai_augmented_roots.json`.
+
+Result:
+
+| metric | v0.5.0 | v0.5.5 |
+|---|---|---|
+| Lexicon entries (pure) | n/a | 14,106 |
+| Loanwords dropped | 0 | 1,500 |
+| Abai vocabulary coverage | 88.8% | **97.8%** (+9 pp) |
+
+Missing-vocabulary examples added (each backed by corpus frequency):
+- `сөз` (word, speech — 123× in Abai)
+- `бой`, `қан`, `қол`, `қар`, `жау`, `жат`, `жет`, `түс`, `қыс`, `жай`
+- `надан` (ignorant — Abai's key philosophical concept)
+
+These are fundamental proto-Kazakh vocabulary items the Apertium import had zero entries for.
+
+No changes to the FST code, phonology, or morphotactics modules. The augmented lexicon file lives alongside the v0.4.5 imports and can be unioned into the active lexicon at load time.
+
+Workspace totals: 150 tests passing, 4 ignored, 0 failing.
+
 ## [0.5.0] — 2026-04-19
 
 Expands the v0.4.5 FST to cover Kazakh non-finite verb forms.
