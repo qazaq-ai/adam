@@ -47,7 +47,9 @@ fn roundtrip_nouns(
         total += 1;
         let synth = synthesise_noun(&entry.root, features);
         let analyses = analyse(&synth, lex);
-        let ok = analyses.iter().any(|a| matches_noun_analysis(a, entry, features));
+        let ok = analyses
+            .iter()
+            .any(|a| matches_noun_analysis(a, entry, features));
         if ok {
             successes += 1;
         } else if fails.len() < 20 {
@@ -80,7 +82,9 @@ fn roundtrip_verbs(
         total += 1;
         let synth = synthesise_verb(&entry.root, features);
         let analyses = analyse(&synth, lex);
-        let ok = analyses.iter().any(|a| matches_verb_analysis(a, entry, features));
+        let ok = analyses
+            .iter()
+            .any(|a| matches_verb_analysis(a, entry, features));
         if ok {
             successes += 1;
         } else if fails.len() < 20 {
@@ -128,12 +132,18 @@ fn roundtrip_noun_plural_smoke_100() {
         total += 1;
         let synth = synthesise_noun(&entry.root, features);
         let analyses = analyse(&synth, &lex);
-        if analyses.iter().any(|a| matches_noun_analysis(a, entry, features)) {
+        if analyses
+            .iter()
+            .any(|a| matches_noun_analysis(a, entry, features))
+        {
             successes += 1;
         }
     }
     let rate = successes as f64 / total.max(1) as f64;
-    eprintln!("smoke100 noun+PL: {successes}/{total} = {:.1}%", rate * 100.0);
+    eprintln!(
+        "smoke100 noun+PL: {successes}/{total} = {:.1}%",
+        rate * 100.0
+    );
     assert!(rate >= 0.95, "smoke roundtrip < 95%: {:.1}%", rate * 100.0);
 }
 
@@ -197,7 +207,10 @@ fn roundtrip_verb_past_1sg() {
     };
     let (ok, total, fails) = roundtrip_verbs(&lex, features);
     let rate = ok as f64 / total.max(1) as f64;
-    eprintln!("verb+PAST+1SG roundtrip: {ok}/{total} = {:.1}%", rate * 100.0);
+    eprintln!(
+        "verb+PAST+1SG roundtrip: {ok}/{total} = {:.1}%",
+        rate * 100.0
+    );
     for (root, synth) in fails.iter().take(5) {
         eprintln!("  fail: {root} → {synth}");
     }
