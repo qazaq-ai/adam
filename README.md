@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.0-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.5-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,39 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.9.5 — FST-backed slot expansion
+
+Templates can now request grammatical forms via `{slot|features}`; the realiser synthesises them through `adam_kernel_fst::morphotactics::synthesise_noun`. Kazakh case marking becomes FST-guaranteed — no more hand-written agreement.
+
+```
+$ adam_chat
+> менің атым Дәулет
+Дәулетпен танысқаныма қуаныштымын       ← {name|instrumental} → Дәулетпен
+> мен Алматыданмын
+Алматыда тұрасыз ба                     ← {city|locative}  → Алматыда
+> мен мұғаліммін
+мұғалімдер — қажетті мамандық           ← {occupation|plural} → мұғалімдер
+> сәлем
+сәлем Дәулет, Алматыдан хабар жақсы ма  ← cross-slot: {name} + {city|ablative}
+```
+
+### Feature spec
+
+Slot features are case-insensitive and `+`-separated:
+
+| token | field set |
+|---|---|
+| `nominative`/`nom`, `genitive`/`gen`, `dative`/`dat`, `accusative`/`acc`, `locative`/`loc`, `ablative`/`abl`, `instrumental`/`inst` | `case` |
+| `singular`/`sg`, `plural`/`pl` | `number` |
+
+Unknown tokens are silently ignored — templates stay forward-compatible as new feature types arrive (`derivation`, `possessive` in v1.0.0).
+
+### Cross-slot templates
+
+The v0.8.5 template-fillability filter handles multi-slot templates for free: a template referencing both `{name}` and `{city|ablative}` is only eligible when both are in session. Plain single-slot and literal templates stay available for sessions that don't have all entities — no regression.
+
+56 dialog end-to-end tests (up from 52). Workspace totals: **229 passing**, 4 ignored, 0 failing.
 
 ## v0.9.0 — Full entity absorption (age, city, occupation)
 

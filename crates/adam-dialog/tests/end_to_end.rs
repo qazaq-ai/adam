@@ -246,13 +246,14 @@ fn intent_statement_of_name_lowercase_is_capitalised() {
 
 #[test]
 fn response_statement_of_name_substitutes_slot() {
-    // Must produce one of the templates WITH {name} replaced by Дәулет.
+    // Plain and FST-backed instrumental variants.
     assert_response_with_toml(
         "менің атым Дәулет",
         &[
-            "танысқаныма қуаныштымын Дәулет",
             "қош келдіңіз Дәулет",
             "сәлем Дәулет",
+            "Дәулетпен танысқаныма қуаныштымын",
+            "Дәулетпен сөйлесу — құрмет",
         ],
     );
 }
@@ -305,6 +306,9 @@ fn response_statement_of_location() {
             "әдемі аймақ",
             "Алматы — әдемі қала",
             "Алматы туралы көп естідім",
+            "Алматыда тұрасыз ба",
+            "Алматыдан хабар жақсы ма",
+            "Алматыға сапар шегу қызық",
         ],
     );
 }
@@ -331,6 +335,8 @@ fn response_statement_of_occupation() {
             "сәттілік тілеймін",
             "мұғалім — құрметті кәсіп",
             "сіз мұғалім екенсіз",
+            "мұғалімдер — қажетті мамандық",
+            "мұғалімге сәттілік тілеймін",
         ],
     );
 }
@@ -545,6 +551,93 @@ fn conversation_age_slot_appears_in_personalised_template() {
     assert!(
         saw_personalised,
         "expected at least one seed in 0..32 to pick a template containing 30"
+    );
+}
+
+// --- v0.9.5 FST-backed slot expansion ---------------------------------------
+
+#[test]
+fn realiser_synthesises_locative_for_city_slot() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен Алматыданмын", &lex, &repo, 0);
+
+    // Explore the seed space; at least one seed should pick a
+    // {city|locative} template, producing "Алматыда тұрасыз ба".
+    let mut saw_locative = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("мен Алматыданмын", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        if out == "Алматыда тұрасыз ба" {
+            saw_locative = true;
+        }
+    }
+    assert!(
+        saw_locative,
+        "expected at least one seed in 0..32 to synthesise Locative \"Алматыда тұрасыз ба\""
+    );
+}
+
+#[test]
+fn realiser_synthesises_instrumental_for_name_slot() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let mut saw_instrumental = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("менің атым Дәулет", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        if out.contains("Дәулетпен") {
+            saw_instrumental = true;
+        }
+    }
+    assert!(
+        saw_instrumental,
+        "expected at least one seed in 0..32 to pick an Instrumental \"Дәулетпен\" template"
+    );
+}
+
+#[test]
+fn realiser_synthesises_plural_for_occupation_slot() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let mut saw_plural = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("мен мұғаліммін", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        if out == "мұғалімдер — қажетті мамандық" {
+            saw_plural = true;
+        }
+    }
+    assert!(
+        saw_plural,
+        "expected at least one seed in 0..32 to pick the {{occupation|plural}} template"
+    );
+}
+
+#[test]
+fn cross_slot_greeting_fires_when_both_name_and_city_known() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // Seed the session with both entities.
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+    let _ = conv.turn("мен Алматыданмын", &lex, &repo, 0);
+    // Now a plain "сәлем" should have the cross-slot template in its
+    // eligible pool.
+    let mut saw_cross = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("сәлем", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        if out == "сәлем Дәулет, Алматыдан хабар жақсы ма" {
+            saw_cross = true;
+        }
+    }
+    assert!(
+        saw_cross,
+        "expected at least one seed in 0..32 to pick the {{name}}+{{city|abl}} cross-slot greeting"
     );
 }
 

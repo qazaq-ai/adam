@@ -1,5 +1,6 @@
 //! `adam-chat` — interactive REPL demo of the predictable Kazakh dialog
-//! pipeline (v0.9.0 MVP — 25 intents + session state + entity absorption).
+//! pipeline (v0.9.5 MVP — 25 intents + session state + FST-backed slot
+//! expansion via `{slot|features}`).
 //!
 //! Usage:
 //!   adam_chat                — interactive REPL on stdin
@@ -57,7 +58,7 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!("adam-chat v0.9.0 — пікірлесейік! Type a Kazakh sentence; ^D to quit.");
+    eprintln!("adam-chat v0.9.5 — пікірлесейік! Type a Kazakh sentence; ^D to quit.");
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut conv = Conversation::new();

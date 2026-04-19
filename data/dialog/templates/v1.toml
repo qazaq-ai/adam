@@ -13,7 +13,7 @@
 #   key = "intent_identifier"
 #   templates = ["phrase 1", "phrase 2", ...]
 
-version = "0.9.0"
+version = "0.9.5"
 
 # ---------- Greetings ----------
 
@@ -23,6 +23,7 @@ templates = [
     "сәлем",
     "сәлем достым",
     "сәлем {name}",
+    "сәлем {name}, {city|ablative} хабар жақсы ма",
 ]
 
 [[families]]
@@ -31,6 +32,7 @@ templates = [
     "сәлеметсіз бе",
     "армысыз",
     "сәлеметсіз бе {name}",
+    "сәлеметсіз бе {name}, {city|locative} қалай отырсыз",
 ]
 
 [[families]]
@@ -133,13 +135,16 @@ templates = [
 # ---------- Social topics (v0.8.0 new) ----------
 
 # User introduced self by name. `{name}` is substituted by the realiser
-# with the extracted PersonName entity.
+# with the extracted PersonName entity. `{name|instrumental}` uses the
+# FST to produce the grammatically correct "with X" form: Дәулет →
+# Дәулетпен, Ерлан → Ерланмен.
 [[families]]
 key = "statement_of_name"
 templates = [
-    "танысқаныма қуаныштымын {name}",
     "қош келдіңіз {name}",
     "сәлем {name}",
+    "{name|instrumental} танысқаныма қуаныштымын",
+    "{name|instrumental} сөйлесу — құрмет",
 ]
 
 [[families]]
@@ -176,6 +181,9 @@ templates = [
     "әдемі аймақ",
     "{city} — әдемі қала",
     "{city} туралы көп естідім",
+    "{city|locative} тұрасыз ба",
+    "{city|ablative} хабар жақсы ма",
+    "{city|dative} сапар шегу қызық",
 ]
 
 [[families]]
@@ -194,6 +202,8 @@ templates = [
     "сәттілік тілеймін",
     "{occupation} — құрметті кәсіп",
     "сіз {occupation} екенсіз",
+    "{occupation|plural} — қажетті мамандық",
+    "{occupation|dative} сәттілік тілеймін",
 ]
 
 [[families]]

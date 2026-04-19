@@ -109,19 +109,19 @@ pub fn plan_response_with_session(
 }
 
 /// True iff every `{placeholder}` appearing in `template` has a
-/// corresponding key in `slots`. Literal-only templates are always
+/// corresponding key in `slots`. Understands the `{slot|features}`
+/// syntax introduced in v0.9.5 — features don't affect fillability,
+/// only the slot name is checked. Literal-only templates are always
 /// fillable.
 fn template_is_fillable(template: &str, slots: &HashMap<String, String>) -> bool {
-    // Cheap scan for `{...}` tokens. Malformed braces (`{` with no
-    // closing `}`) are treated as literal text, which is fine for our
-    // template surface.
     let bytes = template.as_bytes();
     let mut i = 0;
     while i < bytes.len() {
         if bytes[i] == b'{' {
             if let Some(end_rel) = template[i + 1..].find('}') {
-                let name = &template[i + 1..i + 1 + end_rel];
-                if !slots.contains_key(name) {
+                let inner = &template[i + 1..i + 1 + end_rel];
+                let (slot_name, _) = crate::slot_syntax::parse_placeholder(inner);
+                if !slots.contains_key(slot_name) {
                     return false;
                 }
                 i += 1 + end_rel + 1;
@@ -192,6 +192,14 @@ mod tests {
             "сәлем {name}, сіз {city}-дансыз ба",
             &slots,
         ));
+    }
+
+    #[test]
+    fn placeholder_with_features_uses_slot_name_for_fillability() {
+        let mut slots = HashMap::new();
+        assert!(!template_is_fillable("{city|locative} тұрамын", &slots));
+        slots.insert("city".into(), "Алматы".into());
+        assert!(template_is_fillable("{city|locative} тұрамын", &slots));
     }
 }
 

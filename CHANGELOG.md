@@ -2,6 +2,66 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.9.5] — 2026-04-19
+
+FST-backed slot expansion. Templates can now emit `{slot|features}` atoms; the realiser synthesises grammatical forms via `adam_kernel_fst::morphotactics::synthesise_noun` instead of plain text substitution. Cross-slot templates (using multiple slots in one response) drop in naturally because of the v0.8.5 template-fillability filter.
+
+### New slot syntax
+
+```text
+{slot}                    — plain: substitute slot value verbatim
+{slot|feat1+feat2+...}    — FST: synthesise via morphotactics
+```
+
+Feature tokens (case-insensitive, `+`-separated, unknown tokens ignored):
+
+| token | → field |
+|---|---|
+| `nominative / nom` | `case = Nominative` |
+| `genitive / gen` | `case = Genitive` |
+| `dative / dat` | `case = Dative` |
+| `accusative / acc` | `case = Accusative` |
+| `locative / loc` | `case = Locative` |
+| `ablative / abl` | `case = Ablative` |
+| `instrumental / inst` | `case = Instrumental` |
+| `singular / sg` | `number = Singular` |
+| `plural / pl` | `number = Plural` |
+
+### Examples of what now works
+
+| template | filled | rendered |
+|---|---|---|
+| `{city\|locative} тұрасыз ба` | city=Алматы | Алматыда тұрасыз ба |
+| `{city\|ablative} хабар жақсы ма` | city=Алматы | Алматыдан хабар жақсы ма |
+| `{name\|instrumental} танысқаныма қуаныштымын` | name=Дәулет | Дәулетпен танысқаныма қуаныштымын |
+| `{occupation\|plural} — қажетті мамандық` | occupation=мұғалім | мұғалімдер — қажетті мамандық |
+| `сәлем {name}, {city\|ablative} хабар жақсы ма` | name=Дәулет, city=Алматы | сәлем Дәулет, Алматыдан хабар жақсы ма |
+
+The last one is a cross-slot template: the planner only considers it when BOTH `name` and `city` are in session.
+
+### Public API additions
+
+- `adam_dialog::slot_syntax::{parse_placeholder, parse_noun_features}`
+
+### TOML changes (v1.toml version → 0.9.5)
+
+- `greeting.casual`, `greeting.polite` each get a cross-slot `{name}+{city|abl/loc}` variant.
+- `statement_of_name` gets `{name|instrumental}` variants.
+- `statement_of_location` gets 3 FST-backed variants: locative / ablative / dative.
+- `statement_of_occupation` gets plural + dative variants.
+
+### Tests
+
+56 dialog end-to-end pairs (up from 52), 4 new covering every FST-backed expansion path + the cross-slot greeting. 7 slot-syntax unit tests + 1 additional planner unit test. 1 doc-test.
+
+Workspace: **229 passing**, 4 ignored, 0 failing.
+
+### Known v0.9.5 limitations
+
+- Feature parser covers noun `case + number` only. Derivation and possessive are v1.0.0 additions.
+- Occupation recogniser still uses the fixed 6-form table; generic 1sg-copula stripping via FST lookup is queued for v0.9.8.
+- No verb slot expansion — `{root|verb_features}` would need a different synthesiser dispatch.
+
 ## [0.9.0] — 2026-04-19
 
 Full entity absorption: every social-topic statement now contributes an extractable entity to session state. Age is parsed from Kazakh numerals (1–99), city from ablative/locative case stripping, occupation from 1sg-copula stripping.

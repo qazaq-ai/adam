@@ -18,6 +18,7 @@ pub mod intent;
 pub mod planner;
 pub mod realiser;
 pub mod semantics;
+pub mod slot_syntax;
 pub mod templates;
 
 pub use conversation::Conversation;
