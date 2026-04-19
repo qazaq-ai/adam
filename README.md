@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.4.5-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.5.0-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -156,20 +156,20 @@ bash ./scripts/run_generation_showcase.sh
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
 
-## v0.4.5 — deterministic Kazakh FST
+## v0.5.0 — FST participles + converbs + vowel-stem coalescence
 
-New in v0.4.5: a pure-Rust finite-state transducer for Kazakh morphology, living alongside (not replacing) the v0.4.0 transformer baseline. This is Phase 1 of the v1.0.0 architecture pivot — see [`docs/kazakh_grammar/00_architecture_v1.md`](docs/kazakh_grammar/00_architecture_v1.md) for the full rationale.
+Expansion of the v0.4.5 FST. Adds participles, converbs, and the vowel-final-stem coalescence rules (оқы + PRES = оқиды). The FST now covers most non-finite forms of Kazakh verbs.
 
 | Component | Value |
 |---|---|
 | New crate | [`adam-kernel-fst`](crates/adam-kernel-fst/) |
-| Unit tests | **55 passing** (phonology + morphotactics + parser) |
-| Archiphonemes | 12 (A, I, E, D, L, M, N, G, K, S, Y, N-buffer) |
-| Phonological rules | 54 catalogued from Apertium-kaz; 20+ implemented |
-| Suffix templates | 25 (plural, 7 cases, 4 possessives, verb tense/voice/person) |
+| Unit tests | **68 passing** (up from 55 in v0.4.5) |
+| Archiphonemes | 12 |
+| Phonological rules | 54 catalogued; 22+ implemented |
+| Suffix templates | 30 (+ 3 participles, + 2 converbs since v0.4.5) |
 | Lexicon (v1) | **14,296 entries** = 4,454 curated + 11,919 Apertium-imported |
-| Roundtrip coverage | **36,238 / 36,238 = 100.0%** (synthesise → analyse on the full lexicon, 4 feature combinations) |
-| CLI binary | [`adam_fst`](crates/adam-kernel-fst/src/bin/adam_fst.rs) with `synth`, `analyse`, `stats` subcommands |
+| Roundtrip coverage | **36,238 / 36,238 = 100.0%** (full-lexicon synthesise → analyse) |
+| CLI binary | [`adam_fst`](crates/adam-kernel-fst/src/bin/adam_fst.rs) with `synth`, `analyse`, `stats` |
 
 Examples:
 ```bash
@@ -181,9 +181,15 @@ $ target/release/adam_fst synth --root жаз --voice passive --negation --tense
 
 $ target/release/adam_fst analyse мектебім
 noun: мектеп +P1Sg
+
+$ target/release/adam_fst synth --root оқы --tense present --person 3
+оқиды
+
+$ target/release/adam_fst synth --root жаз --tense ParticiplePast
+жазған
 ```
 
-The FST is not a language model; it handles morphology deterministically so a future small LM (v0.5+) doesn't need to waste capacity learning suffix patterns.
+The FST is not a language model; it handles morphology deterministically so a future small LM (v0.5.5+) doesn't need to waste capacity learning suffix patterns.
 
 ## Foundation Policies
 

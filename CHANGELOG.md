@@ -2,6 +2,23 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.5.0] — 2026-04-19
+
+Expands the v0.4.5 FST to cover Kazakh non-finite verb forms.
+
+- **Vowel-final-stem aorist coalescence** (Apertium rules 17, 18, 19, 20, 30). Stem-final `ы/і` merge with the aorist `{A}` to produce `и` (e.g. `оқы` + PRES + 3 → `оқиды`, not the previous `*оқыа`). Stems ending in other vowels take a `й`-glide (`сөйле` → `сөйлейді`). Past tense on vowel-final stems (`оқы` + PAST + 1SG → `оқыдым`) continues to work without coalescence.
+- **Participles** — three new `Tense` variants:
+  - `ParticiplePast` — `-{G}{A}н` (`жазған`, `берген`, `қалған`).
+  - `ParticipleHabitual` — `-{A}тын` (`жазатын`, `келетін`).
+  - `ParticipleFuture` — `-{A}р` (`жазар`, `келер`).
+- **Converbs** — two new `Tense` variants:
+  - `ConverbPerfect` — `-{Y}п` (`жазып`, `беріп`).
+  - `ConverbImperfect` — `-{A}` (`жаза` without personal ending).
+
+Tests: **68 unit tests passing** in `adam-kernel-fst` (up from 55 in v0.4.5). Workspace totals: 150 passing, 4 ignored, 0 failing.
+
+No changes to v0.4.0 transformer baseline or v0.4.5 FST core code.
+
 ## [0.4.5] — 2026-04-19
 
 Introduces **adam-kernel-fst**, a pure-Rust deterministic finite-state transducer for Kazakh morphology. This is Phase 1 of the architecture pivot from stochastic transformers to deterministic morphology + small LM (v1.0.0 track). v0.4.0 transformer stack stays untouched; v0.4.5 adds the new FST layer alongside.

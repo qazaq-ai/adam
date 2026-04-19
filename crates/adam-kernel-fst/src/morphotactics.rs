@@ -82,6 +82,19 @@ pub enum Tense {
     FuturePossible,
     Conditional,
     Imperative,
+    /// Non-finite `-{G}{A}н` participle ("having been V-ed / the V-er").
+    /// Same shape as PastEvidential but treated as a participle — no
+    /// personal-ending slot follows.
+    ParticiplePast,
+    /// Habitual / relative participle `-{A}тын`.
+    ParticipleHabitual,
+    /// Future/intentional participle `-{A}р`.
+    ParticipleFuture,
+    /// Perfect converb `-{Y}п` ("having V-ed").
+    ConverbPerfect,
+    /// Imperfect converb `-{A}` ("while V-ing"). Same shape as aorist but
+    /// non-finite.
+    ConverbImperfect,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -183,8 +196,62 @@ const VERB_EVIDENTIAL_PAST: SuffixTemplate = &[
 /// Aorist (present/habitual) tense marker: `-{A}`.
 /// жаз + а = жаза- (stem for present);  кел + е = келе-.
 /// Vowel-final stems take а special path (rules 30 / 17 on deletion and
-/// йот insertion) which is NOT covered by this simple template.
+/// йот insertion) handled by `apply_aorist_after_vowel`.
 const VERB_AORIST: SuffixTemplate = &[SuffixAtom::Arch(Archiphoneme::A)];
+
+// -------------------------------------------------------------------------
+// Participles — non-finite verb forms that also act as adjectives / nouns.
+// Each participle is the same suffix across all persons; personal endings
+// can attach afterwards for the finite reported-past tense (already
+// implemented as VERB_EVIDENTIAL_PAST below).
+// -------------------------------------------------------------------------
+
+/// Past participle / verbal adjective: `-{G}{A}н`.
+/// жаз + ған = жазған ("written"), бер + ген = берген ("given"),
+/// оқы + ған = оқыған ("that which has been read").
+/// Same shape as VERB_EVIDENTIAL_PAST; the morphological feature differs
+/// (participle vs finite reported past) — semantics set by the caller.
+const VERB_PART_PAST: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::G),
+    SuffixAtom::Arch(Archiphoneme::A),
+    SuffixAtom::Literal('н'),
+];
+
+/// Habitual / relative participle: `-{A}тын` (after consonant stems) /
+/// `-йтын/-йтін` (after vowel stems, via aorist й coalescence).
+/// жаз + атын = жазатын ("one who writes"),
+/// кел + етін = келетін, оқы + йтын → оқитын.
+///
+/// For week-2 simplicity we use the consonant-stem template; vowel-stem
+/// special case will arrive along with converbs.
+const VERB_PART_HABITUAL: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::A),
+    SuffixAtom::Literal('т'),
+    SuffixAtom::Arch(Archiphoneme::Y),
+    SuffixAtom::Literal('н'),
+];
+
+/// Future participle / intentional: `-{A}р`.
+/// жаз + ар = жазар ("one who would write"),
+/// кел + ер = келер.
+const VERB_PART_FUTURE: SuffixTemplate =
+    &[SuffixAtom::Arch(Archiphoneme::A), SuffixAtom::Literal('р')];
+
+// -------------------------------------------------------------------------
+// Converbs — non-finite "while / having" forms.
+// -------------------------------------------------------------------------
+
+/// Perfect converb: `-{Y}п`. Expresses completed prior action.
+/// жаз + ып = жазып ("having written"),
+/// кел + іп = келіп ("having come").
+/// After vowel-final stems the buffer {Y} drops: оқы + п = оқып.
+const VERB_CONV_PERFECT: SuffixTemplate =
+    &[SuffixAtom::Arch(Archiphoneme::Y), SuffixAtom::Literal('п')];
+
+/// Imperfect converb: `-{A}` — identical shape to aorist; in a non-finite
+/// clause it reads as "while V-ing".
+/// жаз + а = "жаза отыр" ≈ "writing sitting" (posture verb construction).
+const VERB_CONV_IMPERFECT: SuffixTemplate = &[SuffixAtom::Arch(Archiphoneme::A)];
 
 // -------------------------------------------------------------------------
 // Voice suffixes — attach immediately after the root, before negation,
@@ -448,6 +515,44 @@ pub fn synthesise_noun(root: &str, features: NounFeatures) -> String {
     acc.out
 }
 
+/// Returns `true` if the final character of `stem` is a vowel.
+fn stem_ends_in_vowel(stem: &str) -> bool {
+    stem.chars().last().map(is_vowel).unwrap_or(false)
+}
+
+/// Apply the aorist (present-tense) marker to a stem already ending in a
+/// vowel. Implements the coalescence documented in Apertium rules 17, 18,
+/// 19, 20, 30:
+///   - `ы` / `і` at the stem end → REPLACED with `и` (no further glide;
+///     the ий digraph collapses to a single и character in orthography)
+///   - other vowel-final stems (а, е, о, ө, у, ү) → add `й` glide
+///
+/// Example:
+///   оқы → оқи       (stem ы becomes и; this IS the aorist stem)
+///   сөйле → сөйлей  (е preserved, й inserted)
+///
+/// The following personal-ending atom then attaches to whatever vowel or
+/// й now ends the stem.
+fn apply_aorist_after_vowel(acc: &mut Accumulator) {
+    let last = acc.out.chars().last();
+    match last {
+        Some('ы') | Some('і') => {
+            // Replace final ы/і with и.
+            let mut rebuilt: String = acc.out.chars().take(acc.out.chars().count() - 1).collect();
+            rebuilt.push('и');
+            acc.out = rebuilt;
+            acc.ctx.preceding = ConsonantClass::VowelPreceding;
+            acc.ctx.preceded_by_y_or_i = true;
+        }
+        Some(_) => {
+            acc.out.push('й');
+            acc.ctx.preceding = ConsonantClass::HighSonorant;
+            acc.ctx.preceded_by_y_or_i = true;
+        }
+        None => {}
+    }
+}
+
 /// Synthesise a fully-inflected verb surface form. Walks
 /// `VOICE → NEGATION → TENSE → PERSON/NUMBER`.
 ///
@@ -479,7 +584,20 @@ pub fn synthesise_verb(root: &str, features: VerbFeatures) -> String {
     match tense {
         Some(Tense::PastDefinite) => acc.apply(VERB_PAST),
         Some(Tense::PastEvidential) => acc.apply(VERB_EVIDENTIAL_PAST),
-        Some(Tense::Present) => acc.apply(VERB_AORIST),
+        Some(Tense::Present) | Some(Tense::ConverbImperfect) => {
+            // Aorist after vowel-final stems needs special handling:
+            // the {A} archiphoneme coalesces with the preceding vowel.
+            // See `apply_aorist_after_vowel` for the rule details.
+            if stem_ends_in_vowel(&acc.out) {
+                apply_aorist_after_vowel(&mut acc);
+            } else {
+                acc.apply(VERB_AORIST);
+            }
+        }
+        Some(Tense::ParticiplePast) => acc.apply(VERB_PART_PAST),
+        Some(Tense::ParticipleHabitual) => acc.apply(VERB_PART_HABITUAL),
+        Some(Tense::ParticipleFuture) => acc.apply(VERB_PART_FUTURE),
+        Some(Tense::ConverbPerfect) => acc.apply(VERB_CONV_PERFECT),
         _ => {}
     }
 
@@ -1141,6 +1259,196 @@ mod tests {
     // Vowel-final stems like жу require a special {Y}-buffer-insertion rule
     // (the semivowel /u/ behaves consonant-like for buffer purposes). That
     // is deferred to week-2 when we add per-stem irregularities.
+
+    // -----------------------------------------------------------------
+    // Vowel-final verb stems (v0.5.0 Step 1).
+    // Aorist after -ы / -і coalesces via Apertium rules 17/19/20.
+    // -----------------------------------------------------------------
+
+    #[test]
+    fn verb_pres_3_vowel_stem_оқы() {
+        // оқы + PRES + 3 = оқиды (stem ы → и, й inserted, then -ды)
+        let out = synthesise_verb(
+            "оқы",
+            VerbFeatures {
+                tense: Some(Tense::Present),
+                person: Some(Person::Third),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "оқиды");
+    }
+
+    #[test]
+    fn verb_pres_1sg_vowel_stem_оқы() {
+        // оқы + PRES + 1SG = оқимын (оқи + й + мын)
+        let out = synthesise_verb(
+            "оқы",
+            VerbFeatures {
+                tense: Some(Tense::Present),
+                person: Some(Person::First),
+                number: Some(Number::Singular),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "оқимын");
+    }
+
+    #[test]
+    fn verb_pres_3_vowel_stem_і_сөйле() {
+        // сөйле + PRES + 3 = сөйлейді (е-final: just add й, then -ді)
+        let out = synthesise_verb(
+            "сөйле",
+            VerbFeatures {
+                tense: Some(Tense::Present),
+                person: Some(Person::Third),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "сөйлейді");
+    }
+
+    #[test]
+    fn verb_past_vowel_stem_оқы() {
+        // оқы + PAST + 1SG = оқыдым (no coalescence — past is not aorist)
+        let out = synthesise_verb(
+            "оқы",
+            VerbFeatures {
+                tense: Some(Tense::PastDefinite),
+                person: Some(Person::First),
+                number: Some(Number::Singular),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "оқыдым");
+    }
+
+    // -----------------------------------------------------------------
+    // Participles (v0.5.0 Step 2).
+    // -----------------------------------------------------------------
+
+    #[test]
+    fn verb_part_past_жаз() {
+        // жаз + ParticiplePast = жазған
+        let out = synthesise_verb(
+            "жаз",
+            VerbFeatures {
+                tense: Some(Tense::ParticiplePast),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жазған");
+    }
+
+    #[test]
+    fn verb_part_past_бер() {
+        // бер + ParticiplePast = берген
+        let out = synthesise_verb(
+            "бер",
+            VerbFeatures {
+                tense: Some(Tense::ParticiplePast),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "берген");
+    }
+
+    #[test]
+    fn verb_part_past_қал_voiceless_context() {
+        // қал + ParticiplePast = қалған ({G} after liquid → ғ, not voiced)
+        let out = synthesise_verb(
+            "қал",
+            VerbFeatures {
+                tense: Some(Tense::ParticiplePast),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "қалған");
+    }
+
+    #[test]
+    fn verb_part_habitual_жаз() {
+        // жаз + ParticipleHabitual = жазатын
+        //   {A} → а (back), т → т, {Y} → ы, н → н
+        let out = synthesise_verb(
+            "жаз",
+            VerbFeatures {
+                tense: Some(Tense::ParticipleHabitual),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жазатын");
+    }
+
+    #[test]
+    fn verb_part_habitual_кел() {
+        // кел + ParticipleHabitual = кeлетін
+        let out = synthesise_verb(
+            "кел",
+            VerbFeatures {
+                tense: Some(Tense::ParticipleHabitual),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "келетін");
+    }
+
+    #[test]
+    fn verb_part_future_жаз() {
+        // жаз + ParticipleFuture = жазар
+        let out = synthesise_verb(
+            "жаз",
+            VerbFeatures {
+                tense: Some(Tense::ParticipleFuture),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жазар");
+    }
+
+    // -----------------------------------------------------------------
+    // Converbs (v0.5.0 Step 3).
+    // -----------------------------------------------------------------
+
+    #[test]
+    fn verb_conv_perfect_жаз() {
+        // жаз + ConverbPerfect = жазып ({Y} → ы after consonant)
+        let out = synthesise_verb(
+            "жаз",
+            VerbFeatures {
+                tense: Some(Tense::ConverbPerfect),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жазып");
+    }
+
+    #[test]
+    fn verb_conv_perfect_бер() {
+        // бер + ConverbPerfect = беріп ({Y} → і after front consonant)
+        let out = synthesise_verb(
+            "бер",
+            VerbFeatures {
+                tense: Some(Tense::ConverbPerfect),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "беріп");
+    }
+
+    #[test]
+    fn verb_conv_imperfect_жаз() {
+        // жаз + ConverbImperfect = жаза (same shape as aorist 3rd person
+        // but without personal ending)
+        let out = synthesise_verb(
+            "жаз",
+            VerbFeatures {
+                tense: Some(Tense::ConverbImperfect),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "жаза");
+    }
 
     #[test]
     fn verb_neg_pres_жаз() {

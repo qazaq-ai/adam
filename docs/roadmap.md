@@ -52,6 +52,7 @@ Capacity limit confirmed: 24M params × 4M tokens ≈ 25× below Chinchilla-opti
 | Release | Scope | Result |
 |---|---|---|
 | v0.4.5 | `adam-kernel-fst` crate — phonology + morphotactics + parser + lexicon (4,454 curated + 11,919 Apertium) + CLI | 55 unit tests, 100% roundtrip on 36,238 full-lexicon cycles |
+| v0.5.0 | Participles (`-{G}{A}н`, `-{A}тын`, `-{A}р`), converbs (`-{Y}п`, `-{A}`), vowel-final-stem aorist coalescence | 68 unit tests, covers most non-finite Kazakh verb forms |
 
 Phase 10 pivots the project from pure-stochastic transformers (v0.3–v0.4 line) to a deterministic morphology layer + small LM-over-roots. The v0.4.0 transformer baseline stays as reference; new work layers on top.
 
