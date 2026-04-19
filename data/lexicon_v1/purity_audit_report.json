@@ -1,0 +1,138 @@
+{
+  "total_entries": 16373,
+  "by_pos": {
+    "adjective": {
+      "total": 3408,
+      "has_russian_only_letter": 390,
+      "no_kazakh_specific": 52,
+      "loanword_suffix": 99,
+      "attested_in_abai": 394,
+      "clean": 2919
+    },
+    "adverb": {
+      "total": 354,
+      "has_russian_only_letter": 5,
+      "no_kazakh_specific": 12,
+      "loanword_suffix": 0,
+      "attested_in_abai": 78,
+      "clean": 347
+    },
+    "conjunction": {
+      "total": 27,
+      "has_russian_only_letter": 0,
+      "no_kazakh_specific": 2,
+      "loanword_suffix": 0,
+      "attested_in_abai": 13,
+      "clean": 26
+    },
+    "modal": {
+      "total": 6,
+      "has_russian_only_letter": 0,
+      "no_kazakh_specific": 1,
+      "loanword_suffix": 0,
+      "attested_in_abai": 4,
+      "clean": 6
+    },
+    "noun": {
+      "total": 9424,
+      "has_russian_only_letter": 421,
+      "no_kazakh_specific": 804,
+      "loanword_suffix": 29,
+      "attested_in_abai": 1751,
+      "clean": 8306
+    },
+    "numeral": {
+      "total": 21,
+      "has_russian_only_letter": 0,
+      "no_kazakh_specific": 5,
+      "loanword_suffix": 0,
+      "attested_in_abai": 18,
+      "clean": 20
+    },
+    "particle": {
+      "total": 15,
+      "has_russian_only_letter": 0,
+      "no_kazakh_specific": 2,
+      "loanword_suffix": 0,
+      "attested_in_abai": 15,
+      "clean": 15
+    },
+    "postposition": {
+      "total": 29,
+      "has_russian_only_letter": 0,
+      "no_kazakh_specific": 6,
+      "loanword_suffix": 0,
+      "attested_in_abai": 13,
+      "clean": 27
+    },
+    "pronoun": {
+      "total": 28,
+      "has_russian_only_letter": 0,
+      "no_kazakh_specific": 3,
+      "loanword_suffix": 0,
+      "attested_in_abai": 14,
+      "clean": 27
+    },
+    "verb": {
+      "total": 3061,
+      "has_russian_only_letter": 8,
+      "no_kazakh_specific": 143,
+      "loanword_suffix": 0,
+      "attested_in_abai": 909,
+      "clean": 2989
+    }
+  },
+  "abai_vocabulary_size": 8209,
+  "clean_entries_total": 14682,
+  "examples_dropped_russian": [
+    "модель",
+    "экономикалық",
+    "экологиялық",
+    "географиялық",
+    "этникалық",
+    "фото",
+    "электрондық",
+    "физикалық",
+    "социалистік",
+    "конституциялық",
+    "инвестициялық",
+    "акционерлік",
+    "коммерциялық",
+    "съез",
+    "әлеуметтік-экономикалық"
+  ],
+  "examples_dropped_loanword_suffix": [
+    "блог",
+    "практикалық",
+    "грамматикалық",
+    "энергетикалық",
+    "статистикалық",
+    "арктикалық",
+    "лингвистикалық",
+    "синтетикалық",
+    "этикалық",
+    "дидактикалық",
+    "эстетикалық",
+    "семантикалық",
+    "ринг",
+    "арифметикалық",
+    "профилактикалық"
+  ],
+  "examples_attested_in_abai": [
+    "шағым",
+    "мәртебе",
+    "қызмет",
+    "ол",
+    "о",
+    "біз",
+    "сіз",
+    "кел",
+    "бар",
+    "кет",
+    "жап",
+    "мін",
+    "қон",
+    "қара",
+    "адам"
+  ]
+}
