@@ -59,8 +59,23 @@ fn expand_placeholder(inner: &str, slots: &std::collections::HashMap<String, Str
     match feature_spec {
         None => root.clone(),
         Some(spec) => {
+            // FST phonology is tuned for Kazakh Cyrillic roots. If the
+            // extracted entity is entirely non-Cyrillic (Latin names
+            // like "John" from v0.9.6 multi-language inputs), feeding
+            // it through `synthesise_noun` produces garbled mixed-
+            // script output ("Johnман"). Fall back to plain substitution
+            // in that case — grammatical agreement is impossible
+            // without Kazakh phonology, so better to surface the bare
+            // name than to hallucinate a suffix.
+            if !root.chars().any(is_cyrillic) {
+                return root.clone();
+            }
             let features = parse_noun_features(spec);
             synthesise_noun(root, features)
         }
     }
+}
+
+fn is_cyrillic(c: char) -> bool {
+    matches!(c, '\u{0400}'..='\u{04FF}' | '\u{0500}'..='\u{052F}')
 }

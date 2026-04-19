@@ -2,6 +2,57 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.9.6] — 2026-04-19
+
+Multilingual recogniser surface. The model now reads Kazakh, Russian, and English input across all 25 intents and replies exclusively in Kazakh. This is NOT translation — the core pipeline stays deterministic Kazakh-only. The expansion is purely at the recogniser layer: more surface forms map to the same Intent taxonomy.
+
+### Triggers added (per intent)
+
+- **Greeting** (casual/polite/time-of-day): `hi/hello/hey`, `привет`, `здравствуйте`, `доброе утро/день/вечер`, `good morning/afternoon/evening/day`
+- **Farewell**: `bye/goodbye/see you`, `до свидания/пока`
+- **Affirmation**: `yes/yeah/yep/sure/ok`, `да/конечно/ага`
+- **Negation**: `no/nope/nah`, `нет`
+- **Thanks**: `thanks/thank you`, `спасибо/большое спасибо`
+- **Apology**: `sorry/excuse me`, `извини/извините/прости`
+- **AskHowAreYou**: `how are you/how's it`, `как дела/как ты/как вы`
+- **StatementOfWellbeing**: `fine/great/i'm good/i'm fine`, `хорошо/нормально/отлично`
+- **AskName**: `what is/what's your name`, `как тебя/вас зовут`
+- **StatementOfName**: four new patterns —
+  - `meня зовут <N>`, `моё имя <N>` (Russian)
+  - `my name is <N>`, `call me <N>`, `hi i am <N>` (English; bare "I am X" is ambiguous so requires a leading greet token)
+- **AskAge**: `how old are you`, `сколько тебе/вам лет`
+- **AskLocation**: `where are you from / where do you live`, `откуда ты/вы`
+- **AskOccupation**: `what do you do / what's your job`, `кем работаешь/занимаешься`
+- **AskWeather**: `how's / what's the weather`, `какая погода`
+- **AskTime**: `what time is it / what's the time`, `сколько времени/который час`
+- **Compliment**: `great/awesome/wonderful/excellent/well done`, `молодец/отлично/здорово`
+- **Request**: `please/need help/can you help`, `пожалуйста/помогите/помоги`
+- **WellWishes**: `good luck/all the best`, `удачи/всего наилучшего`
+
+### Safety guard for Latin roots
+
+FST phonology is tuned for Kazakh Cyrillic. Feeding `"John"` into `synthesise_noun(..., Case::Instrumental)` would produce garbled `"Johnман"`. The realiser now detects non-Cyrillic roots and falls back to plain substitution — no suffix attached. Output: `"John танысқаныма қуаныштымын"` rather than hallucinated morphology.
+
+### Ordering change
+
+`StatementOfName` is now checked BEFORE `Greeting` in `interpret_text`. This prevents `"hi i am John"` from misfiring as a bare Casual greeting. All StatementOfName patterns (атым/есімім/зовут/my name is/call me/[greet] i am X) are explicit enough to rule out false positives.
+
+### Tests
+
+73 dialog end-to-end pairs (up from 56), 17 new:
+- 10 recogniser triggers (greetings × 3, farewell, affirmation, negation, thanks, apology, ask-how-are-you, ask-name)
+- 4 self-introduction patterns (Russian `зовут`, English `my name is` / `call me` / `hi i am`)
+- 2 output-is-Kazakh invariants (Russian input → Cyrillic-only output; Latin name → no FST suffix)
+- 1 multilingual multi-turn conversation flow
+
+Workspace: **245 passing**, 4 ignored, 0 failing. Foundation CI green.
+
+### Known v0.9.6 limitations
+
+- Recogniser catches the common phrasings. Edge cases (British contractions "init", ru-ua mix, Kazakh with Latin transliteration "salem") are not handled.
+- Latin names stay un-inflected in templates requesting `{name|features}`. Transliteration to Cyrillic (e.g. `John` → `Джон`) would let the FST synthesise properly — possible future work.
+- No output-language switching: Russian / English input still gets Kazakh output by design.
+
 ## [0.9.5] — 2026-04-19
 
 FST-backed slot expansion. Templates can now emit `{slot|features}` atoms; the realiser synthesises grammatical forms via `adam_kernel_fst::morphotactics::synthesise_noun` instead of plain text substitution. Cross-slot templates (using multiple slots in one response) drop in naturally because of the v0.8.5 template-fillability filter.

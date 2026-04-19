@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.5-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.6-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,36 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.9.6 — Multilingual recogniser surface
+
+The model now reads Kazakh, Russian, and English input across all 25 intents — and replies exclusively in Kazakh. This is **not** translation: the core pipeline stays deterministic Kazakh-only. Only the recogniser layer widens; more surface forms map to the same Intent.
+
+```
+$ adam_chat
+> hello
+сәлем
+> how are you
+жақсымын, рахмет
+> my name is John
+John танысқаныма қуаныштымын            ← Latin name stays bare (FST is Kazakh-only)
+> меня зовут Дәулет
+Дәулетпен сөйлесу — құрмет              ← Cyrillic root → full FST synthesis
+> спасибо
+ештеңе емес
+> bye
+сау болыңыз
+```
+
+### Latin root safety
+
+FST phonology is tuned for Kazakh Cyrillic. Feeding `"John"` into `synthesise_noun(..., Case::Instrumental)` would produce garbled `"Johnман"`. The realiser now detects non-Cyrillic roots and falls back to plain substitution — no suffix is attached, no hallucinated morphology.
+
+### Ordering change
+
+`StatementOfName` is checked BEFORE `Greeting` so `"hi i am John"` doesn't misfire as a bare Casual greeting. All self-introduction patterns (атым / есімім / зовут / my name is / call me / [greet] i am X) are explicit enough to rule out false positives.
+
+73 dialog end-to-end tests (up from 56). Workspace totals: **245 passing**, 4 ignored, 0 failing.
 
 ## v0.9.5 — FST-backed slot expansion
 
