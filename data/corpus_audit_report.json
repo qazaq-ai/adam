@@ -1,0 +1,94 @@
+{
+  "version": "1.1.5",
+  "starting_position_words": 2237926,
+  "target_words": 100000000,
+  "expansion_factor": 44.68423,
+  "unique_words_total": 193020,
+  "overall_purity_score": 0.967427,
+  "packs": [
+    {
+      "pack": "tatoeba_kazakh_pack.json",
+      "sample_count": 4058,
+      "total_words": 24643,
+      "unique_words": 9709,
+      "duplicate_samples": 0,
+      "loanword_words": 464,
+      "russian_only_letter_words": 456,
+      "loanword_suffix_words": 8,
+      "purity_score": 0.98117113,
+      "avg_sentence_length": 6.148842
+    },
+    {
+      "pack": "wikipedia_kz_pack.json",
+      "sample_count": 100000,
+      "total_words": 1150532,
+      "unique_words": 138128,
+      "duplicate_samples": 0,
+      "loanword_words": 46905,
+      "russian_only_letter_words": 45685,
+      "loanword_suffix_words": 1220,
+      "purity_score": 0.9592319,
+      "avg_sentence_length": 12.22278
+    },
+    {
+      "pack": "common_voice_kk_pack.json",
+      "sample_count": 6108,
+      "total_words": 36397,
+      "unique_words": 10575,
+      "duplicate_samples": 0,
+      "loanword_words": 34,
+      "russian_only_letter_words": 32,
+      "loanword_suffix_words": 2,
+      "purity_score": 0.9990659,
+      "avg_sentence_length": 6.103143
+    },
+    {
+      "pack": "cc100_kk_pack.json",
+      "sample_count": 50000,
+      "total_words": 602144,
+      "unique_words": 74333,
+      "duplicate_samples": 0,
+      "loanword_words": 20563,
+      "russian_only_letter_words": 19843,
+      "loanword_suffix_words": 720,
+      "purity_score": 0.96585035,
+      "avg_sentence_length": 12.75374
+    },
+    {
+      "pack": "abai_wikisource_pack.json",
+      "sample_count": 2253,
+      "total_words": 20303,
+      "unique_words": 8209,
+      "duplicate_samples": 0,
+      "loanword_words": 39,
+      "russian_only_letter_words": 39,
+      "loanword_suffix_words": 0,
+      "purity_score": 0.9980791,
+      "avg_sentence_length": 9.114514
+    },
+    {
+      "pack": "kazakh_proverbs_pack.json",
+      "sample_count": 80,
+      "total_words": 349,
+      "unique_words": 245,
+      "duplicate_samples": 0,
+      "loanword_words": 0,
+      "russian_only_letter_words": 0,
+      "loanword_suffix_words": 0,
+      "purity_score": 1.0,
+      "avg_sentence_length": 4.975
+    },
+    {
+      "pack": "synthetic_sentences_pack.json",
+      "sample_count": 100000,
+      "total_words": 403558,
+      "unique_words": 15880,
+      "duplicate_samples": 207,
+      "loanword_words": 4891,
+      "russian_only_letter_words": 4891,
+      "loanword_suffix_words": 0,
+      "purity_score": 0.9878803,
+      "avg_sentence_length": 4.03558
+    }
+  ]
+}

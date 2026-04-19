@@ -39,7 +39,8 @@ The MVP path. Each release is strictly additive — no rollbacks, no feature gat
 | v0.9.8 | Full slot syntax (Derivation + Possessive) + Latin→Cyrillic transliteration + triple-slot templates | 265 workspace tests; demo-ready UX |
 | v0.9.9 | FST Instrumental harmony fix (`Алматыман → Алматымен`, `мұғалімбен → мұғаліммен`); 6 regression tests; template polish | 271 workspace tests; last stretch before MVP |
 | v1.0.0 | **MVP cut** — no new features; full documentation refresh; transformer-era narrative compressed into history section | 271 workspace tests; investor-demoable |
-| **v1.1.0** | **Kazakh-only revert + modern Lexicon + smart Unknown** — reverted v0.9.6 multilingual triggers, removed transliteration module; added Insult intent (polite non-engagement); Unknown handler extracts noun hint via FST and responds contextually; +12 modern Kazakh Lexicon roots (бағдарламашы, әзірлеуші, зерттеуші, жазушы, …) | **253 workspace tests**; course-correction toward thinking Kazakh model |
+| v1.1.0 | **Kazakh-only revert + modern Lexicon + smart Unknown** — reverted v0.9.6 multilingual triggers, removed transliteration module; added Insult intent; Unknown handler extracts noun hint via FST; +12 modern Kazakh Lexicon roots | 253 workspace tests; course-correction toward thinking Kazakh model |
+| **v1.1.5** | **Corpus audit baseline** — new `corpus_audit` binary measures the v1.x starting position per-source: word counts, vocab, Kazakh purity, dedup. Reports **2.24 M words baseline** (45× expansion needed to reach the 100 M target). Adds expansion plan through v1.5.0 | 256 workspace tests; measurable progress toward thinking model |
 
 ## Pre-Phase-10 — transformer era (v0.1.0 → v0.4.0)
 
