@@ -20,6 +20,7 @@ use adam_kernel_fst::morphotactics::synthesise_noun;
 
 use crate::planner::ResponsePlan;
 use crate::slot_syntax::{parse_noun_features, parse_placeholder};
+use crate::transliteration::latin_to_cyrillic;
 
 /// Render a response plan into the final output string. Scans the
 /// template left-to-right, expanding `{...}` placeholders as they
@@ -59,19 +60,19 @@ fn expand_placeholder(inner: &str, slots: &std::collections::HashMap<String, Str
     match feature_spec {
         None => root.clone(),
         Some(spec) => {
-            // FST phonology is tuned for Kazakh Cyrillic roots. If the
-            // extracted entity is entirely non-Cyrillic (Latin names
-            // like "John" from v0.9.6 multi-language inputs), feeding
-            // it through `synthesise_noun` produces garbled mixed-
-            // script output ("Johnман"). Fall back to plain substitution
-            // in that case — grammatical agreement is impossible
-            // without Kazakh phonology, so better to surface the bare
-            // name than to hallucinate a suffix.
-            if !root.chars().any(is_cyrillic) {
-                return root.clone();
-            }
+            // FST phonology is tuned for Kazakh Cyrillic roots. For a
+            // Latin-only entity (v0.9.6 multilingual inputs like
+            // "John" from `my name is John`), we transliterate to
+            // Cyrillic BEFORE running `synthesise_noun`. This makes
+            // Kazakh morphology work on foreign names without the
+            // mixed-script garbling that v0.9.6 guarded against.
+            let kazakh_root = if root.chars().any(is_cyrillic) {
+                root.clone()
+            } else {
+                latin_to_cyrillic(root)
+            };
             let features = parse_noun_features(spec);
-            synthesise_noun(root, features)
+            synthesise_noun(&kazakh_root, features)
         }
     }
 }

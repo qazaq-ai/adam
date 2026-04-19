@@ -586,19 +586,31 @@ fn response_to_russian_input_is_kazakh() {
 }
 
 #[test]
-fn latin_name_does_not_get_fst_suffixed() {
-    // "John" should NOT become "Johnман" when a template requests
-    // {name|instrumental} — FST phonology is Kazakh-only. Realiser
-    // must fall back to plain substitution for non-Cyrillic roots.
+fn latin_name_is_transliterated_for_fst_synthesis() {
+    // v0.9.8 policy: plain `{name}` substitution stays verbatim
+    // (Latin in → Latin out — user's spelling is preserved), but
+    // morphology-requesting `{name|features}` transliterates to
+    // Cyrillic first so `synthesise_noun` can work. No template
+    // should ever produce a garbled "Johnм…"/"Johnп…"/"Johnб…".
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
+    let mut saw_transliterated_synth = false;
     for seed in 0..32u64 {
         let out = respond_with_repo("my name is John", &lex, &repo, seed);
         assert!(
             !out.contains("Johnм") && !out.contains("Johnп") && !out.contains("Johnб"),
-            "FST applied Kazakh suffix to Latin root: {out:?}"
+            "FST suffix attached to un-transliterated Latin root: {out:?}"
         );
+        // Transliteration maps `John` → `Джохн`; the Instrumental
+        // variant should therefore start with "Джохн" at least once.
+        if out.contains("Джохн") {
+            saw_transliterated_synth = true;
+        }
     }
+    assert!(
+        saw_transliterated_synth,
+        "expected at least one seed in 0..32 to produce a transliterated FST-synthesised form"
+    );
 }
 
 #[test]
@@ -887,6 +899,72 @@ fn realiser_synthesises_plural_for_occupation_slot() {
     assert!(
         saw_plural,
         "expected at least one seed in 0..32 to pick the {{occupation|plural}} template"
+    );
+}
+
+#[test]
+fn cross_slot_how_are_you_uses_remembered_name() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+
+    let mut saw_personalised = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("қалайсыз", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        if out.contains("Дәулет") {
+            saw_personalised = true;
+        }
+    }
+    assert!(
+        saw_personalised,
+        "expected at least one seed to personalise ask-how-are-you response with the name"
+    );
+}
+
+#[test]
+fn cross_slot_age_mentions_remembered_name() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+
+    let mut saw_cross = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("менің жасым отыз", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        if out.contains("Дәулет") && out.contains("30") {
+            saw_cross = true;
+        }
+    }
+    assert!(
+        saw_cross,
+        "expected at least one seed in 0..32 to pick a template mentioning BOTH name and age"
+    );
+}
+
+#[test]
+fn cross_slot_occupation_in_city_fires_with_all_three() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+    let _ = conv.turn("мен Алматыданмын", &lex, &repo, 0);
+
+    let mut saw_triple = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("мен мұғаліммін", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        // Triple-slot: Дәулет + Алматыда (locative) + мұғалім.
+        if out.contains("Дәулет") && out.contains("Алматыда") && out.contains("мұғалім")
+        {
+            saw_triple = true;
+        }
+    }
+    assert!(
+        saw_triple,
+        "expected at least one seed to pick the {{name}}+{{city|loc}}+{{occupation}} triple-slot template"
     );
 }
 

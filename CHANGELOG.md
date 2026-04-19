@@ -2,6 +2,80 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.9.8] — 2026-04-19
+
+Slot syntax completes the noun-feature surface (Derivation + Possessive), Latin names get transliterated before FST synthesis, and templates gain a layer of cross-slot personalisation that uses multiple remembered entities in a single response.
+
+### Slot syntax: full noun-feature coverage
+
+Adds 11 derivation tokens and 7 possessive tokens to `parse_noun_features`:
+
+```text
+{root|agent}           → Agent (-шы/-ші)
+{root|abstract}        → Abstract (-лық/-лік)
+{root|privative}       → Privative (-сыз/-сіз)
+{root|endowed}         → Endowed (-лы/-лі)
+{root|similative}      → Similative (-дай/-дей)
+{root|comparative}     → Comparative (-рақ/-рек)
+{root|verbalnoun}      → VerbalNoun (-у)
+{root|actionnoun}      → ActionNoun (-ым/-ім)
+{root|diminutive}      → Diminutive (-шық/-шік)
+{root|ordinal}         → Ordinal (-ншы/-нші)
+{root|collective}      → Collective (-еу/-ау)
+
+{root|p1sg}            → P1Sg (my)
+{root|p2sg}            → P2SgPolite (your, polite default)
+{root|p2sg_inf}        → P2SgInformal
+{root|p3}              → P3 (his/her)
+{root|p1pl}            → P1Pl (our)
+{root|p2pl}            → P2PlPolite
+{root|p2pl_inf}        → P2PlInformal
+```
+
+Combinations work as you'd expect: `{name|agent+p1sg+dative}` yields root → Agent derivation → P1Sg possessive → Dative case, all in one synthesis pass.
+
+### Latin → Cyrillic transliteration
+
+New module `adam_dialog::transliteration` converts Latin proper names to Kazakh Cyrillic BEFORE `synthesise_noun` when a template requests morphology on a non-Cyrillic slot value. v0.9.6 guarded against garbled output by falling back to plain substitution; v0.9.8 replaces that fallback with real transliteration so FST inflection actually runs on foreign names.
+
+| Latin input | transliterated |
+|---|---|
+| `Anna` | Анна |
+| `Tom` | Том |
+| `John` | Джохн |
+| `Zhanna` | Жанна |
+| `Sharon` | Шарон |
+| `Charlie` | Чарлие |
+
+Conservative single-letter + digraph mapping: `sh/ch/zh/kh/gh/ph/th/ts/yo/ya/yu/ye` as digraphs, rest letter-by-letter (`j → дж`, `c → к`, `x → кс`, `y → й`). Silent `h` in English is **not** special-cased (`John → Джохн`, not `Джон`) — intentionally conservative.
+
+**Policy:** plain `{name}` substitution still keeps the user's original spelling ("сәлем John"). Only `{name|features}` triggers transliteration → synthesis.
+
+### Cross-slot templates
+
+New templates reference multiple session entities in one response. Eligible only when every slot is fillable; plain variants stay available otherwise.
+
+| key | new templates |
+|---|---|
+| `ask_how_are_you` | `"жақсымын {name}, ал сіз қалайсыз"`, `"жақсымын, рахмет {name}"` |
+| `statement_of_age` | `"{name}, {age} жастасыз, тамаша"`, `"{name}, {age} жас — керемет кезең"` |
+| `statement_of_occupation` | `"{name}, {occupation} — құрметті кәсіп"`, `"{name}, сіз {city|locative} {occupation} екенсіз"` |
+| `compliment` | `"рахмет {name}"`, `"рахмет {name}, сіз де тамашасыз"` |
+
+The triple-slot `"{name}, сіз {city|locative} {occupation} екенсіз"` only fires after the user has stated all three entities — "Дәулет, сіз Алматыда әнші екенсіз".
+
+### Tests
+
+81 dialog end-to-end pairs (up from 78), 3 new cross-slot tests covering (name+ask_how_are_you), (name+age), and (name+city+occupation triple). 23 lib-level unit tests (13 slot_syntax + 6 transliteration + 4 planner).
+
+Workspace: **265 passing**, 4 ignored, 0 failing. Foundation CI green.
+
+### Known v0.9.8 limitations
+
+- Silent `h` in English is not special-cased (`John → Джохн` rather than the standard spelling `Джон`). Good enough for FST synthesis; a more polished transliterator is v1.0.0+ work.
+- Back-vowel instrumental harmony (`Алматы` → `Алматыман` rather than `Алматымен`) is a pre-existing FST quirk — check `INSTRUMENTAL` template archiphoneme `E` resolution. Out of scope for the dialog layer.
+- Derivation + Possessive tokens are fully parseable; the current template set uses only a handful of the 18 feature tokens. Template authors have the full surface available when needed.
+
 ## [0.9.7] — 2026-04-19
 
 Lexicon-backed occupation recognition. The fixed 6-form table (`мұғаліммін → мұғалім` and five others) is replaced with generic 1sg-copula stripping + noun lookup against the 14 k-entry Lexicon. Any noun in the Lexicon ending in a 1sg predicate suffix (`-мын/-мін/-пын/-пін/-бын/-бін`) is now recognised.

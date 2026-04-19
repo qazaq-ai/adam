@@ -1,4 +1,4 @@
-//! Template slot syntax (v0.9.5).
+//! Template slot syntax.
 //!
 //! Slot placeholders in a template take one of two shapes:
 //!
@@ -7,9 +7,12 @@
 //!   {slot|feat1+feat2+...}   — FST: synthesise via morphotactics
 //! ```
 //!
-//! Feature tokens are case-insensitive and map to [`NounFeatures`]:
+//! Feature tokens are case-insensitive and populate [`NounFeatures`].
+//! Four families of tokens are recognised:
 //!
-//! | token | → field |
+//! ### Case (v0.9.5)
+//!
+//! | token | → |
 //! |---|---|
 //! | `nominative` / `nom` | `case = Nominative` |
 //! | `genitive` / `gen`   | `case = Genitive` |
@@ -18,14 +21,53 @@
 //! | `locative` / `loc`   | `case = Locative` |
 //! | `ablative` / `abl`   | `case = Ablative` |
 //! | `instrumental` / `inst` | `case = Instrumental` |
-//! | `singular` / `sg`    | `number = Singular` |
-//! | `plural` / `pl`      | `number = Plural` |
 //!
-//! Unknown feature tokens are silently ignored — this keeps templates
-//! forward-compatible when new features arrive. Feature order doesn't
-//! matter; later tokens of the same class win.
+//! ### Number (v0.9.5)
+//!
+//! | token | → |
+//! |---|---|
+//! | `singular` / `sg` | `number = Singular` |
+//! | `plural` / `pl`   | `number = Plural` |
+//!
+//! ### Derivation (v0.9.8)
+//!
+//! Applied BEFORE inflection — so `{root|agent+dative}` = root → Agent
+//! derivation → Dative case (e.g. жаз → жазушы → жазушыға).
+//!
+//! | token | → `derivation = ...` | effect |
+//! |---|---|---|
+//! | `agent` | `Agent` | `-шы/-ші` (жаз → жазушы, "writer") |
+//! | `abstract` / `abs` | `Abstract` | `-лық/-лік` (жақсы → жақсылық, "goodness") |
+//! | `privative` / `priv` | `Privative` | `-сыз/-сіз` (тұз → тұзсыз, "saltless") |
+//! | `endowed` / `end` | `Endowed` | `-лы/-лі` (күш → күшті, "strong") |
+//! | `similative` / `sim` | `Similative` | `-дай/-дей` (тау → таудай) |
+//! | `comparative` / `comp` | `Comparative` | `-рақ/-рек` |
+//! | `verbalnoun` / `vnoun` | `VerbalNoun` | `-у` (жаз → жазу) |
+//! | `actionnoun` / `anoun` | `ActionNoun` | `-ым/-ім` (айт → айтым) |
+//! | `diminutive` / `dim` | `Diminutive` | `-шық/-шік` (үй → үйшік) |
+//! | `ordinal` / `ord` | `Ordinal` | `-ншы/-нші` (бір → бірінші) |
+//! | `collective` / `coll` | `Collective` | `-еу/-ау` (бір → біреу) |
+//!
+//! ### Possessive (v0.9.8)
+//!
+//! | token | → `possessive = ...` |
+//! |---|---|
+//! | `p1sg` | `P1Sg` (my) |
+//! | `p2sg_inf` | `P2SgInformal` (your, informal) |
+//! | `p2sg` / `p2sg_pol` | `P2SgPolite` (your, polite) |
+//! | `p3` | `P3` (his/her/its/their) |
+//! | `p1pl` | `P1Pl` (our) |
+//! | `p2pl_inf` | `P2PlInformal` (your pl, informal) |
+//! | `p2pl` / `p2pl_pol` | `P2PlPolite` (your pl, polite) |
+//!
+//! ### General rules
+//!
+//! - Unknown tokens are silently ignored — keeps templates forward-
+//!   compatible when new features arrive.
+//! - Feature order doesn't matter; later tokens of the same class win.
+//! - Combination example: `{name|p1sg+dative}` → "менің Xке" sense.
 
-use adam_kernel_fst::morphotactics::{Case, NounFeatures, Number};
+use adam_kernel_fst::morphotactics::{Case, Derivation, NounFeatures, Number, Possessive};
 
 /// Parse the inner text of a `{...}` placeholder into (slot-name,
 /// optional feature spec). The slot name is what the planner looks
@@ -46,14 +88,16 @@ pub fn parse_placeholder(inner: &str) -> (&str, Option<&str>) {
     }
 }
 
-/// Parse a feature spec ("locative", "plural+dative", "pl+loc") into
-/// a [`NounFeatures`] bundle. Unknown tokens are ignored; empty input
-/// gives `NounFeatures::default()`.
+/// Parse a feature spec into a [`NounFeatures`] bundle. Supports four
+/// token families: case, number, derivation, possessive (see module
+/// docs for the full mapping). Unknown tokens are silently ignored;
+/// empty input gives `NounFeatures::default()`.
 pub fn parse_noun_features(spec: &str) -> NounFeatures {
     let mut feats = NounFeatures::default();
     for tok in spec.split('+') {
         let tok = tok.trim().to_lowercase();
         match tok.as_str() {
+            // Case
             "nominative" | "nom" => feats.case = Some(Case::Nominative),
             "genitive" | "gen" => feats.case = Some(Case::Genitive),
             "dative" | "dat" => feats.case = Some(Case::Dative),
@@ -61,8 +105,29 @@ pub fn parse_noun_features(spec: &str) -> NounFeatures {
             "locative" | "loc" => feats.case = Some(Case::Locative),
             "ablative" | "abl" => feats.case = Some(Case::Ablative),
             "instrumental" | "inst" => feats.case = Some(Case::Instrumental),
+            // Number
             "singular" | "sg" => feats.number = Some(Number::Singular),
             "plural" | "pl" => feats.number = Some(Number::Plural),
+            // Derivation (applied BEFORE inflection)
+            "agent" => feats.derivation = Some(Derivation::Agent),
+            "abstract" | "abs" => feats.derivation = Some(Derivation::Abstract),
+            "privative" | "priv" => feats.derivation = Some(Derivation::Privative),
+            "endowed" | "end" => feats.derivation = Some(Derivation::Endowed),
+            "similative" | "sim" => feats.derivation = Some(Derivation::Similative),
+            "comparative" | "comp" => feats.derivation = Some(Derivation::Comparative),
+            "verbalnoun" | "vnoun" => feats.derivation = Some(Derivation::VerbalNoun),
+            "actionnoun" | "anoun" => feats.derivation = Some(Derivation::ActionNoun),
+            "diminutive" | "dim" => feats.derivation = Some(Derivation::Diminutive),
+            "ordinal" | "ord" => feats.derivation = Some(Derivation::Ordinal),
+            "collective" | "coll" => feats.derivation = Some(Derivation::Collective),
+            // Possessive
+            "p1sg" => feats.possessive = Some(Possessive::P1Sg),
+            "p2sg_inf" => feats.possessive = Some(Possessive::P2SgInformal),
+            "p2sg" | "p2sg_pol" => feats.possessive = Some(Possessive::P2SgPolite),
+            "p3" => feats.possessive = Some(Possessive::P3),
+            "p1pl" => feats.possessive = Some(Possessive::P1Pl),
+            "p2pl_inf" => feats.possessive = Some(Possessive::P2PlInformal),
+            "p2pl" | "p2pl_pol" => feats.possessive = Some(Possessive::P2PlPolite),
             _ => {}
         }
     }
@@ -122,5 +187,82 @@ mod tests {
     fn features_last_wins_on_collision() {
         let f = parse_noun_features("dative+ablative");
         assert_eq!(f.case, Some(Case::Ablative));
+    }
+
+    #[test]
+    fn features_derivation_agent() {
+        let f = parse_noun_features("agent");
+        assert_eq!(f.derivation, Some(Derivation::Agent));
+    }
+
+    #[test]
+    fn features_derivation_all_11_tokens() {
+        for (tok, expected) in [
+            ("agent", Derivation::Agent),
+            ("abstract", Derivation::Abstract),
+            ("privative", Derivation::Privative),
+            ("endowed", Derivation::Endowed),
+            ("similative", Derivation::Similative),
+            ("comparative", Derivation::Comparative),
+            ("verbalnoun", Derivation::VerbalNoun),
+            ("actionnoun", Derivation::ActionNoun),
+            ("diminutive", Derivation::Diminutive),
+            ("ordinal", Derivation::Ordinal),
+            ("collective", Derivation::Collective),
+        ] {
+            let f = parse_noun_features(tok);
+            assert_eq!(
+                f.derivation,
+                Some(expected),
+                "derivation token {tok:?} misparsed"
+            );
+        }
+    }
+
+    #[test]
+    fn features_derivation_short_aliases() {
+        assert_eq!(
+            parse_noun_features("abs").derivation,
+            Some(Derivation::Abstract)
+        );
+        assert_eq!(
+            parse_noun_features("dim").derivation,
+            Some(Derivation::Diminutive)
+        );
+        assert_eq!(
+            parse_noun_features("ord").derivation,
+            Some(Derivation::Ordinal)
+        );
+    }
+
+    #[test]
+    fn features_possessive_all() {
+        for (tok, expected) in [
+            ("p1sg", Possessive::P1Sg),
+            ("p2sg_inf", Possessive::P2SgInformal),
+            ("p2sg", Possessive::P2SgPolite),
+            ("p2sg_pol", Possessive::P2SgPolite),
+            ("p3", Possessive::P3),
+            ("p1pl", Possessive::P1Pl),
+            ("p2pl_inf", Possessive::P2PlInformal),
+            ("p2pl", Possessive::P2PlPolite),
+        ] {
+            let f = parse_noun_features(tok);
+            assert_eq!(
+                f.possessive,
+                Some(expected),
+                "possessive token {tok:?} misparsed"
+            );
+        }
+    }
+
+    #[test]
+    fn features_full_combination() {
+        // Derivation + possessive + number + case together.
+        let f = parse_noun_features("agent+p1sg+plural+dative");
+        assert_eq!(f.derivation, Some(Derivation::Agent));
+        assert_eq!(f.possessive, Some(Possessive::P1Sg));
+        assert_eq!(f.number, Some(Number::Plural));
+        assert_eq!(f.case, Some(Case::Dative));
     }
 }

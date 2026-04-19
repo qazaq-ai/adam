@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.7-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.9.8-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,30 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.9.8 — Full slot syntax + transliteration + cross-slot templates
+
+Three improvements that together push the dialog layer toward demo-ready quality:
+
+**1. Slot syntax covers all four NounFeature fields.** v0.9.5 parsed `case + number`; v0.9.8 adds `derivation` (11 tokens: agent / abstract / privative / endowed / similative / comparative / verbalnoun / actionnoun / diminutive / ordinal / collective) and `possessive` (7 tokens: p1sg / p2sg / p2sg_inf / p3 / p1pl / p2pl / p2pl_inf). `{name|agent+p1sg+dative}` is now a single synthesis pass.
+
+**2. Latin → Cyrillic transliteration.** When the template requests morphology on a Latin root (say `my name is John` → session.name = "John"), the realiser now transliterates to Cyrillic (`Джохн`) before `synthesise_noun`, then the FST inflects naturally (`Джохнбен…`). Plain `{name}` substitution still preserves the user's original Latin spelling ("сәлем John").
+
+**3. Cross-slot templates.** Multiple session entities in one response — fires only when every slot is fillable:
+
+```
+$ adam_chat
+> менің атым Дәулет
+Дәулетпен танысқаныма қуаныштымын
+> мен Алматыданмын
+Алматы — әдемі қала
+> мен әншімін
+Дәулет, сіз Алматыда әнші екенсіз          ← triple-slot template
+> қалайсыз
+жақсымын Дәулет, ал сіз қалайсыз           ← cross-slot with name
+```
+
+81 dialog end-to-end tests (up from 78). 23 lib-level unit tests. Workspace totals: **265 passing**, 4 ignored, 0 failing.
 
 ## v0.9.7 — Lexicon-backed occupation recognition
 

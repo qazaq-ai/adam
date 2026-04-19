@@ -20,6 +20,7 @@ pub mod realiser;
 pub mod semantics;
 pub mod slot_syntax;
 pub mod templates;
+pub mod transliteration;
 
 pub use conversation::Conversation;
 pub use intent::{GreetingKind, Intent, SubjectPerson};
