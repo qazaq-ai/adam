@@ -1,14 +1,14 @@
 //! `adam-chat` — interactive REPL demo of the predictable Kazakh dialog
-//! pipeline (v0.8.0 MVP — 25 intents, PersonName slot substitution).
+//! pipeline (v0.8.5 MVP — 25 intents + session state).
 //!
 //! Usage:
 //!   adam_chat                — interactive REPL on stdin
 //!   adam_chat --once "сәлем" — single-shot, print response + trace
 //!   adam_chat --trace        — REPL with full Layer 1..5 trace per turn
 //!
-//! The REPL is intentionally minimal — no history, no config. It exists
-//! so that the v0.7.5 artifact is runnable and demonstrable without
-//! writing Rust.
+//! The REPL holds a single [`Conversation`] for the whole session, so
+//! the user's name (once said) persists across turns: subsequent
+//! greetings personalise automatically.
 
 use std::{
     io::{self, BufRead, Write},
@@ -16,7 +16,7 @@ use std::{
 };
 
 use adam_dialog::{
-    TemplateRepository, interpret_text, plan_response_with_repo, realise, respond_with_repo,
+    Conversation, TemplateRepository, interpret_text, plan_response_with_session, realise,
 };
 use adam_kernel_fst::lexicon::LexiconV1;
 
@@ -48,7 +48,8 @@ fn main() -> ExitCode {
 
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
-            run_once(input, &lex, &repo, trace, turn_seed(0));
+            let mut conv = Conversation::new();
+            run_turn(&mut conv, input, &lex, &repo, trace, turn_seed(0));
             return ExitCode::SUCCESS;
         } else {
             eprintln!("--once requires an argument");
@@ -56,9 +57,10 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!("adam-chat v0.8.0 — пікірлесейік! Type a Kazakh sentence; ^D to quit.");
+    eprintln!("adam-chat v0.8.5 — пікірлесейік! Type a Kazakh sentence; ^D to quit.");
     let stdin = io::stdin();
     let stdout = io::stdout();
+    let mut conv = Conversation::new();
     let mut turn = 0u64;
     for line in stdin.lock().lines() {
         let Ok(line) = line else { break };
@@ -68,17 +70,23 @@ fn main() -> ExitCode {
         }
         turn += 1;
         let seed = turn_seed(turn);
-        run_once(line, &lex, &repo, trace, seed);
+        run_turn(&mut conv, line, &lex, &repo, trace, seed);
         stdout.lock().flush().ok();
     }
     ExitCode::SUCCESS
 }
 
-fn run_once(input: &str, lex: &LexiconV1, repo: &TemplateRepository, trace: bool, seed: u64) {
+fn run_turn(
+    conv: &mut Conversation,
+    input: &str,
+    lex: &LexiconV1,
+    repo: &TemplateRepository,
+    trace: bool,
+    seed: u64,
+) {
     if trace {
-        // Rebuild the pipeline in pieces so we can show the intermediate
-        // states — this is the "predictable by construction" property
-        // made visible.
+        // Trace mode has to duplicate Conversation::turn so we can
+        // surface intermediate state. Functionally identical.
         let parses: Vec<_> = input
             .split_whitespace()
             .flat_map(|t| {
@@ -93,18 +101,31 @@ fn run_once(input: &str, lex: &LexiconV1, repo: &TemplateRepository, trace: bool
             })
             .collect();
         let intent = interpret_text(input, &parses);
-        let plan = plan_response_with_repo(&intent, seed, repo);
+        // Fold entities BEFORE planning so "менің атым X" immediately
+        // allows the very same turn's response to reference {name}.
+        absorb_into(conv, &intent);
+        let plan = plan_response_with_session(&intent, seed, repo, &conv.session);
         let out = realise(&plan);
-        println!("┌─ input:   {input}");
-        println!("├─ parses:  {parses:#?}");
-        println!("├─ intent:  {intent:?}");
+        println!("┌─ input:    {input}");
+        println!("├─ parses:   {parses:#?}");
+        println!("├─ intent:   {intent:?}");
+        println!("├─ session:  {:?}", conv.session);
         for t in &plan.trace {
             println!("├─ {t}");
         }
-        println!("└─ output:  {out}");
+        println!("└─ output:   {out}");
     } else {
-        let out = respond_with_repo(input, lex, repo, seed);
+        let out = conv.turn(input, lex, repo, seed);
         println!("{out}");
+    }
+}
+
+/// Mirror of `Conversation::absorb_entities` — duplicated here for the
+/// trace path. Kept tiny on purpose: when it grows, extract as a
+/// `pub(crate)` helper on Conversation.
+fn absorb_into(conv: &mut Conversation, intent: &adam_dialog::Intent) {
+    if let adam_dialog::Intent::StatementOfName { name } = intent {
+        conv.session.insert("name".into(), name.clone());
     }
 }
 

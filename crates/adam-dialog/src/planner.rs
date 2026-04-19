@@ -35,11 +35,33 @@ pub fn plan_response(intent: &Intent, rng_seed: u64) -> ResponsePlan {
 }
 
 /// Full-information variant. Supply the loaded TemplateRepository to
-/// use the configured Kazakh template set.
+/// use the configured Kazakh template set. Equivalent to calling
+/// [`plan_response_with_session`] with an empty session map.
 pub fn plan_response_with_repo(
     intent: &Intent,
     rng_seed: u64,
     repo: &TemplateRepository,
+) -> ResponsePlan {
+    plan_response_with_session(intent, rng_seed, repo, &HashMap::new())
+}
+
+/// Session-aware variant. `session` holds entities extracted from past
+/// turns (see `Conversation` in `conversation.rs`). The planner:
+///
+/// 1. Computes the full slot map = per-intent slots ∪ session slots.
+///    Per-intent slots win on collision (a freshly stated name
+///    overrides an older remembered one).
+/// 2. Filters the candidate template pool down to templates whose
+///    every `{slot}` reference can be satisfied from that slot map.
+///    If filtering empties the pool, falls back to the unfiltered
+///    pool — templates with unfilled `{slot}` are visibly ugly which
+///    is better than a silent crash.
+/// 3. Seed-mod picks among the filtered templates.
+pub fn plan_response_with_session(
+    intent: &Intent,
+    rng_seed: u64,
+    repo: &TemplateRepository,
+    session: &HashMap<String, String>,
 ) -> ResponsePlan {
     let mut trace = Vec::new();
     trace.push(format!("planner: seed={rng_seed}"));
@@ -48,27 +70,67 @@ pub fn plan_response_with_repo(
     let key = intent_key(intent);
     trace.push(format!("planner: template_key={key}"));
 
-    let applicable = repo.get(key);
-    // Deterministic pick: rng_seed modulo applicable.len().
-    let idx = (rng_seed as usize) % applicable.len().max(1);
-    let chosen = applicable.get(idx).cloned().unwrap_or_default();
-    trace.push(format!(
-        "planner: applicable_count={} chosen_index={} text='{}'",
-        applicable.len(),
-        idx,
-        chosen,
-    ));
-
-    let slots = extract_slots(intent);
+    // Merge per-turn slots with persistent session entities. Per-turn
+    // wins on collision.
+    let mut slots = session.clone();
+    for (k, v) in extract_slots(intent) {
+        slots.insert(k, v);
+    }
     if !slots.is_empty() {
         trace.push(format!("planner: slots={slots:?}"));
     }
+
+    let applicable_all = repo.get(key);
+    let fillable: Vec<&String> = applicable_all
+        .iter()
+        .filter(|t| template_is_fillable(t, &slots))
+        .collect();
+    let effective: Vec<&String> = if fillable.is_empty() {
+        applicable_all.iter().collect()
+    } else {
+        fillable
+    };
+
+    let idx = (rng_seed as usize) % effective.len().max(1);
+    let chosen = effective.get(idx).map(|s| (*s).clone()).unwrap_or_default();
+    trace.push(format!(
+        "planner: applicable_total={} fillable={} chosen_index={} text='{}'",
+        applicable_all.len(),
+        effective.len(),
+        idx,
+        chosen,
+    ));
 
     ResponsePlan {
         literal: chosen,
         slots,
         trace,
     }
+}
+
+/// True iff every `{placeholder}` appearing in `template` has a
+/// corresponding key in `slots`. Literal-only templates are always
+/// fillable.
+fn template_is_fillable(template: &str, slots: &HashMap<String, String>) -> bool {
+    // Cheap scan for `{...}` tokens. Malformed braces (`{` with no
+    // closing `}`) are treated as literal text, which is fine for our
+    // template surface.
+    let bytes = template.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'{' {
+            if let Some(end_rel) = template[i + 1..].find('}') {
+                let name = &template[i + 1..i + 1 + end_rel];
+                if !slots.contains_key(name) {
+                    return false;
+                }
+                i += 1 + end_rel + 1;
+                continue;
+            }
+        }
+        i += 1;
+    }
+    true
 }
 
 /// Pull entity values out of the Intent into a slot map the realiser
@@ -79,6 +141,39 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
         slots.insert("name".into(), name.clone());
     }
     slots
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn template_without_placeholder_is_always_fillable() {
+        assert!(template_is_fillable("сәлем", &HashMap::new()));
+    }
+
+    #[test]
+    fn template_with_placeholder_requires_slot() {
+        let mut slots = HashMap::new();
+        assert!(!template_is_fillable("сәлем {name}", &slots));
+        slots.insert("name".into(), "Дәулет".into());
+        assert!(template_is_fillable("сәлем {name}", &slots));
+    }
+
+    #[test]
+    fn template_with_multiple_placeholders_needs_all_slots() {
+        let mut slots = HashMap::new();
+        slots.insert("name".into(), "Дәулет".into());
+        assert!(!template_is_fillable(
+            "сәлем {name}, сіз {city}-дансыз ба",
+            &slots,
+        ));
+        slots.insert("city".into(), "Алматы".into());
+        assert!(template_is_fillable(
+            "сәлем {name}, сіз {city}-дансыз ба",
+            &slots,
+        ));
+    }
 }
 
 /// Map an [`Intent`] to the template-repository key that holds its

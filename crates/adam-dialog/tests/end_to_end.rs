@@ -9,7 +9,8 @@
 
 use adam_dialog::intent::{GreetingKind, Intent, TimeOfDay};
 use adam_dialog::{
-    TemplateRepository, interpret_text, plan_response, realise, respond, respond_with_repo,
+    Conversation, TemplateRepository, interpret_text, plan_response, realise, respond,
+    respond_with_repo,
 };
 use adam_kernel_fst::lexicon::LexiconV1;
 
@@ -390,6 +391,65 @@ fn response_well_wishes() {
         "сәттілік",
         &["сізге де", "сәттілік сізге де", "тілегіңіз қабыл болсын"],
     );
+}
+
+// --- v0.8.5 session state (Conversation) -----------------------------------
+
+#[test]
+fn conversation_remembers_name_across_turns() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    // Turn 1: user introduces. Any of the statement_of_name templates
+    // is acceptable — we only assert the name got absorbed.
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+    assert_eq!(conv.session.get("name"), Some(&"Дәулет".to_string()));
+
+    // Turn 2: plain casual greeting. Because the session has a name,
+    // "сәлем {name}" is now eligible and should fire for at least one
+    // seed in 0..16. We also ensure every fired response is plausible
+    // (no unfilled `{name}` leaks).
+    let mut saw_personalised = false;
+    for seed in 0..16u64 {
+        let out = conv.turn("сәлем", &lex, &repo, seed);
+        assert!(!out.contains("{name}"), "unfilled slot leaked: {out:?}");
+        if out == "сәлем Дәулет" {
+            saw_personalised = true;
+        }
+    }
+    assert!(
+        saw_personalised,
+        "expected at least one seed in 0..16 to pick \"сәлем Дәулет\""
+    );
+}
+
+#[test]
+fn conversation_without_name_never_emits_unfilled_greeting() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // No introduction: no name in session. Every seed must produce a
+    // literal-only greeting.
+    for seed in 0..16u64 {
+        let out = conv.turn("сәлем", &lex, &repo, seed);
+        assert!(!out.contains("{"), "slot placeholder leaked: {out:?}");
+        assert!(
+            out == "сәлем" || out == "сәлем достым",
+            "unexpected greeting w/o name: {out:?}"
+        );
+    }
+}
+
+#[test]
+fn conversation_reset_clears_name() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("атым Дәулет", &lex, &repo, 0);
+    assert!(conv.session.contains_key("name"));
+    conv.reset();
+    assert!(conv.session.is_empty());
 }
 
 // --- Traceability ----------------------------------------------------------

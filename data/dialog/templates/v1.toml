@@ -13,7 +13,7 @@
 #   key = "intent_identifier"
 #   templates = ["phrase 1", "phrase 2", ...]
 
-version = "0.8.0"
+version = "0.8.5"
 
 # ---------- Greetings ----------
 
@@ -22,6 +22,7 @@ key = "greeting.casual"
 templates = [
     "сәлем",
     "сәлем достым",
+    "сәлем {name}",
 ]
 
 [[families]]
@@ -29,6 +30,7 @@ key = "greeting.polite"
 templates = [
     "сәлеметсіз бе",
     "армысыз",
+    "сәлеметсіз бе {name}",
 ]
 
 [[families]]
@@ -36,18 +38,21 @@ key = "greeting.morning"
 templates = [
     "қайырлы таң",
     "қайырлы таң болсын",
+    "қайырлы таң {name}",
 ]
 
 [[families]]
 key = "greeting.day"
 templates = [
     "қайырлы күн",
+    "қайырлы күн {name}",
 ]
 
 [[families]]
 key = "greeting.evening"
 templates = [
     "қайырлы кеш",
+    "қайырлы кеш {name}",
 ]
 
 # ---------- Farewell ----------

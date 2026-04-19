@@ -2,6 +2,27 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.8.5] — 2026-04-19
+
+First session state in the dialog layer. The new [`Conversation`] struct accumulates entities across turns, so a user who introduces themselves once gets greeted by name on every subsequent turn.
+
+- `Conversation { session: HashMap<String, String> }` with `new()`, `turn(input, lex, repo, seed) -> String`, `reset()`.
+- `planner::plan_response_with_session(intent, seed, repo, session)` merges per-turn slots with session slots (per-turn wins on collision) and filters candidate templates down to those whose every `{slot}` reference is satisfiable. If filtering empties the pool, falls back to the full pool (visible `{slot}` is better than a crash).
+- `plan_response_with_repo` is now defined in terms of `plan_response_with_session(…, &HashMap::new())` — no behaviour change for existing callers.
+- Greeting families get `{name}` variants:
+  - `greeting.casual`: сәлем / сәлем достым / **сәлем {name}**
+  - `greeting.polite`: сәлеметсіз бе / армысыз / **сәлеметсіз бе {name}**
+  - `greeting.morning` / `.day` / `.evening` all get a corresponding `{name}` variant.
+- `adam_chat` CLI now holds a single `Conversation` for the whole REPL session; `--trace` mode dumps the live session map.
+- Ordering: `Conversation::turn` absorbs entities BEFORE planning, so the SAME turn that says "менің атым X" can already receive a response containing `{name}` substituted to X.
+
+Tests: 44 dialog end-to-end pairs (+3 session tests covering persistence, non-persistence when no name said, and `reset()`). 3 planner unit tests for `template_is_fillable`. Workspace: **204 passing**, 4 ignored, 0 failing.
+
+Known v0.8.5 limitations:
+
+- Only `name` is persisted across turns — `age`, `location`, `occupation`, `family` recognition exists but their entities aren't yet extracted into session. That lands in v0.9.0 together with numeric extraction.
+- No context-aware responses: the model doesn't say "мен сізді Дәулет деп атадым, иә?" to confirm, or disambiguate "Дәулет" the name from "дәулет" the concept.
+
 ## [0.8.0] — 2026-04-19
 
 Dialog layer widened from 10 to **25 intents**. First entity extraction lands: the user's name is pulled out of self-introduction patterns and substituted into the response template.

@@ -13,6 +13,7 @@
 //! which picks uniformly from ≤ 5 applicable templates for the recognised
 //! intent. That is the ONLY source of randomness in the system.
 
+pub mod conversation;
 pub mod entities;
 pub mod intent;
 pub mod planner;
@@ -20,8 +21,11 @@ pub mod realiser;
 pub mod semantics;
 pub mod templates;
 
+pub use conversation::Conversation;
 pub use intent::{GreetingKind, Intent, SubjectPerson};
-pub use planner::{ResponsePlan, intent_key, plan_response, plan_response_with_repo};
+pub use planner::{
+    ResponsePlan, intent_key, plan_response, plan_response_with_repo, plan_response_with_session,
+};
 pub use realiser::realise;
 pub use semantics::{interpret, interpret_text};
 pub use templates::{TemplateError, TemplateRepository};
@@ -54,6 +58,17 @@ pub fn respond_with_repo(
     let intent = interpret_text(input, &parses);
     let plan = plan_response_with_repo(&intent, rng_seed, repo);
     realise(&plan)
+}
+
+/// Crate-public alias so [`Conversation::turn`] can share the same
+/// parser path without duplicating the token-cleaning logic. Not
+/// intended for external callers — use [`respond`] / [`respond_with_repo`]
+/// or the `Conversation` API instead.
+pub(crate) fn parse_input_public(
+    input: &str,
+    lexicon: &adam_kernel_fst::lexicon::LexiconV1,
+) -> Vec<adam_kernel_fst::parser::Analysis> {
+    parse_input(input, lexicon)
 }
 
 /// Layer 1 wrapper: parse each whitespace-separated token, keep only the

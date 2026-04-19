@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.8.0-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.8.5-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,40 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.8.5 — Multi-turn session state
+
+The dialog pipeline now has memory. A `Conversation` struct accumulates entities extracted from previous turns and feeds them back into the planner as slot values. Say your name once, get greeted by name on every subsequent turn.
+
+```
+$ adam_chat
+adam-chat v0.8.5 — пікірлесейік! Type a Kazakh sentence; ^D to quit.
+> менің атым Дәулет
+сәлем Дәулет
+> сәлем
+сәлем Дәулет            ← the model remembers
+> қайырлы таң
+қайырлы таң Дәулет
+> сәлеметсіз бе
+сәлеметсіз бе Дәулет
+```
+
+API surface:
+
+```rust
+use adam_dialog::{Conversation, TemplateRepository};
+
+let mut conv = Conversation::new();
+let response = conv.turn(input, &lexicon, &repo, seed); // absorbs + plans + realises
+// conv.session is a HashMap<String, String> — {name: "Дәулет"} after a self-intro.
+conv.reset(); // clear state
+```
+
+**Template filtering.** `plan_response_with_session` only considers templates whose every `{slot}` is satisfiable from the merged (session ∪ per-turn) slot map. When no templates are fillable, it falls back to the unfiltered pool rather than crash. This means adding a `сәлем {name}` variant doesn't break sessions where the user never introduced themselves — the template simply isn't eligible.
+
+**Ordering.** `Conversation::turn` absorbs entities BEFORE planning, so the same turn that says "менің атым X" can already receive a personalised response.
+
+44 dialog end-to-end tests (3 new multi-turn tests). Workspace totals: **204 passing**, 4 ignored, 0 failing.
 
 ## v0.8.0 — 25 intents + PersonName extraction
 
