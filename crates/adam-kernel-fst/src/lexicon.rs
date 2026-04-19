@@ -18,7 +18,7 @@ use std::{collections::HashMap, fs, path::Path};
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct RootEntry {
     pub id: String,
     pub root: String,

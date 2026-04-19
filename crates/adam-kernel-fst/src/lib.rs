@@ -21,6 +21,7 @@
 
 pub mod lexicon;
 pub mod morphotactics;
+pub mod parser;
 pub mod phonology;
 
 pub use phonology::{
