@@ -57,16 +57,16 @@ Capacity limit confirmed: 24M params × 4M tokens ≈ 25× below Chinchilla-opti
 | v0.6.0 | Derivational morphology — 11 word-formation suffixes (agent, abstract, privative, similative, ordinal, diminutive, verbal-noun, …) | 78 unit tests; root→derived→inflected chains work end-to-end |
 | v0.7.0 | First dialog layer — 5-intent MVP (`adam-dialog` crate + `adam_chat` CLI + 15 end-to-end tests) | 175 workspace tests; predictable 5-layer pipeline documented |
 | v0.7.5 | Dialog widening — 10 intents (+Thanks, Apology, AskHowAreYou, StatementOfWellbeing, AskName), templates moved to `data/dialog/templates/v1.toml` | 183 workspace tests; data-driven template repo replaces hardcoded planner arrays |
+| v0.8.0 | Dialog widening — 25 intents (+15: age, location, occupation, family, weather, time, compliment, request, well-wishes, statement-of-name), PersonName extraction + slot expansion | 201 workspace tests; first entity extraction lands — user's name is pulled from self-introduction and substituted via `{name}` slot |
 
 Phase 10 pivots the project from pure-stochastic transformers (v0.3–v0.4 line) to a deterministic morphology layer + small LM-over-roots. The v0.4.0 transformer baseline stays as reference; new work layers on top.
 
 ## Near-term
 
-- **v0.8.0** — widen dialog to ~25 intents covering full MVP social topic set: introductions, location, age, family, occupation, weather, food, days/numbers. Entity extraction (the user's own name) lands here.
-- **v0.8.5** — slotted templates: planner emits `(root, feature-bundle)` atoms, realiser synthesises via `adam_kernel_fst::morphotactics` — agreement becomes grammatically guaranteed, not hand-written.
-- **v0.9.0** — native-speaker review of the MVP template set (~60 templates × ~3 variants). Correct phrasing, tighten politeness/register, replace any residual stiffness.
-- **v0.9.5** — small LM over `(root, feature-bundle)` sequences as a fallback when no template fires — keeps predictability but widens coverage at the margin.
-- **v1.0.0** — investor-demoable MVP: 25-intent predictable Kazakh dialog, 100% FST-guaranteed morphology, native-speaker-reviewed templates, end-to-end Rust stack.
+- **v0.8.5** — `Conversation` struct + session state: remember the user's name (and other extracted entities) across turns so the model can greet back by name on subsequent inputs.
+- **v0.9.0** — FST-backed slot expansion: templates can emit `(root, features)` atoms; realiser synthesises grammatical forms via `adam_kernel_fst::morphotactics`. Numeric extraction (StatementOfAge → numeral) lands here.
+- **v0.9.5** — native-speaker review of the MVP template set (~75 templates × 2–4 variants). Correct phrasing, tighten politeness/register, replace any residual stiffness.
+- **v1.0.0** — investor-demoable MVP: 25-intent predictable Kazakh dialog, session state, FST-guaranteed morphology, native-speaker-reviewed templates, end-to-end Rust stack.
 
 ## Out of near-term scope
 

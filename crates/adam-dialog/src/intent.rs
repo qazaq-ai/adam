@@ -42,6 +42,63 @@ pub enum Intent {
     /// "What's your name?": атың кім, есіміңіз қалай.
     AskName,
 
+    // --- v0.8.0 social topic intents --------------------------------------
+    /// User introduces self by name: "менің атым X", "мені X деп атайды".
+    /// The extracted `name` is surfaced so templates can personalise:
+    /// e.g. "қош келдіңіз {name}".
+    StatementOfName { name: String },
+
+    /// "How old are you?": жасың неше, жасыңыз қанша, қанша жастасың.
+    AskAge,
+
+    /// User states age: "менің жасым отыз", "жиырма жастамын".
+    /// Numeric extraction is a v0.9.0 concern — for now literal-template
+    /// response only.
+    StatementOfAge,
+
+    /// "Where are you from / where do you live?":
+    /// қай жерденсің, қайда тұрасыз, қай қаладансың.
+    AskLocation,
+
+    /// User says where they are from / live: "мен Алматыданмын",
+    /// "астанада тұрамын".
+    StatementOfLocation,
+
+    /// "What do you do?": немен айналысасың, жұмысың не, кәсібің қандай.
+    AskOccupation,
+
+    /// User states occupation: "мен мұғаліммін", "дәрігер болып жұмыс
+    /// істеймін".
+    StatementOfOccupation,
+
+    /// "Are you married? / Do you have children?": үйлендің бе,
+    /// балаларың бар ма, отбасың бар ма.
+    AskFamily,
+
+    /// User talks about their family: "менің екі балам бар",
+    /// "үйленгенмін", "менің отбасым бар".
+    StatementOfFamily,
+
+    /// "How's the weather?": ауа райы қалай, бүгін ауа райы.
+    AskWeather,
+
+    /// User describes weather: "бүгін суық", "жылы", "қар жауып тұр",
+    /// "ауа райы жақсы".
+    StatementOfWeather,
+
+    /// "What time is it? / What day?": сағат неше, қазір қай уақыт,
+    /// бүгін қандай күн.
+    AskTime,
+
+    /// Compliment / praise: жарайсың, өте жақсы, керемет.
+    Compliment,
+
+    /// Polite request: өтінемін, сұраймын, көмектесіңізші.
+    Request,
+
+    /// Well-wishes: жақсы күн тілеймін, сәттілік, табысты болыңыз.
+    WellWishes,
+
     /// Nothing matched. Fallback response is a polite
     /// "түсінбедім" (I didn't understand).
     Unknown { raw_tokens: Vec<String> },

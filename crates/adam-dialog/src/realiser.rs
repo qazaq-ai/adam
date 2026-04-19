@@ -1,20 +1,22 @@
 //! Layer 4 — response realiser.
 //!
-//! v0.7.0 realiser is trivial: the planner already emitted a literal
-//! Kazakh string, we just hand it through. No FST synthesis needed
-//! because MVP templates are hardcoded grammatical forms.
+//! v0.8.0: templates may contain `{slot}` placeholders (e.g., `{name}`);
+//! realiser substitutes them with the slot values the planner
+//! extracted from the Intent. Unknown slots stay as-is — better to
+//! emit a visible `{unfilled}` than silently drop information.
 //!
-//! v0.7.5 will switch to slotted templates: `planner` will emit
-//! `(template_id, slots)`, and `realiser` will expand the template's
-//! `(root, features)` atoms through `adam_kernel_fst::morphotactics`.
+//! v0.9.0 will extend this with `{root|features}` atoms, expanded
+//! through `adam_kernel_fst::morphotactics::synthesise_*` so agreement
+//! becomes FST-guaranteed rather than hand-written.
 
 use crate::planner::ResponsePlan;
 
 /// Render a response plan into the final output string.
-///
-/// In v0.7.0 this is just the planner's literal. Exists as a separate
-/// function so the v0.7.5 template expansion can drop in without
-/// changing the top-level `respond()` signature.
 pub fn realise(plan: &ResponsePlan) -> String {
-    plan.literal.clone()
+    let mut out = plan.literal.clone();
+    for (key, value) in &plan.slots {
+        let needle = format!("{{{key}}}");
+        out = out.replace(&needle, value);
+    }
+    out
 }

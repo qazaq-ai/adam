@@ -18,6 +18,10 @@ use crate::intent::{GreetingKind, Intent, TimeOfDay};
 /// v0.7.5 intents can start using morphological info without changing
 /// the call site.
 pub fn interpret_text(input: &str, _parses: &[Analysis]) -> Intent {
+    // Keep two parallel token streams:
+    //   `tokens`  — cleaned lowercase, used for keyword matching
+    //   `raw_tokens` — case-preserving, used for PersonName extraction
+    //                  (so "Дәулет" isn't turned into "дәулет")
     let tokens: Vec<String> = input
         .split_whitespace()
         .map(|t| {
@@ -25,6 +29,15 @@ pub fn interpret_text(input: &str, _parses: &[Analysis]) -> Intent {
                 .filter(|c| c.is_alphabetic() || *c == '-')
                 .collect::<String>()
                 .to_lowercase()
+        })
+        .filter(|t| !t.is_empty())
+        .collect();
+    let raw_tokens: Vec<String> = input
+        .split_whitespace()
+        .map(|t| {
+            t.chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect::<String>()
         })
         .filter(|t| !t.is_empty())
         .collect();
@@ -48,8 +61,61 @@ pub fn interpret_text(input: &str, _parses: &[Analysis]) -> Intent {
     if detect_ask_how_are_you(&joined) {
         return Intent::AskHowAreYou;
     }
+    // StatementOfName must be checked BEFORE AskName: "менің атым X"
+    // contains "атым" which the AskName rule tolerates. Statements
+    // always carry a concrete name slot; questions do not.
+    if let Some(name) = detect_statement_of_name(&tokens, &raw_tokens, &joined) {
+        return Intent::StatementOfName { name };
+    }
     if detect_ask_name(&joined) {
         return Intent::AskName;
+    }
+    // Statement-* is checked BEFORE Ask-* inside each topic pair: a
+    // 1st-person marker ("келдім", "тұрамын", "жасым") unambiguously
+    // means the user is stating, not asking. Without this ordering,
+    // "қайдан келдім" would hit AskLocation (because of "қайдан")
+    // before StatementOfLocation (which keys on "келдім").
+    if detect_statement_of_age(&tokens, &joined) {
+        return Intent::StatementOfAge;
+    }
+    if detect_ask_age(&joined) {
+        return Intent::AskAge;
+    }
+    if detect_statement_of_location(&tokens, &joined) {
+        return Intent::StatementOfLocation;
+    }
+    if detect_ask_location(&joined) {
+        return Intent::AskLocation;
+    }
+    if detect_statement_of_occupation(&tokens, &joined) {
+        return Intent::StatementOfOccupation;
+    }
+    if detect_ask_occupation(&joined) {
+        return Intent::AskOccupation;
+    }
+    if detect_statement_of_family(&joined) {
+        return Intent::StatementOfFamily;
+    }
+    if detect_ask_family(&joined) {
+        return Intent::AskFamily;
+    }
+    if detect_statement_of_weather(&tokens, &joined) {
+        return Intent::StatementOfWeather;
+    }
+    if detect_ask_weather(&joined) {
+        return Intent::AskWeather;
+    }
+    if detect_ask_time(&joined) {
+        return Intent::AskTime;
+    }
+    if detect_compliment(&tokens, &joined) {
+        return Intent::Compliment;
+    }
+    if detect_request(&tokens, &joined) {
+        return Intent::Request;
+    }
+    if detect_well_wishes(&joined) {
+        return Intent::WellWishes;
     }
     if detect_statement_of_wellbeing(&tokens, &joined) {
         return Intent::StatementOfWellbeing;
@@ -213,4 +279,221 @@ fn detect_statement_of_wellbeing(tokens: &[String], joined: &str) -> bool {
             "жақсымын" | "жаманмын" | "жақсы" | "жаман" | "дұрысмын"
         )
     }) || joined.contains("жаман емес")
+}
+
+// --- v0.8.0 new recognisers ------------------------------------------------
+
+/// User introduces self: "менің атым Дәулет", "атым Дәулет",
+/// "мені Дәулет деп атайды". Returns the extracted name (case
+/// preserved) or None if the pattern doesn't match.
+///
+/// The three patterns are:
+///   1.  [менің] атым <NAME>
+///   2.  мені <NAME> деп атайды
+///   3.  есімім <NAME>
+fn detect_statement_of_name(
+    tokens: &[String],
+    raw_tokens: &[String],
+    joined: &str,
+) -> Option<String> {
+    // Pattern 1: "атым X" or "менің атым X" — name is the token right
+    // after "атым".
+    if let Some(i) = tokens.iter().position(|t| t == "атым") {
+        if let Some(name) = raw_tokens.get(i + 1) {
+            return Some(capitalise(name));
+        }
+    }
+    // Pattern 3: "есімім X".
+    if let Some(i) = tokens.iter().position(|t| t == "есімім") {
+        if let Some(name) = raw_tokens.get(i + 1) {
+            return Some(capitalise(name));
+        }
+    }
+    // Pattern 2: "мені X деп атайды" — X is between "мені" and "деп".
+    if joined.contains("деп атайды") {
+        if let (Some(start), Some(end)) = (
+            tokens.iter().position(|t| t == "мені"),
+            tokens.iter().position(|t| t == "деп"),
+        ) {
+            if end > start + 1 {
+                // Take the token(s) between them; for MVP just the first.
+                if let Some(name) = raw_tokens.get(start + 1) {
+                    return Some(capitalise(name));
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Capitalise the first character of a Unicode string (Kazakh Cyrillic
+/// names should render title-cased regardless of user input casing).
+fn capitalise(s: &str) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        Some(c) => c.to_uppercase().chain(chars).collect(),
+        None => String::new(),
+    }
+}
+
+/// "How old are you?" — жасың неше, жасыңыз қанша, қанша жастасың.
+fn detect_ask_age(joined: &str) -> bool {
+    (joined.contains("жасың") && (joined.contains("неше") || joined.contains("қанша")))
+        || (joined.contains("жасыңыз") && (joined.contains("неше") || joined.contains("қанша")))
+        || joined.contains("қанша жастасың")
+        || joined.contains("қанша жастасыз")
+}
+
+/// User reports age: "менің жасым N", "N жастамын", "N жасында".
+/// For MVP we accept the 1st-person markers; the numeral is left
+/// un-extracted (v0.9.0 numeral extraction will fill this in).
+fn detect_statement_of_age(tokens: &[String], joined: &str) -> bool {
+    joined.contains("жасым")
+        || tokens
+            .iter()
+            .any(|t| t == "жастамын" || t == "жастаймын" || t == "жаспын")
+}
+
+/// "Where are you from / where do you live?" — қай жерденсің,
+/// қайда тұрасыз, қай қаладан, қайдан келдің.
+fn detect_ask_location(joined: &str) -> bool {
+    joined.contains("қай жерден")
+        || joined.contains("қайдан")
+        || joined.contains("қайда тұра")
+        || joined.contains("қай қала")
+        || joined.contains("қай аудан")
+}
+
+/// User states location: "мен Алматыданмын", "астанада тұрамын",
+/// "ауылдан келдім".
+fn detect_statement_of_location(tokens: &[String], joined: &str) -> bool {
+    // 1st-person "live" verb: тұрамын
+    if tokens.iter().any(|t| t == "тұрамын" || t == "тұрамыз") {
+        return true;
+    }
+    // Ablative + 1sg copula: "X-данмын" / "X-денмін" — crude but OK
+    // for the MVP template pool.
+    if tokens.iter().any(|t| {
+        t.ends_with("данмын")
+            || t.ends_with("денмін")
+            || t.ends_with("танмын")
+            || t.ends_with("тенмін")
+    }) {
+        return true;
+    }
+    joined.contains("келдім") && (joined.contains("ауыл") || joined.contains("қала"))
+}
+
+/// "What do you do for work?" — немен айналысасың, жұмысың не,
+/// кәсібің қандай, мамандығың не.
+fn detect_ask_occupation(joined: &str) -> bool {
+    joined.contains("немен айналыс")
+        || (joined.contains("жұмысың") && joined.contains("не"))
+        || (joined.contains("жұмысыңыз") && joined.contains("не"))
+        || joined.contains("кәсібің")
+        || joined.contains("кәсібіңіз")
+        || joined.contains("мамандығың")
+        || joined.contains("мамандығыңыз")
+}
+
+/// User states occupation: "мен мұғаліммін", "дәрігермін",
+/// "мен жұмыс істеймін".
+fn detect_statement_of_occupation(tokens: &[String], joined: &str) -> bool {
+    let occupation_copula = tokens.iter().any(|t| {
+        matches!(
+            t.as_str(),
+            "мұғаліммін"
+                | "дәрігермін"
+                | "студентпін"
+                | "инженермін"
+                | "оқушымын"
+                | "жұмысшымын"
+        )
+    });
+    occupation_copula || joined.contains("жұмыс істеймін")
+}
+
+/// "Family question" — үйлендің бе, балаларың бар ма, отбасың бар ма.
+fn detect_ask_family(joined: &str) -> bool {
+    joined.contains("үйлендің")
+        || joined.contains("үйлендіңіз")
+        || (joined.contains("балаларың") && joined.contains("бар"))
+        || (joined.contains("балаларыңыз") && joined.contains("бар"))
+        || (joined.contains("отбасың") && joined.contains("бар"))
+        || (joined.contains("отбасыңыз") && joined.contains("бар"))
+}
+
+/// User talks about family: "менің балам бар", "үйленгенмін",
+/// "отбасым бар".
+fn detect_statement_of_family(joined: &str) -> bool {
+    joined.contains("балам бар")
+        || joined.contains("балаларым бар")
+        || joined.contains("үйленгенмін")
+        || joined.contains("отбасым бар")
+        || joined.contains("отбасым жақсы")
+}
+
+/// "What's the weather?" — ауа райы қалай, бүгін қалай,
+/// сыртта қалай.
+fn detect_ask_weather(joined: &str) -> bool {
+    (joined.contains("ауа райы") && joined.contains("қалай"))
+        || (joined.contains("бүгін") && joined.contains("ауа райы"))
+        || (joined.contains("сыртта") && joined.contains("қалай"))
+}
+
+/// User describes weather: "бүгін суық", "жылы", "қар жауып тұр",
+/// "күн ашық".
+fn detect_statement_of_weather(tokens: &[String], joined: &str) -> bool {
+    let weather_token = tokens.iter().any(|t| {
+        matches!(
+            t.as_str(),
+            "суық" | "жылы" | "ыстық" | "салқын" | "жаңбырлы" | "қарлы"
+        )
+    });
+    let weather_phrase = joined.contains("қар жауып")
+        || joined.contains("жаңбыр жауып")
+        || joined.contains("күн ашық")
+        || joined.contains("ауа райы жақсы")
+        || joined.contains("ауа райы жаман");
+    // Guard: "жақсы" / "жаман" alone is wellbeing, not weather —
+    // require the keyword OR the phrase, never bare goodness tokens.
+    (weather_token && (joined.contains("бүгін") || joined.contains("қазір"))) || weather_phrase
+}
+
+/// "What time / day is it?" — сағат неше, қазір уақыт,
+/// бүгін қандай күн.
+fn detect_ask_time(joined: &str) -> bool {
+    (joined.contains("сағат") && (joined.contains("неше") || joined.contains("қанша")))
+        || joined.contains("қазір уақыт")
+        || joined.contains("қандай күн")
+        || joined.contains("қай күн")
+}
+
+/// Compliments: жарайсың, өте жақсы, керемет, тамаша.
+fn detect_compliment(tokens: &[String], joined: &str) -> bool {
+    tokens.iter().any(|t| {
+        matches!(
+            t.as_str(),
+            "жарайсың" | "жарайсыз" | "керемет" | "тамаша" | "мықты"
+        )
+    }) || joined.contains("өте жақсы")
+}
+
+/// Polite request / please: өтінемін, сұраймын, көмектесіңізші,
+/// көмектесіңіз.
+fn detect_request(tokens: &[String], joined: &str) -> bool {
+    tokens.iter().any(|t| {
+        matches!(
+            t.as_str(),
+            "өтінемін" | "сұраймын" | "көмектесіңізші" | "көмектесіңіз" | "көмектес"
+        )
+    }) || joined.contains("көмек керек")
+}
+
+/// Well-wishes: жақсы күн тілеймін, сәттілік, табысты болыңыз.
+fn detect_well_wishes(joined: &str) -> bool {
+    joined.contains("жақсы күн тіле")
+        || joined.contains("сәттілік")
+        || joined.contains("табысты бол")
+        || joined.contains("денсаулық тіле")
 }

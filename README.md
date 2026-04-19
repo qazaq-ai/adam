@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.7.5-blue?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-0.8.0-blue?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -155,6 +155,40 @@ bash ./scripts/run_generation_showcase.sh
 | Wall time (M2 Metal, 20k steps, seq=128 batch=8) | **~8h** |
 | Periodic checkpoints | **every 2000 steps** (crash-resilient since v0.4.0) |
 | **Validation perplexity** | **1691.89** (12,101 held-out samples, v0.4.0 model) |
+
+## v0.8.0 — 25 intents + PersonName extraction
+
+Dialog layer widened from 10 to **25 intents** covering full MVP social-conversation topics: introductions, age, location, occupation, family, weather, time, compliments, requests, well-wishes. First entity extraction lands: the user's name is pulled from self-introduction patterns and substituted into the response via `{name}` slot placeholders.
+
+New intents (+15):
+
+| intent | example input | example response |
+|---|---|---|
+| `StatementOfName { name }` | `менің атым Дәулет` | `сәлем Дәулет` / `қош келдіңіз Дәулет` |
+| `AskAge` | `жасың неше` | `мен әлі жаспын` / `менің жасым адамзат жасындай` |
+| `StatementOfAge` | `менің жасым отыз` | `түсіндім` / `жақсы жас` |
+| `AskLocation` | `қайда тұрасыз` | `мен сандық әлемде тұрамын` |
+| `StatementOfLocation` | `мен Алматыданмын` | `жақсы жер` / `әдемі аймақ` |
+| `AskOccupation` | `немен айналысасың` | `мен тілдерді үйренемін` |
+| `StatementOfOccupation` | `мен мұғаліммін` | `жақсы кәсіп` |
+| `AskFamily` | `балаларың бар ма` | `мен жалғызбын` |
+| `StatementOfFamily` | `менің балам бар` | `отбасыңыз аман болсын` |
+| `AskWeather` | `ауа райы қалай` | `менде терезе жоқ` |
+| `StatementOfWeather` | `бүгін суық` | `ауа райы мейірімді болсын` |
+| `AskTime` | `сағат неше` | `уақыт — асыл қазына` |
+| `Compliment` | `жарайсың` | `рахмет` / `сіз де өте жақсысыз` |
+| `Request` | `көмектесіңіз` | `әрине, айтыңыз` / `тыңдап тұрмын` |
+| `WellWishes` | `сәттілік` | `сізге де` / `тілегіңіз қабыл болсын` |
+
+Entity extraction + slot expansion:
+
+- `ResponsePlan` gains `slots: HashMap<String, String>` populated from the Intent (e.g., `{"name": "Дәулет"}`)
+- `realiser::realise` substitutes `{slot}` placeholders in the chosen template
+- PersonName is extracted from three surface patterns: `атым X`, `мені X деп атайды`, `есімім X` — case preserved and title-cased on output
+
+Ordering rule: Statement-of-X checked BEFORE Ask-of-X. A 1st-person marker ("келдім", "тұрамын", "жасым") unambiguously identifies the user as stating, not asking.
+
+41 dialog end-to-end tests (up from 23). Workspace totals: **201 passing**, 4 ignored, 0 failing.
 
 ## v0.7.5 — 10 intents + TOML templates
 

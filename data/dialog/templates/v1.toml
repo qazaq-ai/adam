@@ -13,7 +13,7 @@
 #   key = "intent_identifier"
 #   templates = ["phrase 1", "phrase 2", ...]
 
-version = "0.7.5"
+version = "0.8.0"
 
 # ---------- Greetings ----------
 
@@ -123,6 +123,130 @@ key = "ask_name"
 templates = [
     "менің атым адам",
     "мені адам деп атайды",
+]
+
+# ---------- Social topics (v0.8.0 new) ----------
+
+# User introduced self by name. `{name}` is substituted by the realiser
+# with the extracted PersonName entity.
+[[families]]
+key = "statement_of_name"
+templates = [
+    "танысқаныма қуаныштымын {name}",
+    "қош келдіңіз {name}",
+    "сәлем {name}",
+]
+
+[[families]]
+key = "ask_age"
+templates = [
+    "менің жасым адамзат жасындай",
+    "мен әлі жаспын",
+    "жасымды айта алмаймын",
+]
+
+[[families]]
+key = "statement_of_age"
+templates = [
+    "түсіндім",
+    "жасыңыз келісті",
+    "жақсы жас",
+]
+
+[[families]]
+key = "ask_location"
+templates = [
+    "мен сандық әлемде тұрамын",
+    "менің мекенім жоқ",
+    "қазақстан елімде",
+]
+
+[[families]]
+key = "statement_of_location"
+templates = [
+    "түсіндім",
+    "жақсы жер",
+    "әдемі аймақ",
+]
+
+[[families]]
+key = "ask_occupation"
+templates = [
+    "мен сөйлесуге жаралғанмын",
+    "менің жұмысым — сізге көмектесу",
+    "мен тілдерді үйренемін",
+]
+
+[[families]]
+key = "statement_of_occupation"
+templates = [
+    "жақсы кәсіп",
+    "мақтанышпен",
+    "сәттілік тілеймін",
+]
+
+[[families]]
+key = "ask_family"
+templates = [
+    "менің отбасым жоқ",
+    "мен жалғызбын",
+    "сұрағыңыз керемет",
+]
+
+[[families]]
+key = "statement_of_family"
+templates = [
+    "отбасыңыз аман болсын",
+    "жақсы отбасы жарасымды",
+    "қуаныштымын",
+]
+
+[[families]]
+key = "ask_weather"
+templates = [
+    "менде терезе жоқ",
+    "ауа райын білмеймін",
+    "сыртта қалай екенін айтыңызшы",
+]
+
+[[families]]
+key = "statement_of_weather"
+templates = [
+    "түсіндім",
+    "ауа райы мейірімді болсын",
+    "жақсы күн болсын",
+]
+
+[[families]]
+key = "ask_time"
+templates = [
+    "уақытты білмеймін",
+    "менде сағат жоқ",
+    "уақыт — асыл қазына",
+]
+
+[[families]]
+key = "compliment"
+templates = [
+    "рахмет",
+    "сіз де өте жақсысыз",
+    "қуаныштымын",
+]
+
+[[families]]
+key = "request"
+templates = [
+    "әрине, айтыңыз",
+    "қалай көмектесе аламын",
+    "тыңдап тұрмын",
+]
+
+[[families]]
+key = "well_wishes"
+templates = [
+    "сізге де",
+    "сәттілік сізге де",
+    "тілегіңіз қабыл болсын",
 ]
 
 # ---------- Fallback ----------

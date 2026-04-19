@@ -1,5 +1,5 @@
 //! `adam-chat` — interactive REPL demo of the predictable Kazakh dialog
-//! pipeline (v0.7.5 MVP — 10 intents from TOML templates).
+//! pipeline (v0.8.0 MVP — 25 intents, PersonName slot substitution).
 //!
 //! Usage:
 //!   adam_chat                — interactive REPL on stdin
@@ -56,7 +56,7 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!("adam-chat v0.7.5 — пікірлесейік! Type a Kazakh sentence; ^D to quit.");
+    eprintln!("adam-chat v0.8.0 — пікірлесейік! Type a Kazakh sentence; ^D to quit.");
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut turn = 0u64;

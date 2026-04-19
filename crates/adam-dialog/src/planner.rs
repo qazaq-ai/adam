@@ -9,14 +9,20 @@
 //! response strings are external data that can be extended without
 //! recompiling.
 
+use std::collections::HashMap;
+
 use crate::intent::{GreetingKind, Intent, TimeOfDay};
 use crate::templates::TemplateRepository;
 
 /// Output of Layer 3 — what the realiser needs to produce text.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResponsePlan {
-    /// The literal surface form to emit.
+    /// The chosen template, possibly containing `{slot}` placeholders.
     pub literal: String,
+    /// Slot values extracted from the intent (e.g., `{"name": "Дәулет"}`).
+    /// The realiser substitutes `{slot}` in `literal` with the mapped
+    /// value; unknown slots stay as-is.
+    pub slots: HashMap<String, String>,
     /// Trace log entries — for --trace mode.
     pub trace: Vec<String>,
 }
@@ -53,10 +59,26 @@ pub fn plan_response_with_repo(
         chosen,
     ));
 
+    let slots = extract_slots(intent);
+    if !slots.is_empty() {
+        trace.push(format!("planner: slots={slots:?}"));
+    }
+
     ResponsePlan {
         literal: chosen,
+        slots,
         trace,
     }
+}
+
+/// Pull entity values out of the Intent into a slot map the realiser
+/// can substitute. v0.8.0 covers `{name}` only.
+fn extract_slots(intent: &Intent) -> HashMap<String, String> {
+    let mut slots = HashMap::new();
+    if let Intent::StatementOfName { name } = intent {
+        slots.insert("name".into(), name.clone());
+    }
+    slots
 }
 
 /// Map an [`Intent`] to the template-repository key that holds its
@@ -79,6 +101,21 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::AskHowAreYou => "ask_how_are_you",
         Intent::StatementOfWellbeing => "statement_of_wellbeing",
         Intent::AskName => "ask_name",
+        Intent::StatementOfName { .. } => "statement_of_name",
+        Intent::AskAge => "ask_age",
+        Intent::StatementOfAge => "statement_of_age",
+        Intent::AskLocation => "ask_location",
+        Intent::StatementOfLocation => "statement_of_location",
+        Intent::AskOccupation => "ask_occupation",
+        Intent::StatementOfOccupation => "statement_of_occupation",
+        Intent::AskFamily => "ask_family",
+        Intent::StatementOfFamily => "statement_of_family",
+        Intent::AskWeather => "ask_weather",
+        Intent::StatementOfWeather => "statement_of_weather",
+        Intent::AskTime => "ask_time",
+        Intent::Compliment => "compliment",
+        Intent::Request => "request",
+        Intent::WellWishes => "well_wishes",
         Intent::Unknown { .. } => "unknown",
     }
 }

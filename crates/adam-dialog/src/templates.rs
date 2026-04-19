@@ -76,9 +76,12 @@ impl TemplateRepository {
     }
 
     /// Minimal hardcoded fallback used when the TOML file is absent
-    /// (e.g., in isolated unit tests). Covers only the v0.7.0 intents.
+    /// (e.g., in isolated unit tests). One template per intent-key
+    /// covering the full v0.8.0 intent surface so dialog keeps working
+    /// even if `data/dialog/templates/v1.toml` is missing.
     pub fn hardcoded_fallback() -> Self {
         let mut by_key = HashMap::new();
+        // v0.7.0 intents
         by_key.insert("greeting.casual".into(), vec!["сәлем".into()]);
         by_key.insert("greeting.polite".into(), vec!["сәлеметсіз бе".into()]);
         by_key.insert("greeting.morning".into(), vec!["қайырлы таң".into()]);
@@ -87,11 +90,38 @@ impl TemplateRepository {
         by_key.insert("farewell".into(), vec!["сау бол".into()]);
         by_key.insert("affirmation".into(), vec!["иә".into()]);
         by_key.insert("negation".into(), vec!["жоқ".into()]);
+        // v0.7.5 intents
         by_key.insert("thanks".into(), vec!["оқасы жоқ".into()]);
         by_key.insert("apology".into(), vec!["ештеңе емес".into()]);
         by_key.insert("ask_how_are_you".into(), vec!["жақсымын, рахмет".into()]);
         by_key.insert("statement_of_wellbeing".into(), vec!["жақсы екен".into()]);
         by_key.insert("ask_name".into(), vec!["менің атым адам".into()]);
+        // v0.8.0 intents
+        by_key.insert(
+            "statement_of_name".into(),
+            vec!["қош келдіңіз {name}".into()],
+        );
+        by_key.insert("ask_age".into(), vec!["мен әлі жаспын".into()]);
+        by_key.insert("statement_of_age".into(), vec!["түсіндім".into()]);
+        by_key.insert(
+            "ask_location".into(),
+            vec!["мен сандық әлемде тұрамын".into()],
+        );
+        by_key.insert("statement_of_location".into(), vec!["жақсы жер".into()]);
+        by_key.insert(
+            "ask_occupation".into(),
+            vec!["мен сөйлесуге жаралғанмын".into()],
+        );
+        by_key.insert("statement_of_occupation".into(), vec!["жақсы кәсіп".into()]);
+        by_key.insert("ask_family".into(), vec!["мен жалғызбын".into()]);
+        by_key.insert("statement_of_family".into(), vec!["қуаныштымын".into()]);
+        by_key.insert("ask_weather".into(), vec!["менде терезе жоқ".into()]);
+        by_key.insert("statement_of_weather".into(), vec!["түсіндім".into()]);
+        by_key.insert("ask_time".into(), vec!["уақытты білмеймін".into()]);
+        by_key.insert("compliment".into(), vec!["рахмет".into()]);
+        by_key.insert("request".into(), vec!["әрине, айтыңыз".into()]);
+        by_key.insert("well_wishes".into(), vec!["сізге де".into()]);
+        // fallback
         by_key.insert("unknown".into(), vec!["түсінбедім".into()]);
         Self { by_key }
     }

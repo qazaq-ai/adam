@@ -208,6 +208,190 @@ fn response_ask_name_polite() {
     assert_response_with_toml("атыңыз кім", &["менің атым адам", "мені адам деп атайды"]);
 }
 
+// --- v0.8.0 social-topic intents + PersonName extraction -------------------
+
+#[test]
+fn intent_statement_of_name_with_атым() {
+    let got = interpret_text("менің атым Дәулет", &[]);
+    assert_eq!(
+        got,
+        Intent::StatementOfName {
+            name: "Дәулет".into()
+        }
+    );
+}
+
+#[test]
+fn intent_statement_of_name_with_мені_деп_атайды() {
+    let got = interpret_text("мені Дәулет деп атайды", &[]);
+    assert_eq!(
+        got,
+        Intent::StatementOfName {
+            name: "Дәулет".into()
+        }
+    );
+}
+
+#[test]
+fn intent_statement_of_name_lowercase_is_capitalised() {
+    let got = interpret_text("атым нұрсұлтан", &[]);
+    assert_eq!(
+        got,
+        Intent::StatementOfName {
+            name: "Нұрсұлтан".into()
+        }
+    );
+}
+
+#[test]
+fn response_statement_of_name_substitutes_slot() {
+    // Must produce one of the templates WITH {name} replaced by Дәулет.
+    assert_response_with_toml(
+        "менің атым Дәулет",
+        &[
+            "танысқаныма қуаныштымын Дәулет",
+            "қош келдіңіз Дәулет",
+            "сәлем Дәулет",
+        ],
+    );
+}
+
+#[test]
+fn response_ask_age() {
+    assert_response_with_toml(
+        "жасың неше",
+        &[
+            "менің жасым адамзат жасындай",
+            "мен әлі жаспын",
+            "жасымды айта алмаймын",
+        ],
+    );
+}
+
+#[test]
+fn response_statement_of_age() {
+    assert_response_with_toml(
+        "менің жасым отыз",
+        &["түсіндім", "жасыңыз келісті", "жақсы жас"],
+    );
+}
+
+#[test]
+fn response_ask_location() {
+    assert_response_with_toml(
+        "қайда тұрасыз",
+        &[
+            "мен сандық әлемде тұрамын",
+            "менің мекенім жоқ",
+            "қазақстан елімде",
+        ],
+    );
+}
+
+#[test]
+fn response_statement_of_location() {
+    assert_response_with_toml(
+        "мен Алматыданмын",
+        &["түсіндім", "жақсы жер", "әдемі аймақ"],
+    );
+}
+
+#[test]
+fn response_ask_occupation() {
+    assert_response_with_toml(
+        "немен айналысасың",
+        &[
+            "мен сөйлесуге жаралғанмын",
+            "менің жұмысым — сізге көмектесу",
+            "мен тілдерді үйренемін",
+        ],
+    );
+}
+
+#[test]
+fn response_statement_of_occupation() {
+    assert_response_with_toml(
+        "мен мұғаліммін",
+        &["жақсы кәсіп", "мақтанышпен", "сәттілік тілеймін"],
+    );
+}
+
+#[test]
+fn response_ask_family() {
+    assert_response_with_toml(
+        "балаларың бар ма",
+        &["менің отбасым жоқ", "мен жалғызбын", "сұрағыңыз керемет"],
+    );
+}
+
+#[test]
+fn response_statement_of_family() {
+    assert_response_with_toml(
+        "менің балам бар",
+        &[
+            "отбасыңыз аман болсын",
+            "жақсы отбасы жарасымды",
+            "қуаныштымын",
+        ],
+    );
+}
+
+#[test]
+fn response_ask_weather() {
+    assert_response_with_toml(
+        "ауа райы қалай",
+        &[
+            "менде терезе жоқ",
+            "ауа райын білмеймін",
+            "сыртта қалай екенін айтыңызшы",
+        ],
+    );
+}
+
+#[test]
+fn response_statement_of_weather() {
+    assert_response_with_toml(
+        "бүгін суық",
+        &["түсіндім", "ауа райы мейірімді болсын", "жақсы күн болсын"],
+    );
+}
+
+#[test]
+fn response_ask_time() {
+    assert_response_with_toml(
+        "сағат неше",
+        &[
+            "уақытты білмеймін",
+            "менде сағат жоқ",
+            "уақыт — асыл қазына",
+        ],
+    );
+}
+
+#[test]
+fn response_compliment() {
+    assert_response_with_toml(
+        "жарайсың",
+        &["рахмет", "сіз де өте жақсысыз", "қуаныштымын"],
+    );
+}
+
+#[test]
+fn response_request() {
+    assert_response_with_toml(
+        "көмектесіңізші",
+        &["әрине, айтыңыз", "қалай көмектесе аламын", "тыңдап тұрмын"],
+    );
+}
+
+#[test]
+fn response_well_wishes() {
+    assert_response_with_toml(
+        "сәттілік",
+        &["сізге де", "сәттілік сізге де", "тілегіңіз қабыл болсын"],
+    );
+}
+
 // --- Traceability ----------------------------------------------------------
 
 #[test]

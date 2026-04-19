@@ -2,6 +2,42 @@
 
 All notable changes are tagged in git as `vX.Y.Z`. Versions before 0.1.0 are foundation work — APIs, schemas, and rules may change between any two releases.
 
+## [0.8.0] — 2026-04-19
+
+Dialog layer widened from 10 to **25 intents**. First entity extraction lands: the user's name is pulled out of self-introduction patterns and substituted into the response template.
+
+New intents (+15, recognisers in `semantics.rs`):
+
+- `StatementOfName { name }` — "менің атым X" / "мені X деп атайды" / "есімім X"
+- `AskAge` / `StatementOfAge` — жасың неше / менің жасым отыз
+- `AskLocation` / `StatementOfLocation` — қайда тұрасыз / мен Алматыданмын
+- `AskOccupation` / `StatementOfOccupation` — немен айналысасың / мен мұғаліммін
+- `AskFamily` / `StatementOfFamily` — балаларың бар ма / менің балам бар
+- `AskWeather` / `StatementOfWeather` — ауа райы қалай / бүгін суық
+- `AskTime` — сағат неше
+- `Compliment` — жарайсың / керемет / тамаша
+- `Request` — өтінемін / көмектесіңізші
+- `WellWishes` — сәттілік / жақсы күн тілеймін
+
+Entity extraction + slot expansion:
+
+- `semantics::detect_statement_of_name` extracts the PersonName from three surface patterns (атым / мені X деп атайды / есімім) with case-preserving capitalisation.
+- `ResponsePlan` gains a `slots: HashMap<String, String>` field populated by the planner from the Intent.
+- `realiser::realise` substitutes `{slot}` placeholders in the chosen template; templates like `"қош келдіңіз {name}"` now personalise.
+
+Ordering subtlety: Statement-of-X is checked BEFORE Ask-of-X in every topic pair — a 1st-person marker ("келдім", "тұрамын", "жасым") unambiguously identifies the user as stating, not asking. Without this, "қайдан келдім" would hit `AskLocation` first (because of "қайдан").
+
+TOML repository: +15 families → 29 families total, version = "0.8.0".
+
+Tests: 41 dialog end-to-end pairs (up from 23), 18 new covering recognition, slot substitution, and planner coverage for every new intent. Workspace: **201 passing**, 4 ignored, 0 failing.
+
+Known v0.8.0 limitations (by design, not bugs):
+
+- No session state: the model doesn't remember the user's name across turns. Adding a `Conversation` struct lands in v0.8.5.
+- Numeric extraction (age, time) is a v0.9.0 concern; StatementOfAge templates acknowledge generically.
+- Templates are still literal phrases with optional `{slot}` text replacement. FST-backed `{root|features}` atoms land in v0.9.0.
+- Templates have not been native-speaker reviewed — stiffness is expected; v0.9.0 tightens phrasing.
+
 ## [0.7.5] — 2026-04-19
 
 Dialog layer widened from 5 to **10 intents** and templates externalised to TOML.
