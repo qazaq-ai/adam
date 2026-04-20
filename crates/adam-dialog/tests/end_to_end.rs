@@ -1103,6 +1103,146 @@ fn unknown_with_session_and_evidence_personalises_frame() {
     );
 }
 
+/// v1.9.0 option-B: with `InSampleCitySwap` mode and a recognised
+/// city in the session, a retrieved quote that mentions a different
+/// city should be rewritten to the user's city — preserving case
+/// morphology via FST. Biographical quotes (containing a 4-digit year)
+/// must NOT be swapped.
+#[test]
+fn compose_mode_swaps_cities_in_retrieval_samples() {
+    use adam_dialog::ComposeMode;
+    use adam_retrieval::MorphemeIndex;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    // Fresh empty index with only a synthetic sample — avoids
+    // dependence on the committed corpus ranker picking our sample
+    // over, say, an Abai quote that scores higher.
+    let mut index = MorphemeIndex::new();
+    let sref = adam_retrieval::SampleRef {
+        pack: "abai_wikisource_pack.json".into(), // use a high-purity pack
+        sample_id: "test_001".into(),
+    };
+    index.insert("бала", sref.clone());
+    index.remember_text(&sref, "Бала Алматыда жақсы өмір сүреді");
+    index.refresh_stats();
+
+    let mut conv = Conversation::new()
+        .with_morpheme_index(index)
+        .with_compose_mode(ComposeMode::InSampleCitySwap);
+    conv.session.insert("city".into(), "Шымкент".into());
+
+    let mut saw_swap = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        if let Some(quoted) = quoted_portion(&out) {
+            if quoted.contains("Шымкентте") && !quoted.contains("Алматыда") {
+                saw_swap = true;
+            }
+        }
+    }
+    assert!(
+        saw_swap,
+        "InSampleCitySwap should rewrite Алматыда → Шымкентте inside the quote for at least one seed"
+    );
+}
+
+/// Return the string between the first `«` and the last `»` in `s`,
+/// or `None` if the quote markers aren't both present. UTF-8-safe:
+/// slices on codepoint boundaries, never mid-`»`.
+fn quoted_portion(s: &str) -> Option<&str> {
+    let start = s.find('«')? + '«'.len_utf8();
+    let tail = &s[start..];
+    let end_in_tail = tail.rfind('»')?;
+    Some(&tail[..end_in_tail])
+}
+
+/// v1.9.0 regression: default ComposeMode::Verbatim must NOT rewrite
+/// the retrieved sample. The quote stays byte-identical to the corpus.
+#[test]
+fn compose_mode_verbatim_preserves_retrieved_quote() {
+    use adam_retrieval::MorphemeIndex;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let mut index = MorphemeIndex::new();
+    let sref = adam_retrieval::SampleRef {
+        pack: "abai_wikisource_pack.json".into(),
+        sample_id: "test_001".into(),
+    };
+    index.insert("бала", sref.clone());
+    index.remember_text(&sref, "Бала Алматыда жақсы өмір сүреді");
+    index.refresh_stats();
+
+    // Default compose_mode is Verbatim — no with_compose_mode call.
+    let mut conv = Conversation::new().with_morpheme_index(index);
+    conv.session.insert("city".into(), "Шымкент".into());
+
+    let mut saw_verbatim_quote = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, seed);
+        // v1.8.5 frame templates can put "Шымкентте" in the FRAME
+        // (outside «…»), but the QUOTED portion must stay verbatim.
+        if let Some(quoted) = quoted_portion(&out) {
+            assert!(
+                !quoted.contains("Шымкентте"),
+                "Verbatim mode must NOT swap cities inside the quote: {quoted:?}"
+            );
+            if quoted.contains("Алматыда") {
+                saw_verbatim_quote = true;
+            }
+        }
+    }
+    assert!(
+        saw_verbatim_quote,
+        "at least one seed should cite the synthetic sample verbatim (with Алматыда preserved)"
+    );
+}
+
+/// v1.9.0 safety: InSampleCitySwap must refuse to rewrite a quote
+/// that contains a 4-digit year (biographical / historical guard).
+/// "Абай 1845 жылы Қарқаралыда туған" + user.city=Алматы must stay
+/// put — swapping would produce a false biographical fact.
+#[test]
+fn compose_mode_respects_biographical_year_guard() {
+    use adam_dialog::ComposeMode;
+    use adam_retrieval::MorphemeIndex;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let mut index = MorphemeIndex::new();
+    let sref = adam_retrieval::SampleRef {
+        pack: "abai_wikisource_pack.json".into(),
+        sample_id: "abai_bio".into(),
+    };
+    index.insert("бала", sref.clone());
+    index.remember_text(&sref, "Абай 1845 жылы Қарқаралыда туған бала еді");
+    index.refresh_stats();
+
+    let mut conv = Conversation::new()
+        .with_morpheme_index(index)
+        .with_compose_mode(ComposeMode::InSampleCitySwap);
+    conv.session.insert("city".into(), "Алматы".into());
+
+    for seed in 0..8u64 {
+        let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, seed);
+        if let Some(quoted) = quoted_portion(&out) {
+            if quoted.contains("Қарқаралыда") {
+                // In-sample swap must respect the biographical-year
+                // guard — Алматы must NOT leak into this quote.
+                assert!(
+                    !quoted.contains("Алматыда"),
+                    "biographical-year guard failed; quote rewritten: {quoted:?}"
+                );
+            }
+        }
+    }
+}
+
 /// v1.8.5 regression: "мен Алматыдамын" must resolve to
 /// `StatementOfLocation { city: Алматы }`, not `StatementOfOccupation`.
 /// Before the fix, the occupation recogniser accepted any noun+P1Sg

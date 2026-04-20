@@ -7,6 +7,104 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.9.0] — 2026-04-20 — In-sample city swap (option B, opt-in, year-guarded)
+
+Minor release. First step into **option B** territory — the retrieved corpus quote is no longer guaranteed byte-identical to the source. When the user opts into `ComposeMode::InSampleCitySwap` and the session has a known Kazakh city, city mentions inside the cited sample are rewritten to the user's city, feature-preserving via the FST. v1.8.5 and earlier behaviour (`ComposeMode::Verbatim`, the default) is unchanged.
+
+### What changes — and what doesn't
+
+- **Grammaticality still FST-guaranteed.** `synthesise_noun(user_city, features)` produces the harmonically-correct surface (Алматы+locative → Алматыда, Шымкент+locative → Шымкентте).
+- **Semantic truthfulness is no longer guaranteed.** That is the honest trade-off of option B. A composed sentence may say something true, or it may produce a plausible but non-factual claim. Earlier releases never did this.
+- **Safety guards are explicit, conservative, and auditable:**
+  - **Closed city list** (`PLACE_NAMES`): 20 editorially-curated Kazakh cities are the only eligible swap targets. Other proper nouns and common nouns are never touched.
+  - **User-side recognition:** the user's proposed city must itself be in `PLACE_NAMES`, otherwise the FST can't re-synthesise reliably.
+  - **Biographical-year guard:** any 4-digit year in [1500, 2100] refuses the whole swap. This keeps biographies ("Абай 1845 жылы Қарқаралыда туған") untouched — we must not rewrite "Қарқаралыда" to the user's city and fabricate a birth fact.
+  - **No name or number swaps.** Names-in-biography and numerals-in-dates are exactly the categories that would produce the worst fabrications; explicitly out of scope for v1.9.0.
+
+### Opt-in — `ComposeMode`
+
+```rust
+use adam_dialog::{ComposeMode, Conversation};
+
+// Default: byte-identical corpus quote (v1.8.5 behaviour).
+let conv_safe = Conversation::new().with_morpheme_index(idx.clone());
+
+// Opt-in: city mentions inside the quote rewrite to user.session.city.
+let conv_swap = Conversation::new()
+    .with_morpheme_index(idx)
+    .with_compose_mode(ComposeMode::InSampleCitySwap);
+```
+
+Same call site, same type, one explicit setter. Embedders who don't opt in see zero behavioural change.
+
+### New API — `adam_retrieval::compose`
+
+```rust
+pub const PLACE_NAMES: &[&str];        // the 20-city editorial list
+
+pub struct Swap {
+    pub token_index: usize,
+    pub from: String,
+    pub to: String,
+    pub user_root: String,
+    pub features: NounFeatures,
+}
+
+pub struct Composition {
+    pub original: String,
+    pub output: String,
+    pub swaps: Vec<Swap>,
+}
+impl Composition {
+    pub fn was_changed(&self) -> bool;
+    pub fn trace(&self) -> String;         // per-swap provenance for --trace
+}
+
+pub fn compose_with_city(
+    sample_text: &str,
+    user_city: &str,
+    lexicon: &LexiconV1,
+) -> Composition;
+```
+
+Every swap preserves full FST feature provenance: case, number, possessive, predicate. `Composition::trace()` emits a per-swap line usable by `adam_chat --trace` (e.g. `[2] Алматыда → Шымкентте (root=шымкент, case=Some(Locative))`).
+
+### Determinism
+
+- `compose_with_city` is a pure function; no rng, no system time.
+- First-match policy by token order, deterministic.
+- FST synthesis is itself deterministic.
+- Same `(sample, user_city, lexicon)` → byte-identical `Composition` across runs.
+
+### Tests (+11)
+
+**Unit tests in `adam-retrieval::compose` (+8):**
+
+- `no_swap_when_user_city_unknown` — city outside `PLACE_NAMES` → no-op.
+- `no_swap_when_text_has_biographical_year` — biography guard fires.
+- `swaps_city_preserving_locative` — Алматыда → Шымкентте.
+- `preserves_capitalisation_on_swap`.
+- `no_swap_when_city_matches_user_city` — identity is no-op.
+- `preserves_trailing_punctuation` — commas and periods survive.
+- `trace_records_swap_details` — trace line is well-formed.
+- `year_guard_ignores_short_digit_runs` — "25 жас" does NOT trigger the guard.
+
+**Dialog e2e tests (+3):**
+
+- `compose_mode_swaps_cities_in_retrieval_samples` — `InSampleCitySwap` + `session.city=Шымкент` + synthetic "Бала Алматыда ..." → quote rewrites to Шымкентте.
+- `compose_mode_verbatim_preserves_retrieved_quote` — default mode keeps Алматыда in the quote (the v1.8.5 frame template can still say Шымкентте outside «…»).
+- `compose_mode_respects_biographical_year_guard` — "Абай 1845 жылы Қарқаралыда ..." stays put under `InSampleCitySwap`.
+
+### Workspace tests
+
+**301 tests pass** (290 → +11).
+
+### Next (v1.9.5 candidates)
+
+- Wrap swap-mode responses in a template that explicitly marks the composition ("сіздің қалаңыздың аясында..."), so readers know the quote was adapted.
+- Extract patterns at index-build time (option C) so composition isn't done at runtime per turn.
+- Experiments on name / year composition with stricter sanity guards.
+
 ## [1.8.5] — 2026-04-20 — Locative+P1Sg bug fix, FST-aware city slots, comprehensive README refresh
 
 Patch release. Fixes the `-мын` greedy-strip bug in `detect_statement_of_occupation`, wires the existing `{slot|features}` syntax into v1.8.0's session-aware templates, and brings the README fully in sync with the v1.5.0–v1.8.0 retrieval-era arc.

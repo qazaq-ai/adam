@@ -34,6 +34,8 @@
 //! No weights are learned; they are editorial constants that a future
 //! version can tune. Same input + same index → same top-k.
 
+pub mod compose;
+
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};

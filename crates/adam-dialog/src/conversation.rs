@@ -20,7 +20,7 @@
 use std::collections::HashMap;
 
 use adam_kernel_fst::lexicon::LexiconV1;
-use adam_retrieval::{MorphemeIndex, RankConfig};
+use adam_retrieval::{MorphemeIndex, RankConfig, compose::compose_with_city};
 
 use crate::intent::Intent;
 use crate::planner::plan_response_with_session;
@@ -31,6 +31,28 @@ use crate::templates::TemplateRepository;
 /// Maximum intent-history length retained across turns. Bounded so a
 /// long-running session doesn't accumulate an unbounded trace.
 const MAX_HISTORY: usize = 32;
+
+/// How the retrieval-fallback path treats the cited corpus sample.
+///
+/// v1.9.0 introduces [`InSampleCitySwap`](ComposeMode::InSampleCitySwap),
+/// which opts into the option-B composition: when the session has a
+/// known city and the cited sample mentions a **different** known city
+/// in a biography-free context, the mention is rewritten to the user's
+/// city. The quote is no longer byte-identical to the corpus. Default
+/// stays [`Verbatim`](ComposeMode::Verbatim) — existing callers see no
+/// behavioural change.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum ComposeMode {
+    /// v1.8.5 and earlier behaviour: cited quote is byte-identical to
+    /// the corpus sample. Zero fabrication risk.
+    #[default]
+    Verbatim,
+    /// v1.9.0 option-B experiment: city mentions in the cited sample
+    /// are swapped for the user's session city when safe. Feature
+    /// bundle is preserved (locative stays locative, etc.). See
+    /// [`adam_retrieval::compose`] for the safety guards.
+    InSampleCitySwap,
+}
 
 /// A running multi-turn dialog.
 ///
@@ -61,6 +83,11 @@ pub struct Conversation {
     /// `Conversation::default()` cheap and avoid threading the config
     /// through every embedder.
     pub rank_config: Option<RankConfig>,
+    /// How the retrieval fallback treats the cited sample. Default
+    /// [`ComposeMode::Verbatim`] keeps the v1.8.5 behaviour (byte-
+    /// identical corpus quote); [`ComposeMode::InSampleCitySwap`]
+    /// enables the v1.9.0 option-B city rewrite. Added v1.9.0.
+    pub compose_mode: ComposeMode,
 }
 
 /// Lightweight "kind" summary of an `Intent` — the payload (name /
@@ -144,6 +171,16 @@ impl Conversation {
         self
     }
 
+    /// Opt into v1.9.0 option-B in-sample composition. When the mode
+    /// is `InSampleCitySwap` and the session has a recognised city,
+    /// `Intent::Unknown` responses rewrite city mentions in the cited
+    /// sample to the user's city (feature-preserving, biography-guarded).
+    /// Leave at the default `Verbatim` for the v1.8.5 behaviour.
+    pub fn with_compose_mode(mut self, mode: ComposeMode) -> Self {
+        self.compose_mode = mode;
+        self
+    }
+
     /// Run one conversational turn. Parses the input, recognises the
     /// intent, folds any new entities into [`session`](Self::session),
     /// updates [`active_intent`](Self::active_intent) and
@@ -168,10 +205,11 @@ impl Conversation {
         // purposes (planner picks a response without asking back).
         let mut intent = resolve_follow_up(raw_intent, input, self.active_intent);
 
-        // v1.6.5 / v1.7.0: inject a retrieval example into Unknown.
-        // Deterministic — ranker ties break by (pack, sample_id), so
-        // reruns produce identical evidence. rng_seed is NOT consulted.
-        self.inject_retrieval_example(&mut intent, &parses);
+        // v1.6.5 / v1.7.0 / v1.9.0: inject a retrieval example into
+        // Unknown, optionally composing it with session slots per
+        // compose_mode. Deterministic throughout — ranker ties break
+        // on (pack, sample_id), compose_with_city is a pure function.
+        self.inject_retrieval_example(&mut intent, &parses, lexicon);
 
         self.absorb_entities(&intent);
         self.record_intent(&intent);
@@ -183,12 +221,23 @@ impl Conversation {
     /// attached, call `MorphemeIndex::rank` with every content root
     /// parsed from the input (v1.7.0) and fill the `example` slot with
     /// the top-1 hit's text. Falls back to `search(noun_hint)[0]` when
-    /// ranking returns nothing. No-op for every non-Unknown intent, for
-    /// unknown-without-noun, and when the index is absent.
+    /// ranking returns nothing.
+    ///
+    /// v1.9.0: when [`compose_mode`](Self::compose_mode) is
+    /// `InSampleCitySwap` and the session has a recognised city, the
+    /// cited text is passed through `compose_with_city` before being
+    /// assigned to the `example` slot. If the composer reports a swap,
+    /// we use the rewritten version; otherwise we keep the verbatim
+    /// quote. Original-sample provenance is preserved on the `Hit` —
+    /// the swap is a cosmetic layer on top.
+    ///
+    /// No-op for every non-Unknown intent, for unknown-without-noun,
+    /// and when the index is absent.
     fn inject_retrieval_example(
         &self,
         intent: &mut Intent,
         parses: &[adam_kernel_fst::parser::Analysis],
+        lexicon: &LexiconV1,
     ) {
         let Some(index) = self.morpheme_index.as_ref() else {
             return;
@@ -218,21 +267,42 @@ impl Conversation {
                 }
             };
             let ranked = index.rank(&root_refs, config);
-            if let Some(hit) = ranked.first() {
-                if let Some(text) = index.sample_text(&hit.sref) {
-                    *example = Some(text.to_string());
-                    return;
-                }
-            }
-            // Fallback: single-morpheme first-posting (the v1.6.5 path)
-            // — kicks in when the ranker found nothing or the top hit
-            // lacks a stored text.
-            let refs = index.search(noun);
-            if let Some(first) = refs.first() {
-                if let Some(text) = index.sample_text(first) {
-                    *example = Some(text.to_string());
-                }
-            }
+            let candidate_text = ranked
+                .first()
+                .and_then(|hit| index.sample_text(&hit.sref).map(|s| s.to_string()))
+                .or_else(|| {
+                    // Fallback: single-morpheme first-posting (v1.6.5 path).
+                    index
+                        .search(noun)
+                        .first()
+                        .and_then(|s| index.sample_text(s).map(|t| t.to_string()))
+                });
+            let Some(text) = candidate_text else {
+                return;
+            };
+            let composed_text = self.maybe_compose(&text, lexicon);
+            *example = Some(composed_text);
+        }
+    }
+
+    /// v1.9.0 option-B step. If [`compose_mode`](Self::compose_mode) is
+    /// `InSampleCitySwap` and the session has a recognised city,
+    /// rewrite city mentions in `text` to the user's city. Otherwise
+    /// return `text` unchanged. Delegates all safety guards
+    /// (biography year, known-place list) to
+    /// [`compose_with_city`].
+    fn maybe_compose(&self, text: &str, lexicon: &LexiconV1) -> String {
+        if !matches!(self.compose_mode, ComposeMode::InSampleCitySwap) {
+            return text.to_string();
+        }
+        let Some(user_city) = self.session.get("city") else {
+            return text.to_string();
+        };
+        let composition = compose_with_city(text, user_city, lexicon);
+        if composition.was_changed() {
+            composition.output
+        } else {
+            composition.original
         }
     }
 

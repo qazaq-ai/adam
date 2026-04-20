@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.8.5-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.9.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-290%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-301%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
 </p>
 
@@ -93,7 +93,7 @@ Eight Rust crates, three layers:
 | **L1** | [`adam-corpus`](crates/adam-corpus) | Source acceptance, streaming processors (Wikipedia, CC-100, classics, Common Voice, Tatoeba), synthetic generator, `corpus_audit`, `morpheme_coverage` (v1.5.5) |
 | **L1** | [`adam-eval`](crates/adam-eval) | Evaluation suite + benchmark reports |
 | **L1** | [`adam-dialog`](crates/adam-dialog) | **Dialog pipeline** — intent recognisers (26 intents), multi-turn session + DST, template planner with `{slot\|features}` syntax, slot-expanding realiser |
-| **L1** | [`adam-retrieval`](crates/adam-retrieval) | **Retrieval engine** (v1.6.0+) — morpheme inverted index (`MorphemeIndex`), deterministic `rank(input_morphemes, config)` with overlap + pack-purity + length + loanword scoring (v1.7.0), `SampleRef` provenance, `sample_texts` for direct quoting |
+| **L1** | [`adam-retrieval`](crates/adam-retrieval) | **Retrieval engine** (v1.6.0+) — morpheme inverted index (`MorphemeIndex`), deterministic `rank(input_morphemes, config)` with overlap + pack-purity + length + loanword scoring (v1.7.0), `SampleRef` provenance, `sample_texts` for direct quoting, `compose::compose_with_city` (v1.9.0) for opt-in in-sample city swap |
 | **L2** | [`adam-train`](crates/adam-train) | Legacy transformer baseline (see [History](#history)) |
 
 Every layer outputs deterministic, regression-tested JSON artifacts. `bash ./scripts/validate_foundation.sh` runs the full foundation validation end-to-end.
@@ -164,13 +164,30 @@ This path is:
 - **Traceable** — every response cites its source.
 - **Hallucination-free** — we quote, never invent. The retrieved sentence is always a real sentence from a real source.
 
+### Opt-in in-sample composition (v1.9.0)
+
+By default, the cited quote is **byte-identical** to the corpus sample — zero fabrication. Embedders who want composition can opt into `ComposeMode::InSampleCitySwap`:
+
+```rust
+use adam_dialog::{ComposeMode, Conversation};
+
+let conv = Conversation::new()
+    .with_morpheme_index(idx)
+    .with_compose_mode(ComposeMode::InSampleCitySwap);
+```
+
+With swap mode on **and** the session carrying a known Kazakh city, city mentions inside the cited quote are rewritten to the user's city, feature-preserving via the FST (locative stays locative, etc.). Safety guards:
+
+- **Closed list of 20 cities** — only roots in `adam_retrieval::compose::PLACE_NAMES` are swappable.
+- **User's city must be in the list** — otherwise the FST can't re-synthesise reliably.
+- **Biographical-year guard** — quotes containing a 4-digit year in [1500, 2100] are refused outright, so biographies like "Абай 1845 жылы Қарқаралыда туған" are never rewritten.
+- **No name or number swaps** — those are the highest-fabrication-risk categories and are explicitly out of scope for v1.9.0.
+
+Every swap produces provenance via `Composition::trace()` — `[2] Алматыда → Шымкентте (root=шымкент, case=Some(Locative))` — so `adam_chat --trace` can explain every change.
+
 ### Kazakh-only recogniser (v1.1.0 revert)
 
 v0.9.6 shipped Russian / English trigger phrasings for all 25 intents. Post-v1.0.0 testing showed the multilingual path diluted the Kazakh-first thesis without delivering real generalisation — a Russian speaker typing "Я разработчик" got "түсінбедім" because "разработчик" isn't in the Kazakh Lexicon. **The multilingual surface was removed in v1.1.0.** Non-Kazakh input now falls through to `Intent::Unknown`, which since v1.6.5 routes through the retrieval engine above.
-
-### Kazakh-only recogniser (v1.1.0 revert)
-
-v0.9.6 shipped Russian / English trigger phrasings for all 25 intents. Post-v1.0.0 testing showed the multilingual path diluted the Kazakh-first thesis without delivering real generalisation — a Russian speaker typing "Я разработчик" got "түсінбедім" because "разработчик" isn't in the Kazakh Lexicon. **The multilingual surface was removed in v1.1.0.** Non-Kazakh input now falls through to `Intent::Unknown`.
 
 The project's path to handling unbounded inputs is **not translation and not a trained neural LM** — it is the retrieval engine above, scaled to a ~100 M-token Kazakh corpus. See [History](#history) and [roadmap](docs/roadmap.md#post-v10-direction) for the architectural rationale.
 
@@ -238,7 +255,7 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | Committed morpheme index | **3,191 samples → 3,082 distinct morphemes → 16,262 postings** (`data/retrieval/morpheme_index.json`, ~2.1 MB) |
 | Full local morpheme index | rebuildable via `build_morpheme_index -- --full` (~10 min, ~700 MB, gitignored) |
 | Hallucination rate | **0%** (retrieval quotes verbatim; no generative path) |
-| Workspace tests | **290 passing**, 4 ignored, 0 failing |
+| Workspace tests | **301 passing**, 4 ignored, 0 failing |
 | End-to-end dialog tests | **81** |
 | FST unit tests | **84** |
 
@@ -258,7 +275,8 @@ See [data/README.md](data/README.md) for a top-level map of the `data/` tree, an
 - **v0.1.0 – v0.4.0 (transformer era)** — authentic Kazakh corpus curation (Tatoeba, Wikipedia KZ, Common Voice KK, CC-100, Abai Wikisource), BPE tokenizer, baseline transformer training. The v0.4.0 checkpoint (24.2 M parameters, PPL 1691.89 on 12 k held-out samples) is preserved in `data/training/` as a regression reference but is **not** on the current codepath.
 - **v0.4.5 – v1.0.0 (FST + dialog era)** — deterministic FST morphology, 14 k-entry pure Kazakh Lexicon, 25-intent dialog pipeline with multi-turn session state, FST-backed slot expansion.
 - **v1.1.0 course-correction** — post-v1.0.0 testing showed the v0.9.6 multilingual surface was a mistake. Removing it and committing to a Kazakh-only input surface is the honest path toward a thinking Kazakh model.
-- **v1.5.0 – v1.8.5 (retrieval era)** — the path to v2.0 is **retrieval**, not a trained neural LM. v1.5.0 re-extracted CC-100 into a 77.9 M-word local corpus. v1.5.5 measured the 79.48 % morpheme-coverage baseline. v1.6.0 shipped `adam-retrieval` with the morpheme inverted index. v1.6.5 wired retrieval into `Intent::Unknown` so dialog cites Abai / Wikipedia / CC-100 verbatim. v1.7.0 added deterministic ranking (overlap + purity + length + loanword density). v1.8.0 introduced **session-aware composition (option A)** — the retrieved quote stays verbatim, the frame around it personalises via the session. v1.8.5 fixed the `-мын` greedy-strip bug and wired FST-aware `{city|locative}` into session-aware templates. Every response to an out-of-intent input is now: *retrieved from a real source, ranked by four deterministic signals, framed in a session-aware Kazakh sentence, with zero fabrication.*
+- **v1.5.0 – v1.8.5 (retrieval era)** — the path to v2.0 is **retrieval**, not a trained neural LM. v1.5.0 re-extracted CC-100 into a 77.9 M-word local corpus. v1.5.5 measured the 79.48 % morpheme-coverage baseline. v1.6.0 shipped `adam-retrieval` with the morpheme inverted index. v1.6.5 wired retrieval into `Intent::Unknown` so dialog cites Abai / Wikipedia / CC-100 verbatim. v1.7.0 added deterministic ranking (overlap + purity + length + loanword density). v1.8.0 introduced **session-aware composition (option A)** — the retrieved quote stays verbatim, the frame around it personalises via the session. v1.8.5 fixed the `-мын` greedy-strip bug and wired FST-aware `{city|locative}` into session-aware templates.
+- **v1.9.0 (option B entry)** — first step where the retrieved quote is no longer guaranteed byte-identical. `ComposeMode::InSampleCitySwap` (opt-in; default stays `Verbatim`) rewrites city mentions inside the cited quote to the user's session city via feature-preserving FST synthesis. Safety guards: closed 20-city list, biographical-year refusal (any year 1500–2100), no name/number swaps. Grammaticality FST-guaranteed; semantic truthfulness now a trade-off, explicitly marked in the mode setter.
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version-by-version history and [docs/roadmap.md](docs/roadmap.md) for the phase-by-phase overview, including the v1.9.0+ roadmap toward in-sample slot swap (option B/C territory, with semantic sanity guards).
 
