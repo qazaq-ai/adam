@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.9.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.9.5-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-301%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-303%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
 </p>
 
@@ -142,7 +142,7 @@ bash ./scripts/validate_foundation.sh
 
 Every `Statement*` intent with an `Option<T>` payload carries an extracted entity that persists into the session and feeds downstream templates.
 
-### Retrieval engine (v1.6.0–v1.8.5)
+### Retrieval engine (v1.6.0–v1.9.5)
 
 When no intent matches, `adam` falls back to **retrieve → rank → compose**:
 
@@ -164,7 +164,7 @@ This path is:
 - **Traceable** — every response cites its source.
 - **Hallucination-free** — we quote, never invent. The retrieved sentence is always a real sentence from a real source.
 
-### Opt-in in-sample composition (v1.9.0)
+### Opt-in in-sample composition (v1.9.0+)
 
 By default, the cited quote is **byte-identical** to the corpus sample — zero fabrication. Embedders who want composition can opt into `ComposeMode::InSampleCitySwap`:
 
@@ -182,6 +182,8 @@ With swap mode on **and** the session carrying a known Kazakh city, city mention
 - **User's city must be in the list** — otherwise the FST can't re-synthesise reliably.
 - **Biographical-year guard** — quotes containing a 4-digit year in [1500, 2100] are refused outright, so biographies like "Абай 1845 жылы Қарқаралыда туған" are never rewritten.
 - **No name or number swaps** — those are the highest-fabrication-risk categories and are explicitly out of scope for v1.9.0.
+
+**Trust contract — when we adapt, we say so (v1.9.5).** The planner routes any adapted response through the `unknown.with_adapted_evidence` template family, whose every template contains the Kazakh stem «бейімд-» ("adapt-"). Two invariants are test-enforced: when a swap happened the marker MUST fire, and when no swap happened the marker MUST NOT fire. A user can always distinguish a verbatim corpus quote from an adapted one at the textual level alone.
 
 Every swap produces provenance via `Composition::trace()` — `[2] Алматыда → Шымкентте (root=шымкент, case=Some(Locative))` — so `adam_chat --trace` can explain every change.
 
@@ -255,8 +257,8 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | Committed morpheme index | **3,191 samples → 3,082 distinct morphemes → 16,262 postings** (`data/retrieval/morpheme_index.json`, ~2.1 MB) |
 | Full local morpheme index | rebuildable via `build_morpheme_index -- --full` (~10 min, ~700 MB, gitignored) |
 | Hallucination rate | **0%** (retrieval quotes verbatim; no generative path) |
-| Workspace tests | **301 passing**, 4 ignored, 0 failing |
-| End-to-end dialog tests | **81** |
+| Workspace tests | **303 passing**, 4 ignored, 0 failing |
+| End-to-end dialog tests | **86** |
 | FST unit tests | **84** |
 
 ## Directory layout

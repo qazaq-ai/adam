@@ -250,13 +250,25 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::WellWishes => "well_wishes",
         Intent::Insult => "insult",
         Intent::Unknown {
-            noun_hint, example, ..
+            noun_hint,
+            example,
+            example_adapted,
+            ..
         } => {
+            // v1.9.5: when the retrieved quote was rewritten by the
+            // composer (e.g. `ComposeMode::InSampleCitySwap`), route to
+            // the `adapted_evidence` family so the user is explicitly
+            // informed the quote is not byte-identical to the source.
+            // Traceability wins over the slightly cleaner phrasing the
+            // verbatim-evidence templates give you.
+            //
             // v1.6.5: if retrieval surfaced a concrete example from the
             // committed corpus for this noun, route to the evidence
             // family. Otherwise the v1.1.0 noun-hint family, then the
             // bare "түсінбедім" fallback.
-            if example.is_some() {
+            if example.is_some() && *example_adapted {
+                "unknown.with_adapted_evidence"
+            } else if example.is_some() {
                 "unknown.with_evidence"
             } else if noun_hint.is_some() {
                 "unknown.with_noun"

@@ -245,6 +245,7 @@ impl Conversation {
         if let Intent::Unknown {
             noun_hint: Some(noun),
             example,
+            example_adapted,
             ..
         } = intent
         {
@@ -280,29 +281,35 @@ impl Conversation {
             let Some(text) = candidate_text else {
                 return;
             };
-            let composed_text = self.maybe_compose(&text, lexicon);
+            let (composed_text, was_adapted) = self.maybe_compose(&text, lexicon);
             *example = Some(composed_text);
+            *example_adapted = was_adapted;
         }
     }
 
     /// v1.9.0 option-B step. If [`compose_mode`](Self::compose_mode) is
     /// `InSampleCitySwap` and the session has a recognised city,
-    /// rewrite city mentions in `text` to the user's city. Otherwise
-    /// return `text` unchanged. Delegates all safety guards
-    /// (biography year, known-place list) to
+    /// rewrite city mentions in `text` to the user's city. Returns the
+    /// (possibly rewritten) text and a flag indicating whether any
+    /// swap actually happened. v1.9.5: the flag propagates to
+    /// `Intent::Unknown.example_adapted` so the planner can route to
+    /// the `unknown.with_adapted_evidence` family and the user sees an
+    /// explicit "this quote was adapted" framing.
+    ///
+    /// All safety guards (biography year, known-place list) live in
     /// [`compose_with_city`].
-    fn maybe_compose(&self, text: &str, lexicon: &LexiconV1) -> String {
+    fn maybe_compose(&self, text: &str, lexicon: &LexiconV1) -> (String, bool) {
         if !matches!(self.compose_mode, ComposeMode::InSampleCitySwap) {
-            return text.to_string();
+            return (text.to_string(), false);
         }
         let Some(user_city) = self.session.get("city") else {
-            return text.to_string();
+            return (text.to_string(), false);
         };
         let composition = compose_with_city(text, user_city, lexicon);
         if composition.was_changed() {
-            composition.output
+            (composition.output, true)
         } else {
-            composition.original
+            (composition.original, false)
         }
     }
 

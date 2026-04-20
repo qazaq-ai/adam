@@ -360,3 +360,28 @@ templates = [
     "{city|locative} тұратын сізге {noun} туралы мынадай дерек: «{example}»",
     "{name}, {city|locative} отырып {noun} жайында ойланасыз ба. Дерек: «{example}»",
 ]
+
+# v1.9.5: Unknown with *adapted* retrieval evidence — the retrieved
+# quote was rewritten by `compose_with_city` (ComposeMode::InSampleCitySwap)
+# so at least one city mention was swapped to the user's session city.
+# Traceability contract: when we change the source text, the user MUST
+# be told. Every template here explicitly frames the quote as
+# "adapted" / "your city's version" / "rewritten for you" — never
+# presents the adapted text as if it were the original corpus line.
+#
+# The planner (v1.9.5) routes Intent::Unknown with example_adapted=true
+# to this family instead of `unknown.with_evidence`, so the two paths
+# cannot be confused at runtime.
+[[families]]
+key = "unknown.with_adapted_evidence"
+templates = [
+    # Neutral — no session slots beyond city required (city is always
+    # present when we reach this family, since it triggered the swap).
+    "{city|locative} болғандықтан мынадай бейімделген мысал ұсынамын: «{example}»",
+    "{noun} туралы корпустағы бір жолды сіздің қалаңызға бейімдеп көрдім: «{example}»",
+    "Бұл бейімделген нұсқа (түпнұсқада басқа қала аталған): «{example}»",
+    # Name-aware — when the session also has a name.
+    "{name}, мен {noun} туралы бір жолды сіздің {city|locative} болуыңызға сай бейімдедім: «{example}»",
+    "{name}, бейімделген мысал (түпнұсқадан өзгертілген): «{example}»",
+]
+

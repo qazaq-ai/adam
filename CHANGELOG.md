@@ -7,6 +7,67 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.9.5] — 2026-04-20 — Composition-marker framing (adapted-evidence template family)
+
+Patch release restoring the **traceability contract** broken in v1.9.0. When `ComposeMode::InSampleCitySwap` silently rewrote a quoted corpus line, the user saw the adapted text in «…» and could easily assume it was the original source. That's a trust violation — even if the swap was grammatically correct and semantically benign.
+
+v1.9.5 makes the adaptation **explicit in the response itself**. The planner now routes swapped responses through a separate `unknown.with_adapted_evidence` template family whose every template contains the word stem **«бейімд-»** ("adapt-"). Verbatim quotes stay on the v1.8.0 `unknown.with_evidence` family.
+
+### Before / after
+
+```text
+Corpus: "Бала Алматыда жақсы өмір сүреді"
+Session: { city: "Шымкент" }
+Mode: InSampleCitySwap
+
+v1.9.0 (silent):
+< Шымкентте тұратын сізге бала туралы мынадай дерек:
+  «Бала Шымкентте жақсы өмір сүреді»    ← user has no way to know the quote was adapted
+
+v1.9.5 (explicit marker):
+< Бұл бейімделген нұсқа (түпнұсқада басқа қала аталған):
+  «Бала Шымкентте жақсы өмір сүреді»    ← the frame literally says "adapted version,
+                                           different city in the original"
+< бала туралы корпустағы бір жолды сіздің қалаңызға бейімдеп көрдім:
+  «Бала Шымкентте жақсы өмір сүреді»    ← "I adapted a corpus line to your city"
+```
+
+### Changes
+
+- **`adam-dialog::intent::Intent::Unknown`** gains a new field `example_adapted: bool`. Defaults to `false`; `#[serde(default)]` so deserialising older traces still works.
+- **`adam-dialog::planner`** routes:
+  - `example.is_some() && example_adapted` → `"unknown.with_adapted_evidence"` *(new)*
+  - `example.is_some()` → `"unknown.with_evidence"` *(v1.8.0 verbatim path)*
+  - `noun_hint.is_some()` → `"unknown.with_noun"` *(v1.1.0)*
+  - else → `"unknown"` *(v1.0.0)*
+- **`Conversation::maybe_compose`** now returns `(String, bool)` — the flag propagates to `example_adapted` in `Intent::Unknown`. No caller outside `Conversation` is exposed to the internal API change.
+- **New template family** `unknown.with_adapted_evidence` (5 templates) in `data/dialog/templates/v1.toml`. Every single template contains the «бейімд-» stem so consumers can grep for it as a runtime marker. FST-aware `{city|locative}` renders the user's city harmony-correctly.
+
+### Safety invariants (new)
+
+Two tests enforce the bi-directional guarantee:
+
+| Direction | Test | Guarantee |
+|---|---|---|
+| **When swap happened** → marker must fire | `adapted_evidence_templates_announce_the_adaptation` | the «бейімд-» stem appears in the output for at least one seed under `InSampleCitySwap` + actual swap |
+| **When no swap** → marker must NOT fire | `verbatim_mode_never_claims_adaptation` | the «бейімд-» stem is absent for every seed under `Verbatim` mode |
+
+The second guarantee is the trust-critical one: v1.9.5 must never claim to have adapted a quote it didn't actually adapt.
+
+### Determinism
+
+Unchanged. `example_adapted` is a pure function of `(retrieved text, session city, compose_mode)`. Template selection still honours `template_is_fillable` + seed-mod.
+
+### Tests (+2 → 303 total)
+
+- `adapted_evidence_templates_announce_the_adaptation` — swap fires → marker fires.
+- `verbatim_mode_never_claims_adaptation` — no swap → no marker, ever.
+
+### What's next (v2.0 territory, not v1.9.x)
+
+- **Option C** — pre-compute `(pattern, slot_types)` pairs at index-build time. Keeps runtime cheap, lets us audit swap candidates offline, and is a prerequisite for swap types beyond city (names-in-biography, numbers-in-dates). Not a patch.
+- **v2.0 stabilisation** — freeze the retrieval-as-v2.0 commitment (`project_retrieval_not_neural_v2`), run end-to-end demos, cut the investor-demoable v2.0 tag.
+
 ## [1.9.0] — 2026-04-20 — In-sample city swap (option B, opt-in, year-guarded)
 
 Minor release. First step into **option B** territory — the retrieved corpus quote is no longer guaranteed byte-identical to the source. When the user opts into `ComposeMode::InSampleCitySwap` and the session has a known Kazakh city, city mentions inside the cited sample are rewritten to the user's city, feature-preserving via the FST. v1.8.5 and earlier behaviour (`ComposeMode::Verbatim`, the default) is unchanged.

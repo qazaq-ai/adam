@@ -1159,6 +1159,83 @@ fn quoted_portion(s: &str) -> Option<&str> {
     Some(&tail[..end_in_tail])
 }
 
+/// v1.9.5: when a swap actually happens, the planner must route to
+/// the `unknown.with_adapted_evidence` family — which explicitly marks
+/// the quote as adapted so the user can distinguish it from a verbatim
+/// corpus citation. "бейімделген" is the common stem across all the
+/// adapted-evidence templates; its presence in the output proves the
+/// new routing fired.
+#[test]
+fn adapted_evidence_templates_announce_the_adaptation() {
+    use adam_dialog::ComposeMode;
+    use adam_retrieval::MorphemeIndex;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let mut index = MorphemeIndex::new();
+    let sref = adam_retrieval::SampleRef {
+        pack: "abai_wikisource_pack.json".into(),
+        sample_id: "test_001".into(),
+    };
+    index.insert("бала", sref.clone());
+    index.remember_text(&sref, "Бала Алматыда жақсы өмір сүреді");
+    index.refresh_stats();
+
+    let mut conv = Conversation::new()
+        .with_morpheme_index(index)
+        .with_compose_mode(ComposeMode::InSampleCitySwap);
+    conv.session.insert("city".into(), "Шымкент".into());
+
+    let mut saw_adapted_frame = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, seed);
+        assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+        if out.contains("бейімд") {
+            saw_adapted_frame = true;
+        }
+    }
+    assert!(
+        saw_adapted_frame,
+        "adapted-evidence family must fire at least once under a successful swap — \
+         every template in that family contains the «бейімд-» stem"
+    );
+}
+
+/// v1.9.5 negative case: without a swap (either Verbatim mode or the
+/// city already matches), the planner must NEVER route to the adapted
+/// family. Guards against false-positive "this quote was adapted"
+/// claims — a trust-critical invariant.
+#[test]
+fn verbatim_mode_never_claims_adaptation() {
+    use adam_retrieval::MorphemeIndex;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let mut index = MorphemeIndex::new();
+    let sref = adam_retrieval::SampleRef {
+        pack: "abai_wikisource_pack.json".into(),
+        sample_id: "test_001".into(),
+    };
+    index.insert("бала", sref.clone());
+    index.remember_text(&sref, "Бала Алматыда жақсы өмір сүреді");
+    index.refresh_stats();
+
+    let mut conv = Conversation::new().with_morpheme_index(index);
+    // Default ComposeMode::Verbatim. Even with a different session
+    // city, the adapted-evidence family must never fire.
+    conv.session.insert("city".into(), "Шымкент".into());
+
+    for seed in 0..32u64 {
+        let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, seed);
+        assert!(
+            !out.contains("бейімд"),
+            "Verbatim mode must NEVER produce an adapted-evidence template, got: {out:?}"
+        );
+    }
+}
+
 /// v1.9.0 regression: default ComposeMode::Verbatim must NOT rewrite
 /// the retrieved sample. The quote stays byte-identical to the corpus.
 #[test]

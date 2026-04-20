@@ -124,6 +124,16 @@ pub enum Intent {
         /// `MorphemeIndex` is attached. Added v1.6.5.
         #[serde(default)]
         example: Option<String>,
+        /// v1.9.5: `true` iff the text in `example` was **adapted** from
+        /// the retrieved corpus sample (e.g. a city mention was swapped
+        /// to the user's session city via `ComposeMode::InSampleCitySwap`).
+        /// The planner routes to the `unknown.with_adapted_evidence`
+        /// family when this is set, so the user is explicitly informed
+        /// that the quote is not byte-identical to the source. Defaults
+        /// to `false` — verbatim quotes stay on the v1.8.0 evidence
+        /// path.
+        #[serde(default)]
+        example_adapted: bool,
     },
 }
 
