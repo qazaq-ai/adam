@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/surface-Kazakh--only-9CCC65?style=flat-square" alt="Kazakh only">
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/templates-31%20families-FBC02D?style=flat-square" alt="templates">
-  <img src="https://img.shields.io/badge/tests-286%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-288%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
 </p>
 

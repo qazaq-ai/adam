@@ -305,15 +305,25 @@ templates = [
 # Unknown with noun hint — parser surfaced a noun from the input.
 # Acknowledge what the user is talking about even if we don't
 # recognise the full intent. {noun} is filled from Intent::Unknown
-# { noun_hint }.
+# { noun_hint }. v1.8.0 adds session-aware variants: when the user
+# has a remembered name / city / age, the planner prefers a template
+# that personalises the acknowledgement.
 [[families]]
 key = "unknown.with_noun"
 templates = [
+    # Original (v1.1.0) — no session slots required
     "ах, {noun} туралы айтасыз ба",
     "{noun} — қызықты тақырып",
     "{noun} туралы не білгіңіз келеді",
     "{noun} жайында көбірек айтыңызшы",
     "{noun} туралы ойланып көрейін",
+    # v1.8.0 — session-aware variants. planner's template_is_fillable
+    # auto-activates these ONLY when the required session slot exists.
+    "{name}, {noun} жайында не ойлайсыз",
+    "{name}, {noun} деген сіз үшін жаңа тақырып па",
+    "{city} тұрғыны үшін {noun} жаңалық па",
+    "{name}, {city}-да {noun} туралы қалай қарайды екен",
+    "{age} жасында {noun} жайында ойлану әрі қызық",
 ]
 
 # v1.6.5: Unknown with retrieval evidence — the morpheme index had a
@@ -322,11 +332,25 @@ templates = [
 # Kazakh conversational registers ("мысалы", "анау бір кісі айтты",
 # "бір кітапта жаздым оқыдым"). {example} is the verbatim sentence
 # from data/retrieval/morpheme_index.json's sample_texts field.
+#
+# v1.8.0 — compositional-synthesis option A. The retrieved {example}
+# stays verbatim (no slot-swap inside the quote → zero fabrication
+# risk), but the FRAME around it becomes session-aware: when the user
+# has a remembered name, city, age, etc., the planner prefers a
+# template that personalises the citation.
 [[families]]
 key = "unknown.with_evidence"
 templates = [
+    # Original (v1.6.5) — no session slots required
     "{noun} туралы мынадай бір жазба кездестірдім: «{example}»",
     "{noun} жайында осындай мысал бар: «{example}»",
     "{noun} деген сөзге қатысты бір жолым есіме түсті: «{example}»",
     "мен {noun} туралы «{example}» деген дерек кездестіргенмін",
+    # v1.8.0 — session-aware variants
+    "Сіз, {name}, {noun} туралы сұрап тұрсыз ба. Мынадай дерек бар: «{example}»",
+    "{name}, {noun} жайында осы жазба сізге қызық болуы мүмкін: «{example}»",
+    "{city} тұрғыны үшін {noun} туралы мынадай дерек бар: «{example}»",
+    "{name}, {city}-да тұратын сіз үшін {noun} жайында: «{example}»",
+    "Сіз {age} жасында-ақ {noun} жайында сұрайсыз екен. Дерек: «{example}»",
+    "{occupation} ретінде сіз үшін {noun} туралы дерек: «{example}»",
 ]

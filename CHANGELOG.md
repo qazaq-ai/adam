@@ -7,6 +7,68 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.8.0] — 2026-04-20 — Session-aware compositional synthesis (option A: frame-only, retrieved quote stays verbatim)
+
+Minor release. First step in the **retrieve → compose → respond** ladder described in the v1.7.0 release notes. This release commits to **option A** of the three compositional-synthesis variants we debated: composition happens **around** the retrieved sample, never **inside** it. Zero fabrication risk; the retrieved sentence stays byte-identical to the corpus.
+
+### The contract
+
+- **Retrieved quote is immutable.** No slot-swapping inside the guillemets. Whatever the corpus says, the corpus still says.
+- **Frame becomes session-aware.** When the user has told us their `name`, `city`, `age`, or `occupation`, the planner prefers a template that personalises the wrapper around the citation.
+- **Still deterministic.** The planner's template pool filter (`template_is_fillable`) automatically gates session-aware templates on slot presence. No new conditional logic, no runtime trickery.
+
+### Visible effect
+
+```
+# Before (v1.7.0, session = {name: "Дәулет"})
+< бала туралы мынадай бір жазба кездестірдім:
+  «Кім сендерді балалар, сүйе-тұғын...»
+
+# After (v1.8.0, same session, session-aware templates now in pool)
+< Сіз, Дәулет, бала туралы сұрап тұрсыз ба. Мынадай дерек бар:
+  «Кім сендерді балалар, сүйе-тұғын...»
+
+# After (v1.8.0, session = {name: "Дәулет", city: "Алматы"})
+< Дәулет, Алматы-да тұратын сіз үшін бала жайында:
+  «Кім сендерді балалар, сүйе-тұғын...»
+```
+
+The quote is the same Abai verse in every case. The frame adapts to what the dialog remembers.
+
+### Changes
+
+- **`data/dialog/templates/v1.toml`** — `unknown.with_evidence` grows from 4 to 10 templates (6 new session-aware variants: 2 × `{name}`, 1 × `{city}`, 1 × `{name}+{city}`, 1 × `{age}`, 1 × `{occupation}`). `unknown.with_noun` similarly grows from 5 to 10 with session-aware variants.
+- **Planner**: no code change. The existing `template_is_fillable` + session merge does all the work. This is the whole design thesis of option A — composition implemented as pure data.
+- **Tests (+2)**:
+  - `unknown_with_session_and_evidence_personalises_frame` — with `name` in session, at least one seed picks a personalised template.
+  - `unknown_with_session_name_and_city_can_use_combined_frame` — with both slots, at least one seed picks a template combining them.
+
+### Known bug (not addressed this release)
+
+Input like «мен Алматыдамын» (I'm in Almaty) is mis-classified by `detect_statement_of_occupation` because the recogniser greedy-strips `-мын` and treats the residue as an occupation surface — session ends up with `occupation: "алматы"` instead of `city: "Алматы"`. This is a pre-v1.8.0 semantics bug, orthogonal to composition. The test for the combined-frame path sets the session directly to bypass it. Planned for v1.8.5.
+
+### Determinism audit
+
+- No new random call sites.
+- No new runtime-conditional routing — templates decide activation purely by slot presence, which is itself deterministic.
+- `rng_seed` still picks among the filtered pool, as before.
+
+Same session + same input + same seed → byte-identical output.
+
+### What v1.8.0 does NOT do (deferred — option B/C territory)
+
+- **No in-sample slot swap.** We do NOT replace proper nouns or numerals inside the retrieved quote. That's true compositional synthesis, with all the semantic-fabrication risk it brings. Deferred explicitly.
+- **No FST-aware re-inflection of session slots.** Templates use session values as-is; Kazakh case marking still comes from the hand-written `-да`, `-мен`, etc. in the template text. v0.9.5's `{slot|features}` is available but not yet wired into the new v1.8.0 templates; future templates can upgrade.
+- **No semantic sanity check.** Even the frame could say weird things like "{city} тұрғыны үшін..." when the user is only visiting. Narrowing phrasing is polish, not scope.
+
+### Workspace tests
+
+**288 tests pass** (286 → +2 dialog e2e).
+
+### Next (v1.8.5)
+
+Fix the `-мын` greedy-strip bug in `detect_statement_of_occupation`. Wire `{slot|features}` into 2–3 session-aware templates to demonstrate FST-aware case marking on session slots (e.g. `{city|locative}` instead of the literal `{city}-да`). Still option A — retrieved quote stays verbatim.
+
 ## [1.7.0] — 2026-04-20 — Deterministic retrieval ranking: overlap + purity + length + loanword penalty
 
 Minor release. `MorphemeIndex::rank` replaces "first matching posting" with a composite deterministic score. Dialog now ranks over **every content root** parsed from the user's input, not just the first noun — so a sentence mentioning both `бала` and `мектеп` outranks one that mentions only `бала` for the input «бала мектепке барды». This is where the retrieval engine starts behaving like a *search* engine rather than a bag dip.

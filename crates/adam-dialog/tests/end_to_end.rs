@@ -1057,3 +1057,91 @@ fn unknown_without_index_falls_back_to_noun_echo() {
         "no index attached → no evidence quote, got: {out:?}"
     );
 }
+
+/// v1.8.0: when the user has told us their name AND retrieval has a
+/// sample for the topic, at least ONE seed should pick a session-aware
+/// template that personalises the citation (mentions the name).
+/// The evidence itself stays verbatim — only the frame composes.
+#[test]
+fn unknown_with_session_and_evidence_personalises_frame() {
+    use adam_retrieval::MorphemeIndex;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let index_path = "../../data/retrieval/morpheme_index.json";
+    if !std::path::Path::new(index_path).exists() {
+        eprintln!("morpheme index not present, skipping");
+        return;
+    }
+    let raw = std::fs::read_to_string(index_path).expect("read index");
+    let mut index: MorphemeIndex = serde_json::from_str(&raw).expect("parse index");
+    index.refresh_stats();
+
+    let mut conv = Conversation::new().with_morpheme_index(index);
+    // Establish session: name → Дәулет.
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+
+    // Across several seeds, at least one Unknown response should
+    // personalise with the name.
+    let mut saw_personalised = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, seed);
+        assert!(
+            !out.contains("{"),
+            "unfilled slot leaked at seed={seed}: {out:?}"
+        );
+        // Guillemets confirm the evidence path fired (not the noun-echo
+        // path); name presence confirms the frame was personalised.
+        if out.contains("Дәулет") && out.contains("«") {
+            saw_personalised = true;
+        }
+    }
+    assert!(
+        saw_personalised,
+        "expected at least one seed to produce a session-aware evidence response mentioning the name"
+    );
+}
+
+/// v1.8.0: with BOTH name and city in the session, at least one
+/// template combining both should activate for an Unknown + evidence
+/// turn. Verifies the {name} + {city} + {example} combination is reachable.
+#[test]
+fn unknown_with_session_name_and_city_can_use_combined_frame() {
+    use adam_retrieval::MorphemeIndex;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let index_path = "../../data/retrieval/morpheme_index.json";
+    if !std::path::Path::new(index_path).exists() {
+        eprintln!("morpheme index not present, skipping");
+        return;
+    }
+    let raw = std::fs::read_to_string(index_path).expect("read index");
+    let mut index: MorphemeIndex = serde_json::from_str(&raw).expect("parse index");
+    index.refresh_stats();
+
+    let mut conv = Conversation::new().with_morpheme_index(index);
+    // Populate session directly — the "мен Алматыдамын" path has a
+    // pre-existing semantic bug (the occupation recogniser greedy-strips
+    // -мын), unrelated to v1.8.0's template layer.
+    conv.session.insert("name".into(), "Дәулет".into());
+    conv.session.insert("city".into(), "Алматы".into());
+
+    let mut saw_name_and_city = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, seed);
+        assert!(
+            !out.contains("{"),
+            "unfilled slot leaked at seed={seed}: {out:?}"
+        );
+        if out.contains("Дәулет") && out.contains("Алматы") && out.contains("«") {
+            saw_name_and_city = true;
+        }
+    }
+    assert!(
+        saw_name_and_city,
+        "expected at least one seed to produce a response combining name + city + evidence"
+    );
+}
