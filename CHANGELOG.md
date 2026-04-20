@@ -7,6 +7,47 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.4.5] — 2026-04-19 — Lexicon polish: +20 modern Kazakh nouns
+
+Patch release. Expands the curated Lexicon with modern professional nouns and common conversational vocabulary — all native Kazakh formations, no Russian loanwords (per the `project_corpus_purity_directive` and `project_kazakh_only_directive` memories).
+
+### Added roots (+20)
+
+**Professions** (agent `-шы` formations and older native forms):
+- `нұсқаушы` (instructor), `кеңесші` (consultant), `жетекші` (leader),
+- `қызметкер` (employee), `құрылысшы` (builder), `сатушы` (seller),
+- `тергеуші` (investigator), `қорғаушы` (defender/lawyer), `басшы` (boss),
+- `іскер` (businessman), `жүргізуші` (driver), `балықшы` (fisherman),
+- `аңшы` (hunter), `етікші` (shoemaker), `мергенші` (sharpshooter),
+- `жауынгер` (warrior), `оқытушы` (lecturer), `саудагер` (merchant),
+- `тәрбиеші` (tutor/educator)
+
+**Common nouns** (conversation-relevant):
+- `мекеме` (institution), `кеңсе` (office), `ұйым` (organisation),
+- `жүрек` (heart), `әке` (father), `аға` (elder brother), `іні` (younger brother),
+- `апа` (elder sister), `қарындас` (younger sister),
+- `кеше` (yesterday), `бүгін` (today), `ертең` (tomorrow), `таңертең` (morning)
+
+Total Lexicon: **4,516 entries** (was 4,496 in v1.4.0).
+
+### Verified round-trip
+
+Each new occupation round-trips through the FST-NER path from v1.4.0:
+
+```
+$ adam_chat
+> мен жүргізушімін   → сіз жүргізуші екенсіз
+> мен саудагермін    → саудагерлер — қажетті мамандық
+> мен нұсқаушымын    → сіз нұсқаушы екенсіз
+> мен сатушымын      → сіз сатушы екенсіз
+```
+
+Parser → predicate=P1Sg → POS-filter accepts → `occupation` slot filled → template plural / dative FST synthesis.
+
+### Tests
+
+Workspace: **262 passing**, 4 ignored, 0 failing. Foundation CI green. No new test cases — the v1.4.0 FST-NER tests already cover the general mechanism; these new roots are data-only expansion.
+
 ## [1.4.0] — 2026-04-19 — FST-NER refactor + DST + predicate-copula morphology
 
 Minor release. Four connected pieces of work that together address the external-reviewer critiques from v1.3.5 and lay groundwork for v1.6.0+ retrieval engine.
