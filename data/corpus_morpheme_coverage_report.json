@@ -1,0 +1,730 @@
+{
+  "version": "1.5.0",
+  "lexicon_roots": 14247,
+  "min_root_len": 3,
+  "total_words": 3844204,
+  "covered_words": 3055199,
+  "overall_coverage": 0.7947546,
+  "packs": [
+    {
+      "pack": "tatoeba_kazakh_pack.json",
+      "total_words": 23245,
+      "unique_words": 9628,
+      "covered_words": 18562,
+      "coverage_ratio": 0.7985373,
+      "uncovered_unique": 4683,
+      "top_uncovered": [
+        {
+          "word": "оның",
+          "count": 113
+        },
+        {
+          "word": "маған",
+          "count": 97
+        },
+        {
+          "word": "деп",
+          "count": 71
+        },
+        {
+          "word": "оны",
+          "count": 68
+        },
+        {
+          "word": "оған",
+          "count": 51
+        },
+        {
+          "word": "осы",
+          "count": 49
+        },
+        {
+          "word": "алды",
+          "count": 32
+        },
+        {
+          "word": "жатыр",
+          "count": 31
+        },
+        {
+          "word": "өтті",
+          "count": 28
+        },
+        {
+          "word": "қалды",
+          "count": 26
+        },
+        {
+          "word": "қол",
+          "count": 25
+        },
+        {
+          "word": "отыр",
+          "count": 24
+        },
+        {
+          "word": "алмаймын",
+          "count": 22
+        },
+        {
+          "word": "пен",
+          "count": 22
+        },
+        {
+          "word": "алып",
+          "count": 19
+        },
+        {
+          "word": "бастады",
+          "count": 19
+        },
+        {
+          "word": "бойы",
+          "count": 19
+        },
+        {
+          "word": "елдің",
+          "count": 17
+        },
+        {
+          "word": "үйде",
+          "count": 17
+        },
+        {
+          "word": "аламын",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "pack": "wikipedia_kz_pack.json",
+      "total_words": 1683182,
+      "unique_words": 173857,
+      "covered_words": 1294175,
+      "coverage_ratio": 0.76888597,
+      "uncovered_unique": 389007,
+      "top_uncovered": [
+        {
+          "word": "оның",
+          "count": 6746
+        },
+        {
+          "word": "деп",
+          "count": 5441
+        },
+        {
+          "word": "осы",
+          "count": 3960
+        },
+        {
+          "word": "сол",
+          "count": 3106
+        },
+        {
+          "word": "деген",
+          "count": 2926
+        },
+        {
+          "word": "орналасқан",
+          "count": 2494
+        },
+        {
+          "word": "пен",
+          "count": 2438
+        },
+        {
+          "word": "байланысты",
+          "count": 2216
+        },
+        {
+          "word": "оны",
+          "count": 2193
+        },
+        {
+          "word": "пайда",
+          "count": 2093
+        },
+        {
+          "word": "алып",
+          "count": 2061
+        },
+        {
+          "word": "алғашқы",
+          "count": 1743
+        },
+        {
+          "word": "орта",
+          "count": 1739
+        },
+        {
+          "word": "бас",
+          "count": 1657
+        },
+        {
+          "word": "облысы",
+          "count": 1549
+        },
+        {
+          "word": "оңтүстік",
+          "count": 1515
+        },
+        {
+          "word": "алады",
+          "count": 1439
+        },
+        {
+          "word": "батыс",
+          "count": 1433
+        },
+        {
+          "word": "орталық",
+          "count": 1420
+        },
+        {
+          "word": "оған",
+          "count": 1408
+        }
+      ]
+    },
+    {
+      "pack": "common_voice_kk_pack.json",
+      "total_words": 34403,
+      "unique_words": 10494,
+      "covered_words": 27704,
+      "coverage_ratio": 0.8052786,
+      "uncovered_unique": 6699,
+      "top_uncovered": [
+        {
+          "word": "сөз",
+          "count": 128
+        },
+        {
+          "word": "мал",
+          "count": 115
+        },
+        {
+          "word": "деп",
+          "count": 80
+        },
+        {
+          "word": "қыз",
+          "count": 79
+        },
+        {
+          "word": "жау",
+          "count": 76
+        },
+        {
+          "word": "бай",
+          "count": 61
+        },
+        {
+          "word": "батыр",
+          "count": 53
+        },
+        {
+          "word": "ердің",
+          "count": 52
+        },
+        {
+          "word": "ісі",
+          "count": 52
+        },
+        {
+          "word": "басы",
+          "count": 47
+        },
+        {
+          "word": "деме",
+          "count": 46
+        },
+        {
+          "word": "деген",
+          "count": 44
+        },
+        {
+          "word": "бас",
+          "count": 41
+        },
+        {
+          "word": "алған",
+          "count": 40
+        },
+        {
+          "word": "жат",
+          "count": 40
+        },
+        {
+          "word": "шығады",
+          "count": 37
+        },
+        {
+          "word": "алады",
+          "count": 34
+        },
+        {
+          "word": "елдің",
+          "count": 33
+        },
+        {
+          "word": "атқа",
+          "count": 32
+        },
+        {
+          "word": "дейді",
+          "count": 32
+        }
+      ]
+    },
+    {
+      "pack": "cc100_kk_pack.json",
+      "total_words": 1684920,
+      "unique_words": 141243,
+      "covered_words": 1301772,
+      "coverage_ratio": 0.77260166,
+      "uncovered_unique": 383148,
+      "top_uncovered": [
+        {
+          "word": "деп",
+          "count": 5470
+        },
+        {
+          "word": "осы",
+          "count": 4260
+        },
+        {
+          "word": "оның",
+          "count": 4038
+        },
+        {
+          "word": "деген",
+          "count": 2999
+        },
+        {
+          "word": "республикасының",
+          "count": 2944
+        },
+        {
+          "word": "облысы",
+          "count": 2587
+        },
+        {
+          "word": "бас",
+          "count": 2478
+        },
+        {
+          "word": "республикасы",
+          "count": 2095
+        },
+        {
+          "word": "өтті",
+          "count": 2067
+        },
+        {
+          "word": "басты",
+          "count": 1983
+        },
+        {
+          "word": "алу",
+          "count": 1912
+        },
+        {
+          "word": "пен",
+          "count": 1881
+        },
+        {
+          "word": "орта",
+          "count": 1872
+        },
+        {
+          "word": "байланысты",
+          "count": 1862
+        },
+        {
+          "word": "облыстық",
+          "count": 1706
+        },
+        {
+          "word": "дамыту",
+          "count": 1683
+        },
+        {
+          "word": "сол",
+          "count": 1596
+        },
+        {
+          "word": "алып",
+          "count": 1584
+        },
+        {
+          "word": "оны",
+          "count": 1571
+        },
+        {
+          "word": "облысының",
+          "count": 1551
+        }
+      ]
+    },
+    {
+      "pack": "abai_wikisource_pack.json",
+      "total_words": 18935,
+      "unique_words": 8114,
+      "covered_words": 14413,
+      "coverage_ratio": 0.761183,
+      "uncovered_unique": 4522,
+      "top_uncovered": [
+        {
+          "word": "деп",
+          "count": 201
+        },
+        {
+          "word": "сөз",
+          "count": 72
+        },
+        {
+          "word": "алмай",
+          "count": 62
+        },
+        {
+          "word": "сол",
+          "count": 57
+        },
+        {
+          "word": "мал",
+          "count": 54
+        },
+        {
+          "word": "боп",
+          "count": 42
+        },
+        {
+          "word": "алып",
+          "count": 41
+        },
+        {
+          "word": "алды",
+          "count": 36
+        },
+        {
+          "word": "дағы",
+          "count": 34
+        },
+        {
+          "word": "бай",
+          "count": 31
+        },
+        {
+          "word": "деген",
+          "count": 29
+        },
+        {
+          "word": "осы",
+          "count": 29
+        },
+        {
+          "word": "қыз",
+          "count": 28
+        },
+        {
+          "word": "салды",
+          "count": 27
+        },
+        {
+          "word": "қалды",
+          "count": 25
+        },
+        {
+          "word": "сонда",
+          "count": 24
+        },
+        {
+          "word": "пен",
+          "count": 23
+        },
+        {
+          "word": "бас",
+          "count": 22
+        },
+        {
+          "word": "пайда",
+          "count": 21
+        },
+        {
+          "word": "жау",
+          "count": 20
+        }
+      ]
+    },
+    {
+      "pack": "kazakh_proverbs_pack.json",
+      "total_words": 319,
+      "unique_words": 230,
+      "covered_words": 272,
+      "coverage_ratio": 0.8526646,
+      "uncovered_unique": 47,
+      "top_uncovered": [
+        {
+          "word": "сөз",
+          "count": 5
+        },
+        {
+          "word": "байлық",
+          "count": 2
+        },
+        {
+          "word": "бастауы",
+          "count": 2
+        },
+        {
+          "word": "басы",
+          "count": 2
+        },
+        {
+          "word": "денсаулық",
+          "count": 2
+        },
+        {
+          "word": "озар",
+          "count": 2
+        },
+        {
+          "word": "оттан",
+          "count": 2
+        },
+        {
+          "word": "ісі",
+          "count": 2
+        },
+        {
+          "word": "азығы",
+          "count": 1
+        },
+        {
+          "word": "алады",
+          "count": 1
+        },
+        {
+          "word": "байлығы",
+          "count": 1
+        },
+        {
+          "word": "байлықтың",
+          "count": 1
+        },
+        {
+          "word": "бастаған",
+          "count": 1
+        },
+        {
+          "word": "бақ",
+          "count": 1
+        },
+        {
+          "word": "дастархан",
+          "count": 1
+        },
+        {
+          "word": "елдей",
+          "count": 1
+        },
+        {
+          "word": "елдікке",
+          "count": 1
+        },
+        {
+          "word": "елдің",
+          "count": 1
+        },
+        {
+          "word": "жау",
+          "count": 1
+        },
+        {
+          "word": "жеткен",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "pack": "synthetic_sentences_pack.json",
+      "total_words": 398307,
+      "unique_words": 15866,
+      "covered_words": 397573,
+      "coverage_ratio": 0.9981572,
+      "uncovered_unique": 734,
+      "top_uncovered": [
+        {
+          "word": "алады",
+          "count": 198
+        },
+        {
+          "word": "ашады",
+          "count": 194
+        },
+        {
+          "word": "ашты",
+          "count": 136
+        },
+        {
+          "word": "алды",
+          "count": 123
+        },
+        {
+          "word": "істі",
+          "count": 16
+        },
+        {
+          "word": "елді",
+          "count": 15
+        },
+        {
+          "word": "елде",
+          "count": 8
+        },
+        {
+          "word": "істе",
+          "count": 7
+        },
+        {
+          "word": "істің",
+          "count": 5
+        },
+        {
+          "word": "ашамыз",
+          "count": 4
+        },
+        {
+          "word": "ашасыз",
+          "count": 4
+        },
+        {
+          "word": "іске",
+          "count": 4
+        },
+        {
+          "word": "істен",
+          "count": 4
+        },
+        {
+          "word": "елдің",
+          "count": 3
+        },
+        {
+          "word": "ашасың",
+          "count": 2
+        },
+        {
+          "word": "елден",
+          "count": 2
+        },
+        {
+          "word": "елдер",
+          "count": 2
+        },
+        {
+          "word": "аламыз",
+          "count": 1
+        },
+        {
+          "word": "аламын",
+          "count": 1
+        },
+        {
+          "word": "аласыз",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "pack": "kazakh_classics_pack.json",
+      "total_words": 893,
+      "unique_words": 689,
+      "covered_words": 728,
+      "coverage_ratio": 0.81522954,
+      "uncovered_unique": 165,
+      "top_uncovered": [
+        {
+          "word": "деп",
+          "count": 8
+        },
+        {
+          "word": "мал",
+          "count": 4
+        },
+        {
+          "word": "алуан-алуан",
+          "count": 3
+        },
+        {
+          "word": "деген",
+          "count": 3
+        },
+        {
+          "word": "аларсың",
+          "count": 2
+        },
+        {
+          "word": "алушы",
+          "count": 2
+        },
+        {
+          "word": "алып",
+          "count": 2
+        },
+        {
+          "word": "байлығы",
+          "count": 2
+        },
+        {
+          "word": "бас",
+          "count": 2
+        },
+        {
+          "word": "басып",
+          "count": 2
+        },
+        {
+          "word": "батыр",
+          "count": 2
+        },
+        {
+          "word": "бен",
+          "count": 2
+        },
+        {
+          "word": "жай",
+          "count": 2
+        },
+        {
+          "word": "кеш",
+          "count": 2
+        },
+        {
+          "word": "оянған",
+          "count": 2
+        },
+        {
+          "word": "сай",
+          "count": 2
+        },
+        {
+          "word": "қаз",
+          "count": 2
+        },
+        {
+          "word": "қырда",
+          "count": 2
+        },
+        {
+          "word": "азған",
+          "count": 1
+        },
+        {
+          "word": "айуан",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.5.5] — 2026-04-20 — Morpheme-coverage audit: 79.48 % Lexicon prefix-match over 3.84 M words
+
+Patch release. Adds `morpheme_coverage` — a fast prefix-match audit that measures what fraction of corpus words begin with a known Lexicon root. This is the first diagnostic for the v1.6.0+ retrieval engine: it tells us concretely *where* the Lexicon misses and gives every future Lexicon PR a measurable coverage delta.
+
+### Scope pivot
+
+v1.5.5 was originally planned as "government Kazakh sources" (akorda.kz, egov.kz, bnews.kz) to close the last 1.3× gap to 100 M local words. The planned sources turned out to need scraping infrastructure that is out of scope for a patch release, so v1.5.5 instead delivers the **measurement** tool that will drive the Lexicon/corpus expansion once a reliable source pipeline exists. The 100 M-word directive is not abandoned — it moves to v1.6.x.
+
+### Added: `morpheme_coverage` binary
+
+- Walks every committed pack listed in `corpus_audit`'s `SOURCE_PACKS`.
+- Loads curated + Apertium roots (14,247 roots at ≥ 3 chars, the false-positive guard).
+- For each word: true if any prefix (≥ 3 chars) matches a lexicon root.
+- Per-pack report: total words, covered words, coverage ratio, top 20 uncovered words by frequency.
+- Output: `data/corpus_morpheme_coverage_report.json`.
+- 5 unit tests covering prefix-match + normalisation semantics.
+
+Prefix match is a **lower bound** on true FST parse coverage — it says nothing about whether suffixes are valid, only whether the root side is recognised. A full FST parse of 3.84 M words would require ~2 trillion synth calls at ~600 k per parse; the prefix audit runs in seconds and gives an honest ceiling.
+
+### Coverage baseline (v1.5.5)
+
+| Pack | Words | Coverage |
+|---|---:|---:|
+| `tatoeba_kazakh_pack.json` | 23 245 | 79.85 % |
+| `wikipedia_kz_pack.json` | 1 683 182 | 76.89 % |
+| `common_voice_kk_pack.json` | 34 403 | 80.53 % |
+| `cc100_kk_pack.json` | 1 684 920 | 77.26 % |
+| `abai_wikisource_pack.json` | 18 935 | 76.12 % |
+| `kazakh_proverbs_pack.json` | 319 | 85.27 % |
+| `synthetic_sentences_pack.json` | 398 307 | **99.82 %** (synth uses Lexicon) |
+| `kazakh_classics_pack.json` | 893 | 81.52 % |
+| **Overall** | **3 844 204** | **79.48 %** |
+
+### Top uncovered words — concrete Lexicon candidates
+
+The report names the most-frequent unmatched words across CC-100 — closed-class items not yet in the Lexicon that every future Lexicon PR can remove from this list:
+
+- `деп` — quotative particle
+- `осы` — proximal demonstrative (closed-class)
+- `оның` — genitive of `ол` (closed-class pronoun case form)
+- `деген` — participle of `де-` ("say / that which is said"), no derivation chain yet
+- `республикасының`, `облысы`, `республикасы`, `облыстық` — proper-noun state/region terms
+- `пен` — postposition "with / and" (closed-class)
+- `орта`, `бас`, `алу` — high-frequency common nouns/infinitives
+
+### Workspace tests
+
+- **267 tests pass** (was 262; +5 from the new binary's unit tests).
+
 ## [1.5.0] — 2026-04-20 — CC-100 re-extract: corpus local → 77.9 M words (gap 1.3×)
 
 Minor release. Rewrites the CC-100 Kazakh processor along the same lines as v1.3.0 Wikipedia — **chunked streaming + loanword-density filter + sharding** — and unleashes it against the full `cc100_kk.txt.xz` (≈ 5 GB decompressed) that previously had a hard 50 k-sample cap.
