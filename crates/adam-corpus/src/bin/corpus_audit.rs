@@ -129,8 +129,7 @@ fn main() -> ExitCode {
                 .map(|e| e.path())
                 .filter(|p| {
                     p.file_name().and_then(|n| n.to_str()).is_some_and(|s| {
-                        (s.starts_with("wikipedia_kz_shard_")
-                            || s.starts_with("cc100_kk_shard_"))
+                        (s.starts_with("wikipedia_kz_shard_") || s.starts_with("cc100_kk_shard_"))
                             && s.ends_with(".json")
                     })
                 })
