@@ -1,36 +1,37 @@
-//! `adam-chat` — interactive REPL for the adam v1.1.0 Kazakh dialog
-//! pipeline.
+//! `adam-chat` — interactive REPL for the adam v2.0 Kazakh dialog pipeline.
 //!
-//! **Kazakh-only surface (v1.1.0).** Input and output are both Kazakh.
-//! The v0.9.6 multilingual recogniser (Russian / English triggers) and
-//! the v0.9.8 Latin→Cyrillic transliteration were reverted per the
-//! Kazakh-first directive. The roadmap commits to a real Kazakh LM
-//! trained on a 100 M+ token corpus as the Unknown-intent fallback in
-//! v2.0; multilingual / multimodal work is deferred until that ships.
+//! **Kazakh-only surface** (v1.1.0 revert). Input and output are both Kazakh.
 //!
-//! Capabilities:
-//!   - 26 intents (25 conversational + Insult for polite
-//!     non-engagement), all Kazakh-triggered.
-//!   - Kazakh-only output, FST-guaranteed morphology.
-//!   - Multi-turn session state (`Conversation`): `name`, `age`,
-//!     `city`, `occupation` persist across turns.
-//!   - `{slot|features}` template expansion with case / number /
-//!     derivation / possessive feature tokens.
-//!   - Smart Unknown handler — when no intent matches, the parser
-//!     extracts a noun hint and the fallback response acknowledges
-//!     the topic: "ах, {noun} туралы айтасыз ба".
+//! Capabilities at v2.0:
 //!
-//! See `docs/kazakh_grammar/07_dialog_architecture.md` for the full
-//! architectural commitment.
+//!   - **26 intents** — 25 conversational + Insult for polite non-engagement.
+//!   - **Multi-turn session state** (`Conversation`): `name`, `age`, `city`,
+//!     `occupation` persist across turns, feeding downstream templates.
+//!   - **`{slot|features}` FST templates** with case / number / derivation /
+//!     possessive feature tokens — no morphologically invalid form ever
+//!     leaves the system.
+//!   - **Retrieval fallback** (v1.6.0+) — when no intent matches, we rank
+//!     the committed morpheme index by **overlap + pack_purity + length +
+//!     loanword-density** and cite the top-1 sample verbatim with
+//!     provenance.
+//!   - **Session-aware framing** (v1.8.0) — when session has entities, the
+//!     template wrapping the citation personalises automatically via
+//!     `template_is_fillable`.
+//!   - **Opt-in city composition** (v1.9.0, `--compose`) — rewrites city
+//!     mentions inside retrieved quotes to the user's session city via
+//!     FST feature-preserving synthesis. Biographical-year guarded.
+//!   - **Adaptation marker** (v1.9.5) — when a swap happened, the response
+//!     frame contains the «бейімд-» stem so the user can always distinguish
+//!     a verbatim corpus quote from an adapted one.
+//!
+//! Architecture reference: [`docs/architecture_v2.md`](../../../docs/architecture_v2.md).
 //!
 //! Usage:
-//!   adam_chat                — interactive REPL on stdin
-//!   adam_chat --once "сәлем" — single-shot, print response + trace
-//!   adam_chat --trace        — REPL with full Layer 1..5 trace per turn
-//!
-//! The REPL holds a single [`Conversation`] for the whole session, so
-//! the user's name (once said) persists across turns: subsequent
-//! greetings personalise automatically.
+//!   adam_chat                    — REPL with retrieval on
+//!   adam_chat --once "сәлем"     — single-shot, print response (+ trace)
+//!   adam_chat --trace            — REPL with full per-turn trace
+//!   adam_chat --no-retrieval     — skip retrieval (v1.1.0 behaviour)
+//!   adam_chat --compose          — opt into InSampleCitySwap composition
 
 use std::{
     io::{self, BufRead, Write},
@@ -38,14 +39,19 @@ use std::{
 };
 
 use adam_dialog::{
-    Conversation, TemplateRepository, interpret_text_with_lexicon, plan_response_with_session,
-    realise,
+    ComposeMode, Conversation, TemplateRepository, interpret_text_with_lexicon,
+    plan_response_with_session, realise,
 };
 use adam_kernel_fst::lexicon::LexiconV1;
+use adam_retrieval::MorphemeIndex;
+
+const RETRIEVAL_INDEX_PATH: &str = "data/retrieval/morpheme_index.json";
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().collect();
     let trace = args.iter().any(|a| a == "--trace");
+    let no_retrieval = args.iter().any(|a| a == "--no-retrieval");
+    let compose = args.iter().any(|a| a == "--compose");
 
     let lex = match LexiconV1::load_default() {
         Ok(l) => l,
@@ -69,9 +75,42 @@ fn main() -> ExitCode {
         }
     };
 
+    // v2.0: load the committed morpheme index by default. Skip on
+    // --no-retrieval (for v1.1.0-style behaviour) or when the file is
+    // absent (e.g. running in a trimmed CI checkout).
+    let index = if no_retrieval {
+        None
+    } else {
+        match load_retrieval_index() {
+            Some(idx) => {
+                eprintln!(
+                    "adam-chat: retrieval on — {} morphemes, {} postings, {} indexed samples",
+                    idx.unique_morphemes, idx.total_postings, idx.samples_indexed
+                );
+                Some(idx)
+            }
+            None => {
+                eprintln!(
+                    "adam-chat: retrieval index not found at {RETRIEVAL_INDEX_PATH} — falling back to v1.1.0 noun-echo"
+                );
+                None
+            }
+        }
+    };
+
+    let mut conv = Conversation::new();
+    if let Some(idx) = index {
+        conv = conv.with_morpheme_index(idx);
+    }
+    if compose {
+        conv = conv.with_compose_mode(ComposeMode::InSampleCitySwap);
+        eprintln!(
+            "adam-chat: compose mode = InSampleCitySwap (v1.9.0 opt-in; adapted quotes marked with «бейімд-»)"
+        );
+    }
+
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
-            let mut conv = Conversation::new();
             run_turn(&mut conv, input, &lex, &repo, trace, turn_seed(0));
             return ExitCode::SUCCESS;
         } else {
@@ -80,10 +119,9 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!("adam-chat v1.1.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
+    eprintln!("adam-chat v2.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
     let stdin = io::stdin();
     let stdout = io::stdout();
-    let mut conv = Conversation::new();
     let mut turn = 0u64;
     for line in stdin.lock().lines() {
         let Ok(line) = line else { break };
@@ -99,6 +137,13 @@ fn main() -> ExitCode {
     ExitCode::SUCCESS
 }
 
+fn load_retrieval_index() -> Option<MorphemeIndex> {
+    let raw = std::fs::read_to_string(RETRIEVAL_INDEX_PATH).ok()?;
+    let mut idx: MorphemeIndex = serde_json::from_str(&raw).ok()?;
+    idx.refresh_stats();
+    Some(idx)
+}
+
 fn run_turn(
     conv: &mut Conversation,
     input: &str,
@@ -109,7 +154,8 @@ fn run_turn(
 ) {
     if trace {
         // Trace mode has to duplicate Conversation::turn so we can
-        // surface intermediate state. Functionally identical.
+        // surface intermediate state. Functionally identical up to the
+        // retrieval/compose injection (which only fires inside turn()).
         let parses: Vec<_> = input
             .split_whitespace()
             .flat_map(|t| {
@@ -124,8 +170,6 @@ fn run_turn(
             })
             .collect();
         let intent = interpret_text_with_lexicon(input, &parses, Some(lex));
-        // Fold entities BEFORE planning so "менің атым X" immediately
-        // allows the very same turn's response to reference {name}.
         absorb_into(conv, &intent);
         let plan = plan_response_with_session(&intent, seed, repo, &conv.session);
         let out = realise(&plan);
@@ -143,9 +187,6 @@ fn run_turn(
     }
 }
 
-/// Mirror of `Conversation::absorb_entities` for the --trace path
-/// (external binary can't call pub(crate)). Keep in lockstep with the
-/// in-crate version when adding new entity types.
 fn absorb_into(conv: &mut Conversation, intent: &adam_dialog::Intent) {
     use adam_dialog::Intent;
     match intent {
@@ -167,10 +208,7 @@ fn absorb_into(conv: &mut Conversation, intent: &adam_dialog::Intent) {
     }
 }
 
-/// Seed derivation from a turn number. Keeps the chat reproducible if
-/// someone wants to replay a specific session.
 fn turn_seed(turn: u64) -> u64 {
-    // xorshift-style mix so consecutive turns pick diverse templates.
     let mut s = turn.wrapping_mul(0x9E3779B97F4A7C15);
     s ^= s >> 33;
     s = s.wrapping_mul(0xFF51AFD7ED558CCD);

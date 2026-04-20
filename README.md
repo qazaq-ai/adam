@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.9.5-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-2.0.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -29,32 +29,67 @@
 
 ---
 
-## What is adam?
+## Why adam
 
-`adam` is a **predictable, auditable Kazakh dialog system**, built **entirely in Rust**. Every output is produced by a five-layer pipeline you can trace end-to-end:
+A different kind of AI system — one that trades **generalisation for integrity**.
 
-```
-  input ─▶ parser ─▶ semantics ─▶ planner ─▶ realiser ─▶ FST synth ─▶ output
-          (Layer 1) (Layer 2)   (Layer 3)   (Layer 4)   (Layer 5)
-```
+| | adam (v2.0) | mainstream LLM |
+|---|---|---|
+| Outputs | template + verbatim corpus quote + FST synthesis | probabilistic token generation |
+| Hallucinations | **0** (by construction) | non-zero, non-auditable |
+| Determinism | byte-identical across runs for same `(input, session, seed)` | temperature-dependent |
+| Provenance | every response traces to `(pack, sample_id)` + template id | ~no provenance for free-form output |
+| Inference cost | ms, CPU-only, laptop-grade | dollars, GPU, datacentre |
+| Language coverage | Kazakh only | many, but shallow for low-resource |
+| Knowledge depth | bounded by what's in the curated corpus | broad, but fabricated edges |
+| Self-improvement | ships by commit, reviewed by humans | parametric updates through training |
 
-No transformer. No embeddings. No probabilistic generation. For any input, a developer can dump every layer's state and audit why the model chose what it said. The only source of non-determinism is a seed-modulo pick across ≤ 5 interchangeable response templates per intent.
+adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, and fully traceable** — the four properties that matter when a Kazakh-speaking user, a regulator, or an investor asks *"why did you say that?"* and we must be able to answer at the `(pack, sample_id)` level.
 
 The name *adam* (Kazakh: **адам**) means "human".
+
+## What is adam?
+
+A **predictable, auditable Kazakh dialog system**, built **entirely in Rust**. Every output is produced by a five-layer pipeline you can trace end-to-end:
+
+```
+  input ─▶ parser ─▶ semantics ─▶ [ retrieval + compose ] ─▶ planner ─▶ realiser ─▶ FST synth ─▶ output
+          (Layer 1) (Layer 2)       (Layer 2.5–2.75)       (Layer 3)   (Layer 4)   (Layer 5)
+```
+
+No transformer. No embeddings. No probabilistic generation. For any input, a developer can dump every layer's state and audit why the model chose what it said.
 
 **Design principles:**
 
 - **Predictable** — every stage is deterministic or samples from a finite, inspectable set.
-- **Auditable** — `adam_chat --trace` dumps every layer per turn.
-- **Grammatically correct by construction on the slot path** — `{slot|features}` placeholders go through the FST synthesiser, so no morphologically invalid inflected form can leave the system. Literal template text (e.g. `"сәлем"`, `"қайырлы таң"`) is pre-verified Kazakh in `data/dialog/templates/v1.toml`, audited offline.
+- **Auditable** — `adam_chat --trace` dumps every layer per turn; every corpus citation names its `(pack, sample_id)`.
+- **Grammatically correct by construction** on the slot path — `{slot|features}` placeholders go through the FST synthesiser, so no morphologically invalid inflected form can leave the system.
+- **Hallucination-free by default** — the retrieved quote is byte-identical to the corpus. Adaptation (`ComposeMode::InSampleCitySwap`) is opt-in and every adapted response is explicitly marked with «бейімд-» so the user always knows.
 - **Small** — runs on a MacBook Air M2 8 GB. No GPU.
-- **Kazakh-native** — built on a 14 k-entry curated pre-modern Kazakh Lexicon (no Russian-era loanwords), not translated from English.
+- **Kazakh-native** — built on a 14 k-entry curated pre-modern Kazakh Lexicon and a 77.9 M-word local corpus, not translated from English.
+
+See [**`docs/architecture_v2.md`**](docs/architecture_v2.md) for the single canonical architecture reference.
 
 ## Demo
 
+### Scripted 15-turn walkthrough
+
+The fastest way to see adam end-to-end. Fully deterministic, safe to record for a presentation.
+
+```
+$ cargo run --release -p adam-dialog --bin adam_demo
+```
+
+Three parts:
+- **Part 1** — all 12 canonical turns with retrieval on, `ComposeMode::Verbatim` (default v2.0). Every cited quote is byte-identical to the corpus.
+- **Part 2** — same 12 turns with `ComposeMode::InSampleCitySwap`. On the real corpus, the safety guards refuse most swaps — this is the *safe case* (marker fires only when a swap actually happened).
+- **Part 3** — synthetic sample explicitly triggering the swap path, so the v1.9.5 «бейімд-» marker is visible in action.
+
+### Interactive REPL
+
 ```
 $ cargo run --release -p adam-dialog --bin adam_chat
-adam-chat v1.8.5 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
+adam-chat v2.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
 
 > сәлем
 сәлем

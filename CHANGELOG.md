@@ -7,6 +7,75 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.0.0] — 2026-04-20 — v2.0: commitment release, retrieval-as-v2.0, investor-demoable
+
+Major release. **Not a feature drop — an architectural commitment.**
+
+v2.0 freezes the answer to the question `project_retrieval_not_neural_v2` has been circling since v1.6.0:
+
+> **v2.0 is not a trained neural model. It is a deterministic retrieval + composition engine over a 77.9 M-word Kazakh corpus.**
+
+Everything functional is already in v1.9.5. v2.0 adds:
+
+### 1. Demo binaries
+
+- **`adam_chat` v2.0** — now auto-loads the committed morpheme index and enables retrieval by default. New flags:
+  - `--no-retrieval` — reproduces v1.1.0 noun-echo behaviour (regression reference).
+  - `--compose` — opts into `ComposeMode::InSampleCitySwap`. Banner prints the «бейімд-» marker policy so the user knows what to expect.
+- **`adam_demo` (new)** — scripted 15-turn end-to-end walkthrough. Three parts:
+  - Part 1: the full social + retrieval arc under `Verbatim`.
+  - Part 2: same script under `InSampleCitySwap` — most swaps refused by guards (the safe case).
+  - Part 3: synthetic sample explicitly triggering the swap path, so the v1.9.5 «бейімд-» marker is visible in action.
+  Fully deterministic. Re-runs print byte-identical output.
+
+### 2. Canonical architecture doc — `docs/architecture_v2.md`
+
+Single source of truth for the v2.0 pipeline. Diagrams the 5 layers + the 2.5/2.75 retrieval-injection sub-layers. Lists all three response paths and the guarantees each carries. Catalogues the determinism contract, safety guards, and trade-offs accepted. Points at every concern-to-file mapping for future contributors.
+
+### 3. README restructure
+
+Investor-facing **"Why adam"** comparison table lands first — explicit positioning against mainstream LLMs: 0 hallucinations vs non-zero, byte-identical determinism vs temperature-dependent, ms-on-CPU vs dollars-on-GPU, full provenance vs none. The rest of the README was already current at v1.9.5; v2.0 updates the banner version + demo section (`adam_demo` instructions + `adam_chat` flag reference).
+
+### 4. Commitment declarations
+
+Explicit in the README "Out of scope" and the architecture doc's "What v2.0 is NOT" section:
+
+- **Not a trained neural model.** No parameters. No embeddings. No PyTorch.
+- **Not multilingual.** Kazakh-only surface.
+- **Not generative.** Every token is from a template, a corpus sample, or FST synthesis.
+- **Not a generalist.** 26 intents + retrieval, honest «түсінбедім» outside.
+- **Not self-modifying.** Separate architectural direction if ever; not v2.x.
+
+### What v2.0 does NOT change
+
+- **No new crates.** All v2.0 work is binaries + docs on top of the v1.9.5 code surface.
+- **No new tests.** The 303 tests from v1.9.5 carry forward unchanged.
+- **No behaviour change at the library API.** `Conversation::turn` is bit-for-bit the same function. `MorphemeIndex` serialisation is unchanged. Embedders who upgrade see zero semantic diff.
+- **No index format change.** Existing `data/retrieval/morpheme_index.json` files are still valid.
+
+### Determinism audit (reaffirmed at v2.0)
+
+- FST synthesis is a pure function.
+- FST parse enumerates deterministically.
+- `MorphemeIndex::rank` ties on `(pack, sample_id)` lex order.
+- `compose_with_city` is a pure function; no RNG.
+- `inject_retrieval_example` does NOT consult `rng_seed`.
+- `adam_demo` re-runs print byte-identical output.
+
+Same `(input, session, seed)` → byte-identical response, across runs, machines, and time.
+
+### Workspace tests
+
+**303 passing** (unchanged from v1.9.5). The v2.0 binary additions are thin glue on top of already-tested library code.
+
+### Post-v2.0 directions (committed but not shipped)
+
+- **Option C** — pre-compute `(pattern, slot_types)` pairs at index-build time. Keeps runtime cheap; enables swap types beyond city.
+- **Kazakh technical corpus** — translate key chapters of the Rust Book into Kazakh as a new source pack. Doubles as educational material and corpus-vocabulary expansion.
+- **Diversity** — allow consecutive turns for the same query to cite different top-ranked samples. Current top-1 is deterministic by design.
+
+These are v2.x / v3.x work, not v2.0 scope.
+
 ## [1.9.5] — 2026-04-20 — Composition-marker framing (adapted-evidence template family)
 
 Patch release restoring the **traceability contract** broken in v1.9.0. When `ComposeMode::InSampleCitySwap` silently rewrote a quoted corpus line, the user saw the adapted text in «…» and could easily assume it was the original source. That's a trust violation — even if the swap was grammatically correct and semantically benign.
