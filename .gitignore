@@ -24,6 +24,13 @@ data/curated/adam_training_ids_pack.json
 # `cargo run --release -p adam-corpus --bin process_wikipedia_kz -- --full`.
 data/curated/shards/
 
+# Full morpheme index (v1.6.0+). Only the committed-limit snapshot
+# (data/retrieval/morpheme_index.json, built with --limit 500/pack)
+# lives in git; the full-corpus build balloons to ~700 MB and is
+# rebuildable via:
+#   cargo run --release -p adam-retrieval --bin build_morpheme_index -- --full
+data/retrieval/morpheme_index_full.json
+
 # Checkpoints (regeneratable via `bash scripts/run_train_baseline.sh`).
 # Each v0.4.0 checkpoint is ~92 MB. Distribute via release attachments if needed.
 data/training/*.safetensors

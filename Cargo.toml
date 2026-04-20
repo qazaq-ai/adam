@@ -6,12 +6,13 @@ members = [
   "crates/adam-tokenizer",
   "crates/adam-corpus",
   "crates/adam-eval",
+  "crates/adam-retrieval",
   "crates/adam-train",
 ]
 resolver = "2"
 
 [workspace.package]
-version = "1.5.5"
+version = "1.6.0"
 edition = "2024"
 license = "BUSL-1.1"
 

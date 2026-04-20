@@ -7,6 +7,42 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.6.0] — 2026-04-20 — Retrieval engine bootstrap: `adam-retrieval` crate + morpheme inverted index
+
+Minor release. First shipped component of the **v2.0 retrieval engine**. Unlike a probabilistic LM, retrieval is deterministic (given a morpheme bag + index, top-k is fully determined), traceable (every hit names the pack + sample id it came from), and cheap (a hash lookup + sorted-list intersection, not a matmul). See the `project_retrieval_not_neural_v2` memory for the architectural rationale.
+
+### New crate: `adam-retrieval`
+
+- `MorphemeIndex` — `BTreeMap<String, Vec<SampleRef>>`. BTreeMap (not HashMap) so the on-disk JSON form is deterministic: the same input always serialises byte-identical, making `git diff` of the committed index meaningful.
+- `SampleRef { pack, sample_id }` — every posting traces back to exactly one sentence in one committed pack.
+- API: `insert(morpheme, sref)` (idempotent, keeps postings sorted), `search(morpheme)`, `search_conjunction(&[morpheme])` (AND-search with shortest-list-first intersection), `refresh_stats` (for bulk loads).
+- **7 unit tests** covering idempotence, sorted invariants, conjunction intersections, and unknown-morpheme collapse.
+
+### New binary: `build_morpheme_index`
+
+Walks committed corpus packs, runs each unique word through the FST parser once (cached), indexes the sample under every root the parser emits. The per-word cache drops build time from ~75 minutes (one parse per word occurrence) to ~10 minutes full corpus / ~17 s for the committed snapshot.
+
+**Two modes** (the v1.3.5 / v1.5.0 sharding convention):
+
+- **default** — per-pack `--limit 500` cap. Writes to committed `data/retrieval/morpheme_index.json` (~1.6 MB). Runs in 17 s. Committed index ingests 3,191 samples → 3,082 distinct morphemes → 16,262 postings. This is the reference snapshot CI + integration tests consume.
+- **`--full`** — full committed corpus. Writes to `data/retrieval/morpheme_index_full.json` (gitignored; ~700 MB). Fuel for v1.7.0+ retrieval experiments.
+
+### FST-parser throughput measured
+
+Benchmark on the committed corpus: **1.155 ms / word** on a cold cache (single-threaded, M2). With the unique-word cache, a full build performs ~270 k parses instead of ~3.84 M — 14× savings.
+
+### Tests
+
+- **274 workspace tests pass** (267 → +7 for the new `adam-retrieval` crate).
+
+### What this release does NOT do (scope discipline)
+
+- No `Intent::Unknown` fallback integration yet — that is v1.6.5+.
+- No ranking / scoring — v1.7.0 work. Today `search` returns postings in deterministic sort order, which is good enough to build against.
+- No compositional synthesis (retrieve → splice → inflect) — v1.8.0+.
+
+The v1.6.0 bet: **ship the index as a first-class artifact**, so every subsequent release can measure itself against it concretely rather than against abstract targets.
+
 ## [1.5.5] — 2026-04-20 — Morpheme-coverage audit: 79.48 % Lexicon prefix-match over 3.84 M words
 
 Patch release. Adds `morpheme_coverage` — a fast prefix-match audit that measures what fraction of corpus words begin with a known Lexicon root. This is the first diagnostic for the v1.6.0+ retrieval engine: it tells us concretely *where* the Lexicon misses and gives every future Lexicon PR a measurable coverage delta.
