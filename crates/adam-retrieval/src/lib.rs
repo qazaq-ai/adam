@@ -23,6 +23,12 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
+/// Separator used to flatten `(pack, sample_id)` into the string key
+/// used by [`MorphemeIndex::sample_texts`]. Neither pack file names
+/// nor sample ids contain `::` in the current data, so this is safe
+/// and keeps the JSON form flat and diffable.
+const TEXT_KEY_SEP: &str = "::";
+
 /// A pointer to one sample in one committed pack.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct SampleRef {
@@ -30,6 +36,13 @@ pub struct SampleRef {
     pub pack: String,
     /// Stable id from the pack's `samples[].id` field.
     pub sample_id: String,
+}
+
+impl SampleRef {
+    /// Composite key for [`MorphemeIndex::sample_texts`].
+    pub fn text_key(&self) -> String {
+        format!("{}{}{}", self.pack, TEXT_KEY_SEP, self.sample_id)
+    }
 }
 
 /// Morpheme → sorted postings-list mapping.
@@ -51,6 +64,13 @@ pub struct MorphemeIndex {
     /// morpheme → sorted unique list of sample refs containing a word
     /// whose FST analysis yielded this morpheme as its root.
     pub postings: BTreeMap<String, Vec<SampleRef>>,
+    /// `SampleRef::text_key()` → original sample text. Populated by the
+    /// index builder so downstream consumers (v1.6.5 dialog integration)
+    /// can cite the actual sentence without round-tripping through the
+    /// source packs. Default: empty for older indices that pre-date this
+    /// field; [`sample_text`](Self::sample_text) returns `None`.
+    #[serde(default)]
+    pub sample_texts: BTreeMap<String, String>,
 }
 
 impl MorphemeIndex {
@@ -108,6 +128,21 @@ impl MorphemeIndex {
             .filter(|s| rest_sets.iter().all(|set| set.contains(s)))
             .cloned()
             .collect()
+    }
+
+    /// Record the original text of `sref`'s sample. Idempotent —
+    /// re-inserting the same text is a no-op. Last write wins if two
+    /// calls disagree on the text, which shouldn't happen in practice
+    /// (sample ids are stable per pack).
+    pub fn remember_text(&mut self, sref: &SampleRef, text: impl Into<String>) {
+        self.sample_texts.insert(sref.text_key(), text.into());
+    }
+
+    /// Original text of the sample, if the index was built with texts.
+    /// Returns `None` for indices predating v1.6.5 or for refs whose
+    /// text was not included.
+    pub fn sample_text(&self, sref: &SampleRef) -> Option<&str> {
+        self.sample_texts.get(&sref.text_key()).map(|s| s.as_str())
     }
 
     /// Refresh the derived counts after direct mutation of `postings`
@@ -189,6 +224,29 @@ mod tests {
         let mut idx = MorphemeIndex::new();
         idx.insert("бала", sref("pack_a", "id_1"));
         assert!(idx.search_conjunction(&[]).is_empty());
+    }
+
+    #[test]
+    fn remember_and_retrieve_text() {
+        let mut idx = MorphemeIndex::new();
+        let s = sref("pack_a", "id_1");
+        idx.insert("бала", s.clone());
+        idx.remember_text(&s, "бала кітап оқиды");
+        assert_eq!(idx.sample_text(&s), Some("бала кітап оқиды"));
+    }
+
+    #[test]
+    fn sample_text_returns_none_when_absent() {
+        let mut idx = MorphemeIndex::new();
+        let s = sref("pack_a", "id_1");
+        idx.insert("бала", s.clone());
+        assert!(idx.sample_text(&s).is_none());
+    }
+
+    #[test]
+    fn text_key_is_pack_and_id_joined() {
+        let s = sref("wikipedia_kz_pack.json", "wiki_kz_0000001");
+        assert_eq!(s.text_key(), "wikipedia_kz_pack.json::wiki_kz_0000001");
     }
 
     #[test]

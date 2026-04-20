@@ -158,10 +158,14 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
             slots.insert("occupation".into(), occupation.clone());
         }
         Intent::Unknown {
-            noun_hint: Some(noun),
-            ..
+            noun_hint, example, ..
         } => {
-            slots.insert("noun".into(), noun.clone());
+            if let Some(noun) = noun_hint {
+                slots.insert("noun".into(), noun.clone());
+            }
+            if let Some(ex) = example {
+                slots.insert("example".into(), ex.clone());
+            }
         }
         _ => {}
     }
@@ -245,11 +249,16 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::Request => "request",
         Intent::WellWishes => "well_wishes",
         Intent::Insult => "insult",
-        Intent::Unknown { noun_hint, .. } => {
-            // If the FST parser surfaced any noun, route to the
-            // context-aware fallback family. Otherwise the generic
-            // unknown family (bare "түсінбедім", etc.)
-            if noun_hint.is_some() {
+        Intent::Unknown {
+            noun_hint, example, ..
+        } => {
+            // v1.6.5: if retrieval surfaced a concrete example from the
+            // committed corpus for this noun, route to the evidence
+            // family. Otherwise the v1.1.0 noun-hint family, then the
+            // bare "түсінбедім" fallback.
+            if example.is_some() {
+                "unknown.with_evidence"
+            } else if noun_hint.is_some() {
                 "unknown.with_noun"
             } else {
                 "unknown"

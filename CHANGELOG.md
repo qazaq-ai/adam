@@ -7,6 +7,53 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.6.5] — 2026-04-20 — Retrieval wired into `Intent::Unknown`: dialog cites real Kazakh corpus
+
+Patch release. The retrieval index shipped in v1.6.0 now feeds the dialog layer. When `Intent::Unknown` fires with a recognised noun AND the committed morpheme index contains a sample text for it, the response quotes that sentence verbatim — a concrete step toward "not just predictable, but informed by the corpus." The 26-intent deterministic backbone is untouched; this is strictly a fallback improvement.
+
+### Demo — what it looks like
+
+```
+> бала туралы бірдеңе айт
+< бала туралы мынадай бір жазба кездестірдім: «Кеше бала ең, келдің ғой
+  талай жасқа, Көз жетті бір қалыпта тұра алмасқа.»                     [Abai Wikisource]
+
+> Абай жайында не дейсің
+< абай жайында осындай мысал бар: «Абай Құнанбайұлы (10 тамыз 1845 —
+  6 шілде 1904)»                                                         [Wikipedia KZ]
+
+> мектеп керек пе
+< мектеп деген сөзге қатысты бір жолым есіме түсті: «... 300 орындық
+  мектеп құрылысы толықтай аяқталмаған ...»                              [CC-100]
+
+> адам не істесе болады
+< адам туралы мынадай бір жазба кездестірдім: «Адам — бір боқ көтерген
+  боқтың қабы, Боқтан сасық боласың өлсең тағы.»                        [Abai — "Сегіз аяқ"]
+```
+
+Every cited sentence traces back to a specific `(pack, sample_id)` in the committed index — fully deterministic, no hallucination path.
+
+### Changes
+
+- **`adam-retrieval`**: `MorphemeIndex` gains a `sample_texts: BTreeMap<String, String>` field (keyed `pack::sample_id`). `remember_text` / `sample_text` helpers. `SampleRef::text_key`. The build binary now stores sample text alongside postings.
+- **`Intent::Unknown`**: new optional `example: Option<String>` field. Defaults to `None`; populated by `Conversation::turn` when a `MorphemeIndex` is attached and the `noun_hint` has postings.
+- **`Conversation::with_morpheme_index`**: attaches the index. Without it, dialog behaviour is identical to v1.6.0.
+- **Planner routing**: `Intent::Unknown` now routes to `unknown.with_evidence` when `example` is set, else `unknown.with_noun` (v1.1.0), else bare `unknown`.
+- **New template family** in `data/dialog/templates/v1.toml`: 4 `unknown.with_evidence` templates that wrap the retrieved sentence in Kazakh guillemets («…»).
+- **Committed index regenerated** with sample texts → 2.1 MB (was 1.6 MB without texts).
+- **+3 retrieval lib tests** (`remember_and_retrieve_text`, `sample_text_returns_none_when_absent`, `text_key_is_pack_and_id_joined`); **+2 dialog e2e tests** (`unknown_with_retrieval_cites_corpus_example`, `unknown_without_index_falls_back_to_noun_echo`).
+
+### Design points worth remembering
+
+- **Determinism**: `inject_retrieval_example` picks the first (sort-order) posting, not a random one. rng_seed is NOT consulted — the cited evidence is reproducible across runs.
+- **Optional**: index attachment is additive; no-index callers (CLI without `--with-index`, older tests) keep the v1.1.0 noun-echo behaviour. No behavioural regression.
+- **Small committed index**: only 3,191 samples are in the committed snapshot (500/pack cap). Users who want richer hits run `build_morpheme_index -- --full` locally (~10 min → ~700 MB gitignored artifact).
+- **Traceability wins over style**: the templates wrap quotes in «…» so the evidence is visually separated from the wrapper — critical for the "every response is traceable" promise.
+
+### Workspace tests
+
+- **279 tests pass** (274 → +3 retrieval + +2 dialog e2e).
+
 ## [1.6.0] — 2026-04-20 — Retrieval engine bootstrap: `adam-retrieval` crate + morpheme inverted index
 
 Minor release. First shipped component of the **v2.0 retrieval engine**. Unlike a probabilistic LM, retrieval is deterministic (given a morpheme bag + index, top-k is fully determined), traceable (every hit names the pack + sample id it came from), and cheap (a hash lookup + sorted-list intersection, not a matmul). See the `project_retrieval_not_neural_v2` memory for the architectural rationale.

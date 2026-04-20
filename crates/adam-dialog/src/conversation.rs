@@ -20,6 +20,7 @@
 use std::collections::HashMap;
 
 use adam_kernel_fst::lexicon::LexiconV1;
+use adam_retrieval::MorphemeIndex;
 
 use crate::intent::Intent;
 use crate::planner::plan_response_with_session;
@@ -32,6 +33,13 @@ use crate::templates::TemplateRepository;
 const MAX_HISTORY: usize = 32;
 
 /// A running multi-turn dialog.
+///
+/// v1.6.5 adds an optional [`MorphemeIndex`]: when attached, the
+/// `Intent::Unknown` fallback consults the index for the parsed
+/// `noun_hint` and cites a concrete Kazakh sentence from the committed
+/// corpus in place of a bare "түсінбедім". The index is optional so
+/// embedders (CLI, tests) that don't want the retrieval dependency
+/// can continue to run the 26-intent pipeline stand-alone.
 #[derive(Debug, Clone, Default)]
 pub struct Conversation {
     /// Entity slot values accumulated across turns
@@ -43,6 +51,10 @@ pub struct Conversation {
     /// Ordered history of recognised intent kinds, oldest-first.
     /// Bounded to [`MAX_HISTORY`] items.
     pub intent_history: Vec<IntentKind>,
+    /// Optional retrieval index. When `Some`, `Intent::Unknown` gets an
+    /// `example` injected for any `noun_hint` that has postings in the
+    /// index. Added v1.6.5.
+    pub morpheme_index: Option<MorphemeIndex>,
 }
 
 /// Lightweight "kind" summary of an `Intent` — the payload (name /
@@ -118,6 +130,14 @@ impl Conversation {
         Self::default()
     }
 
+    /// Attach a retrieval index so `Intent::Unknown` can quote a
+    /// concrete Kazakh sentence for any recognised noun. Without this,
+    /// the fallback behaviour is the v1.1.0 noun-echo path.
+    pub fn with_morpheme_index(mut self, index: MorphemeIndex) -> Self {
+        self.morpheme_index = Some(index);
+        self
+    }
+
     /// Run one conversational turn. Parses the input, recognises the
     /// intent, folds any new entities into [`session`](Self::session),
     /// updates [`active_intent`](Self::active_intent) and
@@ -140,12 +160,46 @@ impl Conversation {
         // becomes a re-interpretation: "user is asking me the same
         // thing back", which is still AskHowAreYou for planning
         // purposes (planner picks a response without asking back).
-        let intent = resolve_follow_up(raw_intent, input, self.active_intent);
+        let mut intent = resolve_follow_up(raw_intent, input, self.active_intent);
+
+        // v1.6.5: inject a retrieval example into Unknown if the index
+        // has postings for the noun_hint. Deterministic — picks the
+        // first (sorted) sample for reproducibility. rng_seed is NOT
+        // used here so the evidence is stable across reruns.
+        self.inject_retrieval_example(&mut intent);
 
         self.absorb_entities(&intent);
         self.record_intent(&intent);
         let plan = plan_response_with_session(&intent, rng_seed, repo, &self.session);
         realise(&plan)
+    }
+
+    /// For `Intent::Unknown { noun_hint: Some(n), .. }`, if an index is
+    /// attached and has postings for `n` with a stored sample text,
+    /// fill the `example` slot with that text. Deterministic: picks
+    /// the first posting in sort order so reruns produce identical
+    /// output. No-op for every other intent, and for unknown-without-
+    /// noun, and when the index is absent.
+    fn inject_retrieval_example(&self, intent: &mut Intent) {
+        let Some(index) = self.morpheme_index.as_ref() else {
+            return;
+        };
+        if let Intent::Unknown {
+            noun_hint: Some(noun),
+            example,
+            ..
+        } = intent
+        {
+            if example.is_some() {
+                return;
+            }
+            let refs = index.search(noun);
+            if let Some(first) = refs.first() {
+                if let Some(text) = index.sample_text(first) {
+                    *example = Some(text.to_string());
+                }
+            }
+        }
     }
 
     /// Extract persistent entities from an intent and push them into

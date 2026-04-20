@@ -315,3 +315,18 @@ templates = [
     "{noun} жайында көбірек айтыңызшы",
     "{noun} туралы ойланып көрейін",
 ]
+
+# v1.6.5: Unknown with retrieval evidence — the morpheme index had a
+# concrete sentence from the committed corpus mentioning {noun}. We
+# acknowledge the topic AND cite a real Kazakh example, pattern after
+# Kazakh conversational registers ("мысалы", "анау бір кісі айтты",
+# "бір кітапта жаздым оқыдым"). {example} is the verbatim sentence
+# from data/retrieval/morpheme_index.json's sample_texts field.
+[[families]]
+key = "unknown.with_evidence"
+templates = [
+    "{noun} туралы мынадай бір жазба кездестірдім: «{example}»",
+    "{noun} жайында осындай мысал бар: «{example}»",
+    "{noun} деген сөзге қатысты бір жолым есіме түсті: «{example}»",
+    "мен {noun} туралы «{example}» деген дерек кездестіргенмін",
+]

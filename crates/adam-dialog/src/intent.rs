@@ -110,12 +110,20 @@ pub enum Intent {
     /// Nothing matched. Fallback may carry a `noun_hint` extracted from
     /// the input by the FST parser so the response can at least
     /// acknowledge what the user is talking about, rather than blank
-    /// "түсінбедім". Field added v1.1.0.
+    /// "түсінбедім". `example` (v1.6.5) optionally carries a native
+    /// Kazakh sentence retrieved from the committed morpheme index for
+    /// the `noun_hint`, so the response can cite concrete evidence
+    /// rather than just echoing the noun.
     Unknown {
         raw_tokens: Vec<String>,
         /// First parsed noun root, if any — populated by the lexicon-aware
         /// `interpret_text_with_lexicon` path.
         noun_hint: Option<String>,
+        /// A sample sentence from the committed corpus that contains
+        /// the `noun_hint`. Populated by `Conversation::turn` when a
+        /// `MorphemeIndex` is attached. Added v1.6.5.
+        #[serde(default)]
+        example: Option<String>,
     },
 }
 

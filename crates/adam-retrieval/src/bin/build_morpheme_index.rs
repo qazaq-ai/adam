@@ -143,6 +143,7 @@ fn main() -> ExitCode {
                 pack: pack_name.to_string(),
                 sample_id: sample.id.clone(),
             };
+            let mut contributed_any_morpheme = false;
             for word in sample.text.split_whitespace() {
                 let cleaned = normalise(word);
                 if cleaned.is_empty() {
@@ -171,6 +172,14 @@ fn main() -> ExitCode {
                 for root in roots {
                     index.insert(root, sref.clone());
                 }
+                contributed_any_morpheme = true;
+            }
+            // v1.6.5: remember sample text so downstream consumers (the
+            // dialog layer's `Intent::Unknown` fallback) can cite the
+            // actual sentence. Skip samples that contributed no morpheme
+            // to keep the texts map in sync with the postings.
+            if contributed_any_morpheme {
+                index.remember_text(&sref, sample.text.clone());
             }
             if total_samples % PROGRESS_EVERY == 0 {
                 eprintln!(

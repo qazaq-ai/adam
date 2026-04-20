@@ -149,11 +149,13 @@ pub fn interpret_text_with_lexicon(
     }
 
     // Unknown — but try to extract a noun hint from the parses so the
-    // fallback response can at least acknowledge context.
+    // fallback response can at least acknowledge context. `example` is
+    // filled later by `Conversation::turn` via retrieval (v1.6.5).
     let noun_hint = first_noun_root(parses);
     Intent::Unknown {
         raw_tokens: tokens,
         noun_hint,
+        example: None,
     }
 }
 
@@ -239,6 +241,7 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
     Intent::Unknown {
         raw_tokens: tokens,
         noun_hint: first_noun_root(parses),
+        example: None,
     }
 }
 

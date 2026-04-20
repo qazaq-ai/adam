@@ -1009,3 +1009,51 @@ fn trace_contains_intent_and_choice() {
         "realiser should emit non-empty for greeting"
     );
 }
+
+/// v1.6.5: when a committed morpheme index is attached, `Intent::Unknown`
+/// with a recognised noun should cite a concrete Kazakh sentence from the
+/// corpus instead of the bare noun-echo template.
+#[test]
+fn unknown_with_retrieval_cites_corpus_example() {
+    use adam_retrieval::MorphemeIndex;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let index_path = "../../data/retrieval/morpheme_index.json";
+    if !std::path::Path::new(index_path).exists() {
+        eprintln!("morpheme index not present, skipping");
+        return;
+    }
+    let raw = std::fs::read_to_string(index_path).expect("read index");
+    let mut index: MorphemeIndex = serde_json::from_str(&raw).expect("parse index");
+    index.refresh_stats();
+
+    let mut conv = Conversation::new().with_morpheme_index(index);
+    // "бала" is known to have postings in the committed snapshot with
+    // Abai's lines stored as sample_texts.
+    let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, 0);
+    assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+    // The evidence templates all wrap the example in «…», so assert
+    // the guillemets are present as a robust signal that the evidence
+    // path fired (not the v1.1.0 noun-echo fallback).
+    assert!(
+        out.contains("«") && out.contains("»"),
+        "expected retrieval-evidence template to quote an example, got: {out:?}"
+    );
+}
+
+/// Without an attached index, the Unknown fallback keeps the v1.1.0
+/// noun-echo behaviour — no retrieval side-effects, no crashes.
+#[test]
+fn unknown_without_index_falls_back_to_noun_echo() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, 0);
+    assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+    assert!(
+        !out.contains("«"),
+        "no index attached → no evidence quote, got: {out:?}"
+    );
+}
