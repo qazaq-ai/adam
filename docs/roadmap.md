@@ -45,7 +45,8 @@ The MVP path. Each release is strictly additive — no rollbacks, no feature gat
 | v1.3.0 | **Wikipedia re-extract** — rewrote `process_wikipedia_kz` (byte-by-byte → 64 KB chunked streaming, 100× faster; added 10 % loanword-density filter). Committed pack: 150 k samples / 1.61 M words / 99.99 % purity. Local uncapped: 1.4 M samples / 15 M words. Corpus total 2.85 M words, expansion gap 45× → 35× | 256 workspace tests; +27 % corpus |
 | v1.3.5 | **Sharding + docs drift + v2.0 direction committed** — `--full` mode writes 10 shards (≤50 MB each) to gitignored `data/curated/shards/` for local retrieval-engine fuel; `corpus_audit --local` scans them. Docs fixed: badge 253→256, `foundation_scope` no longer claims trilingual/transliteration, "FST-guaranteed" wording tightened. **v2.0 committed as retrieval-over-corpus, not a trained LM** | 256 workspace tests; local corpus 16 M words, gap to 100 M = 6.2× |
 | v1.4.0 | **FST-NER + DST + predicate-copula FST** — added `Predicate` feature to `NounFeatures` (7 person variants + 6 suffix templates); +30 Kazakh place-name entries in Lexicon; `detect_statement_of_location` / `detect_statement_of_occupation` refactored to use `Analysis` as primary path; `Conversation` gained `active_intent` + `intent_history` + `resolve_follow_up` | 262 workspace tests; closes Codex/Antigravity critiques |
-| **v1.4.5** | **Lexicon polish +20 nouns** — modern Kazakh professions (нұсқаушы, кеңесші, жетекші, жүргізуші, саудагер, …) and common conversational vocabulary (әке, аға, апа, бүгін, ертең, кеше, мекеме, кеңсе, ұйым). All native Kazakh, no loanwords | 262 workspace tests; each new profession round-trips through FST-NER |
+| v1.4.5 | **Lexicon polish +20 nouns** — modern Kazakh professions (нұсқаушы, кеңесші, жетекші, жүргізуші, саудагер, …) and common conversational vocabulary (әке, аға, апа, бүгін, ертең, кеше, мекеме, кеңсе, ұйым). All native Kazakh, no loanwords | 262 workspace tests; each new profession round-trips through FST-NER |
+| **v1.5.0** | **CC-100 re-extract** — rewrote `process_cc100_kk` (stdin streaming, old 50 k cap removed, 10 % loanword-density filter, sharding at 140 k samples/shard). Committed pack: 140 k samples / 4.01 M words committed. 33 local shards (02–34) add 4.6 M samples / 74 M more local words. **Corpus: 4.01 M committed / 77.9 M local; gap to 100 M = 1.3×**. Purity −1.6 pp (web-crawl tax, accepted per corpus-purity directive) | 262 workspace tests; +27× local corpus |
 
 ## Pre-Phase-10 — transformer era (v0.1.0 → v0.4.0)
 
@@ -70,7 +71,7 @@ Post-v1.0.0 testing exposed that the MVP was a programmed toy — it answered on
 ### Committed sequence
 
 - **v1.1.0 (done)** — Kazakh-only revert; modern Lexicon expansion (+12 roots); Insult intent; smart Unknown handler with noun-hint. Incremental coverage without abandoning thesis.
-- **v1.x** — Kazakh corpus engineering. Current corpus is ~4 M tokens. Chinchilla-optimal for a 24 M param LM is ~480 M tokens. Target: **100 M+ Kazakh tokens** from native-text sources (Qazaq Wikipedia, literature, government Kazakh, OCR books). Pure data engineering, not ML.
+- **v1.x** — Kazakh corpus engineering. **Committed 4.01 M / local 77.9 M as of v1.5.0 (gap to 100 M = 1.3×)**. Target: **100 M+ Kazakh tokens** from native-text sources (Qazaq Wikipedia, literature, government Kazakh, OCR books). v1.5.5 government sources are expected to close the gap. Pure data engineering, not ML.
 - **v2.0** — compact Kazakh LM (transformer or SSM), trained in pure Rust (GGML-style, no PyTorch). Plugged in as the `Intent::Unknown` fallback only. The 26-intent pipeline continues to handle everything it recognises at 0 hallucinations.
 - **post-v2.0** — multimodality (speech / vision) only after a truly thinking Kazakh LM exists. Not before.
 

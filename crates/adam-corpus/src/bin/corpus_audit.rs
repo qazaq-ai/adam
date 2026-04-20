@@ -129,13 +129,18 @@ fn main() -> ExitCode {
                 .map(|e| e.path())
                 .filter(|p| {
                     p.file_name().and_then(|n| n.to_str()).is_some_and(|s| {
-                        s.starts_with("wikipedia_kz_shard_") && s.ends_with(".json")
+                        (s.starts_with("wikipedia_kz_shard_")
+                            || s.starts_with("cc100_kk_shard_"))
+                            && s.ends_with(".json")
                     })
                 })
                 .collect();
             shard_paths.sort();
             if !shard_paths.is_empty() {
-                eprintln!("--local: including {} Wikipedia shards", shard_paths.len());
+                eprintln!(
+                    "--local: including {} shard(s) (Wikipedia + CC-100)",
+                    shard_paths.len()
+                );
                 paths.extend(shard_paths);
             }
         }

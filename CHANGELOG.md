@@ -7,6 +7,43 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.5.0] — 2026-04-20 — CC-100 re-extract: corpus local → 77.9 M words (gap 1.3×)
+
+Minor release. Rewrites the CC-100 Kazakh processor along the same lines as v1.3.0 Wikipedia — **chunked streaming + loanword-density filter + sharding** — and unleashes it against the full `cc100_kk.txt.xz` (≈ 5 GB decompressed) that previously had a hard 50 k-sample cap.
+
+### Processor rewrite (`process_cc100_kk.rs`)
+
+- Adds the 10 % loanword-density filter shared with `process_wikipedia_kz`. CC-100 web crawl is Russified far more heavily than Wikipedia — 24 k of every 140 k accepted samples were rejected by this filter alone on shard 01.
+- Replaces the old 50 k hard cap with the project-standard sharding pattern: first shard committed (≤ 50 MB), subsequent shards written to the gitignored `data/curated/shards/` for local retrieval-engine fuel.
+- Shard size 140 k (vs Wikipedia's 150 k) — web-crawl sentences average longer, so 140 k keeps each shard's pretty-printed JSON safely below the 50 MB GitHub warning threshold.
+- `--full` flag mirrors the Wikipedia processor. Default mode writes shard 01 only; `--full` continues until the stream ends.
+
+### Audit integration (`corpus_audit.rs`)
+
+- `--local` mode now includes both `wikipedia_kz_shard_*` and `cc100_kk_shard_*` shards from `data/curated/shards/`.
+- Default mode (CI) audits committed packs only; behaviour unchanged.
+
+### Corpus impact
+
+| Metric | v1.3.5 | v1.4.5 | **v1.5.0** | Δ |
+|---|---:|---:|---:|---:|
+| Committed words | 2.85 M | 2.85 M | **4.01 M** | +40.7 % |
+| Local words (committed + shards) | 16 M | 16 M | **77.9 M** | +387 % |
+| Committed unique vocab | 92 k | 92 k | **270 k** | +193 % |
+| Local unique vocab | 485 k | 485 k | **1.72 M** | +255 % |
+| Overall Kazakh purity | 99.99 % | 99.99 % | **98.36 %** | −1.6 pp (web-crawl noise) |
+| Expansion gap to 100 M | 6.2× | 6.2× | **1.3×** | **within striking distance** |
+
+33 CC-100 shards now live locally in `data/curated/shards/` (shards 02–34). Shard 01 is committed at `data/curated/cc100_kk_pack.json` (140 000 samples, 48.7 MiB).
+
+### Purity trade-off (noted, not fixed)
+
+CC-100 is web-crawl text, so overall corpus purity drops from 99.99 % → 98.36 %. The 10 % density cap already rejects the most heavily Russified sentences; further tightening would throw out too much signal. This is the trade-off encoded in the `project_corpus_purity_directive` memory — apply the filter, then accept the residual. v1.5.5 (government sources — akorda.kz, egov.kz) is expected to restore purity closer to 99 % and push local past 100 M.
+
+### Workspace tests
+
+- **262 tests pass** (unchanged from v1.4.5). No code in the FST + dialog path changed; only the corpus processor and audit tool.
+
 ## [1.4.5] — 2026-04-19 — Lexicon polish: +20 modern Kazakh nouns
 
 Patch release. Expands the curated Lexicon with modern professional nouns and common conversational vocabulary — all native Kazakh formations, no Russian loanwords (per the `project_corpus_purity_directive` and `project_kazakh_only_directive` memories).
