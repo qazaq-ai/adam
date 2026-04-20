@@ -7,6 +7,86 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.8.5] — 2026-04-20 — Locative+P1Sg bug fix, FST-aware city slots, comprehensive README refresh
+
+Patch release. Fixes the `-мын` greedy-strip bug in `detect_statement_of_occupation`, wires the existing `{slot|features}` syntax into v1.8.0's session-aware templates, and brings the README fully in sync with the v1.5.0–v1.8.0 retrieval-era arc.
+
+### Bug fix — locative+P1Sg is a location statement, not an occupation
+
+Before v1.8.5:
+
+```
+user: мен Алматыдамын
+conv.session:
+  { name: "Дәулет", occupation: "алматы" }   ❌ wrong — "Алматы" is not an occupation
+```
+
+The FST correctly parsed `Алматыдамын` as `Алматы + locative + P1Sg`, but `detect_statement_of_occupation` Priority 1 accepted any noun with `Predicate::P1Sg` regardless of case, so the city got slotted as an occupation. `detect_statement_of_location` required an explicit `тұрамын / тұрамыз` verb co-occurring with the locative and didn't trigger on the bare `locative+P1Sg` stack.
+
+v1.8.5 fixes both ends:
+
+- `detect_statement_of_location` now accepts **any** Noun with both `Case::Locative` and `Predicate::P1Sg` — a standalone self-locative ("I am in X") is a location statement by itself, no verb required.
+- `detect_statement_of_occupation` Priority 1 now **rejects** `Case::Locative` and `Case::Ablative` — those cases mean "in / from X", not "I am X (profession)".
+
+Result:
+
+```
+user: мен Алматыдамын
+conv.session:
+  { name: "Дәулет", city: "Алматы" }   ✅ correct
+response: "жақсы жер"
+```
+
+### FST-aware session slots in retrieval templates
+
+The v1.8.0 session-aware templates used literal case marking (`{city}-да`). This is both ugly (dangling hyphen: `Алматы-да` instead of `Алматыда`) and wrong for vowel harmony (Астана-да / Өскемен-де: one "а", one "е", and the planner can't know which).
+
+v1.8.5 swaps the literals for `{slot|features}`:
+
+```toml
+# v1.8.0 (literal, wrong harmony):
+"{city}-да тұратын сіз үшін {noun} жайында: «{example}»"
+
+# v1.8.5 (FST, correct harmony):
+"{city|locative} тұратын сізге {noun} туралы мынадай дерек: «{example}»"
+```
+
+`{city|locative}` routes through `adam_kernel_fst::morphotactics::synthesise_noun`, so Алматы → Алматыда, Астана → Астанада, Өскемен → Өскеменде automatically. Demo at seed=6:
+
+```
+Алматыда тұратын сізге бала туралы мынадай дерек:
+«Кім сендерді балалар, сүйе-тұғын, Қуанышыңа қуанып, қайғыңа күйе-тұғын»
+```
+
+No dangling hyphen; harmonically correct locative suffix.
+
+### Comprehensive README refresh
+
+The README had drifted since v1.4.5. Every stale reference is fixed:
+
+- **Version badge** 1.4.5 → 1.8.5.
+- **Retrieval badge** added; **corpus badge** added showing `77.9 M local / 4 M committed`; **test count** 288 → 290.
+- **Demo** updated to v1.8.5: shows the v1.8.5 locative fix, the v1.6.0+ retrieval-engine path (`Алматыда тұратын сізге... «Абай Wikisource quote»`), and session-aware frame composition.
+- **Architecture** table now lists `adam-retrieval` as a proper L1 crate alongside the others. Counts corrected (11 archiphonemes, 36 suffix templates).
+- **New section**: "Retrieval engine (v1.6.0–v1.8.5)" — documents the `retrieve → rank → compose` path with the full composite scoring formula, determinism guarantees, and provenance contract.
+- **Kazakh-only recogniser** section now points at the retrieval engine instead of a future trained LM.
+- **Technical specification** rewritten: committed corpus words (3.84 M), local corpus words (77.9 M), morpheme-coverage baseline (79.48 %), FST parser throughput (1.155 ms/word), committed morpheme index size (3,191 / 3,082 / 16,262), full-corpus rebuild procedure, 26 intents (was 25), 31 template families, 290 tests.
+- **History** extended with the "v1.5.0–v1.8.5 retrieval era" section explaining each release's contribution to the retrieve → rank → compose ladder.
+- **Out of scope** rewritten: multilingual removed, "compact trained LM" removed, replaced with the honest commitment that v2.0 is the retrieval engine, not a neural model.
+
+### Tests (+2)
+
+- `locative_with_copula_is_location_not_occupation` — regression test for the `-мын` bug fix.
+- `session_aware_city_template_uses_fst_locative` — verifies at least one seed produces FST-rendered `Алматыда` (not `Алматы-да`) when a `{city|locative}` template fires.
+
+### Workspace tests
+
+**290 tests pass** (288 → +2).
+
+### What's next
+
+- **v1.9.0** — option B/C territory: in-sample slot swap. Risky — it's where we leave the "retrieved text is immutable" safety. Needs semantic-sanity guards before shipping.
+
 ## [1.8.0] — 2026-04-20 — Session-aware compositional synthesis (option A: frame-only, retrieved quote stays verbatim)
 
 Minor release. First step in the **retrieve → compose → respond** ladder described in the v1.7.0 release notes. This release commits to **option A** of the three compositional-synthesis variants we debated: composition happens **around** the retrieved sample, never **inside** it. Zero fabrication risk; the retrieved sentence stays byte-identical to the corpus.

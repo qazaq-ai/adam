@@ -321,9 +321,10 @@ templates = [
     # auto-activates these ONLY when the required session slot exists.
     "{name}, {noun} жайында не ойлайсыз",
     "{name}, {noun} деген сіз үшін жаңа тақырып па",
-    "{city} тұрғыны үшін {noun} жаңалық па",
-    "{name}, {city}-да {noun} туралы қалай қарайды екен",
     "{age} жасында {noun} жайында ойлану әрі қызық",
+    # v1.8.5 — FST-aware city inflection via synthesise_noun.
+    "{city|locative} {noun} туралы қалай қарайды екен",
+    "{name}, {city|locative} отырып {noun} жайында ойланамыз ба",
 ]
 
 # v1.6.5: Unknown with retrieval evidence — the morpheme index had a
@@ -346,11 +347,16 @@ templates = [
     "{noun} жайында осындай мысал бар: «{example}»",
     "{noun} деген сөзге қатысты бір жолым есіме түсті: «{example}»",
     "мен {noun} туралы «{example}» деген дерек кездестіргенмін",
-    # v1.8.0 — session-aware variants
+    # v1.8.0 — session-aware variants (literal slot interpolation)
     "Сіз, {name}, {noun} туралы сұрап тұрсыз ба. Мынадай дерек бар: «{example}»",
     "{name}, {noun} жайында осы жазба сізге қызық болуы мүмкін: «{example}»",
-    "{city} тұрғыны үшін {noun} туралы мынадай дерек бар: «{example}»",
-    "{name}, {city}-да тұратын сіз үшін {noun} жайында: «{example}»",
     "Сіз {age} жасында-ақ {noun} жайында сұрайсыз екен. Дерек: «{example}»",
     "{occupation} ретінде сіз үшін {noun} туралы дерек: «{example}»",
+    # v1.8.5 — FST-aware slot variants. `{city|locative}` renders via
+    # synthesise_noun so the locative suffix is harmony-correct for the
+    # actual city (Алматыда / Астанада / Өскеменде / Атырауда). The
+    # previous `{city}-да` literal is both ugly (dangling hyphen) and
+    # ignores vowel harmony for front/back stems.
+    "{city|locative} тұратын сізге {noun} туралы мынадай дерек: «{example}»",
+    "{name}, {city|locative} отырып {noun} жайында ойланасыз ба. Дерек: «{example}»",
 ]

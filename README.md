@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.4.5-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.8.5-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -21,8 +21,9 @@
   <img src="https://img.shields.io/badge/intents-26-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/surface-Kazakh--only-9CCC65?style=flat-square" alt="Kazakh only">
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
-  <img src="https://img.shields.io/badge/templates-31%20families-FBC02D?style=flat-square" alt="templates">
-  <img src="https://img.shields.io/badge/tests-288%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204%20M%20committed-FBC02D?style=flat-square" alt="corpus">
+  <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
+  <img src="https://img.shields.io/badge/tests-290%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
 </p>
 
@@ -53,42 +54,46 @@ The name *adam* (Kazakh: **адам**) means "human".
 
 ```
 $ cargo run --release -p adam-dialog --bin adam_chat
-adam-chat v1.1.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
+adam-chat v1.8.5 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
 
 > сәлем
 сәлем
 > менің атым Дәулет
 Дәулетпен танысқаныма қуаныштымын
-> мен Алматыданмын
-Алматы — әдемі қала
+> мен Алматыдамын
+Алматы — әдемі қала                      # v1.8.5 fix: locative+P1Sg now classified as location, not occupation
 > мен бағдарламашымын
-бағдарламашыға сәттілік тілеймін         # new modern profession via Lexicon + FST dative
-> мен әзірлеушімін
-Дәулет, әзірлеуші — құрметті кәсіп
+бағдарламашыға сәттілік тілеймін
 > қалайсыз
 жақсы, ал сіз қалайсыз
-> кітап оқимын
-кітап — қызықты тақырып                  # smart Unknown handler: noun-hint acknowledgement
+> бала туралы бірдеңе айт
+Алматыда тұратын сізге бала туралы мынадай дерек:
+«Кім сендерді балалар, сүйе-тұғын, Қуанышыңа қуанып, қайғыңа күйе-тұғын»
+                                         # v1.6.0 retrieval + v1.7.0 ranking + v1.8.0 session-aware frame + v1.8.5 FST locative
+> Абай жайында не дейсің
+абай жайында осындай мысал бар: «Абай Құнанбайұлы (10 тамыз 1845 — 6 шілде 1904)»
+                                         # quote from data/retrieval/morpheme_index.json → Wikipedia KZ
 > сен ақымақсың
-сізге ренжімеймін                        # Insult intent: polite non-engagement
+сізге ренжімеймін                        # Insult intent (v1.1.0): polite non-engagement
 > сау бол
 сау болыңыз
 ```
 
-Kazakh-only input and output. Entities (name, age, city, occupation) persist across turns. Personalised templates fire when the session has the right slots filled. When no intent matches, the parser extracts a noun hint so the fallback response can acknowledge the topic instead of blank "түсінбедім".
+Kazakh-only input and output. Entities (name, age, city, occupation) persist across turns. When no intent matches, the retrieval engine looks up content morphemes in the committed morpheme index, ranks matches by **overlap + pack-purity + length-goodness − loanword-density**, and cites the top-ranked sample verbatim (guaranteed to exist in the corpus — zero fabrication). When the session has remembered entities, the frame around the citation personalises automatically via `template_is_fillable`.
 
 ## Architecture
 
-Seven Rust crates, three layers:
+Eight Rust crates, three layers:
 
 | Layer | Crate | Role |
 |---|---|---|
 | **L0** | [`adam-kernel`](crates/adam-kernel) | Core identity + foundation contracts |
-| **L0** | [`adam-kernel-fst`](crates/adam-kernel-fst) | **FST morphology** — phonology (12 archiphonemes, 22+ twol rules), morphotactics (30 suffix templates), synthesiser + parser, 14 k-entry Lexicon |
+| **L0** | [`adam-kernel-fst`](crates/adam-kernel-fst) | **FST morphology** — phonology (11 archiphonemes, 22+ twol rules), morphotactics (36 suffix templates incl. v1.4.0 predicate-person copula), synthesiser + parser, 14 k-entry Lexicon |
 | **L1** | [`adam-tokenizer`](crates/adam-tokenizer) | Pre-tokenizer + BPE trainer + encoder |
-| **L1** | [`adam-corpus`](crates/adam-corpus) | Source acceptance + synthetic sentence generation |
+| **L1** | [`adam-corpus`](crates/adam-corpus) | Source acceptance, streaming processors (Wikipedia, CC-100, classics, Common Voice, Tatoeba), synthetic generator, `corpus_audit`, `morpheme_coverage` (v1.5.5) |
 | **L1** | [`adam-eval`](crates/adam-eval) | Evaluation suite + benchmark reports |
-| **L1** | [`adam-dialog`](crates/adam-dialog) | **Dialog pipeline** — intent recognisers, session state, template planner, slot-expanding realiser |
+| **L1** | [`adam-dialog`](crates/adam-dialog) | **Dialog pipeline** — intent recognisers (26 intents), multi-turn session + DST, template planner with `{slot\|features}` syntax, slot-expanding realiser |
+| **L1** | [`adam-retrieval`](crates/adam-retrieval) | **Retrieval engine** (v1.6.0+) — morpheme inverted index (`MorphemeIndex`), deterministic `rank(input_morphemes, config)` with overlap + pack-purity + length + loanword scoring (v1.7.0), `SampleRef` provenance, `sample_texts` for direct quoting |
 | **L2** | [`adam-train`](crates/adam-train) | Legacy transformer baseline (see [History](#history)) |
 
 Every layer outputs deterministic, regression-tested JSON artifacts. `bash ./scripts/validate_foundation.sh` runs the full foundation validation end-to-end.
@@ -123,7 +128,7 @@ cargo run --release -p adam-kernel-fst --bin adam_fst -- analyse мектебі�
 bash ./scripts/validate_foundation.sh
 ```
 
-## Capabilities (v1.0.0)
+## Capabilities
 
 ### 26 intents
 
@@ -133,15 +138,41 @@ bash ./scripts/validate_foundation.sh
 | Conversational | AskHowAreYou, StatementOfWellbeing, AskName, StatementOfName { name } |
 | Social topics | AskAge, StatementOfAge { years }, AskLocation, StatementOfLocation { city }, AskOccupation, StatementOfOccupation { occupation }, AskFamily, StatementOfFamily, AskWeather, StatementOfWeather, AskTime |
 | Boundary | **Insult** (v1.1.0) — polite non-engagement for rude input |
-| Fallback | Unknown { raw_tokens, noun_hint } — v1.1.0 smart handler acknowledges the topic when a noun is parseable |
+| Fallback | Unknown { raw_tokens, noun_hint, example } — v1.6.5+ smart handler retrieves a corpus sample for the topic and cites it verbatim |
 
 Every `Statement*` intent with an `Option<T>` payload carries an extracted entity that persists into the session and feeds downstream templates.
+
+### Retrieval engine (v1.6.0–v1.8.5)
+
+When no intent matches, `adam` falls back to **retrieve → rank → compose**:
+
+1. Parse the user's input through the FST; extract every **content root** (no pronouns, no closed-class tokens).
+2. Look those morphemes up in the committed `MorphemeIndex` (`data/retrieval/morpheme_index.json`, built offline from `tatoeba`, `wikipedia_kz`, `common_voice_kk`, `cc100_kk`, `abai_wikisource`, `kazakh_proverbs`, `synthetic_sentences`, and `kazakh_classics`).
+3. Rank the candidate samples by a **deterministic composite score**:
+   ```
+   score = 0.40 · overlap_ratio          // main "smart" signal
+         + 0.30 · pack_purity            // Abai 1.00, Wikipedia 0.85, CC-100 0.75
+         + 0.15 · length_goodness        // Gaussian μ=8 words, σ=6
+         − 0.15 · loanword_density       // native-Kazakh thesis
+   ```
+4. Quote the top-1 hit **verbatim** — guaranteed to exist in the corpus. Every quote carries a `(pack, sample_id)` provenance.
+5. Choose a **session-aware template** (v1.8.0) to frame the quote — `template_is_fillable` auto-activates personalised variants when the session has `name` / `city` / `age` / `occupation`. FST-aware placeholders like `{city|locative}` (v1.8.5) render with correct vowel-harmonic suffixes.
+
+This path is:
+
+- **Deterministic** — rank has zero randomness; ties break on `(pack, sample_id)`. Same input + same index → byte-identical output.
+- **Traceable** — every response cites its source.
+- **Hallucination-free** — we quote, never invent. The retrieved sentence is always a real sentence from a real source.
+
+### Kazakh-only recogniser (v1.1.0 revert)
+
+v0.9.6 shipped Russian / English trigger phrasings for all 25 intents. Post-v1.0.0 testing showed the multilingual path diluted the Kazakh-first thesis without delivering real generalisation — a Russian speaker typing "Я разработчик" got "түсінбедім" because "разработчик" isn't in the Kazakh Lexicon. **The multilingual surface was removed in v1.1.0.** Non-Kazakh input now falls through to `Intent::Unknown`, which since v1.6.5 routes through the retrieval engine above.
 
 ### Kazakh-only recogniser (v1.1.0 revert)
 
 v0.9.6 shipped Russian / English trigger phrasings for all 25 intents. Post-v1.0.0 testing showed the multilingual path diluted the Kazakh-first thesis without delivering real generalisation — a Russian speaker typing "Я разработчик" got "түсінбедім" because "разработчик" isn't in the Kazakh Lexicon. **The multilingual surface was removed in v1.1.0.** Non-Kazakh input now falls through to `Intent::Unknown`.
 
-The project's path to handling unbounded inputs is **not translation** — it is training a compact Kazakh LM on a 100 M+ token corpus and plugging it in as the Unknown fallback. See [History](#history).
+The project's path to handling unbounded inputs is **not translation and not a trained neural LM** — it is the retrieval engine above, scaled to a ~100 M-token Kazakh corpus. See [History](#history) and [roadmap](docs/roadmap.md#post-v10-direction) for the architectural rationale.
 
 Self-introduction patterns (Kazakh only):
 
@@ -191,20 +222,25 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 
 | Component | Value |
 |---|---|
-| Lexicon roots | **14,106** (10 POS, pure pre-modern Kazakh, loanwords purged) |
+| Lexicon roots | **14,247** (≥ 3 chars, curated + Apertium, pure Kazakh) |
 | Abai Qunanbayuly coverage | **97.8%** (word forms → root prefix match) |
+| Committed corpus words | **3.84 M** across 8 source packs |
+| Local corpus words (with Wikipedia + CC-100 shards) | **77.9 M** |
+| Morpheme-coverage baseline (v1.5.5) | **79.48%** prefix-match over 3.84 M committed words |
 | FST archiphonemes | **11** |
 | FST twol phonology rules | **22+** of Apertium's 54 catalogued, all implemented |
-| Suffix templates | **30** (7 cases × 2 numbers × 7 possessives × 11 derivations) |
+| Suffix templates | **36** (cases × numbers × possessives × derivations × predicate-person copula) |
 | FST synthesis → analysis roundtrip | **100.0%** on 36,238 forms |
-| Dialog intents | **25** |
-| Intent recognisers | 25 × ≈3 trigger phrasings per language × 3 languages |
-| Template families | **29** (one per intent-key) |
-| Slot types | `name`, `age`, `city`, `occupation` |
-| Hallucination rate | **0%** (no generative path) |
-| Workspace tests | **271 passing**, 4 ignored, 0 failing |
-| End-to-end dialog tests | 81 |
-| FST unit tests | 84 |
+| FST parser throughput | **1.155 ms / word** single-threaded M2 |
+| Dialog intents | **26** (v1.1.0 added Insult) |
+| Template families | **31** |
+| Slot types (session) | `name`, `age`, `city`, `occupation` (plus `{slot\|features}` FST-aware variants) |
+| Committed morpheme index | **3,191 samples → 3,082 distinct morphemes → 16,262 postings** (`data/retrieval/morpheme_index.json`, ~2.1 MB) |
+| Full local morpheme index | rebuildable via `build_morpheme_index -- --full` (~10 min, ~700 MB, gitignored) |
+| Hallucination rate | **0%** (retrieval quotes verbatim; no generative path) |
+| Workspace tests | **290 passing**, 4 ignored, 0 failing |
+| End-to-end dialog tests | **81** |
+| FST unit tests | **84** |
 
 ## Directory layout
 
@@ -217,13 +253,14 @@ See [data/README.md](data/README.md) for a top-level map of the `data/` tree, an
 
 ## History
 
-`adam` went through two major architectural eras and a v1.1.0 course-correction:
+`adam` went through three major architectural eras and a v1.1.0 course-correction:
 
-- **v0.1.0 – v0.4.0 (transformer era)** — authentic Kazakh corpus curation (Tatoeba, Wikipedia KZ, Common Voice KK, CC-100, Abai Wikisource), BPE tokenizer, baseline transformer training. The v0.4.0 checkpoint (24.2 M parameters, PPL 1691.89 on 12 k held-out samples) is preserved in `data/training/` as a regression reference but is not on the current codepath.
-- **v0.4.5 – v1.0.0 (FST + dialog era)** — deterministic FST morphology, 14 k-entry pure Kazakh Lexicon, 25-intent dialog pipeline with multi-turn session state, FST-backed slot expansion, trilingual input recogniser (briefly — see v1.1.0).
-- **v1.1.0 course-correction** — Post-v1.0.0 testing showed the v0.9.6 multilingual surface was a mistake. Removing it and committing to a Kazakh-only input surface is the honest path toward a thinking Kazakh model. See [roadmap](docs/roadmap.md#post-v10-direction) for the full rationale and path to v2.0 (a compact Kazakh LM trained on 100 M+ tokens, plugged in as the `Unknown`-intent fallback).
+- **v0.1.0 – v0.4.0 (transformer era)** — authentic Kazakh corpus curation (Tatoeba, Wikipedia KZ, Common Voice KK, CC-100, Abai Wikisource), BPE tokenizer, baseline transformer training. The v0.4.0 checkpoint (24.2 M parameters, PPL 1691.89 on 12 k held-out samples) is preserved in `data/training/` as a regression reference but is **not** on the current codepath.
+- **v0.4.5 – v1.0.0 (FST + dialog era)** — deterministic FST morphology, 14 k-entry pure Kazakh Lexicon, 25-intent dialog pipeline with multi-turn session state, FST-backed slot expansion.
+- **v1.1.0 course-correction** — post-v1.0.0 testing showed the v0.9.6 multilingual surface was a mistake. Removing it and committing to a Kazakh-only input surface is the honest path toward a thinking Kazakh model.
+- **v1.5.0 – v1.8.5 (retrieval era)** — the path to v2.0 is **retrieval**, not a trained neural LM. v1.5.0 re-extracted CC-100 into a 77.9 M-word local corpus. v1.5.5 measured the 79.48 % morpheme-coverage baseline. v1.6.0 shipped `adam-retrieval` with the morpheme inverted index. v1.6.5 wired retrieval into `Intent::Unknown` so dialog cites Abai / Wikipedia / CC-100 verbatim. v1.7.0 added deterministic ranking (overlap + purity + length + loanword density). v1.8.0 introduced **session-aware composition (option A)** — the retrieved quote stays verbatim, the frame around it personalises via the session. v1.8.5 fixed the `-мын` greedy-strip bug and wired FST-aware `{city|locative}` into session-aware templates. Every response to an out-of-intent input is now: *retrieved from a real source, ranked by four deterministic signals, framed in a session-aware Kazakh sentence, with zero fabrication.*
 
-See [CHANGELOG.md](CHANGELOG.md) for the full version-by-version history and [docs/roadmap.md](docs/roadmap.md) for the phase-by-phase overview.
+See [CHANGELOG.md](CHANGELOG.md) for the full version-by-version history and [docs/roadmap.md](docs/roadmap.md) for the phase-by-phase overview, including the v1.9.0+ roadmap toward in-sample slot swap (option B/C territory, with semantic sanity guards).
 
 ## Foundation policies
 
@@ -239,12 +276,13 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version-by-version history and [do
 
 ## Out of scope
 
-- Multilingual output (response is always Kazakh by design)
-- Speech / multimodal
-- Cloud platform work
-- Arbitrary-topic question answering (the 25-intent surface is the product)
+- **Multilingual input and output** (v1.1.0 revert). The v0.9.6 Russian / English triggers were removed; `adam` accepts and produces only Kazakh. Generalisation comes via the retrieval engine over the 77.9 M-word Kazakh corpus, not translation.
+- **Speech / multimodal** — deferred until the retrieval engine is a solid baseline.
+- **Cloud platform work.**
+- **Probabilistic / LLM-style free generation.** Every response is either a template realisation (26-intent path) or a verbatim corpus quote (retrieval path). Nothing invented.
+- **50 M+ parameter transformer experiments on current hardware** (M2 8 GB). v2.0 will **not** be a trained neural LM — it will be the retrieval engine above, extended with pattern-based composition and ranking polish. See [`project_retrieval_not_neural_v2`](docs/roadmap.md#post-v10-direction).
 
-The repo grows from clean data and tight scope, not from broad claims.
+The repo grows from clean data, tight scope, and deterministic composition. Not from broad claims, and not from gradient descent.
 
 ## License
 

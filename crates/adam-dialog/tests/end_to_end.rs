@@ -1103,6 +1103,74 @@ fn unknown_with_session_and_evidence_personalises_frame() {
     );
 }
 
+/// v1.8.5 regression: "мен Алматыдамын" must resolve to
+/// `StatementOfLocation { city: Алматы }`, not `StatementOfOccupation`.
+/// Before the fix, the occupation recogniser accepted any noun+P1Sg
+/// without checking case, so «Алматыдамын» (Алматы + locative + P1Sg)
+/// was miscategorised and `session.occupation` ended up as "алматы".
+#[test]
+fn locative_with_copula_is_location_not_occupation() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен Алматыдамын", &lex, &repo, 0);
+    assert_eq!(
+        conv.session.get("city").map(|s| s.as_str()),
+        Some("Алматы"),
+        "locative+P1Sg should populate city, got session={:?}",
+        conv.session
+    );
+    assert!(
+        conv.session.get("occupation").is_none(),
+        "locative+P1Sg should NOT populate occupation, got session={:?}",
+        conv.session
+    );
+}
+
+/// v1.8.5: FST-aware `{city|locative}` in a session-aware template
+/// should render the city with correct vowel-harmonic locative suffix
+/// (Алматы → Алматыда, Астана → Астанада, Өскемен → Өскеменде). The
+/// test fixes session to Алматы and asserts the rendered form appears
+/// when the planner picks an FST-slot template.
+#[test]
+fn session_aware_city_template_uses_fst_locative() {
+    use adam_retrieval::MorphemeIndex;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let index_path = "../../data/retrieval/morpheme_index.json";
+    if !std::path::Path::new(index_path).exists() {
+        eprintln!("morpheme index not present, skipping");
+        return;
+    }
+    let raw = std::fs::read_to_string(index_path).expect("read index");
+    let mut index: MorphemeIndex = serde_json::from_str(&raw).expect("parse index");
+    index.refresh_stats();
+
+    let mut conv = Conversation::new().with_morpheme_index(index);
+    conv.session.insert("city".into(), "Алматы".into());
+
+    let mut saw_fst_inflection = false;
+    for seed in 0..32u64 {
+        let out = conv.turn("бала туралы бірдеңе айт", &lex, &repo, seed);
+        assert!(
+            !out.contains("{"),
+            "unfilled slot leaked at seed={seed}: {out:?}"
+        );
+        // FST-rendered locative of Алматы is "Алматыда". If we see that
+        // exact form (without a dangling hyphen from a literal `{city}-да`),
+        // the FST-slot template fired.
+        if out.contains("Алматыда") && !out.contains("Алматы-да") {
+            saw_fst_inflection = true;
+        }
+    }
+    assert!(
+        saw_fst_inflection,
+        "expected at least one seed to render {{city|locative}} via the FST"
+    );
+}
+
 /// v1.8.0: with BOTH name and city in the session, at least one
 /// template combining both should activate for an Unknown + evidence
 /// turn. Verifies the {name} + {city} + {example} combination is reachable.

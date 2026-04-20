@@ -572,6 +572,20 @@ fn detect_statement_of_location(
     if let Some(c) = ablative_root {
         return Some(Some(c));
     }
+    // v1.8.5: if a Noun stacks Locative + P1Sg ("Алматыдамын" = "I am
+    // in Almaty"), that's a location statement on its own — no need for
+    // a separate "тұрамын" verb. Without this branch, Locative+P1Sg
+    // falls through to `detect_statement_of_occupation` and "Алматы"
+    // gets miscategorised as an occupation.
+    use adam_kernel_fst::morphotactics::Predicate;
+    for p in parses {
+        if let Analysis::Noun { root, features } = p {
+            if features.case == Some(Case::Locative) && features.predicate == Some(Predicate::P1Sg)
+            {
+                return Some(Some(capitalise(&root.root)));
+            }
+        }
+    }
     let live_verb = tokens.iter().any(|t| t == "тұрамын" || t == "тұрамыз");
     if live_verb {
         if let Some(c) = locative_root {
@@ -704,9 +718,18 @@ fn detect_statement_of_occupation(
     // nouns (POS-filtered) — the parser also returns adjective
     // analyses under Analysis::Noun, but "жақсымын" (adj жақсы +
     // P1Sg) is wellbeing, not an occupation.
+    //
+    // v1.8.5 guard: reject Locative / Ablative case on the noun.
+    // "Алматыдамын" (loc+P1Sg) and "Алматыданмын" (abl+P1Sg) are
+    // location statements ("I am in / from Almaty"), NOT occupation
+    // statements — they're handled by `detect_statement_of_location`.
+    use adam_kernel_fst::morphotactics::Case;
     for p in parses {
         if let Analysis::Noun { root, features } = p {
-            if features.predicate == Some(Predicate::P1Sg) && root.part_of_speech == "noun" {
+            if features.predicate == Some(Predicate::P1Sg)
+                && root.part_of_speech == "noun"
+                && !matches!(features.case, Some(Case::Locative) | Some(Case::Ablative))
+            {
                 return Some(Some(root.root.clone()));
             }
         }
