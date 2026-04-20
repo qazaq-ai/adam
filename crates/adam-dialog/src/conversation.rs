@@ -20,12 +20,12 @@
 use std::collections::HashMap;
 
 use adam_kernel_fst::lexicon::LexiconV1;
-use adam_retrieval::MorphemeIndex;
+use adam_retrieval::{MorphemeIndex, RankConfig};
 
 use crate::intent::Intent;
 use crate::planner::plan_response_with_session;
 use crate::realiser::realise;
-use crate::semantics::interpret_text_with_lexicon;
+use crate::semantics::{content_roots, interpret_text_with_lexicon};
 use crate::templates::TemplateRepository;
 
 /// Maximum intent-history length retained across turns. Bounded so a
@@ -55,6 +55,12 @@ pub struct Conversation {
     /// `example` injected for any `noun_hint` that has postings in the
     /// index. Added v1.6.5.
     pub morpheme_index: Option<MorphemeIndex>,
+    /// Tunable weights + pack purity priors for the v1.7.0 ranker.
+    /// Defaults to `RankConfig::default()` — only override for tests
+    /// or experiments. Uses `Option` rather than a direct value to keep
+    /// `Conversation::default()` cheap and avoid threading the config
+    /// through every embedder.
+    pub rank_config: Option<RankConfig>,
 }
 
 /// Lightweight "kind" summary of an `Intent` — the payload (name /
@@ -162,11 +168,10 @@ impl Conversation {
         // purposes (planner picks a response without asking back).
         let mut intent = resolve_follow_up(raw_intent, input, self.active_intent);
 
-        // v1.6.5: inject a retrieval example into Unknown if the index
-        // has postings for the noun_hint. Deterministic — picks the
-        // first (sorted) sample for reproducibility. rng_seed is NOT
-        // used here so the evidence is stable across reruns.
-        self.inject_retrieval_example(&mut intent);
+        // v1.6.5 / v1.7.0: inject a retrieval example into Unknown.
+        // Deterministic — ranker ties break by (pack, sample_id), so
+        // reruns produce identical evidence. rng_seed is NOT consulted.
+        self.inject_retrieval_example(&mut intent, &parses);
 
         self.absorb_entities(&intent);
         self.record_intent(&intent);
@@ -175,12 +180,16 @@ impl Conversation {
     }
 
     /// For `Intent::Unknown { noun_hint: Some(n), .. }`, if an index is
-    /// attached and has postings for `n` with a stored sample text,
-    /// fill the `example` slot with that text. Deterministic: picks
-    /// the first posting in sort order so reruns produce identical
-    /// output. No-op for every other intent, and for unknown-without-
-    /// noun, and when the index is absent.
-    fn inject_retrieval_example(&self, intent: &mut Intent) {
+    /// attached, call `MorphemeIndex::rank` with every content root
+    /// parsed from the input (v1.7.0) and fill the `example` slot with
+    /// the top-1 hit's text. Falls back to `search(noun_hint)[0]` when
+    /// ranking returns nothing. No-op for every non-Unknown intent, for
+    /// unknown-without-noun, and when the index is absent.
+    fn inject_retrieval_example(
+        &self,
+        intent: &mut Intent,
+        parses: &[adam_kernel_fst::parser::Analysis],
+    ) {
         let Some(index) = self.morpheme_index.as_ref() else {
             return;
         };
@@ -193,6 +202,31 @@ impl Conversation {
             if example.is_some() {
                 return;
             }
+            // v1.7.0: rank over all content roots, not just the first.
+            let roots = content_roots(parses);
+            let root_refs: Vec<&str> = if roots.is_empty() {
+                vec![noun.as_str()]
+            } else {
+                roots.iter().map(|s| s.as_str()).collect()
+            };
+            let default_cfg;
+            let config = match self.rank_config.as_ref() {
+                Some(c) => c,
+                None => {
+                    default_cfg = RankConfig::default();
+                    &default_cfg
+                }
+            };
+            let ranked = index.rank(&root_refs, config);
+            if let Some(hit) = ranked.first() {
+                if let Some(text) = index.sample_text(&hit.sref) {
+                    *example = Some(text.to_string());
+                    return;
+                }
+            }
+            // Fallback: single-morpheme first-posting (the v1.6.5 path)
+            // — kicks in when the ranker found nothing or the top hit
+            // lacks a stored text.
             let refs = index.search(noun);
             if let Some(first) = refs.first() {
                 if let Some(text) = index.sample_text(first) {

@@ -7,6 +7,85 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.7.0] — 2026-04-20 — Deterministic retrieval ranking: overlap + purity + length + loanword penalty
+
+Minor release. `MorphemeIndex::rank` replaces "first matching posting" with a composite deterministic score. Dialog now ranks over **every content root** parsed from the user's input, not just the first noun — so a sentence mentioning both `бала` and `мектеп` outranks one that mentions only `бала` for the input «бала мектепке барды». This is where the retrieval engine starts behaving like a *search* engine rather than a bag dip.
+
+### The formula
+
+```
+score = 0.40 · overlap_ratio            // main "smart" signal
+      + 0.30 · pack_purity              // main "safe" signal
+      + 0.15 · length_goodness(words)   // Gaussian around 8 words
+      − 0.15 · loanword_density         // preserves Kazakh-first thesis
+```
+
+All four components are deterministic pure functions of `(sample, input_morphemes)`. Ties break by `(pack, sample_id)`. Zero randomness, zero training.
+
+### Editorial pack purity priors
+
+Encoded in `RankConfig::default()`:
+
+| Pack | Prior | Why |
+|---|---:|---|
+| Abai Wikisource, Kazakh classics, proverbs | 1.00 | centuries of curation |
+| Synthetic, Tatoeba, Common Voice | 0.95 | Lexicon-bounded / selected |
+| Wikipedia KZ | 0.85 | edited but technical loanwords |
+| CC-100 (web crawl) | 0.75 | weakest source |
+
+Unknown packs fall back to `DEFAULT_UNKNOWN_PACK_PURITY` (0.70).
+
+### Visible effect (same prompts, v1.6.5 → v1.7.0)
+
+| Prompt | v1.6.5 cited | v1.7.0 cited |
+|---|---|---|
+| «бала туралы…» | "Кеше бала ең, келдің ғой талай жасқа…" (11w, Abai) | "Кім сендерді балалар, сүйе-тұғын…" (8w, Abai) |
+| «мектеп керек пе» | CC-100 bureaucratic paragraph (36w) | "иә мұнай-газ жалақыны тағылды немесе таза мектеп сүйенеді." (8w, CC-100) |
+| «адам не істесе…» | "Адам — бір боқ көтерген боқтың қабы…" (Abai, crude) | "Ақылды адам сөзін де, ісін де өлшеп айтар." (Abai proverb) |
+
+Ranking picked the shorter, cleaner, more topical option every time. Still deterministic.
+
+### Changes
+
+- **`adam-retrieval`**:
+  - `Hit { sref, score, overlap_count, overlap_ratio, length_goodness, loanword_density, pack_purity }` — every score component is preserved for tracing.
+  - `RankConfig { top_k, weight_overlap, weight_purity, weight_length, weight_loanword_penalty, pack_purity: BTreeMap<String, f32> }` with `Default` that hard-codes the editorial priors.
+  - `MorphemeIndex::rank(input_morphemes, config) -> Vec<Hit>` — returns top-`k` sorted by descending score, ties broken by `(pack, sample_id)`.
+  - Public `length_goodness(word_count) -> f32` (Gaussian, σ = 6, μ = 8).
+  - Public `sample_loanword_density(text) -> f32` (the v1.x purity rule applied to a single sample).
+  - `DEFAULT_UNKNOWN_PACK_PURITY: f32 = 0.70` for packs not in the table.
+- **`adam-dialog`**:
+  - New `semantics::content_roots(parses) -> Vec<String>` — every distinct content-noun root from the input, not just the first. Preserves insertion order. Filters closed-class items via the existing `NOT_A_TOPIC` list.
+  - `Conversation::rank_config: Option<RankConfig>` — override for tests / experiments; `None` uses the default.
+  - `inject_retrieval_example` now calls `index.rank(&content_roots, &config)` and picks the top hit; falls back to v1.6.5 single-morpheme path if the ranker finds nothing with a stored text.
+- **+7 retrieval tests**:
+  - `rank_prefers_higher_overlap` — 2-morpheme match beats 1-morpheme match.
+  - `rank_breaks_ties_with_pack_purity` — Abai beats CC-100 at equal overlap.
+  - `rank_penalises_loanword_heavy_sample` — native-language sample wins.
+  - `length_goodness_peaks_at_8_words`.
+  - `sample_loanword_density_flags_russian_only_letters`.
+  - `rank_top_k_is_respected`.
+  - `rank_empty_input_returns_empty`.
+
+### Determinism audit
+
+- `rank` never calls rng or system time.
+- Tie-break is `(pack, sample_id)` lex order → identical across runs / machines.
+- `RankConfig::default` is a pure constant.
+- `inject_retrieval_example` does not consult `rng_seed`.
+
+Same corpus + same input + same weights → byte-identical cited sentence.
+
+### What v1.7.0 does NOT do
+
+- **No Lexicon expansion** — top uncovered items from v1.5.5 (`деп`, `осы`, `пен`) are still gaps; that is separate Lexicon work.
+- **No compositional synthesis** — we still QUOTE the retrieved sentence verbatim. Adapting its grammar to the user's context is v1.8.0.
+- **No multi-hit diversity** — top-1 is deterministic; conversation will cite the same sentence every time for the same prompt. Diversity is a later concern.
+
+### Workspace tests
+
+**286 tests pass** (279 → +7 retrieval ranker).
+
 ## [1.6.5] — 2026-04-20 — Retrieval wired into `Intent::Unknown`: dialog cites real Kazakh corpus
 
 Patch release. The retrieval index shipped in v1.6.0 now feeds the dialog layer. When `Intent::Unknown` fires with a recognised noun AND the committed morpheme index contains a sample text for it, the response quotes that sentence verbatim — a concrete step toward "not just predictable, but informed by the corpus." The 26-intent deterministic backbone is untouched; this is strictly a fallback improvement.

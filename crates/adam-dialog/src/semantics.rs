@@ -159,49 +159,80 @@ pub fn interpret_text_with_lexicon(
     }
 }
 
+/// Closed-class items the parser often tags as `Noun` but which carry
+/// no topical content for the `unknown.with_noun` template or for
+/// retrieval ranking. Filtered from both `first_noun_root` and
+/// `content_roots`.
+const NOT_A_TOPIC: &[&str] = &[
+    // pronouns
+    "мен",
+    "сен",
+    "сіз",
+    "ол",
+    "біз",
+    "сендер",
+    "сіздер",
+    "олар",
+    // demonstratives
+    "бұл",
+    "мына",
+    "сол",
+    "осы",
+    "ана",
+    // postpositions
+    "туралы",
+    "бойынша",
+    "үшін",
+    "кейін",
+    "дейін",
+    "сияқты",
+    "ретінде",
+    "арқылы",
+    // quantifiers / closed-class
+    "көп",
+    "аз",
+    "бәрі",
+    "барлық",
+];
+
 /// Return the root of the first content-noun Analysis in the parse list.
 /// Skips Kazakh pronouns, demonstratives, and postpositions that the
 /// FST parser may tag as Noun but which aren't informative as a
 /// "topic hint" for the unknown.with_noun template.
 fn first_noun_root(parses: &[Analysis]) -> Option<String> {
-    const NOT_A_TOPIC: &[&str] = &[
-        // pronouns
-        "мен",
-        "сен",
-        "сіз",
-        "ол",
-        "біз",
-        "сендер",
-        "сіздер",
-        "олар",
-        // demonstratives
-        "бұл",
-        "мына",
-        "сол",
-        "осы",
-        "ана",
-        // postpositions
-        "туралы",
-        "бойынша",
-        "үшін",
-        "кейін",
-        "дейін",
-        "сияқты",
-        "ретінде",
-        "арқылы",
-        "мен",
-        // quantifiers / closed-class
-        "көп",
-        "аз",
-        "бәрі",
-        "барлық",
-    ];
     parses.iter().find_map(|a| match a {
         Analysis::Noun { root, .. } if !NOT_A_TOPIC.contains(&root.root.as_str()) => {
             Some(root.root.clone())
         }
         _ => None,
     })
+}
+
+/// v1.7.0: return every distinct content root from the parse list.
+///
+/// This is what the retrieval ranker consumes — more morphemes in means
+/// more signal for the overlap score. Preserves insertion order so the
+/// first hit still wins for equal-score ties after ranking.
+pub fn content_roots(parses: &[Analysis]) -> Vec<String> {
+    let mut seen = std::collections::HashSet::new();
+    let mut out = Vec::new();
+    for a in parses {
+        if let Analysis::Noun { root, .. } = a {
+            let r = root.root.as_str();
+            if NOT_A_TOPIC.contains(&r) {
+                continue;
+            }
+            // Keep POS-wise noun-like only. "adjective" roots are
+            // signal too but widen the net; v1.7.0 sticks to nouns.
+            if root.part_of_speech != "noun" {
+                continue;
+            }
+            if seen.insert(root.root.clone()) {
+                out.push(root.root.clone());
+            }
+        }
+    }
+    out
 }
 
 /// Legacy-compatible wrapper: runs intent recognition on parse surface
