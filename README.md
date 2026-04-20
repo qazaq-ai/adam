@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.3.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-1.3.5-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/surface-Kazakh--only-9CCC65?style=flat-square" alt="Kazakh only">
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/templates-31%20families-FBC02D?style=flat-square" alt="templates">
-  <img src="https://img.shields.io/badge/tests-253%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-256%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
 </p>
 
@@ -45,7 +45,7 @@ The name *adam* (Kazakh: **адам**) means "human".
 
 - **Predictable** — every stage is deterministic or samples from a finite, inspectable set.
 - **Auditable** — `adam_chat --trace` dumps every layer per turn.
-- **Grammatically correct by construction** — responses go through the FST synthesiser; no morphologically invalid word can leave the system.
+- **Grammatically correct by construction on the slot path** — `{slot|features}` placeholders go through the FST synthesiser, so no morphologically invalid inflected form can leave the system. Literal template text (e.g. `"сәлем"`, `"қайырлы таң"`) is pre-verified Kazakh in `data/dialog/templates/v1.toml`, audited offline.
 - **Small** — runs on a MacBook Air M2 8 GB. No GPU.
 - **Kazakh-native** — built on a 14 k-entry curated pre-modern Kazakh Lexicon (no Russian-era loanwords), not translated from English.
 

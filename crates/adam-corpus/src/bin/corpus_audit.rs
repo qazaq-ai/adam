@@ -62,6 +62,10 @@ const SOURCE_PACKS: &[&str] = &[
     "kazakh_classics_pack.json",
 ];
 
+/// v1.3.5: optional Wikipedia shards beyond the committed first shard.
+/// Present only when the user has run `process_wikipedia_kz -- --full`.
+const SHARDS_DIR: &str = "data/curated/shards";
+
 const CURATED_DIR: &str = "data/curated";
 const REPORT_PATH: &str = "data/corpus_audit_report.json";
 
@@ -108,13 +112,41 @@ fn main() -> ExitCode {
     let mut total_words = 0usize;
     let mut total_loanword_words = 0usize;
 
-    for pack_name in SOURCE_PACKS {
-        let path = Path::new(CURATED_DIR).join(pack_name);
+    // --local flag (or $ADAM_CORPUS_AUDIT_LOCAL=1): include gitignored
+    // shards from data/curated/shards/. Default: committed packs only,
+    // so the report matches what CI sees and doesn't drift locally.
+    let include_local_shards = std::env::args().any(|a| a == "--local")
+        || std::env::var("ADAM_CORPUS_AUDIT_LOCAL").ok().as_deref() == Some("1");
+
+    let mut paths: Vec<PathBuf> = SOURCE_PACKS
+        .iter()
+        .map(|n| Path::new(CURATED_DIR).join(n))
+        .collect();
+    if include_local_shards {
+        if let Ok(entries) = fs::read_dir(SHARDS_DIR) {
+            let mut shard_paths: Vec<PathBuf> = entries
+                .flatten()
+                .map(|e| e.path())
+                .filter(|p| {
+                    p.file_name().and_then(|n| n.to_str()).is_some_and(|s| {
+                        s.starts_with("wikipedia_kz_shard_") && s.ends_with(".json")
+                    })
+                })
+                .collect();
+            shard_paths.sort();
+            if !shard_paths.is_empty() {
+                eprintln!("--local: including {} Wikipedia shards", shard_paths.len());
+                paths.extend(shard_paths);
+            }
+        }
+    }
+
+    for path in &paths {
         if !path.exists() {
             eprintln!("skipping missing: {}", path.display());
             continue;
         }
-        let audit = match audit_pack(&path) {
+        let audit = match audit_pack(path) {
             Ok(a) => a,
             Err(e) => {
                 eprintln!("error auditing {}: {e}", path.display());
@@ -123,7 +155,7 @@ fn main() -> ExitCode {
         };
         total_words += audit.total_words;
         total_loanword_words += audit.loanword_words;
-        let raw: PackFile = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+        let raw: PackFile = serde_json::from_str(&fs::read_to_string(path).unwrap()).unwrap();
         for sample in &raw.samples {
             for word in sample.text.split_whitespace() {
                 corpus_vocab.insert(normalise_word(word));

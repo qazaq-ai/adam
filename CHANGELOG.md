@@ -7,6 +7,46 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.3.5] — 2026-04-19 — Wikipedia sharding + docs drift fixes + v2.0 direction committed
+
+Patch release. No behavioural change in the dialog layer. Unlocks the full 15 M-word Wikipedia yield for local use (the v2.0 retrieval engine's fuel), fixes documentation drift, and commits the v2.0 architectural direction — retrieval over morpheme-parsed corpus, not a trained transformer LM.
+
+### Wikipedia sharding — `--full` mode
+
+`process_wikipedia_kz` now supports a `--full` flag. Default mode is unchanged (single committed pack, 150 k samples, ~49 MB). With `--full`, the processor writes additional shards to `data/curated/shards/wikipedia_kz_shard_NN_pack.json` (gitignored), one per 150 k samples, for the full ~1.4 M-sample, ~16 M-word corpus on local disk. These are the input fuel for v1.6.0+ retrieval-engine work.
+
+`corpus_audit` scans shards automatically when `--local` is passed (or `ADAM_CORPUS_AUDIT_LOCAL=1`); default behaviour is unchanged (reads only committed packs, matches what CI sees).
+
+### Docs drift fixed (after Codex + Antigravity reviews)
+
+Two external AI reviewers flagged specific overclaims and documentation drift. The valid points:
+
+- **Badge count** was `253 passing`; actual test count has been 256 since v1.2.0. Badge updated.
+- **`foundation_scope.md`** still listed "Trilingual input recognition" and "Latin→Cyrillic transliteration" as in-scope, which were both reverted in v1.1.0. Rewritten for v1.3.x+ reality.
+- **"Grammatically correct by construction"** wording in the README was an overclaim — FST guarantees apply to `{slot|features}` expansion, not to literal template text. README and `foundation_scope.md` both tightened: now "grammatically correct by construction on the slot path".
+
+### FST-NER refactor deferred
+
+Reviewers suggested routing entity extraction through `adam_kernel_fst::parser::Analysis` instead of manual suffix stripping. Investigation found this requires two prerequisites that don't fit a patch release:
+
+1. **Predicate-person feature markers** in FST morphotactics (1sg / 2sg / 3rd-person predicate copulas like `-мын / -сың / -дір`). Currently the FST knows possessives but not predicates, so `мұғаліммін` can't be parsed.
+2. **Place names in the Lexicon.** `Алматы`, `Астана`, `Шымкент` etc. aren't in `data/tokenizer/segmentation_roots.json`, so the parser returns empty for any ablative/locative form of them.
+
+Both are v1.4.0 minor-level work (new FST features + Lexicon expansion). Queued, not blocking.
+
+### v2.0 direction — committed
+
+Memory saved (`project_retrieval_not_neural_v2`): v2.0 "minimally thinking Kazakh model" is **retrieval-based, not a trained transformer LM**. Morpheme-indexed retrieval over the 100 M+ word corpus + rule-based compositional synthesis. Properties: zero hallucinations by construction, full trace to source sentences, M2 8 GB-runnable, exploits Kazakh's rich agglutinative structure that the FST already unpacks. Rejects the mainstream "small LLM fallback" path as a scaled-down clone rather than a new direction.
+
+### Numbers
+
+- Committed corpus (CI view): **256 tests passing**, 2.85 M words / 224 k unique / 97.99 % purity — unchanged from v1.3.0
+- Local-with-shards: 16.23 M words / 749 k unique / 98.03 % purity / gap to 100 M target = 6.2×
+
+### Tests
+
+Workspace: 256 passing, 4 ignored, 0 failing. Foundation CI green.
+
 ## [1.3.0] — 2026-04-19 — Wikipedia re-extract (+27 % corpus, 2.85 M words)
 
 Unlocks the Kazakh Wikipedia pack after realising the existing 100 k-sample slice was only 3 % of what the already-downloaded 638 MB source file can yield. The v1.3.0 rewrite of `process_wikipedia_kz` is 100× faster and applies the v1.x purity gate.

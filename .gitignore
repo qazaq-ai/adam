@@ -18,6 +18,12 @@ data/curated/adam_training_corpus_pack.json
 data/curated/adam_pretokenized_corpus_pack.json
 data/curated/adam_training_ids_pack.json
 
+# Wikipedia shard files 02+ (v1.3.5+). Only shard 01 lives at the
+# canonical committed path `wikipedia_kz_pack.json`; the rest are
+# local-only fuel for the v2.0 retrieval engine. Regenerate with
+# `cargo run --release -p adam-corpus --bin process_wikipedia_kz -- --full`.
+data/curated/shards/
+
 # Checkpoints (regeneratable via `bash scripts/run_train_baseline.sh`).
 # Each v0.4.0 checkpoint is ~92 MB. Distribute via release attachments if needed.
 data/training/*.safetensors
