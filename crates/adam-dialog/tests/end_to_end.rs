@@ -513,6 +513,93 @@ fn lexicon_extracts_modern_occupations() {
     }
 }
 
+// --- v1.4.0 FST-NER + DST + follow-up resolution ---------------------------
+
+#[test]
+fn fst_ner_recognises_lexicon_place_name_as_city() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен Алматыданмын", &lex, &repo, 0);
+    // Lexicon has 'алматы' (lowercased, v1.4.0). FST-NER primary path
+    // returns the Lexicon root directly.
+    assert_eq!(conv.session.get("city"), Some(&"Алматы".to_string()));
+}
+
+#[test]
+fn fst_ner_recognises_lexicon_occupation_via_predicate_p1sg() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // "мен бағдарламашымын" — FST parses as Noun(бағдарламашы)+P1Sg.
+    let _ = conv.turn("мен бағдарламашымын", &lex, &repo, 0);
+    assert_eq!(
+        conv.session.get("occupation"),
+        Some(&"бағдарламашы".to_string())
+    );
+}
+
+#[test]
+fn fst_ner_rejects_adjective_predicate_as_occupation() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // "жақсымын" = adj жақсы + P1Sg. Parser emits Analysis::Noun
+    // (nominal slot) with root marked adjective — occupation NER must
+    // POS-filter and reject, letting wellbeing fire.
+    let _ = conv.turn("жақсымын", &lex, &repo, 0);
+    assert!(conv.session.get("occupation").is_none());
+}
+
+#[test]
+fn dst_tracks_active_intent_across_turns() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("қалайсыз", &lex, &repo, 0);
+    assert_eq!(
+        conv.active_intent,
+        Some(adam_dialog::conversation::IntentKind::AskHowAreYou)
+    );
+    let _ = conv.turn("жақсымын", &lex, &repo, 0);
+    assert_eq!(
+        conv.active_intent,
+        Some(adam_dialog::conversation::IntentKind::StatementOfWellbeing)
+    );
+    assert_eq!(conv.intent_history.len(), 2);
+}
+
+#[test]
+fn follow_up_ал_сіз_resolves_against_active_intent() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("қалайсыз", &lex, &repo, 0); // AskHowAreYou
+    // "ал сіз" alone would be Unknown; DST should re-tag as AskHowAreYou.
+    let out = conv.turn("ал сіз", &lex, &repo, 0);
+    // Response must be a how-are-you answer template, not бл Unknown.
+    assert!(
+        out.contains("жақсы") || out.contains("жаман") || out.contains("рахмет"),
+        "expected wellbeing-answer after follow-up, got {out:?}"
+    );
+}
+
+#[test]
+fn reset_clears_all_state_including_history() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+    let _ = conv.turn("қалайсыз", &lex, &repo, 0);
+    assert!(!conv.session.is_empty());
+    assert!(conv.active_intent.is_some());
+    assert!(!conv.intent_history.is_empty());
+    conv.reset();
+    assert!(conv.session.is_empty());
+    assert!(conv.active_intent.is_none());
+    assert!(conv.intent_history.is_empty());
+}
+
 // --- v0.8.5 session state (Conversation) -----------------------------------
 
 #[test]

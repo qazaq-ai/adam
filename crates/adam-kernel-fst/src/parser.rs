@@ -21,8 +21,8 @@
 
 use crate::lexicon::{LexiconV1, RootEntry};
 use crate::morphotactics::{
-    Case, NounFeatures, Number, Person, Possessive, Tense, VerbFeatures, Voice, synthesise_noun,
-    synthesise_verb,
+    Case, NounFeatures, Number, Person, Possessive, Predicate, Tense, VerbFeatures, Voice,
+    synthesise_noun, synthesise_verb,
 };
 
 /// One analysis of a surface form. Holds the root entry (so consumers can
@@ -115,20 +115,37 @@ fn try_noun_analyses(surface: &str, entry: &RootEntry, out: &mut Vec<Analysis>) 
         Some(Case::Ablative),
         Some(Case::Instrumental),
     ];
+    // v1.4.0: also enumerate predicate-person copula suffix.
+    let predicates = [
+        None,
+        Some(Predicate::P1Sg),
+        Some(Predicate::P2SgInformal),
+        Some(Predicate::P2SgPolite),
+        Some(Predicate::P1Pl),
+        Some(Predicate::P2PlInformal),
+        Some(Predicate::P2PlPolite),
+    ];
     for &number in &numbers {
         for &possessive in &possessives {
             for &case in &cases {
-                let features = NounFeatures {
-                    derivation: None,
-                    number,
-                    possessive,
-                    case,
-                };
-                if synthesise_noun(&entry.root, features) == surface {
-                    out.push(Analysis::Noun {
-                        root: entry.clone(),
-                        features,
-                    });
+                for &predicate in &predicates {
+                    // Predicate + possessive never stack in Kazakh.
+                    if predicate.is_some() && possessive.is_some() {
+                        continue;
+                    }
+                    let features = NounFeatures {
+                        derivation: None,
+                        number,
+                        possessive,
+                        case,
+                        predicate,
+                    };
+                    if synthesise_noun(&entry.root, features) == surface {
+                        out.push(Analysis::Noun {
+                            root: entry.clone(),
+                            features,
+                        });
+                    }
                 }
             }
         }

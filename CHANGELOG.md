@@ -7,6 +7,72 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [1.4.0] — 2026-04-19 — FST-NER refactor + DST + predicate-copula morphology
+
+Minor release. Four connected pieces of work that together address the external-reviewer critiques from v1.3.5 and lay groundwork for v1.6.0+ retrieval engine.
+
+### 1. Predicate-person FST morphology (new)
+
+`NounFeatures` gains a `predicate: Option<Predicate>` field with seven variants (P1Sg / P2SgInformal / P2SgPolite / P3 / P1Pl / P2PlInformal / P2PlPolite). Applied AFTER case in `synthesise_noun`:
+
+| form | derivation |
+|---|---|
+| мұғалім + P1Sg | мұғаліммін |
+| мұғалім + P2SgPolite | мұғалімсіз |
+| Алматы + Ablative + P1Sg | Алматыданмын |
+| бағдарламашы + P1Sg | бағдарламашымын |
+
+Six new suffix templates (`PREDICATE_1SG` / `PREDICATE_2SG_INFORMAL` / `PREDICATE_2SG_POLITE` / `PREDICATE_1PL` / `PREDICATE_2PL_INFORMAL` / `PREDICATE_2PL_POLITE`). The inverse parser now enumerates predicate in its feature space; predicate + possessive never stack (grammatically exclusive), saving search space.
+
+### 2. Lexicon place names (+30 entries)
+
+Added Kazakh cities and country names as proper nouns to `data/tokenizer/segmentation_roots.json`: Алматы, Астана, Шымкент, Қарағанды, Ақтөбе, Тараз, Павлодар, Өскемен, Атырау, Семей, Қостанай, Қызылорда, Талдықорған, Ақтау, Орал, Петропавл, Түркістан, Көкшетау, Маңғыстау, Қазақстан, Ресей, Қытай, Түркия, Монғолия, Өзбекстан, Қырғызстан, Еуропа, Азия, Әлем, Отан. All lowercased for case-insensitive parser lookup.
+
+Total Lexicon: 4,496 entries (was 4,466 in v1.3.5).
+
+### 3. Semantics FST-NER refactor
+
+Replaced manual suffix-stripping in the city and occupation recognisers with **FST parse-based entity extraction** — addresses the architectural inconsistency Codex and Antigravity flagged.
+
+- **City**: `detect_statement_of_location` now scans `parses: &[Analysis]` for the first Noun in Ablative or Locative case. Ablative signals origin ("Алматыданмын"), Locative signals residence when co-occurring with "тұрамын / тұрамыз". Rule-based string heuristics remain as fallback for out-of-Lexicon inputs.
+- **Occupation**: `detect_statement_of_occupation` scans parses for Noun with `predicate == Some(P1Sg)` AND `part_of_speech == "noun"` (the POS filter rejects adjective-predicate forms like `жақсымын`). Fallback chain: FST parse → Lexicon-backed copula-strip (v0.9.7) → fixed 6-form table (v0.8.0).
+
+### 4. Dialog State Tracking (DST)
+
+`Conversation` is no longer a flat slot HashMap — it tracks intent context:
+
+```rust
+pub struct Conversation {
+    pub session: HashMap<String, String>,        // slots
+    pub active_intent: Option<IntentKind>,       // last-turn intent kind
+    pub intent_history: Vec<IntentKind>,         // bounded-capacity trace
+}
+```
+
+`IntentKind` (new, exported) is a lightweight payload-free summary of `Intent` — string names aren't copied into history. History is capped at 32 entries (long sessions don't grow unboundedly).
+
+**Follow-up resolution** handles contextual utterances like `ал сіз?` ("and you?") — `resolve_follow_up` re-tags weak-intent utterances ([`Unknown`] / [`Affirmation`] / [`Negation`]) against the previous turn's `active_intent`, so after `AskHowAreYou` the follow-up fires as `AskHowAreYou` again for planning. Strong intents are never overridden.
+
+### Addresses external reviewer critiques
+
+| Critique | Disposition |
+|---|---|
+| Codex: "FST parser ignored in semantics" | **Fixed** — FST parses are the primary entity-extraction path |
+| Codex: "duplicated morphology in strip_*" | **Fixed** — fallback to rule-based string heuristics only when FST parse is empty |
+| Antigravity: "flat HashMap isn't DST" | **Fixed** — active_intent + intent_history + follow-up resolution |
+| Antigravity: "можно добавить ML для NLU" | **Rejected** — contradicts v2.0 retrieval-not-neural direction |
+
+### Tests
+
+75 dialog end-to-end pairs (up from 69 in v1.3.5), 6 new covering FST-NER place-name recognition, predicate-P1Sg occupation, adjective rejection, DST active_intent tracking, follow-up resolution, and reset clearing all state. Workspace total: **262 passing**, 4 ignored, 0 failing. Foundation CI green.
+
+### Public API additions
+
+- `adam_dialog::IntentKind` — lightweight payload-free intent summary
+- `adam_dialog::Conversation { active_intent, intent_history }` — new fields
+- `adam_kernel_fst::morphotactics::Predicate` — new enum for noun-predicate copula
+- `adam_kernel_fst::morphotactics::NounFeatures.predicate` — new optional field
+
 ## [1.3.5] — 2026-04-19 — Wikipedia sharding + docs drift fixes + v2.0 direction committed
 
 Patch release. No behavioural change in the dialog layer. Unlocks the full 15 M-word Wikipedia yield for local use (the v2.0 retrieval engine's fuel), fixes documentation drift, and commits the v2.0 architectural direction — retrieval over morpheme-parsed corpus, not a trained transformer LM.

@@ -29,7 +29,7 @@ pub fn interpret_text(input: &str, parses: &[Analysis]) -> Intent {
 /// (e.g. `философпын` → `философ` if present).
 pub fn interpret_text_with_lexicon(
     input: &str,
-    _parses: &[Analysis],
+    parses: &[Analysis],
     lexicon: Option<&LexiconV1>,
 ) -> Intent {
     // Keep two parallel token streams:
@@ -97,13 +97,14 @@ pub fn interpret_text_with_lexicon(
     if detect_ask_age(&joined) {
         return Intent::AskAge;
     }
-    if let Some(city) = detect_statement_of_location(&tokens, &raw_tokens, &joined) {
+    if let Some(city) = detect_statement_of_location(&tokens, &raw_tokens, &joined, parses) {
         return Intent::StatementOfLocation { city };
     }
     if detect_ask_location(&joined) {
         return Intent::AskLocation;
     }
-    if let Some(occupation) = detect_statement_of_occupation(&tokens, &raw_tokens, &joined, lexicon)
+    if let Some(occupation) =
+        detect_statement_of_occupation(&tokens, &raw_tokens, &joined, lexicon, parses)
     {
         return Intent::StatementOfOccupation { occupation };
     }
@@ -149,7 +150,7 @@ pub fn interpret_text_with_lexicon(
 
     // Unknown — but try to extract a noun hint from the parses so the
     // fallback response can at least acknowledge context.
-    let noun_hint = first_noun_root(_parses);
+    let noun_hint = first_noun_root(parses);
     Intent::Unknown {
         raw_tokens: tokens,
         noun_hint,
@@ -500,10 +501,57 @@ fn detect_ask_location(joined: &str) -> bool {
 
 /// User states location: "мен Алматыданмын", "астанада тұрамын",
 /// "ауылдан келдім". Returns `Some(city)` when the pattern fires,
-/// with `city` being the extracted root (case-preserved, nominative)
-/// — or `None` inside `Some` when the pattern fires without a
-/// parseable city token.
+/// with `city` being the extracted root — or `None` inside `Some`
+/// when the pattern fires without a parseable city token.
+///
+/// v1.4.0 FST-NER primary path: scan the FST `parses` for a
+/// Noun in Ablative or Locative case (possibly with P1Sg predicate
+/// stacked). If found, its root is the city. Rule-based string-
+/// stripping stays as fallback for words not in the Lexicon.
 fn detect_statement_of_location(
+    tokens: &[String],
+    raw_tokens: &[String],
+    joined: &str,
+    parses: &[Analysis],
+) -> Option<Option<String>> {
+    use adam_kernel_fst::morphotactics::Case;
+
+    // Primary: look for a parsed Noun in Ablative or Locative case.
+    // Prefer Ablative (stronger signal for origin: "X-дан+мын") over
+    // bare Locative. Also accept Locative if co-occurring with
+    // "тұрамын / тұрамыз".
+    let mut ablative_root: Option<String> = None;
+    let mut locative_root: Option<String> = None;
+    for p in parses {
+        if let Analysis::Noun { root, features } = p {
+            match features.case {
+                Some(Case::Ablative) if ablative_root.is_none() => {
+                    ablative_root = Some(capitalise(&root.root));
+                }
+                Some(Case::Locative) if locative_root.is_none() => {
+                    locative_root = Some(capitalise(&root.root));
+                }
+                _ => {}
+            }
+        }
+    }
+    if let Some(c) = ablative_root {
+        return Some(Some(c));
+    }
+    let live_verb = tokens.iter().any(|t| t == "тұрамын" || t == "тұрамыз");
+    if live_verb {
+        if let Some(c) = locative_root {
+            return Some(Some(c));
+        }
+    }
+
+    // Fallback for out-of-lexicon inputs: string-based heuristics.
+    detect_statement_of_location_rule_based(tokens, raw_tokens, joined)
+}
+
+/// Pre-v1.4.0 string-based heuristic retained as fallback when the FST
+/// can't parse the form (e.g. the city isn't in the Lexicon yet).
+fn detect_statement_of_location_rule_based(
     tokens: &[String],
     raw_tokens: &[String],
     joined: &str,
@@ -600,25 +648,43 @@ fn detect_ask_occupation(joined: &str) -> bool {
 
 /// User states occupation.
 ///
-/// Strategy:
-/// 1. If a `LexiconV1` is supplied: for every token, try stripping
-///    each 1sg-copula suffix (`-мын/-мін/-пын/-пін/-бын/-бін`) and
-///    look up the residue. If it's tagged `noun`, that's the occupation.
-/// 2. Otherwise fall back to a fixed 6-form table for the most common
-///    occupations — keeps `interpret_text` working without a lexicon.
-/// 3. In both paths, bare "жұмыс істеймін" ("I work") fires the intent
-///    with no specific occupation.
+/// Priority chain (v1.4.0):
+/// 1. **FST parse**: any Noun with `predicate = P1Sg` in the parses is
+///    the occupation. Root from the Analysis is returned.
+/// 2. **Lexicon fallback**: strip 1sg-copula suffix + lookup noun POS.
+///    Runs when parser didn't produce a Noun+P1Sg (e.g. word not in
+///    Lexicon).
+/// 3. **Fixed table**: final fallback with 6 hand-written forms for
+///    callers that pass neither parses nor a lexicon.
+/// 4. Bare "жұмыс істеймін" matches as occupation = None.
 fn detect_statement_of_occupation(
     tokens: &[String],
     _raw_tokens: &[String],
     joined: &str,
     lexicon: Option<&LexiconV1>,
+    parses: &[Analysis],
 ) -> Option<Option<String>> {
+    use adam_kernel_fst::morphotactics::Predicate;
+
+    // Priority 1 — FST parse with P1Sg predicate. Only accept real
+    // nouns (POS-filtered) — the parser also returns adjective
+    // analyses under Analysis::Noun, but "жақсымын" (adj жақсы +
+    // P1Sg) is wellbeing, not an occupation.
+    for p in parses {
+        if let Analysis::Noun { root, features } = p {
+            if features.predicate == Some(Predicate::P1Sg) && root.part_of_speech == "noun" {
+                return Some(Some(root.root.clone()));
+            }
+        }
+    }
+
+    // Priority 2 — Lexicon-backed copula-strip lookup.
     if let Some(lex) = lexicon {
         if let Some(root) = strip_copula_and_lookup_noun(tokens, lex) {
             return Some(Some(root));
         }
     } else {
+        // Priority 3 — fixed table for no-lexicon callers.
         const OCCUPATIONS: &[(&str, &str)] = &[
             ("мұғаліммін", "мұғалім"),
             ("дәрігермін", "дәрігер"),

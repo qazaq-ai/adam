@@ -54,6 +54,14 @@ pub struct NounFeatures {
     pub number: Option<Number>,
     pub possessive: Option<Possessive>,
     pub case: Option<Case>,
+    /// Predicate-person copula appended AFTER case (v1.4.0).
+    /// Turns a noun into a "X is/am/are" predicate form:
+    ///   мұғалім + P1Sg → мұғаліммін  ("I am a teacher")
+    ///   мұғалім + P2SgPolite → мұғалімсіз ("you are a teacher")
+    ///   Алматы + Ablative + P1Sg → Алматыданмын ("I am from Almaty")
+    /// Mutually exclusive with `possessive` in practice — the two
+    /// copula layers never stack in Kazakh grammar.
+    pub predicate: Option<Predicate>,
 }
 
 /// Partial feature bundle for a verb-like word.
@@ -77,6 +85,27 @@ pub enum Number {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Possessive {
+    P1Sg,
+    P2SgInformal,
+    P2SgPolite,
+    P3,
+    P1Pl,
+    P2PlInformal,
+    P2PlPolite,
+}
+
+/// Kazakh predicate-person copula (v1.4.0). Attached after case to form
+/// predicative phrases like `мен мұғаліммін` ("I am a teacher").
+/// Morphology:
+///   P1Sg         — -мын/-мін/-пын/-пін/-бын/-бін (M archiphoneme + harmonic ы/і)
+///   P2SgInformal — -сың/-сің
+///   P2SgPolite   — -сыз/-сіз
+///   P3           — ∅ (zero-marked; "ол мұғалім" with no copula is already 3rd-person)
+///   P1Pl         — -мыз/-міз/-пыз/-піз/-быз/-біз
+///   P2PlInformal — -сыңдар/-сіңдер
+///   P2PlPolite   — -сыздар/-сіздер
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Predicate {
     P1Sg,
     P2SgInformal,
     P2SgPolite,
@@ -207,6 +236,58 @@ const INSTRUMENTAL: SuffixTemplate = &[
     SuffixAtom::Arch(Archiphoneme::M),
     SuffixAtom::Literal('е'),
     SuffixAtom::Literal('н'),
+];
+
+/// Predicate-person copula templates (v1.4.0).
+///
+/// 1sg: -{M}{I}н (мұғалім+мын, Алматы+данмын)
+///   M picks between м / б / п by preceding consonant class.
+///   I is harmonic ы/і (back/front).
+const PREDICATE_1SG: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::M),
+    SuffixAtom::Arch(Archiphoneme::I),
+    SuffixAtom::Literal('н'),
+];
+
+/// 2sg informal: -сың/-сің (мұғалімсің, балаларсың)
+const PREDICATE_2SG_INFORMAL: SuffixTemplate = &[
+    SuffixAtom::Literal('с'),
+    SuffixAtom::Arch(Archiphoneme::I),
+    SuffixAtom::Literal('ң'),
+];
+
+/// 2sg polite: -сыз/-сіз (мұғалімсіз)
+const PREDICATE_2SG_POLITE: SuffixTemplate = &[
+    SuffixAtom::Literal('с'),
+    SuffixAtom::Arch(Archiphoneme::I),
+    SuffixAtom::Literal('з'),
+];
+
+/// 1pl: -{M}{I}з (мұғаліммiз)
+const PREDICATE_1PL: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::M),
+    SuffixAtom::Arch(Archiphoneme::I),
+    SuffixAtom::Literal('з'),
+];
+
+/// 2pl informal: -сыңдар/-сіңдер (мұғалімсіңдер)
+const PREDICATE_2PL_INFORMAL: SuffixTemplate = &[
+    SuffixAtom::Literal('с'),
+    SuffixAtom::Arch(Archiphoneme::I),
+    SuffixAtom::Literal('ң'),
+    SuffixAtom::Literal('д'),
+    SuffixAtom::Arch(Archiphoneme::A),
+    SuffixAtom::Literal('р'),
+];
+
+/// 2pl polite: -сыздар/-сіздер (мұғалімсіздер)
+const PREDICATE_2PL_POLITE: SuffixTemplate = &[
+    SuffixAtom::Literal('с'),
+    SuffixAtom::Arch(Archiphoneme::I),
+    SuffixAtom::Literal('з'),
+    SuffixAtom::Literal('д'),
+    SuffixAtom::Arch(Archiphoneme::A),
+    SuffixAtom::Literal('р'),
 ];
 
 /// Past-definite tense marker: `-{D}{I}`. After stem ending in voiceless →
@@ -687,6 +768,20 @@ pub fn synthesise_noun(root: &str, features: NounFeatures) -> String {
             Case::Locative => acc.apply(LOCATIVE),
             Case::Ablative => acc.apply(ABLATIVE),
             Case::Instrumental => acc.apply(INSTRUMENTAL),
+        }
+    }
+    // Predicate-person copula slot (v1.4.0). Applied AFTER case so
+    // patterns like "Алматыданмын" (Ablative + 1sg predicate) work.
+    // 3rd person is zero-marked.
+    if let Some(pred) = features.predicate {
+        match pred {
+            Predicate::P1Sg => acc.apply(PREDICATE_1SG),
+            Predicate::P2SgInformal => acc.apply(PREDICATE_2SG_INFORMAL),
+            Predicate::P2SgPolite => acc.apply(PREDICATE_2SG_POLITE),
+            Predicate::P3 => {} // zero
+            Predicate::P1Pl => acc.apply(PREDICATE_1PL),
+            Predicate::P2PlInformal => acc.apply(PREDICATE_2PL_INFORMAL),
+            Predicate::P2PlPolite => acc.apply(PREDICATE_2PL_POLITE),
         }
     }
     acc.out

@@ -1,5 +1,5 @@
 {
-  "version": "1.3.5",
+  "version": "1.4.0",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -31265,6 +31265,216 @@
       "part_of_speech": "adjective",
       "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "place_v14_2000",
+      "root": "алматы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2001",
+      "root": "астана",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2002",
+      "root": "шымкент",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "place_v14_2003",
+      "root": "қарағанды",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2004",
+      "root": "ақтөбе",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2005",
+      "root": "тараз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "place_v14_2006",
+      "root": "павлодар",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "place_v14_2007",
+      "root": "өскемен",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "place_v14_2008",
+      "root": "атырау",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2009",
+      "root": "семей",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2010",
+      "root": "қостанай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2011",
+      "root": "қызылорда",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2012",
+      "root": "талдықорған",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "place_v14_2013",
+      "root": "ақтау",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2014",
+      "root": "орал",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "place_v14_2015",
+      "root": "петропавл",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "place_v14_2016",
+      "root": "түркістан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "place_v14_2017",
+      "root": "көкшетау",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2018",
+      "root": "маңғыстау",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2019",
+      "root": "қазақстан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "place_v14_2020",
+      "root": "ресей",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2021",
+      "root": "қытай",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2022",
+      "root": "түркия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2023",
+      "root": "монғолия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2024",
+      "root": "өзбекстан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "place_v14_2025",
+      "root": "қырғызстан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "place_v14_2026",
+      "root": "еуропа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2027",
+      "root": "азия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "place_v14_2028",
+      "root": "әлем",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "place_v14_2029",
+      "root": "отан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
     }
   ]
 }

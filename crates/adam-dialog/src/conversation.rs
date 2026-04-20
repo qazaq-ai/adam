@@ -1,30 +1,21 @@
-//! Layer 3.5 — multi-turn session state.
+//! Layer 3.5 — multi-turn session state + dialog state tracking.
 //!
-//! v0.8.5 adds the first piece of persistent memory to the dialog
-//! layer: a [`Conversation`] accumulates entities extracted from past
-//! turns (the user's name, later: age, location, occupation) and
-//! makes them available to the planner as slot values on every
-//! subsequent turn.
-//!
-//! The design is deliberately small:
+//! v0.8.5 introduced a flat slot map. v1.4.0 adds proper Dialog State
+//! Tracking (DST): the `Conversation` now carries
 //!
 //! ```text
-//!  turn N:  input --parse--> intent --extract--> new-entities
-//!                                                     |
-//!                       session (from turn N-1) <-----+
-//!                                |
-//!                                v
-//!                       planner: pick template that
-//!                                is fillable from session
-//!                                |
-//!                                v
-//!                       realiser: substitute {slot}s
+//!   { slots: HashMap, active_intent: Option<IntentKind>, intent_history: Vec<IntentKind> }
 //! ```
 //!
-//! No free generation — the only thing session state changes is which
-//! TEMPLATE is eligible, and how its `{slot}` placeholders are filled.
-//! The MVP predictability property holds: given (session, intent,
-//! seed) the output is fully determined.
+//! - `slots` — accumulated entities across turns (name, age, city, occupation).
+//! - `active_intent` — the kind of the LAST recognised intent. Used for
+//!   follow-up resolution like "ал сіз?" ("and you?") which re-interpretates
+//!   against the previous frame.
+//! - `intent_history` — ordered list of every recognised intent kind this
+//!   session (bounded to MAX_HISTORY to avoid unbounded growth).
+//!
+//! Deterministic-by-construction: given (slots, active_intent, input, seed),
+//! the next turn's output is fully determined. No probabilistic decisions.
 
 use std::collections::HashMap;
 
@@ -36,27 +27,104 @@ use crate::realiser::realise;
 use crate::semantics::interpret_text_with_lexicon;
 use crate::templates::TemplateRepository;
 
-/// A running multi-turn dialog. Holds accumulated session entities
-/// (name, age, location, …) and exposes a single [`turn`](Self::turn)
-/// method for "input string → response string".
+/// Maximum intent-history length retained across turns. Bounded so a
+/// long-running session doesn't accumulate an unbounded trace.
+const MAX_HISTORY: usize = 32;
+
+/// A running multi-turn dialog.
 #[derive(Debug, Clone, Default)]
 pub struct Conversation {
-    /// All entities extracted from past turns, keyed by slot name.
-    /// Current supported slots: `name`.
+    /// Entity slot values accumulated across turns
+    /// (`name`, `age`, `city`, `occupation`).
     pub session: HashMap<String, String>,
+    /// Kind of the last recognised intent. `None` before the first turn.
+    /// Used by follow-up resolution (v1.4.0).
+    pub active_intent: Option<IntentKind>,
+    /// Ordered history of recognised intent kinds, oldest-first.
+    /// Bounded to [`MAX_HISTORY`] items.
+    pub intent_history: Vec<IntentKind>,
+}
+
+/// Lightweight "kind" summary of an `Intent` — the payload (name /
+/// years / city / …) is already held in `slots`, so history doesn't
+/// need to copy it. Keeping this separate from `intent::Intent` avoids
+/// retaining potentially large `String`s in the session log.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IntentKind {
+    Greeting,
+    Farewell,
+    Affirmation,
+    Negation,
+    Thanks,
+    Apology,
+    AskHowAreYou,
+    StatementOfWellbeing,
+    AskName,
+    StatementOfName,
+    AskAge,
+    StatementOfAge,
+    AskLocation,
+    StatementOfLocation,
+    AskOccupation,
+    StatementOfOccupation,
+    AskFamily,
+    StatementOfFamily,
+    AskWeather,
+    StatementOfWeather,
+    AskTime,
+    Compliment,
+    Request,
+    WellWishes,
+    Insult,
+    Unknown,
+}
+
+impl From<&Intent> for IntentKind {
+    fn from(intent: &Intent) -> Self {
+        match intent {
+            Intent::Greeting { .. } => Self::Greeting,
+            Intent::Farewell => Self::Farewell,
+            Intent::Affirmation => Self::Affirmation,
+            Intent::Negation => Self::Negation,
+            Intent::Thanks => Self::Thanks,
+            Intent::Apology => Self::Apology,
+            Intent::AskHowAreYou => Self::AskHowAreYou,
+            Intent::StatementOfWellbeing => Self::StatementOfWellbeing,
+            Intent::AskName => Self::AskName,
+            Intent::StatementOfName { .. } => Self::StatementOfName,
+            Intent::AskAge => Self::AskAge,
+            Intent::StatementOfAge { .. } => Self::StatementOfAge,
+            Intent::AskLocation => Self::AskLocation,
+            Intent::StatementOfLocation { .. } => Self::StatementOfLocation,
+            Intent::AskOccupation => Self::AskOccupation,
+            Intent::StatementOfOccupation { .. } => Self::StatementOfOccupation,
+            Intent::AskFamily => Self::AskFamily,
+            Intent::StatementOfFamily => Self::StatementOfFamily,
+            Intent::AskWeather => Self::AskWeather,
+            Intent::StatementOfWeather => Self::StatementOfWeather,
+            Intent::AskTime => Self::AskTime,
+            Intent::Compliment => Self::Compliment,
+            Intent::Request => Self::Request,
+            Intent::WellWishes => Self::WellWishes,
+            Intent::Insult => Self::Insult,
+            Intent::Unknown { .. } => Self::Unknown,
+        }
+    }
 }
 
 impl Conversation {
-    /// Start a fresh session — no remembered entities.
+    /// Start a fresh session — no remembered entities and no history.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Run one conversational turn. Parses the input, recognises the
     /// intent, folds any new entities into [`session`](Self::session),
-    /// then plans + realises a response using the merged slot map.
+    /// updates [`active_intent`](Self::active_intent) and
+    /// [`intent_history`](Self::intent_history), then plans + realises
+    /// a response using the merged slot map.
     ///
-    /// Deterministic given (current session, input, seed). The session
+    /// Deterministic given (current state, input, seed). The state
     /// mutation is the ONLY side-effect.
     pub fn turn(
         &mut self,
@@ -66,18 +134,22 @@ impl Conversation {
         rng_seed: u64,
     ) -> String {
         let parses = crate::parse_input_public(input, lexicon);
-        let intent = interpret_text_with_lexicon(input, &parses, Some(lexicon));
+        let raw_intent = interpret_text_with_lexicon(input, &parses, Some(lexicon));
+
+        // v1.4.0: follow-up resolution. "ал сіз?" after AskHowAreYou
+        // becomes a re-interpretation: "user is asking me the same
+        // thing back", which is still AskHowAreYou for planning
+        // purposes (planner picks a response without asking back).
+        let intent = resolve_follow_up(raw_intent, input, self.active_intent);
+
         self.absorb_entities(&intent);
+        self.record_intent(&intent);
         let plan = plan_response_with_session(&intent, rng_seed, repo, &self.session);
         realise(&plan)
     }
 
     /// Extract persistent entities from an intent and push them into
     /// the running session.
-    ///
-    /// v0.8.5: `{name}` only.
-    /// v0.9.0: `{name}`, `{age}`, `{city}`, `{occupation}` — every
-    /// statement intent carrying an extractable entity contributes it.
     pub(crate) fn absorb_entities(&mut self, intent: &Intent) {
         match intent {
             Intent::StatementOfName { name } => {
@@ -98,9 +170,66 @@ impl Conversation {
         }
     }
 
-    /// Clear all session state — used when the user wants a fresh
-    /// conversation without dropping the Conversation instance.
+    /// Update `active_intent` + push to `intent_history` with a bounded
+    /// capacity. Called on every turn by [`turn`](Self::turn).
+    fn record_intent(&mut self, intent: &Intent) {
+        let kind = IntentKind::from(intent);
+        self.active_intent = Some(kind);
+        if self.intent_history.len() >= MAX_HISTORY {
+            self.intent_history.remove(0);
+        }
+        self.intent_history.push(kind);
+    }
+
+    /// Clear all conversation state — slots, active intent, history.
     pub fn reset(&mut self) {
         self.session.clear();
+        self.active_intent = None;
+        self.intent_history.clear();
+    }
+}
+
+/// v1.4.0 follow-up resolution. Some Kazakh utterances are meaningless
+/// out of context but carry a pointer back to the previous turn:
+///
+///   "ал сіз?"     — "and you?"       (flip subject of last Ask-)
+///   "ал сен?"     — informal version
+///
+/// When we detect a bare reflective-query as `Unknown` (or any
+/// weak-intent), and the PREVIOUS turn was an Ask- intent, we re-tag
+/// the current turn as the same Ask kind, so the planner picks a
+/// matching response template.
+fn resolve_follow_up(raw: Intent, input: &str, active: Option<IntentKind>) -> Intent {
+    let normalised: String = input.to_lowercase();
+    let is_reflective = normalised.trim() == "ал сіз"
+        || normalised.trim() == "ал сіз?"
+        || normalised.trim() == "ал сен"
+        || normalised.trim() == "ал сен?"
+        || normalised.trim() == "сіз ше"
+        || normalised.trim() == "сен ше";
+    if !is_reflective {
+        return raw;
+    }
+    // Only reroute when the raw intent is weak (Unknown / Affirmation)
+    // — never override a clearly-recognised strong intent.
+    if !matches!(
+        raw,
+        Intent::Unknown { .. } | Intent::Affirmation | Intent::Negation
+    ) {
+        return raw;
+    }
+    match active {
+        Some(IntentKind::AskHowAreYou) | Some(IntentKind::StatementOfWellbeing) => {
+            Intent::AskHowAreYou
+        }
+        Some(IntentKind::AskName) | Some(IntentKind::StatementOfName) => Intent::AskName,
+        Some(IntentKind::AskAge) | Some(IntentKind::StatementOfAge) => Intent::AskAge,
+        Some(IntentKind::AskLocation) | Some(IntentKind::StatementOfLocation) => {
+            Intent::AskLocation
+        }
+        Some(IntentKind::AskOccupation) | Some(IntentKind::StatementOfOccupation) => {
+            Intent::AskOccupation
+        }
+        _ => raw,
     }
 }
