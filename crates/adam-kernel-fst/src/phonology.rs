@@ -271,10 +271,27 @@ pub fn realise_n_buffer(_ctx: PhonologicalContext) -> Option<char> {
 // ---------------------------------------------------------------------------
 
 /// Classify a character. Returns `None` for punctuation / non-letter input.
+///
+/// v2.3: **glide-vowels у, и, ю** moved from `VowelPreceding` to
+/// `HighSonorant`, matching the enum docstring ("High sonorant: й, у,
+/// р, и, ю"). Rationale: these letters spell the consonantal glides
+/// [w] and [j] in Kazakh; they pattern with consonants for several
+/// morphophonological rules, not with true vowels.
+///
+/// Observable effects of the fix:
+///
+///   - `realise_s_buffer` no longer inserts с after у/и/ю → `оқу+P3` =
+///     `оқуы` (not `оқусы`), `бастау+P3` = `бастауы` (not `бастаусы`).
+///   - `realise_y_buffer` now inserts ы/і after у/и/ю → `оқу+P1SG`
+///     correctly produces `оқуым` instead of `оқум`.
+///   - `realise_n` now returns `д` after у/и/ю (HighSonorant path).
+///     Dative/genitive are synthesised by `{G}` / `{N}` archiphonemes
+///     whose `HighSonorant` branch already matched existing corpus
+///     forms, so this is a pure correction.
 pub fn classify_char(c: char) -> Option<ConsonantClass> {
     let c = c.to_lowercase().next()?;
     Some(match c {
-        'а' | 'ә' | 'е' | 'ё' | 'и' | 'і' | 'о' | 'ө' | 'у' | 'ұ' | 'ү' | 'ы' | 'э' | 'ю' | 'я' => {
+        'а' | 'ә' | 'е' | 'ё' | 'і' | 'о' | 'ө' | 'ұ' | 'ү' | 'ы' | 'э' | 'я' => {
             ConsonantClass::VowelPreceding
         }
         'к' | 'қ' | 'п' | 'с' | 'т' | 'ф' | 'х' | 'ш' | 'щ' | 'ц' | 'ч' | 'һ' => {
@@ -283,7 +300,10 @@ pub fn classify_char(c: char) -> Option<ConsonantClass> {
         'б' | 'в' | 'г' | 'ғ' | 'д' | 'ж' | 'з' => ConsonantClass::VoicedObstruent,
         'м' | 'н' | 'ң' => ConsonantClass::Nasal,
         'л' => ConsonantClass::Liquid,
-        'й' | 'р' => ConsonantClass::HighSonorant,
+        // у / и / ю are glide vowels — spelt as letters, pattern as
+        // consonants for P3 с-buffer and Y-buffer alternation. Moved
+        // here from VowelPreceding in v2.3.
+        'й' | 'р' | 'у' | 'и' | 'ю' => ConsonantClass::HighSonorant,
         _ => return None,
     })
 }

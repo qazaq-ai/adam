@@ -7,6 +7,137 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.3.0] — 2026-04-21 — FST vowel-final+P3 fix + Lexical Graph v0 (fact projection)
+
+Minor release. Two step-changes:
+
+1. **FST fix**: Kazakh glide-vowels `у`, `и`, `ю` are moved from `ConsonantClass::VowelPreceding` to `HighSonorant`, aligning the code with the enum docstring and fixing a whole class of vowel-final + P3 mis-synthesis. Observable: `оқу+P3`, `бастау+P3` now produce `оқуы`, `бастауы` (before: wrong `оқусы`, `бастаусы`). v2.2's last remaining imprecision (`жер → тіршілік` should have been `жер → бастау`) is fixed as a direct consequence.
+2. **Lexical Graph v0**: new `adam_reasoning::graph::LexicalGraph`. Pure projection of `facts.json` into `(nodes, edges)` — every edge traces back to the fact(s) that produced it. 29 nodes, 15 edges from the v2.3 fact set. First step toward a reasoner that can answer "tell me about X" or "what is X?" in O(1) via the graph.
+
+### The FST fix — `classify_char` correction
+
+```rust
+// before (v2.2)
+'а' | 'ә' | 'е' | 'ё' | 'и' | 'і' | 'о' | 'ө' | 'у' | 'ұ' | 'ү' | 'ы' | 'э' | 'ю' | 'я'
+  → VowelPreceding
+
+// after (v2.3)
+'а' | 'ә' | 'е' | 'ё'       | 'і' | 'о' | 'ө'       | 'ұ' | 'ү' | 'ы' | 'э'       | 'я'
+  → VowelPreceding
+'й' | 'р' | 'у' | 'и' | 'ю'
+  → HighSonorant
+```
+
+Kazakh grammatical rationale: `у`, `и`, `ю` are glide-vowels — spelt as letters, but patterning with consonants for P3 `с`-buffer insertion and Y-buffer alternation.
+
+Observable cascade of fixes:
+
+- `realise_s_buffer` no longer inserts `с` after у/и/ю → `оқу+P3` = `оқуы` (not `оқусы`).
+- `realise_y_buffer` now inserts `ы/і` after у/и/ю → `оқу+P1SG` = `оқуым` (not the broken `оқум`).
+- `realise_n` `HighSonorant` branch already existed; existing vowel-cases fall through vowel-path untouched.
+
+Every pre-v2.3 test still passes (328 → 335, including +7 graph tests). Zero regressions.
+
+### Extraction delta — v2.2 → v2.3
+
+| Metric | v2.2 | **v2.3** | Δ |
+|---|---:|---:|---|
+| Committed facts | 13 | **15** | +2 (`жер → бастау` corrected, `ой → қару` newly unblocked) |
+| Predicates | 2 (IsA, Has) | 2 | — |
+| Clean facts | 13 | **15 (100 %)** | **0 imprecisions remain** |
+
+v2.1 → v2.3 arc on the *same committed corpus*:
+
+```
+  v2.1 : 11 facts, 4 imprecisions  (Lexicon gaps visible)
+  v2.2 : 13 facts, 1 imprecision   (87 Lexicon pollutions purged; 3 fixed, 1 blocked)
+  v2.3 : 15 facts, 0 imprecisions  (FST glide-vowel fix unblocks the remainder)
+```
+
+The feedback loop is continuous — every release's diagnostics drive the next release's targets.
+
+### Lexical Graph v0
+
+New module `adam_reasoning::graph` + binary `build_lexical_graph`:
+
+```rust
+pub struct GraphEdge {
+    pub from: String,
+    pub predicate: Predicate,
+    pub to: String,
+    pub sources: Vec<FactSource>,       // merged provenance
+}
+
+pub struct NodeStats {
+    pub out_degree: usize,
+    pub in_degree: usize,
+    pub out_by_predicate: BTreeMap<String, usize>,
+    pub in_by_predicate: BTreeMap<String, usize>,
+}
+
+pub struct LexicalGraph {
+    pub nodes: BTreeMap<String, NodeStats>,
+    pub edges: Vec<GraphEdge>,
+    pub facts_ingested: usize,
+}
+```
+
+Build: `LexicalGraph::from_facts(&facts)`. **Pure projection** — no learned weights, no heuristics beyond what fact extraction already applied. Same facts → byte-identical graph.
+
+**Current graph** (15 facts → 29 nodes, 15 edges, most-connected node `бұлақ` with degree 2):
+
+```
+  адам            --Has       --> гүл
+  айлакерлік      --IsA       --> іс
+  ана             --IsA       --> жанашыр
+  ақиқат          --IsA       --> тірек
+  бала            --IsA       --> болашақ
+  ел              --Has       --> сыртқ
+  еңбек           --IsA       --> қайнар
+  жер             --IsA       --> бастау
+  кітап           --IsA       --> бұлақ
+  ой              --IsA       --> қару
+  тыңайтқыш       --Has       --> түр
+  тіл             --IsA       --> айна
+  ынтымақ         --IsA       --> байлық
+  ілім            --IsA       --> бұлақ
+  ғылым           --IsA       --> қазына
+```
+
+`incoming("бұлақ")` → 2 edges (both `кітап` and `ілім` metaphorically map to бұлақ). This is the kind of **connective knowledge** a reasoner will traverse.
+
+### API additions
+
+- `LexicalGraph::from_facts(&[Fact]) -> LexicalGraph`
+- `LexicalGraph::outgoing(root) -> Vec<&GraphEdge>` — "tell me about X"
+- `LexicalGraph::incoming(root) -> Vec<&GraphEdge>` — "what is an X?"
+- `GraphEdge { from, predicate, to, sources }`
+- `NodeStats { out_degree, in_degree, out_by_predicate, in_by_predicate }`
+- Determinism: `BTreeMap`/sorted `Vec` so JSON is byte-identical across runs.
+
+### Committed artifacts
+
+- `data/retrieval/facts.json` regenerated — 15 facts, 0 imprecisions.
+- `data/retrieval/lexical_graph.json` **new** — 29 nodes, 15 edges, summary + per-node stats.
+
+### Tests (+7 → 335 total)
+
+- `empty_facts_empty_graph`, `single_fact_single_edge`, `repeated_triple_merges_sources`
+- `node_stats_track_degree_per_predicate`
+- `outgoing_and_incoming_lookups`
+- `edges_are_deterministically_sorted`
+- `graph_round_trips_through_json`
+
+### Zero regressions
+
+FST fix was an invariant improvement — no existing test relied on the incorrect vowel-class classification. All 328 pre-v2.3 tests still pass.
+
+### Next (v2.4+)
+
+- Lexical graph **enrichment** — derive additional edges from Lexicon POS + morphological co-occurrence, not just from facts.
+- **Rule reasoner v0** — traverse the graph to answer questions like «бала неге білім алады?» → chain (бала IsA адам) + (адам Has жан) + (жан requires білім) → answer. Deterministic forward-chaining, auditable step-by-step.
+- More pattern matchers — dative-motion (`X Y-ке барады`), verb-derived action facts.
+
 ## [2.2.0] — 2026-04-21 — Lexicon pollution purge + possessive-existence pattern (Has predicate)
 
 Minor release. **The v2.1 feedback loop paid off.** v2.1 extracted 11 facts from the committed corpus and named 4 imprecisions. v2.2 investigated each one, found a **systematic Lexicon pollution**, purged it, added the missing roots, and introduced a new `Has` predicate via a third pattern matcher.

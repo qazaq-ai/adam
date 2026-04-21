@@ -38,6 +38,7 @@
 //! probability score. A human or downstream consumer can filter by
 //! confidence kind without trusting any learned magnitude.
 
+pub mod graph;
 pub mod patterns;
 
 use adam_kernel_fst::lexicon::LexiconV1;

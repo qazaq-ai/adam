@@ -1,0 +1,435 @@
+{
+  "version": "2.2.0",
+  "built_from": "data/retrieval/facts.json",
+  "summary": {
+    "total_nodes": 29,
+    "total_edges": 15,
+    "facts_ingested": 15,
+    "most_connected": [
+      [
+        "бұлақ",
+        2
+      ],
+      [
+        "адам",
+        1
+      ],
+      [
+        "айлакерлік",
+        1
+      ],
+      [
+        "айна",
+        1
+      ],
+      [
+        "ана",
+        1
+      ]
+    ]
+  },
+  "graph": {
+    "nodes": {
+      "адам": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "has": 1
+        },
+        "in_by_predicate": {}
+      },
+      "айлакерлік": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "айна": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
+      "ана": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "ақиқат": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "байлық": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
+      "бала": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "бастау": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
+      "болашақ": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
+      "бұлақ": {
+        "out_degree": 0,
+        "in_degree": 2,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 2
+        }
+      },
+      "гүл": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "has": 1
+        }
+      },
+      "ел": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "has": 1
+        },
+        "in_by_predicate": {}
+      },
+      "еңбек": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "жанашыр": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
+      "жер": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "кітап": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "ой": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "сыртқ": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "has": 1
+        }
+      },
+      "тыңайтқыш": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "has": 1
+        },
+        "in_by_predicate": {}
+      },
+      "тіл": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "тірек": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
+      "түр": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "has": 1
+        }
+      },
+      "ынтымақ": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "ілім": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "іс": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
+      "ғылым": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "қазына": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
+      "қайнар": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
+      "қару": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      }
+    },
+    "edges": [
+      {
+        "from": "адам",
+        "predicate": "Has",
+        "to": "гүл",
+        "sources": [
+          {
+            "pack": "common_voice_kk_pack.json",
+            "sample_id": "cv_kk_00130"
+          }
+        ]
+      },
+      {
+        "from": "айлакерлік",
+        "predicate": "IsA",
+        "to": "іс",
+        "sources": [
+          {
+            "pack": "common_voice_kk_pack.json",
+            "sample_id": "cv_kk_00273"
+          }
+        ]
+      },
+      {
+        "from": "ана",
+        "predicate": "IsA",
+        "to": "жанашыр",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_058"
+          }
+        ]
+      },
+      {
+        "from": "ақиқат",
+        "predicate": "IsA",
+        "to": "тірек",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_049"
+          }
+        ]
+      },
+      {
+        "from": "бала",
+        "predicate": "IsA",
+        "to": "болашақ",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_056"
+          }
+        ]
+      },
+      {
+        "from": "ел",
+        "predicate": "Has",
+        "to": "сыртқ",
+        "sources": [
+          {
+            "pack": "cc100_kk_pack.json",
+            "sample_id": "cc100_kk_0000197"
+          }
+        ]
+      },
+      {
+        "from": "еңбек",
+        "predicate": "IsA",
+        "to": "қайнар",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_068"
+          }
+        ]
+      },
+      {
+        "from": "жер",
+        "predicate": "IsA",
+        "to": "бастау",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_060"
+          }
+        ]
+      },
+      {
+        "from": "кітап",
+        "predicate": "IsA",
+        "to": "бұлақ",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_003"
+          }
+        ]
+      },
+      {
+        "from": "ой",
+        "predicate": "IsA",
+        "to": "қару",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_071"
+          }
+        ]
+      },
+      {
+        "from": "тыңайтқыш",
+        "predicate": "Has",
+        "to": "түр",
+        "sources": [
+          {
+            "pack": "cc100_kk_pack.json",
+            "sample_id": "cc100_kk_0000417"
+          }
+        ]
+      },
+      {
+        "from": "тіл",
+        "predicate": "IsA",
+        "to": "айна",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_020"
+          }
+        ]
+      },
+      {
+        "from": "ынтымақ",
+        "predicate": "IsA",
+        "to": "байлық",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_053"
+          }
+        ]
+      },
+      {
+        "from": "ілім",
+        "predicate": "IsA",
+        "to": "бұлақ",
+        "sources": [
+          {
+            "pack": "common_voice_kk_pack.json",
+            "sample_id": "cv_kk_00047"
+          }
+        ]
+      },
+      {
+        "from": "ғылым",
+        "predicate": "IsA",
+        "to": "қазына",
+        "sources": [
+          {
+            "pack": "kazakh_proverbs_pack.json",
+            "sample_id": "proverb_007"
+          }
+        ]
+      }
+    ],
+    "facts_ingested": 15
+  }
+}

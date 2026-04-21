@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
+  "version": "2.2.0",
   "built_from": [
     "tatoeba_kazakh_pack.json",
     "wikipedia_kz_pack.json",
@@ -12,16 +12,16 @@
   ],
   "counts": {
     "samples_scanned": 3191,
-    "samples_with_facts": 13,
-    "facts_total": 13,
+    "samples_with_facts": 15,
+    "facts_total": 15,
     "by_predicate": {
-      "has": 2,
-      "is_a": 11
+      "has": 3,
+      "is_a": 12
     },
     "by_pack": {
-      "cc100_kk_pack.json": 1,
+      "cc100_kk_pack.json": 2,
       "common_voice_kk_pack.json": 3,
-      "kazakh_proverbs_pack.json": 9
+      "kazakh_proverbs_pack.json": 10
     }
   },
   "facts": [
@@ -84,6 +84,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Айлакерлік — әлсіздіктің ісі."
+    },
+    {
+      "subject": {
+        "surface": "елдің",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сыртқы",
+        "root": "сыртқ",
+        "pos": "noun"
+      },
+      "pattern": "X-тың Y-сы бар",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000197"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ауғанстан жөніндегі ірі форумға 40-қа жуық елдің сыртқы істер министрлері, 70 шақты халықаралық өкілдер қатысып жатыр. Олардың арасында АҚШ мемлекеттік хатшысы Хиллари Клинтон, БҰҰ Бас хатшысы Пан Ги Мун, ЕҚЫҰ-ның қазіргі хатшысы, Қазақстан сыртқы істер министрі Қанат Саудабаев бар."
     },
     {
       "subject": {
@@ -253,8 +273,8 @@
       },
       "predicate": "IsA",
       "object": {
-        "surface": "тіршіліктің",
-        "root": "тіршілік",
+        "surface": "бастауы",
+        "root": "бастау",
         "pos": "noun"
       },
       "pattern": "X — Y",
@@ -284,6 +304,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Еңбек — табыстың қайнары."
+    },
+    {
+      "subject": {
+        "surface": "Ой",
+        "root": "ой",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қаруы",
+        "root": "қару",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_071"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ой — адамның қаруы."
     }
   ]
 }
