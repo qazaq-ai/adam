@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.8.0] — 2026-04-22 — R2 Has-inheritance rule + complete predicate-specific renderers (v3.0 ladder step 4/6)
+
+Minor release. **Rule and renderer matrix completed.** v2.8 activates R2 (`A IsA B ∧ B Has X ⟹ A Has X`) and adds Kazakh prose renderings for every `Predicate` variant, so any derivation the reasoner produces can be cited in the dialog layer without a fallback placeholder.
+
+### New: R2 — Has inheritance through IsA
+
+```
+R2_has_inheritance:
+   A IsA B ∧ B Has X  ⟹  A Has X
+```
+
+The soundness caveat is explicit in the module docstring: this is **conservative monotonic inheritance**, which is not universally true in natural language (бала IsA адам and адам Has автокөлік does NOT mean бала Has автокөлік). The rule produces derivations labelled `ConfidenceKind::RuleInferred`, so downstream consumers can filter by confidence kind and treat these as "possible" rather than "certain".
+
+Tautology guard (A = X) rejects pathological cases.
+
+On the current 15-fact set, R2 produces 0 derivations — our IsA targets (бұлақ, іс, қазына …) have no outgoing Has edges. That's the honest state. R2 will fire naturally as v2.x patterns populate more connective facts.
+
+### Complete predicate-specific renderers
+
+`render_derivation_as_kazakh` previously handled `IsA` + `RelatedTo` + a generic fallback. v2.8 adds specific phrasings for every other variant:
+
+| predicate | Kazakh rendering |
+|---|---|
+| `RelatedTo` | «X пен Y бір-біріне байланысты екен» |
+| `IsA` | «қорытынды: X — Y (байланысты ой-тізбек арқылы)» |
+| `Has` | «ой-тізбек: X Y-ға қатысты байланысы бар (иелік мұрагерлік)» |
+| `GoesTo` | «X Y жағына байланысты қозғалыс ретінде шықты» |
+| `LivesIn` | «X Y орнымен байланысты мекендеу қорытындысы бар» |
+| `PartOf` | «X Y-дың құрамына байланысты бір бөлігі ретінде шықты» |
+
+All six contain the mandatory trust marker **«байланыс-»** — the invariant introduced in v2.7 still holds: any rendered derivation is distinguishable from a verbatim corpus quote at the textual level.
+
+### Ladder progress: 4/6 done
+
+| step | release | status |
+|---|---|---|
+| 1/6 | v2.5 — `GoesTo` + dative pattern | ✅ |
+| 2/6 | v2.6 — `PartOf` + `RelatedTo` + R5 active | ✅ |
+| 3/6 | v2.7 — dialog integration | ✅ |
+| **4/6** | **v2.8 — R2 active + complete renderers** | **✅ shipped** |
+| 5/6 | v2.9 — investor-demo polish | next |
+| 6/6 | v3.0 — investor-demoable commitment cut | |
+
+### Tests (+3 → 357 total)
+
+- `r2_derives_has_inheritance` — canonical positive case (бала IsA адам + адам Has жан → бала Has жан).
+- `r2_respects_tautology_guard` — never derives A Has A.
+- `r2_does_not_fire_without_has_edge` — A IsA B alone doesn't trigger R2.
+
+### Reasoner state
+
+| rule | status on current corpus | tested |
+|---|---|---|
+| R1 — IsA transitivity | correct, 0 fires (no chains in metaphorical data) | ✅ |
+| R2 — Has inheritance | correct, 0 fires (no outgoing Has edges from IsA targets) | ✅ |
+| R3 — LivesIn transitivity | documented, deferred (needs `PartOf` data) | — |
+| R4 — IsA symmetry diagnostic | documented, deferred (needs diagnostic surface) | — |
+| R5 — Shared IsA target | 1 firing (кітап RelatedTo ілім) | ✅ |
+
+### Zero regressions
+
+All 354 pre-v2.8 tests still pass. R2 is additive; `render_derivation_as_kazakh` generic-fallback arm removed because every predicate now has a specific branch (exhaustive matching).
+
+### Committed artefacts
+
+Unchanged. Single R5 derivation on the current data; R2 silent until more facts connect.
+
+### What v2.9 will do
+
+Investor-demo polish: scripted walkthrough showing the full reasoning chain end-to-end. An `adam_demo` enhancement (or new binary) that walks through "user asks X → reasoner consults graph → chain emerges → response cites it". Positioning + narration for presentation.
+
 ## [2.7.0] — 2026-04-22 — Dialog integration: reasoning chains in `Intent::Unknown` responses (v3.0 ladder step 3/6)
 
 Minor release. **The reasoner's output becomes user-visible.** Up to v2.6 derivations existed only in `derived_facts.json`. v2.7 wires them into `Conversation::turn`: when `Intent::Unknown` fires with a noun hint that appears in a derived fact, the response cites the reasoning chain in Kazakh prose with a trust marker.

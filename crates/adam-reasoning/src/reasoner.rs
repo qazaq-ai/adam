@@ -141,6 +141,7 @@ fn run_one_pass(
 ) -> Vec<DerivedFact> {
     let mut out = Vec::new();
     rule_r1_is_a_transitivity(facts, graph, seen, &mut out);
+    rule_r2_has_inheritance(facts, graph, seen, &mut out);
     rule_r5_shared_is_a_target(facts, graph, seen, &mut out);
     out
 }
@@ -225,6 +226,68 @@ fn rule_r1_is_a_transitivity(
 ///
 /// Tautology: A = B is impossible here because we iterate over
 /// distinct subjects sharing a target.
+
+/// `R2`: Has inheritance through IsA. If `A IsA B` and `B Has X`,
+/// derive `A Has X` — a kind inherits properties from its super-type.
+/// Activated in v2.8.
+///
+/// Soundness note: this is **conservative monotonic inheritance**. It
+/// assumes that "Has" relationships documented at a higher type level
+/// apply to all subtypes. In natural language this can fail (бала IsA
+/// адам and адам Has автокөлік does NOT always mean бала Has автокөлік),
+/// so we label every derivation `ConfidenceKind::RuleInferred` — never
+/// `Grammar` — and keep the rule active only because downstream
+/// consumers can filter by confidence kind.
+///
+/// Tautology guard: A = X is rejected (avoid `A Has A` nonsense).
+fn rule_r2_has_inheritance(
+    facts: &[Fact],
+    graph: &LexicalGraph,
+    seen: &BTreeSet<(String, String, String)>,
+    out: &mut Vec<DerivedFact>,
+) {
+    for first in facts {
+        if first.predicate != Predicate::IsA {
+            continue;
+        }
+        // A IsA B — now find every (B Has X) edge in the graph.
+        for second in graph.outgoing(&first.object.root) {
+            if second.predicate != Predicate::Has {
+                continue;
+            }
+            // A = X tautology.
+            if first.subject.root == second.to {
+                continue;
+            }
+            let key = (
+                first.subject.root.clone(),
+                "has".to_string(),
+                second.to.clone(),
+            );
+            if seen.contains(&key) {
+                continue;
+            }
+            let second_source = second
+                .sources
+                .first()
+                .cloned()
+                .expect("graph edge must carry at least one source");
+            out.push(DerivedFact {
+                subject: first.subject.clone(),
+                predicate: Predicate::Has,
+                object: SlotRef {
+                    surface: second.to.clone(),
+                    root: second.to.clone(),
+                    pos: "noun".into(),
+                },
+                rule_id: "R2_has_inheritance".into(),
+                source_chain: vec![first.source.clone(), second_source],
+                confidence: ConfidenceKind::RuleInferred,
+            });
+        }
+    }
+}
+
 fn rule_r5_shared_is_a_target(
     _facts: &[Fact],
     graph: &LexicalGraph,
@@ -547,5 +610,57 @@ mod tests {
             canonical_relation_pair("ілім", "кітап"),
             ("кітап".to_string(), "ілім".to_string())
         );
+    }
+
+    #[test]
+    fn r2_derives_has_inheritance() {
+        // бала IsA адам, адам Has жан ⟹ бала Has жан
+        let facts = vec![
+            mk_fact("бала", Predicate::IsA, "адам", "p1", "s1"),
+            mk_fact("адам", Predicate::Has, "жан", "p2", "s2"),
+        ];
+        let derived = run(&facts);
+        let r2: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R2_has_inheritance")
+            .collect();
+        assert_eq!(r2.len(), 1);
+        let d = r2[0];
+        assert_eq!(d.subject.root, "бала");
+        assert_eq!(d.predicate, Predicate::Has);
+        assert_eq!(d.object.root, "жан");
+        assert_eq!(d.confidence, ConfidenceKind::RuleInferred);
+        assert_eq!(d.source_chain.len(), 2);
+    }
+
+    #[test]
+    fn r2_respects_tautology_guard() {
+        // A IsA X, X Has A → would produce A Has A (tautology).
+        let facts = vec![
+            mk_fact("A", Predicate::IsA, "X", "p", "s1"),
+            mk_fact("X", Predicate::Has, "A", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        for d in &derived {
+            assert!(
+                !(d.subject.root == d.object.root && d.rule_id == "R2_has_inheritance"),
+                "R2 must never derive A Has A: {d:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn r2_does_not_fire_without_has_edge() {
+        // A IsA B, but no B Has X → no R2 derivations.
+        let facts = vec![
+            mk_fact("A", Predicate::IsA, "B", "p", "s1"),
+            mk_fact("C", Predicate::Has, "D", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        let r2: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R2_has_inheritance")
+            .collect();
+        assert!(r2.is_empty());
     }
 }

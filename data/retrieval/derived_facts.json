@@ -1,5 +1,5 @@
 {
-  "version": "2.5.0",
+  "version": "2.7.0",
   "built_from": "data/retrieval/facts.json",
   "counts": {
     "initial_facts": 15,

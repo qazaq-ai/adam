@@ -456,25 +456,49 @@ impl Conversation {
 /// fallback that still contains the marker. Future releases will add
 /// predicate-specific renderings as reasoner output grows.
 fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
+    // Every arm MUST include the marker stem «байланыс-» (or one of its
+    // forms) so downstream consumers can distinguish a reasoning
+    // citation from a verbatim corpus quote at the textual level alone.
+    // v2.7 handled IsA + RelatedTo + generic fallback. v2.8 adds
+    // predicate-specific renderings for Has / GoesTo / LivesIn /
+    // PartOf so every derived variant produces idiomatic Kazakh.
     match d.predicate {
         ReasPredicate::RelatedTo => {
-            // "X пен Y бір-біріне байланысты"
+            // "X пен Y бір-біріне байланысты" — shared-type relation
             format!(
                 "{} пен {} бір-біріне байланысты екен",
                 d.subject.root, d.object.root
             )
         }
         ReasPredicate::IsA => {
-            // Transitivity-derived IsA — e.g. "кітап — зат болып табылады"
+            // Transitivity-derived IsA — the reasoner chained.
             format!(
                 "қорытынды: {} — {} (байланысты ой-тізбек арқылы)",
                 d.subject.root, d.object.root
             )
         }
-        _ => {
-            // Generic fallback — still carries the «байланыс-» marker.
+        ReasPredicate::Has => {
+            // Inheritance-derived Has via R2.
             format!(
-                "{} мен {} арасында логикалық байланыс бар",
+                "ой-тізбек: {} {}-ға қатысты байланысы бар (иелік мұрагерлік)",
+                d.subject.root, d.object.root
+            )
+        }
+        ReasPredicate::GoesTo => {
+            format!(
+                "{} {} жағына байланысты қозғалыс ретінде шықты",
+                d.subject.root, d.object.root
+            )
+        }
+        ReasPredicate::LivesIn => {
+            format!(
+                "{} {} орнымен байланысты мекендеу қорытындысы бар",
+                d.subject.root, d.object.root
+            )
+        }
+        ReasPredicate::PartOf => {
+            format!(
+                "{} {}-дың құрамына байланысты бір бөлігі ретінде шықты",
                 d.subject.root, d.object.root
             )
         }

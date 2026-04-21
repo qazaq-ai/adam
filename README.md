@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-2.7.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-2.8.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-354%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-357%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
 </p>
 
