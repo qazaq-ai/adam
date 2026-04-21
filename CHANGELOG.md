@@ -7,6 +7,103 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.0.0] — 2026-04-22 — v3.0: investor-demoable intelligent MVP (commitment cut)
+
+Major release. **Not a feature drop — a positioning freeze.** v3.0 captures the v2.5 → v2.9 reasoning ladder as the investor-demoable "intelligent Kazakh AI" cut we committed to when v2.4 shipped.
+
+Everything functional has already shipped across v2.5 – v2.9. v3.0 adds:
+
+1. **`docs/architecture_v3.md`** — new canonical architecture reference that adds the reasoning layer (fact extraction + lexical graph + rule reasoner + dialog integration + trust markers) on top of the v2.0 retrieval foundation. `architecture_v2.md` remains valid as a v2.0–v2.3 historical snapshot.
+2. **"Why adam v3.0" README section** — replaces the v2.0 comparison with a v3.0-specific pitch that includes the **reasoning** row, the **«байланыс-» marker**, and the **trust stack** graphic.
+3. **Commitment declarations** — explicit in README + architecture_v3:
+   - Not a trained neural model.
+   - Not multilingual.
+   - Not generative.
+   - Not a generalist.
+   - Not self-modifying.
+   - **Reasoning = forward-chaining over typed facts, every conclusion has a `rule_id`** — not emergence, not matmul, not hope.
+4. **Docs currency audit** (per `feedback_docs_currency` memory) — `foundation_scope.md`, `eval_baseline.md`, `kazakh_grammar/07_dialog_architecture.md` refreshed with v3.0 test count, v3.0 links, and accurate in-scope / delivered lists.
+
+### The v3.0 trust stack
+
+```
+ template realisation            →  recognised intent, 0% fabrication
+ verbatim quote «…»              →  corpus citation, byte-identical to source
+ «бейімд-» adaptation marker      →  quote was rewritten (v1.9.5)
+ «байланыс-» reasoning marker     →  derivation, not a quote (v3.0)
+```
+
+Every marker is test-enforced bi-directionally: fires when and only when the path fired.
+
+### What v3.0 changes about the code
+
+**Nothing in the library surface.** Intent structures, Conversation API, adam-retrieval, adam-reasoning — all bit-identical to v2.9. Embedders upgrading from v2.9 see zero diff.
+
+- README `version` badge 2.9.0 → 3.0.0
+- `docs/architecture_v3.md` (new file, supersedes v2 for v3.0 state)
+- README "Why adam v3.0" section
+- `docs/foundation_scope.md` + `docs/eval_baseline.md` + `docs/kazakh_grammar/07_dialog_architecture.md` — stale-link + test-count refresh
+- Cargo workspace + manifest versions → 3.0.0
+
+### Ladder: 6/6 complete
+
+| step | release | what landed |
+|---|---|---|
+| 1/6 | v2.5 | `GoesTo` predicate + dative-motion pattern |
+| 2/6 | v2.6 | `PartOf` + `RelatedTo` predicates, R5 active → first real derivation |
+| 3/6 | v2.7 | dialog integration → first user-visible inference |
+| 4/6 | v2.8 | R2 Has-inheritance + complete predicate renderers |
+| 5/6 | v2.9 | `adam_demo` Part 4 — reasoning chain end-to-end |
+| **6/6** | **v3.0** | **commitment cut — positioning + docs freeze** |
+
+### Tests
+
+**357 passing** — unchanged from v2.8, carried through v2.9 and v3.0. v3.0 is docs + positioning; no library changes.
+
+### Zero regressions
+
+No library code touched since v2.9. Upgrading from v2.x → v3.0 is safe and silent for embedders.
+
+### The arc, v2.0 → v3.0
+
+| Release | Facts | Predicates | Active rules | Derivations | User-visible inferences | Tests |
+|---|---:|---:|---:|---:|---:|---:|
+| v2.0 | 0 | 0 | — | — | 0 | 303 |
+| v2.1 | 11 | 1 | — | 0 | 0 | 325 |
+| v2.2 | 13 | 2 | — | 0 | 0 | 328 |
+| v2.3 | 15 | 2 | — | 0 | 0 | 335 |
+| v2.4 | 15 | 2 | 1 (R1) | 0 | 0 | 343 |
+| v2.5 | 15 | 4 | 1 | 0 | 0 | 347 |
+| v2.6 | 15 | 6 | 2 (+R5) | **1** | 0 | 352 |
+| v2.7 | 15 | 6 | 2 | 1 | **1** | 354 |
+| v2.8 | 15 | 6 | 3 (+R2) | 1 | 1 | 357 |
+| v2.9 | 15 | 6 | 3 | 1 | 1 | 357 |
+| **v3.0** | **15** | **6** | **3** | **1** | **1** | **357** |
+
+v3.0 does not add to the numbers. It **affirms** the state reached: from 0 derivations at v2.4 to a real rule-derived `кітап RelatedTo ілім` that dialog cites with the «байланыс-» marker to the user, with full `source_chain` provenance, deterministically, across 357 tests.
+
+### How to demo v3.0 for investors
+
+```bash
+cargo run --release -p adam-dialog --bin adam_demo
+```
+
+4-part scripted walkthrough (intents + retrieval + composition + reasoning). Byte-identical across runs. Safe to record once, play anywhere.
+
+### Post-v3.0
+
+Post-v3.0 work continues incrementally on the same architecture:
+
+- More pattern matchers (densifying the fact graph so R1 transitivity fires naturally).
+- `PartOf` extraction pattern (activates R3).
+- More predicates when specific domains demand them (`Causes`, `Enables`, `Prevents` for causal reasoning).
+- R4 diagnostic surface (IsA symmetry → curator review).
+- Option C composition (offline pattern extraction for swap types beyond city).
+- Kazakh technical corpus (Rust Book translation as a new source pack).
+- Response-side diversity (multiple top-k citations across repeated prompts).
+
+Each is additive. None requires rethinking the v3.0 architecture.
+
 ## [2.9.0] — 2026-04-22 — Investor-demo polish: `adam_demo` Part 4 shows reasoning chains end-to-end (v3.0 ladder step 5/6)
 
 Minor release. **Penultimate rung before the investor-demoable v3.0 cut.** v2.9 adds a fourth part to the `adam_demo` scripted walkthrough that loads the committed fact + derivation artefacts and shows, live, how adam produces a *reasoned* answer the user can see, with full provenance, with the trust marker. Ready to record for a presentation.

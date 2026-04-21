@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-2.9.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.0.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -29,22 +29,35 @@
 
 ---
 
-## Why adam
+## Why adam (v3.0)
 
-A different kind of AI system — one that trades **generalisation for integrity**.
+A different kind of AI system — one that trades **generalisation for integrity**, and (as of v3.0) adds **deterministic reasoning** on top of retrieval.
 
-| | adam (v2.0) | mainstream LLM |
+| | adam v3.0 | mainstream LLM |
 |---|---|---|
-| Outputs | template + verbatim corpus quote + FST synthesis | probabilistic token generation |
+| Outputs | template + verbatim quote + FST synthesis + **rule-derived chain** | probabilistic token generation |
 | Hallucinations | **0** (by construction) | non-zero, non-auditable |
+| Inference | ms on laptop CPU | dollars on GPU / datacentre |
+| **Reasoning** | **forward-chaining over typed facts, every conclusion has a `rule_id`** | opaque emergent reasoning |
+| **Provenance** | **`source_chain: Vec<FactSource>` per derivation; `(pack, sample_id)` per quote** | ~none for free-form output |
+| **Inference marker** | **«байланыс-» on every reasoned claim, test-enforced** | — |
 | Determinism | byte-identical across runs for same `(input, session, seed)` | temperature-dependent |
-| Provenance | every response traces to `(pack, sample_id)` + template id | ~no provenance for free-form output |
-| Inference cost | ms, CPU-only, laptop-grade | dollars, GPU, datacentre |
 | Language coverage | Kazakh only | many, but shallow for low-resource |
-| Knowledge depth | bounded by what's in the curated corpus | broad, but fabricated edges |
+| Knowledge depth | bounded by curated corpus + deterministic rules | broad, but fabricated edges |
 | Self-improvement | ships by commit, reviewed by humans | parametric updates through training |
 
-adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, and fully traceable** — the four properties that matter when a Kazakh-speaking user, a regulator, or an investor asks *"why did you say that?"* and we must be able to answer at the `(pack, sample_id)` level.
+adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, auditable, and — as of v3.0 — capable of deriving conclusions no single corpus sentence states**, while marking every such conclusion with a textual trust signal and a source chain.
+
+### The v3.0 trust stack
+
+```
+ template realisation            →  recognised intent, 0% fabrication
+ verbatim quote «…»              →  corpus citation, byte-identical to source
+ «бейімд-» adaptation marker      →  quote was rewritten (v1.9.5)
+ «байланыс-» reasoning marker     →  derivation, not a quote — v3.0 addition
+```
+
+Every marker is test-enforced in both directions: it fires when and only when the underlying path fired.
 
 The name *adam* (Kazakh: **адам**) means "human".
 
@@ -68,7 +81,7 @@ No transformer. No embeddings. No probabilistic generation. For any input, a dev
 - **Small** — runs on a MacBook Air M2 8 GB. No GPU.
 - **Kazakh-native** — built on a 14 k-entry curated pre-modern Kazakh Lexicon and a 77.9 M-word local corpus, not translated from English.
 
-See [**`docs/architecture_v2.md`**](docs/architecture_v2.md) for the single canonical architecture reference.
+See [**`docs/architecture_v3.md`**](docs/architecture_v3.md) for the single canonical architecture reference ([`architecture_v2.md`](docs/architecture_v2.md) remains as a v2.0–v2.3 snapshot).
 
 ## Demo
 
