@@ -1,0 +1,108 @@
+{
+  "status": "completed",
+  "elapsed_s": 564,
+  "tiers_completed": 4,
+  "tiers_planned": 4,
+  "version": "3.2.0",
+  "total_elapsed_s": 563,
+  "machine": {
+    "rayon_threads": 8
+  },
+  "sources": {
+    "committed_packs_loaded": [
+      "abai_wikisource_pack.json",
+      "kazakh_proverbs_pack.json",
+      "kazakh_classics_pack.json",
+      "wikipedia_kz_pack.json",
+      "synthetic_sentences_pack.json",
+      "tatoeba_kazakh_pack.json",
+      "common_voice_kk_pack.json",
+      "cc100_kk_pack.json"
+    ],
+    "shard_packs_loaded": [],
+    "total_samples_available": 402610,
+    "total_words_available": 4230449
+  },
+  "tiers": [
+    {
+      "label": "T1_100",
+      "target_samples": 100,
+      "samples_scanned": 100,
+      "words_scanned": 903,
+      "facts_extracted": 0,
+      "facts_by_predicate": {},
+      "derivations": 0,
+      "derivations_by_rule": {},
+      "graph_nodes": 0,
+      "graph_edges": 0,
+      "elapsed_ms": {
+        "extract": 490,
+        "graph": 0,
+        "reason": 0
+      }
+    },
+    {
+      "label": "T2_1k",
+      "target_samples": 1000,
+      "samples_scanned": 1000,
+      "words_scanned": 8957,
+      "facts_extracted": 0,
+      "facts_by_predicate": {},
+      "derivations": 0,
+      "derivations_by_rule": {},
+      "graph_nodes": 0,
+      "graph_edges": 0,
+      "elapsed_ms": {
+        "extract": 7016,
+        "graph": 0,
+        "reason": 0
+      }
+    },
+    {
+      "label": "T3_10k",
+      "target_samples": 10000,
+      "samples_scanned": 10000,
+      "words_scanned": 117979,
+      "facts_extracted": 58,
+      "facts_by_predicate": {
+        "has": 10,
+        "is_a": 48
+      },
+      "derivations": 5,
+      "derivations_by_rule": {
+        "R5_shared_is_a_target": 5
+      },
+      "graph_nodes": 55,
+      "graph_edges": 32,
+      "elapsed_ms": {
+        "extract": 91866,
+        "graph": 0,
+        "reason": 0
+      }
+    },
+    {
+      "label": "T4_50k",
+      "target_samples": 50000,
+      "samples_scanned": 50000,
+      "words_scanned": 611224,
+      "facts_extracted": 152,
+      "facts_by_predicate": {
+        "has": 52,
+        "is_a": 100
+      },
+      "derivations": 65,
+      "derivations_by_rule": {
+        "R1_is_a_transitivity": 8,
+        "R2_has_inheritance": 33,
+        "R5_shared_is_a_target": 24
+      },
+      "graph_nodes": 141,
+      "graph_edges": 101,
+      "elapsed_ms": {
+        "extract": 464532,
+        "graph": 0,
+        "reason": 1
+      }
+    }
+  ]
+}

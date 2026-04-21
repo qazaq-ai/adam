@@ -37,10 +37,31 @@ pub struct RootsFile {
 }
 
 /// Runtime lexicon — keyed lookup by surface form, with source tag.
+///
+/// **Dual storage (v3.2.0):**
+///
+/// - `by_surface: HashMap<String, RootEntry>` — O(1) lookup for
+///   `get(word)` in the hot path.
+/// - `entries_ordered: Vec<RootEntry>` — the same entries, kept in
+///   deterministic root-alphabetical order. `parser::analyse` iterates
+///   **this** vector so that ambiguous surfaces always yield the same
+///   first analysis across runs.
+///
+/// The v2.1+ reasoning pipeline depends on `parser::analyse` returning
+/// stable ordering — otherwise `extract_facts` emits a different fact
+/// set every run, invalidating the "deterministic by design" thesis.
+/// The dual storage costs a single extra `Vec<RootEntry>` (a few
+/// hundred KB on a 16 k-entry Lexicon) but keeps lookup throughput at
+/// HashMap level.
+///
+/// See v3.2.0 CHANGELOG for the latent non-determinism story.
 #[derive(Debug, Clone)]
 pub struct LexiconV1 {
     /// Surface → entry. First winner on merge is curated > apertium > corpus.
     pub by_surface: HashMap<String, RootEntry>,
+    /// Same entries as `by_surface.values()`, sorted by `root`. Iterate
+    /// this (not `by_surface.values()`) when determinism matters.
+    pub entries_ordered: Vec<RootEntry>,
     pub curated_count: usize,
     pub apertium_count: usize,
 }
@@ -71,8 +92,16 @@ impl LexiconV1 {
                 .or_insert_with(|| e.clone());
         }
 
+        // v3.2.0 — build a root-alphabetical Vec for deterministic
+        // `parser::analyse` iteration without paying BTreeMap
+        // lookup cost. Cost: one `Vec::clone` × N (16k entries) at
+        // load time + a sort. Amortised across the process lifetime.
+        let mut entries_ordered: Vec<RootEntry> = by_surface.values().cloned().collect();
+        entries_ordered.sort_by(|a, b| a.root.cmp(&b.root).then_with(|| a.id.cmp(&b.id)));
+
         Ok(Self {
             by_surface,
+            entries_ordered,
             curated_count: curated.roots.len(),
             apertium_count: apertium.roots.len(),
         })

@@ -1,7 +1,7 @@
 {
-  "version": "3.0.1",
+  "version": "3.2.0",
   "status": "completed",
-  "elapsed_s": 10,
+  "elapsed_s": 19,
   "packs_completed": 8,
   "packs_total": 8,
   "built_from": [
@@ -16,14 +16,14 @@
   ],
   "counts": {
     "samples_scanned": 3191,
-    "samples_with_facts": 14,
-    "facts_total": 14,
+    "samples_with_facts": 15,
+    "facts_total": 15,
     "by_predicate": {
-      "has": 2,
+      "has": 3,
       "is_a": 12
     },
     "by_pack": {
-      "cc100_kk_pack.json": 1,
+      "cc100_kk_pack.json": 2,
       "common_voice_kk_pack.json": 3,
       "kazakh_proverbs_pack.json": 10
     }
@@ -88,6 +88,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Айлакерлік — әлсіздіктің ісі."
+    },
+    {
+      "subject": {
+        "surface": "елдің",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сыртқы",
+        "root": "сыртқ",
+        "pos": "noun"
+      },
+      "pattern": "X-тың Y-сы бар",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000197"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ауғанстан жөніндегі ірі форумға 40-қа жуық елдің сыртқы істер министрлері, 70 шақты халықаралық өкілдер қатысып жатыр. Олардың арасында АҚШ мемлекеттік хатшысы Хиллари Клинтон, БҰҰ Бас хатшысы Пан Ги Мун, ЕҚЫҰ-ның қазіргі хатшысы, Қазақстан сыртқы істер министрі Қанат Саудабаев бар."
     },
     {
       "subject": {

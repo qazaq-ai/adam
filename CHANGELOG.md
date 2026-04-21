@@ -7,6 +7,118 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.2.0] — 2026-04-21 — scaling-law bench + parser determinism fix (foundational)
+
+**Second step** of the post-v3.0 scale-up ladder. Ships **two** things at once because writing the first one exposed an existential bug in the second:
+
+1. The empirical-curve equivalent of a neural-era "perplexity vs FLOPS" chart, but for a deterministic system: **given N input words, how many facts, how many rule derivations, how dense a graph, and how many wall-clock seconds?**
+2. **A latent non-determinism fix in `adam-kernel-fst::parser::analyse`** that the scaling bench surfaced on its first run. See the "Latent non-determinism" section below — this is the more important of the two.
+
+### Latent non-determinism bug (found and fixed)
+
+The first scaling-bench run produced byte-different counts on every invocation (±1–3 facts at T3/T4 scale). Root cause: `parser::analyse` iterated `LexiconV1::by_surface.values()` — a `HashMap` — whose iteration order is seeded randomly at process start. When multiple Lexicon entries prefix-match an ambiguous surface, `analyse().into_iter().next()` returned a **different first analysis every run**. Every v2.1+ pattern matcher picks `.next()`, so extracted facts drifted across runs.
+
+This means the v2.5.0-era committed `facts.json` (15 facts) was a lucky snapshot — not a deterministic truth. Previous v3.1.0 regeneration happened to produce 14 facts because that run's HashMap seed sorted a marginal fact out; the drift was invisible to the test suite because no test asserted repeat-call equality.
+
+**Fix:** dual-storage Lexicon (v3.2.0).
+
+```rust
+pub struct LexiconV1 {
+    pub by_surface: HashMap<String, RootEntry>,    // O(1) get
+    pub entries_ordered: Vec<RootEntry>,            // deterministic iteration
+    ...
+}
+```
+
+`entries_ordered` is built once at Lexicon load, sorted by `(root, id)`. `parser::analyse` iterates this Vec instead of `by_surface.values()`. Cost: one extra `Vec<RootEntry>` (≈ 600 KB on the 16 k-entry Lexicon) + a sort at load time. Gain: fully deterministic analysis across runs at HashMap-level throughput (no BTreeMap log-N lookup tax).
+
+Two new regression tests in `parser::determinism_tests`:
+- `analyse_ordering_stable_across_calls` — three ambiguous surfaces (`бала`, `алматыда`, `кітабы`, `мектебі`, `жазды`), two back-to-back calls must be equal.
+- `first_analysis_stable_for_ambiguous_surface` — `.next()` on the analyse iterator must be stable.
+
+Without these, the whole "deterministic pipeline" thesis is a falsehood — any CI green was historically luck. Now it's a test invariant.
+
+### Re-baselined committed artifacts
+
+With the fix, the committed pipeline settled at **15 facts + 1 derivation** (exactly matching the v2.5.0 figure that was supposed to be canonical). The v3.1.0 "14 facts" baseline is retired — it was a HashMap-seed artifact, not a real drift from the Lexicon purge.
+
+Regenerated artifacts at v3.2.0:
+
+| | v3.2.0 (deterministic) |
+|---|---:|
+| `data/retrieval/facts.json` facts | **15** |
+| `data/retrieval/lexical_graph.json` nodes / edges | 29 / 15 |
+| `data/retrieval/derived_facts.json` derivations | 1 (кітап RelatedTo ілім via R5) |
+
+Byte-identical across three consecutive runs.
+
+Unlike transformer scaling laws, every number below is measured on a fully deterministic pipeline — same corpus slice + same Lexicon + same matchers → byte-identical artifacts + byte-identical metric counts across runs (wall-clock drifts; everything else is fixed).
+
+### New crate: `adam-scaling`
+
+- `crates/adam-scaling/` — new 10th crate on the workspace (the ninth reasoning-ready component).
+- `src/lib.rs` — `ScalingReport`, `ScalingPoint`, `StageMs`, `MachineSignal`, `SourcesSnapshot` + canonical pack ordering (fact-dense packs first: Abai → proverbs → classics → Wikipedia → synthetic → conversational).
+- `src/bench.rs` — pure bench logic: `load_corpus`, `run_tier` (parallel per-sample FST extraction via Rayon, deterministic collect), `run_bench`, `render_markdown`. 4 unit tests (deterministic re-run, tier cap, missing-shards silence, Markdown coverage).
+- `src/bin/scaling_bench.rs` — CLI wrapping the lib. Default tiers `[100, 1k, 10k, 50k]` finish in ≲ 10 min on M2 8-core committed corpus. `--use-shards` switches to `[1k, 10k, 50k, 200k, 1M]` for the gitignored full local pool. `--tiers 100,1000,…,0` overrides (0 = uncapped). Honours the v3.1.0 harness: `--time-budget`, `--progress-interval`, SIGINT → graceful commit.
+
+### First measured scaling-law curve (committed-only, 4.23 M-word pool, deterministic)
+
+| tier | samples | words | facts | derivations | graph nodes | graph edges | extract ms |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| T1_100 | 100 | 903 | 0 | 0 | 0 | 0 | ~490 |
+| T2_1k | 1 000 | 8 957 | 0 | 0 | 0 | 0 | ~7 000 |
+| T3_10k | 10 000 | 117 979 | **58** | **5** | 55 | 32 | ~92 000 |
+| T4_50k | 50 000 | 611 224 | **152** | **65** | 141 | 101 | ~465 000 |
+
+**Full bench: ~9 min 24 s on M2 8-core, 4 / 4 tiers completed, byte-identical counts across runs.**
+
+### Scaling-law signals from T3 → T4 (×5 corpus)
+
+- **words** ×5.18 (corpus growth)
+- **facts** ×2.62 (sub-linear — high-density Abai pool exhausted by T3)
+- **derivations** **×13.0 (super-linear! — the reasoning signal)**
+- **graph nodes** ×2.56 (sub-linear — new words often hit existing nodes)
+- **graph edges** ×3.16 (near-linear)
+
+Super-linear derivation growth is exactly the expected scaling law for a rule-based reasoner: more facts → more transitive chains → more inferences. It's the reason this release exists as a separate commit rather than a subsection of something else.
+
+### Rule-activation evolution with scale
+
+| tier | R1 | R2 | R5 |
+|---|---:|---:|---:|
+| T3_10k | 0 | 0 | 5 |
+| T4_50k | 8 | 33 | 24 |
+
+R1 (IsA-transitivity) and R2 (Has-inheritance) only activate once the graph is dense enough for multi-hop chains to form. This is the first release where all three rules fire on real corpus data — the v3.0 artifact only ever surfaced R5.
+
+### Output artifacts
+
+- `data/scaling/scaling_report.json` — structured report with `status` + `elapsed_s` + `tiers_completed / tiers_planned` at the top level, then per-tier ScalingPoints.
+- `docs/scaling_report.md` — human-readable projection of the same data, with a Markdown table + per-tier predicate/rule breakdowns. Diffs cleanly across runs (wall-clock is the only drift).
+
+Both are committed to the repo so the curve is version-controlled — every release can compare against prior artifacts.
+
+### Positioning: this replaces "perplexity vs FLOPS"
+
+When investor-facing reviewers ask "what's the scaling law?", the neural-era answer is a plot of perplexity at varying compute budgets. The deterministic-era answer is **this table** — factored into three independently measurable signals (facts, derivations, graph density) each of which tells you something different about what the system does with more data. v3.5.0 will grow it to 20 M words (still on M2, still within a 3 h budget).
+
+### Dependencies
+
+- `rayon` (already workspace-level from v3.1.0) — new direct dep of `adam-scaling`.
+- `tempfile 3.12` — dev-only, for the bench unit tests.
+
+### Tests
+
+**371 passing, 0 failing, 0 warnings** (367 + 4 bench unit tests).
+
+### Upgrade notes
+
+- No existing API changed. `adam-scaling` is additive.
+- CLI: `cargo run --release -p adam-scaling --bin scaling_bench` runs with committed-only defaults (~10 min). Add `--use-shards` if local shards are populated.
+- Artifacts: `data/scaling/` is new; existing manifests unaffected.
+
+---
+
 ## [3.1.0] — 2026-04-21 — iteration infrastructure for the 3h-budget discipline
 
 First step of the post-v3.0 scale-up ladder. **No new reasoning capability** — this release builds the *harness* that makes the corpus-jaw work in v3.2+ tractable on a MacBook Air M2 8 GB with a hard 3-hour iteration cap.

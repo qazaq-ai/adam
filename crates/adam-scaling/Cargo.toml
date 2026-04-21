@@ -1,0 +1,20 @@
+[package]
+name = "adam-scaling"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Deterministic scaling-law bench — measures facts/derivations/graph size as a function of corpus size across fixed tiers, emits scaling_report.json + docs/scaling_report.md"
+
+[dependencies]
+adam-kernel-fst = { path = "../adam-kernel-fst" }
+adam-reasoning = { path = "../adam-reasoning" }
+rayon.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tempfile = "3.12"
+
+[[bin]]
+name = "scaling_bench"
+path = "src/bin/scaling_bench.rs"

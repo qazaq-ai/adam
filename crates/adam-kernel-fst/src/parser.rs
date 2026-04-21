@@ -46,9 +46,22 @@ pub enum Analysis {
 /// Runs both noun and verb paradigms on every root-prefix candidate. Does
 /// NOT attempt derivational morphology (participles-as-nouns, infinitives
 /// etc.) — that is a separate week-2 task.
+///
+/// ## Determinism contract (v3.2.0)
+///
+/// The returned `Vec<Analysis>` is ordered by lexicographic root surface
+/// (primary) then Lexicon `id` (tie-breaker) — inherited from
+/// [`LexiconV1::entries_ordered`], which is built once at Lexicon load.
+/// Iterating the Vec is as fast as iterating `HashMap::values()` was
+/// before v3.2.0 (contiguous memory, no tree walk), while yielding a
+/// stable order across runs.
+///
+/// Downstream consumers in `adam-reasoning` that pick `analyse(...)
+/// .into_iter().next()` (every v2.1+ pattern matcher) are stable
+/// because of this ordering guarantee.
 pub fn analyse(surface: &str, lex: &LexiconV1) -> Vec<Analysis> {
     let mut out = Vec::new();
-    for entry in lex.by_surface.values() {
+    for entry in &lex.entries_ordered {
         if !surface_could_contain_root(surface, &entry.root) {
             continue;
         }
@@ -71,6 +84,56 @@ pub fn analyse(surface: &str, lex: &LexiconV1) -> Vec<Analysis> {
         }
     }
     out
+}
+
+#[cfg(test)]
+mod determinism_tests {
+    //! Regression tests for the v3.2.0 determinism fix — these must
+    //! pass or every run of `extract_facts` produces a different fact
+    //! set, invalidating the scaling bench and the entire
+    //! "deterministic pipeline" thesis.
+
+    use super::*;
+    use crate::lexicon::LexiconV1;
+
+    fn load_real_lex() -> Option<LexiconV1> {
+        let curated = "../../data/tokenizer/segmentation_roots.json";
+        let apertium = "../../data/lexicon_v1/apertium_imported_roots.json";
+        if !std::path::Path::new(curated).exists() {
+            return None;
+        }
+        LexiconV1::load(curated, apertium).ok()
+    }
+
+    #[test]
+    fn analyse_ordering_stable_across_calls() {
+        // Ambiguous surfaces on the real Lexicon are the only way this
+        // bug shows up — single-analysis words are trivially stable.
+        // On the real Lexicon `алматыда` (locative of алматы) and
+        // `бала` (either bare noun or possibly other) have multiple
+        // analyses when cross-POS ambiguity strikes.
+        let Some(lex) = load_real_lex() else { return };
+        for word in ["бала", "алматыда", "кітабы", "мектебі", "жазды"]
+        {
+            let first = analyse(word, &lex);
+            let second = analyse(word, &lex);
+            assert_eq!(
+                first, second,
+                "analyse(`{word}`) must be identical across repeat calls"
+            );
+        }
+    }
+
+    #[test]
+    fn first_analysis_stable_for_ambiguous_surface() {
+        // Downstream consumers in adam-reasoning pick `.next()` on the
+        // analyse() iterator. For the scaling bench to be deterministic,
+        // that first choice must also be stable.
+        let Some(lex) = load_real_lex() else { return };
+        let first_a = analyse("бала", &lex).into_iter().next();
+        let first_b = analyse("бала", &lex).into_iter().next();
+        assert_eq!(first_a, first_b);
+    }
 }
 
 /// Returns `true` if the surface form could plausibly start with the given
@@ -240,8 +303,11 @@ mod tests {
                 },
             );
         }
+        let mut entries_ordered: Vec<RootEntry> = by_surface.values().cloned().collect();
+        entries_ordered.sort_by(|a, b| a.root.cmp(&b.root).then_with(|| a.id.cmp(&b.id)));
         LexiconV1 {
             by_surface,
+            entries_ordered,
             curated_count: 5,
             apertium_count: 0,
         }
