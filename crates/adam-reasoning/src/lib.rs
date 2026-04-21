@@ -71,6 +71,9 @@ pub enum Predicate {
     /// Subject has / owns object (genitive-possessive existence "X-тың
     /// Y-сы бар"). "Баланың кітабы бар" → (бала, Has, кітап). v2.2.
     Has,
+    /// Subject goes / travels to object (dative-motion "X Y-ке барады").
+    /// "Бала мектепке барады" → (бала, GoesTo, мектеп). v2.5.
+    GoesTo,
 }
 
 impl Predicate {
@@ -80,6 +83,7 @@ impl Predicate {
             Self::IsA => "is_a",
             Self::LivesIn => "lives_in",
             Self::Has => "has",
+            Self::GoesTo => "goes_to",
         }
     }
 }
@@ -174,6 +178,7 @@ pub fn extract_facts(
     patterns::copula_is_a(text, parses, lexicon, source, &mut out);
     patterns::locative_lives_in(text, parses, lexicon, source, &mut out);
     patterns::possessive_has(text, parses, lexicon, source, &mut out);
+    patterns::dative_goes_to(text, parses, lexicon, source, &mut out);
     out
 }
 
@@ -186,6 +191,7 @@ mod tests {
         assert_eq!(Predicate::IsA.as_str(), "is_a");
         assert_eq!(Predicate::LivesIn.as_str(), "lives_in");
         assert_eq!(Predicate::Has.as_str(), "has");
+        assert_eq!(Predicate::GoesTo.as_str(), "goes_to");
     }
 
     #[test]

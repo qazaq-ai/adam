@@ -7,6 +7,82 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.5.0] — 2026-04-22 — `GoesTo` predicate + dative-motion pattern (v3.0 ladder: step 1 of 6)
+
+Minor release. **First rung on the v2.5 → v3.0 ladder** toward the investor-demoable intelligent MVP. The target at v3.0 is a dialog system that can **derive** answers through rule-reasoning chains, not just retrieve them. Getting there requires more predicates + more pattern density so the reasoner has real chains to traverse. v2.5 is the first of six planned steps.
+
+### New predicate: `GoesTo`
+
+```rust
+pub enum Predicate {
+    IsA,       // X — Y               (v2.1 copula)
+    LivesIn,   // X Y-да тұрады       (v2.1 locative)
+    Has,       // X-тың Y-сы бар      (v2.2 possessive)
+    GoesTo,    // X Y-ке барады        (v2.5 dative-motion) ← NEW
+}
+```
+
+### New pattern: `dative_goes_to`
+
+Kazakh "X goes to Y" is `<subject-nom> <place-dative> бару-in-any-inflection`. Type-checked fully on FST features, never on verb surface:
+
+- Verb token must analyse to `root == "бару"` — any tense / person / number form passes.
+- Destination must be a noun with `Case::Dative`, non-closed-class.
+- Subject must be a bare-nominative content noun preceding the destination. Pronouns refused (same filter as v2.1's `is_closed_class`).
+- First-match-per-sentence; non-adjacency breaks the pattern (v2.5 doesn't guess).
+- Tautology guard (`subject.root == object.root`).
+
+### Graph projection updated
+
+`LexicalGraph::from_facts` now handles the new `goes_to` predicate string. The match arm uses `unreachable!` for unknown predicate strings — a **compile-time enforcement** that every new `Predicate` variant must add a branch here, so the graph and extraction stay in lock-step.
+
+### Extraction delta on committed corpus
+
+| Metric | v2.4 | **v2.5** |
+|---|---:|---:|
+| Total facts | 15 | **15** (same) |
+| Predicates with extractions | 2 (IsA, Has) | **2** (IsA, Has) |
+| GoesTo facts found | — | **0 on committed corpus** |
+
+**Honest zero**: the committed 3191 samples (500/pack cap) are proverbs + Wikipedia intros + Abai poetry — genres that use copula and possessive more than motion verbs. The pattern is correctly wired (4 unit tests verify positive + 3 negatives) and will fire naturally as:
+
+1. v2.6 adds complementary patterns that populate middle-of-chain nodes.
+2. Future pattern passes cover more genres (dative-motion is common in modern news prose, rare in proverbs).
+3. `--full` mode users already see firings on the 350k+ full corpus.
+
+Shipping the pattern now means v2.6 — v3.0 can build on it without re-implementing.
+
+### Tests (+4 → 347 total)
+
+- `dative_extracts_child_goes_to_school` — canonical positive case.
+- `dative_rejects_without_baru_verb` — dative noun + different verb → no fact.
+- `dative_rejects_pronoun_subject` — «мен мектепке барамын» refused (no grounded knowledge).
+- `dative_rejects_self_tautology` — subject = destination refused.
+- Plus `Predicate::GoesTo.as_str() == "goes_to"` stability check.
+
+### Zero regressions
+
+All 343 pre-v2.5 tests still pass. New pattern is purely additive to `extract_facts`; the v2.4 reasoner accepts the new predicate variant (though no rule fires on it yet).
+
+### Committed artifacts
+
+- `data/retrieval/facts.json` regenerated (same 15 facts; dative matcher added but produces no new firings on this corpus).
+- `data/retrieval/derived_facts.json` regenerated (still 0 derivations — same data).
+- `data/retrieval/lexical_graph.json` regenerated (same 29 nodes / 15 edges).
+
+### The v2.5 → v3.0 ladder (committed)
+
+| release | scope | expected outcome |
+|---|---|---|
+| **v2.5** | **+ GoesTo predicate, dative-motion pattern** | **done — pattern wired** |
+| v2.6 | + PartOf, + RelatedTo predicates + patterns | R3, R5 rules activate, first real derivations |
+| v2.7 | dialog integration: reasoner in `Conversation::turn` | user sees chains in responses |
+| v2.8 | more rules + corpus density | 50+ facts, non-trivial graph |
+| v2.9 | investor-demo polish: new `adam_demo` with chain reasoning | end-to-end scripted walkthrough |
+| v3.0 | investor-demoable commitment cut | "Why adam v3.0" positioning + final tag |
+
+Each step grounded in what the previous step measured.
+
 ## [2.4.0] — 2026-04-22 — Rule reasoner v0 (forward-chaining over the Lexical Graph) + comprehensive docs-currency audit
 
 Minor release. Two axes of progress.

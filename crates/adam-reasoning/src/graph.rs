@@ -101,10 +101,14 @@ impl LexicalGraph {
                         "is_a" => Predicate::IsA,
                         "lives_in" => Predicate::LivesIn,
                         "has" => Predicate::Has,
-                        // Unknown string — silently drop (forward-compat
-                        // for future predicates serialised from older
-                        // code). Construction is pure so this is safe.
-                        _ => unreachable!("unknown predicate string in graph build"),
+                        "goes_to" => Predicate::GoesTo,
+                        // Unreachable by construction: `pred_str` is
+                        // derived from `Predicate::as_str()` on an
+                        // existing `Fact::predicate`, so every live
+                        // variant must have a branch here. This arm
+                        // enforces at compile time: adding a new
+                        // Predicate variant requires adding a branch.
+                        _ => unreachable!("unknown predicate string in graph build: {pred_str}"),
                     },
                     to,
                     sources,

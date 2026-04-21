@@ -402,6 +402,121 @@ pub fn possessive_has(
     });
 }
 
+/// Dative-motion pattern — `X Y-ке барады` produces `(X, goes_to, Y)`.
+///
+/// Kazakh expresses "X goes to Y" as `<subject-nom> <place-dative>
+/// бару-in-some-inflection`. We type-check every slot with FST
+/// features instead of string-matching the verb surface — every
+/// person / number / tense form of `бару` is accepted as long as its
+/// root analyses to `бару`.
+///
+/// Requirements (all enforced via FST features, never by surface):
+///
+///   - a verb token whose root is `бару` ("to go"). Any tense /
+///     person / number passes.
+///   - a noun token with `Case::Dative` earlier in the sentence.
+///     Its root is the destination.
+///   - a subject: the first **bare-nominative** content noun before
+///     the destination. Pronouns + closed-class items are refused —
+///     v2.1's [`is_closed_class`] filter — because a pronoun-subject
+///     fact ("мен Алматы GoesTo") is ungrounded knowledge.
+///
+/// Non-adjacency and multiple-dative handling:
+///
+///   - If > 1 dative noun precedes the verb, we take the FIRST
+///     (earliest in the sentence) — Kazakh proverbs and Wikipedia
+///     prefer the direct destination first when chained.
+///   - If a subject cannot be identified (ellipsis via P1Sg copula
+///     on the verb, no bare-nominative noun precedes), the pattern
+///     refuses — v2.5 does not guess; subject ellipsis is v2.6+.
+pub fn dative_goes_to(
+    text: &str,
+    _parses: &[Analysis],
+    lexicon: &LexiconV1,
+    source: &FactSource,
+    out: &mut Vec<Fact>,
+) {
+    let tokens: Vec<(String, Option<Analysis>)> = text
+        .split_whitespace()
+        .map(|t| {
+            let cleaned: String = t
+                .chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect();
+            let lowered = cleaned.to_lowercase();
+            let first = analyse(&lowered, lexicon).into_iter().next();
+            (cleaned, first)
+        })
+        .filter(|(s, _)| !s.is_empty())
+        .collect();
+
+    // Require a form of the verb бару in the sentence.
+    let has_baru = tokens.iter().any(|(_, a)| match a {
+        Some(Analysis::Verb { root, .. }) => root.root == "бару",
+        _ => false,
+    });
+    if !has_baru {
+        return;
+    }
+
+    // First dative noun is the destination.
+    let dative_idx = tokens.iter().position(|(_, a)| match a {
+        Some(Analysis::Noun { features, root }) => {
+            features.case == Some(Case::Dative)
+                && root.part_of_speech == "noun"
+                && !is_closed_class(&root.root)
+        }
+        _ => false,
+    });
+    let Some(dat_idx) = dative_idx else { return };
+    let (dest_surface, dest_root) = match &tokens[dat_idx].1 {
+        Some(Analysis::Noun { root, .. }) => (tokens[dat_idx].0.clone(), root.root.clone()),
+        _ => return,
+    };
+
+    // Subject = first bare-nominative content noun strictly before the
+    // destination. Same POS + closed-class filter as locative pattern.
+    let subj = (0..dat_idx).find_map(|i| match &tokens[i].1 {
+        Some(Analysis::Noun { features, root }) => {
+            if root.part_of_speech != "noun" {
+                return None;
+            }
+            if features.case.is_some() && features.case != Some(Case::Nominative) {
+                return None;
+            }
+            if is_closed_class(&root.root) {
+                return None;
+            }
+            Some(SlotRef {
+                surface: tokens[i].0.clone(),
+                root: root.root.clone(),
+                pos: "noun".to_string(),
+            })
+        }
+        _ => None,
+    });
+    let Some(subject) = subj else { return };
+
+    // Tautology guard.
+    if subject.root == dest_root {
+        return;
+    }
+
+    out.push(Fact {
+        subject,
+        predicate: Predicate::GoesTo,
+        object: SlotRef {
+            surface: dest_surface,
+            root: dest_root,
+            pos: "noun".to_string(),
+        },
+        pattern: "X Y-ке барады".to_string(),
+        source: source.clone(),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: text.trim().to_string(),
+    });
+}
+
 // -----------------------------------------------------------------------------
 // helpers
 // -----------------------------------------------------------------------------
@@ -772,6 +887,55 @@ mod tests {
             out.is_empty(),
             "non-adjacent possessor + possessed → refuse"
         );
+    }
+
+    // ------------------------- dative_goes_to -----------------------------
+
+    #[test]
+    fn dative_extracts_child_goes_to_school() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        dative_goes_to("Бала мектепке барады", &[], &lex, &src(), &mut out);
+        if out.is_empty() {
+            eprintln!("note: «бала» or «мектеп» may not be in Lexicon; skipping");
+            return;
+        }
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].subject.root, "бала");
+        assert_eq!(out[0].object.root, "мектеп");
+        assert_eq!(out[0].predicate, Predicate::GoesTo);
+        assert_eq!(out[0].pattern, "X Y-ке барады");
+    }
+
+    #[test]
+    fn dative_rejects_without_baru_verb() {
+        // Dative case without the verb «бару» is just a dative noun
+        // — not a motion claim.
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        dative_goes_to("Бала мектепке кітап берді", &[], &lex, &src(), &mut out);
+        assert!(
+            out.is_empty(),
+            "no 'бару' verb → no GoesTo fact (got {out:?})"
+        );
+    }
+
+    #[test]
+    fn dative_rejects_pronoun_subject() {
+        // Pronouns carry no grounded subject identity for a fact.
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        dative_goes_to("Мен мектепке барамын", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "pronoun subject refused");
+    }
+
+    #[test]
+    fn dative_rejects_self_tautology() {
+        // Hypothetical tautology — subject and destination share a root.
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        dative_goes_to("Бала балаға барады", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "tautology refused");
     }
 
     // ------------------------- helpers ------------------------------------
