@@ -7,6 +7,75 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.7.0] — 2026-04-22 — Dialog integration: reasoning chains in `Intent::Unknown` responses (v3.0 ladder step 3/6)
+
+Minor release. **The reasoner's output becomes user-visible.** Up to v2.6 derivations existed only in `derived_facts.json`. v2.7 wires them into `Conversation::turn`: when `Intent::Unknown` fires with a noun hint that appears in a derived fact, the response cites the reasoning chain in Kazakh prose with a trust marker.
+
+### The first user-visible derivation
+
+```
+$ adam_chat --once "кітап туралы бірдеңе айт"
+adam-chat: reasoning on — 1 derived facts available (15 supporting extracted facts)
+
+кітап туралы мынадай байланыс анықтадым:
+  кітап пен ілім бір-біріне байланысты екен.
+```
+
+The chain that `R5_shared_is_a_target` derived in v2.6 (both `кітап` and `ілім` are IS-A `бұлақ` ⟹ they're related) is now spoken back to the user. The marker stem **«байланыс-»** flags the claim as *reasoned*, not *retrieved* — a runtime-greppable signal that this sentence was **inferred** and is not a verbatim corpus line.
+
+### Changes
+
+- **`Conversation`** gains two new fields:
+  - `derived_facts: Vec<DerivedFact>`
+  - `extracted_facts: Vec<ReasFact>`
+
+  Both default to empty. Builder: `Conversation::with_reasoning_chains(extracted, derived)`.
+- **`Intent::Unknown`** gains `reasoning_chain: Option<String>` field (`#[serde(default)]`).
+- **New injection step**: `Conversation::turn` calls `inject_reasoning_chain` after the existing retrieval injection. When `noun_hint` matches a derivation's subject or object root, the chain is rendered into Kazakh and placed in the slot.
+- **Kazakh prose renderer**: `render_derivation_as_kazakh` — explicit handling for `RelatedTo` and `IsA`; generic fallback for others. Every output contains «байланыс-».
+- **Planner routing priority**: `reasoning_chain.is_some()` → `unknown.with_derived_chain`. Takes precedence over retrieval evidence — a derived conclusion is a stronger claim than a cited passage.
+- **New template family** `unknown.with_derived_chain` (4 templates). Every template contains «байланыс-».
+
+### Trust invariants — test-enforced
+
+- `derived_facts` match `noun_hint` ⇒ response contains «байланыс-».
+- `derived_facts` empty ⇒ «байланыс-» NEVER appears across 32 seeds.
+- Mirrors v1.9.5's `verbatim_mode_never_claims_adaptation` — never claim "I reasoned this" when we didn't.
+
+### `adam_chat` autoloads reasoning artefacts
+
+CLI loads `data/retrieval/facts.json` + `data/retrieval/derived_facts.json` alongside the morpheme index at startup. Banner confirms. Missing/malformed artefacts silently disable the path.
+
+### Ladder progress: step 3/6 done
+
+| step | release | status |
+|---|---|---|
+| 1/6 | v2.5 — GoesTo + dative pattern | ✅ |
+| 2/6 | v2.6 — PartOf + RelatedTo + R5 active | ✅ |
+| **3/6** | **v2.7 — dialog integration** | **✅ shipped** |
+| 4/6 | v2.8 — more rules + pattern density | next |
+| 5/6 | v2.9 — investor-demo polish | |
+| 6/6 | v3.0 — investor-demoable commitment cut | |
+
+### Tests (+2 → 354 total)
+
+- `unknown_with_reasoning_chain_cites_derivation` — synthetic `RelatedTo` fact → «байланыс-» fires.
+- `unknown_without_derived_facts_never_claims_chain` — no facts → marker never fires, 32 seeds.
+
+### Zero regressions
+
+All 352 pre-v2.7 tests still pass. Additive to `Conversation` + `Intent`; existing embedders see v2.6-identical behaviour.
+
+### Committed artefacts
+
+Unchanged from v2.6. (New behaviour is in how they're consumed, not the data itself.)
+
+### What v2.8 will do
+
+- Additional pattern matchers (populate middle-of-chain nodes so R1 transitivity starts firing on corpus).
+- More rules: R2 (`Has` inheritance via IsA), R4 (`IsA` symmetry diagnostic).
+- Predicate-specific Kazakh prose renderers for `GoesTo` / `Has` / `LivesIn` derivations.
+
 ## [2.6.0] — 2026-04-22 — `PartOf` + `RelatedTo` predicates + R5 rule activation (v3.0 ladder: step 2/6)
 
 Minor release. **The reasoner starts producing actual derivations on real corpus data.** v2.5 shipped the inference machinery; v2.6 wires it to the first real chain.

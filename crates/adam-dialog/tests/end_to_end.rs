@@ -1043,6 +1043,80 @@ fn unknown_with_retrieval_cites_corpus_example() {
     );
 }
 
+/// v2.7: when derived facts are attached, `Intent::Unknown` whose
+/// noun_hint appears in a derivation should route to the
+/// `unknown.with_derived_chain` family. Trust invariant — every
+/// template in that family contains the marker stem «байланыс-»
+/// so users can distinguish reasoning citations from corpus quotes
+/// at the textual level alone.
+#[test]
+fn unknown_with_reasoning_chain_cites_derivation() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    // Synthetic derivation: кітап RelatedTo ілім, as if R5 had fired.
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "кітап".into(),
+            root: "кітап".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::RelatedTo,
+        object: SlotRef {
+            surface: "ілім".into(),
+            root: "ілім".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R5_shared_is_a_target".into(),
+        source_chain: vec![
+            FactSource {
+                pack: "proverbs".into(),
+                sample_id: "p_003".into(),
+            },
+            FactSource {
+                pack: "common_voice".into(),
+                sample_id: "cv_047".into(),
+            },
+        ],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let out = conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
+    assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+    // Trust invariant: the marker stem MUST appear when a chain fires.
+    assert!(
+        out.contains("байланыс"),
+        "unknown.with_derived_chain family must include «байланыс-» marker, got: {out:?}"
+    );
+    // The derived pair (кітап, ілім) should appear.
+    assert!(
+        out.contains("кітап") && out.contains("ілім"),
+        "rendered chain must name both roots, got: {out:?}"
+    );
+}
+
+/// v2.7 negative invariant: without any derived facts attached, the
+/// reasoning-chain path must NEVER fire. Guards against false-positive
+/// "this is inferred" claims — a trust-critical corollary of v1.9.5's
+/// verbatim_mode_never_claims_adaptation.
+#[test]
+fn unknown_without_derived_facts_never_claims_chain() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    for seed in 0..32u64 {
+        let out = conv.turn("кітап туралы бірдеңе айт", &lex, &repo, seed);
+        assert!(
+            !out.contains("байланыс"),
+            "no derived facts → chain marker MUST NOT appear, got: {out:?}"
+        );
+    }
+}
+
 /// Without an attached index, the Unknown fallback keeps the v1.1.0
 /// noun-echo behaviour — no retrieval side-effects, no crashes.
 #[test]

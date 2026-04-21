@@ -158,6 +158,7 @@ pub fn interpret_text_with_lexicon(
         noun_hint,
         example: None,
         example_adapted: false,
+        reasoning_chain: None,
     }
 }
 
@@ -276,6 +277,7 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         noun_hint: first_noun_root(parses),
         example: None,
         example_adapted: false,
+        reasoning_chain: None,
     }
 }
 

@@ -134,6 +134,15 @@ pub enum Intent {
         /// path.
         #[serde(default)]
         example_adapted: bool,
+        /// v2.7: rendered reasoning chain — Kazakh prose describing a
+        /// rule-derived RelatedTo fact involving the `noun_hint`
+        /// («X пен Y бір-біріне байланысты: екеуі де Z болып табылады»).
+        /// Populated by `Conversation::turn` when `derived_facts` are
+        /// attached and the noun_hint appears in a derivation's
+        /// subject or object. Routes the planner to the
+        /// `unknown.with_derived_chain` template family.
+        #[serde(default)]
+        reasoning_chain: Option<String>,
     },
 }
 

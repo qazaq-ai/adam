@@ -9,6 +9,7 @@ description = "Predictable Kazakh dialog layer — 26-intent recogniser, multi-t
 adam-kernel = { path = "../adam-kernel" }
 adam-kernel-fst = { path = "../adam-kernel-fst" }
 adam-retrieval = { path = "../adam-retrieval" }
+adam-reasoning = { path = "../adam-reasoning" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

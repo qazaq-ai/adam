@@ -20,6 +20,8 @@
 use std::collections::HashMap;
 
 use adam_kernel_fst::lexicon::LexiconV1;
+use adam_reasoning::reasoner::DerivedFact;
+use adam_reasoning::{Fact as ReasFact, Predicate as ReasPredicate};
 use adam_retrieval::{MorphemeIndex, RankConfig, compose::compose_with_city};
 
 use crate::intent::Intent;
@@ -88,6 +90,18 @@ pub struct Conversation {
     /// identical corpus quote); [`ComposeMode::InSampleCitySwap`]
     /// enables the v1.9.0 option-B city rewrite. Added v1.9.0.
     pub compose_mode: ComposeMode,
+    /// Rule-derived facts produced by `adam_reasoning::reasoner::run`.
+    /// When attached, `Intent::Unknown` can cite a reasoning chain
+    /// (e.g. «кітап пен ілім бір-біріне байланысты: екеуі де бұлақ
+    /// болып табылады») in addition to or instead of a verbatim corpus
+    /// sample. Added v2.7. When absent, dialog behaviour matches v2.6
+    /// exactly — retrieval path only.
+    pub derived_facts: Vec<DerivedFact>,
+    /// Extracted (non-derived) facts, used by the reasoning-integration
+    /// path to build human-readable "source_chain" renderings. Typically
+    /// loaded alongside `derived_facts` from the same artefact pair.
+    /// Added v2.7.
+    pub extracted_facts: Vec<ReasFact>,
 }
 
 /// Lightweight "kind" summary of an `Intent` — the payload (name /
@@ -181,6 +195,25 @@ impl Conversation {
         self
     }
 
+    /// Attach rule-derived facts + their supporting extracted facts so
+    /// `Intent::Unknown` can cite reasoning chains ("X and Y are both
+    /// kinds of Z, therefore related"). `extracted` is used to render
+    /// the source_chain into Kazakh evidence phrases; `derived` is the
+    /// list of `RuleInferred` facts to match against noun hints.
+    ///
+    /// Both lists default to empty, in which case dialog behaviour is
+    /// bit-identical to v2.6 — retrieval path only, zero reasoning
+    /// citations.
+    pub fn with_reasoning_chains(
+        mut self,
+        extracted: Vec<ReasFact>,
+        derived: Vec<DerivedFact>,
+    ) -> Self {
+        self.extracted_facts = extracted;
+        self.derived_facts = derived;
+        self
+    }
+
     /// Run one conversational turn. Parses the input, recognises the
     /// intent, folds any new entities into [`session`](Self::session),
     /// updates [`active_intent`](Self::active_intent) and
@@ -211,10 +244,57 @@ impl Conversation {
         // on (pack, sample_id), compose_with_city is a pure function.
         self.inject_retrieval_example(&mut intent, &parses, lexicon);
 
+        // v2.7: inject a rule-derived reasoning chain into Unknown
+        // when `derived_facts` are attached and the noun_hint appears
+        // in a derivation. Pure function of (derived_facts, noun_hint);
+        // no RNG, no side-effects.
+        self.inject_reasoning_chain(&mut intent);
+
         self.absorb_entities(&intent);
         self.record_intent(&intent);
         let plan = plan_response_with_session(&intent, rng_seed, repo, &self.session);
         realise(&plan)
+    }
+
+    /// v2.7: for `Intent::Unknown { noun_hint: Some(n), .. }`, scan
+    /// the attached `derived_facts` for any derivation whose subject
+    /// OR object root equals `n`. If found, render the source_chain
+    /// into a Kazakh prose sentence and fill the `reasoning_chain`
+    /// slot. The planner then routes to `unknown.with_derived_chain`.
+    ///
+    /// **Trust invariant** — every rendered chain carries the marker
+    /// stem «байланыс-» ("connect-/relate-") so the user can always
+    /// tell a reasoning citation apart from a verbatim corpus quote.
+    /// This mirrors v1.9.5's «бейімд-» marker for adapted evidence.
+    ///
+    /// Deterministic: picks the first matching derivation (sorted
+    /// order from the reasoner). No-op when `derived_facts` is empty,
+    /// `example` is already set (retrieval wins if it ran), or the
+    /// intent isn't Unknown / has no noun_hint.
+    fn inject_reasoning_chain(&self, intent: &mut Intent) {
+        if self.derived_facts.is_empty() {
+            return;
+        }
+        if let Intent::Unknown {
+            noun_hint: Some(noun),
+            reasoning_chain,
+            ..
+        } = intent
+        {
+            if reasoning_chain.is_some() {
+                return;
+            }
+            // Find the first derivation involving `noun`. Prefer the
+            // subject side so the rendered sentence starts with the
+            // user's mentioned word.
+            let matched = self
+                .derived_facts
+                .iter()
+                .find(|d| d.subject.root == *noun || d.object.root == *noun);
+            let Some(d) = matched else { return };
+            let rendered = render_derivation_as_kazakh(d);
+            *reasoning_chain = Some(rendered);
+        }
     }
 
     /// For `Intent::Unknown { noun_hint: Some(n), .. }`, if an index is
@@ -364,6 +444,43 @@ impl Conversation {
 /// weak-intent), and the PREVIOUS turn was an Ask- intent, we re-tag
 /// the current turn as the same Ask kind, so the planner picks a
 /// matching response template.
+/// Render a [`DerivedFact`] as a Kazakh prose sentence suitable for the
+/// `unknown.with_derived_chain` template family. Every output contains
+/// the marker stem «байланыс-» so consumers can distinguish a reasoning
+/// citation from a verbatim corpus quote at the textual level alone
+/// (trust invariant; mirrors v1.9.5's «бейімд-» marker for adapted
+/// evidence).
+///
+/// v2.7 only handles `Predicate::RelatedTo` (the sole rule-derived
+/// predicate currently emitted). Other predicates produce a generic
+/// fallback that still contains the marker. Future releases will add
+/// predicate-specific renderings as reasoner output grows.
+fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
+    match d.predicate {
+        ReasPredicate::RelatedTo => {
+            // "X пен Y бір-біріне байланысты"
+            format!(
+                "{} пен {} бір-біріне байланысты екен",
+                d.subject.root, d.object.root
+            )
+        }
+        ReasPredicate::IsA => {
+            // Transitivity-derived IsA — e.g. "кітап — зат болып табылады"
+            format!(
+                "қорытынды: {} — {} (байланысты ой-тізбек арқылы)",
+                d.subject.root, d.object.root
+            )
+        }
+        _ => {
+            // Generic fallback — still carries the «байланыс-» marker.
+            format!(
+                "{} мен {} арасында логикалық байланыс бар",
+                d.subject.root, d.object.root
+            )
+        }
+    }
+}
+
 fn resolve_follow_up(raw: Intent, input: &str, active: Option<IntentKind>) -> Intent {
     let normalised: String = input.to_lowercase();
     let is_reflective = normalised.trim() == "ал сіз"

@@ -385,3 +385,19 @@ templates = [
     "{name}, бейімделген мысал (түпнұсқадан өзгертілген): «{example}»",
 ]
 
+# v2.7 — Unknown with rule-derived reasoning chain. When the reasoner
+# (adam_reasoning::reasoner::run) produces a DerivedFact involving the
+# user's noun_hint, the chain is rendered into Kazakh prose and routed
+# here. Every template in this family contains the marker stem
+# «байланыс-» ("connect-/relate-"), mirroring the v1.9.5 «бейімд-»
+# marker for adapted evidence. Users can grep for «байланыс-» as a
+# runtime signal that the response is inferred, not retrieved.
+[[families]]
+key = "unknown.with_derived_chain"
+templates = [
+    "{noun} туралы мынадай байланыс анықтадым: {chain}.",
+    "Айтуыңыз бойынша, мынадай қисынды байланыс бар: {chain}.",
+    "Қолда бар деректерден байланыс құрастырдым: {chain}.",
+    "{name}, {noun} жайында мен мынадай байланысты таптым: {chain}.",
+]
+

@@ -158,13 +158,19 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
             slots.insert("occupation".into(), occupation.clone());
         }
         Intent::Unknown {
-            noun_hint, example, ..
+            noun_hint,
+            example,
+            reasoning_chain,
+            ..
         } => {
             if let Some(noun) = noun_hint {
                 slots.insert("noun".into(), noun.clone());
             }
             if let Some(ex) = example {
                 slots.insert("example".into(), ex.clone());
+            }
+            if let Some(chain) = reasoning_chain {
+                slots.insert("chain".into(), chain.clone());
             }
         }
         _ => {}
@@ -253,20 +259,25 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             noun_hint,
             example,
             example_adapted,
+            reasoning_chain,
             ..
         } => {
-            // v1.9.5: when the retrieved quote was rewritten by the
-            // composer (e.g. `ComposeMode::InSampleCitySwap`), route to
-            // the `adapted_evidence` family so the user is explicitly
-            // informed the quote is not byte-identical to the source.
-            // Traceability wins over the slightly cleaner phrasing the
-            // verbatim-evidence templates give you.
+            // v2.7: reasoning-chain takes priority over retrieval when
+            // both are available, because a derived chain shows how the
+            // system CONNECTED facts rather than just cited one. The
+            // `unknown.with_derived_chain` family always includes the
+            // «байланыс-» marker for user-side auditability (mirrors
+            // v1.9.5's «бейімд-» marker for adapted evidence).
             //
-            // v1.6.5: if retrieval surfaced a concrete example from the
-            // committed corpus for this noun, route to the evidence
-            // family. Otherwise the v1.1.0 noun-hint family, then the
-            // bare "түсінбедім" fallback.
-            if example.is_some() && *example_adapted {
+            // v1.9.5: adapted-evidence routing (retrieval was rewritten
+            // by compose_with_city); the «бейімд-» marker fires.
+            //
+            // v1.6.5: verbatim retrieval evidence.
+            // v1.1.0: noun-echo acknowledgement when no retrieval hit.
+            // v1.0.0: bare "түсінбедім" fallback.
+            if reasoning_chain.is_some() {
+                "unknown.with_derived_chain"
+            } else if example.is_some() && *example_adapted {
                 "unknown.with_adapted_evidence"
             } else if example.is_some() {
                 "unknown.with_evidence"

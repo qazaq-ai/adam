@@ -43,9 +43,12 @@ use adam_dialog::{
     plan_response_with_session, realise,
 };
 use adam_kernel_fst::lexicon::LexiconV1;
+use adam_reasoning::{Fact as ReasFact, reasoner::DerivedFact};
 use adam_retrieval::MorphemeIndex;
 
 const RETRIEVAL_INDEX_PATH: &str = "data/retrieval/morpheme_index.json";
+const FACTS_PATH: &str = "data/retrieval/facts.json";
+const DERIVED_FACTS_PATH: &str = "data/retrieval/derived_facts.json";
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().collect();
@@ -98,6 +101,20 @@ fn main() -> ExitCode {
         }
     };
 
+    // v2.7: load rule-derived facts + their supporting extracted
+    // facts if present. When both exist, Intent::Unknown can cite a
+    // reasoning chain (marked with «байланыс-») alongside retrieval.
+    // Absent artefacts silently disable the path — v2.6 behaviour
+    // is preserved.
+    let (extracted, derived) = load_reasoning_chains();
+    if !derived.is_empty() {
+        eprintln!(
+            "adam-chat: reasoning on — {} derived facts available ({} supporting extracted facts)",
+            derived.len(),
+            extracted.len(),
+        );
+    }
+
     let mut conv = Conversation::new();
     if let Some(idx) = index {
         conv = conv.with_morpheme_index(idx);
@@ -107,6 +124,9 @@ fn main() -> ExitCode {
         eprintln!(
             "adam-chat: compose mode = InSampleCitySwap (v1.9.0 opt-in; adapted quotes marked with «бейімд-»)"
         );
+    }
+    if !derived.is_empty() || !extracted.is_empty() {
+        conv = conv.with_reasoning_chains(extracted, derived);
     }
 
     if let Some(pos) = args.iter().position(|a| a == "--once") {
@@ -142,6 +162,31 @@ fn load_retrieval_index() -> Option<MorphemeIndex> {
     let mut idx: MorphemeIndex = serde_json::from_str(&raw).ok()?;
     idx.refresh_stats();
     Some(idx)
+}
+
+/// Load the v2.7 reasoning artefacts — `facts.json` + `derived_facts.json`.
+/// Silently returns empty vectors for any missing / malformed file so
+/// embedders running in trimmed checkouts get v2.6-identical behaviour.
+fn load_reasoning_chains() -> (Vec<ReasFact>, Vec<DerivedFact>) {
+    #[derive(serde::Deserialize)]
+    struct FactsFile {
+        facts: Vec<ReasFact>,
+    }
+    #[derive(serde::Deserialize)]
+    struct DerivedFile {
+        derived: Vec<DerivedFact>,
+    }
+    let extracted = std::fs::read_to_string(FACTS_PATH)
+        .ok()
+        .and_then(|raw| serde_json::from_str::<FactsFile>(&raw).ok())
+        .map(|f| f.facts)
+        .unwrap_or_default();
+    let derived = std::fs::read_to_string(DERIVED_FACTS_PATH)
+        .ok()
+        .and_then(|raw| serde_json::from_str::<DerivedFile>(&raw).ok())
+        .map(|d| d.derived)
+        .unwrap_or_default();
+    (extracted, derived)
 }
 
 fn run_turn(
