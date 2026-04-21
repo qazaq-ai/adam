@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
+  "version": "2.2.0",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -1811,13 +1811,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "verb_tagh",
-      "root": "тағ",
-      "part_of_speech": "verb",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_asta",
       "root": "аста",
       "part_of_speech": "noun",
@@ -1851,13 +1844,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_boelihg",
-      "root": "бөліг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_ekonomikalyq",
@@ -2278,13 +2264,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_sharuashylygh",
-      "root": "шаруашылығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_shama",
@@ -3134,13 +3113,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_aumagh",
-      "root": "аумағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_juubanov",
       "root": "жұбанов",
       "part_of_speech": "noun",
@@ -3237,13 +3209,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_taqyryb",
-      "root": "тақырыб",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_taghayyndal",
@@ -3589,13 +3554,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_biihktihg",
-      "root": "биіктіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_oekihlder",
       "root": "өкілдер",
       "part_of_speech": "noun",
@@ -3733,13 +3691,6 @@
       "root": "дәстүрл",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "verb_sogh",
-      "root": "соғ",
-      "part_of_speech": "verb",
-      "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
     },
     {
@@ -4154,13 +4105,6 @@
       "part_of_speech": "verb",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_tob",
-      "root": "тоб",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_qayt",
@@ -4595,13 +4539,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_ministrlihg",
-      "root": "министрліг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_tuul",
@@ -5423,20 +5360,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_oenerkaesihb",
-      "root": "өнеркәсіб",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_engbeg",
-      "root": "еңбег",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "verb_qayta",
       "root": "қайта",
       "part_of_speech": "verb",
@@ -5682,13 +5605,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_salmagh",
-      "root": "салмағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_qamti",
       "root": "қамти",
       "part_of_speech": "noun",
@@ -5701,13 +5617,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_quuqygh",
-      "root": "құқығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_soezihn",
@@ -5885,13 +5794,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_bilihg",
-      "root": "биліг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_koezqaras",
       "root": "көзқарас",
       "part_of_speech": "noun",
@@ -6016,13 +5918,6 @@
       "part_of_speech": "verb",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_aymagh",
-      "root": "аймағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_monggholiya",
@@ -6410,13 +6305,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_taertihb",
-      "root": "тәртіб",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_daeuihrihn",
       "root": "дәуірін",
       "part_of_speech": "noun",
@@ -6443,13 +6331,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_jinagh",
-      "root": "жинағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_jinaq",
@@ -6802,13 +6683,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_aekihmdihg",
-      "root": "әкімдіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_esihk",
       "root": "есік",
       "part_of_speech": "noun",
@@ -7152,13 +7026,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_kihtab",
-      "root": "кітаб",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_naghyz",
       "root": "нағыз",
       "part_of_speech": "noun",
@@ -7222,25 +7089,11 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_ayagh",
-      "root": "аяғ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_boks",
       "root": "бокс",
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_erekshelihg",
-      "root": "ерекшеліг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_etihstihk",
@@ -7481,13 +7334,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_blog",
-      "root": "блог",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "verb_boele",
       "root": "бөле",
       "part_of_speech": "verb",
@@ -7574,13 +7420,6 @@
     {
       "id": "noun_fayl",
       "root": "файл",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_khandygh",
-      "root": "хандығ",
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
@@ -7985,13 +7824,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_jiyntygh",
-      "root": "жиынтығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_muukh",
       "root": "мұх",
       "part_of_speech": "noun",
@@ -8123,13 +7955,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_qalyngdygh",
-      "root": "қалыңдығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_aur",
@@ -9203,13 +9028,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_ayyrmashylygh",
-      "root": "айырмашылығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_min",
       "root": "мин",
       "part_of_speech": "noun",
@@ -9271,13 +9089,6 @@
       "part_of_speech": "verb",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_agenttihg",
-      "root": "агенттіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_astyndagh",
@@ -9714,13 +9525,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_atagh",
-      "root": "атағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_biologiyalyq",
       "root": "биологиялық",
       "part_of_speech": "noun",
@@ -9733,13 +9537,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_eseb",
-      "root": "есеб",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_oezgertihl",
@@ -10554,13 +10351,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_taeuelsihzdihg",
-      "root": "тәуелсіздіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_shaghatay",
       "root": "шағатай",
       "part_of_speech": "noun",
@@ -10636,13 +10426,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_sabagh",
-      "root": "сабағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_sueyihk",
@@ -10827,13 +10610,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_syylygh",
-      "root": "сыйлығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_saen",
       "root": "сән",
       "part_of_speech": "noun",
@@ -10857,13 +10633,6 @@
     {
       "id": "noun_qangtardagh",
       "root": "қаңтардағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_uurpagh",
-      "root": "ұрпағ",
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
@@ -12451,13 +12220,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_bolashagh",
-      "root": "болашағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_jiyntyq",
       "root": "жиынтық",
       "part_of_speech": "noun",
@@ -12654,13 +12416,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "verb_qagh",
-      "root": "қағ",
-      "part_of_speech": "verb",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_quatyn",
       "root": "қуатын",
       "part_of_speech": "noun",
@@ -12701,13 +12456,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_juygh",
-      "root": "жуығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_jyra",
@@ -13214,13 +12962,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_qauymdastygh",
-      "root": "қауымдастығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_quunarl",
       "root": "құнарл",
       "part_of_speech": "noun",
@@ -13690,13 +13431,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_aekihmshihlihg",
-      "root": "әкімшіліг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_oezgeruih",
       "root": "өзгеруі",
       "part_of_speech": "noun",
@@ -13968,13 +13702,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_tarmagh",
-      "root": "тармағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_tuesihre",
@@ -14348,13 +14075,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_koelihg",
-      "root": "көліг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_maenerle",
       "root": "мәнерле",
       "part_of_speech": "noun",
@@ -14422,13 +14142,6 @@
       "root": "шол",
       "part_of_speech": "verb",
       "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_qauihpsihzdihg",
-      "root": "қауіпсіздіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
       "final_sound_class": "voiced_consonant"
     },
     {
@@ -14521,13 +14234,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_salygh",
-      "root": "салығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_subektihlerih",
@@ -14871,13 +14577,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_topyragh",
-      "root": "топырағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_shang",
@@ -15461,13 +15160,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_endihg",
-      "root": "ендіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_erkih",
       "root": "еркі",
       "part_of_speech": "noun",
@@ -15853,13 +15545,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_jarlygh",
-      "root": "жарлығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_jart",
       "root": "жарт",
       "part_of_speech": "noun",
@@ -15942,13 +15627,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_sanagh",
-      "root": "санағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_septihgihn",
@@ -16378,13 +16056,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_tuesihnihg",
-      "root": "түсініг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_tuuq",
       "root": "тұқ",
       "part_of_speech": "noun",
@@ -16798,13 +16469,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_qabygh",
-      "root": "қабығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "verb_qalmay",
       "root": "қалмай",
       "part_of_speech": "verb",
@@ -16880,20 +16544,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun__bab",
-      "root": "-баб",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun__tarmagh",
-      "root": "-тармағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun__tarmaghyn",
@@ -17015,13 +16665,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_serihg",
-      "root": "серіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_soqyr",
       "root": "соқыр",
       "part_of_speech": "noun",
@@ -17055,13 +16698,6 @@
       "part_of_speech": "verb",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_shyghanagh",
-      "root": "шығанағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_qadihrihn",
@@ -17974,13 +17610,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_tihreg",
-      "root": "тірег",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_tuepkihlihk",
       "root": "түпкілік",
       "part_of_speech": "noun",
@@ -18555,13 +18184,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_soezdihg",
-      "root": "сөздіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_tetihk",
       "root": "тетік",
       "part_of_speech": "noun",
@@ -19045,13 +18667,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_erlihg",
-      "root": "ерліг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_etse",
       "root": "етсе",
       "part_of_speech": "noun",
@@ -19134,13 +18749,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_sheberlihg",
-      "root": "шеберліг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_qabyq",
@@ -19409,13 +19017,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_koroldihg",
-      "root": "корольдіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_meri",
       "root": "мэри",
       "part_of_speech": "noun",
@@ -19470,13 +19071,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_shoeb",
-      "root": "шөб",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_elektrlihk",
@@ -19638,13 +19232,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_syzygh",
-      "root": "сызығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_tesihk",
@@ -20128,20 +19715,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_tetihg",
-      "root": "тетіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "verb_totygh",
-      "root": "тотығ",
-      "part_of_speech": "verb",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_uchaskesih",
@@ -20795,13 +20368,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_sayabagh",
-      "root": "саябағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "verb_uaej",
       "root": "уәж",
       "part_of_speech": "verb",
@@ -21028,13 +20594,6 @@
     {
       "id": "noun_shor",
       "root": "шор",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_shyragh",
-      "root": "шырағ",
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
@@ -21271,13 +20830,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_tuumsygh",
-      "root": "тұмсығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_toerihn",
       "root": "төрін",
       "part_of_speech": "noun",
@@ -21353,13 +20905,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_qaldygh",
-      "root": "қалдығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_quyq",
@@ -21469,13 +21014,6 @@
     {
       "id": "noun_zaer",
       "root": "зәр",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_igihlihg",
-      "root": "игіліг",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiced_consonant"
@@ -21999,13 +21537,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_shapqynshylygh",
-      "root": "шапқыншылығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_shuurayl",
       "root": "шұрайл",
       "part_of_speech": "noun",
@@ -22293,13 +21824,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_tueleg",
-      "root": "түлег",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_ufa",
       "root": "уфа",
       "part_of_speech": "noun",
@@ -22550,13 +22074,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_ielihg",
-      "root": "иеліг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_ile",
@@ -23301,13 +22818,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_uezdihg",
-      "root": "үздіг",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_uerker",
       "root": "үркер",
       "part_of_speech": "noun",
@@ -23373,13 +22883,6 @@
     {
       "id": "noun_abd",
       "root": "абд",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_ayghagh",
-      "root": "айғағ",
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
@@ -23628,13 +23131,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_mysygh",
-      "root": "мысығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_maeresih",
@@ -24778,13 +24274,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "verb_toeg",
-      "root": "төг",
-      "part_of_speech": "verb",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_uay",
       "root": "уай",
       "part_of_speech": "noun",
@@ -25506,13 +24995,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_shanagh",
-      "root": "шанағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_shybyq",
       "root": "шыбық",
       "part_of_speech": "noun",
@@ -25945,13 +25427,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_jangghagh",
-      "root": "жаңғағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_jent",
@@ -26787,13 +26262,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_juurnagh",
-      "root": "жұрнағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "verb_zaqymdan",
       "root": "зақымдан",
       "part_of_speech": "verb",
@@ -27086,13 +26554,6 @@
       "part_of_speech": "verb",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_tuuyagh",
-      "root": "тұяғ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_toek",
@@ -28103,13 +27564,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_yrghagh",
-      "root": "ырғағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_eyr",
       "root": "эйр",
       "part_of_speech": "noun",
@@ -28339,13 +27793,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "verb_asygh",
-      "root": "асығ",
-      "part_of_speech": "verb",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_atf",
@@ -29013,13 +28460,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_tog",
-      "root": "тог",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "verb_toza",
       "root": "тоза",
       "part_of_speech": "verb",
@@ -29384,13 +28824,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_uushagh",
-      "root": "ұшағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_uushaghy",
       "root": "ұшағы",
       "part_of_speech": "noun",
@@ -29753,13 +29186,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "verb_jeg",
-      "root": "жег",
-      "part_of_speech": "verb",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_jetpeytihn",
@@ -30602,13 +30028,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_qazagh",
-      "root": "қазағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_qaznet",
       "root": "қазнет",
       "part_of_speech": "noun",
@@ -30677,13 +30096,6 @@
       "part_of_speech": "verb",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_qyzghaldagh",
-      "root": "қызғалдағ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_qyzghanysh",
@@ -30766,13 +30178,6 @@
       "id": "verb_uuzatyl",
       "root": "ұзатыл",
       "part_of_speech": "verb",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_uurygh",
-      "root": "ұрығ",
-      "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
     },
@@ -30887,13 +30292,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_aylygh",
-      "root": "айлығ",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_ayqa",
@@ -31125,13 +30523,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_dob",
-      "root": "доб",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_duadaq",
@@ -31615,6 +31006,27 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_baylyq",
+      "root": "байлық",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_bastau",
+      "root": "бастау",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_zhanashyr",
+      "root": "жанашыр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
     }
   ]
 }

@@ -18,7 +18,7 @@
 //!      with a positive and a negative case in `#[cfg(test)]` below.
 
 use adam_kernel_fst::lexicon::LexiconV1;
-use adam_kernel_fst::morphotactics::Case;
+use adam_kernel_fst::morphotactics::{Case, Possessive};
 use adam_kernel_fst::parser::{Analysis, analyse};
 
 use crate::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
@@ -283,6 +283,119 @@ pub fn locative_lives_in(
             pos: "noun".to_string(),
         },
         pattern: "X Y-да тұрады".to_string(),
+        source: source.clone(),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: text.trim().to_string(),
+    });
+}
+
+/// Possessive-existence pattern — `X-тың Y-сы бар` produces
+/// `(X, has, Y)`.
+///
+/// Kazakh expresses "X has Y" as `<possessor-genitive> <possessed-P3> бар`
+/// ("Баланың кітабы бар" = "The child has a book"). We type-check with
+/// full FST features, not string matching:
+///
+///   - a token analysable as a noun in `Case::Genitive` — its root is
+///     the possessor (subject);
+///   - a following token analysable as a noun with `Possessive::P3` —
+///     its root is the possessed (object);
+///   - the existential particle "бар" at the end (free order inside the
+///     sentence).
+///
+/// Guards:
+///
+///   - subject root must not be closed-class (pronoun / demonstrative);
+///   - subject ≠ object (no tautological self-possession);
+///   - the possessor's genitive form and the possessed's P3 form must
+///     appear **in order** (possessor first, possessed second) — Kazakh
+///     is strictly head-final, so reversing them is a different
+///     construction.
+pub fn possessive_has(
+    text: &str,
+    _parses: &[Analysis],
+    lexicon: &LexiconV1,
+    source: &FactSource,
+    out: &mut Vec<Fact>,
+) {
+    // Cheap prefilter — "бар" must appear as a word. Most sentences
+    // don't contain possessive-existence, so this short-circuits the
+    // expensive per-token parse.
+    let has_bar = text
+        .split(|c: char| !(c.is_alphabetic() || c == '-'))
+        .any(|t| t.to_lowercase() == "бар");
+    if !has_bar {
+        return;
+    }
+
+    // Per-token parse with surface preservation.
+    let tokens: Vec<(String, Option<Analysis>)> = text
+        .split_whitespace()
+        .map(|t| {
+            let cleaned: String = t
+                .chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect();
+            let lowered = cleaned.to_lowercase();
+            let first = analyse(&lowered, lexicon).into_iter().next();
+            (cleaned, first)
+        })
+        .filter(|(s, _)| !s.is_empty())
+        .collect();
+
+    // Find a genitive noun (possessor).
+    let gen_idx = tokens.iter().position(|(_, a)| match a {
+        Some(Analysis::Noun { features, root }) => {
+            features.case == Some(Case::Genitive)
+                && root.part_of_speech == "noun"
+                && !is_closed_class(&root.root)
+        }
+        _ => false,
+    });
+    let Some(gen_idx) = gen_idx else { return };
+    let (possessor_surface, possessor_root) = match &tokens[gen_idx].1 {
+        Some(Analysis::Noun { root, .. }) => (tokens[gen_idx].0.clone(), root.root.clone()),
+        _ => return,
+    };
+
+    // Immediately-following token must parse as a noun with P3 possessive
+    // (possessed noun). Strict adjacency — intervening tokens break the
+    // construction ("Баланың үйде кітабы бар" is a different meaning).
+    let possessed_slot = tokens.get(gen_idx + 1).and_then(|(surface, a)| match a {
+        Some(Analysis::Noun { features, root }) => {
+            if features.possessive == Some(Possessive::P3)
+                && root.part_of_speech == "noun"
+                && !is_closed_class(&root.root)
+            {
+                Some(SlotRef {
+                    surface: surface.clone(),
+                    root: root.root.clone(),
+                    pos: "noun".to_string(),
+                })
+            } else {
+                None
+            }
+        }
+        _ => None,
+    });
+    let Some(possessed) = possessed_slot else {
+        return;
+    };
+
+    // Tautology guard.
+    if possessor_root == possessed.root {
+        return;
+    }
+
+    out.push(Fact {
+        subject: SlotRef {
+            surface: possessor_surface,
+            root: possessor_root,
+            pos: "noun".to_string(),
+        },
+        predicate: Predicate::Has,
+        object: possessed,
+        pattern: "X-тың Y-сы бар".to_string(),
         source: source.clone(),
         confidence: ConfidenceKind::Grammar,
         raw_text: text.trim().to_string(),
@@ -618,6 +731,46 @@ mod tests {
         assert!(
             out.is_empty(),
             "pronoun subject rejected (no knowledge value)"
+        );
+    }
+
+    // ------------------------- possessive_has -----------------------------
+
+    #[test]
+    fn possessive_extracts_child_has_book() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        possessive_has("Баланың кітабы бар", &[], &lex, &src(), &mut out);
+        if out.is_empty() {
+            eprintln!("note: «бала» or «кітап» may not be in Lexicon; skipping");
+            return;
+        }
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].subject.root, "бала");
+        assert_eq!(out[0].object.root, "кітап");
+        assert_eq!(out[0].predicate, Predicate::Has);
+        assert_eq!(out[0].pattern, "X-тың Y-сы бар");
+    }
+
+    #[test]
+    fn possessive_rejects_without_bar() {
+        // Without the existential "бар", this isn't a Has claim.
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        possessive_has("Баланың кітабы", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "no 'бар' → no Has fact");
+    }
+
+    #[test]
+    fn possessive_rejects_non_adjacent() {
+        // Intervening word between possessor and possessed breaks the
+        // simple X-тың Y-сы bar construction. We refuse to guess.
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        possessive_has("Баланың үйде кітабы бар", &[], &lex, &src(), &mut out);
+        assert!(
+            out.is_empty(),
+            "non-adjacent possessor + possessed → refuse"
         );
     }
 

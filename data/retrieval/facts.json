@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "built_from": [
     "tatoeba_kazakh_pack.json",
     "wikipedia_kz_pack.json",
@@ -12,13 +12,15 @@
   ],
   "counts": {
     "samples_scanned": 3191,
-    "samples_with_facts": 11,
-    "facts_total": 11,
+    "samples_with_facts": 13,
+    "facts_total": 13,
     "by_predicate": {
+      "has": 2,
       "is_a": 11
     },
     "by_pack": {
-      "common_voice_kk_pack.json": 2,
+      "cc100_kk_pack.json": 1,
+      "common_voice_kk_pack.json": 3,
       "kazakh_proverbs_pack.json": 9
     }
   },
@@ -45,6 +47,26 @@
     },
     {
       "subject": {
+        "surface": "адамдардың",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "гүлі",
+        "root": "гүл",
+        "pos": "noun"
+      },
+      "pattern": "X-тың Y-сы бар",
+      "source": {
+        "pack": "common_voice_kk_pack.json",
+        "sample_id": "cv_kk_00130"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Адам бар дүр, адамдардың гүлі дүр, адам бар дүр, хайуан одан жақсы дүр."
+    },
+    {
+      "subject": {
         "surface": "Айлакерлік",
         "root": "айлакерлік",
         "pos": "noun"
@@ -62,6 +84,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Айлакерлік — әлсіздіктің ісі."
+    },
+    {
+      "subject": {
+        "surface": "тыңайтқыштардың",
+        "root": "тыңайтқыш",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түрлері",
+        "root": "түр",
+        "pos": "noun"
+      },
+      "pattern": "X-тың Y-сы бар",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000417"
+      },
+      "confidence": "Grammar",
+      "raw_text": "4. Облыстың, республикалық маңызы бар қаланың, астананың жергілікті атқарушы органының қаулысымен Қазақстан Республикасы Ауыл шаруашылығы министрлігімен (бұдан әрі – Министрлік) келісім бойынша субсидияланатын отандық тыңайтқыштардың түрлері және тыңайтқыштарды сатушыдан сатып алынған тыңайтқыштардың 1 тоннасына (килограмына, литрiне) арналған субсидиялардың нормалары белгіленеді."
     },
     {
       "subject": {
@@ -151,8 +193,8 @@
       },
       "predicate": "IsA",
       "object": {
-        "surface": "халықтың",
-        "root": "халық",
+        "surface": "байлығы",
+        "root": "байлық",
         "pos": "noun"
       },
       "pattern": "X — Y",
@@ -172,7 +214,7 @@
       "predicate": "IsA",
       "object": {
         "surface": "болашағы",
-        "root": "болашағ",
+        "root": "болашақ",
         "pos": "noun"
       },
       "pattern": "X — Y",
@@ -191,8 +233,8 @@
       },
       "predicate": "IsA",
       "object": {
-        "surface": "бала",
-        "root": "бала",
+        "surface": "жанашыры",
+        "root": "жанашыр",
         "pos": "noun"
       },
       "pattern": "X — Y",

@@ -56,6 +56,9 @@ pub enum Predicate {
     /// Subject lives / is located in object (locative + тұру).
     /// "Ол Алматыда тұрады" → (ол, LivesIn, Алматы).
     LivesIn,
+    /// Subject has / owns object (genitive-possessive existence "X-тың
+    /// Y-сы бар"). "Баланың кітабы бар" → (бала, Has, кітап). v2.2.
+    Has,
 }
 
 impl Predicate {
@@ -64,6 +67,7 @@ impl Predicate {
         match self {
             Self::IsA => "is_a",
             Self::LivesIn => "lives_in",
+            Self::Has => "has",
         }
     }
 }
@@ -157,6 +161,7 @@ pub fn extract_facts(
     let mut out = Vec::new();
     patterns::copula_is_a(text, parses, lexicon, source, &mut out);
     patterns::locative_lives_in(text, parses, lexicon, source, &mut out);
+    patterns::possessive_has(text, parses, lexicon, source, &mut out);
     out
 }
 
@@ -168,6 +173,7 @@ mod tests {
     fn predicate_strings_are_stable() {
         assert_eq!(Predicate::IsA.as_str(), "is_a");
         assert_eq!(Predicate::LivesIn.as_str(), "lives_in");
+        assert_eq!(Predicate::Has.as_str(), "has");
     }
 
     #[test]

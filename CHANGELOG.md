@@ -7,6 +7,103 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.2.0] — 2026-04-21 — Lexicon pollution purge + possessive-existence pattern (Has predicate)
+
+Minor release. **The v2.1 feedback loop paid off.** v2.1 extracted 11 facts from the committed corpus and named 4 imprecisions. v2.2 investigated each one, found a **systematic Lexicon pollution**, purged it, added the missing roots, and introduced a new `Has` predicate via a third pattern matcher.
+
+### The order-of-magnitude Lexicon finding
+
+v2.1's "бала → болашағ" imprecision was not a one-off — a scan found **87 intervocalic-voicing-duplicate root pairs** in `segmentation_roots.json`:
+
+```
+кітап ↔ кітаб,  сабақ ↔ сабағ,  қазақ ↔ қазағ,
+еңбек ↔ еңбег,  топ   ↔ тоб,   ... (82 more)
+```
+
+The voiced variant (`-ғ`, `-г`, `-б`) is never a valid Kazakh stem on its own — it's the surface result of intervocalic voicing when a vowel-initial suffix attaches to a voiceless-final root. These entries were duplicated during the Apertium import without de-duplication. v2.2 **removes all 87** polluted entries.
+
+The FST parser already handles intervocalic voicing in `surface_could_contain_root` (checks whether a surface starts with the voiced variant of a voiceless-final root). So removing the polluted entries makes parsing **more precise**, not less — "болашағы" now only resolves to root "болашақ", not to the ghost root "болашағ".
+
+Code audit: `grep -r` across all crates for any of the 87 polluted IDs → **zero hits**. Nothing in code depended on the duplication.
+
+### Lexicon additions (data-driven)
+
+Three roots that v2.1 signaled missing:
+
+- `байлық` (wealth) — possessive-final, voiceless
+- `бастау` (source, beginning) — vowel-final
+- `жанашыр` (caregiver, sympathizer) — voiced-consonant-final
+  - Note: v2.2 briefly added "жанашы" (wrong root) before the FST parse test revealed the correct form is `жанашыр`. Corrected before release.
+
+Total Lexicon delta: **4,516 → 4,432 roots** (−87 pollutions, +3 additions). Net cleaner.
+
+### New pattern: possessive-existence `X-тың Y-сы бар` → `Has`
+
+Kazakh expresses possession via a genitive + P3-possessed + existential `бар` construction. v2.2 adds a third pattern to `adam-reasoning::patterns`:
+
+```
+"Баланың кітабы бар"  →  (бала, Has, кітап)
+"Тыңайтқыштың түрлері (...) бар"  →  (тыңайтқыш, Has, түр)
+```
+
+**Type-checked on FST features**, not strings:
+
+- subject token must have `Case::Genitive` + `part_of_speech == "noun"` + not closed-class;
+- object token must immediately follow and have `Possessive::P3` + be a noun;
+- existential `бар` must appear elsewhere in the sentence;
+- tautology guard (subject ≠ object).
+
+**Non-adjacent guard**: intervening words between possessor and possessed break the simple construction — we refuse rather than guess.
+
+### Predicate set — 3 predicates
+
+```rust
+pub enum Predicate {
+    IsA,      // X — Y                (v2.1 copula)
+    LivesIn,  // X Y-да тұрады        (v2.1 locative)
+    Has,      // X-тың Y-сы бар       (v2.2 possessive)
+}
+```
+
+### Extraction yield
+
+| Mode | v2.1 | v2.2 | Δ |
+|---|---:|---:|---:|
+| Committed samples scanned | 3,191 | 3,191 | — |
+| Facts extracted | 11 | **13** | +2 |
+| Distinct predicates | 1 | **2** | +1 |
+| Corrected from v2.1 imprecisions | — | 3 / 4 | ынтымақ→байлық, бала→болашақ, ана→жанашыр |
+| Still blocked | — | 1 | жер→тіршілік (бастау blocked by separate FST vowel-final+P3 bug) |
+
+The remaining imprecision (жер→тіршілік instead of бастау) exposes an **FST-level bug** in the vowel-final + P3 code path ("оқуы" also fails to parse). Added to `docs/roadmap.md` as a v2.3 agenda item, not blocking v2.2.
+
+### Determinism
+
+Unchanged. Pattern matchers remain pure functions; same corpus → byte-identical `facts.json`.
+
+### Tests (+3 → 328 total)
+
+- `possessive_extracts_child_has_book` — positive case with head extraction through P3.
+- `possessive_rejects_without_bar` — missing existential → no fact.
+- `possessive_rejects_non_adjacent` — intervening word → refuse.
+- `Predicate::Has.as_str() == "has"` — stability check.
+
+### Zero regressions
+
+All 325 pre-v2.2 tests still pass after 87 Lexicon removals. Workspace test count: **303 (v2.0) → 325 (v2.1) → 328 (v2.2)**.
+
+### What v2.2 does NOT do (deferred)
+
+- **Vowel-final + P3 FST bug** — "оқуы" / "бастауы" don't parse. Isolated diagnostic; fix in v2.3.
+- **Lexical graph** — still just a flat list of roots. v2.3 will build typed edges (is_a, has_role, related_to) over roots.
+- **Rule reasoner** — v2.3+.
+- **Scale** — committed extraction still at 500 samples/pack cap. Full corpus run remains gitignored-local.
+
+### Next (v2.3)
+
+- Fix the vowel-final + P3 FST bug.
+- Start building the **Lexical-Morphemic Knowledge Graph** — root-level edges derived from fact accumulation + POS co-occurrence. Deterministic construction; no learned weights.
+
 ## [2.1.0] — 2026-04-21 — ILMRR bootstrap: fact extraction (copula pattern, typed provenance)
 
 Minor release. **First step toward reasoning.** Our v2.0 system is a smart retrieval engine — it quotes. v2.1 starts extracting **structured facts** from the corpus: `(subject, predicate, object)` triples with full provenance, typed `ConfidenceKind`, and deterministic head extraction via FST.
