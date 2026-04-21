@@ -1,0 +1,247 @@
+{
+  "version": "2.0.0",
+  "built_from": [
+    "tatoeba_kazakh_pack.json",
+    "wikipedia_kz_pack.json",
+    "common_voice_kk_pack.json",
+    "cc100_kk_pack.json",
+    "abai_wikisource_pack.json",
+    "kazakh_proverbs_pack.json",
+    "synthetic_sentences_pack.json",
+    "kazakh_classics_pack.json"
+  ],
+  "counts": {
+    "samples_scanned": 3191,
+    "samples_with_facts": 11,
+    "facts_total": 11,
+    "by_predicate": {
+      "is_a": 11
+    },
+    "by_pack": {
+      "common_voice_kk_pack.json": 2,
+      "kazakh_proverbs_pack.json": 9
+    }
+  },
+  "facts": [
+    {
+      "subject": {
+        "surface": "Ілім",
+        "root": "ілім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бұлақ",
+        "root": "бұлақ",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "common_voice_kk_pack.json",
+        "sample_id": "cv_kk_00047"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ілім — бұлақ."
+    },
+    {
+      "subject": {
+        "surface": "Айлакерлік",
+        "root": "айлакерлік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ісі",
+        "root": "іс",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "common_voice_kk_pack.json",
+        "sample_id": "cv_kk_00273"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Айлакерлік — әлсіздіктің ісі."
+    },
+    {
+      "subject": {
+        "surface": "Кітап",
+        "root": "кітап",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бұлағы",
+        "root": "бұлақ",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_003"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Кітап — білім бұлағы."
+    },
+    {
+      "subject": {
+        "surface": "Ғылым",
+        "root": "ғылым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қазына",
+        "root": "қазына",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_007"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ғылым — таусылмас қазына."
+    },
+    {
+      "subject": {
+        "surface": "Тіл",
+        "root": "тіл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "айнасы",
+        "root": "айна",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_020"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Тіл — жүректің айнасы."
+    },
+    {
+      "subject": {
+        "surface": "Ақиқат",
+        "root": "ақиқат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тірегі",
+        "root": "тірек",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_049"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ақиқат — тіршіліктің тірегі."
+    },
+    {
+      "subject": {
+        "surface": "Ынтымақ",
+        "root": "ынтымақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халықтың",
+        "root": "халық",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_053"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ынтымақ — халықтың байлығы."
+    },
+    {
+      "subject": {
+        "surface": "Бала",
+        "root": "бала",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "болашағы",
+        "root": "болашағ",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_056"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Бала — елдің болашағы."
+    },
+    {
+      "subject": {
+        "surface": "Ана",
+        "root": "ана",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бала",
+        "root": "бала",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_058"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ана — бала жанашыры."
+    },
+    {
+      "subject": {
+        "surface": "Жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіршіліктің",
+        "root": "тіршілік",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_060"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Жер — анасы, тіршіліктің бастауы."
+    },
+    {
+      "subject": {
+        "surface": "Еңбек",
+        "root": "еңбек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қайнары",
+        "root": "қайнар",
+        "pos": "noun"
+      },
+      "pattern": "X — Y",
+      "source": {
+        "pack": "kazakh_proverbs_pack.json",
+        "sample_id": "proverb_068"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Еңбек — табыстың қайнары."
+    }
+  ]
+}

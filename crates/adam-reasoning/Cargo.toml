@@ -1,0 +1,16 @@
+[package]
+name = "adam-reasoning"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Intelligent Lexical-Morphemic Retrieval & Reasoning — fact extraction, lexical graph, and symbolic inference over the adam corpus"
+
+[dependencies]
+adam-kernel-fst = { path = "../adam-kernel-fst" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[[bin]]
+name = "extract_facts"
+path = "src/bin/extract_facts.rs"

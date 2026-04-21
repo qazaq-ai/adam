@@ -7,6 +7,72 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.1.0] — 2026-04-21 — ILMRR bootstrap: fact extraction (copula pattern, typed provenance)
+
+Minor release. **First step toward reasoning.** Our v2.0 system is a smart retrieval engine — it quotes. v2.1 starts extracting **structured facts** from the corpus: `(subject, predicate, object)` triples with full provenance, typed `ConfidenceKind`, and deterministic head extraction via FST.
+
+This is the first rung of the ladder laid out in [`docs/architecture_v2.md`](docs/architecture_v2.md#post-v20-directions-committed-but-not-shipped) and discussed as **ILMRR — Intelligent Lexical-Morphemic Retrieval & Reasoning**. v2.1 is the infrastructure: facts as data. v2.2 will add the lexical graph; v2.3 the rule reasoner.
+
+### New crate: `adam-reasoning`
+
+- **`Fact { subject, predicate, object, pattern, source, confidence, raw_text }`** — structured knowledge with every field typed and traceable.
+- **`Predicate` enum** — v2.1 ships two: `IsA`, `LivesIn`. Every addition is an intentional architectural decision.
+- **`ConfidenceKind` enum** — **categorical** evidence type (Grammar, CuratedQuote, RepeatedPattern, HumanApproved, RuleInferred). Explicitly not an LLM probability; consumers filter by kind, not by magnitude. Reaffirms `project_retrieval_not_neural_v2`.
+- **`SlotRef { surface, root, pos }`** — every slot carries the canonical root, not just the surface. Possessive-suffixed "бұлағы" correctly yields root "бұлақ".
+- **`FactSource { pack, sample_id }`** — identical shape to `adam_retrieval::SampleRef`, kept independent to avoid a reasoning→retrieval dep cycle.
+- **`extract_facts(text, parses, lexicon, source) -> Vec<Fact>`** — pure function. Same input → same facts, byte-identical across runs.
+
+### Pattern matchers (v2.1)
+
+1. **Copula `X — Y`** → `IsA` — uses Kazakh em-dash as a syntactic anchor. **Strict LHS** (single bare nominative noun). **Head-extracted RHS** (right-to-left FST scan; possessive "Y-сі" correctly resolves to root Y). Guards: ≤4-token RHS cap, parenthetical noise stripped, tautology (`subj == obj`) rejected.
+2. **Locative-existential `X Y-да тұрады`** → `LivesIn` — requires the verb `тұру` in any inflected form + a `Case::Locative` noun + a bare-nominative subject. Pronouns rejected as non-content subjects.
+
+### New binary: `extract_facts`
+
+Walks committed corpus packs, runs every pattern matcher on each sample, emits structured JSON. Two modes:
+
+- **default** — first 500 samples per pack, writes committed `data/retrieval/facts.json`.
+- **`--full`** — every sample, writes gitignored `data/retrieval/facts_full.json`.
+- **`--limit N`** — custom per-pack cap.
+
+Progress is streamed to stderr every 1,000 samples (flushed) — no more silent minutes.
+
+### Baseline — 11 facts from 3,191 samples
+
+Extraction over the committed corpus yielded **11 facts** (37.8 s). Precision:
+
+- **7 clean**: ілім→бұлақ, айлакерлік→іс, кітап→бұлақ, ғылым→қазына, тіл→айна, ақиқат→тірек, еңбек→қайнар.
+- **4 Lexicon-gap cases**: ынтымақ→халық (should be байлық), ана→бала (should be жанашы), жер→тіршілік (should be бастау), бала→болашағ (FST intervocalic-voicing issue on болашақ).
+
+The 4 imprecisions are not pattern bugs — they are **concrete Lexicon gaps** (байлық, жанашы, бастау) + **one FST voicing regression** (болашақ). These become the v2.2 agenda.
+
+All 11 facts have `(pack, sample_id)` provenance → every fact is auditable back to its corpus sentence.
+
+### Determinism contract
+
+- Pattern matchers: pure functions of `(text, parses, lexicon, source)`.
+- RHS head extraction: deterministic right-to-left walk + deterministic FST parse.
+- `extract_facts` output: samples scanned in pack order, then `samples[]` order within pack. Same corpus → byte-identical `facts.json`.
+
+### Tests (+22 → 325 total)
+
+- 3 lib tests: predicate/confidence strings, Fact JSON round-trip.
+- 19 pattern tests: copula positive + 7 negatives (no dash, double dash, inflected, tautology, multi-token LHS, long RHS clause, parenthetical noise), locative positive + 2 negatives (no тұру, pronoun subject), head-extraction helpers.
+
+### What v2.1 does NOT do
+
+- **No multi-sentence chains.** `extract_facts` is per-sample.
+- **No rule inference.** The Reasoner (v2.3) will combine facts into new facts; v2.1 only extracts.
+- **No lexical graph.** v2.2 will build `is_a` / `has_role` / `related_to` edges over roots and connect facts to them.
+
+### Workspace tests
+
+**325 passing** (303 → +22 reasoning).
+
+### Committed artifacts
+
+- `data/retrieval/facts.json` — 11-fact v2.1 baseline, ~4 KB. CI will regenerate on every reasoning-crate change and diff.
+
 ## [2.0.0] — 2026-04-20 — v2.0: commitment release, retrieval-as-v2.0, investor-demoable
 
 Major release. **Not a feature drop — an architectural commitment.**
