@@ -76,9 +76,8 @@ impl IterationBudget {
     ///   `--time-budget-mins <MIN>`  — convenience alias.
     /// Unrecognised values parse to `None` and log a warning on stderr.
     pub fn from_args(args: &[String]) -> Self {
-        let seconds = parse_flag_u64(args, "--time-budget").or_else(|| {
-            parse_flag_u64(args, "--time-budget-mins").map(|m| m.saturating_mul(60))
-        });
+        let seconds = parse_flag_u64(args, "--time-budget")
+            .or_else(|| parse_flag_u64(args, "--time-budget-mins").map(|m| m.saturating_mul(60)));
         let started = Instant::now();
         let deadline = seconds.map(|s| started + Duration::from_secs(s));
         Self {
