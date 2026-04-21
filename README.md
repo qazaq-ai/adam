@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.0.1-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.1.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-357%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-367%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20by%20design-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
 
@@ -64,12 +64,13 @@ v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is en
 | Lexicon roots | 14 247 |
 | Corpus (committed / local) | 3.84 M / 77.9 M words |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **357 passing, 0 failing** |
+| Workspace tests | **367 passing, 0 failing** |
 | Pattern matchers | 4 (copula / locative / possessive / dative-motion) |
 | Reasoning rules active | 3 (R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo) |
-| Extracted facts (committed) | **15** |
+| Extracted facts (committed) | **14** (v3.1.0 stale-artifact purge — false-positive "сыртқ" root removed) |
 | Rule-derived facts (committed) | **1** (кітап RelatedTo ілім, via R5) |
-| Fact-graph nodes / edges | 29 / 15 |
+| Fact-graph nodes / edges | 28 / 14 |
+| Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |
 
 The scale-up path is explicit: scale coverage of the four existing matchers to the full 77.9 M-word corpus, add `PartOf` / `Causes` extractors, activate R3/R4. Nothing in the architecture is gated on more data — the engine already produces derivations with full provenance.
 
@@ -333,9 +334,10 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | Full local morpheme index | rebuildable via `build_morpheme_index -- --full` (~10 min, ~700 MB, gitignored) |
 | Pattern matchers (v3.0) | **4** — copula IsA, locative LivesIn, possessive Has, dative-motion GoesTo |
 | Reasoning rules active (v3.0) | **3** — R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo |
-| Extracted / derived facts (committed) | **15 / 1** (proof of mechanism at v3.0; scale-up path in [roadmap](docs/roadmap.md)) |
+| Extracted / derived facts (committed) | **14 / 1** (v3.1.0 regeneration: stale false-positive root purged; proof of mechanism at v3.0; scale-up path in [roadmap](docs/roadmap.md)) |
 | Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
-| Workspace tests | **357 passing**, 0 failing |
+| Workspace tests | **367 passing**, 0 failing |
+| Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential; 20 M-word full-corpus run fits in the 3 h iteration budget |
 
 ## Directory layout
 

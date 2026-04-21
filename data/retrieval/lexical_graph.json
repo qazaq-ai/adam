@@ -1,10 +1,13 @@
 {
-  "version": "2.5.0",
+  "version": "3.0.1",
+  "status": "completed",
+  "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
+  "built_from_status": "completed",
   "summary": {
-    "total_nodes": 29,
-    "total_edges": 15,
-    "facts_ingested": 15,
+    "total_nodes": 27,
+    "total_edges": 14,
+    "facts_ingested": 14,
     "most_connected": [
       [
         "бұлақ",
@@ -118,14 +121,6 @@
           "has": 1
         }
       },
-      "ел": {
-        "out_degree": 1,
-        "in_degree": 0,
-        "out_by_predicate": {
-          "has": 1
-        },
-        "in_by_predicate": {}
-      },
       "еңбек": {
         "out_degree": 1,
         "in_degree": 0,
@@ -165,14 +160,6 @@
           "is_a": 1
         },
         "in_by_predicate": {}
-      },
-      "сыртқ": {
-        "out_degree": 0,
-        "in_degree": 1,
-        "out_by_predicate": {},
-        "in_by_predicate": {
-          "has": 1
-        }
       },
       "тыңайтқыш": {
         "out_degree": 1,
@@ -320,17 +307,6 @@
         ]
       },
       {
-        "from": "ел",
-        "predicate": "Has",
-        "to": "сыртқ",
-        "sources": [
-          {
-            "pack": "cc100_kk_pack.json",
-            "sample_id": "cc100_kk_0000197"
-          }
-        ]
-      },
-      {
         "from": "еңбек",
         "predicate": "IsA",
         "to": "қайнар",
@@ -430,6 +406,6 @@
         ]
       }
     ],
-    "facts_ingested": 15
+    "facts_ingested": 14
   }
 }

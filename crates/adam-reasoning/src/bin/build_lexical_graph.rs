@@ -7,24 +7,48 @@
 //!
 //! **Zero new extraction**, zero new heuristics — the graph is a pure
 //! projection. Regenerate whenever `facts.json` changes.
+//!
+//! ## v3.1.0 iteration harness
+//!
+//! Projection is O(|facts|) with tiny per-fact work (hash insert into
+//! `BTreeMap`). On 1M facts it finishes in seconds — no rayon needed,
+//! but we still honour the harness contract for consistency: every
+//! binary in the reasoning pipeline accepts `--time-budget`,
+//! `--progress-interval`, and SIGINT; downstream consumers see the
+//! same output schema regardless of the run's outcome.
 
-use std::{fs, path::Path, process::ExitCode};
+use std::{env, fs, path::Path, process::ExitCode, sync::Arc, time::Duration};
 
-use adam_reasoning::{Fact, graph::LexicalGraph};
+use adam_reasoning::{
+    Fact,
+    graph::LexicalGraph,
+    harness::{IterationBudget, ProgressCounter, ProgressMonitor, StopReason},
+};
 use serde::{Deserialize, Serialize};
 
 const FACTS_PATH: &str = "data/retrieval/facts.json";
 const OUTPUT_PATH: &str = "data/retrieval/lexical_graph.json";
+const DEFAULT_PROGRESS_INTERVAL_SECS: u64 = 30;
 
 #[derive(Debug, Deserialize)]
 struct FactsFile {
     facts: Vec<Fact>,
+    /// v3.1.0 — optional, read back so we can surface upstream's
+    /// status in our own artifact's `built_from_status` field.
+    #[serde(default)]
+    status: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
 struct Artifact {
     version: String,
+    status: String,
+    elapsed_s: u64,
     built_from: String,
+    /// v3.1.0 — `facts.json`'s own status (if set), for cross-artifact
+    /// auditability. `None` when the input is v3.0.x.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    built_from_status: Option<String>,
     summary: Summary,
     graph: LexicalGraph,
 }
@@ -38,6 +62,16 @@ struct Summary {
 }
 
 fn main() -> ExitCode {
+    let args: Vec<String> = env::args().collect();
+    let progress_interval = Duration::from_secs(
+        parse_usize_flag(&args, "--progress-interval")
+            .map(|n| n as u64)
+            .unwrap_or(DEFAULT_PROGRESS_INTERVAL_SECS),
+    );
+
+    let budget = IterationBudget::from_args(&args);
+    budget.install_signal_handler();
+
     let facts_raw = match fs::read_to_string(FACTS_PATH) {
         Ok(s) => s,
         Err(e) => {
@@ -54,7 +88,33 @@ fn main() -> ExitCode {
         }
     };
 
-    let graph = LexicalGraph::from_facts(&facts_file.facts);
+    eprintln!(
+        "build_lexical_graph: loaded {} facts (upstream status: {})",
+        facts_file.facts.len(),
+        facts_file.status.as_deref().unwrap_or("<pre-v3.1.0>"),
+    );
+
+    let counters = ProgressCounter::new();
+    counters.add_extra(facts_file.facts.len() as u64);
+    let monitor = ProgressMonitor::spawn(
+        budget.clone(),
+        Arc::clone(&counters),
+        progress_interval,
+        "build_lexical_graph",
+    );
+
+    // Projection itself doesn't check the budget — it's O(|facts|)
+    // with tiny per-fact work. Budget only matters if the whole binary
+    // is spawned after the outer deadline has already passed; the
+    // harness check below catches that.
+    let graph = if budget.should_stop() {
+        // Degenerate: deadline already past. Commit an empty graph
+        // with the appropriate status so downstream can distinguish.
+        LexicalGraph::from_facts(&[])
+    } else {
+        LexicalGraph::from_facts(&facts_file.facts)
+    };
+    counters.add_items(graph.edges.len());
     eprintln!(
         "build_lexical_graph: {} facts → {} nodes, {} edges",
         graph.facts_ingested,
@@ -74,9 +134,13 @@ fn main() -> ExitCode {
         eprintln!("  most-connected: {root} (degree {deg})");
     }
 
+    let reason = budget.stop_reason();
     let artifact = Artifact {
         version: env!("CARGO_PKG_VERSION").to_string(),
+        status: reason.as_str().to_string(),
+        elapsed_s: budget.elapsed_secs(),
         built_from: FACTS_PATH.to_string(),
+        built_from_status: facts_file.status,
         summary: Summary {
             total_nodes: graph.nodes.len(),
             total_edges: graph.edges.len(),
@@ -85,6 +149,15 @@ fn main() -> ExitCode {
         },
         graph,
     };
+
+    monitor.join();
+
+    if reason != StopReason::Completed {
+        eprintln!(
+            "NOTE: graph build ended as `{}` (elapsed {}s)",
+            artifact.status, artifact.elapsed_s
+        );
+    }
 
     if let Some(parent) = Path::new(OUTPUT_PATH).parent() {
         if !parent.as_os_str().is_empty() && !parent.exists() {
@@ -107,4 +180,9 @@ fn main() -> ExitCode {
     }
     eprintln!("wrote {OUTPUT_PATH}");
     ExitCode::SUCCESS
+}
+
+fn parse_usize_flag(args: &[String], name: &str) -> Option<usize> {
+    let idx = args.iter().position(|a| a == name)?;
+    args.get(idx + 1).and_then(|s| s.parse().ok())
 }

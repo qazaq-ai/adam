@@ -7,6 +7,67 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.1.0] — 2026-04-21 — iteration infrastructure for the 3h-budget discipline
+
+First step of the post-v3.0 scale-up ladder. **No new reasoning capability** — this release builds the *harness* that makes the corpus-jaw work in v3.2+ tractable on a MacBook Air M2 8 GB with a hard 3-hour iteration cap.
+
+### Why this release exists
+
+Every binary in the reasoning pipeline (`extract_facts`, `build_lexical_graph`, `run_reasoner`) now honours four invariants:
+
+1. **`--time-budget <SEC>` / `--time-budget-mins <MIN>`** — hard deadline. When it hits, the binary commits a partial artifact with `status: "timed_out"` and exits 0. Downstream bins treat partial artifacts as first-class input — a partial `facts.json` is still a valid `facts.json`, just smaller.
+2. **`--progress-interval <SEC>` (default 30)** — a monitor thread prints `[hh:mm:ss] <bin> samples=N items=M extra=W elapsed=S rem=R` to stderr every interval, so the user can watch 3-hour runs in real time and early-abort when they've seen enough.
+3. **SIGINT / SIGTERM → graceful commit** with `status: "interrupted"`. Ctrl-C never loses work.
+4. **Rayon parallelism** on the `extract_facts` hot loop. Chunked (128 samples/chunk) so the budget gets checked between chunks — granularity ~0.5-1 s on the current pack sizes. Input-order-preserving collect guarantees byte-identical artifacts across runs.
+
+### Measured speedup (smoke test on committed 3 191-sample corpus)
+
+| binary | pre-v3.1 | post-v3.1 | speedup |
+|---|---|---|---|
+| `extract_facts` (committed 500/pack) | 42.8 s | 10-15 s | **~3.5×** on M2 8-core |
+
+This is the enabler for v3.2 (scaling bench) and v3.5 (20 M-word full corpus commit in ≤ 3 h).
+
+### New public API (`adam-reasoning`)
+
+- `adam_reasoning::harness` — new module. `IterationBudget`, `ProgressCounter`, `ProgressMonitor`, `StopReason` enum. 10 unit tests.
+- `adam_reasoning::reasoner::run_with_budget(&[Fact], &IterationBudget) -> (Vec<DerivedFact>, usize)` — budget-aware variant of `run()` that checks the deadline between forward-chaining iterations. Existing `run()` now delegates through unbounded budget.
+
+### Artifact schema additions (all fields additive, old readers tolerate)
+
+All three artifacts (`facts.json`, `lexical_graph.json`, `derived_facts.json`) gain:
+
+- `status: "completed" | "timed_out" | "interrupted"`
+- `elapsed_s: u64`
+
+Plus per-artifact specifics:
+- `facts.json` — `packs_completed / packs_total` for mid-pack termination diagnostics.
+- `lexical_graph.json` / `derived_facts.json` — `built_from_status` that surfaces the upstream's status for cross-artifact audit.
+- `derived_facts.json` — `iterations_completed` (how many forward-chaining passes ran before fixpoint or budget hit; capped at `MAX_ITER = 8`).
+
+### Stale committed artifact refreshed
+
+Regenerating `facts.json` with the current Lexicon surfaced that the v2.5.0-era committed artifact carried one false-positive fact: `ел Has сыртқ` (surface "сыртқы" → invalid root "сыртқ") from `cc100_kk_pack.json / cc100_kk_0000197`. The Lexicon purge across v2.5 → v3.0 correctly stopped accepting "сыртқ" as a content-noun root, but the artifact was never regenerated. The fresh extraction is **14 facts + 1 derivation** — strictly cleaner. The derivation (`кітап RelatedTo ілім` via R5) survives unaffected.
+
+This is why every release should regenerate data artifacts, not just bump Cargo versions. v3.1.0 makes that regeneration fast enough to be routine.
+
+### Dependencies
+
+- `rayon = "1.10"` (workspace)
+- `ctrlc = "3.4"` (workspace; adds ~4 transitive deps, ~50 KB compiled)
+
+### Tests
+
+**367 passing, 0 failing** (357 baseline + 10 harness unit tests).
+
+### Upgrade notes
+
+- Library API is additive. `reasoner::run(&facts)` still exists with identical behaviour.
+- CLI: all three binaries accept the new flags; omitting them reverts to unbounded default.
+- Artifacts written by v3.0 are forward-compatible with v3.1 readers (optional `status` field defaults to `None`).
+
+---
+
 ## [3.0.1] — 2026-04-21 — v3.0 polish pass (Codex + Antigravity review items)
 
 Pure polish release based on two external reviews of the v3.0 MVP (Codex + Antigravity). **Zero library changes, zero test-surface changes.** Shipping as a patch because everything it touches is banner strings, doc wording, or dead-code warnings.

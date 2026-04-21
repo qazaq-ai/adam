@@ -42,7 +42,10 @@ use std::collections::BTreeSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef, graph::LexicalGraph};
+use crate::{
+    ConfidenceKind, Fact, FactSource, Predicate, SlotRef, graph::LexicalGraph,
+    harness::IterationBudget,
+};
 
 const MAX_ITER: usize = 8;
 
@@ -102,20 +105,41 @@ impl DerivedFact {
 /// against the accumulating set using `(subject.root, predicate,
 /// object.root)` as the identity key.
 pub fn run(initial_facts: &[Fact]) -> Vec<DerivedFact> {
+    let budget = IterationBudget::unbounded_for_tests();
+    let (derived, _) = run_with_budget(initial_facts, &budget);
+    derived
+}
+
+/// Budget-aware variant — returns `(derived_facts, iterations_completed)`.
+///
+/// v3.1.0: the reasoner checks `budget.should_stop()` between iterations.
+/// On stop, the current set of derived facts is returned — the caller
+/// commits them with the appropriate `status`. Inside a single iteration
+/// the reasoner runs to completion (each pass is O(|facts| × fanout)
+/// and at current scale fits in well under one second).
+///
+/// When unbudgeted, behaviour is byte-identical to [`run`] — same
+/// iteration cap, same merge order, same dedup.
+pub fn run_with_budget(
+    initial_facts: &[Fact],
+    budget: &IterationBudget,
+) -> (Vec<DerivedFact>, usize) {
     let mut all_facts: Vec<Fact> = initial_facts.to_vec();
     let mut derived: Vec<DerivedFact> = Vec::new();
     let mut seen_triples: BTreeSet<(String, String, String)> =
         initial_facts.iter().map(|f| fact_triple_key(f)).collect();
+    let mut iterations_completed = 0usize;
 
     for _iter in 0..MAX_ITER {
+        if budget.should_stop() {
+            break;
+        }
         let graph = LexicalGraph::from_facts(&all_facts);
         let new_derived = run_one_pass(&all_facts, &graph, &seen_triples);
         if new_derived.is_empty() {
+            iterations_completed += 1;
             break;
         }
-        // Merge: append to all_facts (for the next graph build) + to
-        // derived (as the return value) + to seen_triples (for
-        // deduplication).
         for d in &new_derived {
             let key = (
                 d.subject.root.clone(),
@@ -127,9 +151,10 @@ pub fn run(initial_facts: &[Fact]) -> Vec<DerivedFact> {
                 derived.push(d.clone());
             }
         }
+        iterations_completed += 1;
     }
 
-    derived
+    (derived, iterations_completed)
 }
 
 /// Single pass of all active rules. Returns every new derivation from

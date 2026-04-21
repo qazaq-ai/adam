@@ -49,6 +49,7 @@
 //! confidence kind without trusting any learned magnitude.
 
 pub mod graph;
+pub mod harness;
 pub mod patterns;
 pub mod reasoner;
 
