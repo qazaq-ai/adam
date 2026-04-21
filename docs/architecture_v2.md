@@ -178,6 +178,10 @@ The negative invariant is trust-critical: **v2.0 never claims to have adapted a 
 | Composition | `adam-retrieval` | `src/compose.rs` |
 | Committed index artifact | data | `data/retrieval/morpheme_index.json` |
 | Corpus packs | data | `data/curated/*_pack.json` |
+| Fact extraction (v2.1+) | `adam-reasoning` | `src/patterns.rs` + `src/lib.rs` |
+| Lexical Graph (v2.3+) | `adam-reasoning` | `src/graph.rs` |
+| Facts artifact | data | `data/retrieval/facts.json` |
+| Lexical graph artifact | data | `data/retrieval/lexical_graph.json` |
 
 ---
 
@@ -202,8 +206,19 @@ cargo run --release -p adam-dialog --bin adam_chat -- --no-retrieval
 
 ---
 
-## Post-v2.0 directions (committed but not shipped)
+## Post-v2.0 progress
 
-- **Option C** — pre-compute `(pattern, slot_types)` pairs at index-build time. Moves swap candidate analysis offline; enables swap types beyond city.
+### Shipped in v2.1 – v2.3 (ILMRR bootstrap)
+
+- **v2.1** — `adam-reasoning` crate: typed `Fact { subject, predicate, object, pattern, source, confidence_kind, raw_text }`. `Predicate { IsA, LivesIn }`. Copula (`X — Y`) and locative-existential (`X Y-да тұрады`) pattern matchers. First structured knowledge artifact at `data/retrieval/facts.json`.
+- **v2.2** — Lexicon pollution purge (87 Apertium-import intervocalic-voicing duplicates removed). New `Has` predicate + possessive-existence pattern (`X-тың Y-сы бар`). Extraction yield 11 → 13 facts.
+- **v2.3** — FST glide-vowel classification fix (у / и / ю → `HighSonorant`). Lexical Graph v0 — pure projection of facts into nodes + typed edges with merged provenance at `data/retrieval/lexical_graph.json`. Extraction yield 13 → **15 facts, 0 imprecisions**.
+
+### Still ahead
+
+- **Rule reasoner v0** (v2.4 target) — forward-chaining over the Lexical Graph. Rules are pure functions `(graph_pattern) → new_fact`. Every inferred fact carries a traceable rule-provenance. This is where "understand → find → connect → conclude → show chain" starts to hold.
+- **Lexical graph enrichment** — Lexicon-level edges (POS co-occurrence, shared domain) beyond just fact-derived ones.
+- **More pattern matchers** — dative-motion (`X Y-ке барады` → `GoesTo`), verb-derived action facts. Each new pattern gets immediate downstream benefit via the graph projection.
+- **Option C composition** — pre-compute `(pattern, slot_types)` pairs at index-build time. Moves swap candidate analysis offline; enables swap types beyond city.
 - **Kazakh technical corpus** — translate key chapters of the Rust Book into Kazakh as a new source pack. Doubles as educational material and corpus-vocabulary expansion.
 - **Diversity** — allow consecutive turns for the same query to cite different samples; current top-1 is deterministic by design.

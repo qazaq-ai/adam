@@ -1,14 +1,15 @@
-# adam v1.0.0 Lexicon
+# adam Lexicon
 
-This directory holds the v1.0.0 lexicon materials, separate from the
-v0.3-v0.5 `data/tokenizer/segmentation_roots.json` (which is frozen at
-211 curated entries for compatibility with existing segmentation tests).
+This directory holds the adam Kazakh Lexicon materials consumed by the FST
+parser / synthesiser (`adam-kernel-fst::lexicon::LexiconV1`).
 
-The v1.0.0 FST (to be built) consumes the union of:
-- `data/tokenizer/segmentation_roots.json` (211 curated, authoritative)
-- `data/lexicon_v1/apertium_imported_roots.json` (Apertium-kaz, this dir)
-- future `data/lexicon_v1/corpus_derived_roots.json` (week 3)
-- future `data/lexicon_v1/proper_nouns.json` (week 4)
+The FST consumes the union of two files at runtime:
+
+- `data/tokenizer/segmentation_roots.json` — curated roots (**4,432 as of v2.2** after the 87-entry intervocalic-voicing pollution purge; v1.4.5 added 20 modern professions; v2.1+ is driving new additions from extracted-fact gap signals)
+- `data/lexicon_v1/apertium_imported_roots.json` — 11,919 Apertium-kaz imports (read-only; any cleanup happens in the curated file)
+
+Total ~16.4 k roots. The `LexiconV1` loader merges them and resolves
+collisions curated-wins.
 
 ## Files
 

@@ -1,10 +1,20 @@
 //! adam-reasoning — Intelligent Lexical-Morphemic Retrieval & Reasoning (ILMRR).
 //!
-//! Stage: v2.1 bootstrap — **fact extraction only**.
+//! Stage: v2.3+ — **fact extraction + lexical graph projection**.
 //!
-//! This crate is the first rung of the v3.0 reasoning engine. It takes
+//! This crate is the reasoning layer of the adam architecture. It takes
 //! FST-parsed corpus samples and extracts **typed facts** with full
-//! provenance:
+//! provenance, then projects those facts into a node-edge graph that
+//! a future rule-reasoner (v2.4+) will traverse.
+//!
+//! Capabilities shipped:
+//!
+//! - **Fact extraction** (v2.1): three pattern matchers producing
+//!   `IsA`, `LivesIn`, `Has` relations. See [`patterns`].
+//! - **Lexical Graph v0** (v2.3): pure projection of facts into a
+//!   directed typed graph with per-edge provenance. See [`graph`].
+//!
+//! The canonical example:
 //!
 //! ```text
 //!   "Абай — ақын"  (Abai Wikisource, abai_00042)
@@ -40,6 +50,7 @@
 
 pub mod graph;
 pub mod patterns;
+pub mod reasoner;
 
 use adam_kernel_fst::lexicon::LexiconV1;
 use adam_kernel_fst::parser::Analysis;

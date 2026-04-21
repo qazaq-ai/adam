@@ -1,23 +1,32 @@
 //! adam-kernel-fst — deterministic finite-state transducer for Kazakh morphology.
 //!
-//! Stage: v1.0.0 scaffold (week 1 day 1 — skeleton only).
-//!
-//! This crate is the new core of the adam v1.0.0 line. It replaces the
-//! probability-driven transformer with a two-level finite-state transducer
-//! that encodes Kazakh morphology deterministically. See
-//! `docs/kazakh_grammar/00_architecture_v1.md` for the rationale.
+//! The core of the adam architecture. Replaces probability-driven token
+//! generation with a two-level FST that encodes Kazakh morphology
+//! deterministically. Every surface form the system emits through the
+//! slot path is produced by this crate; there is no generative
+//! alternative.
 //!
 //! ## Module layout
 //!
-//! - [`phonology`] — 54 phonological rules as pure Rust functions. Resolves
-//!   abstract underlying forms (archiphonemes) to surface letters.
-//! - [`morphotactics`] — state machines for noun and verb inflection chains.
-//!   Given `(root, feature_bundle)` emits a sequence of archiphoneme strings
-//!   that `phonology` then realises.
-//! - [`lexicon`] — loader for the v1 lexicon (211 curated + 11,919 Apertium
-//!   imports at current count).
-//!
-//! Week 1 deliverable is **types + red tests**. No implementation yet.
+//! - [`phonology`] — phonological rules as pure Rust functions.
+//!   Resolves abstract underlying forms (archiphonemes `{Y}`, `{I}`,
+//!   `{S}`, `{N}`, `{G}`, `{M}`, `{L}`, `{D}`, `{K}`, `{A}`, `{E}`)
+//!   to surface letters. 22+ of Apertium's 54 catalogued rules are
+//!   implemented; glide-vowels `у`, `и`, `ю` are `HighSonorant`
+//!   (v2.3 correction).
+//! - [`morphotactics`] — state machines for noun and verb inflection
+//!   chains. Given `(root, feature_bundle)` emits a sequence of
+//!   archiphoneme atoms that `phonology` then realises. 36 suffix
+//!   templates covering 7 cases × 2 numbers × 7 possessives × 11
+//!   derivations × 7 predicate-person copulas.
+//! - [`parser`] — inverse direction. Given a surface form, enumerates
+//!   every `(root, features)` analysis whose synthesis matches.
+//!   Generate-and-test over every Lexicon root; O(lex × features ×
+//!   word_len) per parse, ~1.2 ms / word on M2.
+//! - [`lexicon`] — loader for the curated + Apertium Lexicon. Current
+//!   count: ~4.4k curated + 11,919 Apertium imports; v2.2 purged 87
+//!   intervocalic-voicing duplicates that were Apertium-import
+//!   artefacts.
 
 pub mod lexicon;
 pub mod morphotactics;

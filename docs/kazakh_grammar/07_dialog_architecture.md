@@ -359,8 +359,10 @@ The "one file per intent family" plan was simplified to a single `v1.toml` durin
 2. Predictable multi-turn conversation across 25 intents — ✅ delivered
 3. Every turn's decision traceable through Layers 1–5 via `--trace` — ✅ delivered
 4. Pure Rust, no Python runtime, no GPU — ✅ delivered
-5. Grammar errors in output = 0 (FST-guaranteed) — ✅ delivered
-6. Trilingual input recogniser (kk / ru / en) — ✅ delivered (v0.9.6+)
-7. Regression test suite covers every layer — ✅ **271 passing**, 0 failing
+5. Grammar errors in output = 0 (FST-guaranteed on the slot path) — ✅ delivered
+6. ~~Trilingual input recogniser (kk / ru / en) — delivered v0.9.6~~ **REVERTED in v1.1.0** — Kazakh-only surface is the committed path (see `project_kazakh_only_directive` memory); see `docs/architecture_v2.md` for the v2.x retrieval-based substitute for "generalisation beyond the 26-intent backbone".
+7. Regression test suite covers every layer — ✅ **335 passing** as of v2.3 (was 271 at v1.0.0 MVP cut), 0 failing
 
-Native-speaker naturalness review (originally target 40/50) is queued for post-v1.0.0; the v0.9.9 polish pass is an in-team inspection, not a formal review. This does not gate the MVP cut.
+Native-speaker naturalness review was queued for post-v1.0.0 and remains a post-v2.x item. The in-team polish that shipped for the v1.0.0 MVP continues to carry through.
+
+> **Historical context.** This document captures the architecture as it was at the v1.0.0 MVP cut. The v1.1.0 → v2.3 arc has added: retrieval engine (`adam-retrieval`), reasoning bootstrap (`adam-reasoning`), composition marker, lexical graph, and FST correctness fixes. For the current single source of truth see [`docs/architecture_v2.md`](../architecture_v2.md).

@@ -18,3 +18,7 @@ path = "src/bin/extract_facts.rs"
 [[bin]]
 name = "build_lexical_graph"
 path = "src/bin/build_lexical_graph.rs"
+
+[[bin]]
+name = "run_reasoner"
+path = "src/bin/run_reasoner.rs"

@@ -7,6 +7,88 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.4.0] — 2026-04-22 — Rule reasoner v0 (forward-chaining over the Lexical Graph) + comprehensive docs-currency audit
+
+Minor release. Two axes of progress.
+
+### 1. Rule reasoner v0 — the first *inference* step
+
+New `adam_reasoning::reasoner` module + `run_reasoner` binary. Takes the v2.1+ `facts.json`, runs forward-chaining rules against the Lexical Graph (v2.3), emits every derived fact with:
+
+- **`rule_id`** — the stable identifier of the rule that fired (never a probability score);
+- **`source_chain: Vec<FactSource>`** — every underlying fact that contributed (non-empty by invariant);
+- **`ConfidenceKind::RuleInferred`** — distinguishes derivations from `Grammar`-extracted corpus facts at every downstream site.
+
+Initial rule set (**1 active, 4 documented for v2.5+**):
+
+| id | pattern | conclusion | status |
+|---|---|---|---|
+| `R1_is_a_transitivity` | `A IsA B ∧ B IsA C ⟹ A IsA C` | IS-A chains | **active** |
+| `R2_has_inheritance` | `A IsA B ∧ B Has X ⟹ A HasKinded X` | inherited `Has` | documented, deferred |
+| `R3_lives_in_transitivity` | `A LivesIn B ∧ B PartOf C ⟹ A LivesIn C` | geographic containment | waits on `PartOf` |
+| `R4_is_a_symmetry_filter` | `A IsA B ∧ B IsA A` | diagnostic for curator review | not yet wired |
+| `R5_shared_is_a_target` | `A IsA X ∧ B IsA X, A ≠ B ⟹ RelatedTo(A, B)` | implicit similarity | waits on `RelatedTo` predicate |
+
+### 2. Trust invariants (test-enforced)
+
+- Rule fires ⇒ derived fact's `confidence == RuleInferred`.
+- Derived fact's `source_chain` is non-empty.
+- Fixpoint reached ⇒ re-running the reasoner adds nothing.
+- `R1` never derives `A IsA A` even under `A↔B↔A` loops.
+
+### 3. Baseline result on the v2.3 fact set
+
+**0 derivations** from the current 15 facts. This is **honest** — our extracted facts are metaphorical one-hops (`кітап IsA бұлақ`, `ілім IsA бұлақ`), and the objects don't themselves have outgoing IS-A edges. The reasoner is correctly wired (unit tests verify multi-hop chains up to 3 hops), the data just doesn't yet form chains. Future extraction (dative-motion, more copula cases) will populate middle-of-chain nodes and unlock R1.
+
+Zero derivations today ≠ zero value: we now have the inference machinery, tested, ready, with a rule-id audit surface. v2.5 adds more predicates + patterns; R1 starts firing naturally.
+
+### 4. Comprehensive docs-currency audit
+
+**Per-release directive** (new memory `feedback_docs_currency`): every release must refresh every documentation, descriptive, and module-level docstring — not just README/CHANGELOG/roadmap. Stale info anywhere is a defect.
+
+Files refreshed in this release:
+
+- `crates/adam-dialog/Cargo.toml` description — dropped stale "adam v1.0.0" tag
+- `crates/adam-kernel-fst/Cargo.toml` description — now describes current FST capabilities precisely
+- `crates/adam-kernel-fst/src/lib.rs` — module-level docstring replaced "v1.0.0 scaffold (week 1 day 1 — skeleton only)" with current capabilities
+- `crates/adam-reasoning/src/lib.rs` — stage marker bumped "v2.1 bootstrap — fact extraction only" → "v2.3+ fact extraction + lexical graph projection"
+- `docs/foundation_scope.md` — scope section rewritten to cover v1.0.0 → v2.3 deliveries; stale "v1.4.0+ out of scope" replaced with accurate post-v2.3 agenda
+- `docs/corpus_audit.md` — title dropped "v1.1.5 Baseline", added current (v2.3) position + historical expansion-plan pivot note
+- `docs/repository_layout.md` — 7 crates → 9 crates (added `adam-retrieval`, `adam-reasoning`); added `data/retrieval/` entry; stale Lexicon count fixed
+- `docs/eval_baseline.md` — test count 271 → 335
+- `docs/kazakh_grammar/07_dialog_architecture.md` — test count 271 → 335; stale "trilingual delivered" marked as reverted in v1.1.0
+- `docs/architecture_v2.md` — added reasoning + graph entries to code-location map; "Post-v2.0 directions" section replaced with "Shipped in v2.1–v2.3" + "Still ahead"
+- `data/dialog/README.md` — "29 families, v0.8.5" → "31 families as of v2.3"
+- `data/lexicon_v1/README.md` — replaced "211 curated, week 3/4 future" with accurate "4,432 curated after v2.2 purge"
+- Memory: new `feedback_docs_currency.md` documents the audit checklist for every future release
+
+### Tests (+8 → 343 total)
+
+Reasoner tests:
+- `r1_derives_is_a_transitivity`
+- `r1_chains_three_hops` (multi-iteration fixpoint)
+- `r1_rejects_tautology`
+- `reasoner_reaches_fixpoint` (idempotence)
+- `derived_fact_has_nonempty_source_chain`
+- `derived_fact_always_rule_inferred_confidence`
+- `into_fact_promotes_cleanly`
+- `empty_input_empty_output`
+
+### Zero regressions
+
+All 335 pre-v2.4 tests still pass. Rule reasoner is a pure additive module; no change to extraction, retrieval, dialog, or FST crates.
+
+### Committed artifacts
+
+- `data/retrieval/derived_facts.json` — **new**, 0 derivations on v2.3 facts (honest zero, documented)
+- Every other data artifact unchanged
+
+### Next (v2.5+)
+
+- **More pattern matchers** — dative-motion (`X Y-ке барады` → `GoesTo`), verb-derived action facts. Each new pattern unlocks middle-of-chain nodes that activate R1.
+- **New predicates** — `RelatedTo` (to unlock R5), `PartOf` (to unlock R3). Both geographic/compositional relations that Kazakh proverbs and Wikipedia make heavy use of.
+- **Rule-inferred facts in dialog responses** — retrieve + reason pipeline where the Unknown handler can cite a chain ("X IsA Y because Z + W") when exact quote retrieval misses.
+
 ## [2.3.0] — 2026-04-21 — FST vowel-final+P3 fix + Lexical Graph v0 (fact projection)
 
 Minor release. Two step-changes:

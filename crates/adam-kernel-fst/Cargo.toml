@@ -3,7 +3,7 @@ name = "adam-kernel-fst"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Deterministic finite-state transducer for Kazakh morphology (adam v1.0.0)"
+description = "Deterministic finite-state transducer for Kazakh morphology — 11 archiphonemes, 22+ phonology rules, 36 suffix templates, inverse parser, curated Lexicon"
 
 [dependencies]
 adam-kernel = { path = "../adam-kernel" }

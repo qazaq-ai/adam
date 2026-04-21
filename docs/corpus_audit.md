@@ -1,27 +1,41 @@
-# Corpus Audit — v1.1.5 Baseline
+# Corpus Audit
 
-This page documents the starting position for the v1.x corpus expansion toward a 100 M+ word Kazakh corpus that can realistically train a compact LM as the v2.0 `Intent::Unknown` fallback.
+This page documents the Kazakh corpus position across releases. **Current as of v2.3**: 3.84 M committed / 77.9 M local words. The v1.x expansion plan below is **fully executed** (see "Historical baseline" section).
 
-Run `cargo run --release -p adam-corpus --bin corpus_audit` to regenerate `data/corpus_audit_report.json`.
+> **Note on v2.0 direction.** The original plan targeted a 100 M+ word corpus to *train* a compact neural LM as the `Intent::Unknown` fallback. v2.0 committed to a different architecture: **retrieval + composition**, not trained-neural. The corpus is now fuel for the morpheme-indexed retrieval engine (`adam-retrieval`) and structured fact extraction (`adam-reasoning`), not for gradient descent. See [`project_retrieval_not_neural_v2`](roadmap.md#post-v10-direction).
 
-## Baseline (current)
+Run `cargo run --release -p adam-corpus --bin corpus_audit` to regenerate `data/corpus_audit_report.json` (committed corpus) or add `--local` to include gitignored Wikipedia + CC-100 shards.
 
-| pack | samples | words | unique words | Kazakh purity | dup samples | added |
-|---|---:|---:|---:|---:|---:|---|
-| tatoeba_kazakh | 4,058 | 24,643 | 9,709 | 98.12 % | 0 | v0.1.1 |
-| **wikipedia_kz** | **150,036** | **1,613,306** | **155,917** | **99.99 %** | **0** | **v1.3.0 (re-extract)** |
-| common_voice_kk | 6,108 | 36,397 | 10,575 | 99.91 % | 0 | v0.1.6 |
-| cc100_kk | 50,000 | 602,144 | 74,333 | 96.59 % | 0 | v0.4.0 |
-| abai_wikisource | 2,253 | 20,303 | 8,209 | 99.81 % | 0 | v0.4.0 |
-| kazakh_proverbs | 80 | 349 | 245 | 100.00 % | 0 | v0.4.0 |
-| synthetic_sentences | 100,000 | 403,558 | 15,880 | 98.79 % | 207 | v0.4.0 |
-| kazakh_classics | 111 | 926 | 710 | 100.00 % | 0 | v1.2.0 |
-| **TOTAL** | **312,646** | **2,851,629** | **224,301** | **97.99 %** | **207** | |
+## Current position (v2.3, committed)
 
-- **Target:** 100 M words
-- **Gap:** 97.15 M words
-- **Expansion factor needed:** **~35×** (was 45× at v1.1.5 baseline)
-- **v1.3.0 contribution:** +613k words from re-extracting the full Wikipedia dump with the loanword-density filter; Wikipedia purity jumped from 95.92 % → 99.99 % because the filter now catches high-density Russian-loanword articles that slipped through before.
+| pack | samples | words | purity | added |
+|---|---:|---:|---:|---|
+| tatoeba_kazakh | 4,058 | 24,643 | 98.12 % | v0.1.1 |
+| wikipedia_kz (shard 01, committed) | 150,036 | 1,613,306 | 99.99 % | v1.3.0 re-extract |
+| common_voice_kk | 6,108 | 36,397 | 99.91 % | v0.1.6 |
+| **cc100_kk (shard 01, committed)** | **140,000** | **1,140 k** | **98.36 %** | **v1.5.0 re-extract** |
+| abai_wikisource | 2,253 | 20,303 | 99.81 % | v0.4.0 |
+| kazakh_proverbs | 80 | 349 | 100.00 % | v0.4.0 |
+| synthetic_sentences | 100,000 | 403,558 | 98.79 % | v0.4.0 |
+| kazakh_classics | 111 | 926 | 100.00 % | v1.2.0 |
+| **TOTAL (committed)** | **~402 k** | **~3.84 M** | **98.36 %** | |
+
+### Local corpus (with gitignored shards)
+
+33 additional CC-100 shards (v1.5.0) + 9 Wikipedia shards (v1.3.5) are gitignored and regenerable via `--full` mode on their processors. Local totals:
+
+- **~77.9 M words** across all packs + shards
+- **1.72 M unique roots** (prefix-match basis)
+- Gap to nominal 100 M target: **~1.3×** (v1.5.0 baseline)
+
+### Morpheme coverage (v1.5.5 baseline, still current at v2.3)
+
+- **79.48 %** of committed-corpus words begin with a Lexicon root (≥ 3 chars). See [morpheme_coverage_baseline](../CHANGELOG.md) memory for top uncovered items.
+
+### Structured facts (v2.1 → v2.3)
+
+- **15 extracted facts**, 2 predicates (`IsA`, `Has`), 0 imprecisions, deterministic provenance. See `data/retrieval/facts.json`.
+- **Lexical Graph**: 29 nodes, 15 edges. See `data/retrieval/lexical_graph.json`.
 
 ## File size constraint
 
@@ -40,18 +54,21 @@ cargo run --release -p adam-corpus --bin process_wikipedia_kz
 - **Synthetic sentences** plateau at ~16k unique vocabulary despite 100k samples — expected, since the generator combines a fixed template set with a bounded root Lexicon. Not a path to vocabulary growth; useful only for morphological coverage.
 - **Wikipedia is the single biggest single-source opportunity** — the full Kazakh Wikipedia dump (~200k articles × ~500 words average) could approach the 100 M target alone, though purity-gated samples will cut that substantially.
 
-## Expansion plan (v1.2.0 → v1.5.0)
+## Historical expansion plan (v1.1.5 → v1.5.0 — delivered)
 
-| release | source | target added | cumulative |
-|---|---|---:|---:|
-| v1.1.5 (here) | audit + baseline | — | 2.24 M |
-| v1.2.0 | Kazakh classical literature — OCR of Әуезов, Жамбыл, Ыбырай, other early-20c poets (public domain) | +10–15 M | ~15 M |
-| v1.2.5 | cleanup + dedup of v1.2.0 ingestion | — | ~15 M |
-| v1.3.0 | full Qazaq Wikipedia dump (beyond the current 100k sample subset) | +30 M | ~45 M |
-| v1.3.5 | Wikipedia purity tightening + de-loanwording | — | ~45 M |
-| v1.4.0 | Kazakh government corpora (egov.kz, akorda.kz, bnews.kz — select long-form content) | +15–20 M | ~60 M |
-| v1.4.5 | Lexicon auto-extraction from the expanded corpus (new curated roots) | — | ~60 M |
-| v1.5.0 | reach 100 M+ via additional classical literature or filtered news corpora | +40 M | **100+ M** |
+| release | what landed | committed/local |
+|---|---|---|
+| v1.1.5 | audit + baseline | 2.24 M committed |
+| v1.2.0 | Kazakh classical literature (Ыбырай + Мағжан public-domain PD) | +0.9 k samples (cleaner than planned; OCR deferred) |
+| v1.3.0 | full Wikipedia re-extract, streaming + 10 % loanword filter | 2.85 M committed |
+| v1.3.5 | Wikipedia sharding (committed shard 01 + gitignored 02–10) | 16 M local |
+| v1.4.0 | FST-NER + DST + predicate-copula (not corpus work) | — |
+| v1.4.5 | Lexicon +20 modern nouns | — |
+| v1.5.0 | CC-100 re-extract, streaming + sharding | 4.01 M committed / **77.9 M local** |
+| v1.5.5 | morpheme-coverage audit (79.48 % baseline) | — |
+| v1.5.5→v2.0 | committed corpus stable; focus shifted to retrieval engine | — |
+
+**Government Kazakh sources** (akorda.kz, egov.kz, bnews.kz) — originally v1.4.0 plan — were de-prioritised once retrieval-over-corpus delivered the quality the planned volume was meant to support. Still on the post-v2.x shortlist.
 
 ## Purity filter (for all new ingestions)
 

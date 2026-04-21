@@ -1,0 +1,10 @@
+{
+  "version": "2.3.0",
+  "built_from": "data/retrieval/facts.json",
+  "counts": {
+    "initial_facts": 15,
+    "derived_facts": 0,
+    "by_rule": {}
+  },
+  "derived": []
+}
