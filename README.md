@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.0.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.0.1-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -24,19 +24,25 @@
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
   <img src="https://img.shields.io/badge/tests-357%20passing-2EA44F?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/hallucinations-0-2EA44F?style=flat-square" alt="hallucinations">
+  <img src="https://img.shields.io/badge/ungrounded%20generation-none%20by%20design-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
 
 ---
 
 ## Why adam (v3.0)
 
-A different kind of AI system — one that trades **generalisation for integrity**, and (as of v3.0) adds **deterministic reasoning** on top of retrieval.
+adam is a **neuro-symbolic retrieval system for Kazakh** — the rule-based dialog backbone, the morpheme-indexed retrieval engine, and the forward-chaining reasoner all run together as a single deterministic pipeline. It trades **generalisation for integrity**, and (as of v3.0) adds **rule-derived reasoning** on top of retrieval.
+
+Three things make the trade viable specifically for Kazakh:
+
+- **Agglutinative advantage** — Kazakh's rich morphology means the FST unpacks each word into a typed bundle (root + case + number + possessive + predicate-person), which the retrieval index and reasoner both exploit. What would be a 10⁶-parameter subword model in English is a 14 k-root Lexicon + deterministic rules here.
+- **Mathematical determinism** — same input + same session + same seed produces a byte-identical answer across runs. No temperature, no sampling, no GPU.
+- **No ungrounded generation by design** — every output is either a template realisation, a corpus quote, or a rule derivation with a full `source_chain`. There is no free-text generator anywhere in the pipeline that could invent content not traceable to its source.
 
 | | adam v3.0 | mainstream LLM |
 |---|---|---|
 | Outputs | template + verbatim quote + FST synthesis + **rule-derived chain** | probabilistic token generation |
-| Hallucinations | **0** (by construction) | non-zero, non-auditable |
+| Ungrounded generation | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) | non-zero, non-auditable |
 | Inference | ms on laptop CPU | dollars on GPU / datacentre |
 | **Reasoning** | **forward-chaining over typed facts, every conclusion has a `rule_id`** | opaque emergent reasoning |
 | **Provenance** | **`source_chain: Vec<FactSource>` per derivation; `(pack, sample_id)` per quote** | ~none for free-form output |
@@ -47,6 +53,25 @@ A different kind of AI system — one that trades **generalisation for integrity
 | Self-improvement | ships by commit, reviewed by humans | parametric updates through training |
 
 adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, auditable, and — as of v3.0 — capable of deriving conclusions no single corpus sentence states**, while marking every such conclusion with a textual trust signal and a source chain.
+
+### Current state (v3.0.1 — honest numbers)
+
+v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is end-to-end and test-locked, but the fact set is deliberately small while the matchers mature.
+
+| | value |
+|---|---|
+| Dialog intents | 26 |
+| Lexicon roots | 14 247 |
+| Corpus (committed / local) | 3.84 M / 77.9 M words |
+| Morpheme coverage over committed corpus | 79.48 % |
+| Workspace tests | **357 passing, 0 failing** |
+| Pattern matchers | 4 (copula / locative / possessive / dative-motion) |
+| Reasoning rules active | 3 (R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo) |
+| Extracted facts (committed) | **15** |
+| Rule-derived facts (committed) | **1** (кітап RelatedTo ілім, via R5) |
+| Fact-graph nodes / edges | 29 / 15 |
+
+The scale-up path is explicit: scale coverage of the four existing matchers to the full 77.9 M-word corpus, add `PartOf` / `Causes` extractors, activate R3/R4. Nothing in the architecture is gated on more data — the engine already produces derivations with full provenance.
 
 ### The v3.0 trust stack
 
@@ -77,7 +102,7 @@ No transformer. No embeddings. No probabilistic generation. For any input, a dev
 - **Predictable** — every stage is deterministic or samples from a finite, inspectable set.
 - **Auditable** — `adam_chat --trace` dumps every layer per turn; every corpus citation names its `(pack, sample_id)`.
 - **Grammatically correct by construction** on the slot path — `{slot|features}` placeholders go through the FST synthesiser, so no morphologically invalid inflected form can leave the system.
-- **Hallucination-free by default** — the retrieved quote is byte-identical to the corpus. Adaptation (`ComposeMode::InSampleCitySwap`) is opt-in and every adapted response is explicitly marked with «бейімд-» so the user always knows.
+- **No ungrounded generation by default** — the retrieved quote is byte-identical to the corpus. Adaptation (`ComposeMode::InSampleCitySwap`) is opt-in and every adapted response is explicitly marked with «бейімд-» so the user always knows.
 - **Small** — runs on a MacBook Air M2 8 GB. No GPU.
 - **Kazakh-native** — built on a 14 k-entry curated pre-modern Kazakh Lexicon and a 77.9 M-word local corpus, not translated from English.
 
@@ -93,17 +118,17 @@ The fastest way to see adam end-to-end. Fully deterministic, safe to record for 
 $ cargo run --release -p adam-dialog --bin adam_demo
 ```
 
-Four parts (v2.9):
+Four parts (v3.0):
 - **Part 1** — all 12 canonical turns with retrieval on, `ComposeMode::Verbatim` (default). Every cited quote is byte-identical to the corpus.
 - **Part 2** — same 12 turns with `ComposeMode::InSampleCitySwap`. On the real corpus, the safety guards refuse most swaps — this is the *safe case* (marker fires only when a swap actually happened).
 - **Part 3** — synthetic sample explicitly triggering the swap path, so the v1.9.5 «бейімд-» marker is visible in action.
-- **Part 4** (v2.9) — loads committed `facts.json` + `derived_facts.json`, surfaces the rule-derived chain with its `source_chain` provenance, runs a user probe across 4 deterministic seeds. Every response cites the **reasoned** chain (not a quote) and carries the v2.7 «байланыс-» trust marker.
+- **Part 4** — loads committed `facts.json` + `derived_facts.json`, surfaces the rule-derived chain with its `source_chain` provenance, runs a user probe across 4 deterministic seeds. Every response cites the **reasoned** chain (not a quote) and carries the v2.7 «байланыс-» trust marker.
 
 ### Interactive REPL
 
 ```
 $ cargo run --release -p adam-dialog --bin adam_chat
-adam-chat v2.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
+adam-chat v3.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
 
 > сәлем
 сәлем
@@ -212,7 +237,7 @@ This path is:
 
 - **Deterministic** — rank has zero randomness; ties break on `(pack, sample_id)`. Same input + same index → byte-identical output.
 - **Traceable** — every response cites its source.
-- **Hallucination-free** — we quote, never invent. The retrieved sentence is always a real sentence from a real source.
+- **No ungrounded generation** — we quote, never invent. The retrieved sentence is always a real sentence from a real source.
 
 ### Opt-in in-sample composition (v1.9.0+)
 
@@ -302,14 +327,15 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | FST synthesis → analysis roundtrip | **100.0%** on 36,238 forms |
 | FST parser throughput | **1.155 ms / word** single-threaded M2 |
 | Dialog intents | **26** (v1.1.0 added Insult) |
-| Template families | **31** |
+| Template families | **34** (v3.0 added `unknown.with_derived_chain`) |
 | Slot types (session) | `name`, `age`, `city`, `occupation` (plus `{slot\|features}` FST-aware variants) |
 | Committed morpheme index | **3,191 samples → 3,082 distinct morphemes → 16,262 postings** (`data/retrieval/morpheme_index.json`, ~2.1 MB) |
 | Full local morpheme index | rebuildable via `build_morpheme_index -- --full` (~10 min, ~700 MB, gitignored) |
-| Hallucination rate | **0%** (retrieval quotes verbatim; no generative path) |
-| Workspace tests | **303 passing**, 4 ignored, 0 failing |
-| End-to-end dialog tests | **86** |
-| FST unit tests | **84** |
+| Pattern matchers (v3.0) | **4** — copula IsA, locative LivesIn, possessive Has, dative-motion GoesTo |
+| Reasoning rules active (v3.0) | **3** — R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo |
+| Extracted / derived facts (committed) | **15 / 1** (proof of mechanism at v3.0; scale-up path in [roadmap](docs/roadmap.md)) |
+| Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
+| Workspace tests | **357 passing**, 0 failing |
 
 ## Directory layout
 
@@ -349,7 +375,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version-by-version history and [do
 - **Multilingual input and output** (v1.1.0 revert). The v0.9.6 Russian / English triggers were removed; `adam` accepts and produces only Kazakh. Generalisation comes via the retrieval engine over the 77.9 M-word Kazakh corpus, not translation.
 - **Speech / multimodal** — deferred until the retrieval engine is a solid baseline.
 - **Cloud platform work.**
-- **Probabilistic / LLM-style free generation.** Every response is either a template realisation (26-intent path) or a verbatim corpus quote (retrieval path). Nothing invented.
+- **Probabilistic / LLM-style free generation.** Every response is either a template realisation (26-intent path), a verbatim corpus quote (retrieval path), or a rule derivation over typed facts with a full `source_chain` (reasoning path). Nothing invented.
 - **50 M+ parameter transformer experiments on current hardware** (M2 8 GB). v2.0 will **not** be a trained neural LM — it will be the retrieval engine above, extended with pattern-based composition and ranking polish. See [`project_retrieval_not_neural_v2`](docs/roadmap.md#post-v10-direction).
 
 The repo grows from clean data, tight scope, and deterministic composition. Not from broad claims, and not from gradient descent.

@@ -35,7 +35,7 @@ This is a weaker claim than "whole output is FST-guaranteed" — which would req
 
 ## v2.0 direction — retrieval, not neural generation
 
-The v2.0 "minimally thinking Kazakh model" is **not** a trained transformer LM. The approach is morpheme-indexed retrieval over the 100 M+ word corpus plus rule-based compositional synthesis. Reasons: predictability, zero hallucinations, cheap (M2 8 GB), safe (cannot say what isn't in the corpus), and exploits Kazakh's rich agglutinative morphology that the FST already unpacks. See `project_retrieval_not_neural_v2` memory and the roadmap for details.
+The v2.0 "minimally thinking Kazakh model" is **not** a trained transformer LM. The approach is morpheme-indexed retrieval over the 100 M+ word corpus plus rule-based compositional synthesis. Reasons: predictability, **no ungrounded generation by design** (every output is a quote, a template, or a rule derivation with a full `source_chain`), cheap (M2 8 GB), safe (cannot say what isn't in the corpus or derivable from typed facts), and exploits Kazakh's rich agglutinative morphology that the FST already unpacks. See `project_retrieval_not_neural_v2` memory and the roadmap for details.
 
 ## Post-v2.3 work (committed, not yet shipped)
 

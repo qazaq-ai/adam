@@ -7,6 +7,45 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.0.1] — 2026-04-21 — v3.0 polish pass (Codex + Antigravity review items)
+
+Pure polish release based on two external reviews of the v3.0 MVP (Codex + Antigravity). **Zero library changes, zero test-surface changes.** Shipping as a patch because everything it touches is banner strings, doc wording, or dead-code warnings.
+
+### Codex review items (accepted in full)
+
+1. **Stale version banners** — `adam_demo` boxed banner was still printing "adam v2.9" even though the project had shipped v3.0; `adam_chat` greeter + docstring still said "v2.0". Both now say v3.0.
+2. **Two compiler warnings fixed** — `first_alphabetic_token` and `last_alphabetic_token` in `crates/adam-reasoning/src/patterns.rs` are used only from the `#[cfg(test)]` module; they now carry `#[cfg(test)]` themselves. `cargo build --workspace` is warning-free.
+3. **"0 hallucinations" claim rephrased** — replaced across README, `docs/architecture_v3.md`, `docs/foundation_scope.md`. The honest framing is **"no ungrounded generation by design"** — a falsifiable claim about the absence of a free-text generator in the pipeline, rather than a strong-but-fuzzy "0 hallucinations" badge. The README hallucinations badge is now `ungrounded generation — none by design`.
+4. **Honest scale framing** — new **Current state (v3.0.1 — honest numbers)** section in README presents 15 extracted facts + 1 derivation as *proof of mechanism, not scale*, alongside 357 tests / 14 k roots / 77.9 M local corpus. Makes the small-facts-set impossible to miss, and the scale-up path explicit.
+5. **Weak demo probe replaced** — step 09 in `adam_demo`'s 12-turn script swapped from `"мектеп керек пе"` (which rarely triggers meaningful retrieval) to `"білім туралы айтшы"` (topic-probe phrasing that matches the retrieval surface).
+
+### Antigravity review items (partial)
+
+1. **"Neuro-Symbolic Retrieval" positioning** — adopted in the README hero paragraph. Names a real paradigm and makes the architecture legible to reviewers who don't read Rust.
+2. **Agglutinative advantage** — one-paragraph explanation in the "Why adam (v3.0)" section of why deterministic retrieval + FST composition works specifically for Kazakh and wouldn't transfer to English.
+3. **"Physically cannot hallucinate"** — *rejected.* Rhetorically strong but literally false once `ComposeMode::InSampleCitySwap` is on (synthesised forms are new text). Consistent with item 3 above — we prefer falsifiable claims.
+4. **"Mathematical determinism" / "Edge AI"** framing — already covered in README / architecture_v3, not re-duplicated.
+
+### What ships
+
+- `crates/adam-dialog/src/bin/adam_demo.rs` — docstring + boxed banner v2.9 → v3.0; step 09 input.
+- `crates/adam-dialog/src/bin/adam_chat.rs` — docstring v2.0 → v3.0, REPL greeter string, v2.7 reasoning-chain capability documented.
+- `crates/adam-reasoning/src/patterns.rs` — `#[cfg(test)]` on the two test-only helpers.
+- `README.md` — hero reworded, new "Current state" table, hallucination wording across the file, template-families count 31 → 34, workspace-tests count 303 → 357, ungrounded-generation row added to the technical spec table, Neuro-Symbolic Retrieval positioning + Agglutinative Advantage line in "Why adam".
+- `docs/architecture_v3.md` — trade-off table `0% hallucination` row reworded.
+- `docs/foundation_scope.md` — v2.0 rationale wording.
+- Workspace `version` → 3.0.1.
+
+### Tests
+
+**357 passing** — unchanged. Zero library surface touched.
+
+### Upgrade notes
+
+None. v3.0.0 and v3.0.1 are byte-identical for embedders.
+
+---
+
 ## [3.0.0] — 2026-04-22 — v3.0: investor-demoable intelligent MVP (commitment cut)
 
 Major release. **Not a feature drop — a positioning freeze.** v3.0 captures the v2.5 → v2.9 reasoning ladder as the investor-demoable "intelligent Kazakh AI" cut we committed to when v2.4 shipped.

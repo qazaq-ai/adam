@@ -577,6 +577,11 @@ fn exactly_one_alphabetic_token(s: &str) -> Option<&str> {
 
 /// First alphabetic token in `s` (UTF-8 safe, stops at whitespace /
 /// punctuation). `None` if the string has no alphabetic content.
+///
+/// Currently only exercised by unit tests — gated with `#[cfg(test)]`
+/// to avoid a dead-code warning on non-test builds. Unblock the gate
+/// when a matcher actually needs the helper.
+#[cfg(test)]
 fn first_alphabetic_token(s: &str) -> Option<&str> {
     let s = s.trim_start();
     let start = s.char_indices().find(|(_, c)| c.is_alphabetic())?.0;
@@ -590,6 +595,10 @@ fn first_alphabetic_token(s: &str) -> Option<&str> {
 }
 
 /// Last alphabetic token in `s` — symmetrical to [`first_alphabetic_token`].
+///
+/// Test-only today; see the `first_alphabetic_token` note for the reason
+/// behind the `#[cfg(test)]` gate.
+#[cfg(test)]
 fn last_alphabetic_token(s: &str) -> Option<&str> {
     // Walk backward through chars, find the last alphabetic one, then
     // extend leftward while alphabetic.

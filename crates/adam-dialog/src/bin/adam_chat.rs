@@ -1,8 +1,8 @@
-//! `adam-chat` — interactive REPL for the adam v2.0 Kazakh dialog pipeline.
+//! `adam-chat` — interactive REPL for the adam v3.0 Kazakh dialog pipeline.
 //!
 //! **Kazakh-only surface** (v1.1.0 revert). Input and output are both Kazakh.
 //!
-//! Capabilities at v2.0:
+//! Capabilities at v3.0:
 //!
 //!   - **26 intents** — 25 conversational + Insult for polite non-engagement.
 //!   - **Multi-turn session state** (`Conversation`): `name`, `age`, `city`,
@@ -23,8 +23,12 @@
 //!   - **Adaptation marker** (v1.9.5) — when a swap happened, the response
 //!     frame contains the «бейімд-» stem so the user can always distinguish
 //!     a verbatim corpus quote from an adapted one.
+//!   - **Rule-derived reasoning chains** (v2.7+) — when committed
+//!     `facts.json` + `derived_facts.json` are present and the user probes
+//!     a noun that matches a derivation, adam cites the chain (not a
+//!     corpus quote) with the «байланыс-» trust marker.
 //!
-//! Architecture reference: [`docs/architecture_v2.md`](../../../docs/architecture_v2.md).
+//! Architecture reference: [`docs/architecture_v3.md`](../../../docs/architecture_v3.md).
 //!
 //! Usage:
 //!   adam_chat                    — REPL with retrieval on
@@ -139,7 +143,7 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!("adam-chat v2.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
+    eprintln!("adam-chat v3.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut turn = 0u64;

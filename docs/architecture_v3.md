@@ -218,7 +218,7 @@ Every `DerivedFact` carries:
 
 | choice | what we lose | what we gain |
 |---|---|---|
-| Retrieval over a curated corpus, not a trained LM | generalisation outside recognised topics | 0% hallucination on corpus path, full provenance, runs on M2 |
+| Retrieval over a curated corpus, not a trained LM | generalisation outside recognised topics | no ungrounded generation on the corpus path (every quote is byte-identical to a committed sample), full provenance, runs on M2 |
 | Kazakh-only surface | coverage of RU/EN speakers | a corpus and dialect that are native, not translated |
 | Deterministic rank | novelty across reruns | reproducible demos, auditable trace |
 | Frame-only composition by default | responses feel less personalised | quote is byte-identical to source — a hard promise |

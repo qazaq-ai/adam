@@ -1,14 +1,15 @@
 //! `adam_demo` — scripted end-to-end walkthrough for investors.
 //!
-//! Updated for v2.9 to include the reasoning-chain part (Part 4) —
-//! the full v3.0 ladder is now demonstrable in a single binary.
+//! v3.0 shipped the full four-part demo: intents + retrieval +
+//! composition + rule-derived reasoning. v3.0.1 is a polish pass —
+//! stale banners fixed, probes tuned, claims reworded for honesty.
 //!
 //! Parts 1 + 2: 12 canonical conversational turns (verbatim retrieval
 //! vs opt-in InSampleCitySwap). Part 3: synthetic sample showing the
-//! v1.9.5 «бейімд-» adaptation marker. **Part 4 (v2.9 new):** rule-
-//! derived reasoning chain showing the v2.6–v2.7 arc — adam concludes
-//! via R5 (shared-type relation) and cites the derivation in Kazakh
-//! prose with the «байланыс-» trust marker.
+//! v1.9.5 «бейімд-» adaptation marker. **Part 4:** rule-derived
+//! reasoning chain showing the v2.6–v2.7 arc — adam concludes via R5
+//! (shared-type relation) and cites the derivation in Kazakh prose
+//! with the «байланыс-» trust marker.
 //!
 //! Each turn prints:
 //!   • user line,
@@ -74,7 +75,7 @@ const SCRIPT: &[Step] = &[
     },
     Step {
         label: "09. Session-aware frame over retrieval (name + city + quote)",
-        input: "мектеп керек пе",
+        input: "білім туралы айтшы",
     },
     Step {
         label: "10. Biographical-year guard (1845 → no swap)",
@@ -108,7 +109,7 @@ fn main() -> ExitCode {
     let index = load_retrieval_index();
 
     println!("╔══════════════════════════════════════════════════════════════╗");
-    println!("║ adam v2.9 — 4-part scripted demo (intents + retrieval +     ║");
+    println!("║ adam v3.0 — 4-part scripted demo (intents + retrieval +     ║");
     println!("║              composition + reasoning, deterministic)        ║");
     println!("╚══════════════════════════════════════════════════════════════╝\n");
 
