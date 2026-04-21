@@ -145,6 +145,18 @@ fn run_one_pass(
     out
 }
 
+/// Key used to decide if we've already emitted a symmetric pair.
+/// `RelatedTo` is symmetric — `(A, B)` and `(B, A)` are the same
+/// logical fact; we canonicalise to the lexicographically smaller
+/// first element so the pair dedup is stable.
+fn canonical_relation_pair(a: &str, b: &str) -> (String, String) {
+    if a <= b {
+        (a.to_string(), b.to_string())
+    } else {
+        (b.to_string(), a.to_string())
+    }
+}
+
 /// `R1`: IS-A transitivity. If `A IsA B` and `B IsA C`, derive `A IsA C`
 /// (skipping A = C tautologies). Chain length limited to 1 hop per
 /// pass; longer chains surface across iterations.
@@ -199,20 +211,87 @@ fn rule_r1_is_a_transitivity(
 }
 
 /// `R5`: shared IS-A target → `RelatedTo`. If `A IsA X` and `B IsA X`
-/// for distinct A, B, both are related via the common type X. This
-/// surfaces implicit similarity without inventing new IsA edges.
-/// v2.4 doesn't yet ship a `RelatedTo` predicate — we piggy-back on
-/// `IsA` with a rule marker so this rule is live; v2.5 will add a
-/// proper `RelatedTo` variant and remove the coercion.
+/// for distinct A, B, both are **related** via the common type X.
+/// Activated in v2.6 once `Predicate::RelatedTo` exists. This is the
+/// first rule that produces derivations on the committed v2.5 fact
+/// set: `кітап IsA бұлақ` and `ілім IsA бұлақ` share target `бұлақ`,
+/// so R5 derives `кітап RelatedTo ілім` with the `бұлақ` hub as
+/// evidence.
 ///
-/// Disabled in v2.4. Left as a stub to document the intended shape.
+/// Symmetry: `RelatedTo` is symmetric. To avoid emitting both
+/// `(A, B)` and `(B, A)`, we canonicalise each pair with the
+/// lexicographically smaller root first. The emitted fact has
+/// `subject = min(A, B)` and `object = max(A, B)`.
+///
+/// Tautology: A = B is impossible here because we iterate over
+/// distinct subjects sharing a target.
 fn rule_r5_shared_is_a_target(
     _facts: &[Fact],
-    _graph: &LexicalGraph,
-    _seen: &BTreeSet<(String, String, String)>,
-    _out: &mut Vec<DerivedFact>,
+    graph: &LexicalGraph,
+    seen: &BTreeSet<(String, String, String)>,
+    out: &mut Vec<DerivedFact>,
 ) {
-    // v2.4: deferred to v2.5 when `Predicate::RelatedTo` lands.
+    // Track pairs we've already emitted in THIS pass (guarding against
+    // a hub node with many incoming IS-A edges producing one pair twice
+    // from different orderings). Seen-set dedup across passes is the
+    // caller's responsibility.
+    let mut pass_pairs: BTreeSet<(String, String)> = BTreeSet::new();
+
+    // Scan every node; if it has ≥ 2 incoming IsA edges, every pair
+    // of those incoming subjects is RelatedTo each other via it.
+    for (hub, _stats) in graph.nodes.iter() {
+        let incoming_is_a: Vec<&crate::graph::GraphEdge> = graph
+            .incoming(hub)
+            .into_iter()
+            .filter(|e| e.predicate == Predicate::IsA)
+            .collect();
+        if incoming_is_a.len() < 2 {
+            continue;
+        }
+        // Every pair (a, b) with a < b lexicographically.
+        for (i, first) in incoming_is_a.iter().enumerate() {
+            for second in &incoming_is_a[i + 1..] {
+                let (a, b) = canonical_relation_pair(&first.from, &second.from);
+                if a == b {
+                    continue; // defensive
+                }
+                if !pass_pairs.insert((a.clone(), b.clone())) {
+                    continue;
+                }
+                let key = (a.clone(), "related_to".to_string(), b.clone());
+                if seen.contains(&key) {
+                    continue;
+                }
+                // Source chain = one source per side of the hub.
+                let first_source = first
+                    .sources
+                    .first()
+                    .cloned()
+                    .expect("graph edge must carry at least one source");
+                let second_source = second
+                    .sources
+                    .first()
+                    .cloned()
+                    .expect("graph edge must carry at least one source");
+                out.push(DerivedFact {
+                    subject: SlotRef {
+                        surface: a.clone(),
+                        root: a,
+                        pos: "noun".into(),
+                    },
+                    predicate: Predicate::RelatedTo,
+                    object: SlotRef {
+                        surface: b.clone(),
+                        root: b,
+                        pos: "noun".into(),
+                    },
+                    rule_id: "R5_shared_is_a_target".into(),
+                    source_chain: vec![first_source, second_source],
+                    confidence: ConfidenceKind::RuleInferred,
+                });
+            }
+        }
+    }
 }
 
 /// Stable triple key for dedup — same shape used by LexicalGraph edge
@@ -260,12 +339,20 @@ mod tests {
             mk_fact("құрал", Predicate::IsA, "зат", "p2", "s2"),
         ];
         let derived = run(&facts);
-        assert_eq!(derived.len(), 1);
-        let d = &derived[0];
+        // R1 derives кітап IsA зат. R5 then also fires on the
+        // resulting graph because after R1, both кітап and құрал
+        // share the target `зат`, yielding кітап RelatedTo құрал.
+        // That's correct interleaving behaviour; the test asserts
+        // R1's contribution specifically.
+        let r1: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R1_is_a_transitivity")
+            .collect();
+        assert_eq!(r1.len(), 1, "exactly one R1 derivation expected");
+        let d = r1[0];
         assert_eq!(d.subject.root, "кітап");
         assert_eq!(d.object.root, "зат");
         assert_eq!(d.predicate, Predicate::IsA);
-        assert_eq!(d.rule_id, "R1_is_a_transitivity");
         assert_eq!(d.confidence, ConfidenceKind::RuleInferred);
         assert_eq!(d.source_chain.len(), 2);
     }
@@ -368,5 +455,97 @@ mod tests {
     #[test]
     fn empty_input_empty_output() {
         assert!(run(&[]).is_empty());
+    }
+
+    #[test]
+    fn r5_derives_related_to_from_shared_target() {
+        // A IsA X, B IsA X → (A, RelatedTo, B) (canonical order)
+        let facts = vec![
+            mk_fact("кітап", Predicate::IsA, "бұлақ", "p", "s1"),
+            mk_fact("ілім", Predicate::IsA, "бұлақ", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        // Find the RelatedTo derivation.
+        let rel: Vec<_> = derived
+            .iter()
+            .filter(|d| d.predicate == Predicate::RelatedTo)
+            .collect();
+        assert_eq!(
+            rel.len(),
+            1,
+            "exactly one RelatedTo pair expected from two shared-target facts: got {rel:?}"
+        );
+        let r = &rel[0];
+        assert_eq!(r.rule_id, "R5_shared_is_a_target");
+        assert_eq!(r.confidence, ConfidenceKind::RuleInferred);
+        assert_eq!(r.source_chain.len(), 2);
+        // Canonical ordering: lexicographically smaller first.
+        let (a, b) = canonical_relation_pair("кітап", "ілім");
+        assert_eq!(r.subject.root, a);
+        assert_eq!(r.object.root, b);
+    }
+
+    #[test]
+    fn r5_no_derivation_without_shared_target() {
+        let facts = vec![
+            mk_fact("A", Predicate::IsA, "X", "p", "s1"),
+            mk_fact("B", Predicate::IsA, "Y", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        let rel: Vec<_> = derived
+            .iter()
+            .filter(|d| d.predicate == Predicate::RelatedTo)
+            .collect();
+        assert!(rel.is_empty(), "no shared target → no RelatedTo");
+    }
+
+    #[test]
+    fn r5_three_way_hub_produces_three_pairs() {
+        // A, B, C all IsA X → 3 RelatedTo pairs: (A,B), (A,C), (B,C).
+        let facts = vec![
+            mk_fact("A", Predicate::IsA, "X", "p", "s1"),
+            mk_fact("B", Predicate::IsA, "X", "p", "s2"),
+            mk_fact("C", Predicate::IsA, "X", "p", "s3"),
+        ];
+        let derived = run(&facts);
+        let rel: Vec<_> = derived
+            .iter()
+            .filter(|d| d.predicate == Predicate::RelatedTo)
+            .collect();
+        assert_eq!(
+            rel.len(),
+            3,
+            "three-way hub must yield 3 unique pairs: got {rel:?}"
+        );
+    }
+
+    #[test]
+    fn r5_symmetry_dedups_pairs() {
+        // Even if the input order flips, only one RelatedTo per pair.
+        let facts = vec![
+            mk_fact("B", Predicate::IsA, "X", "p", "s1"),
+            mk_fact("A", Predicate::IsA, "X", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        let rel: Vec<_> = derived
+            .iter()
+            .filter(|d| d.predicate == Predicate::RelatedTo)
+            .collect();
+        assert_eq!(rel.len(), 1);
+        // Canonical order: A first.
+        assert_eq!(rel[0].subject.root, "A");
+        assert_eq!(rel[0].object.root, "B");
+    }
+
+    #[test]
+    fn canonical_relation_pair_is_sorted() {
+        assert_eq!(
+            canonical_relation_pair("кітап", "ілім"),
+            ("кітап".to_string(), "ілім".to_string())
+        );
+        assert_eq!(
+            canonical_relation_pair("ілім", "кітап"),
+            ("кітап".to_string(), "ілім".to_string())
+        );
     }
 }

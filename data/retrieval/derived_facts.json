@@ -1,10 +1,38 @@
 {
-  "version": "2.3.0",
+  "version": "2.5.0",
   "built_from": "data/retrieval/facts.json",
   "counts": {
     "initial_facts": 15,
-    "derived_facts": 0,
-    "by_rule": {}
+    "derived_facts": 1,
+    "by_rule": {
+      "R5_shared_is_a_target": 1
+    }
   },
-  "derived": []
+  "derived": [
+    {
+      "subject": {
+        "surface": "кітап",
+        "root": "кітап",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ілім",
+        "root": "ілім",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "kazakh_proverbs_pack.json",
+          "sample_id": "proverb_003"
+        },
+        {
+          "pack": "common_voice_kk_pack.json",
+          "sample_id": "cv_kk_00047"
+        }
+      ],
+      "confidence": "RuleInferred"
+    }
+  ]
 }

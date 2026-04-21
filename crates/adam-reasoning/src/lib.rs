@@ -74,6 +74,16 @@ pub enum Predicate {
     /// Subject goes / travels to object (dative-motion "X Y-ке барады").
     /// "Бала мектепке барады" → (бала, GoesTo, мектеп). v2.5.
     GoesTo,
+    /// Subject is a physical / administrative part of object
+    /// ("X Y-нің құрамында" / "X Y-нің бір бөлігі"). v2.6.
+    /// "Алматы Қазақстанның құрамында" → (алматы, PartOf, қазақстан).
+    PartOf,
+    /// Subject is semantically related to object — shared type,
+    /// co-occurrence in a sibling structure. v2.6. This predicate is
+    /// typically **derived** by rule `R5_shared_is_a_target`
+    /// (A IsA X ∧ B IsA X ⟹ RelatedTo(A, B)); extraction patterns for
+    /// it will be added incrementally as lexical data supports them.
+    RelatedTo,
 }
 
 impl Predicate {
@@ -84,6 +94,8 @@ impl Predicate {
             Self::LivesIn => "lives_in",
             Self::Has => "has",
             Self::GoesTo => "goes_to",
+            Self::PartOf => "part_of",
+            Self::RelatedTo => "related_to",
         }
     }
 }
@@ -192,6 +204,8 @@ mod tests {
         assert_eq!(Predicate::LivesIn.as_str(), "lives_in");
         assert_eq!(Predicate::Has.as_str(), "has");
         assert_eq!(Predicate::GoesTo.as_str(), "goes_to");
+        assert_eq!(Predicate::PartOf.as_str(), "part_of");
+        assert_eq!(Predicate::RelatedTo.as_str(), "related_to");
     }
 
     #[test]

@@ -7,6 +7,87 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.6.0] — 2026-04-22 — `PartOf` + `RelatedTo` predicates + R5 rule activation (v3.0 ladder: step 2/6)
+
+Minor release. **The reasoner starts producing actual derivations on real corpus data.** v2.5 shipped the inference machinery; v2.6 wires it to the first real chain.
+
+### New predicates
+
+```rust
+pub enum Predicate {
+    IsA,        // v2.1
+    LivesIn,    // v2.1
+    Has,        // v2.2
+    GoesTo,     // v2.5
+    PartOf,     // v2.6 ← NEW — physical / administrative containment
+    RelatedTo,  // v2.6 ← NEW — symmetric semantic relation, derived by R5
+}
+```
+
+`PartOf` covers phrasings like «X Y-нің құрамында», «X Y-нің бөлігі» — geographic containment, administrative subdivision. No extraction pattern yet in v2.6 (will land when a committed source pack surfaces enough of them); the predicate is declared so future patterns and rules can wire it without a breaking release.
+
+`RelatedTo` is typically **rule-derived** rather than pattern-extracted — it's what `R5_shared_is_a_target` produces. Making it a first-class predicate lets downstream consumers (v2.7+ dialog integration) treat derived-relatedness facts with the same graph/query surface as extracted facts.
+
+### Rule activation: R5 is now live
+
+```
+R5_shared_is_a_target:   A IsA X ∧ B IsA X ∧ A ≠ B  ⟹  RelatedTo(A, B)
+```
+
+Symmetry-aware: the canonical pair has the lexicographically smaller root as the subject, so `(кітап, ілім)` and `(ілім, кітап)` deduplicate to one fact. R5 runs in the same pass as R1; they interleave correctly (R1 can feed R5 via newly-derived IS-A edges).
+
+### The first real derivation
+
+On the v2.5 fact set — completely unchanged, no new extraction — R5 now derives:
+
+```
+кітап  --RelatedTo-->  ілім    [R5_shared_is_a_target]
+    source chain: proverb_003 (кітап IsA бұлақ) + cv_kk_00047 (ілім IsA бұлақ)
+```
+
+This is the first **inferred** fact in adam's history. It's a small claim but a real one: the system recognised that two proverbs map different subjects to the same metaphorical hub (`бұлақ` — a spring, a source), and therefore those subjects stand in a **shared-type relation**. A reasoner did that, not retrieval.
+
+### Commitment check: v3.0 ladder progress
+
+| release | scope | status |
+|---|---|---|
+| v2.5 | `GoesTo` + dative pattern | done |
+| **v2.6** | **`PartOf` + `RelatedTo` + R5 rule active → first real derivation** | **done** |
+| v2.7 | dialog integration (reasoner in `Conversation::turn`) | next |
+| v2.8 | more rules + pattern density | |
+| v2.9 | investor-demo polish with chain reasoning | |
+| v3.0 | commitment cut | |
+
+The machinery now produces derivations. v2.7 will make them visible to the user in dialog responses.
+
+### Tests (+5 → 352 total)
+
+- `r5_derives_related_to_from_shared_target` — canonical positive (2 shared-target facts → 1 RelatedTo).
+- `r5_no_derivation_without_shared_target` — distinct targets → no RelatedTo.
+- `r5_three_way_hub_produces_three_pairs` — A, B, C sharing hub X → 3 pairs.
+- `r5_symmetry_dedups_pairs` — order-flip invariance: one pair per relation.
+- `canonical_relation_pair_is_sorted` — helper invariant.
+- Plus: `Predicate::PartOf.as_str()` / `Predicate::RelatedTo.as_str()` stability checks.
+- Updated: `r1_derives_is_a_transitivity` now filters by rule_id because R1 + R5 interleave on the shared-target graph R1 builds.
+
+### Graph updated
+
+`LexicalGraph::from_facts` handles both new predicate strings. The compile-time `unreachable!` arm stays effective — any future `Predicate` variant will break the build until a graph branch is added, keeping extraction and graph in permanent lock-step.
+
+### Committed artifacts
+
+- `data/retrieval/derived_facts.json` — **1 derivation** (was 0): `кітап RelatedTo ілім` via R5.
+- `data/retrieval/lexical_graph.json` — regenerated, same 15 facts / 29 nodes / 15 edges (derived facts don't reshape the graph unless they're pushed back through `build_lexical_graph`; v2.8 will consider that integration).
+- `data/retrieval/facts.json` — unchanged 15 facts.
+
+### Zero regressions
+
+All 347 pre-v2.6 tests still pass. R5 activation is additive; R1 behaviour is unchanged at the algorithm level (the test update reflects the expanded emergent derivation set, not a R1 change).
+
+### Next (v2.7)
+
+Wire the reasoner into `Conversation::turn`. When `Intent::Unknown` fires with a noun hint that appears in the graph, the response can cite a derived fact alongside (or instead of) a retrieved sample: *«кітап пен ілім бір-біріне байланысты: екеуі де бұлақ болып табылады.»* — with full source-chain provenance in the trace.
+
 ## [2.5.0] — 2026-04-22 — `GoesTo` predicate + dative-motion pattern (v3.0 ladder: step 1 of 6)
 
 Minor release. **First rung on the v2.5 → v3.0 ladder** toward the investor-demoable intelligent MVP. The target at v3.0 is a dialog system that can **derive** answers through rule-reasoning chains, not just retrieve them. Getting there requires more predicates + more pattern density so the reasoner has real chains to traverse. v2.5 is the first of six planned steps.

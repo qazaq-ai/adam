@@ -102,6 +102,8 @@ impl LexicalGraph {
                         "lives_in" => Predicate::LivesIn,
                         "has" => Predicate::Has,
                         "goes_to" => Predicate::GoesTo,
+                        "part_of" => Predicate::PartOf,
+                        "related_to" => Predicate::RelatedTo,
                         // Unreachable by construction: `pred_str` is
                         // derived from `Predicate::as_str()` on an
                         // existing `Fact::predicate`, so every live
