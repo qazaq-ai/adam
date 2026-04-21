@@ -7,6 +7,99 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [2.9.0] — 2026-04-22 — Investor-demo polish: `adam_demo` Part 4 shows reasoning chains end-to-end (v3.0 ladder step 5/6)
+
+Minor release. **Penultimate rung before the investor-demoable v3.0 cut.** v2.9 adds a fourth part to the `adam_demo` scripted walkthrough that loads the committed fact + derivation artefacts and shows, live, how adam produces a *reasoned* answer the user can see, with full provenance, with the trust marker. Ready to record for a presentation.
+
+### `adam_demo` gains Part 4 — the reasoning payoff
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║ adam v2.9 — 4-part scripted demo (intents + retrieval +     ║
+║              composition + reasoning, deterministic)        ║
+╚══════════════════════════════════════════════════════════════╝
+
+...  [Parts 1, 2, 3 unchanged] ...
+
+────────────────────────────────────────────────────────────────
+PART 4 — rule-derived reasoning chain (v2.6 R5 + v2.7 dialog)
+         loading committed facts.json + derived_facts.json
+         reasoner produces RelatedTo derivations; dialog
+         cites them with the «байланыс-» trust marker.
+────────────────────────────────────────────────────────────────
+
+Loaded reasoning artefacts:
+  extracted facts:      15
+  rule-derived facts:   1
+
+Derivation(s) available to cite:
+  кітап --related_to--> ілім   [R5_shared_is_a_target]
+    source_chain:
+      kazakh_proverbs_pack.json / proverb_003
+      common_voice_kk_pack.json / cv_kk_00047
+
+User probe: «кітап туралы бірдеңе айт»
+  seed  1 [chain]: Қолда бар деректерден байланыс құрастырдым: кітап пен ілім бір-біріне байланысты екен.
+  seed  4 [chain]: Айтуыңыз бойынша, мынадай қисынды байланыс бар: кітап пен ілім бір-біріне байланысты екен.
+  seed  8 [chain]: кітап туралы мынадай байланыс анықтадым: кітап пен ілім бір-біріне байланысты екен.
+  seed 12 [chain]: кітап туралы мынадай байланыс анықтадым: кітап пен ілім бір-біріне байланысты екен.
+
+NOTE: every response above containing «байланыс-» is REASONED,
+not RETRIEVED. The v2.7 trust invariant (tested) guarantees
+the marker never appears without an actual derivation backing it.
+```
+
+### What Part 4 shows (investor narrative)
+
+1. **Artefacts loaded** — 15 extracted facts + 1 derivation from disk. Concrete, counted, auditable.
+2. **Derivation surfaced with provenance** — the chain `кітап --related_to--> ілім [R5_shared_is_a_target]` is printed **with both source facts** (`proverb_003` and `cv_kk_00047`). The presenter can point at this: *"these are the two actual corpus sentences whose relation the system concluded."*
+3. **User probe** — «кітап туралы бірдеңе айт» — a natural open-ended question.
+4. **Four deterministic seeds** — every one cites the chain. Each response is marked `[chain]` in the demo output; every one contains «байланыс-». If the reasoning path were somehow bypassed, the marker would be absent and the test invariants (from v2.7) would have caught it.
+5. **The trust invariant is called out explicitly** — the closing NOTE tells the presenter (and the viewer) that «байланыс-» **never** appears without an actual derivation. The safety is structural, not cosmetic.
+
+### What this looks like vs an LLM pitch
+
+| | adam (v2.9 demo, Part 4) | LLM pitch |
+|---|---|---|
+| Source of claim | `proverb_003` + `cv_kk_00047` named inline | "from training data" (unnamed) |
+| Mechanism | R5 forward-chaining, rule id shown | matmul across billions of weights |
+| Marker of inference | «байланыс-» in every response, test-enforced | — |
+| Re-runnable | byte-identical across runs | temperature-dependent |
+| Auditable | every derivation has `source_chain` | — |
+| Cost | ms on laptop CPU | dollars on GPU |
+
+### Ladder progress: 5/6 done
+
+| step | release | status |
+|---|---|---|
+| 1/6 | v2.5 — `GoesTo` + dative pattern | ✅ |
+| 2/6 | v2.6 — `PartOf` + `RelatedTo` + R5 active | ✅ |
+| 3/6 | v2.7 — dialog integration | ✅ |
+| 4/6 | v2.8 — R2 active + complete renderers | ✅ |
+| **5/6** | **v2.9 — investor-demo polish, `adam_demo` Part 4** | **✅ shipped** |
+| 6/6 | v3.0 — investor-demoable commitment cut | next |
+
+### Changes
+
+- `adam_demo` binary:
+  - New `run_reasoning_chain_demo` function — loads `data/retrieval/facts.json` + `data/retrieval/derived_facts.json`, attaches them to a fresh `Conversation`, picks a noun that appears in a derivation, and runs deterministic probes across seeds 1 / 4 / 8 / 12.
+  - Every response is tagged `[chain]` or `[plain]` based on marker presence for at-a-glance scanning.
+  - Graceful no-op with a help message if artefacts are missing (e.g. trimmed CI checkouts).
+  - Banner updated to "v2.9 — 4-part scripted demo" with the part list in the subtitle.
+- Module docstring rewritten to describe all four parts.
+
+### Tests
+
+**357 passing** (unchanged from v2.8). v2.9 is demo-binary polish — no library-surface changes, no new tests.
+
+### Zero regressions
+
+No library code touched. The demo binary is the only modification; Parts 1–3 are unchanged.
+
+### What v3.0 will do
+
+The commitment cut. Not a feature drop — a positioning freeze. README refreshed with a v3.0 "Why adam" section that reflects the reasoning capability, `docs/architecture_v2.md` renamed or updated to `architecture_v3.md`, and the final tag that says *this is the investor-demoable intelligent MVP we committed to from the v2.5 ladder start*.
+
 ## [2.8.0] — 2026-04-22 — R2 Has-inheritance rule + complete predicate-specific renderers (v3.0 ladder step 4/6)
 
 Minor release. **Rule and renderer matrix completed.** v2.8 activates R2 (`A IsA B ∧ B Has X ⟹ A Has X`) and adds Kazakh prose renderings for every `Predicate` variant, so any derivation the reasoner produces can be cited in the dialog layer without a fallback placeholder.

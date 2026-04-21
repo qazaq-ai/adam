@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-2.8.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-2.9.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -80,10 +80,11 @@ The fastest way to see adam end-to-end. Fully deterministic, safe to record for 
 $ cargo run --release -p adam-dialog --bin adam_demo
 ```
 
-Three parts:
-- **Part 1** — all 12 canonical turns with retrieval on, `ComposeMode::Verbatim` (default v2.0). Every cited quote is byte-identical to the corpus.
+Four parts (v2.9):
+- **Part 1** — all 12 canonical turns with retrieval on, `ComposeMode::Verbatim` (default). Every cited quote is byte-identical to the corpus.
 - **Part 2** — same 12 turns with `ComposeMode::InSampleCitySwap`. On the real corpus, the safety guards refuse most swaps — this is the *safe case* (marker fires only when a swap actually happened).
 - **Part 3** — synthetic sample explicitly triggering the swap path, so the v1.9.5 «бейімд-» marker is visible in action.
+- **Part 4** (v2.9) — loads committed `facts.json` + `derived_facts.json`, surfaces the rule-derived chain with its `source_chain` provenance, runs a user probe across 4 deterministic seeds. Every response cites the **reasoned** chain (not a quote) and carries the v2.7 «байланыс-» trust marker.
 
 ### Interactive REPL
 

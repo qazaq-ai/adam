@@ -1,22 +1,14 @@
-//! `adam_demo` — scripted v2.0 end-to-end walkthrough.
+//! `adam_demo` — scripted end-to-end walkthrough for investors.
 //!
-//! 15 canonical turns that demonstrate, in order:
+//! Updated for v2.9 to include the reasoning-chain part (Part 4) —
+//! the full v3.0 ladder is now demonstrable in a single binary.
 //!
-//!   1. Kazakh-only greeting + response.
-//!   2. Name extraction + session storage.
-//!   3. City extraction via FST locative+P1Sg (v1.8.5 fix).
-//!   4. Age extraction via Kazakh numeral parser.
-//!   5. Occupation extraction via FST predicate-person (v1.4.0).
-//!   6. Personalised greeting (session slots feed templates).
-//!   7. Cross-slot template firing (requires all four entities).
-//!   8. AskHowAreYou + follow-up "ал сіз?" (v1.4.0 DST).
-//!   9. Retrieval on a recognised topic (Abai, «бала»).
-//!  10. Session-aware retrieval frame (name + city wrap the citation).
-//!  11. FST-rendered `{city|locative}` in a session-aware template.
-//!  12. InSampleCitySwap composition + v1.9.5 marker.
-//!  13. Biographical-year guard (1845 → swap refused).
-//!  14. Insult intent — polite non-engagement, no escalation.
-//!  15. Farewell.
+//! Parts 1 + 2: 12 canonical conversational turns (verbatim retrieval
+//! vs opt-in InSampleCitySwap). Part 3: synthetic sample showing the
+//! v1.9.5 «бейімд-» adaptation marker. **Part 4 (v2.9 new):** rule-
+//! derived reasoning chain showing the v2.6–v2.7 arc — adam concludes
+//! via R5 (shared-type relation) and cites the derivation in Kazakh
+//! prose with the «байланыс-» trust marker.
 //!
 //! Each turn prints:
 //!   • user line,
@@ -25,8 +17,9 @@
 //!
 //! The demo is **fully deterministic** for reproducible presentations —
 //! seeds are derived from turn number (same xorshift as `adam_chat`),
-//! the ranker has no rng, and `compose_with_city` is a pure function.
-//! Re-running the binary always prints the same lines.
+//! the ranker has no rng, `compose_with_city` is a pure function, and
+//! the reasoner is deterministic. Re-running the binary always prints
+//! the same lines.
 
 use std::process::ExitCode;
 
@@ -115,7 +108,8 @@ fn main() -> ExitCode {
     let index = load_retrieval_index();
 
     println!("╔══════════════════════════════════════════════════════════════╗");
-    println!("║ adam v2.0 — scripted demo (15 canonical turns, deterministic)║");
+    println!("║ adam v2.9 — 4-part scripted demo (intents + retrieval +     ║");
+    println!("║              composition + reasoning, deterministic)        ║");
     println!("╚══════════════════════════════════════════════════════════════╝\n");
 
     // --- Part 1: retrieval on, compose off (v1.8.5 verbatim behaviour) ---
@@ -147,6 +141,19 @@ fn main() -> ExitCode {
     println!("         adapted — not the original source.");
     println!("────────────────────────────────────────────────────────────────\n");
     run_synthetic_swap_demo(&lex, &repo);
+
+    // --- Part 4 (v2.9): the reasoner tells the user something no single
+    //     corpus sentence states. This is the v3.0-ladder pay-off: adam
+    //     doesn't just cite, it concludes. The chain has full provenance,
+    //     and the «байланыс-» marker makes the inference distinguishable
+    //     from a verbatim quote at the textual level alone. ---
+    println!("\n────────────────────────────────────────────────────────────────");
+    println!("PART 4 — rule-derived reasoning chain (v2.6 R5 + v2.7 dialog)");
+    println!("         loading committed facts.json + derived_facts.json");
+    println!("         reasoner produces RelatedTo derivations; dialog");
+    println!("         cites them with the «байланыс-» trust marker.");
+    println!("────────────────────────────────────────────────────────────────\n");
+    run_reasoning_chain_demo(&lex, &repo);
 
     ExitCode::SUCCESS
 }
@@ -183,6 +190,96 @@ fn run_synthetic_swap_demo(lex: &LexiconV1, repo: &TemplateRepository) {
         println!("turn {seed_n:>2}: {out}");
         println!();
     }
+}
+
+/// Part 4: load the committed fact + derivation artefacts, attach to
+/// a fresh `Conversation`, and show that adam cites a derived chain —
+/// not a corpus quote — when the user's topic matches a derivation.
+/// The «байланыс-» marker in the response tells the user (or a
+/// reviewer) that this sentence was **reasoned**, not retrieved.
+fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
+    let Some((extracted, derived)) = load_reasoning_artefacts() else {
+        println!("(reasoning artefacts not found — skipping Part 4.)");
+        println!("Run `cargo run -p adam-reasoning --bin extract_facts`");
+        println!("    then `cargo run -p adam-reasoning --bin run_reasoner`");
+        println!("to regenerate data/retrieval/facts.json + derived_facts.json.");
+        return;
+    };
+
+    println!("Loaded reasoning artefacts:");
+    println!("  extracted facts:      {}", extracted.len());
+    println!("  rule-derived facts:   {}", derived.len());
+    println!();
+
+    if derived.is_empty() {
+        println!("(no derivations in the committed artefact — Part 4 is a no-op for");
+        println!(" this corpus snapshot. Add pattern coverage or extend the corpus");
+        println!(" to unlock chains.)");
+        return;
+    }
+
+    println!("Derivation(s) available to cite:");
+    for d in &derived {
+        println!(
+            "  {} --{}--> {}   [{}]",
+            d.subject.root,
+            d.predicate.as_str(),
+            d.object.root,
+            d.rule_id,
+        );
+        println!("    source_chain:");
+        for s in &d.source_chain {
+            println!("      {} / {}", s.pack, s.sample_id);
+        }
+    }
+    println!();
+
+    // Fresh session so reasoning — not retrieval — is the path exercised.
+    // The v2.7 priority rule in the planner puts reasoning above retrieval
+    // when both are available; we don't attach a morpheme index here so
+    // the contrast is visually obvious.
+    let mut conv = Conversation::new().with_reasoning_chains(extracted.clone(), derived.clone());
+
+    // Pick a noun that actually appears in a derivation to exercise the
+    // path. With the v2.6+ fact set that's "кітап" or "ілім" (the R5 pair).
+    let probe_noun = &derived[0].subject.root;
+    let input = format!("{probe_noun} туралы бірдеңе айт");
+    println!("User probe: «{input}»");
+    for seed_n in [1u64, 4, 8, 12] {
+        let seed = turn_seed(seed_n);
+        let out = conv.turn(&input, lex, repo, seed);
+        let marker_present = out.contains("байланыс");
+        println!(
+            "  seed {:>2} [{}]: {out}",
+            seed_n,
+            if marker_present { "chain" } else { "plain" }
+        );
+    }
+    println!();
+    println!("NOTE: every response above containing «байланыс-» is REASONED,");
+    println!("not RETRIEVED. The v2.7 trust invariant (tested) guarantees");
+    println!("the marker never appears without an actual derivation backing it.");
+}
+
+/// Helper: load both committed artefacts together. Missing either →
+/// return `None`; the caller prints a helpful message.
+fn load_reasoning_artefacts() -> Option<(
+    Vec<adam_reasoning::Fact>,
+    Vec<adam_reasoning::reasoner::DerivedFact>,
+)> {
+    #[derive(serde::Deserialize)]
+    struct FactsFile {
+        facts: Vec<adam_reasoning::Fact>,
+    }
+    #[derive(serde::Deserialize)]
+    struct DerivedFile {
+        derived: Vec<adam_reasoning::reasoner::DerivedFact>,
+    }
+    let facts_raw = std::fs::read_to_string("data/retrieval/facts.json").ok()?;
+    let derived_raw = std::fs::read_to_string("data/retrieval/derived_facts.json").ok()?;
+    let facts: FactsFile = serde_json::from_str(&facts_raw).ok()?;
+    let derived: DerivedFile = serde_json::from_str(&derived_raw).ok()?;
+    Some((facts.facts, derived.derived))
 }
 
 fn run_script(
