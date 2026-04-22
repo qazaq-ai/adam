@@ -7,6 +7,82 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.7.5] — 2026-04-22 — `adam_demo` Part 4 — one derivation per rule (4-rule showcase)
+
+Small polish release (per `feedback_versioning_post_1_0`: `x.y.5` = small). Refreshes `adam_demo` Part 4 to demonstrate **all four active reasoning rules** in a single run — one representative derivation per `rule_id`, each with its own Kazakh-prose rendering carrying the «байланыс-» trust marker.
+
+### Before vs after
+
+**v3.7.0 Part 4** picked `derived[0]` and repeated the same chain across 4 seeds. Viewer saw one reasoning pattern four times.
+
+**v3.7.5 Part 4** picks one representative derivation per `rule_id` (R1 / R2 / R3 / R5), probes each separately, and shows the variety of cognitive operations the system performs at the v3.6.5 committed scale (13 345 facts, 207 derivations).
+
+### Concrete demo output (v3.6.5 committed pool)
+
+```
+Picking one representative derivation per rule id (4 total rules fired):
+  [R1_is_a_transitivity]             еңбек  --is_a-->     өзен
+    source_chain: proverb_068 + wiki_kz_0139793
+  [R2_has_inheritance]               қазақ  --has-->      атау
+    source_chain: wiki_kz_0001219 + wiki_kz_0118247
+  [R3_has_inheritance_via_part_of]   аңғар  --has-->      өсімдік
+    source_chain: wiki_kz_0079189 + wiki_kz_0081218
+  [R5_shared_is_a_target]            неміс  --related_to--> халқы
+    source_chain: wiki_kz_0109606 + wiki_kz_0012411
+
+── R1_is_a_transitivity ──
+  probe: «еңбек туралы бірдеңе айт»
+  seed  1 [chain]: Қолда бар деректерден байланыс құрастырдым:
+                   қорытынды: еңбек — өзен (байланысты ой-тізбек арқылы).
+  seed  8 [chain]: ...
+
+── R2_has_inheritance ──
+  probe: «қазақ туралы бірдеңе айт»
+  seed  1 [chain]: ... ой-тізбек: қазақ атау-ға қатысты байланысы бар
+                       (иелік мұрагерлік).
+
+── R3_has_inheritance_via_part_of ──
+  probe: «аңғар туралы бірдеңе айт»
+  seed  1 [chain]: ... ой-тізбек: аңғар өсімдік-ға қатысты байланысы бар
+                       (иелік мұрагерлік).
+
+── R5_shared_is_a_target ──
+  probe: «неміс туралы бірдеңе айт»
+  seed  1 [chain]: ... ой-тізбек: неміс ара-ға қатысты байланысы бар ...
+```
+
+**All four probes surface the «байланыс-» marker.** The v2.7 trust invariant (test-enforced bi-directionally) still guarantees the marker never fires on retrieval-only paths.
+
+### Implementation detail: content-noun filter
+
+Raw `derived[0]`-per-rule selection hit a planner quirk: demonstrative / closed-class subjects like «ана» (that one) route through a non-Unknown intent and miss the reasoning-chain hook. Added a small demo-local filter — `subject.root` must be ≥ 4 chars and not in a demo-scoped closed-class list — so each rule's pick actually lights up the chain. The v3.7.0 raw derivation pool is unchanged (still 207); only the demo's picking policy filters.
+
+### Kazakh-prose variety
+
+Each rule uses a distinct Kazakh sentence pattern:
+
+- **R1**: `қорытынды: <X> — <Y> (байланысты ой-тізбек арқылы)` — "conclusion: X is Y (via related thought chain)"
+- **R2** and **R3** (both Has-producing): `ой-тізбек: <X> <Y>-ға қатысты байланысы бар (иелік мұрагерлік)` — "thought chain: X has a connection regarding Y (ownership inheritance)"
+- **R5**: `ой-тізбек: <X> <Y>-ға қатысты байланысы бар ...` — RelatedTo-flavour wording
+
+Investor watching the demo sees **different cognitive operations** at the language level, not just four repetitions of the same sentence.
+
+### Tests
+
+**416 passing, 0 failing, 0 warnings** — unchanged. Demo binary change is display-only; no library / pattern / rule surface touched.
+
+### Banner sync
+
+  - `adam_chat.rs`: v3.7 → v3.7.5
+  - `adam_demo.rs`: v3.7 → v3.7.5
+  - README hero, comparison table, demo transcript all bumped
+
+### Upgrade notes
+
+Purely cosmetic. No library surface change. Embedders and external CLI users see identical behaviour on `adam_chat` / `adam_inspect` / `extract_facts` / `scaling_bench`.
+
+---
+
 ## [3.7.0] — 2026-04-22 — `adam_inspect` — interactive intelligence query
 
 New `adam-dialog::adam_inspect` binary — the **interactive complement to `adam_demo`**. Where `adam_demo` runs a scripted 4-part walkthrough, `adam_inspect` takes a Kazakh root from the user and prints **everything adam knows** about it, traceable to `(pack, sample_id)` or `rule_id + source_chain`.

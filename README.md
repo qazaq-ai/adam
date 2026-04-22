@@ -29,7 +29,7 @@
 
 ---
 
-## Why adam (v3.7)
+## Why adam (v3.7.5)
 
 adam is a **neuro-symbolic retrieval system for Kazakh** — the rule-based dialog backbone, the morpheme-indexed retrieval engine, and the forward-chaining reasoner all run together as a single deterministic pipeline. It trades **generalisation for integrity**, and (as of v3.0) adds **rule-derived reasoning** on top of retrieval.
 
@@ -39,7 +39,7 @@ Three things make the trade viable specifically for Kazakh:
 - **Mathematical determinism** — same input + same session + same seed produces a byte-identical answer across runs. No temperature, no sampling, no GPU.
 - **No ungrounded generation by design** — every output is either a template realisation, a corpus quote, or a rule derivation with a full `source_chain`. There is no free-text generator anywhere in the pipeline that could invent content not traceable to its source.
 
-| | adam v3.7 | mainstream LLM |
+| | adam v3.7.5 | mainstream LLM |
 |---|---|---|
 | Outputs | template + verbatim quote + FST synthesis + **rule-derived chain** | probabilistic token generation |
 | Ungrounded generation | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) | non-zero, non-auditable |
@@ -54,7 +54,7 @@ Three things make the trade viable specifically for Kazakh:
 
 adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, auditable, and — as of v3.0 — capable of deriving conclusions no single corpus sentence states**, while marking every such conclusion with a textual trust signal and a source chain.
 
-### Current state (v3.7.0 — honest numbers)
+### Current state (v3.7.5 — honest numbers)
 
 v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is end-to-end and test-locked, but the fact set is deliberately small while the matchers mature.
 
@@ -137,7 +137,7 @@ Four parts (v3.0):
 
 ```
 $ cargo run --release -p adam-dialog --bin adam_chat
-adam-chat v3.7 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
+adam-chat v3.7.5 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
 
 > сәлем
 сәлем

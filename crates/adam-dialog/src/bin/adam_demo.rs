@@ -109,7 +109,7 @@ fn main() -> ExitCode {
     let index = load_retrieval_index();
 
     println!("╔══════════════════════════════════════════════════════════════╗");
-    println!("║ adam v3.7 — 4-part scripted demo (intents + retrieval +     ║");
+    println!("║ adam v3.7.5 — 4-part scripted demo (intents + retrieval +   ║");
     println!("║              composition + reasoning, deterministic)        ║");
     println!("╚══════════════════════════════════════════════════════════════╝\n");
 
@@ -219,14 +219,51 @@ fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
         return;
     }
 
-    println!("Derivation(s) available to cite:");
+    // v3.7.5: pick ONE representative derivation per `rule_id` so the
+    // demo surfaces the full roster of active reasoning operations, not
+    // four seeds of the same chain. Per rule we pick the first
+    // derivation whose SUBJECT root is a genuine content noun — short
+    // demonstrative / pronoun subjects (like "ана" = "that one") route
+    // through a different intent path in the dialog planner and would
+    // miss the reasoning hook. Filter: subject.root ≥ 4 chars + not in
+    // the demo-local closed-class list below.
+    const DEMO_CLOSED_CLASS: &[&str] = &[
+        "ана",
+        "ол",
+        "сол",
+        "осы",
+        "бұл",
+        "мына",
+        "кейбір",
+        "бәрі",
+        "барлық",
+    ];
+    let subject_is_content_noun =
+        |root: &str| -> bool { root.chars().count() >= 4 && !DEMO_CLOSED_CLASS.contains(&root) };
+    let mut per_rule: std::collections::BTreeMap<String, &adam_reasoning::reasoner::DerivedFact> =
+        std::collections::BTreeMap::new();
     for d in &derived {
+        // Skip derivations whose subject is a demonstrative/closed-class
+        // root — dialog planner's Unknown intent extraction won't light
+        // up the reasoning chain for these. We still keep them in the
+        // runtime pool (they're valid facts); we just don't probe with
+        // them in the demo.
+        if !subject_is_content_noun(&d.subject.root) {
+            continue;
+        }
+        per_rule.entry(d.rule_id.clone()).or_insert(d);
+    }
+    println!(
+        "Picking one representative derivation per rule id ({} total rules fired):",
+        per_rule.len(),
+    );
+    for (rule, d) in &per_rule {
         println!(
-            "  {} --{}--> {}   [{}]",
+            "  [{}]  {} --{}--> {}",
+            rule,
             d.subject.root,
             d.predicate.as_str(),
             d.object.root,
-            d.rule_id,
         );
         println!("    source_chain:");
         for s in &d.source_chain {
@@ -241,25 +278,45 @@ fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
     // the contrast is visually obvious.
     let mut conv = Conversation::new().with_reasoning_chains(extracted.clone(), derived.clone());
 
-    // Pick a noun that actually appears in a derivation to exercise the
-    // path. With the v2.6+ fact set that's "кітап" or "ілім" (the R5 pair).
-    let probe_noun = &derived[0].subject.root;
-    let input = format!("{probe_noun} туралы бірдеңе айт");
-    println!("User probe: «{input}»");
-    for seed_n in [1u64, 4, 8, 12] {
-        let seed = turn_seed(seed_n);
-        let out = conv.turn(&input, lex, repo, seed);
-        let marker_present = out.contains("байланыс");
-        println!(
-            "  seed {:>2} [{}]: {out}",
-            seed_n,
-            if marker_present { "chain" } else { "plain" }
-        );
-    }
+    println!("For each rule, probing adam with «<root> туралы бірдеңе айт»:");
+    println!(
+        "(each probe triggers the specific rule-derived chain; «байланыс-» marker = REASONED, not RETRIEVED)"
+    );
     println!();
-    println!("NOTE: every response above containing «байланыс-» is REASONED,");
-    println!("not RETRIEVED. The v2.7 trust invariant (tested) guarantees");
-    println!("the marker never appears without an actual derivation backing it.");
+    for (rule, d) in &per_rule {
+        let probe_noun = &d.subject.root;
+        let input = format!("{probe_noun} туралы бірдеңе айт");
+        println!("  ── {rule} ──");
+        println!("  probe: «{input}»");
+        // Two seeds per rule — enough to show the same chain surfaces,
+        // without repeating the previous bloat of 4 seeds × 1 rule.
+        for seed_n in [1u64, 8] {
+            let seed = turn_seed(seed_n);
+            let out = conv.turn(&input, lex, repo, seed);
+            let marker_present = out.contains("байланыс");
+            println!(
+                "  seed {:>2} [{}]: {out}",
+                seed_n,
+                if marker_present { "chain" } else { "plain" }
+            );
+        }
+        println!();
+    }
+    println!(
+        "NOTE: every response above containing «байланыс-» is REASONED, not RETRIEVED. The v2.7"
+    );
+    println!(
+        "trust invariant (tested bi-directionally) guarantees the marker never appears without an"
+    );
+    println!(
+        "actual derivation backing it — and NEVER appears on a retrieval-only answer. With {} derivations",
+        derived.len()
+    );
+    println!(
+        "in the committed runtime and {} rules active, this demo surfaces the full roster of",
+        per_rule.len()
+    );
+    println!("cognitive operations the deterministic reasoner performs at this scale.");
 }
 
 /// Helper: load both committed artefacts together. Missing either →
