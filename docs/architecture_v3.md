@@ -287,12 +287,21 @@ cargo run --release -p adam-dialog --bin adam_chat -- --no-retrieval
 
 ---
 
-## Post-v3.0 directions (committed but not shipped)
+## Post-v3.0 directions
 
-- **More pattern matchers** — densifying the fact graph so R1 transitivity fires on real corpus (currently awaiting middle-of-chain nodes).
-- **Pattern coverage for `PartOf`** — activates R3.
+### Shipped since v3.0 (v3.1 → v3.3, all additive)
+
+- **v3.1.0** — iteration harness: `--time-budget`, `--progress-interval`, SIGINT → graceful commit, Rayon `par_iter` on extract hot loop (~3.5× speedup on M2 8-core).
+- **v3.2.0** — `adam-scaling` crate + `scaling_bench` binary: empirical `(corpus_size → facts → derivations → graph density → wall-clock)` curves with normalized metrics. **Parser determinism fix** (dual-storage Lexicon) — closes a 2-year latent `HashMap.values()` non-determinism in `parser::analyse`.
+- **v3.3.0** — Codex-review polish pass + `audit_precision` bin + **gold-corpus pilot** (3 secondary-school textbooks OCR'd via `tesseract-kaz`; `kazakh_textbooks_pack.json` with 8 421 samples / 108 913 raw words). All three reasoning rules (R1 / R2 / R5) now fire on real corpus at scale — T4_50k: 120 facts / 51 derivations.
+
+### Committed but not yet shipped (v3.4+ targets)
+
+- **More pattern matchers** — `Causes`, `Temporal`, `Quantity`, `AgentVerb`, `NominalConjunction`, `DomainMembership`. Goal: push `predicate_coverage_pct` from 33 % (today) toward 67–100 %.
+- **R3 activation** — pattern coverage for `PartOf` densifies the graph enough for `Has + PartOf → Has` inheritance to fire.
 - **R4 activation** — diagnostic surface for `IsA` symmetry (curator review).
-- **Predicate types beyond the current six** — e.g. `Causes`, `Enables`, `Prevents` for causal reasoning.
+- **Promote T4-scale facts into runtime** — gated on native-speaker precision audit of `docs/precision_audit.md`. Once audited, `adam_chat` / `adam_demo` will cite the 120-fact / 51-derivation pool instead of the 17-fact committed snapshot.
+- **OCR the remaining 7 textbooks** — Biology 8, Algebra 7, Physics 11 × 2, Informatics 11 × 2, KazLit 11. Expected ~300k more natural-Kazakh words.
 - **Option C composition** — pre-compute `(pattern, slot_types)` at index-build time; enables swap types beyond city.
 - **Kazakh technical corpus** — Rust Book translation as new source pack.
 - **Diversity** — allow consecutive turns for the same query to cite different top-k samples / derivations; current top-1 is deterministic by design.

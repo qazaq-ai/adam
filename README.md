@@ -29,7 +29,7 @@
 
 ---
 
-## Why adam (v3.0)
+## Why adam (v3.3)
 
 adam is a **neuro-symbolic retrieval system for Kazakh** — the rule-based dialog backbone, the morpheme-indexed retrieval engine, and the forward-chaining reasoner all run together as a single deterministic pipeline. It trades **generalisation for integrity**, and (as of v3.0) adds **rule-derived reasoning** on top of retrieval.
 
@@ -39,7 +39,7 @@ Three things make the trade viable specifically for Kazakh:
 - **Mathematical determinism** — same input + same session + same seed produces a byte-identical answer across runs. No temperature, no sampling, no GPU.
 - **No ungrounded generation by design** — every output is either a template realisation, a corpus quote, or a rule derivation with a full `source_chain`. There is no free-text generator anywhere in the pipeline that could invent content not traceable to its source.
 
-| | adam v3.0 | mainstream LLM |
+| | adam v3.3 | mainstream LLM |
 |---|---|---|
 | Outputs | template + verbatim quote + FST synthesis + **rule-derived chain** | probabilistic token generation |
 | Ungrounded generation | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) | non-zero, non-auditable |
@@ -62,14 +62,14 @@ v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is en
 |---|---|
 | Dialog intents | 26 |
 | Lexicon roots | 14 247 |
-| Corpus (committed / local) | 3.84 M / 77.9 M words |
+| Corpus (committed / local) | 4.32 M (v3.3.0: +textbooks) / 77.9 M words across 9 committed source packs |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **367 passing, 0 failing** |
+| Workspace tests | **375 passing, 0 failing, 0 warnings** |
 | Pattern matchers | 4 (copula / locative / possessive / dative-motion) |
 | Reasoning rules active | 3 (R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo) |
 | Extracted facts (committed) | **17** (v3.3.0 textbook pack added; +2 facts within 500/pack cap. Scaling bench T4_50k surfaces **120 facts / 51 derivations**) |
 | Rule-derived facts (committed) | **1** (кітап RelatedTo ілім, via R5 — committed snapshot; T4 scale sees all 3 rules active) |
-| Fact-graph nodes / edges | 29 / 17 (committed); T4_50k scale: 123 / 87 |
+| Fact-graph nodes / edges | 32 / 17 (committed); T4_50k scale: 123 / 87 |
 | Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |
 | Scaling bench (v3.3.0) | `adam-scaling::scaling_bench` + `audit_precision` — emits `data/scaling/scaling_report.json` + `docs/scaling_report.md` + `docs/precision_audit.md`. Budget-aware `run_tier_with_budget` (chunked at 128 samples, SIGINT / `--time-budget` stops within ~1 s). Normalized metrics per tier: `facts_per_10k_words`, `derivations_per_fact`, `predicate_coverage_pct`, `duplicate_fact_rate_pct`. **Measured scaling on 4.32 M-word committed pool (textbooks + wiki + Abai)**: T3_10k (19 facts, 0 deriv) → T4_50k (120 facts, 51 deriv) — reasoning activates once graph density crosses threshold. |
 | Determinism (v3.2.0 + v3.3.0) | dual-storage Lexicon (`HashMap` get + `entries_ordered: Vec<RootEntry>` for `analyse`). Fixes a 2-year latent non-determinism where `analyse().next()` returned different first analyses across runs for ambiguous surfaces. **4 regression tests** guard the invariant, including expected-order assertions that fail ≈ 50 % on pre-v3.2.0 code. |
@@ -132,7 +132,7 @@ Four parts (v3.0):
 
 ```
 $ cargo run --release -p adam-dialog --bin adam_chat
-adam-chat v3.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
+adam-chat v3.3 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
 
 > сәлем
 сәлем
@@ -322,9 +322,9 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 |---|---|
 | Lexicon roots | **14,247** (≥ 3 chars, curated + Apertium, pure Kazakh) |
 | Abai Qunanbayuly coverage | **97.8%** (word forms → root prefix match) |
-| Committed corpus words | **3.84 M** across 8 source packs |
+| Committed corpus words | **4.32 M** across 9 source packs (v3.3.0 added `kazakh_textbooks_pack.json`; earlier was 3.84 M / 8 packs) |
 | Local corpus words (with Wikipedia + CC-100 shards) | **77.9 M** |
-| Morpheme-coverage baseline (v1.5.5) | **79.48%** prefix-match over 3.84 M committed words |
+| Morpheme-coverage baseline (v1.5.5 historical) | **79.48%** prefix-match over 3.84 M committed words at v1.5.5; to be re-run on every Lexicon PR (see `project_morpheme_coverage_baseline` memory) |
 | FST archiphonemes | **11** |
 | FST twol phonology rules | **22+** of Apertium's 54 catalogued, all implemented |
 | Suffix templates | **36** (cases × numbers × possessives × derivations × predicate-person copula) |
@@ -333,11 +333,11 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | Dialog intents | **26** (v1.1.0 added Insult) |
 | Template families | **34** (v3.0 added `unknown.with_derived_chain`) |
 | Slot types (session) | `name`, `age`, `city`, `occupation` (plus `{slot\|features}` FST-aware variants) |
-| Committed morpheme index | **3,191 samples → 3,082 distinct morphemes → 16,262 postings** (`data/retrieval/morpheme_index.json`, ~2.1 MB) |
+| Committed morpheme index | **3,191 samples → 3,082 distinct morphemes → 16,262 postings** at the v2.5.0 build (`data/retrieval/morpheme_index.json`, ~2.1 MB; textbooks corpus added in v3.3.0 is not yet in the index — rebuild pending a v3.4+ release) |
 | Full local morpheme index | rebuildable via `build_morpheme_index -- --full` (~10 min, ~700 MB, gitignored) |
 | Pattern matchers (v3.0) | **4** — copula IsA, locative LivesIn, possessive Has, dative-motion GoesTo |
 | Reasoning rules active (v3.0) | **3** — R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo |
-| Extracted / derived facts (committed) | **15 / 1** (v3.2.0 deterministic parser; `кітап RelatedTo ілім` via R5; proof of mechanism at v3.0; scale-up path in [roadmap](docs/roadmap.md)) |
+| Extracted / derived facts (committed) | **17 / 1** (v3.3.0: +2 from textbooks within 500/pack cap; `кітап RelatedTo ілім` via R5; scaling bench T4_50k: 120 facts / 51 derivations) |
 | Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
 | Workspace tests | **375 passing**, 0 failing |
 | Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential; 20 M-word full-corpus run fits in the 3 h iteration budget |

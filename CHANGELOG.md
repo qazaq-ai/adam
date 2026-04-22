@@ -70,7 +70,7 @@ Quality-gate reject tally (healthy extraction signal — matchers aren't greedy)
 | artifact | v3.2.0 | v3.3.0 | delta |
 |---|---:|---:|---|
 | `facts.json` facts | 15 | **17** | +2 (from textbooks within committed 500/pack cap) |
-| `lexical_graph.json` nodes / edges | 29 / 15 | 29 / 17 | +0 / +2 |
+| `lexical_graph.json` nodes / edges | 29 / 15 | 32 / 17 | +3 / +2 |
 | `derived_facts.json` derivations | 1 | 1 | unchanged (R5 chain surfaces at higher fact counts — visible at T4) |
 | textbook samples in pool | 0 | **8 421** | new |
 
