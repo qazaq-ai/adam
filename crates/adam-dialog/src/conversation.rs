@@ -20,6 +20,7 @@
 use std::collections::HashMap;
 
 use adam_kernel_fst::lexicon::LexiconV1;
+use adam_kernel_fst::morphotactics::{Case, NounFeatures, synthesise_noun};
 use adam_reasoning::reasoner::DerivedFact;
 use adam_reasoning::{Fact as ReasFact, Predicate as ReasPredicate};
 use adam_retrieval::{MorphemeIndex, RankConfig, compose::compose_with_city};
@@ -287,10 +288,20 @@ impl Conversation {
             // Find the first derivation involving `noun`. Prefer the
             // subject side so the rendered sentence starts with the
             // user's mentioned word.
+            //
+            // v3.8.5 — two-pass to make this preference strict. Pre-
+            // v3.8.5 did `find(|d| subj == noun || obj == noun)`, which
+            // picks whichever side matches first in storage order — so
+            // `adam_demo` Part 4 could preview «неміс → халқы» but
+            // render «неміс → ара» (a different derivation with
+            // object=неміс earlier in the list). Subject-first makes
+            // the preview and the rendered text always refer to the
+            // same derivation.
             let matched = self
                 .derived_facts
                 .iter()
-                .find(|d| d.subject.root == *noun || d.object.root == *noun);
+                .find(|d| d.subject.root == *noun)
+                .or_else(|| self.derived_facts.iter().find(|d| d.object.root == *noun));
             let Some(d) = matched else { return };
             let rendered = render_derivation_as_kazakh(d);
             *reasoning_chain = Some(rendered);
@@ -462,6 +473,11 @@ fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
     // v2.7 handled IsA + RelatedTo + generic fallback. v2.8 adds
     // predicate-specific renderings for Has / GoesTo / LivesIn /
     // PartOf so every derived variant produces idiomatic Kazakh.
+    //
+    // v3.8.5: all case suffixes synthesised via FST (no dash-
+    // concatenation) — the previous `"{}-ға"` template produced
+    // morphologically-invalid surfaces like `атау-ға` / `өсімдік-ға`
+    // which broke vowel harmony and the no-invalid-form invariant.
     match d.predicate {
         ReasPredicate::RelatedTo => {
             // "X пен Y бір-біріне байланысты" — shared-type relation
@@ -480,8 +496,9 @@ fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
         ReasPredicate::Has => {
             // Inheritance-derived Has via R2.
             format!(
-                "ой-тізбек: {} {}-ға қатысты байланысы бар (иелік мұрагерлік)",
-                d.subject.root, d.object.root
+                "ой-тізбек: {} {} қатысты байланысы бар (иелік мұрагерлік)",
+                d.subject.root,
+                inflect(&d.object.root, Case::Dative)
             )
         }
         ReasPredicate::GoesTo => {
@@ -497,29 +514,39 @@ fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
             )
         }
         ReasPredicate::PartOf => {
+            // v3.8.5 — use dative instead of genitive to sidestep the
+            // pre-v3.9 FST bug where genitive-after-vowel produces
+            // `қаладың` instead of `қаланың` (the `{D}{I}ң` template's
+            // {D} archiphoneme lacks the "after-vowel → н" rule that
+            // genitive requires but ablative does not).
             format!(
-                "{} {}-дың құрамына байланысты бір бөлігі ретінде шықты",
-                d.subject.root, d.object.root
+                "{} {} құрамына байланысты бір бөлігі ретінде шықты",
+                d.subject.root,
+                inflect(&d.object.root, Case::Dative)
             )
         }
         // v3.5.0 additions. Each keeps the «байланыс-» marker per the
         // trust-stack invariant (test-enforced in v2.7+).
         ReasPredicate::Causes => {
+            // v3.8.5 — same FST genitive bug → avoid genitive here too.
             format!(
-                "{} {}-ның себебі екендігі байланысты ой-тізбек арқылы шықты",
-                d.subject.root, d.object.root
+                "{} {} себеп болатыны байланысты ой-тізбек арқылы шықты",
+                d.subject.root,
+                inflect(&d.object.root, Case::Dative)
             )
         }
         ReasPredicate::After => {
             format!(
-                "{} {}-нен кейін болатындығы байланысты уақыт-тізбек арқылы шықты",
-                d.subject.root, d.object.root
+                "{} {} кейін болатындығы байланысты уақыт-тізбек арқылы шықты",
+                d.subject.root,
+                inflect(&d.object.root, Case::Ablative)
             )
         }
         ReasPredicate::HasQuantity => {
             format!(
-                "{} {}-мен байланысты санды қатынас ретінде шықты",
-                d.subject.root, d.object.root
+                "{} {} байланысты санды қатынас ретінде шықты",
+                d.subject.root,
+                inflect(&d.object.root, Case::Instrumental)
             )
         }
         ReasPredicate::DoesTo => {
@@ -530,11 +557,22 @@ fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
         }
         ReasPredicate::InDomain => {
             format!(
-                "{} {} саласына байланысты мүше ретінде шықты",
-                d.subject.root, d.object.root
+                "{} {} байланысты мүше ретінде шықты",
+                d.subject.root,
+                inflect(&d.object.root, Case::Dative)
             )
         }
     }
+}
+
+/// v3.8.5 — synthesise a noun in the requested grammatical case via FST.
+/// Replaces the pre-v3.8.5 practice of manually concatenating a hyphen +
+/// invariant suffix (`{root}-ға` etc.), which produced surface forms
+/// like `атау-ға` that violate Kazakh vowel harmony.
+fn inflect(root: &str, case: Case) -> String {
+    let mut features = NounFeatures::default();
+    features.case = Some(case);
+    synthesise_noun(root, features)
 }
 
 fn resolve_follow_up(raw: Intent, input: &str, active: Option<IntentKind>) -> Intent {

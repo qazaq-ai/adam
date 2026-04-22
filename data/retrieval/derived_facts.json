@@ -6,12 +6,11 @@
   "built_from_status": "completed",
   "iterations_completed": 4,
   "counts": {
-    "initial_facts": 14430,
-    "derived_facts": 207,
+    "initial_facts": 13627,
+    "derived_facts": 205,
     "by_rule": {
       "R1_is_a_transitivity": 33,
       "R2_has_inheritance": 116,
-      "R3_has_inheritance_via_part_of": 2,
       "R5_shared_is_a_target": 56
     }
   },
@@ -2993,31 +2992,6 @@
     },
     {
       "subject": {
-        "surface": "аңғарлардың",
-        "root": "аңғар",
-        "pos": "noun"
-      },
-      "predicate": "Has",
-      "object": {
-        "surface": "өсімдік",
-        "root": "өсімдік",
-        "pos": "noun"
-      },
-      "rule_id": "R3_has_inheritance_via_part_of",
-      "source_chain": [
-        {
-          "pack": "wikipedia_kz_pack.json",
-          "sample_id": "wiki_kz_0079189"
-        },
-        {
-          "pack": "wikipedia_kz_pack.json",
-          "sample_id": "wiki_kz_0081218"
-        }
-      ],
-      "confidence": "RuleInferred"
-    },
-    {
-      "subject": {
         "surface": "ана",
         "root": "ана",
         "pos": "noun"
@@ -4562,31 +4536,6 @@
         {
           "pack": "wikipedia_kz_pack.json",
           "sample_id": "wiki_kz_0027741"
-        }
-      ],
-      "confidence": "RuleInferred"
-    },
-    {
-      "subject": {
-        "surface": "аңғарлардың",
-        "root": "аңғар",
-        "pos": "noun"
-      },
-      "predicate": "Has",
-      "object": {
-        "surface": "көкөніс",
-        "root": "көкөніс",
-        "pos": "noun"
-      },
-      "rule_id": "R3_has_inheritance_via_part_of",
-      "source_chain": [
-        {
-          "pack": "wikipedia_kz_pack.json",
-          "sample_id": "wiki_kz_0079189"
-        },
-        {
-          "pack": "wikipedia_kz_pack.json",
-          "sample_id": "wiki_kz_0149157"
         }
       ],
       "confidence": "RuleInferred"

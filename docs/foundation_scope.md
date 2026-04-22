@@ -11,13 +11,13 @@ Deliver a **predictable, auditable Kazakh dialog system** built entirely in Rust
 - 26-intent dialog pipeline with multi-turn session state + follow-up resolution (v1.4.0)
 - **Kazakh-only recogniser surface** (v0.9.6 trilingual experiment reverted in v1.1.0; Latin transliteration removed)
 - FST-backed slot expansion (`{slot|features}` — case × number × derivation × possessive × predicate-person)
-- Template repository as external TOML data (34 families as of v3.8.0)
+- Template repository as external TOML data (34 families as of v3.8.5)
 - **Retrieval engine** (v1.6.0+): morpheme inverted index over committed corpus, composite deterministic ranking (overlap + pack-purity + length + loanword-density), verbatim sample citation with `(pack, sample_id)` provenance
 - **Opt-in composition** (v1.9.0+): in-sample city swap via FST feature-preserving synthesis, year-guarded; adapted responses carry the «бейімд-» marker (v1.9.5)
 - **Reasoning engine** (v2.1 → v2.9): typed `Fact` tuples from four pattern matchers (copula, locative, possessive, dative), projected into a deterministic `LexicalGraph`, forward-chaining reasoner with three active rules (R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo), Kazakh prose rendering for every predicate, dialog integration citing derivations with the mandatory «байланыс-» trust marker (v2.7)
 - **`adam_demo` 4-part scripted walkthrough** (v2.9) — intents + retrieval + composition + reasoning, deterministic, investor-demoable
 - Kazakh corpus at ~3.84 M committed / ~77.9 M local words; sources: Tatoeba, Wikipedia KZ, Common Voice KK, CC-100, Abai Wikisource, proverbs, synthetic, Kazakh classics
-- Full regression test suite (416 workspace tests as of v3.8.0, 0 failing, 0 warnings) and foundation CI
+- Full regression test suite (423 workspace tests as of v3.8.5, 0 failing, 0 warnings) and foundation CI
 
 ## Scope of "FST-guaranteed" claim (accurate wording)
 

@@ -2,8 +2,8 @@
 
 **Target:** 50-fact sample + 50-derivation sample from the committed artifacts, seed `42`.
 
-- `facts.json`: 14430 facts total (upstream status: `completed`) — sampled 50 here.
-- `derived_facts.json`: 207 derivations total (upstream status: `completed`) — sampled 50 here.
+- `facts.json`: 13627 facts total (upstream status: `completed`) — sampled 50 here.
+- `derived_facts.json`: 205 derivations total (upstream status: `completed`) — sampled 50 here.
 
 ## How to review
 
@@ -15,447 +15,434 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Fact #1218
 
-- Triple: `(биологиялық — does_to — әсер)`
+- Triple: `(жоба — does_to — қамту)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні қайта-лайды`
-- Source: `kazakh_textbooks_pack.json / kz_textbook_physics_11_emn_p0252_s14`
+- Pattern: `X Y-ні көзде-лайды`
+- Source: `kazakh_textbooks_pack.json / kz_textbook_physics_11_ogn_p0068_s15`
 - Sentence:
 
-    > Сәулелену дозасының төмендеуі биологиялық әсерді азайтады, нәтижесінде ағзаны қайта қалпына келтіру мүмкіндігі пайда болады
+    > Жоба Нұр-сұлтан, Алматы қалаларындағы және ҚР-ның барлық облыс орталық- тарындағы көпқабатты үйлер мен коттедж құрылыс- тарын толық қамтуды көздеді
+
+- [ ] Correct
+- Comment:
+
+### Fact #1366
+
+- Triple: `(өткен — after — өркениет)`
+- Predicate: `after`
+- Pattern: `X Y-дан кейін`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0000542`
+- Sentence:
+
+    > Династиялар ауысқан сайын түрлі даму кезеңдерінен өткен ежелгі әкімшілік басқарудың баршылығы, өзге өркениеттен кейін қалып қойған көшпенді көршілер мен тау халықтарына қарағанда, жер өңдеу саласы дамыған экономикасының баршылығы анық артықшылық болды.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #1440
 
-- Triple: `(мұндай — goes_to — өсіру)`
-- Predicate: `goes_to`
-- Pattern: `X Y-ке барады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0000357`
+- Triple: `(іргетас — has — үст)`
+- Predicate: `has`
+- Pattern: `X-тың Y-сы бар`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0001865`
 - Sentence:
 
-    > Мұндай агроклиматтық жағдайда бидай, қарабидай, арпа, бұршақ, зығыр, қарақұмық, картоп, кейбір көкөніс түрлерін, малазықтық дақылдарды өсіруге мүмкіндік бар.
+    > Іргетастың үстінде шөгінді қорабы бар, ол тұз асты, тұзды, тұз үсті кешендеріне бөлінеді, палеозой және мезокайнозой кезеңдерінде қалыптасқан, жыныстарының жалпы тереңдігі 12–14 километрден асады.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #1770
 
-- Triple: `(қазақ — lives_in — уез)`
-- Predicate: `lives_in`
-- Pattern: `X Y-да тұрады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0005775`
+- Triple: `(ереуіл — does_to — ардақ)`
+- Predicate: `does_to`
+- Pattern: `X Y-ні қара-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0007389`
 - Sentence:
 
-    > Қазақтар негізінен Алтай, Іле, Тарбағатай округтері кіретін автономиялық облыста, сондай-ақ ҚХР ШҰАА Мори Қазақ автономиялық ауданы, Баркөл Қазақ уездерінде, Ганьсу провинциясының Ақсай Қазақ автономиялық уезінде және аз мөлшерде Бейжіңде тұрады.
+    > «Ереуіл атқа ер салмай», «Ұлы арман», «Жайықтың бойы көк шалғын», «Атадан туған ардақты ер» жырларында ақын алдағы күндеріне үмітпен, зор сеніммен қарады.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #1799
 
-- Triple: `(мемлекет — related_to — қоғам)`
+- Triple: `(қабылан — related_to — аю)`
 - Predicate: `related_to`
 - Pattern: `X пен Y`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0006317`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0007774`
 - Sentence:
 
-    > Ол ақпараттық және білім беру функцияларын орындай отырып, мемлекет пен қоғам арасындағы қатынастарды үйлестіруге бағытталған.
+    > Тау ормандарында марал, кербұғы, елік, жабайы шошқа, қабылан мен аюлар кездеседі.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #1806
 
-- Triple: `(ағаш — does_to — тиек)`
+- Triple: `(түркия — does_to — күш)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні көр-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0006428`
+- Pattern: `X Y-ні қалыптас-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0007801`
 - Sentence:
 
-    > Қолына алып қараған батыр аспаптың мойын тұсынан титтей ағаш тиекті көреді, оны әлдебіреу ішектің астынан келтіріп орнатып қойған екен.
+    > 1923 жылы республика ретінде құрылғаннан бері Түркия зайырлылықтың күшті дәстүрін қалыптастырды.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #2280
 
-- Triple: `(жүк — does_to — ағаш)`
+- Triple: `(әлеуметтік — does_to — өнімділік)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні атқара-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0013448`
+- Pattern: `X Y-ні айт-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0015964`
 - Sentence:
 
-    > Мысалы, әмбебап ауыр жүк тартушы комбайн ағаштарды кесу, тамырларды, бұтақтарды қию, діңдерді жинау мен оларды жолға сүйреп шығару жұмыстарын атқара алады.
+    > Оған қоса ол Қазақстанның әлеуметтік жүйесін оңтайландыру, өнімділікті арттыру және жасыл экономиканы құру, бизнес жағдайын теңестіру, білімге көбірек инвестиция салу және басқаруды қадағалау туралы айтты.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #2405
 
-- Triple: `(айын — goes_to — қажылық)`
-- Predicate: `goes_to`
-- Pattern: `X Y-ке барады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0015688`
+- Triple: `(асқан — does_to — хан)`
+- Predicate: `does_to`
+- Pattern: `X Y-ні жаса-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0017373`
 - Sentence:
 
-    > Зүл-Хижжа айының 9-шы күні Мұхаммед, Меккеге қажылыққа келген, барлық мұсылмандарды Араваттағы Жабәл әл-Рахман тауына шақырып сөйлесті.
+    > Есім ханның ел ішіндегі беделін, асқан абыройын іштей қызғанып жүретін Тұрсын Бұхара ханының ниетін тез түсініп, Сырдария жағасында екеуі астыртын келіссөз жүргізеді де, Есім ханды жоюдың жоспарын жасайды.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #2414
 
-- Triple: `(шетелдік — does_to — жергілік)`
+- Triple: `(қазақ — does_to — халық)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні бұз-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0015908`
+- Pattern: `X Y-ні ұшырат-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0017515`
 - Sentence:
 
-    > Елде тұрақтылық сақталды да, саяси өзгеріс орын алды және жаңа реформалар жүрді, алайда оған қарамастан Тоқаевтың басшылығы шетелдік және жергілікті ақпарат көздерінен кейде адам құқықтарын бұзған және авторитарлық болып келеді деген сыни пікір көреді.
+    > 18 ғасыр қазақ халқы үшін ел басына күн туған кезең болды, жоңғарлар тарапынан болатын шабуылдар халықты көп күйзеліске ұшыратты.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #2767
 
-- Triple: `(табиғат — does_to — айырмашылық)`
-- Predicate: `does_to`
-- Pattern: `X Y-ні көрсет-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0020032`
+- Triple: `(айша — goes_to — тіл)`
+- Predicate: `goes_to`
+- Pattern: `X Y-ке барады`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0022114`
 - Sentence:
 
-    > Алайда ғалым табиғат зандары мен қоғам арасындағы айырмашылықты ажыратып көрсетеді.
+    > Бірақ Айша тілге келмейді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #2887
 
-- Triple: `(би — does_to — көңіл)`
+- Triple: `(жент — does_to — қыпшақ)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні біл-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0021365`
+- Pattern: `X Y-ні талқанда-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0024173`
 - Sentence:
 
-    > Төле би іштей қабылдаса да, сыр білдірмей, қайта көңілді сыңай білдіреді.
+    > Жент қаласынан Дешті қыпшақ даласына тереңдетіп соққы жасаған Атсыз (хорезмшахы) қыпшақтарды талқандайды.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #3020
 
-- Triple: `(қытай — does_to — әскер)`
-- Predicate: `does_to`
-- Pattern: `X Y-ні түсір-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0023142`
+- Triple: `(-дүниежүзілік — after — соғыс)`
+- Predicate: `after`
+- Pattern: `X Y-дан кейін`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0026224`
 - Sentence:
 
-    > Қытай әскерлері де үш бағытта шабуылдап, мыңдаған әскерді тұтқынға түсіреді.
+    > 2-дүниежүзілік соғыстан кейін халық толқулары қайтадан күшейді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #3231
 
-- Triple: `(аяғы — related_to — күз)`
-- Predicate: `related_to`
-- Pattern: `X пен Y`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0026510`
+- Triple: `(мұхит — goes_to — пішін)`
+- Predicate: `goes_to`
+- Pattern: `X Y-ке барады`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0029779`
 - Sentence:
 
-    > Көбінесе, жаздың аяғы мен күз айларында болатын тайфундар нөсер жауын алып келеді.
+    > Тау көтерілуіне байланысты олигоценде мұхиттар мен құрлықтар біртіндеп қазіргі пішінге келді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #3421
 
-- Triple: `(жуық — does_to — ел)`
+- Triple: `(өткен — does_to — мәселе)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні ал-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0029357`
+- Pattern: `X Y-ні уағдалас-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0033180`
 - Sentence:
 
-    > Көтерілісті басу үшін Францияның 1 млн-ға жуық әскерлері елді мекендерді бақылауға алды.
+    > Дегенмен, 2007 жылы өткен Оңтүстік Азия өңірлік ынтымақтастық қауымдастығының саммитінде екі жақ шекара мәселелерін, сондай-ақ қауіпсіздік пен экономикалық дамуға қатысты мәселелерді бірлесіп шешуге уағдаласты [43].
 
 - [ ] Correct
 - Comment:
 
 ### Fact #3441
 
-- Triple: `(мәжіліс — does_to — атқару)`
+- Triple: `(грек — does_to — үн)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні жалғастыра-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0029812`
+- Pattern: `X Y-ні жүр-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0033522`
 - Sentence:
 
-    > Мәжіліс сенім білдірген жағдайда, егер Республика Президенті өзгеше шешім қабылдамаса, Үкімет өз міндеттерін атқаруды жалғастыра береді.
+    > арасында жағалауына грек, мысыр, қытай, үнді, араб теңіз жиһанкездері жиі-жиі келіп-кетіп жүреді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #3449
 
-- Triple: `(ғылыми — does_to — мәселе)`
+- Triple: `(ұлыбритания — does_to — бур)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні бер-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0029942`
+- Pattern: `X Y-ні ерік-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0033675`
 - Sentence:
 
-    > ) дамуының түрлі мәселелеріне ғылыми практикалық зерттеулер жасап, қалалардың нақты жағдайын түсіндіріп, сақталған мәселелерді көрсетіп береді және шешу жолдарын ұсынады.
+    > Ұлыбритания 19 ғасырдың 70-жылдары бурларды жаулауға кірісіп, нәтижесінде 1902 жылы Трансвааль мен Ерікті Қызғылт республикалары ағылшын отарына айналды.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #3764
 
-- Triple: `(ілім — related_to — аралық)`
-- Predicate: `related_to`
-- Pattern: `X пен Y`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0035160`
+- Triple: `(шаруашылық — does_to — тағам)`
+- Predicate: `does_to`
+- Pattern: `X Y-ні ете-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0038810`
 - Sentence:
 
-    > “Ұлы ілім” мен “Аралық туралы ілім”' атты туындылар да Конфуцийдің өзінікі емес, ол тек мұның екеуін де қайта әңгімелеп берген деп саналады.
+    > Мал шаруашылық өңірлерінің ауа-райы суық, теңіз деңгейінен биік болғандықтан, олар жылдың төрт маусымында ет пен сүттен жасалған тағамдарды басты азық етеді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #3961
 
-- Triple: `(мұн — goes_to — болу)`
-- Predicate: `goes_to`
-- Pattern: `X Y-ке барады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0037966`
+- Triple: `(бала — does_to — қала)`
+- Predicate: `does_to`
+- Pattern: `X Y-ні өзгер-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0041664`
 - Sentence:
 
-    > Мұның өзі жүрегінде оты бар жасты туған елін, атамекенін жаудан азат ету тұралы арманға жетеледі, батыр болуға құлшындырды.
+    > Немесе бала ұйықтай береді; Кейде талып қалады (тырысу), немесе дене қозғалысы да бір түрлі болып өзгереді; Көбінесе баланың жағдайы бірте-бірте нашарлай бастайды, ол мүлде есінен танған кезде ғана тынышталады; Туберкулез менингиті өте жай өрбиді, ол талай күндерге немесе апталарға созылады.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #4348
 
-- Triple: `(серік — goes_to — өту)`
-- Predicate: `goes_to`
-- Pattern: `X Y-ке барады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0043902`
+- Triple: `(ақш — related_to — куба)`
+- Predicate: `related_to`
+- Pattern: `X пен Y`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0047909`
 - Sentence:
 
-    > Бүгінде белгілі режиссер Серік Жармұхамедовтің Мәскеудегі Жоғары курстың екінші курсын тәмамдап, «Қазақфильмге» тәжірибеден өтуге келген шағы.
+    > 1977 — АҚШ пен Куба дипломаттық өкілдерімен алмасу келісімін жасады (1 қыркүйектен бері).
 
 - [ ] Correct
 - Comment:
 
 ### Fact #4833
 
-- Triple: `(түйе — related_to — ат)`
+- Triple: `(қазақ — related_to — түркістан)`
 - Predicate: `related_to`
 - Pattern: `X пен Y`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0051294`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0055491`
 - Sentence:
 
-    > Ол заман­да негізгі көлік қатынасы түйе мен ат болғанын ескерсек, бұл сапа­рының өзі 2-3 жыл уақытты қамтыса керек.
+    > реформаларға сәйкес қазақтар мен Түркістан өлкесіндегі өзге де мұсылман халықтарының діни істері ешқандай діни басқарма қарамағына қаратылмай, жергілікті орт.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #4880
 
-- Triple: `(төмен — does_to — рөл)`
+- Triple: `(классикалық — does_to — көле)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні атқар-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0051911`
+- Pattern: `X Y-ні айғақта-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0056391`
 - Sentence:
 
-    > Төмен вакуум арқылы ток жүргенде шешуші рөлді газ молекулаларының иондалуы атқарады.
+    > Классикалық араб лексикографиясының қағидалары бойынша дайындалған бұл сөздік Қашғарлы Махмұттың түркі тілі туралы білімінің ауқымдылығын ғана емес, араб филологиясы ғылымы бойынша дайындығының да көлемді екендігін айғақтайды.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #5009
 
-- Triple: `(өзара — goes_to — құлдырау)`
+- Triple: `(жазушы — goes_to — дүние)`
 - Predicate: `goes_to`
 - Pattern: `X Y-ке барады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0053257`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0058648`
 - Sentence:
 
-    > Олардың қазіргі өзара тәуелділігі соншалықты, ұлттық және аймақтық нарықтардың әлемдік нарықтан кез келген оқшаулануы ол ұлтты немесе аймақты құлдырауға ұшыратады.
+    > Жазушы Қабдеш Жұмаділов Тарбағатай тауының күнгей бетіндегі Малдыбай бұлағының бойында дүниеге келді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #5563
 
-- Triple: `(кейбір — lives_in — рет)`
-- Predicate: `lives_in`
-- Pattern: `X Y-да тұрады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0061593`
+- Triple: `(үгедей — does_to — қытай)`
+- Predicate: `does_to`
+- Pattern: `X Y-ні аяқта-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0067131`
 - Sentence:
 
-    > Бірақ кейбір тіл ғалымдары «һамза» белгісін әріп ретінде санап, араб әліппесі 29 әріптен тұрады деп санайды.
+    > 1232—34 жылы Үгедей мен Төле басқарған әскерлер Цзань империясын толық талқандап, Солтүстік Қытайды бағындыруды аяқтады.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #5812
 
-- Triple: `(жол — does_to — ат)`
-- Predicate: `does_to`
-- Pattern: `X Y-ні тау-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0064931`
+- Triple: `(күрес — related_to — үміт)`
+- Predicate: `related_to`
+- Pattern: `X пен Y`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0071508`
 - Sentence:
 
-    > шамасында) “Қаған алты бөріг алаш(а) ерті” деген жолдар, Алтай тауының Сібір жағында (Тува) Алаш атты өзен, Алаш атты тау сілемдері бар.
+    > Бүгінде айтулы мемориалдық кешен «Қайғы қақпасы» монументі, «Күрес пен үміт» және «Ашыну мен дәрменсіздік» секілді екі мүсіндік композициядан, сондай-ақ «Еске алу қабырғасынан» құралған.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #5825
 
-- Triple: `(жәдитшілік — goes_to — түркістан)`
-- Predicate: `goes_to`
-- Pattern: `X Y-ке барады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0065029`
+- Triple: `(қайырымдылық — related_to — өсиет)`
+- Predicate: `related_to`
+- Pattern: `X пен Y`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0071726`
 - Sentence:
 
-    > Кейін, жәдитшілік идеялары қазақ даласына және Түркістанға, Орта Азияға келген.
+    > Холдингтер Үшінші республикадан бері қайырымдылық пен өсиет арқылы тұрақты өсті.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #5850
 
-- Triple: `(ресей — does_to — қатынас)`
+- Triple: `(қазақ — does_to — түсінік)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні қос-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0065502`
+- Pattern: `X Y-ні түсіндір-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0072286`
 - Sentence:
 
-    > ) - Армения мен Ресей халықтары арасындағы дәстүрлі достық қатынастарды нығайтуға, Армения Республикасы мен Ресей Федерациясы арасындағы одақтас стратегиялық қатынастарды тереңдетуге және кеңейтуге, сонымен қатар бейбітшілік пен халықаралық қауіпсіздікті қорғауға қосқан жеке үлесі үшін.
+    > Алда әңгімемізге арқау болатын оқиғалар шоғырының қазақ оқырмандарына түсінікті болуы үшін ең алдымен осы сөздердің біздің тілімізде қандай мағыналарға ие болатыны туралы түсіндірме сөздік түрінде қысқаша болса да түсінік бере кеткенді жөн көрдік.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #5883
 
-- Triple: `(қызыл — does_to — рең)`
+- Triple: `(климаттық — does_to — жағдай)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні аш-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0066125`
+- Pattern: `X Y-ні екпе-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0072768`
 - Sentence:
 
-    > Мамыр, маусым айларында қызыл немесе қызыл күлгін реңді гүл ашады, шілде, тамыз айларында жемістенеді.
+    > Теріс климаттық жағдайларды болдырмау үшін қала аумағының қажетті микроклиматын құрайтын, қорғайтын екпе ағаштары кешенін құру керек.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #6089
 
-- Triple: `(мысал — does_to — қолдау)`
-- Predicate: `does_to`
-- Pattern: `X Y-ні қабылда-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0069445`
+- Triple: `(үйрек — related_to — тауық)`
+- Predicate: `related_to`
+- Pattern: `X пен Y`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0076460`
 - Sentence:
 
-    > Баспасөзде билеушілердің экстравагант байлығы туралы мысалдар айтылған Махатхир патшалық үй шаруашылығын қаржылай қолдауды қысқартуға шешім қабылдады.
+    > Мажарстан Мажарстанда дастарқанға үйрек пен тауық еті қойылмайды.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #6621
 
-- Triple: `(жер — does_to — жара)`
-- Predicate: `does_to`
-- Pattern: `X Y-ні ал-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0077874`
+- Triple: `(өсетін — goes_to — өзен)`
+- Predicate: `goes_to`
+- Pattern: `X Y-ке барады`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0085383`
 - Sentence:
 
-    > Техника мен жер суарудың тым қара дүрсін болуы жағдайында ауыл шаруашылығына жарамды жерлер тапшы, ал мал жайылатын жерлер кеп болды.
+    > Жай өсетін нәсіл негізінен өзендерді және көлдің суы аз шығанақтарын мекендейді, ал тез өсетін нәсіл терең суларды мекендейді және өзендерге тек уылдырық шашу үшін келеді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #6837
 
-- Triple: `(бұта — related_to — астық)`
-- Predicate: `related_to`
-- Pattern: `X пен Y`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0080711`
+- Triple: `(науқас — goes_to — жұмыс)`
+- Predicate: `goes_to`
+- Pattern: `X Y-ке барады`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0089147`
 - Sentence:
 
-    > әдетте 200 – 300 м, пассат желдердің бағытына қарай созыла орналасқан; құм бұталар мен астық тұқымдас өсімдіктермен бекіген.
+    > Науқас жүдеп, ашуланшақ келеді, жұмысқа қабілеті төмендейді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #7105
 
-- Triple: `(кездесетін — does_to — жергілік)`
+- Triple: `(ақша — does_to — ат)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні іле-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0085758`
+- Pattern: `X Y-ні көр-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0094087`
 - Sentence:
 
-    > Сирек кездесетін жергілікті өсімдіктерге : өрік, Іле барбарисі, долана, ирис Альберта жатады.
+    > Кейнстің «Ақша реформасы туралы трактат» атты еңбегі жарық көрді, онда автор Англия банкінің саясатымен келіспейді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #7583
 
-- Triple: `(егер — goes_to — есеп)`
-- Predicate: `goes_to`
-- Pattern: `X Y-ке барады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0093827`
+- Triple: `(бүкіл — does_to — билік)`
+- Predicate: `does_to`
+- Pattern: `X Y-ні жинақта-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0102318`
 - Sentence:
 
-    > Егер Антарктиданың мұздық сауыты ери бастаса, ол біздің планетамыздың барлық өзендерін, қазіргі өзендердегі бар суды есепке алғанда, 500 жылдан астам уақыт қоректендіруге жетер еді, ал дүние жүзілік мұхиттық деңгейі мұздық суынан 60 метрден астам көтерілген болар еді.
+    > Өз қолына бүкіл билікті жинақтаған Цезарь іс жүзінде басқарудың римдік респ.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #8239
 
-- Triple: `(киіз — does_to — үй)`
+- Triple: `(көз — does_to — жұлдыз)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні ұсын-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0104597`
+- Pattern: `X Y-ні қос-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0113515`
 - Sentence:
 
-    > Газет рәміздік-бейне ретінде киіз үйді ұсынды.
+    > Қырағы көз мамандар болашақ «жұлдызды» дер кезінде байқап, құрама сапына қосты.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #8482
-
-- Triple: `(домалақ — does_to — қабат)`
-- Predicate: `does_to`
-- Pattern: `X Y-ні түзіл-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0108078`
-- Sentence:
-
-    > Лизосома ( - еріту, - төн) - домалақ немесе сопақша пішінді, бір қабатты жарғақшалы түзіліс.
-
-- [ ] Correct
-- Comment:
-
-### Fact #8496
-
-- Triple: `(дәріс — does_to — жұмыс)`
-- Predicate: `does_to`
-- Pattern: `X Y-ні жаз-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0108402`
-- Sentence:
-
-    > Лотман бәріне үлгеретін: дәріс оқиды, курстық жұмыстарды басқарады, мақалалар жазады.
-
-- [ ] Correct
-- Comment:
-
-### Fact #9075
 
 - Triple: `(өнімдері — is_a — күріш)`
 - Predicate: `is_a`
@@ -468,197 +455,210 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Correct
 - Comment:
 
-### Fact #9130
+### Fact #8496
 
-- Triple: `(қала — has — атау)`
-- Predicate: `has`
-- Pattern: `X-тың Y-сы бар`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0118247`
+- Triple: `(ескерткіш — does_to — атақ)`
+- Predicate: `does_to`
+- Pattern: `X Y-ні әңгімеле-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0117506`
 - Sentence:
 
-    > Тақтада Жайық өзенінің жағасында орналасқан қалалардың атаулары бар лента бейнеленген.
+    > «Яссауи мазасы» (2016) тарихи ескерткіш туралы әйгілі ислам ғалымының мұрасы туралы баяндайды «Әбу Ханифа» (2016) атақты ғалымның өмірі, адамгершілік қасиеттері мен жетістіктері туралы әңгімелейді «Ғибратты ғұмырлар» (2017) Қазақстанның рухани және мәдени өміріне ерекше үлес қосқан белгілі тұлғалар туралы әңгімелейді.
+
+- [ ] Correct
+- Comment:
+
+### Fact #9075
+
+- Triple: `(ұлттық — goes_to — ұлан)`
+- Predicate: `goes_to`
+- Pattern: `X Y-ке барады`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0129144`
+- Sentence:
+
+    > Бірақ ұлттық құраманың бас бапкері Тұрсынғали Еділов Бекзаттың көзінде от барын байқап, ел намысын қорғауды Түркістандық жас ұланға сеніп тапсырады.
+
+- [ ] Correct
+- Comment:
+
+### Fact #9130
+
+- Triple: `(торғай — related_to — ырғыз)`
+- Predicate: `related_to`
+- Pattern: `X пен Y`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0130323`
+- Sentence:
+
+    > ==Қажетті қорғау шаралары== Іле, Қара Ертіс өзендерінің атыраптарында, Торғай мен Ырғыз өзендерінің аңғарларындағы көлдерде қорықтар ұйымдастыру.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #9329
 
-- Triple: `(ауа — does_to — күш)`
+- Triple: `(еңбек — does_to — іздеу)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні жете-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0122447`
+- Pattern: `X Y-ні жұм-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0133696`
 - Sentence:
 
-    > Жылы атлант ауа массаларының да аудан аума- ғының ылғалына әсері мардымсыз, өйткені жолда күшті өзгеріске үшырап жетеді және жазық жер бедерінің үстімен тоқтамай өтіп кетеді.
+    > Сондықтан еңбек нарығында белгілі ағымдар қалыптасады: жұмысшы күші құрамынан шығушылар, жұмысшы күші құрамына кірушілер; жұмыс іздеуден бас тартқандар; жұмыс іздеуді бітіргендер; жұмыс тапқандар және т.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #9850
 
-- Triple: `(тігу — has_quantity — тәсіл)`
-- Predicate: `has_quantity`
-- Pattern: `X-тың N Y-ы бар`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0131640`
+- Triple: `(бұзу — goes_to — құқық)`
+- Predicate: `goes_to`
+- Pattern: `X Y-ке барады`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0142240`
 - Sentence:
 
-    > Байпақ тігудің екі тәсілі бар.
+    > Ресми түрде белгіленген және бекітілген сызығын мемлекеттердің бір жақты бұзуы немесе қайта қарауы халықаралық құқыққа қайшы келеді.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #9870
 
-- Triple: `(жыл — lives_in — шіл)`
-- Predicate: `lives_in`
-- Pattern: `X Y-да тұрады`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0131968`
+- Triple: `(нығайту — does_to — ауру)`
+- Predicate: `does_to`
+- Pattern: `X Y-ні жұм-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0142774`
 - Sentence:
 
-    > Ол қорғаныс (1942 жылы 17 шілде – 18 қараша) және шабуыл (1942 жылы 19 қараша – 1943 жылы 2 ақпан) кезеңдерінен тұрады.
+    > Алғашқы кезде медицина ғылымы өзінің басты міндеті – денсаулықты сақтау, нығайту деп қараған, ал ауруды емдеуді қосалқы жұмыс ретінде санаған.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #9952
 
-- Triple: `(соны — does_to — ақыл)`
+- Triple: `(идея — does_to — материал)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні жібер-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0132871`
+- Pattern: `X Y-ні ғыл-лайды`
+- Source: `wikipedia_kz_pack.json / wiki_kz_0144767`
 - Sentence:
 
-    > Не көрдің, не есттің, әрнешік білдің, соны тездікпенен ұғып, ұққандықпенен тұрмай, арты қайдан шығады, алды қайда барады, сол екі жағына да ақылды жіберіп қарамаққа тез қозғап жібереді.
+    > Мұның өзі көптеген тың идеялар мен материалдарды ғыл.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #10326
 
-- Triple: `(дін — does_to — әлем)`
+- Triple: `(түр — does_to — студенттік)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні тыр-лайды`
-- Source: `wikipedia_kz_pack.json / wiki_kz_0138890`
+- Pattern: `X Y-ні жүкте-лайды`
+- Source: `synthetic_sentences_pack.json / synth_00588`
 - Sentence:
 
-    > Дін атаулы адам мен әлемді Құдіретті күшпен тұтастыруға тырысады.
+    > түр -кенің студенттікті жүктеді себебі қандай туылады.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #10999
 
-- Triple: `(шар — does_to — ара)`
+- Triple: `(физикалық — does_to — мәжбүр)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні аш-лайды`
-- Source: `synthetic_sentences_pack.json / synth_00195`
+- Pattern: `X Y-ні сәл-лайды`
+- Source: `synthetic_sentences_pack.json / synth_04460`
 - Sentence:
 
-    > алты шар арамды ашады.
+    > физикалық жалптың мәжбүрді сәледі.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #11863
 
-- Triple: `(абай — does_to — психологиялық)`
+- Triple: `(сайт — does_to — тый)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні ата-лайды`
-- Source: `synthetic_sentences_pack.json / synth_05141`
+- Pattern: `X Y-ні соқ-лайды`
+- Source: `synthetic_sentences_pack.json / synth_09326`
 - Sentence:
 
-    > абай ауылдан психологиялықты атады.
+    > экономикалықта сайт тыйды соқты.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #12286
 
-- Triple: `(жалпақ — does_to — түбег)`
+- Triple: `(піші — does_to — сарайшық)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні кеңі-лайды`
-- Source: `synthetic_sentences_pack.json / synth_07575`
+- Pattern: `X Y-ні қыдыр-лайды`
+- Source: `synthetic_sentences_pack.json / synth_11841`
 - Sentence:
 
-    > жатқанда жалпақ түбегінді кеңіді.
+    > піші сарайшықты қыдырды бірақ ертең жұмайды.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #12414
 
-- Triple: `(ғарыш — does_to — қарж)`
+- Triple: `(бөлшек — does_to — киел)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні тік-лайды`
-- Source: `synthetic_sentences_pack.json / synth_08197`
+- Pattern: `X Y-ні кеңес-лайды`
+- Source: `synthetic_sentences_pack.json / synth_12668`
 - Sentence:
 
-    > жылдам ғарыш қаржды тікті әрі кішке талады.
+    > бөлшек киелді кеңесті әрі бірден біледі.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #12858
 
-- Triple: `(жұлдыз — does_to — сүт)`
+- Triple: `(ара — does_to — жүк)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні кеңі-лайды`
-- Source: `synthetic_sentences_pack.json / synth_10609`
+- Pattern: `X Y-ні тынық-лайды`
+- Source: `synthetic_sentences_pack.json / synth_15141`
 - Sentence:
 
-    > әдемі жұлдыз сүтті кеңіді.
+    > жаман ара жүкті тынықты.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #12903
 
-- Triple: `(салқын — does_to — үй)`
+- Triple: `(сұхбат — does_to — ақш-)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні қаба-лайды`
-- Source: `synthetic_sentences_pack.json / synth_10857`
+- Pattern: `X Y-ні жұмса-лайды`
+- Source: `synthetic_sentences_pack.json / synth_15380`
 - Sentence:
 
-    > көші-қонде салқын үйлерді қабады.
+    > тоғыз сұхбат ақш-ды жұмсайды.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #13095
 
-- Triple: `(атқаруш — does_to — логикалық)`
+- Triple: `(шың — does_to — қуаныш)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні қайыр-лайды`
-- Source: `synthetic_sentences_pack.json / synth_12034`
+- Pattern: `X Y-ні сала-лайды`
+- Source: `synthetic_sentences_pack.json / synth_16404`
 - Sentence:
 
-    > атқаруш логикалықты қайырды себебі ертең жезқазеді.
+    > шың мүліктің қуанышты салады бірақ мұсылман атанады.
 
 - [ ] Correct
 - Comment:
 
 ### Fact #13098
 
-- Triple: `(төбе — does_to — өзін)`
+- Triple: `(қақпақ — does_to — дәулет)`
 - Predicate: `does_to`
-- Pattern: `X Y-ні аула-лайды`
-- Source: `synthetic_sentences_pack.json / synth_12065`
+- Pattern: `X Y-ні тау-лайды`
+- Source: `synthetic_sentences_pack.json / synth_16431`
 - Sentence:
 
-    > төбе өзінді аулады өйткені ендіг ішкті ішейді.
-
-- [ ] Correct
-- Comment:
-
-### Fact #14045
-
-- Triple: `(президенттік — does_to — эфир)`
-- Predicate: `does_to`
-- Pattern: `X Y-ні тірке-лайды`
-- Source: `synthetic_sentences_pack.json / synth_17333`
-- Sentence:
-
-    > президенттік ұзын эфирді тіркеді.
+    > біраз қақпақ дәулетті тауды бірақ негізгі ұрпағ кірейді.
 
 - [ ] Correct
 - Comment:
@@ -695,6 +695,17 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - Rule: `R1_is_a_transitivity`
 - Confidence: `rule_inferred`
 - Source chain: wikipedia_kz_pack.json/wiki_kz_0046261, wikipedia_kz_pack.json/wiki_kz_0127358
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #16
+
+- Triple: `(-қа — is_a — көшбасшы)`
+- Rule: `R1_is_a_transitivity`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0103523, wikipedia_kz_pack.json/wiki_kz_0047666
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -933,17 +944,6 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #126
 
-- Triple: `(абай — related_to — қызылжар)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0007148, wikipedia_kz_pack.json/wiki_kz_0047327
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #127
-
 - Triple: `(қазақстан — related_to — қызылжар)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
@@ -953,7 +953,7 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #128
+### Derivation #127
 
 - Triple: `(ауғанстан — related_to — үндістан)`
 - Rule: `R5_shared_is_a_target`
@@ -964,29 +964,29 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #136
+### Derivation #128
 
-- Triple: `(абай — related_to — қазақ)`
+- Triple: `(ауғанстан — related_to — ұлыбритания)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0007158, wikipedia_kz_pack.json/wiki_kz_0001219
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0026147, wikipedia_kz_pack.json/wiki_kz_0027741
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #136
+
+- Triple: `(арыс — related_to — ақмешіт)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0110255, wikipedia_kz_pack.json/wiki_kz_0055603
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
 - Comment:
 
 ### Derivation #139
-
-- Triple: `(арыс — related_to — талғар)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0110255, wikipedia_kz_pack.json/wiki_kz_0110712
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #140
 
 - Triple: `(арыс — related_to — қазақ)`
 - Rule: `R5_shared_is_a_target`
@@ -997,12 +997,23 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #143
+### Derivation #140
 
-- Triple: `(ақмешіт — related_to — қазақ)`
+- Triple: `(ақмешіт — related_to — сәтбаев)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0055603, wikipedia_kz_pack.json/wiki_kz_0001219
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0055603, wikipedia_kz_pack.json/wiki_kz_0098675
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #143
+
+- Triple: `(сәтбаев — related_to — талғар)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0098675, wikipedia_kz_pack.json/wiki_kz_0110712
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1010,10 +1021,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #147
 
-- Triple: `(темір — related_to — томдық)`
+- Triple: `(дуадақ — related_to — жағалтай)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0043190, wikipedia_kz_pack.json/wiki_kz_0003061
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0130217, wikipedia_kz_pack.json/wiki_kz_0135186
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1021,10 +1032,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #150
 
-- Triple: `(ақпан — related_to — қаңтар)`
+- Triple: `(әсел — related_to — өрік)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0001080, wikipedia_kz_pack.json/wiki_kz_0001075
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0146217, wikipedia_kz_pack.json/wiki_kz_0081700
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1032,10 +1043,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #152
 
-- Triple: `(қыркүйек — is_a — ақпан)`
+- Triple: `(сәуір — is_a — өкіметі)`
 - Rule: `R1_is_a_transitivity`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0009178, wikipedia_kz_pack.json/wiki_kz_0009181
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0009181, wikipedia_kz_pack.json/wiki_kz_0009182
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1043,10 +1054,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #156
 
-- Triple: `(қыркүйек — is_a — өкіметі)`
-- Rule: `R1_is_a_transitivity`
+- Triple: `(қаңтар — has — астанадағ)`
+- Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0009178, wikipedia_kz_pack.json/wiki_kz_0009182
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0009192, wikipedia_kz_pack.json/wiki_kz_0141921
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1054,7 +1065,7 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #159
 
-- Triple: `(жыл — has — арасындағ)`
+- Triple: `(жыл — has — көбі)`
 - Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
 - Source chain: wikipedia_kz_pack.json/wiki_kz_0046286, wikipedia_kz_pack.json/wiki_kz_0027741
@@ -1065,7 +1076,7 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #161
 
-- Triple: `(жыл — has — көгалдандыру)`
+- Triple: `(жыл — has — солтүстік-батыс)`
 - Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
 - Source chain: wikipedia_kz_pack.json/wiki_kz_0046286, wikipedia_kz_pack.json/wiki_kz_0027741
@@ -1076,7 +1087,7 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #165
 
-- Triple: `(жыл — has — түбег)`
+- Triple: `(жыл — has — халқ)`
 - Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
 - Source chain: wikipedia_kz_pack.json/wiki_kz_0046286, wikipedia_kz_pack.json/wiki_kz_0027741
@@ -1087,10 +1098,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #170
 
-- Triple: `(-қа — has — пікір)`
+- Triple: `(-қа — has — ара)`
 - Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0103523, wikipedia_kz_pack.json/wiki_kz_0040759
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0103523, wikipedia_kz_pack.json/wiki_kz_0027741
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1098,7 +1109,7 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #176
 
-- Triple: `(-қа — has — сыртқ)`
+- Triple: `(-қа — has — таул)`
 - Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
 - Source chain: wikipedia_kz_pack.json/wiki_kz_0103523, wikipedia_kz_pack.json/wiki_kz_0027741
@@ -1109,27 +1120,16 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #181
 
-- Triple: `(-қа — has — ішк)`
-- Rule: `R2_has_inheritance`
+- Triple: `(-қа — related_to — абай)`
+- Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0103523, wikipedia_kz_pack.json/wiki_kz_0027741
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0103523, wikipedia_kz_pack.json/wiki_kz_0088327
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
 - Comment:
 
 ### Derivation #191
-
-- Triple: `(жая — related_to — күлше)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0058346, wikipedia_kz_pack.json/wiki_kz_0062890
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #193
 
 - Triple: `(абай — related_to — алматы)`
 - Rule: `R5_shared_is_a_target`
@@ -1140,29 +1140,18 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Underlying facts are both correct
 - Comment:
 
+### Derivation #193
+
+- Triple: `(еңбек — related_to — қайнар)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: kazakh_proverbs_pack.json/proverb_068, wikipedia_kz_pack.json/wiki_kz_0139793
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
 ### Derivation #196
-
-- Triple: `(желтоқсан — related_to — қазан)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0001072, wikipedia_kz_pack.json/wiki_kz_0009182
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #197
-
-- Triple: `(қазан — related_to — қаңтар)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0009182, wikipedia_kz_pack.json/wiki_kz_0001075
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #198
 
 - Triple: `(-қа — related_to — ауғанстан)`
 - Rule: `R5_shared_is_a_target`
@@ -1173,7 +1162,18 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #200
+### Derivation #197
+
+- Triple: `(-қа — related_to — үндістан)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0103523, wikipedia_kz_pack.json/wiki_kz_0004297
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #198
 
 - Triple: `(-қа — related_to — ұлыбритания)`
 - Rule: `R5_shared_is_a_target`
@@ -1184,18 +1184,18 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #201
+### Derivation #200
 
-- Triple: `(-қа — related_to — алматы)`
+- Triple: `(ақпан — related_to — қыркүйек)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0103523, wikipedia_kz_pack.json/wiki_kz_0127358
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0001080, wikipedia_kz_pack.json/wiki_kz_0009178
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #203
+### Derivation #201
 
 - Triple: `(желтоқсан — related_to — сәуір)`
 - Rule: `R5_shared_is_a_target`
@@ -1206,7 +1206,7 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #205
+### Derivation #203
 
 - Triple: `(сәуір — related_to — қаңтар)`
 - Rule: `R5_shared_is_a_target`
@@ -1231,40 +1231,41 @@ Fill in after review. `N` = number of items you ended up reviewing; `C` = number
 
 Sampled facts by pattern:
 
-- `X Y-да тұрады`: 3
+- `X Y-дан кейін`: 2
 - `X Y-ке барады`: 7
-- `X Y-ні ал-лайды`: 2
-- `X Y-ні ата-лайды`: 1
-- `X Y-ні атқар-лайды`: 1
-- `X Y-ні атқара-лайды`: 1
-- `X Y-ні аула-лайды`: 1
-- `X Y-ні аш-лайды`: 2
-- `X Y-ні бер-лайды`: 1
-- `X Y-ні біл-лайды`: 1
-- `X Y-ні бұз-лайды`: 1
-- `X Y-ні жаз-лайды`: 1
-- `X Y-ні жалғастыра-лайды`: 1
-- `X Y-ні жете-лайды`: 1
-- `X Y-ні жібер-лайды`: 1
-- `X Y-ні кеңі-лайды`: 2
+- `X Y-ні айт-лайды`: 1
+- `X Y-ні айғақта-лайды`: 1
+- `X Y-ні аяқта-лайды`: 1
+- `X Y-ні екпе-лайды`: 1
+- `X Y-ні ерік-лайды`: 1
+- `X Y-ні ете-лайды`: 1
+- `X Y-ні жаса-лайды`: 1
+- `X Y-ні жинақта-лайды`: 1
+- `X Y-ні жүкте-лайды`: 1
+- `X Y-ні жүр-лайды`: 1
+- `X Y-ні жұм-лайды`: 2
+- `X Y-ні жұмса-лайды`: 1
+- `X Y-ні кеңес-лайды`: 1
+- `X Y-ні көзде-лайды`: 1
 - `X Y-ні көр-лайды`: 1
-- `X Y-ні көрсет-лайды`: 1
+- `X Y-ні сала-лайды`: 1
+- `X Y-ні соқ-лайды`: 1
+- `X Y-ні сәл-лайды`: 1
+- `X Y-ні талқанда-лайды`: 1
 - `X Y-ні тау-лайды`: 1
-- `X Y-ні тыр-лайды`: 1
-- `X Y-ні тік-лайды`: 1
-- `X Y-ні тірке-лайды`: 1
-- `X Y-ні түзіл-лайды`: 1
-- `X Y-ні түсір-лайды`: 1
-- `X Y-ні іле-лайды`: 1
-- `X Y-ні қаба-лайды`: 1
-- `X Y-ні қабылда-лайды`: 1
-- `X Y-ні қайта-лайды`: 1
-- `X Y-ні қайыр-лайды`: 1
+- `X Y-ні тынық-лайды`: 1
+- `X Y-ні түсіндір-лайды`: 1
+- `X Y-ні уағдалас-лайды`: 1
+- `X Y-ні ғыл-лайды`: 1
+- `X Y-ні қалыптас-лайды`: 1
+- `X Y-ні қара-лайды`: 1
 - `X Y-ні қос-лайды`: 1
-- `X Y-ні ұсын-лайды`: 1
-- `X пен Y`: 5
+- `X Y-ні қыдыр-лайды`: 1
+- `X Y-ні ұшырат-лайды`: 1
+- `X Y-ні әңгімеле-лайды`: 1
+- `X Y-ні өзгер-лайды`: 1
+- `X пен Y`: 7
 - `X — Y`: 1
-- `X-тың N Y-ы бар`: 1
 - `X-тың Y-сы бар`: 1
 
 Sampled derivations by rule:

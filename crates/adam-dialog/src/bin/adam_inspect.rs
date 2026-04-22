@@ -43,6 +43,7 @@
 
 use std::{collections::BTreeMap, fs, process::ExitCode};
 
+use adam_kernel_fst::morphotactics::{Case, NounFeatures, synthesise_noun};
 use adam_reasoning::{Fact, Predicate, reasoner::DerivedFact};
 use serde::Deserialize;
 
@@ -343,14 +344,19 @@ fn main() -> ExitCode {
 /// render_derivation_as_kazakh` but kept inline here to avoid a bin →
 /// bin dep.
 fn render_kazakh_with_marker(d: &DerivedFact) -> String {
+    // v3.8.5 — grammatical case suffixes synthesised via FST instead
+    // of manual `"-ға"` dash-concatenation (which produced morpho-
+    // logically-invalid forms like `атау-ға` / `өсімдік-ға`). Must
+    // stay in lock-step with `conversation::render_derivation_as_kazakh`.
     match d.predicate {
         Predicate::IsA => format!(
             "қорытынды: {} — {} (байланысты ой-тізбек арқылы)",
             d.subject.root, d.object.root
         ),
         Predicate::Has => format!(
-            "ой-тізбек: {} {}-ға қатысты иелік байланысы бар",
-            d.subject.root, d.object.root
+            "ой-тізбек: {} {} қатысты иелік байланысы бар",
+            d.subject.root,
+            inflect(&d.object.root, Case::Dative)
         ),
         Predicate::RelatedTo => format!(
             "{} пен {} бір-біріне байланысты екен",
@@ -365,29 +371,43 @@ fn render_kazakh_with_marker(d: &DerivedFact) -> String {
             d.subject.root, d.object.root
         ),
         Predicate::PartOf => format!(
-            "{} {}-дың құрамына байланысты бөлігі",
-            d.subject.root, d.object.root
+            "{} {} құрамына байланысты бөлігі",
+            d.subject.root,
+            inflect(&d.object.root, Case::Dative)
         ),
         Predicate::Causes => format!(
-            "{} {}-ның себебі (байланысты ой-тізбек арқылы)",
-            d.subject.root, d.object.root
+            "{} {} себеп болатыны (байланысты ой-тізбек арқылы)",
+            d.subject.root,
+            inflect(&d.object.root, Case::Dative)
         ),
         Predicate::After => format!(
-            "{} {}-нен кейін (байланысты уақыт-тізбек арқылы)",
-            d.subject.root, d.object.root
+            "{} {} кейін (байланысты уақыт-тізбек арқылы)",
+            d.subject.root,
+            inflect(&d.object.root, Case::Ablative)
         ),
         Predicate::HasQuantity => {
-            format!("{} {}-мен санды байланыс", d.subject.root, d.object.root)
+            format!(
+                "{} {} санды байланыс",
+                d.subject.root,
+                inflect(&d.object.root, Case::Instrumental)
+            )
         }
         Predicate::DoesTo => format!(
             "{} {} үстінде байланысты әрекет иесі",
             d.subject.root, d.object.root
         ),
         Predicate::InDomain => format!(
-            "{} {} саласына байланысты мүше",
-            d.subject.root, d.object.root
+            "{} {} байланысты мүше",
+            d.subject.root,
+            inflect(&d.object.root, Case::Dative)
         ),
     }
+}
+
+fn inflect(root: &str, case: Case) -> String {
+    let mut features = NounFeatures::default();
+    features.case = Some(case);
+    synthesise_noun(root, features)
 }
 
 /// Find the N alphabetically-closest keys to `target` in `map`. Simple

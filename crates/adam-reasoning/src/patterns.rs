@@ -252,6 +252,19 @@ pub fn locative_lives_in(
         _ => return,
     };
 
+    // v3.8.5 — reject locative objects that retain a possessive
+    // marker on their FST analysis (e.g. «аумағында» → root `аумағын`
+    // keeps P3-ended fragment). These are always fragment parses,
+    // never valid places. Codex flagged «Қазақстан lives_in аумағын»
+    // as a canonical example.
+    let loc_has_possessive = matches!(
+        &loc_entry.1,
+        Some(Analysis::Noun { features, .. }) if features.possessive.is_some()
+    );
+    if loc_has_possessive {
+        return;
+    }
+
     // Subject = first nominative-case noun strictly before the locative.
     // We REJECT pronouns / closed-class items as subjects — a pronoun-
     // as-subject fact ("мен Алматы") is not useful knowledge. This is
@@ -266,6 +279,19 @@ pub fn locative_lives_in(
                 return None;
             }
             if is_closed_class(&root.root) {
+                return None;
+            }
+            // v3.8.5 precision hardening: a country / major city can
+            // never be the subject of LivesIn ("Қазақстан lives_in X"
+            // is categorically wrong — countries don't reside). A time
+            // noun can never be the subject either ("жыл lives_in X").
+            // Short broken stems (< 3 chars) rule out truncated FST
+            // analyses like `кешк` / `қаһарл` that were leaking into
+            // v3.8.0 facts.
+            if is_location_root(&root.root)
+                || is_time_noun(&root.root)
+                || root.root.chars().count() < 3
+            {
                 return None;
             }
             Some(SlotRef {
@@ -474,9 +500,12 @@ pub fn dative_goes_to(
     }
 
     // First dative noun is the destination.
+    // v3.8.5 — reject dative objects that still carry a possessive
+    // marker (same class of fragment-parse that contaminated LivesIn).
     let dative_idx = tokens.iter().position(|(_, a)| match a {
         Some(Analysis::Noun { features, root }) => {
             features.case == Some(Case::Dative)
+                && features.possessive.is_none()
                 && root.part_of_speech == "noun"
                 && !is_closed_class(&root.root)
         }
@@ -499,6 +528,15 @@ pub fn dative_goes_to(
                 return None;
             }
             if is_closed_class(&root.root) {
+                return None;
+            }
+            // v3.8.5 precision hardening — time nouns as GoesTo subjects
+            // were 309 / 1864 = 16.6 % of all pre-hardening GoesTo facts
+            // (e.g. «күн → goes_to → жұмыс» from Abai's «бір күн Масғұт
+            // шықты»). «жыл», «күн», «ай» etc. cannot "go to" anywhere —
+            // they are time adverbials, not agents. Short broken stems
+            // (< 3 chars) also ruled out.
+            if is_time_noun(&root.root) || root.root.chars().count() < 3 {
                 return None;
             }
             Some(SlotRef {
@@ -893,6 +931,13 @@ pub fn agent_verb(
                 || features.case.is_some_and(|c| c != Case::Nominative)
                 || features.possessive.is_some()
             {
+                return None;
+            }
+            // v3.8.5 — rule out short broken stems (< 3 chars) and
+            // time-adverbial roots that the agent_verb pattern was
+            // also grabbing (e.g. «жыл ... әсер етеді» → «жыл does_to
+            // әсер», where «жыл» = "year" is not an agent).
+            if is_time_noun(&root.root) || root.root.chars().count() < 3 {
                 return None;
             }
             Some(SlotRef {
@@ -1374,6 +1419,136 @@ fn is_closed_class(root: &str) -> bool {
             | "неліктен"
             | "неге"
             | "қанша"
+            // v3.8.5 (precision hardening): demonstrative qualifiers
+            // and quantifier-like closed-class items the FST some-
+            // times tags as bare nouns. Precision audit flagged
+            // these as noisy subjects (e.g. «мұндай → goes_to → X»
+            // where мұндай = "such/this kind of" is not an agent).
+            | "мұндай"
+            | "сондай"
+            | "ондай"
+            | "мынадай"
+            | "сондай-ақ"
+            | "кейбір"
+            | "өз"
+            | "өзі"
+            | "бірнеше"
+            | "барша"
+            | "әрбір"
+            | "әр"
+            | "бір"
+            | "кей"
+    )
+}
+
+/// v3.8.5 — time-denoting nouns refused as **subjects** of motion /
+/// residence predicates. `(күн → goes_to → жұмыс)` from Abai's «Шаһардан
+/// бір күн Масғұт шықты» is a parse artifact: «күн» is a time adverbial,
+/// not the actor. Rejecting these at extraction removes ~350 noisy
+/// LivesIn / GoesTo facts on the committed v3.8.0 runtime without
+/// affecting any valid (person/place, goes_to/lives_in, place) triples.
+///
+/// Not rejected as OBJECTS — «жыл» can legitimately be a reference
+/// point for `After` (X Y-дан кейін), and is ontologically a noun.
+fn is_time_noun(root: &str) -> bool {
+    matches!(
+        root,
+        "жыл"
+            | "күн"
+            | "ай"
+            | "сағат"
+            | "минут"
+            | "секунд"
+            | "ғасыр"
+            | "уақыт"
+            | "тәулік"
+            | "апта"
+            | "кез"
+            | "сәт"
+            | "мезгіл"
+            | "шақ"
+            | "мезет"
+            | "түн"
+            | "таң"
+            | "кеш"
+            | "таңертең"
+            | "бүгін"
+            | "кеше"
+            | "ертең"
+    )
+}
+
+/// v3.8.5 — known toponyms / country names refused as **subjects** of
+/// `LivesIn`. «Қазақстан → lives_in → аумағын» is categorically wrong:
+/// a country cannot reside somewhere, it IS somewhere. Countries and
+/// major cities belong on the OBJECT side of `LivesIn` facts (or are
+/// legitimate IsA / PartOf subjects via other matchers). This filter
+/// is intentionally conservative (explicit allow-list of toponyms
+/// attested in the committed corpus) — widening to a full gazetteer
+/// is a v3.9+ target.
+fn is_location_root(root: &str) -> bool {
+    matches!(
+        root,
+        // Countries
+        "қазақстан"
+            | "ресей"
+            | "қытай"
+            | "өзбекстан"
+            | "қырғызстан"
+            | "түркіменстан"
+            | "тәжікстан"
+            | "ауғанстан"
+            | "иран"
+            | "түркия"
+            | "германия"
+            | "франция"
+            | "англия"
+            | "америка"
+            | "ақш"
+            | "жапония"
+            | "үндістан"
+            | "моңғолия"
+            | "корея"
+            | "пәкістан"
+            | "египет"
+            // Continents / regions
+            | "еуропа"
+            | "азия"
+            | "африка"
+            | "аустралия"
+            | "сібір"
+            | "кавказ"
+            | "алтай"
+            | "памір"
+            // Major Kazakh cities
+            | "алматы"
+            | "астана"
+            | "нұр-сұлтан"
+            | "шымкент"
+            | "қарағанды"
+            | "ақтөбе"
+            | "атырау"
+            | "тараз"
+            | "павлодар"
+            | "семей"
+            | "өскемен"
+            | "қызылорда"
+            | "ақтау"
+            | "талдықорған"
+            | "көкшетау"
+            | "орал"
+            | "петропавл"
+            | "жезқазған"
+            | "балқаш"
+            | "екібастұз"
+            // Rivers / lakes / seas (can't "live in" the way a person can)
+            | "арал"
+            | "каспий"
+            | "ертіс"
+            | "сырдария"
+            | "амудария"
+            | "іле"
+            | "балқаш-көл"
     )
 }
 
@@ -1883,5 +2058,85 @@ mod tests {
         // Tautological X=Y refused.
         structural_part_of("ми мидың бөлігі", &[], &lex, &src(), &mut out);
         assert!(out.is_empty(), "X=Y tautology refused");
+    }
+
+    // ------------------------- v3.8.5 precision hardening ------------------
+
+    #[test]
+    fn is_closed_class_covers_v3_8_5_additions() {
+        // Demonstrative qualifiers flagged by Codex precision audit.
+        assert!(is_closed_class("мұндай"));
+        assert!(is_closed_class("сондай"));
+        assert!(is_closed_class("ондай"));
+        assert!(is_closed_class("кейбір"));
+        assert!(is_closed_class("өз"));
+        assert!(is_closed_class("өзі"));
+        // Content nouns still pass.
+        assert!(!is_closed_class("бала"));
+        assert!(!is_closed_class("қазақстан"));
+    }
+
+    #[test]
+    fn is_time_noun_covers_standard_set() {
+        assert!(is_time_noun("жыл"));
+        assert!(is_time_noun("күн"));
+        assert!(is_time_noun("ай"));
+        assert!(is_time_noun("ғасыр"));
+        assert!(is_time_noun("уақыт"));
+        // Not a time noun.
+        assert!(!is_time_noun("бала"));
+        assert!(!is_time_noun("мектеп"));
+    }
+
+    #[test]
+    fn is_location_root_covers_countries_and_cities() {
+        assert!(is_location_root("қазақстан"));
+        assert!(is_location_root("ресей"));
+        assert!(is_location_root("алматы"));
+        assert!(is_location_root("астана"));
+        // Content nouns still pass through the gate.
+        assert!(!is_location_root("бала"));
+        assert!(!is_location_root("кітап"));
+    }
+
+    #[test]
+    fn locative_lives_in_rejects_country_subject() {
+        // Pre-v3.8.5: «Қазақстан аумағында тұрады» produced
+        // (қазақстан, lives_in, аумағын) — garbage. Post-v3.8.5 the
+        // location-root filter refuses Қазақстан as a LivesIn subject.
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        locative_lives_in("Қазақстан өз аумағында тұрады", &[], &lex, &src(), &mut out);
+        assert!(
+            out.is_empty(),
+            "country subject must be refused for LivesIn (got {out:?})"
+        );
+    }
+
+    #[test]
+    fn dative_goes_to_rejects_time_subject() {
+        // «бір күн Масғұт жұмысқа барды» pre-v3.8.5 produced
+        // (күн, goes_to, жұмыс). «күн» is a time noun, not an agent.
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        dative_goes_to("бір күн жұмысқа барды", &[], &lex, &src(), &mut out);
+        assert!(
+            out.is_empty(),
+            "time-noun subject refused for GoesTo (got {out:?})"
+        );
+    }
+
+    #[test]
+    fn dative_goes_to_rejects_demonstrative_subject() {
+        // «мұндай жағдай ... өсіруге мүмкіндік» pre-v3.8.5 produced
+        // (мұндай, goes_to, өсіру). «мұндай» is a demonstrative
+        // qualifier (closed-class).
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        dative_goes_to("мұндай жағдай өсіруге болады", &[], &lex, &src(), &mut out);
+        assert!(
+            out.is_empty(),
+            "demonstrative subject refused for GoesTo (got {out:?})"
+        );
     }
 }

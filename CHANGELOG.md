@@ -7,6 +7,75 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.8.5] — 2026-04-22 — Precision hardening: Codex review response (doc drift, renderer morphology, matcher filters)
+
+**Patch release addressing the [Codex / Antigravity review of v3.8.0](https://github.com/qazaq-ai/adam/issues).** Three categories of defect closed, each concretely flagged by the external reviewer:
+
+### 1. Documentation drift (README vs architecture_v3 vs runtime)
+
+- README table had **two contradicting rows** for "Reasoning rules active": one saying `4/5` (including R3), another (further down) saying `3 (R1, R2, R5)`. Removed the stale row.
+- `docs/architecture_v3.md` still described **4 pattern matchers** and R3 as `documented, deferred` — actual runtime has **11 matchers** and R3 has been active since v3.5.5. Rewrote both the matchers table and the rule table. Added R6/R7 as v3.9+ targets (LivesIn+PartOf, GoesTo+PartOf transitivity) now that the v3.8.0 verb-root fix gave those predicates real data.
+
+### 2. Renderer morphology (`атау-ға` / `өсімдік-ға` bug)
+
+Pre-v3.8.5 `render_derivation_as_kazakh` (both in `adam-dialog::conversation` and in the `adam_inspect` binary) concatenated case suffixes with a literal dash: `format!("{}-ға ...", root)`. This produced two kinds of invalid Kazakh: **(a)** the dash itself (suffixes attach directly), and **(b)** wrong vowel harmony on every front-harmony root (`өсімдік-ға` instead of `өсімдікке`). v3.8.5 routes every case suffix through `synthesise_noun(root, features)` — the same FST the template realiser uses. Verified dative output for a representative set:
+
+| root | dative |
+|---|---|
+| атау | атауға ✓ |
+| өсімдік | өсімдікке ✓ (front harmony + voiceless gemination) |
+| кітап | кітапқа ✓ |
+| мектеп | мектепке ✓ |
+| қазақ | қазаққа ✓ (voiceless gemination) |
+| халық | халыққа ✓ |
+| жер | жерге ✓ |
+
+Regression test `reasoning_chain_uses_fst_synthesis_not_dash_concatenation` asserts positive FST form and negative absence of `атау-ға`.
+
+**Known FST limitation discovered during fix (deferred to v3.9)**: `synthesise_noun` with `Case::Genitive` on a **vowel-final root** produces `қаладың` instead of `қаланың` — the `{D}{I}ң` archiphoneme template lacks the "after-vowel → н" rule that genitive requires. Ablative / dative / instrumental on the same roots are all correct. The renderer now sidesteps the bug by using dative in PartOf / Causes chains instead of genitive; the FST phonology fix itself is a v3.9 target (it affects 48+ existing FST roundtrip tests and warrants a standalone release).
+
+### 3. Matcher precision hardening
+
+Codex's live `adam_inspect` session produced three canonical noisy triples: `қазақстан → lives_in → аумағын`, `мұндай → goes_to → өсіру`, `күн → goes_to → жұмыс`. Each is a distinct failure mode:
+
+- **Country as `LivesIn` subject**: "Қазақстан" can't reside anywhere — it **is** a place. Added `is_location_root` (50-toponym allow-list of Kazakh countries / major cities / continents / major rivers) and refuse as `LivesIn` subject. Scope is intentionally conservative; widening to a full gazetteer is v3.9+.
+- **Time noun as motion subject**: "бір күн Масғұт жұмысқа барды" was producing `(күн, goes_to, жұмыс)`. Added `is_time_noun` helper (жыл / күн / ай / сағат / минут / ғасыр / уақыт / тәулік / апта / кез / сәт / мезгіл / шақ / мезет / түн / таң / кеш / …) and refuse as subject for `LivesIn`, `GoesTo`, **and** `DoesTo`. Pre-hardening these were **309 / 1864 = 16.6 % of all `GoesTo` facts**.
+- **Demonstrative qualifier as subject**: "мұндай" / "сондай" / "ондай" / "мынадай" / "сондай-ақ" / "кейбір" / "өз" / "өзі" / "бірнеше" / "барша" / "әрбір" / "әр" / "бір" / "кей" all added to `is_closed_class`. Pre-hardening: 243 noisy facts across all predicates.
+- **Object with leaked possessive suffix**: `(қазақстан, lives_in, аумағын)` — the object surface is `аумағында` but the FST analysis retains P3 possessive on the root (`аумағын`), indicating a fragment parse. v3.8.5 refuses any `LivesIn` / `GoesTo` object whose FST analysis has `features.possessive.is_some()`.
+- **Short broken stems**: added minimum subject-root length of 3 characters across `locative_lives_in`, `dative_goes_to`, `agent_verb` — drops truncated FST outputs like `кешк`, `қаһарл` that had been contaminating the committed fact set.
+
+### 4. Demo preview / rendered-text mismatch
+
+`adam_demo` Part 4 printed a per-rule preview like `[R5]  неміс → халқы` but the rendered user-facing response used `неміс → ара` (a different derivation with the same subject appearing earlier in storage order). Root cause: the demo's selection was `BTreeMap<rule_id, first-content-subject>` while `inject_reasoning_chain` uses `find(subj == probe || obj == probe)` — non-equivalent selectors.
+
+v3.8.5 fixes both ends:
+1. `inject_reasoning_chain` now does a **strict subject-first two-pass** (`find(subj == noun).or_else(|| find(obj == noun))`), matching the comment that was already there.
+2. The demo's per-rule picker now **also tracks a `seen_subjects: HashSet<String>`** and skips derivations whose subject root was claimed by an earlier derivation in storage order — so every preview points to the exact derivation the pipeline would render.
+
+### Tests
+
+**423 passing** (+7 vs v3.8.0): new matcher filters each get a regression test (`locative_lives_in_rejects_country_subject`, `dative_goes_to_rejects_time_subject`, `dative_goes_to_rejects_demonstrative_subject`, `is_closed_class_covers_v3_8_5_additions`, `is_time_noun_covers_standard_set`, `is_location_root_covers_countries_and_cities`), plus the renderer regression `reasoning_chain_uses_fst_synthesis_not_dash_concatenation`.
+
+### Predicate coverage
+
+Unchanged at **9 / 11** (LivesIn, GoesTo stay active — the hardening tightens precision, not removes them).
+
+### Upgrade notes
+
+- Purely additive on matcher side — no library API change.
+- Fact-set shrinks (precision vs recall trade-off). `data/retrieval/facts.json` regenerated at v3.8.5. Downstream consumers expecting exactly 14 430 facts will see the updated count (tracked in `data/retrieval/facts.json`; README reflects the new number).
+- Dialog renderer output surface changes for `Has` / `PartOf` / `Causes` / `After` / `HasQuantity` / `InDomain` chains — suffixes are now properly inflected. The `unknown_with_reasoning_chain_cites_derivation` test still passes (it asserts on marker + root presence, not suffix shape).
+
+### What's next (v3.9.0)
+
+- Fix FST genitive-after-vowel phonology rule
+- Extend location allow-list to full Kazakh gazetteer
+- R6 (`LivesIn + PartOf → LivesIn`) / R7 (`GoesTo + PartOf → GoesTo`) rules now that the two predicates have data
+- Full Codex-recommended **confidence tiers** (`High` / `Medium` / `Low`) on Fact + demo-only high-confidence subset
+- Populate `docs/precision_audit.md` tally via native-speaker review pass
+
+---
+
 ## [3.8.0] — 2026-04-22 — Critical verb-root bug fix: LivesIn + GoesTo activated (predicate coverage 7/11 → 9/11)
 
 **Unlocks two dormant predicates that have been silently broken since v2.1 (LivesIn) and v2.5 (GoesTo).** The root-comparison checks used the **infinitive forms** (`"тұру"` / `"бару"`) while the FST stores verb **stems** without the `-у` suffix (`"тұр"` / `"бар"`). Neither matcher has ever fired, at any scale, on any corpus. v3.8.0 fixes the comparisons and widens the verb set.

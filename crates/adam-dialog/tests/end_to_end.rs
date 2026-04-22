@@ -1099,6 +1099,64 @@ fn unknown_with_reasoning_chain_cites_derivation() {
     );
 }
 
+/// v3.8.5: the reasoning-chain renderer must produce morphologically
+/// valid Kazakh case forms — not dash-concatenated strings like
+/// `атау-ға`. Pre-v3.8.5 the `Has` / `PartOf` / `Causes` / `After` /
+/// `HasQuantity` / `InDomain` arms appended `"-ға"` / `"-дың"` /
+/// `"-нен"` / `"-мен"` etc. verbatim, violating vowel harmony. v3.8.5
+/// routes every case suffix through `synthesise_noun`.
+#[test]
+fn reasoning_chain_uses_fst_synthesis_not_dash_concatenation() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    // Has predicate — the renderer inflects the object root as dative.
+    // Root "атау" + dative = "атауға". Pre-v3.8.5 would emit "атау-ға".
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "кітап".into(),
+            root: "кітап".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::Has,
+        object: SlotRef {
+            surface: "атау".into(),
+            root: "атау".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R2_has_inheritance".into(),
+        source_chain: vec![FactSource {
+            pack: "proverbs".into(),
+            sample_id: "p_003".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let out = conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
+
+    // Trust invariant: marker still fires.
+    assert!(out.contains("байланыс"), "marker missing, got: {out:?}");
+    // Positive: properly synthesised dative form of "атау" is "атауға".
+    // (Back-vowel harmony: атау's last vowel /a/ → dative suffix /ғa/.)
+    assert!(
+        out.contains("атауға") || out.contains("атау "),
+        "expected FST-synthesised dative «атауға», got: {out:?}"
+    );
+    // Negative: no dash-concatenated form.
+    assert!(
+        !out.contains("атау-ға"),
+        "dash-concatenation leaked (атау-ға found in: {out:?})"
+    );
+    assert!(
+        !out.contains("атау-дың") && !out.contains("атау-ды"),
+        "stale dash-concatenation pattern, got: {out:?}"
+    );
+}
+
 /// v2.7 negative invariant: without any derived facts attached, the
 /// reasoning-chain path must NEVER fire. Guards against false-positive
 /// "this is inferred" claims — a trust-critical corollary of v1.9.5's

@@ -227,6 +227,16 @@ fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
     // through a different intent path in the dialog planner and would
     // miss the reasoning hook. Filter: subject.root ≥ 4 chars + not in
     // the demo-local closed-class list below.
+    //
+    // v3.8.5 — additionally require that the chosen derivation's
+    // SUBJECT root is unique in storage order up to this point. This
+    // matches the subject-first lookup inside
+    // `conversation::inject_reasoning_chain`, so the derivation we
+    // print as the per-rule preview is the same derivation the dialog
+    // pipeline renders when the user probes with the subject root.
+    // Pre-v3.8.5 the preview printed «неміс → халқы» but the rendered
+    // response was the earlier «неміс → ара» — a different derivation
+    // sharing the same subject. The uniqueness guard closes that gap.
     const DEMO_CLOSED_CLASS: &[&str] = &[
         "ана",
         "ол",
@@ -242,16 +252,21 @@ fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
         |root: &str| -> bool { root.chars().count() >= 4 && !DEMO_CLOSED_CLASS.contains(&root) };
     let mut per_rule: std::collections::BTreeMap<String, &adam_reasoning::reasoner::DerivedFact> =
         std::collections::BTreeMap::new();
+    let mut seen_subjects: std::collections::HashSet<String> = std::collections::HashSet::new();
     for d in &derived {
-        // Skip derivations whose subject is a demonstrative/closed-class
-        // root — dialog planner's Unknown intent extraction won't light
-        // up the reasoning chain for these. We still keep them in the
-        // runtime pool (they're valid facts); we just don't probe with
-        // them in the demo.
         if !subject_is_content_noun(&d.subject.root) {
+            seen_subjects.insert(d.subject.root.clone());
+            continue;
+        }
+        if seen_subjects.contains(&d.subject.root) {
+            // Another derivation earlier in storage already claims this
+            // subject — `inject_reasoning_chain`'s subject-first lookup
+            // would pick THAT one, not us. Skip to keep the demo preview
+            // aligned with the actual rendered response.
             continue;
         }
         per_rule.entry(d.rule_id.clone()).or_insert(d);
+        seen_subjects.insert(d.subject.root.clone());
     }
     println!(
         "Picking one representative derivation per rule id ({} total rules fired):",

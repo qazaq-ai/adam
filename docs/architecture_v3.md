@@ -164,16 +164,23 @@ The **only** source of non-determinism in the API is the `rng_seed` argument to 
 
 ### Fact extraction
 
-Four pattern matchers in `adam_reasoning::patterns`:
+Eleven pattern matchers in `adam_reasoning::patterns` (v2.x baseline + v3.5.x scale-up):
 
-| pattern | emitted predicate | rule ref |
+| pattern | emitted predicate | since |
 |---|---|---|
 | `X — Y` (em-dash copula) | `IsA` | v2.1 |
-| `X Y-да тұрады` | `LivesIn` | v2.1 |
+| `X Y-да тұрады / мекендейді / орналасады` | `LivesIn` | v2.1 (v3.8.0 verb-root fix) |
 | `X-тың Y-сы бар` | `Has` | v2.2 |
-| `X Y-ке барады` | `GoesTo` | v2.5 |
+| `X Y-ке барады / келеді` | `GoesTo` | v2.5 (v3.8.0 verb-root fix) |
+| `X-тің себебі / салдары Y` | `Causes` | v3.5.0 |
+| `X-тен кейін / соң Y` | `After` | v3.5.0 |
+| `X-тің N Y-сы бар` (quantified) | `HasQuantity` | v3.5.0 |
+| `X Y-ні V-лайды` (transitive) | `DoesTo` | v3.5.0 (v3.5.5 stopwords, v3.6.0 passive refuse) |
+| `X пен Y / X және Y` | `RelatedTo` | v3.5.0 |
+| `X-ның саласы / ғылымы Y` | `InDomain` | v3.5.0 |
+| `X-тің бөлігі / бөлшегі Y` | `PartOf` | v3.5.5 |
 
-Every matcher is type-checked on FST features (`Case`, `Predicate` enum, verb root), never on raw verb surface. Outputs `Fact` with categorical `ConfidenceKind::Grammar` + full `FactSource` provenance.
+Every matcher is type-checked on FST features (`Case`, `Predicate` enum, verb root), never on raw verb surface. Outputs `Fact` with categorical `ConfidenceKind::Grammar` + full `FactSource` provenance. At v3.8.5, **9 of 11 predicates fire** on the committed 200 k-sample runtime (`Causes` and `InDomain` remain at 0 — literal head-word patterns rare in current corpus; v3.9+ target loosens them). **v3.8.5 precision hardening**: added `is_location_root` (refuses Қазақстан / Ресей / Алматы etc. as LivesIn subjects — countries can't reside), `is_time_noun` (refuses жыл / күн / ай as subjects of LivesIn / GoesTo / DoesTo — time adverbials are not agents), expanded `is_closed_class` with demonstrative qualifiers (мұндай / сондай / ондай / кейбір / өз / …), rejected LivesIn / GoesTo objects whose FST analysis retains a P3 possessive (fragment parses), 3-char minimum subject-root length. Result: facts dropped from 14 430 to **13 627** (−803, −5.6 %) with LivesIn the biggest precision-win (572 → 315, −44.9 %).
 
 ### Lexical graph
 
@@ -189,9 +196,11 @@ API: `outgoing(root)`, `incoming(root)`, per-node `NodeStats`.
 |---|---|---|
 | **R1** | `A IsA B ∧ B IsA C ⟹ A IsA C` | active (v2.4) |
 | **R2** | `A IsA B ∧ B Has X ⟹ A Has X` | active (v2.8) |
-| R3 | `A LivesIn B ∧ B PartOf C ⟹ A LivesIn C` | documented, deferred |
-| R4 | `A IsA B ∧ B IsA A` → diagnostic | documented, deferred |
+| **R3** | `A Has X ∧ X PartOf Y ⟹ A Has Y` | active (v3.5.5) |
+| R4 | `A IsA B ∧ B IsA A` → diagnostic | curator-warning only |
 | **R5** | `A IsA X ∧ B IsA X ⟹ RelatedTo(A, B)` | active (v2.6) |
+| R6 | `A LivesIn B ∧ B PartOf C ⟹ A LivesIn C` | v3.9+ target (LivesIn now has data) |
+| R7 | `A GoesTo B ∧ B PartOf C ⟹ A GoesTo C` | v3.9+ target (GoesTo now has data) |
 
 Every `DerivedFact` carries:
 - `rule_id: String` — stable identifier (never a probability score)
@@ -302,10 +311,12 @@ cargo run --release -p adam-dialog --bin adam_chat -- --no-retrieval
 - **v3.7.0** — `adam_inspect` binary: interactive "what does adam know about `<root>`?" query over the committed pool, with full provenance per claim.
 - **v3.7.5** — `adam_demo` Part 4 refreshed to iterate one derivation per rule id (R1 / R2 / R3 / R5), showing all four cognitive operations in one demo run.
 - **v3.8.0** — **critical verb-root bug fix**: `locative_lives_in` / `dative_goes_to` compared the infinitive forms (`"тұру"` / `"бару"`) against FST-stored stems (`"тұр"` / `"бар"`); neither predicate had ever fired at any scale since v2.1 / v2.5. Fix unblocks **LivesIn (572 facts) + GoesTo (1 864 facts)** at T4_200k. Predicate coverage jumps **7/11 → 9/11**.
+- **v3.8.5** — **precision hardening** in response to Codex external review: matcher filters (location / time-noun / demonstrative blocklists, possessive-object refusal, 3-char minimum stem), renderer FST synthesis (case suffixes no longer dash-concatenated), demo preview / actual-render alignment (subject-first two-pass in `inject_reasoning_chain`), contradicting README rule-count row removed. Facts drop to **13 627** (−803, −5.6 %) with LivesIn the biggest precision-win (572 → 315, −44.9 %); derivations 207 → 205; coverage holds at 9/11. **423 workspace tests** (+7). First release with a morphology-regression test.
 
 ### Committed but not yet shipped (v3.9+ targets)
 
-- **R6 / R7 rules** — `LivesIn + PartOf → LivesIn`, `GoesTo + PartOf → GoesTo`. Turns the new (v3.8.0) predicate facts into derivations. With 572 LivesIn + 25 PartOf at T4, expect non-zero fire.
+- **R6 / R7 rules** — `LivesIn + PartOf → LivesIn`, `GoesTo + PartOf → GoesTo`. Turns the (v3.8.0-activated, v3.8.5-hardened) predicate facts into derivations. With 315 LivesIn + 23 PartOf at v3.8.5 T4, expect non-zero fire.
+- **FST genitive-after-vowel phonology fix** — the `{D}{I}ң` genitive template produces `қаладың` instead of `қаланың` on vowel-final stems (discovered during v3.8.5 renderer work; sidestepped by using dative/ablative in the reasoning-chain renderer). Dedicated phonology fix is a v3.9 target since it affects 48+ existing FST roundtrip tests.
 - **Loosen `copula_causes` + `domain_membership`** — literal head-word patterns (`себебі`, `саласы`, `ғылымы`) are rare even at T4. Accept broader causal / domain constructions to push coverage **9/11 → 11/11**.
 - **R4 activation** — diagnostic surface for `IsA` symmetry (curator review; remains documented-only because its output is a curator warning, not a fact).
 - **Native-speaker precision audit** — 50-fact / 50-derivation sample in `docs/precision_audit.md` is primed; unblocks first Lexicon PR from v3.4.0 candidates.
