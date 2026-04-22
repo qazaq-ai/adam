@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.5.5-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.6.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -29,7 +29,7 @@
 
 ---
 
-## Why adam (v3.5.5)
+## Why adam (v3.6)
 
 adam is a **neuro-symbolic retrieval system for Kazakh** — the rule-based dialog backbone, the morpheme-indexed retrieval engine, and the forward-chaining reasoner all run together as a single deterministic pipeline. It trades **generalisation for integrity**, and (as of v3.0) adds **rule-derived reasoning** on top of retrieval.
 
@@ -39,7 +39,7 @@ Three things make the trade viable specifically for Kazakh:
 - **Mathematical determinism** — same input + same session + same seed produces a byte-identical answer across runs. No temperature, no sampling, no GPU.
 - **No ungrounded generation by design** — every output is either a template realisation, a corpus quote, or a rule derivation with a full `source_chain`. There is no free-text generator anywhere in the pipeline that could invent content not traceable to its source.
 
-| | adam v3.5 | mainstream LLM |
+| | adam v3.6 | mainstream LLM |
 |---|---|---|
 | Outputs | template + verbatim quote + FST synthesis + **rule-derived chain** | probabilistic token generation |
 | Ungrounded generation | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) | non-zero, non-auditable |
@@ -54,7 +54,7 @@ Three things make the trade viable specifically for Kazakh:
 
 adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, auditable, and — as of v3.0 — capable of deriving conclusions no single corpus sentence states**, while marking every such conclusion with a textual trust signal and a source chain.
 
-### Current state (v3.5.5 — honest numbers)
+### Current state (v3.6.0 — honest numbers)
 
 v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is end-to-end and test-locked, but the fact set is deliberately small while the matchers mature.
 
@@ -70,10 +70,10 @@ v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is en
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
 | Reasoning rules active | 3 (R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo) |
-| Extracted facts (committed) | **251** (v3.5.0: 10 textbooks + 6 new matchers; v3.5.5 adds `structural_part_of` matcher — 0 facts on committed, 5 at T4_50k). Scaling bench **T4_50k: 2 527 facts / 27 derivations**, 4 reasoning rules active (R1/R2/R3/R5) |
-| Rule-derived facts (committed) | **1** (кітап RelatedTo ілім, via R5 — committed snapshot); T4_50k: R1=7, R2=5, R5=15, R3=0-at-this-scale (density threshold) |
-| Fact-graph nodes / edges | 373 / 244 (committed); T4_50k scale: 1 317 / 2 207 |
-| **Predicate coverage (v3.5.5)** | **7 / 11 = 63.6 %** firing at T4_50k (IsA, Has, PartOf, RelatedTo, After, HasQuantity, DoesTo). Not yet firing: LivesIn, GoesTo, Causes, InDomain (density-limited, expected at 1M+ scale) |
+| Extracted facts (committed snapshot) | **251** (v3.5.5). **v3.6.0 `--use-shards` bench on 54.27 M-word pool (9 packs + 27 shards):** T3_50k=2 527, T4_200k=**13 740**, T5_1M partial=**67 806 facts** |
+| Rule-derived facts (committed) | **1** (R5). **v3.6.0 bench T4_200k: R1=33, R2=116, R3=2, R5=56 = 207 derivations — first release where all 4 active rules fire with counts > 0 on real corpus simultaneously** |
+| Fact-graph nodes / edges | 373 / 244 (committed); **v3.6.0 T4_200k: 3 003 / 12 066**; T5_1M: 4 051 / 50 349 (node saturation — vocabulary closing over ~4 k roots) |
+| **Predicate coverage (v3.6.0)** | **7 / 11 = 63.6 %** stable T3 → T5 (IsA, Has, PartOf, RelatedTo, After, HasQuantity, DoesTo). Not yet firing: LivesIn, GoesTo, Causes, InDomain (specific surface patterns not dense in current corpus) |
 | Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |
 | Scaling bench (v3.3.0) | `adam-scaling::scaling_bench` + `audit_precision` — emits `data/scaling/scaling_report.json` + `docs/scaling_report.md` + `docs/precision_audit.md`. Budget-aware `run_tier_with_budget` (chunked at 128 samples, SIGINT / `--time-budget` stops within ~1 s). Normalized metrics per tier: `facts_per_10k_words`, `derivations_per_fact`, `predicate_coverage_pct`, `duplicate_fact_rate_pct`. **Measured scaling on 4.32 M-word committed pool (textbooks + wiki + Abai)**: T3_10k (19 facts, 0 deriv) → T4_50k (120 facts, 51 deriv) — reasoning activates once graph density crosses threshold. |
 | Determinism (v3.2.0 + v3.3.0) | dual-storage Lexicon (`HashMap` get + `entries_ordered: Vec<RootEntry>` for `analyse`). Fixes a 2-year latent non-determinism where `analyse().next()` returned different first analyses across runs for ambiguous surfaces. **4 regression tests** guard the invariant, including expected-order assertions that fail ≈ 50 % on pre-v3.2.0 code. |
@@ -137,7 +137,7 @@ Four parts (v3.0):
 
 ```
 $ cargo run --release -p adam-dialog --bin adam_chat
-adam-chat v3.5 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
+adam-chat v3.6 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
 
 > сәлем
 сәлем

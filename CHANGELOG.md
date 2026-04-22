@@ -7,6 +7,104 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.6.0] — 2026-04-22 — First `--use-shards` scaling run (54 M-word pool, T5_1M tier)
+
+**Sixth** post-v3.0 scale-up release. First **full-scale** scaling-bench run — tapping the 77.9 M-word gitignored local shard pool via the v3.2.0 `--use-shards` flag. With the 3-hour iteration budget the bench makes it through all 5 tiers (`[1k, 10k, 50k, 200k, 1M]`) with T5 as an honest partial-extract (940 288 / 1 000 000 samples scanned at the time-budget cutoff).
+
+### Key finding: R3 fires for the first time on real corpus
+
+At T4_200k, **R3 produces 2 derivations** — the `A Has B ∧ B PartOf C ⟹ A Has C` chain finally finds a matching path in the graph. This confirms the v3.5.5 architectural activation was correct, and R3 is now on the same empirical footing as R1/R2/R5. **All 4 active rules fire with counts > 0 on real corpus simultaneously for the first time.**
+
+### Scaling-law data points
+
+| tier | samples | words | facts | derivations | graph nodes | graph edges | extract s |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| T1_1k | 1 000 | 8 957 | 25 | 0 | 39 | 25 | 11 |
+| T2_10k | 10 000 | 106 190 | 450 | 0 | 442 | 417 | 159 |
+| T3_50k | 50 000 | 611 522 | 2 527 | 27 | 1 317 | 2 207 | 522 |
+| T4_200k | 200 000 | 2 313 598 | **13 740** | **207** | 3 003 | 12 066 | 1 655 |
+| T5_1M* | 940 288 | 11 371 301 | **67 806** | 0† | 4 051 | 50 349 | 8 445 |
+
+\* Partial — hit `--time-budget 10800` (3h) mid-extract at 940 k of 1 M target. `status: "timed_out"` recorded. † Reasoner received 0 budget after extract finished; 0 derivations at T5 is a budget-not-chain artifact.
+
+### Scaling-law signals
+
+**T3 → T4_200k (×3.78 words):**
+
+- facts: 2 527 → 13 740 = **×5.44** (super-linear in words — more words unlock more matcher surface)
+- **derivations: 27 → 207 = ×7.67** (super-linear in facts — exactly the expected reasoning-graph densification)
+- graph nodes: 1 317 → 3 003 = ×2.28 (sub-linear — new words reuse existing roots)
+- graph edges: 2 207 → 12 066 = ×5.47 (near-linear)
+
+**T4_200k → T5_1M (~4.9× words even partial):**
+
+- facts: 13 740 → 67 806 = ×4.94 (holds near-linear)
+- nodes: 3 003 → 4 051 = ×1.35 (**saturating** — vocabulary closure at scale)
+- edges: 12 066 → 50 349 = ×4.17 (tracks fact count)
+
+Node saturation at T5 is significant: the lexical graph is approaching its closure over the 20k-root Lexicon. Additional corpus from here on produces more FACTS over the SAME nodes, densifying the graph rather than widening it. This is the expected regime for a deterministic reasoner — **richer structure on a stable vocabulary, not vocabulary explosion**.
+
+### Rule activations across tiers
+
+| tier | R1 | R2 | R3 | R5 | total |
+|---|---:|---:|---:|---:|---:|
+| T1_1k | 0 | 0 | 0 | 0 | 0 |
+| T2_10k | 0 | 0 | 0 | 0 | 0 |
+| T3_50k | 7 | 5 | 0 | 15 | 27 |
+| **T4_200k** | **33** | **116** | **2** | **56** | **207** |
+| T5_1M† | 0 | 0 | 0 | 0 | 0 (budget) |
+
+**R3 (`has_inheritance_via_part_of`) fires 2 times at T4_200k** — first concrete evidence that the v3.5.5 rule activation was materially correct, not just architecturally wired. R2 shows the biggest jump (5 → 116 = ×23) — textbook prose is rich in `X IsA Y ∧ Y Has Z` chains that the v3.5.0 matchers unlock.
+
+### Normalized metrics across tiers
+
+| tier | facts/10k words | deriv/fact | predicate coverage | duplicate rate |
+|---|---:|---:|---:|---:|
+| T1_1k | 27.9 | 0.0 | 18.2 % | 0.0 % |
+| T2_10k | 42.4 | 0.0 | 45.5 % | 7.3 % |
+| T3_50k | 41.3 | 0.011 | 63.6 % | 12.7 % |
+| **T4_200k** | **59.4** | **0.015** | **63.6 %** | 12.2 % |
+| T5_1M† | 59.6 | 0.0† | 63.6 % | 25.7 % |
+
+**Extraction density (`facts/10k words`) rises 27.9 → 59.6** — the matchers get more efficient per unit corpus as the context diversifies. Stabilising around 60 means we're approaching the linear-density regime; further corpus adds facts but not density.
+
+**Duplicate rate jumps T4 → T5 (12.2 % → 25.7 %)** — at 67 k facts on 1 M samples, we start seeing repeated structural phrases across different textbook chapters. This is the signal Codex flagged as "occurrence_count deserves to be its own field" — a v3.7+ target.
+
+### Sources loaded
+
+- 9 committed packs: `tatoeba` + `wikipedia_kz` + `common_voice_kk` + `cc100_kk` + `abai_wikisource` + `kazakh_proverbs` + `synthetic_sentences` + `kazakh_classics` + `kazakh_textbooks`
+- **27 local shards**: `wikipedia_kz_shard_*` + `cc100_kk_shard_*`
+- Total pool: **4 376 521 samples / 54 270 582 words**
+
+(Pool is smaller than the often-cited 77.9M because some local shards are excluded from committed/shard pools — a v3.7+ cleanup target.)
+
+### Committed artifacts
+
+All committed artifacts unchanged from v3.5.5. This release is a **bench-only scaling data point**; no library / matcher / rule changes.
+
+- `data/retrieval/facts.json`: 251 (unchanged)
+- `data/retrieval/lexical_graph.json`: 373 nodes / 244 edges (unchanged)
+- `data/retrieval/derived_facts.json`: 1 (R5, unchanged)
+- `data/scaling/scaling_report.json`: **regenerated with T5_1M partial + R3 first-fire evidence**
+
+### Tests
+
+**413 passing, 0 failing, 0 warnings** — no test surface change.
+
+### Upgrade notes
+
+- No code changes. Pure scaling-run release.
+- `scaling_report.json` schema unchanged (v3.3.0 normalized-metrics fields already in place).
+- `data/scaling/scaling_report.json` is larger than v3.5.5 (~5× samples scanned); still well under 1 MB.
+
+### What's next
+
+- **v3.6.5** — Codex #4 follow-up: `occurrence_count` as a first-class field on `Fact` to absorb the T5 duplicate signal cleanly.
+- **v3.7.0** — `--persist-tier` flag on `scaling_bench` + `adam_chat --facts-tier T5` integration: demo the 67 k-fact pool interactively.
+- **v3.8.0** — native-speaker precision audit + first Lexicon PR (v3.4.0 candidates file unblocks).
+
+---
+
 ## [3.5.5] — 2026-04-22 — PartOf matcher + R3 mereological rule activation
 
 Small incremental release (per `feedback_versioning_post_1_0`: x.y.5 = small). Completes the **reasoning-rule roster at 4 active rules** by activating R3 with the first `PartOf`-producing extractor.

@@ -1,10 +1,10 @@
 {
-  "status": "completed",
-  "elapsed_s": 974,
-  "tiers_completed": 4,
-  "tiers_planned": 4,
-  "version": "3.5.0",
-  "total_elapsed_s": 973,
+  "status": "timed_out",
+  "elapsed_s": 10801,
+  "tiers_completed": 5,
+  "tiers_planned": 5,
+  "version": "3.5.5",
+  "total_elapsed_s": 10793,
   "machine": {
     "rayon_threads": 8
   },
@@ -20,38 +20,41 @@
       "common_voice_kk_pack.json",
       "cc100_kk_pack.json"
     ],
-    "shard_packs_loaded": [],
-    "total_samples_available": 430720,
-    "total_words_available": 4573075
+    "shard_packs_loaded": [
+      "cc100_kk_shard_02_pack.json",
+      "cc100_kk_shard_03_pack.json",
+      "cc100_kk_shard_04_pack.json",
+      "cc100_kk_shard_05_pack.json",
+      "cc100_kk_shard_06_pack.json",
+      "cc100_kk_shard_07_pack.json",
+      "cc100_kk_shard_08_pack.json",
+      "cc100_kk_shard_09_pack.json",
+      "cc100_kk_shard_10_pack.json",
+      "cc100_kk_shard_11_pack.json",
+      "cc100_kk_shard_12_pack.json",
+      "cc100_kk_shard_13_pack.json",
+      "cc100_kk_shard_14_pack.json",
+      "cc100_kk_shard_15_pack.json",
+      "cc100_kk_shard_16_pack.json",
+      "cc100_kk_shard_17_pack.json",
+      "cc100_kk_shard_18_pack.json",
+      "cc100_kk_shard_19_pack.json",
+      "wikipedia_kz_shard_02_pack.json",
+      "wikipedia_kz_shard_03_pack.json",
+      "wikipedia_kz_shard_04_pack.json",
+      "wikipedia_kz_shard_05_pack.json",
+      "wikipedia_kz_shard_06_pack.json",
+      "wikipedia_kz_shard_07_pack.json",
+      "wikipedia_kz_shard_08_pack.json",
+      "wikipedia_kz_shard_09_pack.json",
+      "wikipedia_kz_shard_10_pack.json"
+    ],
+    "total_samples_available": 4376521,
+    "total_words_available": 54270582
   },
   "tiers": [
     {
-      "label": "T1_100",
-      "target_samples": 100,
-      "samples_scanned": 100,
-      "words_scanned": 903,
-      "facts_extracted": 2,
-      "facts_by_predicate": {
-        "does_to": 2
-      },
-      "derivations": 0,
-      "derivations_by_rule": {},
-      "graph_nodes": 3,
-      "graph_edges": 2,
-      "elapsed_ms": {
-        "extract": 880,
-        "graph": 0,
-        "reason": 0
-      },
-      "normalized": {
-        "facts_per_10k_words": 22.148394241417495,
-        "derivations_per_fact": 0.0,
-        "predicate_coverage_pct": 9.090909090909092,
-        "duplicate_fact_rate_pct": 0.0
-      }
-    },
-    {
-      "label": "T2_1k",
+      "label": "T1_1k",
       "target_samples": 1000,
       "samples_scanned": 1000,
       "words_scanned": 8957,
@@ -65,9 +68,9 @@
       "graph_nodes": 39,
       "graph_edges": 25,
       "elapsed_ms": {
-        "extract": 17324,
-        "graph": 0,
-        "reason": 0
+        "extract": 11317,
+        "graph": 1,
+        "reason": 1
       },
       "normalized": {
         "facts_per_10k_words": 27.911130959026462,
@@ -77,7 +80,7 @@
       }
     },
     {
-      "label": "T3_10k",
+      "label": "T2_10k",
       "target_samples": 10000,
       "samples_scanned": 10000,
       "words_scanned": 106190,
@@ -94,9 +97,9 @@
       "graph_nodes": 442,
       "graph_edges": 417,
       "elapsed_ms": {
-        "extract": 173264,
-        "graph": 0,
-        "reason": 1
+        "extract": 159457,
+        "graph": 1,
+        "reason": 2
       },
       "normalized": {
         "facts_per_10k_words": 42.37687164516433,
@@ -106,7 +109,7 @@
       }
     },
     {
-      "label": "T4_50k",
+      "label": "T3_50k",
       "target_samples": 50000,
       "samples_scanned": 50000,
       "words_scanned": 611522,
@@ -129,15 +132,82 @@
       "graph_nodes": 1317,
       "graph_edges": 2207,
       "elapsed_ms": {
-        "extract": 782261,
-        "graph": 3,
-        "reason": 41
+        "extract": 522208,
+        "graph": 2,
+        "reason": 27
       },
       "normalized": {
         "facts_per_10k_words": 41.32312492436904,
         "derivations_per_fact": 0.010684606252473288,
         "predicate_coverage_pct": 63.63636363636363,
         "duplicate_fact_rate_pct": 12.663237039968342
+      }
+    },
+    {
+      "label": "T4_200k",
+      "target_samples": 200000,
+      "samples_scanned": 200000,
+      "words_scanned": 2313598,
+      "facts_extracted": 13740,
+      "facts_by_predicate": {
+        "after": 278,
+        "does_to": 11611,
+        "has": 190,
+        "has_quantity": 19,
+        "is_a": 162,
+        "part_of": 25,
+        "related_to": 1455
+      },
+      "derivations": 207,
+      "derivations_by_rule": {
+        "R1_is_a_transitivity": 33,
+        "R2_has_inheritance": 116,
+        "R3_has_inheritance_via_part_of": 2,
+        "R5_shared_is_a_target": 56
+      },
+      "graph_nodes": 3003,
+      "graph_edges": 12066,
+      "elapsed_ms": {
+        "extract": 1655121,
+        "graph": 17,
+        "reason": 365
+      },
+      "normalized": {
+        "facts_per_10k_words": 59.388018143169205,
+        "derivations_per_fact": 0.015065502183406113,
+        "predicate_coverage_pct": 63.63636363636363,
+        "duplicate_fact_rate_pct": 12.183406113537117
+      }
+    },
+    {
+      "label": "T5_1M",
+      "target_samples": 1000000,
+      "samples_scanned": 940288,
+      "words_scanned": 11371301,
+      "facts_extracted": 67806,
+      "facts_by_predicate": {
+        "after": 959,
+        "does_to": 57493,
+        "has": 904,
+        "has_quantity": 53,
+        "is_a": 335,
+        "part_of": 61,
+        "related_to": 8001
+      },
+      "derivations": 0,
+      "derivations_by_rule": {},
+      "graph_nodes": 4051,
+      "graph_edges": 50349,
+      "elapsed_ms": {
+        "extract": 8445233,
+        "graph": 78,
+        "reason": 84
+      },
+      "normalized": {
+        "facts_per_10k_words": 59.62906091396226,
+        "derivations_per_fact": 0.0,
+        "predicate_coverage_pct": 63.63636363636363,
+        "duplicate_fact_rate_pct": 25.745509246969295
       }
     }
   ]
