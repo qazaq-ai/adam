@@ -1,10 +1,10 @@
 {
   "status": "completed",
-  "elapsed_s": 904,
+  "elapsed_s": 974,
   "tiers_completed": 4,
   "tiers_planned": 4,
-  "version": "3.4.0",
-  "total_elapsed_s": 903,
+  "version": "3.5.0",
+  "total_elapsed_s": 973,
   "machine": {
     "rayon_threads": 8
   },
@@ -39,7 +39,7 @@
       "graph_nodes": 3,
       "graph_edges": 2,
       "elapsed_ms": {
-        "extract": 761,
+        "extract": 880,
         "graph": 0,
         "reason": 0
       },
@@ -65,7 +65,7 @@
       "graph_nodes": 39,
       "graph_edges": 25,
       "elapsed_ms": {
-        "extract": 12305,
+        "extract": 17324,
         "graph": 0,
         "reason": 0
       },
@@ -94,7 +94,7 @@
       "graph_nodes": 442,
       "graph_edges": 417,
       "elapsed_ms": {
-        "extract": 163798,
+        "extract": 173264,
         "graph": 0,
         "reason": 1
       },
@@ -110,13 +110,14 @@
       "target_samples": 50000,
       "samples_scanned": 50000,
       "words_scanned": 611522,
-      "facts_extracted": 2522,
+      "facts_extracted": 2527,
       "facts_by_predicate": {
         "after": 48,
         "does_to": 2019,
         "has": 49,
         "has_quantity": 4,
         "is_a": 57,
+        "part_of": 5,
         "related_to": 345
       },
       "derivations": 27,
@@ -125,18 +126,18 @@
         "R2_has_inheritance": 5,
         "R5_shared_is_a_target": 15
       },
-      "graph_nodes": 1315,
-      "graph_edges": 2203,
+      "graph_nodes": 1317,
+      "graph_edges": 2207,
       "elapsed_ms": {
-        "extract": 726533,
-        "graph": 5,
-        "reason": 42
+        "extract": 782261,
+        "graph": 3,
+        "reason": 41
       },
       "normalized": {
-        "facts_per_10k_words": 41.24136171715817,
-        "derivations_per_fact": 0.01070578905630452,
-        "predicate_coverage_pct": 54.54545454545454,
-        "duplicate_fact_rate_pct": 12.648691514670896
+        "facts_per_10k_words": 41.32312492436904,
+        "derivations_per_fact": 0.010684606252473288,
+        "predicate_coverage_pct": 63.63636363636363,
+        "duplicate_fact_rate_pct": 12.663237039968342
       }
     }
   ]

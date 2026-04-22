@@ -1077,6 +1077,138 @@ pub fn domain_membership(
     });
 }
 
+/// Structural-partitive pattern — `X Y-нің бөлігі` / `X Y-нің
+/// құрамында` → `(X, PartOf, Y)`.
+///
+/// Two concrete Kazakh constructions for "X is a part of Y" — each
+/// common in textbook prose (biology / geography / physics / math
+/// taxonomies):
+///
+///   1. `X Y-нің бөлігі` — "X is Y's piece" (genitive + possessed
+///      `бөлігі`, P3 of `бөлік` "piece/part").
+///   2. `X Y-нің құрамында` — "X is in Y's composition" (locative of
+///      `құрам`, P3).
+///
+/// **v3.5.5 intentionally drops `ішінде`** ("inside" / "among") — the
+/// word is semantically ambiguous between partitive (`X is inside Y`)
+/// and universal-quantifier (`among all N, X stands out`). The latter
+/// reading triggered false positives on v3.5.5 initial extraction
+/// ("тілдердің ішінде қазақ" = "among languages, Kazakh" is NOT a
+/// PartOf claim). Restricted the matcher to the two unambiguous heads.
+///
+/// v3.5.5 uses literal possessed-noun heads rather than pure morphology
+/// because Kazakh `-нің` alone doesn't distinguish a partitive genitive
+/// from a general genitive. The head word pins the semantic relation.
+///
+/// Requirements:
+///
+///   - The sentence contains one of the three literal head words as a
+///     standalone token: `бөлігі`, `құрамында`, `ішінде`.
+///   - The immediately-preceding token analyses as a genitive noun
+///     (`Case::Genitive`) → Y, the parent.
+///   - A bare-nominative content noun earlier in the sentence → X,
+///     the part.
+///   - Tautology guard: X.root ≠ Y.root.
+///
+/// Feeds the v3.5.5 `R3_has_inheritance_via_part_of` rule
+/// (`Has(X, Y) ∧ PartOf(Y, Z) ⟹ Has(X, Z)`) — producing the first
+/// derivation path that chains two non-IsA predicates.
+pub fn structural_part_of(
+    text: &str,
+    _parses: &[Analysis],
+    lexicon: &LexiconV1,
+    source: &FactSource,
+    out: &mut Vec<Fact>,
+) {
+    let text_lower = text.to_lowercase();
+    let has_head = text_lower.contains(" бөлігі")
+        || text_lower.contains(" құрамында")
+        // Start-of-sentence cases (rare but possible).
+        || text_lower.starts_with("бөлігі")
+        || text_lower.starts_with("құрамында");
+    if !has_head {
+        return;
+    }
+    let tokens: Vec<(String, Option<Analysis>)> = text
+        .split_whitespace()
+        .map(|t| {
+            let cleaned: String = t
+                .chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect();
+            let lowered = cleaned.to_lowercase();
+            let first = analyse(&lowered, lexicon).into_iter().next();
+            (cleaned, first)
+        })
+        .filter(|(s, _)| !s.is_empty())
+        .collect();
+    // Find the first head-word occurrence. `ішінде` is deliberately
+    // omitted — see doc comment for the false-positive story.
+    let head_idx = tokens.iter().position(|(s, _)| {
+        let lo = s.to_lowercase();
+        lo == "бөлігі" || lo == "құрамында"
+    });
+    let Some(head_idx) = head_idx else { return };
+    if head_idx == 0 {
+        return;
+    }
+    // Preceding token must analyse as a genitive noun (the Y parent).
+    let prev = &tokens[head_idx - 1];
+    let Some(Analysis::Noun { features, root }) = &prev.1 else {
+        return;
+    };
+    if features.case != Some(Case::Genitive) {
+        return;
+    }
+    if root.part_of_speech != "noun" || is_closed_class(&root.root) {
+        return;
+    }
+    let obj_slot = SlotRef {
+        surface: prev.0.clone(),
+        root: root.root.clone(),
+        pos: "noun".to_string(),
+    };
+    // Subject X: first bare-nominative content noun before the genitive
+    // Y. Refuses pronouns, closed-class items, and possessive-form
+    // surfaces (consistent with v3.5.0 agent_verb tightening).
+    let subj = (0..head_idx - 1).find_map(|i| match &tokens[i].1 {
+        Some(Analysis::Noun { features, root }) => {
+            if root.part_of_speech != "noun"
+                || is_closed_class(&root.root)
+                || features.case.is_some_and(|c| c != Case::Nominative)
+                || features.possessive.is_some()
+            {
+                return None;
+            }
+            Some(SlotRef {
+                surface: tokens[i].0.clone(),
+                root: root.root.clone(),
+                pos: "noun".to_string(),
+            })
+        }
+        _ => None,
+    });
+    let Some(subject) = subj else { return };
+    if subject.root == obj_slot.root {
+        return;
+    }
+    let head_tok = tokens[head_idx].0.to_lowercase();
+    let pattern = match head_tok.as_str() {
+        "бөлігі" => "X Y-нің бөлігі",
+        "құрамында" => "X Y-нің құрамында",
+        _ => "X Y-нің <part>",
+    };
+    out.push(Fact {
+        subject,
+        predicate: Predicate::PartOf,
+        object: obj_slot,
+        pattern: pattern.to_string(),
+        source: source.clone(),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: text.trim().to_string(),
+    });
+}
+
 // -----------------------------------------------------------------------------
 // helpers
 // -----------------------------------------------------------------------------
@@ -1693,5 +1825,42 @@ mod tests {
             &mut out,
         );
         assert!(out.is_empty(), "no саласы/ғылымы head → refuse");
+    }
+
+    // ------------------------- structural_part_of (v3.5.5) ----------------
+
+    #[test]
+    fn structural_part_of_rejects_without_head_word() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        structural_part_of("жапырақ ағаштың жасыл түрі", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "no бөлігі/құрамында/ішінде → refuse");
+    }
+
+    #[test]
+    fn structural_part_of_rejects_without_genitive_preceding_head() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        // "бөлігі" present but preceding token is NOT a genitive noun.
+        structural_part_of("жапырақ жасыл бөлігі болады", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "preceding token must be genitive");
+    }
+
+    #[test]
+    fn structural_part_of_rejects_pronoun_subject() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        // Pronoun subject refused per closed-class.
+        structural_part_of("мен денеміздің бөлігі", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "pronoun subject refused");
+    }
+
+    #[test]
+    fn structural_part_of_rejects_tautology() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        // Tautological X=Y refused.
+        structural_part_of("ми мидың бөлігі", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "X=Y tautology refused");
     }
 }

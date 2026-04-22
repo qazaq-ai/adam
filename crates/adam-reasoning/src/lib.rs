@@ -235,6 +235,9 @@ pub fn extract_facts(
     patterns::agent_verb(text, parses, lexicon, source, &mut out);
     patterns::nominal_conjunction(text, parses, lexicon, source, &mut out);
     patterns::domain_membership(text, parses, lexicon, source, &mut out);
+    // v3.5.5: structural partitive — first PartOf extractor. Feeds
+    // the R3_has_inheritance_via_part_of rule (Has + PartOf → Has).
+    patterns::structural_part_of(text, parses, lexicon, source, &mut out);
     out
 }
 

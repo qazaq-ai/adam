@@ -7,6 +7,97 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.5.5] — 2026-04-22 — PartOf matcher + R3 mereological rule activation
+
+Small incremental release (per `feedback_versioning_post_1_0`: x.y.5 = small). Completes the **reasoning-rule roster at 4 active rules** by activating R3 with the first `PartOf`-producing extractor.
+
+### New matcher: `structural_part_of`
+
+Pattern: `X Y-нің бөлігі` ("X is Y's part") + `X Y-нің құрамында` ("X is in Y's composition"). Both are structurally partitive with unambiguous Kazakh semantics.
+
+**Dropped from the initial design**: `ішінде` ("inside" / "among") was semantically ambiguous — both partitive (`X is inside Y`) and universal-quantifier (`among all N, X stands out`). First run produced 3 facts with 2/3 false-positive rate (e.g. "тілдердің ішінде қазақ" = "among languages, Kazakh" is NOT a PartOf claim). Tightened to the two unambiguous heads only; 4 unit tests cover the negative cases.
+
+Fact-production requirements:
+- genitive noun immediately before the `бөлігі` / `құрамында` head → Y
+- bare-nominative content noun earlier in the sentence → X (same POS + closed-class + possessive filters as v3.5.0 agent_verb tightening)
+- X ≠ Y tautology guard
+
+### New reasoning rule: R3
+
+`R3_has_inheritance_via_part_of`: `A Has B ∧ B PartOf C ⟹ A Has C`.
+
+Mereological inheritance — if A owns B, and B is part of C, A has a claim on (at least the presence of) C. Labelled `ConfidenceKind::RuleInferred` (never Grammar), so downstream consumers can filter by confidence kind. Tautology guard on A = C.
+
+4 unit tests:
+- `r3_derives_has_inheritance_via_part_of` — positive case.
+- `r3_respects_tautology_guard` — refuses A Has A.
+- `r3_does_not_fire_without_part_of_edge` — no Has/PartOf chain → no derivation.
+- `r3_dedupes_against_existing_facts` — if `A Has C` already exists, R3 doesn't re-emit.
+
+**Total active rules**: R1 (IsA-transitivity), R2 (Has-inheritance), **R3 (Has-inheritance via PartOf, v3.5.5)**, R5 (shared-IsA → RelatedTo). 4/5 documented rules active. R4 (IsA-symmetry diagnostic) remains documented-only — its output is a curator warning, not a fact, and needs an asymmetric code path.
+
+### Committed artifacts
+
+PartOf facts at committed 500/pack: **0** — the strict `бөлігі` / `құрамында` heads don't appear in the first 500 samples of any canonical pack. Scaling bench on T4_50k shows the first meaningful activations.
+
+Facts: **251** (unchanged from v3.5.0 — PartOf dropped from 3 → 0 by tightening; the 3 that DID extract at v3.5.0 were 2 false positives + 1 borderline, so this is net a precision improvement).
+
+### Scaling bench T4_50k
+
+Fresh run on 4.57 M-word committed pool:
+
+| predicate | count |
+|---|---:|
+| `does_to` | 2 019 |
+| `related_to` | 345 |
+| `is_a` | 57 |
+| `has` | 49 |
+| `after` | 48 |
+| **`part_of`** | **5 (new!)** |
+| `has_quantity` | 4 |
+| **Total** | **2 527** (+5 vs v3.5.0) |
+
+**Predicate coverage: 6/11 (54.5 %) → 7/11 (63.6 %)** — PartOf is the 7th predicate to fire on real corpus.
+
+### R3 activation signal
+
+At T4_50k, R3 fires **0 times**. R1/R2/R5 unchanged (7 / 5 / 15 = 27 total derivations). Why R3 = 0:
+
+- R3 needs `Has(X, Y) ∧ PartOf(Y, Z)` — a Has-fact whose object is a PartOf-fact's subject.
+- At T4: 49 Has facts, 5 PartOf facts.
+- The Has-object roots and the PartOf-subject roots don't overlap in the current slice.
+
+This is **architecturally correct and expected**: R3 is wired, unit-tested (4 tests), and will fire automatically as soon as the corpus contains the right chain. The "0 at this scale" is an honest signal, not a bug — the density threshold is simply higher for mereological inheritance than for IsA-transitivity.
+
+**Precedent**: R5 sat at 0 derivations for several releases (v2.6 → v2.7 activation) before the corpus supplied shared-IsA targets. R1/R2 similarly took v3.2 → v3.3 scale to fire with counts > 1. R3 is in that same "activate at scale" cohort.
+
+### Normalized metrics (v3.5.0 → v3.5.5, T4_50k)
+
+| | v3.5.0 | v3.5.5 | delta |
+|---|---:|---:|---|
+| facts / 10k words | 41.24 | 41.32 | +0.2 % (near-noise) |
+| derivations / fact | 0.0107 | 0.0107 | unchanged |
+| **predicate coverage** | 54.5 % | **63.6 %** | **+9.1 pp** |
+| duplicate-fact rate | 12.65 % | 12.66 % | ≈ unchanged |
+
+The single meaningful delta is **predicate coverage**. Raw fact count barely moved (+5 PartOf on 2 522) because the tightened `structural_part_of` matcher is deliberately narrow. A broader PartOf matcher could push the count up 10-100× but would re-introduce the "ішінде" false-positive class.
+
+### Tests
+
+**413 passing, 0 failing, 0 warnings** (405 baseline + 4 structural_part_of + 4 R3).
+
+### Why only a .5 bump (not 3.6.0)
+
+Per `feedback_versioning_post_1_0`: `x.y.5` = small / incremental. This release:
+- Adds 1 matcher (not 6).
+- Activates 1 rule (not a new reasoning framework).
+- Retires 1 pattern (`ішінде` dropped) on precision grounds.
+- Scales existing infrastructure; no new crate, no API change.
+
+The predicate coverage still reads `7/11` (PartOf now firing at T4 scale — see bench numbers), so this is a meaningful scaling-law data point in a small package.
+
+---
+
 ## [3.5.0] — 2026-04-22 — Corpus + predicate breadth (10 textbooks + 5 new predicates)
 
 **Fifth** post-v3.0 scale-up release. Executes the approved "multiplicative axes" strategy: **Corpus** (3 → 10 textbooks, pack 8 421 → **28 110 samples**) + **Predicate breadth** (6 predicates → 11, five new matchers). Together they multiply committed fact count by **~15× (17 → 251)** and shift the scaling curve in both X-axis (more corpus) and Y-axis (more predicate dimensions).

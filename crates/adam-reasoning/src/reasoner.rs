@@ -20,7 +20,7 @@
 //! |---|---|---|
 //! | `R1_is_a_transitivity` | A IsA B ∧ B IsA C | A IsA C |
 //! | `R2_has_inheritance` | A IsA B ∧ B Has X | A HasKinded X (new predicate) |
-//! | `R3_lives_in_transitivity` | A LivesIn B ∧ B PartOf C | A LivesIn C (not active yet — no PartOf facts) |
+//! | `R3_has_inheritance_via_part_of` | A Has B ∧ B PartOf C | A Has C (v3.5.5 — mereological inheritance; activated with the structural_part_of matcher) |
 //! | `R4_is_a_symmetry_filter` | A IsA B ∧ B IsA A | flag both for curator review (returns diagnostic, not a fact) |
 //! | `R5_shared_is_a_target` | A IsA X ∧ B IsA X (A ≠ B) | RelatedTo(A, B) |
 //!
@@ -167,6 +167,7 @@ fn run_one_pass(
     let mut out = Vec::new();
     rule_r1_is_a_transitivity(facts, graph, seen, &mut out);
     rule_r2_has_inheritance(facts, graph, seen, &mut out);
+    rule_r3_has_inheritance_via_part_of(facts, graph, seen, &mut out);
     rule_r5_shared_is_a_target(facts, graph, seen, &mut out);
     out
 }
@@ -306,6 +307,65 @@ fn rule_r2_has_inheritance(
                     pos: "noun".into(),
                 },
                 rule_id: "R2_has_inheritance".into(),
+                source_chain: vec![first.source.clone(), second_source],
+                confidence: ConfidenceKind::RuleInferred,
+            });
+        }
+    }
+}
+
+/// `R3`: Has-inheritance via PartOf (mereological). If
+/// `A Has B` and `B PartOf C`, derive `A Has C`.
+///
+/// Intuition: if A owns B, and B is structurally part of C, A
+/// effectively has a claim on the whole of C (or at least on the
+/// presence of C via B). In natural language this is weaker than the
+/// object-level claim — «адам Has денеміздің бөлігі» — so every
+/// derivation is labelled `ConfidenceKind::RuleInferred` (never
+/// Grammar) and downstream consumers can filter by confidence kind.
+///
+/// Tautology guard: A = C rejected.
+fn rule_r3_has_inheritance_via_part_of(
+    facts: &[Fact],
+    graph: &LexicalGraph,
+    seen: &BTreeSet<(String, String, String)>,
+    out: &mut Vec<DerivedFact>,
+) {
+    for first in facts {
+        if first.predicate != Predicate::Has {
+            continue;
+        }
+        // A Has B — find every (B PartOf C) edge in the graph.
+        for second in graph.outgoing(&first.object.root) {
+            if second.predicate != Predicate::PartOf {
+                continue;
+            }
+            // A = C tautology.
+            if first.subject.root == second.to {
+                continue;
+            }
+            let key = (
+                first.subject.root.clone(),
+                "has".to_string(),
+                second.to.clone(),
+            );
+            if seen.contains(&key) {
+                continue;
+            }
+            let second_source = second
+                .sources
+                .first()
+                .cloned()
+                .expect("graph edge must carry at least one source");
+            out.push(DerivedFact {
+                subject: first.subject.clone(),
+                predicate: Predicate::Has,
+                object: SlotRef {
+                    surface: second.to.clone(),
+                    root: second.to.clone(),
+                    pos: "noun".into(),
+                },
+                rule_id: "R3_has_inheritance_via_part_of".into(),
                 source_chain: vec![first.source.clone(), second_source],
                 confidence: ConfidenceKind::RuleInferred,
             });
@@ -687,5 +747,80 @@ mod tests {
             .filter(|d| d.rule_id == "R2_has_inheritance")
             .collect();
         assert!(r2.is_empty());
+    }
+
+    // ------------------------- R3 (v3.5.5) --------------------------------
+
+    #[test]
+    fn r3_derives_has_inheritance_via_part_of() {
+        // адам Has жүрек, жүрек PartOf дене ⟹ адам Has дене
+        let facts = vec![
+            mk_fact("адам", Predicate::Has, "жүрек", "p1", "s1"),
+            mk_fact("жүрек", Predicate::PartOf, "дене", "p2", "s2"),
+        ];
+        let derived = run(&facts);
+        let r3: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R3_has_inheritance_via_part_of")
+            .collect();
+        assert_eq!(r3.len(), 1, "R3 should produce exactly one derivation");
+        let d = r3[0];
+        assert_eq!(d.subject.root, "адам");
+        assert_eq!(d.predicate, Predicate::Has);
+        assert_eq!(d.object.root, "дене");
+        assert_eq!(d.confidence, ConfidenceKind::RuleInferred);
+        assert_eq!(
+            d.source_chain.len(),
+            2,
+            "R3 source chain must have both fact sources"
+        );
+    }
+
+    #[test]
+    fn r3_respects_tautology_guard() {
+        // A Has B, B PartOf A → A Has A tautology; must NOT derive.
+        let facts = vec![
+            mk_fact("A", Predicate::Has, "B", "p", "s1"),
+            mk_fact("B", Predicate::PartOf, "A", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        for d in &derived {
+            assert!(
+                !(d.subject.root == d.object.root && d.rule_id == "R3_has_inheritance_via_part_of"),
+                "R3 must never derive A Has A: {d:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn r3_does_not_fire_without_part_of_edge() {
+        // A Has B, no B PartOf X anywhere.
+        let facts = vec![
+            mk_fact("A", Predicate::Has, "B", "p", "s1"),
+            mk_fact("C", Predicate::PartOf, "D", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        let r3: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R3_has_inheritance_via_part_of")
+            .collect();
+        assert!(r3.is_empty());
+    }
+
+    #[test]
+    fn r3_dedupes_against_existing_facts() {
+        // адам Has жүрек, жүрек PartOf дене, адам Has дене (already known)
+        //   → R3 MUST NOT re-emit a duplicate.
+        let facts = vec![
+            mk_fact("адам", Predicate::Has, "жүрек", "p", "s1"),
+            mk_fact("жүрек", Predicate::PartOf, "дене", "p", "s2"),
+            mk_fact("адам", Predicate::Has, "дене", "p", "s3"),
+        ];
+        let derived = run(&facts);
+        let r3: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R3_has_inheritance_via_part_of")
+            .collect();
+        assert!(r3.is_empty(), "R3 must not duplicate an existing fact");
     }
 }
