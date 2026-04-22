@@ -7,6 +7,74 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.7.0] — 2026-04-22 — `adam_inspect` — interactive intelligence query
+
+New `adam-dialog::adam_inspect` binary — the **interactive complement to `adam_demo`**. Where `adam_demo` runs a scripted 4-part walkthrough, `adam_inspect` takes a Kazakh root from the user and prints **everything adam knows** about it, traceable to `(pack, sample_id)` or `rule_id + source_chain`.
+
+Concrete example (`cargo run -p adam-dialog --bin adam_inspect -- еңбек`):
+
+```
+# Graph position for `еңбек`
+  out-degree: 18   in-degree: 16   total: 34
+  outgoing: does_to=12, has_quantity=1, is_a=1, related_to=4
+
+# Direct facts (extracted from corpus): 24 as subject, 17 as object
+  `еңбек` --is_a--> `қайнар`  [pattern: X — Y; kazakh_proverbs_pack.json/proverb_068]
+  ...
+
+# Rule-derived facts (not in corpus — inferred): 2 as subject
+  `еңбек` --is_a--> `өзен`  [R1_is_a_transitivity]
+    source_chain:
+      • kazakh_proverbs_pack.json / proverb_068
+      • wikipedia_kz_pack.json / wiki_kz_0139793
+    Kazakh: қорытынды: еңбек — өзен (байланысты ой-тізбек арқылы)
+  `еңбек` --related_to--> `қайнар`  [R5_shared_is_a_target]
+    ...
+```
+
+The R1-derived `еңбек — өзен` ("labor is a river") is a **conclusion not present in corpus** — built by chaining `еңбек IsA қайнар` (proverb) + `қайнар IsA өзен` (wiki). Every hop has a `(pack, sample_id)` pointer. An investor typing any Kazakh content noun gets this kind of structured report over the 13 345-fact / 207-derivation committed runtime pool.
+
+### Why this complements `adam_demo`
+
+- **`adam_demo`** — scripted, same 4 turns every run, good for recorded demos.
+- **`adam_inspect`** — interactive, user-driven, good for live "prove it" sessions.
+
+Both tools load the same committed artifacts (no per-binary scale difference). Together they cover the two investor-demo modes: "watch a scripted narrative" vs "ask your own question".
+
+### Sections of the inspect report
+
+1. **Graph position** — degree, per-predicate incoming / outgoing counts.
+2. **Direct facts** — every extracted `Fact` touching the root, capped at 10 per side, with the rest reported as "… and N more".
+3. **Rule-derived facts** — every `DerivedFact` the reasoner chained to this root, with full `source_chain` and a Kazakh-prose rendering carrying the «байланыс-» trust marker.
+4. **Co-predicated neighbours** — other roots that share an IsA target with this one (the R5-input surface — useful for "who is similar to X" queries).
+5. **Summary footer** — one-line degree + fact-count + derivation-count recap.
+
+For unknown roots the binary prints the 5 alphabetically-closest entries from the 2 974-node graph as "did you mean" suggestions.
+
+### Implementation notes
+
+- Pure viewer over existing `data/retrieval/*.json` artefacts — no library-surface change.
+- Kazakh-prose renderer is duplicated inline (avoiding a bin → bin dep on `adam-dialog::conversation`).
+- 3 unit tests: nearest-key prefix match, empty-map edge case, all-predicates rendering coverage.
+
+### Tests
+
+**416 passing, 0 failing, 0 warnings** (413 baseline + 3 adam_inspect).
+
+### Upgrade notes
+
+- Additive. No library API change. Existing `adam_chat` / `adam_demo` unchanged.
+- Cargo auto-discovers the new `src/bin/*.rs` file — no Cargo.toml change needed.
+- Banner sync: `adam_chat` / `adam_demo` / README `v3.6.5 → v3.7.0` per `feedback_readme_pre_push_audit`.
+
+### What's next
+
+- **v3.7.5** — refresh `adam_demo` Part 4 to iterate over one derivation per rule type (R1/R2/R3/R5 showcase) rather than repeating the same derivation across seeds.
+- **v3.8.0** — native-speaker precision audit unblocks Lexicon PR.
+- **v3.9.0** — `occurrence_count` first-class field (Codex #4 follow-up).
+
+---
+
 ## [3.6.5] — 2026-04-22 — Committed runtime scaled to T4_200k (first signs of intelligence)
 
 Intelligence that was **stuck in a scaling_bench report** is now **surfaced in the interactive runtime**. Before v3.6.5, `adam_chat` and `adam_demo` loaded the committed 251-fact / 1-derivation snapshot; after v3.6.5 they load **13 345 facts / 207 derivations** covering 4 active rules. Human users interacting with adam finally see the scaling-law reasoning — the same 200× growth the T4_200k bench produced — directly in their conversation.

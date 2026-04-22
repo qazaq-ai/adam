@@ -109,7 +109,7 @@ fn main() -> ExitCode {
     let index = load_retrieval_index();
 
     println!("╔══════════════════════════════════════════════════════════════╗");
-    println!("║ adam v3.6.5 — 4-part scripted demo (intents + retrieval +   ║");
+    println!("║ adam v3.7 — 4-part scripted demo (intents + retrieval +     ║");
     println!("║              composition + reasoning, deterministic)        ║");
     println!("╚══════════════════════════════════════════════════════════════╝\n");
 
