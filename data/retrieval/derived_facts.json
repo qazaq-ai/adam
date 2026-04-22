@@ -1,39 +1,5192 @@
 {
-  "version": "3.5.0",
+  "version": "3.6.5",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
-  "iterations_completed": 2,
+  "iterations_completed": 4,
   "counts": {
-    "initial_facts": 251,
-    "derived_facts": 1,
+    "initial_facts": 13345,
+    "derived_facts": 207,
     "by_rule": {
-      "R5_shared_is_a_target": 1
+      "R1_is_a_transitivity": 33,
+      "R2_has_inheritance": 116,
+      "R3_has_inheritance_via_part_of": 2,
+      "R5_shared_is_a_target": 56
     }
   },
   "derived": [
     {
       "subject": {
-        "surface": "кітап",
-        "root": "кітап",
+        "surface": "Еңбек",
+        "root": "еңбек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өзен",
+        "root": "өзен",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "kazakh_proverbs_pack.json",
+          "sample_id": "proverb_068"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0139793"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қыркүйек",
+        "root": "қыркүйек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "павлодар",
+        "root": "павлодар",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009178"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0003423"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қыркүйек",
+        "root": "қыркүйек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қазан",
+        "root": "қазан",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009178"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009181"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "сәуір",
+        "root": "сәуір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ақпан",
+        "root": "ақпан",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009181"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009182"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қазан",
+        "root": "қазан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өкіметі",
+        "root": "өкіметі",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009182"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001080"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қаңтар",
+        "root": "қаңтар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ресей",
+        "root": "ресей",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009192"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0141921"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халық",
+        "root": "халық",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046261"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0127358"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ел",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Күлше",
+        "root": "күлше",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0062890"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0113358"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халық",
+        "root": "халық",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0088327"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0127358"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "алматы",
+        "root": "алматы",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046261"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ақын",
+        "root": "ақын",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0047891"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "болд",
+        "root": "болд",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046287"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жұмысын",
+        "root": "жұмысын",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001136"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "зілзала",
+        "root": "зілзала",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046249"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "көтеріліс",
+        "root": "көтеріліс",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026257"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "көшбасшы",
+        "root": "көшбасшы",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0047666"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мұнай",
+        "root": "мұнай",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001139"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "президенті",
+        "root": "президенті",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0047830"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шайқа",
+        "root": "шайқа",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046246"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0094587"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "іс",
+        "root": "іс",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0047829"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғалым",
+        "root": "ғалым",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0040759"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қарағанды",
+        "root": "қарағанды",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0047137"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әли",
+        "root": "әли",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0047040"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әнші",
+        "root": "әнші",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0047361"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Өнімдері",
+        "root": "өнімдері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мәдени",
+        "root": "мәдени",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0117263"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0100463"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "атау",
+        "root": "атау",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001219"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0118247"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ен",
+        "root": "ен",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001219"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0073463"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "томдық",
+        "root": "томдық",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "тармақ",
+        "root": "тармақ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0003061"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007661"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ара",
+        "root": "ара",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027081"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "арасындағ",
+        "root": "арасындағ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0028999"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көбі",
+        "root": "көбі",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0138207"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көгалдандыру",
+        "root": "көгалдандыру",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0083168"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "солтүстік-батыс",
+        "root": "солтүстік-батыс",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0033025"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сыртқ",
+        "root": "сыртқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027915"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "таул",
+        "root": "таул",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0030414"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түбег",
+        "root": "түбег",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0032018"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "халқ",
+        "root": "халқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0053810"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішек",
+        "root": "ішек",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0056731"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішк",
+        "root": "ішк",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "kazakh_textbooks_pack.json",
+          "sample_id": "kz_textbook_kz_lang_11_ogn_p0143_s13"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "атау",
+        "root": "атау",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007158"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0118247"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ен",
+        "root": "ен",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007158"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0073463"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Халқы",
+        "root": "халқы",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ара",
+        "root": "ара",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0012411"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0016981"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Халқы",
+        "root": "халқы",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көб",
+        "root": "көб",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0012411"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0130787"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Халқы",
+        "root": "халқы",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сан",
+        "root": "сан",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0012411"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0087483"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Халқы",
+        "root": "халқы",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "іш",
+        "root": "іш",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0012411"
+        },
+        {
+          "pack": "kazakh_textbooks_pack.json",
+          "sample_id": "kz_textbook_kz_lang_11_emn_p0009_s08"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Халқы",
+        "root": "халқы",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "қайс",
+        "root": "қайс",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0012411"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0018686"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Халқы",
+        "root": "халқы",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ұрпақ",
+        "root": "ұрпақ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0012411"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0132475"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішк",
+        "root": "ішк",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026052"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0053179"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ара",
+        "root": "ара",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027081"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "арасындағ",
+        "root": "арасындағ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0028999"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көбі",
+        "root": "көбі",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0138207"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көгалдандыру",
+        "root": "көгалдандыру",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0083168"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "солтүстік-батыс",
+        "root": "солтүстік-батыс",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0033025"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сыртқ",
+        "root": "сыртқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027915"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "таул",
+        "root": "таул",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0030414"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түбег",
+        "root": "түбег",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0032018"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "халқ",
+        "root": "халқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0053810"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішек",
+        "root": "ішек",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0056731"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ара",
+        "root": "ара",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027081"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "арасындағ",
+        "root": "арасындағ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0028999"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көбі",
+        "root": "көбі",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0138207"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көгалдандыру",
+        "root": "көгалдандыру",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0083168"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "солтүстік-батыс",
+        "root": "солтүстік-батыс",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0033025"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сыртқ",
+        "root": "сыртқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027915"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "таул",
+        "root": "таул",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0030414"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түбег",
+        "root": "түбег",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0032018"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "халқ",
+        "root": "халқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0053810"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішек",
+        "root": "ішек",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0056731"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішк",
+        "root": "ішк",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        },
+        {
+          "pack": "kazakh_textbooks_pack.json",
+          "sample_id": "kz_textbook_kz_lang_11_ogn_p0143_s13"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "еңбек",
+        "root": "еңбек",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0040759"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0140508"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "пікір",
+        "root": "пікір",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0040759"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0043828"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Темір",
+        "root": "темір",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "тармақ",
+        "root": "тармақ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0043190"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007661"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ақмешіт",
+        "root": "ақмешіт",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "атау",
+        "root": "атау",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0055603"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0118247"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ақмешіт",
+        "root": "ақмешіт",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ен",
+        "root": "ен",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0055603"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0073463"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Түндік",
+        "root": "түндік",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "кіндік",
+        "root": "кіндік",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0056466"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0061742"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Түндік",
+        "root": "түндік",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ұл",
+        "root": "ұл",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0056466"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0075877"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Уран",
+        "root": "уран",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "серік",
+        "root": "серік",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0062376"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0061386"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ана",
+        "root": "ана",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ара",
+        "root": "ара",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0069231"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0016981"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ана",
+        "root": "ана",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көб",
+        "root": "көб",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0069231"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0130787"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ана",
+        "root": "ана",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сан",
+        "root": "сан",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0069231"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0087483"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ана",
+        "root": "ана",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "іш",
+        "root": "іш",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0069231"
+        },
+        {
+          "pack": "kazakh_textbooks_pack.json",
+          "sample_id": "kz_textbook_kz_lang_11_emn_p0009_s08"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ана",
+        "root": "ана",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "қайс",
+        "root": "қайс",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0069231"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0018686"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ана",
+        "root": "ана",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ұрпақ",
+        "root": "ұрпақ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0069231"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0132475"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Өрік",
+        "root": "өрік",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түр",
+        "root": "түр",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0081700"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001896"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "кезеңі",
+        "root": "кезеңі",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "іш",
+        "root": "іш",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0083073"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0045006"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Сәтбаев",
+        "root": "сәтбаев",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "атау",
+        "root": "атау",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0098675"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0118247"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Сәтбаев",
+        "root": "сәтбаев",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ен",
+        "root": "ен",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0098675"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0073463"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Әтір",
+        "root": "әтір",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түр",
+        "root": "түр",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0102432"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0023360"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "желтоқсан",
+        "root": "желтоқсан",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0075406"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "күз",
+        "root": "күз",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0122033"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "іш",
+        "root": "іш",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0003112"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "қаңтар",
+        "root": "қаңтар",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0094776"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Неміс",
+        "root": "неміс",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ара",
+        "root": "ара",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0109606"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0016981"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Неміс",
+        "root": "неміс",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көб",
+        "root": "көб",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0109606"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0130787"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Неміс",
+        "root": "неміс",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сан",
+        "root": "сан",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0109606"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0087483"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Неміс",
+        "root": "неміс",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "іш",
+        "root": "іш",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0109606"
+        },
+        {
+          "pack": "kazakh_textbooks_pack.json",
+          "sample_id": "kz_textbook_kz_lang_11_emn_p0009_s08"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Неміс",
+        "root": "неміс",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "қайс",
+        "root": "қайс",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0109606"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0018686"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Неміс",
+        "root": "неміс",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ұрпақ",
+        "root": "ұрпақ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0109606"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0132475"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Арыс",
+        "root": "арыс",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "атау",
+        "root": "атау",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110255"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0118247"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Арыс",
+        "root": "арыс",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ен",
+        "root": "ен",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110255"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0073463"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Талғар",
+        "root": "талғар",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "атау",
+        "root": "атау",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110712"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0118247"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Талғар",
+        "root": "талғар",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ен",
+        "root": "ен",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110712"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0073463"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Дуадақ",
+        "root": "дуадақ",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "тырнақ",
+        "root": "тырнақ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0130217"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0024867"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Дуадақ",
+        "root": "дуадақ",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түр",
+        "root": "түр",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0130217"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0085083"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Дуадақ",
+        "root": "дуадақ",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "іш",
+        "root": "іш",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0130217"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0002165"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Жағалтай",
+        "root": "жағалтай",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "тырнақ",
+        "root": "тырнақ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0135186"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0024867"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Жағалтай",
+        "root": "жағалтай",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түр",
+        "root": "түр",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0135186"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0085083"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Жағалтай",
+        "root": "жағалтай",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "іш",
+        "root": "іш",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0135186"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0002165"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "желтоқсан",
+        "root": "желтоқсан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "астанадағ",
+        "root": "астанадағ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0141921"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110030"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ит",
+        "root": "ит",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "бала",
+        "root": "бала",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0142270"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0089705"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ит",
+        "root": "ит",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сырт",
+        "root": "сырт",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0142270"
+        },
+        {
+          "pack": "kazakh_textbooks_pack.json",
+          "sample_id": "kz_textbook_kz_lang_11_emn_p0031_s14"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ит",
+        "root": "ит",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түр",
+        "root": "түр",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0142270"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0128615"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ит",
+        "root": "ит",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "шаңырақ",
+        "root": "шаңырақ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0142270"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0003387"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ит",
+        "root": "ит",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "іш",
+        "root": "іш",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0142270"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0062811"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Ит",
+        "root": "ит",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "қабырға",
+        "root": "қабырға",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0142270"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0100750"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "Әсел",
+        "root": "әсел",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түр",
+        "root": "түр",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0146217"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001896"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "аңғарлардың",
+        "root": "аңғар",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "өсімдік",
+        "root": "өсімдік",
+        "pos": "noun"
+      },
+      "rule_id": "R3_has_inheritance_via_part_of",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0079189"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0081218"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ана",
+        "root": "ана",
         "pos": "noun"
       },
       "predicate": "RelatedTo",
       "object": {
-        "surface": "ілім",
-        "root": "ілім",
+        "surface": "неміс",
+        "root": "неміс",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0069231"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0109606"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ана",
+        "root": "ана",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "халқы",
+        "root": "халқы",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0069231"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0012411"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "неміс",
+        "root": "неміс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "халқы",
+        "root": "халқы",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0109606"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0012411"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0088327"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046261"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "арал",
+        "root": "арал",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "үйшік",
+        "root": "үйшік",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0068210"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0010293"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007148"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0135507"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қызылжар",
+        "root": "қызылжар",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007148"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0047327"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қызылжар",
+        "root": "қызылжар",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0135507"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0047327"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жая",
+        "root": "жая",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "нан",
+        "root": "нан",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0058346"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0113358"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "арыс",
+        "root": "арыс",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007158"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110255"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ақмешіт",
+        "root": "ақмешіт",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007158"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0055603"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "сәтбаев",
+        "root": "сәтбаев",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007158"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0098675"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "талғар",
+        "root": "талғар",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007158"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110712"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0007158"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001219"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "арыс",
+        "root": "арыс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ақмешіт",
+        "root": "ақмешіт",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110255"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0055603"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "арыс",
+        "root": "арыс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "сәтбаев",
+        "root": "сәтбаев",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110255"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0098675"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "арыс",
+        "root": "арыс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "талғар",
+        "root": "талғар",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110255"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110712"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "арыс",
+        "root": "арыс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110255"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001219"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ақмешіт",
+        "root": "ақмешіт",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "сәтбаев",
+        "root": "сәтбаев",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0055603"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0098675"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ақмешіт",
+        "root": "ақмешіт",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "талғар",
+        "root": "талғар",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0055603"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110712"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ақмешіт",
+        "root": "ақмешіт",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0055603"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001219"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "сәтбаев",
+        "root": "сәтбаев",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "талғар",
+        "root": "талғар",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0098675"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110712"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "сәтбаев",
+        "root": "сәтбаев",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0098675"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001219"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "талғар",
+        "root": "талғар",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0110712"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001219"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "темір",
+        "root": "темір",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "томдық",
+        "root": "томдық",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0043190"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0003061"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "дуадақ",
+        "root": "дуадақ",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жағалтай",
+        "root": "жағалтай",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0130217"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0135186"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ақпан",
+        "root": "ақпан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "желтоқсан",
+        "root": "желтоқсан",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001080"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001072"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ақпан",
+        "root": "ақпан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қаңтар",
+        "root": "қаңтар",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001080"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001075"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "әсел",
+        "root": "әсел",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "өрік",
+        "root": "өрік",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0146217"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0081700"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қыркүйек",
+        "root": "қыркүйек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ақпан",
+        "root": "ақпан",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009178"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009181"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "сәуір",
+        "root": "сәуір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өкіметі",
+        "root": "өкіметі",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009181"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009182"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ел",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халық",
+        "root": "халық",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046261"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қыркүйек",
+        "root": "қыркүйек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өкіметі",
+        "root": "өкіметі",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009178"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009182"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қаңтар",
+        "root": "қаңтар",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "астанадағ",
+        "root": "астанадағ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009192"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0141921"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ара",
+        "root": "ара",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "арасындағ",
+        "root": "арасындағ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көбі",
+        "root": "көбі",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көгалдандыру",
+        "root": "көгалдандыру",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "солтүстік-батыс",
+        "root": "солтүстік-батыс",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сыртқ",
+        "root": "сыртқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "таул",
+        "root": "таул",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түбег",
+        "root": "түбег",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "халқ",
+        "root": "халқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішек",
+        "root": "ішек",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішк",
+        "root": "ішк",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "еңбек",
+        "root": "еңбек",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0040759"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "пікір",
+        "root": "пікір",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0040759"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ара",
+        "root": "ара",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "арасындағ",
+        "root": "арасындағ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көбі",
+        "root": "көбі",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көгалдандыру",
+        "root": "көгалдандыру",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "солтүстік-батыс",
+        "root": "солтүстік-батыс",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сыртқ",
+        "root": "сыртқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "таул",
+        "root": "таул",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түбег",
+        "root": "түбег",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "халқ",
+        "root": "халқ",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішек",
+        "root": "ішек",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішк",
+        "root": "ішк",
+        "pos": "noun"
+      },
+      "rule_id": "R2_has_inheritance",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "аңғарлардың",
+        "root": "аңғар",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "көкөніс",
+        "root": "көкөніс",
+        "pos": "noun"
+      },
+      "rule_id": "R3_has_inheritance_via_part_of",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0079189"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0149157"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0088327"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046261"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046286"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "күріш",
+        "root": "күріш",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "өнімдері",
+        "root": "өнімдері",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0100463"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0117263"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "сәуір",
+        "root": "сәуір",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қыркүйек",
+        "root": "қыркүйек",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0003423"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009178"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қазан",
+        "root": "қазан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қыркүйек",
+        "root": "қыркүйек",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0003416"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009178"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "жая",
+        "root": "жая",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "күлше",
+        "root": "күлше",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0058346"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0062890"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "күлше",
+        "root": "күлше",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "нан",
+        "root": "нан",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0062890"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0113358"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "абай",
+        "root": "абай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "алматы",
+        "root": "алматы",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0088327"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0127358"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "алматы",
+        "root": "алматы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0127358"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0046261"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "еңбек",
+        "root": "еңбек",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қайнар",
+        "root": "қайнар",
         "pos": "noun"
       },
       "rule_id": "R5_shared_is_a_target",
       "source_chain": [
         {
           "pack": "kazakh_proverbs_pack.json",
-          "sample_id": "proverb_003"
+          "sample_id": "proverb_068"
         },
         {
-          "pack": "common_voice_kk_pack.json",
-          "sample_id": "cv_kk_00047"
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0139793"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "желтоқсан",
+        "root": "желтоқсан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазан",
+        "root": "қазан",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001072"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009182"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қазан",
+        "root": "қазан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қаңтар",
+        "root": "қаңтар",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009182"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001075"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ауғанстан",
+        "root": "ауғанстан",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0026147"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "үндістан",
+        "root": "үндістан",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0004297"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0027741"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "-қа",
+        "root": "-қа",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "алматы",
+        "root": "алматы",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0103523"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0127358"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "ақпан",
+        "root": "ақпан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қыркүйек",
+        "root": "қыркүйек",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001080"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009178"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "желтоқсан",
+        "root": "желтоқсан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "сәуір",
+        "root": "сәуір",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001072"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009181"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "желтоқсан",
+        "root": "желтоқсан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қыркүйек",
+        "root": "қыркүйек",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001072"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009178"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "сәуір",
+        "root": "сәуір",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қаңтар",
+        "root": "қаңтар",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009181"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001075"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "қаңтар",
+        "root": "қаңтар",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қыркүйек",
+        "root": "қыркүйек",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0001075"
+        },
+        {
+          "pack": "wikipedia_kz_pack.json",
+          "sample_id": "wiki_kz_0009178"
         }
       ],
       "confidence": "RuleInferred"

@@ -7,6 +7,88 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.6.5] — 2026-04-22 — Committed runtime scaled to T4_200k (first signs of intelligence)
+
+Intelligence that was **stuck in a scaling_bench report** is now **surfaced in the interactive runtime**. Before v3.6.5, `adam_chat` and `adam_demo` loaded the committed 251-fact / 1-derivation snapshot; after v3.6.5 they load **13 345 facts / 207 derivations** covering 4 active rules. Human users interacting with adam finally see the scaling-law reasoning — the same 200× growth the T4_200k bench produced — directly in their conversation.
+
+### Primary goal: first signs of intelligence
+
+Per user directive («главная цель — добиться первых признаков интеллекта»): runtime reasoning needed to visibly scale, not just the bench numbers.
+
+`adam_demo` Part 4 now produces outputs like:
+
+```
+Derivations available to cite:
+  ақпан --related_to--> қыркүйек       [R5_shared_is_a_target]
+  желтоқсан --related_to--> сәуір       [R5_shared_is_a_target]
+  ...
+  еңбек --is_a--> өзен                  [R1_is_a_transitivity]  (derived, not in corpus)
+
+User probe: «еңбек туралы бірдеңе айт»
+  seed  1 [chain]: Қолда бар деректерден байланыс құрастырдым:
+                    қорытынды: еңбек — өзен (байланысты ой-тізбек арқылы).
+```
+
+The R1-derived «еңбек — өзен» ("labor is a river" — metaphorical transitivity) is a **conclusion the corpus does not directly state** — constructed from chained Is-A facts via the reasoning rule. It's the first time a user-interactive turn surfaces a rule-inferred claim.
+
+### New flags on `extract_facts`
+
+- `--bench-order` — switches pack walk from Tatoeba-first (v2.1 default) to fact-dense-first (Abai → proverbs → classics → textbooks → Wikipedia → …), matching `adam-scaling::CANONICAL_COMMITTED_PACKS`.
+- `--max-total <N>` — caps total samples scanned across all packs; per-pack `--limit` can still apply as a secondary cap.
+
+Combined: `extract_facts --bench-order --max-total 200000` produces a committed fact pool equivalent to the `scaling_bench` T4_200k tier.
+
+### Precision tightening: `сияқ`
+
+First T4-scale run showed `сияқ` (comparison particle, the bare root of `сияқты` "like / as") most-connected with **341 edges** — all false positives because the `is_closed_class` check matched `сияқты` but not the bare `сияқ` root. Added `сияқ` to closed-class; re-ran extraction. **-395 false-positive DoesTo facts** removed (13 740 → 13 345, -2.9 %). Most-connected after fix: `адам` (237), `ел` (209), `ат` (186), `жер` (176), `қазақ` (170) — all legitimate content nouns.
+
+### Regenerated committed artifacts
+
+| artifact | v3.6.0 | v3.6.5 | factor |
+|---|---:|---:|---|
+| `facts.json` (size) | 125 KB | **8.8 MB** | ×70 |
+| `facts.json` (fact count) | 251 | **13 345** | **×53** |
+| `lexical_graph.json` nodes | 373 | **2 974** | ×8 |
+| `lexical_graph.json` edges | 244 | **11 813** | ×48 |
+| `derived_facts.json` derivations | 1 | **207** | **×207** |
+
+**All under 50 MB gitignore threshold** (per `feedback_git_ignore_policy`) — stays committed to git.
+
+### Rule activations on committed runtime
+
+| rule | derivations |
+|---|---:|
+| `R1_is_a_transitivity` | 33 |
+| `R2_has_inheritance` | 116 |
+| `R3_has_inheritance_via_part_of` | 2 |
+| `R5_shared_is_a_target` | 56 |
+| **Total** | **207** |
+
+**First release where all 4 active rules fire simultaneously on the committed runtime pool** — not just in bench reports.
+
+### Precision audit
+
+`docs/precision_audit.md` regenerated with **50-fact / 50-derivation sample** (was 17/1 at v3.6.0). Native-speaker review surface is now meaningful.
+
+### Tests
+
+**413 passing, 0 failing, 0 warnings** — no test changes.
+
+### Upgrade notes
+
+- `adam_chat` / `adam_demo` automatically surface the bigger pool. No code change in dialog crates.
+- `extract_facts` default behaviour unchanged — new flags opt-in.
+- Existing `facts.json` readers downstream see bigger file; all existing readers load-then-iterate, no schema assumption.
+- `adam_demo` Part 4 picks `derived[0]` dynamically — will pick a different derivation post-upgrade (previously кітап/ілім; now the first-by-subject-root derivation from the sorted 207-pool).
+
+### What's next
+
+- **v3.7.0** — `--persist-tier` on `scaling_bench` + `adam_chat --facts-tier` flag for ad-hoc tier switching.
+- **v3.8.0** — native-speaker precision audit unblocked; Lexicon PR using v3.4.0 candidates.
+- **v3.9.0** — `occurrence_count` first-class field (Codex #4 follow-up).
+
+---
+
 ## [3.6.0] — 2026-04-22 — First `--use-shards` scaling run (54 M-word pool, T5_1M tier)
 
 **Sixth** post-v3.0 scale-up release. First **full-scale** scaling-bench run — tapping the 77.9 M-word gitignored local shard pool via the v3.2.0 `--use-shards` flag. With the 3-hour iteration budget the bench makes it through all 5 tiers (`[1k, 10k, 50k, 200k, 1M]`) with T5 as an honest partial-extract (940 288 / 1 000 000 samples scanned at the time-budget cutoff).

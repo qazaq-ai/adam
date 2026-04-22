@@ -74,10 +74,14 @@ const CHUNK_SIZE: usize = 128;
 
 /// Same canonical pack list as `corpus_audit` / `build_morpheme_index`.
 /// Kept in sync manually — a future consolidation lives in v2.x.
-/// v3.3.0 added `kazakh_textbooks_pack.json` — Kazakh secondary-school
-/// textbooks (grades 7–11) OCR'd via tesseract-kaz from MES-published
-/// PDFs. Silently skipped if the pack is absent (shipped opt-in so
-/// CI checkouts without the textbook corpus still pass).
+/// v3.3.0 added `kazakh_textbooks_pack.json`.
+///
+/// Default order (Tatoeba-first) is what `corpus_audit` uses for
+/// purity/coverage comparisons. The `--bench-order` flag (v3.6.5)
+/// switches to the fact-dense-first order used by the scaling bench —
+/// use that when generating the committed runtime fact pool so the
+/// first N samples are Abai/proverbs/classics/textbooks (the high-
+/// yield material) rather than Tatoeba short dialogues.
 const SOURCE_PACKS: &[&str] = &[
     "tatoeba_kazakh_pack.json",
     "wikipedia_kz_pack.json",
@@ -88,6 +92,22 @@ const SOURCE_PACKS: &[&str] = &[
     "synthetic_sentences_pack.json",
     "kazakh_classics_pack.json",
     "kazakh_textbooks_pack.json",
+];
+
+/// Fact-dense-first order (v3.6.5) — matches `adam-scaling`'s
+/// `CANONICAL_COMMITTED_PACKS`. Activated by `--bench-order` so
+/// `extract_facts --bench-order --max-total 200000` produces a
+/// committed fact pool equivalent to the `scaling_bench` T4_200k tier.
+const SOURCE_PACKS_BENCH_ORDER: &[&str] = &[
+    "abai_wikisource_pack.json",
+    "kazakh_proverbs_pack.json",
+    "kazakh_classics_pack.json",
+    "kazakh_textbooks_pack.json",
+    "wikipedia_kz_pack.json",
+    "synthetic_sentences_pack.json",
+    "tatoeba_kazakh_pack.json",
+    "common_voice_kk_pack.json",
+    "cc100_kk_pack.json",
 ];
 
 #[derive(Debug, Deserialize)]
@@ -129,8 +149,15 @@ struct Artifact {
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
     let full_mode = args.iter().any(|a| a == "--full");
-    let limit: Option<usize> = if full_mode {
-        None
+    let bench_order = args.iter().any(|a| a == "--bench-order");
+    let max_total: Option<usize> = parse_usize_flag(&args, "--max-total");
+    // v3.6.5 — `--max-total` overrides per-pack limit so a caller
+    // can produce a committed runtime artifact equivalent to a
+    // specific bench tier (e.g. `--bench-order --max-total 200000`
+    // gives T4_200k). The per-pack `--limit` still applies as a
+    // secondary cap inside each pack — most callers don't set it.
+    let limit: Option<usize> = if full_mode || max_total.is_some() {
+        parse_usize_flag(&args, "--limit")
     } else {
         Some(parse_usize_flag(&args, "--limit").unwrap_or(COMMITTED_DEFAULT_LIMIT))
     };
@@ -138,6 +165,11 @@ fn main() -> ExitCode {
         FULL_OUTPUT
     } else {
         COMMITTED_OUTPUT
+    };
+    let packs: &[&str] = if bench_order {
+        SOURCE_PACKS_BENCH_ORDER
+    } else {
+        SOURCE_PACKS
     };
     let progress_interval = Duration::from_secs(
         parse_usize_flag(&args, "--progress-interval")
@@ -163,6 +195,12 @@ fn main() -> ExitCode {
         "extract_facts: mode = {}, output = {output_path}",
         if full_mode {
             "FULL (every sample, gitignored)".to_string()
+        } else if let Some(n) = max_total {
+            format!(
+                "committed ({} order, up to {n} total samples{})",
+                if bench_order { "bench" } else { "default" },
+                limit.map(|l| format!(", ≤ {l}/pack")).unwrap_or_default(),
+            )
         } else {
             format!("committed (first {} per pack)", limit.unwrap())
         }
@@ -183,7 +221,7 @@ fn main() -> ExitCode {
         "extract_facts",
     );
 
-    let packs_total = SOURCE_PACKS.len();
+    let packs_total = packs.len();
     let mut artifact = Artifact {
         version: env!("CARGO_PKG_VERSION").to_string(),
         status: StopReason::Completed.as_str().to_string(),
@@ -201,8 +239,10 @@ fn main() -> ExitCode {
         facts: Vec::new(),
     };
 
-    for pack_name in SOURCE_PACKS {
-        if budget.should_stop() {
+    // v3.6.5 — track total samples scanned across packs for --max-total.
+    let mut total_budget_hit = false;
+    for pack_name in packs {
+        if budget.should_stop() || total_budget_hit {
             break;
         }
         let path = Path::new(CURATED_DIR).join(pack_name);
@@ -222,7 +262,17 @@ fn main() -> ExitCode {
             }
         };
 
-        let effective_limit = limit.unwrap_or(pack.samples.len()).min(pack.samples.len());
+        // v3.6.5 — compute the per-pack effective limit:
+        //   1. start from the explicit per-pack `--limit` (or full pack).
+        //   2. if --max-total set, further cap by (max_total - scanned-so-far)
+        //      so the aggregate walk stops at exactly N samples.
+        let per_pack_cap = limit.unwrap_or(pack.samples.len()).min(pack.samples.len());
+        let effective_limit = if let Some(max) = max_total {
+            let remaining = max.saturating_sub(artifact.counts.samples_scanned);
+            per_pack_cap.min(remaining)
+        } else {
+            per_pack_cap
+        };
         let samples_slice = &pack.samples[..effective_limit];
 
         // Parallel chunked scan. Each chunk becomes a flat Vec of
@@ -288,6 +338,13 @@ fn main() -> ExitCode {
             // Pack didn't finish — mark the run and stop the outer
             // loop on the next iteration's budget check.
             break;
+        }
+        // v3.6.5 — aggregate max_total cap: break after the pack that
+        // got us to the target.
+        if let Some(max) = max_total {
+            if artifact.counts.samples_scanned >= max {
+                total_budget_hit = true;
+            }
         }
     }
 
