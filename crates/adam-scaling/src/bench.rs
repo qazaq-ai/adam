@@ -16,8 +16,8 @@ use rayon::prelude::*;
 use serde::Deserialize;
 
 use crate::{
-    CANONICAL_COMMITTED_PACKS, CorpusPaths, MachineSignal, SHARD_PACK_PREFIXES, ScalingPoint,
-    ScalingReport, SourcesSnapshot, StageMs,
+    CANONICAL_COMMITTED_PACKS, CorpusPaths, MachineSignal, NormalizedMetrics, SHARD_PACK_PREFIXES,
+    ScalingPoint, ScalingReport, SourcesSnapshot, StageMs,
 };
 
 /// One loaded sample, together with the pack it came from. We keep
@@ -138,11 +138,41 @@ fn read_pack(path: &Path) -> Option<Vec<PackSample>> {
 
 /// Run one tier — take the first `target_samples` entries (or all if
 /// `target_samples == 0`), extract, project, reason, and report.
+///
+/// Budget-unaware variant — calls [`run_tier_with_budget`] under an
+/// unbounded budget. Retained for test-code ergonomics.
 pub fn run_tier(
     label: impl Into<String>,
     target_samples: usize,
     corpus: &[LoadedSample],
     lexicon: &LexiconV1,
+) -> ScalingPoint {
+    let budget = IterationBudget::unbounded_for_tests();
+    run_tier_with_budget(label, target_samples, corpus, lexicon, &budget)
+}
+
+/// Budget-aware variant — checks `budget.should_stop()` between
+/// extraction chunks. The **chunked flow**:
+///
+///   1. Slice the corpus to the tier's target.
+///   2. Chunk the slice at [`EXTRACT_CHUNK_SIZE`] samples per chunk
+///      (128 samples → ~0.5–1 s per chunk on M2 8-core).
+///   3. Run Rayon `par_iter` inside each chunk; facts are collected
+///      input-order-preserving into a growing Vec.
+///   4. Between chunks, check `budget.should_stop()`. On stop, return
+///      a partial [`ScalingPoint`] whose `samples_scanned` reflects
+///      exactly how much work got done. Downstream graph + reasoner
+///      run on the partial fact set.
+///
+/// This keeps the v3.1.0 harness contract intact even for multi-minute
+/// tiers — Ctrl-C or `--time-budget` expiration stops the tier within
+/// ~1 second, not "between tiers" (which for T4/T5 meant never).
+pub fn run_tier_with_budget(
+    label: impl Into<String>,
+    target_samples: usize,
+    corpus: &[LoadedSample],
+    lexicon: &LexiconV1,
+    budget: &IterationBudget,
 ) -> ScalingPoint {
     let slice_end = if target_samples == 0 {
         corpus.len()
@@ -151,26 +181,32 @@ pub fn run_tier(
     };
     let slice = &corpus[..slice_end];
 
-    let words_scanned: u64 = slice
-        .iter()
-        .map(|s| s.text.split_whitespace().count() as u64)
-        .sum();
-
-    // Stage 1 — extract. Parallel per-sample via rayon; chunked to
-    // keep memory pressure low and budget-check granularity high in
-    // the enclosing binary. Input-order-preserving collect keeps the
-    // fact array deterministic (same order every run).
+    // Stage 1 — extract, chunked. Budget checked between chunks.
     let t0 = Instant::now();
-    let facts: Vec<Fact> = slice
-        .par_iter()
-        .flat_map_iter(|s| {
-            let source = FactSource {
-                pack: s.pack_label.clone(),
-                sample_id: s.sample_id.clone(),
-            };
-            extract_facts(&s.text, &[], lexicon, &source).into_iter()
-        })
-        .collect();
+    let mut facts: Vec<Fact> = Vec::new();
+    let mut samples_scanned = 0usize;
+    let mut words_scanned: u64 = 0;
+    for chunk in slice.chunks(EXTRACT_CHUNK_SIZE) {
+        if budget.should_stop() {
+            break;
+        }
+        let chunk_facts: Vec<Fact> = chunk
+            .par_iter()
+            .flat_map_iter(|s| {
+                let source = FactSource {
+                    pack: s.pack_label.clone(),
+                    sample_id: s.sample_id.clone(),
+                };
+                extract_facts(&s.text, &[], lexicon, &source).into_iter()
+            })
+            .collect();
+        facts.extend(chunk_facts);
+        samples_scanned += chunk.len();
+        words_scanned += chunk
+            .iter()
+            .map(|s| s.text.split_whitespace().count() as u64)
+            .sum::<u64>();
+    }
     let extract_ms = t0.elapsed().as_millis() as u64;
 
     let mut facts_by_predicate: BTreeMap<String, usize> = BTreeMap::new();
@@ -180,16 +216,17 @@ pub fn run_tier(
             .or_insert(0) += 1;
     }
 
-    // Stage 2 — graph projection.
+    // Stage 2 — graph projection. O(|facts|) with tiny per-fact work;
+    // we don't chunk (a partial tier's fact set is small enough that
+    // projecting it completes well inside any realistic budget).
     let t1 = Instant::now();
     let graph = LexicalGraph::from_facts(&facts);
     let graph_ms = t1.elapsed().as_millis() as u64;
 
-    // Stage 3 — reasoner. Use a fresh unbounded budget for each tier;
-    // the outer bench driver is the one with a wall-clock cap.
+    // Stage 3 — reasoner. Honours the caller's budget between
+    // forward-chaining iterations.
     let t2 = Instant::now();
-    let budget = IterationBudget::unbounded_for_tests();
-    let (derived, _iterations) = reasoner::run_with_budget(&facts, &budget);
+    let (derived, _iterations) = reasoner::run_with_budget(&facts, budget);
     let reason_ms = t2.elapsed().as_millis() as u64;
 
     let mut derivations_by_rule: BTreeMap<String, usize> = BTreeMap::new();
@@ -197,10 +234,21 @@ pub fn run_tier(
         *derivations_by_rule.entry(d.rule_id.clone()).or_insert(0) += 1;
     }
 
+    // v3.3.0 — count (subject.root, predicate, object.root) triple
+    // duplicates across facts. O(N log N) via sort.
+    let duplicate_fact_count = count_duplicate_triples(&facts);
+    let normalized = NormalizedMetrics::compute(
+        facts.len(),
+        words_scanned,
+        derived.len(),
+        facts_by_predicate.len(),
+        duplicate_fact_count,
+    );
+
     ScalingPoint {
         label: label.into(),
         target_samples,
-        samples_scanned: slice.len(),
+        samples_scanned,
         words_scanned,
         facts_extracted: facts.len(),
         facts_by_predicate,
@@ -213,8 +261,44 @@ pub fn run_tier(
             graph: graph_ms,
             reason: reason_ms,
         },
+        normalized,
     }
 }
+
+/// Count facts whose `(subject.root, predicate, object.root)` triple
+/// coincides with at least one other fact in the list. Returns the
+/// number of redundant facts (so `0` for a fully-unique set, `N - 1`
+/// for a set of N identical facts).
+fn count_duplicate_triples(facts: &[Fact]) -> usize {
+    let mut keys: Vec<(String, String, String)> = facts
+        .iter()
+        .map(|f| {
+            (
+                f.subject.root.clone(),
+                f.predicate.as_str().to_string(),
+                f.object.root.clone(),
+            )
+        })
+        .collect();
+    keys.sort();
+    let mut dupes = 0usize;
+    let mut i = 0;
+    while i + 1 < keys.len() {
+        let mut j = i + 1;
+        while j < keys.len() && keys[j] == keys[i] {
+            dupes += 1;
+            j += 1;
+        }
+        i = j;
+    }
+    dupes
+}
+
+/// Chunk size for the budget-aware extract loop. 128 × ~15 words/sample
+/// × ~0.3 ms/word (Rayon on M2 8-core) ≈ 0.5–1 s per chunk — a good
+/// trade-off between budget-check granularity and Rayon scheduling
+/// overhead. Match to `extract_facts`'s CHUNK_SIZE for consistency.
+pub const EXTRACT_CHUNK_SIZE: usize = 128;
 
 /// Run every tier in order, build a full [`ScalingReport`]. Tiers are
 /// monotone non-decreasing by the caller's convention — the driver
@@ -316,6 +400,24 @@ pub fn render_markdown(report: &ScalingReport) -> String {
             } else {
                 parts.join(", ")
             }
+        ));
+    }
+    out.push_str("\n## Normalized metrics by tier (v3.3.0)\n\n");
+    out.push_str(
+        "Raw counts grow with corpus size; these ratios tell you **what kind** of growth it is. See `NormalizedMetrics` docstring for the formulas and what a healthy curve looks like.\n\n",
+    );
+    out.push_str(
+        "| tier | facts/10k words | derivations/fact | predicate coverage | duplicate-fact rate |\n",
+    );
+    out.push_str("|---|---:|---:|---:|---:|\n");
+    for p in &report.tiers {
+        out.push_str(&format!(
+            "| {} | {:.2} | {:.4} | {:.1}% | {:.2}% |\n",
+            p.label,
+            p.normalized.facts_per_10k_words,
+            p.normalized.derivations_per_fact,
+            p.normalized.predicate_coverage_pct,
+            p.normalized.duplicate_fact_rate_pct,
         ));
     }
     out.push_str("\n*Generated by `cargo run --release -p adam-scaling --bin scaling_bench`.*\n");
@@ -446,6 +548,7 @@ mod tests {
                         graph: 1,
                         reason: 0,
                     },
+                    normalized: NormalizedMetrics::compute(2, 42, 0, 1, 0),
                 },
                 ScalingPoint {
                     label: "T2".into(),
@@ -467,6 +570,7 @@ mod tests {
                         graph: 1,
                         reason: 0,
                     },
+                    normalized: NormalizedMetrics::compute(5, 100, 1, 2, 0),
                 },
             ],
         };

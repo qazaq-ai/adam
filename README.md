@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.2.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.3.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-373%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-375%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20by%20design-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
 
@@ -54,7 +54,7 @@ Three things make the trade viable specifically for Kazakh:
 
 adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, auditable, and — as of v3.0 — capable of deriving conclusions no single corpus sentence states**, while marking every such conclusion with a textual trust signal and a source chain.
 
-### Current state (v3.0.1 — honest numbers)
+### Current state (v3.3.0 — honest numbers)
 
 v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is end-to-end and test-locked, but the fact set is deliberately small while the matchers mature.
 
@@ -67,12 +67,13 @@ v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is en
 | Workspace tests | **367 passing, 0 failing** |
 | Pattern matchers | 4 (copula / locative / possessive / dative-motion) |
 | Reasoning rules active | 3 (R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo) |
-| Extracted facts (committed) | **15** (v3.2.0 deterministic parser; byte-identical across runs) |
-| Rule-derived facts (committed) | **1** (кітап RelatedTo ілім, via R5) |
-| Fact-graph nodes / edges | 29 / 15 |
+| Extracted facts (committed) | **17** (v3.3.0 textbook pack added; +2 facts within 500/pack cap. Scaling bench T4_50k surfaces **120 facts / 51 derivations**) |
+| Rule-derived facts (committed) | **1** (кітап RelatedTo ілім, via R5 — committed snapshot; T4 scale sees all 3 rules active) |
+| Fact-graph nodes / edges | 29 / 17 (committed); T4_50k scale: 123 / 87 |
 | Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |
-| Scaling bench (v3.2.0) | `adam-scaling::scaling_bench` — emits `data/scaling/scaling_report.json` + `docs/scaling_report.md` with `(samples → facts → derivations → graph nodes/edges → wall-clock)` across configurable tiers. **First measured super-linear derivation growth (deterministic)**: T3_10k → T4_50k = ×5 corpus, ×13 derivations, all 3 rules (R1/R2/R5) active (R1=8, R2=33, R5=24 at T4). |
-| Determinism (v3.2.0) | dual-storage Lexicon (`HashMap` get + `entries_ordered: Vec<RootEntry>` for `analyse`). Fixes a 2-year latent non-determinism where `analyse().next()` returned different first analyses across runs for ambiguous surfaces. 2 regression tests guard the invariant. |
+| Scaling bench (v3.3.0) | `adam-scaling::scaling_bench` + `audit_precision` — emits `data/scaling/scaling_report.json` + `docs/scaling_report.md` + `docs/precision_audit.md`. Budget-aware `run_tier_with_budget` (chunked at 128 samples, SIGINT / `--time-budget` stops within ~1 s). Normalized metrics per tier: `facts_per_10k_words`, `derivations_per_fact`, `predicate_coverage_pct`, `duplicate_fact_rate_pct`. **Measured scaling on 4.32 M-word committed pool (textbooks + wiki + Abai)**: T3_10k (19 facts, 0 deriv) → T4_50k (120 facts, 51 deriv) — reasoning activates once graph density crosses threshold. |
+| Determinism (v3.2.0 + v3.3.0) | dual-storage Lexicon (`HashMap` get + `entries_ordered: Vec<RootEntry>` for `analyse`). Fixes a 2-year latent non-determinism where `analyse().next()` returned different first analyses across runs for ambiguous surfaces. **4 regression tests** guard the invariant, including expected-order assertions that fail ≈ 50 % on pre-v3.2.0 code. |
+| Gold corpus (v3.3.0) | 3 Kazakh secondary-school textbooks OCR'd via tesseract-kaz @ 200 DPI (pdftotext drops Қ/Ң/Ғ/Ө/Ү/Ұ/Һ on custom-font PDFs). **108 913 raw words → 8 421 samples** in `kazakh_textbooks_pack.json`, per-book provenance. 7 more textbooks staged for v3.4. |
 
 The scale-up path is explicit: scale coverage of the four existing matchers to the full 77.9 M-word corpus, add `PartOf` / `Causes` extractors, activate R3/R4. Nothing in the architecture is gated on more data — the engine already produces derivations with full provenance.
 
@@ -338,7 +339,7 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | Reasoning rules active (v3.0) | **3** — R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo |
 | Extracted / derived facts (committed) | **15 / 1** (v3.2.0 deterministic parser; `кітап RelatedTo ілім` via R5; proof of mechanism at v3.0; scale-up path in [roadmap](docs/roadmap.md)) |
 | Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
-| Workspace tests | **367 passing**, 0 failing |
+| Workspace tests | **375 passing**, 0 failing |
 | Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential; 20 M-word full-corpus run fits in the 3 h iteration budget |
 
 ## Directory layout

@@ -18,3 +18,7 @@ tempfile = "3.12"
 [[bin]]
 name = "scaling_bench"
 path = "src/bin/scaling_bench.rs"
+
+[[bin]]
+name = "audit_precision"
+path = "src/bin/audit_precision.rs"

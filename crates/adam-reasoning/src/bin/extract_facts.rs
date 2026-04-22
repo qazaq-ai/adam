@@ -74,6 +74,10 @@ const CHUNK_SIZE: usize = 128;
 
 /// Same canonical pack list as `corpus_audit` / `build_morpheme_index`.
 /// Kept in sync manually — a future consolidation lives in v2.x.
+/// v3.3.0 added `kazakh_textbooks_pack.json` — Kazakh secondary-school
+/// textbooks (grades 7–11) OCR'd via tesseract-kaz from MES-published
+/// PDFs. Silently skipped if the pack is absent (shipped opt-in so
+/// CI checkouts without the textbook corpus still pass).
 const SOURCE_PACKS: &[&str] = &[
     "tatoeba_kazakh_pack.json",
     "wikipedia_kz_pack.json",
@@ -83,6 +87,7 @@ const SOURCE_PACKS: &[&str] = &[
     "kazakh_proverbs_pack.json",
     "synthetic_sentences_pack.json",
     "kazakh_classics_pack.json",
+    "kazakh_textbooks_pack.json",
 ];
 
 #[derive(Debug, Deserialize)]

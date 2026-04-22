@@ -34,7 +34,7 @@ use adam_kernel_fst::lexicon::LexiconV1;
 use adam_reasoning::harness::{IterationBudget, ProgressCounter, ProgressMonitor, StopReason};
 use adam_scaling::{
     CorpusPaths, MachineSignal, ScalingReport,
-    bench::{load_corpus, render_markdown, run_tier},
+    bench::{load_corpus, render_markdown, run_tier_with_budget},
 };
 use serde::Serialize;
 
@@ -176,7 +176,7 @@ fn main() -> ExitCode {
             target,
             corpus.len()
         );
-        let point = run_tier(label.clone(), *target, &corpus, &lexicon);
+        let point = run_tier_with_budget(label.clone(), *target, &corpus, &lexicon, &budget);
         eprintln!(
             "  → scanned={} words={} facts={} derivations={} nodes={} edges={} extract={}ms graph={}ms reason={}ms",
             point.samples_scanned,

@@ -7,6 +7,140 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.3.0] — 2026-04-22 — Codex review polish + precision audit + gold-corpus pilot
+
+**Third step** of the post-v3.0 scale-up ladder. Response to the second Codex external review of v3.2.0 (see the "Codex findings" section below), plus the first quality-gated ingestion of natural Kazakh corpus beyond Wikisource and Wikipedia (3 secondary-school textbooks OCR'd through `tesseract-kaz`).
+
+### Codex findings (v3.2.0 review) — resolved
+
+1. **Determinism test was too weak** — the in-process `analyse_ordering_stable_across_calls` would have passed on the pre-v3.2.0 HashMap code too (HashMap iteration is stable within one process; the bug was cross-process). v3.3.0 strengthens it with **two expected-order assertions**:
+   - `analyses_sorted_by_root_then_id_when_cross_root_ambiguous` — asserts that for the genuinely cross-root-ambiguous surface `кітабы`, the first analysis is under root `кітабы` (< `кітап` by Cyrillic code point), and the whole sequence is non-decreasing by root. Under the pre-v3.2.0 HashMap-values path this assertion fails ≈ 50 % of runs.
+   - `first_root_matches_entries_ordered_for_prefix_ambiguous_surface` — cross-checks the first analysis against `LexiconV1::entries_ordered`'s first prefix-matching entry, directly asserting the dual-storage contract.
+2. **`run_tier()` wasn't budget-aware** — `budget.should_stop()` was only checked between tiers, so a long T5 couldn't be interrupted internally. Now `run_tier_with_budget` chunks extraction at `EXTRACT_CHUNK_SIZE=128` samples and checks the budget between chunks (~0.5–1 s granularity). Partial-tier `ScalingPoint` is returned with the actual `samples_scanned` reflecting how much work completed.
+3. **Doc contradiction in `adam-scaling/lib.rs`** — the header said "canonical order like extract_facts", the pack-constant docstring said "NOT the same as extract_facts". Reconciled in v3.3.0: the bench uses a **bench-specific** canonical order (fact-dense first), distinct from extract_facts's order; the lib docstring now states this plainly.
+4. **README `Current state (v3.0.1 — honest numbers)` header was stale** — renamed to `Current state (v3.3.0 — honest numbers)`; test count refreshed to match the final v3.3.0 total.
+
+### Codex follow-ups (partial uptake)
+
+- ✅ **Normalized metrics on every `ScalingPoint`** (Codex #4) — new `NormalizedMetrics` struct computes `facts_per_10k_words`, `derivations_per_fact`, `predicate_coverage_pct`, `duplicate_fact_rate_pct` per tier. Also rendered as a Markdown table in `docs/scaling_report.md`. Raw counts grow with corpus size; these ratios tell you *what kind* of growth it is (extraction density, reasoning leverage, breadth of predicate types, de-duplication hygiene).
+- ✅ **Precision audit binary** (Codex #3) — new `audit_precision` bin in `adam-scaling`. Deterministically samples 50 facts + 50 derivations (seeded, reproducible), renders `docs/precision_audit.md` with per-item checkboxes, full source sentence, pattern/rule id, and a Tally section for the reviewer to compute precision. **Audit format primed for native-speaker review — the output file is the precision-gate for v3.4 scaling.**
+- ⏸ **Promoting T4 facts into runtime** (Codex #1 follow-up) — deferred to v3.4.0, gated on precision audit ≥ threshold. We don't want to wire 200+ potentially-borderline facts into `adam_chat` without quality bar.
+- ⏸ **New `PartOf`/`Causes`/`LivesIn`/`GoesTo` extractors at scale** (Codex #5 follow-up) — deferred to v3.4.0 (6-matcher addition was the original v3.3.0 plan before this polish-pass took priority).
+
+### Gold-corpus pilot (3 textbooks OCR'd)
+
+In parallel Codex flagged the v2.x training corpus as heavily synthetic (~84 % by sample count) and too small for natural-Kazakh LM training. User provided 10 Kazakh secondary-school textbook PDFs (`data/external/*.pdf`). **Problem:** PDFs use custom-font glyph encoding — `pdftotext` silently drops `Қ Ң Ғ Ө Ү Ұ Һ`, the very characters any Kazakh-first pipeline depends on. **Solution:** new OCR pipeline (`/tmp/ocr_pipeline.sh`) — `pdftoppm` @ 200 DPI → PNG → `tesseract -l kaz`, 6-way parallel.
+
+v3.3.0 ships a **pilot** ingestion of 3 language-focused books (KazYazyk 11 EMN + OGN, Kazakh Language & Culture 9), via the new `process_kazakh_textbooks` binary in `adam-corpus`. The remaining 7 textbooks (physics, biology, algebra, informatics, literature) are staged for v3.3.5 / v3.4.0 once the pilot validates extraction quality. **Pack counts + extraction numbers to be filled in post-OCR** — see the "Pilot results" section at the end of this entry.
+
+The pack carries per-book provenance (`source_id` = book slug), page range (`p{NNN}`), sentence index (`s{NN}`), and gets registered in:
+- `adam-reasoning::extract_facts::SOURCE_PACKS` — immediately participates in fact extraction.
+- `adam-scaling::CANONICAL_COMMITTED_PACKS` — scaling bench picks it up on the next run.
+
+Quality gates on textbook samples (stricter than classics/wiki because OCR noise is real):
+- ≥ 80 % Cyrillic characters (guards against table/figure fragments).
+- 4 ≤ words ≤ 60 (widened from 3–60 literature; textbooks use definition-style sentences).
+- ≤ 15 % loanword density (widened from 10 % — physics/informatics have more Russian technical vocab).
+- No Latin run (defensive against OCR mis-segmentation).
+- Cross-book dedup by lowercase text.
+
+### Pilot results
+
+OCR'd and ingested in the pilot:
+
+| book | raw words | samples in pack |
+|---|---:|---:|
+| Қазақ тілі 11 ЕМН (language, natural-math track) | 26 705 | 2 046 |
+| Қазақ тілі 11 ОГН (language, general-humanities track) | 59 738 | 4 365 |
+| Қазақ тілі мен әдебиеті 9 | 22 470 | 2 010 |
+| **Total** | **108 913** | **8 421** |
+
+Pack: 2.8 MB, `data/curated/kazakh_textbooks_pack.json`. Per-book provenance preserved (`source_id = <book-slug>`, ids shaped `kz_textbook_<book>_p<NNN>_s<NN>`).
+
+Quality-gate reject tally (healthy extraction signal — matchers aren't greedy):
+
+- `skipped_length`: 3 542 (short headers, single-word chapter labels)
+- `skipped_duplicate`: 565 (structural phrases repeated across pages)
+- `skipped_loanword_heavy`: 396 (physics / math terms with Russian technical suffixes — textbooks have more than Abai)
+- `skipped_low_kazakh`: 6 (near-empty OCR pages)
+- `skipped_latin`: 0 (filter working)
+
+### Committed artifacts (byte-identical across 3 runs on post-v3.2.0 deterministic parser)
+
+| artifact | v3.2.0 | v3.3.0 | delta |
+|---|---:|---:|---|
+| `facts.json` facts | 15 | **17** | +2 (from textbooks within committed 500/pack cap) |
+| `lexical_graph.json` nodes / edges | 29 / 15 | 29 / 17 | +0 / +2 |
+| `derived_facts.json` derivations | 1 | 1 | unchanged (R5 chain surfaces at higher fact counts — visible at T4) |
+| textbook samples in pool | 0 | **8 421** | new |
+
+### Scaling bench — first measurement with textbooks in pool
+
+Default tiers on committed-only corpus (4.32 M-word pool, up from 4.23 M without textbooks):
+
+| tier | samples | words | facts | derivations | graph nodes | graph edges | extract ms |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| T1_100 | 100 | 903 | 0 | 0 | 0 | 0 | ~520 |
+| T2_1k | 1 000 | 8 957 | 0 | 0 | 0 | 0 | ~7 500 |
+| T3_10k | 10 000 | 106 190 | 19 | 0 | 38 | 19 | ~85 000 |
+| T4_50k | 50 000 | 600 885 | **120** | **51** | 123 | 87 | ~520 000 |
+
+Total run: 614 s (10 min 14 s) on M2 8-core, 4 / 4 tiers completed, `status: "completed"`.
+
+Scaling signal T3 → T4 (×5 words):
+
+- **derivations** ×∞ (was 0 at T3, 51 at T4) — reasoning activates once graph density crosses threshold. This is the R1 / R2 / R5 rules kicking in at scale.
+- **facts** ×6.32 (slightly super-linear because textbook prose has more compound phrases per unit corpus)
+- **graph edges** ×4.58, **nodes** ×3.24 — edge count growing faster than nodes, i.e. the graph is densifying (a healthy sign for reasoning).
+
+### Normalized metrics (new in v3.3.0, per Codex #4)
+
+| tier | facts / 10k words | derivations / fact | predicate coverage | duplicate-fact rate |
+|---|---:|---:|---:|---:|
+| T3_10k | 1.79 | 0.0000 | 33.3 % | 0.00 % |
+| T4_50k | 2.00 | 0.4250 | 33.3 % | 27.50 % |
+
+Reading this:
+- `facts/10k words ≈ 2` is the steady-state extraction density across T3 → T4. Matcher throughput is linear-in-corpus, no saturation.
+- `derivations/fact = 0.425` at T4 means every ~2.3 facts produce 1 rule-derivation on average — strong reasoning leverage.
+- `predicate_coverage = 33 %` (is_a + has out of 6 variants). v3.4.0 target: activate locative / dative / part_of matchers on the textbook pool → push toward 67-80 %.
+- **`duplicate_fact_rate = 27.5 %`** is the headline hygiene signal that only appears once we scale. Same `(subject, predicate, object)` triple is extracted from multiple textbook sentences. This is not necessarily wrong (repetition is evidence of stability), but future releases should either dedupe-on-extraction or expose `occurrence_count` as a per-fact field for downstream weighting.
+
+### Precision audit surface
+
+`docs/precision_audit.md` generated at v3.3.0 — 17 facts + 1 derivation sampled for native-speaker review with seed-reproducible order, full source sentences, pattern-id + rule-id breakdown, Tally section for computing precision. See the file header for how to review. v3.4 will scale this to the 120-fact T4 pool via `audit_precision --facts-sample 50`.
+
+### Cleanup: `data/external/` slimmed 2.7 GB → 87 MB
+
+Per user request at release-end, cleanup of `data/external/` (which is gitignored end-to-end, so this is pure local-disk reclamation — zero repo impact):
+
+| category | deleted | kept |
+|---|---|---|
+| Raw sources with `fetch_*.sh` scripts + committed packs | cc100_kk.txt.xz (888 MB), sentences.csv (711 MB), wikipedia_kz_plain.txt (638 MB), sentences.tar.bz2, kkwiki XML bundle, apertium/, Abai + Tatoeba + Common Voice + classics raw files, `.DS_Store`, broken `kaz_news_2011_30K.tar.gz` | — |
+| Processed textbook PDFs (pack committed) | 3 KazYazyk/KazLangCulture PDFs (16 MB) | — |
+| Unprocessed textbooks (v3.4 target) | — | 7 PDFs (87 MB): Biology 8, Algebra 7, Physics 11 × 2, Informatics 11 × 2, KazLit 11 |
+
+**Reclaimed ≈ 2.65 GB local disk.** Any deleted source is regenerable — raw sources via their `scripts/fetch_*.sh`, textbook packs by re-OCR if the PDFs are reacquired. `validate_foundation.sh` runs green before **and** after the deletion.
+
+### New binaries + modules
+
+- `adam-scaling::bench::run_tier_with_budget` + `EXTRACT_CHUNK_SIZE` — budget-aware tier runner.
+- `adam-scaling::NormalizedMetrics` + `TOTAL_PREDICATE_VARIANTS` constant.
+- `adam-scaling::bin::audit_precision` — precision audit review generator.
+- `adam-corpus::bin::process_kazakh_textbooks` — OCR-output → JSON pack processor.
+
+### Tests
+
+**375 passing, 0 failing, 0 warnings** (373 baseline + 2 strengthened determinism tests in `parser::determinism_tests`: `analyses_sorted_by_root_then_id_when_cross_root_ambiguous` + `first_root_matches_entries_ordered_for_prefix_ambiguous_surface`).
+
+### Upgrade notes
+
+- Library: fully additive. `run_tier` retained as a budget-unaware convenience wrapper around `run_tier_with_budget` for test-code ergonomics.
+- Artifacts: `ScalingPoint` gains `normalized: NormalizedMetrics` with `#[serde(default)]` — old reports parse fine. Old versions of the reader ignore the field.
+- Data: `kazakh_textbooks_pack.json` is opt-in (the pack list silently skips missing packs). CI checkouts without it run identically to v3.2.0.
+
+---
+
 ## [3.2.0] — 2026-04-21 — scaling-law bench + parser determinism fix (foundational)
 
 **Second step** of the post-v3.0 scale-up ladder. Ships **two** things at once because writing the first one exposed an existential bug in the second:

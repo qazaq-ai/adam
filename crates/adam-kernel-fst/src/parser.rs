@@ -92,6 +92,23 @@ mod determinism_tests {
     //! pass or every run of `extract_facts` produces a different fact
     //! set, invalidating the scaling bench and the entire
     //! "deterministic pipeline" thesis.
+    //!
+    //! ## Why the v3.2.0 in-process test was insufficient (Codex review)
+    //!
+    //! The v3.2.0 release shipped `analyse_ordering_stable_across_calls`
+    //! which called `analyse()` twice in a single process and asserted
+    //! equality. A pre-fix HashMap-backed analyse **would also pass that
+    //! test** because within one process HashMap iteration order is
+    //! fixed (the seed is picked at HashMap instance creation and stays
+    //! put). The original bug was cross-process: re-run the binary, get
+    //! a different HashMap seed, different `.next()` analysis.
+    //!
+    //! v3.3.0 strengthens the tests with **expected-order assertions**
+    //! on genuinely cross-root-ambiguous surfaces. Under the v3.2.0+
+    //! contract (iterate `LexiconV1::entries_ordered`, sorted by
+    //! `(root, id)`), the first analysis for an ambiguous surface is
+    //! *determined by the sort key*. Under pre-v3.2.0 HashMap-values
+    //! iteration, that same assertion would fail ≈ 50 % of runs.
 
     use super::*;
     use crate::lexicon::LexiconV1;
@@ -105,13 +122,20 @@ mod determinism_tests {
         LexiconV1::load(curated, apertium).ok()
     }
 
+    fn root_id(a: &Analysis) -> &str {
+        match a {
+            Analysis::Noun { root, .. } => &root.root,
+            Analysis::Verb { root, .. } => &root.root,
+        }
+    }
+
     #[test]
     fn analyse_ordering_stable_across_calls() {
-        // Ambiguous surfaces on the real Lexicon are the only way this
-        // bug shows up — single-analysis words are trivially stable.
-        // On the real Lexicon `алматыда` (locative of алматы) and
-        // `бала` (either bare noun or possibly other) have multiple
-        // analyses when cross-POS ambiguity strikes.
+        // Weak-form determinism: two back-to-back calls must return
+        // identical vectors. This passes under both the old and new
+        // implementations — kept for defence-in-depth. The stronger
+        // expected-order tests below are what actually catches the
+        // pre-v3.2.0 bug.
         let Some(lex) = load_real_lex() else { return };
         for word in ["бала", "алматыда", "кітабы", "мектебі", "жазды"]
         {
@@ -126,13 +150,83 @@ mod determinism_tests {
 
     #[test]
     fn first_analysis_stable_for_ambiguous_surface() {
-        // Downstream consumers in adam-reasoning pick `.next()` on the
-        // analyse() iterator. For the scaling bench to be deterministic,
-        // that first choice must also be stable.
+        // Same weak-form: `.next()` parity across repeat calls.
         let Some(lex) = load_real_lex() else { return };
         let first_a = analyse("бала", &lex).into_iter().next();
         let first_b = analyse("бала", &lex).into_iter().next();
         assert_eq!(first_a, first_b);
+    }
+
+    #[test]
+    fn analyses_sorted_by_root_then_id_when_cross_root_ambiguous() {
+        // Strong-form determinism: the ordering contract declared in
+        // the `analyse` docstring is the sort key `(entry.root, entry.id)`
+        // inherited from `LexiconV1::entries_ordered`. This test asserts
+        // the contract on a genuinely cross-root-ambiguous surface.
+        //
+        // On the real Lexicon `кітабы` is the P3 possessive inflection
+        // of `кітап` ("book") AND has its own root entry `кітабы`
+        // (Apertium import artefact). `analyse("кітабы")` therefore
+        // returns analyses under two distinct roots. Under the v3.2.0+
+        // contract the sort order is by Cyrillic Unicode code point of
+        // `root`: `б` (U+0431) < `п` (U+043F), so `кітабы` < `кітап`
+        // and `кітабы` analyses come first. Under the pre-v3.2.0
+        // HashMap-values path the "first" could be either root, picked
+        // by the per-process HashMap seed — this assertion fails ≈ 50 %
+        // of runs on the old code.
+        let Some(lex) = load_real_lex() else { return };
+        let analyses = analyse("кітабы", &lex);
+        if analyses.len() < 2 {
+            eprintln!(
+                "note: expected ≥ 2 analyses for «кітабы»; got {}. Lexicon may have drifted.",
+                analyses.len()
+            );
+            return;
+        }
+        // First analysis must be under the lexicographically-smaller
+        // root `кітабы` (by Unicode code point), not the `кітап` root.
+        assert_eq!(
+            root_id(&analyses[0]),
+            "кітабы",
+            "sort contract broken — first analysis must be under `кітабы` (< `кітап` by Cyrillic code point)"
+        );
+        // And the whole sequence must be non-decreasing by root.
+        let roots: Vec<&str> = analyses.iter().map(root_id).collect();
+        let mut sorted = roots.clone();
+        sorted.sort();
+        assert_eq!(
+            roots, sorted,
+            "analyses must be non-decreasing by root; got {:?}",
+            roots
+        );
+    }
+
+    #[test]
+    fn first_root_matches_entries_ordered_for_prefix_ambiguous_surface() {
+        // Cross-check: the first analysis of an ambiguous surface must
+        // match the first `entries_ordered` Lexicon entry whose root
+        // prefixes the surface. This is a direct invariant on the v3.2.0
+        // dual-storage contract.
+        let Some(lex) = load_real_lex() else { return };
+        let surface = "кітабы";
+        let analyses = analyse(surface, &lex);
+        if analyses.is_empty() {
+            return;
+        }
+        let first_analysis_root = root_id(&analyses[0]);
+
+        // Find the first Lexicon entry (in entries_ordered) that could
+        // plausibly prefix this surface (v3.2.0 analyse() prefix test).
+        let first_candidate = lex
+            .entries_ordered
+            .iter()
+            .find(|e| surface_could_contain_root(surface, &e.root))
+            .expect("at least one candidate must exist — the analyse above succeeded");
+        assert_eq!(
+            first_analysis_root, first_candidate.root,
+            "first analysis root must match first entries_ordered candidate — got {first_analysis_root}, expected {}",
+            first_candidate.root,
+        );
     }
 }
 

@@ -1,9 +1,9 @@
 {
-  "version": "3.2.0",
+  "version": "3.3.0",
   "status": "completed",
-  "elapsed_s": 19,
-  "packs_completed": 8,
-  "packs_total": 8,
+  "elapsed_s": 27,
+  "packs_completed": 9,
+  "packs_total": 9,
   "built_from": [
     "tatoeba_kazakh_pack.json",
     "wikipedia_kz_pack.json",
@@ -12,20 +12,22 @@
     "abai_wikisource_pack.json",
     "kazakh_proverbs_pack.json",
     "synthetic_sentences_pack.json",
-    "kazakh_classics_pack.json"
+    "kazakh_classics_pack.json",
+    "kazakh_textbooks_pack.json"
   ],
   "counts": {
-    "samples_scanned": 3191,
-    "samples_with_facts": 15,
-    "facts_total": 15,
+    "samples_scanned": 3691,
+    "samples_with_facts": 17,
+    "facts_total": 17,
     "by_predicate": {
-      "has": 3,
+      "has": 5,
       "is_a": 12
     },
     "by_pack": {
       "cc100_kk_pack.json": 2,
       "common_voice_kk_pack.json": 3,
-      "kazakh_proverbs_pack.json": 10
+      "kazakh_proverbs_pack.json": 10,
+      "kazakh_textbooks_pack.json": 2
     }
   },
   "facts": [
@@ -328,6 +330,46 @@
       },
       "confidence": "Grammar",
       "raw_text": "Ой — адамның қаруы."
+    },
+    {
+      "subject": {
+        "surface": "адамдардың",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ішінде",
+        "root": "іш",
+        "pos": "noun"
+      },
+      "pattern": "X-тың Y-сы бар",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0009_s08"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Өздерің біле- тін адамдардың ішінде шешен сөйлейтіндер бар ма"
+    },
+    {
+      "subject": {
+        "surface": "үйдің",
+        "root": "үй",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сыртында",
+        "root": "сырт",
+        "pos": "noun"
+      },
+      "pattern": "X-тың Y-сы бар",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0031_s14"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Анадай жерде, қонақ үйдің сыртында, қасында екі-үш үлкен кісі бар әкесі Құнан- бай тұр екен"
     }
   ]
 }

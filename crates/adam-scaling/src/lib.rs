@@ -21,12 +21,16 @@
 //!
 //! ## Determinism contract
 //!
-//! 1. Packs are iterated in a fixed canonical order
-//!    ([`CANONICAL_COMMITTED_PACKS`] then
-//!    [`SHARD_PACK_PREFIXES`]'s shard files in lexical order).
-//! 2. Samples inside each pack are iterated in `samples[]` array order.
-//! 3. Extraction calls `adam_reasoning::extract_facts` which is pure.
-//! 4. Graph projection and reasoner are pure.
+//! 1. Packs are iterated in a **bench-specific** canonical order
+//!    (see [`CANONICAL_COMMITTED_PACKS`] — fact-dense packs first,
+//!    conversational packs last). This is **not** the same order
+//!    `extract_facts` uses; see the [`CANONICAL_COMMITTED_PACKS`]
+//!    docstring for why the two orders diverge.
+//! 2. Shard files (`--use-shards`) come after committed packs, in
+//!    lexical filename order ([`SHARD_PACK_PREFIXES`]).
+//! 3. Samples inside each pack are iterated in `samples[]` array order.
+//! 4. Extraction calls `adam_reasoning::extract_facts` which is pure.
+//! 5. Graph projection and reasoner are pure.
 //!
 //! Consequently `scaling_report.json` is byte-identical across runs on
 //! the same `(data/curated, data/curated/shards, Lexicon)` state,
@@ -52,6 +56,7 @@ pub const CANONICAL_COMMITTED_PACKS: &[&str] = &[
     "abai_wikisource_pack.json",
     "kazakh_proverbs_pack.json",
     "kazakh_classics_pack.json",
+    "kazakh_textbooks_pack.json",
     "wikipedia_kz_pack.json",
     "synthetic_sentences_pack.json",
     "tatoeba_kazakh_pack.json",
@@ -116,6 +121,12 @@ pub struct ScalingPoint {
     /// Per-stage wall-clock in milliseconds. Only wall-clock metric —
     /// everything else is deterministic.
     pub elapsed_ms: StageMs,
+    /// v3.3.0 — normalized quality signals. Unlike raw counts these
+    /// compare meaningfully across tiers and across releases. Computed
+    /// from the raw fields above; always present. See
+    /// [`NormalizedMetrics`] for the formulas.
+    #[serde(default)]
+    pub normalized: NormalizedMetrics,
 }
 
 /// Wall-clock per pipeline stage.
@@ -129,6 +140,85 @@ pub struct StageMs {
 impl StageMs {
     pub fn total(&self) -> u64 {
         self.extract + self.graph + self.reason
+    }
+}
+
+/// Normalized quality signals for a [`ScalingPoint`]. Raw counts grow
+/// with corpus size; these ratios tell you *what kind* of growth it is.
+///
+/// ## Interpretation
+///
+/// - **`facts_per_10k_words`** — extraction density. A higher number
+///   means the matchers are finding more grammar-indexed structure per
+///   unit of text. Expected to stabilise or slowly drift up as more
+///   matchers ship; a sharp drop is a regression signal.
+/// - **`derivations_per_fact`** — reasoning leverage. Each fact in the
+///   graph produces on average this many rule-derived conclusions. As
+///   the graph densifies, this ratio grows super-linearly — the
+///   reasoning scaling law.
+/// - **`predicate_coverage_pct`** — breadth across predicate types.
+///   `(predicates with ≥ 1 fact) / (total predicate variants available)
+///   × 100`. At v3.3.0 total = 6 (IsA, LivesIn, Has, GoesTo, PartOf,
+///   RelatedTo). 100 % means every extractor is firing at this scale.
+/// - **`duplicate_fact_rate_pct`** — hygiene signal. Two facts are
+///   considered duplicates when their `(subject.root, predicate,
+///   object.root)` triple coincides. Low is good (different samples
+///   produce distinct claims); high signals template-like corpus or
+///   over-confident matchers.
+///
+/// All fields are floats rendered to 2-4 decimals in the Markdown
+/// report. A tier with zero facts has all-zero ratios (not NaN) —
+/// this keeps JSON clean and plots linearisable.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
+pub struct NormalizedMetrics {
+    pub facts_per_10k_words: f64,
+    pub derivations_per_fact: f64,
+    pub predicate_coverage_pct: f64,
+    pub duplicate_fact_rate_pct: f64,
+}
+
+impl Eq for NormalizedMetrics {}
+
+/// Total number of [`adam_reasoning::Predicate`] variants the v3.3.0
+/// codebase defines. Used as the denominator for
+/// [`NormalizedMetrics::predicate_coverage_pct`]. Update this when the
+/// `Predicate` enum grows.
+pub const TOTAL_PREDICATE_VARIANTS: usize = 6;
+
+impl NormalizedMetrics {
+    /// Derive the normalized signals from a [`ScalingPoint`]'s raw
+    /// counts + the duplicate count the caller computed (it needs the
+    /// underlying fact list, not just the counts, so we can't derive
+    /// it here).
+    pub fn compute(
+        facts_extracted: usize,
+        words_scanned: u64,
+        derivations: usize,
+        distinct_predicates_fired: usize,
+        duplicate_fact_count: usize,
+    ) -> Self {
+        let facts = facts_extracted as f64;
+        let words = words_scanned as f64;
+        Self {
+            facts_per_10k_words: if words > 0.0 {
+                (facts / words) * 10_000.0
+            } else {
+                0.0
+            },
+            derivations_per_fact: if facts > 0.0 {
+                derivations as f64 / facts
+            } else {
+                0.0
+            },
+            predicate_coverage_pct: (distinct_predicates_fired as f64
+                / TOTAL_PREDICATE_VARIANTS as f64)
+                * 100.0,
+            duplicate_fact_rate_pct: if facts > 0.0 {
+                (duplicate_fact_count as f64 / facts) * 100.0
+            } else {
+                0.0
+            },
+        }
     }
 }
 
