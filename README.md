@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.3.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-3.4.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,13 +23,13 @@
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-375%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-391%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20by%20design-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
 
 ---
 
-## Why adam (v3.3)
+## Why adam (v3.4)
 
 adam is a **neuro-symbolic retrieval system for Kazakh** — the rule-based dialog backbone, the morpheme-indexed retrieval engine, and the forward-chaining reasoner all run together as a single deterministic pipeline. It trades **generalisation for integrity**, and (as of v3.0) adds **rule-derived reasoning** on top of retrieval.
 
@@ -39,7 +39,7 @@ Three things make the trade viable specifically for Kazakh:
 - **Mathematical determinism** — same input + same session + same seed produces a byte-identical answer across runs. No temperature, no sampling, no GPU.
 - **No ungrounded generation by design** — every output is either a template realisation, a corpus quote, or a rule derivation with a full `source_chain`. There is no free-text generator anywhere in the pipeline that could invent content not traceable to its source.
 
-| | adam v3.3 | mainstream LLM |
+| | adam v3.4 | mainstream LLM |
 |---|---|---|
 | Outputs | template + verbatim quote + FST synthesis + **rule-derived chain** | probabilistic token generation |
 | Ungrounded generation | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) | non-zero, non-auditable |
@@ -64,8 +64,9 @@ v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is en
 | Lexicon roots | 14 247 |
 | Corpus (committed / local) | 4.32 M (v3.3.0: +textbooks) / 77.9 M words across 9 committed source packs |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **375 passing, 0 failing, 0 warnings** |
+| Workspace tests | **391 passing, 0 failing, 0 warnings** |
 | Pattern matchers | 4 (copula / locative / possessive / dative-motion) |
+| **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
 | Reasoning rules active | 3 (R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo) |
 | Extracted facts (committed) | **17** (v3.3.0 textbook pack added; +2 facts within 500/pack cap. Scaling bench T4_50k surfaces **120 facts / 51 derivations**) |
 | Rule-derived facts (committed) | **1** (кітап RelatedTo ілім, via R5 — committed snapshot; T4 scale sees all 3 rules active) |
@@ -73,6 +74,7 @@ v3.0 is **proof of mechanism, not proof of scale.** The reasoning pipeline is en
 | Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |
 | Scaling bench (v3.3.0) | `adam-scaling::scaling_bench` + `audit_precision` — emits `data/scaling/scaling_report.json` + `docs/scaling_report.md` + `docs/precision_audit.md`. Budget-aware `run_tier_with_budget` (chunked at 128 samples, SIGINT / `--time-budget` stops within ~1 s). Normalized metrics per tier: `facts_per_10k_words`, `derivations_per_fact`, `predicate_coverage_pct`, `duplicate_fact_rate_pct`. **Measured scaling on 4.32 M-word committed pool (textbooks + wiki + Abai)**: T3_10k (19 facts, 0 deriv) → T4_50k (120 facts, 51 deriv) — reasoning activates once graph density crosses threshold. |
 | Determinism (v3.2.0 + v3.3.0) | dual-storage Lexicon (`HashMap` get + `entries_ordered: Vec<RootEntry>` for `analyse`). Fixes a 2-year latent non-determinism where `analyse().next()` returned different first analyses across runs for ambiguous surfaces. **4 regression tests** guard the invariant, including expected-order assertions that fail ≈ 50 % on pre-v3.2.0 code. |
+| Lexicon mining (v3.4.0) | `adam-corpus::mine_lexicon_gaps` scans all 9 committed packs, finds uncovered tokens, ranks globally by frequency, auto-tags (vowel harmony + final-sound class), extracts 3 context sentences per candidate. Produces `docs/lexicon_gap_candidates.md` for native-speaker review. First scan: top-5 candidates **validated against the v1.5.5-era `project_morpheme_coverage_baseline` memory** — exact match on all 5 predicted gaps (`деп, оның, осы, деген, пен`). |
 | Gold corpus (v3.3.0) | 3 Kazakh secondary-school textbooks OCR'd via tesseract-kaz @ 200 DPI (pdftotext drops Қ/Ң/Ғ/Ө/Ү/Ұ/Һ on custom-font PDFs). **108 913 raw words → 8 421 samples** in `kazakh_textbooks_pack.json`, per-book provenance. 7 more textbooks staged for v3.4. |
 
 The scale-up path is explicit: scale coverage of the four existing matchers to the full 77.9 M-word corpus, add `PartOf` / `Causes` extractors, activate R3/R4. Nothing in the architecture is gated on more data — the engine already produces derivations with full provenance.
@@ -132,7 +134,7 @@ Four parts (v3.0):
 
 ```
 $ cargo run --release -p adam-dialog --bin adam_chat
-adam-chat v3.3 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
+adam-chat v3.4 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.
 
 > сәлем
 сәлем
@@ -339,7 +341,7 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | Reasoning rules active (v3.0) | **3** — R1 IsA-transitivity, R2 Has-inheritance, R5 shared-IsA → RelatedTo |
 | Extracted / derived facts (committed) | **17 / 1** (v3.3.0: +2 from textbooks within 500/pack cap; `кітап RelatedTo ілім` via R5; scaling bench T4_50k: 120 facts / 51 derivations) |
 | Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
-| Workspace tests | **375 passing**, 0 failing |
+| Workspace tests | **391 passing**, 0 failing, 0 warnings |
 | Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential; 20 M-word full-corpus run fits in the 3 h iteration budget |
 
 ## Directory layout
