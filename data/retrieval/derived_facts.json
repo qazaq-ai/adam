@@ -1,12 +1,12 @@
 {
-  "version": "3.3.0",
+  "version": "3.4.0",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
   "iterations_completed": 2,
   "counts": {
-    "initial_facts": 17,
+    "initial_facts": 251,
     "derived_facts": 1,
     "by_rule": {
       "R5_shared_is_a_target": 1

@@ -502,6 +502,38 @@ fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
                 d.subject.root, d.object.root
             )
         }
+        // v3.5.0 additions. Each keeps the «байланыс-» marker per the
+        // trust-stack invariant (test-enforced in v2.7+).
+        ReasPredicate::Causes => {
+            format!(
+                "{} {}-ның себебі екендігі байланысты ой-тізбек арқылы шықты",
+                d.subject.root, d.object.root
+            )
+        }
+        ReasPredicate::After => {
+            format!(
+                "{} {}-нен кейін болатындығы байланысты уақыт-тізбек арқылы шықты",
+                d.subject.root, d.object.root
+            )
+        }
+        ReasPredicate::HasQuantity => {
+            format!(
+                "{} {}-мен байланысты санды қатынас ретінде шықты",
+                d.subject.root, d.object.root
+            )
+        }
+        ReasPredicate::DoesTo => {
+            format!(
+                "{} {} үстінде байланысты әрекет иесі ретінде шықты",
+                d.subject.root, d.object.root
+            )
+        }
+        ReasPredicate::InDomain => {
+            format!(
+                "{} {} саласына байланысты мүше ретінде шықты",
+                d.subject.root, d.object.root
+            )
+        }
     }
 }
 

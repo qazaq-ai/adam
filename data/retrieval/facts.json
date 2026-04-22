@@ -1,7 +1,7 @@
 {
-  "version": "3.3.0",
+  "version": "3.4.0",
   "status": "completed",
-  "elapsed_s": 27,
+  "elapsed_s": 39,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -17,20 +17,888 @@
   ],
   "counts": {
     "samples_scanned": 3691,
-    "samples_with_facts": 17,
-    "facts_total": 17,
+    "samples_with_facts": 246,
+    "facts_total": 251,
     "by_predicate": {
+      "after": 1,
+      "does_to": 200,
       "has": 5,
-      "is_a": 12
+      "is_a": 12,
+      "related_to": 33
     },
     "by_pack": {
-      "cc100_kk_pack.json": 2,
-      "common_voice_kk_pack.json": 3,
+      "abai_wikisource_pack.json": 14,
+      "cc100_kk_pack.json": 50,
+      "common_voice_kk_pack.json": 8,
+      "kazakh_classics_pack.json": 2,
       "kazakh_proverbs_pack.json": 10,
-      "kazakh_textbooks_pack.json": 2
+      "kazakh_textbooks_pack.json": 35,
+      "synthetic_sentences_pack.json": 90,
+      "tatoeba_kazakh_pack.json": 2,
+      "wikipedia_kz_pack.json": 40
     }
   },
   "facts": [
+    {
+      "subject": {
+        "surface": "жаңбыр",
+        "root": "жаңбыр",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жерді",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кет-лайды",
+      "source": {
+        "pack": "tatoeba_kazakh_pack.json",
+        "sample_id": "tatoeba_kz_00274"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Өткінші жаңбыр жерді дымдап кетті."
+    },
+    {
+      "subject": {
+        "surface": "Әсем",
+        "root": "әсем",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ыдысты",
+        "root": "ыдыс",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні сын-лайды",
+      "source": {
+        "pack": "tatoeba_kazakh_pack.json",
+        "sample_id": "tatoeba_kz_00402"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Сол түнде, Әсем бес ыдысты сындырды."
+    },
+    {
+      "subject": {
+        "surface": "қауіпсіздік",
+        "root": "қауіпсіздік",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сияқты",
+        "root": "сияқ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кір-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000060"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Сонымен қатар Еуропадағы қауіпсіздік және ынтымақтастық ұйымына, Ұжымдық қауіпсіздік туралы шарт ұйымына, Шанхай Ынтымақтастық Ұйымына және Еуразиялық Экономикалық Қауымдастығы сияқты басқа да бірнеше халықаралық ұйымдардың құрамына кіреді."
+    },
+    {
+      "subject": {
+        "surface": "инвестициялық",
+        "root": "инвестициялық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қомақты",
+        "root": "қомақ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бол-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000123"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қолайлы инвестициялық жағдайлардың жасалуы тікелей шетелдік қомақты инвестициялардың тікелей ағылып келуіне себепші болды, оның негізгі бөлігі еліміздің мұнай өндіру саласына жұмсалады."
+    },
+    {
+      "subject": {
+        "surface": "мұнай",
+        "root": "мұнай",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "өндіруді",
+        "root": "өндіру",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қарқ-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000124"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Біріншіден, бұл өз кезегінде мұнай мен газ конденсатын өндіруді қарқынды дамытты."
+    },
+    {
+      "subject": {
+        "surface": "мұнай",
+        "root": "мұнай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "газ",
+        "root": "газ",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000124"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Біріншіден, бұл өз кезегінде мұнай мен газ конденсатын өндіруді қарқынды дамытты."
+    },
+    {
+      "subject": {
+        "surface": "Қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "әскерлерді",
+        "root": "әскер",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тыл-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000134"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қазақстан Республикасының әскери құрылымы әскери басқару органдарын, Қарулы Күштердің түрлерін, арнайы әскерлерді, тыл, әскери оқу орындары мен ғыл."
+    },
+    {
+      "subject": {
+        "surface": "жабу",
+        "root": "жабу",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жағдайды",
+        "root": "жағдай",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні сәйкес-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000141"
+      },
+      "confidence": "Grammar",
+      "raw_text": "тұрғыда маңызды өңірлерін жабу; маңызды әскери нысандарды күзету; елдің кез келген ауданында жағдайды тұрақтандыру жөніндегі батыл іс-қимылға әзір болу; халықаралық міндеттемелерге сәйкес бітімгершілік және өзге де операцияларға қатысу."
+    },
+    {
+      "subject": {
+        "surface": "Қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Ресей",
+        "root": "ресей",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000189"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Әлемдегі ең ұзын құрлықтық шекара — Қазақстан мен Ресей шекарасы (7591 шақырым)."
+    },
+    {
+      "subject": {
+        "surface": "қала",
+        "root": "қала",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "көгалды",
+        "root": "көгал",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні гүлде-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000194"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ал басқа түсіндірмеде қала атауы соғдының (иранның) «чиминь-чемень» яғни, көгалды, гүлденген алқап, ал бұған «Кент» сөзінің жалғануымен, «жасыл (гүлденген) қала» деген мағынаны білдіреді."
+    },
+    {
+      "subject": {
+        "surface": "Шымкент",
+        "root": "шымкент",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "елді",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жаз-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000198"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Біздің заманымызға жеткен жазба деректерде Шымкент алғаш рет елді мекен ретінде парсы тарихшысы Шараф ад-Дин Әли Йаздидің (1425 жыл) біздің жыл санауымыз бойынша 1365–1366 жылдардағы Әмір Темірдің әскери жорықтары туралы жазған «Зафар Наме» атты («Жеңіс кітабы») кітабында кездеседі."
+    },
+    {
+      "subject": {
+        "surface": "Сансыз",
+        "root": "сан",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жергілікті",
+        "root": "жергілік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні өркенде-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000206"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Сансыз соғыстар мен өзара тартыстар жергілікті халықтардың өміріне қайғы-қасірет әкелгенімен, Сайрам оазисі-жер өңдеу мен бау-бақша және қол өнері өркендеген аймақ болып қала берді."
+    },
+    {
+      "subject": {
+        "surface": "соғыстар",
+        "root": "соғыс",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "өзара",
+        "root": "өзара",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000206"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Сансыз соғыстар мен өзара тартыстар жергілікті халықтардың өміріне қайғы-қасірет әкелгенімен, Сайрам оазисі-жер өңдеу мен бау-бақша және қол өнері өркендеген аймақ болып қала берді."
+    },
+    {
+      "subject": {
+        "surface": "Қала",
+        "root": "қала",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "өнімдерді",
+        "root": "өнім",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні өн-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000224"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қала танктерге қажетті қосалқы бөлшектер, снарядтар, металл, қорғасын, оптикалық қүралдар және басқа да өнімдерді өндірді."
+    },
+    {
+      "subject": {
+        "surface": "тігін",
+        "root": "тігін",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "материалдарды",
+        "root": "материал",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ал-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000227"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Олардың ішінен мақта-қағаз комбинаты, қаракөл, цемент, гидролиз зауыттары, «Восход» тігін фабрикасы, металлқұрастыру және тұрғын үй құрылысына қажетті материалдарды өндіретін кәсіпорынды, «Электроаппарат» зауыты, ал, тамақ өнер-кәсібінен ет, сүт, сыра, салқындатылған сусындарды шығаратын кәсіпорындарды атауға болады."
+    },
+    {
+      "subject": {
+        "surface": "Шымкент",
+        "root": "шымкент",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "етуді",
+        "root": "ету",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні асыр-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000239"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Шымкент қалалық әкімдігі — Шымкент қаласы әкімінің аппараты қала әкімінің қызметін басқаруды және бақылауды, оны ұйымдық, құқықтық, ақпараттық-талдау, консультативтік және материалдық-техникалық қамтамасыз етуді жүзеге асырады."
+    },
+    {
+      "subject": {
+        "surface": "Жоба",
+        "root": "жоба",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "етуді",
+        "root": "ету",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көзде-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000253"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Жоба қаланың 50 мың тұрғынын баспанамен қамтамасыз етуді көздейді."
+    },
+    {
+      "subject": {
+        "surface": "ұлттық",
+        "root": "ұлттық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ұтымды",
+        "root": "ұтым",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кел-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000256"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Олардың белсене қатысуы және қолдауымен ұлттық саясат және тұрғындардың бос уақытын ұтымды ұйымдастыру мәселелері оң шешімін тауып келеді."
+    },
+    {
+      "subject": {
+        "surface": "ауа",
+        "root": "ауа",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "Ресейді",
+        "root": "ресей",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бол-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000275"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ресейдің ауа райы оның үлкен аумағына байланысты әр түрлі: көп аумағы континенталды немесе қоңыржай континенталды, қысы ұзақ және қысқа ыстық емес, соған қарай Ресейді 3 үлкен аймаққа бөлуге болады: Еуропалық Ресей, Орал тауынан батысқа қарай аумақты алып жатыр."
+    },
+    {
+      "subject": {
+        "surface": "жерін",
+        "root": "жерін",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "құдіретті",
+        "root": "құдірет",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бол-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000296"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Келесі ғасырда Украина мен Беларусь жерін басып алу мақсатында көршілес елдермен, соның ішінде құдіретті Осман империясымен ұзаққа созылған соғыс жүргізуге мәжбүр болды."
+    },
+    {
+      "subject": {
+        "surface": "Азия",
+        "root": "азия",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000305"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ресей империясының басқыншылық саясаты нәтижесінде Орта Азия мен Қазақстан жері толығымен дерлік тәуелді аумақтарға айналды."
+    },
+    {
+      "subject": {
+        "surface": "Ресей",
+        "root": "ресей",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тиімді",
+        "root": "тиім",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көш-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000312"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ендігі жерде Ресей белгілі бір елдер тобына бағдарланған саясат жүргізуге қарағанда, өзінің экономикалық, саяси мүдделеріне сай келетін мемлекеттердің барлығымен өзара тиімді байланыстар орнатуға көшті."
+    },
+    {
+      "subject": {
+        "surface": "ұлттар",
+        "root": "ұлт",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "діндер",
+        "root": "дін",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000315"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қазіргі заманғы әлемдегі геосаяси жағдай, ұлттар мен діндер араздығы, халықаралық терроризммен күрес шаралары Еуразияның көптеген аудандарында саяси тұрақсыздықтың орын алуына себепші болды."
+    },
+    {
+      "subject": {
+        "surface": "Жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "әрекеттерді",
+        "root": "әрекет",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кел-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000328"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Жер бедерінің құрылымы шаруашылық әрекеттерді жүргізуге қолайлы болып келеді."
+    },
+    {
+      "subject": {
+        "surface": "ендік",
+        "root": "ендік",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ылғалды",
+        "root": "ылғал",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жаса-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000331"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Солтүстікке қарай ендік бағыттағы тау жоталарының болмауы арктикалық ауа массаларының оңтүстіктегі тау белдеулеріне дейін еркін қозғалуына мүмкіндік берсе, керісінше Қиыр Шығыстағы тау жоталары Тынық мұхит үстінен келетін ылғалды ауа массаларының тереңдеп енуіне кедергі жасайды."
+    },
+    {
+      "subject": {
+        "surface": "Мұндай",
+        "root": "мұндай",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "аймақтарды",
+        "root": "аймақ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні теже-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000338"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Мұндай табиғат жағдайы осы аймақтарды игеру мүмкіндігін тежейді."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жарамды",
+        "root": "жара",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шоғырлан-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000349"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Алайда жер қорының 1/3-і ғана пайдалануға жарамды, онда Ресей халқының 95%-ы қоныстанып, бүкіл шаруашылық салалары құрылымдарының 93%-ы шоғырланған."
+    },
+    {
+      "subject": {
+        "surface": "Ауыл",
+        "root": "ауыл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жарамды",
+        "root": "жара",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кір-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000350"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ауыл шаруашылығына жарамды жерлер де осы үлеске кіреді."
+    },
+    {
+      "subject": {
+        "surface": "бөлігі",
+        "root": "бөлігі",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "егіншілікті",
+        "root": "егіншілік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қарқ-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000355"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Көпшілік бөлігі егіншілікті дамытуға қолайлы, топырақ құнарлылығы, жоғары ылғалдылығы мен қарқынды температуралар (10°С-тан асатын) жиынтығы жеткілікті қоңыржай белдеуде орналасқан."
+    },
+    {
+      "subject": {
+        "surface": "Сібір",
+        "root": "сібір",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Қиыр",
+        "root": "қиыр",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000356"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ондай аудандарға Ресейдің орталық бөлігі, Батыс Сібір мен Қиыр Шығыстың оңтүстігін алып жатқан орманды дала және дала зоналары жатады."
+    },
+    {
+      "subject": {
+        "surface": "Сібір",
+        "root": "сібір",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Қиыр",
+        "root": "қиыр",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000363"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ормандардың көпшілігі елдің шығысында, яғни Шығыс Сібір мен Қиыр Шығыста, одан кейін Батыс Сібір мен Оралда шоғырланған."
+    },
+    {
+      "subject": {
+        "surface": "Сібір",
+        "root": "сібір",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Қиыр",
+        "root": "қиыр",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000368"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Орталық қара топырақты ауданның өзен ағынымен қамтамасыз етілуі Шығыс Сібір мен Қиыр Шығыстағы көрсеткіштен 100 есе төмен."
+    },
+    {
+      "subject": {
+        "surface": "кеме",
+        "root": "кеме",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жарамды",
+        "root": "жара",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні аса-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000375"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Олардың кеме жүзуге жарамды жалпы ұзындығы 300 мың км-ден асады."
+    },
+    {
+      "subject": {
+        "surface": "қойнаулар",
+        "root": "қойнау",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жағалаулар",
+        "root": "жағалау",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000378"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Табиғи-рекреациялық ресурстардан қолайлы қойнаулар мен жағалаулар (теңіз, өзен, көл), таулар мен ормандар, минералды сулар, табиғат ескерткіштері, табиғи саябақтар өте көп таралған."
+    },
+    {
+      "subject": {
+        "surface": "өнеркәсіп",
+        "root": "өнеркәсіп",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ауыл",
+        "root": "ауыл",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000398"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Елдегі жұмыспен қамтылғандардың басым бөлігі өндірістік емес салада (57%), қалғандары өнеркәсіп пен ауыл шаруашылығы салаларында еңбек етеді."
+    },
+    {
+      "subject": {
+        "surface": "ұлттар",
+        "root": "ұлт",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ұлыстар",
+        "root": "ұлыс",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000399"
+      },
+      "confidence": "Grammar",
+      "raw_text": "100-ге жуық ұлттар мен ұлыстар Ресейдің; байырғы халқына жатады."
+    },
+    {
+      "subject": {
+        "surface": "ұлттар",
+        "root": "ұлт",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ұлыстар",
+        "root": "ұлыс",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000407"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Елдің солтүстігін, Қиыр Шығысты саны жағынан аз ұлттар мен ұлыстар мекендейді."
+    },
+    {
+      "subject": {
+        "surface": "Солтүстік",
+        "root": "солтүстік",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "адамды",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бұл-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000416"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Мысалы, Солтүстік Осетияда тығыздық 1 км²-ге шаққанда 80 адамды құраса, табиғаты қолайсыз Таймырда бұл көрсеткіш 1 адамға тең."
+    },
+    {
+      "subject": {
+        "surface": "Атап",
+        "root": "атап",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сияқты",
+        "root": "сияқ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні үнде-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000439"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Атап айтқанда, Ресей мәдениеті Византиямен қатар, көршілес жатқан Болгария, Сербия, Армения, Грузия сияқты елдердің мәдениетімен үндестік тапты."
+    },
+    {
+      "subject": {
+        "surface": "ауыл",
+        "root": "ауыл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "халықты",
+        "root": "халық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні аса-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000467"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Өйткені ауыл шаруашылығы материалдық өндірістің шешуші саласы, ол халықты тек азық-түлікпен қамтамасыз етумен шектелмейді, сондай-ақ өнеркәсіптің көптеген салалары үшін аса қажетті шикізат та өндіреді."
+    },
+    {
+      "subject": {
+        "surface": "Әсіресе",
+        "root": "әсіресе",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "өнімді",
+        "root": "өнім",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ете-лайды",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000471"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Әсіресе өнімді өңдеу мен қызмет көрсету салалары жетілдіруді қажет етеді."
+    },
+    {
+      "subject": {
+        "surface": "өңдеу",
+        "root": "өңдеу",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қызмет",
+        "root": "қызмет",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000471"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Әсіресе өнімді өңдеу мен қызмет көрсету салалары жетілдіруді қажет етеді."
+    },
+    {
+      "subject": {
+        "surface": "Ел",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тамағыңды",
+        "root": "тамақ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тау-лайды",
+      "source": {
+        "pack": "common_voice_kk_pack.json",
+        "sample_id": "cv_kk_00011"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Ел көшеді» деп, отыныңды тауыспа, «Жау келеді» деп, тамағыңды тауыспа."
+    },
     {
       "subject": {
         "surface": "Ілім",
@@ -50,6 +918,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Ілім — бұлақ."
+    },
+    {
+      "subject": {
+        "surface": "Адал",
+        "root": "адал",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жаныңды",
+        "root": "жан",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні сақта-лайды",
+      "source": {
+        "pack": "common_voice_kk_pack.json",
+        "sample_id": "cv_kk_00103"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Адал дос жаныңды сақтайды, аяр дос малыңды жақтайды."
     },
     {
       "subject": {
@@ -93,6 +981,366 @@
     },
     {
       "subject": {
+        "surface": "дос",
+        "root": "дос",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "аяулыңды",
+        "root": "аяул",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні сұра-лайды",
+      "source": {
+        "pack": "common_voice_kk_pack.json",
+        "sample_id": "cv_kk_00340"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Айырылар дос аяулыңды сұрайды."
+    },
+    {
+      "subject": {
+        "surface": "ас",
+        "root": "ас",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қолыңды",
+        "root": "қолы",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бос-лайды",
+      "source": {
+        "pack": "common_voice_kk_pack.json",
+        "sample_id": "cv_kk_00395"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Алдыңа ас қойдым, екі қолыңды бос қойдым."
+    },
+    {
+      "subject": {
+        "surface": "жол",
+        "root": "жол",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "атты",
+        "root": "ат",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні сына-лайды",
+      "source": {
+        "pack": "common_voice_kk_pack.json",
+        "sample_id": "cv_kk_00458"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Алыс жол атты сынайды, ауыр жол ерді сынайды."
+    },
+    {
+      "subject": {
+        "surface": "Қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қадағалауды",
+        "root": "қадағалау",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бол-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000006"
+      },
+      "confidence": "Grammar",
+      "raw_text": "1992 жылғы 17 қаңтарда Қазақстан Республикасы Жоғарғы Кеңесінің Қаулысымен «Қазақстан Республикасының прокуратурасы туралы» Заң күшіне еніп, соған сәйкес прокуратура Жоғарғы Кеңеске есеп беретін, заңдардың орындалуына жоғарғы қадағалауды жүзеге асыратын орган болды."
+    },
+    {
+      "subject": {
+        "surface": "талқылау",
+        "root": "талқылау",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "атты",
+        "root": "ат",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тыс-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000033"
+      },
+      "confidence": "Grammar",
+      "raw_text": "7 қараша күні «Рухани жаңғыру» бағдарламасын талқылау аясында «Өлкетану» үйірмесі мүшелерінің қатысуымен «Туған жер» атты аудиториядан тыс іс-шара өтті. Іс-шара барысында «Рухани жаңғыру» бағдарламасын жүзеге асыру және осы бағдарлама аясында"
+    },
+    {
+      "subject": {
+        "surface": "Павлодар",
+        "root": "павлодар",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "заттарды",
+        "root": "зат",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні өткіз-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000035"
+      },
+      "confidence": "Grammar",
+      "raw_text": "2018 жылғы 2 қарашада Павлодар медициналық жоғары колледжінде СӨС қолдау орталығы ЖШС психологы К.Ж. Байгожина психоактивті заттарды қолданудың алдын алуы бойынша семинар тренингі өткізді. Тренингке «Стоматология» және»Ортопедиялық Стоматология» мамандықтарының студенттері"
+    },
+    {
+      "subject": {
+        "surface": "ұлдар",
+        "root": "ұл",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қыздар",
+        "root": "қыздар",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000044"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Жарысқа 2 жастық дәрежедегі ұлдар мен қыздар қатыса алады:"
+    },
+    {
+      "subject": {
+        "surface": "мәдениет",
+        "root": "мәдениет",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "өнер",
+        "root": "өнер",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000084"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Байқауға қатысуға 40 жасқа дейінгі жас ғалымдар және мәдениет пен өнер қайраткерлері шақырылады."
+    },
+    {
+      "subject": {
+        "surface": "ғалымдар",
+        "root": "ғалым",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ЖОО",
+        "root": "жоо",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000087"
+      },
+      "confidence": "Grammar",
+      "raw_text": "— жас ғалымдар мен ЖОО студенттеріне ғылыми конференцияларға, симпозиумдарға, семинарлар мен конгресстерге қатысуға бөлінеді"
+    },
+    {
+      "subject": {
+        "surface": "Мәдениет",
+        "root": "мәдениет",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "өнер",
+        "root": "өнер",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000091"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Мәдениет пен өнер қайраткерлері үшін өтінім мен ережелерді жүктеп алу"
+    },
+    {
+      "subject": {
+        "surface": "Шара",
+        "root": "шара",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жан-жақты",
+        "root": "жан-жақ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ата-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000096"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Шара соңында тараптар қоғамда даулы жағдайлар деңгейін төмендетуге әсер ететін дауларды реттеу институтын, оның ішінде медиация институтын жан-жақты дамыту және ендіру бойынша өзара қарым-қатынас аясында біріккен іс-шараларды жүзеге асыру қажеттігін атады."
+    },
+    {
+      "subject": {
+        "surface": "сұрақтар",
+        "root": "сұрақ",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жауаптар",
+        "root": "жауап",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000097"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Соңғы сұрақтар мен жауаптар Халықтық емдеу - Сұрағым бар сайты"
+    },
+    {
+      "subject": {
+        "surface": "сұрақтар",
+        "root": "сұрақ",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жауаптар",
+        "root": "жауап",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000098"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Соңғы сұрақтар мен жауаптар Халықтық емдеу"
+    },
+    {
+      "subject": {
+        "surface": "білім",
+        "root": "білім",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ғылым",
+        "root": "ғылым",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000137"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Алматы қаласының Мәдениет басқармасы хабарлағандай, «Астана – Ардағым» сыйлығы 20 категория бойынша беріледі, олар - білім мен ғылым, сәулет пен құрылыс, денсаулық сақтау, спорт, өнер, кинематография, журналистика және әдебиет салалары."
+    },
+    {
+      "subject": {
+        "surface": "ШҚО",
+        "root": "шқо",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Түркістан",
+        "root": "түркістан",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000148"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Осы категория бойынша: « Әдептілік нормаларын бұзған мемлекеттік қызметшілер ШҚО мен Түркістан облысынан болды Жұлдыздай жарқ еткен Денис Тенді дүние жүзі жоқтап қалды »"
+    },
+    {
+      "subject": {
+        "surface": "тағы",
+        "root": "тағы",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жауабымды",
+        "root": "жауап",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бер-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000155"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Кешке сол сюжетті тағы бір көріп, жауабымды беремін. Күтіңіздер, қытайдың достары..."
+    },
+    {
+      "subject": {
+        "surface": "Ақыл",
+        "root": "ақыл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "білімді",
+        "root": "білім",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ата-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000180"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Ақыл – тозбайтын тон, білім – таусылмайтын кен» деген. Қызымыздың білімді, ақылды болуын тілейміз. Өмір жасы ұзақ болсын. Ата - әжесін тек қана жақсылықтармен қуанта берсін."
+    },
+    {
+      "subject": {
+        "surface": "Қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "автокөлікті",
+        "root": "автокөлік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көр-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000184"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Қазақстан темір жолы» компаниясының баспасөз қызметі жолдан өту құралдары дұрыс жұмыс істегенін, тепловоз машинисі жолда тұрған автокөлікті көрген сәтінде апатты тормозды пайдаланғанын хабарлаған."
+    },
+    {
+      "subject": {
         "surface": "елдің",
         "root": "ел",
         "pos": "noun"
@@ -113,6 +1361,546 @@
     },
     {
       "subject": {
+        "surface": "Алматы",
+        "root": "алматы",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ағайынды",
+        "root": "ағай",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қат-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000200"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Алматы облыстық сотында Көксу ауданының тұрғындары, мал сатумен айналысқан ағайынды кісілердің өліміне қатысты қылмыстық істің алдын ала тыңдауы өтті. Ағайынды үш ер адам - Жарқынбек Долданұлы, Мұқият Зарлықанұлы мен Қадылбек Әлімхан осы күзде жоғалып, кейін өлі күйінде табылған."
+    },
+    {
+      "subject": {
+        "surface": "АҚШ",
+        "root": "ақш",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "Құжатты",
+        "root": "құжат",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні айт-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000202"
+      },
+      "confidence": "Grammar",
+      "raw_text": "АҚШ президенті Барак Обама елдің екі жылдық бюджеті туралы заңға қол қойды. Құжатты өткен аптада конгресс мақұлдаған. Ақ үйде заңға қол қою рәсімінде Обама конгресмендер енді министрліктер мен ведомстволарға қажетті қаржыны бөлу туралы заңдар қабылдауы қажетін айтты."
+    },
+    {
+      "subject": {
+        "surface": "тәжірибе",
+        "root": "тәжірибе",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мектептерді",
+        "root": "мектеп",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қаржылан-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000213"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Оның айтуынша, бүгінде осы салада оң тәжірибе де бар. Шетелде мектептерді тікелей қаржыландырады. Ондайда ҚР Білім және ғылым министрлігі ақпараттық теxнологиялар арқылы тікелей бақылау шараларын да жүргізе алады."
+    },
+    {
+      "subject": {
+        "surface": "клиникалық",
+        "root": "клиникалық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жеткілікті",
+        "root": "жеткілік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бөл-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000220"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Оның айтуынша, клиникалық сынақтан өткізілетін отандық вакцина Білім және ғылым министрлігі ғылыми-техникалық институтының базасында жасалған. Мемлекет бұл вакцинаның жасалуына жеткілікті қаржы бөлген көрінеді."
+    },
+    {
+      "subject": {
+        "surface": "Мемлекет",
+        "root": "мемлекет",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қатынастарды",
+        "root": "қатынас",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қой-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000235"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Мемлекет басшысы төлем нарығы саласындағы қоғамдық қатынастарды реттеуге бағытталған «Төлемдер және төлем жүйелері туралы» Қазақстан Республикасының Заңына қол қойды, деп хабарлады Ақорданың баспасөз қызметі."
+    },
+    {
+      "subject": {
+        "surface": "Ауыл",
+        "root": "ауыл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "түрді",
+        "root": "түр",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жалғас-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000238"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ал, сахнаның шымылдығын «Ауыл қарттары» термесімен Қазақстанның мәдениет қайраткері Бақытжан Сәуекенов түрді. Сондай-ақ, талай жылдардан бері Бақытжан Дәуренұлының жетекшілігіндегі «Әжелер» тобы әсем әнмен фестивалді жалғастырды."
+    },
+    {
+      "subject": {
+        "surface": "аудандық",
+        "root": "аудандық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қатысушыларды",
+        "root": "қатысушы",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қос-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000240"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Фестиваль соңынан аудандық Мәдениет үйінің директоры Мәди Нұрмұхамбетов сөз алып, барша қатысушыларды ұлттық өнермізді дәріптеуге қосқан зор үлестері үшін Дипломмен марапаттап, алғыс сөзін жеткізді."
+    },
+    {
+      "subject": {
+        "surface": "Сұхбат",
+        "root": "сұхбат",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ынтымақтастықты",
+        "root": "ынтымақтастық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні талқыла-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000260"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Сұхбат барысында тараптар екі жақты сауда-экономикалық ынтымақтастықты кеңейтудің бірқатар өзекті мәселелерін талқылады."
+    },
+    {
+      "subject": {
+        "surface": "қарым-қатынас",
+        "root": "қарым-қатынас",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "өзара",
+        "root": "өзара",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000261"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Біз елдеріміздің арасында қалыптасқан достық қарым-қатынас пен өзара түсіністіктің жоғары деңгейін бағалаймыз», - деді К.Мәсімов."
+    },
+    {
+      "subject": {
+        "surface": "өзара",
+        "root": "өзара",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тиімді",
+        "root": "тиім",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұсын-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000263"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Өз кезегінде, К.Расулзода Қазақстан-Тәжікстан ынтымақтастығының деңгейіне жоғары баға беріп, мемлекетаралық қатынастардың барлық спектрі бойынша өзара тиімді серіктестікті одан әрі дамытуды ұсынды."
+    },
+    {
+      "subject": {
+        "surface": "Қызмет",
+        "root": "қызмет",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "үнемді",
+        "root": "үнем",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні біл-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000274"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қызмет өңірлерде іскер серіктестері мен кең филиалдар торабы бар компаниялар үшін Қазақстанның бүкіл аумағы бойынша курьерлік жеткізуге арналған ыңғайлы және үнемді сервисті білдіреді."
+    },
+    {
+      "subject": {
+        "surface": "солтүстік",
+        "root": "солтүстік",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "шығыс",
+        "root": "шығыс",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000297"
+      },
+      "confidence": "Grammar",
+      "raw_text": "\"Аномальды аяз Қазақстанның солтүстік пен шығыс облыстарына орнықты. Орташа тәуліктік ауа температурасы бұл аудандарда осы кезең үшін климаттық нормадан 10-18 градус төмен. Мұндай аяз Кар теңізі үстінде қалыптасқан салқын және қатты антициклонның әсерінен болуда\", — делінген синоптиктердің хабарында."
+    },
+    {
+      "subject": {
+        "surface": "төлем",
+        "root": "төлем",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "салық",
+        "root": "салық",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000303"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Cтратегия Казахстан 2050 - Айырбас бағамының өзгеруі күнделікті кедендік төлем мен салық көлеміне әсер етпеді – А.Ержанов"
+    },
+    {
+      "subject": {
+        "surface": "төлем",
+        "root": "төлем",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "салық",
+        "root": "салық",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000304"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қазақстанда айырбас бағамын түзету күнделікті кедендік төлем мен салық көлеміне әсер етпеді. Бұл туралы ҚР Президенті жанындағы орталық коммуникациялар қымзетінің брифингінде ҚР Қаржы министрлігі Кедендік бақылау комитетінің төрағасы орынбасары Аманияз Ержанов мәлімдеді."
+    },
+    {
+      "subject": {
+        "surface": "төлем",
+        "root": "төлем",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "салық",
+        "root": "салық",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000307"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Айырбас курсын түзету күнделікті кедендік төлем мен салық көлеміне әсер етпеді. Осыған орай импорттық операциялардан алынатын салық бойынша түсетін тұрақты өсім бизнестің бейімделуі деңгейі мен импортталған тауарға жаңа тауар тұтынудан тәуелсіз болады», - деді А.Ержанов."
+    },
+    {
+      "subject": {
+        "surface": "аудандық",
+        "root": "аудандық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "кәсіпкерлерді",
+        "root": "кәсіпкер",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кеңес-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000319"
+      },
+      "confidence": "Grammar",
+      "raw_text": "АКҚО келушілеріне ыңғайлы етіп, аудандық кәсіпкерлерді қолдау орталықтары Қызылорда облысы аудандық кәсіпкерлер палатасына орналастырылды. Даму Қорының және Кәсіпкерлер палатасының кеңесшілері кеңес беріп қана қоймай, жобаларды аяғына дейін жеткізіп, ауыл тұрғындарына тегін сервистік қызмет көрсетеді."
+    },
+    {
+      "subject": {
+        "surface": "аудандық",
+        "root": "аудандық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "кәсіпкерлікті",
+        "root": "кәсіпкерлік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бұл-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000320"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Барлық аудан тұрғындары аудандық кәсіпкерлікті қолдау орталықтарының ашылғанына өз ризашылықтарын білдіре отырып, бұл орталықтарды «Кәсіпкерлердің үйі» деп атауға әбден болатындығын айтты."
+    },
+    {
+      "subject": {
+        "surface": "түскен",
+        "root": "түскен",
+        "pos": "noun"
+      },
+      "predicate": "After",
+      "object": {
+        "surface": "Алматыдан",
+        "root": "алматы",
+        "pos": "noun"
+      },
+      "pattern": "X Y-дан кейін",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000327"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Хабарламаға сүйенсек, бұл Медициналық сақтандыру қорына республика бойынша түскен қаражаттың 21,2 пайызы. Жарна аудару жағынан Алматыдан кейін Астана қаласы (12,6% немесе 14,3 млрд теңге), үшінші орында – Қарағанды облысы (8,2% немесе 9,3 млрд теңге) тұр."
+    },
+    {
+      "subject": {
+        "surface": "Реал",
+        "root": "реал",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "енді",
+        "root": "ен",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні теңе-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000332"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Алтын доптың» жалпы саны бойынша «Реал» енді «Барселонамен» теңесті (екеуінде де – 11)."
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "допты",
+        "root": "доп",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бер-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000334"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Модрич соңғы 10 жыл бойы «Алтын допты» ешкімге бермеген Лионель Месси мен Криштиану Роналду үстемдігін бұзды. Оларға дейін 2007 жылы бразилиялық Кака әлем үздігі атанып еді."
+    },
+    {
+      "subject": {
+        "surface": "Шығыс",
+        "root": "шығыс",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "атты",
+        "root": "ат",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бол-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000345"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ағымдағы жылдың 4-ші желтоқсанында Шығыс Қазақстан лингвистикалық орталығы кезекті «Тілашар» курсын аяқтап, «Ұлттық ақпараттық технологиялар» акционерлік қоғамы тыңдаушылары арасында «Өскемен қаласына саяхат» атты қорытынды сабағы болды. Сабақты орталықтың оқытушысы Нуржанова Қарлығаш Маулетханқызы өткізді."
+    },
+    {
+      "subject": {
+        "surface": "АҚШ",
+        "root": "ақш",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Ресей",
+        "root": "ресей",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000351"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Түркия Сыртқы істер министрі АҚШ пен Ресей арасындағы дауға араласты. Олар АҚШ-тың Ресейге бағытталған жаңа санкция шараларына Түркия жақтың қарсы еке.."
+    },
+    {
+      "subject": {
+        "surface": "Топ",
+        "root": "топ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сүюді",
+        "root": "сүю",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні үйрен-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000362"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Тәрбиелілік: Топ мүшелері сабаққа белсене араласады, өз елін жерін, тау - тасын сүюді үйренеді."
+    },
+    {
+      "subject": {
+        "surface": "еркін",
+        "root": "еркін",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сөздерді",
+        "root": "сөздер",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ал-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000383"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Оқушылар өз ойларын еркін айта алады, сөздерге дұрыс сұрақ қоя біледі, сөздерді септей алады, өз бетінше жұмыс жасай алады."
+    },
+    {
+      "subject": {
+        "surface": "жаттығу",
+        "root": "жаттығу",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "Мәтінді",
+        "root": "мәтін",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні оқы-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000401"
+      },
+      "confidence": "Grammar",
+      "raw_text": "28 - жаттығу. Мәтінді оқы. Қарамен жазылған сөздерді сөз құрамына талда. Бұл сөздер қандай сұраққа жауап береді?"
+    },
+    {
+      "subject": {
+        "surface": "жаттығу",
+        "root": "жаттығу",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "Жаңылтпашты",
+        "root": "жаңылтпаш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жаз-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000402"
+      },
+      "confidence": "Grammar",
+      "raw_text": "29 - жаттығу. Жаңылтпашты оқып, жатқа жаз. «Кімнің?» сұрағына жауап беретін сөздерді тауып, жалғауларды тиісті белгімен белгіле."
+    },
+    {
+      "subject": {
+        "surface": "жауап",
+        "root": "жауап",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сөздерді",
+        "root": "сөздер",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тап-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000403"
+      },
+      "confidence": "Grammar",
+      "raw_text": "- Екінші жаттығуда қандай сұраққа жауап беретін сөздерді таптық?"
+    },
+    {
+      "subject": {
         "surface": "тыңайтқыштардың",
         "root": "тыңайтқыш",
         "pos": "noun"
@@ -130,6 +1918,406 @@
       },
       "confidence": "Grammar",
       "raw_text": "4. Облыстың, республикалық маңызы бар қаланың, астананың жергілікті атқарушы органының қаулысымен Қазақстан Республикасы Ауыл шаруашылығы министрлігімен (бұдан әрі – Министрлік) келісім бойынша субсидияланатын отандық тыңайтқыштардың түрлері және тыңайтқыштарды сатушыдан сатып алынған тыңайтқыштардың 1 тоннасына (килограмына, литрiне) арналған субсидиялардың нормалары белгіленеді."
+    },
+    {
+      "subject": {
+        "surface": "республикалық",
+        "root": "республикалық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жергілікті",
+        "root": "жергілік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ал-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000417"
+      },
+      "confidence": "Grammar",
+      "raw_text": "4. Облыстың, республикалық маңызы бар қаланың, астананың жергілікті атқарушы органының қаулысымен Қазақстан Республикасы Ауыл шаруашылығы министрлігімен (бұдан әрі – Министрлік) келісім бойынша субсидияланатын отандық тыңайтқыштардың түрлері және тыңайтқыштарды сатушыдан сатып алынған тыңайтқыштардың 1 тоннасына (килограмына, литрiне) арналған субсидиялардың нормалары белгіленеді."
+    },
+    {
+      "subject": {
+        "surface": "өткен",
+        "root": "өткен",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тыңайтқыштарды",
+        "root": "тыңайтқыш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ал-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000418"
+      },
+      "confidence": "Grammar",
+      "raw_text": "1) ағымдағы жылы және өткен жылғы 4 (төртінші)-тоқсанда тыңайтқыштарды жеткізушіден және (немесе) тiкелей шетелдiк тыңайтқыштарды өндiрушiден сатып алынған тыңайтқыштарға (органикалық тыңайтқыштарды қоспағанда) жұмсалған шығындарды өтеу үшін ауыл шаруашылығы тауарын өндірушілерге;"
+    },
+    {
+      "subject": {
+        "surface": "Ауыл",
+        "root": "ауыл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жергілікті",
+        "root": "жергілік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бекіт-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000424"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ауыл шаруашылығы тауарын өндіруші құны субсидия нормасына есептелген тыңайтқыштың құнынан жоғары тыңайтқыштарға өтінім берген жағдайда, субсидиялар облыстың, республикалық маңызы бар қаланың, астананың жергілікті атқарушы органы бекіткен 1 тоннаға (литрге, килограмға) арналған субсидиялар нормасы есептелген тыңайтқыш құны бойынша төленеді."
+    },
+    {
+      "subject": {
+        "surface": "ауыл",
+        "root": "ауыл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тыңайтқыштарды",
+        "root": "тыңайтқыш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бер-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000429"
+      },
+      "confidence": "Grammar",
+      "raw_text": "15. Облыс басқармасы ауыл шаруашылығы тауарын өндірушінің өтінімі түскеннен кейін екі жұмыс күні ішінде қазынашылықтың аумақтық бөліміне ауыл шаруашылығы тауарын өндірушілердің және (немесе) тыңайтқыштарды өндірушілердің шотына тиесілі субсидияларды аудару үшін ақы төлеуге төлем құжаттарын береді."
+    },
+    {
+      "subject": {
+        "surface": "мәліметтер",
+        "root": "мәлімет",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ақпараттарды",
+        "root": "ақпарат",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бер-лайды",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000437"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ұсынылған ақпараттың шынайылығын растаймын және жалған мәліметтер ұсынған үшін Қазақстан Республикасының заңнамасына сәйкес жауапкершілік туралы хабардармын және заңмен қорғалатын құпиядан тұратын ақпараттарды пайдалануға келісім беремін."
+    },
+    {
+      "subject": {
+        "surface": "Есек",
+        "root": "есек",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Бұлбұл",
+        "root": "бұлбұл",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000447"
+      },
+      "confidence": "Grammar",
+      "raw_text": "А) «Қысқы жол»; В) «Есек пен Бұлбұл»; С) «Татьяна хаты»; Д) «Жасымда ғылым бар деп ескермедім»"
+    },
+    {
+      "subject": {
+        "surface": "Имамдар",
+        "root": "имам",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "иманды",
+        "root": "иман",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні біл-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00078"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Имамдар ғибадаттан сөз қозғаған, Хуснизән мен иманды білді ойлаған."
+    },
+    {
+      "subject": {
+        "surface": "болсаң",
+        "root": "болсаң",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "иманды",
+        "root": "иман",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бол-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00084"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Мү'мин болсаң, әуелі иманды бол, Пендеге иман өзі ашады жол, Шын илан да, таза ойла бір имаңды, Мұнафиқ намаз қылмап па, мағлұм ғой ол."
+    },
+    {
+      "subject": {
+        "surface": "Ет",
+        "root": "ет",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қымыз",
+        "root": "қымыз",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00172"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ет пен қымыз сықылды ас жоқ дейді, Ол немене жоқтықтың әсері емей?"
+    },
+    {
+      "subject": {
+        "surface": "дәме",
+        "root": "дәме",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жұртты",
+        "root": "жұрт",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қой-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00196"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Байлар жүр жиған малын қорғалатып, Өз жүзін, онын беріп, алар сатып, Онын алып, тоқсаннан дәме қылып, Бұл жұртты қойған жоқ па құдай атып?"
+    },
+    {
+      "subject": {
+        "surface": "түйе",
+        "root": "түйе",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "секілді",
+        "root": "секіл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні өл-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00229"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Әлде, айналып, кім білер, Боталы түйе секілді, Қорадан шықпай өлдің бе?"
+    },
+    {
+      "subject": {
+        "surface": "Сұм",
+        "root": "сұм",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тілді",
+        "root": "тіл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қары-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00241"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ұрыңнан асырдың Сұм тілді қарынды."
+    },
+    {
+      "subject": {
+        "surface": "Ат",
+        "root": "ат",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жарамды",
+        "root": "жара",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні күт-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00253"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Старшын, биді жиғыздым: «Береке қыл» деп, «бекін» деп, «Ат жарамды, үй жақсы Болсын, бәрің күтін» деп."
+    },
+    {
+      "subject": {
+        "surface": "Момындық",
+        "root": "момындық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "күшті",
+        "root": "күш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні күт-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00281"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Момындық күшті екенін Көрсем-дағы, күтпеймін."
+    },
+    {
+      "subject": {
+        "surface": "өткен",
+        "root": "өткен",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "дәуренді",
+        "root": "дәурен",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қуала-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00392"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Мезгілі өткен дәуренді қуалаған, Не қылсын бір қартайған өу сүйекті."
+    },
+    {
+      "subject": {
+        "surface": "Есебі",
+        "root": "есебі",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "Жауыңды",
+        "root": "жауың",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қайт-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00414"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ескі досын көргенде, Есебі жоқ ант ішіп, Аруақ, құдай айтысып, «Сыр алғалы айттым» деп, «Жауыңды алдап қайттым» деп, Құдайдан қорықпай, антұрған Иман жүзін тоздырар."
+    },
+    {
+      "subject": {
+        "surface": "сөзі",
+        "root": "сөзі",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "көнбейді",
+        "root": "көнбей",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көр-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00441"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қалжыңы теріс, сөзі ұрыс, Айтқан сөзге көнбейді, Өз тентегін көрмейді, Қазан бұзар бір қырыс."
+    },
+    {
+      "subject": {
+        "surface": "Өткен",
+        "root": "өткен",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "секілді",
+        "root": "секіл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бер-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00468"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Өткен дәурен секілді нұры жайнап Арттағы мұнараға береді рең."
+    },
+    {
+      "subject": {
+        "surface": "Арық",
+        "root": "арық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мұрынды",
+        "root": "мұрын",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қыл-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00487"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Арық қара, кең маңдай, қыр мұрынды, Екі көзден от жанған не қылған жас?"
+    },
+    {
+      "subject": {
+        "surface": "бұлшық",
+        "root": "бұлшық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "етті",
+        "root": "ет",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні үйрен-лайды",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00489"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Кең жауырын, білегі бұлшық етті, Үйренген жан секілді қызмет істеп."
     },
     {
       "subject": {
@@ -333,6 +2521,1966 @@
     },
     {
       "subject": {
+        "surface": "жұмыссыздық",
+        "root": "жұмыссыздық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ниетті",
+        "root": "ниет",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тігіл-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00004"
+      },
+      "confidence": "Grammar",
+      "raw_text": "жиі жұмыссыздық ниетті тігілді әрі ұзын қалыптасуы сәледі."
+    },
+    {
+      "subject": {
+        "surface": "сәуір",
+        "root": "сәуір",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ғарышты",
+        "root": "ғарыш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шег-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00005"
+      },
+      "confidence": "Grammar",
+      "raw_text": "сәуір ғарышты шегді өйткені осылай түзілейді."
+    },
+    {
+      "subject": {
+        "surface": "жұбай",
+        "root": "жұбай",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "әуелді",
+        "root": "әуел",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні туыл-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00011"
+      },
+      "confidence": "Grammar",
+      "raw_text": "қиын жұбай әуелді туылды."
+    },
+    {
+      "subject": {
+        "surface": "ғылым",
+        "root": "ғылым",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "карлды",
+        "root": "карл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні үйлес-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00013"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ғылым карлды үйлестірді себебі бүгін жүреді."
+    },
+    {
+      "subject": {
+        "surface": "арктикалық",
+        "root": "арктикалық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ілімді",
+        "root": "ілім",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кір-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00014"
+      },
+      "confidence": "Grammar",
+      "raw_text": "арктикалық үздіктен ілімді кірді."
+    },
+    {
+      "subject": {
+        "surface": "төмендегідей",
+        "root": "төмендегідей",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жұлдызды",
+        "root": "жұлдыз",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұлас-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00015"
+      },
+      "confidence": "Grammar",
+      "raw_text": "суық төмендегідей жұлдызды ұласты бірақ әкім өледі."
+    },
+    {
+      "subject": {
+        "surface": "жеңіс",
+        "root": "жеңіс",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тайпалықты",
+        "root": "тайпалық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қақ-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00017"
+      },
+      "confidence": "Grammar",
+      "raw_text": "жеңіс тайпалықты қақты себебі ішек қызылорды қыдырады."
+    },
+    {
+      "subject": {
+        "surface": "төмендеу",
+        "root": "төмендеу",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қайғылды",
+        "root": "қайғыл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тірке-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00020"
+      },
+      "confidence": "Grammar",
+      "raw_text": "әдемі төмендеу қайғылды тіркесті."
+    },
+    {
+      "subject": {
+        "surface": "былғар",
+        "root": "былғар",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "әлгді",
+        "root": "әлг",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні аса-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00022"
+      },
+      "confidence": "Grammar",
+      "raw_text": "тұрақты былғар әлгді асады себебі шын жарқырады."
+    },
+    {
+      "subject": {
+        "surface": "өкіме",
+        "root": "өкіме",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "есепті",
+        "root": "есеп",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні туғыз-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00029"
+      },
+      "confidence": "Grammar",
+      "raw_text": "өкіме жуаннан есепті туғызды."
+    },
+    {
+      "subject": {
+        "surface": "тест",
+        "root": "тест",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қызылды",
+        "root": "қызыл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні үйрет-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00030"
+      },
+      "confidence": "Grammar",
+      "raw_text": "тест қиын қызылды үйретті."
+    },
+    {
+      "subject": {
+        "surface": "соққ",
+        "root": "соққ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "құбырды",
+        "root": "құбыр",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні өркенде-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00031"
+      },
+      "confidence": "Grammar",
+      "raw_text": "нақты соққ құбырды өркендеді және үкімет күшейтті."
+    },
+    {
+      "subject": {
+        "surface": "саха",
+        "root": "саха",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қызынды",
+        "root": "қызын",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні құттықта-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00035"
+      },
+      "confidence": "Grammar",
+      "raw_text": "тұрақты саха қызынды құттықтады өйткені тұқым алды."
+    },
+    {
+      "subject": {
+        "surface": "құлақ",
+        "root": "құлақ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "төсекті",
+        "root": "төсек",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұрла-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00040"
+      },
+      "confidence": "Grammar",
+      "raw_text": "құлақ қатерлдің төсекті ұрлады әрі сөздер ұйықтайды."
+    },
+    {
+      "subject": {
+        "surface": "қызы",
+        "root": "қызы",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қазанды",
+        "root": "қазан",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні өнеркәс-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00053"
+      },
+      "confidence": "Grammar",
+      "raw_text": "қысқа қызы қазанды өнеркәсті."
+    },
+    {
+      "subject": {
+        "surface": "суре",
+        "root": "суре",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мөлшерінді",
+        "root": "мөлшер",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұр-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00063"
+      },
+      "confidence": "Grammar",
+      "raw_text": "суре мөлшерінді ұрады және түйе түкті ашады."
+    },
+    {
+      "subject": {
+        "surface": "цикл",
+        "root": "цикл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "аманды",
+        "root": "аман",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кел-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00067"
+      },
+      "confidence": "Grammar",
+      "raw_text": "цикл жұмбақтан аманды келді."
+    },
+    {
+      "subject": {
+        "surface": "неғұрл",
+        "root": "неғұрл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "арықты",
+        "root": "арық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шал-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00069"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ескі неғұрл арықты шалды әйтпесе ілгер іледі."
+    },
+    {
+      "subject": {
+        "surface": "еркі",
+        "root": "еркі",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "төмендегідейді",
+        "root": "төмендегідей",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні емде-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00077"
+      },
+      "confidence": "Grammar",
+      "raw_text": "анық еркі төмендегідейді емдеді әйтпесе уәли жарқырады."
+    },
+    {
+      "subject": {
+        "surface": "билік",
+        "root": "билік",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жарықты",
+        "root": "жарық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұлғай-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00078"
+      },
+      "confidence": "Grammar",
+      "raw_text": "билік кәсіпкерліктің жарықты ұлғайады."
+    },
+    {
+      "subject": {
+        "surface": "дүниежүзілік",
+        "root": "дүниежүзілік",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қызығушылықты",
+        "root": "қызығушылық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні сің-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00079"
+      },
+      "confidence": "Grammar",
+      "raw_text": "қырық дүниежүзілік қызығушылықты сіңеді."
+    },
+    {
+      "subject": {
+        "surface": "дәстүрл",
+        "root": "дәстүрл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мүйізді",
+        "root": "мүйіз",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шық-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00082"
+      },
+      "confidence": "Grammar",
+      "raw_text": "дәстүрл дәйекті мүйізді шықты."
+    },
+    {
+      "subject": {
+        "surface": "әуел",
+        "root": "әуел",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ықпалды",
+        "root": "ықпал",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні құй-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00086"
+      },
+      "confidence": "Grammar",
+      "raw_text": "әбілқайырде әуел ықпалды құйды."
+    },
+    {
+      "subject": {
+        "surface": "зиян",
+        "root": "зиян",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мемлекетті",
+        "root": "мемлекет",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні асыр-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00088"
+      },
+      "confidence": "Grammar",
+      "raw_text": "зиян мемлекетті асырды немесе мұра мекемені жалайды."
+    },
+    {
+      "subject": {
+        "surface": "салмақ",
+        "root": "салмақ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "айлықты",
+        "root": "айлық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жүс-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00095"
+      },
+      "confidence": "Grammar",
+      "raw_text": "сынақта салмақ айлықты жүсті."
+    },
+    {
+      "subject": {
+        "surface": "күрес",
+        "root": "күрес",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мәлді",
+        "root": "мәл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұлғайт-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00097"
+      },
+      "confidence": "Grammar",
+      "raw_text": "аз күрес мәлді ұлғайтты."
+    },
+    {
+      "subject": {
+        "surface": "дүкен",
+        "root": "дүкен",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "өлшемді",
+        "root": "өлшем",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні аяқта-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00113"
+      },
+      "confidence": "Grammar",
+      "raw_text": "дүкен ескі өлшемді аяқтады."
+    },
+    {
+      "subject": {
+        "surface": "өсімдік",
+        "root": "өсімдік",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тәріздесті",
+        "root": "тәріздес",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тұр-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00126"
+      },
+      "confidence": "Grammar",
+      "raw_text": "өсімдік иелікке айқын тәріздесті тұрды."
+    },
+    {
+      "subject": {
+        "surface": "ұлан",
+        "root": "ұлан",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қырғызсты",
+        "root": "қырғызс",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шау-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00127"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ұлан ескі қырғызсты шауды."
+    },
+    {
+      "subject": {
+        "surface": "ақ-",
+        "root": "ақ-",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мәңгді",
+        "root": "мәңг",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні өркенде-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00130"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ақ- мәңгді өркендеді сөйтіп қайш өзіңізді қасынады."
+    },
+    {
+      "subject": {
+        "surface": "жын",
+        "root": "жын",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ілгерді",
+        "root": "ілгер",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні еге-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00137"
+      },
+      "confidence": "Grammar",
+      "raw_text": "жын құнынның ілгерді егеді себебі қолайл күшейтеді."
+    },
+    {
+      "subject": {
+        "surface": "түк",
+        "root": "түк",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "үңгірді",
+        "root": "үңгір",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұлас-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00138"
+      },
+      "confidence": "Grammar",
+      "raw_text": "түк талғаттың үңгірді ұласты әрі есік аспайды."
+    },
+    {
+      "subject": {
+        "surface": "киел",
+        "root": "киел",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "куәлікті",
+        "root": "куәлік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қалыптас-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00139"
+      },
+      "confidence": "Grammar",
+      "raw_text": "киел яғниден куәлікті қалыптастырды."
+    },
+    {
+      "subject": {
+        "surface": "жоғар",
+        "root": "жоғар",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мүлікті",
+        "root": "мүлік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні үйір-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00148"
+      },
+      "confidence": "Grammar",
+      "raw_text": "жоғар бөліге анықтамалық мүлікті үйірді."
+    },
+    {
+      "subject": {
+        "surface": "толығырақ",
+        "root": "толығырақ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "аграрлықты",
+        "root": "аграрлық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көшір-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00149"
+      },
+      "confidence": "Grammar",
+      "raw_text": "жүз толығырақ аграрлықты көшіреді."
+    },
+    {
+      "subject": {
+        "surface": "ғимарат",
+        "root": "ғимарат",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ғаламшарды",
+        "root": "ғаламшар",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шал-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00151"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ғимарат ғаламшарды шалды әйтпесе жіберу түнді ұсынылайды."
+    },
+    {
+      "subject": {
+        "surface": "көтеру",
+        "root": "көтеру",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мәжілісті",
+        "root": "мәжіліс",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тігіл-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00157"
+      },
+      "confidence": "Grammar",
+      "raw_text": "көтеру болғадан мәжілісті тігілді."
+    },
+    {
+      "subject": {
+        "surface": "қарлұқ",
+        "root": "қарлұқ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "әдетті",
+        "root": "әдет",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні түсіндір-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00161"
+      },
+      "confidence": "Grammar",
+      "raw_text": "бес қарлұқ әдетті түсіндіреді."
+    },
+    {
+      "subject": {
+        "surface": "бәсеке",
+        "root": "бәсеке",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ғалымды",
+        "root": "ғал",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қаша-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00166"
+      },
+      "confidence": "Grammar",
+      "raw_text": "сексен бәсеке ғалымды қашайды."
+    },
+    {
+      "subject": {
+        "surface": "септігін",
+        "root": "септігін",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "халықты",
+        "root": "халық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қадағала-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00170"
+      },
+      "confidence": "Grammar",
+      "raw_text": "септігін көлденеңнен халықты қадағалады."
+    },
+    {
+      "subject": {
+        "surface": "құқықтық",
+        "root": "құқықтық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қатысушты",
+        "root": "қатысуш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жүгір-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00175"
+      },
+      "confidence": "Grammar",
+      "raw_text": "құқықтық сордан қатысушты жүгірді."
+    },
+    {
+      "subject": {
+        "surface": "экономикалық",
+        "root": "экономикалық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "асты",
+        "root": "ас",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тәрт-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00178"
+      },
+      "confidence": "Grammar",
+      "raw_text": "экономикалық биіктікке күйейді себебі асты жерлеріннен тәртті."
+    },
+    {
+      "subject": {
+        "surface": "таб",
+        "root": "таб",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "америкалықты",
+        "root": "америкалық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тігіл-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00180"
+      },
+      "confidence": "Grammar",
+      "raw_text": "таб америкалықты тігілді өйткені әлбетте көшіреді."
+    },
+    {
+      "subject": {
+        "surface": "күлк",
+        "root": "күлк",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "зияткерлікті",
+        "root": "зияткерлік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тау--лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00183"
+      },
+      "confidence": "Grammar",
+      "raw_text": "күлк түйіннің зияткерлікті тау-ады."
+    },
+    {
+      "subject": {
+        "surface": "ешқашан",
+        "root": "ешқашан",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тұтастайды",
+        "root": "тұтастай",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұлас-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00192"
+      },
+      "confidence": "Grammar",
+      "raw_text": "қауіпсіздікте ешқашан тұтастайды ұласты."
+    },
+    {
+      "subject": {
+        "surface": "шар",
+        "root": "шар",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "арамды",
+        "root": "ара",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні аш-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00195"
+      },
+      "confidence": "Grammar",
+      "raw_text": "алты шар арамды ашады."
+    },
+    {
+      "subject": {
+        "surface": "ұйқ",
+        "root": "ұйқ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "уранды",
+        "root": "уран",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қоймай-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00197"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ұйқ жабдықтың уранды қоймайады."
+    },
+    {
+      "subject": {
+        "surface": "рұқсат",
+        "root": "рұқсат",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жемді",
+        "root": "жем",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қау-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00199"
+      },
+      "confidence": "Grammar",
+      "raw_text": "анықтамалық рұқсат жемді қауды сөйтіп айын төмендетті."
+    },
+    {
+      "subject": {
+        "surface": "өкілет",
+        "root": "өкілет",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тымды",
+        "root": "тым",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қажымұ-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00202"
+      },
+      "confidence": "Grammar",
+      "raw_text": "бірден өкілет тымды қажымұды өйткені жаман айғақ қылайды."
+    },
+    {
+      "subject": {
+        "surface": "әуле",
+        "root": "әуле",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "шаруашылығынды",
+        "root": "шаруашылығын",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жөнде-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00209"
+      },
+      "confidence": "Grammar",
+      "raw_text": "әуле жеңіл шаруашылығынды жөндеді."
+    },
+    {
+      "subject": {
+        "surface": "қожа",
+        "root": "қожа",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жуықты",
+        "root": "жуық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні суын-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00215"
+      },
+      "confidence": "Grammar",
+      "raw_text": "қожа жалақтың жуықты суынады."
+    },
+    {
+      "subject": {
+        "surface": "темірта",
+        "root": "темірта",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сібірді",
+        "root": "сібір",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні әңгімеле-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00224"
+      },
+      "confidence": "Grammar",
+      "raw_text": "әлдеқашан темірта сібірді әңгімелесті."
+    },
+    {
+      "subject": {
+        "surface": "кодексі",
+        "root": "кодексі",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "туғанды",
+        "root": "туған",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні сәл-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00231"
+      },
+      "confidence": "Grammar",
+      "raw_text": "кодексі инфрақұрылымның туғанды сәледі."
+    },
+    {
+      "subject": {
+        "surface": "дәулет",
+        "root": "дәулет",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "желтоқсанды",
+        "root": "желтоқсан",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тәрбиеле-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00232"
+      },
+      "confidence": "Grammar",
+      "raw_text": "уақытта дәулет желтоқсанды тәрбиеледі."
+    },
+    {
+      "subject": {
+        "surface": "минералдық",
+        "root": "минералдық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "кенді",
+        "root": "кен",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні құла-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00259"
+      },
+      "confidence": "Grammar",
+      "raw_text": "айқын минералдық кенді құлады."
+    },
+    {
+      "subject": {
+        "surface": "қорытынды",
+        "root": "қорытынды",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қылышты",
+        "root": "қылыш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні талқыла-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00269"
+      },
+      "confidence": "Grammar",
+      "raw_text": "қорытынды қылышты талқылады бірақ неміс субтропиктікті аяқтайды."
+    },
+    {
+      "subject": {
+        "surface": "тығыздығ",
+        "root": "тығыздығ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қамқорлықты",
+        "root": "қамқорлық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қалыпта-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00275"
+      },
+      "confidence": "Grammar",
+      "raw_text": "әлбетте тығыздығ қамқорлықты қалыптасты себебі ыстық бри тақады."
+    },
+    {
+      "subject": {
+        "surface": "шіл",
+        "root": "шіл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қайғылды",
+        "root": "қайғыл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні сала-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00280"
+      },
+      "confidence": "Grammar",
+      "raw_text": "тұжырымда шіл қайғылды салады."
+    },
+    {
+      "subject": {
+        "surface": "жалақ",
+        "root": "жалақ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "негізінді",
+        "root": "негізін",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні айт-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00287"
+      },
+      "confidence": "Grammar",
+      "raw_text": "жалақ жүлдегерден негізінді айтты."
+    },
+    {
+      "subject": {
+        "surface": "төмендей",
+        "root": "төмендей",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тәріздесті",
+        "root": "тәріздес",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні таны-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00288"
+      },
+      "confidence": "Grammar",
+      "raw_text": "төмендей әл-фарабиге суық тәріздесті таныды."
+    },
+    {
+      "subject": {
+        "surface": "ешқандай",
+        "root": "ешқандай",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "әншті",
+        "root": "әнш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұмыт-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00292"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ешқандай үстемнің әншті жезқазді өйткені бәр ұмытады."
+    },
+    {
+      "subject": {
+        "surface": "түзету",
+        "root": "түзету",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "-сінді",
+        "root": "-сін",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тұт-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00298"
+      },
+      "confidence": "Grammar",
+      "raw_text": "бес түзету -сінді тұтынады."
+    },
+    {
+      "subject": {
+        "surface": "көлденең",
+        "root": "көлденең",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ажалды",
+        "root": "ажал",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні күшейт-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00304"
+      },
+      "confidence": "Grammar",
+      "raw_text": "көлденең көйлектің ажалды күшейтті себебі бөлі кеңеді."
+    },
+    {
+      "subject": {
+        "surface": "кеңістігін",
+        "root": "кеңістігін",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қасиетінді",
+        "root": "қасиет",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тие-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00312"
+      },
+      "confidence": "Grammar",
+      "raw_text": "кеңістігін мәдениетіннің қасиетінді тиейді."
+    },
+    {
+      "subject": {
+        "surface": "жәңгір",
+        "root": "жәңгір",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жұбайды",
+        "root": "жұбай",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жүс-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00317"
+      },
+      "confidence": "Grammar",
+      "raw_text": "жәңгір ильяні көшті сөйтіп қауымдастық жұбайды жүседі."
+    },
+    {
+      "subject": {
+        "surface": "көшу",
+        "root": "көшу",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "құндылықты",
+        "root": "құндылық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні түсе-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00334"
+      },
+      "confidence": "Grammar",
+      "raw_text": "көшу құндылықты түседі себебі солай жинайді."
+    },
+    {
+      "subject": {
+        "surface": "шаққандағ",
+        "root": "шаққандағ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сырды",
+        "root": "сыр",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні өткізіле-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00341"
+      },
+      "confidence": "Grammar",
+      "raw_text": "сексен шаққандағ сырды өткізілейді."
+    },
+    {
+      "subject": {
+        "surface": "игілік",
+        "root": "игілік",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "компьютерлікті",
+        "root": "компьютерлік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жаз-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00351"
+      },
+      "confidence": "Grammar",
+      "raw_text": "бес игілік компьютерлікті жазады."
+    },
+    {
+      "subject": {
+        "surface": "биологиялық",
+        "root": "биологиялық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ауғансты",
+        "root": "ауғанс",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні іл-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00352"
+      },
+      "confidence": "Grammar",
+      "raw_text": "биологиялық ауғансты іледі бірақ осылай тәртеді."
+    },
+    {
+      "subject": {
+        "surface": "қоңырат",
+        "root": "қоңырат",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "синтаксистікті",
+        "root": "синтаксистік",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жалғас-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00360"
+      },
+      "confidence": "Grammar",
+      "raw_text": "қоңырат қалыптастыруға қысқа синтаксистікті жалғасты."
+    },
+    {
+      "subject": {
+        "surface": "оқу",
+        "root": "оқу",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "аймағындағды",
+        "root": "аймағындағ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні үйір-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00364"
+      },
+      "confidence": "Grammar",
+      "raw_text": "тұрақты оқу аймағындағды үйірді."
+    },
+    {
+      "subject": {
+        "surface": "түсіну",
+        "root": "түсіну",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "күшінді",
+        "root": "күш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұлас-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00381"
+      },
+      "confidence": "Grammar",
+      "raw_text": "пәнде түсіну күшінді ұласты."
+    },
+    {
+      "subject": {
+        "surface": "ван",
+        "root": "ван",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мұндайды",
+        "root": "мұндай",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні түсір-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00399"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ван кезіге айқын мұндайды түсірді."
+    },
+    {
+      "subject": {
+        "surface": "ақын",
+        "root": "ақын",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қуғын-сүргінді",
+        "root": "қуғын-сүргін",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шеш-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00401"
+      },
+      "confidence": "Grammar",
+      "raw_text": "жоқ ақын қуғын-сүргінді шешті."
+    },
+    {
+      "subject": {
+        "surface": "салмақ",
+        "root": "салмақ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "желісінді",
+        "root": "желі",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні құла-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00404"
+      },
+      "confidence": "Grammar",
+      "raw_text": "салмақ ұзын желісінді құлады."
+    },
+    {
+      "subject": {
+        "surface": "қасие",
+        "root": "қасие",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қырғызды",
+        "root": "қырғыз",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қалыптас-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00408"
+      },
+      "confidence": "Grammar",
+      "raw_text": "қасие тәуелсіздігіннің қырғызды қалыптастырады."
+    },
+    {
+      "subject": {
+        "surface": "ағы",
+        "root": "ағы",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қуғын-сүргінді",
+        "root": "қуғын-сүргін",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жаңғыр-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00411"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ағы ресми қуғын-сүргінді жаңғырды."
+    },
+    {
+      "subject": {
+        "surface": "шар",
+        "root": "шар",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "топты",
+        "root": "топ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні күзет-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00418"
+      },
+      "confidence": "Grammar",
+      "raw_text": "шар топты күзетті және мол лепті жезқазеді."
+    },
+    {
+      "subject": {
+        "surface": "лига",
+        "root": "лига",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жағалауынды",
+        "root": "жағалау",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кеңей-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00437"
+      },
+      "confidence": "Grammar",
+      "raw_text": "лига ресми жағалауынды кеңейді."
+    },
+    {
+      "subject": {
+        "surface": "тама",
+        "root": "тама",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ауызды",
+        "root": "ауыз",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жақсарт-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00442"
+      },
+      "confidence": "Grammar",
+      "raw_text": "тама шөптен ауызды жақсартты."
+    },
+    {
+      "subject": {
+        "surface": "шықпай",
+        "root": "шықпай",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сұлулықты",
+        "root": "сұлулық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні әңгімеле-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00443"
+      },
+      "confidence": "Grammar",
+      "raw_text": "шықпай газеден сұлулықты әңгімелесті."
+    },
+    {
+      "subject": {
+        "surface": "ілгер",
+        "root": "ілгер",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "шығысынды",
+        "root": "шығыс",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тыс-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00449"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ілгер қаншалықтың шығысынды тысты сондықтан тағайындай қатысайды."
+    },
+    {
+      "subject": {
+        "surface": "сәби",
+        "root": "сәби",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жалақты",
+        "root": "жалақ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні күшейт-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00453"
+      },
+      "confidence": "Grammar",
+      "raw_text": "сәби ұзын жалақты күшейтті."
+    },
+    {
+      "subject": {
+        "surface": "бухгалтерлік",
+        "root": "бухгалтерлік",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "толықтырылсынды",
+        "root": "толықтырылсын",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шоғырлан-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00465"
+      },
+      "confidence": "Grammar",
+      "raw_text": "бухгалтерлік өнеркәсібіннің толықтырылсынды шоғырланады."
+    },
+    {
+      "subject": {
+        "surface": "жеміс",
+        "root": "жеміс",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "көзқарасты",
+        "root": "көзқарас",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні мәлімде-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00471"
+      },
+      "confidence": "Grammar",
+      "raw_text": "отыз жеміс көзқарасты мәлімдейді."
+    },
+    {
+      "subject": {
+        "surface": "әлеуметтік",
+        "root": "әлеуметтік",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ырысты",
+        "root": "ырыс",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні сіңір-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00479"
+      },
+      "confidence": "Grammar",
+      "raw_text": "тіпті әлеуметтік ырысты сіңірді."
+    },
+    {
+      "subject": {
+        "surface": "өзгеше",
+        "root": "өзгеше",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ұсақты",
+        "root": "ұсақ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні күзет-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00484"
+      },
+      "confidence": "Grammar",
+      "raw_text": "өзгеше дәннің ұсақты күзетті бірақ тыңайтқыш қабайды."
+    },
+    {
+      "subject": {
+        "surface": "дсұ-",
+        "root": "дсұ-",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тығызды",
+        "root": "тығыз",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ауыс-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00485"
+      },
+      "confidence": "Grammar",
+      "raw_text": "жаман дсұ- тығызды ауысты себебі сағат тигізді."
+    },
+    {
+      "subject": {
+        "surface": "қыркүйегін",
+        "root": "қыркүйегін",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "тауықты",
+        "root": "тауық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бұз-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00486"
+      },
+      "confidence": "Grammar",
+      "raw_text": "кейде қыркүйегін тауықты бұзды."
+    },
+    {
+      "subject": {
+        "surface": "сәбит",
+        "root": "сәбит",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қуыршақты",
+        "root": "қуыршақ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні соқ-лайды",
+      "source": {
+        "pack": "synthetic_sentences_pack.json",
+        "sample_id": "synth_00495"
+      },
+      "confidence": "Grammar",
+      "raw_text": "сәбит бөлектің қуыршақты соқты бірақ әуел өсейді."
+    },
+    {
+      "subject": {
+        "surface": "Оқу",
+        "root": "оқу",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "таниды",
+        "root": "тани",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні таны-лайды",
+      "source": {
+        "pack": "kazakh_classics_pack.json",
+        "sample_id": "kz_classics_00059"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Оқу білген таниды Бір жаратқан құдайды, Танымаған құдайды Неғылғанда ұнайды"
+    },
+    {
+      "subject": {
+        "surface": "Ақылсыз",
+        "root": "ақыл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жанды",
+        "root": "жан",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні айт-лайды",
+      "source": {
+        "pack": "kazakh_classics_pack.json",
+        "sample_id": "kz_classics_00066"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ақылсыз жанды досым деп, Басыңды қосып сыр айтпа"
+    },
+    {
+      "subject": {
+        "surface": "кітабы",
+        "root": "кітабы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Дидактикалық",
+        "root": "дидактикалық",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0004_s05"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Қазақ тілі» оқу-әдістемелік кешені оқулықтан, электронды қосымшадан (СД дискі), Мұғалім кітабы мен Дидактикалық ма- териалдардан тұрады"
+    },
+    {
+      "subject": {
+        "surface": "Мұхаммед",
+        "root": "мұхаммед",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "атты",
+        "root": "ат",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қат-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0006_s19"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ХУ ғасырдың 50-жыл- дары Мұхаммед Хайдар Дулатидың «Тарих-и Рашиди» атты еңбегінде Керей ханның есімі туысы Жәнібек ханмен бірге Қазақ хандығының құрылуына қатысты оқиғаларда алғаш рет атала бастайды"
+    },
+    {
+      "subject": {
+        "surface": "хан",
+        "root": "хан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "Жәнібек",
+        "root": "жәнібек",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0007_s00"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ғылыми мәліметтер бойынша, Керей хан мен (Жәнібек хан қол астындағы ру-тайпалармен 1457 жылдың күзінде Шу өңі- ріне көшіп келген"
+    },
+    {
+      "subject": {
+        "surface": "хандығы",
+        "root": "хандығы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0007_s07"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Жәнібек хан Жәнібек (Әбусаид) - Қазақ хандығы мен қазақ хандары әулетінің негізін қалаушы, Барақ ханның ұлы, Орыс ханның шөбересі"
+    },
+    {
+      "subject": {
+        "surface": "Халық",
+        "root": "халық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ханды",
+        "root": "хан",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ата-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0007_s21"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Халық аңыздарында Жәнібек ханды «Әз Жәнібек» деп атаған"
+    },
+    {
+      "subject": {
+        "surface": "қауым",
+        "root": "қауым",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "күмәнді",
+        "root": "күмән",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қос-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0008_s03"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ойталқыға жиналған қауым өз көңілін- дегі күмәнді, екіұшты ойларын нақтылау, ортақ шешімін қарастыру, мәселенің шынайы мүмкіндіктерін іздестіру мақсатында бас қосады"
+    },
+    {
+      "subject": {
         "surface": "адамдардың",
         "root": "адам",
         "pos": "noun"
@@ -353,6 +4501,506 @@
     },
     {
       "subject": {
+        "surface": "Ақтабан",
+        "root": "ақтабан",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "шұбырынды",
+        "root": "шұбырын",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ұшыра-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0010_s29"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ақтабан шұбырынды, Алқакөл сұлама «Ақтабан шұбырынды, Алқакөл сұлама» - қазақ хал- қының жоңғар шапқыншылығы (1728-1725) салдарынан басынан кешкен ауыр қасіретін, босқыншылыққа ұшыраған кезеңін бейнелейтін ұғым"
+    },
+    {
+      "subject": {
+        "surface": "Қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "шұбырынды",
+        "root": "шұбырын",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қалыпта-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0011_s06"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қазақ тарихындағы бұл ұлы басқыншылық этностың санасында өшпестей сақталып, «Ақтабан шұбырынды, Алқакөл сұла- ма» деген тарихи фразеологизм қалыптасты"
+    },
+    {
+      "subject": {
+        "surface": "нің",
+        "root": "нің",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "шұбырынды",
+        "root": "шұбырын",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тап-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0011_s07"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ұлы жүз, Орта жүз қазақтарының Қаратау асып, Сыр- дан өтіп, Алқакөлде қырғынға ұшыраған жері - «Алқакөл сұлама»; Кіші жүз қазақтарының Қаратаудан Түркістанға келіп, одан Сауранды айналып, Бұхараға бет түзеген шұбы- рынды көші - «Сауран айналған», ал Орта жүздің бір бөлігі- нің Қаратаудан солтүстікке қарай ауған шұбырынды жолы «қайың сауғанда, ел ауғанда» деп келетін фразеологизмдерде көрініс тапты"
+    },
+    {
+      "subject": {
+        "surface": "ет",
+        "root": "ет",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "жарамды",
+        "root": "жара",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бол-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0011_s08"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Негізгі асы ет пен сүт болған босқын қазақтар қайыңның қабығын тіліп, шырынын ішуге, алғыр (ашы өсім- діктің тамыры), қозықұйрық (саңырауқұлақтың түрі)сияқты жеуге жарамды шөптесін өсімдіктерді талғажау етуге мәжбүр болды"
+    },
+    {
+      "subject": {
+        "surface": "ет",
+        "root": "ет",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "сүт",
+        "root": "сүт",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0011_s08"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Негізгі асы ет пен сүт болған босқын қазақтар қайыңның қабығын тіліп, шырынын ішуге, алғыр (ашы өсім- діктің тамыры), қозықұйрық (саңырауқұлақтың түрі)сияқты жеуге жарамды шөптесін өсімдіктерді талғажау етуге мәжбүр болды"
+    },
+    {
+      "subject": {
+        "surface": "тырнақша",
+        "root": "тырнақша",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қуатты",
+        "root": "қуат",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кел-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0012_s03"
+      },
+      "confidence": "Grammar",
+      "raw_text": "тырнақша Мысалдар Шешендік өнер Шешендік өнер қай қоғамда болса да, халыққа, қалың көпшілікке әсер ететін, оның санасын, сезімін баурап, жігерін тасытатын қуатты құрал болып келген және күні бүгінге дейін сол күшін, қасиетін жойған жоқ"
+    },
+    {
+      "subject": {
+        "surface": "әрбір",
+        "root": "әрбір",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "білімді",
+        "root": "білім",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шеше-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0012_s04"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Демек, әрбір білімді, мәдениетті адам үшін шешендік өнердің тари- хымен танысып, теориясымен қарулану әсте артық емес"
+    },
+    {
+      "subject": {
+        "surface": "тисе",
+        "root": "тисе",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "Жаныңды",
+        "root": "жан",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні тұр-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0013_s15"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Жолдасыңа жау тисе, Жаныңды аяп тұрыспа"
+    },
+    {
+      "subject": {
+        "surface": "Қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "қатерді",
+        "root": "қатер",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қыл-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0014_s14"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Қазақ жастарын окоп жұмысына алады» деген хабарды естігенде, ел басына төнген қатерді ақын былай жырлайды: Верныйдан жандаралдар бұйрық қылды, Құйрығы бұйрығының тіпті зілді"
+    },
+    {
+      "subject": {
+        "surface": "бұқара",
+        "root": "бұқара",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "елді",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шақыр-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0014_s18"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ол бұқара халықтың осындай ауыр жағдайға ұшырау себептерінің түп-тамырын ашып, елді патшаға бас имеуге, бағынбауға, оның озбырлығына қарсы күресуге шақырады"
+    },
+    {
+      "subject": {
+        "surface": "қару",
+        "root": "қару",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "елді",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шақыр-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0015_s13"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қолындағы домбы- расын қару етіп, елді рухтандырып, патша өкіметінің қанауына қарсы көтеріліске шақырған"
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "шындықты",
+        "root": "шындық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ал-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0015_s15"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Өйткені ол 1916 жыл оқиғасына арналған жырларында тарихи шындықты нақты түрде баяндап бере алған"
+    },
+    {
+      "subject": {
+        "surface": "Семей",
+        "root": "семей",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сияқты",
+        "root": "сияқ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні ал-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0015_s20"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Семей Өскемен Көкпекті Зайсан Аягөз Үржар сияқты патша бекіністері қазақ даласын тор тәрізді шырмап алған еді"
+    },
+    {
+      "subject": {
+        "surface": "өнер",
+        "root": "өнер",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ғылымды",
+        "root": "ғылым",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көне-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0016_s02"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Шешендік өнер тарихы Шешендік өнер туралы ғылымды халықаралық тілде риторика (көне грек сөзі) дейді"
+    },
+    {
+      "subject": {
+        "surface": "Ғылымдар",
+        "root": "ғылым",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "атты",
+        "root": "ат",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні жаз-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0016_s07"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Протагор шешендік өнерге байланысты «Айтыс өнері», «Тартыс туралы», «Ғылымдар туралы», «Өктем сөз», «Жарыссөз» атты еңбектер жазған"
+    },
+    {
+      "subject": {
+        "surface": "білім",
+        "root": "білім",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мықты",
+        "root": "мық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шеше-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0017_s01"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Өзінің сөзімен тыңдаушысына әрі білім берсе, әрі көңілін көтерсе, ең мықты шешен - сол"
+    },
+    {
+      "subject": {
+        "surface": "табиғи",
+        "root": "табиғи",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "күшті",
+        "root": "күш",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні айт-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0019_s12"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ломоносов табиғи дарындылықты жан дарыны және тән дарыны деп екіге бөледі, жан дарынына - ақыл мен ес, тән дарынына күшті әрі сүйкімді дауыс пен үн жататынын айтады"
+    },
+    {
+      "subject": {
+        "surface": "негізі",
+        "root": "негізі",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "көңілді",
+        "root": "көңіл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні кел-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0021_s07"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Балбырауын күйүнде, бидің негізі бар көңілді шабытты ырғағы жеңіл болып келеді"
+    },
+    {
+      "subject": {
+        "surface": "Қосымша",
+        "root": "қосымша",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "әдебиеттерді",
+        "root": "әдебиет",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көр-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0021_s23"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қосымша әдебиеттерді пайдаланып, «Маған бүкіл қазақ дала- сы ән салып тұрғандай көрінеді» тақырыбында презентация дайындаңдар"
+    },
+    {
+      "subject": {
+        "surface": "Ел",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ларды",
+        "root": "лар",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні біл-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0022_s05"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ел мерейін арттырған қандай қазақстандық спортшы- ларды білесіңдер"
+    },
+    {
+      "subject": {
+        "surface": "деректер",
+        "root": "дерек",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "ауқымды",
+        "root": "ауқым",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көр-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0026_s06"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«ЭКСПО-2017» халықаралық көрмесі туралы деректер Қазақстан посткеңестік кеңістікте өз аумағында кең ауқымды көрме өткізу құқығына ие болған бірінші ел болды"
+    },
+    {
+      "subject": {
+        "surface": "Ұлыбритания",
+        "root": "ұлыбритания",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "сияқты",
+        "root": "сияқ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көр-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0026_s07"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Жалпы, Ұлыбритания, Франция, АҚШ, Аустралия, Аустрия, Бельгия, Италия, Канада, Испания, Бразилия, Оңтүстік Корея, Португалия, Германия, Қытай және Түркия сияқты елдер өз кезінде бүкіләлемдік көрме өткізген"
+    },
+    {
+      "subject": {
+        "surface": "Артық",
+        "root": "артық",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "мәтінді",
+        "root": "мәтін",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні қайта-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0028_s14"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Артық болмас білгенің» айдарымен берілген мәтінді редак- циялап, азатжолдарға бөліп, қайта жазыңдар"
+    },
+    {
+      "subject": {
+        "surface": "ғылым",
+        "root": "ғылым",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "көңілді",
+        "root": "көңіл",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні нұрлан-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0029_s20"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Тоғызыншыдан, ғылым көңілді нұрландырады, адамға ақыл-ой қосады, ал мал масаттандырады, болған үстіне бола берсем деп, дүниеқоңыз етеді"
+    },
+    {
+      "subject": {
+        "surface": "қазақ",
+        "root": "қазақ",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "дәуірлерді",
+        "root": "дәуір",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні бер-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0030_s20"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Алексей Толстойды қайталасақ, «қазақ халқының ұлылығын, оның өткен өмі- рін, тарихын, тарихының түбірлі кезеңдерін, қазақ мінезі қалыптасқан трагикалық һәм шығармашылық дәуірлерді ғажайып көркемдік күшпен жарқыратып ашып, жан-жақты айқындап, терең түсіндіріп берді»"
+    },
+    {
+      "subject": {
         "surface": "үйдің",
         "root": "үй",
         "pos": "noun"
@@ -370,6 +5018,46 @@
       },
       "confidence": "Grammar",
       "raw_text": "Анадай жерде, қонақ үйдің сыртында, қасында екі-үш үлкен кісі бар әкесі Құнан- бай тұр екен"
+    },
+    {
+      "subject": {
+        "surface": "шығатын",
+        "root": "шығатын",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "үйлесімді",
+        "root": "үйлесім",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні шеше-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0032_s02"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Көпшілік алдына шығатын адамның киім киісі, тазалығы, жинақылығы, өзін ұстауы, бет-жүз, дене қимылдарының сөз мазмұнымен үйлесімді болуы да шешен сөзінің мәнін арттырады"
+    },
+    {
+      "subject": {
+        "surface": "өмір",
+        "root": "өмір",
+        "pos": "noun"
+      },
+      "predicate": "DoesTo",
+      "object": {
+        "surface": "халықты",
+        "root": "халық",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ні көзде-лайды",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0034_s01"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Бейбіт өмір сүріп жатқан халықты талан-таражға салып азық-түлік мал-мүлкін тартып алуды көздеді"
     }
   ]
 }

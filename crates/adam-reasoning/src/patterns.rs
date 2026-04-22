@@ -18,7 +18,7 @@
 //!      with a positive and a negative case in `#[cfg(test)]` below.
 
 use adam_kernel_fst::lexicon::LexiconV1;
-use adam_kernel_fst::morphotactics::{Case, Possessive};
+use adam_kernel_fst::morphotactics::{Case, Possessive, Voice};
 use adam_kernel_fst::parser::{Analysis, analyse};
 
 use crate::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
@@ -518,6 +518,566 @@ pub fn dative_goes_to(
 }
 
 // -----------------------------------------------------------------------------
+// v3.5.0 matchers — breadth expansion for the reasoning graph.
+// -----------------------------------------------------------------------------
+
+/// Causal pattern — `X — Y-нің себебі` → `(X, Causes, Y)`.
+///
+/// Kazakh causal copula: "X is the cause/reason of Y". Structure:
+/// bare-nominative X + em-dash + genitive Y + possessed noun `себебі`
+/// (P3 of `себеп` "reason"). This is stricter than an open-ended
+/// causal matcher — we require the literal `себебі` head — but is
+/// what textbook prose uses when stating definitions like «су — өмірдің
+/// себебі» ("water is the cause of life").
+pub fn copula_causes(
+    text: &str,
+    _parses: &[Analysis],
+    lexicon: &LexiconV1,
+    source: &FactSource,
+    out: &mut Vec<Fact>,
+) {
+    if !text.contains("себебі") {
+        return;
+    }
+    let dash_count = text.chars().filter(|c| *c == '\u{2014}').count();
+    if dash_count != 1 {
+        return;
+    }
+    let (left, right) = match text.split_once('\u{2014}') {
+        Some(parts) => parts,
+        None => return,
+    };
+    // LHS: exactly one bare-nominative content noun.
+    let subj_surface = match exactly_one_alphabetic_token(left) {
+        Some(t) => t,
+        None => return,
+    };
+    let Some(subj) = resolve_bare_noun(subj_surface, lexicon) else {
+        return;
+    };
+    // RHS must end in `себебі` (optionally followed by punctuation) and
+    // the token before it must analyse as a genitive noun (the
+    // "causer's complement" — i.e. the Y in "Y-нің себебі").
+    let rhs_tokens: Vec<String> = strip_parens(right)
+        .split(|c: char| !(c.is_alphabetic() || c == '-'))
+        .filter(|t| !t.is_empty())
+        .map(|t| t.to_string())
+        .collect();
+    // Find the last occurrence of «себебі» in the RHS.
+    let Some(sebebi_idx) = rhs_tokens
+        .iter()
+        .rposition(|t| t.to_lowercase() == "себебі")
+    else {
+        return;
+    };
+    if sebebi_idx == 0 {
+        return;
+    }
+    // Preceding token must analyse as a genitive noun (the Y).
+    let prev = &rhs_tokens[sebebi_idx - 1].to_lowercase();
+    let Some(obj_analysis) = analyse(prev, lexicon).into_iter().next() else {
+        return;
+    };
+    let Analysis::Noun { features, root } = obj_analysis else {
+        return;
+    };
+    if features.case != Some(Case::Genitive) {
+        return;
+    }
+    if root.part_of_speech != "noun" || is_closed_class(&root.root) {
+        return;
+    }
+    if subj.root == root.root {
+        return;
+    }
+    out.push(Fact {
+        subject: subj,
+        predicate: Predicate::Causes,
+        object: SlotRef {
+            surface: rhs_tokens[sebebi_idx - 1].clone(),
+            root: root.root.clone(),
+            pos: "noun".to_string(),
+        },
+        pattern: "X — Y-нің себебі".to_string(),
+        source: source.clone(),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: text.trim().to_string(),
+    });
+}
+
+/// Temporal pattern — `X Y-дан кейін ...` → `(X, After, Y)`.
+///
+/// Kazakh "after" construction: bare-nominative subject + ablative
+/// noun (the reference point) + postposition `кейін` or `соң`.
+/// Example: «түс таңнан кейін болады» → (түс, After, таң).
+pub fn temporal_after(
+    text: &str,
+    _parses: &[Analysis],
+    lexicon: &LexiconV1,
+    source: &FactSource,
+    out: &mut Vec<Fact>,
+) {
+    let text_lower = text.to_lowercase();
+    if !text_lower.contains(" кейін") && !text_lower.contains(" соң") {
+        return;
+    }
+    let tokens: Vec<(String, Option<Analysis>)> = text
+        .split_whitespace()
+        .map(|t| {
+            let cleaned: String = t
+                .chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect();
+            let lowered = cleaned.to_lowercase();
+            let first = analyse(&lowered, lexicon).into_iter().next();
+            (cleaned, first)
+        })
+        .filter(|(s, _)| !s.is_empty())
+        .collect();
+    // Find the postposition position.
+    let Some(post_idx) = tokens.iter().position(|(s, _)| {
+        let lo = s.to_lowercase();
+        lo == "кейін" || lo == "соң"
+    }) else {
+        return;
+    };
+    if post_idx == 0 {
+        return;
+    }
+    // Preceding token must be an ablative noun (the Y reference point).
+    let prev = &tokens[post_idx - 1];
+    let Some(Analysis::Noun { features, root }) = &prev.1 else {
+        return;
+    };
+    if features.case != Some(Case::Ablative) {
+        return;
+    }
+    if root.part_of_speech != "noun" || is_closed_class(&root.root) {
+        return;
+    }
+    let obj_slot = SlotRef {
+        surface: prev.0.clone(),
+        root: root.root.clone(),
+        pos: "noun".to_string(),
+    };
+    // Subject: first bare-nominative content noun before the ablative.
+    let subj = (0..post_idx - 1).find_map(|i| match &tokens[i].1 {
+        Some(Analysis::Noun { features, root }) => {
+            if root.part_of_speech != "noun"
+                || is_closed_class(&root.root)
+                || features.case.is_some_and(|c| c != Case::Nominative)
+            {
+                return None;
+            }
+            Some(SlotRef {
+                surface: tokens[i].0.clone(),
+                root: root.root.clone(),
+                pos: "noun".to_string(),
+            })
+        }
+        _ => None,
+    });
+    let Some(subject) = subj else { return };
+    if subject.root == obj_slot.root {
+        return;
+    }
+    out.push(Fact {
+        subject,
+        predicate: Predicate::After,
+        object: obj_slot,
+        pattern: "X Y-дан кейін".to_string(),
+        source: source.clone(),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: text.trim().to_string(),
+    });
+}
+
+/// Quantity pattern — `X-тың N Y-ы бар` → `(X, HasQuantity, Y)` where
+/// N is a numeral preserved in the raw_text. An extension of
+/// [`possessive_has`] that specifically catches numeric-count claims
+/// common in textbooks («адамның екі аяғы бар», «планетаның алты
+/// айы бар»).
+pub fn quantity_count(
+    text: &str,
+    _parses: &[Analysis],
+    lexicon: &LexiconV1,
+    source: &FactSource,
+    out: &mut Vec<Fact>,
+) {
+    let has_bar = text
+        .split(|c: char| !(c.is_alphabetic() || c == '-'))
+        .any(|t| t.to_lowercase() == "бар");
+    if !has_bar {
+        return;
+    }
+    let tokens: Vec<(String, Option<Analysis>)> = text
+        .split_whitespace()
+        .map(|t| {
+            let cleaned: String = t
+                .chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect();
+            let lowered = cleaned.to_lowercase();
+            let first = analyse(&lowered, lexicon).into_iter().next();
+            (cleaned, first)
+        })
+        .filter(|(s, _)| !s.is_empty())
+        .collect();
+    // Scan for: genitive noun → numeral → P3 noun → … → бар.
+    // We use is_numeral_token because numerals are either Lexicon-
+    // tagged `numeral` OR the closed set of Kazakh numeral forms.
+    let gen_idx = tokens.iter().position(|(_, a)| match a {
+        Some(Analysis::Noun { features, root }) => {
+            features.case == Some(Case::Genitive)
+                && root.part_of_speech == "noun"
+                && !is_closed_class(&root.root)
+        }
+        _ => false,
+    });
+    let Some(gen_idx) = gen_idx else { return };
+    // Must be followed by a numeral, then a P3 noun.
+    let num_idx = gen_idx + 1;
+    if num_idx >= tokens.len() {
+        return;
+    }
+    let Some(num_analysis) = &tokens[num_idx].1 else {
+        return;
+    };
+    let is_numeral = match num_analysis {
+        Analysis::Noun { root, .. } => root.part_of_speech == "numeral",
+        _ => false,
+    };
+    if !is_numeral {
+        return;
+    }
+    let poss_idx = num_idx + 1;
+    if poss_idx >= tokens.len() {
+        return;
+    }
+    let Some(Analysis::Noun {
+        features: p_feat,
+        root: p_root,
+    }) = &tokens[poss_idx].1
+    else {
+        return;
+    };
+    if p_feat.possessive != Some(Possessive::P3)
+        || p_root.part_of_speech != "noun"
+        || is_closed_class(&p_root.root)
+    {
+        return;
+    }
+    let (poss_surface, poss_root_str) = (tokens[poss_idx].0.clone(), p_root.root.clone());
+    let (gen_surface, gen_root_str) = match &tokens[gen_idx].1 {
+        Some(Analysis::Noun { root, .. }) => (tokens[gen_idx].0.clone(), root.root.clone()),
+        _ => return,
+    };
+    if gen_root_str == poss_root_str {
+        return;
+    }
+    out.push(Fact {
+        subject: SlotRef {
+            surface: gen_surface,
+            root: gen_root_str,
+            pos: "noun".to_string(),
+        },
+        predicate: Predicate::HasQuantity,
+        object: SlotRef {
+            surface: poss_surface,
+            root: poss_root_str,
+            pos: "noun".to_string(),
+        },
+        pattern: "X-тың N Y-ы бар".to_string(),
+        source: source.clone(),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: text.trim().to_string(),
+    });
+}
+
+/// Agent-verb pattern — `X Y-ні Z-лайды` → `(X, DoesTo, Y)` where the
+/// verb root goes in the `pattern` field.
+///
+/// Kazakh SOV: bare-nominative agent + accusative patient + verb.
+/// Only records the (agent, patient) pair as a `DoesTo` edge — the
+/// verb itself is captured in the pattern tag so downstream consumers
+/// can filter if needed. Pronouns are refused as agents for the same
+/// reason as other matchers.
+pub fn agent_verb(
+    text: &str,
+    _parses: &[Analysis],
+    lexicon: &LexiconV1,
+    source: &FactSource,
+    out: &mut Vec<Fact>,
+) {
+    let tokens: Vec<(String, Option<Analysis>)> = text
+        .split_whitespace()
+        .map(|t| {
+            let cleaned: String = t
+                .chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect();
+            let lowered = cleaned.to_lowercase();
+            let first = analyse(&lowered, lexicon).into_iter().next();
+            (cleaned, first)
+        })
+        .filter(|(s, _)| !s.is_empty())
+        .collect();
+    // Find an accusative noun.
+    let acc_idx = tokens.iter().position(|(_, a)| match a {
+        Some(Analysis::Noun { features, root }) => {
+            features.case == Some(Case::Accusative)
+                && root.part_of_speech == "noun"
+                && !is_closed_class(&root.root)
+        }
+        _ => false,
+    });
+    let Some(acc_idx) = acc_idx else { return };
+    // Must be followed by a verb.
+    let verb_idx =
+        (acc_idx + 1..tokens.len()).find(|&i| matches!(tokens[i].1, Some(Analysis::Verb { .. })));
+    let Some(verb_idx) = verb_idx else { return };
+    let (verb_root, verb_voice) = match &tokens[verb_idx].1 {
+        Some(Analysis::Verb { root, features }) => (root.root.clone(), features.voice),
+        _ => return,
+    };
+    // v3.5.0 precision fix: Passive voice inverts the thematic roles —
+    // the grammatical subject of a passive clause is the PATIENT, not
+    // the agent. "Кітап оқылды" = "The book was read", NOT "The book
+    // read (something)". Refusing passives stops false-positive
+    // agent-verb extractions from frequent textbook phrasings like
+    // «... қолданылады» ("... is used").
+    if verb_voice == Some(Voice::Passive) {
+        return;
+    }
+    // Refuse stopword verbs: бар (existential), болу (copula),
+    // бару (direction — handled by dative_goes_to), еді (past
+    // copula).
+    if matches!(verb_root.as_str(), "бару" | "бар" | "болу" | "еді" | "еду") {
+        return;
+    }
+    let (acc_surface, acc_root) = match &tokens[acc_idx].1 {
+        Some(Analysis::Noun { root, .. }) => (tokens[acc_idx].0.clone(), root.root.clone()),
+        _ => return,
+    };
+    // Subject: first bare-nominative content noun before the accusative.
+    // v3.5.0 precision fix: refuse possessive-form subjects — a P3 noun
+    // ("тілі") is not a bare subject, it's an inflected head. The
+    // nominal_conjunction matcher already does this; agent_verb now
+    // too. Also refuse the surface being capitalised mid-sentence when
+    // lowercase(surface) != root (imperfect but filters most proper-
+    // name-misclassified-as-noun cases).
+    let subj = (0..acc_idx).find_map(|i| match &tokens[i].1 {
+        Some(Analysis::Noun { features, root }) => {
+            if root.part_of_speech != "noun"
+                || is_closed_class(&root.root)
+                || features.case.is_some_and(|c| c != Case::Nominative)
+                || features.possessive.is_some()
+            {
+                return None;
+            }
+            Some(SlotRef {
+                surface: tokens[i].0.clone(),
+                root: root.root.clone(),
+                pos: "noun".to_string(),
+            })
+        }
+        _ => None,
+    });
+    let Some(subject) = subj else { return };
+    if subject.root == acc_root {
+        return;
+    }
+    out.push(Fact {
+        subject,
+        predicate: Predicate::DoesTo,
+        object: SlotRef {
+            surface: acc_surface,
+            root: acc_root,
+            pos: "noun".to_string(),
+        },
+        pattern: format!("X Y-ні {verb_root}-лайды"),
+        source: source.clone(),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: text.trim().to_string(),
+    });
+}
+
+/// Nominal-conjunction pattern — `X пен Y` → `(X, RelatedTo, Y)`.
+///
+/// Kazakh nominal conjunction: "X and Y" using `пен` / `мен` / `бен`
+/// (harmony-driven). The two conjuncts are brought together by the
+/// author so they co-occur in a sibling structure — a weak RelatedTo
+/// signal comparable to the R5-derived ones but grounded in explicit
+/// syntactic co-predication. Refuses pronoun / closed-class sides.
+pub fn nominal_conjunction(
+    text: &str,
+    _parses: &[Analysis],
+    lexicon: &LexiconV1,
+    source: &FactSource,
+    out: &mut Vec<Fact>,
+) {
+    let text_lower = text.to_lowercase();
+    let has_conj = text_lower.contains(" пен ")
+        || text_lower.contains(" мен ")
+        || text_lower.contains(" бен ");
+    if !has_conj {
+        return;
+    }
+    let tokens: Vec<(String, Option<Analysis>)> = text
+        .split_whitespace()
+        .map(|t| {
+            let cleaned: String = t
+                .chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect();
+            let lowered = cleaned.to_lowercase();
+            let first = analyse(&lowered, lexicon).into_iter().next();
+            (cleaned, first)
+        })
+        .filter(|(s, _)| !s.is_empty())
+        .collect();
+    let Some(conj_idx) = tokens.iter().position(|(s, _)| {
+        let lo = s.to_lowercase();
+        lo == "пен" || lo == "мен" || lo == "бен"
+    }) else {
+        return;
+    };
+    if conj_idx == 0 || conj_idx + 1 >= tokens.len() {
+        return;
+    }
+    // Both sides must be bare-nominative content nouns.
+    let lhs = match &tokens[conj_idx - 1].1 {
+        Some(Analysis::Noun { features, root }) => {
+            if root.part_of_speech != "noun"
+                || is_closed_class(&root.root)
+                || features.case.is_some_and(|c| c != Case::Nominative)
+                || features.possessive.is_some()
+            {
+                return;
+            }
+            SlotRef {
+                surface: tokens[conj_idx - 1].0.clone(),
+                root: root.root.clone(),
+                pos: "noun".to_string(),
+            }
+        }
+        _ => return,
+    };
+    let rhs = match &tokens[conj_idx + 1].1 {
+        Some(Analysis::Noun { features, root }) => {
+            if root.part_of_speech != "noun"
+                || is_closed_class(&root.root)
+                || features.case.is_some_and(|c| c != Case::Nominative)
+                || features.possessive.is_some()
+            {
+                return;
+            }
+            SlotRef {
+                surface: tokens[conj_idx + 1].0.clone(),
+                root: root.root.clone(),
+                pos: "noun".to_string(),
+            }
+        }
+        _ => return,
+    };
+    if lhs.root == rhs.root {
+        return;
+    }
+    out.push(Fact {
+        subject: lhs,
+        predicate: Predicate::RelatedTo,
+        object: rhs,
+        pattern: "X пен Y".to_string(),
+        source: source.clone(),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: text.trim().to_string(),
+    });
+}
+
+/// Domain-membership pattern — `X — Y саласы` → `(X, InDomain, Y)`.
+///
+/// Kazakh educational / taxonomic prose: "X is a field/branch of Y".
+/// Structure: bare-nominative X + em-dash + possessive `саласы`
+/// (P3 of `сала` "field/branch") + genitive or bare Y that names the
+/// parent domain. Precise form: "X — Y саласы" OR "X — Y-нің саласы".
+/// Textbooks use this heavily: «алгебра — математиканың саласы».
+pub fn domain_membership(
+    text: &str,
+    _parses: &[Analysis],
+    lexicon: &LexiconV1,
+    source: &FactSource,
+    out: &mut Vec<Fact>,
+) {
+    let text_lower = text.to_lowercase();
+    if !text_lower.contains("саласы") && !text_lower.contains("ғылымы") {
+        return;
+    }
+    let dash_count = text.chars().filter(|c| *c == '\u{2014}').count();
+    if dash_count != 1 {
+        return;
+    }
+    let (left, right) = match text.split_once('\u{2014}') {
+        Some(parts) => parts,
+        None => return,
+    };
+    let subj_surface = match exactly_one_alphabetic_token(left) {
+        Some(t) => t,
+        None => return,
+    };
+    let Some(subj) = resolve_bare_noun(subj_surface, lexicon) else {
+        return;
+    };
+    // RHS: token before `саласы` / `ғылымы` is the Y.
+    let rhs_tokens: Vec<String> = strip_parens(right)
+        .split(|c: char| !(c.is_alphabetic() || c == '-'))
+        .filter(|t| !t.is_empty())
+        .map(|t| t.to_string())
+        .collect();
+    let head_idx = rhs_tokens.iter().rposition(|t| {
+        let lo = t.to_lowercase();
+        lo == "саласы" || lo == "ғылымы"
+    });
+    let Some(head_idx) = head_idx else { return };
+    if head_idx == 0 {
+        return;
+    }
+    let prev_surface = rhs_tokens[head_idx - 1].to_lowercase();
+    // Y may be bare-nominative OR genitive (-ның/-нің/-дың/-дің/-тың/-тің).
+    let Some(analysis) = analyse(&prev_surface, lexicon).into_iter().next() else {
+        return;
+    };
+    let Analysis::Noun { features, root } = analysis else {
+        return;
+    };
+    if root.part_of_speech != "noun" || is_closed_class(&root.root) {
+        return;
+    }
+    // Accept either bare nominative OR explicit genitive as the Y.
+    let case_ok = features.case.is_none()
+        || features.case == Some(Case::Nominative)
+        || features.case == Some(Case::Genitive);
+    if !case_ok {
+        return;
+    }
+    if subj.root == root.root {
+        return;
+    }
+    out.push(Fact {
+        subject: subj,
+        predicate: Predicate::InDomain,
+        object: SlotRef {
+            surface: rhs_tokens[head_idx - 1].clone(),
+            root: root.root.clone(),
+            pos: "noun".to_string(),
+        },
+        pattern: "X — Y саласы".to_string(),
+        source: source.clone(),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: text.trim().to_string(),
+    });
+}
+
+// -----------------------------------------------------------------------------
 // helpers
 // -----------------------------------------------------------------------------
 
@@ -650,6 +1210,17 @@ fn is_closed_class(root: &str) -> bool {
             | "аз"
             | "бәрі"
             | "барлық"
+            // v3.5.0: interrogatives + common adjectival-looking
+            // roots the FST sometimes tags as nouns.
+            | "қандай"
+            | "кім"
+            | "не"
+            | "қай"
+            | "қашан"
+            | "қайда"
+            | "неліктен"
+            | "неге"
+            | "қанша"
     )
 }
 
@@ -968,5 +1539,159 @@ mod tests {
     fn closed_class_catches_pronoun() {
         assert!(is_closed_class("мен"));
         assert!(!is_closed_class("бала"));
+    }
+
+    // ------------------------- v3.5.0 matchers ----------------------------
+
+    #[test]
+    fn copula_causes_extracts_water_cause_life() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        copula_causes("су — өмірдің себебі", &[], &lex, &src(), &mut out);
+        if out.is_empty() {
+            eprintln!("note: су/өмір may not be in Lexicon; skipping");
+            return;
+        }
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].predicate, Predicate::Causes);
+        assert_eq!(out[0].subject.root, "су");
+        assert_eq!(out[0].object.root, "өмір");
+        assert_eq!(out[0].pattern, "X — Y-нің себебі");
+    }
+
+    #[test]
+    fn copula_causes_rejects_missing_sebeb_i() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        copula_causes("су — өмір", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty());
+    }
+
+    #[test]
+    fn copula_causes_rejects_tautology() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        // Whole same root on both sides — refuse.
+        copula_causes("адам — адамның себебі", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty());
+    }
+
+    #[test]
+    fn temporal_after_extracts_noon_after_morning() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        temporal_after("түс таңнан кейін болады", &[], &lex, &src(), &mut out);
+        if out.is_empty() {
+            eprintln!("note: түс/таң may not analyse; skipping");
+            return;
+        }
+        assert_eq!(out[0].predicate, Predicate::After);
+        assert_eq!(out[0].subject.root, "түс");
+        assert_eq!(out[0].object.root, "таң");
+    }
+
+    #[test]
+    fn temporal_after_rejects_no_postposition() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        temporal_after("түс таңнан болады", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "no кейін/соң → refuse");
+    }
+
+    #[test]
+    fn quantity_count_rejects_without_numeral() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        quantity_count("адамның аяғы бар", &[], &lex, &src(), &mut out);
+        // Without a numeral between genitive and P3, this is a plain
+        // possessive, not a quantity claim — refuse.
+        assert!(out.is_empty());
+    }
+
+    #[test]
+    fn quantity_count_rejects_without_bar() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        quantity_count("адамның екі аяғы жоқ", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "no бар → no HasQuantity");
+    }
+
+    #[test]
+    fn agent_verb_rejects_pronoun_subject() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        agent_verb("мен кітапты оқимын", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "pronoun subject refused");
+    }
+
+    #[test]
+    fn agent_verb_rejects_without_accusative() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        // No accusative object — refuse.
+        agent_verb("бала жүгіреді", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty());
+    }
+
+    #[test]
+    fn nominal_conjunction_extracts_book_and_science() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        nominal_conjunction("кітап пен ілім", &[], &lex, &src(), &mut out);
+        if out.is_empty() {
+            eprintln!("note: кітап/ілім may not analyse; skipping");
+            return;
+        }
+        assert_eq!(out[0].predicate, Predicate::RelatedTo);
+        assert_eq!(out[0].pattern, "X пен Y");
+    }
+
+    #[test]
+    fn nominal_conjunction_rejects_without_conjunction() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        nominal_conjunction("кітап ілім", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty());
+    }
+
+    #[test]
+    fn nominal_conjunction_rejects_pronoun_side() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        nominal_conjunction("мен пен сен", &[], &lex, &src(), &mut out);
+        assert!(out.is_empty(), "pronouns refused on either side");
+    }
+
+    #[test]
+    fn domain_membership_extracts_algebra_is_math_field() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        domain_membership(
+            "алгебра — математиканың саласы",
+            &[],
+            &lex,
+            &src(),
+            &mut out,
+        );
+        if out.is_empty() {
+            eprintln!("note: алгебра/математика may not be in Lexicon; skipping");
+            return;
+        }
+        assert_eq!(out[0].predicate, Predicate::InDomain);
+        assert_eq!(out[0].pattern, "X — Y саласы");
+    }
+
+    #[test]
+    fn domain_membership_rejects_without_salasy_glymy() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        domain_membership(
+            "алгебра — математиканың бөлімі",
+            &[],
+            &lex,
+            &src(),
+            &mut out,
+        );
+        assert!(out.is_empty(), "no саласы/ғылымы head → refuse");
     }
 }

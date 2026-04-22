@@ -1,10 +1,10 @@
 {
   "status": "completed",
-  "elapsed_s": 614,
+  "elapsed_s": 904,
   "tiers_completed": 4,
   "tiers_planned": 4,
-  "version": "3.3.0",
-  "total_elapsed_s": 613,
+  "version": "3.4.0",
+  "total_elapsed_s": 903,
   "machine": {
     "rayon_threads": 8
   },
@@ -21,8 +21,8 @@
       "cc100_kk_pack.json"
     ],
     "shard_packs_loaded": [],
-    "total_samples_available": 411031,
-    "total_words_available": 4322704
+    "total_samples_available": 430720,
+    "total_words_available": 4573075
   },
   "tiers": [
     {
@@ -30,21 +30,23 @@
       "target_samples": 100,
       "samples_scanned": 100,
       "words_scanned": 903,
-      "facts_extracted": 0,
-      "facts_by_predicate": {},
+      "facts_extracted": 2,
+      "facts_by_predicate": {
+        "does_to": 2
+      },
       "derivations": 0,
       "derivations_by_rule": {},
-      "graph_nodes": 0,
-      "graph_edges": 0,
+      "graph_nodes": 3,
+      "graph_edges": 2,
       "elapsed_ms": {
-        "extract": 524,
+        "extract": 761,
         "graph": 0,
         "reason": 0
       },
       "normalized": {
-        "facts_per_10k_words": 0.0,
+        "facts_per_10k_words": 22.148394241417495,
         "derivations_per_fact": 0.0,
-        "predicate_coverage_pct": 0.0,
+        "predicate_coverage_pct": 9.090909090909092,
         "duplicate_fact_rate_pct": 0.0
       }
     },
@@ -53,21 +55,24 @@
       "target_samples": 1000,
       "samples_scanned": 1000,
       "words_scanned": 8957,
-      "facts_extracted": 0,
-      "facts_by_predicate": {},
+      "facts_extracted": 25,
+      "facts_by_predicate": {
+        "does_to": 20,
+        "related_to": 5
+      },
       "derivations": 0,
       "derivations_by_rule": {},
-      "graph_nodes": 0,
-      "graph_edges": 0,
+      "graph_nodes": 39,
+      "graph_edges": 25,
       "elapsed_ms": {
-        "extract": 7479,
+        "extract": 12305,
         "graph": 0,
         "reason": 0
       },
       "normalized": {
-        "facts_per_10k_words": 0.0,
+        "facts_per_10k_words": 27.911130959026462,
         "derivations_per_fact": 0.0,
-        "predicate_coverage_pct": 0.0,
+        "predicate_coverage_pct": 18.181818181818183,
         "duplicate_fact_rate_pct": 0.0
       }
     },
@@ -76,55 +81,62 @@
       "target_samples": 10000,
       "samples_scanned": 10000,
       "words_scanned": 106190,
-      "facts_extracted": 19,
+      "facts_extracted": 450,
       "facts_by_predicate": {
+        "after": 3,
+        "does_to": 367,
         "has": 9,
-        "is_a": 10
+        "is_a": 10,
+        "related_to": 61
       },
       "derivations": 0,
       "derivations_by_rule": {},
-      "graph_nodes": 38,
-      "graph_edges": 19,
+      "graph_nodes": 442,
+      "graph_edges": 417,
       "elapsed_ms": {
-        "extract": 85044,
+        "extract": 163798,
         "graph": 0,
-        "reason": 0
+        "reason": 1
       },
       "normalized": {
-        "facts_per_10k_words": 1.7892456916847161,
+        "facts_per_10k_words": 42.37687164516433,
         "derivations_per_fact": 0.0,
-        "predicate_coverage_pct": 33.33333333333333,
-        "duplicate_fact_rate_pct": 0.0
+        "predicate_coverage_pct": 45.45454545454545,
+        "duplicate_fact_rate_pct": 7.333333333333333
       }
     },
     {
       "label": "T4_50k",
       "target_samples": 50000,
       "samples_scanned": 50000,
-      "words_scanned": 600885,
-      "facts_extracted": 120,
+      "words_scanned": 611522,
+      "facts_extracted": 2522,
       "facts_by_predicate": {
-        "has": 54,
-        "is_a": 66
+        "after": 48,
+        "does_to": 2019,
+        "has": 49,
+        "has_quantity": 4,
+        "is_a": 57,
+        "related_to": 345
       },
-      "derivations": 51,
+      "derivations": 27,
       "derivations_by_rule": {
         "R1_is_a_transitivity": 7,
-        "R2_has_inheritance": 25,
-        "R5_shared_is_a_target": 19
+        "R2_has_inheritance": 5,
+        "R5_shared_is_a_target": 15
       },
-      "graph_nodes": 123,
-      "graph_edges": 87,
+      "graph_nodes": 1315,
+      "graph_edges": 2203,
       "elapsed_ms": {
-        "extract": 520942,
-        "graph": 0,
-        "reason": 2
+        "extract": 726533,
+        "graph": 5,
+        "reason": 42
       },
       "normalized": {
-        "facts_per_10k_words": 1.997054344841359,
-        "derivations_per_fact": 0.425,
-        "predicate_coverage_pct": 33.33333333333333,
-        "duplicate_fact_rate_pct": 27.500000000000004
+        "facts_per_10k_words": 41.24136171715817,
+        "derivations_per_fact": 0.01070578905630452,
+        "predicate_coverage_pct": 54.54545454545454,
+        "duplicate_fact_rate_pct": 12.648691514670896
       }
     }
   ]

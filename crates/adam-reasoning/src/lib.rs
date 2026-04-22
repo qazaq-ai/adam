@@ -85,6 +85,32 @@ pub enum Predicate {
     /// (A IsA X ∧ B IsA X ⟹ RelatedTo(A, B)); extraction patterns for
     /// it will be added incrementally as lexical data supports them.
     RelatedTo,
+    /// Subject **causes** object. v3.5.0. Kazakh construction:
+    /// `X — Y-нің себебі` ("X is the cause of Y") or
+    /// `X Y-ға себеп болады` ("X becomes a cause for Y").
+    /// Example: (су, Causes, өмір) from "су — өмірдің себебі".
+    Causes,
+    /// Subject happens **after** object in time. v3.5.0. Kazakh
+    /// construction: `X Y-дан кейін` / `X Y-ден соң` ("X after Y").
+    /// Example: (түс, After, таң) from "түс таңнан кейін келеді".
+    After,
+    /// Subject **has quantity** of object (numeric + counted noun).
+    /// v3.5.0. Kazakh construction: `X Y-дің N Z-ы бар`
+    /// ("X has N Y's"). Example: (бала, HasQuantity, кітап).
+    /// The count is kept in the `raw_text` field; this predicate
+    /// records the relationship, not the magnitude.
+    HasQuantity,
+    /// Subject **does** (verb) object. v3.5.0 agent-verb pattern.
+    /// Kazakh construction: `X Y-ні Z-лайды` ("X does Z to Y"). The
+    /// subject is the agent, the object is the patient; the verb is
+    /// encoded in the `pattern` field of the fact.
+    /// Example: (бала, DoesTo, доп) from "бала допты тебеді".
+    DoesTo,
+    /// Subject is a member of domain (object). v3.5.0. Kazakh
+    /// construction: `X — Y саласы` ("X is a field of Y"),
+    /// `X Y ғылымына жатады` ("X belongs to Y science").
+    /// Example: (алгебра, InDomain, математика).
+    InDomain,
 }
 
 impl Predicate {
@@ -97,6 +123,11 @@ impl Predicate {
             Self::GoesTo => "goes_to",
             Self::PartOf => "part_of",
             Self::RelatedTo => "related_to",
+            Self::Causes => "causes",
+            Self::After => "after",
+            Self::HasQuantity => "has_quantity",
+            Self::DoesTo => "does_to",
+            Self::InDomain => "in_domain",
         }
     }
 }
@@ -188,10 +219,22 @@ pub fn extract_facts(
     source: &FactSource,
 ) -> Vec<Fact> {
     let mut out = Vec::new();
+    // v2.x baseline matchers.
     patterns::copula_is_a(text, parses, lexicon, source, &mut out);
     patterns::locative_lives_in(text, parses, lexicon, source, &mut out);
     patterns::possessive_has(text, parses, lexicon, source, &mut out);
     patterns::dative_goes_to(text, parses, lexicon, source, &mut out);
+    // v3.5.0 breadth expansion — 6 new matchers bring predicate
+    // coverage from 4 → 9 distinct predicates (adds Causes, After,
+    // HasQuantity, DoesTo, InDomain; `nominal_conjunction` extracts
+    // into RelatedTo — a second extraction path for the rule-derived
+    // predicate, grounded now in explicit syntactic co-predication).
+    patterns::copula_causes(text, parses, lexicon, source, &mut out);
+    patterns::temporal_after(text, parses, lexicon, source, &mut out);
+    patterns::quantity_count(text, parses, lexicon, source, &mut out);
+    patterns::agent_verb(text, parses, lexicon, source, &mut out);
+    patterns::nominal_conjunction(text, parses, lexicon, source, &mut out);
+    patterns::domain_membership(text, parses, lexicon, source, &mut out);
     out
 }
 
@@ -207,6 +250,12 @@ mod tests {
         assert_eq!(Predicate::GoesTo.as_str(), "goes_to");
         assert_eq!(Predicate::PartOf.as_str(), "part_of");
         assert_eq!(Predicate::RelatedTo.as_str(), "related_to");
+        // v3.5.0 additions.
+        assert_eq!(Predicate::Causes.as_str(), "causes");
+        assert_eq!(Predicate::After.as_str(), "after");
+        assert_eq!(Predicate::HasQuantity.as_str(), "has_quantity");
+        assert_eq!(Predicate::DoesTo.as_str(), "does_to");
+        assert_eq!(Predicate::InDomain.as_str(), "in_domain");
     }
 
     #[test]

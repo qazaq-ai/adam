@@ -179,11 +179,14 @@ pub struct NormalizedMetrics {
 
 impl Eq for NormalizedMetrics {}
 
-/// Total number of [`adam_reasoning::Predicate`] variants the v3.3.0
+/// Total number of [`adam_reasoning::Predicate`] variants the v3.5.0
 /// codebase defines. Used as the denominator for
 /// [`NormalizedMetrics::predicate_coverage_pct`]. Update this when the
 /// `Predicate` enum grows.
-pub const TOTAL_PREDICATE_VARIANTS: usize = 6;
+///
+/// v3.5.0 grew this from 6 to 11 (+Causes, +After, +HasQuantity,
+/// +DoesTo, +InDomain).
+pub const TOTAL_PREDICATE_VARIANTS: usize = 11;
 
 impl NormalizedMetrics {
     /// Derive the normalized signals from a [`ScalingPoint`]'s raw

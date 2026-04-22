@@ -40,6 +40,17 @@
 //!   and informatics have more Russian-derived technical vocabulary).
 //! - Dedup by lowercase text across all books.
 //!
+//! ## v3.5.0 merge mode (`--merge-existing`)
+//!
+//! The pilot v3.3.0 pack covered 3 books; v3.5.0 adds 7 more but the
+//! source PDFs for the first 3 were deleted during the v3.3.0
+//! data/external/ cleanup (they're regenerable from external URLs if
+//! ever needed). To avoid losing the already-committed OCR work, the
+//! `--merge-existing <PATH>` flag reads the existing pack at PATH,
+//! seeds the output with its samples (and its dedup set), and appends
+//! the new book samples on top. Cross-book text dedup still applies —
+//! no fact duplicates from the merge.
+//!
 //! ## Why OCR'd PDFs and not the original `pdftotext`
 //!
 //! The source PDFs use custom-font glyph encoding: `pdftotext` silently
@@ -58,7 +69,7 @@ use std::{
     process::ExitCode,
 };
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 const DEFAULT_INPUT_DIR: &str = "/tmp/kazakh_textbooks_ocr";
 const DEFAULT_OUTPUT: &str = "data/curated/kazakh_textbooks_pack.json";
@@ -91,13 +102,21 @@ const KAZAKH_SPECIFIC: &[char] = &[
     'қ', 'ң', 'ғ', 'ө', 'ү', 'ұ', 'һ', 'і', 'ә', 'Қ', 'Ң', 'Ғ', 'Ө', 'Ү', 'Ұ', 'Һ', 'І', 'Ә',
 ];
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 struct Sample {
     id: String,
     pack_name: String,
     source_id: String,
     domain: String,
     text: String,
+}
+
+/// Shape of a previously-committed pack we merge on top of.
+/// We only read `samples`; the by-book counts are recomputed from
+/// the merged set so old + new stay consistent.
+#[derive(Debug, Deserialize)]
+struct ExistingPackFile {
+    samples: Vec<Sample>,
 }
 
 #[derive(Debug, Serialize)]
@@ -122,12 +141,25 @@ struct Pack {
 }
 
 fn main() -> ExitCode {
-    let input_dir = env::args()
-        .nth(1)
+    let raw_args: Vec<String> = env::args().collect();
+    // Positional args remain: [1] = input_dir, [2] = output_path.
+    let input_dir = raw_args
+        .get(1)
+        .filter(|s| !s.starts_with("--"))
+        .cloned()
         .unwrap_or_else(|| DEFAULT_INPUT_DIR.to_string());
-    let output_path = env::args()
-        .nth(2)
+    let output_path = raw_args
+        .get(2)
+        .filter(|s| !s.starts_with("--"))
+        .cloned()
         .unwrap_or_else(|| DEFAULT_OUTPUT.to_string());
+    let merge_existing = raw_args.iter().enumerate().find_map(|(i, a)| {
+        if a == "--merge-existing" {
+            raw_args.get(i + 1).cloned()
+        } else {
+            None
+        }
+    });
 
     let input_root = Path::new(&input_dir);
     if !input_root.exists() {
@@ -171,6 +203,37 @@ fn main() -> ExitCode {
     let mut skipped_low_kazakh = 0usize;
     let mut skipped_duplicate = 0usize;
     let mut skipped_loanword = 0usize;
+
+    // v3.5.0 — if --merge-existing given, seed samples + dedup set
+    // from a previously-committed pack. Per-book counts from the
+    // existing pack propagate; new books get counted as they're added.
+    if let Some(existing_path) = merge_existing.as_ref() {
+        let raw = match fs::read_to_string(existing_path) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("cannot read --merge-existing path {existing_path}: {e}");
+                return ExitCode::FAILURE;
+            }
+        };
+        let existing: ExistingPackFile = match serde_json::from_str(&raw) {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("cannot parse {existing_path}: {e}");
+                return ExitCode::FAILURE;
+            }
+        };
+        eprintln!(
+            "process_kazakh_textbooks: merging {} pre-existing samples from {existing_path}",
+            existing.samples.len(),
+        );
+        for s in existing.samples {
+            let key = s.text.to_lowercase();
+            if seen.insert(key) {
+                *samples_by_book.entry(s.source_id.clone()).or_insert(0) += 1;
+                samples.push(s);
+            }
+        }
+    }
 
     for (book_id, pages_dir) in &books {
         let mut page_files: Vec<PathBuf> = match fs::read_dir(pages_dir) {
