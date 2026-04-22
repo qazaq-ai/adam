@@ -220,12 +220,20 @@ pub fn locative_lives_in(
         .filter(|(s, _)| !s.is_empty())
         .collect();
 
-    // Require a form of the verb тұру somewhere in the sentence.
-    let has_turu_verb = tokens.iter().any(|(_, a)| match a {
-        Some(Analysis::Verb { root, .. }) => root.root == "тұру",
+    // v3.8.0 — FST stores verb stems WITHOUT the -у infinitive suffix
+    // (`тұрады` analyses as root `тұр`, not `тұру`). The pre-v3.8.0
+    // check `root == "тұру"` never fired, which is why `lives_in`
+    // produced 0 facts at every tier through v3.7.5. Fixed + widened
+    // to accept locative verbs beyond `тұр`: `мекен` ("dwelled-in"),
+    // `орналас` ("located"). These are all valid "X lives in Y" Kazakh
+    // constructions in textbook prose.
+    let has_locative_verb = tokens.iter().any(|(_, a)| match a {
+        Some(Analysis::Verb { root, .. }) => {
+            matches!(root.root.as_str(), "тұр" | "мекен" | "орналас")
+        }
         _ => false,
     });
-    if !has_turu_verb {
+    if !has_locative_verb {
         return;
     }
 
@@ -450,12 +458,18 @@ pub fn dative_goes_to(
         .filter(|(s, _)| !s.is_empty())
         .collect();
 
-    // Require a form of the verb бару in the sentence.
-    let has_baru = tokens.iter().any(|(_, a)| match a {
-        Some(Analysis::Verb { root, .. }) => root.root == "бару",
+    // v3.8.0 — fix the same `"бару" → "бар"` root-comparison bug
+    // as `locative_lives_in` (FST stores verb stems without the -у
+    // infinitive suffix). Pre-v3.8.0 `goes_to` produced 0 facts at
+    // every tier. Also widened to `кел` ("come") — "X Y-ге келді"
+    // ("X came to Y") is as valid a directional as "X Y-ке барды".
+    let has_motion_verb = tokens.iter().any(|(_, a)| match a {
+        Some(Analysis::Verb { root, .. }) => {
+            matches!(root.root.as_str(), "бар" | "кел")
+        }
         _ => false,
     });
-    if !has_baru {
+    if !has_motion_verb {
         return;
     }
 
@@ -849,10 +863,16 @@ pub fn agent_verb(
     if verb_voice == Some(Voice::Passive) {
         return;
     }
-    // Refuse stopword verbs: бар (existential), болу (copula),
-    // бару (direction — handled by dative_goes_to), еді (past
-    // copula).
-    if matches!(verb_root.as_str(), "бару" | "бар" | "болу" | "еді" | "еду") {
+    // Refuse stopword verbs. v3.8.0 — these are the raw FST stems
+    // (no -у infinitive suffix) — see the same fix in
+    // `locative_lives_in` / `dative_goes_to`. `бар` is existential
+    // ("there is"), `бол` is copula ("to be"), `бар` also direction
+    // motion verb handled by `dative_goes_to`, `кел` is direction
+    // motion ("come"), `еді` / `еду` are past copula forms.
+    if matches!(
+        verb_root.as_str(),
+        "бар" | "бол" | "кел" | "еді" | "еду" | "тұр" | "мекен" | "орналас"
+    ) {
         return;
     }
     let (acc_surface, acc_root) = match &tokens[acc_idx].1 {

@@ -7,6 +7,111 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.8.0] — 2026-04-22 — Critical verb-root bug fix: LivesIn + GoesTo activated (predicate coverage 7/11 → 9/11)
+
+**Unlocks two dormant predicates that have been silently broken since v2.1 (LivesIn) and v2.5 (GoesTo).** The root-comparison checks used the **infinitive forms** (`"тұру"` / `"бару"`) while the FST stores verb **stems** without the `-у` suffix (`"тұр"` / `"бар"`). Neither matcher has ever fired, at any scale, on any corpus. v3.8.0 fixes the comparisons and widens the verb set.
+
+### The bug
+
+```rust
+// pre-v3.8.0 — never matches:
+Some(Analysis::Verb { root, .. }) => root.root == "тұру",
+
+// v3.8.0:
+Some(Analysis::Verb { root, .. }) => matches!(root.root.as_str(),
+    "тұр" | "мекен" | "орналас"),
+```
+
+Verification via `cargo run -p adam-kernel-fst --bin adam_fst -- analyse тұрады`:
+
+```
+verb: тұр +Present
+```
+
+Lexicon root is `тұр`, not `тұру`. The pre-v3.8.0 code was looking for a root that could never exist.
+
+### Fact delta at T4_200k (committed runtime scale)
+
+| predicate | v3.7.5 | v3.8.0 | delta |
+|---|---:|---:|---|
+| `lives_in` | **0** | **572** | **+572 (first fire!)** |
+| `goes_to` | **0** | **1 864** | **+1 864 (first fire!)** |
+| `does_to` | 11 216 | 9 865 | -1 351 (stopword list finally effective) |
+| `is_a` | 162 | 162 | unchanged |
+| `has` | 190 | 190 | unchanged |
+| `has_quantity` | 19 | 19 | unchanged |
+| `part_of` | 25 | 25 | unchanged |
+| `after` | 278 | 278 | unchanged |
+| `related_to` | 1 455 | 1 455 | unchanged |
+| **Total** | **13 345** | **14 430** | **+1 085** |
+
+The `does_to` drop is a **concurrent precision fix**: the `agent_verb` stopword list was using the same infinitive forms (`"бару"`, `"болу"`, `"бару"`) so the stopword filter was also never effective. v3.8.0 aligns it to the real FST stems (`"бар"`, `"бол"`, `"кел"`, `"тұр"`, etc), correctly refusing those verbs as agent-patterns.
+
+### Predicate coverage (committed runtime)
+
+- **v3.7.5**: 7 / 11 — IsA, Has, PartOf, RelatedTo, After, HasQuantity, DoesTo
+- **v3.8.0**: **9 / 11** (+2) — adds **LivesIn, GoesTo**
+- Still at 0: Causes (v3.9 — literal `себебі` head is rare), InDomain (v3.9 — similarly rare head).
+
+### Sample new facts
+
+From `cargo run -p adam-dialog --bin adam_inspect -- қазақстан`:
+
+```
+outgoing: does_to=50, goes_to=8, is_a=2, lives_in=6, part_of=1, related_to=13
+incoming: does_to=11, goes_to=14, lives_in=3, related_to=10
+
+  `қазақстан` --lives_in--> `аумағын`  [pattern: X Y-да тұрады; wiki_kz_...]
+  `қазақстан` --lives_in--> `қала`     [pattern: X Y-да тұрады; wiki_kz_...]
+  `қазақстан` --goes_to--> `іс`         [pattern: X Y-ке барады; wiki_kz_...]
+```
+
+### Regenerated committed artifacts
+
+| artifact | v3.7.5 | v3.8.0 | delta |
+|---|---:|---:|---|
+| `facts.json` | 13 345 | **14 430** | +1 085 |
+| graph nodes | 2 974 | **3 091** | +117 |
+| graph edges | 11 813 | **12 772** | +959 |
+| `derived_facts.json` | 207 | **207** | unchanged |
+
+**Derivations unchanged at 207**: R1/R2/R3/R5 only consume IsA/Has/PartOf predicates. LivesIn/GoesTo enrich the graph but don't drive the existing rules. **v3.9+ can add R6** (`LivesIn + PartOf → LivesIn`, spatial-inheritance) or similar to turn the new predicates into derivations.
+
+### Most-connected nodes post-extraction
+
+- `жер` (degree 227) — earth/ground
+- `ел` (degree 211) — country/people
+- `қазақ` (degree 197) — Kazakh (ethnic/linguistic)
+
+All legitimate content nouns. No noise.
+
+### Tests
+
+**416 passing, 0 failing, 0 warnings** — existing `locative_rejects_without_turu_verb` + `dative_rejects_without_baru_verb` tests still pass because they construct synthetic negative cases. **Note: these tests did not catch the bug** — they tested that a sentence *without* the required verb is rejected, but never tested that a sentence *with* the verb produces a fact. Strengthening the positive-case tests is a follow-up.
+
+### Honest note
+
+This is a **2-year-old latent correctness bug**. The reasoning crate has been shipping with silently-broken LivesIn / GoesTo predicates since v2.1 / v2.5 respectively, across every release up to v3.7.5. Like the v3.2.0 parser-determinism bug and v3.3.0 stale-artifact issue, this is a case where **repeat extraction on a bigger corpus surfaced a structural flaw** that wasn't visible at small scale. The v3.7.0 `adam_inspect` binary would have flagged zero lives_in/goes_to edges for any probe — worth noting for future per-predicate sanity checks.
+
+### Banner sync per feedback_readme_pre_push_audit
+
+  - `adam_chat.rs`: v3.7.5 → v3.8
+  - `adam_demo.rs`: v3.7.5 → v3.8
+  - README hero, comparison table, demo transcript all bumped
+
+### Upgrade notes
+
+- Purely additive on artifact side: existing IDs preserved, new facts appended.
+- No library API change.
+- **Behavioral change for embedders**: matchers now produce `lives_in` / `goes_to` edges that didn't exist before. Downstream code that enumerated `Predicate` variants in a match arm with `_ => panic!()` or similar will now see those variants. In-tree code is already prepared (variants have been defined since v2.1 / v2.5; render arms shipped in v3.5.0).
+
+### What's next
+
+- **v3.8.5** — re-examine `agent_verb` false positives. With the stopword list now effective, the ~1 351 facts lost may reveal OTHER false-positive patterns now visible in the top-100.
+- **v3.9.0** — either (a) loosen `copula_causes` + `domain_membership` (push 9/11 → 11/11), or (b) add new rules R6/R7 (`LivesIn + PartOf → LivesIn`; `GoesTo + PartOf → GoesTo`) to turn the new predicates into derivations.
+
+---
+
 ## [3.7.5] — 2026-04-22 — `adam_demo` Part 4 — one derivation per rule (4-rule showcase)
 
 Small polish release (per `feedback_versioning_post_1_0`: `x.y.5` = small). Refreshes `adam_demo` Part 4 to demonstrate **all four active reasoning rules** in a single run — one representative derivation per `rule_id`, each with its own Kazakh-prose rendering carrying the «байланыс-» trust marker.

@@ -289,19 +289,28 @@ cargo run --release -p adam-dialog --bin adam_chat -- --no-retrieval
 
 ## Post-v3.0 directions
 
-### Shipped since v3.0 (v3.1 → v3.3, all additive)
+### Shipped since v3.0 (v3.1 → v3.8, all additive)
 
 - **v3.1.0** — iteration harness: `--time-budget`, `--progress-interval`, SIGINT → graceful commit, Rayon `par_iter` on extract hot loop (~3.5× speedup on M2 8-core).
 - **v3.2.0** — `adam-scaling` crate + `scaling_bench` binary: empirical `(corpus_size → facts → derivations → graph density → wall-clock)` curves with normalized metrics. **Parser determinism fix** (dual-storage Lexicon) — closes a 2-year latent `HashMap.values()` non-determinism in `parser::analyse`.
-- **v3.3.0** — Codex-review polish pass + `audit_precision` bin + **gold-corpus pilot** (3 secondary-school textbooks OCR'd via `tesseract-kaz`; `kazakh_textbooks_pack.json` with 8 421 samples / 108 913 raw words). All three reasoning rules (R1 / R2 / R5) now fire on real corpus at scale — T4_50k: 120 facts / 51 derivations.
+- **v3.3.0** — Codex-review polish pass + `audit_precision` bin + **gold-corpus pilot** (3 secondary-school textbooks OCR'd via `tesseract-kaz`).
+- **v3.4.0** — `mine_lexicon_gaps` binary: mines the committed corpus for high-frequency tokens no Lexicon root prefixes; auto-tags vowel harmony + final-sound class; writes `docs/lexicon_gap_candidates.md` for native-speaker review.
+- **v3.5.0** — 7 more textbooks OCR'd (total 10 books, 434 k raw words, 28 110 samples) + **+6 pattern matchers** (copula_causes, temporal_after, quantity_count, agent_verb, nominal_conjunction, domain_membership) bringing predicate count 6 → 11.
+- **v3.5.5** — `structural_part_of` matcher + **R3 rule activation** (`Has + PartOf → Has` mereological inheritance).
+- **v3.6.0** — first `--use-shards` full-scale run: 5 tiers on 54.27 M-word pool (9 packs + 27 shards); T5_1M hits 3 h budget with 67 806 facts extracted partial. **R3 first real fire at T4_200k** (2 derivations).
+- **v3.6.5** — committed runtime scaled to T4_200k equivalent (**13 345 facts, 207 derivations**); `adam_chat` / `adam_demo` now surface the 200× larger pool directly to the user.
+- **v3.7.0** — `adam_inspect` binary: interactive "what does adam know about `<root>`?" query over the committed pool, with full provenance per claim.
+- **v3.7.5** — `adam_demo` Part 4 refreshed to iterate one derivation per rule id (R1 / R2 / R3 / R5), showing all four cognitive operations in one demo run.
+- **v3.8.0** — **critical verb-root bug fix**: `locative_lives_in` / `dative_goes_to` compared the infinitive forms (`"тұру"` / `"бару"`) against FST-stored stems (`"тұр"` / `"бар"`); neither predicate had ever fired at any scale since v2.1 / v2.5. Fix unblocks **LivesIn (572 facts) + GoesTo (1 864 facts)** at T4_200k. Predicate coverage jumps **7/11 → 9/11**.
 
-### Committed but not yet shipped (v3.4+ targets)
+### Committed but not yet shipped (v3.9+ targets)
 
-- **More pattern matchers** — `Causes`, `Temporal`, `Quantity`, `AgentVerb`, `NominalConjunction`, `DomainMembership`. Goal: push `predicate_coverage_pct` from 33 % (today) toward 67–100 %.
-- **R3 activation** — pattern coverage for `PartOf` densifies the graph enough for `Has + PartOf → Has` inheritance to fire.
-- **R4 activation** — diagnostic surface for `IsA` symmetry (curator review).
-- **Promote T4-scale facts into runtime** — gated on native-speaker precision audit of `docs/precision_audit.md`. Once audited, `adam_chat` / `adam_demo` will cite the 120-fact / 51-derivation pool instead of the 17-fact committed snapshot.
-- **OCR the remaining 7 textbooks** — Biology 8, Algebra 7, Physics 11 × 2, Informatics 11 × 2, KazLit 11. Expected ~300k more natural-Kazakh words.
+- **R6 / R7 rules** — `LivesIn + PartOf → LivesIn`, `GoesTo + PartOf → GoesTo`. Turns the new (v3.8.0) predicate facts into derivations. With 572 LivesIn + 25 PartOf at T4, expect non-zero fire.
+- **Loosen `copula_causes` + `domain_membership`** — literal head-word patterns (`себебі`, `саласы`, `ғылымы`) are rare even at T4. Accept broader causal / domain constructions to push coverage **9/11 → 11/11**.
+- **R4 activation** — diagnostic surface for `IsA` symmetry (curator review; remains documented-only because its output is a curator warning, not a fact).
+- **Native-speaker precision audit** — 50-fact / 50-derivation sample in `docs/precision_audit.md` is primed; unblocks first Lexicon PR from v3.4.0 candidates.
+- **`occurrence_count` first-class field** — Codex #4 follow-up: capture the T5 duplicate signal (25.7 % at 1 M samples) as a per-fact weight rather than de-duplicating on extraction.
+- **`--persist-tier` on `scaling_bench`** — write per-tier facts / derived artefacts so `adam_chat --facts-tier T5_1M` can expose the biggest pool interactively.
 - **Option C composition** — pre-compute `(pattern, slot_types)` at index-build time; enables swap types beyond city.
 - **Kazakh technical corpus** — Rust Book translation as new source pack.
 - **Diversity** — allow consecutive turns for the same query to cite different top-k samples / derivations; current top-1 is deterministic by design.

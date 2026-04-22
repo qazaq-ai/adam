@@ -1,12 +1,12 @@
 {
-  "version": "3.6.5",
+  "version": "3.8.0",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
   "iterations_completed": 4,
   "counts": {
-    "initial_facts": 13345,
+    "initial_facts": 14430,
     "derived_facts": 207,
     "by_rule": {
       "R1_is_a_transitivity": 33,
