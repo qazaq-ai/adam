@@ -1501,6 +1501,35 @@ fn is_closed_class(root: &str) -> bool {
             | "ін"
             | "сын"
             | "сін"
+            // v4.0.6 — narrow attributive blocklist. `-лық / -лік / -и`
+            // derivational adjectives that the FST tags as bare nouns.
+            // These leak as subjects when the real NP head is elided
+            // (e.g. «Бірінші дүниежүзілік соғыстан кейін …» where
+            // `дүниежүзілік` gets picked instead of the real subject,
+            // which is implicit and the head `соғыс` is consumed as
+            // the ablative object). The v4.0.5 rightmost-subject fix
+            // handles multi-head cases; this blocklist handles the
+            // head-elided case.
+            //
+            // Spotted on v4.0.5 committed runtime as After-fact
+            // subjects (frequency in parens):
+            //
+            //   дүниежүзілік (41) / ұзақ (9) / әскери (6) / ядролық (3)
+            //   тропикалық (2) / жыныстық (2)
+            //
+            // Plus FST-fragment / truncated parses on same pass:
+            // `жарт` (from "жарты" = half), `арасындағ` (poss-loc
+            // fragment), adverb `тағы` (= "again / also") which the
+            // FST occasionally tags as a noun.
+            | "дүниежүзілік"
+            | "тропикалық"
+            | "ядролық"
+            | "әскери"
+            | "жыныстық"
+            | "ұзақ"
+            | "жарт"
+            | "арасындағ"
+            | "тағы"
     )
 }
 
@@ -2218,6 +2247,39 @@ mod tests {
         // Content nouns still pass.
         assert!(!is_closed_class("бала"));
         assert!(!is_closed_class("қазақстан"));
+    }
+
+    /// v4.0.6 regression: narrow attributive blocklist — `-лық/-лік/-и`
+    /// derivational adjectives that the FST tags as bare nouns. These
+    /// surfaced as `After`-fact subjects on the v4.0.5 runtime
+    /// (`дүниежүзілік` alone had 41 facts). Adding them to
+    /// `is_closed_class` blocks the head-elided attributive-as-subject
+    /// pattern that the v4.0.5 rightmost-subject fix could not catch.
+    #[test]
+    fn is_closed_class_covers_v4_0_6_attributives() {
+        // The -лық/-лік adjective cluster (ordered by frequency on v4.0.5
+        // After-fact subjects).
+        assert!(is_closed_class("дүниежүзілік"));
+        assert!(is_closed_class("ұзақ"));
+        assert!(is_closed_class("әскери"));
+        assert!(is_closed_class("ядролық"));
+        assert!(is_closed_class("тропикалық"));
+        assert!(is_closed_class("жыныстық"));
+        // FST-fragment / truncated roots.
+        assert!(is_closed_class("жарт"));
+        assert!(is_closed_class("арасындағ"));
+        // Adverb occasionally tagged as noun.
+        assert!(is_closed_class("тағы"));
+        // True compound nouns + legitimate subjects must still pass.
+        // Don't block `ұлт-азаттық` (national-liberation — real noun),
+        // `белгі` (sign), `сан` (number), `жұрт` (folk).
+        assert!(!is_closed_class("ұлт-азаттық"));
+        assert!(!is_closed_class("белгі"));
+        assert!(!is_closed_class("сан"));
+        assert!(!is_closed_class("жұрт"));
+        // Content nouns still pass through.
+        assert!(!is_closed_class("адам"));
+        assert!(!is_closed_class("мектеп"));
     }
 
     #[test]

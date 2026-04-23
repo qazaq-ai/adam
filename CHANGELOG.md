@@ -7,6 +7,91 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.6] — 2026-04-23 — Narrow attributive blocklist in `is_closed_class`
+
+Continuing the noise-elimination axis from v4.0.5. That patch shipped the **rightmost-subject** fix in `temporal_after`; spot-check then surfaced a distinct noise class the rightmost scan couldn't catch: attributive `-лық / -лік / -и` adjective-derivations that the FST tags as bare nouns. When the real NP head got consumed in the ablative slot, the attributive modifier was the *only* remaining nominative candidate before the postposition — so both left-to-right and right-to-left scans picked it.
+
+### Fix
+
+Narrow blocklist added directly to `is_closed_class`. Nine roots, each spotted on the committed v4.0.5 runtime:
+
+| root | gloss | v4.0.5 After-fact count |
+|---|---|---:|
+| `дүниежүзілік` | worldwide | 41 |
+| `ұзақ` | long (duration) | 9 |
+| `әскери` | military | 6 |
+| `ядролық` | nuclear | 3 |
+| `тропикалық` | tropical | 2 |
+| `жыныстық` | sexual / gender | 2 |
+| `жарт` | truncated stem of «жарты» (half) | 3 |
+| `арасындағ` | possessive-locative fragment | 4 |
+| `тағы` | "again / also" (adverb tagged as noun) | 3 |
+
+Applies globally via `is_closed_class`, not just to `temporal_after`. Every pattern matcher that consults the helper (all 11) now rejects these as subjects *and* as head-noun objects in the few places where head-nouns are scanned.
+
+### Important non-inclusions
+
+Three roots deliberately **excluded** from the blocklist:
+
+- `ұлт-азаттық` (national-liberation) — real compound noun; legitimate subject in some world_core / IsA contexts.
+- `белгі` (sign), `сан` (number), `жұрт` (folk) — all legitimate nouns.
+
+The regression test `is_closed_class_covers_v4_0_6_attributives` asserts both: the 9 blocked roots fail, and the 4 legitimate-noun roots pass through.
+
+### Measured effect
+
+Re-ran extract + reasoner pipeline on the committed 200 k-sample runtime. All 9 attributive / fragment roots verified absent from `facts.json` as subjects (spot-checked per root: 0 occurrences each).
+
+| | v4.0.5 | v4.0.6 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 887 | **13 703** | **−184** |
+| After facts | 269 | **219** | **−50** (primary target — attributive adjectives) |
+| DoesTo facts | 9 289 | 9 192 | **−97** (cross-matcher cleanup) |
+| GoesTo facts | 1 617 | 1 595 | **−22** |
+| LivesIn facts | 292 | 289 | −3 |
+| RelatedTo facts | 1 467 | 1 458 | −9 |
+| IsA facts | 525 | 524 | −1 |
+| PartOf facts | 116 | 115 | −1 |
+| Has facts | 226 | 225 | −1 |
+| HasQuantity / InDomain / Causes | 40 / 24 / 22 | 40 / 24 / 22 | unchanged |
+
+The blocklist applies globally via `is_closed_class`, so gains span every matcher that consults the helper — not just `temporal_after`. The DoesTo `−97` and GoesTo `−22` drops are the attributive-as-agent cases that the Codex review didn't surface on the After side: e.g. «дүниежүзілік үрдіс X-ні тудырады» → pre-v4.0.6 extracted as `(дүниежүзілік, DoesTo, X)`.
+
+Per-rule derivation deltas:
+
+| rule | v4.0.5 | v4.0.6 | delta |
+|---|---:|---:|---|
+| R1_is_a_transitivity | 361 | 361 | 0 |
+| R2_has_inheritance | 422 | 417 | −5 |
+| R3_has_inheritance_via_part_of | 26 | 26 | 0 |
+| R5_shared_is_a_target | 5 437 | 5 437 | 0 |
+| R6_lives_in_via_part_of | 36 | 36 | 0 |
+| R7_goes_to_via_part_of | 297 | 300 | +3 |
+| R8_after_transitivity | 714 | 734 | +20 |
+| **total derivations** | **7 293** | **7 311** | **+18** |
+
+Small R7 and R8 *increases* are structural: with fewer attributive-subjected base facts, the reasoner's `seen_triples` dedup set is smaller, so a few chains that were previously short-circuited now fire freely. The new derivations use clean content-noun subjects where the noisy attributive ones were blocked.
+
+Graph: 3 287 → **3 284** nodes (−3), 12 439 → **12 308** edges (−131). Most-connected content nouns: **адам (288), жер (218), дүние (207), қазақ (201), жыл (151)**.
+
+### Tests
+
+**463 passing** (+1 from v4.0.5): `is_closed_class_covers_v4_0_6_attributives`.
+
+### Scope discipline
+
+One helper, nine new entries, one regression test. No rule changes, no world_core changes, no extractor-logic changes. Sequential 1→9 cadence preserved (v4.0.5 → v4.0.6 → v4.0.7).
+
+### What's next (v4.0.7)
+
+Axes continue to rotate per `project_v4_direction`:
+- **World Core** expansion in an existing / new domain
+- **New reasoning rule** R9 candidate
+- More **noise elimination** if new classes surface
+- **Corpus** — long-horizon FST-synthetic data generation
+
+---
+
 ## [4.0.5] — 2026-04-23 — Noise elimination in `temporal_after` subject selector
 
 Continuing the v4.0.x curriculum — one axis per patch, this one is **noise elimination**. Rotating axes keep new rule leverage (v4.0.4 R8) from compounding existing matcher precision gaps.
