@@ -21,9 +21,12 @@
   <img src="https://img.shields.io/badge/intents-26-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/surface-Kazakh--only-9CCC65?style=flat-square" alt="Kazakh only">
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
-  <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204%20M%20committed-FBC02D?style=flat-square" alt="corpus">
+  <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-416%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-440%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/reasoning%20rules-6%20active-2EA44F?style=flat-square" alt="reasoning rules">
+  <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
+  <img src="https://img.shields.io/badge/world%20core-200%20curated%20/%20270%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20by%20design-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
 
