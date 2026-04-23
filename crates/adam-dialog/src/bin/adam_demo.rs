@@ -202,6 +202,17 @@ fn run_synthetic_swap_demo(lex: &LexiconV1, repo: &TemplateRepository) {
 /// The «байланыс-» marker in the response tells the user (or a
 /// reviewer) that this sentence was **reasoned**, not retrieved.
 fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
+    // v4.0.2 — check for --all-derivations flag (dev mode): shows every
+    // rule-derived fact regardless of source-chain provenance. The
+    // **default** is now investor-safe: only derivations whose full
+    // `source_chain` sits inside `data/world_core/*.jsonl` are eligible
+    // for the per-rule preview. Codex v4.0.0 review flagged
+    // `абай is_a халық`, `еңбек — өзен`, `топырақ goes_to дене` as
+    // public-demo-unsafe — each was a legitimate R1/R7 chain, but the
+    // source_chain mixed in text-extracted facts with lower semantic
+    // integrity. Curated-chain filtering retires those without touching
+    // extraction.
+    let all_derivations = std::env::args().any(|a| a == "--all-derivations");
     let Some((extracted, derived)) = load_reasoning_artefacts() else {
         println!("(reasoning artefacts not found — skipping Part 4.)");
         println!("Run `cargo run -p adam-reasoning --bin extract_facts`");
@@ -213,6 +224,23 @@ fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
     println!("Loaded reasoning artefacts:");
     println!("  extracted facts:      {}", extracted.len());
     println!("  rule-derived facts:   {}", derived.len());
+    let curated_count = derived
+        .iter()
+        .filter(|d| derivation_is_fully_curated(d))
+        .count();
+    println!(
+        "  fully-curated chains: {}  ({:.1}%)",
+        curated_count,
+        (curated_count as f64 / derived.len().max(1) as f64) * 100.0,
+    );
+    println!(
+        "  demo-mode:            {}",
+        if all_derivations {
+            "--all-derivations (dev)"
+        } else {
+            "curated-only (investor-safe default)"
+        }
+    );
     println!();
 
     if derived.is_empty() {
@@ -266,6 +294,14 @@ fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
             // subject — `inject_reasoning_chain`'s subject-first lookup
             // would pick THAT one, not us. Skip to keep the demo preview
             // aligned with the actual rendered response.
+            continue;
+        }
+        // v4.0.2 — investor-safe default: skip any derivation whose
+        // `source_chain` pulls from ANY text-extracted (non-world_core)
+        // pack. Closes Codex v4.0.0-flagged «абай is_a халық» /
+        // «еңбек — өзен» / «топырақ goes_to дене». Pass
+        // `--all-derivations` to bypass this filter for dev / audit.
+        if !all_derivations && !derivation_is_fully_curated(d) {
             continue;
         }
         per_rule.entry(d.rule_id.clone()).or_insert(d);
@@ -339,6 +375,19 @@ fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
 
 /// Helper: load both committed artefacts together. Missing either →
 /// return `None`; the caller prints a helpful message.
+/// v4.0.2 — classify a derivation by whether every source in its
+/// `source_chain` points to a `data/world_core/*.jsonl` pack (i.e.
+/// every supporting fact is human-reviewed). Used to gate the Part 4
+/// demo to investor-safe material by default. Empty chains are treated
+/// as NOT curated (they should never occur per the v2.4 invariant,
+/// but we fail closed).
+fn derivation_is_fully_curated(d: &adam_reasoning::reasoner::DerivedFact) -> bool {
+    !d.source_chain.is_empty()
+        && d.source_chain
+            .iter()
+            .all(|s| s.pack.starts_with("world_core/"))
+}
+
 fn load_reasoning_artefacts() -> Option<(
     Vec<adam_reasoning::Fact>,
     Vec<adam_reasoning::reasoner::DerivedFact>,
@@ -392,6 +441,92 @@ fn load_retrieval_index() -> Option<MorphemeIndex> {
     let mut idx: MorphemeIndex = serde_json::from_str(&raw).ok()?;
     idx.refresh_stats();
     Some(idx)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::derivation_is_fully_curated;
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    fn mk_derived(rule: &str, chain: &[&str]) -> DerivedFact {
+        DerivedFact {
+            subject: SlotRef {
+                surface: "s".into(),
+                root: "s".into(),
+                pos: "noun".into(),
+            },
+            predicate: Predicate::IsA,
+            object: SlotRef {
+                surface: "o".into(),
+                root: "o".into(),
+                pos: "noun".into(),
+            },
+            rule_id: rule.into(),
+            source_chain: chain
+                .iter()
+                .map(|pack| FactSource {
+                    pack: pack.to_string(),
+                    sample_id: "id".into(),
+                })
+                .collect(),
+            confidence: ConfidenceKind::RuleInferred,
+        }
+    }
+
+    #[test]
+    fn curated_chain_is_accepted() {
+        // Both sources under world_core/ → fully curated.
+        let d = mk_derived(
+            "R1",
+            &[
+                "world_core/astronomy.jsonl",
+                "world_core/biology_basic.jsonl",
+            ],
+        );
+        assert!(derivation_is_fully_curated(&d));
+    }
+
+    #[test]
+    fn mixed_chain_is_rejected() {
+        // One text-pack source poisons the whole chain.
+        let d = mk_derived(
+            "R1",
+            &["world_core/astronomy.jsonl", "wikipedia_kz_pack.json"],
+        );
+        assert!(
+            !derivation_is_fully_curated(&d),
+            "any non-world_core source disqualifies the chain"
+        );
+    }
+
+    #[test]
+    fn text_only_chain_is_rejected() {
+        let d = mk_derived(
+            "R1",
+            &["wikipedia_kz_pack.json", "kazakh_textbooks_pack.json"],
+        );
+        assert!(!derivation_is_fully_curated(&d));
+    }
+
+    #[test]
+    fn empty_chain_fails_closed() {
+        // Defensive: empty source_chain means we can't verify; refuse.
+        let d = mk_derived("R1", &[]);
+        assert!(!derivation_is_fully_curated(&d));
+    }
+
+    #[test]
+    fn chain_with_world_core_prefix_only_is_rejected() {
+        // Guard against a non-world_core pack whose name starts with
+        // something longer — our `starts_with("world_core/")` must be
+        // exact-prefix with the slash, not a substring.
+        let d = mk_derived("R1", &["world_core_mirror/x.jsonl"]);
+        assert!(
+            !derivation_is_fully_curated(&d),
+            "prefix must include trailing slash"
+        );
+    }
 }
 
 fn turn_seed(turn: u64) -> u64 {

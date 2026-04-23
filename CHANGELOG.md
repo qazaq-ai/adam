@@ -7,6 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.2] — 2026-04-23 — Investor-safe demo mode: curated-source-chain filter in `adam_demo`
+
+Small, focused patch continuing the Codex v4.0.0 hand-off. Same design philosophy as v4.0.1: a surgical fix at the right layer, not a broad architecture change.
+
+### The problem
+
+Codex flagged three specific chains in `adam_demo` Part 4 as public-demo-unsafe:
+
+- `абай is_a халық`  — R1 transitivity via `wikipedia_kz_pack.json`
+- `еңбек — өзен`  — R1 transitivity chaining through metaphorical corpus text
+- `топырақ goes_to дене`  — R7 chain with cross-domain semantic collision
+
+Each was technically correct — FST-typed, fully `rule_id`-tagged, `source_chain` non-empty — but the **text-extracted** facts feeding the chains had weaker semantic integrity than the hand-reviewed World Core entries they competed with. An investor looking at the demo would read "adam: Abai is a people" and stop listening.
+
+### The fix
+
+A demo-layer filter, not an extract-layer filter (recall preserved for downstream consumers):
+
+- New helper [`derivation_is_fully_curated`](crates/adam-dialog/src/bin/adam_demo.rs): returns `true` iff **every** `FactSource` in the derivation's `source_chain` has a `pack` starting with `"world_core/"`. Empty chains fail closed.
+- `adam_demo` Part 4 per-rule-representative picker now requires this predicate by default.
+- `--all-derivations` dev flag bypasses the filter for audit / debugging.
+
+### Measured effect
+
+| | before | after | delta |
+|---|---:|---:|---|
+| Total derivations loaded | 6 579 | 6 579 | unchanged (filter is a view) |
+| **Fully-curated chains** | 4 753 | **4 753 (72.2 %)** | reported in Part 4 header |
+| Rules represented in Part 4 default | all 4 firing | 4 curated rules (R1, R2, R3, R5) | R6/R7 have ≥1 curated chain but subject-uniqueness guard filters in current artefact |
+| Codex-flagged bad chains | shown as R1/R7 examples | **eliminated** | all three had text-pack `source_chain` entries |
+
+Post-v4.0.2 Part 4 per-rule-representative output (real):
+
+```
+  [R1_is_a_transitivity]    түлкі --is_a--> жануар           (world_core/animals)
+  [R2_has_inheritance]      құс жолы --has--> жұлдыз        (world_core/astronomy)
+  [R3_has_inheritance_via_part_of]  қазақ --has--> бас      (world_core/colors + body_parts)
+  [R5_shared_is_a_target]   бөлу --related_to--> көбейту    (world_core/numbers)
+```
+
+The R5 sample — «division related to multiplication» via shared-math-operation IsA target — is an unusually clean investor pitch for math-driven reasoning. Every claim traceable to a named reviewer (`shaman` at this stage).
+
+### Tests
+
+**449 passing** (+5 from v4.0.1): 5 unit tests for the `derivation_is_fully_curated` helper covering curated / mixed / text-only / empty / prefix-boundary cases.
+
+### Scope discipline
+
+Part 4 `adam_demo` only. `adam_chat --safe` equivalent is deferred to v4.0.3 — keeping each patch single-concern.
+
+### What's next (v4.0.3)
+
+- Wire the same curated-only filter into `adam_chat` behind a `--safe` / `--curated-only` flag. Dialog's `inject_reasoning_chain` currently scans *all* derivations; the filter belongs there too for investor-safe chat mode.
+
+---
+
 ## [4.0.1] — 2026-04-23 — «Неліктен?» REPL path fix (Codex v4.0.0 review follow-up)
 
 Small, focused patch closing the bug Codex caught in the v4.0.0 audit:
