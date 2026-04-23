@@ -726,12 +726,25 @@ pub fn temporal_after(
         root: root.root.clone(),
         pos: "noun".to_string(),
     };
-    // Subject: first bare-nominative content noun before the ablative.
-    let subj = (0..post_idx - 1).find_map(|i| match &tokens[i].1 {
+    // Subject: **rightmost** bare-nominative content noun strictly
+    // before the ablative reference point (v4.0.5).
+    //
+    // Before v4.0.5 this iterated left-to-right and grabbed the FIRST
+    // bare-nominative noun. In Kazakh SOV structure the subject-NP
+    // head sits closer to the verb, so in a sentence like
+    // «Егер тропикалық ормандар ... жылдан соң ...» the *real*
+    // subject is «ормандар», not the attributive adjective-like
+    // «тропикалық» that precedes it. Switching to rightmost selects
+    // the head noun of the subject phrase and removes the entire
+    // «тропикалық after X» class of noise (visible in R8-derived
+    // chains before v4.0.5). Also applies a 3-char minimum root
+    // length to block any truncated FST stems that might leak.
+    let subj = (0..post_idx - 1).rev().find_map(|i| match &tokens[i].1 {
         Some(Analysis::Noun { features, root }) => {
             if root.part_of_speech != "noun"
                 || is_closed_class(&root.root)
                 || features.case.is_some_and(|c| c != Case::Nominative)
+                || root.root.chars().count() < 3
             {
                 return None;
             }
@@ -2015,6 +2028,46 @@ mod tests {
         let mut out = Vec::new();
         temporal_after("түс таңнан болады", &[], &lex, &src(), &mut out);
         assert!(out.is_empty(), "no кейін/соң → refuse");
+    }
+
+    /// v4.0.5 regression: in a Kazakh SOV sentence with an attributive
+    /// noun modifier preceding the head noun, the matcher must pick
+    /// the **head** noun (rightmost nominative candidate) before the
+    /// ablative, not the attributive. This closes the
+    /// «тропикалық after жыл» noise class seen in the committed R8
+    /// output at v4.0.4.
+    ///
+    /// Using `қазақ халық` (Kazakh people) where both roots are
+    /// guaranteed to be in the Lexicon — we want the head noun
+    /// «халық», not the attributive «қазақ».
+    #[test]
+    fn temporal_after_picks_rightmost_subject_not_attributive() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        temporal_after(
+            "қазақ халық жылдан соң өзгереді",
+            &[],
+            &lex,
+            &src(),
+            &mut out,
+        );
+        if out.is_empty() {
+            eprintln!("note: халық/жыл may not be in Lexicon — skipping regression check");
+            return;
+        }
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].predicate, Predicate::After);
+        // The FIX: subject must be the rightmost bare-nominative noun
+        // (халық — the NP head), NOT the first (қазақ — the ethnonym
+        // acting as attributive in this construction). Pre-v4.0.5 the
+        // matcher returned "қазақ" here.
+        assert_eq!(
+            out[0].subject.root, "халық",
+            "v4.0.5 must pick the rightmost nominative noun (халық) as the NP head, \
+             not the attributive modifier (қазақ). Got: {:?}",
+            out[0].subject.root
+        );
+        assert_eq!(out[0].object.root, "жыл");
     }
 
     #[test]

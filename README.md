@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.4-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.5-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-461%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-462%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/reasoning%20rules-6%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
   <img src="https://img.shields.io/badge/world%20core-507%20curated%20/%20601%20facts-9CCC65?style=flat-square" alt="world core">
@@ -69,15 +69,15 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
 | **World Core (v4.0)** | **507 entries / 601 curated facts** across 13 domains: astronomy (30 / 41), time (20 / 38), geography_kz (30 / 47), biology_basic (40 / 41), body_parts (40 / 55), society (40 / 48), **colors (37 / 38)**, **numbers (45 / 54)**, **kz_literature (60 / 69)**, **food (50 / 50)**, **clothing (35 / 35)**, **proverbs (40 / 43)**, **animals (40 / 42)** — bolded are new in v4.0. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **461 passing, 0 failing, 0 warnings** |
+| Workspace tests | **462 passing, 0 failing, 0 warnings** |
 | Pattern matchers | **11** — v2.x baseline (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
 | **Reasoning rules active** | **7 of 8 firing on v4.0 corpus** — R1 IsA-transitivity (**361**), R2 Has-inheritance (**422**), R3 Has-via-PartOf (**26**), R5 shared-IsA → RelatedTo (**5 437**), R6 LivesIn-via-PartOf (**36**), R7 GoesTo-via-PartOf (**297**), **R8 After-transitivity (789, NEW in v4.0.4)**. R4 IsA-symmetry is curator-warning only. **R8 is mathematically clean** — `A After B ∧ B After C ⟹ A After C` over a strict partial order; closes temporal chains like «күз after жаз + қыс after күз ⟹ қыс after жаз». |
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | **Dialog closed-class sync** (v3.9.5) | `NOT_A_TOPIC` mirrors `adam_reasoning::patterns::is_closed_class` — closes the pre-v3.9.5 «Неліктен → Нелікте тұрасыз ба» misparse where the FST correctly analysed `Неліктен` as ablative of a noun stem but the dialog layer had no interrogative filter |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
-| Facts (committed runtime) | **13 889 total** = **13 288 extracted (Grammar)** + **601 curated (HumanApproved)**. T4_200k scale for the text-extracted portion |
-| **Rule-derived facts (committed runtime)** | **7 368** (v4.0.4: R1=361, R2=422, R3=26, R5=**5 437**, R6=36, R7=297, **R8=789**). Delta vs v4.0.3: **+789 (+12 %)** from R8 After-transitivity — curated time chains close to 6 (таң/түс/кеш/түн, көктем/жаз/күз/қыс); remainder inherits upstream After-extractor noise that `--safe` mode filters out |
-| Fact-graph nodes / edges | **3 286 / 12 447** (committed v4.0); most-connected content nouns: **адам (289), жер (219), дүние (211), қазақ (201), ат (150)** — `адам` (human) stays central |
+| Facts (committed runtime) | **13 887 total** = **13 286 extracted (Grammar)** + **601 curated (HumanApproved)**. T4_200k scale for the text-extracted portion |
+| **Rule-derived facts (committed runtime)** | **7 293** (v4.0.5: R1=361, R2=422, R3=26, R5=**5 437**, R6=36, R7=297, R8=**714**). Delta vs v4.0.4: **−75** from temporal_after rightmost-subject fix — tightens R8 base while preserving all 6 curated seasonal / daytime closures |
+| Fact-graph nodes / edges | **3 287 / 12 439** (committed v4.0.5); most-connected content nouns: **адам (290), жер (218), дүние (210), қазақ (200), жыл (151)** |
 | **Predicate coverage (v3.9.5)** | **11 / 11 = 100 %** — every declared predicate fires. Causes = 6, InDomain = 5 (v3.9.5 biology/anatomy/society entries extended the v3.9.0 foothold) |
 | Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |
 | Scaling bench (v3.3.0) | `adam-scaling::scaling_bench` + `audit_precision` — emits `data/scaling/scaling_report.json` + `docs/scaling_report.md` + `docs/precision_audit.md`. Budget-aware `run_tier_with_budget` (chunked at 128 samples, SIGINT / `--time-budget` stops within ~1 s). Normalized metrics per tier: `facts_per_10k_words`, `derivations_per_fact`, `predicate_coverage_pct`, `duplicate_fact_rate_pct`. **Measured scaling on 4.32 M-word committed pool (textbooks + wiki + Abai)**: T3_10k (19 facts, 0 deriv) → T4_50k (120 facts, 51 deriv) — reasoning activates once graph density crosses threshold. |
@@ -199,7 +199,7 @@ The opposite of a scripted demo — the investor types any Kazakh root they care
 
 ```
 $ cargo run --release -p adam-dialog --bin adam_inspect -- жер
-adam_inspect — committed runtime: 13 889 facts, 6 579 derivations, 3 286 nodes, 12 447 edges
+adam_inspect — committed runtime: 13 887 facts, 7 293 derivations, 3 287 nodes, 12 439 edges
 
 # Graph position for `жер`
   out-degree: 83   in-degree: 138   total: 221
@@ -413,7 +413,7 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | Pattern matchers | **11** — v2.x (4) + v3.5.0 (6) + **v3.5.5 structural_part_of** (X Y-нің бөлігі / X Y-нің құрамында) |
 | Reasoning rules active | **4** — R1 IsA-transitivity, R2 Has-inheritance, **R3 Has-inheritance via PartOf (v3.5.5)**, R5 shared-IsA → RelatedTo |
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
-| Extracted / curated / derived facts (committed runtime) | **13 288 extracted + 601 curated (world_core) / 6 579 derived** (v4.0: 507 curated entries across 13 domains. Reasoning leverage ×3.2 vs v3.9.5 — R5 shared-IsA alone jumps 933 → 5 437 from dense IsA base. R6/R7 astronomical-target guards blocked 410 false chains as precision win. T4_200k text-extraction scale via `extract_facts --bench-order --max-total 200000`) |
+| Extracted / curated / derived facts (committed runtime) | **13 286 extracted + 601 curated (world_core) / 7 293 derived** (v4.0.5: 507 curated entries across 13 domains. 8 rules in the reasoner, 7 firing (R1/R2/R3/R5/R6/R7/R8). R5 shared-IsA = 5 437; R8 after-transitivity = 714. T4_200k text-extraction scale via `extract_facts --bench-order --max-total 200000`) |
 | Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
 | Workspace tests | **416 passing**, 0 failing, 0 warnings |
 | Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential; 20 M-word full-corpus run fits in the 3 h iteration budget |

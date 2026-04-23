@@ -7,6 +7,79 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.5] — 2026-04-23 — Noise elimination in `temporal_after` subject selector
+
+Continuing the v4.0.x curriculum — one axis per patch, this one is **noise elimination**. Rotating axes keep new rule leverage (v4.0.4 R8) from compounding existing matcher precision gaps.
+
+### Root cause
+
+v4.0.4 spot-check showed R8 producing derivations like `(тропикалық, After, айып)` — the chain was mathematically sound but inherited a noisy base fact `(тропикалық, After, жыл)` from `temporal_after`. Source: «Егер **тропикалық** ормандар осындай қарқынмен жойыла берсе, 80-40 **жылдан** соң жер бетінде мұндай ормандар қалмайды». The matcher scanned left-to-right and grabbed the first bare-nominative noun (`тропикалық`, an attributive modifier) as the subject, when Kazakh SOV structure places the NP head (`ормандар`) closer to the verb.
+
+### Fix
+
+Two tiny guards in `temporal_after`:
+
+1. **Rightmost subject, not leftmost** (`(0..post_idx-1).rev().find_map(...)` instead of `(0..post_idx-1).find_map(...)`). In Kazakh SOV the subject-NP head sits closer to the ablative / verb, so the rightmost bare-nominative candidate before the postposition is the real subject.
+2. **3-char minimum root length** (mirrors the guards already present in `locative_lives_in` and `dative_goes_to`). Blocks any truncated FST stems that might leak through.
+
+### Measured effect
+
+Re-ran extract + reasoner pipeline on the same committed 200 k-sample runtime:
+
+| | v4.0.4 | v4.0.5 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 889 | **13 887** | −2 |
+| After facts | 269 | 269 | 0 (net) |
+| R8_after_transitivity | 789 | **714** | **−75 (−9.5 %)** |
+| total derivations | 7 368 | **7 293** | **−75** |
+| graph nodes | 3 286 | 3 287 | +1 |
+| graph edges | 12 447 | 12 439 | −8 |
+
+The rightmost-subject fix correctly narrowed the `(тропикалық, After, *)` class (from 2 → 1 base facts, with R8 transitive multiplication eliminated). Most of the 75 blocked R8 derivations came from that transitive multiplication.
+
+### Honest observation — adjacent noise class identified
+
+The spot-check surfaced a **different** noise class still active at v4.0.5: attributive `-лық / -лік / -и` adjective-derivations that the FST tags as nouns. Top offender: **«дүниежүзілік»** (worldwide) — 41 `After` facts in the committed runtime, typically from patterns like «Бірінші дүниежүзілік соғыстан кейін...» where the REAL subject is elided (implicit event) and the grab-the-attributive heuristic still wins even with rightmost-scan because the head noun (`соғыс`) sits in the ablative slot, consumed as the object.
+
+Also seen: `ядролық` (nuclear, ×3), `әскери` (military, ×6), `ұлт-азаттық` (national-liberation, ×3), `жыныстық` (sexual / gender, ×2), `ұзақ` (long, ×9).
+
+Fixing this requires a different tool: a narrow **attributive blocklist** for known -лық/-и adjective-acting roots. Queued for the next noise-elimination patch to keep v4.0.5 single-concern per the cadence rule.
+
+### Curated temporal chains preserved
+
+The 6 clean seasonal / daytime R8 closures from v4.0.4 are invariant under the rightmost-scan change — they pass through a single-subject-candidate path where left-to-right and right-to-left identify the same token:
+
+| subject | After | object |
+|---|---|---|
+| күз | After | көктем |
+| қыс | After | жаз |
+| қыс | After | көктем |
+| түн | After | түс |
+| түн | After | таң |
+| кеш | After | таң |
+
+### Tests
+
+**462 passing** (+1 from v4.0.4): new `temporal_after_picks_rightmost_subject_not_attributive` uses `қазақ халық жылдан соң өзгереді` to verify that:
+- The matcher picks `халық` (head of the NP), not `қазақ` (attributive).
+- Object stays `жыл` (ablative reference point).
+
+Existing `temporal_after_extracts_noon_after_morning` continues to pass — the single-subject-candidate case is invariant under direction change.
+
+### Scope discipline
+
+One concern per patch. Only `temporal_after` subject selector touched, no rule changes, no world_core changes. Sequential 1→9 cadence preserved (v4.0.4 → v4.0.5 → v4.0.6).
+
+### What's next
+
+Axes continue to rotate:
+- **noise elimination**: narrow attributive-adjectival blocklist (`дүниежүзілік`, `ядролық`, `әскери`, `ұлт-азаттық`, `жыныстық`, `ұзақ`) — would knock out ~58 base After facts + their transitive R8 multiplications. Targeted v4.0.6.
+- **reasoning rules**: R9 candidate ideas — After anti-symmetry curator warning (R4-style), or Causes-transitivity with type guards.
+- **world_core / Lexicon**: gap `орман` (forest) surfaced by this patch's test authoring — new entries for nature domain.
+- **corpus**: FST-synthetic clean data generation remains the long-horizon axis.
+
+---
+
 ## [4.0.4] — 2026-04-23 — R8 After-transitivity rule (new reasoning rule)
 
 One concern per patch — this one adds a new rule to the forward-chaining reasoner: **`R8_after_transitivity`**.
