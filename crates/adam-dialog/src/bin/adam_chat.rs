@@ -1,8 +1,8 @@
-//! `adam-chat` — interactive REPL for the adam v3.9.5 Kazakh dialog pipeline.
+//! `adam-chat` — interactive REPL for the adam v4.0 Kazakh dialog pipeline.
 //!
 //! **Kazakh-only surface** (v1.1.0 revert). Input and output are both Kazakh.
 //!
-//! Capabilities at v3.9.5:
+//! Capabilities at v4.0:
 //!
 //!   - **26 intents** — 25 conversational + Insult for polite non-engagement.
 //!   - **Multi-turn session state** (`Conversation`): `name`, `age`, `city`,
@@ -156,7 +156,7 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!("adam-chat v3.9.5 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
+    eprintln!("adam-chat v4.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut turn = 0u64;

@@ -97,22 +97,37 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v3.9.5)
+## Current scale (v4.0.0)
 
 - `astronomy.jsonl` — 30 entries / 41 facts
 - `time.jsonl` — 20 entries / 38 facts
 - `geography_kz.jsonl` — 30 entries / 47 facts
-- `biology_basic.jsonl` — 40 entries / 41 facts  *(new in v3.9.5)*
-- `body_parts.jsonl` — 40 entries / 55 facts  *(new in v3.9.5)*
-- `society.jsonl` — 40 entries / 48 facts  *(new in v3.9.5)*
-- **Total: 200 entries / 270 facts**, all `approved` at `high` or
-  `medium` confidence by `shaman`.
+- `biology_basic.jsonl` — 40 entries / 41 facts
+- `body_parts.jsonl` — 40 entries / 55 facts
+- `society.jsonl` — 40 entries / 48 facts
+- `colors.jsonl` — 37 entries / 38 facts  *(new in v4.0)*
+- `numbers.jsonl` — 45 entries / 54 facts  *(new in v4.0)*
+- `kz_literature.jsonl` — 60 entries / 69 facts  *(new in v4.0)*
+- `food.jsonl` — 50 entries / 50 facts  *(new in v4.0)*
+- `clothing.jsonl` — 35 entries / 35 facts  *(new in v4.0)*
+- `proverbs.jsonl` — 40 entries / 43 facts  *(new in v4.0)*
+- `animals.jsonl` — 40 entries / 42 facts  *(new in v4.0)*
+- **Total: 507 entries / 601 facts across 13 domains**, all `approved`
+  at `high` or `medium` confidence by `shaman`.
 
 ## Roadmap
 
-- **v4.0.0** — 500–1 000 entries across 10+ domains; full scripted
-  investor demo; `validate_world_core` integrated into CI; community
-  contribution workflow for native-speaker review.
-- **v4.x** — native-speaker review tool (web UI); every entry gets at
-  least two reviewers before promoting to `approved`.
-- **v5.x** — target 5 000+ entries, 20+ domains.
+- **v4.0.0** (shipped) — **507 entries / 601 facts** across 13 domains,
+  including 7 new domains (colors, numbers, kz_literature, food,
+  clothing, proverbs, animals). Contradiction filter (R6/R7 refuse
+  astronomical-scale derived targets) and object-side 3-char minimum
+  close the Codex-flagged v3.9.5 noise (`бала lives_in күн жүйесі`,
+  `бала lives_in ған`, `(егер, DoesTo, X)`, `(жалға, GoesTo, жер)`).
+- **v4.x** — `validate_world_core` integrated into
+  `scripts/validate_foundation.sh` as a CI gate. Native-speaker
+  review tool (web UI); every entry gets at least two reviewers
+  before promoting to `approved`.
+- **v5.x** — target 1 500+ entries, 20+ domains, typed ontology
+  layer (Codex's «Typed World Model» recommendation — every root
+  gets an EntityType, rules become type-constrained, Fact Promotion
+  Pipeline with `Candidate` → `Verified` → `HumanApproved` tiers).

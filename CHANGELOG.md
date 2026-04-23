@@ -7,6 +7,100 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.0] — 2026-04-23 — World Core 500+ expansion + contradiction immune system + Codex-review response
+
+**Major release.** Codex's v3.9.5 review correctly flagged that reasoning was scaling faster than precision — «бала lives_in күн жүйесі», «(егер, DoesTo, газ)», «(жалға, GoesTo, жер)», «еңбек — өзен» were real chains in `facts.json`, not hypothetical. v4.0.0 addresses both ends of the problem: (1) **expand curated knowledge** to outweigh extracted noise via sheer IsA density, and (2) **add a contradiction immune system** that categorically refuses the classes of false derivations Codex exhibited.
+
+### 1. World Core expansion — 200 → 507 entries / 270 → 601 facts
+
+Seven new domains authored by `shaman` at `approved` status:
+
+| new domain | entries | facts | content |
+|---|---:|---:|---|
+| `colors.jsonl` | 37 | 38 | primary colors, Kazakh traditional (алтын / күміс / көксоңы / боз / құла), nature-color associations, kemperqosaq (rainbow), vision-domain |
+| `numbers.jsonl` | 45 | 54 | digits 1–10, tens 20–90, 100 / 1000 / million / billion, basic operations (қосу, алу, көбейту, бөлу), even/odd, time units |
+| `kz_literature.jsonl` | 60 | 69 | 18 authors (Абай, Махамбет, Жамбыл, Мағжан, Шәкәрім, Ыбырай, Мұхтар, Олжас, Мұқағали, …), 7 works (Қара сөздер, Абай жолы, Қобыланды, Қыз Жібек, Алпамыс, Қозы Көрпеш, …), 12 genres (өлең, поэма, роман, әңгіме, ертегі, дастан, жыр, …), structure (шумақ, тармақ, ұйқас, поэзия, проза) |
+| `food.jsonl` | 50 | 50 | bread (нан, бауырсақ, шелпек), meat (қой/сиыр/жылқы/түйе еті), Kazakh traditional dishes (бешбармақ, куырдак, сорпа), dairy (сүт, қымыз, шұбат, айран, қаймақ, ірімшік, құрт, сары май), fruits, vegetables, grains, beverages |
+| `clothing.jsonl` | 35 | 35 | general (көйлек, шалбар, тон, ішік), Kazakh traditional (шапан, камзол, сәукеле, кимешек), headwear (тақия, қалпақ, бөрік, орамал), footwear (мәсі, кебіс, етік, бәтеңке), fabrics, jewellery |
+| `proverbs.jsonl` | 40 | 43 | curated mақал with embedded IsA / Causes / RelatedTo facts — «Еңбек түбі — береке», «Білім — қуат», «Тіл — ұлт белгісі», «Бірлік — байлық», «Ана — баланың алғашқы ұстазы» |
+| `animals.jsonl` | 40 | 42 | predators (қасқыр, түлкі, арыстан, жолбарыс, аю), game (қоян, тиін, бұғы, киік, арқар), birds (бүркіт, тырна, аққу, үкі, тауық, қаз, үйрек, торғай, қарға, сауысқан), domestic (сиыр, қой, жылқы, түйе, ит, мысық), insects, taxonomy (сүтқоректі, жыртқыш, жәндік, зоология, орнитология) |
+
+Plus existing 6 domains carried forward. **Total: 507 entries / 601 facts across 13 domains.** All 0-rejection on `validate_world_core`.
+
+### 2. Contradiction immune system
+
+Codex's v3.9.5 review surfaced specific false chains in `facts.json`. Each fix is targeted and test-enforced:
+
+- **R6/R7 astronomical-target guard** (new in reasoner.rs): `is_astronomical_object` helper (күн / ай / жер / марс / шолпан / меркурий / юпитер / сатурн / уран / нептун / күн жүйесі / галактика / құс жолы / ғаламшар / жұлдыз / аспан денесі / метеор / атмосфера / орбита). R6 and R7 now refuse derivations where the target `C` is astronomical-scale. Closes `(бала, LivesIn, жер) + (жер, PartOf, күн жүйесі) ⟹ (бала, LivesIn, күн жүйесі)` — the homonymous «жер» (both "ground" and "Earth") cross-domain leak.
+- **Object-side 3-char minimum** (locative_lives_in, dative_goes_to): mirrors the subject-side guard from v3.8.5. Closes `(бала, LivesIn, ған)` where the FST emitted a `-ған` participle tail as a standalone root, and analogous `-ын / -ін / -қан / -сын` fragments.
+- **`is_closed_class` expansion** (patterns.rs, 20+ new entries):
+  - conjunctions: `егер` / `алайда` / `бірақ` / `дегенмен` / `сондықтан` / `демек` / `яғни` / `әйтсе` / `өйткені` / `сонда` / `сонымен` — closes `(егер, DoesTo, газ)` ("if" as subject);
+  - adverbial oblique stems: `жалға` / `тек` / `қана` / `ғана` — closes `(жалға, GoesTo, жер)`;
+  - fragment-suffix standalones: `ған` / `ген` / `қан` / `кен` / `ын` / `ін` / `сын` / `сін` — defence in depth alongside the 3-char minimum above.
+
+Three new regression tests: `r6_refuses_astronomical_derived_target`, `r6_still_fires_for_country_target`, `r7_refuses_astronomical_derived_target`. The "still fires for country" test is the key one — the guard must NOT block legitimate `(person, LivesIn, city) + (city, PartOf, country) ⟹ (person, LivesIn, country)` chains.
+
+### 3. Measured impact at T4_200k
+
+| | v3.9.5 | v4.0.0 | delta |
+|---|---:|---:|---|
+| facts.json (total) | 13 771 | **13 889** | **+118** |
+| curated (HumanApproved) | 270 | **601** | **+331** (×2.2) |
+| extracted (Grammar) | 13 501 | 13 288 | −213 (filter noise removal) |
+| graph nodes | 3 151 | **3 286** | **+135** |
+| graph edges | 12 317 | **12 447** | **+130** |
+| **derivations** | **2 058** | **6 579** | **+4 521 (×3.2)** |
+| predicate coverage | 11/11 | 11/11 | preserved |
+
+Per-predicate fact counts — World Core drives structural gains, filters trim noise:
+
+| predicate | v3.9.5 | v4.0.0 | delta | driver |
+|---|---:|---:|---:|---|
+| **IsA** | 294 | **525** | **+231** | world_core breadth (13 domains → many IsA) |
+| RelatedTo | 1 446 | 1 467 | +21 | |
+| **Has** | 207 | 226 | +19 | world_core body_parts/society |
+| **PartOf** | 105 | 116 | +11 | |
+| **HasQuantity** | 29 | 40 | +11 | numbers.jsonl (year has 12 months etc) |
+| **Causes** | 6 | **22** | **+16** | proverbs + biology entries |
+| **InDomain** | 5 | **24** | **+19** | kz_literature genres + sciences |
+| After | 269 | 265 | −4 | |
+| LivesIn | 313 | 292 | **−21** | 3-char object filter + fragment-suffix closed-class |
+| GoesTo | 1 692 | 1 617 | **−75** | same filters |
+| DoesTo | 9 399 | 9 295 | **−104** | same filters |
+
+Per-rule derivation counts — **R5 and R1 jump from denser IsA graph; R6/R7 shrink as astronomical-guard blocks false chains**:
+
+| rule | v3.9.5 | v4.0.0 | delta | reason |
+|---|---:|---:|---:|---|
+| R1_is_a_transitivity | 114 | **361** | **+247 (×3.2)** | more IsA chains (world_core 507 entries → 525 IsA facts → dense A-IsA-B-IsA-C paths) |
+| R2_has_inheritance | 253 | **422** | **+169** | denser IsA base |
+| R3_has_inheritance_via_part_of | 15 | **26** | **+11** | body_parts PartOf chains |
+| **R5_shared_is_a_target** | 933 | **5 437** | **+4 504 (×5.8)** | 525 IsA facts form exponentially more sibling pairs sharing a target |
+| **R6_lives_in_via_part_of** | 103 | **36** | **−67** | **astronomical-target guard** blocked 67 false chains (`бала lives_in күн жүйесі` class) |
+| **R7_goes_to_via_part_of** | 640 | **297** | **−343** | **same guard** — biggest precision win |
+
+R6/R7 shrinkage is a **net precision gain**: the 67+343 = 410 blocked derivations were chains where the target was an astronomical-scale object (homonymous «жер» bridging "ground" to "Earth", or adverbial "жалға" chaining through "жер" to "күн жүйесі"). Genuine `(person, LivesIn, city) + (city, PartOf, country) ⟹ (person, LivesIn, country)` chains still fire, as verified by `r6_still_fires_for_country_target` test.
+
+Most-connected graph nodes (content-noun focus preserved): **адам (289), жер (219), дүние (211), қазақ (201), ат (150)**.
+
+### Tests
+
+**443 passing** (+3 from v3.9.5): `r6_refuses_astronomical_derived_target`, `r6_still_fires_for_country_target`, `r7_refuses_astronomical_derived_target`.
+
+### Architectural stance — Codex response
+
+Codex's full recommendation included a Typed World Model with EntityType ontology, Fact Promotion Pipeline with `Candidate`/`Verified`/`HumanApproved` tiers, and a dedicated Contradiction/Absurdity Filter. v4.0.0 ships **targeted** fixes — the filters are hand-coded blocklists rather than type-derived constraints — because every hand-coded filter is test-enforceable today without gating on a larger ontology design. The Typed World Model is a v5.x target; v4.x adds incremental curated-knowledge breadth and domain-specific blocklists as new noise classes surface.
+
+The architectural stance stays: **adam is not competing with ChatGPT on breadth.** v4.0.0's 507 curated entries + 600+ typed facts, each with a named reviewer, are measured against GPT-4's "correct answer" baseline: correct per-claim, traceable per-source, zero hallucination by construction. This is a substrate for sovereign-AI / education / government domains, not a general-purpose Q&A model.
+
+### What's next (v4.5+)
+
+- v4.5: investor-ready MVP — scripted 3-minute `adam_demo_v4` narrative pulling **exclusively** from `HumanApproved` tier; screencast recording; one-page pitch deck.
+- `validate_world_core` integrated into `scripts/validate_foundation.sh` as a CI gate (currently standalone).
+- v5.x: Typed World Model — EntityType ontology per root, type-constrained rule firing, Fact Promotion Pipeline with `Candidate`/`Verified` tiers that require evidence from multiple sources before promotion.
+
+---
+
 ## [3.9.5] — 2026-04-23 — World Core expansion + R6/R7 rules + dialog closed-class sync
 
 **Continuation of the v3.9.0 architectural direction.** Three independent improvements, each a small and contained delta:

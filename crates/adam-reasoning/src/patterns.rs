@@ -265,6 +265,17 @@ pub fn locative_lives_in(
         return;
     }
 
+    // v4.0.0 — object-side 3-char minimum (mirrors the subject-side
+    // guard added in v3.8.5). Closes «(бала, LivesIn, ған)» where
+    // the FST emitted a -ған participle as a standalone root, and
+    // «(X, LivesIn, ын/ін/қан)» fragment-tail cases.
+    if loc_root.chars().count() < 3 {
+        return;
+    }
+    if is_closed_class(&loc_root) {
+        return;
+    }
+
     // Subject = first nominative-case noun strictly before the locative.
     // We REJECT pronouns / closed-class items as subjects — a pronoun-
     // as-subject fact ("мен Алматы") is not useful knowledge. This is
@@ -502,12 +513,15 @@ pub fn dative_goes_to(
     // First dative noun is the destination.
     // v3.8.5 — reject dative objects that still carry a possessive
     // marker (same class of fragment-parse that contaminated LivesIn).
+    // v4.0.0 — additional object-side 3-char minimum (closes
+    // «(X, GoesTo, ын/ің/ған)» fragment-tail cases).
     let dative_idx = tokens.iter().position(|(_, a)| match a {
         Some(Analysis::Noun { features, root }) => {
             features.case == Some(Case::Dative)
                 && features.possessive.is_none()
                 && root.part_of_speech == "noun"
                 && !is_closed_class(&root.root)
+                && root.root.chars().count() >= 3
         }
         _ => false,
     });
@@ -1438,6 +1452,38 @@ fn is_closed_class(root: &str) -> bool {
             | "әр"
             | "бір"
             | "кей"
+            // v4.0.0 — Codex-review expansion: conjunctions and
+            // particles that the FST analyses as nouns in ambiguous
+            // contexts. «(егер, DoesTo, газ)» was Codex's canonical
+            // noise sample where "егер" (= "if") leaked as subject.
+            | "егер"
+            | "алайда"
+            | "бірақ"
+            | "дегенмен"
+            | "сондықтан"
+            | "демек"
+            | "яғни"
+            | "әйтсе"
+            | "өйткені"
+            | "сонда"
+            | "сонымен"
+            // v4.0.0 — common adverbial / oblique stems never
+            // legitimately subjects.
+            | "жалға"
+            | "тек"
+            | "қана"
+            | "ғана"
+            // v4.0.0 — fragment-suffix roots the FST occasionally
+            // emits as standalone bare-noun roots. «бала lives_in ған»
+            // (Codex-flagged) was a -ған participle leaking as root.
+            | "ған"
+            | "ген"
+            | "қан"
+            | "кен"
+            | "ын"
+            | "ін"
+            | "сын"
+            | "сін"
     )
 }
 
@@ -1475,6 +1521,47 @@ fn is_time_noun(root: &str) -> bool {
             | "бүгін"
             | "кеше"
             | "ертең"
+    )
+}
+
+/// v4.0.0 — astronomical / celestial-scale objects refused as
+/// **derived targets** of R6 (LivesIn) and R7 (GoesTo) rules. Codex's
+/// v3.9.5 review surfaced «бала lives_in күн жүйесі» as a canonical
+/// false chain: `(бала, LivesIn, жер)` is extracted (child lives on
+/// ground) and `(жер, PartOf, күн жүйесі)` is curated (Earth is part
+/// of Solar System) — R6 naively chains them. The homonymy of "жер"
+/// (both "ground" and "Earth") collides in the graph. Blocking
+/// astronomical scale objects as R6/R7 derived targets resolves the
+/// cross-domain absurdity without needing per-sense disambiguation.
+///
+/// Not used as an extractor-side filter — «ғаламшар» is a legitimate
+/// IsA target in world_core astronomy, and «жұлдыз» can legitimately
+/// appear in retrieval quotes. Scope is specifically R6/R7 chain
+/// pruning.
+pub(crate) fn is_astronomical_object(root: &str) -> bool {
+    matches!(
+        root,
+        // Celestial bodies
+        "күн"
+            | "ай"
+            | "жер"
+            | "марс"
+            | "шолпан"
+            | "меркурий"
+            | "юпитер"
+            | "сатурн"
+            | "уран"
+            | "нептун"
+            // Scale-up concepts
+            | "күн жүйесі"
+            | "галактика"
+            | "құс жолы"
+            | "ғаламшар"
+            | "жұлдыз"
+            | "аспан денесі"
+            | "метеор"
+            | "атмосфера"
+            | "орбита"
     )
 }
 

@@ -459,6 +459,14 @@ fn rule_r5_shared_is_a_target(
 /// `geography_kz.jsonl` entries. Before these, R6 would have fired zero
 /// times; the rule is architecturally correct regardless.
 ///
+/// **v4.0.0 guard** — refuse derivations where the target `C` is an
+/// astronomical-scale object (`is_astronomical_object`). Codex v3.9.5
+/// review flagged «бала lives_in күн жүйесі» as a canonical false
+/// chain: the homonymous «жер» (both "ground" and "Earth") bridges
+/// two unrelated semantic domains. Blocking astronomical targets in
+/// R6 output resolves the cross-domain absurdity without needing
+/// per-sense disambiguation of the intermediate node.
+///
 /// Tautology guard: A = C rejected.
 fn rule_r6_lives_in_via_part_of(
     facts: &[Fact],
@@ -477,6 +485,12 @@ fn rule_r6_lives_in_via_part_of(
             }
             // A = C tautology.
             if first.subject.root == second.to {
+                continue;
+            }
+            // v4.0.0 — refuse astronomical-scale derived targets.
+            // «(бала, LivesIn, жер)» + «(жер, PartOf, күн жүйесі)»
+            // must NOT produce «(бала, LivesIn, күн жүйесі)».
+            if crate::patterns::is_astronomical_object(&second.to) {
                 continue;
             }
             let key = (
@@ -532,6 +546,15 @@ fn rule_r7_goes_to_via_part_of(
                 continue;
             }
             if first.subject.root == second.to {
+                continue;
+            }
+            // v4.0.0 — same astronomical-target guard as R6.
+            // «(жалға, GoesTo, жер)» was a Codex-flagged FST-misparse
+            // chain; blocking astronomical targets prunes the noisiest
+            // branch of R7 output. Legitimate country-level chains
+            // (e.g. `(X, GoesTo, Алматы)` → `(X, GoesTo, Қазақстан)`)
+            // still fire.
+            if crate::patterns::is_astronomical_object(&second.to) {
                 continue;
             }
             let key = (
@@ -1066,5 +1089,89 @@ mod tests {
                 "R7 must never derive A GoesTo A: {d:?}"
             );
         }
+    }
+
+    // ------------------- v4.0.0 astronomical-target guard ----------------
+
+    #[test]
+    fn r6_refuses_astronomical_derived_target() {
+        // Codex v3.9.5-flagged chain: (бала, LivesIn, жер) + (жер, PartOf,
+        // күн жүйесі) must NOT produce (бала, LivesIn, күн жүйесі).
+        let facts = vec![
+            mk_fact("бала", Predicate::LivesIn, "жер", "extracted", "s1"),
+            mk_fact(
+                "жер",
+                Predicate::PartOf,
+                "күн жүйесі",
+                "world_core",
+                "astro_001",
+            ),
+        ];
+        let derived = run(&facts);
+        let bad: Vec<_> = derived
+            .iter()
+            .filter(|d| {
+                d.rule_id == "R6_lives_in_via_part_of"
+                    && d.subject.root == "бала"
+                    && d.object.root == "күн жүйесі"
+            })
+            .collect();
+        assert!(
+            bad.is_empty(),
+            "R6 must not derive (бала, LivesIn, күн жүйесі) — astronomical target (got {derived:?})"
+        );
+    }
+
+    #[test]
+    fn r6_still_fires_for_country_target() {
+        // Regression: the astronomical-target guard must NOT block the
+        // legitimate `(person, LivesIn, city)` + `(city, PartOf, country)`
+        // → `(person, LivesIn, country)` chain.
+        let facts = vec![
+            mk_fact("дәулет", Predicate::LivesIn, "қостанай", "wiki", "s1"),
+            mk_fact(
+                "қостанай",
+                Predicate::PartOf,
+                "қазақстан",
+                "world_core",
+                "geo_013",
+            ),
+        ];
+        let derived = run(&facts);
+        let ok: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R6_lives_in_via_part_of")
+            .collect();
+        assert_eq!(
+            ok.len(),
+            1,
+            "country-target R6 chain must still fire (got {derived:?})"
+        );
+        assert_eq!(ok[0].object.root, "қазақстан");
+    }
+
+    #[test]
+    fn r7_refuses_astronomical_derived_target() {
+        // «(жалға, GoesTo, жер)» + «(жер, PartOf, күн жүйесі)» must NOT
+        // produce «(жалға, GoesTo, күн жүйесі)».
+        let facts = vec![
+            mk_fact("жалға", Predicate::GoesTo, "жер", "extracted", "s1"),
+            mk_fact(
+                "жер",
+                Predicate::PartOf,
+                "күн жүйесі",
+                "world_core",
+                "astro_001",
+            ),
+        ];
+        let derived = run(&facts);
+        let bad: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R7_goes_to_via_part_of" && d.object.root == "күн жүйесі")
+            .collect();
+        assert!(
+            bad.is_empty(),
+            "R7 must not derive GoesTo against astronomical targets (got {derived:?})"
+        );
     }
 }
