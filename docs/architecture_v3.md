@@ -194,7 +194,9 @@ A second, orthogonal source of facts: human-authored JSONL in `data/world_core/<
 | `adam_inspect` split | per-root output has two sections: **Curated** (HumanApproved) first, **Extracted** (Grammar) after |
 | Authoring guide | `data/world_core/README.md` |
 
-Seed data shipped with v3.9.0: **80 entries / 126 curated facts** across `astronomy` (30), `time` (20), `geography_kz` (30). Long-term target: 5 000+ entries across 10+ domains by v4.0.0.
+Seed data shipped with v3.9.0: **80 entries / 126 curated facts** across `astronomy` (30), `time` (20), `geography_kz` (30).
+
+**Expanded in v3.9.5 to 200 entries / 270 facts** with three new domains: `biology_basic` (40 / 41), `body_parts` (40 / 55), `society` (40 / 48). Long-term target: 5 000+ entries across 20+ domains by v5.x.
 
 ### Lexical graph
 
@@ -213,8 +215,8 @@ API: `outgoing(root)`, `incoming(root)`, per-node `NodeStats`.
 | **R3** | `A Has X ∧ X PartOf Y ⟹ A Has Y` | active (v3.5.5) |
 | R4 | `A IsA B ∧ B IsA A` → diagnostic | curator-warning only |
 | **R5** | `A IsA X ∧ B IsA X ⟹ RelatedTo(A, B)` | active (v2.6) |
-| R6 | `A LivesIn B ∧ B PartOf C ⟹ A LivesIn C` | v3.9+ target (LivesIn now has data) |
-| R7 | `A GoesTo B ∧ B PartOf C ⟹ A GoesTo C` | v3.9+ target (GoesTo now has data) |
+| **R6** | `A LivesIn B ∧ B PartOf C ⟹ A LivesIn C` | active (v3.9.5) |
+| **R7** | `A GoesTo B ∧ B PartOf C ⟹ A GoesTo C` | active (v3.9.5) |
 
 Every `DerivedFact` carries:
 - `rule_id: String` — stable identifier (never a probability score)
@@ -327,11 +329,11 @@ cargo run --release -p adam-dialog --bin adam_chat -- --no-retrieval
 - **v3.8.0** — **critical verb-root bug fix**: `locative_lives_in` / `dative_goes_to` compared the infinitive forms (`"тұру"` / `"бару"`) against FST-stored stems (`"тұр"` / `"бар"`); neither predicate had ever fired at any scale since v2.1 / v2.5. Fix unblocks **LivesIn (572 facts) + GoesTo (1 864 facts)** at T4_200k. Predicate coverage jumps **7/11 → 9/11**.
 - **v3.8.5** — **precision hardening** in response to Codex external review: matcher filters (location / time-noun / demonstrative blocklists, possessive-object refusal, 3-char minimum stem), renderer FST synthesis (case suffixes no longer dash-concatenated), demo preview / actual-render alignment (subject-first two-pass in `inject_reasoning_chain`), contradicting README rule-count row removed. Facts drop to **13 627** (−803, −5.6 %) with LivesIn the biggest precision-win (572 → 315, −44.9 %); derivations 207 → 205; coverage holds at 9/11. **423 workspace tests** (+7). First release with a morphology-regression test.
 - **v3.9.0** — **World Core v1 + fragment-root hygiene gate**. Codex's second-pass review crystallised the architectural direction: **not** an LLM-clone, but an *auditable Kazakh reasoning engine*. Ships (a) central `is_fragment_root` post-filter that drops the 87 `-`-prefixed fragment facts Codex measured; (b) World Core infrastructure — `data/world_core/*.jsonl` human-authored knowledge packs, `adam_reasoning::world_core` loader / validator / emitter, `validate_world_core` binary, pipeline merge into `extract_facts`, `ConfidenceKind::HumanApproved` as exclusive tier; (c) seed data (80 entries / 126 curated facts across `astronomy`, `time`, `geography_kz`); (d) `adam_inspect` split into **Curated** + **Extracted** sections. First release where adam has structured foundational knowledge beyond what the Kazakh corpus makes explicit.
+- **v3.9.5** — **World Core expansion + R6/R7 rules + dialog closed-class sync**. World Core grows 80 → 200 entries / 126 → 270 facts with three new domains (`biology_basic` 40 / 41, `body_parts` 40 / 55, `society` 40 / 48). R6 (`LivesIn + PartOf → LivesIn`) and R7 (`GoesTo + PartOf → GoesTo`) activate — both were waiting on v3.8.0's verb-root fix + v3.9.0's curated city-PartOf-country chains. **R7 fires 640× and R6 fires 103×** on the v3.9.5 T4 runtime; R3 first-fires on curated chains (15×); R5 nearly doubles (489 → 933). Total derivations **704 → 2 058 (×2.9)**. Dialog `NOT_A_TOPIC` synced with `adam-reasoning::patterns::is_closed_class` — closes the «Неліктен → Нелікте тұрасыз ба» REPL bug. **440 tests** (+7); 6 active rules (R1 / R2 / R3 / R5 / R6 / R7). Facts: 13 501 extracted + 270 curated = 13 771. Graph 3 151 / 12 317. Predicate coverage 11/11.
 
 ### Committed but not yet shipped (v4.0+ targets)
 
-- **R6 / R7 rules** — `LivesIn + PartOf → LivesIn`, `GoesTo + PartOf → GoesTo`. Turns the (v3.8.0-activated, v3.8.5-hardened) predicate facts into derivations. With 315 LivesIn + 23 PartOf at v3.8.5 T4, expect non-zero fire.
-- **FST genitive-after-vowel phonology fix** — the `{D}{I}ң` genitive template produces `қаладың` instead of `қаланың` on vowel-final stems (discovered during v3.8.5 renderer work; sidestepped by using dative/ablative in the reasoning-chain renderer). Dedicated phonology fix is a v3.9 target since it affects 48+ existing FST roundtrip tests.
+- **FST genitive-after-vowel phonology fix** — the `{D}{I}ң` genitive template produces `қаладың` instead of `қаланың` on vowel-final stems (discovered during v3.8.5 renderer work; sidestepped by using dative/ablative in the reasoning-chain renderer). Dedicated phonology fix is a v4.x target since it affects 48+ existing FST roundtrip tests.
 - **Loosen `copula_causes` + `domain_membership`** — literal head-word patterns (`себебі`, `саласы`, `ғылымы`) are rare even at T4. Accept broader causal / domain constructions to push coverage **9/11 → 11/11**.
 - **R4 activation** — diagnostic surface for `IsA` symmetry (curator review; remains documented-only because its output is a curator warning, not a fact).
 - **Native-speaker precision audit** — 50-fact / 50-derivation sample in `docs/precision_audit.md` is primed; unblocks first Lexicon PR from v3.4.0 candidates.

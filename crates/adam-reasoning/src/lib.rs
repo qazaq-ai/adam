@@ -1,18 +1,32 @@
 //! adam-reasoning — Intelligent Lexical-Morphemic Retrieval & Reasoning (ILMRR).
 //!
-//! Stage: v2.3+ — **fact extraction + lexical graph projection**.
+//! Stage: **v3.9.5** — fact extraction + lexical graph + forward-chaining
+//! reasoner + human-authored World Core knowledge packs.
 //!
 //! This crate is the reasoning layer of the adam architecture. It takes
-//! FST-parsed corpus samples and extracts **typed facts** with full
-//! provenance, then projects those facts into a node-edge graph that
-//! a future rule-reasoner (v2.4+) will traverse.
+//! FST-parsed corpus samples, extracts **typed facts** with full
+//! provenance, projects them into a node-edge graph, and runs a
+//! deterministic forward-chaining reasoner over the result. In v3.9.0
+//! it also started merging a second, orthogonal source of facts:
+//! human-authored [`world_core`] entries.
 //!
 //! Capabilities shipped:
 //!
-//! - **Fact extraction** (v2.1): three pattern matchers producing
-//!   `IsA`, `LivesIn`, `Has` relations. See [`patterns`].
-//! - **Lexical Graph v0** (v2.3): pure projection of facts into a
-//!   directed typed graph with per-edge provenance. See [`graph`].
+//! - **Fact extraction** (v2.1 → v3.8.5): **11 pattern matchers** across
+//!   [`patterns`] producing all 11 declared [`Predicate`] variants.
+//!   Precision hardened in v3.8.5 / v3.9.0 with location / time-noun /
+//!   demonstrative / fragment-root filters.
+//! - **Lexical Graph** (v2.3+): pure projection of facts into a directed
+//!   typed graph with per-edge provenance. See [`graph`].
+//! - **Forward-chaining reasoner** (v2.4 → v3.9.5): 5 active rules (R1
+//!   IsA-transitivity, R2 Has-inheritance, R3 Has-via-PartOf, R5
+//!   shared-IsA → RelatedTo, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf).
+//!   See [`reasoner`].
+//! - **World Core** (v3.9.0+): human-authored Kazakh knowledge packs
+//!   merged into the committed fact set with `ConfidenceKind::HumanApproved`
+//!   as the exclusive tier marker. See [`world_core`].
+//! - **Iteration harness** (v3.1.0+): `--time-budget`, progress monitor,
+//!   SIGINT → graceful commit. See [`harness`].
 //!
 //! The canonical example:
 //!
@@ -30,11 +44,6 @@
 //!   }
 //! ```
 //!
-//! Facts are structured knowledge: they can be indexed, chained, and
-//! reasoned over (v2.3+). Unlike retrieval hits, which are opaque
-//! sentences, facts expose **subject → relation → object** shape that
-//! a rule engine can match against.
-//!
 //! ## Determinism contract
 //!
 //! Every pattern matcher is a **pure function** of (parses, raw text).
@@ -45,8 +54,9 @@
 //!
 //! Per the `project_retrieval_not_neural_v2` commitment: `confidence`
 //! is the **kind of evidence** backing a fact — never an LLM-style
-//! probability score. A human or downstream consumer can filter by
-//! confidence kind without trusting any learned magnitude.
+//! probability score. `Grammar` marks corpus-extracted facts,
+//! `HumanApproved` marks World Core entries, `RuleInferred` marks
+//! reasoner output. Consumers filter by kind, never by magnitude.
 
 pub mod graph;
 pub mod harness;

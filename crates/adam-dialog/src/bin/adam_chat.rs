@@ -1,8 +1,8 @@
-//! `adam-chat` — interactive REPL for the adam v3.9 Kazakh dialog pipeline.
+//! `adam-chat` — interactive REPL for the adam v3.9.5 Kazakh dialog pipeline.
 //!
 //! **Kazakh-only surface** (v1.1.0 revert). Input and output are both Kazakh.
 //!
-//! Capabilities at v3.9:
+//! Capabilities at v3.9.5:
 //!
 //!   - **26 intents** — 25 conversational + Insult for polite non-engagement.
 //!   - **Multi-turn session state** (`Conversation`): `name`, `age`, `city`,
@@ -26,7 +26,20 @@
 //!   - **Rule-derived reasoning chains** (v2.7+) — when committed
 //!     `facts.json` + `derived_facts.json` are present and the user probes
 //!     a noun that matches a derivation, adam cites the chain (not a
-//!     corpus quote) with the «байланыс-» trust marker.
+//!     corpus quote) with the «байланыс-» trust marker. At v3.9.5 the
+//!     reasoner has 5 active rules (R1 / R2 / R3 / R5 / R6 / R7); the
+//!     latter two (LivesIn-via-PartOf, GoesTo-via-PartOf) turn
+//!     city-level locations into country-level conclusions through
+//!     curated `city PartOf country` chains.
+//!   - **World Core curated knowledge** (v3.9.0+) — `data/world_core/*.jsonl`
+//!     entries reviewed by `shaman` are merged into `facts.json` with
+//!     `ConfidenceKind::HumanApproved`. At v3.9.5: **200 entries / 270
+//!     facts** across 6 domains (astronomy, time, geography_kz,
+//!     biology_basic, body_parts, society).
+//!   - **Dialog closed-class sync** (v3.9.5) — `NOT_A_TOPIC` mirrors
+//!     `adam_reasoning::patterns::is_closed_class`, so interrogatives
+//!     like «Неліктен?» are correctly treated as function-word input
+//!     rather than noun+ablative topics.
 //!
 //! Architecture reference: [`docs/architecture_v3.md`](../../../docs/architecture_v3.md).
 //!
@@ -143,7 +156,7 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!("adam-chat v3.9 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
+    eprintln!("adam-chat v3.9.5 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut turn = 0u64;

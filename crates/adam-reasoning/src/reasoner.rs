@@ -23,6 +23,8 @@
 //! | `R3_has_inheritance_via_part_of` | A Has B ∧ B PartOf C | A Has C (v3.5.5 — mereological inheritance; activated with the structural_part_of matcher) |
 //! | `R4_is_a_symmetry_filter` | A IsA B ∧ B IsA A | flag both for curator review (returns diagnostic, not a fact) |
 //! | `R5_shared_is_a_target` | A IsA X ∧ B IsA X (A ≠ B) | RelatedTo(A, B) |
+//! | `R6_lives_in_via_part_of` | A LivesIn B ∧ B PartOf C | A LivesIn C (v3.9.5 — spatial inheritance; activated once v3.8.5 verb-root fix gave LivesIn real data) |
+//! | `R7_goes_to_via_part_of` | A GoesTo B ∧ B PartOf C | A GoesTo C (v3.9.5 — directional inheritance; same motivation as R6) |
 //!
 //! ## Determinism
 //!
@@ -169,6 +171,8 @@ fn run_one_pass(
     rule_r2_has_inheritance(facts, graph, seen, &mut out);
     rule_r3_has_inheritance_via_part_of(facts, graph, seen, &mut out);
     rule_r5_shared_is_a_target(facts, graph, seen, &mut out);
+    rule_r6_lives_in_via_part_of(facts, graph, seen, &mut out);
+    rule_r7_goes_to_via_part_of(facts, graph, seen, &mut out);
     out
 }
 
@@ -438,6 +442,123 @@ fn rule_r5_shared_is_a_target(
                     confidence: ConfidenceKind::RuleInferred,
                 });
             }
+        }
+    }
+}
+
+/// `R6`: Spatial inheritance via PartOf. If `A LivesIn B` and
+/// `B PartOf C`, derive `A LivesIn C`.
+///
+/// Example: `(Дәулет, LivesIn, Қостанай) ∧ (Қостанай, PartOf, Қазақстан)`
+/// ⟹ `(Дәулет, LivesIn, Қазақстан)`. A person who lives in a city also
+/// lives in the country that city is part of.
+///
+/// Added v3.9.5 — waited on (a) v3.8.0's verb-root bug fix that gave
+/// `LivesIn` real data for the first time, and (b) v3.9.0's World Core
+/// which contributed the `city PartOf country` chain via curated
+/// `geography_kz.jsonl` entries. Before these, R6 would have fired zero
+/// times; the rule is architecturally correct regardless.
+///
+/// Tautology guard: A = C rejected.
+fn rule_r6_lives_in_via_part_of(
+    facts: &[Fact],
+    graph: &LexicalGraph,
+    seen: &BTreeSet<(String, String, String)>,
+    out: &mut Vec<DerivedFact>,
+) {
+    for first in facts {
+        if first.predicate != Predicate::LivesIn {
+            continue;
+        }
+        // A LivesIn B — find every (B PartOf C) edge in the graph.
+        for second in graph.outgoing(&first.object.root) {
+            if second.predicate != Predicate::PartOf {
+                continue;
+            }
+            // A = C tautology.
+            if first.subject.root == second.to {
+                continue;
+            }
+            let key = (
+                first.subject.root.clone(),
+                "lives_in".to_string(),
+                second.to.clone(),
+            );
+            if seen.contains(&key) {
+                continue;
+            }
+            let second_source = second
+                .sources
+                .first()
+                .cloned()
+                .expect("graph edge must carry at least one source");
+            out.push(DerivedFact {
+                subject: first.subject.clone(),
+                predicate: Predicate::LivesIn,
+                object: SlotRef {
+                    surface: second.to.clone(),
+                    root: second.to.clone(),
+                    pos: "noun".into(),
+                },
+                rule_id: "R6_lives_in_via_part_of".into(),
+                source_chain: vec![first.source.clone(), second_source],
+                confidence: ConfidenceKind::RuleInferred,
+            });
+        }
+    }
+}
+
+/// `R7`: Directional inheritance via PartOf. If `A GoesTo B` and
+/// `B PartOf C`, derive `A GoesTo C`.
+///
+/// Symmetric structure to R6, applied to motion rather than residence.
+/// «Ол Алматыға барды» + «Алматы Қазақстанның бөлігі» ⟹ «Ол Қазақстанға
+/// барды». Added v3.9.5 for the same reason as R6 — requires v3.8.0's
+/// verb-root fix + v3.9.0's curated PartOf chains.
+///
+/// Tautology guard: A = C rejected.
+fn rule_r7_goes_to_via_part_of(
+    facts: &[Fact],
+    graph: &LexicalGraph,
+    seen: &BTreeSet<(String, String, String)>,
+    out: &mut Vec<DerivedFact>,
+) {
+    for first in facts {
+        if first.predicate != Predicate::GoesTo {
+            continue;
+        }
+        for second in graph.outgoing(&first.object.root) {
+            if second.predicate != Predicate::PartOf {
+                continue;
+            }
+            if first.subject.root == second.to {
+                continue;
+            }
+            let key = (
+                first.subject.root.clone(),
+                "goes_to".to_string(),
+                second.to.clone(),
+            );
+            if seen.contains(&key) {
+                continue;
+            }
+            let second_source = second
+                .sources
+                .first()
+                .cloned()
+                .expect("graph edge must carry at least one source");
+            out.push(DerivedFact {
+                subject: first.subject.clone(),
+                predicate: Predicate::GoesTo,
+                object: SlotRef {
+                    surface: second.to.clone(),
+                    root: second.to.clone(),
+                    pos: "noun".into(),
+                },
+                rule_id: "R7_goes_to_via_part_of".into(),
+                source_chain: vec![first.source.clone(), second_source],
+                confidence: ConfidenceKind::RuleInferred,
+            });
         }
     }
 }
@@ -822,5 +943,128 @@ mod tests {
             .filter(|d| d.rule_id == "R3_has_inheritance_via_part_of")
             .collect();
         assert!(r3.is_empty(), "R3 must not duplicate an existing fact");
+    }
+
+    // ------------------------- R6 / R7 (v3.9.5) -------------------------
+
+    #[test]
+    fn r6_derives_lives_in_via_part_of() {
+        // Дәулет LivesIn Қостанай, Қостанай PartOf Қазақстан
+        //   ⟹ Дәулет LivesIn Қазақстан
+        let facts = vec![
+            mk_fact("дәулет", Predicate::LivesIn, "қостанай", "wiki", "s1"),
+            mk_fact(
+                "қостанай",
+                Predicate::PartOf,
+                "қазақстан",
+                "world_core",
+                "geo_013",
+            ),
+        ];
+        let derived = run(&facts);
+        let r6: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R6_lives_in_via_part_of")
+            .collect();
+        assert_eq!(r6.len(), 1, "R6 should fire exactly once (got {derived:?})");
+        let d = r6[0];
+        assert_eq!(d.subject.root, "дәулет");
+        assert_eq!(d.predicate, Predicate::LivesIn);
+        assert_eq!(d.object.root, "қазақстан");
+        assert_eq!(d.confidence, ConfidenceKind::RuleInferred);
+        assert_eq!(d.source_chain.len(), 2);
+    }
+
+    #[test]
+    fn r6_respects_tautology_guard() {
+        let facts = vec![
+            mk_fact("A", Predicate::LivesIn, "B", "p", "s1"),
+            mk_fact("B", Predicate::PartOf, "A", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        for d in &derived {
+            assert!(
+                !(d.subject.root == d.object.root && d.rule_id == "R6_lives_in_via_part_of"),
+                "R6 must never derive A LivesIn A: {d:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn r6_does_not_fire_without_part_of_edge() {
+        let facts = vec![mk_fact(
+            "дәулет",
+            Predicate::LivesIn,
+            "қостанай",
+            "wiki",
+            "s1",
+        )];
+        let derived = run(&facts);
+        let r6: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R6_lives_in_via_part_of")
+            .collect();
+        assert!(r6.is_empty());
+    }
+
+    #[test]
+    fn r6_dedupes_against_existing_fact() {
+        let facts = vec![
+            mk_fact("дәулет", Predicate::LivesIn, "қостанай", "wiki", "s1"),
+            mk_fact("қостанай", Predicate::PartOf, "қазақстан", "wc", "geo"),
+            mk_fact("дәулет", Predicate::LivesIn, "қазақстан", "explicit", "s3"),
+        ];
+        let derived = run(&facts);
+        let r6: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R6_lives_in_via_part_of")
+            .collect();
+        assert!(
+            r6.is_empty(),
+            "R6 must not re-derive an already-asserted LivesIn fact"
+        );
+    }
+
+    #[test]
+    fn r7_derives_goes_to_via_part_of() {
+        // ол GoesTo Алматы, Алматы PartOf Қазақстан
+        //   ⟹ ол GoesTo Қазақстан
+        let facts = vec![
+            mk_fact("балалар", Predicate::GoesTo, "алматы", "wiki", "s1"),
+            mk_fact(
+                "алматы",
+                Predicate::PartOf,
+                "қазақстан",
+                "world_core",
+                "geo_004",
+            ),
+        ];
+        let derived = run(&facts);
+        let r7: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R7_goes_to_via_part_of")
+            .collect();
+        assert_eq!(r7.len(), 1);
+        let d = r7[0];
+        assert_eq!(d.subject.root, "балалар");
+        assert_eq!(d.predicate, Predicate::GoesTo);
+        assert_eq!(d.object.root, "қазақстан");
+        assert_eq!(d.confidence, ConfidenceKind::RuleInferred);
+        assert_eq!(d.source_chain.len(), 2);
+    }
+
+    #[test]
+    fn r7_respects_tautology_guard() {
+        let facts = vec![
+            mk_fact("A", Predicate::GoesTo, "B", "p", "s1"),
+            mk_fact("B", Predicate::PartOf, "A", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        for d in &derived {
+            assert!(
+                !(d.subject.root == d.object.root && d.rule_id == "R7_goes_to_via_part_of"),
+                "R7 must never derive A GoesTo A: {d:?}"
+            );
+        }
     }
 }

@@ -2,8 +2,8 @@
 
 **Target:** 50-fact sample + 50-derivation sample from the committed artifacts, seed `42`.
 
-- `facts.json`: 13627 facts total (upstream status: `completed`) — sampled 50 here.
-- `derived_facts.json`: 704 derivations total (upstream status: `completed`) — sampled 50 here.
+- `facts.json`: 13771 facts total (upstream status: `completed`) — sampled 50 here.
+- `derived_facts.json`: 2058 derivations total (upstream status: `completed`) — sampled 50 here.
 
 ## How to review
 
@@ -667,89 +667,12 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ## Derivation sample
 
-### Derivation #2
-
-- Triple: `(сәуір — is_a — қала)`
-- Rule: `R1_is_a_transitivity`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0003423, world_core/geography_kz.jsonl/geo_kz_009
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
 ### Derivation #40
 
-- Triple: `(үндістан — has — көбі)`
-- Rule: `R2_has_inheritance`
+- Triple: `(ит — is_a — тіршілік иесі)`
+- Rule: `R1_is_a_transitivity`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0004297, wikipedia_kz_pack.json/wiki_kz_0138207
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #50
-
-- Triple: `(абай — has — ен)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0007158, wikipedia_kz_pack.json/wiki_kz_0073463
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #56
-
-- Triple: `(халқы — has — ұрпақ)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0012411, wikipedia_kz_pack.json/wiki_kz_0132475
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #74
-
-- Triple: `(ұлыбритания — has — таул)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0027741, wikipedia_kz_pack.json/wiki_kz_0030414
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #101
-
-- Triple: `(неміс — has — іш)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0109606, kazakh_textbooks_pack.json/kz_textbook_kz_lang_11_emn_p0009_s08
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #105
-
-- Triple: `(арыс — has — ен)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0110255, wikipedia_kz_pack.json/wiki_kz_0073463
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #126
-
-- Triple: `(шолпан — has — серік)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: world_core/astronomy.jsonl/astro_005, wikipedia_kz_pack.json/wiki_kz_0061386
+- Source chain: world_core/biology_basic.jsonl/bio_003, world_core/biology_basic.jsonl/bio_012
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -757,27 +680,60 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #143
 
-- Triple: `(астана — has — атау)`
+- Triple: `(ұлыбритания — has — ішк)`
 - Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_003, wikipedia_kz_pack.json/wiki_kz_0118247
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #147
-
-- Triple: `(шымкент — has — атау)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_005, wikipedia_kz_pack.json/wiki_kz_0118247
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0027741, kazakh_textbooks_pack.json/kz_textbook_kz_lang_11_ogn_p0143_s13
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
 - Comment:
 
 ### Derivation #165
+
+- Triple: `(әтір — has — түр)`
+- Rule: `R2_has_inheritance`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0102432, wikipedia_kz_pack.json/wiki_kz_0023360
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #196
+
+- Triple: `(күн — has — жарықтылық)`
+- Rule: `R2_has_inheritance`
+- Confidence: `rule_inferred`
+- Source chain: world_core/astronomy.jsonl/astro_002, kazakh_textbooks_pack.json/kz_textbook_physics_11_emn_p0276_s08
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #197
+
+- Triple: `(күн — has — жарқырау)`
+- Rule: `R2_has_inheritance`
+- Confidence: `rule_inferred`
+- Source chain: world_core/astronomy.jsonl/astro_002, kazakh_textbooks_pack.json/kz_textbook_physics_11_ogn_p0189_s12
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #251
+
+- Triple: `(өскемен — has — атау)`
+- Rule: `R2_has_inheritance`
+- Confidence: `rule_inferred`
+- Source chain: world_core/geography_kz.jsonl/geo_kz_012, wikipedia_kz_pack.json/wiki_kz_0118247
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #255
 
 - Triple: `(ақтау — has — атау)`
 - Rule: `R2_has_inheritance`
@@ -788,166 +744,12 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #170
-
-- Triple: `(талдықорған — has — ен)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_016, wikipedia_kz_pack.json/wiki_kz_0073463
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #191
-
-- Triple: `(абай — related_to — қызылжар)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0007148, wikipedia_kz_pack.json/wiki_kz_0047327
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #196
-
-- Triple: `(қазақстан — related_to — ұлыбритания)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_002, wikipedia_kz_pack.json/wiki_kz_0027741
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #197
-
-- Triple: `(үндістан — related_to — ұлыбритания)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0004297, wikipedia_kz_pack.json/wiki_kz_0027741
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #205
-
-- Triple: `(ауғанстан — related_to — өзбекстан)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0026052, world_core/geography_kz.jsonl/geo_kz_030
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #236
-
-- Triple: `(жер — related_to — марс)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/astronomy.jsonl/astro_001, world_core/astronomy.jsonl/astro_004
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #251
-
-- Triple: `(меркурий — related_to — уран)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/astronomy.jsonl/astro_006, wikipedia_kz_pack.json/wiki_kz_0062376
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #255
-
-- Triple: `(нептун — related_to — уран)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/astronomy.jsonl/astro_010, wikipedia_kz_pack.json/wiki_kz_0062376
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #263
-
-- Triple: `(шолпан — related_to — юпитер)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/astronomy.jsonl/astro_005, world_core/astronomy.jsonl/astro_007
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #264
-
-- Triple: `(абай — related_to — алматы)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0007158, world_core/geography_kz.jsonl/geo_kz_004
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #266
-
-- Triple: `(абай — related_to — астана)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0007158, world_core/geography_kz.jsonl/geo_kz_003
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #268
-
-- Triple: `(абай — related_to — ақмешіт)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0007158, wikipedia_kz_pack.json/wiki_kz_0055603
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
 ### Derivation #272
 
-- Triple: `(абай — related_to — орал)`
-- Rule: `R5_shared_is_a_target`
+- Triple: `(қытай — has — халық)`
+- Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0007158, world_core/geography_kz.jsonl/geo_kz_018
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #332
-
-- Triple: `(астана — related_to — шымкент)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_003, world_core/geography_kz.jsonl/geo_kz_005
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #333
-
-- Triple: `(астана — related_to — қазақ)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_003, wikipedia_kz_pack.json/wiki_kz_0001219
+- Source chain: world_core/geography_kz.jsonl/geo_kz_029, world_core/society.jsonl/soc_001
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -955,16 +757,60 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #341
 
-- Triple: `(атырау — related_to — көкшетау)`
+- Triple: `(сиыр — related_to — қой)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_008, world_core/geography_kz.jsonl/geo_kz_017
+- Source chain: world_core/biology_basic.jsonl/bio_007, world_core/biology_basic.jsonl/bio_006
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #342
+### Derivation #369
+
+- Triple: `(асқазан — related_to — мұрын)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/body_parts.jsonl/body_023, world_core/body_parts.jsonl/body_005
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #386
+
+- Triple: `(аяқ — related_to — бүйрек)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/body_parts.jsonl/body_016, world_core/body_parts.jsonl/body_022
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #527
+
+- Triple: `(тарих — related_to — химия)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/society.jsonl/soc_027, world_core/society.jsonl/soc_026
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #528
+
+- Triple: `(тарих — related_to — экология)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/society.jsonl/soc_027, world_core/biology_basic.jsonl/bio_040
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #610
 
 - Triple: `(атырау — related_to — орал)`
 - Rule: `R5_shared_is_a_target`
@@ -975,144 +821,12 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #369
-
-- Triple: `(ақмешіт — related_to — қызылорда)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0055603, world_core/geography_kz.jsonl/geo_kz_015
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #386
-
-- Triple: `(ақтөбе — related_to — көкшетау)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_007, world_core/geography_kz.jsonl/geo_kz_017
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #420
-
-- Triple: `(орал — related_to — қостанай)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_018, world_core/geography_kz.jsonl/geo_kz_013
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #461
-
-- Triple: `(талғар — related_to — тараз)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0110712, world_core/geography_kz.jsonl/geo_kz_011
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #462
-
-- Triple: `(талғар — related_to — шымкент)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0110712, world_core/geography_kz.jsonl/geo_kz_005
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #469
-
-- Triple: `(тараз — related_to — қазақ)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_011, wikipedia_kz_pack.json/wiki_kz_0001219
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #472
-
-- Triple: `(тараз — related_to — қызылорда)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_011, world_core/geography_kz.jsonl/geo_kz_015
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #490
-
-- Triple: `(ертіс — related_to — сырдария)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_019, world_core/geography_kz.jsonl/geo_kz_020
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #501
-
-- Triple: `(сәуір — is_a — өкіметі)`
-- Rule: `R1_is_a_transitivity`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0009181, wikipedia_kz_pack.json/wiki_kz_0009182
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #527
-
-- Triple: `(қыркүйек — has — атау)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0009178, world_core/geography_kz.jsonl/geo_kz_009
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #528
-
-- Triple: `(қыркүйек — has — ен)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0009178, world_core/geography_kz.jsonl/geo_kz_009
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #610
-
-- Triple: `(жыл — related_to — тараз)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0046261, world_core/geography_kz.jsonl/geo_kz_011
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
 ### Derivation #617
 
-- Triple: `(жыл — related_to — өскемен)`
+- Triple: `(атырау — related_to — шымкент)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0046261, world_core/geography_kz.jsonl/geo_kz_012
+- Source chain: world_core/geography_kz.jsonl/geo_kz_008, world_core/geography_kz.jsonl/geo_kz_005
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1120,10 +834,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #636
 
-- Triple: `(сәуір — related_to — өскемен)`
+- Triple: `(ақмешіт — related_to — қостанай)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0003423, world_core/geography_kz.jsonl/geo_kz_012
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0055603, world_core/geography_kz.jsonl/geo_kz_013
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1131,32 +845,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #645
 
-- Triple: `(қазан — related_to — өскемен)`
+- Triple: `(ақтау — related_to — талдықорған)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0003416, world_core/geography_kz.jsonl/geo_kz_012
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #646
-
-- Triple: `(ай — related_to — уақыт)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/time.jsonl/time_003, world_core/time.jsonl/time_020
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #663
-
-- Triple: `(кезеңі — related_to — меркурий)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0083073, world_core/astronomy.jsonl/astro_006
+- Source chain: world_core/geography_kz.jsonl/geo_kz_014, world_core/geography_kz.jsonl/geo_kz_016
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1164,21 +856,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #665
 
-- Triple: `(кезеңі — related_to — сатурн)`
+- Triple: `(ақтөбе — related_to — қызылорда)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0083073, world_core/astronomy.jsonl/astro_008
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #669
-
-- Triple: `(кезеңі — related_to — ғаламшар)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0083073, world_core/astronomy.jsonl/astro_012
+- Source chain: world_core/geography_kz.jsonl/geo_kz_007, world_core/geography_kz.jsonl/geo_kz_015
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1186,32 +867,351 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #685
 
-- Triple: `(орал — related_to — қыркүйек)`
+- Triple: `(орал — related_to — шымкент)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/geography_kz.jsonl/geo_kz_018, wikipedia_kz_pack.json/wiki_kz_0009178
+- Source chain: world_core/geography_kz.jsonl/geo_kz_018, world_core/geography_kz.jsonl/geo_kz_005
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #698
+### Derivation #724
 
-- Triple: `(кезеңі — related_to — уақыт)`
+- Triple: `(талдықорған — related_to — қазақ)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0083073, world_core/time.jsonl/time_020
+- Source chain: world_core/geography_kz.jsonl/geo_kz_016, wikipedia_kz_pack.json/wiki_kz_0001219
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #700
+### Derivation #821
 
-- Triple: `(желтоқсан — related_to — сәуір)`
+- Triple: `(хан — lives_in — күн жүйесі)`
+- Rule: `R6_lives_in_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0127303, world_core/astronomy.jsonl/astro_001
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #842
+
+- Triple: `(жүрек — goes_to — еуразия)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: kazakh_textbooks_pack.json/kz_textbook_kz_lang_11_ogn_p0233_s14, world_core/geography_kz.jsonl/geo_kz_027
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #858
+
+- Triple: `(табиғи — goes_to — күн жүйесі)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0000931, world_core/astronomy.jsonl/astro_001
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #930
+
+- Triple: `(көбінесе — goes_to — күн жүйесі)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0041738, world_core/astronomy.jsonl/astro_001
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #939
+
+- Triple: `(бағдарлама — goes_to — еуразия)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0051743, world_core/geography_kz.jsonl/geo_kz_027
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #960
+
+- Triple: `(жаңбыр — goes_to — апта)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0062657, world_core/time.jsonl/time_002
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #962
+
+- Triple: `(ақын — goes_to — ауыз)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0064706, world_core/body_parts.jsonl/body_007
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #973
+
+- Triple: `(түр — goes_to — апта)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0071175, world_core/time.jsonl/time_002
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1014
+
+- Triple: `(қазақ — goes_to — күн жүйесі)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0102007, world_core/astronomy.jsonl/astro_001
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1162
+
+- Triple: `(жер — related_to — жұлдыз)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0001072, wikipedia_kz_pack.json/wiki_kz_0009181
+- Source chain: world_core/astronomy.jsonl/astro_001, world_core/astronomy.jsonl/astro_011
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1210
+
+- Triple: `(дуадақ — related_to — құс)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0130217, world_core/biology_basic.jsonl/bio_010
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1213
+
+- Triple: `(жағалтай — related_to — ит)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0135186, world_core/biology_basic.jsonl/bio_003
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1226
+
+- Triple: `(желтоқсан — related_to — өзбекстан)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0141921, world_core/geography_kz.jsonl/geo_kz_030
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1290
+
+- Triple: `(адам — related_to — әсел)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/biology_basic.jsonl/bio_001, wikipedia_kz_pack.json/wiki_kz_0146217
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1341
+
+- Triple: `(бидай — related_to — құс)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/biology_basic.jsonl/bio_017, world_core/biology_basic.jsonl/bio_010
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1359
+
+- Triple: `(ешкі — related_to — өрік)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/biology_basic.jsonl/bio_009, wikipedia_kz_pack.json/wiki_kz_0081700
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1390
+
+- Triple: `(мысық — related_to — өсімдік)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/biology_basic.jsonl/bio_004, world_core/biology_basic.jsonl/bio_013
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1469
+
+- Triple: `(жыл — related_to — қостанай)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0046261, world_core/geography_kz.jsonl/geo_kz_013
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1616
+
+- Triple: `(жазушы — goes_to — еуразия)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0007212, world_core/geography_kz.jsonl/geo_kz_027
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1666
+
+- Triple: `(қазақстан — goes_to — құс жолы)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0043019, world_core/astronomy.jsonl/astro_022
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1690
+
+- Triple: `(соғыс — goes_to — құс жолы)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0068631, world_core/astronomy.jsonl/astro_022
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1763
+
+- Triple: `(рет — goes_to — құс жолы)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0130463, world_core/astronomy.jsonl/astro_022
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1838
+
+- Triple: `(жағалтай — related_to — шөп)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0135186, world_core/biology_basic.jsonl/bio_015
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1843
+
+- Triple: `(алматы — related_to — қыркүйек)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/geography_kz.jsonl/geo_kz_004, wikipedia_kz_pack.json/wiki_kz_0009178
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1848
+
+- Triple: `(ақтау — related_to — қыркүйек)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/geography_kz.jsonl/geo_kz_014, wikipedia_kz_pack.json/wiki_kz_0009178
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1853
+
+- Triple: `(павлодар — related_to — қыркүйек)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/geography_kz.jsonl/geo_kz_009, wikipedia_kz_pack.json/wiki_kz_0009178
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1895
+
+- Triple: `(мектеп — goes_to — күн жүйесі)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0020137, world_core/astronomy.jsonl/astro_001
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1913
+
+- Triple: `(яғни — goes_to — ғасыр)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0057448, world_core/time.jsonl/time_005
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #1940
+
+- Triple: `(өмір — goes_to — күн жүйесі)`
+- Rule: `R7_goes_to_via_part_of`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0099077, world_core/astronomy.jsonl/astro_001
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #2056
+
+- Triple: `(жыл — has — дене)`
+- Rule: `R2_has_inheritance`
+- Confidence: `rule_inferred`
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0046261, world_core/society.jsonl/soc_040
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1270,6 +1270,8 @@ Sampled facts by pattern:
 
 Sampled derivations by rule:
 
-- `R1_is_a_transitivity`: 2
-- `R2_has_inheritance`: 13
-- `R5_shared_is_a_target`: 35
+- `R1_is_a_transitivity`: 1
+- `R2_has_inheritance`: 8
+- `R5_shared_is_a_target`: 25
+- `R6_lives_in_via_part_of`: 1
+- `R7_goes_to_via_part_of`: 15

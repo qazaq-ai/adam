@@ -10,13 +10,17 @@
 //!
 //! 1. **Graph position** — degree, incoming / outgoing edges per
 //!    predicate, top-5 most-connected neighbours.
-//! 2. **Direct facts** — every extracted `Fact` where this root is
-//!    subject OR object, with pattern, predicate, provenance.
-//! 3. **Rule-derived facts** — every `DerivedFact` where this root is
+//! 2. **Curated facts** (v3.9.0+) — `Fact`s with
+//!    `ConfidenceKind::HumanApproved` from `data/world_core/*.jsonl`.
+//!    Shown first because every entry carries a named reviewer.
+//! 3. **Extracted facts** — every `Fact` with `ConfidenceKind::Grammar`
+//!    where this root is subject OR object, with pattern, predicate,
+//!    provenance.
+//! 4. **Rule-derived facts** — every `DerivedFact` where this root is
 //!    subject OR object, with the rule id that fired, the full
 //!    `source_chain`, and a one-line Kazakh-prose rendering with the
 //!    `«байланыс-»` trust marker.
-//! 4. **Co-predicated neighbours** — other roots that share an IsA or
+//! 5. **Co-predicated neighbours** — other roots that share an IsA or
 //!    Has target with this root (the R5-input surface).
 //!
 //! Each section is skipped cleanly if empty. Unknown roots produce a
@@ -25,13 +29,11 @@
 //!
 //! ## Investor-demo intent
 //!
-//! `adam_demo` is scripted — it shows the same 4 canonical turns every
+//! `adam_demo` is scripted — it shows the same canonical turns every
 //! run. `adam_inspect` is the opposite: the investor supplies any
 //! Kazakh root they care about, and the system prints everything it
-//! knows. At v3.6.5's committed state (13 345 facts, 207 derivations,
-//! 2 974 graph nodes), any content noun with degree > 3 produces a
-//! multi-page structured report, with every claim traceable to a
-//! `(pack, sample_id)` or `rule_id`.
+//! knows. Every claim is traceable to a `(pack, sample_id)` provenance
+//! or a `rule_id` + `source_chain`.
 //!
 //! ## Usage
 //!

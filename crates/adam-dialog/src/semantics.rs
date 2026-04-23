@@ -166,6 +166,16 @@ pub fn interpret_text_with_lexicon(
 /// no topical content for the `unknown.with_noun` template or for
 /// retrieval ranking. Filtered from both `first_noun_root` and
 /// `content_roots`.
+///
+/// **v3.9.5** — kept in sync with `adam_reasoning::patterns::is_closed_class`.
+/// Pre-v3.9.5 this list was narrower, which caused the user-visible bug
+/// where «Неліктен?» («why?» — a vocative interrogative) was parsed as
+/// `Нелік` (noun-root) + ablative suffix, so the dialog replied
+/// «Нелікте тұрасыз ба» («Do you live in Нелік?»). Expansion covers:
+/// interrogative pronouns (неліктен / неге / қашан / қайда / …),
+/// demonstrative qualifiers (мұндай / сондай / …), quantifier-like
+/// forms (кейбір / өз / бірнеше / әрбір / …), and the comparison
+/// particle сияқ (bare root of сияқты).
 const NOT_A_TOPIC: &[&str] = &[
     // pronouns
     "мен",
@@ -189,6 +199,7 @@ const NOT_A_TOPIC: &[&str] = &[
     "кейін",
     "дейін",
     "сияқты",
+    "сияқ",
     "ретінде",
     "арқылы",
     // quantifiers / closed-class
@@ -196,6 +207,32 @@ const NOT_A_TOPIC: &[&str] = &[
     "аз",
     "бәрі",
     "барлық",
+    // v3.9.5 — interrogatives (mirrors `adam_reasoning::patterns`).
+    // Closes the «Неліктен → Нелікте тұрасыз ба» REPL bug.
+    "қандай",
+    "кім",
+    "не",
+    "қай",
+    "қашан",
+    "қайда",
+    "неліктен",
+    "неге",
+    "қанша",
+    // v3.9.5 — demonstrative qualifiers + quantifier forms.
+    "мұндай",
+    "сондай",
+    "ондай",
+    "мынадай",
+    "сондай-ақ",
+    "кейбір",
+    "өз",
+    "өзі",
+    "бірнеше",
+    "барша",
+    "әрбір",
+    "әр",
+    "бір",
+    "кей",
 ];
 
 /// Return the root of the first content-noun Analysis in the parse list.
@@ -899,4 +936,48 @@ fn detect_insult(tokens: &[String], joined: &str) -> bool {
         )
     }) || joined.contains("ақылсыз")
         || joined.contains("түкке тұрмайсың")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// v3.9.5 regression: «Неліктен» / «Неге» / «Қашан» etc. must not be
+    /// extracted as a topic-noun. Pre-v3.9.5 the REPL would reply with
+    /// «Нелікте тұрасыз ба» (= "Do you live in Нелік?") to the input
+    /// «Неліктен?» because the FST parsed it as `Нелік` + ablative and
+    /// `NOT_A_TOPIC` did not include the interrogative.
+    #[test]
+    fn not_a_topic_covers_v3_9_5_additions() {
+        // Interrogatives — primary fix.
+        for word in [
+            "неліктен",
+            "неге",
+            "қашан",
+            "қайда",
+            "қандай",
+            "кім",
+            "қанша",
+        ] {
+            assert!(
+                NOT_A_TOPIC.contains(&word),
+                "interrogative `{word}` must be in NOT_A_TOPIC"
+            );
+        }
+        // Demonstrative qualifiers.
+        for word in ["мұндай", "сондай", "ондай", "кейбір", "өз", "әрбір"]
+        {
+            assert!(
+                NOT_A_TOPIC.contains(&word),
+                "demonstrative `{word}` must be in NOT_A_TOPIC"
+            );
+        }
+        // Content nouns still pass through the gate.
+        for word in ["бала", "кітап", "мектеп", "қазақстан", "жер"] {
+            assert!(
+                !NOT_A_TOPIC.contains(&word),
+                "content noun `{word}` must NOT be in NOT_A_TOPIC"
+            );
+        }
+    }
 }

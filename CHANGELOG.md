@@ -7,6 +7,121 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.9.5] — 2026-04-23 — World Core expansion + R6/R7 rules + dialog closed-class sync
+
+**Continuation of the v3.9.0 architectural direction.** Three independent improvements, each a small and contained delta:
+
+### 1. World Core expansion — 80 → 200 entries / 126 → 270 facts
+
+Three new domains added by `shaman` at `approved` review status:
+
+| domain | entries | facts |
+|---|---:|---:|
+| astronomy | 30 | 41 |
+| time | 20 | 38 |
+| geography_kz | 30 | 47 |
+| **biology_basic** (v3.9.5) | **40** | **41** |
+| **body_parts** (v3.9.5) | **40** | **55** |
+| **society** (v3.9.5) | **40** | **48** |
+| **TOTAL** | **200** | **270** |
+
+Content:
+- `biology_basic.jsonl` — human, mammals, common animals (ит, мысық, жылқы, қой, сиыр, түйе, ешкі, құс, балық), plants (ағаш, шөп, гүл, бидай), terrain (орман, дала, шөл, тайга, тау, өзен, көл, теңіз, мұхит), cell / organism, biology + ecology as sciences. 41 typed facts.
+- `body_parts.jsonl` — head parts (бас, бет, көз, құлақ, мұрын, ауыз, тіл, тіс, шаш), limbs (мойын, иық, қол, саусақ, алақан, тізе, аяқ, табан), internal organs (жүрек, өкпе, бауыр, бүйрек, асқазан, ми, қан), structural (сүйек, ет, тері, жүйке), 6 quantified claims («адамда екі көз бар» etc), anatomy as a science. 55 typed facts.
+- `society.jsonl` — state / law / constitution / parliament / president / courts, family (ана, әке, бала), education (мектеп, университет, оқушы, мұғалім, студент, кітап, кітапхана), sciences (математика, физика, химия, тарих), economy (ақша, теңге, еңбек), professions (дәрігер, мұғалім, инженер, заңгер), dimension (дін, мәдениет, тіл, қазақ тілі, халық). 48 typed facts.
+
+All 200 entries pass `validate_world_core` with 0 rejections / 0 Kazakh-purity warnings.
+
+### 2. R6 + R7 — spatial + directional transitivity rules
+
+Two new forward-chaining rules, activated now that v3.8.0's verb-root fix gave `LivesIn` / `GoesTo` real data AND v3.9.0's `geography_kz.jsonl` curated a `city PartOf country` chain:
+
+| rule | formula | example |
+|---|---|---|
+| **R6_lives_in_via_part_of** | `A LivesIn B ∧ B PartOf C ⟹ A LivesIn C` | (Дәулет, LivesIn, Қостанай) ∧ (Қостанай, PartOf, Қазақстан) ⟹ (Дәулет, LivesIn, Қазақстан) |
+| **R7_goes_to_via_part_of** | `A GoesTo B ∧ B PartOf C ⟹ A GoesTo C` | (ол, GoesTo, Алматы) ∧ (Алматы, PartOf, Қазақстан) ⟹ (ол, GoesTo, Қазақстан) |
+
+Both emit `ConfidenceKind::RuleInferred` with a 2-source chain. Tautology-guarded (A ≠ C). 6 new unit tests: `r6_derives_lives_in_via_part_of`, `r6_respects_tautology_guard`, `r6_does_not_fire_without_part_of_edge`, `r6_dedupes_against_existing_fact`, `r7_derives_goes_to_via_part_of`, `r7_respects_tautology_guard`.
+
+Reasoner roster is now 5 active rules: R1 / R2 / R3 / R5 / R6 / R7 (6 total). R4 remains curator-warning only.
+
+### 3. Dialog `NOT_A_TOPIC` sync — closes «Неліктен → Нелікте тұрасыз ба» bug
+
+v3.8.5 free-form REPL testing surfaced: user typing «Неліктен?» («why?» — an interrogative) got reply «Нелікте тұрасыз ба» («Do you live in Нелік?»). The FST analysed «Неліктен» as `Нелік` + ablative suffix (a valid morphological parse), and `adam-dialog::semantics::NOT_A_TOPIC` lacked the interrogative entries that `adam-reasoning::patterns::is_closed_class` had gained in v3.5.0+.
+
+Fix: expanded `NOT_A_TOPIC` to mirror `is_closed_class` — added interrogatives (`неліктен`, `неге`, `қашан`, `қайда`, `қандай`, `кім`, `не`, `қай`, `қанша`), demonstrative qualifiers (`мұндай`, `сондай`, `ондай`, `мынадай`, `сондай-ақ`, `кейбір`, `өз`, `өзі`, `бірнеше`, `барша`, `әрбір`, `әр`, `бір`, `кей`), plus the comparison particle `сияқ` missing since v3.5.0.
+
+Regression test `not_a_topic_covers_v3_9_5_additions` asserts every newly-added word is present AND that content nouns (бала, кітап, мектеп, қазақстан, жер) still pass through.
+
+### Committed runtime delta
+
+Measured on T4_200k after v3.9.5 extraction (`--bench-order --max-total 200000`):
+
+| | v3.9.0 | v3.9.5 | delta |
+|---|---:|---:|---|
+| facts.json (total) | 13 627 | **13 771** | **+144** |
+| curated (world_core, HumanApproved) | 126 | **270** | **+144** (new domains) |
+| extracted (text, Grammar) | 13 501 | 13 501 | 0 (text corpus unchanged) |
+| graph nodes | 3 100 | **3 151** | **+51** |
+| graph edges | 12 175 | **12 317** | **+142** |
+| **derivations** | **704** | **2 058** | **+1 354 (×2.9)** |
+| predicate coverage | 11/11 (100 %) | 11/11 (100 %) | preserved |
+
+Per-predicate fact counts after v3.9.5:
+
+| predicate | v3.9.0 | v3.9.5 | delta |
+|---|---:|---:|---|
+| DoesTo | 9 399 | 9 399 | 0 |
+| GoesTo | 1 692 | 1 692 | 0 |
+| RelatedTo | 1 446 | 1 446 | 0 |
+| LivesIn | 313 | 313 | 0 |
+| **IsA** | 219 | **294** | **+75** (world_core biology/society/body_parts) |
+| After | 269 | 269 | 0 |
+| **Has** | 190 | **207** | **+17** |
+| **PartOf** | 65 | **105** | **+40** (body_parts / biology / society chains) |
+| **HasQuantity** | 29 | **35** | **+6** |
+| **Causes** | 3 | **6** | **+3** (biology water/air entries) |
+| **InDomain** | 2 | **5** | **+3** (biology/anatomy sciences) |
+
+Per-rule derivation counts — **R6 and R7 fire for the first time**:
+
+| rule | v3.9.0 | v3.9.5 | delta |
+|---|---:|---:|---|
+| R1_is_a_transitivity | 42 | **114** | +72 |
+| R2_has_inheritance | 173 | **253** | +80 |
+| **R3_has_inheritance_via_part_of** | 0 | **15** | +15 (first real fire on curated chains) |
+| R5_shared_is_a_target | 489 | **933** | +444 (×1.9) |
+| **R6_lives_in_via_part_of** | 0 | **103** | +103 (NEW — v3.9.5) |
+| **R7_goes_to_via_part_of** | 0 | **640** | +640 (NEW — v3.9.5) |
+
+**R7 is the biggest single-rule contribution**: every one of the 1 692 extracted `GoesTo` facts whose destination is a city that curated `geography_kz` identifies as part of Қазақстан (or Орталық Азия / Еуразия) now produces a derivation at the country level. This is exactly the "city-level facts + curated chain → country-level conclusions" leverage the v3.9.5 plan targeted.
+
+Most-connected graph nodes (content-noun focus preserved): **адам (290), жер (221), дүние (210), қазақ (200), ат (156)**. «адам» (human) remains central — a stronger semantic signal than any raw corpus statistic would give.
+
+### Tests
+
+**440 passing** (+7 from v3.9.0): 4 R6 regressions + 2 R7 regressions + 1 NOT_A_TOPIC sync test.
+
+### Architectural status
+
+At v3.9.5 adam has:
+- **200 curated knowledge entries** → 270 facts with full reviewer provenance
+- **5 active forward-chaining rules** (R1, R2, R3, R5, R6, R7) — R6/R7 turn the clean v3.8.5-hardened LivesIn/GoesTo predicates into new derivations
+- **11/11 predicate coverage** preserved from v3.9.0
+- **Dialog intent layer synced with reasoning closed-class** — one single source of truth for «what is a content noun»
+
+Every curated fact is signed by a reviewer; every derivation has a source_chain; every refusal («Неліктен?») goes through an explicit filter rather than a heuristic. This is the shape of an **auditable Kazakh reasoning engine**.
+
+### What's next (v4.0.0 — investor-ready MVP)
+
+- Expand World Core to 500–1 000 entries (add `numbers`, `colors`, `kz_literature`, `food`, `clothing`)
+- Full scripted investor demo (`adam_demo_v4` — one command, one full narrative, ~3-minute screencast)
+- Native-speaker review workflow (web UI for community contributions)
+- `validate_world_core` integrated into `validate_foundation.sh` as CI gate
+- Extend `data/world_core/README.md` with per-domain authoring guides
+
+---
+
 ## [3.9.0] — 2026-04-23 — World Core v1: curated Kazakh knowledge packs + hygiene gate
 
 **Architectural direction captured.** Codex's second-pass review of v3.8.5 converged with our own assessment: the path to a «ChatGPT-class intellectual, but without probability / cost / hallucination» is **not** to train an LLM-clone — it's to build an *auditable Kazakh reasoning engine* on top of **curated knowledge packs**. v3.9.0 ships the World Core infrastructure that unlocks this path + closes the `-`-prefixed fragment noise Codex flagged on the facts.json graph.

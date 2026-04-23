@@ -97,23 +97,22 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v3.9.0)
+## Current scale (v3.9.5)
 
-At bootstrap, World Core ships with:
-
-- `astronomy.jsonl` — 30 entries / ≈ 45 facts
-- `time.jsonl` — 20 entries / ≈ 35 facts
-- `geography_kz.jsonl` — 30 entries / ≈ 50 facts
-- **Total: 80 entries / ≈ 130 facts**, all `approved` at `high` or
+- `astronomy.jsonl` — 30 entries / 41 facts
+- `time.jsonl` — 20 entries / 38 facts
+- `geography_kz.jsonl` — 30 entries / 47 facts
+- `biology_basic.jsonl` — 40 entries / 41 facts  *(new in v3.9.5)*
+- `body_parts.jsonl` — 40 entries / 55 facts  *(new in v3.9.5)*
+- `society.jsonl` — 40 entries / 48 facts  *(new in v3.9.5)*
+- **Total: 200 entries / 270 facts**, all `approved` at `high` or
   `medium` confidence by `shaman`.
 
 ## Roadmap
 
-- **v3.9.5** — expand to 500+ entries across 6–8 domains (`biology_basic`,
-  `society`, `numbers`, `kz_literature`, `colors`, `body_parts`).
-- **v4.0.0** — 5 000+ entries; R6 (`LivesIn + PartOf → LivesIn`) and R7
-  (`GoesTo + PartOf → GoesTo`) rules activated; investor demo built on
-  the `HumanApproved`-only view.
-- **v4.x** — native-speaker review tool (web UI) for community
-  contributions; every entry gets at least two reviewers before
-  promoting to `approved`.
+- **v4.0.0** — 500–1 000 entries across 10+ domains; full scripted
+  investor demo; `validate_world_core` integrated into CI; community
+  contribution workflow for native-speaker review.
+- **v4.x** — native-speaker review tool (web UI); every entry gets at
+  least two reviewers before promoting to `approved`.
+- **v5.x** — target 5 000+ entries, 20+ domains.

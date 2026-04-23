@@ -1,17 +1,17 @@
 {
-  "version": "3.9.0",
+  "version": "3.9.5",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
   "summary": {
-    "total_nodes": 3100,
-    "total_edges": 12175,
-    "facts_ingested": 13627,
+    "total_nodes": 3151,
+    "total_edges": 12317,
+    "facts_ingested": 13771,
     "most_connected": [
       [
         "адам",
-        279
+        290
       ],
       [
         "жер",
@@ -189,18 +189,21 @@
         }
       },
       "адам": {
-        "out_degree": 129,
-        "in_degree": 150,
+        "out_degree": 139,
+        "in_degree": 151,
         "out_by_predicate": {
           "does_to": 86,
           "goes_to": 24,
-          "has": 6,
+          "has": 9,
+          "has_quantity": 5,
+          "is_a": 2,
           "lives_in": 2,
           "related_to": 11
         },
         "in_by_predicate": {
           "does_to": 106,
           "goes_to": 31,
+          "has": 1,
           "is_a": 3,
           "part_of": 1,
           "related_to": 9
@@ -530,6 +533,14 @@
         },
         "in_by_predicate": {}
       },
+      "алақан": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {}
+      },
       "алматы": {
         "out_degree": 27,
         "in_degree": 16,
@@ -633,10 +644,22 @@
         "in_by_predicate": {}
       },
       "ана": {
+        "out_degree": 3,
+        "in_degree": 1,
+        "out_by_predicate": {
+          "is_a": 2,
+          "part_of": 1
+        },
+        "in_by_predicate": {
+          "has": 1
+        }
+      },
+      "анатомия": {
         "out_degree": 2,
         "in_degree": 0,
         "out_by_predicate": {
-          "is_a": 2
+          "in_domain": 1,
+          "is_a": 1
         },
         "in_by_predicate": {}
       },
@@ -1335,10 +1358,12 @@
         "in_by_predicate": {}
       },
       "асқазан": {
-        "out_degree": 3,
+        "out_degree": 5,
         "in_degree": 1,
         "out_by_predicate": {
           "does_to": 2,
+          "is_a": 1,
+          "part_of": 1,
           "related_to": 1
         },
         "in_by_predicate": {
@@ -1604,9 +1629,10 @@
         "in_by_predicate": {}
       },
       "ауа": {
-        "out_degree": 21,
+        "out_degree": 22,
         "in_degree": 4,
         "out_by_predicate": {
+          "causes": 1,
           "does_to": 17,
           "goes_to": 2,
           "lives_in": 1,
@@ -1700,7 +1726,7 @@
       },
       "аумақ": {
         "out_degree": 4,
-        "in_degree": 24,
+        "in_degree": 25,
         "out_by_predicate": {
           "does_to": 2,
           "lives_in": 1,
@@ -1709,6 +1735,7 @@
         "in_by_predicate": {
           "does_to": 20,
           "goes_to": 2,
+          "has": 1,
           "related_to": 2
         }
       },
@@ -1755,16 +1782,19 @@
         "in_by_predicate": {}
       },
       "ауыз": {
-        "out_degree": 8,
-        "in_degree": 13,
+        "out_degree": 10,
+        "in_degree": 15,
         "out_by_predicate": {
           "does_to": 6,
           "goes_to": 1,
-          "lives_in": 1
+          "is_a": 1,
+          "lives_in": 1,
+          "part_of": 1
         },
         "in_by_predicate": {
           "does_to": 11,
           "goes_to": 1,
+          "part_of": 2,
           "related_to": 1
         }
       },
@@ -1983,13 +2013,17 @@
         }
       },
       "аяқ": {
-        "out_degree": 6,
-        "in_degree": 4,
+        "out_degree": 8,
+        "in_degree": 7,
         "out_by_predicate": {
-          "does_to": 6
+          "does_to": 6,
+          "is_a": 1,
+          "part_of": 1
         },
         "in_by_predicate": {
-          "does_to": 4
+          "does_to": 4,
+          "has_quantity": 1,
+          "part_of": 2
         }
       },
       "аяқжол": {
@@ -2059,33 +2093,35 @@
         }
       },
       "ағаш": {
-        "out_degree": 22,
-        "in_degree": 25,
+        "out_degree": 23,
+        "in_degree": 26,
         "out_by_predicate": {
           "does_to": 14,
           "has": 1,
+          "is_a": 1,
           "lives_in": 1,
           "related_to": 6
         },
         "in_by_predicate": {
           "does_to": 17,
           "goes_to": 1,
+          "has": 1,
           "related_to": 7
         }
       },
       "ағза": {
-        "out_degree": 10,
-        "in_degree": 7,
+        "out_degree": 11,
+        "in_degree": 9,
         "out_by_predicate": {
           "does_to": 6,
           "goes_to": 1,
-          "has": 1,
+          "has": 2,
           "related_to": 2
         },
         "in_by_predicate": {
           "does_to": 2,
           "goes_to": 3,
-          "part_of": 1,
+          "part_of": 3,
           "related_to": 1
         }
       },
@@ -2475,16 +2511,18 @@
         }
       },
       "ақша": {
-        "out_degree": 13,
-        "in_degree": 4,
+        "out_degree": 14,
+        "in_degree": 5,
         "out_by_predicate": {
           "does_to": 8,
           "goes_to": 2,
+          "is_a": 1,
           "related_to": 3
         },
         "in_by_predicate": {
           "does_to": 1,
-          "goes_to": 3
+          "goes_to": 3,
+          "is_a": 1
         }
       },
       "ақшалай": {
@@ -2702,21 +2740,30 @@
         }
       },
       "бала": {
-        "out_degree": 39,
-        "in_degree": 22,
+        "out_degree": 40,
+        "in_degree": 23,
         "out_by_predicate": {
           "does_to": 21,
           "goes_to": 9,
           "is_a": 2,
           "lives_in": 3,
+          "part_of": 1,
           "related_to": 4
         },
         "in_by_predicate": {
           "does_to": 9,
           "goes_to": 7,
-          "has": 1,
+          "has": 2,
           "related_to": 5
         }
+      },
+      "балық": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "балықшы": {
         "out_degree": 1,
@@ -2748,6 +2795,16 @@
           "does_to": 1
         }
       },
+      "бас": {
+        "out_degree": 1,
+        "in_degree": 5,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {
+          "part_of": 5
+        }
+      },
       "бастау": {
         "out_degree": 4,
         "in_degree": 3,
@@ -2762,14 +2819,15 @@
       },
       "басшы": {
         "out_degree": 3,
-        "in_degree": 1,
+        "in_degree": 2,
         "out_by_predicate": {
           "does_to": 1,
           "goes_to": 1,
           "related_to": 1
         },
         "in_by_predicate": {
-          "does_to": 1
+          "does_to": 1,
+          "is_a": 1
         }
       },
       "басқарушы": {
@@ -2778,6 +2836,15 @@
         "out_by_predicate": {
           "does_to": 4,
           "goes_to": 2
+        },
+        "in_by_predicate": {}
+      },
+      "бауыр": {
+        "out_degree": 2,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1,
+          "part_of": 1
         },
         "in_by_predicate": {}
       },
@@ -2816,7 +2883,7 @@
       },
       "белгі": {
         "out_degree": 11,
-        "in_degree": 7,
+        "in_degree": 9,
         "out_by_predicate": {
           "after": 1,
           "does_to": 4,
@@ -2827,7 +2894,17 @@
         "in_by_predicate": {
           "does_to": 5,
           "has": 1,
-          "is_a": 1
+          "is_a": 3
+        }
+      },
+      "бет": {
+        "out_degree": 1,
+        "in_degree": 2,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {
+          "part_of": 2
         }
       },
       "би": {
@@ -2845,6 +2922,14 @@
         "in_degree": 0,
         "out_by_predicate": {
           "related_to": 1
+        },
+        "in_by_predicate": {}
+      },
+      "бидай": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
         },
         "in_by_predicate": {}
       },
@@ -2940,6 +3025,17 @@
           "goes_to": 1
         },
         "in_by_predicate": {}
+      },
+      "биология": {
+        "out_degree": 2,
+        "in_degree": 2,
+        "out_by_predicate": {
+          "in_domain": 1,
+          "is_a": 1
+        },
+        "in_by_predicate": {
+          "in_domain": 2
+        }
       },
       "биологиялық": {
         "out_degree": 11,
@@ -3488,17 +3584,19 @@
         "in_by_predicate": {}
       },
       "білім": {
-        "out_degree": 27,
-        "in_degree": 35,
+        "out_degree": 28,
+        "in_degree": 36,
         "out_by_predicate": {
           "after": 1,
           "does_to": 20,
           "goes_to": 1,
+          "is_a": 1,
           "related_to": 5
         },
         "in_by_predicate": {
           "does_to": 26,
           "goes_to": 1,
+          "is_a": 1,
           "related_to": 8
         }
       },
@@ -3550,11 +3648,13 @@
         }
       },
       "бүйрек": {
-        "out_degree": 5,
+        "out_degree": 7,
         "in_degree": 3,
         "out_by_predicate": {
           "does_to": 2,
           "has": 1,
+          "is_a": 1,
+          "part_of": 1,
           "related_to": 2
         },
         "in_by_predicate": {
@@ -4717,11 +4817,12 @@
         }
       },
       "гүл": {
-        "out_degree": 5,
+        "out_degree": 6,
         "in_degree": 16,
         "out_by_predicate": {
           "does_to": 1,
           "goes_to": 1,
+          "is_a": 1,
           "related_to": 3
         },
         "in_by_predicate": {
@@ -4763,6 +4864,30 @@
           "does_to": 2
         },
         "in_by_predicate": {}
+      },
+      "дала": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "has": 1
+        },
+        "in_by_predicate": {}
+      },
+      "дауыс": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "дене": {
+        "out_degree": 0,
+        "in_degree": 14,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "part_of": 14
+        }
       },
       "дерек": {
         "out_degree": 21,
@@ -5073,12 +5198,13 @@
         }
       },
       "дін": {
-        "out_degree": 16,
+        "out_degree": 17,
         "in_degree": 27,
         "out_by_predicate": {
           "does_to": 11,
           "goes_to": 2,
           "has": 1,
+          "is_a": 1,
           "related_to": 2
         },
         "in_by_predicate": {
@@ -5422,10 +5548,11 @@
         }
       },
       "дәрігер": {
-        "out_degree": 10,
+        "out_degree": 11,
         "in_degree": 12,
         "out_by_predicate": {
-          "does_to": 10
+          "does_to": 10,
+          "is_a": 1
         },
         "in_by_predicate": {
           "does_to": 8,
@@ -5817,7 +5944,7 @@
       },
       "ереже": {
         "out_degree": 8,
-        "in_degree": 10,
+        "in_degree": 11,
         "out_by_predicate": {
           "does_to": 7,
           "related_to": 1
@@ -5825,6 +5952,7 @@
         "in_by_predicate": {
           "does_to": 7,
           "goes_to": 2,
+          "is_a": 1,
           "related_to": 1
         }
       },
@@ -6183,9 +6311,10 @@
         }
       },
       "ет": {
-        "out_degree": 4,
+        "out_degree": 5,
         "in_degree": 42,
         "out_by_predicate": {
+          "part_of": 1,
           "related_to": 4
         },
         "in_by_predicate": {
@@ -6388,9 +6517,11 @@
         }
       },
       "ешкі": {
-        "out_degree": 0,
+        "out_degree": 1,
         "in_degree": 1,
-        "out_by_predicate": {},
+        "out_by_predicate": {
+          "is_a": 1
+        },
         "in_by_predicate": {
           "does_to": 1
         }
@@ -6450,13 +6581,13 @@
         }
       },
       "еңбек": {
-        "out_degree": 20,
+        "out_degree": 21,
         "in_degree": 17,
         "out_by_predicate": {
           "does_to": 12,
           "goes_to": 1,
           "has_quantity": 1,
-          "is_a": 1,
+          "is_a": 2,
           "lives_in": 1,
           "related_to": 4
         },
@@ -6846,6 +6977,17 @@
           "after": 1
         }
       },
+      "жануар": {
+        "out_degree": 2,
+        "in_degree": 9,
+        "out_by_predicate": {
+          "has": 1,
+          "is_a": 1
+        },
+        "in_by_predicate": {
+          "is_a": 9
+        }
+      },
       "жанындағ": {
         "out_degree": 1,
         "in_degree": 0,
@@ -7034,6 +7176,17 @@
         },
         "in_by_predicate": {
           "does_to": 1,
+          "has": 1
+        }
+      },
+      "жасуша": {
+        "out_degree": 2,
+        "in_degree": 1,
+        "out_by_predicate": {
+          "is_a": 1,
+          "part_of": 1
+        },
+        "in_by_predicate": {
           "has": 1
         }
       },
@@ -7272,10 +7425,11 @@
       },
       "жақтау": {
         "out_degree": 0,
-        "in_degree": 1,
+        "in_degree": 2,
         "out_by_predicate": {},
         "in_by_predicate": {
-          "does_to": 1
+          "does_to": 1,
+          "has_quantity": 1
         }
       },
       "жақтаушы": {
@@ -7586,6 +7740,14 @@
           "lives_in": 18,
           "part_of": 2,
           "related_to": 8
+        }
+      },
+      "жер бедері": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
         }
       },
       "жергілік": {
@@ -8097,6 +8259,14 @@
           "causes": 1
         }
       },
+      "жылқы": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "жын": {
         "out_degree": 4,
         "in_degree": 6,
@@ -8307,7 +8477,7 @@
       },
       "жүйе": {
         "out_degree": 15,
-        "in_degree": 10,
+        "in_degree": 11,
         "out_by_predicate": {
           "does_to": 7,
           "goes_to": 4,
@@ -8317,15 +8487,17 @@
         "in_by_predicate": {
           "does_to": 3,
           "goes_to": 5,
+          "is_a": 1,
           "lives_in": 1,
           "related_to": 1
         }
       },
       "жүйке": {
-        "out_degree": 2,
+        "out_degree": 3,
         "in_degree": 0,
         "out_by_predicate": {
-          "does_to": 2
+          "does_to": 2,
+          "part_of": 1
         },
         "in_by_predicate": {}
       },
@@ -8393,17 +8565,19 @@
         }
       },
       "жүрек": {
-        "out_degree": 15,
-        "in_degree": 10,
+        "out_degree": 17,
+        "in_degree": 11,
         "out_by_predicate": {
           "does_to": 8,
           "goes_to": 4,
+          "has_quantity": 1,
           "is_a": 1,
+          "part_of": 1,
           "related_to": 2
         },
         "in_by_predicate": {
           "does_to": 8,
-          "has": 1,
+          "has": 2,
           "related_to": 1
         }
       },
@@ -8865,24 +9039,28 @@
         "in_by_predicate": {}
       },
       "заң": {
-        "out_degree": 21,
-        "in_degree": 32,
+        "out_degree": 22,
+        "in_degree": 34,
         "out_by_predicate": {
           "does_to": 14,
           "goes_to": 6,
+          "is_a": 1,
           "related_to": 1
         },
         "in_by_predicate": {
           "does_to": 29,
           "goes_to": 2,
+          "has": 1,
+          "is_a": 1,
           "related_to": 1
         }
       },
       "заңгер": {
-        "out_degree": 1,
+        "out_degree": 2,
         "in_degree": 1,
         "out_by_predicate": {
-          "goes_to": 1
+          "goes_to": 1,
+          "is_a": 1
         },
         "in_by_predicate": {
           "does_to": 1
@@ -9188,13 +9366,14 @@
       },
       "игілік": {
         "out_degree": 3,
-        "in_degree": 14,
+        "in_degree": 15,
         "out_by_predicate": {
           "does_to": 3
         },
         "in_by_predicate": {
           "does_to": 13,
-          "goes_to": 1
+          "goes_to": 1,
+          "is_a": 1
         }
       },
       "идея": {
@@ -9347,6 +9526,14 @@
         },
         "in_by_predicate": {}
       },
+      "инженер": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "инженерлік": {
         "out_degree": 3,
         "in_degree": 1,
@@ -9426,10 +9613,10 @@
         "in_by_predicate": {}
       },
       "ит": {
-        "out_degree": 2,
+        "out_degree": 3,
         "in_degree": 0,
         "out_by_predicate": {
-          "is_a": 2
+          "is_a": 3
         },
         "in_by_predicate": {}
       },
@@ -9463,10 +9650,11 @@
         "in_by_predicate": {}
       },
       "иық": {
-        "out_degree": 1,
+        "out_degree": 2,
         "in_degree": 2,
         "out_by_predicate": {
-          "does_to": 1
+          "does_to": 1,
+          "part_of": 1
         },
         "in_by_predicate": {
           "goes_to": 1,
@@ -10423,6 +10611,14 @@
         },
         "in_by_predicate": {}
       },
+      "конституция": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "конституциялық": {
         "out_degree": 3,
         "in_degree": 5,
@@ -10749,21 +10945,30 @@
         }
       },
       "кітап": {
-        "out_degree": 13,
-        "in_degree": 27,
+        "out_degree": 14,
+        "in_degree": 28,
         "out_by_predicate": {
           "after": 1,
           "does_to": 8,
           "has": 1,
-          "is_a": 1,
+          "is_a": 2,
           "related_to": 2
         },
         "in_by_predicate": {
           "does_to": 21,
           "goes_to": 4,
+          "has": 1,
           "lives_in": 1,
           "related_to": 1
         }
+      },
+      "кітапхана": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "has": 1
+        },
+        "in_by_predicate": {}
       },
       "кішке": {
         "out_degree": 1,
@@ -11256,10 +11461,11 @@
       },
       "кәсіп": {
         "out_degree": 0,
-        "in_degree": 6,
+        "in_degree": 7,
         "out_by_predicate": {},
         "in_by_predicate": {
           "does_to": 4,
+          "is_a": 1,
           "related_to": 2
         }
       },
@@ -11448,19 +11654,23 @@
         }
       },
       "көз": {
-        "out_degree": 22,
-        "in_degree": 24,
+        "out_degree": 24,
+        "in_degree": 26,
         "out_by_predicate": {
           "after": 2,
           "does_to": 17,
           "goes_to": 1,
+          "is_a": 1,
           "lives_in": 1,
+          "part_of": 1,
           "related_to": 1
         },
         "in_by_predicate": {
           "does_to": 15,
           "goes_to": 6,
           "has": 1,
+          "has_quantity": 1,
+          "is_a": 1,
           "related_to": 2
         }
       },
@@ -11657,12 +11867,13 @@
         }
       },
       "көл": {
-        "out_degree": 19,
+        "out_degree": 20,
         "in_degree": 16,
         "out_by_predicate": {
           "does_to": 9,
           "goes_to": 2,
           "has": 1,
+          "is_a": 1,
           "lives_in": 3,
           "related_to": 4
         },
@@ -12175,6 +12386,22 @@
           "is_a": 1
         }
       },
+      "маман": {
+        "out_degree": 0,
+        "in_degree": 4,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 4
+        }
+      },
+      "мамандық": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "марс": {
         "out_degree": 3,
         "in_degree": 0,
@@ -12182,6 +12409,14 @@
           "has_quantity": 1,
           "is_a": 1,
           "part_of": 1
+        },
+        "in_by_predicate": {}
+      },
+      "математика": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
         },
         "in_by_predicate": {}
       },
@@ -12196,6 +12431,14 @@
         "in_by_predicate": {
           "does_to": 22,
           "related_to": 2
+        }
+      },
+      "материя": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
         }
       },
       "мағына": {
@@ -12238,7 +12481,7 @@
       },
       "мекеме": {
         "out_degree": 9,
-        "in_degree": 3,
+        "in_degree": 5,
         "out_by_predicate": {
           "does_to": 3,
           "goes_to": 1,
@@ -12247,15 +12490,17 @@
         },
         "in_by_predicate": {
           "does_to": 1,
+          "is_a": 2,
           "related_to": 2
         }
       },
       "мектеп": {
-        "out_degree": 9,
-        "in_degree": 27,
+        "out_degree": 10,
+        "in_degree": 29,
         "out_by_predicate": {
           "does_to": 4,
           "goes_to": 2,
+          "is_a": 1,
           "lives_in": 1,
           "related_to": 2
         },
@@ -12263,16 +12508,18 @@
           "does_to": 18,
           "goes_to": 7,
           "lives_in": 1,
+          "part_of": 2,
           "related_to": 1
         }
       },
       "мемлекет": {
-        "out_degree": 48,
-        "in_degree": 41,
+        "out_degree": 52,
+        "in_degree": 43,
         "out_by_predicate": {
           "does_to": 33,
           "goes_to": 3,
-          "has": 1,
+          "has": 4,
+          "is_a": 1,
           "lives_in": 2,
           "related_to": 9
         },
@@ -12282,7 +12529,7 @@
           "goes_to": 8,
           "is_a": 5,
           "lives_in": 2,
-          "part_of": 2,
+          "part_of": 4,
           "related_to": 4
         }
       },
@@ -12302,6 +12549,17 @@
           "is_a": 1
         },
         "in_by_predicate": {}
+      },
+      "ми": {
+        "out_degree": 2,
+        "in_degree": 1,
+        "out_by_predicate": {
+          "is_a": 1,
+          "part_of": 1
+        },
+        "in_by_predicate": {
+          "has": 1
+        }
       },
       "микротолқын": {
         "out_degree": 0,
@@ -12428,6 +12686,14 @@
         "in_degree": 0,
         "out_by_predicate": {
           "related_to": 1
+        },
+        "in_by_predicate": {}
+      },
+      "мойын": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "part_of": 1
         },
         "in_by_predicate": {}
       },
@@ -12637,10 +12903,11 @@
         }
       },
       "мысық": {
-        "out_degree": 3,
+        "out_degree": 4,
         "in_degree": 3,
         "out_by_predicate": {
-          "does_to": 3
+          "does_to": 3,
+          "is_a": 1
         },
         "in_by_predicate": {
           "does_to": 3
@@ -12788,7 +13055,7 @@
       },
       "мүше": {
         "out_degree": 3,
-        "in_degree": 4,
+        "in_degree": 16,
         "out_by_predicate": {
           "does_to": 1,
           "goes_to": 1,
@@ -12796,7 +13063,7 @@
         },
         "in_by_predicate": {
           "does_to": 2,
-          "is_a": 1,
+          "is_a": 13,
           "related_to": 1
         }
       },
@@ -12974,10 +13241,12 @@
         }
       },
       "мұрын": {
-        "out_degree": 1,
+        "out_degree": 3,
         "in_degree": 2,
         "out_by_predicate": {
-          "does_to": 1
+          "does_to": 1,
+          "is_a": 1,
+          "part_of": 1
         },
         "in_by_predicate": {
           "does_to": 1,
@@ -13047,12 +13316,13 @@
         "in_by_predicate": {}
       },
       "мұхит": {
-        "out_degree": 18,
+        "out_degree": 19,
         "in_degree": 9,
         "out_by_predicate": {
           "does_to": 11,
           "goes_to": 2,
           "has": 3,
+          "is_a": 1,
           "lives_in": 1,
           "related_to": 1
         },
@@ -13073,12 +13343,14 @@
         }
       },
       "мұғалім": {
-        "out_degree": 7,
+        "out_degree": 9,
         "in_degree": 1,
         "out_by_predicate": {
           "does_to": 5,
           "goes_to": 1,
-          "has": 1
+          "has": 1,
+          "is_a": 1,
+          "part_of": 1
         },
         "in_by_predicate": {
           "does_to": 1
@@ -13156,16 +13428,18 @@
         "in_by_predicate": {}
       },
       "мәдениет": {
-        "out_degree": 21,
-        "in_degree": 22,
+        "out_degree": 22,
+        "in_degree": 23,
         "out_by_predicate": {
           "does_to": 13,
           "goes_to": 3,
           "has": 1,
+          "is_a": 1,
           "related_to": 4
         },
         "in_by_predicate": {
           "does_to": 18,
+          "has": 1,
           "related_to": 4
         }
       },
@@ -13234,7 +13508,7 @@
       },
       "мәлімет": {
         "out_degree": 18,
-        "in_degree": 25,
+        "in_degree": 26,
         "out_by_predicate": {
           "does_to": 12,
           "goes_to": 3,
@@ -13244,7 +13518,8 @@
         "in_by_predicate": {
           "does_to": 22,
           "goes_to": 2,
-          "has": 1
+          "has": 1,
+          "is_a": 1
         }
       },
       "мәліметінше": {
@@ -14164,6 +14439,24 @@
           "related_to": 1
         }
       },
+      "орган": {
+        "out_degree": 0,
+        "in_degree": 3,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 3
+        }
+      },
+      "орман": {
+        "out_degree": 1,
+        "in_degree": 1,
+        "out_by_predicate": {
+          "has": 1
+        },
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
       "орталық азия": {
         "out_degree": 0,
         "in_degree": 1,
@@ -14184,6 +14477,17 @@
           "goes_to": 1
         }
       },
+      "отбасы": {
+        "out_degree": 4,
+        "in_degree": 3,
+        "out_by_predicate": {
+          "has": 3,
+          "part_of": 1
+        },
+        "in_by_predicate": {
+          "part_of": 3
+        }
+      },
       "оқу": {
         "out_degree": 17,
         "in_degree": 17,
@@ -14200,6 +14504,14 @@
           "related_to": 1
         }
       },
+      "оқушы": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {}
+      },
       "павлодар": {
         "out_degree": 10,
         "in_degree": 4,
@@ -14215,6 +14527,15 @@
           "lives_in": 1,
           "related_to": 1
         }
+      },
+      "парламент": {
+        "out_degree": 2,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1,
+          "part_of": 1
+        },
+        "in_by_predicate": {}
       },
       "пияз": {
         "out_degree": 5,
@@ -14309,6 +14630,14 @@
         "in_by_predicate": {
           "does_to": 3
         }
+      },
+      "президент": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "президенттік": {
         "out_degree": 5,
@@ -15433,13 +15762,15 @@
         }
       },
       "саусақ": {
-        "out_degree": 1,
-        "in_degree": 1,
+        "out_degree": 2,
+        "in_degree": 2,
         "out_by_predicate": {
-          "does_to": 1
+          "does_to": 1,
+          "part_of": 1
         },
         "in_by_predicate": {
-          "does_to": 1
+          "does_to": 1,
+          "has_quantity": 1
         }
       },
       "сауық": {
@@ -15858,9 +16189,10 @@
         "in_by_predicate": {}
       },
       "сиыр": {
-        "out_degree": 3,
+        "out_degree": 4,
         "in_degree": 1,
         "out_by_predicate": {
+          "is_a": 1,
           "related_to": 3
         },
         "in_by_predicate": {
@@ -16068,11 +16400,12 @@
         }
       },
       "сот": {
-        "out_degree": 8,
+        "out_degree": 9,
         "in_degree": 6,
         "out_by_predicate": {
           "does_to": 6,
           "has": 1,
+          "is_a": 1,
           "related_to": 1
         },
         "in_by_predicate": {
@@ -16253,6 +16586,14 @@
         },
         "in_by_predicate": {}
       },
+      "студент": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {}
+      },
       "студенттері": {
         "out_degree": 1,
         "in_degree": 0,
@@ -16270,6 +16611,24 @@
         },
         "in_by_predicate": {
           "does_to": 3
+        }
+      },
+      "су": {
+        "out_degree": 1,
+        "in_degree": 2,
+        "out_by_predicate": {
+          "causes": 1
+        },
+        "in_by_predicate": {
+          "is_a": 2
+        }
+      },
+      "су қоймасы": {
+        "out_degree": 0,
+        "in_degree": 2,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 2
         }
       },
       "суайрық": {
@@ -16752,14 +17111,16 @@
         "in_by_predicate": {}
       },
       "сүйек": {
-        "out_degree": 5,
-        "in_degree": 13,
+        "out_degree": 6,
+        "in_degree": 14,
         "out_by_predicate": {
-          "does_to": 5
+          "does_to": 5,
+          "part_of": 1
         },
         "in_by_predicate": {
           "does_to": 11,
           "goes_to": 1,
+          "is_a": 1,
           "related_to": 1
         }
       },
@@ -16850,7 +17211,7 @@
       },
       "сүтқоректі": {
         "out_degree": 7,
-        "in_degree": 2,
+        "in_degree": 3,
         "out_by_predicate": {
           "does_to": 3,
           "has": 2,
@@ -16859,6 +17220,7 @@
         },
         "in_by_predicate": {
           "does_to": 1,
+          "is_a": 1,
           "related_to": 1
         }
       },
@@ -17298,6 +17660,14 @@
         },
         "in_by_predicate": {}
       },
+      "табан": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {}
+      },
       "табандылық": {
         "out_degree": 1,
         "in_degree": 1,
@@ -17382,6 +17752,14 @@
         "in_by_predicate": {
           "related_to": 1
         }
+      },
+      "тайга": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "тайлақ": {
         "out_degree": 1,
@@ -17481,9 +17859,10 @@
         "in_by_predicate": {}
       },
       "тамақ": {
-        "out_degree": 12,
+        "out_degree": 13,
         "in_degree": 15,
         "out_by_predicate": {
+          "causes": 1,
           "does_to": 9,
           "goes_to": 2,
           "related_to": 1
@@ -17604,6 +17983,14 @@
           "related_to": 1
         }
       },
+      "тарих": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "тарихындағ": {
         "out_degree": 1,
         "in_degree": 4,
@@ -17699,9 +18086,11 @@
         }
       },
       "тау": {
-        "out_degree": 0,
+        "out_degree": 1,
         "in_degree": 2,
-        "out_by_predicate": {},
+        "out_by_predicate": {
+          "is_a": 1
+        },
         "in_by_predicate": {
           "is_a": 2
         }
@@ -18024,6 +18413,14 @@
           "related_to": 1
         }
       },
+      "температура": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "температуралық": {
         "out_degree": 2,
         "in_degree": 0,
@@ -18154,12 +18551,13 @@
         }
       },
       "тері": {
-        "out_degree": 16,
+        "out_degree": 17,
         "in_degree": 4,
         "out_by_predicate": {
           "does_to": 12,
           "goes_to": 2,
           "has": 1,
+          "part_of": 1,
           "related_to": 1
         },
         "in_by_predicate": {
@@ -18220,9 +18618,12 @@
         }
       },
       "теңге": {
-        "out_degree": 0,
+        "out_degree": 2,
         "in_degree": 2,
-        "out_by_predicate": {},
+        "out_by_predicate": {
+          "is_a": 1,
+          "part_of": 1
+        },
         "in_by_predicate": {
           "does_to": 1,
           "related_to": 1
@@ -18274,11 +18675,12 @@
         }
       },
       "теңіз": {
-        "out_degree": 41,
+        "out_degree": 42,
         "in_degree": 23,
         "out_by_predicate": {
           "does_to": 25,
           "goes_to": 7,
+          "is_a": 1,
           "lives_in": 2,
           "part_of": 1,
           "related_to": 6
@@ -18865,6 +19267,16 @@
         },
         "in_by_predicate": {}
       },
+      "тыныс": {
+        "out_degree": 1,
+        "in_degree": 1,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {
+          "causes": 1
+        }
+      },
       "тыныштық": {
         "out_degree": 5,
         "in_degree": 4,
@@ -19008,6 +19420,14 @@
           "does_to": 1
         }
       },
+      "тізе": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {}
+      },
       "тізім": {
         "out_degree": 1,
         "in_degree": 6,
@@ -19049,19 +19469,22 @@
         }
       },
       "тіл": {
-        "out_degree": 24,
-        "in_degree": 34,
+        "out_degree": 27,
+        "in_degree": 36,
         "out_by_predicate": {
           "after": 1,
           "does_to": 10,
           "goes_to": 6,
-          "is_a": 1,
+          "is_a": 3,
           "lives_in": 2,
+          "part_of": 1,
           "related_to": 4
         },
         "in_by_predicate": {
           "does_to": 27,
           "goes_to": 5,
+          "has": 1,
+          "is_a": 1,
           "related_to": 2
         }
       },
@@ -19136,26 +19559,39 @@
         "in_by_predicate": {}
       },
       "тіршілік": {
-        "out_degree": 18,
-        "in_degree": 7,
+        "out_degree": 20,
+        "in_degree": 8,
         "out_by_predicate": {
           "after": 1,
           "does_to": 13,
           "goes_to": 2,
+          "in_domain": 1,
+          "is_a": 1,
           "related_to": 2
         },
         "in_by_predicate": {
+          "causes": 1,
           "does_to": 5,
           "goes_to": 2
         }
       },
+      "тіршілік иесі": {
+        "out_degree": 0,
+        "in_degree": 3,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 3
+        }
+      },
       "тіс": {
-        "out_degree": 7,
+        "out_degree": 9,
         "in_degree": 6,
         "out_by_predicate": {
           "after": 1,
           "does_to": 4,
           "goes_to": 1,
+          "is_a": 1,
+          "part_of": 1,
           "related_to": 1
         },
         "in_by_predicate": {
@@ -19264,11 +19700,12 @@
         }
       },
       "түйе": {
-        "out_degree": 12,
+        "out_degree": 13,
         "in_degree": 2,
         "out_by_predicate": {
           "does_to": 7,
           "goes_to": 2,
+          "is_a": 1,
           "related_to": 3
         },
         "in_by_predicate": {
@@ -20600,6 +21037,16 @@
         },
         "in_by_predicate": {}
       },
+      "университет": {
+        "out_degree": 1,
+        "in_degree": 1,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {
+          "part_of": 1
+        }
+      },
       "университеті": {
         "out_degree": 2,
         "in_degree": 0,
@@ -20824,6 +21271,14 @@
           "goes_to": 1
         }
       },
+      "физика": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "физикалық": {
         "out_degree": 5,
         "in_degree": 1,
@@ -20915,18 +21370,20 @@
         "in_by_predicate": {}
       },
       "халық": {
-        "out_degree": 70,
-        "in_degree": 66,
+        "out_degree": 72,
+        "in_degree": 67,
         "out_by_predicate": {
           "after": 3,
           "does_to": 53,
           "goes_to": 8,
+          "has": 2,
           "lives_in": 3,
           "related_to": 3
         },
         "in_by_predicate": {
           "does_to": 44,
           "goes_to": 9,
+          "has": 1,
           "is_a": 1,
           "part_of": 1,
           "related_to": 11
@@ -21037,6 +21494,14 @@
         "in_by_predicate": {
           "does_to": 5
         }
+      },
+      "химия": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "химиялық": {
         "out_degree": 10,
@@ -21485,6 +21950,14 @@
         "in_by_predicate": {
           "does_to": 2
         }
+      },
+      "шаш": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {}
       },
       "шашақ": {
         "out_degree": 1,
@@ -22554,10 +23027,11 @@
         "in_by_predicate": {}
       },
       "шөл": {
-        "out_degree": 9,
+        "out_degree": 10,
         "in_degree": 15,
         "out_by_predicate": {
           "does_to": 5,
+          "is_a": 1,
           "related_to": 4
         },
         "in_by_predicate": {
@@ -22595,12 +23069,13 @@
         }
       },
       "шөп": {
-        "out_degree": 13,
+        "out_degree": 14,
         "in_degree": 9,
         "out_by_predicate": {
           "does_to": 8,
           "goes_to": 2,
           "has": 1,
+          "is_a": 1,
           "related_to": 2
         },
         "in_by_predicate": {
@@ -22894,6 +23369,14 @@
         "in_by_predicate": {
           "does_to": 1
         }
+      },
+      "экология": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "экологиялық": {
         "out_degree": 7,
@@ -23734,20 +24217,20 @@
         }
       },
       "ғылым": {
-        "out_degree": 39,
-        "in_degree": 21,
+        "out_degree": 40,
+        "in_degree": 29,
         "out_by_predicate": {
           "does_to": 20,
           "goes_to": 3,
-          "is_a": 1,
+          "is_a": 2,
           "part_of": 1,
           "related_to": 14
         },
         "in_by_predicate": {
           "does_to": 14,
           "goes_to": 2,
-          "in_domain": 1,
-          "is_a": 1,
+          "in_domain": 2,
+          "is_a": 8,
           "related_to": 3
         }
       },
@@ -24070,6 +24553,14 @@
         },
         "in_by_predicate": {}
       },
+      "қажеттілік": {
+        "out_degree": 0,
+        "in_degree": 1,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 1
+        }
+      },
       "қажы": {
         "out_degree": 3,
         "in_degree": 1,
@@ -24144,9 +24635,17 @@
           "related_to": 10
         }
       },
+      "қазақ тілі": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "қазақстан": {
         "out_degree": 81,
-        "in_degree": 53,
+        "in_degree": 54,
         "out_by_predicate": {
           "does_to": 52,
           "goes_to": 9,
@@ -24158,7 +24657,7 @@
           "does_to": 11,
           "goes_to": 14,
           "lives_in": 2,
-          "part_of": 16,
+          "part_of": 17,
           "related_to": 10
         }
       },
@@ -24688,6 +25187,16 @@
         "out_by_predicate": {},
         "in_by_predicate": {
           "does_to": 5
+        }
+      },
+      "қан": {
+        "out_degree": 1,
+        "in_degree": 1,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {
+          "has": 1
         }
       },
       "қандас": {
@@ -25753,6 +26262,14 @@
         },
         "in_by_predicate": {}
       },
+      "қой": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "қойнау": {
         "out_degree": 2,
         "in_degree": 2,
@@ -25792,6 +26309,18 @@
         "in_by_predicate": {
           "does_to": 2,
           "goes_to": 1
+        }
+      },
+      "қол": {
+        "out_degree": 2,
+        "in_degree": 3,
+        "out_by_predicate": {
+          "is_a": 1,
+          "part_of": 1
+        },
+        "in_by_predicate": {
+          "has_quantity": 1,
+          "part_of": 2
         }
       },
       "қола": {
@@ -26235,16 +26764,18 @@
         }
       },
       "қоғам": {
-        "out_degree": 13,
-        "in_degree": 17,
+        "out_degree": 14,
+        "in_degree": 18,
         "out_by_predicate": {
           "does_to": 8,
           "goes_to": 2,
+          "has": 1,
           "related_to": 3
         },
         "in_by_predicate": {
           "does_to": 9,
           "goes_to": 2,
+          "part_of": 1,
           "related_to": 6
         }
       },
@@ -26388,7 +26919,7 @@
       },
       "қуат": {
         "out_degree": 7,
-        "in_degree": 32,
+        "in_degree": 33,
         "out_by_predicate": {
           "does_to": 3,
           "goes_to": 1,
@@ -26396,6 +26927,7 @@
           "related_to": 2
         },
         "in_by_predicate": {
+          "causes": 1,
           "does_to": 29,
           "related_to": 3
         }
@@ -27138,7 +27670,7 @@
       },
       "құбылыс": {
         "out_degree": 3,
-        "in_degree": 14,
+        "in_degree": 15,
         "out_by_predicate": {
           "does_to": 1,
           "related_to": 2
@@ -27146,6 +27678,7 @@
         "in_by_predicate": {
           "does_to": 10,
           "goes_to": 2,
+          "is_a": 1,
           "related_to": 2
         }
       },
@@ -27264,14 +27797,17 @@
         }
       },
       "құлақ": {
-        "out_degree": 10,
-        "in_degree": 9,
+        "out_degree": 12,
+        "in_degree": 10,
         "out_by_predicate": {
           "does_to": 8,
+          "is_a": 1,
+          "part_of": 1,
           "related_to": 2
         },
         "in_by_predicate": {
-          "does_to": 9
+          "does_to": 9,
+          "has_quantity": 1
         }
       },
       "құлдырау": {
@@ -27460,6 +27996,14 @@
         },
         "in_by_predicate": {}
       },
+      "құрал": {
+        "out_degree": 0,
+        "in_degree": 3,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 3
+        }
+      },
       "құрылысшы": {
         "out_degree": 2,
         "in_degree": 1,
@@ -27472,11 +28016,12 @@
         }
       },
       "құс": {
-        "out_degree": 14,
+        "out_degree": 15,
         "in_degree": 21,
         "out_by_predicate": {
           "does_to": 9,
           "has": 3,
+          "is_a": 1,
           "related_to": 2
         },
         "in_by_predicate": {
@@ -27879,12 +28424,14 @@
         "in_by_predicate": {}
       },
       "үкімет": {
-        "out_degree": 20,
+        "out_degree": 22,
         "in_degree": 17,
         "out_by_predicate": {
           "does_to": 13,
           "goes_to": 4,
+          "is_a": 1,
           "lives_in": 2,
+          "part_of": 1,
           "related_to": 1
         },
         "in_by_predicate": {
@@ -28247,7 +28794,7 @@
       },
       "ұйым": {
         "out_degree": 8,
-        "in_degree": 15,
+        "in_degree": 16,
         "out_by_predicate": {
           "does_to": 5,
           "goes_to": 1,
@@ -28257,6 +28804,7 @@
         "in_by_predicate": {
           "does_to": 10,
           "goes_to": 2,
+          "is_a": 1,
           "related_to": 3
         }
       },
@@ -28331,11 +28879,14 @@
         }
       },
       "ұйқы": {
-        "out_degree": 0,
-        "in_degree": 2,
-        "out_by_predicate": {},
+        "out_degree": 1,
+        "in_degree": 3,
+        "out_by_predicate": {
+          "is_a": 1
+        },
         "in_by_predicate": {
-          "goes_to": 2
+          "goes_to": 2,
+          "has": 1
         }
       },
       "ұл": {
@@ -29212,17 +29763,18 @@
         }
       },
       "әке": {
-        "out_degree": 18,
-        "in_degree": 1,
+        "out_degree": 19,
+        "in_degree": 2,
         "out_by_predicate": {
           "after": 1,
           "does_to": 7,
           "goes_to": 8,
           "lives_in": 1,
+          "part_of": 1,
           "related_to": 1
         },
         "in_by_predicate": {
-          "has": 1
+          "has": 2
         }
       },
       "әкесі": {
@@ -29604,7 +30156,7 @@
       },
       "әрекет": {
         "out_degree": 12,
-        "in_degree": 18,
+        "in_degree": 19,
         "out_by_predicate": {
           "does_to": 8,
           "goes_to": 2,
@@ -29613,6 +30165,7 @@
         "in_by_predicate": {
           "does_to": 14,
           "goes_to": 2,
+          "is_a": 1,
           "related_to": 2
         }
       },
@@ -30203,12 +30756,13 @@
         }
       },
       "өзен": {
-        "out_degree": 29,
+        "out_degree": 30,
         "in_degree": 20,
         "out_by_predicate": {
           "after": 1,
           "does_to": 14,
           "goes_to": 5,
+          "is_a": 1,
           "lives_in": 3,
           "related_to": 6
         },
@@ -30277,11 +30831,13 @@
         }
       },
       "өкпе": {
-        "out_degree": 6,
+        "out_degree": 8,
         "in_degree": 1,
         "out_by_predicate": {
           "does_to": 3,
           "goes_to": 2,
+          "is_a": 1,
+          "part_of": 1,
           "related_to": 1
         },
         "in_by_predicate": {
@@ -30826,12 +31382,13 @@
         }
       },
       "өсімдік": {
-        "out_degree": 27,
-        "in_degree": 28,
+        "out_degree": 28,
+        "in_degree": 33,
         "out_by_predicate": {
           "does_to": 18,
           "goes_to": 2,
           "has": 1,
+          "is_a": 1,
           "part_of": 1,
           "related_to": 5
         },
@@ -30839,7 +31396,8 @@
           "after": 1,
           "does_to": 19,
           "goes_to": 2,
-          "is_a": 2,
+          "has": 1,
+          "is_a": 6,
           "part_of": 1,
           "related_to": 3
         }
@@ -31040,7 +31598,7 @@
       },
       "өңір": {
         "out_degree": 9,
-        "in_degree": 14,
+        "in_degree": 15,
         "out_by_predicate": {
           "does_to": 5,
           "goes_to": 1,
@@ -31049,6 +31607,7 @@
         "in_by_predicate": {
           "does_to": 10,
           "goes_to": 3,
+          "is_a": 1,
           "related_to": 1
         }
       },
@@ -33467,11 +34026,33 @@
       {
         "from": "адам",
         "predicate": "Has",
+        "to": "жүрек",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_038"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "Has",
         "to": "көб",
         "sources": [
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0130787"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "Has",
+        "to": "ми",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_037"
           }
         ]
       },
@@ -33511,11 +34092,99 @@
       {
         "from": "адам",
         "predicate": "Has",
+        "to": "қан",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_039"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "Has",
         "to": "ұрпақ",
         "sources": [
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0132475"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "HasQuantity",
+        "to": "аяқ",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_035"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "HasQuantity",
+        "to": "көз",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_032"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "HasQuantity",
+        "to": "саусақ",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_034"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "HasQuantity",
+        "to": "қол",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_036"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "HasQuantity",
+        "to": "құлақ",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_033"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "IsA",
+        "to": "сүтқоректі",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_002"
+          }
+        ]
+      },
+      {
+        "from": "адам",
+        "predicate": "IsA",
+        "to": "тіршілік иесі",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_001"
           }
         ]
       },
@@ -34979,6 +35648,17 @@
         ]
       },
       {
+        "from": "алақан",
+        "predicate": "PartOf",
+        "to": "қол",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_014"
+          }
+        ]
+      },
+      {
         "from": "алматы",
         "predicate": "DoesTo",
         "to": "ат",
@@ -35583,6 +36263,39 @@
           {
             "pack": "kazakh_proverbs_pack.json",
             "sample_id": "proverb_058"
+          }
+        ]
+      },
+      {
+        "from": "ана",
+        "predicate": "PartOf",
+        "to": "отбасы",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_012"
+          }
+        ]
+      },
+      {
+        "from": "анатомия",
+        "predicate": "InDomain",
+        "to": "биология",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_040"
+          }
+        ]
+      },
+      {
+        "from": "анатомия",
+        "predicate": "IsA",
+        "to": "ғылым",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_040"
           }
         ]
       },
@@ -37976,6 +38689,28 @@
       },
       {
         "from": "асқазан",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_023"
+          }
+        ]
+      },
+      {
+        "from": "асқазан",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_023"
+          }
+        ]
+      },
+      {
+        "from": "асқазан",
         "predicate": "RelatedTo",
         "to": "ішек",
         "sources": [
@@ -39042,6 +39777,17 @@
       },
       {
         "from": "ауа",
+        "predicate": "Causes",
+        "to": "тыныс",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_019"
+          }
+        ]
+      },
+      {
+        "from": "ауа",
         "predicate": "DoesTo",
         "to": "аудандық",
         "sources": [
@@ -40011,12 +40757,34 @@
       },
       {
         "from": "ауыз",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_006"
+          }
+        ]
+      },
+      {
+        "from": "ауыз",
         "predicate": "LivesIn",
         "to": "кезін",
         "sources": [
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0122338"
+          }
+        ]
+      },
+      {
+        "from": "ауыз",
+        "predicate": "PartOf",
+        "to": "бет",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_006"
           }
         ]
       },
@@ -41170,6 +41938,28 @@
         ]
       },
       {
+        "from": "аяқ",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_016"
+          }
+        ]
+      },
+      {
+        "from": "аяқ",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_016"
+          }
+        ]
+      },
+      {
         "from": "ағай",
         "predicate": "DoesTo",
         "to": "атақ",
@@ -41439,6 +42229,17 @@
       },
       {
         "from": "ағаш",
+        "predicate": "IsA",
+        "to": "өсімдік",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_014"
+          }
+        ]
+      },
+      {
+        "from": "ағаш",
         "predicate": "LivesIn",
         "to": "үй",
         "sources": [
@@ -41624,6 +42425,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0149089"
+          }
+        ]
+      },
+      {
+        "from": "ағза",
+        "predicate": "Has",
+        "to": "жасуша",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_023"
           }
         ]
       },
@@ -43934,6 +44746,17 @@
       },
       {
         "from": "ақша",
+        "predicate": "IsA",
+        "to": "құрал",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_028"
+          }
+        ]
+      },
+      {
+        "from": "ақша",
         "predicate": "RelatedTo",
         "to": "адам",
         "sources": [
@@ -45654,6 +46477,17 @@
       },
       {
         "from": "бала",
+        "predicate": "PartOf",
+        "to": "отбасы",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_014"
+          }
+        ]
+      },
+      {
+        "from": "бала",
         "predicate": "RelatedTo",
         "to": "бүлдіршін",
         "sources": [
@@ -45701,6 +46535,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0128326"
+          }
+        ]
+      },
+      {
+        "from": "балық",
+        "predicate": "IsA",
+        "to": "жануар",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_011"
           }
         ]
       },
@@ -45778,6 +46623,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0052610"
+          }
+        ]
+      },
+      {
+        "from": "бас",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_001"
           }
         ]
       },
@@ -45925,6 +46781,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0105371"
+          }
+        ]
+      },
+      {
+        "from": "бауыр",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_021"
+          }
+        ]
+      },
+      {
+        "from": "бауыр",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_021"
           }
         ]
       },
@@ -46179,6 +47057,17 @@
         ]
       },
       {
+        "from": "бет",
+        "predicate": "PartOf",
+        "to": "бас",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_002"
+          }
+        ]
+      },
+      {
         "from": "би",
         "predicate": "RelatedTo",
         "to": "бала",
@@ -46219,6 +47108,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0146877"
+          }
+        ]
+      },
+      {
+        "from": "бидай",
+        "predicate": "IsA",
+        "to": "өсімдік",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_017"
           }
         ]
       },
@@ -46652,6 +47552,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0047252"
+          }
+        ]
+      },
+      {
+        "from": "биология",
+        "predicate": "InDomain",
+        "to": "ғылым",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_025"
+          }
+        ]
+      },
+      {
+        "from": "биология",
+        "predicate": "IsA",
+        "to": "ғылым",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_024"
           }
         ]
       },
@@ -48842,6 +49764,17 @@
       },
       {
         "from": "білім",
+        "predicate": "IsA",
+        "to": "мәлімет",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_017"
+          }
+        ]
+      },
+      {
+        "from": "білім",
         "predicate": "RelatedTo",
         "to": "тәжірибе",
         "sources": [
@@ -49036,6 +49969,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0091235"
+          }
+        ]
+      },
+      {
+        "from": "бүйрек",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_022"
+          }
+        ]
+      },
+      {
+        "from": "бүйрек",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_022"
           }
         ]
       },
@@ -54110,6 +55065,17 @@
       },
       {
         "from": "гүл",
+        "predicate": "IsA",
+        "to": "өсімдік",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_016"
+          }
+        ]
+      },
+      {
+        "from": "гүл",
         "predicate": "RelatedTo",
         "to": "ағаш",
         "sources": [
@@ -54204,6 +55170,28 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_07863"
+          }
+        ]
+      },
+      {
+        "from": "дала",
+        "predicate": "Has",
+        "to": "өсімдік",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_027"
+          }
+        ]
+      },
+      {
+        "from": "дауыс",
+        "predicate": "IsA",
+        "to": "құрал",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_030"
           }
         ]
       },
@@ -55200,6 +56188,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0032555"
+          }
+        ]
+      },
+      {
+        "from": "дін",
+        "predicate": "IsA",
+        "to": "жүйе",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_036"
           }
         ]
       },
@@ -56796,6 +57795,17 @@
           {
             "pack": "kazakh_textbooks_pack.json",
             "sample_id": "kz_textbook_biology_8_p0023_s21"
+          }
+        ]
+      },
+      {
+        "from": "дәрігер",
+        "predicate": "IsA",
+        "to": "маман",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_032"
           }
         ]
       },
@@ -61134,6 +62144,17 @@
       },
       {
         "from": "ет",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_025"
+          }
+        ]
+      },
+      {
+        "from": "ет",
         "predicate": "RelatedTo",
         "to": "көкөніс",
         "sources": [
@@ -62137,6 +63158,17 @@
         ]
       },
       {
+        "from": "ешкі",
+        "predicate": "IsA",
+        "to": "жануар",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_009"
+          }
+        ]
+      },
+      {
         "from": "ештеңе",
         "predicate": "DoesTo",
         "to": "дәуір",
@@ -62575,6 +63607,17 @@
           {
             "pack": "kazakh_proverbs_pack.json",
             "sample_id": "proverb_068"
+          }
+        ]
+      },
+      {
+        "from": "еңбек",
+        "predicate": "IsA",
+        "to": "әрекет",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_030"
           }
         ]
       },
@@ -64113,6 +65156,28 @@
         ]
       },
       {
+        "from": "жануар",
+        "predicate": "Has",
+        "to": "ұйқы",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_038"
+          }
+        ]
+      },
+      {
+        "from": "жануар",
+        "predicate": "IsA",
+        "to": "тіршілік иесі",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_012"
+          }
+        ]
+      },
+      {
         "from": "жанындағ",
         "predicate": "DoesTo",
         "to": "кемшілік",
@@ -64898,6 +65963,28 @@
           {
             "pack": "kazakh_textbooks_pack.json",
             "sample_id": "kz_textbook_physics_11_ogn_p0189_s12"
+          }
+        ]
+      },
+      {
+        "from": "жасуша",
+        "predicate": "IsA",
+        "to": "материя",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_022"
+          }
+        ]
+      },
+      {
+        "from": "жасуша",
+        "predicate": "PartOf",
+        "to": "ағза",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_021"
           }
         ]
       },
@@ -71051,6 +72138,17 @@
         ]
       },
       {
+        "from": "жылқы",
+        "predicate": "IsA",
+        "to": "жануар",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_005"
+          }
+        ]
+      },
+      {
         "from": "жын",
         "predicate": "DoesTo",
         "to": "желі",
@@ -72080,6 +73178,17 @@
         ]
       },
       {
+        "from": "жүйке",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_028"
+          }
+        ]
+      },
+      {
         "from": "жүйкелену",
         "predicate": "DoesTo",
         "to": "тәріз",
@@ -72426,12 +73535,38 @@
       },
       {
         "from": "жүрек",
+        "predicate": "HasQuantity",
+        "to": "жақтау",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_031"
+          }
+        ]
+      },
+      {
+        "from": "жүрек",
         "predicate": "IsA",
         "to": "мүше",
         "sources": [
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0040376"
+          },
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_018"
+          }
+        ]
+      },
+      {
+        "from": "жүрек",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_018"
           }
         ]
       },
@@ -74697,6 +75832,17 @@
       },
       {
         "from": "заң",
+        "predicate": "IsA",
+        "to": "ереже",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_003"
+          }
+        ]
+      },
+      {
+        "from": "заң",
         "predicate": "RelatedTo",
         "to": "құқық",
         "sources": [
@@ -74718,6 +75864,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0047249"
+          }
+        ]
+      },
+      {
+        "from": "заңгер",
+        "predicate": "IsA",
+        "to": "маман",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_035"
           }
         ]
       },
@@ -76058,6 +77215,17 @@
         ]
       },
       {
+        "from": "инженер",
+        "predicate": "IsA",
+        "to": "маман",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_034"
+          }
+        ]
+      },
+      {
         "from": "инженерлік",
         "predicate": "After",
         "to": "жыл",
@@ -76372,6 +77540,17 @@
       {
         "from": "ит",
         "predicate": "IsA",
+        "to": "жануар",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_003"
+          }
+        ]
+      },
+      {
+        "from": "ит",
+        "predicate": "IsA",
         "to": "үй",
         "sources": [
           {
@@ -76421,6 +77600,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0086430"
+          }
+        ]
+      },
+      {
+        "from": "иық",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_011"
           }
         ]
       },
@@ -79359,6 +80549,17 @@
         ]
       },
       {
+        "from": "конституция",
+        "predicate": "IsA",
+        "to": "заң",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_004"
+          }
+        ]
+      },
+      {
         "from": "конституциялық",
         "predicate": "DoesTo",
         "to": "желтоқсандағ",
@@ -80443,6 +81644,17 @@
       },
       {
         "from": "кітап",
+        "predicate": "IsA",
+        "to": "көз",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_021"
+          }
+        ]
+      },
+      {
+        "from": "кітап",
         "predicate": "RelatedTo",
         "to": "хат",
         "sources": [
@@ -80460,6 +81672,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0140778"
+          }
+        ]
+      },
+      {
+        "from": "кітапхана",
+        "predicate": "Has",
+        "to": "кітап",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_022"
           }
         ]
       },
@@ -83488,12 +84711,34 @@
       },
       {
         "from": "көз",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_003"
+          }
+        ]
+      },
+      {
+        "from": "көз",
         "predicate": "LivesIn",
         "to": "төңірегін",
         "sources": [
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0128039"
+          }
+        ]
+      },
+      {
+        "from": "көз",
+        "predicate": "PartOf",
+        "to": "бас",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_003"
           }
         ]
       },
@@ -84590,6 +85835,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0121002"
+          }
+        ]
+      },
+      {
+        "from": "көл",
+        "predicate": "IsA",
+        "to": "су қоймасы",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_032"
           }
         ]
       },
@@ -86136,6 +87392,17 @@
         ]
       },
       {
+        "from": "мамандық",
+        "predicate": "IsA",
+        "to": "кәсіп",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_031"
+          }
+        ]
+      },
+      {
         "from": "марс",
         "predicate": "HasQuantity",
         "to": "серік",
@@ -86165,6 +87432,17 @@
           {
             "pack": "world_core/astronomy.jsonl",
             "sample_id": "astro_004"
+          }
+        ]
+      },
+      {
+        "from": "математика",
+        "predicate": "IsA",
+        "to": "ғылым",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_024"
           }
         ]
       },
@@ -86550,6 +87828,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0020137"
+          }
+        ]
+      },
+      {
+        "from": "мектеп",
+        "predicate": "IsA",
+        "to": "мекеме",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_015"
           }
         ]
       },
@@ -87005,11 +88294,55 @@
       {
         "from": "мемлекет",
         "predicate": "Has",
+        "to": "аумақ",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_001"
+          }
+        ]
+      },
+      {
+        "from": "мемлекет",
+        "predicate": "Has",
+        "to": "заң",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_001"
+          }
+        ]
+      },
+      {
+        "from": "мемлекет",
+        "predicate": "Has",
+        "to": "халық",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_001"
+          }
+        ]
+      },
+      {
+        "from": "мемлекет",
+        "predicate": "Has",
         "to": "ішк",
         "sources": [
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0053179"
+          }
+        ]
+      },
+      {
+        "from": "мемлекет",
+        "predicate": "IsA",
+        "to": "ұйым",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_002"
           }
         ]
       },
@@ -87196,6 +88529,28 @@
           {
             "pack": "world_core/astronomy.jsonl",
             "sample_id": "astro_030"
+          }
+        ]
+      },
+      {
+        "from": "ми",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_027"
+          }
+        ]
+      },
+      {
+        "from": "ми",
+        "predicate": "PartOf",
+        "to": "бас",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_027"
           }
         ]
       },
@@ -87541,6 +88896,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0074707"
+          }
+        ]
+      },
+      {
+        "from": "мойын",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_010"
           }
         ]
       },
@@ -88671,6 +90037,17 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_10762"
+          }
+        ]
+      },
+      {
+        "from": "мысық",
+        "predicate": "IsA",
+        "to": "жануар",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_004"
           }
         ]
       },
@@ -90127,6 +91504,28 @@
         ]
       },
       {
+        "from": "мұрын",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_005"
+          }
+        ]
+      },
+      {
+        "from": "мұрын",
+        "predicate": "PartOf",
+        "to": "бет",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_005"
+          }
+        ]
+      },
+      {
         "from": "мұса",
         "predicate": "DoesTo",
         "to": "географиялық",
@@ -91045,6 +92444,17 @@
       },
       {
         "from": "мұхит",
+        "predicate": "IsA",
+        "to": "су",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_034"
+          }
+        ]
+      },
+      {
+        "from": "мұхит",
         "predicate": "LivesIn",
         "to": "теңіз",
         "sources": [
@@ -91221,6 +92631,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0120184"
+          }
+        ]
+      },
+      {
+        "from": "мұғалім",
+        "predicate": "IsA",
+        "to": "маман",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_033"
+          }
+        ]
+      },
+      {
+        "from": "мұғалім",
+        "predicate": "PartOf",
+        "to": "мектеп",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_019"
           }
         ]
       },
@@ -91739,6 +93171,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0004453"
+          }
+        ]
+      },
+      {
+        "from": "мәдениет",
+        "predicate": "IsA",
+        "to": "игілік",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_037"
           }
         ]
       },
@@ -96243,6 +97686,17 @@
         ]
       },
       {
+        "from": "орман",
+        "predicate": "Has",
+        "to": "ағаш",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_026"
+          }
+        ]
+      },
+      {
         "from": "отан",
         "predicate": "DoesTo",
         "to": "ат",
@@ -96327,6 +97781,50 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0059011"
+          }
+        ]
+      },
+      {
+        "from": "отбасы",
+        "predicate": "Has",
+        "to": "ана",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_011"
+          }
+        ]
+      },
+      {
+        "from": "отбасы",
+        "predicate": "Has",
+        "to": "бала",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_011"
+          }
+        ]
+      },
+      {
+        "from": "отбасы",
+        "predicate": "Has",
+        "to": "әке",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_011"
+          }
+        ]
+      },
+      {
+        "from": "отбасы",
+        "predicate": "PartOf",
+        "to": "қоғам",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_010"
           }
         ]
       },
@@ -96518,6 +98016,17 @@
         ]
       },
       {
+        "from": "оқушы",
+        "predicate": "PartOf",
+        "to": "мектеп",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_018"
+          }
+        ]
+      },
+      {
         "from": "павлодар",
         "predicate": "DoesTo",
         "to": "жер",
@@ -96636,6 +98145,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0130168"
+          }
+        ]
+      },
+      {
+        "from": "парламент",
+        "predicate": "IsA",
+        "to": "орган",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_006"
+          }
+        ]
+      },
+      {
+        "from": "парламент",
+        "predicate": "PartOf",
+        "to": "мемлекет",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_006"
           }
         ]
       },
@@ -96889,6 +98420,17 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_08924"
+          }
+        ]
+      },
+      {
+        "from": "президент",
+        "predicate": "IsA",
+        "to": "басшы",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_007"
           }
         ]
       },
@@ -101719,6 +103261,17 @@
         ]
       },
       {
+        "from": "саусақ",
+        "predicate": "PartOf",
+        "to": "қол",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_013"
+          }
+        ]
+      },
+      {
         "from": "сауық",
         "predicate": "DoesTo",
         "to": "қыздар",
@@ -102754,6 +104307,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0032262"
+          }
+        ]
+      },
+      {
+        "from": "сиыр",
+        "predicate": "IsA",
+        "to": "жануар",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_007"
           }
         ]
       },
@@ -104025,6 +105589,17 @@
       },
       {
         "from": "сот",
+        "predicate": "IsA",
+        "to": "орган",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_008"
+          }
+        ]
+      },
+      {
+        "from": "сот",
         "predicate": "RelatedTo",
         "to": "губерниялық",
         "sources": [
@@ -104851,6 +106426,17 @@
         ]
       },
       {
+        "from": "студент",
+        "predicate": "PartOf",
+        "to": "университет",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_020"
+          }
+        ]
+      },
+      {
         "from": "студенттері",
         "predicate": "DoesTo",
         "to": "материал",
@@ -104913,6 +106499,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0067411"
+          }
+        ]
+      },
+      {
+        "from": "су",
+        "predicate": "Causes",
+        "to": "тіршілік",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_018"
           }
         ]
       },
@@ -106310,6 +107907,17 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_15819"
+          }
+        ]
+      },
+      {
+        "from": "сүйек",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_024"
           }
         ]
       },
@@ -108260,6 +109868,17 @@
         ]
       },
       {
+        "from": "табан",
+        "predicate": "PartOf",
+        "to": "аяқ",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_017"
+          }
+        ]
+      },
+      {
         "from": "табандылық",
         "predicate": "RelatedTo",
         "to": "төзімділік",
@@ -108993,6 +110612,17 @@
         ]
       },
       {
+        "from": "тайга",
+        "predicate": "IsA",
+        "to": "орман",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_029"
+          }
+        ]
+      },
+      {
         "from": "тайлақ",
         "predicate": "DoesTo",
         "to": "үйлену",
@@ -109330,6 +110960,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0044420"
+          }
+        ]
+      },
+      {
+        "from": "тамақ",
+        "predicate": "Causes",
+        "to": "қуат",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_020"
           }
         ]
       },
@@ -109948,6 +111589,17 @@
         ]
       },
       {
+        "from": "тарих",
+        "predicate": "IsA",
+        "to": "ғылым",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_027"
+          }
+        ]
+      },
+      {
         "from": "тарихындағ",
         "predicate": "GoesTo",
         "to": "дүние",
@@ -110065,6 +111717,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0099197"
+          }
+        ]
+      },
+      {
+        "from": "тау",
+        "predicate": "IsA",
+        "to": "жер бедері",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_030"
           }
         ]
       },
@@ -111284,6 +112947,17 @@
         ]
       },
       {
+        "from": "температура",
+        "predicate": "IsA",
+        "to": "белгі",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_036"
+          }
+        ]
+      },
+      {
         "from": "температуралық",
         "predicate": "DoesTo",
         "to": "өзгеріс",
@@ -112256,6 +113930,17 @@
       },
       {
         "from": "тері",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_026"
+          }
+        ]
+      },
+      {
+        "from": "тері",
         "predicate": "RelatedTo",
         "to": "астық",
         "sources": [
@@ -112644,6 +114329,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0001039"
+          }
+        ]
+      },
+      {
+        "from": "теңге",
+        "predicate": "IsA",
+        "to": "ақша",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_029"
+          }
+        ]
+      },
+      {
+        "from": "теңге",
+        "predicate": "PartOf",
+        "to": "қазақстан",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_029"
           }
         ]
       },
@@ -113163,6 +114870,17 @@
           {
             "pack": "kazakh_textbooks_pack.json",
             "sample_id": "kz_textbook_physics_11_ogn_p0175_s14"
+          }
+        ]
+      },
+      {
+        "from": "теңіз",
+        "predicate": "IsA",
+        "to": "су қоймасы",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_033"
           }
         ]
       },
@@ -116139,6 +117857,17 @@
         ]
       },
       {
+        "from": "тыныс",
+        "predicate": "IsA",
+        "to": "белгі",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_029"
+          }
+        ]
+      },
+      {
         "from": "тыныштық",
         "predicate": "DoesTo",
         "to": "республикасындағ",
@@ -116562,6 +118291,17 @@
         ]
       },
       {
+        "from": "тізе",
+        "predicate": "PartOf",
+        "to": "аяқ",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_015"
+          }
+        ]
+      },
+      {
         "from": "тізім",
         "predicate": "GoesTo",
         "to": "жыл",
@@ -116893,6 +118633,28 @@
       },
       {
         "from": "тіл",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_007"
+          }
+        ]
+      },
+      {
+        "from": "тіл",
+        "predicate": "IsA",
+        "to": "құрал",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_038"
+          }
+        ]
+      },
+      {
+        "from": "тіл",
         "predicate": "LivesIn",
         "to": "қала",
         "sources": [
@@ -116910,6 +118672,17 @@
           {
             "pack": "kazakh_textbooks_pack.json",
             "sample_id": "kz_textbook_kz_lang_11_emn_p0004_s02"
+          }
+        ]
+      },
+      {
+        "from": "тіл",
+        "predicate": "PartOf",
+        "to": "ауыз",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_007"
           }
         ]
       },
@@ -117351,6 +119124,28 @@
       },
       {
         "from": "тіршілік",
+        "predicate": "InDomain",
+        "to": "биология",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_025"
+          }
+        ]
+      },
+      {
+        "from": "тіршілік",
+        "predicate": "IsA",
+        "to": "құбылыс",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_039"
+          }
+        ]
+      },
+      {
+        "from": "тіршілік",
         "predicate": "RelatedTo",
         "to": "ақыл",
         "sources": [
@@ -117434,6 +119229,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0082571"
+          }
+        ]
+      },
+      {
+        "from": "тіс",
+        "predicate": "IsA",
+        "to": "сүйек",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_008"
+          }
+        ]
+      },
+      {
+        "from": "тіс",
+        "predicate": "PartOf",
+        "to": "ауыз",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_008"
           }
         ]
       },
@@ -117900,6 +119717,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0111876"
+          }
+        ]
+      },
+      {
+        "from": "түйе",
+        "predicate": "IsA",
+        "to": "жануар",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_008"
           }
         ]
       },
@@ -122925,6 +124753,17 @@
         ]
       },
       {
+        "from": "университет",
+        "predicate": "IsA",
+        "to": "мекеме",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_016"
+          }
+        ]
+      },
+      {
         "from": "университеті",
         "predicate": "DoesTo",
         "to": "шығын",
@@ -123461,6 +125300,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0024521"
+          }
+        ]
+      },
+      {
+        "from": "физика",
+        "predicate": "IsA",
+        "to": "ғылым",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_025"
           }
         ]
       },
@@ -124453,6 +126303,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0021146"
+          }
+        ]
+      },
+      {
+        "from": "халық",
+        "predicate": "Has",
+        "to": "мәдениет",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_040"
+          }
+        ]
+      },
+      {
+        "from": "халық",
+        "predicate": "Has",
+        "to": "тіл",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_040"
           }
         ]
       },
@@ -125739,6 +127611,17 @@
           {
             "pack": "abai_wikisource_pack.json",
             "sample_id": "abai_02011"
+          }
+        ]
+      },
+      {
+        "from": "химия",
+        "predicate": "IsA",
+        "to": "ғылым",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_026"
           }
         ]
       },
@@ -127233,6 +129116,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0095983"
+          }
+        ]
+      },
+      {
+        "from": "шаш",
+        "predicate": "PartOf",
+        "to": "бас",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_009"
           }
         ]
       },
@@ -131516,6 +133410,17 @@
       },
       {
         "from": "шөл",
+        "predicate": "IsA",
+        "to": "өңір",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_028"
+          }
+        ]
+      },
+      {
+        "from": "шөл",
         "predicate": "RelatedTo",
         "to": "полярлық",
         "sources": [
@@ -131754,6 +133659,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0083197"
+          }
+        ]
+      },
+      {
+        "from": "шөп",
+        "predicate": "IsA",
+        "to": "өсімдік",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_015"
           }
         ]
       },
@@ -132334,6 +134250,17 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_11532"
+          }
+        ]
+      },
+      {
+        "from": "экология",
+        "predicate": "IsA",
+        "to": "ғылым",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_040"
           }
         ]
       },
@@ -135545,6 +137472,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0138821"
+          }
+        ]
+      },
+      {
+        "from": "ғылым",
+        "predicate": "IsA",
+        "to": "білім",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_023"
           }
         ]
       },
@@ -139453,6 +141391,17 @@
         ]
       },
       {
+        "from": "қазақ тілі",
+        "predicate": "IsA",
+        "to": "тіл",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_039"
+          }
+        ]
+      },
+      {
         "from": "қазақстан",
         "predicate": "DoesTo",
         "to": "адам",
@@ -142901,6 +144850,21 @@
           {
             "pack": "kazakh_textbooks_pack.json",
             "sample_id": "kz_textbook_kz_lit_11_emn_p0065_s11"
+          }
+        ]
+      },
+      {
+        "from": "қан",
+        "predicate": "PartOf",
+        "to": "ағза",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_035"
+          },
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_019"
           }
         ]
       },
@@ -146564,6 +148528,17 @@
         ]
       },
       {
+        "from": "қой",
+        "predicate": "IsA",
+        "to": "жануар",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_006"
+          }
+        ]
+      },
+      {
         "from": "қойнау",
         "predicate": "GoesTo",
         "to": "дүние",
@@ -146648,6 +148623,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0046656"
+          }
+        ]
+      },
+      {
+        "from": "қол",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_012"
+          }
+        ]
+      },
+      {
+        "from": "қол",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_012"
           }
         ]
       },
@@ -148664,6 +150661,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0101889"
+          }
+        ]
+      },
+      {
+        "from": "қоғам",
+        "predicate": "Has",
+        "to": "адам",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_009"
           }
         ]
       },
@@ -152696,6 +154704,28 @@
       },
       {
         "from": "құлақ",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_004"
+          }
+        ]
+      },
+      {
+        "from": "құлақ",
+        "predicate": "PartOf",
+        "to": "бас",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_004"
+          }
+        ]
+      },
+      {
+        "from": "құлақ",
         "predicate": "RelatedTo",
         "to": "көз",
         "sources": [
@@ -153422,6 +155452,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0086617"
+          }
+        ]
+      },
+      {
+        "from": "құс",
+        "predicate": "IsA",
+        "to": "жануар",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_010"
           }
         ]
       },
@@ -154604,6 +156645,17 @@
       },
       {
         "from": "үкімет",
+        "predicate": "IsA",
+        "to": "орган",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_005"
+          }
+        ]
+      },
+      {
+        "from": "үкімет",
         "predicate": "LivesIn",
         "to": "кемін",
         "sources": [
@@ -154621,6 +156673,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0072643"
+          }
+        ]
+      },
+      {
+        "from": "үкімет",
+        "predicate": "PartOf",
+        "to": "мемлекет",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_005"
           }
         ]
       },
@@ -156206,6 +158269,17 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_00197"
+          }
+        ]
+      },
+      {
+        "from": "ұйқы",
+        "predicate": "IsA",
+        "to": "қажеттілік",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_037"
           }
         ]
       },
@@ -160088,6 +162162,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0010495"
+          }
+        ]
+      },
+      {
+        "from": "әке",
+        "predicate": "PartOf",
+        "to": "отбасы",
+        "sources": [
+          {
+            "pack": "world_core/society.jsonl",
+            "sample_id": "soc_013"
           }
         ]
       },
@@ -165819,6 +167904,17 @@
       },
       {
         "from": "өзен",
+        "predicate": "IsA",
+        "to": "су",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_031"
+          }
+        ]
+      },
+      {
+        "from": "өзен",
         "predicate": "LivesIn",
         "to": "жағын",
         "sources": [
@@ -166452,6 +168548,28 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0120416"
+          }
+        ]
+      },
+      {
+        "from": "өкпе",
+        "predicate": "IsA",
+        "to": "мүше",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_020"
+          }
+        ]
+      },
+      {
+        "from": "өкпе",
+        "predicate": "PartOf",
+        "to": "дене",
+        "sources": [
+          {
+            "pack": "world_core/body_parts.jsonl",
+            "sample_id": "body_020"
           }
         ]
       },
@@ -169612,6 +171730,17 @@
       },
       {
         "from": "өсімдік",
+        "predicate": "IsA",
+        "to": "тіршілік иесі",
+        "sources": [
+          {
+            "pack": "world_core/biology_basic.jsonl",
+            "sample_id": "bio_013"
+          }
+        ]
+      },
+      {
+        "from": "өсімдік",
         "predicate": "PartOf",
         "to": "көкөніс",
         "sources": [
@@ -170798,6 +172927,6 @@
         ]
       }
     ],
-    "facts_ingested": 13627
+    "facts_ingested": 13771
   }
 }

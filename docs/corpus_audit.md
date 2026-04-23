@@ -1,12 +1,12 @@
 # Corpus Audit
 
-This page documents the Kazakh corpus position across releases. **Current as of v2.3**: 3.84 M committed / 77.9 M local words. The v1.x expansion plan below is **fully executed** (see "Historical baseline" section).
+This page documents the Kazakh corpus position across releases. **Current as of v3.9.5**: **4.57 M committed / 77.9 M local words** across 9 committed source packs. The v1.x expansion plan below is **fully executed** (see "Historical baseline" section). v3.3.0 – v3.5.0 added 10 Kazakh high-school textbooks OCR'd via tesseract-kaz, contributing 28 110 samples / 434 k words.
 
-> **Note on v2.0 direction.** The original plan targeted a 100 M+ word corpus to *train* a compact neural LM as the `Intent::Unknown` fallback. v2.0 committed to a different architecture: **retrieval + composition**, not trained-neural. The corpus is now fuel for the morpheme-indexed retrieval engine (`adam-retrieval`) and structured fact extraction (`adam-reasoning`), not for gradient descent. See [`project_retrieval_not_neural_v2`](roadmap.md#post-v10-direction).
+> **Note on v2.0 direction.** The original plan targeted a 100 M+ word corpus to *train* a compact neural LM as the `Intent::Unknown` fallback. v2.0 committed to a different architecture: **retrieval + composition**, not trained-neural. v3.9.0+ added a third facet: human-authored **World Core** knowledge packs (`data/world_core/*.jsonl`) merged into `facts.json` with `ConfidenceKind::HumanApproved`. The corpus is fuel for the morpheme-indexed retrieval engine (`adam-retrieval`) and the text-pattern fact extractor (`adam-reasoning`), not for gradient descent. See [`project_retrieval_not_neural_v2`](roadmap.md#post-v10-direction).
 
 Run `cargo run --release -p adam-corpus --bin corpus_audit` to regenerate `data/corpus_audit_report.json` (committed corpus) or add `--local` to include gitignored Wikipedia + CC-100 shards.
 
-## Current position (v2.3, committed)
+## Current position (v3.9.5, committed)
 
 | pack | samples | words | purity | added |
 |---|---:|---:|---:|---|
@@ -18,7 +18,8 @@ Run `cargo run --release -p adam-corpus --bin corpus_audit` to regenerate `data/
 | kazakh_proverbs | 80 | 349 | 100.00 % | v0.4.0 |
 | synthetic_sentences | 100,000 | 403,558 | 98.79 % | v0.4.0 |
 | kazakh_classics | 111 | 926 | 100.00 % | v1.2.0 |
-| **TOTAL (committed)** | **~402 k** | **~3.84 M** | **98.36 %** | |
+| **kazakh_textbooks (10 books OCR'd)** | **28,110** | **434,581** | **high** | **v3.3.0 – v3.5.0** |
+| **TOTAL (committed)** | **~430 k** | **~4.57 M** | **≥ 98 %** | |
 
 ### Local corpus (with gitignored shards)
 

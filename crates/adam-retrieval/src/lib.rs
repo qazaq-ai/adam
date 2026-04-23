@@ -1,9 +1,11 @@
 //! adam-retrieval — morpheme-indexed retrieval over a committed Kazakh corpus.
 //!
-//! Stage: v1.6.0 bootstrap.
+//! Stage: **v3.9.5** — inverted morpheme index (v1.6.0) + composite
+//! deterministic ranking (v1.7.0) + opt-in in-sample city swap with
+//! year guard and «бейімд-» marker (v1.9.0 → v1.9.5).
 //!
-//! This crate is the first rung of the v2.0 retrieval engine. Unlike a
-//! probabilistic LM, retrieval is:
+//! This crate is the retrieval engine for the adam architecture. Unlike
+//! a probabilistic LM, retrieval is:
 //!
 //!   - **deterministic** — given a morpheme bag and an index file, the top-k
 //!     result set is fully determined;

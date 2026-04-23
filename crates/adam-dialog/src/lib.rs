@@ -1,11 +1,25 @@
 //! adam-dialog — predictable, auditable Kazakh dialog layer.
 //!
-//! See `docs/kazakh_grammar/07_dialog_architecture.md` for the architectural
-//! commitment. Five-layer pipeline:
+//! **Stage: v3.9.5** — 26-intent recogniser + multi-turn session +
+//! FST-backed slot expansion + session-aware retrieval composition +
+//! rule-derived reasoning chains (v2.7+) + World Core integration
+//! (v3.9.0+). Every path is deterministic or samples from a finite,
+//! inspectable set.
+//!
+//! See [`docs/architecture_v3.md`](../../../docs/architecture_v3.md) for the
+//! current canonical architecture; [`docs/kazakh_grammar/07_dialog_architecture.md`](../../../docs/kazakh_grammar/07_dialog_architecture.md)
+//! is the original v1.0 MVP reference kept as a historical snapshot.
+//!
+//! Five-layer pipeline:
 //!
 //! 1. Morphological parser (`adam_kernel_fst::parser`)
-//! 2. Semantic interpreter ([`semantics`])
-//! 3. Dialog planner ([`planner`])
+//! 2. Semantic interpreter ([`semantics`]) — intent recognition +
+//!    entity extraction + `NOT_A_TOPIC` closed-class filter (v3.9.5
+//!    synced with `adam_reasoning::patterns::is_closed_class`)
+//! 3. Dialog planner ([`planner`]) — template selection (v2.7+
+//!    routes `Intent::Unknown` with `reasoning_chain: Some(...)` to
+//!    the `unknown.with_derived_chain` family for «байланыс-» marked
+//!    responses)
 //! 4. Response realiser ([`realiser`])
 //! 5. Morphological synthesiser (`adam_kernel_fst::morphotactics::synthesise_*`)
 //!

@@ -1,15 +1,18 @@
 //! `adam_demo` — scripted end-to-end walkthrough for investors.
 //!
-//! v3.0 shipped the full four-part demo: intents + retrieval +
-//! composition + rule-derived reasoning. v3.0.1 is a polish pass —
-//! stale banners fixed, probes tuned, claims reworded for honesty.
+//! v3.0 shipped the full four-part demo. Successive releases refined
+//! the surface without changing the structure: v3.0.1 banner + wording
+//! polish, v3.7.5 per-rule representative derivation, v3.8.5
+//! preview/render alignment fix, **v3.9.5** reasoner now has 5 active
+//! rules (R1 / R2 / R3 / R5 / R6 / R7) and the fact pool includes 200
+//! curated World Core entries alongside the 13 k text-extracted facts.
 //!
 //! Parts 1 + 2: 12 canonical conversational turns (verbatim retrieval
 //! vs opt-in InSampleCitySwap). Part 3: synthetic sample showing the
-//! v1.9.5 «бейімд-» adaptation marker. **Part 4:** rule-derived
-//! reasoning chain showing the v2.6–v2.7 arc — adam concludes via R5
-//! (shared-type relation) and cites the derivation in Kazakh prose
-//! with the «байланыс-» trust marker.
+//! v1.9.5 «бейімд-» adaptation marker. **Part 4:** one representative
+//! derivation per `rule_id`, each printed with its Kazakh prose and
+//! the «байланыс-» trust marker — so an investor sees every active
+//! cognitive operation in one run.
 //!
 //! Each turn prints:
 //!   • user line,
@@ -109,7 +112,7 @@ fn main() -> ExitCode {
     let index = load_retrieval_index();
 
     println!("╔══════════════════════════════════════════════════════════════╗");
-    println!("║ adam v3.9 — 4-part scripted demo (intents + retrieval +     ║");
+    println!("║ adam v3.9.5 — 4-part scripted demo (intents + retrieval +   ║");
     println!("║              composition + reasoning, deterministic)        ║");
     println!("╚══════════════════════════════════════════════════════════════╝\n");
 
