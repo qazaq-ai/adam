@@ -354,6 +354,42 @@ fn main() -> ExitCode {
 
     monitor.join();
 
+    // v3.9.0 — merge the curated `data/world_core/*.jsonl` knowledge
+    // packs into the extracted fact set. Curated facts carry
+    // `ConfidenceKind::HumanApproved` + `source.pack = "world_core/…"`
+    // so downstream consumers (adam_inspect, the demo, the planner)
+    // can filter / prioritise them. The world_core loader silently
+    // skips a missing directory (trimmed CI checkouts stay on the
+    // extraction-only path, behaviourally identical to pre-v3.9.0).
+    let world_core_root = std::path::Path::new("data/world_core");
+    let before = artifact.facts.len();
+    let mut world_core_loaded = 0usize;
+    match adam_reasoning::world_core::load_world_core_facts(world_core_root) {
+        Ok(curated) => {
+            world_core_loaded = curated.len();
+            for f in &curated {
+                let pred = f.predicate.as_str().to_string();
+                *artifact.counts.by_predicate.entry(pred).or_insert(0) += 1;
+                *artifact
+                    .counts
+                    .by_pack
+                    .entry(f.source.pack.clone())
+                    .or_insert(0) += 1;
+            }
+            artifact.counts.facts_total += curated.len();
+            artifact.facts.extend(curated);
+        }
+        Err(e) => {
+            eprintln!("extract_facts: world_core load error — {e}");
+        }
+    }
+    if world_core_loaded > 0 {
+        eprintln!(
+            "extract_facts: merged {world_core_loaded} curated world_core facts (pre-merge: {before}, post-merge: {})",
+            artifact.facts.len()
+        );
+    }
+
     eprintln!(
         "DONE: status={} scanned={} samples_with_facts={} facts={} packs={}/{} elapsed={}s",
         artifact.status,

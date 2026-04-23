@@ -52,6 +52,7 @@ pub mod graph;
 pub mod harness;
 pub mod patterns;
 pub mod reasoner;
+pub mod world_core;
 
 use adam_kernel_fst::lexicon::LexiconV1;
 use adam_kernel_fst::parser::Analysis;
@@ -238,7 +239,25 @@ pub fn extract_facts(
     // v3.5.5: structural partitive — first PartOf extractor. Feeds
     // the R3_has_inheritance_via_part_of rule (Has + PartOf → Has).
     patterns::structural_part_of(text, parses, lexicon, source, &mut out);
+    // v3.9.0 — central hygiene gate. The FST tokenizer sometimes
+    // splits compound tokens like `2021-жылғы` into dash-prefixed
+    // fragments (`-жылғы`, `-ға`, `-қа`, `-дүниежүзілік`, `-ғасыр`)
+    // that leak into pattern matchers as subject / object roots.
+    // Codex external review of v3.8.5 flagged 87 such facts on the
+    // committed runtime (`-дүниежүзілік`=20, `-ға`=8, `-жыл`=6, etc).
+    // Every root starting with `-` is guaranteed to be a suffix-
+    // fragment parse and can never represent a real entity — reject
+    // unconditionally at the pipeline boundary.
+    out.retain(|f| !is_fragment_root(&f.subject.root) && !is_fragment_root(&f.object.root));
     out
+}
+
+/// v3.9.0 — filter for dash-prefixed fragment roots. Returns `true`
+/// for any root that begins with `-` (suffix fragment, e.g. `-ға`,
+/// `-жылғы`, `-дүниежүзілік`). Also filters roots that are just a
+/// single dash character. Empty strings are treated as fragments.
+fn is_fragment_root(root: &str) -> bool {
+    root.is_empty() || root.starts_with('-')
 }
 
 #[cfg(test)]
@@ -292,5 +311,27 @@ mod tests {
         let json = serde_json::to_string(&f).unwrap();
         let parsed: Fact = serde_json::from_str(&json).unwrap();
         assert_eq!(parsed, f);
+    }
+
+    // ----------------------- v3.9.0 hygiene gate -------------------------
+
+    #[test]
+    fn is_fragment_root_rejects_dash_prefixed() {
+        // Codex-flagged noise from the committed v3.8.5 runtime.
+        assert!(is_fragment_root("-ға"));
+        assert!(is_fragment_root("-жыл"));
+        assert!(is_fragment_root("-қа"));
+        assert!(is_fragment_root("-ғасыр"));
+        assert!(is_fragment_root("-дүниежүзілік"));
+        assert!(is_fragment_root("-тармағын"));
+        // Empty also refused.
+        assert!(is_fragment_root(""));
+        // Legitimate content nouns pass.
+        assert!(!is_fragment_root("еңбек"));
+        assert!(!is_fragment_root("жер"));
+        assert!(!is_fragment_root("қазақстан"));
+        // Internal dashes are fine (compound content nouns).
+        assert!(!is_fragment_root("сондай-ақ"));
+        assert!(!is_fragment_root("нұр-сұлтан"));
     }
 }

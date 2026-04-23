@@ -7,6 +7,131 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [3.9.0] — 2026-04-23 — World Core v1: curated Kazakh knowledge packs + hygiene gate
+
+**Architectural direction captured.** Codex's second-pass review of v3.8.5 converged with our own assessment: the path to a «ChatGPT-class intellectual, but without probability / cost / hallucination» is **not** to train an LLM-clone — it's to build an *auditable Kazakh reasoning engine* on top of **curated knowledge packs**. v3.9.0 ships the World Core infrastructure that unlocks this path + closes the `-`-prefixed fragment noise Codex flagged on the facts.json graph.
+
+### 1. Hygiene gate — `-`-prefixed fragment roots refused
+
+Codex measured 87 facts on the v3.8.5 committed `facts.json` where subject or object root started with `-` (artifacts of FST tokenisation splitting compound tokens like `2021-жылғы` into dash-prefixed fragments). Top offenders: `-дүниежүзілік` (20), `-ға` (8), `-жыл` (6), `-ғасыр` (7), `-қа` (6), `-нан` (6). Every such root is categorically a suffix-fragment parse and can never represent a real entity.
+
+Fix: central `is_fragment_root` gate in [`lib.rs`](crates/adam-reasoning/src/lib.rs) post-filter that rejects any fact whose subject or object root is empty or starts with `-`. Applies uniformly across all 11 matchers — no per-matcher code churn needed. Regression test `is_fragment_root_rejects_dash_prefixed` covers the seven flagged patterns plus the boundary case of internal dashes (`сондай-ақ`, `нұр-сұлтан` — legitimate content) passing through.
+
+### 2. World Core v1 — curated Kazakh knowledge packs
+
+New infrastructure that lets human reviewers inject high-trust typed facts directly into the graph, bypassing the precision ceiling of text-pattern matchers.
+
+**Schema** (one JSON per line, one file per domain in `data/world_core/<domain>.jsonl`):
+
+```jsonc
+{
+  "id": "astro_001",
+  "kk": "Жер — Күн жүйесіндегі ғаламшар.",
+  "facts": [
+    { "subject": "жер", "predicate": "is_a",    "object": "ғаламшар" },
+    { "subject": "жер", "predicate": "part_of", "object": "күн жүйесі" }
+  ],
+  "domain": "astronomy",
+  "source": "curated",
+  "confidence": "high",
+  "review_status": "approved",
+  "reviewer": "shaman",
+  "reviewed_at": "2026-04-23"
+}
+```
+
+**Crate surface** ([`adam_reasoning::world_core`](crates/adam-reasoning/src/world_core.rs)):
+
+- `WorldCoreEntry` / `WorldCoreFact` — serde-deserialising structs with stable JSONL form.
+- `ConfidenceTier { High, Medium, Low }` — reserved for reviewer discretion; `ReviewStatus { Approved, Pending, Rejected }` — only `Approved` entries enter the runtime fact set.
+- `load_world_core_dir(path)` — parses every `*.jsonl` deterministically; returns a `LoadReport` with accepted + rejected entries (rejection reasons: parse failure, duplicate id, empty fact list, tautology, fragment root).
+- `emit_facts(entry, path)` — converts an approved entry into pipeline `Fact`s with `ConfidenceKind::HumanApproved` + `source.pack = "world_core/<domain>.jsonl"`.
+- `load_world_core_facts(path)` — convenience one-shot for the extract pipeline.
+
+**New binary** [`validate_world_core`](crates/adam-reasoning/src/bin/validate_world_core.rs): authoring-gate validator. Prints per-domain summary (entries / approved / pending / rejected / facts), flags Kazakh-purity violations (any non-Cyrillic character in the `kk` sentence), reports all rejected entries, returns non-zero exit code if anything failed. Intended to run in CI alongside `validate_foundation`.
+
+**Integration into `extract_facts`**: after scanning text corpus packs, the binary calls `world_core::load_world_core_facts("data/world_core")` and merges the curated facts into the same `artifact.facts` vector that text extraction populates. Per-predicate + per-pack counters are updated uniformly so the summary output lists curated packs (`world_core/astronomy.jsonl`, etc.) alongside extracted packs. Missing `data/world_core/` is a silent no-op — trimmed CI checkouts behave identically to pre-v3.9.0.
+
+### 3. Seed data — 80 entries / 126 facts across 3 domains
+
+Bootstrap content authored for v3.9.0 (all `approved` by `shaman` at `high` or `medium` confidence):
+
+| domain | entries | facts | example |
+|---|---:|---:|---|
+| `astronomy` | 30 | 41 | «Жер — Күн жүйесіндегі ғаламшар» → `(жер, is_a, ғаламшар)` + `(жер, part_of, күн жүйесі)` |
+| `time` | 20 | 38 | «Жыл — он екі айдан тұрады» → `(жыл, has_quantity, ай)` + `(ай, part_of, жыл)` |
+| `geography_kz` | 30 | 47 | «Алматы — Қазақстанның ірі қаласы» → `(алматы, is_a, қала)` + `(алматы, part_of, қазақстан)` |
+| **TOTAL** | **80** | **126** | — |
+
+All 80 entries pass `validate_world_core`. `reviewer: "shaman"` is the bootstrap author handle; v3.9.5+ will introduce the native-speaker review workflow.
+
+### 4. `adam_inspect` — Curated vs Extracted split
+
+The per-root report in [`adam_inspect`](crates/adam-dialog/src/bin/adam_inspect.rs) now separates facts into two sections:
+
+1. **Curated (world_core — HumanApproved)** — shown first. Each entry prints the `domain`, the `(pack, sample_id)` provenance, AND the Kazakh sentence `kk` in quotes — the audit trail is complete.
+2. **Extracted (Grammar — corpus text patterns)** — shown after. Unchanged from v3.8.5.
+
+The `is_curated` filter is `f.confidence == ConfidenceKind::HumanApproved` — single-predicate dispatch, no ambiguity. Summary footer updated to count each tier separately.
+
+### Committed runtime delta
+
+| | v3.8.5 | v3.9.0 | delta |
+|---|---:|---:|---|
+| facts.json (total) | 13 627 | **13 627** | **0** (composition changed) |
+| curated (world_core, HumanApproved) | 0 | **126** | **+126** (new tier) |
+| extracted (text, Grammar) | 13 627 | **13 501** | **−126** (fragment-root filter dropped 87 dash noise; small matcher re-runs on top) |
+| graph nodes | 3 087 | **3 100** | **+13** |
+| graph edges | 12 165 | **12 175** | **+10** |
+| derivations | 205 | **704** | **+499 (×3.4)** — world_core IsA chains ignited R5 shared-target matching: 56 → **489** |
+| **predicate coverage** | **9 / 11 = 81.8 %** | **11 / 11 = 100 %** | **+2 (Causes, InDomain)** — world_core entries `astro_015/016` ("Күн жарық береді" / "Күн жылу береді") activate `Causes`; `astro_024` activates `InDomain` |
+
+Per-predicate fact counts after v3.9.0:
+
+| predicate | v3.8.5 | v3.9.0 |
+|---|---:|---:|
+| DoesTo | 9 498 | 9 399 |
+| GoesTo | 1 697 | 1 692 |
+| RelatedTo | 1 449 | 1 446 |
+| LivesIn | 315 | 313 |
+| After | 275 | 269 |
+| **IsA** | 162 | **219 (+57)** |
+| Has | 189 | 190 |
+| **PartOf** | 23 | **65 (+42)** |
+| HasQuantity | 19 | 29 |
+| **Causes** | 0 | **3 (first fire)** |
+| **InDomain** | 0 | **2 (first fire)** |
+
+Per-rule derivation counts at v3.9.0: R1_is_a_transitivity = **42** (was 33), R2_has_inheritance = **173** (was 116), R5_shared_is_a_target = **489** (was 56). R3_has_inheritance_via_part_of fires 0× post-hardening (PartOf subject/object roots don't yet overlap with Has subject in the clean set; v3.9.5 adds more PartOf entries).
+
+Most-connected graph nodes post-merge (content-noun focus preserved): адам (279), жер (221), дүние (210), қазақ (200), ат (156).
+
+### Tests
+
+**433 passing** (+10 from v3.8.5): 1 hygiene-gate regression + 9 world_core loader / validator / emitter tests.
+
+### Trust invariants (test-enforced)
+
+- `ConfidenceKind::HumanApproved` is **exclusive** to world_core; text extraction never produces it.
+- `source.pack` starting with `world_core/` is **exclusive** to world_core; text-pack paths never overlap.
+- `review_status ∈ {Pending, Rejected}` → entry does **not** emit facts (verified by unit tests `emit_facts_refuses_pending_entry` and `emit_facts_refuses_rejected_entry`).
+- `Fact` dash-prefixed root → unconditionally refused (verified by `is_fragment_root_rejects_dash_prefixed`).
+
+### Architectural statement
+
+This release captures a deliberate direction: **adam is not competing with ChatGPT on breadth.** It is becoming an *auditable Kazakh reasoning engine* — narrower than an LLM, cheaper by orders of magnitude, but provably unable to hallucinate (every output is a template / verbatim quote / FST synthesis / rule-derived chain with full provenance, now augmented with curated world_core facts each of which has a named human reviewer).
+
+The long-term goal (v4.0.0) is a **5 000+ entry world_core** across 10+ domains, plus R6 / R7 rules (`LivesIn + PartOf → LivesIn`, `GoesTo + PartOf → GoesTo`) that fire on the clean v3.8.5-hardened predicate set. This makes the project a genuine commercial differentiator for the sovereign-AI / government-sector use case: **you can see exactly where every answer comes from, and no claim enters the runtime without a human's name attached to it.**
+
+### What's next (v3.9.5)
+
+- Expand world_core to 500+ entries across 6–8 domains (add `biology_basic`, `society`, `numbers`, `colors`, `body_parts`)
+- `is_closed_class` / `is_time_noun` / `is_location_root` sync across `adam-reasoning::patterns` and `adam-dialog::semantics` (closes the `Неліктен → Нелікте тұрасыз ба` bug surfaced during the v3.8.5 free-form REPL test)
+- Clean OCR noise filter on retrieval samples (rejects «ақ-», truncated stems)
+- Community contribution workflow for native-speaker review
+
+---
+
 ## [3.8.5] — 2026-04-22 — Precision hardening: Codex review response (doc drift, renderer morphology, matcher filters)
 
 **Patch release addressing the [Codex / Antigravity review of v3.8.0](https://github.com/qazaq-ai/adam/issues).** Three categories of defect closed, each concretely flagged by the external reviewer:

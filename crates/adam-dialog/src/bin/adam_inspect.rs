@@ -44,7 +44,7 @@
 use std::{collections::BTreeMap, fs, process::ExitCode};
 
 use adam_kernel_fst::morphotactics::{Case, NounFeatures, synthesise_noun};
-use adam_reasoning::{Fact, Predicate, reasoner::DerivedFact};
+use adam_reasoning::{ConfidenceKind, Fact, Predicate, reasoner::DerivedFact};
 use serde::Deserialize;
 
 const FACTS_PATH: &str = "data/retrieval/facts.json";
@@ -192,18 +192,82 @@ fn main() -> ExitCode {
         .collect();
     incoming_neighbours.sort_by_key(|(n, _)| *n);
 
-    // Section 2 — direct facts.
-    let direct_subj: Vec<&Fact> = facts.iter().filter(|f| f.subject.root == root).collect();
-    let direct_obj: Vec<&Fact> = facts.iter().filter(|f| f.object.root == root).collect();
+    // Section 2 — direct facts, split by confidence tier.
+    // v3.9.0 — world_core (HumanApproved, curated) shown first as the
+    // highest-trust tier; text-extracted (Grammar) facts shown after.
+    let is_curated = |f: &Fact| f.confidence == ConfidenceKind::HumanApproved;
+    let curated_subj: Vec<&Fact> = facts
+        .iter()
+        .filter(|f| f.subject.root == root && is_curated(f))
+        .collect();
+    let curated_obj: Vec<&Fact> = facts
+        .iter()
+        .filter(|f| f.object.root == root && is_curated(f))
+        .collect();
+    let extracted_subj: Vec<&Fact> = facts
+        .iter()
+        .filter(|f| f.subject.root == root && !is_curated(f))
+        .collect();
+    let extracted_obj: Vec<&Fact> = facts
+        .iter()
+        .filter(|f| f.object.root == root && !is_curated(f))
+        .collect();
+
+    if !curated_subj.is_empty() || !curated_obj.is_empty() {
+        println!(
+            "# Curated facts (world_core — HumanApproved): {} as subject, {} as object",
+            curated_subj.len(),
+            curated_obj.len()
+        );
+        println!();
+        if !curated_subj.is_empty() {
+            println!("  As subject:");
+            for f in curated_subj.iter().take(10) {
+                println!(
+                    "    `{}` --{}--> `{}`  [domain: {}; {}/{}]",
+                    f.subject.root,
+                    f.predicate.as_str(),
+                    f.object.root,
+                    f.pattern.strip_prefix("world_core/").unwrap_or(&f.pattern),
+                    f.source.pack,
+                    f.source.sample_id,
+                );
+                println!("      kk: «{}»", f.raw_text);
+            }
+            if curated_subj.len() > 10 {
+                println!("    … and {} more", curated_subj.len() - 10);
+            }
+        }
+        if !curated_obj.is_empty() {
+            println!("  As object:");
+            for f in curated_obj.iter().take(10) {
+                println!(
+                    "    `{}` --{}--> `{}`  [domain: {}; {}/{}]",
+                    f.subject.root,
+                    f.predicate.as_str(),
+                    f.object.root,
+                    f.pattern.strip_prefix("world_core/").unwrap_or(&f.pattern),
+                    f.source.pack,
+                    f.source.sample_id,
+                );
+                println!("      kk: «{}»", f.raw_text);
+            }
+            if curated_obj.len() > 10 {
+                println!("    … and {} more", curated_obj.len() - 10);
+            }
+        }
+        println!();
+    }
+
     println!(
-        "# Direct facts (extracted from corpus): {} as subject, {} as object",
-        direct_subj.len(),
-        direct_obj.len()
+        "# Extracted facts (Grammar — corpus text patterns): {} as subject, {} as object",
+        extracted_subj.len(),
+        extracted_obj.len()
     );
     println!();
-    if !direct_subj.is_empty() {
+    if !extracted_subj.is_empty() {
         println!("  As subject:");
-        for f in direct_subj.iter().take(10) {
+        for f in extracted_subj.iter().take(10) {
             println!(
                 "    `{}` --{}--> `{}`  [pattern: {}; {}/{}]",
                 f.subject.root,
@@ -214,13 +278,13 @@ fn main() -> ExitCode {
                 f.source.sample_id,
             );
         }
-        if direct_subj.len() > 10 {
-            println!("    … and {} more", direct_subj.len() - 10);
+        if extracted_subj.len() > 10 {
+            println!("    … and {} more", extracted_subj.len() - 10);
         }
     }
-    if !direct_obj.is_empty() {
+    if !extracted_obj.is_empty() {
         println!("  As object:");
-        for f in direct_obj.iter().take(10) {
+        for f in extracted_obj.iter().take(10) {
             println!(
                 "    `{}` --{}--> `{}`  [pattern: {}; {}/{}]",
                 f.subject.root,
@@ -231,8 +295,8 @@ fn main() -> ExitCode {
                 f.source.sample_id,
             );
         }
-        if direct_obj.len() > 10 {
-            println!("    … and {} more", direct_obj.len() - 10);
+        if extracted_obj.len() > 10 {
+            println!("    … and {} more", extracted_obj.len() - 10);
         }
     }
     println!();
@@ -321,13 +385,14 @@ fn main() -> ExitCode {
     println!("---");
     println!(
         "Summary: `{root}` has degree {} ({} out + {} in) across {} graph predicates. \
-         {} extracted facts and {} rule-derived facts reference it directly. \
+         {} curated (world_core) + {} extracted (text) facts and {} rule-derived facts reference it directly. \
          Every claim above is traceable via `(pack, sample_id)` or `rule_id` + `source_chain`.",
         node.out_degree + node.in_degree,
         node.out_degree,
         node.in_degree,
         node.out_by_predicate.len() + node.in_by_predicate.len(),
-        direct_subj.len() + direct_obj.len(),
+        curated_subj.len() + curated_obj.len(),
+        extracted_subj.len() + extracted_obj.len(),
         derived_subj.len() + derived_obj.len(),
     );
 

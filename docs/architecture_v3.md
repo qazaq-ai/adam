@@ -180,7 +180,21 @@ Eleven pattern matchers in `adam_reasoning::patterns` (v2.x baseline + v3.5.x sc
 | `X-ның саласы / ғылымы Y` | `InDomain` | v3.5.0 |
 | `X-тің бөлігі / бөлшегі Y` | `PartOf` | v3.5.5 |
 
-Every matcher is type-checked on FST features (`Case`, `Predicate` enum, verb root), never on raw verb surface. Outputs `Fact` with categorical `ConfidenceKind::Grammar` + full `FactSource` provenance. At v3.8.5, **9 of 11 predicates fire** on the committed 200 k-sample runtime (`Causes` and `InDomain` remain at 0 — literal head-word patterns rare in current corpus; v3.9+ target loosens them). **v3.8.5 precision hardening**: added `is_location_root` (refuses Қазақстан / Ресей / Алматы etc. as LivesIn subjects — countries can't reside), `is_time_noun` (refuses жыл / күн / ай as subjects of LivesIn / GoesTo / DoesTo — time adverbials are not agents), expanded `is_closed_class` with demonstrative qualifiers (мұндай / сондай / ондай / кейбір / өз / …), rejected LivesIn / GoesTo objects whose FST analysis retains a P3 possessive (fragment parses), 3-char minimum subject-root length. Result: facts dropped from 14 430 to **13 627** (−803, −5.6 %) with LivesIn the biggest precision-win (572 → 315, −44.9 %).
+Every matcher is type-checked on FST features (`Case`, `Predicate` enum, verb root), never on raw verb surface. Outputs `Fact` with categorical `ConfidenceKind::Grammar` + full `FactSource` provenance. At v3.8.5, **9 of 11 predicates fire** on the committed 200 k-sample runtime (`Causes` and `InDomain` remain at 0 — literal head-word patterns rare in current corpus; v3.9+ target loosens them). **v3.8.5 precision hardening**: added `is_location_root` (refuses Қазақстан / Ресей / Алматы etc. as LivesIn subjects — countries can't reside), `is_time_noun` (refuses жыл / күн / ай as subjects of LivesIn / GoesTo / DoesTo — time adverbials are not agents), expanded `is_closed_class` with demonstrative qualifiers (мұндай / сондай / ондай / кейбір / өз / …), rejected LivesIn / GoesTo objects whose FST analysis retains a P3 possessive (fragment parses), 3-char minimum subject-root length. Result: facts dropped from 14 430 to **13 627** (−803, −5.6 %) with LivesIn the biggest precision-win (572 → 315, −44.9 %). **v3.9.0** added a central `is_fragment_root` post-filter (refuses any root starting with `-`) closing the 87 dash-prefixed fragment facts Codex flagged on v3.8.5 (`-дүниежүзілік`, `-ға`, `-жыл`, `-ғасыр`, …).
+
+### World Core — curated knowledge packs (v3.9.0)
+
+A second, orthogonal source of facts: human-authored JSONL in `data/world_core/<domain>.jsonl`. Each entry is one short Kazakh sentence + 1–3 typed facts + `reviewer` + `review_status`. Only `approved` entries reach the runtime. Emitted facts carry `ConfidenceKind::HumanApproved` + `source.pack = "world_core/<domain>.jsonl"` — the confidence-kind tier is **exclusive** to world_core; text extraction never produces `HumanApproved` facts.
+
+| component | location |
+|---|---|
+| Schema + loader + validator | `adam_reasoning::world_core` |
+| Validator binary | `cargo run -p adam-reasoning --bin validate_world_core` |
+| Pipeline merge | `extract_facts` calls `load_world_core_facts(...)` after scanning text packs |
+| `adam_inspect` split | per-root output has two sections: **Curated** (HumanApproved) first, **Extracted** (Grammar) after |
+| Authoring guide | `data/world_core/README.md` |
+
+Seed data shipped with v3.9.0: **80 entries / 126 curated facts** across `astronomy` (30), `time` (20), `geography_kz` (30). Long-term target: 5 000+ entries across 10+ domains by v4.0.0.
 
 ### Lexical graph
 
@@ -312,8 +326,9 @@ cargo run --release -p adam-dialog --bin adam_chat -- --no-retrieval
 - **v3.7.5** — `adam_demo` Part 4 refreshed to iterate one derivation per rule id (R1 / R2 / R3 / R5), showing all four cognitive operations in one demo run.
 - **v3.8.0** — **critical verb-root bug fix**: `locative_lives_in` / `dative_goes_to` compared the infinitive forms (`"тұру"` / `"бару"`) against FST-stored stems (`"тұр"` / `"бар"`); neither predicate had ever fired at any scale since v2.1 / v2.5. Fix unblocks **LivesIn (572 facts) + GoesTo (1 864 facts)** at T4_200k. Predicate coverage jumps **7/11 → 9/11**.
 - **v3.8.5** — **precision hardening** in response to Codex external review: matcher filters (location / time-noun / demonstrative blocklists, possessive-object refusal, 3-char minimum stem), renderer FST synthesis (case suffixes no longer dash-concatenated), demo preview / actual-render alignment (subject-first two-pass in `inject_reasoning_chain`), contradicting README rule-count row removed. Facts drop to **13 627** (−803, −5.6 %) with LivesIn the biggest precision-win (572 → 315, −44.9 %); derivations 207 → 205; coverage holds at 9/11. **423 workspace tests** (+7). First release with a morphology-regression test.
+- **v3.9.0** — **World Core v1 + fragment-root hygiene gate**. Codex's second-pass review crystallised the architectural direction: **not** an LLM-clone, but an *auditable Kazakh reasoning engine*. Ships (a) central `is_fragment_root` post-filter that drops the 87 `-`-prefixed fragment facts Codex measured; (b) World Core infrastructure — `data/world_core/*.jsonl` human-authored knowledge packs, `adam_reasoning::world_core` loader / validator / emitter, `validate_world_core` binary, pipeline merge into `extract_facts`, `ConfidenceKind::HumanApproved` as exclusive tier; (c) seed data (80 entries / 126 curated facts across `astronomy`, `time`, `geography_kz`); (d) `adam_inspect` split into **Curated** + **Extracted** sections. First release where adam has structured foundational knowledge beyond what the Kazakh corpus makes explicit.
 
-### Committed but not yet shipped (v3.9+ targets)
+### Committed but not yet shipped (v4.0+ targets)
 
 - **R6 / R7 rules** — `LivesIn + PartOf → LivesIn`, `GoesTo + PartOf → GoesTo`. Turns the (v3.8.0-activated, v3.8.5-hardened) predicate facts into derivations. With 315 LivesIn + 23 PartOf at v3.8.5 T4, expect non-zero fire.
 - **FST genitive-after-vowel phonology fix** — the `{D}{I}ң` genitive template produces `қаладың` instead of `қаланың` on vowel-final stems (discovered during v3.8.5 renderer work; sidestepped by using dative/ablative in the reasoning-chain renderer). Dedicated phonology fix is a v3.9 target since it affects 48+ existing FST roundtrip tests.

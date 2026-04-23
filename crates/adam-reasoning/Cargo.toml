@@ -13,6 +13,9 @@ thiserror.workspace = true
 rayon.workspace = true
 ctrlc.workspace = true
 
+[dev-dependencies]
+tempfile = "3.12"
+
 [[bin]]
 name = "extract_facts"
 path = "src/bin/extract_facts.rs"
@@ -24,3 +27,7 @@ path = "src/bin/build_lexical_graph.rs"
 [[bin]]
 name = "run_reasoner"
 path = "src/bin/run_reasoner.rs"
+
+[[bin]]
+name = "validate_world_core"
+path = "src/bin/validate_world_core.rs"
