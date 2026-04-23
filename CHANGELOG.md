@@ -7,6 +7,93 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.4] — 2026-04-23 — R8 After-transitivity rule (new reasoning rule)
+
+One concern per patch — this one adds a new rule to the forward-chaining reasoner: **`R8_after_transitivity`**.
+
+### Motivation
+
+`After` is a strict partial order — mathematically the cleanest predicate to make transitive. The rule:
+
+> `A After B ∧ B After C ⟹ A After C`
+
+mirrors `R1_is_a_transitivity` in structure but applies to temporal ordering instead of taxonomic subsumption. No semantic overreach risk — unlike Has-transitivity (mixes ownership with composition) or LivesIn-transitivity (mixes residence with physical inclusion), temporal order is a mathematical relation that transits cleanly.
+
+This aligns with the v4.x direction captured in memory `project_v4_direction`: **intelligent thinking via simple math** — add rules with clear mathematical structure, not heuristics.
+
+### Curated temporal chains now close automatically
+
+`data/world_core/time.jsonl` asserts the primitive links:
+
+```
+time_011  түс After таң
+time_012  кеш After түс
+time_013  түн After кеш
+time_015  жаз After көктем
+time_016  күз After жаз
+time_017  қыс After күз
+```
+
+R8 closes these into their full transitive closure. Measured on the live runtime (re-run of `run_reasoner` over the v4.0.3 `facts.json`, which is byte-identical — only derivations change):
+
+```
+R1_is_a_transitivity:           361 → 361   unchanged
+R2_has_inheritance:             422 → 422   unchanged
+R3_has_inheritance_via_part_of:  26 →  26   unchanged
+R5_shared_is_a_target:        5 437 → 5 437 unchanged
+R6_lives_in_via_part_of:         36 →  36   unchanged
+R7_goes_to_via_part_of:         297 → 297   unchanged
+R8_after_transitivity:            — →  789  NEW
+───────────────────────────────────────────────────
+total derivations:            6 579 → 7 368 (+789, +12 %)
+```
+
+Curated-only R8 output (world_core-to-world_core chains) — 6 clean temporal derivations:
+
+| subject | `After` | object |
+|---|---|---|
+| күз | After | көктем |
+| қыс | After | жаз |
+| қыс | After | көктем |
+| түн | After | түс |
+| түн | After | таң |
+| кеш | After | таң |
+
+Every step independently verifiable: e.g. «қыс after көктем» → chain `[time_017, time_016, time_015]` via `(қыс, After, күз) ∧ (күз, After, жаз) ∧ (жаз, After, көктем)`.
+
+### Known upstream noise observation
+
+The remaining 783 R8 derivations inherit the precision profile of the **existing** text-source After extractor — which pulls noisy subject roots like `тропикалық` (adjective surface mis-parsed) from `kazakh_textbooks_pack.json` and `wikipedia_kz_pack.json`. R8 transitively multiplies that noise.
+
+Impact on users: **zero** — both `adam_chat --safe` (v4.0.3) and `adam_demo` Part 4 default (v4.0.2) already filter to fully-curated source chains, so a text-source R8 derivation can never reach the dialog path. The noisy rows only exist in raw `data/retrieval/derived_facts.json` for audit.
+
+The upstream cause — `temporal_after` pattern matcher's subject selection lacking the content-noun / type-guard logic that `locative_lives_in` / `dative_goes_to` already have — is a known target for a subsequent patch under the "noise elimination" axis.
+
+### Tests
+
+**461 passing** (+5 from v4.0.3): five new reasoner unit tests —
+- `r8_derives_after_transitivity` (single-chain positive)
+- `r8_respects_tautology_guard`
+- `r8_does_not_fire_without_chain`
+- `r8_dedupes_against_existing_fact`
+- `r8_chains_across_iterations` — four-season full closure: көктем → жаз → күз → қыс produces (күз, көктем), (қыс, жаз), (қыс, көктем).
+
+### Scope discipline
+
+One rule, one patch. No pattern-matcher changes, no world_core changes, no extraction changes. Sequential 1→9 per-integer versioning preserved (v4.0.3 → v4.0.4 → v4.0.5).
+
+### What's next
+
+The four knowledge-enrichment axes continue:
+- **reasoning rules**: R8 landed. Future candidates — R9 After-anti-symmetry curator warning, R-style rules over other predicates.
+- **world_core**: expansion and new domains remain the main scaling axis.
+- **noise elimination**: `temporal_after` subject guards as a dedicated patch (Codex-style precision audit).
+- **corpus**: clean synthetic-data generation via FST is the direction per `project_v4_direction`.
+
+Each patch is one step. Nine steps per major keeps the pace measured.
+
+---
+
 ## [4.0.3] — 2026-04-23 — `adam_chat --safe` investor REPL mode
 
 Continuing the Codex v4.0.0 hand-off. v4.0.2 landed the curated-only filter

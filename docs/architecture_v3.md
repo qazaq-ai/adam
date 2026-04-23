@@ -217,6 +217,7 @@ API: `outgoing(root)`, `incoming(root)`, per-node `NodeStats`.
 | **R5** | `A IsA X ∧ B IsA X ⟹ RelatedTo(A, B)` | active (v2.6) |
 | **R6** | `A LivesIn B ∧ B PartOf C ⟹ A LivesIn C` | active (v3.9.5) |
 | **R7** | `A GoesTo B ∧ B PartOf C ⟹ A GoesTo C` | active (v3.9.5) |
+| **R8** | `A After B ∧ B After C ⟹ A After C` | active (v4.0.4 — pure temporal order, mathematically clean) |
 
 Every `DerivedFact` carries:
 - `rule_id: String` — stable identifier (never a probability score)

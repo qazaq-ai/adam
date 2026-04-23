@@ -25,6 +25,7 @@
 //! | `R5_shared_is_a_target` | A IsA X ∧ B IsA X (A ≠ B) | RelatedTo(A, B) |
 //! | `R6_lives_in_via_part_of` | A LivesIn B ∧ B PartOf C | A LivesIn C (v3.9.5 — spatial inheritance; activated once v3.8.5 verb-root fix gave LivesIn real data) |
 //! | `R7_goes_to_via_part_of` | A GoesTo B ∧ B PartOf C | A GoesTo C (v3.9.5 — directional inheritance; same motivation as R6) |
+//! | `R8_after_transitivity` | A After B ∧ B After C | A After C (v4.0.4 — pure temporal order transitivity; math-clean, overreach-free) |
 //!
 //! ## Determinism
 //!
@@ -193,6 +194,7 @@ fn run_one_pass(
     rule_r5_shared_is_a_target(facts, graph, seen, &mut out);
     rule_r6_lives_in_via_part_of(facts, graph, seen, &mut out);
     rule_r7_goes_to_via_part_of(facts, graph, seen, &mut out);
+    rule_r8_after_transitivity(facts, graph, seen, &mut out);
     out
 }
 
@@ -599,6 +601,81 @@ fn rule_r7_goes_to_via_part_of(
                     pos: "noun".into(),
                 },
                 rule_id: "R7_goes_to_via_part_of".into(),
+                source_chain: vec![first.source.clone(), second_source],
+                confidence: ConfidenceKind::RuleInferred,
+            });
+        }
+    }
+}
+
+/// `R8`: Temporal-order transitivity. If `A After B` and `B After C`,
+/// derive `A After C`.
+///
+/// Added v4.0.4. `After` is a **strict partial order** — mathematically
+/// the cleanest predicate to make transitive. If X happens after Y and
+/// Y happens after Z, then X happens after Z. No semantic overreach
+/// risk, unlike Has-transitivity (which mixes ownership with
+/// composition) or LivesIn-transitivity (which mixes residence with
+/// physical inclusion).
+///
+/// Example chain from curated `world_core/time.jsonl`:
+///
+/// - `(жаз, After, көктем)` + `(күз, After, жаз)` ⟹ `(күз, After, көктем)`
+/// - `(күз, After, жаз)` + `(қыс, After, күз)` ⟹ `(қыс, After, жаз)`
+///
+/// After two fixpoint passes this gives full orderings like
+/// `(қыс, After, көктем)` — the full seasonal round.
+///
+/// Invariants: `After` is anti-symmetric (`A After B` forbids
+/// `B After A` — but the reasoner doesn't enforce this; it would be a
+/// contradiction in the data). `MAX_ITER` bounds chain length.
+///
+/// Tautology guard: `A = C` rejected (defensive, though a well-formed
+/// `After` chain never produces it).
+fn rule_r8_after_transitivity(
+    facts: &[Fact],
+    graph: &LexicalGraph,
+    seen: &BTreeSet<(String, String, String)>,
+    out: &mut Vec<DerivedFact>,
+) {
+    for first in facts {
+        if first.predicate != Predicate::After {
+            continue;
+        }
+        // A After B — find every (B After C) edge in the graph.
+        for second in graph.outgoing(&first.object.root) {
+            if second.predicate != Predicate::After {
+                continue;
+            }
+            // A = C tautology — defensive. Well-formed After chains
+            // are anti-symmetric so this would mean A After B ∧ B After
+            // A, a contradiction in the data, not a rule-safe
+            // derivation.
+            if first.subject.root == second.to {
+                continue;
+            }
+            let key = (
+                first.subject.root.clone(),
+                "after".to_string(),
+                second.to.clone(),
+            );
+            if seen.contains(&key) {
+                continue;
+            }
+            let second_source = second
+                .sources
+                .first()
+                .cloned()
+                .expect("graph edge must carry at least one source");
+            out.push(DerivedFact {
+                subject: first.subject.clone(),
+                predicate: Predicate::After,
+                object: SlotRef {
+                    surface: second.to.clone(),
+                    root: second.to.clone(),
+                    pos: "noun".into(),
+                },
+                rule_id: "R8_after_transitivity".into(),
                 source_chain: vec![first.source.clone(), second_source],
                 confidence: ConfidenceKind::RuleInferred,
             });
@@ -1193,6 +1270,114 @@ mod tests {
             bad.is_empty(),
             "R7 must not derive GoesTo against astronomical targets (got {derived:?})"
         );
+    }
+
+    // ------------------------- R8 (v4.0.4) ------------------------------
+
+    #[test]
+    fn r8_derives_after_transitivity() {
+        // жаз After көктем, күз After жаз ⟹ күз After көктем
+        let facts = vec![
+            mk_fact("жаз", Predicate::After, "көктем", "world_core", "time_015"),
+            mk_fact("күз", Predicate::After, "жаз", "world_core", "time_016"),
+        ];
+        let derived = run(&facts);
+        let r8: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R8_after_transitivity")
+            .collect();
+        assert_eq!(r8.len(), 1, "R8 should fire once (got {derived:?})");
+        let d = r8[0];
+        assert_eq!(d.subject.root, "күз");
+        assert_eq!(d.predicate, Predicate::After);
+        assert_eq!(d.object.root, "көктем");
+        assert_eq!(d.confidence, ConfidenceKind::RuleInferred);
+        assert_eq!(d.source_chain.len(), 2);
+    }
+
+    #[test]
+    fn r8_respects_tautology_guard() {
+        // A After B + B After A → A After A must be rejected.
+        let facts = vec![
+            mk_fact("A", Predicate::After, "B", "p", "s1"),
+            mk_fact("B", Predicate::After, "A", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        for d in &derived {
+            assert!(
+                !(d.subject.root == d.object.root && d.rule_id == "R8_after_transitivity"),
+                "R8 must never derive A After A: {d:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn r8_does_not_fire_without_chain() {
+        // жаз After көктем alone — no chain to extend.
+        let facts = vec![mk_fact(
+            "жаз",
+            Predicate::After,
+            "көктем",
+            "world_core",
+            "time_015",
+        )];
+        let derived = run(&facts);
+        let r8: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R8_after_transitivity")
+            .collect();
+        assert!(r8.is_empty());
+    }
+
+    #[test]
+    fn r8_dedupes_against_existing_fact() {
+        // Full chain plus explicit long-arc: R8 must not re-derive.
+        let facts = vec![
+            mk_fact("жаз", Predicate::After, "көктем", "wc", "s1"),
+            mk_fact("күз", Predicate::After, "жаз", "wc", "s2"),
+            mk_fact("күз", Predicate::After, "көктем", "wc", "s3"),
+        ];
+        let derived = run(&facts);
+        let r8: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R8_after_transitivity")
+            .collect();
+        assert!(
+            r8.is_empty(),
+            "R8 must not duplicate an explicitly-asserted After fact"
+        );
+    }
+
+    #[test]
+    fn r8_chains_across_iterations() {
+        // Four-season chain: reasoner should reach full closure in
+        // bounded iterations. Start: көктем → жаз → күз → қыс.
+        // Expected R8 derivations:
+        //   (күз, After, көктем)  — iter 1
+        //   (қыс, After, жаз)     — iter 1
+        //   (қыс, After, көктем)  — iter 2 (from күз After көктем + қыс After күз)
+        let facts = vec![
+            mk_fact("жаз", Predicate::After, "көктем", "wc", "time_015"),
+            mk_fact("күз", Predicate::After, "жаз", "wc", "time_016"),
+            mk_fact("қыс", Predicate::After, "күз", "wc", "time_017"),
+        ];
+        let derived = run(&facts);
+        let r8: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R8_after_transitivity")
+            .collect();
+        assert!(
+            r8.len() >= 3,
+            "expected R8 to reach full closure (≥3 derivations), got {}: {derived:?}",
+            r8.len()
+        );
+        let derived_pairs: std::collections::BTreeSet<(String, String)> = r8
+            .iter()
+            .map(|d| (d.subject.root.clone(), d.object.root.clone()))
+            .collect();
+        assert!(derived_pairs.contains(&("күз".into(), "көктем".into())));
+        assert!(derived_pairs.contains(&("қыс".into(), "жаз".into())));
+        assert!(derived_pairs.contains(&("қыс".into(), "көктем".into())));
     }
 
     // ---------------- v4.0.3 derivation_is_fully_curated ----------------
