@@ -7,6 +7,92 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.1] — 2026-04-23 — «Неліктен?» REPL path fix (Codex v4.0.0 review follow-up)
+
+Small, focused patch closing the bug Codex caught in the v4.0.0 audit:
+**«Неліктен?» was still routed through `StatementOfLocation { city: "Нелік" }`**
+in the real `adam_chat` REPL despite the v3.9.5 `NOT_A_TOPIC` work. The
+unit-level test `not_a_topic_covers_v3_9_5_additions` was passing, but it
+exercised `first_noun_root` / `content_roots` — not the ablative-scan path
+in `detect_statement_of_location`. Two separate code paths, one covered,
+one not.
+
+### Root cause
+
+FST analysis of "неліктен" returns three parses (in deterministic order):
+
+```
+noun: нелік +Ablative
+noun: нелік +Singular +Ablative
+noun: неліктен
+```
+
+`detect_statement_of_location` scans parses for the first `Case::Ablative`
+noun and returns its root as a city. Before v4.0.1 that was the stripped
+stem `нелік`, and `NOT_A_TOPIC` only contained the full surface form
+`неліктен` — so the skip-check matched nothing. Result: REPL reply
+"Нелікте тұрасыз ба" ("Do you live in Нелік?") to "Неліктен?".
+
+### Fix
+
+1. Add `нелік` (the FST-stripped stem) to `NOT_A_TOPIC` in
+   `adam_dialog::semantics`.
+2. `detect_statement_of_location` now **skips any noun whose root is in
+   `NOT_A_TOPIC`** at the case-scan step — same filter the content-root
+   path already uses. Covers ablative, locative, and `Locative+P1Sg`
+   branches uniformly.
+3. Mirror `нелік` in `adam_reasoning::patterns::is_closed_class` for
+   cross-layer consistency.
+
+### Regression test — REPL path, not unit filter
+
+New e2e test `nelikten_is_not_absorbed_as_city` in
+`crates/adam-dialog/tests/end_to_end.rs` exercises the exact
+`Conversation::turn(...)` path Codex reproduced:
+
+- Turn 1: "мен Қостанайдамын" → `session.city = "Қостанай"` (baseline
+  works).
+- Turn 2: "Неліктен?" — `session.city` MUST remain "Қостанай" (not be
+  overwritten with "Нелік").
+- Turn 3: fresh `Conversation`, bare "Неліктен?" — `session.city` MUST
+  stay absent.
+
+Pre-v4.0.1 Turn 2 failed the assertion. Post-v4.0.1 it passes.
+
+### Verified in REPL
+
+```
+$ cargo run -p adam-dialog --bin adam_chat -- --once "Неліктен?"
+түсінбедім
+```
+
+(Previously: «Нелікте тұрасыз ба».)
+
+### Tests
+
+**444 passing** (+1 from v4.0.0): the new e2e regression.
+
+### Housekeeping
+
+- `cargo clean` reclaimed **37.4 GiB** of `target/` artefacts (9.7 GiB
+  → 42 GiB free). Standing procedure — run before every release when
+  free space drops below ~15 GiB.
+- Project direction captured in `project_v4_direction` memory: develop
+  on M2 8 GB without investors; synthetic FST-generated data + strict
+  Kazakh grammar rules as the path to "intelligent reasoning via simple
+  math"; sequential 1→9 per-integer versioning (v4.0.1 → v4.0.2 →
+  v4.0.3 …), no half-step jumps.
+
+### What's next
+
+- v4.0.2: reasoning-demo precision polish — filter out the remaining
+  Codex-flagged noise chains (`абай is_a халық`, `еңбек — өзен`,
+  `топырақ goes_to дене`) at the demo layer, not at extraction.
+- v4.0.3+: continued patch-level hardening ahead of the next minor
+  (v4.1.0) which will carry architectural additions.
+
+---
+
 ## [4.0.0] — 2026-04-23 — World Core 500+ expansion + contradiction immune system + Codex-review response
 
 **Major release.** Codex's v3.9.5 review correctly flagged that reasoning was scaling faster than precision — «бала lives_in күн жүйесі», «(егер, DoesTo, газ)», «(жалға, GoesTo, жер)», «еңбек — өзен» were real chains in `facts.json`, not hypothetical. v4.0.0 addresses both ends of the problem: (1) **expand curated knowledge** to outweigh extracted noise via sheer IsA density, and (2) **add a contradiction immune system** that categorically refuses the classes of false derivations Codex exhibited.

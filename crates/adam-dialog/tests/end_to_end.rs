@@ -1562,3 +1562,51 @@ fn unknown_with_session_name_and_city_can_use_combined_frame() {
         "expected at least one seed to produce a response combining name + city + evidence"
     );
 }
+
+/// v4.0.1 regression: «Неліктен?» («why?» — interrogative) must NOT be
+/// absorbed as a city by `StatementOfLocation`. Codex v4.0.0 review
+/// discovered that the v3.9.5 `NOT_A_TOPIC` sync only covered
+/// `first_noun_root` / `content_roots` paths. The FST analyses
+/// "неліктен" as `нелік + Ablative` — a valid noun stem + case combo —
+/// so `detect_statement_of_location`'s ablative scan picked up `нелік`
+/// as a city root and routed the turn through
+/// `StatementOfLocation { city: Some("Нелік") }`. REPL observable effect:
+/// reply "Нелікте тұрасыз ба" ("Do you live in Нелік?") to "Неліктен?".
+///
+/// Fix: `NOT_A_TOPIC` gains `нелік` (the FST-stripped stem), and
+/// `detect_statement_of_location` now skips any noun whose root is in
+/// `NOT_A_TOPIC` before accepting it as a city. This test verifies the
+/// **end-to-end** Conversation path that Codex's unit-level
+/// `not_a_topic_covers_v3_9_5_additions` missed.
+#[test]
+fn nelikten_is_not_absorbed_as_city() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // Pre-condition: no city in session.
+    assert!(!conv.session.contains_key("city"));
+
+    // Turn 1: give a legitimate city first, to confirm the detector
+    // still works for real city inputs.
+    let _ = conv.turn("мен Қостанайдамын", &lex, &repo, 0);
+    assert_eq!(conv.session.get("city"), Some(&"Қостанай".to_string()));
+
+    // Turn 2: «Неліктен?» — this MUST NOT replace the city.
+    // Pre-v4.0.1: session.city would be overwritten with "Нелік".
+    // Post-v4.0.1: intent is Unknown, session.city is untouched.
+    let _ = conv.turn("Неліктен?", &lex, &repo, 0);
+    assert_eq!(
+        conv.session.get("city"),
+        Some(&"Қостанай".to_string()),
+        "«Неліктен?» must not be absorbed as a city by StatementOfLocation"
+    );
+
+    // Turn 3: fresh conversation, «Неліктен?» as the ONLY input.
+    // city must stay absent.
+    let mut fresh = Conversation::new();
+    let _ = fresh.turn("Неліктен?", &lex, &repo, 0);
+    assert!(
+        !fresh.session.contains_key("city"),
+        "bare «Неліктен?» must not set session.city on any seed"
+    );
+}

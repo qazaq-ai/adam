@@ -1433,6 +1433,10 @@ fn is_closed_class(root: &str) -> bool {
             | "неліктен"
             | "неге"
             | "қанша"
+            // v4.0.1 — FST-stripped stem of the «Неліктен» interrogative.
+            // See `adam_dialog::semantics::NOT_A_TOPIC` for the full
+            // explanation; mirror here for reasoning-layer symmetry.
+            | "нелік"
             // v3.8.5 (precision hardening): demonstrative qualifiers
             // and quantifier-like closed-class items the FST some-
             // times tags as bare nouns. Precision audit flagged

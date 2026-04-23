@@ -218,6 +218,15 @@ const NOT_A_TOPIC: &[&str] = &[
     "неліктен",
     "неге",
     "қанша",
+    // v4.0.1 — Codex v4.0.0 review caught that the v3.9.5 «Неліктен»
+    // fix was incomplete. FST analysis of "неліктен" returns three
+    // parses; the first is `нелік + Ablative` (stripped stem plus
+    // case), so the dialog still received a `Нелік` noun and routed
+    // it through `StatementOfLocation { city: "Нелік" }`. The v3.9.5
+    // list only contained the full surface form "неліктен". Add the
+    // stripped stem `нелік` so the ablative-scan in
+    // `detect_statement_of_location` also skips it.
+    "нелік",
     // v3.9.5 — demonstrative qualifiers + quantifier forms.
     "мұндай",
     "сондай",
@@ -596,10 +605,24 @@ fn detect_statement_of_location(
     // Prefer Ablative (stronger signal for origin: "X-дан+мын") over
     // bare Locative. Also accept Locative if co-occurring with
     // "тұрамын / тұрамыз".
+    //
+    // **v4.0.1** — Codex v4.0.0 review caught that «Неліктен?»
+    // («why?» — interrogative) was parsed by the FST as `Нелік` +
+    // Ablative, so this detector returned `StatementOfLocation { city:
+    // "Нелік" }` and the REPL replied with «Нелікте тұрасыз ба» («Do
+    // you live in Нелік?»). The v3.9.5 `NOT_A_TOPIC` sync only
+    // filtered `first_noun_root` / `content_roots` — it never touched
+    // this detector. Fix: skip any noun whose root is in `NOT_A_TOPIC`
+    // (interrogatives, demonstratives, closed-class function words)
+    // at the case-scan step. A legitimate city root is never in
+    // `NOT_A_TOPIC`; an interrogative is.
     let mut ablative_root: Option<String> = None;
     let mut locative_root: Option<String> = None;
     for p in parses {
         if let Analysis::Noun { root, features } = p {
+            if NOT_A_TOPIC.contains(&root.root.as_str()) {
+                continue;
+            }
             match features.case {
                 Some(Case::Ablative) if ablative_root.is_none() => {
                     ablative_root = Some(capitalise(&root.root));
@@ -622,6 +645,9 @@ fn detect_statement_of_location(
     use adam_kernel_fst::morphotactics::Predicate;
     for p in parses {
         if let Analysis::Noun { root, features } = p {
+            if NOT_A_TOPIC.contains(&root.root.as_str()) {
+                continue;
+            }
             if features.case == Some(Case::Locative) && features.predicate == Some(Predicate::P1Sg)
             {
                 return Some(Some(capitalise(&root.root)));
