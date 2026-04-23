@@ -97,6 +97,26 @@ impl DerivedFact {
     }
 }
 
+/// v4.0.3 — classify a [`DerivedFact`] by whether every source in its
+/// `source_chain` points to a `data/world_core/*.jsonl` pack (i.e. every
+/// supporting fact is human-reviewed). The predicate is shared by
+/// `adam_demo` Part 4 (investor-safe default since v4.0.2) and
+/// `adam_chat --safe` (investor-safe REPL since v4.0.3).
+///
+/// Empty `source_chain` is treated as NOT curated. The reasoner
+/// invariant already forbids emitting derivations with empty chains,
+/// but failing closed here guards any future regression.
+///
+/// Prefix match `"world_core/"` requires the **trailing slash** so a
+/// hypothetical `world_core_mirror/...` pack never satisfies the
+/// predicate by accident.
+pub fn derivation_is_fully_curated(d: &DerivedFact) -> bool {
+    !d.source_chain.is_empty()
+        && d.source_chain
+            .iter()
+            .all(|s| s.pack.starts_with("world_core/"))
+}
+
 /// Run the forward-chaining reasoner over `initial_facts`.
 ///
 /// Returns every new fact derived from the rule set, plus a bounded
@@ -1173,5 +1193,70 @@ mod tests {
             bad.is_empty(),
             "R7 must not derive GoesTo against astronomical targets (got {derived:?})"
         );
+    }
+
+    // ---------------- v4.0.3 derivation_is_fully_curated ----------------
+
+    fn mk_derived(chain: &[&str]) -> DerivedFact {
+        DerivedFact {
+            subject: SlotRef {
+                surface: "s".into(),
+                root: "s".into(),
+                pos: "noun".into(),
+            },
+            predicate: Predicate::IsA,
+            object: SlotRef {
+                surface: "o".into(),
+                root: "o".into(),
+                pos: "noun".into(),
+            },
+            rule_id: "R1".into(),
+            source_chain: chain
+                .iter()
+                .map(|pack| FactSource {
+                    pack: pack.to_string(),
+                    sample_id: "id".into(),
+                })
+                .collect(),
+            confidence: ConfidenceKind::RuleInferred,
+        }
+    }
+
+    #[test]
+    fn curated_predicate_accepts_world_core_only_chain() {
+        let d = mk_derived(&[
+            "world_core/astronomy.jsonl",
+            "world_core/biology_basic.jsonl",
+        ]);
+        assert!(derivation_is_fully_curated(&d));
+    }
+
+    #[test]
+    fn curated_predicate_rejects_mixed_chain() {
+        let d = mk_derived(&["world_core/astronomy.jsonl", "wikipedia_kz_pack.json"]);
+        assert!(
+            !derivation_is_fully_curated(&d),
+            "any non-world_core source disqualifies the chain"
+        );
+    }
+
+    #[test]
+    fn curated_predicate_rejects_text_only_chain() {
+        let d = mk_derived(&["wikipedia_kz_pack.json", "kazakh_textbooks_pack.json"]);
+        assert!(!derivation_is_fully_curated(&d));
+    }
+
+    #[test]
+    fn curated_predicate_fails_closed_on_empty_chain() {
+        let d = mk_derived(&[]);
+        assert!(!derivation_is_fully_curated(&d));
+    }
+
+    #[test]
+    fn curated_predicate_requires_trailing_slash_in_prefix() {
+        // Guard against prefix collisions with hypothetical
+        // `world_core_mirror` or `world_core_drafts` packs.
+        let d = mk_derived(&["world_core_mirror/x.jsonl"]);
+        assert!(!derivation_is_fully_curated(&d));
     }
 }

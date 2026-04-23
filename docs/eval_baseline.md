@@ -1,6 +1,6 @@
 # Eval Baseline
 
-> **Legacy context (transformer era, v0.1 – v0.4).** Describes benchmark assembly for the pre-v0.4.5 transformer baseline. The current adam architecture (v1.0.0 → v4.0.2) validates correctness via `cargo test --workspace` (**449 passing** as of v4.0.2) + `scripts/validate_foundation.sh`, not via a benchmark perplexity score. For the current architecture see [`docs/architecture_v3.md`](architecture_v3.md). Earlier snapshots: [`docs/architecture_v2.md`](architecture_v2.md) (v2.0–v2.3 retrieval era), [`docs/kazakh_grammar/07_dialog_architecture.md`](kazakh_grammar/07_dialog_architecture.md) (v1.0.0 MVP).
+> **Legacy context (transformer era, v0.1 – v0.4).** Describes benchmark assembly for the pre-v0.4.5 transformer baseline. The current adam architecture (v1.0.0 → v4.0.3) validates correctness via `cargo test --workspace` (**456 passing** as of v4.0.3) + `scripts/validate_foundation.sh`, not via a benchmark perplexity score. For the current architecture see [`docs/architecture_v3.md`](architecture_v3.md). Earlier snapshots: [`docs/architecture_v2.md`](architecture_v2.md) (v2.0–v2.3 retrieval era), [`docs/kazakh_grammar/07_dialog_architecture.md`](kazakh_grammar/07_dialog_architecture.md) (v1.0.0 MVP).
 
 ## Purpose
 

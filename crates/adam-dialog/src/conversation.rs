@@ -103,6 +103,14 @@ pub struct Conversation {
     /// loaded alongside `derived_facts` from the same artefact pair.
     /// Added v2.7.
     pub extracted_facts: Vec<ReasFact>,
+    /// v4.0.3 — investor-safe reasoning mode. When `true`,
+    /// `inject_reasoning_chain` only considers derivations whose entire
+    /// `source_chain` is rooted in `data/world_core/*.jsonl` (every
+    /// supporting fact human-reviewed). Off by default for backwards
+    /// compatibility. `adam_chat --safe` flips it on. Mirrors the
+    /// investor-safe filter `adam_demo` Part 4 has applied by default
+    /// since v4.0.2.
+    pub curated_only_reasoning: bool,
 }
 
 /// Lightweight "kind" summary of an `Intent` — the payload (name /
@@ -215,6 +223,20 @@ impl Conversation {
         self
     }
 
+    /// v4.0.3 — builder: enable investor-safe reasoning mode.
+    /// When enabled, `inject_reasoning_chain` only cites derivations
+    /// whose full `source_chain` comes from `data/world_core/*.jsonl`
+    /// (every supporting fact human-reviewed). Extracted-pack sources
+    /// (wikipedia, textbooks, abai) are refused.
+    ///
+    /// Default (`false`) preserves v4.0.2 behaviour — the chat cites
+    /// any derivation that references the user's topic. Only
+    /// `adam_chat --safe` flips this on.
+    pub fn with_curated_only_reasoning(mut self, enabled: bool) -> Self {
+        self.curated_only_reasoning = enabled;
+        self
+    }
+
     /// Run one conversational turn. Parses the input, recognises the
     /// intent, folds any new entities into [`session`](Self::session),
     /// updates [`active_intent`](Self::active_intent) and
@@ -297,11 +319,27 @@ impl Conversation {
             // object=неміс earlier in the list). Subject-first makes
             // the preview and the rendered text always refer to the
             // same derivation.
+            //
+            // v4.0.3 — when `curated_only_reasoning` is on, every
+            // candidate derivation must pass
+            // `derivation_is_fully_curated` (every `source_chain`
+            // entry rooted in `world_core/`). Otherwise, no chain
+            // fires at all for this noun — the Unknown fallback
+            // continues with retrieval-only behaviour. This is the
+            // investor-safe chat mode promised by `adam_chat --safe`.
+            let passes_safety = |d: &&DerivedFact| -> bool {
+                !self.curated_only_reasoning
+                    || adam_reasoning::reasoner::derivation_is_fully_curated(d)
+            };
             let matched = self
                 .derived_facts
                 .iter()
-                .find(|d| d.subject.root == *noun)
-                .or_else(|| self.derived_facts.iter().find(|d| d.object.root == *noun));
+                .find(|d| d.subject.root == *noun && passes_safety(d))
+                .or_else(|| {
+                    self.derived_facts
+                        .iter()
+                        .find(|d| d.object.root == *noun && passes_safety(d))
+                });
             let Some(d) = matched else { return };
             let rendered = render_derivation_as_kazakh(d);
             *reasoning_chain = Some(rendered);

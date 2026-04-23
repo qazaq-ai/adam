@@ -7,6 +7,61 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.3] — 2026-04-23 — `adam_chat --safe` investor REPL mode
+
+Continuing the Codex v4.0.0 hand-off. v4.0.2 landed the curated-only filter
+in `adam_demo` Part 4; v4.0.3 extends the same guarantee to the live
+`adam_chat` REPL via an opt-in `--safe` flag. Same design philosophy:
+filter is a **view**, not an extract-time change.
+
+### API additions
+
+- **New pub fn** [`adam_reasoning::reasoner::derivation_is_fully_curated`](crates/adam-reasoning/src/reasoner.rs): the classifier moves out of `adam_demo` and into the reasoning crate so any dialog / inspection path can share it. `adam_demo` now re-exports via `use` — zero duplication.
+- **New field** `Conversation.curated_only_reasoning: bool` + builder `with_curated_only_reasoning(enabled: bool)`.
+- **`inject_reasoning_chain` change**: when the flag is on, candidate derivations must pass `derivation_is_fully_curated` before the subject-first / object-fallback match. Fails through to retrieval (or plain Unknown) otherwise. Backwards-compatible when the flag is `false` (default).
+
+### CLI
+
+- `adam_chat --safe` (alias `--curated-only`) flips the flag at startup and logs `adam-chat: --safe mode — reasoning chains filtered to fully-curated (world_core-only) source chains`.
+
+### Measured — real REPL output
+
+```
+$ adam_chat --once "абай туралы бірдеңе айт"
+# Default (v4.0.2 baseline — cites text-chain derivation):
+абай туралы мынадай байланыс анықтадым: қорытынды: абай — халық
+# "Abai is a people." Text-extracted chain, Codex-flagged.
+
+$ adam_chat --safe --once "абай туралы бірдеңе айт"
+# v4.0.3 safe mode (cites world_core-only R1 transitivity):
+абай туралы мынадай байланыс анықтадым: қорытынды: абай — маман
+# "Abai is a specialist." Derived from world_core/kz_literature:
+#   lit_001  (абай IsA ақын)
+#   lit_029  (ақын IsA маман)
+# R1_is_a_transitivity. Fully human-reviewed source chain.
+```
+
+This is the exact shape of an investor-safe pitch: every derivation goes through named reviewer + named rule, and a text-corpus chain that *might* be true never reaches the user.
+
+### Tests
+
+**456 passing** (+7 from v4.0.2):
+- 5 new unit tests in `adam_reasoning::reasoner` covering the moved helper (curated / mixed / text-only / empty / prefix-boundary).
+- 2 new e2e tests in `adam-dialog/tests/end_to_end.rs`:
+  - `safe_mode_rejects_text_source_chain_derivations` — default chats on text-chain; `--safe` refuses.
+  - `safe_mode_still_cites_fully_curated_derivations` — `--safe` continues firing on world_core chains (guards against overreach).
+
+### Scope discipline
+
+Exactly one feature — the `--safe` chat flag + shared helper. No matcher changes, no extraction changes, no docs migration beyond the directly-affected files. v4.0.x cadence preserved at single-integer patch steps (v4.0.2 → v4.0.3 → v4.0.4).
+
+### What's next (v4.0.4)
+
+- Surface `--safe` mode in a refreshed README demo transcript alongside the default mode, so investors see both sides from one page.
+- Continue the Codex precision-hygiene hand-off with the next small, single-concern patch.
+
+---
+
 ## [4.0.2] — 2026-04-23 — Investor-safe demo mode: curated-source-chain filter in `adam_demo`
 
 Small, focused patch continuing the Codex v4.0.0 hand-off. Same design philosophy as v4.0.1: a surgical fix at the right layer, not a broad architecture change.

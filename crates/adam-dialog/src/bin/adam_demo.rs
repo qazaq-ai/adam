@@ -375,18 +375,11 @@ fn run_reasoning_chain_demo(lex: &LexiconV1, repo: &TemplateRepository) {
 
 /// Helper: load both committed artefacts together. Missing either →
 /// return `None`; the caller prints a helpful message.
-/// v4.0.2 — classify a derivation by whether every source in its
-/// `source_chain` points to a `data/world_core/*.jsonl` pack (i.e.
-/// every supporting fact is human-reviewed). Used to gate the Part 4
-/// demo to investor-safe material by default. Empty chains are treated
-/// as NOT curated (they should never occur per the v2.4 invariant,
-/// but we fail closed).
-fn derivation_is_fully_curated(d: &adam_reasoning::reasoner::DerivedFact) -> bool {
-    !d.source_chain.is_empty()
-        && d.source_chain
-            .iter()
-            .all(|s| s.pack.starts_with("world_core/"))
-}
+/// v4.0.3 — thin alias: the shared helper now lives in
+/// `adam_reasoning::reasoner::derivation_is_fully_curated`. Kept as a
+/// local name so the unit tests in this bin's `mod tests` don't need
+/// to rename; callsites below use the same semantics.
+use adam_reasoning::reasoner::derivation_is_fully_curated;
 
 fn load_reasoning_artefacts() -> Option<(
     Vec<adam_reasoning::Fact>,

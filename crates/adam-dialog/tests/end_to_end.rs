@@ -1610,3 +1610,116 @@ fn nelikten_is_not_absorbed_as_city() {
         "bare «Неліктен?» must not set session.city on any seed"
     );
 }
+
+/// v4.0.3: `Conversation::with_curated_only_reasoning(true)` — the
+/// investor-safe REPL mode behind `adam_chat --safe` — must refuse
+/// every derivation whose `source_chain` pulls from a text-extracted
+/// pack, while default mode still cites them. Covers the promise made
+/// in v4.0.2 (demo-only filter) to the chat path.
+#[test]
+fn safe_mode_rejects_text_source_chain_derivations() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    // A derivation whose source_chain is text-extracted (not world_core).
+    // This is the class of chain Codex flagged — wrongly confident
+    // "абай is_a халық"-style. In safe mode, MUST be ignored.
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "кітап".into(),
+            root: "кітап".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::RelatedTo,
+        object: SlotRef {
+            surface: "ілім".into(),
+            root: "ілім".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R5_shared_is_a_target".into(),
+        source_chain: vec![
+            FactSource {
+                pack: "kazakh_proverbs_pack.json".into(),
+                sample_id: "p_003".into(),
+            },
+            FactSource {
+                pack: "wikipedia_kz_pack.json".into(),
+                sample_id: "wiki_kz_0088327".into(),
+            },
+        ],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    // Default mode — chain fires (v4.0.2 baseline).
+    let mut default_conv = Conversation::new().with_reasoning_chains(vec![], derived.clone());
+    let out_default = default_conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
+    assert!(
+        out_default.contains("байланыс"),
+        "default mode must still cite text-source derivations (got: {out_default:?})"
+    );
+
+    // Safe mode — chain refused, falls through to Unknown noun-echo.
+    let mut safe_conv = Conversation::new()
+        .with_reasoning_chains(vec![], derived.clone())
+        .with_curated_only_reasoning(true);
+    let out_safe = safe_conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
+    assert!(
+        !out_safe.contains("байланыс"),
+        "safe mode must refuse text-source derivations (got: {out_safe:?})"
+    );
+}
+
+/// Symmetric test: safe mode must CONTINUE firing on fully-curated
+/// chains. Closes the regression window where the filter might
+/// overreach and block legitimate world_core derivations.
+#[test]
+fn safe_mode_still_cites_fully_curated_derivations() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    // Fully-curated derivation: both source packs under world_core/.
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "бөлу".into(),
+            root: "бөлу".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::RelatedTo,
+        object: SlotRef {
+            surface: "көбейту".into(),
+            root: "көбейту".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R5_shared_is_a_target".into(),
+        source_chain: vec![
+            FactSource {
+                pack: "world_core/numbers.jsonl".into(),
+                sample_id: "num_026".into(),
+            },
+            FactSource {
+                pack: "world_core/numbers.jsonl".into(),
+                sample_id: "num_027".into(),
+            },
+        ],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut safe_conv = Conversation::new()
+        .with_reasoning_chains(vec![], derived)
+        .with_curated_only_reasoning(true);
+    let out = safe_conv.turn("бөлу туралы бірдеңе айт", &lex, &repo, 0);
+    assert!(
+        out.contains("байланыс"),
+        "safe mode must still cite world_core-only derivations (got: {out:?})"
+    );
+    assert!(
+        out.contains("бөлу") && out.contains("көбейту"),
+        "rendered chain must name both roots (got: {out:?})"
+    );
+}

@@ -44,7 +44,7 @@ Deliver a **predictable, auditable Kazakh reasoning engine** built entirely in R
 - **79.48 % morpheme coverage** of the committed pool (v1.5.5 audit baseline).
 
 ### Quality gates
-- **Full regression test suite (449 workspace tests as of v4.0.2, 0 failing, 0 warnings)** + `scripts/validate_foundation.sh` foundation CI + `scripts/verify_release_version.sh` manifest-consistency gate.
+- **Full regression test suite (456 workspace tests as of v4.0.3, 0 failing, 0 warnings)** + `scripts/validate_foundation.sh` foundation CI + `scripts/verify_release_version.sh` manifest-consistency gate.
 
 ## Scope of the "FST-guaranteed" claim (accurate wording)
 

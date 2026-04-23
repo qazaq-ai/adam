@@ -49,6 +49,13 @@
 //!   adam_chat --trace            — REPL with full per-turn trace
 //!   adam_chat --no-retrieval     — skip retrieval (v1.1.0 behaviour)
 //!   adam_chat --compose          — opt into InSampleCitySwap composition
+//!   adam_chat --safe             — **investor-safe reasoning mode**
+//!                                  (v4.0.3): cite only derivations whose
+//!                                  entire `source_chain` is rooted in
+//!                                  `data/world_core/*.jsonl` (every
+//!                                  supporting fact human-reviewed).
+//!                                  Alias: `--curated-only`. Mirrors
+//!                                  `adam_demo`'s default since v4.0.2.
 
 use std::{
     io::{self, BufRead, Write},
@@ -72,6 +79,12 @@ fn main() -> ExitCode {
     let trace = args.iter().any(|a| a == "--trace");
     let no_retrieval = args.iter().any(|a| a == "--no-retrieval");
     let compose = args.iter().any(|a| a == "--compose");
+    // v4.0.3 — investor-safe chat mode. When `--safe` (or the
+    // longer alias `--curated-only`) is passed, `inject_reasoning_chain`
+    // only cites derivations whose full `source_chain` comes from
+    // human-reviewed World Core entries. Mirrors the `adam_demo` Part 4
+    // investor-safe default added in v4.0.2.
+    let safe = args.iter().any(|a| a == "--safe" || a == "--curated-only");
 
     let lex = match LexiconV1::load_default() {
         Ok(l) => l,
@@ -140,6 +153,12 @@ fn main() -> ExitCode {
         conv = conv.with_compose_mode(ComposeMode::InSampleCitySwap);
         eprintln!(
             "adam-chat: compose mode = InSampleCitySwap (v1.9.0 opt-in; adapted quotes marked with «бейімд-»)"
+        );
+    }
+    if safe {
+        conv = conv.with_curated_only_reasoning(true);
+        eprintln!(
+            "adam-chat: --safe mode — reasoning chains filtered to fully-curated (world_core-only) source chains"
         );
     }
     if !derived.is_empty() || !extracted.is_empty() {
