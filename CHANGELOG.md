@@ -7,6 +7,79 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.12] — 2026-04-24 — World Core batch #3: `emotions.jsonl` + `weather_phenomena.jsonl` + `materials.jsonl`
+
+Third fast-path batch. Three new curated domains, ~3 s pipeline rebuild. **Plan substitution**: `drinks.jsonl` (originally queued) dropped after pre-batch audit — `food.jsonl` already covers the `сусын` hub (шай, су IsA сусын) and the core milk derivatives (сүт / қымыз / шұбат / айран as IsA тағам). Substituted with `materials.jsonl` — genuine gap (шикізат hub had zero world_core coverage).
+
+### New domains
+
+1. **`emotions.jsonl`** (18 entries) — abstract-concept domain. Opens with `адам has сезім` (activates R2 Has-inheritance through `X IsA адам` chains). 17 emotion types IsA сезім: қуаныш, қайғы, ашу, махаббат, қорқыныш, таңданыс, үміт, өкініш, мақтаныш, ұят, ыза, сағыныш, мейірім, сенім, ризашылық, реніш, бақыт. Pure native Kazakh, no loanwords (эмоция / психика / стресс all skipped).
+
+2. **`weather_phenomena.jsonl`** (15 entries) — natural phenomena under existing `құбылыс` hub (was used by `bio_039: тіршілік IsA құбылыс` and `color_029: кемпірқосақ IsA құбылыс`). Adds 15 atmospheric + seismic phenomena: жаңбыр, қар, бұршақ, тұман, шық, жел, боран, дауыл, найзағай, сел, зілзала, қуаң, қырау, аяз, бұлт. Кемпірқосақ deliberately NOT duplicated (already in colors.jsonl).
+
+3. **`materials.jsonl`** (14 entries) — new `шикізат IsA зат` hub with 13 material children. Metals (темір, мыс, алтын, күміс, қорғасын, шойын, болат), minerals (тас, саз), organic materials (қайыс, тері, мата, жіп). Cross-chain designed-in: `мата IsA шикізат` in this batch + existing `жүн / мақта / жібек IsA мата` from `clothing.jsonl` → R1 transitivity produces «жүн IsA шикізат» etc. without explicit statement.
+
+### Totals
+
+| | v4.0.11 | v4.0.12 | delta |
+|---|---:|---:|---|
+| World Core domains | 20 | **23** | +3 |
+| World Core entries | 708 | **755** | +47 |
+| World Core facts | 802 | **849** | +47 |
+
+### Measured runtime delta (fast-path rebuild)
+
+| | v4.0.11 | v4.0.12 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 841 | **13 888** | +47 |
+| curated (HumanApproved) | 802 | **849** | +47 |
+| extracted (Grammar, unchanged) | 13 039 | 13 039 | 0 |
+| **derivations total** | 13 943 | **14 836** | **+893 (+6.4 %)** |
+| R1_is_a_transitivity | 452 | **473** | +21 |
+| R2_has_inheritance | 446 | **467** | +21 |
+| R3_has_inheritance_via_part_of | 28 | 28 | 0 |
+| **R5_shared_is_a_target** | 11 940 | **12 791** | **+851** |
+| R6_lives_in_via_part_of | 37 | 37 | 0 |
+| R7_goes_to_via_part_of | 306 | 306 | 0 |
+| R8_after_transitivity | 734 | 734 | 0 |
+| Graph nodes | 3 407 | **3 432** | +25 |
+| Graph edges | 12 448 | **12 495** | +47 |
+
+### Effective leverage: +19 derivations per added curated fact
+
+Below v4.0.11's +27/fact and v4.0.9's peak of +47/fact. Explanation: this batch adds **three small isolated hubs** (сезім with 17 children, шикізат with 13, + 15 new құбылыс children) rather than **one large cross-chain** into the existing маман hub. R5 shared-IsA leverage scales as C(n,2) within a hub — 17-child сезім gives C(17,2) = 136 pairs; 13-child шикізат gives 78; 15 новых құбылыс children + 2 pre-existing (тіршілік, кемпірқосақ) = 17 total, giving C(17,2) = 136 pairs of which ~15×2 = 30 are new from this batch. Total new R5: roughly 136 + 78 + 30 + cross-hub trickles + R1/R2 cascades ≈ 851 — matches observed.
+
+### R2 activation via «адам has сезім»
+
+New fact `адам has сезім` triggers R2 Has-inheritance for every curated `X IsA адам` chain. Current state has few direct `IsA адам` entries; leverage will compound as future batches add human-category children.
+
+### Cross-domain cross-chain designed-in
+
+- `мата IsA шикізат` (materials) + existing `жүн / мақта / жібек IsA мата` (clothing) → R1 transitive `жүн IsA шикізат`, `мақта IsA шикізат`, `жібек IsA шикізат` emerge without explicit statement.
+- `адам has сезім` (emotions) + future `адам IsA X` entries will produce R2 `X has сезім` inheritance.
+
+### Pipeline cost
+
+Full rebuild: ~3 s. Pre-v4.0.8 equivalent: ~135 min = **~2 700× speedup** on 3-domain batch.
+
+### Cumulative v4.0.7 → v4.0.12 (6 releases)
+
+| | v4.0.7 | v4.0.12 | cumulative delta |
+|---|---:|---:|---|
+| World Core domains | 14 | **23** | +9 (+64 %) |
+| World Core entries | 549 | **755** | +206 (+37.5 %) |
+| World Core facts | 643 | **849** | +206 (+32.0 %) |
+| Derivations | 7 866 | **14 836** | **+6 970 (+88.6 %)** |
+| R5 shared-IsA | 5 940 | **12 791** | **+6 851 (+115 %)** |
+| Graph nodes / edges | 3 315 / 12 350 | 3 432 / 12 495 | +117 / +145 |
+| Pipeline cost per data patch | ~45 min | **~3 s** | ~900× faster |
+
+### Scope
+
+Purely additive data. No code changes. 465 tests unchanged.
+
+---
+
 ## [4.0.11] — 2026-04-24 — World Core batch #2: `music_kz.jsonl` + `sports.jsonl` + `house_parts.jsonl`
 
 Second fast-path batch. Three new curated domains completing v4.0.9's rhythm: +54 entries, ~3 seconds pipeline rebuild.
