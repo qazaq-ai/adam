@@ -111,6 +111,13 @@ pub struct Conversation {
     /// investor-safe filter `adam_demo` Part 4 has applied by default
     /// since v4.0.2.
     pub curated_only_reasoning: bool,
+    /// v4.0.27 — structured belief state (Codex v4.0.26 roadmap Phase 1).
+    /// Tracks every user assertion with provenance, confidence band,
+    /// and contradiction history. Lives **alongside** the flat
+    /// `session` map — `absorb_entities` writes to both so existing
+    /// template-slot consumers keep working, but higher-level
+    /// reasoning now has access to the fuller picture.
+    pub belief: crate::belief::BeliefState,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -130,6 +137,15 @@ pub struct TurnTrace {
     pub intent_after_injection: Intent,
     /// Session slot snapshot taken immediately after entity absorption.
     pub session_snapshot: HashMap<String, String>,
+    /// v4.0.27 — belief-state digest taken after entity absorption.
+    /// Cheap to clone (six counters) and sufficient for --trace
+    /// output. Consumers needing the full picture can clone
+    /// `Conversation::belief` directly.
+    pub belief_digest: crate::belief::BeliefDigest,
+    /// v4.0.27 — the full belief state at the moment of trace
+    /// capture. Lets `adam_chat --trace` render the new / updated
+    /// facts and any fresh contradictions.
+    pub belief_snapshot: crate::belief::BeliefState,
     /// Per-step plan trace emitted by `plan_response_with_session`.
     pub plan_trace: Vec<String>,
 }
@@ -325,6 +341,8 @@ impl Conversation {
             parses,
             intent_after_injection: intent,
             session_snapshot: self.session.clone(),
+            belief_digest: self.belief.digest(),
+            belief_snapshot: self.belief.clone(),
             plan_trace: plan.trace.clone(),
         };
         (output, trace)
@@ -585,22 +603,49 @@ impl Conversation {
     }
 
     /// Extract persistent entities from an intent and push them into
-    /// the running session.
+    /// the running session AND (v4.0.27) the structured belief state.
+    ///
+    /// The dual write is intentional: legacy template-slot consumers
+    /// keep reading from `self.session`; the new belief-aware paths
+    /// (contradiction detection, provenance tracing, future
+    /// verifier / action planner) read from `self.belief`. Keeping
+    /// them in lock-step avoids a disruptive migration.
     pub(crate) fn absorb_entities(&mut self, intent: &Intent) {
+        use crate::belief::{EntityKind, USER_SELF_KEY};
+        // Turn id = count of recognised intents so far (before this
+        // one is recorded). Monotone, stable, and available without
+        // plumbing a counter through every caller.
+        let turn_id = self.intent_history.len();
         match intent {
             Intent::StatementOfName { name } => {
                 self.session.insert("name".into(), name.clone());
+                self.belief
+                    .touch_entity(USER_SELF_KEY, EntityKind::User, name, turn_id);
+                self.belief
+                    .record_user_fact(USER_SELF_KEY, "name", name, turn_id);
             }
             Intent::StatementOfAge { years: Some(years) } => {
                 self.session.insert("age".into(), years.to_string());
+                self.belief
+                    .touch_entity(USER_SELF_KEY, EntityKind::User, "__self__", turn_id);
+                self.belief
+                    .record_user_fact(USER_SELF_KEY, "age", &years.to_string(), turn_id);
             }
             Intent::StatementOfLocation { city: Some(city) } => {
                 self.session.insert("city".into(), city.clone());
+                self.belief
+                    .touch_entity(city, EntityKind::Place, city, turn_id);
+                self.belief
+                    .record_user_fact(USER_SELF_KEY, "city", city, turn_id);
             }
             Intent::StatementOfOccupation {
                 occupation: Some(occupation),
             } => {
                 self.session.insert("occupation".into(), occupation.clone());
+                self.belief
+                    .touch_entity(occupation, EntityKind::Occupation, occupation, turn_id);
+                self.belief
+                    .record_user_fact(USER_SELF_KEY, "occupation", occupation, turn_id);
             }
             _ => {}
         }
@@ -617,11 +662,13 @@ impl Conversation {
         self.intent_history.push(kind);
     }
 
-    /// Clear all conversation state — slots, active intent, history.
+    /// Clear all conversation state — slots, active intent, history,
+    /// and (v4.0.27) the belief state.
     pub fn reset(&mut self) {
         self.session.clear();
         self.active_intent = None;
         self.intent_history.clear();
+        self.belief = crate::belief::BeliefState::new();
     }
 }
 

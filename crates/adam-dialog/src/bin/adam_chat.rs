@@ -243,6 +243,25 @@ fn run_turn(
         println!("├─ parses:   {:#?}", trace.parses);
         println!("├─ intent:   {:?}", trace.intent_after_injection);
         println!("├─ session:  {:?}", trace.session_snapshot);
+        // v4.0.27 — belief snapshot (Codex v4.0.26 roadmap Phase 1).
+        let d = trace.belief_digest;
+        println!(
+            "├─ belief:   entities={} facts={} active={} contested={} pending={} conflicts={}",
+            d.entities,
+            d.facts_total,
+            d.facts_active,
+            d.facts_contested,
+            d.pending_questions,
+            d.contradictions
+        );
+        if !trace.belief_snapshot.contradictions.is_empty() {
+            for c in &trace.belief_snapshot.contradictions {
+                println!(
+                    "├─ belief conflict: {} {}: fact[{}] vs fact[{}] @ turn {}",
+                    c.subject, c.predicate, c.fact_a_index, c.fact_b_index, c.detected_at_turn
+                );
+            }
+        }
         for t in &trace.plan_trace {
             println!("├─ {t}");
         }

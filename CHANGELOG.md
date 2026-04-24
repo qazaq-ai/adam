@@ -7,6 +7,105 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.27] — 2026-04-24 — BeliefState foundation (Codex v4.0.26 roadmap Phase 1)
+
+First architectural patch on Codex's v4.0.26 v5.0 roadmap. Begins the shift from "reactive answering" to "goal-directed cognition" by giving the dialog a structured belief state alongside the legacy flat session map. **Non-breaking** — existing template-slot consumers keep reading from `self.session`; the new belief-aware paths read from `self.belief`.
+
+### Why
+
+Codex's v4.0.26 re-review concluded that `adam` is strong on answering but weak on goal-directed cognition. Phase 1 of the proposed roadmap — **BeliefState with provenance and contradiction tracking** — is the foundation every later phase (TaskState, ActionPlanner, Verifier, Uncertainty Policy, Tool Layer) depends on. Shipping Phase 1 first lets us measure traction before committing to the full 7-phase plan.
+
+### What landed
+
+**New module**: `crates/adam-dialog/src/belief.rs` (~540 lines incl. 6 unit tests). Public surface:
+
+```rust
+pub struct BeliefState {
+    pub entities: BTreeMap<String, EntityMemory>,
+    pub facts: Vec<BeliefFact>,
+    pub pending_questions: Vec<PendingQuestion>,
+    pub contradictions: Vec<BeliefConflict>,
+}
+
+pub struct BeliefFact {
+    pub subject, pub predicate, pub object: String,
+    pub confidence: ConfidenceBand,
+    pub provenance: Provenance,
+    pub status: FactStatus,
+    pub recorded_at_turn: usize,
+}
+
+pub enum ConfidenceBand  { Confirmed, Derived, Retrieved, Hypothesized, Unknown }
+pub enum Provenance      { UserStatement{turn_id}, Retrieval{pack,sample_id},
+                           Reasoning{rule_id, derived_from}, Curated{pack, entry_id} }
+pub enum FactStatus      { Active, Superseded, Contested }
+pub enum EntityKind      { User, Person, Place, Occupation, Topic, Other }
+pub enum QuestionNature  { NeedsClarification,
+                           ContradictionToResolve{predicate, old_value, new_value},
+                           MissingSlot{slot} }
+```
+
+Plus `BeliefConflict`, `EntityMemory`, `PendingQuestion`, and a sentinel `USER_SELF_KEY = "__self__"` for the interlocutor entity (won't collide with any real Kazakh name).
+
+`BeliefState::record_user_fact(subject, predicate, object, turn_id) -> index` handles the three interesting cases deterministically:
+
+- **New fact** → append with `Active` status + `UserStatement` provenance.
+- **Repeated same value** → both copies stay `Active` (restatement ≠ disagreement).
+- **Contradicts prior active fact** → both copies flipped to `Contested`; a `BeliefConflict` is logged with `(fact_a_index, fact_b_index, detected_at_turn)`; a `PendingQuestion::ContradictionToResolve` is pushed so future phases can surface the disagreement.
+
+`BeliefState::touch_entity`, `active_fact`, `facts_about`, and a compact `digest()` round out the API.
+
+### Integration
+
+`Conversation::absorb_entities` now **dual-writes** — every `StatementOfName / Age / Location / Occupation` intent updates both the legacy `session: HashMap<String, String>` map AND the new `belief: BeliefState`. Turn id = `intent_history.len()` before the new intent is recorded — monotone, stable, no extra plumbing.
+
+`TurnTrace` gains `belief_digest: BeliefDigest` (6 counters, cheap to clone) and `belief_snapshot: BeliefState` (full picture for consumers who need it).
+
+`adam_chat --trace` prints the digest line and every unresolved conflict:
+```
+├─ belief:   entities=2 facts=2 active=0 contested=2 pending=1 conflicts=1
+├─ belief conflict: __self__ city: fact[0] vs fact[1] @ turn 1
+```
+
+`Conversation::reset()` clears the belief state too.
+
+### Smoke-test
+
+```
+> менің атым Дәулет
+Дәулетпен танысқаныма қуаныштымын
+[belief: entities=1 facts=1 active=1 contested=0 pending=0 conflicts=0]
+
+> мен алматыда тұрамын
+тамаша өлке
+[belief: entities=2 facts=2 active=2 ...]
+
+> мен астанада тұрамын
+тамаша өлке                      ← template-level response unchanged
+[belief: entities=3 facts=3 active=1 contested=2 pending=1 conflicts=1]
+[belief conflict: __self__ city: fact[1] vs fact[2] @ turn 2]
+```
+
+The **reply itself** stays identical to pre-v4.0.27 behaviour — this patch is pure infrastructure. Later phases (Verifier, Uncertainty Policy) will actually *use* the belief state to change responses; v4.0.27 just builds the substrate and proves it holds up end-to-end.
+
+### Scope
+
+**Phase 1 only**. Explicitly out of scope (Codex roadmap Phases 2–7 queued):
+- Goal / TaskState layer
+- Action planner (goal-directed, not template-choice)
+- Verifier
+- Uncertainty policy
+- Tool layer
+- Cognitive eval harness
+
+Each will ship as an independent release with its own Codex review cycle. No commitment yet to do all seven — we reassess after Phase 1 holds up in production.
+
+### Tests
+
+**503 passing** (+9 this patch: 6 unit tests in `belief.rs` covering each API path, 3 integration tests in `end_to_end.rs`).
+
+---
+
 ## [4.0.26] — 2026-04-24 — `world_core_multiword_coverage` regression test (Codex v4.0.23 residual)
 
 Third and final patch on Codex's v4.0.23 repeat review. Closes the residual maintenance trap.

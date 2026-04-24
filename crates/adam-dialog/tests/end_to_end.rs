@@ -1327,6 +1327,122 @@ fn reranker_prefers_is_a_over_other_predicates_on_tied_score() {
     );
 }
 
+/// v4.0.27 — `Conversation::turn` writes user-supplied entities to
+/// the new structured `belief` state alongside the legacy flat
+/// `session` map. Codex v4.0.26 roadmap Phase 1.
+#[test]
+fn user_statement_populates_belief_alongside_session() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("менің атым Дәулет", &lex, &repo, 0);
+
+    // Legacy session map still works.
+    assert_eq!(conv.session.get("name").map(String::as_str), Some("Дәулет"));
+    // New belief state captured the same fact with provenance.
+    use adam_dialog::{ConfidenceBand, FactStatus, Provenance, USER_SELF_KEY};
+    let fact = conv
+        .belief
+        .active_fact(USER_SELF_KEY, "name")
+        .expect("belief must record name fact");
+    assert_eq!(fact.object, "Дәулет");
+    assert_eq!(fact.status, FactStatus::Active);
+    assert_eq!(fact.confidence, ConfidenceBand::Confirmed);
+    assert!(matches!(fact.provenance, Provenance::UserStatement { .. }));
+    assert!(
+        conv.belief.contradictions.is_empty(),
+        "single user statement must not create contradictions"
+    );
+}
+
+/// v4.0.27 — two contradictory location statements flag a conflict
+/// in belief WITHOUT breaking the legacy session-slot overwrite path
+/// (session still holds the latest value; the belief layer preserves
+/// both and adds a PendingQuestion).
+#[test]
+fn contradictory_city_statements_produce_belief_conflict() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+
+    use adam_dialog::{FactStatus, QuestionNature, USER_SELF_KEY};
+    // Legacy: session has the latest value (no conflict awareness).
+    // Exact capitalisation is whatever the detector emits; we only
+    // care that the overwrite happened and matches the belief path.
+    let session_city = conv
+        .session
+        .get("city")
+        .cloned()
+        .expect("session must carry a city after statement");
+    assert!(
+        session_city.to_lowercase() == "астана",
+        "session city should match latest statement, got {session_city:?}"
+    );
+
+    // Belief: both facts survived, both Contested, with a conflict
+    // log + pending question.
+    let city_facts = conv
+        .belief
+        .facts
+        .iter()
+        .filter(|f| f.predicate == "city")
+        .collect::<Vec<_>>();
+    assert_eq!(city_facts.len(), 2, "both city statements must persist");
+    assert!(city_facts.iter().all(|f| f.status == FactStatus::Contested));
+    assert_eq!(conv.belief.contradictions.len(), 1);
+    let c = &conv.belief.contradictions[0];
+    assert_eq!(c.subject, USER_SELF_KEY);
+    assert_eq!(c.predicate, "city");
+
+    let pending = &conv.belief.pending_questions[0];
+    match &pending.nature {
+        QuestionNature::ContradictionToResolve {
+            old_value,
+            new_value,
+            ..
+        } => {
+            assert!(
+                old_value.to_lowercase() == "алматы",
+                "first city must be алматы, got {old_value:?}"
+            );
+            assert!(
+                new_value.to_lowercase() == "астана",
+                "second city must be астана, got {new_value:?}"
+            );
+        }
+        other => panic!("expected ContradictionToResolve, got {other:?}"),
+    }
+}
+
+/// v4.0.27 — `TurnTrace` now carries a belief snapshot + digest so
+/// `adam_chat --trace` can audit what the belief layer learned on
+/// each turn.
+#[test]
+fn turn_with_trace_surfaces_belief_digest() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    // First turn: state name. Trace should show belief picking up
+    // one entity + one active fact.
+    let (_, trace1) = conv.turn_with_trace("менің атым Дәулет", &lex, &repo, 0);
+    assert!(trace1.belief_digest.entities >= 1);
+    assert_eq!(trace1.belief_digest.facts_total, 1);
+    assert_eq!(trace1.belief_digest.facts_active, 1);
+    assert_eq!(trace1.belief_digest.contradictions, 0);
+
+    // Second turn: introduce a conflict. Digest must reflect both
+    // facts contested + 1 conflict logged.
+    conv.turn_with_trace("мен алматыда тұрамын", &lex, &repo, 1);
+    let (_, trace3) = conv.turn_with_trace("мен астанада тұрамын", &lex, &repo, 2);
+    assert_eq!(trace3.belief_digest.contradictions, 1);
+    assert!(trace3.belief_digest.facts_contested >= 2);
+}
+
 /// v4.0.25 — `Conversation::turn_with_trace` must expose the **post-
 /// injection** intent (with `reasoning_chain` and/or `example`
 /// populated by v4.0.20+ features). Codex v4.0.23 re-review #2 flagged
