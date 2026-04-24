@@ -124,6 +124,19 @@ pub struct Conversation {
     /// Non-breaking: existing consumers ignore it; Phase 3
     /// `ActionPlanner` will consume it to pick next action.
     pub task: crate::task::TaskState,
+    /// v4.0.30 — monotone, **unbounded** turn counter. Codex v4.0.29
+    /// review #1 flagged that pre-v4.0.30 turn ids were derived from
+    /// `intent_history.len()`, which caps at `MAX_HISTORY = 32`.
+    /// After 32 turns the counter plateaued, so belief
+    /// `recorded_at_turn` and task `goal_set_at_turn` stopped being
+    /// real turn indices — breaking any goal-age / fact-age signal
+    /// Phase 3+ will consume.
+    ///
+    /// This counter increments by 1 at the start of every
+    /// `turn_with_trace` call and never resets except on
+    /// [`reset`](Self::reset). Saturating-add insures we never panic
+    /// even at astronomical turn counts.
+    pub turn_counter: usize,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -344,12 +357,18 @@ impl Conversation {
         // no RNG, no side-effects.
         self.inject_reasoning_chain(&mut intent);
 
-        self.absorb_entities(&intent);
+        // v4.0.30 — unbounded monotone turn id (Codex v4.0.29 #1 fix).
+        // Captured BEFORE absorption so belief.record_user_fact,
+        // task.roll_forward, and entity touches all share the same
+        // turn number for this turn. Increment after capture so the
+        // next turn sees the next integer.
+        let turn_id = self.turn_counter;
+        self.turn_counter = self.turn_counter.saturating_add(1);
+        self.absorb_entities(&intent, turn_id);
         // v4.0.29 — roll task state forward AFTER belief absorption,
         // BEFORE record_intent so the turn id used by task matches
         // the one already used by absorb_entities.
-        let task_turn_id = self.intent_history.len();
-        self.task.roll_forward(&intent, &self.belief, task_turn_id);
+        self.task.roll_forward(&intent, &self.belief, turn_id);
         self.record_intent(&intent);
         let plan = plan_response_with_session(&intent, rng_seed, repo, &self.session);
         let output = realise(&plan);
@@ -628,12 +647,13 @@ impl Conversation {
     /// (contradiction detection, provenance tracing, future
     /// verifier / action planner) read from `self.belief`. Keeping
     /// them in lock-step avoids a disruptive migration.
-    pub(crate) fn absorb_entities(&mut self, intent: &Intent) {
+    ///
+    /// v4.0.30 — `turn_id` is threaded from the caller instead of
+    /// derived from `intent_history.len()`. Codex v4.0.29 review #1:
+    /// the old derivation plateaued at `MAX_HISTORY = 32`, breaking
+    /// `recorded_at_turn` as a real turn index in long sessions.
+    pub(crate) fn absorb_entities(&mut self, intent: &Intent, turn_id: usize) {
         use crate::belief::{EntityKind, USER_SELF_KEY};
-        // Turn id = count of recognised intents so far (before this
-        // one is recorded). Monotone, stable, and available without
-        // plumbing a counter through every caller.
-        let turn_id = self.intent_history.len();
         match intent {
             Intent::StatementOfName { name } => {
                 self.session.insert("name".into(), name.clone());
@@ -681,13 +701,15 @@ impl Conversation {
     }
 
     /// Clear all conversation state — slots, active intent, history,
-    /// (v4.0.27) the belief state, and (v4.0.29) the task state.
+    /// (v4.0.27) the belief state, (v4.0.29) the task state, and
+    /// (v4.0.30) the turn counter.
     pub fn reset(&mut self) {
         self.session.clear();
         self.active_intent = None;
         self.intent_history.clear();
         self.belief = crate::belief::BeliefState::new();
         self.task = crate::task::TaskState::new();
+        self.turn_counter = 0;
     }
 }
 

@@ -159,15 +159,26 @@ impl TaskState {
     ///    something is still unresolved.
     /// 3. Goal change? Install the new one, reset `subgoals`, record
     ///    `goal_set_at_turn = turn_id`.
-    /// 4. Status derives from belief:
+    /// 4. Status derives from (belief, intent):
     ///    - Any unresolved contradiction → `Blocked`.
     ///    - Any pending clarification question → `WaitingForUser`.
-    ///    - Otherwise `GatheringEvidence` (a goal is active) or
-    ///      `Idle` (no goal).
+    ///    - Goal active AND the injected intent carries evidence
+    ///      (v4.0.30: `reasoning_chain.is_some()` or
+    ///      `example.is_some()`) → `ReadyToAnswer`.
+    ///    - Goal active, no evidence yet → `GatheringEvidence`.
+    ///    - No goal → `Idle`.
     ///
     /// Codex v4.0.28 invariant: `belief.active_fact() == None` after
     /// a contradiction is a **legitimate** state, not an error.
     /// `Blocked` represents that explicitly.
+    ///
+    /// v4.0.30 — Codex v4.0.29 review #2: pre-v4.0.30 `compute_status`
+    /// never returned `ReadyToAnswer`; tests masked that by
+    /// accepting either variant. Retrieval + reasoning injection run
+    /// BEFORE `roll_forward` in `Conversation::turn_with_trace`, so
+    /// the intent already carries any evidence by the time we reach
+    /// here; checking it surfaces the status the planner is supposed
+    /// to consume.
     pub fn roll_forward(&mut self, intent: &Intent, belief: &BeliefState, turn_id: usize) {
         let candidate = Self::detect_goal(intent);
 
@@ -200,12 +211,39 @@ impl TaskState {
             }
         }
 
-        self.status = self.compute_status(belief);
+        let has_evidence = Self::intent_has_evidence(intent);
+        self.status = self.compute_status(belief, has_evidence);
+    }
+
+    /// v4.0.30 — does the given intent already carry injected
+    /// evidence? Used by `compute_status` to distinguish
+    /// `ReadyToAnswer` (evidence in hand) from `GatheringEvidence`
+    /// (goal set but nothing to cite yet).
+    ///
+    /// Evidence sources for the v4.0.x dialog pipeline:
+    /// - `reasoning_chain` populated by `inject_reasoning_chain`
+    /// - `example` populated by `inject_retrieval_example`
+    ///
+    /// Only `Intent::Unknown` carries these slots; other intents
+    /// go through their own canned-template paths.
+    pub fn intent_has_evidence(intent: &Intent) -> bool {
+        matches!(
+            intent,
+            Intent::Unknown {
+                reasoning_chain: Some(_),
+                ..
+            } | Intent::Unknown {
+                example: Some(_),
+                ..
+            }
+        )
     }
 
     /// Pure-function status derivation, separated so tests can
-    /// exercise it without going through `roll_forward`.
-    fn compute_status(&self, belief: &BeliefState) -> TaskStatus {
+    /// exercise it without going through `roll_forward`. v4.0.30
+    /// gained `has_evidence` so `ReadyToAnswer` is actually
+    /// reachable.
+    fn compute_status(&self, belief: &BeliefState, has_evidence: bool) -> TaskStatus {
         if !belief.contradictions.is_empty() {
             return TaskStatus::Blocked;
         }
@@ -216,6 +254,7 @@ impl TaskState {
             return TaskStatus::WaitingForUser;
         }
         match self.active_goal {
+            Some(_) if has_evidence => TaskStatus::ReadyToAnswer,
             Some(_) => TaskStatus::GatheringEvidence,
             None => TaskStatus::Idle,
         }
@@ -446,5 +485,75 @@ mod tests {
         assert_eq!(d.goal_variant, Some("LearnAboutTopic"));
         assert_eq!(d.status, TaskStatus::GatheringEvidence);
         assert_eq!(d.goal_age_turns, Some(0));
+    }
+
+    /// v4.0.30 — `intent_has_evidence` returns true iff the Unknown
+    /// intent has `reasoning_chain` OR `example` populated by the
+    /// retrieval / reasoning injection passes.
+    #[test]
+    fn intent_has_evidence_detects_injected_slots() {
+        let bare = unknown_with_noun("жер");
+        assert!(!TaskState::intent_has_evidence(&bare));
+
+        let with_chain = Intent::Unknown {
+            raw_tokens: vec!["жер".into()],
+            noun_hint: Some("жер".into()),
+            example: None,
+            example_adapted: false,
+            reasoning_chain: Some("ой-тізбек: жер — аспан денесі".into()),
+        };
+        assert!(TaskState::intent_has_evidence(&with_chain));
+
+        let with_example = Intent::Unknown {
+            raw_tokens: vec!["жер".into()],
+            noun_hint: Some("жер".into()),
+            example: Some("Жер — біздің планета.".into()),
+            example_adapted: false,
+            reasoning_chain: None,
+        };
+        assert!(TaskState::intent_has_evidence(&with_example));
+
+        // Non-Unknown intents never carry evidence slots.
+        assert!(!TaskState::intent_has_evidence(&Intent::Thanks));
+        assert!(!TaskState::intent_has_evidence(&Intent::AskName));
+    }
+
+    /// v4.0.30 — Codex v4.0.29 review #2 regression. Goal + evidence
+    /// in intent MUST produce `ReadyToAnswer`, not the catch-all
+    /// `GatheringEvidence` pre-v4.0.30 always returned.
+    #[test]
+    fn roll_forward_reaches_ready_to_answer_with_injected_chain() {
+        let mut t = TaskState::new();
+        let belief = BeliefState::new();
+        let intent = Intent::Unknown {
+            raw_tokens: vec!["жер".into()],
+            noun_hint: Some("жер".into()),
+            example: None,
+            example_adapted: false,
+            reasoning_chain: Some("ой-тізбек: жер — аспан денесі".into()),
+        };
+        t.roll_forward(&intent, &belief, 0);
+        assert_eq!(t.status, TaskStatus::ReadyToAnswer);
+    }
+
+    /// v4.0.30 — contradictions still dominate even when evidence
+    /// is present — `Blocked` trumps `ReadyToAnswer`.
+    #[test]
+    fn blocked_beats_ready_to_answer() {
+        let mut t = TaskState::new();
+        let mut belief = BeliefState::new();
+        belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        belief.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
+        assert!(!belief.contradictions.is_empty());
+
+        let intent = Intent::Unknown {
+            raw_tokens: vec!["жер".into()],
+            noun_hint: Some("жер".into()),
+            example: Some("sample".into()),
+            example_adapted: false,
+            reasoning_chain: Some("chain".into()),
+        };
+        t.roll_forward(&intent, &belief, 2);
+        assert_eq!(t.status, TaskStatus::Blocked);
     }
 }

@@ -7,6 +7,65 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.30] — 2026-04-24 — Turn-counter fix + ReadyToAnswer reachability (Codex v4.0.29 review)
+
+Two invariant fixes on the Phase 2 substrate before Phase 3 builds on top. Codex flagged both in the v4.0.29 review — #1 as a blocker, #2 as a semantic gap Phase 3 would inherit.
+
+### #1 — Turn counter plateaued at `MAX_HISTORY = 32`
+
+Pre-v4.0.30 both `absorb_entities` (belief) and `task.roll_forward` derived the turn id from `intent_history.len()`. `intent_history` caps at 32 (`MAX_HISTORY`), so after the 32nd recognised intent the counter stopped advancing. Consequence:
+
+- `belief.facts[i].recorded_at_turn` and `BeliefConflict::detected_at_turn` were wrong for long sessions.
+- `task.goal_set_at_turn` plateaued, breaking the "goal age" signal Phase 3 will consume.
+
+**Fix**: introduced `Conversation::turn_counter: usize` — monotone, **unbounded** (saturating-add, but `usize::MAX` is astronomical). Captured at the start of every `turn_with_trace`, threaded into `absorb_entities(intent, turn_id)` and `task.roll_forward(intent, belief, turn_id)`, and cleared in `Conversation::reset()`.
+
+Codex-reproduced probe (35 social turns → 36th turn installs a topic goal): pre-v4.0.30 `goal_set_at_turn = Some(32)`. Post-v4.0.30 `goal_set_at_turn = Some(35)`, `turn_counter = 36`. New integration test `goal_set_at_turn_survives_intent_history_cap` pins this.
+
+### #2 — `TaskStatus::ReadyToAnswer` was unreachable
+
+`compute_status` in v4.0.29 only returned four of five variants. Retrieval + reasoning injection fill `intent.reasoning_chain` / `intent.example` BEFORE `roll_forward` runs, so by the time status is computed the evidence is already on the intent — but the pre-v4.0.30 code didn't look at it. The Phase 2 tests masked the gap by accepting either `GatheringEvidence` or `ReadyToAnswer`.
+
+**Fix**: new `TaskState::intent_has_evidence(intent) -> bool` checks `Unknown { reasoning_chain: Some(_), .. }` or `Unknown { example: Some(_), .. }`. `compute_status(belief, has_evidence)` adds the missing branch:
+
+```
+Some(_) if has_evidence  →  ReadyToAnswer
+Some(_)                  →  GatheringEvidence
+```
+
+Ordering unchanged — `Blocked` (contradictions) and `WaitingForUser` (pending questions) still dominate both.
+
+### Smoke-test
+
+```
+$ adam_chat --once 'жер туралы айтшы' --trace
+├─ task: goal=true variant=LearnAboutTopic subgoals=0 status=ReadyToAnswer set_at=Some(0)
+```
+
+Pre-v4.0.30 this line showed `status=GatheringEvidence` even though a reasoning chain was already rendered in the output.
+
+### Tests
+
+**524 passing** (+5 from v4.0.29):
+
+- Unit `intent_has_evidence_detects_injected_slots` — covers all 4 evidence shapes.
+- Unit `roll_forward_reaches_ready_to_answer_with_injected_chain` — `ReadyToAnswer` fires with goal + chain.
+- Unit `blocked_beats_ready_to_answer` — contradiction dominates even with evidence present.
+- Integration `goal_set_at_turn_survives_intent_history_cap` — 35-turn probe per Codex.
+- Integration `ready_to_answer_reachable_with_reasoning_chain` — end-to-end through `Conversation::turn`.
+
+Tightened pre-existing integration tests to assert the correct status variant deterministically (no more `matches!(either)` accept-all).
+
+### Scope
+
+One concern — close invariants Codex surfaced in the v4.0.29 review. No new public API beyond `turn_counter`. Reply text byte-identical.
+
+### Next
+
+With both invariants holding, Phase 3 (ActionPlanner) can consume `goal_set_at_turn` as a real age signal and `TaskStatus::ReadyToAnswer` as a real routing signal.
+
+---
+
 ## [4.0.29] — 2026-04-24 — TaskState + Goal detection (Codex v4.0.26 roadmap Phase 2)
 
 Second architectural patch on Codex's v5.0 roadmap. Phase 1 (BeliefState) gave the dialog structured memory; Phase 2 gives it **goals** — a representation of what the user is trying to accomplish across turns. Non-breaking substrate; reply text is byte-identical to v4.0.28.

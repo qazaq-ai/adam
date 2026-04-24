@@ -1434,10 +1434,11 @@ fn turn_installs_learn_about_topic_goal_and_preserves_continuity() {
         other => panic!("expected LearnAboutTopic/жер, got {other:?}"),
     }
     let first_turn = conv.task.goal_set_at_turn;
-    assert!(matches!(
-        conv.task.status,
-        TaskStatus::GatheringEvidence | TaskStatus::ReadyToAnswer
-    ));
+    // No reasoning facts attached to this Conversation → evidence
+    // injection can't fire → status stays in GatheringEvidence.
+    // The dedicated `ready_to_answer_reachable_with_reasoning_chain`
+    // test covers the ReadyToAnswer path with facts attached.
+    assert_eq!(conv.task.status, TaskStatus::GatheringEvidence);
 
     // Same topic asked again — goal must persist, set-turn unchanged.
     conv.turn("жер туралы айтшы", &lex, &repo, 1);
@@ -1500,10 +1501,82 @@ fn turn_with_trace_surfaces_task_digest() {
     assert!(trace.task_digest.has_goal);
     assert_eq!(trace.task_digest.goal_variant, Some("LearnAboutTopic"));
     use adam_dialog::TaskStatus;
-    assert!(matches!(
-        trace.task_digest.status,
-        TaskStatus::GatheringEvidence | TaskStatus::ReadyToAnswer
-    ));
+    // No reasoning facts attached → GatheringEvidence (evidence
+    // injection passes don't fire). ReadyToAnswer is covered
+    // separately in `ready_to_answer_reachable_with_reasoning_chain`.
+    assert_eq!(trace.task_digest.status, TaskStatus::GatheringEvidence);
+}
+
+/// v4.0.30 — Codex v4.0.29 review #1 regression. Turn counter must
+/// be a real monotone index, not `intent_history.len()` which caps at
+/// `MAX_HISTORY = 32`. After >32 turns `goal_set_at_turn` must still
+/// reflect the actual turn number.
+#[test]
+fn goal_set_at_turn_survives_intent_history_cap() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    // Feed 35 social turns (no goal installed — Thanks/Farewell
+    // etc. aren't profile/topic intents).
+    for _ in 0..35 {
+        conv.turn("рахмет", &lex, &repo, 0);
+    }
+    // Now install a goal on turn 35.
+    conv.turn("жер туралы айтшы", &lex, &repo, 0);
+
+    assert_eq!(
+        conv.task.goal_set_at_turn,
+        Some(35),
+        "goal_set_at_turn must be the real turn index (35), got {:?}",
+        conv.task.goal_set_at_turn
+    );
+    assert_eq!(
+        conv.turn_counter, 36,
+        "turn_counter must advance past MAX_HISTORY, got {}",
+        conv.turn_counter
+    );
+}
+
+/// v4.0.30 — `TaskStatus::ReadyToAnswer` actually reachable now.
+/// Regression on Codex v4.0.29 review #2: the pre-v4.0.30 status
+/// derivation never produced this variant.
+#[test]
+fn ready_to_answer_reachable_with_reasoning_chain() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "аспан денесі".into(),
+            root: "аспан денесі".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/celestial.jsonl".into(),
+            sample_id: "sky_01".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    conv.turn("жер туралы айтшы", &lex, &repo, 0);
+    use adam_dialog::TaskStatus;
+    assert_eq!(
+        conv.task.status,
+        TaskStatus::ReadyToAnswer,
+        "with injected reasoning chain the status must be ReadyToAnswer"
+    );
 }
 
 /// v4.0.28 — Codex v4.0.27 review #1 regression at the integration
