@@ -7,6 +7,105 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.20] — 2026-04-24 — Lexicon sync with World Core (Codex v4.0.19 review #1)
+
+First release acting on Codex's external review of v4.0.19. Codex's diagnosis was: **knowledge exists in the graph but doesn't reach the user through the dialog layer**. Root cause #1 — many `world_core` subject/object roots are not in the Lexicon, so `first_noun_root` (dialog's entry point) returns None and the query falls through to «түсінбедім».
+
+### Audit findings
+
+Cross-checking `data/world_core/*.jsonl` single-word subjects/objects against the Lexicon (curated `segmentation_roots.json` + Apertium import):
+
+- **295 world_core roots missing from the Lexicon** — including core vocabulary (ай, су, қан, қыз, қол, бас, бет — surprisingly absent) and every recent v4.0.9+ domain-authored root (немере, махаббат, домбыра, медбике, математика, аспап, бағыт, өлшем, etc.).
+
+### Fix — one concern, with a caveat
+
+Added **270 roots** to `data/tokenizer/segmentation_roots.json` with auto-classified vowel-harmony + final-sound-class via a heuristic script (Kazakh last-vowel harmony rule + final-char sound class). Roots all flagged with `v4020` id prefix for grep-ability of provenance.
+
+**Filter — 25 roots deferred**: first attempt added all 295, which broke 4 tokenizer-contract tests (seg_253 аламын, seg_282 қысқа, seg_320 басқа — short-root collisions with existing affix parses). Reverted and filtered to **length ≥ 4 chars + NOT in a homograph risk-list** (ай, су, ақ, ен, ту, ал, қан, қол, бас, бет, мал, кеш, қыс, оң, сол, пеш, сөз, тал, түс, мыс, қаз, қар, қыз, бау, ала). These 25 need per-root FST priority handling in a future patch — one-concern discipline defers.
+
+### Smoke-test: dialog now answers previously-silent queries
+
+Pre-v4.0.20:
+```
+> немере туралы айтшы
+түсінбедім
+> махаббат туралы айтшы
+түсінбедім
+> домбыра туралы айтшы
+түсінбедім
+> медбике туралы айтшы
+түсінбедім
+```
+
+Post-v4.0.20 (all 4 now produce curated-derived answers):
+```
+> немере туралы айтшы
+Қолда бар деректерден байланыс құрастырдым: қорытынды: немере — адам (байланысты ой-тізбек арқылы).
+> махаббат туралы айтшы
+махаббат туралы мынадай байланыс анықтадым: махаббат пен мақтаныш бір-біріне байланысты екен.
+> домбыра туралы айтшы
+Қолда бар деректерден байланыс құрастырдым: қорытынды: домбыра — құрал (байланысты ой-тізбек арқылы).
+> медбике туралы айтшы
+Айтуыңыз бойынша, мынадай қисынды байланыс бар: медбике пен мерген бір-біріне байланысты екен.
+```
+
+This is the **highest-impact single patch** of v4.0.x so far — it converts existing knowledge into actually-reachable answers.
+
+### Measured delta on T4_200k full re-extract
+
+| | v4.0.19 | v4.0.20 | delta |
+|---|---:|---:|---|
+| Lexicon curated roots | 4 432 | **4 702** | **+270** |
+| facts.json total | 13 709 | **15 448** | **+1 739 (+12.7 %)** |
+| text `does_to` | 8 987 | **9 942** | **+955** |
+| text `related_to` | 1 458 | **1 957** | **+499** |
+| text `goes_to` | 1 537 | **1 681** | +144 |
+| text `lives_in` | 280 | **325** | +45 |
+| text `is_a` | 733 | **783** | +50 |
+| text `has` | 224 | **269** | +45 |
+| text `after` | 218 | **248** | +30 |
+| text `part_of` | 149 | **153** | +4 |
+| text `has_quantity` | 40 | **43** | +3 |
+| **derivations total** | 18 406 | **19 395** | **+989 (+5.4 %)** |
+| **R2 has_inheritance** | 707 | **1 110** | **+403** |
+| **R8 after_transitivity** | 734 | **999** | **+265** |
+| **R5 shared_is_a_target** | 15 477 | **15 621** | +144 |
+| **R7 goes_to_via_part_of** | 373 | **505** | **+132** |
+| R6 lives_in_via_part_of | 49 | 81 | +32 |
+| R1 / R3 / R9 / R10 / R11 | minor | minor | ± few |
+| Graph nodes | 3 472 | **3 515** | +43 |
+| Graph edges | 12 360 | **13 725** | **+1 365 (+11 %)** |
+
+### Why such large extract jump (+1 739 text facts)
+
+Kazakh sentences involving the 270 new roots were previously **parseable only partially** — e.g. a sentence mentioning «немере келді» would fail at the noun analysis, so downstream pattern matchers never fired. With the roots in Lexicon, every such sentence is now extractable. The +955 `does_to` gain is the largest — agent_verb patterns are the most common sentence shape in the Wikipedia + textbook corpus, and they were blocked wherever the subject or object noun was one of the newly-added roots.
+
+### Tests
+
+**484 passing** (unchanged — Lexicon addition didn't break any existing test after the filter was tightened).
+
+### Cumulative v4.0.7 → v4.0.20 (14 releases)
+
+| | v4.0.7 | v4.0.20 | delta |
+|---|---:|---:|---|
+| Active reasoning rules | 7 | **10** | +3 |
+| World Core domains | 14 | **29** | +15 |
+| Lexicon curated roots | 4 432 | **4 702** | **+270** |
+| facts.json total | 13 745 | **15 448** | **+1 703** |
+| **Derivations** | **7 866** | **19 395** | **+11 529 (+146.6 %)** |
+| Tests | 463 | **484** | +21 |
+
+**Derivations 2.5× baseline.**
+
+### Not in scope (queued)
+
+- v4.0.21: Codex recommendation #2 — longest-match entity linker for multiword concepts («Құс жолы» → galaxy, not just «құс»).
+- v4.0.22: Codex recommendation #3 — reasoning chain reranker (curated-first, short-first, R1/R10-first).
+- v4.0.23: Codex recommendation #4 — tighten rule guards on broad hubs (адам / ғылым / жануар).
+- Deferred: 25 short / homograph-prone roots (ай, су, ақ, etc.) — need per-root FST priority handling.
+
+---
+
 ## [4.0.19] — 2026-04-24 — World Core batch #5: `kinship_extended.jsonl` + `constellations_kz.jsonl` + `measurements.jsonl` (R5 explodes via адам bridge)
 
 Fifth data batch. **Highest single-batch leverage ever**: +67.6 derivations per curated fact (previous peak: v4.0.9's +47/fact via 40-entry professions.jsonl saturating маман hub).

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.19-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.20-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -20,7 +20,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/intents-26-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/surface-Kazakh--only-9CCC65?style=flat-square" alt="Kazakh only">
-  <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
+  <img src="https://img.shields.io/badge/lexicon-14.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
   <img src="https://img.shields.io/badge/tests-484%20passing-2EA44F?style=flat-square" alt="tests">
@@ -65,7 +65,7 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | | value |
 |---|---|
 | Dialog intents | 26 |
-| Lexicon roots | 14 247 |
+| Lexicon roots | **14 517** (v4.0.20: +270 Codex-review sync with world_core) |
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
 | **World Core (v4.0.19)** | **826 entries / 922 curated facts** across **29 domains**: astronomy, time, geography_kz, biology_basic, body_parts, society, colors, numbers, kz_literature, food, clothing, proverbs, animals, transport, plants, professions, tools_household, music_kz, sports, house_parts, emotions, weather_phenomena, materials, language_features, cooking_methods, directions, **kinship_extended (18 / 20)**, **constellations_kz (6 / 6)**, **measurements (10 / 10)** — bolded are new in v4.0.19. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
@@ -75,9 +75,9 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | **Dialog closed-class sync** (v3.9.5) | `NOT_A_TOPIC` mirrors `adam_reasoning::patterns::is_closed_class` — closes the pre-v3.9.5 «Неліктен → Нелікте тұрасыз ба» misparse where the FST correctly analysed `Неліктен` as ablative of a noun stem but the dialog layer had no interrogative filter |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
-| Facts (committed runtime) | **13 673 total** = **12 787 extracted (Grammar)** + **886 curated (HumanApproved, 26 domains)**. T4_200k scale. Cumulative v4.0.10 + v4.0.16 + v4.0.18 noise cleanup removed **72 facts** net vs v4.0.7 (higher precision, higher derivation density) |
-| **Rule-derived facts (committed runtime)** | **15 973** (v4.0.18: R1=484, R2=450, R3=51, R5=13 414, R6=49, R7=373, R8=734, R9=170, R10=102, **R11=146 NEW**). Delta vs v4.0.16: **+141 (+0.89 %)** from R11 activation (+146) and v4.0.17 fragment-fix materialisation (R2 −4, R7 −1). **Cumulative v4.0.7 → v4.0.18**: **7 866 → 15 973 derivations (+103.1 %)** across 12 releases |
-| Fact-graph nodes / edges | **3 452 / 12 325** (committed v4.0.18); most-connected content nouns: **адам (284), жер (217), қазақ (203), дүние (200), ат (145)** |
+| Facts (committed runtime) | **15 448 total** = **14 526 extracted (Grammar)** + **922 curated (HumanApproved, 29 domains)**. T4_200k scale. v4.0.20 Lexicon sync unlocked +1 739 previously-unparseable text-extracted facts |
+| **Rule-derived facts (committed runtime)** | **19 395** (v4.0.20: R1=574, R2=1 110, R3=55, R5=15 621, R6=81, R7=505, R8=999, R9=175, R10=124, R11=151). Delta vs v4.0.19: **+989 (+5.4 %)** — R2 +403, R8 +265, R5 +144, R7 +132 from newly-parseable Kazakh sentences. **Cumulative v4.0.7 → v4.0.20**: **7 866 → 19 395 derivations (+146.6 %)** across 14 releases |
+| Fact-graph nodes / edges | **3 515 / 13 725** (committed v4.0.20); most-connected content nouns scaled with Lexicon sync |
 | **Tooling throughput (v4.0.8 → v4.0.9 validation)** | `extract_facts --world-core-only` — v4.0.8 infra. v4.0.9 confirmed empirically: 3-domain batch (105 new facts, full rebuild of facts + derived_facts + lexical_graph) took **~4 s total** vs ~135 min under the pre-v4.0.8 per-domain workflow — **~2 000× pipeline speedup on a 3-domain batch**. |
 | **Predicate coverage (v3.9.5)** | **11 / 11 = 100 %** — every declared predicate fires. Causes = 6, InDomain = 5 (v3.9.5 biology/anatomy/society entries extended the v3.9.0 foothold) |
 | Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |
