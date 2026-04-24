@@ -7,6 +7,101 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.16] — 2026-04-24 — Noise audit #2: location-root subjects in `dative_goes_to` + `agent_verb`
+
+Second noise-elimination audit of v4.0.x. Audit on fresh v4.0.15 derived_facts.json surfaced a major contamination class: **R7 GoesTo-via-PartOf had 385 of 388 derivations either fully text-only or mixed** — traced back to text-extracted GoesTo base facts with country / city subjects.
+
+### Audit findings
+
+R7 provenance breakdown on v4.0.15 (388 derivations):
+
+| provenance | count | share |
+|---|---:|---:|
+| fully world_core | 3 | 0.8 % |
+| mixed | 338 | 87.1 % |
+| fully text-only | 47 | 12.1 % |
+
+**R7 is the most text-dependent rule in the reasoner** — it needs both a GoesTo base and a PartOf base, and GoesTo is predominantly text-extracted.
+
+Top text-extracted GoesTo subjects (all producing R7 cascade noise):
+
+| root | × | kind |
+|---|---:|---|
+| қазақ | 52 | ethnic noun / proper noun (homograph) |
+| адам | 27 | generic subject (metaphorical usage) |
+| **қазақстан** | **22** | **country — location, not agent** |
+| **алматы** | **20** | **city — location, not agent** |
+| **шығыс** | **12** | direction (now curated in directions.jsonl) |
+| жалп | 12 | fragment of жалпы |
+| **солтүстік** | **8** | direction (now curated) |
+| **ақтөбе / павлодар / арал** | each **7** | **cities** |
+
+Bolded rows total **~80 base facts** that are clearly locations appearing as kinetic-verb subjects — from Wikipedia biographical patterns like «Оңтүстік Қазақстан облысында дүниеге келді» ("was born in South Kazakhstan oblast") that the extractor takes as `қазақстан goes_to дүние`.
+
+### Root cause (consistent with v4.0.10's pattern)
+
+Four matchers produce predicates whose subjects should not be location nouns (`LivesIn`, `GoesTo`, `DoesTo`):
+
+- `locative_lives_in` ✓ (has `is_location_root` guard since v3.8.5)
+- `dative_goes_to` ✗ **missing the guard**
+- `agent_verb` (DoesTo) ✗ **missing the guard**
+- `copula_is_a` — N/A (IsA can legitimately have location subjects like `жер IsA ғаламшар`)
+
+v3.8.5 hardening identified location nouns as a noise class for `locative_lives_in` but didn't extend to the kinetic verb matchers — the same oversight pattern that v4.0.10 fixed for `is_time_noun` on `copula_is_a`.
+
+### Fix — one concern
+
+Added `is_location_root(&root.root)` guard after the existing `is_time_noun` / < 3-char filter in both:
+
+1. **`dative_goes_to`** subject (line ~567 in patterns.rs)
+2. **`agent_verb`** subject (line ~995 in patterns.rs)
+
+Plus 2 new regression tests:
+
+- `dative_goes_to_rejects_location_subject` — 3 Wikipedia-style cases (Қазақстан, Алматы, Ақтөбе).
+- `agent_verb_rejects_location_subject` — 2 Wikipedia-style cases (Қазақстан, Ресей).
+
+### Measured delta (full re-extract T4_200k + reasoner)
+
+| | v4.0.15 | v4.0.16 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 925 | **13 715** | **−210** |
+| text-extracted `does_to` | ~9 171 | **9 002** | **−169** (agent_verb location-subject guard) |
+| text-extracted `goes_to` | ~1 590 | **1 544** | **−46** (dative_goes_to location-subject guard) |
+| **derivations total** | 15 846 | **15 832** | −14 |
+| R7_goes_to_via_part_of | 388 | **374** | **−14** (primary R-rule target) |
+| R1-R6, R8-R10 | unchanged | unchanged | 0 |
+| Graph nodes | 3 461 | **3 456** | −5 |
+| Graph edges | 12 495 | **12 368** | **−127** |
+| R7 provenance split | 3 WC / 338 mixed / 47 text | 3 WC / 326 mixed / 45 text | mixed −12, text −2 |
+
+**Noise-leverage discrepancy vs v4.0.10**: v4.0.10's `copula_is_a` time-noun guard produced **5.7 derivations eliminated per base fact** (63 base → 357 deriv). v4.0.16 produces only **0.065 deriv/base** (215 base → 14 deriv). Reason: location-subject `goes_to` / `does_to` base facts rarely fed R7 chains because their destinations (дүние, қағаз, өсек, көңіл, etc. — Wikipedia biographical metonymy) lacked matching `part_of` targets in the graph. The primary win here is **direct base-fact precision** — 215 categorically wrong text extractions ("Қазақстан дүниеге келді" → `қазақстан goes_to дүние`) removed — not rule cascade reduction.
+
+### Tests
+
+**478 passing** (+2 regression tests from v4.0.15).
+
+### Not in scope (queued)
+
+- **«қазақ» × 52** text GoesTo — ethnic-noun / homograph polysemy (Qazaq city in Azerbaijan). Same class as v4.0.10's «абай IsA ауыл» deferral — needs dialog-layer sense disambiguation, not extractor guard.
+- **Fragment roots** «жалп / мұн / аста / хіх» × 35 combined — v4.0.6 closed-class expansion pattern; one-concern discipline defers to a future patch.
+- **«адам» × 27**, **«бала» × 15** — generic human subjects; often legitimate ("person goes to work"). Semantic filtering needed, not a blanket guard.
+
+### Cumulative v4.0.7 → v4.0.16 (10 releases)
+
+| | v4.0.7 | v4.0.16 | delta |
+|---|---:|---:|---|
+| Active reasoning rules | 7 | 9 | +2 (R9, R10) |
+| World Core domains | 14 | **26** | +12 |
+| World Core entries | 549 | **792** | +243 |
+| facts.json total | 13 745 | **13 715** | **−30** (cleaner after v4.0.10 / v4.0.16 noise fixes) |
+| Derivations | 7 866 | **15 832** | **+7 966 (+101.3 %)** |
+| Tests | 463 | **478** | +15 |
+
+v4.0.x has now accumulated **two noise-elimination milestones** (v4.0.10 time-nouns in `copula_is_a`, v4.0.16 location-nouns in `dative_goes_to` + `agent_verb`) — both closing 2-year-old oversights where v3.8.5 hardening extended a guard to some matchers but missed others.
+
+---
+
 ## [4.0.15] — 2026-04-24 — World Core batch #4: `language_features.jsonl` + `cooking_methods.jsonl` + `directions.jsonl`
 
 Fourth data batch. Three more curated domains, chosen to exploit R9 (PartOf-transitivity, v4.0.13) and R10 (InDomain-inheritance, v4.0.14) by feeding them long part_of chains and populous IsA taxonomies.

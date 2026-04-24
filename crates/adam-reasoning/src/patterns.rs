@@ -567,6 +567,20 @@ pub fn dative_goes_to(
             if is_time_noun(&root.root) || root.root.chars().count() < 3 {
                 return None;
             }
+            // v4.0.16 precision hardening — location roots (country /
+            // city names) as GoesTo subjects contributed ~60+ noisy
+            // base facts (қазақстан × 22, алматы × 20, ақтөбе / павлодар
+            // / арал / шығыс each × 7–12) from Wikipedia biographical
+            // patterns like «Оңтүстік Қазақстан облысында дүниеге
+            // келді». Countries and cities are locations, not agents;
+            // they cannot "go" anywhere. The R7 cascade multiplier made
+            // this a >300-derivation problem on the v4.0.15 graph.
+            // `locative_lives_in` already uses the same guard since
+            // v3.8.5; v4.0.16 extends it to the other two matchers
+            // (`dative_goes_to` here and `agent_verb` below).
+            if is_location_root(&root.root) {
+                return None;
+            }
             Some(SlotRef {
                 surface: tokens[i].0.clone(),
                 root: root.root.clone(),
@@ -979,6 +993,14 @@ pub fn agent_verb(
             // also grabbing (e.g. «жыл ... әсер етеді» → «жыл does_to
             // әсер», where «жыл» = "year" is not an agent).
             if is_time_noun(&root.root) || root.root.chars().count() < 3 {
+                return None;
+            }
+            // v4.0.16 — location-noun subject guard. Countries and
+            // cities are locations, not agents; «Қазақстан X-ны жасады»
+            // is always metonymic for "Kazakh state did X" and the
+            // extractor doesn't unpack the metonymy. Same rationale as
+            // `dative_goes_to` above.
+            if is_location_root(&root.root) {
                 return None;
             }
             Some(SlotRef {
@@ -2454,5 +2476,44 @@ mod tests {
             out.is_empty(),
             "demonstrative subject refused for GoesTo (got {out:?})"
         );
+    }
+
+    /// v4.0.16 — country / city as GoesTo subject must be refused.
+    /// Pre-v4.0.16 «Қазақстан дүниеге келді» (Wikipedia biographical
+    /// formula) produced (қазақстан, goes_to, дүние) × ~22. Kazakh
+    /// Wikipedia uses this metonymy for "was born in Kazakhstan", but
+    /// the extractor can't unpack metonymy — countries are not agents.
+    #[test]
+    fn dative_goes_to_rejects_location_subject() {
+        let Some(lex) = load_lex() else { return };
+        let cases = [
+            "Қазақстан дүниеге келді.",
+            "Алматы Мәскеуге барды.",
+            "Ақтөбе халыққа жазылды.",
+        ];
+        for text in cases {
+            let mut out = Vec::new();
+            dative_goes_to(text, &[], &lex, &src(), &mut out);
+            assert!(
+                out.is_empty(),
+                "location-root subject refused for GoesTo «{text}» (got {out:?})"
+            );
+        }
+    }
+
+    /// v4.0.16 — country / city as DoesTo (agent_verb) subject refused.
+    /// Same rationale — location roots are not agents.
+    #[test]
+    fn agent_verb_rejects_location_subject() {
+        let Some(lex) = load_lex() else { return };
+        let cases = ["Қазақстан заңды қабылдады.", "Ресей шарт бекітті."];
+        for text in cases {
+            let mut out = Vec::new();
+            agent_verb(text, &[], &lex, &src(), &mut out);
+            assert!(
+                out.is_empty(),
+                "location-root subject refused for DoesTo «{text}» (got {out:?})"
+            );
+        }
     }
 }
