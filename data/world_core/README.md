@@ -97,7 +97,7 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v4.0.15)
+## Current scale (v4.0.19)
 
 - `astronomy.jsonl` — 30 entries / 41 facts
 - `time.jsonl` — 20 entries / 38 facts
@@ -122,10 +122,13 @@ Validator checks:
 - `emotions.jsonl` — 18 entries / 18 facts
 - `weather_phenomena.jsonl` — 15 entries / 15 facts
 - `materials.jsonl` — 14 entries / 14 facts
-- `language_features.jsonl` — 18 entries / 18 facts  *(new in v4.0.15)*
-- `cooking_methods.jsonl` — 10 entries / 10 facts  *(new in v4.0.15)*
-- `directions.jsonl` — 9 entries / 9 facts  *(new in v4.0.15)*
-- **Total: 792 entries / 886 facts across 26 domains**, all `approved`
+- `language_features.jsonl` — 18 entries / 18 facts
+- `cooking_methods.jsonl` — 10 entries / 10 facts
+- `directions.jsonl` — 9 entries / 9 facts
+- `kinship_extended.jsonl` — 18 entries / 20 facts  *(new in v4.0.19)*
+- `constellations_kz.jsonl` — 6 entries / 6 facts  *(new in v4.0.19)*
+- `measurements.jsonl` — 10 entries / 10 facts  *(new in v4.0.19)*
+- **Total: 826 entries / 922 facts across 29 domains**, all `approved`
   at `high` or `medium` confidence by `shaman`.
 
 ## Roadmap

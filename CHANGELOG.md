@@ -7,6 +7,84 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.19] — 2026-04-24 — World Core batch #5: `kinship_extended.jsonl` + `constellations_kz.jsonl` + `measurements.jsonl` (R5 explodes via адам bridge)
+
+Fifth data batch. **Highest single-batch leverage ever**: +67.6 derivations per curated fact (previous peak: v4.0.9's +47/fact via 40-entry professions.jsonl saturating маман hub).
+
+### Three new domains
+
+1. **`kinship_extended.jsonl`** (18 entries) — extended Kazakh family terms. Hub: `туыс IsA адам` (kin IsA human — the load-bearing bridge). 17 туыс children: ата / әже part_of отбасы + IsA туыс, аға / іні / апа / қарындас / сіңлі / немере / шөбере / жиен / бөле / нағашы / абысын / күйеу / келін IsA туыс, plus ұл / қыз IsA бала. Standard Kazakh kinship lexicon, no loanwords.
+
+2. **`constellations_kz.jsonl`** (6 entries) — traditional Kazakh astronomy. `шоқжұлдыз IsA аспан денесі` hub + 4 constellation children: Жетіқарақшы (Ursa Major — "seven thieves"), Үркер (Pleiades), Темірқазық (Polaris — "iron stake", IsA жұлдыз), құйрықты жұлдыз (comet — "tailed star"). Plus `Құс жолы IsA галактика` (Milky Way — confirms implicit usage in astro_022).
+
+3. **`measurements.jsonl`** (10 entries) — physical measurement concepts. `өлшем IsA белгі` hub + 9 measurement children IsA өлшем: ұзындық, көлем, салмақ, биіктік, тереңдік, ен, қашықтық, жылдамдық, пайыз.
+
+### Totals
+
+| | v4.0.18 | v4.0.19 | delta |
+|---|---:|---:|---|
+| World Core domains | 26 | **29** | +3 |
+| World Core entries | 792 | **826** | +34 |
+| World Core facts | 886 | **922** | +36 (kin_002 / kin_003 produce 2 facts each: part_of отбасы + IsA туыс) |
+
+### Measured runtime delta (fast-path rebuild)
+
+| rule | v4.0.18 | v4.0.19 | delta |
+|---|---:|---:|---|
+| R1 is_a_transitivity | 484 | **568** | **+84** |
+| **R2 has_inheritance** | 450 | **707** | **+257** |
+| R3 has_via_part_of | 51 | 51 | 0 |
+| **R5 shared_is_a_target** | 13 414 | **15 477** | **+2 063** |
+| R6 lives_in_via_part_of | 49 | 49 | 0 |
+| R7 goes_to_via_part_of | 373 | 373 | 0 |
+| R8 after_transitivity | 734 | 734 | 0 |
+| R9 part_of_transitivity | 170 | **172** | +2 |
+| **R10 in_domain_inheritance** | 102 | **124** | **+22** |
+| R11 in_domain_shared_target | 146 | **151** | +5 |
+| **derivations total** | 15 973 | **18 406** | **+2 433 (+15.2 %)** |
+| Graph nodes | 3 452 | **3 472** | +20 |
+| Graph edges | 12 325 | **12 360** | +35 |
+
+### Effective leverage: +67.6 derivations per curated fact — new peak
+
+**2 433 new derivations / 36 new curated facts = +67.6/fact** — exceeds v4.0.9's +47/fact peak. The combinatorial explosion is driven by one specific fact: `кин_001: туыс IsA адам`. This single bridge connects the entire 17-child kin cluster into the large адам IsA hub. Every kin child → IsA туыс → R1-transitively IsA адам → R5-related to every other IsA адам descendant (including all professions via мамания, all animals, etc.).
+
+### R5 explosion breakdown (rough)
+
+- 17 kin children × each becomes IsA адам via R1 transitive closure
+- адам hub pre-batch already had ~60+ descendants (indirect via IsA chains through маман, etc.)
+- 17 × 60 new R5 pairs ≈ ~1 000 from cross-cluster pairs
+- Plus C(17,2) = 136 intra-kin pairs
+- Plus second-order cascades
+- **Observed +2 063** — consistent with bridge-fact multiplier effect
+
+### R2 jump (+257) explanation
+
+With kin cluster now IsA адам via R1, and `адам has сезім` (from emotions.jsonl at v4.0.12), R2 derives «X has сезім» for every kin child — 17+ new Has-inheritance derivations. Plus `адам has көз / құлақ / ми / жүрек / қан / өкпе / бауыр / бүйрек / асқазан / саусақ / аяқ / қол` (from body_parts.jsonl) — each kin child inherits all these via R2. 17 × ~12 body parts = ~200 R2 derivations. Rest from R1-chained цепочки.
+
+### Lesson: bridge facts multiply
+
+This batch demonstrates the **highest-ROI authoring pattern**: a single `X IsA большой_хаб` bridge fact can multiply existing cluster connectivity by C(cluster_size, 2). v4.0.9's professions.jsonl did this via маман hub; v4.0.19 does it via адам hub + kin cluster. Future high-leverage authoring: look for uncovered sub-hubs that could link into адам / зат / мүше / құрал with minimal curation.
+
+### Cumulative v4.0.7 → v4.0.19 (13 releases)
+
+| | v4.0.7 | v4.0.19 | delta |
+|---|---:|---:|---|
+| Active reasoning rules | 7 | **10** | +3 |
+| World Core domains | 14 | **29** | +15 |
+| World Core entries | 549 | **826** | +277 (+50.5 %) |
+| facts.json total | 13 745 | 13 709 | −36 (post-audits) |
+| **Derivations** | **7 866** | **18 406** | **+10 540 (+134 %)** |
+| R5 shared-IsA | 5 940 | **15 477** | **+9 537 (+160 %)** |
+
+**Derivations crossed 2.3× mark**. R5 shared-IsA alone has **2.6×** from baseline.
+
+### Scope
+
+Purely additive data. No code changes. 484 tests unchanged.
+
+---
+
 ## [4.0.18] — 2026-04-24 — R11 InDomain shared-target (new reasoning rule) + v4.0.17 fragment-fix materialised
 
 Third rule-axis patch in v4.0.x. Reasoner roster **9 → 10**. Also materialises the v4.0.17 is_closed_class fragment expansion via full T4_200k re-extract.

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.18-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.19-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -26,8 +26,8 @@
   <img src="https://img.shields.io/badge/tests-484%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
-  <img src="https://img.shields.io/badge/world%20core-792%20curated%20/%20886%20facts-9CCC65?style=flat-square" alt="world core">
-  <img src="https://img.shields.io/badge/domains-26-9CCC65?style=flat-square" alt="domains">
+  <img src="https://img.shields.io/badge/world%20core-826%20curated%20/%20922%20facts-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/domains-29-9CCC65?style=flat-square" alt="domains">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20by%20design-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
 
@@ -67,7 +67,7 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | Dialog intents | 26 |
 | Lexicon roots | 14 247 |
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
-| **World Core (v4.0.15)** | **792 entries / 886 curated facts** across **26 domains**: astronomy, time, geography_kz, biology_basic, body_parts, society, colors, numbers, kz_literature, food, clothing, proverbs, animals, transport, plants, professions, tools_household, music_kz, sports, house_parts, emotions, weather_phenomena, materials, **language_features (18 / 18)**, **cooking_methods (10 / 10)**, **directions (9 / 9)** — bolded are new in v4.0.15. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
+| **World Core (v4.0.19)** | **826 entries / 922 curated facts** across **29 domains**: astronomy, time, geography_kz, biology_basic, body_parts, society, colors, numbers, kz_literature, food, clothing, proverbs, animals, transport, plants, professions, tools_household, music_kz, sports, house_parts, emotions, weather_phenomena, materials, language_features, cooking_methods, directions, **kinship_extended (18 / 20)**, **constellations_kz (6 / 6)**, **measurements (10 / 10)** — bolded are new in v4.0.19. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
 | Workspace tests | **484 passing, 0 failing, 0 warnings** |
 | Pattern matchers | **11** — v2.x baseline (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
