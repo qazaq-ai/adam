@@ -1109,4 +1109,70 @@ mod tests {
         assert_eq!(multiword_entity_hint("мектеп керек пе"), None);
         assert_eq!(multiword_entity_hint(""), None);
     }
+
+    /// v4.0.26 — Codex v4.0.23 residual: the v4.0.21 MULTIWORD_ENTITIES
+    /// docstring referenced a `world_core_multiword_coverage_test` that
+    /// didn't actually exist. This test closes that maintenance trap.
+    ///
+    /// It scans every JSONL entry in `data/world_core/` and asserts that
+    /// every compound subject/object (value containing a space) appears
+    /// in the `MULTIWORD_ENTITIES` const. Adding a new compound to
+    /// world_core without extending the const will now fail CI.
+    ///
+    /// Skips silently when the data directory is absent (trimmed CI
+    /// checkouts, external crate consumers). Production CI runs from
+    /// the repo root so the data is always present.
+    #[test]
+    fn world_core_multiword_coverage() {
+        let dir = std::path::Path::new("../../data/world_core");
+        if !dir.exists() {
+            eprintln!(
+                "world_core_multiword_coverage: skipping — {} not present",
+                dir.display()
+            );
+            return;
+        }
+        let mut observed: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+        let entries = std::fs::read_dir(dir).expect("read_dir data/world_core");
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("jsonl") {
+                continue;
+            }
+            let contents = match std::fs::read_to_string(&path) {
+                Ok(c) => c,
+                Err(_) => continue,
+            };
+            for line in contents.lines() {
+                let line = line.trim();
+                if line.is_empty() {
+                    continue;
+                }
+                let parsed: serde_json::Value = match serde_json::from_str(line) {
+                    Ok(v) => v,
+                    Err(_) => continue,
+                };
+                let Some(facts) = parsed.get("facts").and_then(|v| v.as_array()) else {
+                    continue;
+                };
+                for fact in facts {
+                    for key in ["subject", "object"] {
+                        if let Some(value) = fact.get(key).and_then(|v| v.as_str()) {
+                            if value.contains(' ') {
+                                observed.insert(value.to_string());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        let const_set: std::collections::BTreeSet<String> =
+            MULTIWORD_ENTITIES.iter().map(|s| s.to_string()).collect();
+        let missing: Vec<&String> = observed.difference(&const_set).collect();
+        assert!(
+            missing.is_empty(),
+            "world_core has {} compound entities not in MULTIWORD_ENTITIES; add them to the const in semantics.rs: {missing:?}",
+            missing.len()
+        );
+    }
 }

@@ -7,6 +7,61 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.26] — 2026-04-24 — `world_core_multiword_coverage` regression test (Codex v4.0.23 residual)
+
+Third and final patch on Codex's v4.0.23 repeat review. Closes the residual maintenance trap.
+
+### Problem
+
+The v4.0.21 `MULTIWORD_ENTITIES` const in `semantics.rs` carried a docstring that said:
+
+> Kept in sync with `data/world_core/` by audit (re-run `world_core_multiword_coverage_test` whenever a new compound entity enters the world_core set).
+
+But that test **never actually existed**. The const was hand-maintained against the then-current 22 compound entities, and any future world_core batch adding a new multiword subject/object would silently fall out of sync — «тағы жануар / құрал / ...» in a future domain would tokenize to the first word and lose the referent, without any CI signal.
+
+### Fix
+
+Added `world_core_multiword_coverage` test in `semantics.rs::tests`. Mechanism:
+
+1. Walk `../../data/world_core/*.jsonl`.
+2. Parse each JSONL line as JSON, extract every `facts[*].subject` and `facts[*].object` string value.
+3. Filter to those containing a space (compound entities).
+4. Assert each observed compound is present in `MULTIWORD_ENTITIES`.
+
+The test fails with a specific diff message pointing at the missing compounds, so adding a new multiword to world_core without updating the const is an immediate CI red.
+
+Skips silently (with `eprintln!`) if the data directory is absent — external crate consumers and trimmed CI checkouts continue to work; production CI runs from repo root where the data is always present.
+
+### Smoke-test
+
+Running against current world_core state: **22 observed compounds, all 22 in MULTIWORD_ENTITIES** → passes.
+
+If I temporarily remove «қазақ тілі» from the const, the test fails with:
+```
+world_core has 1 compound entities not in MULTIWORD_ENTITIES;
+add them to the const in semantics.rs: ["қазақ тілі"]
+```
+
+### Tests
+
+**494 passing** (+1 coverage regression).
+
+### Scope
+
+One concern — close the documentation-referenced maintenance trap. No data / reasoner / extractor / dialog logic changes.
+
+### Codex v4.0.23 re-review — 3/3 completed
+
+| finding | fix | status |
+|---|---|---|
+| #1 Reranker tie-break | v4.0.24 | ✅ |
+| #2 `--trace` mode divergence | v4.0.25 | ✅ |
+| Residual: missing `world_core_multiword_coverage_test` | v4.0.26 | ✅ |
+
+Review round 2 fully addressed.
+
+---
+
 ## [4.0.25] — 2026-04-24 — `adam_chat --trace` reflects the real runtime path (Codex v4.0.23 re-review #2)
 
 Second patch on Codex's repeat external review. Closes finding #2 — the pre-v4.0.25 `--trace` mode was materially false for every feature added after v4.0.20.
