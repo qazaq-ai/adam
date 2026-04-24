@@ -331,14 +331,34 @@ impl Conversation {
                 !self.curated_only_reasoning
                     || adam_reasoning::reasoner::derivation_is_fully_curated(d)
             };
+            // v4.0.22 — Codex-reranker: score every candidate derivation
+            // involving `noun` and pick the highest-scoring one. Replaces
+            // the pre-v4.0.22 "first match wins" picker, which Codex
+            // flagged for surfacing weak chains («алматы күшке қатысты
+            // байланысы бар», «абай — маман») when stronger curated
+            // chains were available in the same set.
             let matched = self
                 .derived_facts
                 .iter()
-                .find(|d| d.subject.root == *noun && passes_safety(d))
-                .or_else(|| {
-                    self.derived_facts
-                        .iter()
-                        .find(|d| d.object.root == *noun && passes_safety(d))
+                .filter(|d| (d.subject.root == *noun || d.object.root == *noun) && passes_safety(d))
+                .max_by(|a, b| {
+                    score_derivation(a, noun)
+                        .cmp(&score_derivation(b, noun))
+                        // Deterministic tie-break by canonical triple key
+                        // so runs stay byte-identical.
+                        .then_with(|| {
+                            (
+                                a.subject.root.as_str(),
+                                a.predicate.as_str(),
+                                a.object.root.as_str(),
+                            )
+                                .cmp(&(
+                                    b.subject.root.as_str(),
+                                    b.predicate.as_str(),
+                                    b.object.root.as_str(),
+                                ))
+                                .reverse() // lower triple wins on tie
+                        })
                 });
             let Some(d) = matched else { return };
             let rendered = render_derivation_as_kazakh(d);
@@ -504,6 +524,83 @@ impl Conversation {
 /// predicate currently emitted). Other predicates produce a generic
 /// fallback that still contains the marker. Future releases will add
 /// predicate-specific renderings as reasoner output grows.
+
+/// v4.0.22 — composite score for ranking candidate derivations. Higher
+/// scores pick first. Implements Codex v4.0.19 review recommendation
+/// #3 — prefer curated+short+taxonomically-direct chains, penalize
+/// text-only and R5/R2 shared-target fan-out.
+///
+/// The score ranges roughly 0..10. Terms:
+///
+///   + 4 if every `source_chain.pack` starts with `world_core/` (fully
+///       curated — strongest trust signal)
+///   + 1 if at least one source is curated but not all (mixed)
+///   - 2 if no source is curated (text-only — last resort)
+///
+///   + 2 if `source_chain.len() <= 1`
+///   + 1 if `source_chain.len() == 2`
+///   (+ 0 longer — deep chains drift semantically)
+///
+///   + rule_weight — Codex ordering:
+///       R1 IsA-transitivity, R10 InDomain-inheritance: 3 (clean taxonomic)
+///       R2 Has-inheritance: 2
+///       R3 Has-via-PartOf, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf,
+///       R9 PartOf-transitivity, R8 After-transitivity: 2 (mereological/temporal)
+///       R5 shared-IsA, R11 shared-InDomain: 1 (weakest — combinatorial fan-out)
+///       unknown rule: 1 (defensive default)
+///
+///   + 1 if subject matches `noun` (preserves pre-v4.0.22 subject-first preference)
+///
+/// Tie-break is by canonical triple (see `inject_reasoning_chain`).
+fn score_derivation(d: &DerivedFact, noun: &str) -> i32 {
+    let mut score: i32 = 0;
+
+    // 1. Trust (source_chain provenance).
+    if d.source_chain.is_empty() {
+        score -= 2;
+    } else {
+        let wc_count = d
+            .source_chain
+            .iter()
+            .filter(|s| s.pack.starts_with("world_core/"))
+            .count();
+        if wc_count == d.source_chain.len() {
+            score += 4; // fully curated
+        } else if wc_count > 0 {
+            score += 1; // mixed
+        } else {
+            score -= 2; // text-only
+        }
+    }
+
+    // 2. Chain length.
+    match d.source_chain.len() {
+        0 | 1 => score += 2,
+        2 => score += 1,
+        _ => {}
+    }
+
+    // 3. Rule weight.
+    score += match d.rule_id.as_str() {
+        "R1_is_a_transitivity" | "R10_in_domain_inheritance" => 3,
+        "R2_has_inheritance"
+        | "R3_has_inheritance_via_part_of"
+        | "R6_lives_in_via_part_of"
+        | "R7_goes_to_via_part_of"
+        | "R8_after_transitivity"
+        | "R9_part_of_transitivity" => 2,
+        "R5_shared_is_a_target" | "R11_in_domain_shared_target" => 1,
+        _ => 1,
+    };
+
+    // 4. Subject-side preference.
+    if d.subject.root == noun {
+        score += 1;
+    }
+
+    score
+}
+
 fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
     // Every arm MUST include the marker stem «байланыс-» (or one of its
     // forms) so downstream consumers can distinguish a reasoning

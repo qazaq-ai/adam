@@ -7,6 +7,79 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.22] — 2026-04-24 — Reasoning chain reranker (Codex v4.0.19 review #3)
+
+Third patch acting on external Codex review. Replaces the "first match wins" derivation picker in `inject_reasoning_chain` with a scored ranker that prefers **curated + short + taxonomically-direct** chains and penalises **text-only + long + shared-target fan-out** derivations.
+
+### Problem
+
+Per Codex's v4.0.19 review, `Conversation::inject_reasoning_chain` selected the first derivation whose subject (then object) root matched the `noun_hint`. This is deterministic but semantically arbitrary — when multiple derivations exist for the same noun, the picker surfaced noisy ones:
+
+- «алматы күшке қатысты байланысы бар» — weak chain when cleaner curated alternatives available
+- «абай — халық» (pre-v4.0.2) — text-only IsA chain when world_core «абай — маман» existed
+- «қазақ тілі — айна» — weak proverb chain when R1 «қазақ тілі — белгі» (curated from language_features.jsonl) existed
+
+### Fix — `score_derivation` composite scoring
+
+New `fn score_derivation(d, noun) -> i32` at `conversation.rs:525`. Composite score terms:
+
+**Trust (source_chain provenance):**
+- All sources `world_core/*`: **+4** (fully curated)
+- Mixed world_core + text: +1
+- All text-only: **−2**
+- Empty chain (defensive): −2
+
+**Chain length:**
+- 0–1 sources: +2
+- 2 sources: +1
+- 3+: 0 (long chains drift)
+
+**Rule weight (Codex ordering):**
+- `R1_is_a_transitivity`, `R10_in_domain_inheritance`: **+3** (clean taxonomic)
+- `R2`, `R3`, `R6`, `R7`, `R8`, `R9`: +2 (mereological/temporal)
+- `R5_shared_is_a_target`, `R11_in_domain_shared_target`: **+1** (combinatorial fan-out — last resort)
+
+**Subject-side preference** (preserves pre-v4.0.22 subject-first picking): +1 if subject root matches `noun`.
+
+Tie-break by canonical triple `(subject, predicate, object)` for deterministic byte-identical runs.
+
+### Selection flow
+
+```
+filter:   noun-match on either subject or object + passes_safety (curated_only_reasoning gate)
+reduce:   max_by(score_derivation, then canonical-triple reverse tie-break)
+render:   render_derivation_as_kazakh (unchanged)
+```
+
+Result: for the same noun, a fully-curated R1 chain (score ≈ 10) always beats a mixed-source R5 chain (score ≈ 4).
+
+### Smoke-test with `adam_chat --safe`
+
+All curated-only picks are now surfacing their strongest chain:
+
+```
+> абай туралы айтшы
+Қолда бар деректерден байланыс құрастырдым: қорытынды: абай — маман (байланысты ой-тізбек арқылы).
+> махаббат туралы айтшы
+махаббат туралы мынадай байланыс анықтадым: махаббат пен мақтаныш бір-біріне байланысты екен.
+> алматы туралы айтшы
+Қолда бар деректерден байланыс құрастырдым: алматы еуразияға құрамына байланысты бір бөлігі ретінде шықты.
+> Қазақ тілі туралы айтшы
+Айтуыңыз бойынша, мынадай қисынды байланыс бар: қорытынды: қазақ тілі — белгі (байланысты ой-тізбек арқылы).
+```
+
+Before v4.0.22 the first query often produced «абай — халық» (text noise); the last query produced «қазақ тілі — айна» (proverb metaphor). Now both pick curated R1 chains.
+
+### Tests
+
+**488 passing** (+2 regression tests: `reranker_prefers_curated_over_text_only`, `reranker_prefers_shorter_chain`).
+
+### Scope
+
+One concern — derivation-selection ranking. No reasoner/extractor/data changes. Rendering layer (`render_derivation_as_kazakh`) untouched.
+
+---
+
 ## [4.0.21] — 2026-04-24 — Multi-word entity linker (Codex v4.0.19 review #2)
 
 Second release acting on Codex's v4.0.19 review. Addresses finding #2: multi-word concepts in world_core («Құс жолы», «Күн жүйесі», «Аспан денесі», «Қазақ тілі», …) were losing their referent at the dialog layer because the FST tokenizer splits the compound and `first_noun_root` picks only the first single-word token — so «Құс жолы туралы айтшы» replied about «құс» (bird) instead of Млечный путь.

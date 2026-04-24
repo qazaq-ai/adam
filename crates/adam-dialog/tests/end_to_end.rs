@@ -1175,6 +1175,144 @@ fn unknown_without_derived_facts_never_claims_chain() {
     }
 }
 
+/// v4.0.22 — Codex-reranker picks fully-curated chain over text-only
+/// when both are available for the same noun. Pre-v4.0.22 was "first
+/// match wins" which could surface noisy text-extracted chains.
+#[test]
+fn reranker_prefers_curated_over_text_only() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let text_only = DerivedFact {
+        subject: SlotRef {
+            surface: "кітап".into(),
+            root: "кітап".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::RelatedTo,
+        object: SlotRef {
+            surface: "өзен".into(),
+            root: "өзен".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R5_shared_is_a_target".into(),
+        source_chain: vec![
+            FactSource {
+                pack: "wikipedia_kz_pack.json".into(),
+                sample_id: "wiki_1".into(),
+            },
+            FactSource {
+                pack: "wikipedia_kz_pack.json".into(),
+                sample_id: "wiki_2".into(),
+            },
+        ],
+        confidence: ConfidenceKind::RuleInferred,
+    };
+    let curated = DerivedFact {
+        subject: SlotRef {
+            surface: "кітап".into(),
+            root: "кітап".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "құрал".into(),
+            root: "құрал".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/tools_household.jsonl".into(),
+            sample_id: "tool_014".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    };
+    // Feed text-only FIRST so "first match wins" would pick it.
+    let derived = vec![text_only, curated];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let out = conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
+    assert!(
+        out.contains("құрал"),
+        "reranker should pick curated chain (construct/tool), got: {out:?}"
+    );
+    assert!(
+        !out.contains("өзен"),
+        "reranker should NOT pick text-only river chain, got: {out:?}"
+    );
+}
+
+/// v4.0.22 — reranker prefers shorter curated chain when both are
+/// fully curated.
+#[test]
+fn reranker_prefers_shorter_chain() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let long_chain = DerivedFact {
+        subject: SlotRef {
+            surface: "кітап".into(),
+            root: "кітап".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::RelatedTo,
+        object: SlotRef {
+            surface: "сана".into(),
+            root: "сана".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R5_shared_is_a_target".into(),
+        source_chain: vec![
+            FactSource {
+                pack: "world_core/society.jsonl".into(),
+                sample_id: "soc_a".into(),
+            },
+            FactSource {
+                pack: "world_core/kz_literature.jsonl".into(),
+                sample_id: "lit_b".into(),
+            },
+            FactSource {
+                pack: "world_core/proverbs.jsonl".into(),
+                sample_id: "prov_c".into(),
+            },
+        ],
+        confidence: ConfidenceKind::RuleInferred,
+    };
+    let short_chain = DerivedFact {
+        subject: SlotRef {
+            surface: "кітап".into(),
+            root: "кітап".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "құрал".into(),
+            root: "құрал".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/tools_household.jsonl".into(),
+            sample_id: "tool_014".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    };
+    let derived = vec![long_chain, short_chain];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let out = conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
+    assert!(
+        out.contains("құрал"),
+        "reranker should pick shorter R1 curated chain, got: {out:?}"
+    );
+}
+
 /// Without an attached index, the Unknown fallback keeps the v1.1.0
 /// noun-echo behaviour — no retrieval side-effects, no crashes.
 #[test]
