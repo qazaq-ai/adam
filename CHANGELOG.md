@@ -7,6 +7,94 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.23] — 2026-04-24 — R5 overbroad-hub guard (Codex v4.0.19 review #4) — final Codex-review patch
+
+Fourth and final patch acting on external Codex review. Addresses finding #4: "широкие хабы вроде `адам`, `ғылым`, `жануар` дают формально допустимые, но прагматически слабые выводы". R5 shared-IsA through an abstract "everything-is-one" hub produces pairs that are true but cognitively weak — «отын RelatedTo сусын» because both IsA зат, «ашу RelatedTo махаббат» because both IsA сезім.
+
+### Audit (pre-patch v4.0.22)
+
+Data-driven classification of 15 621 R5 derivations by hub:
+
+| hub | R5 pairs | verdict |
+|---|---:|---|
+| **маман** | 1 765 | information-bearing (profession cluster) — keep |
+| **құрал** | 325 | information-bearing (tools) — keep |
+| сан | 297 | numeric — keep |
+| **жануар** | 183 | information-bearing (zoology) — keep |
+| түс | 170 | information-bearing (colors) — keep |
+| тағам | 148 | information-bearing (food) — keep |
+| **сезім** | 135 | emotions — keep (designed axis at v4.0.12) |
+| **құбылыс** | **135** | overbroad — **block** |
+| туыс | 105 | information-bearing (kin) — keep |
+| көлік | 88 | information-bearing (transport) — keep |
+| мүше | 77 | information-bearing (body parts) — keep |
+| шикізат | 77 | information-bearing (materials) — keep |
+| құс | 66 | information-bearing (birds) — keep |
+| **әрекет** | **66** | overbroad — **block** |
+| ыдыс | 54 | information-bearing (vessels) — keep |
+| **белгі** | **45** | overbroad — **block** |
+| **зат** | **20** | overbroad (most abstract "thing") — **block** |
+| … | … | … |
+| **адам** | ~adjusted ~400 via cross-cluster bridges | overbroad per Codex — **block** |
+
+### Fix
+
+New `is_overbroad_r5_hub(root)` guard in `reasoner.rs`. Blocks 5 semantically-abstract hubs: **зат, белгі, әрекет, құбылыс, адам**. Applied at the R5 hub-iteration site — skips the whole hub before enumerating incoming-IsA pairs.
+
+```rust
+fn is_overbroad_r5_hub(root: &str) -> bool {
+    matches!(root, "зат" | "белгі" | "әрекет" | "құбылыс" | "адам")
+}
+```
+
+The адам inclusion is the biggest design call. Codex named it explicitly. The kin cluster (v4.0.19 batch) linked through «туыс IsA адам» bridge, and R5 generated ~400 cross-cluster pairs like «ана RelatedTo жолаушы» (mother related to passenger — weak). Blocking адам at R5 preserves touch-chain IsA knowledge but stops the combinatorial fan-out.
+
+маман / жануар / ғылым (which Codex also named) are **kept** — those hubs do produce meaningful pairs. «аспаз RelatedTo наубайшы» (cook ↔ baker) is cognitively useful; «астрономия RelatedTo математика» is domain-adjacent. The distinction is information-bearing (маман = specific profession type) vs. overbroad (адам = "any human").
+
+### Measured delta
+
+| | v4.0.22 | v4.0.23 | delta |
+|---|---:|---:|---|
+| **R5 shared_is_a_target** | **15 621** | **13 566** | **−2 055 (−13.2 %)** |
+| **derivations total** | 19 395 | **17 340** | **−2 055** |
+| R1–R4, R6–R11 | unchanged | unchanged | 0 |
+| Graph nodes / edges | 3 515 / 13 725 | 3 515 / 13 725 | 0 (base facts unchanged) |
+
+### Tests
+
+**490 passing** (+2 regression tests: `r5_skips_overbroad_hubs` verifies all 5 blocked hubs, `r5_still_fires_for_information_bearing_hubs` verifies 5 preserved hubs — маман, жануар, құрал, ғылым, түс).
+
+### Scope
+
+One concern — R5 source-level noise filter on 5 overbroad hubs. No extractor / data / rendering / reranker changes. Base fact graph unaffected.
+
+### Codex v4.0.19 review — 4/4 completed
+
+| recommendation | patch | status |
+|---|---|---|
+| #1 Lexicon sync | v4.0.20 | ✅ done |
+| #2 Multi-word entity linker | v4.0.21 | ✅ done |
+| #3 Reasoning chain reranker | v4.0.22 | ✅ done |
+| #4 Tighten broad-hub rule guards | v4.0.23 | ✅ done |
+| #5 Learned component | — | out of scope per `project_v4_direction` |
+| #6 Generator model | — | out of scope per `project_retrieval_not_neural_v2` |
+
+### Cumulative v4.0.7 → v4.0.23 (17 releases)
+
+| | v4.0.7 | v4.0.23 | delta |
+|---|---:|---:|---|
+| Active reasoning rules | 7 | **10** | +3 |
+| World Core domains | 14 | **29** | +15 |
+| Lexicon curated roots | 4 432 | **4 702** | +270 |
+| facts.json total | 13 745 | **15 448** | +1 703 |
+| **Derivations** | **7 866** | **17 340** | **+9 474 (+120.4 %)** |
+| Graph nodes / edges | 3 315 / 12 350 | **3 515 / 13 725** | +200 / +1 375 |
+| Tests | 463 | **490** | +27 |
+
+Derivations **2.2×** baseline after Codex-review cleanup removed overbroad R5 noise.
+
+---
+
 ## [4.0.22] — 2026-04-24 — Reasoning chain reranker (Codex v4.0.19 review #3)
 
 Third patch acting on external Codex review. Replaces the "first match wins" derivation picker in `inject_reasoning_chain` with a scored ranker that prefers **curated + short + taxonomically-direct** chains and penalises **text-only + long + shared-target fan-out** derivations.

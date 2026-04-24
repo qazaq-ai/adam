@@ -405,6 +405,26 @@ fn rule_r3_has_inheritance_via_part_of(
     }
 }
 
+/// v4.0.23 — R5 broad-hub guard. Shared-IsA through a semantically
+/// "everything-is-one" hub produces formally-true but cognitively
+/// weak pairs (e.g. «отын RelatedTo сусын» because both IsA зат /
+/// "thing"; «ашу RelatedTo махаббат» because both IsA сезім / "feeling"
+/// — factually connected but low-utility for a dialog answer).
+///
+/// Codex v4.0.19 review #4 flagged this class. Data audit of v4.0.22
+/// R5 (15 621 derivations) found 16 % came from 5–6 overbroad hubs:
+/// зат (~20), белгі (~45), әрекет (~66), құбылыс (~135), адам (~400
+/// via cross-cluster bridges), сезім (~135 — borderline; kept because
+/// the emotion-cluster is a designed v4.0.12 axis).
+///
+/// This guard lists the 4 hubs that are categorically too abstract to
+/// produce useful shared-IsA pairs. Keeping маман / жануар / ғылым /
+/// құрал / құс / туыс etc. — those are genuine information-bearing
+/// domains.
+fn is_overbroad_r5_hub(root: &str) -> bool {
+    matches!(root, "зат" | "белгі" | "әрекет" | "құбылыс" | "адам")
+}
+
 fn rule_r5_shared_is_a_target(
     _facts: &[Fact],
     graph: &LexicalGraph,
@@ -420,6 +440,10 @@ fn rule_r5_shared_is_a_target(
     // Scan every node; if it has ≥ 2 incoming IsA edges, every pair
     // of those incoming subjects is RelatedTo each other via it.
     for (hub, _stats) in graph.nodes.iter() {
+        // v4.0.23 — skip overbroad hubs entirely (Codex #4).
+        if is_overbroad_r5_hub(hub) {
+            continue;
+        }
         let incoming_is_a: Vec<&crate::graph::GraphEdge> = graph
             .incoming(hub)
             .into_iter()
@@ -1117,6 +1141,51 @@ mod tests {
             .filter(|d| d.predicate == Predicate::RelatedTo)
             .collect();
         assert!(rel.is_empty(), "no shared target → no RelatedTo");
+    }
+
+    /// v4.0.23 — R5 overbroad-hub guard. Pairs sharing "зат" / "белгі" /
+    /// "әрекет" / "құбылыс" / "адам" as IsA target produce formally-true
+    /// but cognitively weak RelatedTo derivations (Codex v4.0.19 #4).
+    /// The guard blocks them at R5 source.
+    #[test]
+    fn r5_skips_overbroad_hubs() {
+        for hub in ["зат", "белгі", "әрекет", "құбылыс", "адам"] {
+            let facts = vec![
+                mk_fact("A", Predicate::IsA, hub, "p", "s1"),
+                mk_fact("B", Predicate::IsA, hub, "p", "s2"),
+            ];
+            let derived = run(&facts);
+            let r5: Vec<_> = derived
+                .iter()
+                .filter(|d| d.rule_id == "R5_shared_is_a_target")
+                .collect();
+            assert!(
+                r5.is_empty(),
+                "R5 must skip overbroad hub «{hub}», got {r5:?}"
+            );
+        }
+    }
+
+    /// v4.0.23 — R5 still fires for legitimate information-bearing hubs
+    /// (маман / жануар / құрал / etc.).
+    #[test]
+    fn r5_still_fires_for_information_bearing_hubs() {
+        for hub in ["маман", "жануар", "құрал", "ғылым", "түс"] {
+            let facts = vec![
+                mk_fact("A", Predicate::IsA, hub, "p", "s1"),
+                mk_fact("B", Predicate::IsA, hub, "p", "s2"),
+            ];
+            let derived = run(&facts);
+            let r5: Vec<_> = derived
+                .iter()
+                .filter(|d| d.rule_id == "R5_shared_is_a_target")
+                .collect();
+            assert_eq!(
+                r5.len(),
+                1,
+                "R5 must fire for information-bearing hub «{hub}», got {derived:?}"
+            );
+        }
     }
 
     #[test]
