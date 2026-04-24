@@ -62,10 +62,7 @@ use std::{
     process::ExitCode,
 };
 
-use adam_dialog::{
-    ComposeMode, Conversation, TemplateRepository, interpret_text_with_lexicon,
-    plan_response_with_session, realise,
-};
+use adam_dialog::{ComposeMode, Conversation, TemplateRepository};
 use adam_kernel_fst::lexicon::LexiconV1;
 use adam_reasoning::{Fact as ReasFact, reasoner::DerivedFact};
 use adam_retrieval::MorphemeIndex;
@@ -234,58 +231,25 @@ fn run_turn(
     seed: u64,
 ) {
     if trace {
-        // Trace mode has to duplicate Conversation::turn so we can
-        // surface intermediate state. Functionally identical up to the
-        // retrieval/compose injection (which only fires inside turn()).
-        let parses: Vec<_> = input
-            .split_whitespace()
-            .flat_map(|t| {
-                let cleaned: String = t
-                    .chars()
-                    .filter(|c| c.is_alphabetic() || *c == '-')
-                    .collect::<String>()
-                    .to_lowercase();
-                adam_kernel_fst::parser::analyse(&cleaned, lex)
-                    .into_iter()
-                    .next()
-            })
-            .collect();
-        let intent = interpret_text_with_lexicon(input, &parses, Some(lex));
-        absorb_into(conv, &intent);
-        let plan = plan_response_with_session(&intent, seed, repo, &conv.session);
-        let out = realise(&plan);
+        // v4.0.25 — trace through the REAL runtime path via
+        // `turn_with_trace`. Pre-v4.0.25 this branch manually
+        // re-implemented turn() but stopped before
+        // `inject_retrieval_example` / `inject_reasoning_chain`, so
+        // `--trace` output was materially false for v4.0.20+ features
+        // (Codex v4.0.23 re-review #2). Now trace prints the
+        // post-injection intent — the exact state the planner saw.
+        let (out, trace) = conv.turn_with_trace(input, lex, repo, seed);
         println!("┌─ input:    {input}");
-        println!("├─ parses:   {parses:#?}");
-        println!("├─ intent:   {intent:?}");
-        println!("├─ session:  {:?}", conv.session);
-        for t in &plan.trace {
+        println!("├─ parses:   {:#?}", trace.parses);
+        println!("├─ intent:   {:?}", trace.intent_after_injection);
+        println!("├─ session:  {:?}", trace.session_snapshot);
+        for t in &trace.plan_trace {
             println!("├─ {t}");
         }
         println!("└─ output:   {out}");
     } else {
         let out = conv.turn(input, lex, repo, seed);
         println!("{out}");
-    }
-}
-
-fn absorb_into(conv: &mut Conversation, intent: &adam_dialog::Intent) {
-    use adam_dialog::Intent;
-    match intent {
-        Intent::StatementOfName { name } => {
-            conv.session.insert("name".into(), name.clone());
-        }
-        Intent::StatementOfAge { years: Some(years) } => {
-            conv.session.insert("age".into(), years.to_string());
-        }
-        Intent::StatementOfLocation { city: Some(city) } => {
-            conv.session.insert("city".into(), city.clone());
-        }
-        Intent::StatementOfOccupation {
-            occupation: Some(occupation),
-        } => {
-            conv.session.insert("occupation".into(), occupation.clone());
-        }
-        _ => {}
     }
 }
 

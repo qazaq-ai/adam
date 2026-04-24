@@ -1327,6 +1327,70 @@ fn reranker_prefers_is_a_over_other_predicates_on_tied_score() {
     );
 }
 
+/// v4.0.25 — `Conversation::turn_with_trace` must expose the **post-
+/// injection** intent (with `reasoning_chain` and/or `example`
+/// populated by v4.0.20+ features). Codex v4.0.23 re-review #2 flagged
+/// that the pre-v4.0.25 `adam_chat --trace` mode manually duplicated
+/// `turn()` and stopped before the injection calls, so trace output
+/// was materially false.
+#[test]
+fn turn_with_trace_returns_post_injection_intent() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "кітап".into(),
+            root: "кітап".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "құрал".into(),
+            root: "құрал".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/tools_household.jsonl".into(),
+            sample_id: "tool_014".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let (out, trace) = conv.turn_with_trace("кітап туралы бірдеңе айт", &lex, &repo, 0);
+
+    // Baseline: output and trace must agree — no divergence between
+    // real pipeline and what trace says happened.
+    assert!(
+        !out.is_empty(),
+        "turn_with_trace must produce a non-empty output"
+    );
+
+    // Key assertion: trace.intent_after_injection has `reasoning_chain`
+    // populated because inject_reasoning_chain ran. Pre-v4.0.25 trace
+    // would have shown `reasoning_chain: None` here.
+    if let adam_dialog::Intent::Unknown {
+        reasoning_chain, ..
+    } = &trace.intent_after_injection
+    {
+        assert!(
+            reasoning_chain.is_some(),
+            "trace.intent_after_injection must carry the injected reasoning_chain, got {:?}",
+            reasoning_chain
+        );
+    } else {
+        panic!(
+            "expected Intent::Unknown in trace, got {:?}",
+            trace.intent_after_injection
+        );
+    }
+}
+
 /// v4.0.22 — reranker prefers shorter curated chain when both are
 /// fully curated.
 #[test]

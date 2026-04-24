@@ -113,6 +113,27 @@ pub struct Conversation {
     pub curated_only_reasoning: bool,
 }
 
+/// v4.0.25 — intermediate state captured by
+/// [`Conversation::turn_with_trace`]. Each field is the authoritative
+/// post-injection snapshot used to drive the final template render.
+///
+/// Exposed so CLI `--trace` mode surfaces the real runtime path
+/// (including `reasoning_chain` and `example` slots populated by
+/// `inject_reasoning_chain` / `inject_retrieval_example`) instead of
+/// a pre-injection placeholder.
+#[derive(Debug, Clone)]
+pub struct TurnTrace {
+    /// FST parses for each token in the raw input.
+    pub parses: Vec<adam_kernel_fst::parser::Analysis>,
+    /// Intent after follow-up resolution AND retrieval/reasoning
+    /// injection — this is the shape the planner actually saw.
+    pub intent_after_injection: Intent,
+    /// Session slot snapshot taken immediately after entity absorption.
+    pub session_snapshot: HashMap<String, String>,
+    /// Per-step plan trace emitted by `plan_response_with_session`.
+    pub plan_trace: Vec<String>,
+}
+
 /// Lightweight "kind" summary of an `Intent` — the payload (name /
 /// years / city / …) is already held in `slots`, so history doesn't
 /// need to copy it. Keeping this separate from `intent::Intent` avoids
@@ -252,6 +273,29 @@ impl Conversation {
         repo: &TemplateRepository,
         rng_seed: u64,
     ) -> String {
+        let (out, _) = self.turn_with_trace(input, lexicon, repo, rng_seed);
+        out
+    }
+
+    /// v4.0.25 — trace-aware variant of [`turn`]. Identical runtime
+    /// behaviour (same state mutation, same output); additionally
+    /// returns a [`TurnTrace`] capturing the intermediate state
+    /// **after** retrieval + reasoning-chain injection, so consumers
+    /// like `adam_chat --trace` can print the real runtime path.
+    ///
+    /// Codex v4.0.23 re-review #2 flagged that the pre-v4.0.25 trace
+    /// mode manually duplicated `turn` but stopped before
+    /// `inject_retrieval_example` + `inject_reasoning_chain`, making
+    /// trace output materially false for v4.0.20+ features. This
+    /// method closes that gap by making trace a first-class output
+    /// of the single canonical code path.
+    pub fn turn_with_trace(
+        &mut self,
+        input: &str,
+        lexicon: &LexiconV1,
+        repo: &TemplateRepository,
+        rng_seed: u64,
+    ) -> (String, TurnTrace) {
         let parses = crate::parse_input_public(input, lexicon);
         let raw_intent = interpret_text_with_lexicon(input, &parses, Some(lexicon));
 
@@ -276,7 +320,14 @@ impl Conversation {
         self.absorb_entities(&intent);
         self.record_intent(&intent);
         let plan = plan_response_with_session(&intent, rng_seed, repo, &self.session);
-        realise(&plan)
+        let output = realise(&plan);
+        let trace = TurnTrace {
+            parses,
+            intent_after_injection: intent,
+            session_snapshot: self.session.clone(),
+            plan_trace: plan.trace.clone(),
+        };
+        (output, trace)
     }
 
     /// v2.7: for `Intent::Unknown { noun_hint: Some(n), .. }`, scan

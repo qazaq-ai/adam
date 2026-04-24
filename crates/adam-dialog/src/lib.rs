@@ -35,7 +35,7 @@ pub mod semantics;
 pub mod slot_syntax;
 pub mod templates;
 
-pub use conversation::{ComposeMode, Conversation, IntentKind};
+pub use conversation::{ComposeMode, Conversation, IntentKind, TurnTrace};
 pub use intent::{GreetingKind, Intent, SubjectPerson};
 pub use planner::{
     ResponsePlan, intent_key, plan_response, plan_response_with_repo, plan_response_with_session,

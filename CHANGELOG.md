@@ -7,6 +7,78 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.25] — 2026-04-24 — `adam_chat --trace` reflects the real runtime path (Codex v4.0.23 re-review #2)
+
+Second patch on Codex's repeat external review. Closes finding #2 — the pre-v4.0.25 `--trace` mode was materially false for every feature added after v4.0.20.
+
+### Problem
+
+`adam_chat --trace` manually re-implemented `Conversation::turn` so it could surface intermediate state, but stopped BEFORE calling `inject_retrieval_example` + `inject_reasoning_chain`. Consequence: trace always printed `reasoning_chain: None`, `example: None`, and fell through to `unknown.with_noun`, even when the real runtime produced a reasoning chain. Since auditability is a core contract for this project, this was a visible integrity gap.
+
+### Fix
+
+New public API on `Conversation`:
+
+```rust
+pub struct TurnTrace {
+    pub parses: Vec<Analysis>,
+    pub intent_after_injection: Intent,
+    pub session_snapshot: HashMap<String, String>,
+    pub plan_trace: Vec<String>,
+}
+
+pub fn turn_with_trace(&mut self, input, lex, repo, seed)
+    -> (String, TurnTrace)
+```
+
+`turn_with_trace` is the new canonical implementation — it runs the full pipeline (follow-up resolution → retrieval injection → reasoning-chain injection → entity absorb → plan → realise) and returns the output **plus** the post-injection trace. The existing `turn` method is now a thin `let (out, _) = self.turn_with_trace(...); out` delegate — no code duplication.
+
+`adam_chat.rs --trace` now calls `turn_with_trace` directly and prints:
+- FST parses
+- `intent_after_injection` — the real intent the planner saw (with `reasoning_chain` / `example` populated)
+- session snapshot
+- per-step `plan_trace`
+- output
+
+`TurnTrace` is re-exported from the dialog crate public surface so embedders can also consume it.
+
+### Smoke-test
+
+Pre-v4.0.25:
+```
+adam_chat --trace --once 'Құс жолы туралы айтшы'
+→ intent: Unknown { ..., noun_hint: Some("құс жолы"), reasoning_chain: None, ... }
+→ planner: template_key=unknown.with_noun
+→ output: ах, құс жолы туралы айтасыз ба
+```
+
+But the non-trace run produced: `output: құс жолы туралы мынадай байланыс анықтадым: ой-тізбек: құс жолы жұлдызға қатысты...`
+
+Post-v4.0.25 (trace agrees with non-trace):
+```
+├─ intent:   Unknown { ..., noun_hint: Some("құс жолы"),
+│                     example: Some("..."),
+│                     reasoning_chain: Some("ой-тізбек: құс жолы жұлдызға қатысты...") }
+├─ planner: template_key=unknown.with_derived_chain
+└─ output:   құс жолы туралы мынадай байланыс анықтадым: ой-тізбек: құс жолы жұлдызға қатысты байланысы бар ...
+```
+
+Trace now matches real runtime output byte-for-byte.
+
+### Cleanup
+
+`adam_chat.rs` lost the now-unused `absorb_into` helper (~20 lines) and three stale imports (`interpret_text_with_lexicon`, `plan_response_with_session`, `realise`). The trace path is ~20 lines shorter and uses only the Conversation public API.
+
+### Tests
+
+**493 passing** (+1 regression `turn_with_trace_returns_post_injection_intent` — asserts `reasoning_chain` is populated in the trace's intent).
+
+### Scope
+
+One concern — trace auditability. No data / reasoner / extractor changes. `Conversation::turn` behaviour byte-identical (delegates to new `turn_with_trace`).
+
+---
+
 ## [4.0.24] — 2026-04-24 — Reranker tie-break fix (Codex v4.0.23 re-review #1)
 
 First patch acting on Codex's v4.0.23 **repeat** external review. Closes finding #1 — the v4.0.22 reranker still picked semantically weaker curated chains when multiple candidates tied at the top score.
