@@ -1418,6 +1418,49 @@ fn contradictory_city_statements_produce_belief_conflict() {
     }
 }
 
+/// v4.0.28 — Codex v4.0.27 review #1 regression at the integration
+/// layer. Through `Conversation::turn`, the user sequence
+/// `city=X → city=X → city=Y` must end with `active_fact() == None`
+/// (contradiction detected, all prior actives retired). Pre-v4.0.28
+/// the first copy remained `Active`, so any downstream consumer
+/// reading `active_fact()` saw a stale winner that disagreed with
+/// the conflict log.
+#[test]
+fn same_same_different_city_leaves_no_active_fact_via_conversation() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 1);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 2);
+
+    use adam_dialog::{FactStatus, USER_SELF_KEY};
+    let active_after = conv.belief.active_fact(USER_SELF_KEY, "city");
+    assert!(
+        active_after.is_none(),
+        "after same→same→different, active_fact must be None, got {:?}",
+        active_after
+    );
+    let city_statuses: Vec<FactStatus> = conv
+        .belief
+        .facts
+        .iter()
+        .filter(|f| f.predicate == "city")
+        .map(|f| f.status)
+        .collect();
+    assert_eq!(
+        city_statuses
+            .iter()
+            .filter(|s| **s == FactStatus::Active)
+            .count(),
+        0,
+        "zero Active city facts expected; got statuses {:?}",
+        city_statuses
+    );
+    assert_eq!(conv.belief.contradictions.len(), 1);
+}
+
 /// v4.0.27 — `TurnTrace` now carries a belief snapshot + digest so
 /// `adam_chat --trace` can audit what the belief layer learned on
 /// each turn.

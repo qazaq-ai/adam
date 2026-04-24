@@ -198,14 +198,29 @@ impl BeliefState {
     }
 
     /// Record a fact the **user** just stated, with contradiction
-    /// detection. If a previous `Active` fact for
-    /// `(subject, predicate)` exists with a different object, the
-    /// old fact is flagged [`FactStatus::Contested`], the new fact
-    /// is recorded as [`FactStatus::Contested`] too, and a
-    /// [`BeliefConflict`] + [`PendingQuestion`] are pushed. When the
-    /// new object matches the previous one, the old fact is
-    /// refreshed (still `Active`) and no conflict is logged —
-    /// repeated restatement isn't a disagreement.
+    /// detection, enforcing the **single-active-fact invariant**:
+    /// at most one `Active` fact per `(subject, predicate)` at any
+    /// time. Turn-by-turn behaviour:
+    ///
+    /// - **New fact** (no prior active entries): append as `Active`.
+    /// - **Restatement of the same value**: mark every prior `Active`
+    ///   copy as `Superseded`, append the new one as `Active`. No
+    ///   conflict is logged — restatement isn't disagreement — but the
+    ///   count of active facts remains exactly 1.
+    /// - **Disagreement with any prior active value**: mark every
+    ///   prior `Active` copy as `Contested`, append the new one as
+    ///   `Contested`, log a `BeliefConflict` against the first
+    ///   disagreeing prior fact, and push a
+    ///   `PendingQuestion::ContradictionToResolve`. After this, there
+    ///   are **zero** active facts for the `(subject, predicate)`.
+    ///
+    /// v4.0.28 — pre-v4.0.28 only flipped the most recent active fact
+    /// (Codex v4.0.27 review #1). In the mixed sequence
+    /// `value₁ → value₁ → value₂` the first copy was left `Active`
+    /// even though a contradiction had been detected, so
+    /// `active_fact()` could still return `Some(value₁)`. The fix
+    /// flips **every** prior active fact, so the invariant holds
+    /// regardless of restatement history.
     ///
     /// Returns the index of the newly-inserted fact in `self.facts`.
     pub fn record_user_fact(
@@ -215,22 +230,39 @@ impl BeliefState {
         object: &str,
         turn_id: usize,
     ) -> usize {
-        let prior_idx = self.facts.iter().enumerate().rposition(|(_, f)| {
-            f.subject == subject && f.predicate == predicate && f.status == FactStatus::Active
-        });
+        // Snapshot every currently-active fact for this
+        // (subject, predicate). In steady state there is at most one
+        // (by invariant), but legacy data or a future writer that
+        // forgets the invariant could hold more.
+        let prior_active_indices: Vec<usize> = self
+            .facts
+            .iter()
+            .enumerate()
+            .filter(|(_, f)| {
+                f.subject == subject && f.predicate == predicate && f.status == FactStatus::Active
+            })
+            .map(|(i, _)| i)
+            .collect();
 
-        let new_status = match prior_idx {
-            Some(idx) if self.facts[idx].object == object => FactStatus::Active,
-            Some(idx) => {
-                // Repeated statement with a different value — flag
-                // both as contested. The old fact stays in place so
-                // provenance survives; the new one is stored next
-                // so consumers can inspect both sides.
-                self.facts[idx].status = FactStatus::Contested;
-                FactStatus::Contested
-            }
-            None => FactStatus::Active,
+        // First disagreeing prior fact, if any — drives conflict
+        // logging. Returned by iteration order so the oldest
+        // disagreement wins as `fact_a` (stable across runs).
+        let disagreement_idx = prior_active_indices
+            .iter()
+            .copied()
+            .find(|&i| self.facts[i].object != object);
+
+        let (new_status, mark_prior_as) = if disagreement_idx.is_some() {
+            (FactStatus::Contested, FactStatus::Contested)
+        } else {
+            (FactStatus::Active, FactStatus::Superseded)
         };
+
+        // Flip every prior active fact in one sweep. This is the
+        // v4.0.28 invariant-preserving step.
+        for idx in &prior_active_indices {
+            self.facts[*idx].status = mark_prior_as;
+        }
 
         let fact = BeliefFact {
             subject: subject.to_string(),
@@ -244,25 +276,23 @@ impl BeliefState {
         let new_idx = self.facts.len();
         self.facts.push(fact);
 
-        if let Some(old_idx) = prior_idx {
-            if self.facts[old_idx].object != self.facts[new_idx].object {
-                self.contradictions.push(BeliefConflict {
-                    subject: subject.to_string(),
+        if let Some(dis_idx) = disagreement_idx {
+            self.contradictions.push(BeliefConflict {
+                subject: subject.to_string(),
+                predicate: predicate.to_string(),
+                fact_a_index: dis_idx,
+                fact_b_index: new_idx,
+                detected_at_turn: turn_id,
+            });
+            self.pending_questions.push(PendingQuestion {
+                raised_at_turn: turn_id,
+                about: subject.to_string(),
+                nature: QuestionNature::ContradictionToResolve {
                     predicate: predicate.to_string(),
-                    fact_a_index: old_idx,
-                    fact_b_index: new_idx,
-                    detected_at_turn: turn_id,
-                });
-                self.pending_questions.push(PendingQuestion {
-                    raised_at_turn: turn_id,
-                    about: subject.to_string(),
-                    nature: QuestionNature::ContradictionToResolve {
-                        predicate: predicate.to_string(),
-                        old_value: self.facts[old_idx].object.clone(),
-                        new_value: self.facts[new_idx].object.clone(),
-                    },
-                });
-            }
+                    old_value: self.facts[dis_idx].object.clone(),
+                    new_value: self.facts[new_idx].object.clone(),
+                },
+            });
         }
 
         new_idx
@@ -358,16 +388,62 @@ mod tests {
         assert!(b.pending_questions.is_empty());
     }
 
+    /// v4.0.28 — restatement of the same value must not create a
+    /// conflict, but the single-active-fact invariant means the
+    /// earlier copy is marked `Superseded` rather than kept `Active`.
     #[test]
-    fn repeated_same_value_does_not_create_conflict() {
+    fn repeated_same_value_preserves_single_active_invariant() {
         let mut b = BeliefState::new();
         b.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
         b.record_user_fact(USER_SELF_KEY, "city", "алматы", 3);
         assert_eq!(b.facts.len(), 2);
-        // Restatement stays Active on both sides.
-        assert!(b.facts.iter().all(|f| f.status == FactStatus::Active));
+        assert_eq!(b.facts[0].status, FactStatus::Superseded);
+        assert_eq!(b.facts[1].status, FactStatus::Active);
         assert!(b.contradictions.is_empty());
         assert!(b.pending_questions.is_empty());
+        assert_eq!(
+            b.facts
+                .iter()
+                .filter(|f| f.status == FactStatus::Active)
+                .count(),
+            1
+        );
+    }
+
+    /// v4.0.28 — Codex v4.0.27 review #1 regression. Mixed sequence
+    /// `value → same value → different value` must end with ZERO
+    /// active facts for the `(subject, predicate)` pair. Pre-v4.0.28
+    /// the first copy was left `Active` because `record_user_fact`
+    /// only contested the most recent active entry — downstream
+    /// `active_fact()` could return a stale winner even after a
+    /// contradiction was logged, which would break Phase 2+ (Task,
+    /// Action, Verifier) that trust `active_fact()` as authoritative.
+    #[test]
+    fn same_same_different_leaves_no_active_fact() {
+        let mut b = BeliefState::new();
+        b.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        b.record_user_fact(USER_SELF_KEY, "city", "алматы", 1);
+        b.record_user_fact(USER_SELF_KEY, "city", "астана", 2);
+
+        assert_eq!(b.facts.len(), 3);
+        assert!(
+            b.active_fact(USER_SELF_KEY, "city").is_none(),
+            "after contradiction, active_fact() must be None — got {:?}",
+            b.active_fact(USER_SELF_KEY, "city")
+        );
+        let active_count = b
+            .facts
+            .iter()
+            .filter(|f| f.status == FactStatus::Active)
+            .count();
+        assert_eq!(
+            active_count,
+            0,
+            "active count must be 0, got {active_count}; statuses={:?}",
+            b.facts.iter().map(|f| f.status).collect::<Vec<_>>()
+        );
+        assert_eq!(b.contradictions.len(), 1);
+        assert_eq!(b.pending_questions.len(), 1);
     }
 
     #[test]

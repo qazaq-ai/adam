@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.28] — 2026-04-24 — BeliefState single-active-fact invariant fix (Codex v4.0.27 review #1)
+
+Codex's v4.0.27 review identified a real invariant bug in the Phase 1 foundation before we proceeded to Phase 2. Fixing this is a blocker — Phases 2+ (`TaskState`, `ActionPlanner`, `Verifier`) will trust `BeliefState::active_fact()` as authoritative. If that returns a stale winner after a contradiction, every later phase inherits the bug.
+
+### The bug
+
+Sequence `value → same value → different value` broke the advertised single-active invariant.
+
+Pre-v4.0.28 `record_user_fact` used `rposition` to find the **most recent** active fact and flipped only that one. For `алматы → алматы → астана`:
+
+1. `алматы` → fact[0] Active.
+2. `алматы` (same) → fact[1] Active. **fact[0] still Active** (no-op path skipped updating it).
+3. `астана` (different) → fact[1] flipped to Contested, fact[2] Contested. **fact[0] stays Active.**
+
+Result: `active_fact(self, "city") → Some("алматы")` even though a contradiction was logged. Codex reproduced this independently.
+
+### Fix
+
+Rewrote `record_user_fact` to snapshot **every** prior active fact for the `(subject, predicate)` pair and flip them all in one sweep:
+
+```rust
+let prior_active_indices: Vec<usize> = /* all Active for (subj, pred) */;
+let disagreement_idx = prior_active_indices.iter().copied()
+    .find(|&i| self.facts[i].object != object);
+let (new_status, mark_prior_as) = if disagreement_idx.is_some() {
+    (FactStatus::Contested, FactStatus::Contested)
+} else {
+    (FactStatus::Active, FactStatus::Superseded)
+};
+for idx in &prior_active_indices {
+    self.facts[*idx].status = mark_prior_as;
+}
+```
+
+### Semantic rules (post-fix)
+
+| prior active state | new statement | outcome |
+|---|---|---|
+| none | any value | new fact Active |
+| one with same value | same value | **old → Superseded**, new Active (was: both Active) |
+| one with different value | different value | old → Contested, new Contested, conflict logged |
+| `same → same → different` sequence | (as above) | **all three non-Active** after final turn, zero active facts |
+
+The invariant — "at most one `Active` fact per `(subject, predicate)` at any point" — now holds by construction.
+
+### Tests
+
+**505 passing** (+2 from v4.0.27):
+
+- Renamed + tightened `repeated_same_value_preserves_single_active_invariant` — now asserts `fact[0] Superseded, fact[1] Active` (was: both Active, which was the buggy behaviour).
+- New `same_same_different_leaves_no_active_fact` (unit, in `belief.rs`) — Codex's exact repro path: asserts `active_fact() == None` + 0 active + 1 conflict + 1 pending after the sequence.
+- New `same_same_different_city_leaves_no_active_fact_via_conversation` (integration, in `end_to_end.rs`) — same scenario through the full `Conversation::turn` pipeline.
+
+### Scope
+
+One concern — invariant correctness in the substrate. No new public API, no data changes. `active_fact()` and `digest()` signatures untouched.
+
+### Next
+
+With the invariant holding, Phase 2 (TaskState + Goal layer) can proceed on stable ground.
+
+---
+
 ## [4.0.27] — 2026-04-24 — BeliefState foundation (Codex v4.0.26 roadmap Phase 1)
 
 First architectural patch on Codex's v4.0.26 v5.0 roadmap. Begins the shift from "reactive answering" to "goal-directed cognition" by giving the dialog a structured belief state alongside the legacy flat session map. **Non-breaking** — existing template-slot consumers keep reading from `self.session`; the new belief-aware paths read from `self.belief`.
