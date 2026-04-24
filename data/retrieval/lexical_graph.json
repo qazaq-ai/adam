@@ -1,9 +1,9 @@
 {
-  "version": "4.0.7",
+  "version": "4.0.8",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
-  "built_from_status": "completed",
+  "built_from_status": "world_core_refresh",
   "summary": {
     "total_nodes": 3315,
     "total_edges": 12350,

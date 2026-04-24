@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.7-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.8-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -67,7 +67,7 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | Dialog intents | 26 |
 | Lexicon roots | 14 247 |
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
-| **World Core (v4.0.7)** | **549 entries / 643 curated facts** across 14 domains: astronomy (30 / 41), time (20 / 38), geography_kz (30 / 47), biology_basic (40 / 41), body_parts (40 / 55), society (40 / 48), colors (37 / 38), numbers (45 / 54), kz_literature (60 / 69), food (50 / 50), clothing (35 / 35), proverbs (40 / 43), animals (40 / 42), **transport (42 / 42)** — bolded is new in v4.0.7. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
+| **World Core (v4.0.8, unchanged from v4.0.7)** | **549 entries / 643 curated facts** across 14 domains: astronomy (30 / 41), time (20 / 38), geography_kz (30 / 47), biology_basic (40 / 41), body_parts (40 / 55), society (40 / 48), colors (37 / 38), numbers (45 / 54), kz_literature (60 / 69), food (50 / 50), clothing (35 / 35), proverbs (40 / 43), animals (40 / 42), **transport (42 / 42)**. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
 | Workspace tests | **463 passing, 0 failing, 0 warnings** |
 | Pattern matchers | **11** — v2.x baseline (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
@@ -76,8 +76,9 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | **Dialog closed-class sync** (v3.9.5) | `NOT_A_TOPIC` mirrors `adam_reasoning::patterns::is_closed_class` — closes the pre-v3.9.5 «Неліктен → Нелікте тұрасыз ба» misparse where the FST correctly analysed `Неліктен` as ablative of a noun stem but the dialog layer had no interrogative filter |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
 | Facts (committed runtime) | **13 745 total** = **13 102 extracted (Grammar)** + **643 curated (HumanApproved, 14 domains incl. transport)**. T4_200k scale for the text-extracted portion |
-| **Rule-derived facts (committed runtime)** | **7 866** (v4.0.7: R1=386, R2=442, R3=26, R5=**5 940**, R6=36, R7=302, R8=734). Delta vs v4.0.6: **+555 (+7.6 %)** — new transport.jsonl adds 42 curated facts that cross-chain with existing маман / зат / құрал clusters; R5 alone gains **+503** from the köлік hub + transit professions |
-| Fact-graph nodes / edges | **3 315 / 12 350** (committed v4.0.7); most-connected content nouns: **адам (289), жер (218), дүние (207), қазақ (201), жыл (151)** |
+| **Rule-derived facts (committed runtime)** | **7 866** (v4.0.8: R1=386, R2=442, R3=26, R5=**5 940**, R6=36, R7=302, R8=734 — unchanged from v4.0.7; fast-path equivalence proved byte-for-byte). |
+| Fact-graph nodes / edges | **3 315 / 12 350** (committed v4.0.8); most-connected content nouns: **адам (289), жер (218), дүние (207), қазақ (201), жыл (151)** |
+| **Tooling throughput (v4.0.8)** | `extract_facts --world-core-only` — one-time infrastructure patch. Skips the 41-minute text-pack re-scan when only `data/world_core/*.jsonl` has changed: strips existing curated slice, reloads from disk, re-merges, recomputes counts. Wall-clock ~1 s (vs 2 476 s for full re-extract) → **~1 500× speedup on world_core-only patches**. Mutually exclusive with `--full` / `--bench-order` / `--max-total`; output stamped with `status: "world_core_refresh"` for grep-able provenance. |
 | **Predicate coverage (v3.9.5)** | **11 / 11 = 100 %** — every declared predicate fires. Causes = 6, InDomain = 5 (v3.9.5 biology/anatomy/society entries extended the v3.9.0 foothold) |
 | Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |
 | Scaling bench (v3.3.0) | `adam-scaling::scaling_bench` + `audit_precision` — emits `data/scaling/scaling_report.json` + `docs/scaling_report.md` + `docs/precision_audit.md`. Budget-aware `run_tier_with_budget` (chunked at 128 samples, SIGINT / `--time-budget` stops within ~1 s). Normalized metrics per tier: `facts_per_10k_words`, `derivations_per_fact`, `predicate_coverage_pct`, `duplicate_fact_rate_pct`. **Measured scaling on 4.32 M-word committed pool (textbooks + wiki + Abai)**: T3_10k (19 facts, 0 deriv) → T4_50k (120 facts, 51 deriv) — reasoning activates once graph density crosses threshold. |

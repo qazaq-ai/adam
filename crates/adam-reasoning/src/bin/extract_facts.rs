@@ -121,7 +121,7 @@ struct Sample {
     text: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Counts {
     samples_scanned: usize,
     samples_with_facts: usize,
@@ -130,10 +130,13 @@ struct Counts {
     by_pack: BTreeMap<String, usize>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Artifact {
     version: String,
     /// v3.1.0 — `"completed"` | `"timed_out"` | `"interrupted"`.
+    /// v4.0.8 — also `"world_core_refresh"` for the fast-path that
+    /// only re-merges `data/world_core/*.jsonl` without re-scanning
+    /// the text corpus packs.
     status: String,
     /// v3.1.0 — wall-clock seconds from process start to commit.
     elapsed_s: u64,
@@ -150,7 +153,22 @@ fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
     let full_mode = args.iter().any(|a| a == "--full");
     let bench_order = args.iter().any(|a| a == "--bench-order");
+    let world_core_only = args.iter().any(|a| a == "--world-core-only");
     let max_total: Option<usize> = parse_usize_flag(&args, "--max-total");
+
+    // v4.0.8 — fast-path for curated-knowledge-only patches.
+    // Skips the 45-minute text-pack scan; re-merges world_core/*.jsonl
+    // into the already-committed facts.json in ~2 seconds.
+    if world_core_only {
+        if full_mode || bench_order || max_total.is_some() {
+            eprintln!(
+                "extract_facts: --world-core-only is mutually exclusive with --full / --bench-order / --max-total"
+            );
+            return ExitCode::FAILURE;
+        }
+        return refresh_world_core_only(COMMITTED_OUTPUT);
+    }
+
     // v3.6.5 — `--max-total` overrides per-pack limit so a caller
     // can produce a committed runtime artifact equivalent to a
     // specific bench tier (e.g. `--bench-order --max-total 200000`
@@ -435,4 +453,88 @@ fn parse_usize_flag(args: &[String], name: &str) -> Option<usize> {
 fn load_pack(path: &PathBuf) -> Result<PackFile, String> {
     let raw = fs::read_to_string(path).map_err(|e| e.to_string())?;
     serde_json::from_str(&raw).map_err(|e| e.to_string())
+}
+
+/// v4.0.8 fast-path. Read the existing committed artifact, strip every
+/// fact whose `source.pack` starts with `world_core/`, re-load curated
+/// entries from `data/world_core/*.jsonl`, merge, recompute counts,
+/// write back. Text-extraction state (`built_from`, `packs_completed`,
+/// `packs_total`, `samples_scanned`, `samples_with_facts`) is preserved
+/// from the source artifact — this path makes no claim about the text
+/// corpus and only refreshes the curated slice.
+fn refresh_world_core_only(output_path: &str) -> ExitCode {
+    let t0 = std::time::Instant::now();
+    let raw = match fs::read_to_string(output_path) {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!(
+                "extract_facts --world-core-only: cannot read existing {output_path}: {e} — run a full extract first"
+            );
+            return ExitCode::FAILURE;
+        }
+    };
+    let mut artifact: Artifact = match serde_json::from_str(&raw) {
+        Ok(a) => a,
+        Err(e) => {
+            eprintln!("extract_facts --world-core-only: malformed {output_path}: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    let before_total = artifact.facts.len();
+    artifact
+        .facts
+        .retain(|f| !f.source.pack.starts_with("world_core/"));
+    let after_strip = artifact.facts.len();
+    let stripped = before_total - after_strip;
+
+    let curated = match adam_reasoning::world_core::load_world_core_facts(std::path::Path::new(
+        "data/world_core",
+    )) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("extract_facts --world-core-only: world_core load error — {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let loaded = curated.len();
+    artifact.facts.extend(curated);
+
+    // Recompute by_predicate / by_pack / facts_total from scratch so
+    // the artifact stays internally consistent after the swap.
+    let mut by_predicate: BTreeMap<String, usize> = BTreeMap::new();
+    let mut by_pack: BTreeMap<String, usize> = BTreeMap::new();
+    for f in &artifact.facts {
+        *by_predicate
+            .entry(f.predicate.as_str().to_string())
+            .or_insert(0) += 1;
+        *by_pack.entry(f.source.pack.clone()).or_insert(0) += 1;
+    }
+    artifact.counts.by_predicate = by_predicate;
+    artifact.counts.by_pack = by_pack;
+    artifact.counts.facts_total = artifact.facts.len();
+
+    artifact.version = env!("CARGO_PKG_VERSION").to_string();
+    artifact.status = "world_core_refresh".to_string();
+    artifact.elapsed_s = t0.elapsed().as_secs();
+
+    eprintln!(
+        "extract_facts --world-core-only: stripped {stripped} old world_core facts, merged {loaded} fresh (total {} → {})",
+        before_total,
+        artifact.facts.len()
+    );
+
+    let json = match serde_json::to_string_pretty(&artifact) {
+        Ok(j) => j,
+        Err(e) => {
+            eprintln!("serialise: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+    if let Err(e) = fs::write(output_path, json) {
+        eprintln!("write {output_path}: {e}");
+        return ExitCode::FAILURE;
+    }
+    eprintln!("wrote {output_path} (elapsed {}s)", artifact.elapsed_s);
+    ExitCode::SUCCESS
 }

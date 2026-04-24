@@ -7,6 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.8] — 2026-04-24 — `extract_facts --world-core-only` fast-path (throughput infrastructure)
+
+Axis rotation toward **tooling throughput**. The previous five patches (v4.0.3 → v4.0.7) spent ~2 hours each, of which ~45 min was a full re-extract over 200 k text samples that produced the same text-facts every time and only differed in the `world_core/` slice. At the user's explicit concern ("тратить 2 часа на один патч сильно расточительно"), v4.0.8 lands a one-time infrastructure patch that turns that 45-minute step into a ~1-second re-merge for any world_core-only change.
+
+### Design
+
+New `--world-core-only` flag on `extract_facts`:
+
+1. Read the committed `data/retrieval/facts.json`.
+2. `retain` every fact whose `source.pack` does **not** start with `world_core/`.
+3. Re-load `data/world_core/*.jsonl` via the existing `load_world_core_facts` loader.
+4. Merge the fresh curated facts, recompute `by_predicate` / `by_pack` / `facts_total` from scratch.
+5. Stamp `version = CARGO_PKG_VERSION`, `status = "world_core_refresh"` (new sentinel value — downstream consumers treat any `status` as first-class per the v3.1.0 iteration contract), rewrite.
+
+Text-extraction state (`built_from`, `packs_completed`, `packs_total`, `samples_scanned`, `samples_with_facts`) is preserved verbatim — the fast-path makes no claim about the text corpus, so it inherits those fields from the source artifact. A regression to those numbers requires a full `extract_facts` run (with `--bench-order --max-total 200000` for the canonical T4_200k tier).
+
+Mutually exclusive with `--full`, `--bench-order`, `--max-total` — the binary fails fast if combined.
+
+### Measured equivalence
+
+Baseline: committed `facts.json` @ v4.0.7 (status `"completed"`, 2 476 s elapsed). Ran `--world-core-only` and diffed byte-for-byte:
+
+```
+diff /tmp/facts_baseline.json data/retrieval/facts.json
+3,4c3,4
+<   "status": "completed",
+<   "elapsed_s": 2476,
+---
+>   "status": "world_core_refresh",
+>   "elapsed_s": 0,
+```
+
+**Only `status` + `elapsed_s` differ** — both intentional markers. Every one of 13 745 facts, every `by_predicate` / `by_pack` count, every source chain, byte-identical. The fast-path is provably equivalent to a full re-extract when only `data/world_core/*.jsonl` has changed.
+
+### Measured throughput win
+
+| | full extract | fast-path |
+|---|---:|---:|
+| wall-clock (M2, release) | ~41 min (2 476 s) | **<1 s** (2.5 s including cargo startup) |
+| text packs scanned | 9 (6 completed under the 200 k cap) | 0 |
+| FST parses | ~3 M | 0 |
+
+**~1 500× speedup** on the dominant cost of a world_core-only patch. The next 3–4 curated-knowledge patches alone recoup the ~30 min invested in this infrastructure change.
+
+### Impact on release rhythm
+
+Data-only patches (the axis rotation tracked in `project_v4_direction`: `world_core`, `domains`) drop from ~2 h → ~30 min end-to-end — cargo test + bump + docs + tag become the dominant cost, not extraction. This unblocks the "batch 3–5 domains per patch" direction the user flagged at v4.0.7: with the fast-path in place, adding 5 domains now rebuilds in seconds instead of 4 × 45 min = 3 h of serial re-extraction.
+
+### Scope discipline
+
+Single-concern patch: one new flag, one new helper function, zero changes to extractor logic, zero new predicates, zero test-count change (463 passing, unchanged from v4.0.7 — correctness baseline preserved). Exactly the one-concern-per-patch rhythm the v4.x cadence was set up for.
+
+**Guardrail**: the fast-path is **only** correct when text-extraction output is unchanged. Any patch that touches pattern matchers, the lexicon, or the corpus MUST still run a full extract. This is documented in the binary's help output and the `status = "world_core_refresh"` sentinel makes the provenance trivially greppable.
+
+---
+
 ## [4.0.7] — 2026-04-23 — World Core expansion: new `transport.jsonl` domain
 
 Axis rotation. Two consecutive patches (v4.0.5, v4.0.6) cleaned noise; time to grow clean knowledge. v4.0.7 adds a **14th World Core domain** — `transport.jsonl` — along the "domains" axis of the knowledge-first direction (`project_v4_direction`).
