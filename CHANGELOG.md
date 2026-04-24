@@ -7,6 +7,68 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.9] — 2026-04-24 — World Core batch: `plants.jsonl` + `professions.jsonl` + `tools_household.jsonl` (first fast-path batch release)
+
+First release to exploit the v4.0.8 fast-path. Three new domains added in one patch; full data pipeline rebuild took <3 seconds instead of ~45 minutes under the old per-domain workflow. At the user's direction ("необходимо добавлять от трех до пяти, чтобы все сразу тестировать"), this lands the first multi-domain batch — targeting gap-fill + highest-leverage hubs.
+
+### Three new domains — rationale per domain
+
+1. **`plants.jsonl`** (35 entries / 35 facts) — **symmetry gap filler**. The v4.0.6 World Core had `animals.jsonl` (40 entries) but no flora counterpart. Adds `ағаш` children (қайың, емен, терек, тал, қарағай, шырша, арша, үйеңкі, жиде), `гүл` children (раушан, қызғалдақ, бәйшешек, лала, қалампыр), `бұта` sub-hub (тобылғы, итмұрын), `шөп` children (жусан, қамыс), 7 new `дақыл` species (арпа, сұлы, тары, жүгері, күнбағыс, зығыр, мақта — existing `дақыл` parent in food.jsonl), and 6 `part_of` relations (жапырақ/тамыр/бұтақ/сабақ/бүршік/тұқым part_of ағаш/өсімдік). Cross-domain leverage: parents `ағаш`/`гүл`/`шөп`/`дақыл` already in biology_basic + food, so each new child immediately gets R1 transitivity (e.g. `қайың → ағаш → өсімдік → тіршілік иесі`) and R5 shared-IsA at both levels.
+
+2. **`professions.jsonl`** (40 entries / 40 facts) — **highest-leverage R5 hub**. Pre-v4.0.9 `маман` hub had ~10 children scattered across transport (пилот, капитан, машинист, жүргізуші), clothing (зергер, тігінші), kz_literature (ақын, жазушы), proverbs (ұстаз). Added **40 new professions** all native Kazakh: мұғалім, оқытушы, тәрбиеші, дәрігер, медбике, ғалым, суретші, сазгер, әнші, биші, күйші, жыршы, сатушы, саудагер, аспаз, наубайшы, егінші, малшы, шопан, жылқышы, аңшы, балықшы, ұста, етікші, дарқан, бақбан, құрылысшы, жұмысшы, жөндеуші, заңгер, хатшы, төраға, бастық, сарбаз, жауынгер, тілмаш, аудармашы, тілші, емші, жаттықтырушы. Avoided loanwords (менеджер, инженер, программист, актер — all skipped). **Expected R5 leverage**: маман hub now has ~50 children → C(50,2) = 1 225 RelatedTo pairs vs pre-batch C(10,2) = 45, **27× increase**.
+
+3. **`tools_household.jsonl`** (30 entries / 30 facts) — **құрал + ыдыс dual hub**. `құрал` hub children: 18 concrete tools (пышақ, балта, балға, ара, қайшы, ине, күрек, тырма, орақ, шалғы, арқан, қалам, қарындаш, дәптер, сабын, шүберек, сыпырғыш, піспек). New `ыдыс` sub-hub under құрал: 11 vessels (табақ, кесе, қасық, шанышқы, шәйнек, самауыр, қазан, құмыра, шелек, ожау, тостаған). `піспек` and `торсық`-style traditional Kazakh items included to keep the domain culturally grounded.
+
+### Totals
+
+| | v4.0.7 / v4.0.8 | v4.0.9 | delta |
+|---|---:|---:|---|
+| World Core domains | 14 | **17** | **+3** |
+| World Core entries | 549 | **654** | **+105** |
+| World Core facts | 643 | **748** | **+105** |
+
+### Measured runtime delta (fast-path rebuild)
+
+| | v4.0.8 | v4.0.9 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 745 | **13 850** | +105 |
+| curated (HumanApproved) | 643 | **748** | +105 |
+| extracted (Grammar, unchanged) | 13 102 | 13 102 | 0 |
+| **derivations total** | 7 866 | **12 849** | **+4 983 (+63.3 %)** |
+| R1_is_a_transitivity | 386 | **449** | +63 |
+| R2_has_inheritance | 442 | **474** | +32 |
+| R3_has_inheritance_via_part_of | 26 | 26 | 0 |
+| **R5_shared_is_a_target** | 5 940 | **10 827** | **+4 887** |
+| R6_lives_in_via_part_of | 36 | 36 | 0 |
+| R7_goes_to_via_part_of | 302 | 303 | +1 |
+| R8_after_transitivity | 734 | 734 | 0 |
+| Graph nodes | 3 315 | **3 375** | +60 |
+| Graph edges | 12 350 | **12 449** | +99 |
+
+### Effective leverage: +47 derivations per added curated fact
+
+**4 983 new derivations / 105 new curated facts = +47 derivations per fact** — **3.6× higher leverage than v4.0.7's +13/fact**. Concentrating on the маман hub paid off: R5 shared-IsA alone gained **+4 887** (the dense profession cluster cross-chaining with existing транспорт / ауылшаруашылық / образ clusters). v4.0.7 had no equivalent hub concentration — 42 transport entries spread across 3 sub-clusters (vehicles, infrastructure, professions) each gave ~C(13,2) at most.
+
+### Pipeline cost (fast-path win)
+
+v4.0.9 full rebuild (3 domains, 105 entries added, all validation + extraction + reasoning + graph):
+- validate_world_core: ~0.5 s
+- extract_facts --world-core-only: <1 s
+- run_reasoner: 2 s
+- build_lexical_graph: <1 s
+- **Total data pipeline: ~4 s**
+
+Pre-v4.0.8 equivalent workflow (3× per-domain patches, full extract each):
+- 3 × (45 min extract + 2 s reasoner + <1 s graph) = **~135 min**
+
+**~2 000× pipeline speedup on a 3-domain batch**. Confirms the v4.0.8 infrastructure thesis empirically.
+
+### Scope discipline
+
+Three domains, one patch, one coherent direction (expand curated knowledge). No code changes — purely additive data. 463 tests pass unchanged. Next v4.0.10: could batch another 3 domains (music_kz, sports, education are the queued candidates) — or rotate axes back to rules / noise-elimination depending on where Codex review surfaces the highest-value target next.
+
+---
+
 ## [4.0.8] — 2026-04-24 — `extract_facts --world-core-only` fast-path (throughput infrastructure)
 
 Axis rotation toward **tooling throughput**. The previous five patches (v4.0.3 → v4.0.7) spent ~2 hours each, of which ~45 min was a full re-extract over 200 k text samples that produced the same text-facts every time and only differed in the `world_core/` slice. At the user's explicit concern ("тратить 2 часа на один патч сильно расточительно"), v4.0.8 lands a one-time infrastructure patch that turns that 45-minute step into a ~1-second re-merge for any world_core-only change.

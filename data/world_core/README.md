@@ -97,7 +97,7 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v4.0.8 — unchanged from v4.0.7)
+## Current scale (v4.0.9)
 
 - `astronomy.jsonl` — 30 entries / 41 facts
 - `time.jsonl` — 20 entries / 38 facts
@@ -112,8 +112,11 @@ Validator checks:
 - `clothing.jsonl` — 35 entries / 35 facts
 - `proverbs.jsonl` — 40 entries / 43 facts
 - `animals.jsonl` — 40 entries / 42 facts
-- `transport.jsonl` — 42 entries / 42 facts  *(new in v4.0.7)*
-- **Total: 549 entries / 643 facts across 14 domains**, all `approved`
+- `transport.jsonl` — 42 entries / 42 facts
+- `plants.jsonl` — 35 entries / 35 facts  *(new in v4.0.9)*
+- `professions.jsonl` — 40 entries / 40 facts  *(new in v4.0.9)*
+- `tools_household.jsonl` — 30 entries / 30 facts  *(new in v4.0.9)*
+- **Total: 654 entries / 748 facts across 17 domains**, all `approved`
   at `high` or `medium` confidence by `shaman`.
 
 ## Roadmap
