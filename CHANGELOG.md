@@ -7,6 +7,57 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.21] — 2026-04-24 — Multi-word entity linker (Codex v4.0.19 review #2)
+
+Second release acting on Codex's v4.0.19 review. Addresses finding #2: multi-word concepts in world_core («Құс жолы», «Күн жүйесі», «Аспан денесі», «Қазақ тілі», …) were losing their referent at the dialog layer because the FST tokenizer splits the compound and `first_noun_root` picks only the first single-word token — so «Құс жолы туралы айтшы» replied about «құс» (bird) instead of Млечный путь.
+
+### Fix
+
+Added `MULTIWORD_ENTITIES` const array in `crates/adam-dialog/src/semantics.rs` — **22 compound entities** auto-extracted from `data/world_core/*.jsonl` subjects/objects that contain a space. Sorted longest-first at compile time so the matcher returns on the first substring hit:
+
+```
+құйрықты жұлдыз, қазақ әдебиеті, тіршілік иесі, орталық азия,
+жүк машинасы, аспан денесі, қара сөздер, тағы жануар, қозы көрпеш,
+қазақ тілі, су қоймасы, жер бедері, күн жүйесі, туған жер,
+абай жолы, темір жол, қыз жібек, бас киім, құс жолы, аяқ киім,
+сары май, тас жол
+```
+
+New helper `multiword_entity_hint(input: &str) -> Option<String>` does a longest-match substring scan over the lowercased raw input. Substring match handles Kazakh inflection on the compound tail — e.g. «Құс жолының бейнесі» contains «құс жолы» as a prefix of the inflected form.
+
+New `best_noun_hint(input, parses)` combines: **multi-word match first, then `first_noun_root` fallback**. Called from `interpret_text_with_lexicon` at both `Intent::Unknown` exit points. The legacy `interpret(parses)` function (no raw input available) keeps single-noun-only behaviour — documented in-line.
+
+### Smoke-test: compound entities now answer correctly
+
+Pre-v4.0.21 — all of these answered about "құс" (bird) or generic:
+```
+> Құс жолы туралы айтшы → ... about құс (bird)
+```
+
+Post-v4.0.21:
+```
+> Құс жолы туралы айтшы
+Қолда бар деректерден байланыс құрастырдым: ой-тізбек: құс жолы жұлдызға қатысты байланысы бар (иелік мұрагерлік).
+> Күн жүйесі жайлы
+күн жүйесі туралы мынадай байланыс анықтадым: ай күн жүйесіге құрамына байланысты бір бөлігі ретінде шықты.
+> Аспан денесі деген не
+Қолда бар деректерден байланыс құрастырдым: аспан денесі пен жұлдыз бір-біріне байланысты екен.
+> Қазақ тілі
+Айтуыңыз бойынша, мынадай қисынды байланыс бар: қорытынды: қазақ тілі — айна (байланысты ой-тізбек арқылы).
+```
+
+«Құс жолы» now correctly connects to stars (Milky Way contains stars). «Күн жүйесі» produces the curated moon-as-part-of-solar-system chain. Only «Қазақ тілі» still picks a weak proverb-chain — that's **Codex recommendation #3** (reasoning reranker), explicitly out of scope for this patch.
+
+### Tests
+
+**486 passing** (+2 regression tests: `multiword_entity_hint_matches_compound_entities` + `multiword_entity_hint_returns_none_for_simple_input`).
+
+### Scope
+
+One concern — multi-word entity resolution at the dialog layer. No reasoner / extractor changes, no data changes. The multi-word list is hand-maintained; future world_core compound additions must extend the const array (add a `world_core_multiword_coverage_test` regression in a future patch is queued).
+
+---
+
 ## [4.0.20] — 2026-04-24 — Lexicon sync with World Core (Codex v4.0.19 review #1)
 
 First release acting on Codex's external review of v4.0.19. Codex's diagnosis was: **knowledge exists in the graph but doesn't reach the user through the dialog layer**. Root cause #1 — many `world_core` subject/object roots are not in the Lexicon, so `first_noun_root` (dialog's entry point) returns None and the query falls through to «түсінбедім».

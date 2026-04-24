@@ -152,7 +152,9 @@ pub fn interpret_text_with_lexicon(
     // fallback response can at least acknowledge context. `example` is
     // filled later by `Conversation::turn` via retrieval (v1.6.5).
     // `example_adapted` (v1.9.5) is also set there.
-    let noun_hint = first_noun_root(parses);
+    // v4.0.21 — prefer multi-word entity match before single-noun fallback
+    // so «Құс жолы туралы айтшы» stays intact (not reduced to «құс»).
+    let noun_hint = best_noun_hint(input, parses);
     Intent::Unknown {
         raw_tokens: tokens,
         noun_hint,
@@ -257,6 +259,69 @@ fn first_noun_root(parses: &[Analysis]) -> Option<String> {
     })
 }
 
+/// v4.0.21 — Multi-word entity catalogue drawn from `data/world_core/*.jsonl`
+/// subjects/objects that contain a space. Kazakh agglutinative morphology
+/// doesn't tokenize these well — «Құс жолы» (Milky Way) tokenizes into
+/// «құс» + «жолы» and the FST picks «құс» as the first noun. This loses
+/// the actual referent (galaxy) and falls back to «құс» (bird).
+///
+/// The list is sorted **longest-first** at compile time so the matcher
+/// below can return on the first hit. Kept in sync with `data/world_core/`
+/// by audit (re-run `world_core_multiword_coverage_test` whenever a new
+/// compound entity enters the world_core set).
+///
+/// Codex v4.0.19 review #2 — direct implementation.
+const MULTIWORD_ENTITIES: &[&str] = &[
+    // length 16+
+    "құйрықты жұлдыз",
+    "қазақ әдебиеті",
+    // length 12–13
+    "тіршілік иесі",
+    "орталық азия",
+    "жүк машинасы",
+    "аспан денесі",
+    "қара сөздер",
+    "тағы жануар",
+    "қозы көрпеш",
+    // length 10–11
+    "қазақ тілі",
+    "су қоймасы",
+    "жер бедері",
+    "күн жүйесі",
+    "туған жер",
+    "абай жолы",
+    "темір жол",
+    "қыз жібек",
+    // length 8–9
+    "бас киім",
+    "құс жолы",
+    "аяқ киім",
+    "сары май",
+    "тас жол",
+];
+
+/// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
+/// the first entity found as a substring of the lowercased input.
+/// Substring match handles Kazakh inflection on the last word of the
+/// compound — e.g. «Құс жолының бейнесі» contains «құс жолы» as a prefix
+/// of the inflected compound.
+fn multiword_entity_hint(input: &str) -> Option<String> {
+    let lowered = input.to_lowercase();
+    for entity in MULTIWORD_ENTITIES {
+        if lowered.contains(entity) {
+            return Some((*entity).to_string());
+        }
+    }
+    None
+}
+
+/// v4.0.21 — Best noun hint for the `Intent::Unknown` fallback. Tries
+/// multi-word entity match first (so «Құс жолы» stays intact), then
+/// falls back to single-word `first_noun_root` for the general case.
+fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
+    multiword_entity_hint(input).or_else(|| first_noun_root(parses))
+}
+
 /// v1.7.0: return every distinct content root from the parse list.
 ///
 /// This is what the retrieval ranker consumes — more morphemes in means
@@ -318,6 +383,9 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         return Intent::Negation;
     }
 
+    // Legacy path has no raw input, so multi-word matching is skipped —
+    // callers using raw-text-aware `interpret_text_with_lexicon` get the
+    // full v4.0.21 multiword treatment.
     Intent::Unknown {
         raw_tokens: tokens,
         noun_hint: first_noun_root(parses),
@@ -1005,5 +1073,40 @@ mod tests {
                 "content noun `{word}` must NOT be in NOT_A_TOPIC"
             );
         }
+    }
+
+    /// v4.0.21 — multi-word entity matcher returns the compound entity
+    /// before the single-word fallback. Pre-v4.0.21 «Құс жолы туралы
+    /// айтшы» (tell me about the Milky Way) tokenised to «құс» + «жолы»
+    /// and the reply was about birds («құс»), losing the galaxy referent.
+    #[test]
+    fn multiword_entity_hint_matches_compound_entities() {
+        assert_eq!(
+            multiword_entity_hint("Құс жолы туралы айтшы"),
+            Some("құс жолы".to_string())
+        );
+        assert_eq!(
+            multiword_entity_hint("Күн жүйесі өте кең"),
+            Some("күн жүйесі".to_string())
+        );
+        assert_eq!(
+            multiword_entity_hint("Аспан денесі жайлы"),
+            Some("аспан денесі".to_string())
+        );
+        // Inflected last-word: substring match still fires (Kazakh
+        // agglutinates on the compound tail).
+        assert_eq!(
+            multiword_entity_hint("Құс жолының бейнесі"),
+            Some("құс жолы".to_string())
+        );
+    }
+
+    /// v4.0.21 — no multi-word match ⇒ None, so the single-word fallback
+    /// activates downstream.
+    #[test]
+    fn multiword_entity_hint_returns_none_for_simple_input() {
+        assert_eq!(multiword_entity_hint("құс туралы айтшы"), None);
+        assert_eq!(multiword_entity_hint("мектеп керек пе"), None);
+        assert_eq!(multiword_entity_hint(""), None);
     }
 }
