@@ -294,6 +294,51 @@ impl Conversation {
     /// order from the reasoner). No-op when `derived_facts` is empty,
     /// `example` is already set (retrieval wins if it ran), or the
     /// intent isn't Unknown / has no noun_hint.
+    /// v4.0.24 — BFS depth from `subject` to `target` through **base**
+    /// IsA edges only (`extracted_facts`). Used as a tie-breaker in
+    /// `inject_reasoning_chain`: when two equally-scored R1 derivations
+    /// both claim «X IsA Y», prefer the one whose Y is closer to X in
+    /// the IsA graph (more direct).
+    ///
+    /// **Critically excludes derived facts** — otherwise the R1
+    /// transitive closure itself creates depth-1 IsA edges from
+    /// subject to every reachable object, collapsing all tied
+    /// candidates to equal depth and defeating the tie-break. The
+    /// base-fact-only walk recovers the authentic hop count.
+    ///
+    /// Returns `usize::MAX` when unreachable so tied callers fall through
+    /// to the canonical-triple tie-break. Guarded by `MAX_DEPTH = 8` to
+    /// bound pathological cases (graph cycles blocked by `visited`).
+    fn isa_chain_depth(&self, subject: &str, target: &str) -> usize {
+        const MAX_DEPTH: usize = 8;
+        if subject == target {
+            return 0;
+        }
+        let mut visited: std::collections::HashSet<String> = std::collections::HashSet::new();
+        let mut frontier: Vec<String> = vec![subject.to_string()];
+        visited.insert(subject.to_string());
+        for depth in 1..=MAX_DEPTH {
+            let mut next: Vec<String> = Vec::new();
+            for node in &frontier {
+                for f in &self.extracted_facts {
+                    if f.predicate == ReasPredicate::IsA && f.subject.root == *node {
+                        if f.object.root == target {
+                            return depth;
+                        }
+                        if visited.insert(f.object.root.clone()) {
+                            next.push(f.object.root.clone());
+                        }
+                    }
+                }
+            }
+            if next.is_empty() {
+                break;
+            }
+            frontier = next;
+        }
+        usize::MAX
+    }
+
     fn inject_reasoning_chain(&self, intent: &mut Intent) {
         if self.derived_facts.is_empty() {
             return;
@@ -344,6 +389,32 @@ impl Conversation {
                 .max_by(|a, b| {
                     score_derivation(a, noun)
                         .cmp(&score_derivation(b, noun))
+                        // v4.0.24 — graph-distance tie-break for IsA
+                        // derivations. Codex v4.0.23 re-review flagged
+                        // that for «математика туралы айтшы» we had 4
+                        // fully-curated R1 derivations all scoring 11
+                        // (math IsA білім / байлық / мәлімет / қазына).
+                        // The canonical-triple fallback picked байлық
+                        // (through the metaphorical proverb-chain
+                        // «білім IsA байлық») instead of the 1-hop
+                        // direct answer білім. Lower IsA-path depth
+                        // from subject to object wins — the direct
+                        // parent beats transitive ancestors.
+                        //
+                        // Lower depth sorts GREATER under max_by, so
+                        // `Ord::reverse` on the depth comparison makes
+                        // shorter paths win.
+                        .then_with(|| {
+                            if a.predicate == adam_reasoning::Predicate::IsA
+                                && b.predicate == adam_reasoning::Predicate::IsA
+                            {
+                                let da = self.isa_chain_depth(&a.subject.root, &a.object.root);
+                                let db = self.isa_chain_depth(&b.subject.root, &b.object.root);
+                                da.cmp(&db).reverse()
+                            } else {
+                                std::cmp::Ordering::Equal
+                            }
+                        })
                         // Deterministic tie-break by canonical triple key
                         // so runs stay byte-identical.
                         .then_with(|| {
@@ -596,6 +667,17 @@ fn score_derivation(d: &DerivedFact, noun: &str) -> i32 {
     // 4. Subject-side preference.
     if d.subject.root == noun {
         score += 1;
+    }
+
+    // v4.0.24 — 5. Predicate preference. For "tell me about X" dialog
+    // queries, an IsA answer ("X is a Y") is the most semantically
+    // direct form. Codex v4.0.23 re-review flagged that the pre-v4.0.24
+    // reranker tied multiple curated R1 + R10 candidates on the same
+    // noun and the canonical-triple tie-break surfaced weaker picks
+    // (InDomain over IsA for `немере`). This +2 boost makes IsA the
+    // default winner when all other trust/length/rule terms are equal.
+    if d.predicate == adam_reasoning::Predicate::IsA {
+        score += 2;
     }
 
     score

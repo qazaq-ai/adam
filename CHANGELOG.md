@@ -7,6 +7,59 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.24] — 2026-04-24 — Reranker tie-break fix (Codex v4.0.23 re-review #1)
+
+First patch acting on Codex's v4.0.23 **repeat** external review. Closes finding #1 — the v4.0.22 reranker still picked semantically weaker curated chains when multiple candidates tied at the top score.
+
+### Problem
+
+Codex re-review reproduced two cases where the v4.0.22 scorer produced a tied max-set:
+
+- `adam_chat --once 'немере туралы айтшы'` → «немере зоологияға байланысты мүше...» instead of the expected «немере — адам». The tied set had IsA(немере, адам) + InDomain(немере, зоология) + IsA(немере, жануар) + IsA(немере, сүтқоректі) etc. The canonical-triple tie-break (`.reverse()` picks lowest) surfaced the InDomain branch because «InDomain» < «IsA» lexicographically.
+
+- `adam_chat --safe --once 'математика туралы айтшы'` → «математика — байлық» (metaphor via proverb) instead of the expected «математика — білім» (direct parent). The tied set had 4 fully-curated R1 IsA derivations (→ білім / байлық / мәлімет / қазына). Canonical triple picked байлық because «б» < «б» ordered byte-wise first.
+
+### Fix
+
+Two new tie-break terms in `Conversation::inject_reasoning_chain`:
+
+**1. IsA predicate bonus (+2) in `score_derivation`.** For "tell me about X" dialog queries an IsA answer («X is a Y») is the most semantically direct shape. Applied per-derivation so R1 IsA wins over R10 InDomain / R2 Has / R5 RelatedTo at the score level before canonical-triple fallback even runs.
+
+**2. IsA-chain graph-distance BFS tie-break.** For two tied IsA derivations `(a IsA X)` vs `(a IsA Y)`, compute BFS depth from `a` to `X` and from `a` to `Y` walking **only base IsA facts** from `extracted_facts`. Shorter path wins. Base-only is critical — including derived facts would make R1 transitive closure report every reachable object at depth 1, collapsing the distinction the tie-break needs.
+
+```rust
+fn isa_chain_depth(&self, subject: &str, target: &str) -> usize {
+    // BFS over extracted_facts IsA edges, MAX_DEPTH=8, base-only.
+    // Returns usize::MAX when unreachable so canonical-triple falls through.
+}
+```
+
+### Smoke-test: both Codex cases resolved
+
+| query | pre-v4.0.24 | post-v4.0.24 |
+|---|---|---|
+| `немере туралы айтшы` | зоология / мүше | **немере — адам** ✓ |
+| `немере туралы айтшы` (--safe) | түсінбедім / зоология | **немере — адам** ✓ |
+| `математика туралы айтшы` | байлық (proverb metaphor) | **математика — білім** ✓ |
+| `математика туралы айтшы` (--safe) | байлық | **математика — білім** ✓ |
+
+### Tests
+
+**492 passing** (+2 regression tests):
+- `reranker_prefers_is_a_over_other_predicates_on_tied_score` — немере IsA адам > InDomain зоология.
+- `reranker_prefers_shorter_is_a_path_on_tied_curated` — synthetic 4-node IsA graph confirms depth-3 object is dropped in favour of depth-2 objects.
+
+### Scope
+
+One concern — tie-break within Codex recommendation #3. No data / reasoner / extractor changes. Reranker scoring signature unchanged.
+
+### Out of scope for this patch (Codex v4.0.23 re-review remainder)
+
+- **#2 `--trace` mode** — adam_chat.rs `--trace` path manually rebuilds the turn and stops before `inject_reasoning_chain` / `inject_retrieval_example`. Trace output is materially false for v4.0.20–v4.0.24 features. Queued for v4.0.25.
+- **Residual: missing `world_core_multiword_coverage_test`** — docstring at `semantics.rs:268` references this regression test but it doesn't exist. Queued for v4.0.26.
+
+---
+
 ## [4.0.23] — 2026-04-24 — R5 overbroad-hub guard (Codex v4.0.19 review #4) — final Codex-review patch
 
 Fourth and final patch acting on external Codex review. Addresses finding #4: "широкие хабы вроде `адам`, `ғылым`, `жануар` дают формально допустимые, но прагматически слабые выводы". R5 shared-IsA through an abstract "everything-is-one" hub produces pairs that are true but cognitively weak — «отын RelatedTo сусын» because both IsA зат, «ашу RelatedTo махаббат» because both IsA сезім.

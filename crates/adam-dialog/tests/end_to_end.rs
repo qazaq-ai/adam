@@ -1245,6 +1245,88 @@ fn reranker_prefers_curated_over_text_only() {
     );
 }
 
+/// v4.0.24 — Codex v4.0.23 re-review case #1: when the reranker sees
+/// multiple tied curated R1/R10 candidates for the same noun, the IsA
+/// predicate boost (+2) must prevent InDomain / Has / RelatedTo
+/// picks from winning via canonical-triple tie-break. Pre-v4.0.24
+/// for «немере туралы айтшы» the winner was InDomain(немере, зоология)
+/// instead of IsA(немере, адам). This test asserts the predicate-level
+/// preference.
+#[test]
+fn reranker_prefers_is_a_over_other_predicates_on_tied_score() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let in_domain = DerivedFact {
+        subject: SlotRef {
+            surface: "немере".into(),
+            root: "немере".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::InDomain,
+        object: SlotRef {
+            surface: "зоология".into(),
+            root: "зоология".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R10_in_domain_inheritance".into(),
+        source_chain: vec![
+            FactSource {
+                pack: "world_core/kinship_extended.jsonl".into(),
+                sample_id: "kin_011".into(),
+            },
+            FactSource {
+                pack: "world_core/animals.jsonl".into(),
+                sample_id: "anm_022".into(),
+            },
+        ],
+        confidence: ConfidenceKind::RuleInferred,
+    };
+    let is_a = DerivedFact {
+        subject: SlotRef {
+            surface: "немере".into(),
+            root: "немере".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "адам".into(),
+            root: "адам".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![
+            FactSource {
+                pack: "world_core/kinship_extended.jsonl".into(),
+                sample_id: "kin_011".into(),
+            },
+            FactSource {
+                pack: "world_core/kinship_extended.jsonl".into(),
+                sample_id: "kin_001".into(),
+            },
+        ],
+        confidence: ConfidenceKind::RuleInferred,
+    };
+    // Feed InDomain first — before the IsA predicate bonus, the
+    // canonical-triple reverse tie-break would have picked InDomain
+    // (InDomain < IsA lexicographically → lower triple wins).
+    let derived = vec![in_domain, is_a];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let out = conv.turn("немере туралы айтшы", &lex, &repo, 0);
+    assert!(
+        out.contains("адам"),
+        "reranker should pick IsA(немере→адам), got: {out:?}"
+    );
+    assert!(
+        !out.contains("зоология"),
+        "reranker should NOT pick InDomain(немере→зоология), got: {out:?}"
+    );
+}
+
 /// v4.0.22 — reranker prefers shorter curated chain when both are
 /// fully curated.
 #[test]
@@ -1310,6 +1392,78 @@ fn reranker_prefers_shorter_chain() {
     assert!(
         out.contains("құрал"),
         "reranker should pick shorter R1 curated chain, got: {out:?}"
+    );
+}
+
+/// v4.0.24 — Codex v4.0.23 re-review case #2: when multiple equally-
+/// scored R1 IsA derivations share the same subject but have different
+/// objects, prefer the object with the SHORTER IsA-chain distance in
+/// the base-fact graph. Pre-v4.0.24 the reranker canonical-triple tie-
+/// break picked байлық (a metaphor target 3 hops from математика via
+/// «білім IsA байлық» in proverbs.jsonl) over білім (1 hop direct
+/// «ғылым IsA білім»).
+///
+/// This test wires up a minimal base-fact graph + two tied R1
+/// derivations and asserts that the shorter-path object wins.
+#[test]
+fn reranker_prefers_shorter_is_a_path_on_tied_curated() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let slot = |root: &str| SlotRef {
+        surface: root.into(),
+        root: root.into(),
+        pos: "noun".into(),
+    };
+    let src = |pack: &str, id: &str| FactSource {
+        pack: pack.into(),
+        sample_id: id.into(),
+    };
+
+    // Base IsA edges: A→B→C (depth 2), A→B→D (depth 2), A→B→C→E (depth 3).
+    let base = |s: &str, o: &str, pack: &str, id: &str| Fact {
+        subject: slot(s),
+        predicate: Predicate::IsA,
+        object: slot(o),
+        pattern: "test".into(),
+        source: src(pack, id),
+        confidence: ConfidenceKind::Grammar,
+        raw_text: "test".into(),
+    };
+
+    let extracted = vec![
+        base("a", "b", "world_core/domA.jsonl", "a1"),
+        base("b", "c", "world_core/domA.jsonl", "a2"),
+        base("b", "d", "world_core/domA.jsonl", "a3"),
+        base("c", "e", "world_core/domA.jsonl", "a4"),
+    ];
+
+    let derived_chain = |obj: &str| DerivedFact {
+        subject: slot("a"),
+        predicate: Predicate::IsA,
+        object: slot(obj),
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![
+            src("world_core/domA.jsonl", "a1"),
+            src("world_core/domA.jsonl", "a2"),
+        ],
+        confidence: ConfidenceKind::RuleInferred,
+    };
+
+    // Three tied candidates: a IsA c (depth 2), a IsA d (depth 2),
+    // a IsA e (depth 3). The depth-2 candidates should win over e;
+    // among c/d, canonical-triple tie-break picks c (alphabetic).
+    let derived = vec![derived_chain("e"), derived_chain("d"), derived_chain("c")];
+
+    let mut conv = Conversation::new().with_reasoning_chains(extracted, derived);
+    let out = conv.turn("a туралы айтшы", &lex, &repo, 0);
+    // The shortest-path winner must be c or d (both depth 2), NOT e.
+    assert!(
+        !out.contains('e'),
+        "reranker should reject depth-3 candidate `e`, got: {out:?}"
     );
 }
 
