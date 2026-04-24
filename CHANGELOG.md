@@ -7,6 +7,87 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.18] — 2026-04-24 — R11 InDomain shared-target (new reasoning rule) + v4.0.17 fragment-fix materialised
+
+Third rule-axis patch in v4.0.x. Reasoner roster **9 → 10**. Also materialises the v4.0.17 is_closed_class fragment expansion via full T4_200k re-extract.
+
+### Pattern
+
+`A InDomain D ∧ B InDomain D (A ≠ B) ⟹ RelatedTo(A, B)` — identical structural shape to R5 (shared-IsA), applied to the InDomain predicate.
+
+### Why InDomain-shared
+
+After v4.0.14's R10 inheritance rule, the graph has rich InDomain coverage: 24 base + 102 R10-derived = **126 InDomain facts**. Each domain hub has multiple incoming InDomain edges:
+
+- математика: ~26 incoming → C(26,2) = 325 candidate pairs
+- зоология: ~22 incoming → C(22,2) = 231
+- әдебиет: ~18 incoming → C(18,2) = 153
+- орнитология: ~13 incoming → C(13,2) = 78
+
+Many of these candidate pairs are already dedup'd against R5-derived shared-IsA pairs (since domain children often share taxonomic parents), so R11's net contribution is the **cross-cluster pairs** that aren't reachable via IsA alone.
+
+### Implementation
+
+`rule_r11_in_domain_shared_target` in `reasoner.rs` — ~40-line body, structurally identical to R5 but scans incoming InDomain edges. Guards:
+
+- **Tautology**: A = B rejected (canonical pair after sort).
+- Standard `source_chain` + `rule_id: "R11_in_domain_shared_target"` + `ConfidenceKind::RuleInferred`.
+
+### Test coverage
+
+5 new regression tests:
+
+- `r11_derives_related_to_from_shared_domain` — basic 2-child hub (қосу/бөлу InDomain математика).
+- `r11_respects_tautology_guard` — duplicate InDomain facts produce no self-related.
+- `r11_does_not_fire_for_distinct_domains` — A InDomain X + B InDomain Y produces nothing.
+- `r11_produces_canonical_pair_once` — C(3,2) = 3 unique canonical pairs.
+- `r11_chains_through_r10_derived_in_domain` — confirms R11 fires on R10-derived InDomain at fixpoint iter 2.
+
+### Measured delta on T4_200k full re-extract + reasoner
+
+| | v4.0.16 | v4.0.18 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 715 | **13 673** | **−42** (v4.0.17 fragment-fix materialised) |
+| text `does_to` | 9 002 | **8 987** | −15 |
+| text `goes_to` | 1 544 | **1 537** | −7 |
+| text `lives_in` | 288 | **280** | −8 |
+| text `has` | 230 | **224** | −6 |
+| text `after` | 219 | **218** | −1 |
+| **derivations total** | 15 832 | **15 973** | **+141 (+0.89 %)** |
+| R2 has_inheritance | 454 | **450** | −4 (dedup cascade from fewer base has) |
+| R7 goes_to_via_part_of | 374 | **373** | −1 |
+| **R11 in_domain_shared_target** | — | **146** | **new** |
+| R1 / R3 / R5 / R6 / R8 / R9 / R10 | unchanged | unchanged | 0 |
+| Graph nodes | 3 456 | **3 452** | −4 |
+| Graph edges | 12 368 | **12 325** | −43 |
+
+### v4.0.17 fragment-fix materialised
+
+Full re-extract applied v4.0.17's `is_closed_class` fragment expansion (жалп, мұн, аста, хіх) — net **−42 text-extracted facts** across 5 predicates, confirming v4.0.17's predicted "~32 facts cleaned" was accurate (slight under-prediction due to cascade through other matchers sharing the is_closed_class filter).
+
+### R11 measured 146 net derivations
+
+Pre-rule audit on v4.0.14 predicted R10+R11 stack would produce hundreds of shared-InDomain pairs. Observed net 146 — well below the theoretical maximum because **most candidate pairs dedup against R5-derived shared-IsA pairs**. R5 already covers arithmetic/biology/literature sibling relations through shared taxonomic parents (e.g. `қарға IsA құс + аққу IsA құс` ⟹ R5 produces `қарға RelatedTo аққу` before R11 can). R11's unique contribution is the **cross-cluster pairs** — concepts sharing a domain but NOT a direct IsA parent (e.g. `математика` InDomain-children that aren't IsA-siblings: сан vs қосу vs есеп — each under different IsA parents but same domain).
+
+### Tests
+
+**484 passing** (+5 R11 regression from v4.0.17).
+
+### Cumulative v4.0.7 → v4.0.18 (12 releases)
+
+| | v4.0.7 | v4.0.18 | delta |
+|---|---:|---:|---|
+| Active reasoning rules | 7 | **10** | +3 (R9, R10, R11) |
+| World Core domains | 14 | **26** | +12 |
+| World Core entries | 549 | **792** | +243 |
+| facts.json total | 13 745 | **13 673** | **−72** (cleaner via 2 noise audits) |
+| **Derivations** | **7 866** | **15 973** | **+8 107 (+103.1 %)** |
+| Tests | 463 | **484** | +21 |
+
+**2× derivations crossed cleanly** (+103.1 % cumulative) with **−72 base facts** — higher precision, higher derivation density. The v4.0.x direction (knowledge-first + math-driven reasoning) is compounding as designed.
+
+---
+
 ## [4.0.17] — 2026-04-24 — Fragment roots in `is_closed_class` (code-only micro-patch)
 
 Follow-up to v4.0.16's noise audit. While cleaning location-root GoesTo subjects, the audit also surfaced 4 fragment / tokenisation-artefact roots contaminating text-extracted facts:

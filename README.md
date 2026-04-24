@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.17-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.18-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,8 +23,8 @@
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-479%20passing-2EA44F?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/reasoning%20rules-9%20active-2EA44F?style=flat-square" alt="reasoning rules">
+  <img src="https://img.shields.io/badge/tests-484%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
   <img src="https://img.shields.io/badge/world%20core-792%20curated%20/%20886%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/domains-26-9CCC65?style=flat-square" alt="domains">
@@ -69,15 +69,15 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
 | **World Core (v4.0.15)** | **792 entries / 886 curated facts** across **26 domains**: astronomy, time, geography_kz, biology_basic, body_parts, society, colors, numbers, kz_literature, food, clothing, proverbs, animals, transport, plants, professions, tools_household, music_kz, sports, house_parts, emotions, weather_phenomena, materials, **language_features (18 / 18)**, **cooking_methods (10 / 10)**, **directions (9 / 9)** — bolded are new in v4.0.15. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **479 passing, 0 failing, 0 warnings** |
+| Workspace tests | **484 passing, 0 failing, 0 warnings** |
 | Pattern matchers | **11** — v2.x baseline (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
-| **Reasoning rules active** | **9 of 10 firing on v4.0.16 corpus** — R1 IsA-transitivity (**484**), R2 Has-inheritance (**454**), R3 Has-via-PartOf (**51**), R5 shared-IsA → RelatedTo (**13 414**), R6 LivesIn-via-PartOf (**49**), **R7 GoesTo-via-PartOf (374, −14 from v4.0.16 noise fix)**, R8 After-transitivity (**734**), R9 PartOf-transitivity (**170**), R10 InDomain-inheritance (**102**). R4 IsA-symmetry is curator-warning only. v4.0.16 closed the `is_location_root` guard hole in `dative_goes_to` + `agent_verb` (v3.8.5 had added it only to `locative_lives_in`); 215 categorically-wrong text extractions eliminated (−169 does_to, −46 goes_to). |
+| **Reasoning rules active** | **10 of 11 firing on v4.0.18 corpus** — R1 IsA-transitivity (**484**), R2 Has-inheritance (**450**), R3 Has-via-PartOf (**51**), R5 shared-IsA → RelatedTo (**13 414**), R6 LivesIn-via-PartOf (**49**), R7 GoesTo-via-PartOf (**373**), R8 After-transitivity (**734**), R9 PartOf-transitivity (**170**), R10 InDomain-inheritance (**102**), **R11 InDomain-shared-target (146, NEW in v4.0.18)**. R4 IsA-symmetry is curator-warning only. R11 is the InDomain analogue of R5 — 146 net pairs come from the cross-cluster derivation space (concepts sharing a domain but not a taxonomic parent). |
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | **Dialog closed-class sync** (v3.9.5) | `NOT_A_TOPIC` mirrors `adam_reasoning::patterns::is_closed_class` — closes the pre-v3.9.5 «Неліктен → Нелікте тұрасыз ба» misparse where the FST correctly analysed `Неліктен` as ablative of a noun stem but the dialog layer had no interrogative filter |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
-| Facts (committed runtime) | **13 715 total** = **12 829 extracted (Grammar)** + **886 curated (HumanApproved, 26 domains)**. T4_200k scale for the text-extracted portion. v4.0.16 noise fix removed **215 semantically-wrong text facts** (countries/cities as agents) — does_to −169, goes_to −46 |
-| **Rule-derived facts (committed runtime)** | **15 832** (v4.0.16: R1=484, R2=454, R3=51, R5=13 414, R6=49, R7=**374**, R8=734, R9=170, R10=102). Delta vs v4.0.15: **−14** from v4.0.16 precision patch (R7 alone; other rules unchanged). Noise-leverage modest (0.065 deriv/base fact, vs v4.0.10's 5.7) because location-subject goes_to/does_to destinations rarely had matching part_of targets — the win is direct base-fact precision, not cascade reduction. **Cumulative v4.0.7 → v4.0.16**: **7 866 → 15 832 derivations (+101.3 %)** across 10 releases |
-| Fact-graph nodes / edges | **3 456 / 12 368** (committed v4.0.16); most-connected content nouns: **адам (284), жер (218), дүние (203), қазақ (203), ат (145)** — centrality dropped uniformly as noisy cross-country does_to/goes_to edges removed |
+| Facts (committed runtime) | **13 673 total** = **12 787 extracted (Grammar)** + **886 curated (HumanApproved, 26 domains)**. T4_200k scale. Cumulative v4.0.10 + v4.0.16 + v4.0.18 noise cleanup removed **72 facts** net vs v4.0.7 (higher precision, higher derivation density) |
+| **Rule-derived facts (committed runtime)** | **15 973** (v4.0.18: R1=484, R2=450, R3=51, R5=13 414, R6=49, R7=373, R8=734, R9=170, R10=102, **R11=146 NEW**). Delta vs v4.0.16: **+141 (+0.89 %)** from R11 activation (+146) and v4.0.17 fragment-fix materialisation (R2 −4, R7 −1). **Cumulative v4.0.7 → v4.0.18**: **7 866 → 15 973 derivations (+103.1 %)** across 12 releases |
+| Fact-graph nodes / edges | **3 452 / 12 325** (committed v4.0.18); most-connected content nouns: **адам (284), жер (217), қазақ (203), дүние (200), ат (145)** |
 | **Tooling throughput (v4.0.8 → v4.0.9 validation)** | `extract_facts --world-core-only` — v4.0.8 infra. v4.0.9 confirmed empirically: 3-domain batch (105 new facts, full rebuild of facts + derived_facts + lexical_graph) took **~4 s total** vs ~135 min under the pre-v4.0.8 per-domain workflow — **~2 000× pipeline speedup on a 3-domain batch**. |
 | **Predicate coverage (v3.9.5)** | **11 / 11 = 100 %** — every declared predicate fires. Causes = 6, InDomain = 5 (v3.9.5 biology/anatomy/society entries extended the v3.9.0 foothold) |
 | Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |

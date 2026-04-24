@@ -28,6 +28,7 @@
 //! | `R8_after_transitivity` | A After B ∧ B After C | A After C (v4.0.4 — pure temporal order transitivity; math-clean, overreach-free) |
 //! | `R9_part_of_transitivity` | A PartOf B ∧ B PartOf C | A PartOf C (v4.0.13 — pure mereological transitivity; partial order; `is_astronomical_object` cross-scale guard inherited from R6/R7) |
 //! | `R10_in_domain_inheritance` | A IsA B ∧ B InDomain D | A InDomain D (v4.0.14 — taxonomic inheritance of domain membership; same shape as R2 for Has) |
+//! | `R11_in_domain_shared_target` | A InDomain D ∧ B InDomain D (A ≠ B) | RelatedTo(A, B) (v4.0.18 — InDomain analogue of R5 shared-IsA; concepts sharing a domain are related) |
 //!
 //! ## Determinism
 //!
@@ -199,6 +200,7 @@ fn run_one_pass(
     rule_r8_after_transitivity(facts, graph, seen, &mut out);
     rule_r9_part_of_transitivity(facts, graph, seen, &mut out);
     rule_r10_in_domain_inheritance(facts, graph, seen, &mut out);
+    rule_r11_in_domain_shared_target(facts, graph, seen, &mut out);
     out
 }
 
@@ -830,6 +832,84 @@ fn rule_r10_in_domain_inheritance(
                 source_chain: vec![first.source.clone(), second_source],
                 confidence: ConfidenceKind::RuleInferred,
             });
+        }
+    }
+}
+
+/// v4.0.18 — **R11 InDomain shared-target**. Same structural shape as
+/// R5 (shared-IsA) applied to the InDomain predicate: if A and B both
+/// belong to the same domain D, they are `RelatedTo` each other via
+/// that shared domain.
+///
+/// Examples this closes (on v4.0.14+ data with R10 already producing
+/// rich InDomain populations):
+///
+///   - `қуаныш InDomain сезім ∧ қайғы InDomain сезім ⟹ қуаныш RelatedTo қайғы`
+///     (note: сезім isn't currently an `InDomain` target but the emotions
+///     hub via `X IsA сезім` does feed R10 through a taxonomic path)
+///   - `қосу InDomain математика ∧ бөлу InDomain математика ⟹ қосу RelatedTo бөлу`
+///   - `қарға InDomain орнитология ∧ аққу InDomain орнитология ⟹ қарға RelatedTo аққу`
+///     (both through R10 from the `құс InDomain орнитология` seed)
+///
+/// **Tautology guard**: A = B rejected. Canonical pair ordering (sorted)
+/// applied before dedup, same as R5, so «(A, B)» and «(B, A)» produce
+/// one derivation not two.
+fn rule_r11_in_domain_shared_target(
+    _facts: &[Fact],
+    graph: &LexicalGraph,
+    seen: &BTreeSet<(String, String, String)>,
+    out: &mut Vec<DerivedFact>,
+) {
+    let mut pass_pairs: BTreeSet<(String, String)> = BTreeSet::new();
+    for (hub, _stats) in graph.nodes.iter() {
+        let incoming_in_domain: Vec<&crate::graph::GraphEdge> = graph
+            .incoming(hub)
+            .into_iter()
+            .filter(|e| e.predicate == Predicate::InDomain)
+            .collect();
+        if incoming_in_domain.len() < 2 {
+            continue;
+        }
+        for (i, first) in incoming_in_domain.iter().enumerate() {
+            for second in &incoming_in_domain[i + 1..] {
+                let (a, b) = canonical_relation_pair(&first.from, &second.from);
+                if a == b {
+                    continue;
+                }
+                if !pass_pairs.insert((a.clone(), b.clone())) {
+                    continue;
+                }
+                let key = (a.clone(), "related_to".to_string(), b.clone());
+                if seen.contains(&key) {
+                    continue;
+                }
+                let first_source = first
+                    .sources
+                    .first()
+                    .cloned()
+                    .expect("graph edge must carry at least one source");
+                let second_source = second
+                    .sources
+                    .first()
+                    .cloned()
+                    .expect("graph edge must carry at least one source");
+                out.push(DerivedFact {
+                    subject: SlotRef {
+                        surface: a.clone(),
+                        root: a,
+                        pos: "noun".into(),
+                    },
+                    predicate: Predicate::RelatedTo,
+                    object: SlotRef {
+                        surface: b.clone(),
+                        root: b,
+                        pos: "noun".into(),
+                    },
+                    rule_id: "R11_in_domain_shared_target".into(),
+                    source_chain: vec![first_source, second_source],
+                    confidence: ConfidenceKind::RuleInferred,
+                });
+            }
         }
     }
 }
@@ -1767,6 +1847,122 @@ mod tests {
         assert!(
             r10_pairs.contains(&("арыстан".into(), "зоология".into())),
             "R10 должен покрыть внука через R1-derived IsA жануар (через fixpoint)"
+        );
+    }
+
+    // ------------------------- R11 (v4.0.18) ----------------------------
+
+    #[test]
+    fn r11_derives_related_to_from_shared_domain() {
+        // қосу InDomain математика ∧ бөлу InDomain математика
+        //   ⟹ қосу RelatedTo бөлу
+        let facts = vec![
+            mk_fact("қосу", Predicate::InDomain, "математика", "wc", "num_a"),
+            mk_fact("бөлу", Predicate::InDomain, "математика", "wc", "num_b"),
+        ];
+        let derived = run(&facts);
+        let r11: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R11_in_domain_shared_target")
+            .collect();
+        assert_eq!(r11.len(), 1, "R11 should fire once (got {derived:?})");
+        let d = r11[0];
+        assert_eq!(d.predicate, Predicate::RelatedTo);
+        let pair: std::collections::BTreeSet<&str> =
+            [d.subject.root.as_str(), d.object.root.as_str()]
+                .iter()
+                .copied()
+                .collect();
+        let expected: std::collections::BTreeSet<&str> = ["қосу", "бөлу"].iter().copied().collect();
+        assert_eq!(pair, expected);
+        assert_eq!(d.confidence, ConfidenceKind::RuleInferred);
+        assert_eq!(d.source_chain.len(), 2);
+    }
+
+    #[test]
+    fn r11_respects_tautology_guard() {
+        // A InDomain X + A InDomain X (duplicate) → no self-related.
+        let facts = vec![
+            mk_fact("A", Predicate::InDomain, "X", "p", "s1"),
+            mk_fact("A", Predicate::InDomain, "X", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        for d in &derived {
+            assert!(
+                !(d.subject.root == d.object.root && d.rule_id == "R11_in_domain_shared_target"),
+                "R11 must never derive A RelatedTo A: {d:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn r11_does_not_fire_for_distinct_domains() {
+        // A InDomain X + B InDomain Y (X ≠ Y) — no shared hub.
+        let facts = vec![
+            mk_fact("қосу", Predicate::InDomain, "математика", "wc", "a"),
+            mk_fact("қарға", Predicate::InDomain, "орнитология", "wc", "b"),
+        ];
+        let derived = run(&facts);
+        let r11: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R11_in_domain_shared_target")
+            .collect();
+        assert!(r11.is_empty());
+    }
+
+    #[test]
+    fn r11_produces_canonical_pair_once() {
+        // 3 subjects sharing a domain give C(3,2) = 3 pairs, each once.
+        let facts = vec![
+            mk_fact("қосу", Predicate::InDomain, "математика", "wc", "a"),
+            mk_fact("алу", Predicate::InDomain, "математика", "wc", "b"),
+            mk_fact("бөлу", Predicate::InDomain, "математика", "wc", "c"),
+        ];
+        let derived = run(&facts);
+        let r11: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R11_in_domain_shared_target")
+            .collect();
+        assert_eq!(
+            r11.len(),
+            3,
+            "C(3,2) = 3 unique canonical pairs expected (got {})",
+            r11.len()
+        );
+    }
+
+    #[test]
+    fn r11_chains_through_r10_derived_in_domain() {
+        // арыстан IsA жыртқыш, бөрі IsA жыртқыш, жыртқыш InDomain зоология.
+        // iter 1: R5 derives (арыстан RelatedTo бөрі) via shared-IsA hub
+        //   жыртқыш; R10 derives арыстан InDomain зоология + бөрі
+        //   InDomain зоология.
+        // iter 2: with 3 incoming InDomain edges on зоология (арыстан,
+        //   бөрі, жыртқыш), R11 sees C(3,2) = 3 candidate pairs. The
+        //   (арыстан, бөрі) pair is already seen (R5 got there first),
+        //   so R11 emits only the two new hub-mediated pairs:
+        //   (арыстан ↔ жыртқыш) and (бөрі ↔ жыртқыш). Proves R11 picks
+        //   up R10-derived InDomain via fixpoint.
+        let facts = vec![
+            mk_fact("арыстан", Predicate::IsA, "жыртқыш", "wc", "a"),
+            mk_fact("бөрі", Predicate::IsA, "жыртқыш", "wc", "b"),
+            mk_fact("жыртқыш", Predicate::InDomain, "зоология", "wc", "c"),
+        ];
+        let derived = run(&facts);
+        let r11_pairs: std::collections::BTreeSet<(String, String)> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R11_in_domain_shared_target")
+            .map(|d| (d.subject.root.clone(), d.object.root.clone()))
+            .collect();
+        assert!(
+            !r11_pairs.is_empty(),
+            "R11 should fire via R10-derived InDomain at fixpoint: got {r11_pairs:?}"
+        );
+        let expected_one = canonical_relation_pair("арыстан", "жыртқыш");
+        let expected_two = canonical_relation_pair("бөрі", "жыртқыш");
+        assert!(
+            r11_pairs.contains(&expected_one) && r11_pairs.contains(&expected_two),
+            "R11 should emit (арыстан↔жыртқыш) + (бөрі↔жыртқыш) via R10-derived InDomain; got {r11_pairs:?}"
         );
     }
 
