@@ -7,6 +7,67 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.11] — 2026-04-24 — World Core batch #2: `music_kz.jsonl` + `sports.jsonl` + `house_parts.jsonl`
+
+Second fast-path batch. Three new curated domains completing v4.0.9's rhythm: +54 entries, ~3 seconds pipeline rebuild.
+
+### New domains
+
+1. **`music_kz.jsonl`** (16 entries) — Kazakh traditional music. New `аспап` hub (аспап IsA құрал) with 10 instrument children: домбыра, қобыз, сыбызғы, жетіген, шаңқобыз, дабыл, дауылпаз, асатаяқ, сырнай, сазсырнай. 3 performer professions (домбырашы, қобызшы, сыбызғышы IsA маман). 2 cultural events: айтыс IsA жарыс (song-contest; cross-chains into the new sports.жарыс hub), той IsA жиын. Forms (ән, күй, жыр, терме, толғау) deferred — жыр already in kz_literature as IsA жанр and a cleaner musical-composition hub decision is pending.
+
+2. **`sports.jsonl`** (18 entries) — traditional Kazakh games + general athletics. Hub chain: `ойын IsA әрекет`, `жарыс IsA ойын`. Contest children under жарыс: көкпар, аударыспақ, сайыс, бәйге, күрес (5 national horseback / wrestling traditions). Game children under ойын: алтыбақан, асық, тоғызқұмалақ (3 national). Equipment: доп IsA құрал. Athlete professions (6): шабандоз, палуан, мерген, жүгіруші, жүзгіш (IsA маман). Misc: жаттығу IsA әрекет, жеңіс part_of жарыс. Loanwords (футбол, хоккей, бокс, тренер) excluded per corpus purity directive.
+
+3. **`house_parts.jsonl`** (20 entries) — architectural parts + furniture. `үй has бөлме` opens the hub (activates R3 Has-via-PartOf inheritance through all 11 part_of entries). Parts part_of үй: бөлме, есік, терезе, еден, төбе, қабырға, баспалдақ, шатыр, дәліз, мұржа, пеш, жиһаз, кілем. Furniture sub-hub: жиһаз part_of үй, then 5 IsA жиһаз children (үстел, орындық, төсек, сандық, сөре). пәтер IsA үй (apartment-as-house).
+
+### Totals
+
+| | v4.0.10 | v4.0.11 | delta |
+|---|---:|---:|---|
+| World Core domains | 17 | **20** | +3 |
+| World Core entries | 654 | **708** | +54 |
+| World Core facts | 748 | **802** | +54 |
+
+### Measured runtime delta (fast-path rebuild)
+
+| | v4.0.10 | v4.0.11 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 787 | **13 841** | +54 |
+| curated (HumanApproved) | 748 | **802** | +54 |
+| extracted (Grammar, unchanged) | 13 039 | 13 039 | 0 |
+| **derivations total** | **12 492** | **13 943** | **+1 451 (+11.6 %)** |
+| R1_is_a_transitivity | 426 | **452** | +26 |
+| R2_has_inheritance | 436 | **446** | +10 |
+| **R3_has_inheritance_via_part_of** | 26 | **28** | **+2** (house_parts activates) |
+| **R5_shared_is_a_target** | 10 537 | **11 940** | **+1 403** |
+| R6_lives_in_via_part_of | 36 | **37** | +1 |
+| R7_goes_to_via_part_of | 297 | **306** | +9 |
+| R8_after_transitivity | 734 | 734 | 0 |
+| Graph nodes | 3 374 | **3 407** | +33 |
+| Graph edges | 12 394 | **12 448** | +54 |
+
+### Effective leverage: +27 derivations per added curated fact
+
+**1 451 new derivations / 54 new curated facts = +27 derivations/fact.** Below v4.0.9's peak (+47/fact, which had a single 40-entry professions.jsonl saturating the маман hub), above v4.0.7's +13/fact baseline. The 10 new аспап children (C(10,2)=45 R5 pairs on a new hub) + 6 new athlete professions (extending the ~55-child маман hub to ~61, adding ~55×6 = 330 new R5 pairs with existing children) account for the majority of the R5 gain.
+
+### Cross-domain cross-chain
+
+Explicit designed cross-links in this batch:
+- `айтыс IsA жарыс` (music_kz → sports) — айтыс becomes R5-related to every other жарыс child (көкпар, аударыспақ, бәйге, күрес, сайыс).
+- `күйші / жыршы` (already in professions) — now cross-chain with the instrument domain through their IsA маман shared parent.
+- `пеш part_of үй` (house_parts) — activates new R3 chain: when future entries add `пеш has жылу` or `үй has пеш` inheritance, R3 will populate.
+
+### Pipeline cost
+
+v4.0.11 full rebuild: ~3 seconds (3-domain batch confirms v4.0.8 infra). Pre-v4.0.8 equivalent: ~135 min per-domain workflow → batch in one: **~2 700× speedup**.
+
+### Scope discipline
+
+Purely additive data. No code changes. 465 tests unchanged.
+
+**Substituted from original plan**: v4.0.10 closing mentioned `music_kz / sports / education` as v4.0.11 candidates. Pre-batch audit surfaced that `education` is already 70 % covered across `society.jsonl` (мектеп, университет, білім, оқушы, студент, ғылым), `professions.jsonl` (мұғалім, оқытушы, тәрбиеші), `tools_household.jsonl` (қалам, қарындаш, дәптер), and `kz_literature.jsonl` (ағартушы). A dedicated education.jsonl would duplicate ~10 of 15 core entries. Substituted with `house_parts.jsonl` — genuine gap (үй / бөлме / жиһаз had zero world_core coverage pre-v4.0.11).
+
+---
+
 ## [4.0.10] — 2026-04-24 — Noise-elimination audit: time-noun subjects in `copula_is_a`
 
 Audit on the fresh v4.0.9 `derived_facts.json` (12 849 derivations) surfaced one dominant text-only noise class that had persisted through v4.0.x: Wikipedia timeline entries extracted as IsA facts with month / day / year subjects.

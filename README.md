@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.10-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.11-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -67,7 +67,7 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | Dialog intents | 26 |
 | Lexicon roots | 14 247 |
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
-| **World Core (v4.0.9)** | **654 entries / 748 curated facts** across **17 domains**: astronomy (30 / 41), time (20 / 38), geography_kz (30 / 47), biology_basic (40 / 41), body_parts (40 / 55), society (40 / 48), colors (37 / 38), numbers (45 / 54), kz_literature (60 / 69), food (50 / 50), clothing (35 / 35), proverbs (40 / 43), animals (40 / 42), transport (42 / 42), **plants (35 / 35)**, **professions (40 / 40)**, **tools_household (30 / 30)** — bolded are new in v4.0.9. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
+| **World Core (v4.0.11)** | **708 entries / 802 curated facts** across **20 domains**: astronomy (30 / 41), time (20 / 38), geography_kz (30 / 47), biology_basic (40 / 41), body_parts (40 / 55), society (40 / 48), colors (37 / 38), numbers (45 / 54), kz_literature (60 / 69), food (50 / 50), clothing (35 / 35), proverbs (40 / 43), animals (40 / 42), transport (42 / 42), plants (35 / 35), professions (40 / 40), tools_household (30 / 30), **music_kz (16 / 16)**, **sports (18 / 18)**, **house_parts (20 / 20)** — bolded are new in v4.0.11. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
 | Workspace tests | **465 passing, 0 failing, 0 warnings** |
 | Pattern matchers | **11** — v2.x baseline (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
@@ -75,9 +75,9 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | **Dialog closed-class sync** (v3.9.5) | `NOT_A_TOPIC` mirrors `adam_reasoning::patterns::is_closed_class` — closes the pre-v3.9.5 «Неліктен → Нелікте тұрасыз ба» misparse where the FST correctly analysed `Неліктен` as ablative of a noun stem but the dialog layer had no interrogative filter |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
-| Facts (committed runtime) | **13 787 total** = **13 039 extracted (Grammar)** + **748 curated (HumanApproved, 17 domains)**. T4_200k scale for the text-extracted portion. v4.0.10 noise-elimination: **−63 facts** after closing the month/day IsA-subject gap in `copula_is_a` |
-| **Rule-derived facts (committed runtime)** | **12 492** (v4.0.10: R1=426, R2=436, R3=26, R5=**10 537**, R6=36, R7=297, R8=734). Delta vs v4.0.9: **−357 (−2.8 %)** from v4.0.10 noise-elimination: closed the time-noun-subject gap in `copula_is_a` (missing since v3.8.5 hardening of the other three matchers). Leverage: **5.7 derivations eliminated per removed base fact** — precision compounds through R1/R2/R5 transitive closures |
-| Fact-graph nodes / edges | **3 374 / 12 394** (committed v4.0.10); most-connected content nouns: **адам (289), жер (218), дүние (206), қазақ (203), ат (148)**. «жыл» dropped out of top-5 in v4.0.10 — its previous #5 position (151) was noise-driven (Wikipedia timeline extractions) |
+| Facts (committed runtime) | **13 841 total** = **13 039 extracted (Grammar)** + **802 curated (HumanApproved, 20 domains)**. T4_200k scale for the text-extracted portion |
+| **Rule-derived facts (committed runtime)** | **13 943** (v4.0.11: R1=452, R2=446, R3=**28**, R5=**11 940**, R6=37, R7=306, R8=734). Delta vs v4.0.10: **+1 451 (+11.6 %)** from the three-domain batch; R5 shared-IsA alone gained **+1 403** from the new аспап hub (C(10,2)=45 pairs on one hub) and 6 new маман children cross-chaining with 55 existing professions. R3 Has-via-PartOf **activated** by house_parts.jsonl (26 → 28, +2). **Effective leverage: +27 derivations per added curated fact** (vs v4.0.9 peak +47/fact, v4.0.7 baseline +13/fact) |
+| Fact-graph nodes / edges | **3 407 / 12 448** (committed v4.0.11); most-connected content nouns: **адам (289), жер (218), дүние (206), қазақ (203), ат (148)** |
 | **Tooling throughput (v4.0.8 → v4.0.9 validation)** | `extract_facts --world-core-only` — v4.0.8 infra. v4.0.9 confirmed empirically: 3-domain batch (105 new facts, full rebuild of facts + derived_facts + lexical_graph) took **~4 s total** vs ~135 min under the pre-v4.0.8 per-domain workflow — **~2 000× pipeline speedup on a 3-domain batch**. |
 | **Predicate coverage (v3.9.5)** | **11 / 11 = 100 %** — every declared predicate fires. Causes = 6, InDomain = 5 (v3.9.5 biology/anatomy/society entries extended the v3.9.0 foothold) |
 | Iteration harness (v3.1.0) | `--time-budget <SEC>`, `--progress-interval <SEC>`, SIGINT→graceful-commit; Rayon par_iter on extract hot loop |
