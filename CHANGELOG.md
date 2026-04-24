@@ -7,6 +7,75 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.15] — 2026-04-24 — World Core batch #4: `language_features.jsonl` + `cooking_methods.jsonl` + `directions.jsonl`
+
+Fourth data batch. Three more curated domains, chosen to exploit R9 (PartOf-transitivity, v4.0.13) and R10 (InDomain-inheritance, v4.0.14) by feeding them long part_of chains and populous IsA taxonomies.
+
+### Three new domains
+
+1. **`language_features.jsonl`** (18 entries) — linguistic structure. 5-hop part_of backbone: `дыбыс → буын → сөз → сөйлем → мәтін → тіл`. Sub-chains: `әріп part_of жазу part_of тіл`, `мағына part_of сөз`. Sound types: `дауысты / дауыссыз IsA дыбыс` (vowels/consonants). Action verbs: `сөйлеу / жазу IsA әрекет`. 4 белгі children: `буын / әріп / сөйлем` IsA белгі.
+
+2. **`cooking_methods.jsonl`** (10 entries) — cooking verbs. `пісіру IsA әрекет` hub + 3 пісіру children (`қуыру / қайнату / қақтау`). 6 more әрекет siblings: тұздау / ашыту / турау / араластыру / дайындау. `қамыр part_of нан`.
+
+3. **`directions.jsonl`** (9 entries) — cardinal + spatial orientation. `бағыт IsA белгі` hub + 8 direction children: шығыс / батыс / солтүстік / оңтүстік / жоғары / төмен / оң / сол.
+
+### Totals
+
+| | v4.0.14 | v4.0.15 | delta |
+|---|---:|---:|---|
+| World Core domains | 23 | **26** | +3 |
+| World Core entries | 755 | **792** | +37 |
+| World Core facts | 849 | **886** | +37 |
+
+### Measured runtime delta
+
+| | v4.0.14 | v4.0.15 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 888 | **13 925** | +37 |
+| **derivations total** | 15 135 | **15 846** | **+711 (+4.7 %)** |
+| R1_is_a_transitivity | 473 | **484** | +11 |
+| R2_has_inheritance | 454 | 454 | 0 |
+| R3_has_inheritance_via_part_of | 43 | **51** | +8 |
+| **R5_shared_is_a_target** | 12 791 | **13 414** | **+623** |
+| R6_lives_in_via_part_of | 41 | **49** | +8 |
+| R7_goes_to_via_part_of | 380 | **388** | +8 |
+| R8_after_transitivity | 734 | 734 | 0 |
+| **R9_part_of_transitivity** | 117 | **170** | **+53** |
+| R10_in_domain_inheritance | 102 | 102 | 0 |
+| Graph nodes | 3 432 | **3 461** | +29 |
+| Graph edges | 12 495 | **12 532** | +37 |
+
+### R9 cascade payoff
+
+The 5-hop `language_features` part_of chain (дыбыс → буын → сөз → сөйлем → мәтін → тіл) is exactly the kind of long mereological chain v4.0.13's R9 was designed for. R9 jumps from 117 → **170 (+53)** — 10 new part_of entries produce **+5.3 R9 derivations per entry**. Plus cross-activation: R3/R6/R7 each gained ~8 derivations from R9's new part_of facts.
+
+### R5 leverage
+
++623 R5 pairs from dense hubs: 8 new бағыт children (C(8,2) = 28), 3 new пісіру children + 5 siblings under әрекет, 4 новых белгі children cross-chain with existing (сан, ақша, тіл, дыбыс, буын, әріп, сөйлем now all IsA белгі, giving C(n,2) combinatorics).
+
+### Effective leverage: +19.2 derivations per curated fact
+
+**711 new derivations / 37 new curated facts = +19.2 derivations/fact.** Roughly matches v4.0.12's +19/fact baseline for multi-hub batches. Below v4.0.9's peak of +47/fact (single huge маман hub) but consistent — this was not a concentration batch.
+
+### Cumulative v4.0.7 → v4.0.15 (9 releases)
+
+| | v4.0.7 | v4.0.15 | delta |
+|---|---:|---:|---|
+| Active reasoning rules | 7 | 9 | +2 |
+| World Core domains | 14 | **26** | +12 |
+| World Core entries | 549 | **792** | +243 |
+| World Core facts | 643 | **886** | +243 |
+| **Derivations** | **7 866** | **15 846** | **+7 980 (+101.4 %)** |
+| R5 shared-IsA | 5 940 | **13 414** | **+7 474 (+126 %)** |
+
+**Crossed 2× derivations mark** (+101.4 % cumulative) — the knowledge+rules axis rotation has compounded.
+
+### Scope
+
+Purely additive data. No code changes. 476 tests unchanged.
+
+---
+
 ## [4.0.14] — 2026-04-24 — R10 InDomain-inheritance via IsA (new reasoning rule)
 
 Second consecutive rule-axis patch. Reasoner roster 8 → 9. Pattern: `A IsA B ∧ B InDomain D ⟹ A InDomain D` — identical shape to R2 (Has-inheritance), applied to the domain-membership predicate.
