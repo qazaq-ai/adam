@@ -7,6 +7,114 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.7] — 2026-04-23 — World Core expansion: new `transport.jsonl` domain
+
+Axis rotation. Two consecutive patches (v4.0.5, v4.0.6) cleaned noise; time to grow clean knowledge. v4.0.7 adds a **14th World Core domain** — `transport.jsonl` — along the "domains" axis of the knowledge-first direction (`project_v4_direction`).
+
+### New domain — `transport.jsonl`
+
+**42 entries / 42 facts**. Classic transport taxonomy centred on the `көлік` (transport / vehicle) hub:
+
+- **Vehicle hierarchy** (13 direct IsA көлік): машина, автомобиль, пойыз, ұшақ, кеме, велосипед, мотоцикл, автобус, трамвай, метро, троллейбус, такси, тікұшақ, жүк машинасы.
+- **Infrastructure**: жол + subclasses (көше, даңғыл, тас жол, темір жол, көпір), facilities (аэропорт, вокзал, порт, аялдама, бекет).
+- **Professions**: жүргізуші, пилот, капитан, машинист, жолаушы.
+- **Substances / parts**: отын (+ бензин, дизель, керосин), дөңгелек, мотор.
+- **Actions / events**: қозғалыс, кеме → теңіз, ұшақ → аэропорт.
+
+### Shared-IsA leverage
+
+The 13 vehicles as direct children of `көлік` give R5 shared-IsA up to **C(13,2) = 78** RelatedTo pairs on one hub alone. Professions cluster (4 direct maман children) → C(4,2)=6 more. Road hierarchy gives subclass R1 transitivity through «көше IsA жол», «даңғыл IsA көше», «темір жол IsA жол», etc.
+
+### Totals
+
+| | v4.0.6 | v4.0.7 | delta |
+|---|---:|---:|---|
+| World Core domains | 13 | **14** | +1 |
+| World Core entries | 507 | **549** | +42 |
+| World Core facts | 601 | **643** | +42 |
+
+### Measured runtime delta
+
+Re-extract + reasoner rebuild on the committed 200k-sample runtime (transport-authored facts + unchanged text-extraction):
+
+| | v4.0.6 | v4.0.7 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 703 | **13 745** | **+42** (exactly the transport entries) |
+| curated (HumanApproved) | 601 | **643** | +42 |
+| extracted (Grammar) | 13 102 | 13 102 | unchanged |
+| IsA facts | 524 | **560** | +36 (transport IsA cluster) |
+| PartOf facts | 115 | 117 | +2 |
+| GoesTo facts | 1 595 | 1 597 | +2 (кеме/ұшақ destinations) |
+| Has facts | 225 | 226 | +1 |
+| Causes facts | 22 | 23 | +1 |
+
+Per-rule derivation deltas — **R5 explodes from the dense new IsA cluster**:
+
+| rule | v4.0.6 | v4.0.7 | delta |
+|---|---:|---:|---|
+| R1_is_a_transitivity | 361 | **386** | **+25** (көлік sub-chains: жеңіл машина IsA автомобиль IsA көлік, etc.) |
+| R2_has_inheritance | 417 | **442** | +25 |
+| R3_has_inheritance_via_part_of | 26 | 26 | 0 |
+| **R5_shared_is_a_target** | 5 437 | **5 940** | **+503** (köлік hub + профессия cluster + отын cluster + cross-domain hits) |
+| R6_lives_in_via_part_of | 36 | 36 | 0 |
+| R7_goes_to_via_part_of | 300 | 302 | +2 |
+| R8_after_transitivity | 734 | 734 | 0 |
+| **total derivations** | **7 311** | **7 866** | **+555 (+7.6 %)** |
+
+R5 +503 far exceeds the theoretical C(13,2)=78 from the köлік hub alone because curated IsA chains **cross-reference** existing world_core structure: transport professions (жүргізуші / пилот / капитан / машинист) all IsA маман — joining the existing маман cluster from kz_literature / society, which has ~20 sibling entries already. Plus отын cluster joining substances, plus qозғалыс joining the action hub.
+
+### Graph
+
+Nodes: 3 284 → **3 315** (+31); edges: 12 308 → **12 350** (+42). Most-connected content nouns unchanged: адам (289), жер (218), дүние (207), қазақ (201), жыл (151).
+
+### Single-curated-domain knowledge leverage
+
+The patch adds 42 curated facts and produces **+555 rule derivations** — a net-effective knowledge-growth ratio of ~13× per added fact through the reasoner's cross-chain multiplier. This is exactly the compounding effect the World Core direction targets: one human-authored fact reverberates through existing curated structure to produce many provably correct downstream claims.
+
+### Validator
+
+```
+$ cargo run -p adam-reasoning --bin validate_world_core
+## Domain summary
+
+| domain        | entries | approved | pending | rejected | facts |
+|---            |      ---|       ---|      ---|       ---|    ---|
+| animals       |      40 |       40 |       0 |        0 |    42 |
+| astronomy     |      30 |       30 |       0 |        0 |    41 |
+| biology_basic |      40 |       40 |       0 |        0 |    41 |
+| body_parts    |      40 |       40 |       0 |        0 |    55 |
+| clothing      |      35 |       35 |       0 |        0 |    35 |
+| colors        |      37 |       37 |       0 |        0 |    38 |
+| food          |      50 |       50 |       0 |        0 |    50 |
+| geography_kz  |      30 |       30 |       0 |        0 |    47 |
+| kz_literature |      60 |       60 |       0 |        0 |    69 |
+| numbers       |      45 |       45 |       0 |        0 |    54 |
+| proverbs      |      40 |       40 |       0 |        0 |    43 |
+| society       |      40 |       40 |       0 |        0 |    48 |
+| time          |      20 |       20 |       0 |        0 |    38 |
+| transport     |      42 |       42 |       0 |        0 |    42 |
+| TOTAL         |     549 |      549 |         |          |   643 |
+validate_world_core: OK — 549 entries / 549 approved / 643 facts
+```
+
+### Tests
+
+**463 passing** (unchanged — domain expansion is data-only, no new logic).
+
+### Scope discipline
+
+One new domain. No code changes, no rule changes, no extractor changes. Sequential 1→9 cadence preserved (v4.0.6 → v4.0.7 → v4.0.8).
+
+### What's next
+
+Axes continue to rotate per `project_v4_direction`:
+- **World Core**: more domains (materials / tools / weather / emotions / sports) or expansion of existing ones.
+- **Reasoning rules**: R9 candidate — possibly Causes-transitivity with type guards, or R-rule chaining through the new transport graph.
+- **Noise elimination**: keep precision-auditing each re-extract spot-check.
+- **Corpus**: long-horizon FST-synthetic data generation.
+
+---
+
 ## [4.0.6] — 2026-04-23 — Narrow attributive blocklist in `is_closed_class`
 
 Continuing the noise-elimination axis from v4.0.5. That patch shipped the **rightmost-subject** fix in `temporal_after`; spot-check then surfaced a distinct noise class the rightmost scan couldn't catch: attributive `-лық / -лік / -и` adjective-derivations that the FST tags as bare nouns. When the real NP head got consumed in the ablative slot, the attributive modifier was the *only* remaining nominative candidate before the postposition — so both left-to-right and right-to-left scans picked it.

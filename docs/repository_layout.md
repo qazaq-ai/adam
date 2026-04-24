@@ -38,7 +38,7 @@
 - `data/dialog/`
   dialog-layer template repository (`templates/v1.toml`, **34 families** as of v3.9.5, incl. v1.8.0 session-aware evidence templates, v1.9.5 adapted-evidence family, and v2.7 `unknown.with_derived_chain` reasoning-marker family; see `data/dialog/README.md`)
 - `data/world_core/` (v3.9.0+)
-  human-authored Kazakh knowledge packs — 13 domains (astronomy, time, geography_kz, biology_basic, body_parts, society, colors, numbers, kz_literature, food, clothing, proverbs, animals), **507 entries / 601 curated facts** at v4.0, all `approved` by `shaman`. Schema + authoring guide in `data/world_core/README.md`
+  human-authored Kazakh knowledge packs — 14 domains (astronomy, time, geography_kz, biology_basic, body_parts, society, colors, numbers, kz_literature, food, clothing, proverbs, animals, transport), **549 entries / 643 curated facts** at v4.0.7, all `approved` by `shaman`. Schema + authoring guide in `data/world_core/README.md`
 - `data/retrieval/`
   morpheme inverted index (v1.6.0+), committed `facts.json` (v2.1+) — **mixed source at v3.9.0+** (text-extracted `Grammar` + curated `HumanApproved`), `lexical_graph.json` (v2.3+), `derived_facts.json` (v2.4+)
 - `data/scaling/` (v3.2.0+)

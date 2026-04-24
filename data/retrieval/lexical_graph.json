@@ -1,17 +1,17 @@
 {
-  "version": "4.0.6",
+  "version": "4.0.7",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
   "summary": {
-    "total_nodes": 3284,
-    "total_edges": 12308,
-    "facts_ingested": 13703,
+    "total_nodes": 3315,
+    "total_edges": 12350,
+    "facts_ingested": 13745,
     "most_connected": [
       [
         "адам",
-        288
+        289
       ],
       [
         "жер",
@@ -105,6 +105,14 @@
         },
         "in_by_predicate": {}
       },
+      "автобус": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "автокөлік": {
         "out_degree": 4,
         "in_degree": 5,
@@ -116,6 +124,14 @@
           "does_to": 4,
           "related_to": 1
         }
+      },
+      "автомобиль": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "автономиялық": {
         "out_degree": 2,
@@ -194,7 +210,7 @@
       },
       "адам": {
         "out_degree": 140,
-        "in_degree": 148,
+        "in_degree": 149,
         "out_by_predicate": {
           "after": 1,
           "does_to": 86,
@@ -210,7 +226,7 @@
           "does_to": 104,
           "goes_to": 29,
           "has": 1,
-          "is_a": 3,
+          "is_a": 4,
           "part_of": 1,
           "related_to": 10
         }
@@ -2037,6 +2053,16 @@
         },
         "in_by_predicate": {}
       },
+      "аэропорт": {
+        "out_degree": 1,
+        "in_degree": 1,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {
+          "goes_to": 1
+        }
+      },
       "аю": {
         "out_degree": 2,
         "in_degree": 3,
@@ -2068,6 +2094,14 @@
           "does_to": 5,
           "goes_to": 1
         }
+      },
+      "аялдама": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "аян": {
         "out_degree": 0,
@@ -3074,6 +3108,14 @@
         },
         "in_by_predicate": {}
       },
+      "бекет": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "белбеу": {
         "out_degree": 1,
         "in_degree": 0,
@@ -3097,6 +3139,14 @@
           "has": 1,
           "is_a": 7
         }
+      },
+      "бензин": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "береке": {
         "out_degree": 0,
@@ -4796,6 +4846,14 @@
         },
         "in_by_predicate": {}
       },
+      "велосипед": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "вена": {
         "out_degree": 1,
         "in_degree": 1,
@@ -4831,6 +4889,14 @@
         "in_by_predicate": {
           "related_to": 1
         }
+      },
+      "вокзал": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "газ": {
         "out_degree": 20,
@@ -5217,6 +5283,14 @@
           "is_a": 4
         }
       },
+      "даңғыл": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "дене": {
         "out_degree": 0,
         "in_degree": 15,
@@ -5283,6 +5357,14 @@
         "in_by_predicate": {
           "related_to": 1
         }
+      },
+      "дизель": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "динамикалық": {
         "out_degree": 1,
@@ -5994,11 +6076,12 @@
         "in_by_predicate": {}
       },
       "дөңгелек": {
-        "out_degree": 10,
+        "out_degree": 11,
         "in_degree": 4,
         "out_by_predicate": {
           "does_to": 9,
-          "has": 1
+          "has": 1,
+          "part_of": 1
         },
         "in_by_predicate": {
           "does_to": 4
@@ -8379,14 +8462,15 @@
         }
       },
       "жол": {
-        "out_degree": 31,
-        "in_degree": 23,
+        "out_degree": 32,
+        "in_degree": 26,
         "out_by_predicate": {
           "after": 1,
           "does_to": 20,
           "goes_to": 3,
           "has": 1,
           "has_quantity": 1,
+          "is_a": 1,
           "lives_in": 1,
           "related_to": 4
         },
@@ -8394,9 +8478,18 @@
           "does_to": 15,
           "goes_to": 4,
           "has_quantity": 1,
+          "is_a": 3,
           "lives_in": 2,
           "related_to": 1
         }
+      },
+      "жолаушы": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "жолақ": {
         "out_degree": 2,
@@ -8942,6 +9035,14 @@
           "does_to": 19
         }
       },
+      "жүк машинасы": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "жүктеу": {
         "out_degree": 0,
         "in_degree": 1,
@@ -8977,6 +9078,14 @@
         }
       },
       "жүн": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "жүргізуші": {
         "out_degree": 1,
         "in_degree": 0,
         "out_by_predicate": {
@@ -9430,7 +9539,7 @@
       },
       "зат": {
         "out_degree": 34,
-        "in_degree": 53,
+        "in_degree": 54,
         "out_by_predicate": {
           "does_to": 19,
           "goes_to": 2,
@@ -9441,7 +9550,7 @@
         "in_by_predicate": {
           "does_to": 39,
           "goes_to": 4,
-          "is_a": 6,
+          "is_a": 7,
           "lives_in": 1,
           "part_of": 1,
           "related_to": 2
@@ -10195,6 +10304,14 @@
           "related_to": 2
         }
       },
+      "капитан": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "кар": {
         "out_degree": 3,
         "in_degree": 1,
@@ -10426,11 +10543,12 @@
         "in_by_predicate": {}
       },
       "кеме": {
-        "out_degree": 10,
+        "out_degree": 12,
         "in_degree": 0,
         "out_by_predicate": {
           "does_to": 6,
-          "goes_to": 2,
+          "goes_to": 3,
+          "is_a": 1,
           "related_to": 2
         },
         "in_by_predicate": {}
@@ -10594,6 +10712,14 @@
         "in_degree": 0,
         "out_by_predicate": {
           "does_to": 2
+        },
+        "in_by_predicate": {}
+      },
+      "керосин": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
         },
         "in_by_predicate": {}
       },
@@ -12413,14 +12539,17 @@
         }
       },
       "көлік": {
-        "out_degree": 7,
-        "in_degree": 10,
+        "out_degree": 9,
+        "in_degree": 24,
         "out_by_predicate": {
-          "does_to": 7
+          "causes": 1,
+          "does_to": 7,
+          "is_a": 1
         },
         "in_by_predicate": {
           "does_to": 6,
           "goes_to": 1,
+          "is_a": 14,
           "related_to": 3
         }
       },
@@ -12487,6 +12616,14 @@
         "in_by_predicate": {
           "does_to": 1
         }
+      },
+      "көпір": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "көру": {
         "out_degree": 0,
@@ -12571,14 +12708,16 @@
         }
       },
       "көше": {
-        "out_degree": 3,
-        "in_degree": 7,
+        "out_degree": 4,
+        "in_degree": 8,
         "out_by_predicate": {
           "does_to": 1,
+          "is_a": 1,
           "related_to": 2
         },
         "in_by_predicate": {
           "goes_to": 4,
+          "is_a": 1,
           "lives_in": 1,
           "related_to": 2
         }
@@ -12914,10 +13053,10 @@
       },
       "маман": {
         "out_degree": 0,
-        "in_degree": 12,
+        "in_degree": 16,
         "out_by_predicate": {},
         "in_by_predicate": {
-          "is_a": 12
+          "is_a": 16
         }
       },
       "мамандық": {
@@ -12979,6 +13118,25 @@
         }
       },
       "махамбет": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "машина": {
+        "out_degree": 2,
+        "in_degree": 2,
+        "out_by_predicate": {
+          "has": 1,
+          "is_a": 1
+        },
+        "in_by_predicate": {
+          "part_of": 2
+        }
+      },
+      "машинист": {
         "out_degree": 1,
         "in_degree": 0,
         "out_by_predicate": {
@@ -13069,7 +13227,7 @@
       },
       "мекеме": {
         "out_degree": 9,
-        "in_degree": 5,
+        "in_degree": 8,
         "out_by_predicate": {
           "does_to": 3,
           "goes_to": 1,
@@ -13078,7 +13236,7 @@
         },
         "in_by_predicate": {
           "does_to": 1,
-          "is_a": 2,
+          "is_a": 5,
           "related_to": 2
         }
       },
@@ -13143,6 +13301,14 @@
         "in_by_predicate": {}
       },
       "метеор": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "метро": {
         "out_degree": 1,
         "in_degree": 0,
         "out_by_predicate": {
@@ -13413,6 +13579,22 @@
         "in_by_predicate": {
           "does_to": 2
         }
+      },
+      "мотор": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "part_of": 1
+        },
+        "in_by_predicate": {}
+      },
+      "мотоцикл": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "моғол": {
         "out_degree": 6,
@@ -15167,6 +15349,14 @@
           "part_of": 1
         }
       },
+      "орын": {
+        "out_degree": 0,
+        "in_degree": 2,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 2
+        }
+      },
       "отан": {
         "out_degree": 9,
         "in_degree": 3,
@@ -15199,6 +15389,17 @@
           "is_a": 1
         },
         "in_by_predicate": {}
+      },
+      "отын": {
+        "out_degree": 1,
+        "in_degree": 4,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {
+          "has": 1,
+          "is_a": 3
+        }
       },
       "оқу": {
         "out_degree": 18,
@@ -15250,6 +15451,14 @@
         },
         "in_by_predicate": {}
       },
+      "пилот": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "пияз": {
         "out_degree": 6,
         "in_degree": 2,
@@ -15268,6 +15477,14 @@
         "in_degree": 0,
         "out_by_predicate": {
           "does_to": 1
+        },
+        "in_by_predicate": {}
+      },
+      "пойыз": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
         },
         "in_by_predicate": {}
       },
@@ -15296,10 +15513,11 @@
         }
       },
       "порт": {
-        "out_degree": 4,
+        "out_degree": 5,
         "in_degree": 6,
         "out_by_predicate": {
           "does_to": 3,
+          "is_a": 1,
           "related_to": 1
         },
         "in_by_predicate": {
@@ -18726,6 +18944,14 @@
           "does_to": 7
         }
       },
+      "такси": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "тактикалық": {
         "out_degree": 1,
         "in_degree": 0,
@@ -19003,6 +19229,14 @@
         "in_by_predicate": {
           "is_a": 1
         }
+      },
+      "тас жол": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
       },
       "таса": {
         "out_degree": 1,
@@ -19423,6 +19657,14 @@
           "related_to": 2
         }
       },
+      "темір жол": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "теміржол": {
         "out_degree": 7,
         "in_degree": 3,
@@ -19652,7 +19894,7 @@
       },
       "теңіз": {
         "out_degree": 42,
-        "in_degree": 23,
+        "in_degree": 24,
         "out_by_predicate": {
           "does_to": 25,
           "goes_to": 7,
@@ -19663,7 +19905,7 @@
         },
         "in_by_predicate": {
           "does_to": 11,
-          "goes_to": 3,
+          "goes_to": 4,
           "is_a": 2,
           "lives_in": 1,
           "related_to": 6
@@ -20159,6 +20401,22 @@
           "does_to": 1
         }
       },
+      "трамвай": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
+      "троллейбус": {
+        "out_degree": 1,
+        "in_degree": 0,
+        "out_by_predicate": {
+          "is_a": 1
+        },
+        "in_by_predicate": {}
+      },
       "тропиктік": {
         "out_degree": 9,
         "in_degree": 2,
@@ -20485,9 +20743,11 @@
         }
       },
       "тікұшақ": {
-        "out_degree": 0,
+        "out_degree": 1,
         "in_degree": 1,
-        "out_by_predicate": {},
+        "out_by_predicate": {
+          "is_a": 1
+        },
         "in_by_predicate": {
           "related_to": 1
         }
@@ -27402,15 +27662,17 @@
         }
       },
       "қозғалыс": {
-        "out_degree": 6,
-        "in_degree": 12,
+        "out_degree": 7,
+        "in_degree": 13,
         "out_by_predicate": {
           "does_to": 2,
           "goes_to": 2,
+          "is_a": 1,
           "related_to": 2
         },
         "in_by_predicate": {
           "after": 1,
+          "causes": 1,
           "does_to": 7,
           "goes_to": 3,
           "lives_in": 1
@@ -29226,10 +29488,10 @@
       },
       "құрал": {
         "out_degree": 0,
-        "in_degree": 4,
+        "in_degree": 5,
         "out_by_predicate": {},
         "in_by_predicate": {
-          "is_a": 4
+          "is_a": 5
         }
       },
       "құрт": {
@@ -29239,6 +29501,14 @@
           "is_a": 1
         },
         "in_by_predicate": {}
+      },
+      "құрылыс": {
+        "out_degree": 0,
+        "in_degree": 2,
+        "out_by_predicate": {},
+        "in_by_predicate": {
+          "is_a": 2
+        }
       },
       "құрылысшы": {
         "out_degree": 2,
@@ -30483,10 +30753,12 @@
         "in_by_predicate": {}
       },
       "ұшақ": {
-        "out_degree": 3,
+        "out_degree": 5,
         "in_degree": 10,
         "out_by_predicate": {
           "does_to": 2,
+          "goes_to": 1,
+          "is_a": 1,
           "related_to": 1
         },
         "in_by_predicate": {
@@ -31366,7 +31638,7 @@
       },
       "әрекет": {
         "out_degree": 12,
-        "in_degree": 19,
+        "in_degree": 20,
         "out_by_predicate": {
           "does_to": 8,
           "goes_to": 2,
@@ -31375,7 +31647,7 @@
         "in_by_predicate": {
           "does_to": 14,
           "goes_to": 2,
-          "is_a": 1,
+          "is_a": 2,
           "related_to": 2
         }
       },
@@ -33579,6 +33851,17 @@
         ]
       },
       {
+        "from": "автобус",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_009"
+          }
+        ]
+      },
+      {
         "from": "автокөлік",
         "predicate": "DoesTo",
         "to": "бүтін",
@@ -33619,6 +33902,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0007010"
+          }
+        ]
+      },
+      {
+        "from": "автомобиль",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_003"
           }
         ]
       },
@@ -43037,6 +43331,17 @@
         ]
       },
       {
+        "from": "аэропорт",
+        "predicate": "IsA",
+        "to": "мекеме",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_022"
+          }
+        ]
+      },
+      {
         "from": "аю",
         "predicate": "IsA",
         "to": "жыртқыш",
@@ -43110,6 +43415,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0123573"
+          }
+        ]
+      },
+      {
+        "from": "аялдама",
+        "predicate": "IsA",
+        "to": "орын",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_025"
           }
         ]
       },
@@ -48604,6 +48920,17 @@
         ]
       },
       {
+        "from": "бекет",
+        "predicate": "IsA",
+        "to": "орын",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_026"
+          }
+        ]
+      },
+      {
         "from": "белбеу",
         "predicate": "IsA",
         "to": "киім",
@@ -48751,6 +49078,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0107115"
+          }
+        ]
+      },
+      {
+        "from": "бензин",
+        "predicate": "IsA",
+        "to": "отын",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_033"
           }
         ]
       },
@@ -55604,6 +55942,17 @@
         ]
       },
       {
+        "from": "велосипед",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_007"
+          }
+        ]
+      },
+      {
         "from": "вена",
         "predicate": "DoesTo",
         "to": "шеміршек",
@@ -55655,6 +56004,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0022317"
+          }
+        ]
+      },
+      {
+        "from": "вокзал",
+        "predicate": "IsA",
+        "to": "мекеме",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_023"
           }
         ]
       },
@@ -57169,6 +57529,17 @@
         ]
       },
       {
+        "from": "даңғыл",
+        "predicate": "IsA",
+        "to": "көше",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_018"
+          }
+        ]
+      },
+      {
         "from": "денсаулық",
         "predicate": "IsA",
         "to": "байлық",
@@ -57507,6 +57878,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0067667"
+          }
+        ]
+      },
+      {
+        "from": "дизель",
+        "predicate": "IsA",
+        "to": "отын",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_034"
           }
         ]
       },
@@ -59971,6 +60353,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0016708"
+          }
+        ]
+      },
+      {
+        "from": "дөңгелек",
+        "predicate": "PartOf",
+        "to": "машина",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_036"
           }
         ]
       },
@@ -71127,6 +71520,17 @@
       },
       {
         "from": "жол",
+        "predicate": "IsA",
+        "to": "құрылыс",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_016"
+          }
+        ]
+      },
+      {
+        "from": "жол",
         "predicate": "LivesIn",
         "to": "қазақстан",
         "sources": [
@@ -71177,6 +71581,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0102950"
+          }
+        ]
+      },
+      {
+        "from": "жолаушы",
+        "predicate": "IsA",
+        "to": "адам",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_031"
           }
         ]
       },
@@ -73850,6 +74265,17 @@
         ]
       },
       {
+        "from": "жүк машинасы",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_014"
+          }
+        ]
+      },
+      {
         "from": "жүлде",
         "predicate": "DoesTo",
         "to": "міндет",
@@ -73912,6 +74338,17 @@
           {
             "pack": "world_core/clothing.jsonl",
             "sample_id": "cloth_024"
+          }
+        ]
+      },
+      {
+        "from": "жүргізуші",
+        "predicate": "IsA",
+        "to": "маман",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_027"
           }
         ]
       },
@@ -78342,6 +78779,17 @@
         ]
       },
       {
+        "from": "капитан",
+        "predicate": "IsA",
+        "to": "маман",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_029"
+          }
+        ]
+      },
+      {
         "from": "кар",
         "predicate": "DoesTo",
         "to": "тұщ",
@@ -79063,11 +79511,33 @@
       {
         "from": "кеме",
         "predicate": "GoesTo",
+        "to": "теңіз",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_039"
+          }
+        ]
+      },
+      {
+        "from": "кеме",
+        "predicate": "GoesTo",
         "to": "қала",
         "sources": [
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0061611"
+          }
+        ]
+      },
+      {
+        "from": "кеме",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_006"
           }
         ]
       },
@@ -79398,6 +79868,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0044288"
+          }
+        ]
+      },
+      {
+        "from": "керосин",
+        "predicate": "IsA",
+        "to": "отын",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_035"
           }
         ]
       },
@@ -86722,6 +87203,17 @@
       },
       {
         "from": "көлік",
+        "predicate": "Causes",
+        "to": "қозғалыс",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_041"
+          }
+        ]
+      },
+      {
+        "from": "көлік",
         "predicate": "DoesTo",
         "to": "ерекшелік",
         "sources": [
@@ -86794,6 +87286,17 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_03414"
+          }
+        ]
+      },
+      {
+        "from": "көлік",
+        "predicate": "IsA",
+        "to": "құрал",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_001"
           }
         ]
       },
@@ -87033,6 +87536,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0087270"
+          }
+        ]
+      },
+      {
+        "from": "көпір",
+        "predicate": "IsA",
+        "to": "құрылыс",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_021"
           }
         ]
       },
@@ -87341,6 +87855,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0146470"
+          }
+        ]
+      },
+      {
+        "from": "көше",
+        "predicate": "IsA",
+        "to": "жол",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_017"
           }
         ]
       },
@@ -88298,6 +88823,39 @@
           {
             "pack": "world_core/kz_literature.jsonl",
             "sample_id": "lit_003"
+          }
+        ]
+      },
+      {
+        "from": "машина",
+        "predicate": "Has",
+        "to": "отын",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_038"
+          }
+        ]
+      },
+      {
+        "from": "машина",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_002"
+          }
+        ]
+      },
+      {
+        "from": "машинист",
+        "predicate": "IsA",
+        "to": "маман",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_030"
           }
         ]
       },
@@ -89432,6 +89990,17 @@
         ]
       },
       {
+        "from": "метро",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_011"
+          }
+        ]
+      },
+      {
         "from": "ми",
         "predicate": "IsA",
         "to": "мүше",
@@ -90170,6 +90739,28 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_01437"
+          }
+        ]
+      },
+      {
+        "from": "мотор",
+        "predicate": "PartOf",
+        "to": "машина",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_037"
+          }
+        ]
+      },
+      {
+        "from": "мотоцикл",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_008"
           }
         ]
       },
@@ -98913,6 +99504,17 @@
         ]
       },
       {
+        "from": "отын",
+        "predicate": "IsA",
+        "to": "зат",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_032"
+          }
+        ]
+      },
+      {
         "from": "оқу",
         "predicate": "DoesTo",
         "to": "аймағындағ",
@@ -99266,6 +99868,17 @@
         ]
       },
       {
+        "from": "пилот",
+        "predicate": "IsA",
+        "to": "маман",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_028"
+          }
+        ]
+      },
+      {
         "from": "пияз",
         "predicate": "DoesTo",
         "to": "ет",
@@ -99343,6 +99956,17 @@
         ]
       },
       {
+        "from": "пойыз",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_004"
+          }
+        ]
+      },
+      {
         "from": "пол",
         "predicate": "DoesTo",
         "to": "ат",
@@ -99394,6 +100018,17 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_03566"
+          }
+        ]
+      },
+      {
+        "from": "порт",
+        "predicate": "IsA",
+        "to": "мекеме",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_024"
           }
         ]
       },
@@ -112368,6 +113003,17 @@
         ]
       },
       {
+        "from": "такси",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_013"
+          }
+        ]
+      },
+      {
         "from": "тактикалық",
         "predicate": "DoesTo",
         "to": "қатынас",
@@ -113374,6 +114020,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0129941"
+          }
+        ]
+      },
+      {
+        "from": "тас жол",
+        "predicate": "IsA",
+        "to": "жол",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_019"
           }
         ]
       },
@@ -114666,6 +115323,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0108873"
+          }
+        ]
+      },
+      {
+        "from": "темір жол",
+        "predicate": "IsA",
+        "to": "жол",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_020"
           }
         ]
       },
@@ -118484,6 +119152,28 @@
         ]
       },
       {
+        "from": "трамвай",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_010"
+          }
+        ]
+      },
+      {
+        "from": "троллейбус",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_012"
+          }
+        ]
+      },
+      {
         "from": "тропиктік",
         "predicate": "DoesTo",
         "to": "жер",
@@ -119848,6 +120538,17 @@
           {
             "pack": "wikipedia_kz_pack.json",
             "sample_id": "wiki_kz_0090460"
+          }
+        ]
+      },
+      {
+        "from": "тікұшақ",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_015"
           }
         ]
       },
@@ -149807,6 +150508,17 @@
       },
       {
         "from": "қозғалыс",
+        "predicate": "IsA",
+        "to": "әрекет",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_042"
+          }
+        ]
+      },
+      {
+        "from": "қозғалыс",
         "predicate": "RelatedTo",
         "to": "көтеріліс",
         "sources": [
@@ -161366,6 +162078,28 @@
           {
             "pack": "synthetic_sentences_pack.json",
             "sample_id": "synth_11036"
+          }
+        ]
+      },
+      {
+        "from": "ұшақ",
+        "predicate": "GoesTo",
+        "to": "аэропорт",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_040"
+          }
+        ]
+      },
+      {
+        "from": "ұшақ",
+        "predicate": "IsA",
+        "to": "көлік",
+        "sources": [
+          {
+            "pack": "world_core/transport.jsonl",
+            "sample_id": "tr_005"
           }
         ]
       },
@@ -173806,6 +174540,6 @@
         ]
       }
     ],
-    "facts_ingested": 13703
+    "facts_ingested": 13745
   }
 }

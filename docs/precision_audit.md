@@ -2,8 +2,8 @@
 
 **Target:** 50-fact sample + 50-derivation sample from the committed artifacts, seed `42`.
 
-- `facts.json`: 13703 facts total (upstream status: `completed`) — sampled 50 here.
-- `derived_facts.json`: 7311 derivations total (upstream status: `completed`) — sampled 50 here.
+- `facts.json`: 13745 facts total (upstream status: `completed`) — sampled 50 here.
+- `derived_facts.json`: 7866 derivations total (upstream status: `completed`) — sampled 50 here.
 
 ## How to review
 
@@ -702,10 +702,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #272
 
-- Triple: `(халқы — has — ара)`
-- Rule: `R2_has_inheritance`
+- Triple: `(тас жол — is_a — құрылыс)`
+- Rule: `R1_is_a_transitivity`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0012411, wikipedia_kz_pack.json/wiki_kz_0016981
+- Source chain: world_core/transport.jsonl/tr_019, world_core/transport.jsonl/tr_016
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -713,10 +713,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #369
 
-- Triple: `(сауысқан — has — іш)`
+- Triple: `(дуадақ — has — түр)`
 - Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
-- Source chain: world_core/animals.jsonl/anm_012, wikipedia_kz_pack.json/wiki_kz_0002165
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0130217, wikipedia_kz_pack.json/wiki_kz_0085083
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -724,10 +724,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #528
 
-- Triple: `(дала — has — көкөніс)`
-- Rule: `R3_has_inheritance_via_part_of`
+- Triple: `(роман — has — көшпел)`
+- Rule: `R2_has_inheritance`
 - Confidence: `rule_inferred`
-- Source chain: world_core/biology_basic.jsonl/bio_027, wikipedia_kz_pack.json/wiki_kz_0149157
+- Source chain: world_core/kz_literature.jsonl/lit_021, wikipedia_kz_pack.json/wiki_kz_0035900
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -735,10 +735,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #821
 
-- Triple: `(жәндік — related_to — тиін)`
+- Triple: `(жылан — related_to — сиыр)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/animals.jsonl/anm_029, world_core/animals.jsonl/anm_007
+- Source chain: world_core/animals.jsonl/anm_024, world_core/biology_basic.jsonl/bio_007
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -746,10 +746,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #842
 
-- Triple: `(киік — related_to — тиін)`
+- Triple: `(жылқы — related_to — құс)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/animals.jsonl/anm_009, world_core/animals.jsonl/anm_007
+- Source chain: world_core/biology_basic.jsonl/bio_005, world_core/animals.jsonl/anm_022
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -757,10 +757,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #858
 
-- Triple: `(мысық — related_to — тағы жануар)`
+- Triple: `(жәндік — related_to — мал)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/biology_basic.jsonl/bio_004, world_core/animals.jsonl/anm_037
+- Source chain: world_core/animals.jsonl/anm_029, world_core/animals.jsonl/anm_038
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -768,10 +768,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #930
 
-- Triple: `(бояу — related_to — әшекей)`
+- Triple: `(қой — related_to — құс)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/colors.jsonl/color_033, world_core/clothing.jsonl/cloth_028
+- Source chain: world_core/biology_basic.jsonl/bio_006, world_core/animals.jsonl/anm_022
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -779,10 +779,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #939
 
-- Triple: `(әтір — related_to — әшекей)`
+- Triple: `(қарбыз — related_to — қауын)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0102432, world_core/clothing.jsonl/cloth_028
+- Source chain: world_core/food.jsonl/food_022, world_core/food.jsonl/food_023
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -790,10 +790,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #1843
 
-- Triple: `(анатомия — related_to — экология)`
+- Triple: `(алтын — related_to — сары)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/body_parts.jsonl/body_040, world_core/biology_basic.jsonl/bio_040
+- Source chain: world_core/colors.jsonl/color_011, world_core/colors.jsonl/color_003
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -801,10 +801,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #1895
 
-- Triple: `(абай — related_to — ақмешіт)`
+- Triple: `(жасыл — related_to — қызғылт)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0007158, wikipedia_kz_pack.json/wiki_kz_0055603
+- Source chain: world_core/colors.jsonl/color_004, world_core/colors.jsonl/color_009
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -812,10 +812,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #1940
 
-- Triple: `(арыс — related_to — шымкент)`
+- Triple: `(көк — related_to — қызыл)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0110255, world_core/geography_kz.jsonl/geo_kz_005
+- Source chain: world_core/colors.jsonl/color_002, world_core/colors.jsonl/color_001
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -823,10 +823,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #2317
 
-- Triple: `(мүгедектік — goes_to — отбасы)`
-- Rule: `R7_goes_to_via_part_of`
+- Triple: `(қарағанды — related_to — қызылорда)`
+- Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0025508, world_core/society.jsonl/soc_014
+- Source chain: world_core/geography_kz.jsonl/geo_kz_006, world_core/geography_kz.jsonl/geo_kz_015
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -834,10 +834,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #2451
 
-- Triple: `(мысал — goes_to — өлең)`
-- Rule: `R7_goes_to_via_part_of`
+- Triple: `(блог — lives_in — апта)`
+- Rule: `R6_lives_in_via_part_of`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0138817, world_core/kz_literature.jsonl/lit_046
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0048220, world_core/time.jsonl/time_002
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -845,10 +845,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #2666
 
-- Triple: `(бәр — after — соғыс)`
-- Rule: `R8_after_transitivity`
+- Triple: `(дін — goes_to — ел)`
+- Rule: `R7_goes_to_via_part_of`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0036340, kazakh_textbooks_pack.json/kz_textbook_kz_lang_culture_9_p0132_s14
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0138845, world_core/proverbs.jsonl/prov_035
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -856,10 +856,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #2683
 
-- Triple: `(мұх — after — қуғындау)`
+- Triple: `(неше — after — наразылық)`
 - Rule: `R8_after_transitivity`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0036505, wikipedia_kz_pack.json/wiki_kz_0048591
+- Source chain: kazakh_textbooks_pack.json/kz_textbook_algebra_7_p0166_s05, wikipedia_kz_pack.json/wiki_kz_0006688
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -867,10 +867,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #2727
 
-- Triple: `(синтетикалық — after — көтеріліс)`
+- Triple: `(бойындағ — after — үзіліс)`
 - Rule: `R8_after_transitivity`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0052397, wikipedia_kz_pack.json/wiki_kz_0028274
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0006195, wikipedia_kz_pack.json/wiki_kz_0023126
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -878,21 +878,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #3205
 
-- Triple: `(бұқар — is_a — маман)`
-- Rule: `R1_is_a_transitivity`
+- Triple: `(шықпай — after — қуғындау)`
+- Rule: `R8_after_transitivity`
 - Confidence: `rule_inferred`
-- Source chain: world_core/kz_literature.jsonl/lit_018, world_core/kz_literature.jsonl/lit_033
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #3343
-
-- Triple: `(түндік — has — іш)`
-- Rule: `R2_has_inheritance`
-- Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0056466, world_core/time.jsonl/time_011
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0117248, wikipedia_kz_pack.json/wiki_kz_0048591
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -900,10 +889,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #3380
 
-- Triple: `(нептун — related_to — ғаламшар)`
-- Rule: `R5_shared_is_a_target`
+- Triple: `(зоология — is_a — мәлімет)`
+- Rule: `R1_is_a_transitivity`
 - Confidence: `rule_inferred`
-- Source chain: world_core/astronomy.jsonl/astro_010, world_core/astronomy.jsonl/astro_012
+- Source chain: world_core/animals.jsonl/anm_039, world_core/society.jsonl/soc_023
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -911,10 +900,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #3653
 
-- Triple: `(адам — related_to — сауысқан)`
+- Triple: `(алтын — related_to — мейірім)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/biology_basic.jsonl/bio_002, world_core/animals.jsonl/anm_012
+- Source chain: world_core/colors.jsonl/color_011, world_core/proverbs.jsonl/prov_027
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -922,10 +911,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4018
 
-- Triple: `(ит — related_to — торғай)`
+- Triple: `(аю — related_to — үйрек)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/biology_basic.jsonl/bio_003, world_core/animals.jsonl/anm_020
+- Source chain: world_core/animals.jsonl/anm_005, world_core/animals.jsonl/anm_019
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -933,21 +922,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4041
 
-- Triple: `(көбелек — related_to — мал)`
+- Triple: `(аққу — related_to — қой)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/animals.jsonl/anm_027, world_core/animals.jsonl/anm_038
-
-- [ ] Derivation is semantically valid
-- [ ] Underlying facts are both correct
-- Comment:
-
-### Derivation #4059
-
-- Triple: `(көбелек — related_to — үйрек)`
-- Rule: `R5_shared_is_a_target`
-- Confidence: `rule_inferred`
-- Source chain: world_core/animals.jsonl/anm_027, world_core/animals.jsonl/anm_019
+- Source chain: world_core/animals.jsonl/anm_015, world_core/biology_basic.jsonl/bio_006
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -955,10 +933,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4363
 
-- Triple: `(ақын — related_to — мағжан)`
+- Triple: `(тағы жануар — related_to — үйрек)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/kz_literature.jsonl/lit_029, world_core/kz_literature.jsonl/lit_005
+- Source chain: world_core/animals.jsonl/anm_037, world_core/animals.jsonl/anm_019
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -966,10 +944,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4373
 
-- Triple: `(ақын — related_to — ғабит)`
+- Triple: `(тиін — related_to — үйрек)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/kz_literature.jsonl/lit_029, world_core/kz_literature.jsonl/lit_012
+- Source chain: world_core/animals.jsonl/anm_007, world_core/animals.jsonl/anm_019
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -977,10 +955,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4388
 
-- Triple: `(бейімбет — related_to — тігінші)`
+- Triple: `(тырна — related_to — қоян)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/kz_literature.jsonl/lit_011, world_core/clothing.jsonl/cloth_033
+- Source chain: world_core/animals.jsonl/anm_014, world_core/animals.jsonl/anm_006
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -988,10 +966,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4556
 
-- Triple: `(сәкен — related_to — шәкәрім)`
+- Triple: `(абай — related_to — капитан)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/kz_literature.jsonl/lit_009, world_core/kz_literature.jsonl/lit_006
+- Source chain: world_core/kz_literature.jsonl/lit_001, world_core/transport.jsonl/tr_029
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -999,10 +977,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4603
 
-- Triple: `(кітап — related_to — қазақ тілі)`
+- Triple: `(ата — related_to — жазушы)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/society.jsonl/soc_021, world_core/society.jsonl/soc_039
+- Source chain: world_core/proverbs.jsonl/prov_029, world_core/kz_literature.jsonl/lit_030
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1010,10 +988,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4695
 
-- Triple: `(алма — related_to — қызанақ)`
+- Triple: `(дәрігер — related_to — ілияс)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/food.jsonl/food_020, world_core/food.jsonl/food_027
+- Source chain: world_core/society.jsonl/soc_032, world_core/kz_literature.jsonl/lit_010
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1021,10 +999,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4700
 
-- Triple: `(балық — related_to — жүзім)`
+- Triple: `(жазушы — related_to — махамбет)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/food.jsonl/food_016, world_core/food.jsonl/food_021
+- Source chain: world_core/kz_literature.jsonl/lit_030, world_core/kz_literature.jsonl/lit_003
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1032,10 +1010,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4710
 
-- Triple: `(балық — related_to — қызанақ)`
+- Triple: `(жазушы — related_to — ғабиден)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/food.jsonl/food_016, world_core/food.jsonl/food_027
+- Source chain: world_core/kz_literature.jsonl/lit_030, world_core/kz_literature.jsonl/lit_013
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1043,10 +1021,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #4951
 
-- Triple: `(ірімшік — related_to — қарбыз)`
+- Triple: `(кітап — related_to — құлақ)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/food.jsonl/food_008, world_core/food.jsonl/food_022
+- Source chain: world_core/society.jsonl/soc_021, world_core/body_parts.jsonl/body_004
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1054,10 +1032,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #5280
 
-- Triple: `(ай — related_to — көк)`
+- Triple: `(сәбіз — related_to — ірімшік)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/time.jsonl/time_003, world_core/colors.jsonl/color_002
+- Source chain: world_core/food.jsonl/food_028, world_core/food.jsonl/food_008
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1065,10 +1043,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #5314
 
-- Triple: `(боз — related_to — кеш)`
+- Triple: `(қаймақ — related_to — қырыққабат)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/colors.jsonl/color_017, world_core/time.jsonl/time_012
+- Source chain: world_core/food.jsonl/food_007, world_core/food.jsonl/food_032
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1076,10 +1054,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #5353
 
-- Triple: `(кезеңі — related_to — сағат)`
+- Triple: `(ана — related_to — жылан)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0083073, world_core/time.jsonl/time_006
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0069231, world_core/animals.jsonl/anm_024
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1087,10 +1065,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #5361
 
-- Triple: `(кезеңі — related_to — қоңыр)`
+- Triple: `(ана — related_to — шөп)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0083073, world_core/colors.jsonl/color_008
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0069231, world_core/biology_basic.jsonl/bio_015
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1098,10 +1076,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #5397
 
-- Triple: `(көк — related_to — сағат)`
+- Triple: `(ағаш — related_to — түйе)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/colors.jsonl/color_002, world_core/time.jsonl/time_006
+- Source chain: world_core/biology_basic.jsonl/bio_014, world_core/biology_basic.jsonl/bio_008
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1109,10 +1087,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #5517
 
-- Triple: `(мемлекет — related_to — қазақстан)`
+- Triple: `(жануар — related_to — әсел)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/society.jsonl/soc_002, world_core/geography_kz.jsonl/geo_kz_001
+- Source chain: world_core/biology_basic.jsonl/bio_012, wikipedia_kz_pack.json/wiki_kz_0146217
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1120,10 +1098,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #5851
 
-- Triple: `(қазақ — goes_to — үй)`
-- Rule: `R7_goes_to_via_part_of`
+- Triple: `(жыл — related_to — қазақ)`
+- Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0021641, wikipedia_kz_pack.json/wiki_kz_0047550
+- Source chain: wikipedia_kz_pack.json/wiki_kz_0046261, wikipedia_kz_pack.json/wiki_kz_0001219
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1131,10 +1109,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #6037
 
-- Triple: `(ынтымақ — related_to — экология)`
+- Triple: `(алпыс — related_to — уақыт)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: kazakh_proverbs_pack.json/proverb_053, world_core/biology_basic.jsonl/bio_040
+- Source chain: world_core/numbers.jsonl/num_016, world_core/time.jsonl/time_020
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1142,10 +1120,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #6043
 
-- Triple: `(тыныс — related_to — түндік)`
+- Triple: `(алты — related_to — таң)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/body_parts.jsonl/body_029, wikipedia_kz_pack.json/wiki_kz_0056466
+- Source chain: world_core/numbers.jsonl/num_007, world_core/time.jsonl/time_010
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1153,10 +1131,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #6670
 
-- Triple: `(ақмешіт — related_to — қыркүйек)`
+- Triple: `(ертіс — related_to — сырға)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0055603, wikipedia_kz_pack.json/wiki_kz_0009178
+- Source chain: world_core/geography_kz.jsonl/geo_kz_019, world_core/clothing.jsonl/cloth_030
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1164,10 +1142,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #6678
 
-- Triple: `(сәтбаев — related_to — қыркүйек)`
+- Triple: `(керосин — related_to — іле)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0098675, wikipedia_kz_pack.json/wiki_kz_0009178
+- Source chain: world_core/transport.jsonl/tr_035, world_core/geography_kz.jsonl/geo_kz_021
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1175,10 +1153,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #6911
 
-- Triple: `(жасыл — related_to — сан)`
+- Triple: `(ағаш — related_to — жағалтай)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/colors.jsonl/color_004, world_core/numbers.jsonl/num_030
+- Source chain: world_core/biology_basic.jsonl/bio_014, wikipedia_kz_pack.json/wiki_kz_0135186
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1186,10 +1164,10 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #6942
 
-- Triple: `(жеті — related_to — көксоңы)`
+- Triple: `(бидай — related_to — дуадақ)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/numbers.jsonl/num_008, world_core/colors.jsonl/color_014
+- Source chain: world_core/biology_basic.jsonl/bio_017, wikipedia_kz_pack.json/wiki_kz_0130217
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1197,21 +1175,43 @@ For each fact, mark the checkbox if the triple `(subject, predicate, object)` is
 
 ### Derivation #7266
 
-- Triple: `(сөздігі — goes_to — бас)`
-- Rule: `R7_goes_to_via_part_of`
+- Triple: `(алпыс — related_to — боз)`
+- Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: wikipedia_kz_pack.json/wiki_kz_0062753, world_core/body_parts.jsonl/body_002
+- Source chain: world_core/numbers.jsonl/num_016, world_core/colors.jsonl/color_017
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
 - Comment:
 
-### Derivation #7280
+### Derivation #7392
 
-- Triple: `(бояу — related_to — оқу)`
+- Triple: `(боз — related_to — төрт)`
 - Rule: `R5_shared_is_a_target`
 - Confidence: `rule_inferred`
-- Source chain: world_core/colors.jsonl/color_033, world_core/proverbs.jsonl/prov_025
+- Source chain: world_core/colors.jsonl/color_017, world_core/numbers.jsonl/num_005
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #7395
+
+- Triple: `(боз — related_to — үш)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/colors.jsonl/color_017, world_core/numbers.jsonl/num_004
+
+- [ ] Derivation is semantically valid
+- [ ] Underlying facts are both correct
+- Comment:
+
+### Derivation #7683
+
+- Triple: `(нөл — related_to — құла)`
+- Rule: `R5_shared_is_a_target`
+- Confidence: `rule_inferred`
+- Source chain: world_core/numbers.jsonl/num_001, world_core/colors.jsonl/color_018
 
 - [ ] Derivation is semantically valid
 - [ ] Underlying facts are both correct
@@ -1273,9 +1273,9 @@ Sampled facts by pattern:
 
 Sampled derivations by rule:
 
-- `R1_is_a_transitivity`: 4
-- `R2_has_inheritance`: 3
-- `R3_has_inheritance_via_part_of`: 1
-- `R5_shared_is_a_target`: 35
-- `R7_goes_to_via_part_of`: 4
+- `R1_is_a_transitivity`: 5
+- `R2_has_inheritance`: 2
+- `R5_shared_is_a_target`: 38
+- `R6_lives_in_via_part_of`: 1
+- `R7_goes_to_via_part_of`: 1
 - `R8_after_transitivity`: 3
