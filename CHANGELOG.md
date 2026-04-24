@@ -7,6 +7,89 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.10] — 2026-04-24 — Noise-elimination audit: time-noun subjects in `copula_is_a`
+
+Audit on the fresh v4.0.9 `derived_facts.json` (12 849 derivations) surfaced one dominant text-only noise class that had persisted through v4.0.x: Wikipedia timeline entries extracted as IsA facts with month / day / year subjects.
+
+### Audit findings
+
+R5 provenance breakdown on v4.0.9 (10 827 shared-IsA derivations):
+
+| provenance | count | share |
+|---|---:|---:|
+| both sources world_core | 9 293 | 85.8 % |
+| mixed (1 world_core + 1 text) | 1 421 | 13.1 % |
+| both sources text | 113 | 1.0 % |
+
+**R5 is already safe.** 85.8 % fully curated; the mixed path is filtered by `derivation_is_fully_curated` in the dialog layer (v4.0.2 / v4.0.3).
+
+**R1 is_a-transitivity** told a different story — 19 of 449 derivations were **fully text-only**. Inspecting those, every single one traced back to one of three noise classes:
+
+1. **Month-name subjects from Wikipedia timelines** — "8 қаңтар — Ақтөбеде Кеңес өкіметі орнады" → `қаңтар IsA өкіметі`. Classes: `қаңтар×4`, `ақпан×1`, `сәуір×2`, `қыркүйек×1`, `қазан×3`, `желтоқсан×2` — 13 base IsA facts.
+2. **Year subject `жыл`** — "1791 жыл — Зырян кеніштері жұмысының басталуы" → `жыл IsA жұмысын`. 15+ base facts from date-prefixed timeline entries.
+3. **Month-to-month ranges in parens** — "(қыркүйек 1955 — сәуір 1963) Бобир Н." → `қыркүйек IsA сәуір`, `сәуір IsA қазан`, etc.
+
+### Root cause
+
+Of the four v2.x-era IsA-producing matchers (`copula_is_a`, `locative_lives_in`, `dative_goes_to`, `agent_verb`), three already applied an `is_time_noun` subject guard. **`copula_is_a` did not.** It was the only matcher whose subject path went through `resolve_bare_noun` without any time-noun filter. Every other matcher had the guard added in v3.8.5 when time nouns were identified as a noise class for `LivesIn`/`GoesTo`/`DoesTo`; the `copula_is_a` oversight was missed.
+
+### Fix — one-concern patch
+
+1. **Expanded `is_time_noun`** with 19 new entries — 12 months (қаңтар, ақпан, наурыз, сәуір, мамыр, маусым, шілде, тамыз, қыркүйек, қазан, қараша, желтоқсан) + 7 days (дүйсенбі, сейсенбі, сәрсенбі, бейсенбі, жұма, сенбі, жексенбі). Seasons deliberately excluded: көктем / жаз / күз / қыс are curated in world_core.time.jsonl as legitimate IsA subjects (e.g. `жаз IsA мезгіл`) and never appeared as text-extraction noise.
+2. **Added `is_time_noun(&subj.root)` guard** to `copula_is_a` after `resolve_bare_noun`.
+3. **Two new regression tests**: `is_time_noun_covers_v4_0_10_months_and_days` (31 assertions) and `copula_is_a_refuses_time_noun_subject` (5 Wikipedia-style negative cases).
+
+### Homograph handling
+
+Three of the month names are homographs with other Kazakh words: `қазан` (October / cauldron), `мамыр` (May / peace), `наурыз` (March / Nauryz holiday). **World_core curation takes precedence** — `tool_026: қазан IsA ыдыс` is unaffected (world_core loader bypasses pattern matchers). Any text-pack extraction of these homographs as IsA subjects is dropped; the cost is a handful of rare correct extractions in exchange for eliminating an entire noise class.
+
+### Measured delta
+
+Full re-extract on T4_200k (`--bench-order --max-total 200000`), re-run reasoner + graph:
+
+| | v4.0.9 | v4.0.10 | delta |
+|---|---:|---:|---|
+| facts.json total | 13 850 | **13 787** | **−63** |
+| extracted (Grammar) | 13 102 | 13 039 | −63 |
+| curated (HumanApproved) | 748 | 748 | 0 |
+| `is_a` facts | 659 | **623** | **−36** (primary target) |
+| `does_to` facts | 9 192 | 9 171 | −21 |
+| `goes_to` facts | 1 597 | 1 590 | −7 |
+| `lives_in` facts | 289 | 288 | −1 |
+| Other predicates | unchanged | unchanged | 0 |
+| **derivations total** | **12 849** | **12 492** | **−357 (−2.8 %)** |
+| R1_is_a_transitivity | 449 | **426** | −23 |
+| R2_has_inheritance | 474 | **436** | −38 |
+| R3_has_inheritance_via_part_of | 26 | 26 | 0 |
+| **R5_shared_is_a_target** | 10 827 | **10 537** | **−290** |
+| R6_lives_in_via_part_of | 36 | 36 | 0 |
+| R7_goes_to_via_part_of | 303 | 297 | −6 |
+| R8_after_transitivity | 734 | 734 | 0 |
+| Graph nodes | 3 375 | 3 374 | −1 |
+| Graph edges | 12 449 | 12 394 | −55 |
+
+### Bonus multi-matcher propagation
+
+Because `is_time_noun` is also applied in `locative_lives_in`, `dative_goes_to`, and `agent_verb` subject filters, expanding the set with months + days tightened **all four** matchers simultaneously. The v4.0.10 diff-in-one-function produced −36 IsA (the explicit target) **plus** −29 across the other three matchers (does_to −21, goes_to −7, lives_in −1) — 29 "free" precision wins the audit hadn't predicted. Noise leverage: **63 base facts eliminated → 357 derivations eliminated = 5.7 derivations per base fact**.
+
+### Visible confirmation
+
+Most-connected content nouns on the graph rotated: v4.0.9 had «жыл (151)» in the top-5 — the January/February/2011 noise that made "year" artificially central. v4.0.10 drops «жыл» entirely from the top-5 and promotes «ат (horse, degree 148)» in its place. The fix is observable in graph-level centrality, not just aggregate counts.
+
+### Tests
+
+**465 passing** (+2 from v4.0.9).
+
+### Scope discipline
+
+One concern: close the last time-noun extractor gap. No new predicates, no new rules, no data changes, no schema changes. The fix is a ~35-line diff in one function.
+
+**Not in scope** for v4.0.10 (queued for future audits):
+- **Proper-name homograph noise** — «абай IsA ауыл» (19 times — there are many villages named Abai), «қазақ IsA қала» (city in Azerbaijan). These are factually correct but collide with famous-referent senses (Abai the poet, Kazakh the people). Needs a dialog-layer sense-disambiguation pass, not an extractor guard.
+- **Metaphorical proverbs** — «Еңбек — табыстың қайнары» → `еңбек IsA қайнар`. FST extraction is structurally correct; the metaphor is lost only at the semantic level. Addressing this would need a metaphor detector (out of scope for patch-size work).
+
+---
+
 ## [4.0.9] — 2026-04-24 — World Core batch: `plants.jsonl` + `professions.jsonl` + `tools_household.jsonl` (first fast-path batch release)
 
 First release to exploit the v4.0.8 fast-path. Three new domains added in one patch; full data pipeline rebuild took <3 seconds instead of ~45 minutes under the old per-domain workflow. At the user's direction ("необходимо добавлять от трех до пяти, чтобы все сразу тестировать"), this lands the first multi-domain batch — targeting gap-fill + highest-leverage hubs.

@@ -68,6 +68,20 @@ pub fn copula_is_a(
         return;
     };
 
+    // v4.0.10 — time-noun subject guard. The copula_is_a matcher was the
+    // only one of four v2.x-era extractors that didn't refuse time nouns
+    // as subjects. Wikipedia timeline entries ("8 қаңтар — Ақтөбеде
+    // Кеңес өкіметі орнады", "1791 жыл — Зырян кеніштері жұмысының
+    // басталуы") got extracted as `қаңтар IsA өкіметі`, `жыл IsA
+    // жұмысын`, etc. — ~50 base facts whose R1/R5 transitive closures
+    // cascaded into 100+ noise derivations. Other matchers (locative,
+    // dative, agent_verb) already block time nouns here; v4.0.10 closes
+    // the last gap. See noise audit in v4.0.10 changelog for the
+    // exhaustive list.
+    if is_time_noun(&subj.root) {
+        return;
+    }
+
     // RHS can be a single nominative noun OR a short noun phrase
     // ("білім бұлағы", "бала жанашыры"). For multi-word RHS, the
     // **syntactic head** is the rightmost noun — Kazakh is head-final.
@@ -1567,6 +1581,33 @@ fn is_time_noun(root: &str) -> bool {
             | "бүгін"
             | "кеше"
             | "ертең"
+            // v4.0.10 — 12 months + 7 days. Wikipedia timeline entries
+            // ("8 қаңтар — Ақтөбеде Кеңес өкіметі орнады") were leaking
+            // ≈50 base IsA facts per the month-subject noise class
+            // (`қаңтар IsA өкіметі`, `жыл IsA халық`, etc.) whose R1/R5
+            // transitive closures cascaded into 100+ derivations.
+            // Seasons (көктем/жаз/күз/қыс) deliberately NOT included —
+            // they are valid world_core IsA subjects (time_014..017) and
+            // never appeared as text-extraction noise.
+            | "қаңтар"
+            | "ақпан"
+            | "наурыз"
+            | "сәуір"
+            | "мамыр"
+            | "маусым"
+            | "шілде"
+            | "тамыз"
+            | "қыркүйек"
+            | "қазан"
+            | "қараша"
+            | "желтоқсан"
+            | "дүйсенбі"
+            | "сейсенбі"
+            | "сәрсенбі"
+            | "бейсенбі"
+            | "жұма"
+            | "сенбі"
+            | "жексенбі"
     )
 }
 
@@ -2292,6 +2333,75 @@ mod tests {
         // Not a time noun.
         assert!(!is_time_noun("бала"));
         assert!(!is_time_noun("мектеп"));
+    }
+
+    /// v4.0.10 regression — 12 months + 7 days were surfacing as IsA
+    /// subjects in Wikipedia timeline extractions ("8 қаңтар — Ақтөбеде
+    /// Кеңес өкіметі орнады" → `қаңтар IsA өкіметі`). All must be
+    /// rejected by `is_time_noun`. Seasons stay OUT (curated in
+    /// world_core.time.jsonl).
+    #[test]
+    fn is_time_noun_covers_v4_0_10_months_and_days() {
+        // 12 months.
+        assert!(is_time_noun("қаңтар"));
+        assert!(is_time_noun("ақпан"));
+        assert!(is_time_noun("наурыз"));
+        assert!(is_time_noun("сәуір"));
+        assert!(is_time_noun("мамыр"));
+        assert!(is_time_noun("маусым"));
+        assert!(is_time_noun("шілде"));
+        assert!(is_time_noun("тамыз"));
+        assert!(is_time_noun("қыркүйек"));
+        assert!(is_time_noun("қазан"));
+        assert!(is_time_noun("қараша"));
+        assert!(is_time_noun("желтоқсан"));
+        // 7 days.
+        assert!(is_time_noun("дүйсенбі"));
+        assert!(is_time_noun("сейсенбі"));
+        assert!(is_time_noun("сәрсенбі"));
+        assert!(is_time_noun("бейсенбі"));
+        assert!(is_time_noun("жұма"));
+        assert!(is_time_noun("сенбі"));
+        assert!(is_time_noun("жексенбі"));
+        // Seasons stay OUT — curated in world_core/time.jsonl as IsA
+        // мезгіл; the extractor must still be able to handle any text
+        // mention of seasons without blocking legitimate patterns.
+        assert!(!is_time_noun("көктем"));
+        assert!(!is_time_noun("жаз"));
+        assert!(!is_time_noun("күз"));
+        assert!(!is_time_noun("қыс"));
+    }
+
+    /// v4.0.10 regression — `copula_is_a` must refuse time-noun
+    /// subjects. Pre-v4.0.10, Wikipedia timeline entries such as
+    /// "8 қаңтар — Ақтөбеде Кеңес өкіметі орнады" produced a bogus
+    /// `қаңтар IsA өкіметі` IsA fact whose R1/R5 transitive closure
+    /// cascaded into noise derivations.
+    #[test]
+    fn copula_is_a_refuses_time_noun_subject() {
+        let Some(lexicon) = load_lex() else {
+            eprintln!("skip copula_is_a_refuses_time_noun_subject: lexicon unavailable");
+            return;
+        };
+        let source = src();
+        // Surface forms must be bare-nominative matches in the Lexicon
+        // for this matcher to even engage on the LHS — which they are
+        // (months are root entries).
+        let cases = [
+            "Қаңтар — мемлекет.",
+            "Қазан — қала.",
+            "Жыл — халық.",
+            "Қыркүйек — ай.",
+            "Дүйсенбі — күн.",
+        ];
+        for text in cases {
+            let mut out = Vec::new();
+            copula_is_a(text, &[], &lexicon, &source, &mut out);
+            assert!(
+                out.is_empty(),
+                "copula_is_a should refuse time-noun subject for «{text}», got {out:?}"
+            );
+        }
     }
 
     #[test]
