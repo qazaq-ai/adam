@@ -262,6 +262,16 @@ fn run_turn(
                 );
             }
         }
+        // v4.0.29 — task layer snapshot (Codex Phase 2).
+        let td = trace.task_digest;
+        println!(
+            "├─ task:     goal={} variant={} subgoals={} status={:?} set_at={:?}",
+            td.has_goal,
+            td.goal_variant.unwrap_or("—"),
+            td.subgoals,
+            td.status,
+            td.goal_age_turns
+        );
         for t in &trace.plan_trace {
             println!("├─ {t}");
         }

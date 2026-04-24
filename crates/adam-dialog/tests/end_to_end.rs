@@ -1418,6 +1418,94 @@ fn contradictory_city_statements_produce_belief_conflict() {
     }
 }
 
+/// v4.0.29 — Codex roadmap Phase 2: asking about a topic installs a
+/// `LearnAboutTopic` goal on the task state. Subsequent same-topic
+/// turns keep the goal (continuity); a new topic switches it.
+#[test]
+fn turn_installs_learn_about_topic_goal_and_preserves_continuity() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("жер туралы айтшы", &lex, &repo, 0);
+    use adam_dialog::{Goal, TaskStatus};
+    match &conv.task.active_goal {
+        Some(Goal::LearnAboutTopic { topic }) => assert_eq!(topic, "жер"),
+        other => panic!("expected LearnAboutTopic/жер, got {other:?}"),
+    }
+    let first_turn = conv.task.goal_set_at_turn;
+    assert!(matches!(
+        conv.task.status,
+        TaskStatus::GatheringEvidence | TaskStatus::ReadyToAnswer
+    ));
+
+    // Same topic asked again — goal must persist, set-turn unchanged.
+    conv.turn("жер туралы айтшы", &lex, &repo, 1);
+    assert_eq!(conv.task.goal_set_at_turn, first_turn);
+
+    // Different topic — goal switches, set-turn advances.
+    conv.turn("күн туралы айтшы", &lex, &repo, 2);
+    match &conv.task.active_goal {
+        Some(Goal::LearnAboutTopic { topic }) => assert_eq!(topic, "күн"),
+        other => panic!("expected LearnAboutTopic/күн after switch, got {other:?}"),
+    }
+    assert_ne!(conv.task.goal_set_at_turn, first_turn);
+}
+
+/// v4.0.29 — belief contradiction routes task status to `Blocked`
+/// (Codex v4.0.28 invariant: `active_fact() == None` after a
+/// contradiction is legitimate state; Phase 2 reflects that in
+/// `TaskStatus::Blocked` rather than pretending we have an answer).
+#[test]
+fn belief_contradiction_blocks_task() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+
+    use adam_dialog::{TaskStatus, USER_SELF_KEY};
+    assert!(conv.belief.active_fact(USER_SELF_KEY, "city").is_none());
+    assert_eq!(conv.task.status, TaskStatus::Blocked);
+}
+
+/// v4.0.29 — social intents don't clobber an existing goal. «Thanks»
+/// mid-topic keeps the `LearnAboutTopic` goal so the next turn can
+/// continue it.
+#[test]
+fn social_intent_does_not_clobber_active_goal() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("жер туралы айтшы", &lex, &repo, 0);
+    let goal_before = conv.task.active_goal.clone();
+    conv.turn("рахмет", &lex, &repo, 1);
+    assert_eq!(
+        conv.task.active_goal, goal_before,
+        "social turn must not erase an active goal"
+    );
+}
+
+/// v4.0.29 — `TurnTrace` exposes the task digest so `adam_chat
+/// --trace` can show goal + status without dumping the full state.
+#[test]
+fn turn_with_trace_surfaces_task_digest() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    let (_, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
+    assert!(trace.task_digest.has_goal);
+    assert_eq!(trace.task_digest.goal_variant, Some("LearnAboutTopic"));
+    use adam_dialog::TaskStatus;
+    assert!(matches!(
+        trace.task_digest.status,
+        TaskStatus::GatheringEvidence | TaskStatus::ReadyToAnswer
+    ));
+}
+
 /// v4.0.28 — Codex v4.0.27 review #1 regression at the integration
 /// layer. Through `Conversation::turn`, the user sequence
 /// `city=X → city=X → city=Y` must end with `active_fact() == None`

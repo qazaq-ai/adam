@@ -7,6 +7,122 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.29] — 2026-04-24 — TaskState + Goal detection (Codex v4.0.26 roadmap Phase 2)
+
+Second architectural patch on Codex's v5.0 roadmap. Phase 1 (BeliefState) gave the dialog structured memory; Phase 2 gives it **goals** — a representation of what the user is trying to accomplish across turns. Non-breaking substrate; reply text is byte-identical to v4.0.28.
+
+### What landed
+
+New module `crates/adam-dialog/src/task.rs` (~330 lines incl. 10 unit tests). Public surface:
+
+```rust
+pub enum Goal {
+    LearnAboutTopic { topic: String },
+    IdentifyEntity { entity: String },       // reserved, not yet populated
+    CompareEntities { left: String, right: String }, // reserved
+    ClarifyUserProfile,
+    ContinueOpenQuestion,
+}
+
+pub enum TaskStatus { Idle, GatheringEvidence, ReadyToAnswer,
+                      WaitingForUser, Blocked }
+
+pub struct Subgoal { pub description: String, pub completed: bool }
+
+pub struct TaskState {
+    pub active_goal: Option<Goal>,
+    pub subgoals: Vec<Subgoal>,
+    pub last_action: Option<String>,
+    pub status: TaskStatus,
+    pub goal_set_at_turn: Option<usize>,
+}
+
+pub struct TaskDigest { /* five scalars for trace */ }
+```
+
+### Goal detection (coarse v4.0.29 pass)
+
+`TaskState::detect_goal(intent) -> Option<Goal>`:
+
+- `Intent::Unknown { noun_hint: Some(topic) }` → `Goal::LearnAboutTopic { topic }`
+- `Intent::AskName / AskAge / AskLocation / AskOccupation / AskFamily / StatementOf* (profile)` → `Goal::ClarifyUserProfile`
+- Everything else (greetings, thanks, affirmation, negation, unknown without topic) → `None`
+
+### Carry-over logic
+
+`TaskState::roll_forward(intent, belief, turn_id)`:
+
+1. Compute candidate goal from intent.
+2. **New goal is the same as `active_goal`** → keep `goal_set_at_turn` unchanged (continuity signal for later phases).
+3. **New goal is different** → install, clear `subgoals`, record new `goal_set_at_turn`.
+4. **No candidate goal + there's unresolved belief state** → synthesise `Goal::ContinueOpenQuestion` so the planner knows to circle back.
+5. **No candidate goal + nothing unresolved** → keep whatever was active (social turns don't erase state).
+
+### Status derivation
+
+Pure function of `(active_goal, belief)`:
+
+| belief state | status |
+|---|---|
+| any contradiction | **Blocked** |
+| pending question (non-contradiction) | **WaitingForUser** |
+| goal set, no issues | **GatheringEvidence** |
+| no goal | **Idle** |
+
+The `Blocked` path is **Codex v4.0.28 directive** in action: when `BeliefState::active_fact() == None` because of a contradiction, that's a legitimate state, not an error. Task exposes it explicitly so Phase 3 ActionPlanner can route to clarification.
+
+### Integration
+
+`Conversation` gains `pub task: TaskState`. In the turn loop: `absorb_entities` → **`task.roll_forward`** → `record_intent`. Turn id = `intent_history.len()` (same counter as belief, kept in sync).
+
+`TurnTrace` adds `task_digest: TaskDigest` + `task_snapshot: TaskState`.
+
+`adam_chat --trace` prints a new line:
+```
+├─ task:     goal=true variant=LearnAboutTopic subgoals=0 status=GatheringEvidence set_at=Some(0)
+```
+
+`Conversation::reset()` clears the task state.
+
+### Smoke-test
+
+```
+$ adam_chat --once 'жер туралы айтшы' --trace
+├─ intent:   Unknown { noun_hint: Some("жер"), reasoning_chain: Some(...) }
+├─ belief:   entities=0 facts=0 active=0 contested=0 pending=0 conflicts=0
+├─ task:     goal=true variant=LearnAboutTopic subgoals=0 status=GatheringEvidence set_at=Some(0)
+└─ output:   жер туралы мынадай байланыс анықтадым: қорытынды: жер — аспан денесі (байланысты ой-тізбек арқылы).
+```
+
+Multi-turn continuity test: asking about жер twice keeps `goal_set_at_turn` at the first value. Switching to күн advances it. Social intent (рахмет) in the middle doesn't clobber the goal.
+
+### Tests
+
+**519 passing** (+14 from v4.0.28: 10 unit in `task.rs` + 4 integration in `end_to_end.rs`):
+
+- `detect_goal_maps_unknown_topic_to_learn`
+- `detect_goal_maps_profile_intents_to_clarify_user_profile`
+- `detect_goal_returns_none_for_social_and_unknown_without_topic`
+- `roll_forward_installs_goal_on_first_unknown_topic`
+- `roll_forward_keeps_goal_across_same_topic`
+- `roll_forward_switches_goal_on_topic_change`
+- `roll_forward_preserves_goal_on_social_turn`
+- `roll_forward_marks_blocked_on_belief_contradiction` — exercises Codex v4.0.28 `active_fact() == None → Blocked` invariant
+- `roll_forward_synthesises_continue_open_question_when_belief_has_pending`
+- `digest_captures_variant_tag_and_status`
+- `turn_installs_learn_about_topic_goal_and_preserves_continuity` (integration)
+- `belief_contradiction_blocks_task` (integration)
+- `social_intent_does_not_clobber_active_goal` (integration)
+- `turn_with_trace_surfaces_task_digest` (integration)
+
+### Scope
+
+**Phase 2 only.** No action planner, no verifier, no response changes. The task state is a **substrate for later phases** — reply text is byte-identical to v4.0.28. Phase 3 (ActionPlanner) will consume `active_goal` + `status` to pick the next action instead of the current template choice.
+
+Queued: Phases 3–7 (ActionPlan, Verifier, UncertaintyPolicy, ToolLayer, CognitiveEval) — each an independent release pending Codex review of Phase 2.
+
+---
+
 ## [4.0.28] — 2026-04-24 — BeliefState single-active-fact invariant fix (Codex v4.0.27 review #1)
 
 Codex's v4.0.27 review identified a real invariant bug in the Phase 1 foundation before we proceeded to Phase 2. Fixing this is a blocker — Phases 2+ (`TaskState`, `ActionPlanner`, `Verifier`) will trust `BeliefState::active_fact()` as authoritative. If that returns a stale winner after a contradiction, every later phase inherits the bug.

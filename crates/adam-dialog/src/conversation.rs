@@ -118,6 +118,12 @@ pub struct Conversation {
     /// template-slot consumers keep working, but higher-level
     /// reasoning now has access to the fuller picture.
     pub belief: crate::belief::BeliefState,
+    /// v4.0.29 — goal + task lifecycle state (Codex v4.0.26 roadmap
+    /// Phase 2). Rolled forward on every turn AFTER belief
+    /// absorption so status reflects the newest intent + belief.
+    /// Non-breaking: existing consumers ignore it; Phase 3
+    /// `ActionPlanner` will consume it to pick next action.
+    pub task: crate::task::TaskState,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -146,6 +152,11 @@ pub struct TurnTrace {
     /// capture. Lets `adam_chat --trace` render the new / updated
     /// facts and any fresh contradictions.
     pub belief_snapshot: crate::belief::BeliefState,
+    /// v4.0.29 — task-state digest (five scalars) for quick trace
+    /// rendering.
+    pub task_digest: crate::task::TaskDigest,
+    /// v4.0.29 — full task state at the moment of trace capture.
+    pub task_snapshot: crate::task::TaskState,
     /// Per-step plan trace emitted by `plan_response_with_session`.
     pub plan_trace: Vec<String>,
 }
@@ -334,6 +345,11 @@ impl Conversation {
         self.inject_reasoning_chain(&mut intent);
 
         self.absorb_entities(&intent);
+        // v4.0.29 — roll task state forward AFTER belief absorption,
+        // BEFORE record_intent so the turn id used by task matches
+        // the one already used by absorb_entities.
+        let task_turn_id = self.intent_history.len();
+        self.task.roll_forward(&intent, &self.belief, task_turn_id);
         self.record_intent(&intent);
         let plan = plan_response_with_session(&intent, rng_seed, repo, &self.session);
         let output = realise(&plan);
@@ -343,6 +359,8 @@ impl Conversation {
             session_snapshot: self.session.clone(),
             belief_digest: self.belief.digest(),
             belief_snapshot: self.belief.clone(),
+            task_digest: self.task.digest(),
+            task_snapshot: self.task.clone(),
             plan_trace: plan.trace.clone(),
         };
         (output, trace)
@@ -663,12 +681,13 @@ impl Conversation {
     }
 
     /// Clear all conversation state — slots, active intent, history,
-    /// and (v4.0.27) the belief state.
+    /// (v4.0.27) the belief state, and (v4.0.29) the task state.
     pub fn reset(&mut self) {
         self.session.clear();
         self.active_intent = None;
         self.intent_history.clear();
         self.belief = crate::belief::BeliefState::new();
+        self.task = crate::task::TaskState::new();
     }
 }
 
