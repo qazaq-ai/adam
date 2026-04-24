@@ -7,6 +7,83 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.13] — 2026-04-24 — R9 PartOf-transitivity (new reasoning rule)
+
+Rule-axis rotation after three consecutive data batches. The reasoner has been at 7 active rules since v4.0.4 (R8 added); v4.0.13 adds the 8th — **R9 PartOf-transitivity**.
+
+### Why PartOf-transitivity specifically
+
+`PartOf` is a partial order. The transitive closure is **mathematically clean** — no semantic overreach, unlike `Has`-transitivity which was rejected in v2.x because "car has wheel ∧ garage has car ⟹ garage has wheel" is false. Mereological part-of chains do compose: «шаш part_of бас ∧ бас part_of дене ⟹ шаш part_of дене» is universally accepted.
+
+### Why the timing makes sense
+
+Three v4.0.x data batches (v4.0.7, v4.0.9, v4.0.11, v4.0.12) populated the `PartOf` base from 117 to 137 facts across plants / house_parts / body_parts / transport / astronomy. Pre-rule audit surfaced **103 ready 2-hop chains** on the committed graph — enough for R9 to produce meaningful output on day one, unlike the v2.4.0 R1-activation (which fired 0 times until v2.5+ data landed).
+
+### Implementation
+
+New rule in `adam-reasoning/src/reasoner.rs` (~30-line body, same structure as R8). Guards:
+
+- **Tautology**: `A = C` rejected (defensive; well-formed PartOf chains are acyclic).
+- **Astronomical cross-scale**: inherited from the R6/R7 pattern — if target `C` is an astronomical-scale object (`is_astronomical_object`) and subject `A` is not, reject. Prevents future «жапырақ part_of ағаш part_of ... part_of күн жүйесі» leaks once intermediate forest / ecosystem entries land.
+- Standard `source_chain` + `rule_id: "R9_part_of_transitivity"` + `ConfidenceKind::RuleInferred`.
+
+### Measured delta on committed v4.0.12 runtime
+
+| rule | v4.0.12 | v4.0.13 | delta |
+|---|---:|---:|---|
+| R1_is_a_transitivity | 473 | 473 | 0 |
+| R2_has_inheritance | 467 | 454 | **−13** (dedup — see below) |
+| R3_has_inheritance_via_part_of | 28 | **43** | **+15 (+54 %)** |
+| R5_shared_is_a_target | 12 791 | 12 791 | 0 |
+| R6_lives_in_via_part_of | 37 | **41** | +4 |
+| R7_goes_to_via_part_of | 306 | **380** | **+74 (+24 %)** |
+| R8_after_transitivity | 734 | 734 | 0 |
+| **R9_part_of_transitivity** | — | **117** | **new** |
+| **derivations total** | 14 836 | **15 033** | **+197 (+1.3 %)** |
+| Fixpoint passes | 6 | **5** | cleaner convergence |
+
+### Cross-activation, not just direct derivation
+
+The 117 direct R9 derivations are only ~60 % of the net gain. R9 creates new PartOf facts that **R3**, **R6**, **R7** can then chain through — R7 alone gained +74 derivations (+24 %) as motion-through-parts chains deepened one hop. R3 Has-via-PartOf gained +15 (+54 % on a rule that was previously sparsely activated). This is a **rule-on-rule multiplier** — the intended effect for a mereological primitive.
+
+The R2 drop (−13) is dedup: R9's new part_of derivations mean R2 convergence picks up facts at a different iteration, so some Has-inheritance derivations get consolidated earlier. Fixpoint in 5 passes (was 6) confirms cleaner convergence.
+
+### Test coverage
+
+Six new regression tests in `reasoner.rs`:
+
+- `r9_derives_part_of_transitivity` — basic 2-hop (шаш → бас → дене).
+- `r9_respects_tautology_guard` — synthetic cyclic chain rejection.
+- `r9_astronomy_same_scale_allowed` — жер → күн жүйесі → галактика passes.
+- `r9_astronomy_cross_scale_rejected` — synthetic «бала part_of жер part_of күн жүйесі» blocked.
+- `r9_chains_across_iterations` — 4-node chain (тіс/ауыз/бет/бас/дене) reaches full transitive closure (6 non-adjacent pairs).
+- `r9_dedupes_against_existing_fact` — explicit long-arc in input ⇒ R9 doesn't re-derive.
+
+### Tests
+
+**471 passing** (+6 R9 regression tests from v4.0.12).
+
+### Noise propagation (honest baseline)
+
+R9 propagates existing noise in the PartOf base — e.g. «теңіз part_of өсімдік part_of көкөніс» (text-extraction chain, semantically absurd) will produce «теңіз part_of көкөніс» as a derivation. This is **the same invariant all rules carry**: the reasoner doesn't validate base-fact semantics. The `derivation_is_fully_curated` helper (v4.0.3) remains the recommended filter for investor-safe surfaces.
+
+### Cumulative v4.0.7 → v4.0.13 (7 releases)
+
+| | v4.0.7 | v4.0.13 | delta |
+|---|---:|---:|---|
+| Active reasoning rules | 7 | **8** | +1 |
+| World Core domains | 14 | 23 | +9 |
+| World Core entries | 549 | 755 | +206 |
+| Derivations | 7 866 | **15 033** | **+7 167 (+91.1 %)** |
+| R5 shared-IsA | 5 940 | 12 791 | +6 851 |
+| Workspace tests | 463 | **471** | +8 |
+
+### Scope discipline
+
+One new rule, one concern. 6 new tests, 30 lines of rule body, no other code changes, no data changes.
+
+---
+
 ## [4.0.12] — 2026-04-24 — World Core batch #3: `emotions.jsonl` + `weather_phenomena.jsonl` + `materials.jsonl`
 
 Third fast-path batch. Three new curated domains, ~3 s pipeline rebuild. **Plan substitution**: `drinks.jsonl` (originally queued) dropped after pre-batch audit — `food.jsonl` already covers the `сусын` hub (шай, су IsA сусын) and the core milk derivatives (сүт / қымыз / шұбат / айран as IsA тағам). Substituted with `materials.jsonl` — genuine gap (шикізат hub had zero world_core coverage).

@@ -26,6 +26,7 @@
 //! | `R6_lives_in_via_part_of` | A LivesIn B ∧ B PartOf C | A LivesIn C (v3.9.5 — spatial inheritance; activated once v3.8.5 verb-root fix gave LivesIn real data) |
 //! | `R7_goes_to_via_part_of` | A GoesTo B ∧ B PartOf C | A GoesTo C (v3.9.5 — directional inheritance; same motivation as R6) |
 //! | `R8_after_transitivity` | A After B ∧ B After C | A After C (v4.0.4 — pure temporal order transitivity; math-clean, overreach-free) |
+//! | `R9_part_of_transitivity` | A PartOf B ∧ B PartOf C | A PartOf C (v4.0.13 — pure mereological transitivity; partial order; `is_astronomical_object` cross-scale guard inherited from R6/R7) |
 //!
 //! ## Determinism
 //!
@@ -195,6 +196,7 @@ fn run_one_pass(
     rule_r6_lives_in_via_part_of(facts, graph, seen, &mut out);
     rule_r7_goes_to_via_part_of(facts, graph, seen, &mut out);
     rule_r8_after_transitivity(facts, graph, seen, &mut out);
+    rule_r9_part_of_transitivity(facts, graph, seen, &mut out);
     out
 }
 
@@ -676,6 +678,86 @@ fn rule_r8_after_transitivity(
                     pos: "noun".into(),
                 },
                 rule_id: "R8_after_transitivity".into(),
+                source_chain: vec![first.source.clone(), second_source],
+                confidence: ConfidenceKind::RuleInferred,
+            });
+        }
+    }
+}
+
+/// v4.0.13 — **R9 PartOf transitivity**. `PartOf` is a partial order
+/// (reflexive, anti-symmetric, transitive); R9 closes the transitive
+/// part. Semantically: if A is a part of B and B is a part of C, then
+/// A is a part of C — the classic mereological axiom.
+///
+/// Examples this closes (on v4.0.12 data):
+///
+///   - `шаш part_of бас ∧ бас part_of дене ⟹ шаш part_of дене`
+///   - `жер part_of күн жүйесі ∧ күн жүйесі part_of галактика ⟹ жер part_of галактика`
+///   - `жапырақ part_of ағаш ∧ ... (future)` → propagates once plants-in-forest / trees-in-ecosystem entries land.
+///
+/// **Tautology guard**: `A = C` rejected. Mereological partial orders
+/// forbid cycles, so a well-formed PartOf chain never produces
+/// `A PartOf A`; this is defensive against noisy input.
+///
+/// **Cross-scale guard (inherited from R6/R7 pattern)**: if `C` is an
+/// astronomical-scale object (`is_astronomical_object`) and `A` is
+/// **not**, the derivation is rejected. Prevents «жапырақ part_of
+/// ағаш part_of орман part_of ... part_of галактика» style cross-scale
+/// leaks that would emerge once future data adds intermediate links.
+/// Pure astronomy chains (жер / марс / шолпан part_of күн жүйесі
+/// part_of галактика) are unaffected — both ends are astronomical.
+///
+/// R9 does NOT validate whether each input PartOf fact is semantically
+/// correct; noise in the base set (e.g. `теңіз part_of өсімдік` from
+/// text extraction) propagates through, same as every other rule. The
+/// `derivation_is_fully_curated` helper stays the recommended filter
+/// for investor-safe dialog surfaces.
+fn rule_r9_part_of_transitivity(
+    facts: &[Fact],
+    graph: &LexicalGraph,
+    seen: &BTreeSet<(String, String, String)>,
+    out: &mut Vec<DerivedFact>,
+) {
+    for first in facts {
+        if first.predicate != Predicate::PartOf {
+            continue;
+        }
+        for second in graph.outgoing(&first.object.root) {
+            if second.predicate != Predicate::PartOf {
+                continue;
+            }
+            if first.subject.root == second.to {
+                continue;
+            }
+            // Cross-scale guard — same pattern as R6/R7.
+            if crate::patterns::is_astronomical_object(&second.to)
+                && !crate::patterns::is_astronomical_object(&first.subject.root)
+            {
+                continue;
+            }
+            let key = (
+                first.subject.root.clone(),
+                "part_of".to_string(),
+                second.to.clone(),
+            );
+            if seen.contains(&key) {
+                continue;
+            }
+            let second_source = second
+                .sources
+                .first()
+                .cloned()
+                .expect("graph edge must carry at least one source");
+            out.push(DerivedFact {
+                subject: first.subject.clone(),
+                predicate: Predicate::PartOf,
+                object: SlotRef {
+                    surface: second.to.clone(),
+                    root: second.to.clone(),
+                    pos: "noun".into(),
+                },
+                rule_id: "R9_part_of_transitivity".into(),
                 source_chain: vec![first.source.clone(), second_source],
                 confidence: ConfidenceKind::RuleInferred,
             });
@@ -1378,6 +1460,142 @@ mod tests {
         assert!(derived_pairs.contains(&("күз".into(), "көктем".into())));
         assert!(derived_pairs.contains(&("қыс".into(), "жаз".into())));
         assert!(derived_pairs.contains(&("қыс".into(), "көктем".into())));
+    }
+
+    // ------------------------- R9 (v4.0.13) -----------------------------
+
+    #[test]
+    fn r9_derives_part_of_transitivity() {
+        // шаш part_of бас ∧ бас part_of дене ⟹ шаш part_of дене
+        let facts = vec![
+            mk_fact("шаш", Predicate::PartOf, "бас", "wc", "body_a"),
+            mk_fact("бас", Predicate::PartOf, "дене", "wc", "body_b"),
+        ];
+        let derived = run(&facts);
+        let r9: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R9_part_of_transitivity")
+            .collect();
+        assert_eq!(r9.len(), 1, "R9 should fire once (got {derived:?})");
+        let d = r9[0];
+        assert_eq!(d.subject.root, "шаш");
+        assert_eq!(d.predicate, Predicate::PartOf);
+        assert_eq!(d.object.root, "дене");
+        assert_eq!(d.confidence, ConfidenceKind::RuleInferred);
+        assert_eq!(d.source_chain.len(), 2);
+    }
+
+    #[test]
+    fn r9_respects_tautology_guard() {
+        // Cyclic PartOf is pathological, but guard is defensive.
+        let facts = vec![
+            mk_fact("A", Predicate::PartOf, "B", "p", "s1"),
+            mk_fact("B", Predicate::PartOf, "A", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        for d in &derived {
+            assert!(
+                !(d.subject.root == d.object.root && d.rule_id == "R9_part_of_transitivity"),
+                "R9 must never derive A PartOf A: {d:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn r9_astronomy_same_scale_allowed() {
+        // жер part_of күн жүйесі ∧ күн жүйесі part_of галактика
+        // Both жер and галактика are astronomical → guard allows.
+        let facts = vec![
+            mk_fact("жер", Predicate::PartOf, "күн жүйесі", "wc", "astro_001"),
+            mk_fact(
+                "күн жүйесі",
+                Predicate::PartOf,
+                "галактика",
+                "wc",
+                "astro_013",
+            ),
+        ];
+        let derived = run(&facts);
+        let r9: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R9_part_of_transitivity")
+            .collect();
+        assert_eq!(
+            r9.len(),
+            1,
+            "астрономический same-scale: R9 должен сработать"
+        );
+        assert_eq!(r9[0].subject.root, "жер");
+        assert_eq!(r9[0].object.root, "галактика");
+    }
+
+    #[test]
+    fn r9_astronomy_cross_scale_rejected() {
+        // Synthetic chain: бала part_of жер ∧ жер part_of күн жүйесі.
+        // Subject бала is non-astronomical; target күн жүйесі is
+        // astronomical → guard blocks derivation (same pattern as R6/R7
+        // from v4.0.0).
+        let facts = vec![
+            mk_fact("бала", Predicate::PartOf, "жер", "p", "s1"),
+            mk_fact("жер", Predicate::PartOf, "күн жүйесі", "wc", "astro_001"),
+        ];
+        let derived = run(&facts);
+        let r9: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R9_part_of_transitivity" && d.object.root == "күн жүйесі")
+            .collect();
+        assert!(
+            r9.is_empty(),
+            "R9 must reject cross-scale astronomical leaks: {derived:?}"
+        );
+    }
+
+    #[test]
+    fn r9_chains_across_iterations() {
+        // Four-level chain: тіс part_of ауыз ∧ ауыз part_of бет ∧ бет
+        // part_of бас ∧ бас part_of дене.
+        // Expected derivations span all non-adjacent pairs.
+        let facts = vec![
+            mk_fact("тіс", Predicate::PartOf, "ауыз", "wc", "a"),
+            mk_fact("ауыз", Predicate::PartOf, "бет", "wc", "b"),
+            mk_fact("бет", Predicate::PartOf, "бас", "wc", "c"),
+            mk_fact("бас", Predicate::PartOf, "дене", "wc", "d"),
+        ];
+        let derived = run(&facts);
+        let r9: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R9_part_of_transitivity")
+            .collect();
+        let pairs: std::collections::BTreeSet<(String, String)> = r9
+            .iter()
+            .map(|d| (d.subject.root.clone(), d.object.root.clone()))
+            .collect();
+        // Transitive closure over 4-node chain: C(4,2) - 3 adjacent = 3 derived.
+        assert!(pairs.contains(&("тіс".into(), "бет".into())));
+        assert!(pairs.contains(&("тіс".into(), "бас".into())));
+        assert!(pairs.contains(&("тіс".into(), "дене".into())));
+        assert!(pairs.contains(&("ауыз".into(), "бас".into())));
+        assert!(pairs.contains(&("ауыз".into(), "дене".into())));
+        assert!(pairs.contains(&("бет".into(), "дене".into())));
+    }
+
+    #[test]
+    fn r9_dedupes_against_existing_fact() {
+        // Full chain plus explicit long-arc: R9 must not re-derive.
+        let facts = vec![
+            mk_fact("шаш", Predicate::PartOf, "бас", "wc", "a"),
+            mk_fact("бас", Predicate::PartOf, "дене", "wc", "b"),
+            mk_fact("шаш", Predicate::PartOf, "дене", "wc", "c"),
+        ];
+        let derived = run(&facts);
+        let r9: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R9_part_of_transitivity")
+            .collect();
+        assert!(
+            r9.is_empty(),
+            "R9 must not duplicate an explicitly-asserted PartOf fact: {derived:?}"
+        );
     }
 
     // ---------------- v4.0.3 derivation_is_fully_curated ----------------

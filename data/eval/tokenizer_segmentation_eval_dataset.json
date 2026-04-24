@@ -1,5 +1,5 @@
 {
-  "version": "4.0.12",
+  "version": "4.0.13",
   "name": "adam-tokenizer-segmentation",
   "target_language": "kazakh",
   "script": "cyrillic",
