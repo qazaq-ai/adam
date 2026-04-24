@@ -1566,6 +1566,18 @@ fn is_closed_class(root: &str) -> bool {
             | "жарт"
             | "арасындағ"
             | "тағы"
+            // v4.0.17 — additional FST-fragment / Roman-numeral noise
+            // surfaced in the v4.0.16 noise audit. «жалп» (fragment of
+            // «жалпы» = generally) × 12, «мұн» (demonstrative stem
+            // fragment of «мұны/мұнда») × 8, «аста» (fragment of
+            // «астам» = more-than) × 7, «хіх» (tokenised Roman numeral
+            // XIX) × 5 — all appearing as GoesTo/DoesTo subjects on the
+            // v4.0.15 committed runtime. One-concern patch with
+            // v4.0.6's attributive-blocklist style.
+            | "жалп"
+            | "мұн"
+            | "аста"
+            | "хіх"
     )
 }
 
@@ -2343,6 +2355,22 @@ mod tests {
         // Content nouns still pass through.
         assert!(!is_closed_class("адам"));
         assert!(!is_closed_class("мектеп"));
+    }
+
+    /// v4.0.17 regression — fragment roots + Roman-numeral tokens that
+    /// surfaced in the v4.0.16 R7 noise audit. Blocking them at
+    /// `is_closed_class` prevents the corresponding text-extracted
+    /// GoesTo/DoesTo/IsA/LivesIn base facts on the next full re-extract.
+    #[test]
+    fn is_closed_class_covers_v4_0_17_fragments() {
+        assert!(is_closed_class("жалп"));
+        assert!(is_closed_class("мұн"));
+        assert!(is_closed_class("аста"));
+        assert!(is_closed_class("хіх"));
+        // Legitimate neighbours must still pass.
+        assert!(!is_closed_class("жалпы")); // full form — content adj-adverb
+        assert!(!is_closed_class("астана")); // capital-city root — must not collide with «аста»
+        assert!(!is_closed_class("мұнда")); // full locative demonstrative — curated handling elsewhere
     }
 
     #[test]

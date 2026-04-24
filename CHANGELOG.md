@@ -7,6 +7,37 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.17] — 2026-04-24 — Fragment roots in `is_closed_class` (code-only micro-patch)
+
+Follow-up to v4.0.16's noise audit. While cleaning location-root GoesTo subjects, the audit also surfaced 4 fragment / tokenisation-artefact roots contaminating text-extracted facts:
+
+| root | × | origin |
+|---|---:|---|
+| `жалп` | 12 | fragment of «жалпы» (generally) — FST over-segments before тоқы-reduction rule |
+| `мұн` | 8 | demonstrative stem fragment («мұны» / «мұнда» stripped to stem) |
+| `аста` | 7 | fragment of «астам» (more than) |
+| `хіх` | 5 | tokenised Roman numeral XIX |
+
+v4.0.6 already blocked 3 fragment roots (`жарт`, `арасындағ`, `тағы`); v4.0.17 extends the same blocklist pattern to these 4. Total combined: ~32 base facts will be filtered on the next full re-extract.
+
+### Code change
+
+4-line extension to the `is_closed_class` match + 1 new regression test. Regression test also asserts non-collision with legitimate neighbours: «жалпы» (full form), «астана» (city-root — must not collide with fragment «аста»), «мұнда» (full locative).
+
+### Delivery discipline: code-only, no re-extract
+
+v4.0.16 consumed a 26-minute full T4_200k re-extract to materialise its location-root fix. This patch is small enough (~32 expected base-fact reductions) that a dedicated re-extract is wasteful. **Committed `facts.json` retains the ~32 fragment facts until the next full re-extract** — planned for v4.0.18 along with a new reasoning rule that'll also benefit from the cleaner base.
+
+### Tests
+
+**479 passing** (+1 regression `is_closed_class_covers_v4_0_17_fragments` from v4.0.16).
+
+### Scope
+
+One concern: expand `is_closed_class` with 4 fragments. No data changes, no other code changes.
+
+---
+
 ## [4.0.16] — 2026-04-24 — Noise audit #2: location-root subjects in `dative_goes_to` + `agent_verb`
 
 Second noise-elimination audit of v4.0.x. Audit on fresh v4.0.15 derived_facts.json surfaced a major contamination class: **R7 GoesTo-via-PartOf had 385 of 388 derivations either fully text-only or mixed** — traced back to text-extracted GoesTo base facts with country / city subjects.
