@@ -7,6 +7,83 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.14] — 2026-04-24 — R10 InDomain-inheritance via IsA (new reasoning rule)
+
+Second consecutive rule-axis patch. Reasoner roster 8 → 9. Pattern: `A IsA B ∧ B InDomain D ⟹ A InDomain D` — identical shape to R2 (Has-inheritance), applied to the domain-membership predicate.
+
+### Why InDomain-inheritance
+
+InDomain has been the least-activated predicate — only 24 base facts on v4.0.13 (14 in kz_literature, 4 math-ops, plus biology/anatomy/astronomy/color seeds). Yet IsA taxonomies are dense (587 distinct subjects). An inheritance rule unlocks coverage through existing taxonomy without new curation: every бird inheriting орнитология from `құс InDomain орнитология`, every number inheriting математика from `сан InDomain математика`.
+
+### Pre-rule audit on v4.0.13
+
+Direct 1-hop chains available (A IsA B ∧ B InDomain D, no trivial skip):
+
+| domain | derivable count |
+|---|---:|
+| математика | 25 |
+| зоология | 21 |
+| орнитология | 12 |
+| әдебиет | 4 |
+| астрономия | 3 |
+| көру | 1 |
+| **total 1-hop** | **66** |
+
+Plus fixpoint chaining through R1-derived IsA facts (e.g. `арыстан IsA жыртқыш IsA жануар` → R1 derives `арыстан IsA жануар` → R10 derives `арыстан InDomain зоология` at iter 2).
+
+### Measured on committed v4.0.13 runtime
+
+| rule | v4.0.13 | v4.0.14 | delta |
+|---|---:|---:|---|
+| R1-R9 rules | unchanged | unchanged | 0 |
+| **R10_in_domain_inheritance** | — | **102** | **new** |
+| **derivations total** | 14 836 / 15 033 | **15 135** | **+102 (+0.68 %)** |
+| Fixpoint passes | 5 | 5 | same |
+
+**102 > 66 predicted** — the 36-fact delta is R1-transitive chaining at iter 2. When `X IsA Y IsA Z` exists and `Z InDomain D`, R10 fires for both `(X, InDomain, D)` and `(Y, InDomain, D)` after R1 produces the `X IsA Z` shortcut. Classic fixpoint compounding.
+
+### R10 is isolated (no cross-activation)
+
+Unlike R9 which fed into R3/R6/R7 via PartOf, R10 produces InDomain facts that no current rule consumes. Future R11/R12 could extend (e.g. «A InDomain D1 ∧ B InDomain D1 ⟹ RelatedTo(A, B)» — the InDomain analogue of R5 shared-IsA), but that's scope for a later patch.
+
+### Implementation
+
+`rule_r10_in_domain_inheritance` in `reasoner.rs` — same ~30-line structure as R2 Has-inheritance. Guards:
+
+- **Tautology**: `A = D` rejected (defensive; would mean A categorized into itself via a taxonomy hop).
+- **No cross-scale guard**: InDomain is not a scale concept.
+- Standard `source_chain` + `rule_id: "R10_in_domain_inheritance"` + `ConfidenceKind::RuleInferred`.
+
+### Test coverage
+
+5 new regression tests:
+
+- `r10_derives_in_domain_inheritance` — basic 1-hop (қасқыр IsA жануар → InDomain зоология).
+- `r10_respects_tautology_guard` — synthetic A IsA B + B InDomain A rejection.
+- `r10_does_not_fire_without_chain` — isolated InDomain fact alone → no derivation.
+- `r10_dedupes_against_existing_fact` — explicit long-arc ⇒ R10 doesn't duplicate.
+- `r10_chains_through_r1_derived_is_a` — 3-level chain арыстан IsA жыртқыш IsA жануар, confirms R10 fires on R1-derived IsA at fixpoint iter 2.
+
+### Tests
+
+**476 passing** (+5 R10 regression tests from v4.0.13).
+
+### Cumulative v4.0.7 → v4.0.14 (8 releases)
+
+| | v4.0.7 | v4.0.14 | delta |
+|---|---:|---:|---|
+| Active reasoning rules | 7 | **9** | +2 (R9, R10) |
+| World Core domains | 14 | 23 | +9 |
+| World Core entries | 549 | 755 | +206 |
+| Derivations | 7 866 | **15 135** | **+7 269 (+92.4 %)** |
+| Tests | 463 | **476** | +13 |
+
+### Scope discipline
+
+One new rule, one concern. 5 new tests, ~30 lines of rule body, no data changes.
+
+---
+
 ## [4.0.13] — 2026-04-24 — R9 PartOf-transitivity (new reasoning rule)
 
 Rule-axis rotation after three consecutive data batches. The reasoner has been at 7 active rules since v4.0.4 (R8 added); v4.0.13 adds the 8th — **R9 PartOf-transitivity**.

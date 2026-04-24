@@ -27,6 +27,7 @@
 //! | `R7_goes_to_via_part_of` | A GoesTo B ∧ B PartOf C | A GoesTo C (v3.9.5 — directional inheritance; same motivation as R6) |
 //! | `R8_after_transitivity` | A After B ∧ B After C | A After C (v4.0.4 — pure temporal order transitivity; math-clean, overreach-free) |
 //! | `R9_part_of_transitivity` | A PartOf B ∧ B PartOf C | A PartOf C (v4.0.13 — pure mereological transitivity; partial order; `is_astronomical_object` cross-scale guard inherited from R6/R7) |
+//! | `R10_in_domain_inheritance` | A IsA B ∧ B InDomain D | A InDomain D (v4.0.14 — taxonomic inheritance of domain membership; same shape as R2 for Has) |
 //!
 //! ## Determinism
 //!
@@ -197,6 +198,7 @@ fn run_one_pass(
     rule_r7_goes_to_via_part_of(facts, graph, seen, &mut out);
     rule_r8_after_transitivity(facts, graph, seen, &mut out);
     rule_r9_part_of_transitivity(facts, graph, seen, &mut out);
+    rule_r10_in_domain_inheritance(facts, graph, seen, &mut out);
     out
 }
 
@@ -758,6 +760,73 @@ fn rule_r9_part_of_transitivity(
                     pos: "noun".into(),
                 },
                 rule_id: "R9_part_of_transitivity".into(),
+                source_chain: vec![first.source.clone(), second_source],
+                confidence: ConfidenceKind::RuleInferred,
+            });
+        }
+    }
+}
+
+/// v4.0.14 — **R10 InDomain inheritance via IsA**. Same shape as R2
+/// (Has-inheritance): `A IsA B ∧ B InDomain D ⟹ A InDomain D`.
+///
+/// Intuition: if A is a kind of B and B belongs to domain D, then A
+/// belongs to D too. Taxonomic domain membership inherits down the
+/// IsA tree.
+///
+/// Examples this closes (on v4.0.13 data):
+///
+///   - `қасқыр IsA жануар ∧ жануар InDomain зоология ⟹ қасқыр InDomain зоология`
+///   - `қарға IsA құс ∧ құс InDomain орнитология ⟹ қарға InDomain орнитология`
+///   - `абай IsA ақын ∧ (no InDomain on ақын yet) ⟹ no derivation`
+///   - `қосу InDomain математика` is a leaf (no IsA parent) — unaffected.
+///
+/// **Tautology guard**: `A = D` rejected (defensive; would mean a
+/// concept is categorised into itself via a taxonomy hop — paradoxical).
+///
+/// **No cross-scale guard**: InDomain is not a scale concept (domains
+/// aren't ordered by magnitude), so the R6/R7/R9 astronomical guard
+/// does not apply.
+fn rule_r10_in_domain_inheritance(
+    facts: &[Fact],
+    graph: &LexicalGraph,
+    seen: &BTreeSet<(String, String, String)>,
+    out: &mut Vec<DerivedFact>,
+) {
+    for first in facts {
+        if first.predicate != Predicate::IsA {
+            continue;
+        }
+        // A IsA B — find every (B InDomain D) edge in the graph.
+        for second in graph.outgoing(&first.object.root) {
+            if second.predicate != Predicate::InDomain {
+                continue;
+            }
+            if first.subject.root == second.to {
+                continue;
+            }
+            let key = (
+                first.subject.root.clone(),
+                "in_domain".to_string(),
+                second.to.clone(),
+            );
+            if seen.contains(&key) {
+                continue;
+            }
+            let second_source = second
+                .sources
+                .first()
+                .cloned()
+                .expect("graph edge must carry at least one source");
+            out.push(DerivedFact {
+                subject: first.subject.clone(),
+                predicate: Predicate::InDomain,
+                object: SlotRef {
+                    surface: second.to.clone(),
+                    root: second.to.clone(),
+                    pos: "noun".into(),
+                },
+                rule_id: "R10_in_domain_inheritance".into(),
                 source_chain: vec![first.source.clone(), second_source],
                 confidence: ConfidenceKind::RuleInferred,
             });
@@ -1595,6 +1664,109 @@ mod tests {
         assert!(
             r9.is_empty(),
             "R9 must not duplicate an explicitly-asserted PartOf fact: {derived:?}"
+        );
+    }
+
+    // ------------------------- R10 (v4.0.14) ----------------------------
+
+    #[test]
+    fn r10_derives_in_domain_inheritance() {
+        // қасқыр IsA жануар ∧ жануар InDomain зоология ⟹ қасқыр InDomain зоология
+        let facts = vec![
+            mk_fact("қасқыр", Predicate::IsA, "жануар", "wc", "anm_001"),
+            mk_fact("жануар", Predicate::InDomain, "зоология", "wc", "anm_024"),
+        ];
+        let derived = run(&facts);
+        let r10: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R10_in_domain_inheritance")
+            .collect();
+        assert_eq!(r10.len(), 1, "R10 should fire once (got {derived:?})");
+        let d = r10[0];
+        assert_eq!(d.subject.root, "қасқыр");
+        assert_eq!(d.predicate, Predicate::InDomain);
+        assert_eq!(d.object.root, "зоология");
+        assert_eq!(d.confidence, ConfidenceKind::RuleInferred);
+        assert_eq!(d.source_chain.len(), 2);
+    }
+
+    #[test]
+    fn r10_respects_tautology_guard() {
+        // A IsA B + B InDomain A → A InDomain A rejected.
+        let facts = vec![
+            mk_fact("A", Predicate::IsA, "B", "p", "s1"),
+            mk_fact("B", Predicate::InDomain, "A", "p", "s2"),
+        ];
+        let derived = run(&facts);
+        for d in &derived {
+            assert!(
+                !(d.subject.root == d.object.root && d.rule_id == "R10_in_domain_inheritance"),
+                "R10 must never derive A InDomain A: {d:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn r10_does_not_fire_without_chain() {
+        // жануар InDomain зоология alone — no IsA to extend.
+        let facts = vec![mk_fact(
+            "жануар",
+            Predicate::InDomain,
+            "зоология",
+            "wc",
+            "anm_024",
+        )];
+        let derived = run(&facts);
+        let r10: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R10_in_domain_inheritance")
+            .collect();
+        assert!(r10.is_empty());
+    }
+
+    #[test]
+    fn r10_dedupes_against_existing_fact() {
+        // Full chain plus explicit long-arc: R10 must not re-derive.
+        let facts = vec![
+            mk_fact("қасқыр", Predicate::IsA, "жануар", "wc", "a"),
+            mk_fact("жануар", Predicate::InDomain, "зоология", "wc", "b"),
+            mk_fact("қасқыр", Predicate::InDomain, "зоология", "wc", "c"),
+        ];
+        let derived = run(&facts);
+        let r10: Vec<_> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R10_in_domain_inheritance")
+            .collect();
+        assert!(
+            r10.is_empty(),
+            "R10 must not duplicate an explicitly-asserted InDomain fact: {derived:?}"
+        );
+    }
+
+    #[test]
+    fn r10_chains_through_r1_derived_is_a() {
+        // Three-level IsA chain: арыстан IsA жыртқыш IsA жануар.
+        // жануар InDomain зоология.
+        // Expected: R1 derives арыстан IsA жануар, then R10 derives
+        //   (жыртқыш, InDomain, зоология) + (арыстан, InDomain, зоология).
+        let facts = vec![
+            mk_fact("арыстан", Predicate::IsA, "жыртқыш", "wc", "a"),
+            mk_fact("жыртқыш", Predicate::IsA, "жануар", "wc", "b"),
+            mk_fact("жануар", Predicate::InDomain, "зоология", "wc", "c"),
+        ];
+        let derived = run(&facts);
+        let r10_pairs: std::collections::BTreeSet<(String, String)> = derived
+            .iter()
+            .filter(|d| d.rule_id == "R10_in_domain_inheritance")
+            .map(|d| (d.subject.root.clone(), d.object.root.clone()))
+            .collect();
+        assert!(
+            r10_pairs.contains(&("жыртқыш".into(), "зоология".into())),
+            "R10 должен покрыть прямого ребёнка жануар"
+        );
+        assert!(
+            r10_pairs.contains(&("арыстан".into(), "зоология".into())),
+            "R10 должен покрыть внука через R1-derived IsA жануар (через fixpoint)"
         );
     }
 

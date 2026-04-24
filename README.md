@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.13-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.14-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,8 +23,8 @@
   <img src="https://img.shields.io/badge/lexicon-14%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-471%20passing-2EA44F?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/reasoning%20rules-8%20active-2EA44F?style=flat-square" alt="reasoning rules">
+  <img src="https://img.shields.io/badge/tests-476%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/reasoning%20rules-9%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
   <img src="https://img.shields.io/badge/world%20core-755%20curated%20/%20849%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/domains-23-9CCC65?style=flat-square" alt="domains">
@@ -69,14 +69,14 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
 | **World Core (v4.0.12)** | **755 entries / 849 curated facts** across **23 domains**: astronomy, time, geography_kz, biology_basic, body_parts, society, colors, numbers, kz_literature, food, clothing, proverbs, animals, transport, plants, professions, tools_household, music_kz, sports, house_parts, **emotions (18 / 18)**, **weather_phenomena (15 / 15)**, **materials (14 / 14)** — bolded are new in v4.0.12. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **471 passing, 0 failing, 0 warnings** |
+| Workspace tests | **476 passing, 0 failing, 0 warnings** |
 | Pattern matchers | **11** — v2.x baseline (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
-| **Reasoning rules active** | **8 of 9 firing on v4.0.13 corpus** — R1 IsA-transitivity (**473**), R2 Has-inheritance (**454**), R3 Has-via-PartOf (**43**), R5 shared-IsA → RelatedTo (**12 791**), R6 LivesIn-via-PartOf (**41**), R7 GoesTo-via-PartOf (**380**), R8 After-transitivity (**734**), **R9 PartOf-transitivity (117, NEW in v4.0.13)**. R4 IsA-symmetry is curator-warning only. **R8 + R9 are both mathematically clean** — partial-order transitive closures with no semantic overreach; R9 activated R3/R6/R7 cross-rule cascades (R7 +24 %, R3 +54 %). |
+| **Reasoning rules active** | **9 of 10 firing on v4.0.14 corpus** — R1 IsA-transitivity (**473**), R2 Has-inheritance (**454**), R3 Has-via-PartOf (**43**), R5 shared-IsA → RelatedTo (**12 791**), R6 LivesIn-via-PartOf (**41**), R7 GoesTo-via-PartOf (**380**), R8 After-transitivity (**734**), R9 PartOf-transitivity (**117**), **R10 InDomain-inheritance (102, NEW in v4.0.14)**. R4 IsA-symmetry is curator-warning only. R10 extends domain membership through IsA taxonomy — every бird inherits орнитология from `құс InDomain орнитология` without per-bird curation. |
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | **Dialog closed-class sync** (v3.9.5) | `NOT_A_TOPIC` mirrors `adam_reasoning::patterns::is_closed_class` — closes the pre-v3.9.5 «Неліктен → Нелікте тұрасыз ба» misparse where the FST correctly analysed `Неліктен` as ablative of a noun stem but the dialog layer had no interrogative filter |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
 | Facts (committed runtime) | **13 888 total** = **13 039 extracted (Grammar)** + **849 curated (HumanApproved, 23 domains)**. T4_200k scale for the text-extracted portion |
-| **Rule-derived facts (committed runtime)** | **15 033** (v4.0.13: R1=473, R2=454, R3=**43**, R5=12 791, R6=41, R7=**380**, R8=734, **R9=117 NEW**). Delta vs v4.0.12: **+197 (+1.3 %)** from R9 activation. R9 direct 117 plus cross-activation: R3 +15 (+54 %), R7 +74 (+24 %), R6 +4. **Cumulative v4.0.7 → v4.0.13**: **7 866 → 15 033 derivations (+91.1 %)** across 7 releases |
+| **Rule-derived facts (committed runtime)** | **15 135** (v4.0.14: R1=473, R2=454, R3=43, R5=12 791, R6=41, R7=380, R8=734, R9=117, **R10=102 NEW**). Delta vs v4.0.13: **+102 (+0.68 %)** from R10 activation. R10 is isolated (no rule consumes InDomain yet), so no cross-activation; 102 > 66 predicted because R1-derived IsA shortcuts fed R10 at fixpoint iter 2. **Cumulative v4.0.7 → v4.0.14**: **7 866 → 15 135 derivations (+92.4 %)** across 8 releases |
 | Fact-graph nodes / edges | **3 432 / 12 495** (committed v4.0.12); most-connected content nouns: **адам (290), жер (218), дүние (206), қазақ (203), ат (148)** |
 | **Tooling throughput (v4.0.8 → v4.0.9 validation)** | `extract_facts --world-core-only` — v4.0.8 infra. v4.0.9 confirmed empirically: 3-domain batch (105 new facts, full rebuild of facts + derived_facts + lexical_graph) took **~4 s total** vs ~135 min under the pre-v4.0.8 per-domain workflow — **~2 000× pipeline speedup on a 3-domain batch**. |
 | **Predicate coverage (v3.9.5)** | **11 / 11 = 100 %** — every declared predicate fires. Causes = 6, InDomain = 5 (v3.9.5 biology/anatomy/society entries extended the v3.9.0 foothold) |
