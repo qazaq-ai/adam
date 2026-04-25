@@ -102,11 +102,12 @@ pub struct TaskState {
     /// Ordered sub-steps toward the active goal. Most v4.0.29 goals
     /// have none; reserved for Phase 3.
     pub subgoals: Vec<Subgoal>,
-    /// Whatever `ActionPlanner` (Phase 3) last dispatched, stringly
-    /// typed for now because the Action enum lives in a future
-    /// module. Included so the trace can show the "what did we do
-    /// last" signal even pre-Phase-3.
-    pub last_action: Option<String>,
+    /// v4.0.31 — last `ActionPlan` chosen by
+    /// [`crate::action::ActionPlanner::plan`] for the most recent
+    /// turn. Pre-v4.0.31 this was a placeholder `Option<String>`;
+    /// Phase 3 lands the real type. `None` before the first turn of
+    /// a session or after [`Conversation::reset`].
+    pub last_action: Option<crate::action::ActionPlan>,
     /// Lifecycle position — see [`TaskStatus`].
     pub status: TaskStatus,
     /// 0-based turn index when `active_goal` was installed. Drives

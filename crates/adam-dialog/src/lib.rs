@@ -27,6 +27,7 @@
 //! which picks uniformly from ≤ 5 applicable templates for the recognised
 //! intent. That is the ONLY source of randomness in the system.
 
+pub mod action;
 pub mod belief;
 pub mod conversation;
 pub mod intent;
@@ -37,6 +38,7 @@ pub mod slot_syntax;
 pub mod task;
 pub mod templates;
 
+pub use action::{Action, ActionDigest, ActionPlan, ActionPlanner, OutputKind};
 pub use belief::{
     BeliefConflict, BeliefDigest, BeliefFact, BeliefState, ConfidenceBand, EntityKind,
     EntityMemory, FactStatus, PendingQuestion, Provenance, QuestionNature, USER_SELF_KEY,

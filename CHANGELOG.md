@@ -7,6 +7,92 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.31] — 2026-04-24 — ActionPlanner (Codex v4.0.26 roadmap Phase 3)
+
+Third architectural patch on Codex's v5.0 roadmap. Phase 1 gave structured memory; Phase 2 gave goals; Phase 3 gives **actions** — a coarse vocabulary for what the system should *do* on a turn, chosen by a pure classifier from `(intent, belief, task)`.
+
+**Non-breaking in v4.0.31** — the classifier runs but the existing template planner still drives the surface form. Reply text is byte-identical to v4.0.30. Phase 4 (Verifier) will be the first phase that actually *gates* responses on the ActionPlan.
+
+### What landed
+
+New module `crates/adam-dialog/src/action.rs` (~440 lines incl. 11 unit tests). Public types:
+
+```rust
+pub enum Action {
+    AnswerDirect,        // known from belief
+    RetrieveEvidence,    // retrieval example on intent
+    RunReasoner,         // reasoning chain on intent
+    AskClarification,    // goal set, no evidence path
+    CheckContradiction,  // belief conflict present
+    SummarizeBelief,     // reserved
+    RefuseOutOfScope,    // safe fallback
+    Social,              // greeting/thanks/etc
+}
+
+pub enum OutputKind {
+    DirectAnswer, EvidenceAnswer, DerivedAnswer,
+    ClarifyingQuestion, SafeFallback, SocialPleasantry,
+}
+
+pub struct ActionPlan {
+    pub action: Action,
+    pub rationale: Vec<String>,
+    pub required_inputs: Vec<String>,
+    pub expected_output: OutputKind,
+}
+
+pub struct ActionPlanner;  // static classifier
+```
+
+### Classification precedence
+
+`ActionPlanner::plan(intent, belief, task)` evaluates in order:
+
+1. **Contradiction** in belief → `CheckContradiction` (dominates even with evidence present — Codex v4.0.28 invariant at the action layer).
+2. **`TaskStatus::WaitingForUser`** → `AskClarification`.
+3. **Social intent** (greeting, thanks, affirmation, negation, compliment, etc.) → `Social`.
+4. **Profile ask with matching belief** (e.g. `AskName` + `active_fact(USER, "name")`) → `AnswerDirect`.
+5. **Unknown with reasoning chain** → `RunReasoner` (chains beat retrieval — higher trust).
+6. **Unknown with retrieval example only** → `RetrieveEvidence`.
+7. **Unknown with topic but no evidence** → `AskClarification`.
+8. **Fallthrough** → `RefuseOutOfScope`.
+
+### Integration
+
+- `TaskState.last_action: Option<String>` (v4.0.29 placeholder) → `Option<ActionPlan>` (v4.0.31 real type).
+- `Conversation::turn_with_trace` calls `ActionPlanner::plan` after `roll_forward`, stores the result on `task.last_action`.
+- `TurnTrace` gains `action_digest: ActionDigest` + `action_plan: ActionPlan`.
+- `adam_chat --trace` prints two new lines:
+  ```
+  ├─ action:   RunReasoner → DerivedAnswer (rationale×1)
+  ├─ action rationale: intent carries injected reasoning_chain
+  ```
+
+### Smoke-test
+
+```
+$ adam_chat --once 'жер туралы айтшы' --trace
+├─ task:     goal=true variant=LearnAboutTopic subgoals=0 status=ReadyToAnswer set_at=Some(0)
+├─ action:   RunReasoner → DerivedAnswer (rationale×1)
+├─ action rationale: intent carries injected reasoning_chain
+└─ output:   жер туралы мынадай байланыс анықтадым: қорытынды: жер — аспан денесі (...)
+```
+
+`рахмет` → `Social → SocialPleasantry`. Two-conflict scenario (алматы → астана) → `CheckContradiction → ClarifyingQuestion`.
+
+### Tests
+
+**538 passing** (+14 from v4.0.30):
+
+- 11 unit in `action.rs` covering every branch of the classifier (contradiction dominance, social routing, reasoning-beats-retrieval, clarification on no-evidence, direct answer from belief, fallthrough refusal, digest parity).
+- 3 integration in `end_to_end.rs` exercising the classifier through full `Conversation::turn_with_trace`.
+
+### Scope
+
+**Phase 3 only.** The classifier is pure — no side effects, no output gating. Reply text byte-identical to v4.0.30. Phase 4 (Verifier) will be the first phase that actually changes what the user sees, by refusing to render an answer unless the ActionPlan permits it.
+
+---
+
 ## [4.0.30] — 2026-04-24 — Turn-counter fix + ReadyToAnswer reachability (Codex v4.0.29 review)
 
 Two invariant fixes on the Phase 2 substrate before Phase 3 builds on top. Codex flagged both in the v4.0.29 review — #1 as a blocker, #2 as a semantic gap Phase 3 would inherit.

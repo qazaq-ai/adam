@@ -1507,6 +1507,89 @@ fn turn_with_trace_surfaces_task_digest() {
     assert_eq!(trace.task_digest.status, TaskStatus::GatheringEvidence);
 }
 
+/// v4.0.31 Phase 3 — `Conversation::turn_with_trace` classifies each
+/// turn into an `ActionPlan`. With a reasoning chain injected the
+/// action must be `RunReasoner`; with only a retrieval example it
+/// must be `RetrieveEvidence`. Reply text is still byte-identical to
+/// v4.0.30 — the planner is a classifier in Phase 3.
+#[test]
+fn action_planner_classifies_reasoning_chain_intent_as_run_reasoner() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "аспан денесі".into(),
+            root: "аспан денесі".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/celestial.jsonl".into(),
+            sample_id: "sky_01".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let (_, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
+    use adam_dialog::{Action, OutputKind};
+    assert_eq!(trace.action_digest.action, Action::RunReasoner);
+    assert_eq!(trace.action_digest.expected_output, OutputKind::DerivedAnswer);
+    assert!(
+        !trace.action_plan.rationale.is_empty(),
+        "action plan must carry rationale"
+    );
+    assert_eq!(
+        conv.task.last_action.as_ref().map(|p| p.action),
+        Some(Action::RunReasoner),
+        "last_action must be persisted on task state"
+    );
+}
+
+/// v4.0.31 — belief contradiction routes action to
+/// `CheckContradiction` even when the current turn has evidence
+/// attached. Contradictions dominate everything else.
+#[test]
+fn action_planner_surfaces_contradiction_over_evidence() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+    let (_, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 2);
+
+    use adam_dialog::{Action, OutputKind};
+    assert_eq!(trace.action_digest.action, Action::CheckContradiction);
+    assert_eq!(
+        trace.action_digest.expected_output,
+        OutputKind::ClarifyingQuestion
+    );
+}
+
+/// v4.0.31 — social intents (greeting, thanks, …) route to
+/// `Action::Social` and bypass the cognitive stack.
+#[test]
+fn action_planner_social_intent() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let (_, trace) = conv.turn_with_trace("рахмет", &lex, &repo, 0);
+    use adam_dialog::{Action, OutputKind};
+    assert_eq!(trace.action_digest.action, Action::Social);
+    assert_eq!(trace.action_digest.expected_output, OutputKind::SocialPleasantry);
+}
+
 /// v4.0.30 — Codex v4.0.29 review #1 regression. Turn counter must
 /// be a real monotone index, not `intent_history.len()` which caps at
 /// `MAX_HISTORY = 32`. After >32 turns `goal_set_at_turn` must still

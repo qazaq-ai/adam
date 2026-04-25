@@ -170,6 +170,13 @@ pub struct TurnTrace {
     pub task_digest: crate::task::TaskDigest,
     /// v4.0.29 — full task state at the moment of trace capture.
     pub task_snapshot: crate::task::TaskState,
+    /// v4.0.31 — compact action digest (action + expected output +
+    /// rationale count). Phase 3 non-breaking: this is for audit
+    /// only; the existing template planner still drives rendering.
+    pub action_digest: crate::action::ActionDigest,
+    /// v4.0.31 — full `ActionPlan` including rationale list and
+    /// required inputs, for auditors who want the full picture.
+    pub action_plan: crate::action::ActionPlan,
     /// Per-step plan trace emitted by `plan_response_with_session`.
     pub plan_trace: Vec<String>,
 }
@@ -369,6 +376,14 @@ impl Conversation {
         // BEFORE record_intent so the turn id used by task matches
         // the one already used by absorb_entities.
         self.task.roll_forward(&intent, &self.belief, turn_id);
+        // v4.0.31 Phase 3 — classify the chosen action for this
+        // turn AFTER belief + task are up to date. The result is
+        // stored on task.last_action and echoed in TurnTrace for
+        // audit. The template planner below still drives the
+        // surface form in v4.0.31 — the verifier (Phase 4) is what
+        // will actually gate outputs on `ActionPlan`.
+        let action_plan = crate::action::ActionPlanner::plan(&intent, &self.belief, &self.task);
+        self.task.last_action = Some(action_plan.clone());
         self.record_intent(&intent);
         let plan = plan_response_with_session(&intent, rng_seed, repo, &self.session);
         let output = realise(&plan);
@@ -380,6 +395,8 @@ impl Conversation {
             belief_snapshot: self.belief.clone(),
             task_digest: self.task.digest(),
             task_snapshot: self.task.clone(),
+            action_digest: action_plan.digest(),
+            action_plan,
             plan_trace: plan.trace.clone(),
         };
         (output, trace)

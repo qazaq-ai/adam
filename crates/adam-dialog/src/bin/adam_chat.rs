@@ -272,6 +272,15 @@ fn run_turn(
             td.status,
             td.goal_age_turns
         );
+        // v4.0.31 — action planner (Codex Phase 3).
+        let ad = trace.action_digest;
+        println!(
+            "├─ action:   {:?} → {:?} (rationale×{})",
+            ad.action, ad.expected_output, ad.rationale_count
+        );
+        for r in &trace.action_plan.rationale {
+            println!("├─ action rationale: {r}");
+        }
         for t in &trace.plan_trace {
             println!("├─ {t}");
         }
