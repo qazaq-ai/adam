@@ -7,6 +7,73 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.35] — 2026-04-24 — Cognitive Eval Harness (Codex roadmap Phase 7a, narrow scope)
+
+Seventh release on Codex's v5.0 roadmap. **Narrow Phase 7** ahead of Phase 6 per Codex sequencing: lock in a measurement baseline across all 5 cognitive phases (Belief→Task→Action→Verifier→Uncertainty) before adding tools. The argument was: if Phase 6 changes quality, we won't know whether tools helped or the existing contour broke without a baseline.
+
+### What landed
+
+**New dataset** `data/eval/cognitive_dialog_dataset.json` — 20 scenarios across 6 categories:
+
+| category | scenarios |
+|---|---:|
+| goal_continuity | 3 |
+| topic_switch | 3 |
+| contradiction_handling | 3 |
+| action_routing | 4 |
+| verification_gating | 3 |
+| epistemic_routing | 4 |
+| **total** | **20** |
+
+Each scenario has `id`, `category`, `description`, `turns: Vec<String>`, optional `with_reasoning: true` (attaches a synthetic жер reasoning chain), and an `expect` block of optional trace-signal assertions:
+
+- `epistemic_status`, `action`, `task_status`, `task_goal_variant`, `task_goal_topic`, `task_goal_set_at_turn`, `task_subgoals_count`
+- `belief_contradictions_count`, `verification_supported`
+- `output_contains_lower_any`, `output_contains_lower_any_2`, `output_not_contains`, `output_not_contains_lower`
+
+**New test** `crates/adam-dialog/tests/cognitive_eval.rs`:
+
+- Loads dataset, runs each scenario through `Conversation::turn_with_trace`.
+- Aggregates pass/fail per category, prints summary report (visible with `cargo test -- --nocapture`).
+- Test fails if any scenario fails — initial baseline = 100% pass.
+- Synthetic reasoning chain built locally rather than loaded from `data/retrieval/derived_facts.json` so the harness stays deterministic across corpus pipeline updates.
+
+### Initial baseline (v4.0.35)
+
+```
+=== cognitive_eval baseline (v4.0.35) — total 20/20 ===
+  action_routing                  4/ 4  OK
+  contradiction_handling          3/ 3  OK
+  epistemic_routing               4/ 4  OK
+  goal_continuity                 3/ 3  OK
+  topic_switch                    3/ 3  OK
+  verification_gating             3/ 3  OK
+```
+
+This is the score every future patch (Phase 6+) must defend.
+
+### What we already learned writing the scenarios
+
+Two scenarios initially failed the harness — a real finding, not a bug:
+- `Tentative` requires `noun_hint` to be set; non-Kazakh tokens like «обфускаторий» don't parse to `noun_hint`, so the Action falls to `RefuseOutOfScope` + `EpistemicStatus::Unknown` rather than `Tentative`. The dataset was tightened to use real Kazakh nouns (e.g. «бала туралы айтшы») for "Tentative without evidence" cases, but this surfaces a gap: the system can't currently distinguish "user asked about something I don't know" from "user said something I can't even parse". Phase 6 / 7 work item.
+
+### Tests
+
+**566 passing** (+1 from v4.0.34: `cognitive_eval_baseline`).
+
+### Scope
+
+**Phase 7a only** — narrow harness to lock in measurement before Phase 6 (Tool Layer). Future work:
+- Expand to 50+ scenarios with `expected_failing: true` markers for aspirational coverage.
+- Add per-turn assertions (currently only the final turn's trace is checked).
+- Wire the harness into a binary so the pass-rate is reportable without `cargo test`.
+
+### Next
+
+Phase 6 (Tool Layer) now proceeds with a regression suite already in place. If Phase 6 changes any scenario's outcome, the harness will surface it immediately.
+
+---
+
 ## [4.0.34] — 2026-04-24 — Conflict-surfacing + tentative templates (Codex roadmap Phase 5 part 2)
 
 Sixth architectural patch. Second half of Phase 5. **Reply text actually changes for Conflicted and Tentative cases** — the system for the first time **surfaces contradictions explicitly** in natural Kazakh instead of stripping to a generic fallback.

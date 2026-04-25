@@ -1,0 +1,210 @@
+{
+  "_comment": "v4.0.35 — narrow Cognitive Eval Harness (Codex roadmap Phase 7a). Scenarios exercise the cognitive contour built up across Phases 1-5: BeliefState, TaskState, ActionPlanner, Verifier, UncertaintyPolicy. Each scenario runs a fixed turn sequence through Conversation::turn_with_trace and asserts against trace signals (action, task status, epistemic status, output substrings). Initial baseline: every scenario must pass.",
+  "version": "v4.0.35",
+  "scenarios": [
+    {
+      "id": "goal_continuity_same_topic",
+      "category": "goal_continuity",
+      "description": "Asking same topic twice keeps the goal — set_at_turn must not advance.",
+      "turns": ["жер туралы айтшы", "жер туралы айтшы"],
+      "expect": {
+        "task_goal_variant": "LearnAboutTopic",
+        "task_goal_topic": "жер",
+        "task_goal_set_at_turn": 0
+      }
+    },
+    {
+      "id": "goal_continuity_social_interjection",
+      "category": "goal_continuity",
+      "description": "Social turn (рахмет) between same-topic turns must not erase the goal.",
+      "turns": ["жер туралы айтшы", "рахмет", "жер туралы айтшы"],
+      "expect": {
+        "task_goal_variant": "LearnAboutTopic",
+        "task_goal_topic": "жер"
+      }
+    },
+    {
+      "id": "goal_continuity_long_session",
+      "category": "goal_continuity",
+      "description": "Many social turns + topic — goal_set_at_turn reflects real turn index, not capped at MAX_HISTORY.",
+      "turns": ["рахмет", "рахмет", "рахмет", "рахмет", "рахмет", "жер туралы айтшы"],
+      "expect": {
+        "task_goal_variant": "LearnAboutTopic",
+        "task_goal_set_at_turn": 5
+      }
+    },
+    {
+      "id": "topic_switch_jер_to_күн",
+      "category": "topic_switch",
+      "description": "Different topic in second turn switches the goal.",
+      "turns": ["жер туралы айтшы", "күн туралы айтшы"],
+      "expect": {
+        "task_goal_variant": "LearnAboutTopic",
+        "task_goal_topic": "күн",
+        "task_goal_set_at_turn": 1
+      }
+    },
+    {
+      "id": "topic_switch_with_social",
+      "category": "topic_switch",
+      "description": "Topic switch through a social turn still installs new topic at the right turn id.",
+      "turns": ["жер туралы айтшы", "рахмет", "күн туралы айтшы"],
+      "expect": {
+        "task_goal_topic": "күн",
+        "task_goal_set_at_turn": 2
+      }
+    },
+    {
+      "id": "topic_switch_subgoals_clear",
+      "category": "topic_switch",
+      "description": "Subgoals reset on topic switch (none in v4.0.35 but invariant must hold).",
+      "turns": ["жер туралы айтшы", "ай туралы айтшы"],
+      "expect": {
+        "task_subgoals_count": 0
+      }
+    },
+    {
+      "id": "contradiction_two_cities",
+      "category": "contradiction_handling",
+      "description": "Two conflicting city statements → belief logs conflict, status becomes Blocked, epistemic Conflicted.",
+      "turns": ["мен алматыда тұрамын", "мен астанада тұрамын"],
+      "expect": {
+        "belief_contradictions_count": 1,
+        "task_status": "Blocked",
+        "epistemic_status": "Conflicted"
+      }
+    },
+    {
+      "id": "contradiction_surfaces_in_reply",
+      "category": "contradiction_handling",
+      "description": "After conflict + topic question, reply must cite both values + clarification cue.",
+      "turns": ["мен алматыда тұрамын", "мен астанада тұрамын", "жер туралы айтшы"],
+      "expect": {
+        "epistemic_status": "Conflicted",
+        "action": "CheckContradiction",
+        "output_contains_lower_any": ["алматы"],
+        "output_contains_lower_any_2": ["астана"],
+        "output_not_contains": ["байланыс"]
+      }
+    },
+    {
+      "id": "contradiction_kazakh_predicate",
+      "category": "contradiction_handling",
+      "description": "Conflict reply must use Kazakh predicate label, not raw English slot key.",
+      "turns": ["мен алматыда тұрамын", "мен астанада тұрамын", "жер туралы айтшы"],
+      "expect": {
+        "output_not_contains_lower": ["city"]
+      }
+    },
+    {
+      "id": "action_routing_social",
+      "category": "action_routing",
+      "description": "Greeting → Action::Social, EpistemicStatus::Certain.",
+      "turns": ["сәлем"],
+      "expect": {
+        "action": "Social",
+        "epistemic_status": "Certain"
+      }
+    },
+    {
+      "id": "action_routing_thanks",
+      "category": "action_routing",
+      "description": "Thanks → Action::Social, EpistemicStatus::Certain.",
+      "turns": ["рахмет"],
+      "expect": {
+        "action": "Social",
+        "epistemic_status": "Certain"
+      }
+    },
+    {
+      "id": "action_routing_known_noun_no_evidence",
+      "category": "action_routing",
+      "description": "Real Kazakh noun without attached reasoning chain or retrieval index → AskClarification + Tentative.",
+      "turns": ["бала туралы айтшы"],
+      "expect": {
+        "action": "AskClarification",
+        "epistemic_status": "Tentative"
+      }
+    },
+    {
+      "id": "action_routing_known_topic_with_chain",
+      "category": "action_routing",
+      "description": "Known topic with reasoning chain attached → RunReasoner + Derived.",
+      "turns": ["жер туралы айтшы"],
+      "with_reasoning": true,
+      "expect": {
+        "action": "RunReasoner",
+        "epistemic_status": "Derived"
+      }
+    },
+    {
+      "id": "verification_clean_passes",
+      "category": "verification_gating",
+      "description": "Clean reasoning chain (no belief conflict) — verifier supports, output cites chain.",
+      "turns": ["жер туралы айтшы"],
+      "with_reasoning": true,
+      "expect": {
+        "verification_supported": true,
+        "output_contains_lower_any": ["байланыс"]
+      }
+    },
+    {
+      "id": "verification_conflict_blocks",
+      "category": "verification_gating",
+      "description": "Belief conflict + reasoning chain → verifier rejects, evidence stripped, output is conflict-surfacing.",
+      "turns": ["мен алматыда тұрамын", "мен астанада тұрамын", "жер туралы айтшы"],
+      "with_reasoning": true,
+      "expect": {
+        "verification_supported": false,
+        "output_not_contains": ["байланыс"]
+      }
+    },
+    {
+      "id": "verification_no_evidence_strips_silently",
+      "category": "verification_gating",
+      "description": "Unknown topic, no evidence — verifier doesn't gate (clean path), reply is gentle clarification or noun-echo.",
+      "turns": ["қаз жайында"],
+      "expect": {
+        "verification_supported": true
+      }
+    },
+    {
+      "id": "epistemic_certain_via_social",
+      "category": "epistemic_routing",
+      "description": "Social greeting → Certain.",
+      "turns": ["қайырлы күн"],
+      "expect": {
+        "epistemic_status": "Certain"
+      }
+    },
+    {
+      "id": "epistemic_derived_via_chain",
+      "category": "epistemic_routing",
+      "description": "Reasoning chain present → Derived.",
+      "turns": ["жер туралы айтшы"],
+      "with_reasoning": true,
+      "expect": {
+        "epistemic_status": "Derived"
+      }
+    },
+    {
+      "id": "epistemic_tentative_known_noun_no_evidence",
+      "category": "epistemic_routing",
+      "description": "Real Kazakh noun («бала») without any attached reasoning/retrieval → Tentative band.",
+      "turns": ["бала туралы айтшы"],
+      "expect": {
+        "epistemic_status": "Tentative"
+      }
+    },
+    {
+      "id": "epistemic_conflicted_dominates",
+      "category": "epistemic_routing",
+      "description": "Belief contradiction + topic with chain → Conflicted (dominates Derived).",
+      "turns": ["мен алматыда тұрамын", "мен астанада тұрамын", "жер туралы айтшы"],
+      "with_reasoning": true,
+      "expect": {
+        "epistemic_status": "Conflicted"
+      }
+    }
+  ]
+}
