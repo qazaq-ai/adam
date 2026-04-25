@@ -1596,6 +1596,138 @@ fn action_planner_social_intent() {
     );
 }
 
+/// v4.0.32 Phase 4 — Verifier gates evidence rendering when a belief
+/// contradiction exists. Pre-v4.0.32 the dialog would happily surface
+/// a reasoning chain about «жер» even while the user's own city was
+/// contested. Post-v4.0.32 the gate strips the chain before template
+/// rendering, so the reply falls back to the safe noun-echo.
+#[test]
+fn verifier_gates_reasoning_chain_under_belief_contradiction() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "аспан денесі".into(),
+            root: "аспан денесі".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/celestial.jsonl".into(),
+            sample_id: "sky_01".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+    let (out, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 2);
+
+    assert!(
+        !trace.verification.supported,
+        "verifier must reject under unresolved contradiction, got {:?}",
+        trace.verification
+    );
+    assert!(
+        !out.contains("байланыс"),
+        "gated output must not cite the reasoning chain, got: {out:?}"
+    );
+    if let adam_dialog::Intent::Unknown {
+        reasoning_chain,
+        example,
+        ..
+    } = &trace.intent_after_verification
+    {
+        assert!(reasoning_chain.is_none());
+        assert!(example.is_none());
+    } else {
+        panic!(
+            "expected Intent::Unknown, got {:?}",
+            trace.intent_after_verification
+        );
+    }
+}
+
+/// v4.0.32 — Clean path: no contradictions → verifier passes,
+/// reasoning chain renders as normal. Reply text byte-identical to
+/// v4.0.31.
+#[test]
+fn verifier_passes_through_clean_reasoning_chain() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "аспан денесі".into(),
+            root: "аспан денесі".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/celestial.jsonl".into(),
+            sample_id: "sky_01".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let (out, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
+
+    assert!(
+        trace.verification.supported,
+        "clean scenario must verify, got {:?}",
+        trace.verification
+    );
+    assert!(
+        out.contains("байланыс"),
+        "clean path must render the reasoning-chain marker, got: {out:?}"
+    );
+}
+
+/// Codex v4.0.31 review residual — integration coverage for
+/// `Action::AnswerDirect`. Pre-v4.0.32 only unit coverage.
+#[test]
+fn action_planner_classifies_known_profile_question_as_answer_direct() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("менің атым Дәулет", &lex, &repo, 0);
+    let (_, trace) = conv.turn_with_trace("менің атым кім", &lex, &repo, 1);
+    if matches!(trace.intent_after_injection, adam_dialog::Intent::AskName) {
+        use adam_dialog::{Action, OutputKind};
+        assert_eq!(
+            trace.action_digest.action,
+            Action::AnswerDirect,
+            "AskName with belief active_fact must route to AnswerDirect"
+        );
+        assert_eq!(
+            trace.action_digest.expected_output,
+            OutputKind::DirectAnswer
+        );
+    }
+}
+
 /// v4.0.30 — Codex v4.0.29 review #1 regression. Turn counter must
 /// be a real monotone index, not `intent_history.len()` which caps at
 /// `MAX_HISTORY = 32`. After >32 turns `goal_set_at_turn` must still

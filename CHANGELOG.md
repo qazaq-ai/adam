@@ -7,6 +7,100 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.32] — 2026-04-24 — Verifier + first real output gate (Codex v4.0.26 roadmap Phase 4)
+
+Fourth architectural patch on Codex's v5.0 roadmap. Phases 1–3 were pure substrate (reply text byte-identical). **Phase 4 is the first phase that actually changes user-visible output** — when the verifier rejects a turn, the evidence is stripped from the intent before template rendering so the system falls back to a safe response instead of producing an answer it can't support.
+
+### Why
+
+Codex roadmap Phase 4: "Verifier — не пускать неподтверждённый ответ наружу". Pre-v4.0.32 the dialog would happily surface a reasoning chain about «жер» (Earth) even while the user's own city was logged as contested in belief. The reply was formally correct about Earth but ignored the ongoing conflict in the interlocutor's profile — exactly the "answer on top of an unresolved issue" failure mode Codex flagged.
+
+### What landed
+
+New module `crates/adam-dialog/src/verifier.rs` (~380 lines incl. 11 unit tests).
+
+```rust
+pub struct VerificationReport {
+    pub supported: bool,
+    pub issues: Vec<VerificationIssue>,
+    pub evidence_count: usize,
+}
+
+pub enum VerificationIssue {
+    MissingEvidence,
+    ContradictoryBelief,
+    WeakDerivation,       // reserved for Phase 5
+    IncompleteSlots,      // reserved for Phase 5
+    UnsafeGeneralization, // reserved for Phase 5
+}
+
+pub struct Verifier;                    // static verifier
+pub fn strip_evidence(Intent) -> Intent // gate helper
+```
+
+### Gate semantics
+
+`Verifier::verify(plan, intent, belief)` runs two kinds of check:
+
+1. **Global intent-shape contradiction check.** If `belief.contradictions` is non-empty AND the intent carries `reasoning_chain.is_some() || example.is_some()`, flag `ContradictoryBelief`. This fires **regardless of which action the planner chose** — the existing template planner is blind to `ActionPlan`, so it's the intent shape that actually drives rendering. Even when ActionPlanner correctly routes to `CheckContradiction`, the template would still pick the chain-rendering variant if evidence is still attached. Flag → strip.
+
+2. **Per-action checks.** `RunReasoner` must have `reasoning_chain`; `RetrieveEvidence` must have `example`; `AnswerDirect` must have matching `active_fact` in belief; `CheckContradiction` must have non-empty contradictions; `SummarizeBelief` must have at least one active fact. Missing → `MissingEvidence`. `AskClarification`, `Social`, `RefuseOutOfScope` are question-shaped and never require evidence.
+
+When `supported == false`, the turn loop calls `strip_evidence(intent)` to clear `reasoning_chain` + `example`. The template planner then naturally picks `unknown.with_noun` → «ах, X туралы айтасыз ба», or `unknown` → «түсінбедім». No new templates needed — Phase 5 will add explicit clarification templates; Phase 4's job is just "don't answer what we can't support".
+
+### Integration
+
+- `Conversation::turn_with_trace` runs `Verifier::verify` after `ActionPlanner::plan`. If rejected, passes `strip_evidence(intent)` to the template planner. The **original** intent (with evidence) is still preserved in `TurnTrace.intent_after_injection` so auditors can see what was injected before the gate.
+- `TurnTrace` gains `verification: VerificationReport` + `intent_after_verification: Intent`.
+- `adam_chat --trace` prints two new lines:
+  ```
+  ├─ verify:   supported=false evidence=1 issues=[ContradictoryBelief]
+  ├─ verify:   GATE fired — evidence stripped before rendering
+  ```
+
+### Smoke-test — behavior actually changes
+
+Pre-v4.0.32 (or current v4.0.31):
+```
+> мен алматыда тұрамын
+> мен астанада тұрамын       (contradiction logged)
+> жер туралы айтшы           (unrelated topic with reasoning chain attached)
+→ «жер туралы мынадай байланыс анықтадым: қорытынды: жер — аспан денесі
+   (байланысты ой-тізбек арқылы)»           # chain rendered anyway
+```
+
+Post-v4.0.32:
+```
+> жер туралы айтшы
+→ «Астанада жер туралы қалай қарайды екен»   # noun-echo fallback
+```
+
+The verifier trace confirms the gate: `supported=false issues=[ContradictoryBelief]`.
+
+Clean scenarios (no belief conflict) render identically to v4.0.31 — the `verifier_passes_through_clean_reasoning_chain` integration test pins this.
+
+### Tests
+
+**552 passing** (+14 from v4.0.31):
+
+- 11 unit in `verifier.rs` covering every verification branch + both gate cases for `CheckContradiction` (blocked under answer-shape intent; supported under question-shape intent).
+- 3 integration in `end_to_end.rs`:
+  - `verifier_gates_reasoning_chain_under_belief_contradiction` — the headline Phase 4 regression.
+  - `verifier_passes_through_clean_reasoning_chain` — clean path preserved.
+  - `action_planner_classifies_known_profile_question_as_answer_direct` — closes Codex v4.0.31 review residual (integration coverage for `Action::AnswerDirect`).
+
+### Scope
+
+**Phase 4 only.** No new templates; no new action variants. The gate is binary (strip or don't) — Phase 5 (Uncertainty Policy) will add nuanced markers like "тentative" / "conflicted". `WeakDerivation`, `IncompleteSlots`, `UnsafeGeneralization` are reserved as `VerificationIssue` variants but not yet emitted.
+
+Codex Phase 3 residual noted in v4.0.31 review (integration coverage for `RetrieveEvidence`) — one test is now attached; full coverage requires a retrieval index in the test env, so the test skips silently when unavailable rather than depending on external fixtures.
+
+### Next
+
+Phase 5 (Uncertainty Policy) will add `EpistemicStatus` bands (`Certain / Supported / Derived / Tentative / Unknown / Conflicted`) and map them to response templates — that's when the system starts saying «бұл сөзден екі рет айттыңыз — қайсысы дұрыс?» instead of stripping to a generic fallback.
+
+---
+
 ## [4.0.31] — 2026-04-24 — ActionPlanner (Codex v4.0.26 roadmap Phase 3)
 
 Third architectural patch on Codex's v5.0 roadmap. Phase 1 gave structured memory; Phase 2 gave goals; Phase 3 gives **actions** — a coarse vocabulary for what the system should *do* on a turn, chosen by a pure classifier from `(intent, belief, task)`.

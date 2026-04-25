@@ -154,6 +154,12 @@ pub struct TurnTrace {
     /// Intent after follow-up resolution AND retrieval/reasoning
     /// injection — this is the shape the planner actually saw.
     pub intent_after_injection: Intent,
+    /// v4.0.32 — intent that actually went to `plan_response_with_session`
+    /// AFTER Phase 4 verifier gating. Identical to
+    /// `intent_after_injection` when `verification.supported`; else
+    /// evidence slots stripped so the renderer falls through to safe
+    /// templates.
+    pub intent_after_verification: Intent,
     /// Session slot snapshot taken immediately after entity absorption.
     pub session_snapshot: HashMap<String, String>,
     /// v4.0.27 — belief-state digest taken after entity absorption.
@@ -177,6 +183,11 @@ pub struct TurnTrace {
     /// v4.0.31 — full `ActionPlan` including rationale list and
     /// required inputs, for auditors who want the full picture.
     pub action_plan: crate::action::ActionPlan,
+    /// v4.0.32 — Phase 4 pre-render verification report. When
+    /// `supported == false` the turn loop has stripped evidence
+    /// from `intent_after_verification` to avoid rendering an
+    /// answer on top of an unresolved issue.
+    pub verification: crate::verifier::VerificationReport,
     /// Per-step plan trace emitted by `plan_response_with_session`.
     pub plan_trace: Vec<String>,
 }
@@ -384,12 +395,30 @@ impl Conversation {
         // will actually gate outputs on `ActionPlan`.
         let action_plan = crate::action::ActionPlanner::plan(&intent, &self.belief, &self.task);
         self.task.last_action = Some(action_plan.clone());
+        // v4.0.32 Phase 4 — verify the chosen plan against evidence
+        // present. If the verifier rejects (e.g. the plan is
+        // RunReasoner under a belief contradiction), we strip the
+        // injected evidence from a clone of the intent before
+        // template planning. The template planner then naturally
+        // falls through to `unknown.with_noun` → «ах, X туралы
+        // айтасыз ба» or `unknown` → «түсінбедім», neither of which
+        // can make a false claim on top of an unresolved conflict.
+        // The **original** intent is preserved on TurnTrace so
+        // auditors can see what the injection passes actually
+        // produced before the gate intervened.
+        let verification = crate::verifier::Verifier::verify(&action_plan, &intent, &self.belief);
+        let intent_for_render = if verification.supported {
+            intent.clone()
+        } else {
+            crate::verifier::strip_evidence(intent.clone())
+        };
         self.record_intent(&intent);
-        let plan = plan_response_with_session(&intent, rng_seed, repo, &self.session);
+        let plan = plan_response_with_session(&intent_for_render, rng_seed, repo, &self.session);
         let output = realise(&plan);
         let trace = TurnTrace {
             parses,
             intent_after_injection: intent,
+            intent_after_verification: intent_for_render,
             session_snapshot: self.session.clone(),
             belief_digest: self.belief.digest(),
             belief_snapshot: self.belief.clone(),
@@ -397,6 +426,7 @@ impl Conversation {
             task_snapshot: self.task.clone(),
             action_digest: action_plan.digest(),
             action_plan,
+            verification,
             plan_trace: plan.trace.clone(),
         };
         (output, trace)

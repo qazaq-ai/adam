@@ -281,6 +281,16 @@ fn run_turn(
         for r in &trace.action_plan.rationale {
             println!("├─ action rationale: {r}");
         }
+        // v4.0.32 — verifier (Codex Phase 4).
+        println!(
+            "├─ verify:   supported={} evidence={} issues={:?}",
+            trace.verification.supported,
+            trace.verification.evidence_count,
+            trace.verification.issues
+        );
+        if !trace.verification.supported {
+            println!("├─ verify:   GATE fired — evidence stripped before rendering");
+        }
         for t in &trace.plan_trace {
             println!("├─ {t}");
         }
