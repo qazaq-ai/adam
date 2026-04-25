@@ -7,6 +7,70 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.2.5] — 2026-04-25 — Close AnswerDirect rendering gap + digit-token bug (cognitive baseline 30/30)
+
+Promotes all 5 v4.2.1 aspirational scenarios to canonical. Cognitive eval reaches **30/30 canonical, 0 aspirational** — full pass on every scenario the harness has tracked since v4.0.34.
+
+The fix turned out to require closing **two** distinct bugs together: the AnswerDirect rendering gap (the one v4.2.1 surfaced) plus a long-latent digit-token bug that v4.2.1 turned up while debugging the age scenario.
+
+### Why .1 → .5 (not .2)
+
+Significance-driven semver (`feedback_versioning_post_1_0`). v4.2.5 closes a five-aspirational-scenario gap and includes a long-latent digit-handling fix that affected age statements. More than a one-line patch; less than a minor architectural shift.
+
+### Bug 1 — AnswerDirect template renderer (v4.2.1 finding)
+
+`ActionPlanner::belief_direct_answer` correctly returned `(slot, object)` from belief and the planner correctly chose `Action::AnswerDirect`, but the value was only baked into the rationale string. The template renderer never saw `(slot, object)` — it just looked up templates by `intent_key(intent)` and emitted the default `ask_*` self-introduction templates instead of the stored value.
+
+**Fix**: planner-level override that mirrors the v4.0.34 epistemic-band override pattern. When `Intent::AskName` / `AskAge` / `AskLocation` / `AskOccupation` AND the corresponding session slot is set, the planner picks the new `ask_*.with_known_user` template family that uses `{name}` / `{age}` / `{city|locative}` / `{occupation}` placeholders. Slots come from the existing session map (already populated by `absorb_entities`), so the realiser substitutes the recorded value.
+
+The override only takes effect if the repo carries templates under the override key (`!repo.get(k).is_empty()`), so a missing template family silently falls back to the default — same safety net as the epistemic overrides.
+
+### Bug 2 — Digit-token filter (latent since v0.8.0)
+
+While debugging the age scenario, the v4.2.1 expansion's failing scenario `aspirational_direct_answer_age_surfaces_stored_value` revealed that even with the new `ask_age.with_known_user` family in place, age STILL didn't surface. Root cause: `interpret_text_with_lexicon` builds its `tokens` and `raw_tokens` streams with the filter `c.is_alphabetic() || *c == '-'` — **digits are dropped**. So `30` in `менің жасым 30` never reached `parse_kazakh_age`, `Intent::StatementOfAge` came out with `years: None`, `absorb_entities` skipped the slot fill (it's gated on `Some(years)`), and session never got `age = "30"`.
+
+**Fix**: extend the filter to `c.is_alphabetic() || c.is_ascii_digit() || *c == '-'`. Digits now pass through to tokens, `parse_kazakh_age` finds them, `StatementOfAge { years: Some(30) }` fires, `absorb_entities` writes session and belief, and the v4.2.5 ask-age template fires on the next turn.
+
+This bug has been latent since v0.8.0 (when the StatementOfAge intent was first introduced). Every test scenario for ages used Kazakh-word numerals (`жиырма бес`) — the digit form just never had a test case until v4.2.1 wrote one. Cognitive eval did exactly what it was designed for.
+
+### Promoted scenarios
+
+All five v4.2.1 aspirationals flipped to canonical:
+- `direct_answer_name_surfaces_stored_value` — `менің атым Дәулет` → `атың кім` → reply now contains `Дәулет`.
+- `direct_answer_age_surfaces_stored_value` — `менің жасым 30` → `жасың неше` → reply now contains `30`. (Required both fixes.)
+- `direct_answer_city_surfaces_stored_value` — `мен Алматыдамын` → `қайда тұрасың` → reply now contains `алматы`.
+- `direct_answer_occupation_surfaces_stored_value` — `мен мұғаліммін` → `немен айналысасың` → reply now contains `мұғалім`.
+- `belief_persists_across_social_turns` — 5-turn flow with social interjections; turn-5 reply uses the slot-aware family.
+
+### State
+
+| | v4.2.1 | v4.2.5 |
+|---|---|---|
+| Cognitive eval | 25/25 canonical, 0/5 aspirational | **30/30 canonical, 0 aspirational** |
+| Workspace tests | 581 | 581 (unchanged — cognitive_eval is one test) |
+| Reply text | various default self-introductions | now cites stored values when set |
+
+### Tests
+
+**581 passing**. 0 warnings. **Cognitive eval baseline 30/30 canonical, 0/0 aspirational** — every scenario the harness has tracked since v4.0.34 now passes.
+
+### Scope
+
+`semantics.rs` token-filter expansion (1 char-class predicate) + `planner.rs` override (4 new match arms) + `data/dialog/templates/v1.toml` (4 new template families with 12 total slot-aware templates). No belief layer change, no API change, no new ToolCall variants.
+
+### Why this matters
+
+Two separate-looking issues that turned out to share an architectural root: **`ActionPlanner` knows the answer, but the renderer can't see it.** v4.2.5 closes both surfaces — the slot-aware template families (renderer threads stored value via session) and the digit-token filter (token stream now carries the values needed to populate session in the first place). Reply text for every direct-answer turn now cites the recorded user value.
+
+Cognitive eval at 30/30 canonical means every scenario the harness has tracked since v4.0.34 — across goal continuity, topic switching, contradiction handling, action routing, verification gating, epistemic banding, parse-failure distinction, belief revision, and direct-answer rendering — now passes. The harness's role for the next round is to grow the scenario set toward Codex's 50+ target.
+
+### Next
+
+- v4.2.x patches per `project_v4_direction` cadence: more cognitive eval scenarios (50+ target), capability work (new World Core domains, new reasoning rules), morpheme coverage re-audit.
+- Strategic items still open from Codex v4.1.5 audit: monolith file splits (rec #1), CI core/foundation split (rec #4), corpus profile baseline (rec #5).
+
+---
+
 ## [4.2.1] — 2026-04-25 — Cognitive eval expansion (+8 scenarios; surfaces AnswerDirect rendering gap)
 
 First v4.2.x patch. Returns to capability cadence after the v4.2.0 architecture shift. Cognitive eval grows from 22 → **30 scenarios** (Codex strategic rec #3 progress: target 50+). Three categories: 3 new canonical scenarios closing coverage gaps, 5 new aspirational scenarios documenting a real architectural finding the expansion surfaced.

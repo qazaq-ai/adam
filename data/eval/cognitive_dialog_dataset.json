@@ -231,11 +231,11 @@
       }
     },
     {
-      "id": "aspirational_direct_answer_name_surfaces_stored_value",
+      "id": "direct_answer_name_surfaces_stored_value",
       "category": "direct_answer",
-      "description": "v4.2.1 finding: when user states their name and then asks 'атың кім', the planner correctly routes to Action::AnswerDirect (rationale records the stored value), but the template renderer ignores the stored slot value and emits a default self-introduction (e.g. 'мені адам деп атайды'). Real gap surfaced by the v4.2.1 cognitive eval expansion: ActionPlanner::belief_direct_answer returns (slot, object) but the value is baked into the rationale string only, not threaded into rendering. Aspirational until the AskName template family consumes the stored slot value.",
+      "description": "v4.2.5: After user states their name, AskName ('атың кім') routes to Action::AnswerDirect AND surfaces the stored name in the reply via the new ask_name.with_known_user template family (planner override fires when session.contains_key('name')). Closes the v4.2.1 aspirational gap. Reply text changes from 'мені адам деп атайды' (default self-introduction) to 'сіздің атыңыз — Дәулет' or similar slot-aware variant.",
       "turns": ["менің атым Дәулет", "атың кім"],
-      "expected_failing": true,
+      "expected_failing": false,
       "expect": {
         "action": "AnswerDirect",
         "epistemic_status": "Certain",
@@ -243,11 +243,11 @@
       }
     },
     {
-      "id": "aspirational_direct_answer_age_surfaces_stored_value",
+      "id": "direct_answer_age_surfaces_stored_value",
       "category": "direct_answer",
-      "description": "v4.2.1 finding: same gap as the name variant. AskAge after StatementOfAge currently doesn't surface the stored age in the reply — epistemic_status lands on Unknown rather than Certain because the answer-rendering path doesn't see the (slot, object) belief-direct-answer result.",
+      "description": "v4.2.5: AskAge ('жасың неше') surfaces stored age. Required closing TWO bugs together: (1) the v4.2.5 ask_age.with_known_user template family that consumes the stored value, AND (2) a long-latent bug where the cognitive token-extraction filter in semantics.rs stripped digits via 'is_alphabetic() || -' — so '30' in 'менің жасым 30' never reached parse_kazakh_age and StatementOfAge came out with years: None, leaving session['age'] unset. Filter now also accepts is_ascii_digit. Found by the v4.2.1 cognitive eval expansion.",
       "turns": ["менің жасым 30", "жасың неше"],
-      "expected_failing": true,
+      "expected_failing": false,
       "expect": {
         "action": "AnswerDirect",
         "epistemic_status": "Certain",
@@ -255,11 +255,11 @@
       }
     },
     {
-      "id": "aspirational_direct_answer_city_surfaces_stored_value",
+      "id": "direct_answer_city_surfaces_stored_value",
       "category": "direct_answer",
-      "description": "v4.2.1 finding: same gap. AskLocation after StatementOfLocation currently emits 'менің мекенім жоқ' ('I have no location') instead of citing the recorded city. The city is correctly recorded in belief — the rendering path just doesn't consume it.",
+      "description": "v4.2.5: AskLocation ('қайда тұрасың') surfaces stored city via the new ask_location.with_known_user template family. Reply changes from 'менің мекенім жоқ' to e.g. 'сіз Алматыда тұрасыз'.",
       "turns": ["мен Алматыдамын", "қайда тұрасың"],
-      "expected_failing": true,
+      "expected_failing": false,
       "expect": {
         "action": "AnswerDirect",
         "epistemic_status": "Certain",
@@ -267,11 +267,11 @@
       }
     },
     {
-      "id": "aspirational_direct_answer_occupation_surfaces_stored_value",
+      "id": "direct_answer_occupation_surfaces_stored_value",
       "category": "direct_answer",
-      "description": "v4.2.1 finding: same gap. AskOccupation after StatementOfOccupation currently emits a default self-description ('менің жұмысым — сізге көмектесу') instead of citing the recorded occupation.",
+      "description": "v4.2.5: AskOccupation ('немен айналысасың') surfaces stored occupation via the new ask_occupation.with_known_user template family. Reply changes from default self-description to e.g. 'сіз мұғалім екенсіз'.",
       "turns": ["мен мұғаліммін", "немен айналысасың"],
-      "expected_failing": true,
+      "expected_failing": false,
       "expect": {
         "action": "AnswerDirect",
         "epistemic_status": "Certain",
@@ -279,11 +279,11 @@
       }
     },
     {
-      "id": "aspirational_belief_persists_across_social_turns",
+      "id": "belief_persists_across_social_turns",
       "category": "belief_revision",
-      "description": "v4.2.1 finding: same direct-answer-rendering gap, exercised across a 5-turn flow with social interjections. Belief CORRECTLY persists across the social turns (the planner's rationale on turn 4 still cites the stored name); only the rendering can't see it.",
+      "description": "v4.2.5: 5-turn flow exercising belief persistence across social interjections. Name set turn 0 still drives AnswerDirect on turn 4 (with the v4.2.5 slot-aware template family) after `сәлем`/`рахмет`/`қайырлы күн` interjections. Closes the v4.2.1 aspirational variant; demonstrates that belief lifecycle and slot-aware rendering compose cleanly.",
       "turns": ["менің атым Дәулет", "сәлем", "рахмет", "қайырлы күн", "атың кім"],
-      "expected_failing": true,
+      "expected_failing": false,
       "expect": {
         "action": "AnswerDirect",
         "output_contains_lower_any": ["дәулет"]

@@ -160,6 +160,23 @@ pub fn plan_response_with_epistemic(
             },
             crate::uncertainty::EpistemicStatus::Tentative,
         ) => Some("unknown.tentative"),
+        // **v4.2.5** — `Action::AnswerDirect` rendering: when the user
+        // asks about a profile slot AND the session has it, prefer
+        // the `*.with_known_user` family that cites the stored value.
+        // Mirrors the v4.0.34 epistemic-override pattern: the override
+        // key only takes effect if the repo actually carries
+        // templates under it (`!repo.get(k).is_empty()` below), so a
+        // missing template family silently falls back to the bare
+        // `ask_*` self-introduction templates. Closes the v4.2.1
+        // aspirational gap (5 `direct_answer_*` scenarios).
+        (Intent::AskName, _) if session.contains_key("name") => Some("ask_name.with_known_user"),
+        (Intent::AskAge, _) if session.contains_key("age") => Some("ask_age.with_known_user"),
+        (Intent::AskLocation, _) if session.contains_key("city") => {
+            Some("ask_location.with_known_user")
+        }
+        (Intent::AskOccupation, _) if session.contains_key("occupation") => {
+            Some("ask_occupation.with_known_user")
+        }
         _ => None,
     };
 

@@ -36,11 +36,20 @@ pub fn interpret_text_with_lexicon(
     //   `tokens`  — cleaned lowercase, used for keyword matching
     //   `raw_tokens` — case-preserving, used for PersonName extraction
     //                  (so "Дәулет" isn't turned into "дәулет")
+    //
+    // **v4.2.5** — digit characters now pass the filter. Pre-v4.2.5
+    // both streams stripped digits via `c.is_alphabetic() || '-'`,
+    // so a literal age like `30` in "менің жасым 30" never reached
+    // `parse_kazakh_age` and `Intent::StatementOfAge` came out with
+    // `years: None`. The age slot then never made it into session,
+    // so AskAge couldn't surface a stored value via `belief_direct_answer`.
+    // Surfaced by the v4.2.1 cognitive eval expansion's
+    // `aspirational_direct_answer_age_surfaces_stored_value` scenario.
     let tokens: Vec<String> = input
         .split_whitespace()
         .map(|t| {
             t.chars()
-                .filter(|c| c.is_alphabetic() || *c == '-')
+                .filter(|c| c.is_alphabetic() || c.is_ascii_digit() || *c == '-')
                 .collect::<String>()
                 .to_lowercase()
         })
@@ -50,7 +59,7 @@ pub fn interpret_text_with_lexicon(
         .split_whitespace()
         .map(|t| {
             t.chars()
-                .filter(|c| c.is_alphabetic() || *c == '-')
+                .filter(|c| c.is_alphabetic() || c.is_ascii_digit() || *c == '-')
                 .collect::<String>()
         })
         .filter(|t| !t.is_empty())

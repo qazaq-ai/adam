@@ -134,6 +134,18 @@ templates = [
     "мені адам деп атайды",
 ]
 
+# v4.2.5 — when the session has a recorded user name, the planner
+# routes Intent::AskName through `ask_name.with_known_user` instead
+# of the default self-introduction family. Closes the v4.2.1
+# aspirational gap (`aspirational_direct_answer_name_surfaces_stored_value`).
+[[families]]
+key = "ask_name.with_known_user"
+templates = [
+    "сіздің атыңыз — {name}",
+    "сіз {name|instrumental} таныстыңыз",
+    "{name}, есіңізде ме",
+]
+
 # ---------- Social topics (v0.8.0 new) ----------
 
 # User introduced self by name. `{name}` is substituted by the realiser
@@ -157,6 +169,15 @@ templates = [
     "жасымды айта алмаймын",
 ]
 
+# v4.2.5 — slot-aware variant for Intent::AskAge when session.age is set.
+[[families]]
+key = "ask_age.with_known_user"
+templates = [
+    "сіздің жасыңыз — {age}",
+    "сіз {age} жастасыз",
+    "{age} — сіздің жасыңыз",
+]
+
 [[families]]
 key = "statement_of_age"
 templates = [
@@ -174,6 +195,15 @@ templates = [
     "мен сандық әлемде тұрамын",
     "менің мекенім жоқ",
     "қазақстан елімде",
+]
+
+# v4.2.5 — slot-aware variant for Intent::AskLocation when session.city is set.
+[[families]]
+key = "ask_location.with_known_user"
+templates = [
+    "сіз {city|locative} тұрасыз",
+    "сіздің мекеніңіз — {city}",
+    "сіз {city|ablative} екенсіз",
 ]
 
 [[families]]
@@ -195,6 +225,16 @@ templates = [
     "мен сөйлесуге жаралғанмын",
     "менің жұмысым — сізге көмектесу",
     "мен тілдерді үйренемін",
+]
+
+# v4.2.5 — slot-aware variant for Intent::AskOccupation when
+# session.occupation is set.
+[[families]]
+key = "ask_occupation.with_known_user"
+templates = [
+    "сіз {occupation} екенсіз",
+    "сіздің мамандығыңыз — {occupation}",
+    "{occupation} — сіздің кәсібіңіз",
 ]
 
 [[families]]
