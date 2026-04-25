@@ -406,6 +406,61 @@ impl Conversation {
         // audit. The template planner below still drives the
         // surface form in v4.0.31 — the verifier (Phase 4) is what
         // will actually gate outputs on `ActionPlan`.
+        // v4.0.38 — Phase 6 part 2: AUDIT-mode tool dispatch.
+        // After the existing `inject_*` helpers have run, dispatch
+        // the corresponding ToolCalls so `tool_calls` on TurnTrace
+        // captures what stores were consulted on this turn. The
+        // existing helpers still drive the actual data flow —
+        // future phases can replace them entirely with tool-driven
+        // dispatch. Reply text byte-identical to v4.0.37.
+        let mut tool_calls: Vec<crate::tool::ToolResult> = Vec::new();
+        if let crate::intent::Intent::Unknown {
+            noun_hint: Some(topic),
+            ..
+        } = &intent
+        {
+            let tool_ctx = crate::tool::ToolContext {
+                belief: &self.belief,
+                extracted: &self.extracted_facts,
+                derived: &self.derived_facts,
+                retrieval: self.morpheme_index.as_ref(),
+            };
+            // Belief consult — always cheap, surfaces what the
+            // system already knows about USER for this topic.
+            tool_calls.push(crate::tool::Tool::dispatch(
+                crate::tool::ToolCall::SearchBelief {
+                    subject: crate::belief::USER_SELF_KEY.into(),
+                },
+                &tool_ctx,
+            ));
+            // Reasoner consult — finds existing derivations on the
+            // topic. Only meaningful when derived_facts attached.
+            if !self.derived_facts.is_empty() {
+                tool_calls.push(crate::tool::Tool::dispatch(
+                    crate::tool::ToolCall::RunLocalReasoner {
+                        topic: topic.clone(),
+                    },
+                    &tool_ctx,
+                ));
+            }
+            // Retrieval consult — only meaningful when an index is
+            // attached. The morphemes are the content roots from
+            // the parses (matches what `inject_retrieval_example`
+            // would have used internally).
+            if self.morpheme_index.is_some() {
+                let morphemes: Vec<String> = crate::semantics::content_roots(&parses);
+                let morphemes = if morphemes.is_empty() {
+                    vec![topic.clone()]
+                } else {
+                    morphemes
+                };
+                tool_calls.push(crate::tool::Tool::dispatch(
+                    crate::tool::ToolCall::SearchRetrieval { morphemes },
+                    &tool_ctx,
+                ));
+            }
+        }
+
         let action_plan = crate::action::ActionPlanner::plan(&intent, &self.belief, &self.task);
         self.task.last_action = Some(action_plan.clone());
         // v4.0.32 Phase 4 — verify the chosen plan against evidence
@@ -499,7 +554,7 @@ impl Conversation {
             action_plan,
             verification,
             epistemic_status,
-            tool_calls: Vec::new(),
+            tool_calls,
             plan_trace: plan.trace.clone(),
         };
         (output, trace)

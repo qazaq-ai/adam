@@ -293,16 +293,28 @@ fn run_turn(
         }
         // v4.0.33 — epistemic status (Codex Phase 5 part 1).
         println!("├─ epistem:  {:?}", trace.epistemic_status);
-        // v4.0.37 — tool calls (Codex Phase 6 part 1). Empty until
-        // v4.0.38 wires ActionPlanner through the tool dispatcher.
+        // v4.0.37 substrate / v4.0.38 audit-mode dispatch.
         if trace.tool_calls.is_empty() {
-            println!("├─ tools:    none dispatched (v4.0.37 substrate)");
+            println!("├─ tools:    none dispatched");
         } else {
-            println!("├─ tools:    {} call(s)", trace.tool_calls.len());
+            println!("├─ tools:    {} audit call(s)", trace.tool_calls.len());
             for r in &trace.tool_calls {
+                let tag = match &r.call {
+                    adam_dialog::ToolCall::SearchBelief { subject } => {
+                        format!("SearchBelief({subject})")
+                    }
+                    adam_dialog::ToolCall::SearchGraph { subject, predicate } => {
+                        format!("SearchGraph({subject}, {predicate:?})")
+                    }
+                    adam_dialog::ToolCall::SearchRetrieval { morphemes } => {
+                        format!("SearchRetrieval({} morphemes)", morphemes.len())
+                    }
+                    adam_dialog::ToolCall::RunLocalReasoner { topic } => {
+                        format!("RunLocalReasoner({topic})")
+                    }
+                };
                 println!(
-                    "├─ tool: {:?} success={} findings={}",
-                    r.call,
+                    "├─ tool: {tag} success={} findings={}",
                     r.success,
                     r.findings.len()
                 );

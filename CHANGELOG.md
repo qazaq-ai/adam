@@ -7,6 +7,95 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.38] — 2026-04-24 — Tool Layer wiring + audit-mode dispatch (Codex roadmap Phase 6 part 2)
+
+Ninth architectural patch — second half of Phase 6. Wires the v4.0.37 tool dispatcher into the turn loop in **audit mode**: after the existing `inject_*` helpers run, the turn loop additionally dispatches the corresponding `ToolCall`s and records every `ToolResult` on `TurnTrace.tool_calls`. Reply text **byte-identical** to v4.0.37 — the existing helpers still drive data flow; tool calls are pure audit. Future phase will replace `inject_*` with tool-driven dispatch.
+
+### What landed
+
+**`tool.rs` API refactor** — dispatch now takes a `ToolContext` bundle:
+
+```rust
+pub struct ToolContext<'a> {
+    pub belief: &'a BeliefState,
+    pub extracted: &'a [ReasFact],
+    pub derived: &'a [DerivedFact],
+    pub retrieval: Option<&'a MorphemeIndex>,
+}
+
+pub fn dispatch(call: ToolCall, ctx: &ToolContext) -> ToolResult;
+```
+
+Adding a future tool that needs a new store (e.g. calculator state) means adding a field to `ToolContext`, not changing the dispatch signature.
+
+**`SearchRetrieval` fully implemented** — calls `MorphemeIndex::rank` with the caller-supplied morphemes, returns up to 3 sample texts as `findings`. When no `MorphemeIndex` is attached, returns `success=false` with `"search_retrieval: no MorphemeIndex attached to context"`.
+
+**`RunLocalReasoner` fully implemented** — scans `derived_facts` for any derivation whose subject or object matches `topic`, returns up to 3 rendered triples (`"subj IsA obj (rule=R1_is_a_transitivity)"`).
+
+**Audit-mode wiring in `Conversation::turn_with_trace`**: when `intent == Intent::Unknown { noun_hint: Some(_), .. }`, after the existing `inject_*` helpers run, dispatch:
+- `SearchBelief { subject: USER_SELF_KEY }` — always (cheap; surfaces what we know about the user).
+- `RunLocalReasoner { topic }` — if `derived_facts` is non-empty.
+- `SearchRetrieval { morphemes: content_roots(parses) }` — if `morpheme_index` is attached.
+
+Each result appended to `TurnTrace.tool_calls`. The existing `inject_*` paths still drive what gets rendered — these calls are observability only.
+
+`adam_chat --trace` line:
+```
+├─ tools:    3 audit call(s)
+├─ tool: SearchBelief(__self__) success=false findings=0
+├─ tool: RunLocalReasoner(жер) success=true findings=3
+├─ tool: SearchRetrieval(1 morphemes) success=true findings=3
+```
+
+### Smoke-test
+
+```
+$ adam_chat --once 'жер туралы айтшы' --trace
+├─ tools:    3 audit call(s)
+├─ tool: SearchBelief(__self__) success=false findings=0
+├─ tool: RunLocalReasoner(жер) success=true findings=3
+├─ tool: SearchRetrieval(1 morphemes) success=true findings=3
+└─ output:   жер туралы мынадай байланыс анықтадым: қорытынды: жер — аспан денесі ...
+```
+
+Output text byte-identical to v4.0.37.
+
+### Tests
+
+**575 passing** (+1 net):
+- `tool.rs` test module rewritten to use `ToolContext`; the v4.0.37 stub-verification tests replaced with real-implementation tests:
+  - `search_retrieval_unsupported_without_index` — clean no-index path.
+  - `run_local_reasoner_finds_matching_derivations` — matches by subject/object.
+  - `run_local_reasoner_empty_when_no_match` — no-match path.
+- All 5 v4.0.37 tests carried forward unchanged behaviourally (signature only).
+
+### Scope
+
+Phase 6 part 2 — wiring + audit dispatch. No reply-text change.
+
+### Aspirational scenarios status
+
+The two v4.0.36 aspirational scenarios remain failing — Phase 6 part 2 doesn't yet route tool results back into intent rendering. Future work (Phase 7 / final) will:
+- Use `SearchRetrieval` to drive `inject_retrieval_example` (replacing the inline call).
+- Use `RunLocalReasoner` to drive `inject_reasoning_chain`.
+- Detect "user clarified the conflict" turns via a new tool and update `BeliefState` accordingly — closes `aspirational_contradiction_resolution_via_user_choice`.
+
+### Codex roadmap status
+
+| Phase | Substrate | Behaviour | Status |
+|---|---|---|---|
+| 1 BeliefState | v4.0.27 | v4.0.28 (invariant fix) | ✅ |
+| 2 TaskState | v4.0.29 | v4.0.30 (turn_counter + ReadyToAnswer) | ✅ |
+| 3 ActionPlanner | v4.0.31 | — (substrate only) | ✅ |
+| 4 Verifier | v4.0.32 | v4.0.32 (gate fires) | ✅ |
+| 5 UncertaintyPolicy | v4.0.33 | v4.0.34 (templates) | ✅ |
+| 6 Tool Layer | v4.0.37 | v4.0.38 (audit) | ✅ |
+| 7 Cognitive Eval | v4.0.35 | v4.0.36 (gates fixed) | ✅ |
+
+All 7 phases of Codex's v5.0 roadmap have shipped at least one release. Future work is consolidation: replace `inject_*` with tool-driven dispatch, close aspirational scenarios.
+
+---
+
 ## [4.0.37] — 2026-04-24 — Tool Layer substrate (Codex roadmap Phase 6 part 1)
 
 Eighth architectural patch on Codex's v5.0 roadmap — **first half of Phase 6**. Adds a controlled, traceable tool interface for internal lookups. Pre-v4.0.37 the dialog reached into belief / extracted_facts / retrieval index / derived_facts directly from `inject_*` helpers; each call was invisible to the trace and impossible for the planner to *intend* as a distinct action.

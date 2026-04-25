@@ -33,6 +33,8 @@
 
 use crate::belief::{BeliefState, FactStatus};
 use adam_reasoning::Fact as ReasFact;
+use adam_reasoning::reasoner::DerivedFact;
+use adam_retrieval::MorphemeIndex;
 
 /// One callable internal tool. Each variant carries the inputs the
 /// dispatcher needs; results come back through [`ToolResult`].
@@ -51,13 +53,21 @@ pub enum ToolCall {
         subject: String,
         predicate: Option<String>,
     },
-    /// Reserved — corpus retrieval via `MorphemeIndex::rank`.
-    /// v4.0.37 returns `success=false` with reason recorded in
-    /// `trace`; v4.0.38 will wire `inject_retrieval_example`
-    /// through this dispatcher.
+    /// Corpus retrieval via [`adam_retrieval::MorphemeIndex::rank`].
+    /// v4.0.38 — fully implemented; takes the morpheme list the
+    /// caller would have built for `inject_retrieval_example` and
+    /// returns the top-k surface texts as `findings`. When no
+    /// `MorphemeIndex` is attached to the context, returns
+    /// `success=false` with an explicit reason.
     SearchRetrieval { morphemes: Vec<String> },
-    /// Reserved — invoke the offline reasoner on a specific topic
-    /// to derive a fresh chain on demand. v4.0.37 stub.
+    /// Find an existing rule-derived chain involving the topic.
+    /// v4.0.38 — fully implemented; scans the `derived_facts`
+    /// vector for any derivation whose subject or object matches
+    /// `topic`, returns up to 3 rendered chains as `findings`. The
+    /// "local" qualifier reflects that this consumes pre-computed
+    /// derivations rather than re-running the reasoner; on-demand
+    /// reasoning over arbitrary topics is reserved for a future
+    /// phase.
     RunLocalReasoner { topic: String },
 }
 
@@ -93,34 +103,41 @@ impl ToolResult {
         }
     }
 
-    fn stubbed(call: ToolCall, why: &str) -> Self {
+    fn unsupported(call: ToolCall, why: &str) -> Self {
         Self {
             call,
             success: false,
             findings: Vec::new(),
-            trace: vec![format!("v4.0.37 stub — {why}; v4.0.38 will wire it")],
+            trace: vec![why.to_string()],
         }
     }
 }
 
-/// Pure-function dispatcher. Reads belief / extracted_facts (and
-/// later, retrieval index + derived_facts), never mutates them.
-/// Future tools that need write access (e.g. updating a learned
-/// scorer) must take `&mut` references explicitly.
+/// v4.0.38 — bundle of read-only references the dispatcher needs.
+/// Adding a tool that needs a new store (e.g. retrieval ranker
+/// config, future calculator state) means adding a field here, not
+/// changing the `Tool::dispatch` signature.
+pub struct ToolContext<'a> {
+    pub belief: &'a BeliefState,
+    pub extracted: &'a [ReasFact],
+    pub derived: &'a [DerivedFact],
+    pub retrieval: Option<&'a MorphemeIndex>,
+}
+
+/// Pure-function dispatcher. Reads `ToolContext` references, never
+/// mutates them. Future tools that need write access must take a
+/// `&mut` field explicitly.
 pub struct Tool;
 
 impl Tool {
-    /// Execute a single `ToolCall` against the available stores.
-    /// `extracted` is the flat fact list (Phase 1+2 substrate);
-    /// when the planner wires this in v4.0.38, callers will pass
-    /// the same `&self.extracted_facts` they already keep on the
-    /// `Conversation`.
-    pub fn dispatch(call: ToolCall, belief: &BeliefState, extracted: &[ReasFact]) -> ToolResult {
+    /// Execute a single `ToolCall` against the bundled context.
+    pub fn dispatch(call: ToolCall, ctx: &ToolContext) -> ToolResult {
         let mut trace = Vec::new();
         trace.push(format!("tool: dispatch {call:?}"));
         match &call {
             ToolCall::SearchBelief { subject } => {
-                let active: Vec<String> = belief
+                let active: Vec<String> = ctx
+                    .belief
                     .facts
                     .iter()
                     .filter(|f| f.subject == *subject && f.status == FactStatus::Active)
@@ -131,13 +148,14 @@ impl Tool {
                     active.len()
                 ));
                 if active.is_empty() {
-                    ToolResult::empty(call, "search_belief: no active facts")
+                    ToolResult::unsupported(call, "search_belief: no active facts")
                 } else {
                     ToolResult::ok(call, active, trace)
                 }
             }
             ToolCall::SearchGraph { subject, predicate } => {
-                let matches: Vec<String> = extracted
+                let matches: Vec<String> = ctx
+                    .extracted
                     .iter()
                     .filter(|f| f.subject.root == *subject)
                     .filter(|f| match predicate {
@@ -151,16 +169,62 @@ impl Tool {
                     matches.len()
                 ));
                 if matches.is_empty() {
-                    ToolResult::empty(call, "search_graph: no matching facts")
+                    ToolResult::unsupported(call, "search_graph: no matching facts")
                 } else {
                     ToolResult::ok(call, matches, trace)
                 }
             }
-            ToolCall::SearchRetrieval { .. } => {
-                ToolResult::stubbed(call, "SearchRetrieval not yet wired to MorphemeIndex")
+            ToolCall::SearchRetrieval { morphemes } => {
+                let Some(index) = ctx.retrieval else {
+                    return ToolResult::unsupported(
+                        call,
+                        "search_retrieval: no MorphemeIndex attached to context",
+                    );
+                };
+                let refs: Vec<&str> = morphemes.iter().map(|s| s.as_str()).collect();
+                let cfg = adam_retrieval::RankConfig::default();
+                let hits = index.rank(&refs, &cfg);
+                let top: Vec<String> = hits
+                    .iter()
+                    .take(3)
+                    .filter_map(|h| index.sample_text(&h.sref).map(String::from))
+                    .collect();
+                trace.push(format!(
+                    "search_retrieval: morphemes={} hits={}",
+                    morphemes.len(),
+                    hits.len()
+                ));
+                if top.is_empty() {
+                    ToolResult::unsupported(call, "search_retrieval: no hits for given morphemes")
+                } else {
+                    ToolResult::ok(call, top, trace)
+                }
             }
-            ToolCall::RunLocalReasoner { .. } => {
-                ToolResult::stubbed(call, "RunLocalReasoner not yet wired to reasoner")
+            ToolCall::RunLocalReasoner { topic } => {
+                let matches: Vec<String> = ctx
+                    .derived
+                    .iter()
+                    .filter(|d| d.subject.root == *topic || d.object.root == *topic)
+                    .take(3)
+                    .map(|d| {
+                        format!(
+                            "{} {:?} {} (rule={})",
+                            d.subject.root, d.predicate, d.object.root, d.rule_id
+                        )
+                    })
+                    .collect();
+                trace.push(format!(
+                    "run_local_reasoner: topic={topic} matches={}",
+                    matches.len()
+                ));
+                if matches.is_empty() {
+                    ToolResult::unsupported(
+                        call,
+                        "run_local_reasoner: no derivation found for topic",
+                    )
+                } else {
+                    ToolResult::ok(call, matches, trace)
+                }
             }
         }
     }
@@ -195,6 +259,37 @@ mod tests {
         }
     }
 
+    fn derived(subject: &str, pred: Predicate, object: &str) -> DerivedFact {
+        DerivedFact {
+            subject: SlotRef {
+                surface: subject.into(),
+                root: subject.into(),
+                pos: "noun".into(),
+            },
+            predicate: pred,
+            object: SlotRef {
+                surface: object.into(),
+                root: object.into(),
+                pos: "noun".into(),
+            },
+            rule_id: "R1_is_a_transitivity".into(),
+            source_chain: vec![FactSource {
+                pack: "world_core/test.jsonl".into(),
+                sample_id: "t1".into(),
+            }],
+            confidence: ConfidenceKind::RuleInferred,
+        }
+    }
+
+    fn ctx<'a>(belief: &'a BeliefState, extracted: &'a [ReasFact]) -> ToolContext<'a> {
+        ToolContext {
+            belief,
+            extracted,
+            derived: &[],
+            retrieval: None,
+        }
+    }
+
     #[test]
     fn search_belief_finds_active_fact() {
         let mut belief = BeliefState::new();
@@ -203,8 +298,7 @@ mod tests {
             ToolCall::SearchBelief {
                 subject: USER_SELF_KEY.into(),
             },
-            &belief,
-            &[],
+            &ctx(&belief, &[]),
         );
         assert!(r.success);
         assert_eq!(r.findings.len(), 1);
@@ -218,8 +312,7 @@ mod tests {
             ToolCall::SearchBelief {
                 subject: "nonexistent".into(),
             },
-            &belief,
-            &[],
+            &ctx(&belief, &[]),
         );
         assert!(!r.success);
         assert!(r.findings.is_empty());
@@ -227,9 +320,6 @@ mod tests {
 
     #[test]
     fn search_belief_skips_contested_facts() {
-        // Single-active-fact invariant from v4.0.28: contested
-        // facts are NOT Active, so SearchBelief must not return
-        // them.
         let mut belief = BeliefState::new();
         belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
         belief.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
@@ -237,13 +327,9 @@ mod tests {
             ToolCall::SearchBelief {
                 subject: USER_SELF_KEY.into(),
             },
-            &belief,
-            &[],
+            &ctx(&belief, &[]),
         );
-        assert!(
-            !r.success,
-            "all city facts contested → no Active → SearchBelief must return empty, got {r:?}"
-        );
+        assert!(!r.success, "contested facts must not surface as Active");
     }
 
     #[test]
@@ -253,13 +339,13 @@ mod tests {
             fact("күн", Predicate::IsA, "жұлдыз"),
             fact("жер", Predicate::Has, "ауа"),
         ];
+        let belief = BeliefState::new();
         let r = Tool::dispatch(
             ToolCall::SearchGraph {
                 subject: "жер".into(),
                 predicate: None,
             },
-            &BeliefState::new(),
-            &extracted,
+            &ctx(&belief, &extracted),
         );
         assert!(r.success);
         assert_eq!(r.findings.len(), 2);
@@ -271,13 +357,58 @@ mod tests {
             fact("жер", Predicate::IsA, "аспан денесі"),
             fact("жер", Predicate::Has, "ауа"),
         ];
+        let belief = BeliefState::new();
         let r = Tool::dispatch(
             ToolCall::SearchGraph {
                 subject: "жер".into(),
                 predicate: Some("isa".into()),
             },
-            &BeliefState::new(),
-            &extracted,
+            &ctx(&belief, &extracted),
+        );
+        assert!(r.success);
+        assert_eq!(r.findings.len(), 1);
+        assert!(r.findings[0].contains("аспан денесі"));
+    }
+
+    /// v4.0.38 — SearchRetrieval without a MorphemeIndex returns
+    /// `success=false` with explicit reason. Useful for callers
+    /// that try to dispatch unconditionally.
+    #[test]
+    fn search_retrieval_unsupported_without_index() {
+        let belief = BeliefState::new();
+        let r = Tool::dispatch(
+            ToolCall::SearchRetrieval {
+                morphemes: vec!["жер".into()],
+            },
+            &ctx(&belief, &[]),
+        );
+        assert!(!r.success);
+        assert!(
+            r.trace.iter().any(|t| t.contains("no MorphemeIndex")),
+            "must explain why dispatch failed, got {r:?}"
+        );
+    }
+
+    /// v4.0.38 — RunLocalReasoner finds derivations whose subject
+    /// or object matches the topic. Up to 3 matches returned.
+    #[test]
+    fn run_local_reasoner_finds_matching_derivations() {
+        let derived_facts = vec![
+            derived("жер", Predicate::IsA, "аспан денесі"),
+            derived("күн", Predicate::IsA, "жұлдыз"),
+        ];
+        let belief = BeliefState::new();
+        let context = ToolContext {
+            belief: &belief,
+            extracted: &[],
+            derived: &derived_facts,
+            retrieval: None,
+        };
+        let r = Tool::dispatch(
+            ToolCall::RunLocalReasoner {
+                topic: "жер".into(),
+            },
+            &context,
         );
         assert!(r.success);
         assert_eq!(r.findings.len(), 1);
@@ -285,29 +416,15 @@ mod tests {
     }
 
     #[test]
-    fn search_retrieval_is_stubbed_in_v4_0_37() {
-        let r = Tool::dispatch(
-            ToolCall::SearchRetrieval {
-                morphemes: vec!["жер".into()],
-            },
-            &BeliefState::new(),
-            &[],
-        );
-        assert!(!r.success);
-        assert!(r.trace.iter().any(|t| t.contains("v4.0.37 stub")));
-    }
-
-    #[test]
-    fn run_local_reasoner_is_stubbed_in_v4_0_37() {
+    fn run_local_reasoner_empty_when_no_match() {
+        let belief = BeliefState::new();
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {
-                topic: "жер".into(),
+                topic: "nonexistent".into(),
             },
-            &BeliefState::new(),
-            &[],
+            &ctx(&belief, &[]),
         );
         assert!(!r.success);
-        assert!(r.trace.iter().any(|t| t.contains("v4.0.37 stub")));
     }
 
     #[test]
@@ -316,7 +433,7 @@ mod tests {
         let call = ToolCall::SearchBelief {
             subject: "x".into(),
         };
-        let r = Tool::dispatch(call.clone(), &belief, &[]);
+        let r = Tool::dispatch(call.clone(), &ctx(&belief, &[]));
         assert_eq!(r.call, call);
     }
 }

@@ -56,7 +56,7 @@ pub use realiser::realise;
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
 pub use task::{Goal, Subgoal, TaskDigest, TaskState, TaskStatus};
 pub use templates::{TemplateError, TemplateRepository};
-pub use tool::{Tool, ToolCall, ToolResult};
+pub use tool::{Tool, ToolCall, ToolContext, ToolResult};
 pub use uncertainty::{EpistemicStatus, UncertaintyPolicy};
 pub use verifier::{VerificationIssue, VerificationReport, Verifier, strip_evidence};
 
