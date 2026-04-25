@@ -298,6 +298,64 @@ impl BeliefState {
         new_idx
     }
 
+    /// Resolve a pending contradiction on `(subject, predicate)` by
+    /// promoting `chosen_object` to `Active` and superseding every
+    /// other recorded value for the same slot. Drops the matching
+    /// `BeliefConflict` and `ContradictionToResolve` pending
+    /// question.
+    ///
+    /// Returns `true` if a fact matching `chosen_object` existed and
+    /// the resolution applied; `false` if no such fact exists (in
+    /// which case the contradiction is left untouched — the caller
+    /// is expected to record_user_fact and let the normal flow
+    /// re-detect the conflict).
+    ///
+    /// **v4.0.41** — implements the kernel's signature feature:
+    /// auditable belief revision via user choice. Closes
+    /// aspirational scenario
+    /// `aspirational_contradiction_resolution_via_user_choice`
+    /// (v4.0.35 finding).
+    pub fn resolve_contradiction(
+        &mut self,
+        subject: &str,
+        predicate: &str,
+        chosen_object: &str,
+    ) -> bool {
+        let candidates: Vec<usize> = self
+            .facts
+            .iter()
+            .enumerate()
+            .filter(|(_, f)| f.subject == subject && f.predicate == predicate)
+            .map(|(i, _)| i)
+            .collect();
+        if candidates.is_empty() {
+            return false;
+        }
+        let chosen_idx = candidates
+            .iter()
+            .find(|&&i| self.facts[i].object.eq_ignore_ascii_case(chosen_object))
+            .copied();
+        let Some(chosen_idx) = chosen_idx else {
+            return false;
+        };
+        for &i in &candidates {
+            self.facts[i].status = if i == chosen_idx {
+                FactStatus::Active
+            } else {
+                FactStatus::Superseded
+            };
+        }
+        self.contradictions
+            .retain(|c| !(c.subject == subject && c.predicate == predicate));
+        self.pending_questions.retain(|q| match &q.nature {
+            QuestionNature::ContradictionToResolve { predicate: p, .. } => {
+                !(q.about == subject && p == predicate)
+            }
+            _ => true,
+        });
+        true
+    }
+
     /// Register or refresh an entity bucket. Creates on first
     /// sighting, otherwise updates `last_seen_turn` and appends a
     /// new alias when the surface form differs from the canonical
@@ -471,6 +529,56 @@ mod tests {
             }
             other => panic!("expected ContradictionToResolve, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn resolve_contradiction_picks_chosen_and_supersedes_others() {
+        let mut b = BeliefState::new();
+        b.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        b.record_user_fact(USER_SELF_KEY, "city", "астана", 2);
+        assert_eq!(b.contradictions.len(), 1);
+        assert_eq!(b.pending_questions.len(), 1);
+
+        let resolved = b.resolve_contradiction(USER_SELF_KEY, "city", "астана");
+        assert!(resolved);
+
+        // Astana now Active, Almaty Superseded
+        let astana = b
+            .facts
+            .iter()
+            .find(|f| f.object == "астана")
+            .expect("astana fact present");
+        let almaty = b
+            .facts
+            .iter()
+            .find(|f| f.object == "алматы")
+            .expect("almaty fact present");
+        assert_eq!(astana.status, FactStatus::Active);
+        assert_eq!(almaty.status, FactStatus::Superseded);
+
+        // Conflict and ContradictionToResolve question both gone
+        assert!(b.contradictions.is_empty());
+        assert!(b.pending_questions.is_empty());
+
+        // active_fact() now returns the chosen value (single-active invariant)
+        assert_eq!(
+            b.active_fact(USER_SELF_KEY, "city")
+                .map(|f| f.object.as_str()),
+            Some("астана")
+        );
+    }
+
+    #[test]
+    fn resolve_contradiction_returns_false_when_chosen_value_unknown() {
+        let mut b = BeliefState::new();
+        b.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        b.record_user_fact(USER_SELF_KEY, "city", "астана", 2);
+
+        let resolved = b.resolve_contradiction(USER_SELF_KEY, "city", "шымкент");
+        assert!(!resolved);
+        // State untouched
+        assert_eq!(b.contradictions.len(), 1);
+        assert!(b.facts.iter().all(|f| f.status == FactStatus::Contested));
     }
 
     #[test]

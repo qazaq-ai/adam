@@ -7,6 +7,85 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.1.0] — 2026-04-25 — Belief revision via user choice (close aspirational #2, cognitive baseline 22/22)
+
+**First minor in the v4.x track.** Closes the kernel's signature feature: auditable belief revision via user choice. With this, the cognitive_eval baseline reaches **22/22 canonical, 0 aspirational** — every scenario the harness tracked since v4.0.34 now passes.
+
+**Why a minor and not v4.0.41:** the rigid "single-step patches forever" cadence was already off (we shipped v4.0.10 through v4.0.40 as patches). The user called this out: bump magnitude must reflect contribution, not arrival order. Belief revision is the kernel's signature mechanism — auditable conflict resolution that the world-core / FST stack was designed to support — and it closes a multi-release roadmap goal. That is minor-bump material. Future patches resume v4.1.x.
+
+### What landed
+
+**`BeliefState::resolve_contradiction(subject, predicate, chosen_object) → bool`**. New public method that:
+
+1. Verifies a fact matching `chosen_object` exists for the slot.
+2. Flips it to `Active`; flips every other recorded value for the same `(subject, predicate)` to `Superseded`.
+3. Drops the matching `BeliefConflict` from `contradictions`.
+4. Drops the matching `ContradictionToResolve` entry from `pending_questions`.
+5. Returns `false` (state untouched) if `chosen_object` doesn't match any recorded fact — the caller is expected to fall through to `record_user_fact` and let normal conflict detection re-engage.
+
+The single-active-fact invariant (v4.0.28) is preserved across resolution: exactly one fact ends `Active`, all others `Superseded`. No fact is ever deleted — the audit trail survives.
+
+**`Conversation::try_resolve_pending_contradiction(input, intent) → bool`**. New private wiring that, on every turn:
+
+1. If `belief.contradictions.is_empty()`, returns `false` immediately.
+2. Otherwise, for each pending `(subject, predicate)`, derives the user's chosen value:
+   - **Priority 1**: explicit `Statement*` intent on a matching predicate (`StatementOfLocation { city }`, `StatementOfOccupation { occupation }`, `StatementOfName { name }`, `StatementOfAge { years }`).
+   - **Priority 2**: case-insensitive substring match of any candidate object value in the raw input — handles short replies like «астанада дұрыс» where the noun reaches the surface in locative form, no full Statement intent required.
+3. Calls `BeliefState::resolve_contradiction` with the chosen value.
+4. Returns `true` iff at least one contradiction was resolved.
+
+**`Conversation::turn_with_trace` integration**. After parse + intent classification, before `absorb_entities`:
+
+```rust
+let resolved_contradiction = self.try_resolve_pending_contradiction(input, &intent);
+if !resolved_contradiction {
+    self.absorb_entities(&intent, turn_id);
+}
+```
+
+Skipping `absorb_entities` on a resolution turn is essential — otherwise the chosen value gets re-recorded as a fresh `Active` fact, leaving the belief state with two `Active` entries on the same `(subject, predicate)` (single-active invariant violated) AND the historical Contested fact still hanging around. Branching here keeps the belief state clean: one `Active` (chosen), every prior value `Superseded`, no duplicates.
+
+The `ActionPlanner` runs after this point with `belief.contradictions` empty, so the planner doesn't trigger `CheckContradiction` on the resolution turn — it routes to whatever the resolution turn's intent normally would (Affirmation, Social, or Unknown depending on the surface form).
+
+### Aspirational → canonical
+
+The `aspirational_contradiction_resolution_via_user_choice` scenario (3 turns: «мен алматыда тұрамын» → «мен астанада тұрамын» → «астанада дұрыс»; expects `belief_contradictions_count == 0` after turn 3) is renamed to `contradiction_resolution_via_user_choice`, moved to category `belief_revision`, and `expected_failing` flipped to `false`.
+
+| | v4.0.39 | v4.0.40 | **v4.1.0** |
+|---|---|---|---|
+| Canonical | 20/20 | 21/21 | **22/22** |
+| Aspirational | 0/2 | 0/1 | **0/0** |
+
+**Both Codex strategic-review aspirational gaps are now closed.** The cognitive eval harness has no remaining "expected_failing" scenarios.
+
+### Tests
+
+**577 passing** (+2 — `resolve_contradiction_picks_chosen_and_supersedes_others` and `resolve_contradiction_returns_false_when_chosen_value_unknown` unit tests on `BeliefState`). 0 warnings on `cargo build`.
+
+The two new unit tests cover the state mechanic in isolation:
+- Happy path: 2-fact contradiction → resolve to chosen → 1 Active + 1 Superseded, contradictions/pending_questions cleared, `active_fact()` returns chosen value.
+- Unknown-choice path: `resolve_contradiction` with a value that doesn't match any recorded fact → returns `false`, state untouched (caller can fall through to `record_user_fact`).
+
+### Why this matters
+
+This is the first time the dialog can do something the project's "auditable cognitive kernel" framing has always promised: hold conflicting beliefs simultaneously, surface the conflict to the user, accept their resolution, and revise the belief state with full provenance. Pre-v4.1.0:
+
+- Conflicts persisted indefinitely.
+- The user couldn't disambiguate without `reset()`.
+- The dialog stayed stuck on `CheckContradiction` forever.
+
+Post-v4.1.0 the kernel demonstrates the closed loop: detect → ask → revise → answer cleanly. This is also the first scenario where audit-mode `Tool` dispatch (v4.0.38) starts paying rent — `SearchBelief` + the new resolver together give a future `tools-as-execution` planner everything it needs to detect resolution turns from inside the planner instead of inside `turn_with_trace`.
+
+### Scope
+
+Two new methods (~75 lines), one wire-up site, two unit tests, one aspirational-to-canonical promotion. No template change, no realiser change, no FST/Lexicon change. Reply text unchanged for non-resolution turns; resolution turns produce whatever the resolution intent's normal reply path emits (Affirmation → social pleasantry, etc.).
+
+### Next
+
+With cognitive eval at 22/22 canonical, the next architectural lever is **tools-as-execution** — replacing the `inject_*` helpers with `Tool::dispatch` as the primary path, not just audit. v4.1.5 (or wherever the next significant capability lands) will start that migration. Smaller v4.1.x patches in between can extend cognitive eval to 50+ scenarios, including tool-driven cases.
+
+---
+
 ## [4.0.40] — 2026-04-25 — Parse-failure path (close aspirational #1 / Codex roadmap follow-up)
 
 Eleventh release. Closes the first of two aspirational gaps Codex's strategic review left on the v4.0.36 cognitive eval roadmap: distinguishing "user typed something we couldn't parse" from "user asked about a topic we have no facts on". Both were rolled into the same RefuseOutOfScope/Unknown bucket pre-v4.0.40 — now they route differently.

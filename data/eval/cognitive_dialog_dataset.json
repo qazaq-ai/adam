@@ -217,15 +217,15 @@
       }
     },
     {
-      "id": "aspirational_contradiction_resolution_via_user_choice",
-      "category": "aspirational_gaps",
-      "description": "Aspirational: user's clarification answer to a CheckContradiction reply should resolve the conflict — flip the chosen value to Active and clear the others to Superseded. Currently the dialog doesn't recognise 'мен астанада дұрыс' as a resolution, so the conflict persists. Phase 6 (tool layer) candidate: a SearchBelief tool could let the planner detect 'this turn is a conflict resolution' and update belief.",
+      "id": "contradiction_resolution_via_user_choice",
+      "category": "belief_revision",
+      "description": "v4.0.41: when belief has a pending contradiction and the user's next turn names one of the candidate object values (via Statement* intent OR raw-input substring match like 'астанада дұрыс'), the dialog resolves the conflict — chosen → Active, others → Superseded, BeliefConflict + ContradictionToResolve pending question dropped. Skips absorb_entities for the resolution turn so the chosen value isn't double-recorded as a fresh Active fact. Was aspirational pre-v4.0.41.",
       "turns": [
         "мен алматыда тұрамын",
         "мен астанада тұрамын",
         "астанада дұрыс"
       ],
-      "expected_failing": true,
+      "expected_failing": false,
       "expect": {
         "belief_contradictions_count": 0
       }

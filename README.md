@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.0.40-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.1.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,7 +23,8 @@
   <img src="https://img.shields.io/badge/lexicon-14.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-575%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-577%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/cognitive%20eval-22%2F22%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
   <img src="https://img.shields.io/badge/world%20core-826%20curated%20/%20922%20facts-9CCC65?style=flat-square" alt="world core">
@@ -33,9 +34,11 @@
 
 ---
 
-## Why adam (v4.0)
+## Why adam (v4.1)
 
-adam is a **neuro-symbolic retrieval system for Kazakh** — the rule-based dialog backbone, the morpheme-indexed retrieval engine, and the forward-chaining reasoner all run together as a single deterministic pipeline. It trades **generalisation for integrity**, and (as of v3.0) adds **rule-derived reasoning** on top of retrieval.
+adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced.
+
+**v4.1.0 milestone**: the cognitive eval harness reaches **22/22 canonical baseline, 0 aspirational scenarios remaining**. The kernel can now detect contradictions across turns, ask the user for resolution, and revise belief state with full audit trail (`Active`/`Superseded`/`Contested` statuses, `BeliefConflict` log, `ContradictionToResolve` pending question lifecycle). This is the kernel's signature feature: auditable belief revision via user choice.
 
 Three things make the trade viable specifically for Kazakh:
 
@@ -43,40 +46,43 @@ Three things make the trade viable specifically for Kazakh:
 - **Mathematical determinism** — same input + same session + same seed produces a byte-identical answer across runs. No temperature, no sampling, no GPU.
 - **No ungrounded generation by design** — every output is either a template realisation, a corpus quote, or a rule derivation with a full `source_chain`. There is no free-text generator anywhere in the pipeline that could invent content not traceable to its source.
 
-| | adam v4.0 | mainstream LLM |
+| | adam v4.1 | mainstream LLM |
 |---|---|---|
 | Outputs | template + verbatim quote + FST synthesis + **rule-derived chain** | probabilistic token generation |
 | Ungrounded generation | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) | non-zero, non-auditable |
 | Inference | ms on laptop CPU | dollars on GPU / datacentre |
 | **Reasoning** | **forward-chaining over typed facts, every conclusion has a `rule_id`** | opaque emergent reasoning |
-| **Provenance** | **`source_chain: Vec<FactSource>` per derivation; `(pack, sample_id)` per quote** | ~none for free-form output |
+| **Belief revision** | **explicit `BeliefState` with `Active`/`Superseded`/`Contested` lifecycle; user-driven contradiction resolution (v4.1.0)** | implicit, untraceable across turns |
+| **Provenance** | **`source_chain: Vec<FactSource>` per derivation; `(pack, sample_id)` per quote; `Provenance::UserStatement { turn_id }` per belief fact** | ~none for free-form output |
 | **Inference marker** | **«байланыс-» on every reasoned claim, test-enforced** | — |
 | Determinism | byte-identical across runs for same `(input, session, seed)` | temperature-dependent |
 | Language coverage | Kazakh only | many, but shallow for low-resource |
 | Knowledge depth | bounded by curated corpus + deterministic rules | broad, but fabricated edges |
 | Self-improvement | ships by commit, reviewed by humans | parametric updates through training |
 
-adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, auditable, and — as of v3.0 — capable of deriving conclusions no single corpus sentence states**, while marking every such conclusion with a textual trust signal and a source chain.
+adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, auditable, and — as of v4.1.0 — capable of holding conflicting beliefs simultaneously, surfacing them to the user, and revising them on demand**, while every conclusion carries a textual trust marker and every fact carries a source chain.
 
-### Current state (v4.0.0 — honest numbers)
+### Current state (v4.1.0 — honest numbers)
 
-v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major release that crosses 500 curated entries and adds a contradiction immune system** responding to Codex's v3.9.5 review. World Core expands to **507 entries / 601 facts across 13 domains** (added: colors / numbers / kz_literature / food / clothing / proverbs / animals). R6/R7 now refuse astronomical-scale derived targets (closes `(бала, LivesIn, күн жүйесі)` cross-domain leak). Object-side 3-char minimum and 20+ new closed-class entries (conjunctions, adverbials, fragment-suffix standalones) close the remaining Codex-flagged noise classes. Every curated fact carries `ConfidenceKind::HumanApproved` with a named reviewer; every derivation has a `rule_id` + non-empty `source_chain`; nothing else can leave the system.
+v4.1.0 is the **first v4.x minor**: it closes the kernel's signature feature — auditable belief revision via user choice — and brings the cognitive eval harness to **22/22 canonical baseline, 0 aspirational scenarios remaining**. World Core: **826 entries / 922 curated facts across 29 domains**. Reasoner: **10 of 11 rules firing** with **17 340 derived facts** over **15 448 extracted + curated facts**. Workspace: **577 tests passing**, 0 warnings. Every curated fact carries `ConfidenceKind::HumanApproved` with a named reviewer; every derivation has a `rule_id` + non-empty `source_chain`; every belief fact carries `Provenance` + `FactStatus`; nothing else can leave the system.
 
 | | value |
 |---|---|
 | Dialog intents | 26 |
-| Lexicon roots | **14 517** (v4.0.20: +270 Codex-review sync with world_core) |
+| Lexicon roots | **~25.5 k** (13 606 pure Kazakh + 11 919 Apertium imports, before deduplication) |
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
-| **World Core (v4.0.19)** | **826 entries / 922 curated facts** across **29 domains**: astronomy, time, geography_kz, biology_basic, body_parts, society, colors, numbers, kz_literature, food, clothing, proverbs, animals, transport, plants, professions, tools_household, music_kz, sports, house_parts, emotions, weather_phenomena, materials, language_features, cooking_methods, directions, **kinship_extended (18 / 20)**, **constellations_kz (6 / 6)**, **measurements (10 / 10)** — bolded are new in v4.0.19. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
+| **World Core** | **826 entries / 922 curated facts across 29 domains**: animals, astronomy, biology_basic, body_parts, clothing, colors, constellations_kz, cooking_methods, directions, emotions, food, geography_kz, house_parts, kinship_extended, kz_literature, language_features, materials, measurements, music_kz, numbers, plants, professions, proverbs, society, sports, time, tools_household, transport, weather_phenomena. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **575 passing, 0 failing, 0 warnings** |
+| Workspace tests | **577 passing, 0 failing, 0 warnings** |
+| **Cognitive eval baseline** | **22/22 canonical, 0 aspirational** (v4.1.0). Closed scenarios: parse-failure distinction (v4.0.40), contradiction resolution via user choice (v4.1.0). Tracked in `data/eval/cognitive_dialog_dataset.json`; harness in `crates/adam-dialog/tests/cognitive_eval.rs` |
+| **Belief revision (v4.1.0)** | `BeliefState` with `Active`/`Superseded`/`Contested` lifecycle, `BeliefConflict` log, `ContradictionToResolve` pending-question lifecycle. `resolve_contradiction(subject, predicate, chosen_object)` flips chosen → Active, others → Superseded, drops the matching conflict + pending question. Single-active-fact invariant (v4.0.28) preserved across resolution; nothing is ever deleted |
 | Pattern matchers | **11** — v2.x baseline (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
-| **Reasoning rules active** | **10 of 11 firing on v4.0.18 corpus** — R1 IsA-transitivity (**484**), R2 Has-inheritance (**450**), R3 Has-via-PartOf (**51**), R5 shared-IsA → RelatedTo (**13 414**), R6 LivesIn-via-PartOf (**49**), R7 GoesTo-via-PartOf (**373**), R8 After-transitivity (**734**), R9 PartOf-transitivity (**170**), R10 InDomain-inheritance (**102**), **R11 InDomain-shared-target (146, NEW in v4.0.18)**. R4 IsA-symmetry is curator-warning only. R11 is the InDomain analogue of R5 — 146 net pairs come from the cross-cluster derivation space (concepts sharing a domain but not a taxonomic parent). |
+| **Reasoning rules active** | **10 of 11 firing on v4.1.0 corpus** — R1 IsA-transitivity (**574**), R2 Has-inheritance (**1 110**), R3 Has-via-PartOf (**55**), R5 shared-IsA → RelatedTo (**13 566**), R6 LivesIn-via-PartOf (**81**), R7 GoesTo-via-PartOf (**505**), R8 After-transitivity (**999**), R9 PartOf-transitivity (**175**), R10 InDomain-inheritance (**124**), R11 InDomain-shared-target (**151**). R4 IsA-symmetry is curator-warning only. |
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | **Dialog closed-class sync** (v3.9.5) | `NOT_A_TOPIC` mirrors `adam_reasoning::patterns::is_closed_class` — closes the pre-v3.9.5 «Неліктен → Нелікте тұрасыз ба» misparse where the FST correctly analysed `Неліктен` as ablative of a noun stem but the dialog layer had no interrogative filter |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
-| Facts (committed runtime) | **15 448 total** = **14 526 extracted (Grammar)** + **922 curated (HumanApproved, 29 domains)**. T4_200k scale. v4.0.20 Lexicon sync unlocked +1 739 previously-unparseable text-extracted facts |
-| **Rule-derived facts (committed runtime)** | **17 340** (v4.0.23: R1=574, R2=1 110, R3=55, R5=**13 566**, R6=81, R7=505, R8=999, R9=175, R10=124, R11=151). Delta vs v4.0.20: **−2 055** from v4.0.23 R5 overbroad-hub guard (Codex #4) — 5 abstract hubs (зат/белгі/әрекет/құбылыс/адам) no longer fire R5. **Cumulative v4.0.7 → v4.0.23**: **7 866 → 17 340 derivations (+120.4 %)** across 17 releases, post-Codex-review cleanup |
+| Facts (committed runtime) | **15 448 total** = **14 526 extracted (Grammar)** + **922 curated (HumanApproved, 29 domains)**. T4_200k scale |
+| **Rule-derived facts (committed runtime)** | **17 340 derivations** (10 active rules; numeric breakdown in the rules row above) |
 | Fact-graph nodes / edges | **3 515 / 13 725** (committed v4.0.20); most-connected content nouns scaled with Lexicon sync |
 | **Tooling throughput (v4.0.8 → v4.0.9 validation)** | `extract_facts --world-core-only` — v4.0.8 infra. v4.0.9 confirmed empirically: 3-domain batch (105 new facts, full rebuild of facts + derived_facts + lexical_graph) took **~4 s total** vs ~135 min under the pre-v4.0.8 per-domain workflow — **~2 000× pipeline speedup on a 3-domain batch**. |
 | **Predicate coverage (v3.9.5)** | **11 / 11 = 100 %** — every declared predicate fires. Causes = 6, InDomain = 5 (v3.9.5 biology/anatomy/society entries extended the v3.9.0 foothold) |
@@ -88,13 +94,15 @@ v3.0 is **proof of mechanism, not proof of scale.** v4.0.0 is the **major releas
 
 The scale-up path is explicit: scale coverage of the four existing matchers to the full 77.9 M-word corpus, add `PartOf` / `Causes` extractors, activate R3/R4. Nothing in the architecture is gated on more data — the engine already produces derivations with full provenance.
 
-### The v3.0 trust stack
+### Trust stack
 
 ```
- template realisation            →  recognised intent, 0% fabrication
- verbatim quote «…»              →  corpus citation, byte-identical to source
+ template realisation             →  recognised intent, 0 % fabrication
+ verbatim quote «…»               →  corpus citation, byte-identical to source
  «бейімд-» adaptation marker      →  quote was rewritten (v1.9.5)
- «байланыс-» reasoning marker     →  derivation, not a quote — v3.0 addition
+ «байланыс-» reasoning marker     →  derivation, not a quote (v3.0)
+ BeliefFact { status, provenance }→  belief layer with audit lifecycle (v4.0.27)
+ BeliefConflict + resolve_*       →  contradictions revisable on demand (v4.1.0)
 ```
 
 Every marker is test-enforced in both directions: it fires when and only when the underlying path fired.
@@ -396,28 +404,29 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 
 | Component | Value |
 |---|---|
-| Lexicon roots | **14,247** (≥ 3 chars, curated + Apertium, pure Kazakh) |
-| Abai Qunanbayuly coverage | **97.8%** (word forms → root prefix match) |
-| Committed corpus words | **4.57 M** across 9 source packs (v3.5.0: 10 textbooks in `kazakh_textbooks_pack.json` — 434 581 raw words / 28 110 samples; earlier was 3.84 M / 8 packs pre-textbook) |
+| Lexicon roots | **~25.5 k** (13 606 pure Kazakh + 11 919 Apertium imports, curated, ≥ 3 chars) |
+| Abai Qunanbayuly coverage | **97.8 %** (word forms → root prefix match) |
+| Committed corpus words | **4.57 M** across 9 source packs (10 textbooks in `kazakh_textbooks_pack.json` — 434 581 raw words / 28 110 samples) |
 | Local corpus words (with Wikipedia + CC-100 shards) | **77.9 M** |
-| Morpheme-coverage baseline (v1.5.5 historical) | **79.48%** prefix-match over 3.84 M committed words at v1.5.5; to be re-run on every Lexicon PR (see `project_morpheme_coverage_baseline` memory) |
+| Morpheme-coverage baseline (v1.5.5 historical) | **79.48 %** prefix-match over 3.84 M committed words at v1.5.5; re-run on every Lexicon PR (see `project_morpheme_coverage_baseline` memory) |
 | FST archiphonemes | **11** |
 | FST twol phonology rules | **22+** of Apertium's 54 catalogued, all implemented |
 | Suffix templates | **36** (cases × numbers × possessives × derivations × predicate-person copula) |
-| FST synthesis → analysis roundtrip | **100.0%** on 36,238 forms |
+| FST synthesis → analysis roundtrip | **100.0 %** on 36 238 forms |
 | FST parser throughput | **1.155 ms / word** single-threaded M2 |
 | Dialog intents | **26** (v1.1.0 added Insult) |
-| Template families | **34** (v3.0 added `unknown.with_derived_chain`) |
+| Template families | **34+** (v3.0 added `unknown.with_derived_chain`; v4.0.34 added Tentative / Conflicted families for epistemic-status banding) |
 | Slot types (session) | `name`, `age`, `city`, `occupation` (plus `{slot\|features}` FST-aware variants) |
-| Committed morpheme index | **3,191 samples → 3,082 distinct morphemes → 16,262 postings** at the v2.5.0 build (`data/retrieval/morpheme_index.json`, ~2.1 MB; textbooks corpus added in v3.3.0 is not yet in the index — rebuild pending a v3.4+ release) |
-| Full local morpheme index | rebuildable via `build_morpheme_index -- --full` (~10 min, ~700 MB, gitignored) |
-| Pattern matchers | **11** — v2.x (4) + v3.5.0 (6) + **v3.5.5 structural_part_of** (X Y-нің бөлігі / X Y-нің құрамында) |
-| Reasoning rules active | **4** — R1 IsA-transitivity, R2 Has-inheritance, **R3 Has-inheritance via PartOf (v3.5.5)**, R5 shared-IsA → RelatedTo |
+| Cognitive eval baseline (v4.1.0) | **22 / 22 canonical, 0 aspirational** — every scenario the harness has tracked since v4.0.34 now passes |
+| Belief revision (v4.1.0) | `BeliefState::resolve_contradiction(subject, predicate, chosen_object)` — flips chosen → Active, others → Superseded, drops matching `BeliefConflict` + `ContradictionToResolve` pending question |
+| Tool layer (v4.0.37 → v4.1.0) | `Tool::dispatch(call, ctx)` audit-mode path — `SearchBelief`, `SearchGraph`, `SearchRetrieval`, `RunLocalReasoner`. Distinct `empty` vs `unsupported` result semantics (v4.0.39). Used by `turn_with_trace` to populate `tool_calls` on `TurnTrace` for audit |
+| Pattern matchers | **11** — v2.x (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
+| Reasoning rules active | **10 of 11** — R1 IsA-transitivity, R2 Has-inheritance, R3 Has-via-PartOf, R5 shared-IsA → RelatedTo, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf, R8 After-transitivity, R9 PartOf-transitivity, R10 InDomain-inheritance, R11 InDomain-shared-target. R4 IsA-symmetry is curator-warning only |
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
-| Extracted / curated / derived facts (committed runtime) | **13 286 extracted + 601 curated (world_core) / 7 293 derived** (v4.0.5: 507 curated entries across 13 domains. 8 rules in the reasoner, 7 firing (R1/R2/R3/R5/R6/R7/R8). R5 shared-IsA = 5 437; R8 after-transitivity = 714. T4_200k text-extraction scale via `extract_facts --bench-order --max-total 200000`) |
+| Extracted / curated / derived facts (committed runtime) | **14 526 extracted + 922 curated (world_core) / 17 340 derived** (T4_200k text-extraction scale; numeric per-rule breakdown in the Capabilities table) |
 | Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
-| Workspace tests | **416 passing**, 0 failing, 0 warnings |
-| Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential; 20 M-word full-corpus run fits in the 3 h iteration budget |
+| Workspace tests | **577 passing, 0 failing, 0 warnings** |
+| Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential |
 
 ## Directory layout
 
@@ -458,7 +467,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version-by-version history and [do
 - **Speech / multimodal** — deferred until the retrieval engine is a solid baseline.
 - **Cloud platform work.**
 - **Probabilistic / LLM-style free generation.** Every response is either a template realisation (26-intent path), a verbatim corpus quote (retrieval path), or a rule derivation over typed facts with a full `source_chain` (reasoning path). Nothing invented.
-- **50 M+ parameter transformer experiments on current hardware** (M2 8 GB). v2.0 will **not** be a trained neural LM — it will be the retrieval engine above, extended with pattern-based composition and ranking polish. See [`project_retrieval_not_neural_v2`](docs/roadmap.md#post-v10-direction).
+- **Trained neural LM components in the runtime.** v4.x is committed to deterministic retrieval + composition + reasoning + belief revision over a curated Kazakh corpus. No transformer, no embeddings, no probabilistic generation in the answer path. See [`project_retrieval_not_neural_v2`](docs/roadmap.md#post-v10-direction) and [`project_v4_direction`](docs/roadmap.md#v4-direction).
 
 The repo grows from clean data, tight scope, and deterministic composition. Not from broad claims, and not from gradient descent.
 

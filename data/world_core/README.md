@@ -97,7 +97,7 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v4.0.19)
+## Current scale (v4.1.0)
 
 - `astronomy.jsonl` — 30 entries / 41 facts
 - `time.jsonl` — 20 entries / 38 facts

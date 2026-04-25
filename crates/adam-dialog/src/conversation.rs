@@ -395,7 +395,16 @@ impl Conversation {
         // next turn sees the next integer.
         let turn_id = self.turn_counter;
         self.turn_counter = self.turn_counter.saturating_add(1);
-        self.absorb_entities(&intent, turn_id);
+        // v4.0.41 — if a contradiction is pending and this turn names
+        // one of the candidate values, treat the turn as a resolution
+        // (flip statuses + drop the conflict) and SKIP absorb_entities
+        // so we don't double-record the chosen value as a fresh Active
+        // fact. Closes aspirational scenario
+        // `aspirational_contradiction_resolution_via_user_choice`.
+        let resolved_contradiction = self.try_resolve_pending_contradiction(input, &intent);
+        if !resolved_contradiction {
+            self.absorb_entities(&intent, turn_id);
+        }
         // v4.0.29 — roll task state forward AFTER belief absorption,
         // BEFORE record_intent so the turn id used by task matches
         // the one already used by absorb_entities.
@@ -827,6 +836,78 @@ impl Conversation {
     /// derived from `intent_history.len()`. Codex v4.0.29 review #1:
     /// the old derivation plateaued at `MAX_HISTORY = 32`, breaking
     /// `recorded_at_turn` as a real turn index in long sessions.
+    /// **v4.0.41** — given a fresh user turn, see if it resolves a
+    /// pending `BeliefConflict`. The user's chosen value can come
+    /// from an explicit `Statement*` intent (preferred) or from a
+    /// raw-input substring match against the candidate object values
+    /// (handles short replies like «астанада дұрыс» where the noun
+    /// reaches the surface in locative form).
+    ///
+    /// On a match, mutates belief: chosen → `Active`, others →
+    /// `Superseded`, drops the matching `BeliefConflict` and
+    /// `ContradictionToResolve` pending question. The caller should
+    /// **skip** `absorb_entities` for this turn so the user's
+    /// chosen value isn't recorded as a duplicate `Active` fact.
+    ///
+    /// Returns `true` iff at least one contradiction was resolved.
+    fn try_resolve_pending_contradiction(&mut self, input: &str, intent: &Intent) -> bool {
+        if self.belief.contradictions.is_empty() {
+            return false;
+        }
+        let input_lc = input.to_lowercase();
+        let pending: Vec<(String, String)> = self
+            .belief
+            .contradictions
+            .iter()
+            .map(|c| (c.subject.clone(), c.predicate.clone()))
+            .collect();
+        let mut any_resolved = false;
+        for (subject, predicate) in pending {
+            let candidates: Vec<String> = self
+                .belief
+                .facts
+                .iter()
+                .filter(|f| f.subject == subject && f.predicate == predicate)
+                .map(|f| f.object.clone())
+                .collect();
+            let chosen_from_intent: Option<String> = match (intent, predicate.as_str()) {
+                (Intent::StatementOfLocation { city: Some(c) }, "city") => Some(c.clone()),
+                (
+                    Intent::StatementOfOccupation {
+                        occupation: Some(o),
+                    },
+                    "occupation",
+                ) => Some(o.clone()),
+                (Intent::StatementOfName { name }, "name") => Some(name.clone()),
+                (Intent::StatementOfAge { years: Some(y) }, "age") => Some(y.to_string()),
+                _ => None,
+            };
+            let chosen = chosen_from_intent
+                .as_ref()
+                .and_then(|val| {
+                    candidates
+                        .iter()
+                        .find(|c| c.eq_ignore_ascii_case(val))
+                        .cloned()
+                })
+                .or_else(|| {
+                    candidates
+                        .iter()
+                        .find(|c| input_lc.contains(&c.to_lowercase()))
+                        .cloned()
+                });
+            if let Some(value) = chosen {
+                if self
+                    .belief
+                    .resolve_contradiction(&subject, &predicate, &value)
+                {
+                    any_resolved = true;
+                }
+            }
+        }
+        any_resolved
+    }
+
     pub(crate) fn absorb_entities(&mut self, intent: &Intent, turn_id: usize) {
         use crate::belief::{EntityKind, USER_SELF_KEY};
         match intent {
