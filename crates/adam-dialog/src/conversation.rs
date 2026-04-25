@@ -188,6 +188,10 @@ pub struct TurnTrace {
     /// from `intent_after_verification` to avoid rendering an
     /// answer on top of an unresolved issue.
     pub verification: crate::verifier::VerificationReport,
+    /// v4.0.33 — Phase 5 (part 1) epistemic-status band derived
+    /// from `(plan, verification, intent, belief)`. Pure classifier
+    /// output; not yet consumed by templates (v4.0.34 wires that).
+    pub epistemic_status: crate::uncertainty::EpistemicStatus,
     /// Per-step plan trace emitted by `plan_response_with_session`.
     pub plan_trace: Vec<String>,
 }
@@ -407,6 +411,19 @@ impl Conversation {
         // auditors can see what the injection passes actually
         // produced before the gate intervened.
         let verification = crate::verifier::Verifier::verify(&action_plan, &intent, &self.belief);
+        // v4.0.33 Phase 5 (part 1) — derive the epistemic status
+        // band from `(plan, verification, intent, belief)`. Pure
+        // classifier in v4.0.33 — the status is recorded on the
+        // trace but templates don't yet consume it. v4.0.34 (Phase 5
+        // part 2) adds `unknown.conflicted` / `unknown.tentative`
+        // template families and the reply text starts reflecting
+        // the status.
+        let epistemic_status = crate::uncertainty::UncertaintyPolicy::derive(
+            &action_plan,
+            &verification,
+            &intent,
+            &self.belief,
+        );
         let intent_for_render = if verification.supported {
             intent.clone()
         } else {
@@ -427,6 +444,7 @@ impl Conversation {
             action_digest: action_plan.digest(),
             action_plan,
             verification,
+            epistemic_status,
             plan_trace: plan.trace.clone(),
         };
         (output, trace)

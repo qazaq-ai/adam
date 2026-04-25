@@ -37,6 +37,7 @@ pub mod semantics;
 pub mod slot_syntax;
 pub mod task;
 pub mod templates;
+pub mod uncertainty;
 pub mod verifier;
 
 pub use action::{Action, ActionDigest, ActionPlan, ActionPlanner, OutputKind};
@@ -53,6 +54,7 @@ pub use realiser::realise;
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
 pub use task::{Goal, Subgoal, TaskDigest, TaskState, TaskStatus};
 pub use templates::{TemplateError, TemplateRepository};
+pub use uncertainty::{EpistemicStatus, UncertaintyPolicy};
 pub use verifier::{VerificationIssue, VerificationReport, Verifier, strip_evidence};
 
 /// End-to-end entry point: Kazakh text in, Kazakh text out.

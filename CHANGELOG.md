@@ -7,6 +7,80 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.33] — 2026-04-24 — UncertaintyPolicy classifier (Codex v4.0.26 roadmap Phase 5 part 1)
+
+Fifth architectural patch on Codex's v5.0 roadmap — **first half of Phase 5**. Adds a coarse `EpistemicStatus` band the dialog assigns to every turn. **v4.0.33 scope: classifier + trace only**. Reply text byte-identical to v4.0.32. v4.0.34 (Phase 5 part 2) will add the `unknown.conflicted` / `unknown.tentative` template families and wire the policy into rendering — that's when the reply text starts reflecting the status ("сіз бұрын X дедіңіз, қазір Y дейсіз…" instead of stripping to a generic fallback).
+
+Splitting Phase 5 across two releases mirrors how we handled Phase 1 (substrate v4.0.27 → invariant fix v4.0.28) and Phase 2 (v4.0.29 → v4.0.30). Each half is Codex-reviewable before the next lands.
+
+### What landed
+
+New module `crates/adam-dialog/src/uncertainty.rs` (~280 lines incl. 10 unit tests).
+
+```rust
+pub enum EpistemicStatus {
+    Certain,     // AnswerDirect / Social / acknowledged user fact
+    Supported,   // RetrieveEvidence (verbatim corpus citation)
+    Derived,     // RunReasoner (chain with «байланыс-» marker)
+    Tentative,   // AskClarification / MissingEvidence
+    Unknown,     // RefuseOutOfScope / honest fallback
+    Conflicted,  // contradiction in belief / flagged by verifier
+}
+
+pub struct UncertaintyPolicy;  // static classifier
+```
+
+### Derivation precedence (order-significant)
+
+1. `!belief.contradictions.is_empty()` → `Conflicted` (live conflict wins even if verifier somehow passes).
+2. `verification.issues contains ContradictoryBelief` → `Conflicted` (defensive).
+3. `action == RefuseOutOfScope` → `Unknown`.
+4. `verification.issues contains MissingEvidence` → `Tentative`.
+5. Action-specific:
+   - `Social` / `AnswerDirect` → `Certain`
+   - `RetrieveEvidence` / `SummarizeBelief` → `Supported`
+   - `RunReasoner` → `Derived`
+   - `AskClarification` → `Tentative`
+   - `CheckContradiction` → `Conflicted`
+
+### Reserved-for-future hook
+
+`UncertaintyPolicy::derive` threads `(intent, belief)` through an `.and_refine(intent, belief)` trait call that's a no-op in v4.0.33. Phase 5 part 2 / Phase 6 refinements — low retrieval scores, non-`Confirmed` confidence bands, weak reasoning-chain sources — plug in here without changing the call site.
+
+### Integration
+
+- `Conversation::turn_with_trace` runs `UncertaintyPolicy::derive` after the verifier, stores on `TurnTrace.epistemic_status`.
+- `adam_chat --trace` prints one new line per turn:
+  ```
+  ├─ epistem:  Derived
+  ```
+
+### Smoke-test
+
+| turn | epistem |
+|---|---|
+| «жер туралы айтшы» with reasoning chain attached | Derived |
+| «рахмет» | Certain |
+| «менің атым Дәулет» → «менің атым кім» | Certain (AnswerDirect) |
+| contradiction in belief + any topic | Conflicted |
+| noun_hint without evidence | Tentative |
+| no noun, no goal | Unknown |
+
+Reply text unchanged from v4.0.32. The trace line is the only user-visible difference.
+
+### Tests
+
+**563 passing** (+11 from v4.0.32):
+
+- 10 unit in `uncertainty.rs` covering each derivation branch including the two `Conflicted` paths (live belief vs. verifier flag).
+- 1 integration `epistemic_status_classifies_kinds_of_turn` exercising Derived / Certain / Conflicted end-to-end through `Conversation::turn_with_trace`.
+
+### Scope
+
+**Phase 5 part 1 only** — classifier + trace. Reply text byte-identical. Part 2 (v4.0.34) will wire the status into template selection and add the clarification / conflict-surfacing templates.
+
+---
+
 ## [4.0.32] — 2026-04-24 — Verifier + first real output gate (Codex v4.0.26 roadmap Phase 4)
 
 Fourth architectural patch on Codex's v5.0 roadmap. Phases 1–3 were pure substrate (reply text byte-identical). **Phase 4 is the first phase that actually changes user-visible output** — when the verifier rejects a turn, the evidence is stripped from the intent before template rendering so the system falls back to a safe response instead of producing an answer it can't support.

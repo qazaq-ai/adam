@@ -291,6 +291,8 @@ fn run_turn(
         if !trace.verification.supported {
             println!("├─ verify:   GATE fired — evidence stripped before rendering");
         }
+        // v4.0.33 — epistemic status (Codex Phase 5 part 1).
+        println!("├─ epistem:  {:?}", trace.epistemic_status);
         for t in &trace.plan_trace {
             println!("├─ {t}");
         }

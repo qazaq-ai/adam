@@ -1596,6 +1596,55 @@ fn action_planner_social_intent() {
     );
 }
 
+/// v4.0.33 Phase 5 part 1 — `EpistemicStatus` maps each kind of turn
+/// to the right confidence band end-to-end. Reply text unchanged
+/// from v4.0.32 (the policy is a classifier in v4.0.33); v4.0.34
+/// will consume the status at rendering time.
+#[test]
+fn epistemic_status_classifies_kinds_of_turn() {
+    use adam_dialog::EpistemicStatus;
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    // Clean reasoning-chain turn → Derived.
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "аспан денесі".into(),
+            root: "аспан денесі".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/celestial.jsonl".into(),
+            sample_id: "sky_01".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let (_, t1) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
+    assert_eq!(t1.epistemic_status, EpistemicStatus::Derived);
+
+    // Social turn → Certain.
+    let (_, t2) = conv.turn_with_trace("рахмет", &lex, &repo, 1);
+    assert_eq!(t2.epistemic_status, EpistemicStatus::Certain);
+
+    // Contradiction → Conflicted.
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 2);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 3);
+    let (_, t4) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 4);
+    assert_eq!(t4.epistemic_status, EpistemicStatus::Conflicted);
+}
+
 /// v4.0.32 Phase 4 — Verifier gates evidence rendering when a belief
 /// contradiction exists. Pre-v4.0.32 the dialog would happily surface
 /// a reasoning chain about «жер» even while the user's own city was
