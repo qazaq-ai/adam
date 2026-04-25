@@ -229,6 +229,94 @@
       "expect": {
         "belief_contradictions_count": 0
       }
+    },
+    {
+      "id": "aspirational_direct_answer_name_surfaces_stored_value",
+      "category": "direct_answer",
+      "description": "v4.2.1 finding: when user states their name and then asks 'атың кім', the planner correctly routes to Action::AnswerDirect (rationale records the stored value), but the template renderer ignores the stored slot value and emits a default self-introduction (e.g. 'мені адам деп атайды'). Real gap surfaced by the v4.2.1 cognitive eval expansion: ActionPlanner::belief_direct_answer returns (slot, object) but the value is baked into the rationale string only, not threaded into rendering. Aspirational until the AskName template family consumes the stored slot value.",
+      "turns": ["менің атым Дәулет", "атың кім"],
+      "expected_failing": true,
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["дәулет"]
+      }
+    },
+    {
+      "id": "aspirational_direct_answer_age_surfaces_stored_value",
+      "category": "direct_answer",
+      "description": "v4.2.1 finding: same gap as the name variant. AskAge after StatementOfAge currently doesn't surface the stored age in the reply — epistemic_status lands on Unknown rather than Certain because the answer-rendering path doesn't see the (slot, object) belief-direct-answer result.",
+      "turns": ["менің жасым 30", "жасың неше"],
+      "expected_failing": true,
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["30"]
+      }
+    },
+    {
+      "id": "aspirational_direct_answer_city_surfaces_stored_value",
+      "category": "direct_answer",
+      "description": "v4.2.1 finding: same gap. AskLocation after StatementOfLocation currently emits 'менің мекенім жоқ' ('I have no location') instead of citing the recorded city. The city is correctly recorded in belief — the rendering path just doesn't consume it.",
+      "turns": ["мен Алматыдамын", "қайда тұрасың"],
+      "expected_failing": true,
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["алматы"]
+      }
+    },
+    {
+      "id": "aspirational_direct_answer_occupation_surfaces_stored_value",
+      "category": "direct_answer",
+      "description": "v4.2.1 finding: same gap. AskOccupation after StatementOfOccupation currently emits a default self-description ('менің жұмысым — сізге көмектесу') instead of citing the recorded occupation.",
+      "turns": ["мен мұғаліммін", "немен айналысасың"],
+      "expected_failing": true,
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["мұғалім"]
+      }
+    },
+    {
+      "id": "aspirational_belief_persists_across_social_turns",
+      "category": "belief_revision",
+      "description": "v4.2.1 finding: same direct-answer-rendering gap, exercised across a 5-turn flow with social interjections. Belief CORRECTLY persists across the social turns (the planner's rationale on turn 4 still cites the stored name); only the rendering can't see it.",
+      "turns": ["менің атым Дәулет", "сәлем", "рахмет", "қайырлы күн", "атың кім"],
+      "expected_failing": true,
+      "expect": {
+        "action": "AnswerDirect",
+        "output_contains_lower_any": ["дәулет"]
+      }
+    },
+    {
+      "id": "belief_idempotent_restatement",
+      "category": "belief_revision",
+      "description": "v4.2.1: Re-stating the same name twice doesn't create a contradiction — both statements have the same value, so the second supersedes the first cleanly. belief_contradictions_count stays 0.",
+      "turns": ["менің атым Дәулет", "менің атым Дәулет"],
+      "expect": {
+        "belief_contradictions_count": 0
+      }
+    },
+    {
+      "id": "action_routing_compliment",
+      "category": "action_routing",
+      "description": "v4.2.1: Compliment intent ('сіз керемет') routes to Action::Social, EpistemicStatus::Certain. Closes the action_routing coverage gap for compliments.",
+      "turns": ["сіз керемет"],
+      "expect": {
+        "action": "Social",
+        "epistemic_status": "Certain"
+      }
+    },
+    {
+      "id": "action_routing_apology",
+      "category": "action_routing",
+      "description": "v4.2.1: Apology intent ('кешір') routes to Action::Social, EpistemicStatus::Certain. Closes the action_routing coverage gap for apologies.",
+      "turns": ["кешір"],
+      "expect": {
+        "action": "Social",
+        "epistemic_status": "Certain"
+      }
     }
   ]
 }

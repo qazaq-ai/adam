@@ -7,6 +7,63 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.2.1] — 2026-04-25 — Cognitive eval expansion (+8 scenarios; surfaces AnswerDirect rendering gap)
+
+First v4.2.x patch. Returns to capability cadence after the v4.2.0 architecture shift. Cognitive eval grows from 22 → **30 scenarios** (Codex strategic rec #3 progress: target 50+). Three categories: 3 new canonical scenarios closing coverage gaps, 5 new aspirational scenarios documenting a real architectural finding the expansion surfaced.
+
+### What landed (canonical, +3)
+
+- `action_routing_compliment` — compliment intent (`сіз керемет`) → `Action::Social`, `EpistemicStatus::Certain`. Closes the action-routing gap for compliments.
+- `action_routing_apology` — apology intent (`кешір`) → `Action::Social`, `EpistemicStatus::Certain`. Closes the gap for apologies.
+- `belief_idempotent_restatement` — re-stating the same name twice doesn't create a contradiction (both statements have the same value, so the second supersedes the first cleanly). `belief_contradictions_count` stays 0. Tests the single-active-fact invariant (v4.0.28) under idempotent re-statement.
+
+### What landed (aspirational, +5) — surfaces a real gap
+
+The expansion attempted four `direct_answer_*` scenarios (one per user-profile slot: name, age, city, occupation) plus a multi-turn `belief_persists_across_social_turns` flow. **All five failed**, and the failures share a single architectural root cause:
+
+> `ActionPlanner::belief_direct_answer` correctly returns `(slot, object)` from belief, and the planner correctly chooses `Action::AnswerDirect`. But the value is **only baked into the rationale string**; the template renderer ignores it and emits a default self-introduction or "I don't have X" template instead.
+
+Concrete observed outputs:
+- `менің атым Дәулет` → `атың кім` → reply: `"мені адам деп атайды"` (system answers with its own name, not the user's recorded one).
+- `менің жасым 30` → `жасың неше` → reply doesn't contain `30`; epistemic lands on `Unknown` rather than `Certain`.
+- `мен Алматыдамын` → `қайда тұрасың` → reply: `"менің мекенім жоқ"` ("I have no location").
+- `мен мұғаліммін` → `немен айналысасың` → reply: `"менің жұмысым — сізге көмектесу"` (default self-description, ignoring stored occupation).
+- 5-turn flow with social interjections — name correctly persists in belief, but turn 5 reply still uses the default template.
+
+The five scenarios are added with `expected_failing: true` so the harness tracks them without flagging the canonical baseline as broken. They become the next concrete target for capability work (a future patch threads `(slot, object)` from `belief_direct_answer` into the AskName / AskAge / AskLocation / AskOccupation template families so the recorded value reaches the user-visible reply).
+
+### State
+
+| | v4.2.0 | v4.2.1 |
+|---|---|---|
+| Canonical scenarios | 22 | **25** |
+| Aspirational scenarios | 0 | 5 (all expected-failing on a single rendering gap) |
+| Total cognitive scenarios | 22 | **30** (Codex rec #3 progress: 60 % toward 50+ target) |
+| Workspace tests | 581 | 581 (unchanged — cognitive_eval is one test) |
+| Cognitive baseline | 22/22 canonical, 0/0 aspirational | 25/25 canonical, 0/5 aspirational |
+
+### Tests
+
+**581 passing** (unchanged — workspace test count stable; cognitive_eval is a single test that aggregates the scenarios). 0 warnings on `cargo build`. Reply text byte-identical to v4.2.0 across every scenario — the new tests are pure observation, no runtime change.
+
+### Why this matters
+
+Two distinct wins:
+1. **Coverage**: action-routing branches for `Compliment` / `Apology` were untested; the idempotent-restatement edge of the single-active-fact invariant was untested. All three now pinned.
+2. **Discovery**: the `direct_answer_*` failures pinpoint a real architectural gap — `ActionPlanner` knows the answer but `realiser` can't see it. This isn't a regression; it's been latent since v4.0.31 when `Action::AnswerDirect` was introduced. The cognitive eval harness is doing exactly the job it was designed for: turning latent gaps into tracked work.
+
+### Scope
+
+Pure data: 8 new entries in `data/eval/cognitive_dialog_dataset.json`. No code change. No template change. No belief-layer change.
+
+### Next
+
+Two natural follow-ups:
+- **v4.2.5** (or wherever the work lands): close the AnswerDirect rendering gap. Requires threading `(slot, object)` from `ActionPlanner::belief_direct_answer` into the template render path so the AskName / AskAge / AskLocation / AskOccupation responses cite the recorded value. Once landed, the 5 aspirational scenarios flip to canonical and we hit 30/30.
+- **v4.2.x patches**: continue cognitive eval growth toward 50+ scenarios per Codex strategic rec #3. Untested branches still include `Action::SummarizeBelief`, `RetrieveEvidence` end-to-end with attached index, and multi-turn goal lifecycles beyond the current 3-turn coverage.
+
+---
+
 ## [4.2.0] — 2026-04-25 — Tools-as-execution endgame (retire `inject_*`; `turn_with_trace` is a tool-loop interpreter)
 
 **Second v4.x minor.** Closes the tools-as-execution arc started in v4.0.37 (Tool layer substrate) and continued through v4.0.38 (audit-mode wiring), v4.1.1 (retrieval drives data flow), v4.1.2 (reasoning drives data flow), v4.1.5 (belief lookup drives data flow). v4.2.0 retires the `inject_*` framing entirely — `turn_with_trace` now builds a `Vec<ToolCall>` declaring which tools to dispatch, executes them in one uniform loop, and folds results back into the intent through a single `apply_tool_results` function.
