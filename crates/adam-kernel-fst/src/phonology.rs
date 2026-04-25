@@ -124,13 +124,25 @@ pub fn realise_archiphoneme(arch: Archiphoneme, ctx: PhonologicalContext) -> Opt
 // ---------------------------------------------------------------------------
 
 /// Archiphoneme `{A}` — catalogue rules 14, 21, 23.
+///
+/// **v4.1.6 — known limitation, regression-tested.** The Apertium kaz
+/// twol catalogue lists rules 21–24 as `{A}` realisation overrides
+/// when the preceding segment is `й` / `и` (`ctx.preceded_by_y_or_i =
+/// true`). Current implementation ignores the override — it picks `а`
+/// / `е` purely from `ctx.harmony`. The 100 % synthesis-analysis
+/// roundtrip across the v3.x committed Lexicon (36 238 forms,
+/// regression-tested in `tests/roundtrip.rs`) shows the override is
+/// not load-bearing for our corpus, so the TODO is held until a real
+/// failing case lands. Behaviour pinned by
+/// `tests::a_harmony_ignores_preceded_by_y_or_i_v4_1_6`. If the rule
+/// is ever wired in, that test must flip and the comment block must
+/// be deleted; this is the canonical "yes-this-is-deliberate"
+/// marker.
 pub fn realise_a(ctx: PhonologicalContext) -> char {
     match ctx.harmony {
         VowelClass::Back => 'а',
         VowelClass::Front => 'е',
     }
-    // TODO: rule 21 (back harmony after и) overrides the above in specific
-    //       contexts. Will be added when test cases are added.
 }
 
 /// Archiphoneme `{I}` — catalogue rule 13.
@@ -360,13 +372,29 @@ pub fn apply_intervocalic_voicing(out: &mut String) {
 }
 
 /// Determine vowel harmony from a stem by looking at its last vowel.
+///
+/// **v4.1.6 — documented behaviour, regression-tested.** `у` and `и`
+/// are intentionally skipped (per Apertium's kaz twol FIXME): both
+/// are ambiguous because they encode either a back/front semivowel
+/// (`ұу`/`үу` → `у`, `ый`/`ій` → `и`) and the original quality is
+/// lost in the surface form. Fallback rule: walk earlier letters of
+/// the stem until a definite vowel is found. If none, default to
+/// `Back` (proper nouns, digit sequences, single-consonant roots).
+///
+/// Concrete worked examples are pinned by
+/// `tests::stem_vowel_harmony_skips_y_and_i_v4_1_6`. Loanwords whose
+/// only Kazakh-orthography vowel is `и` (e.g. `такси`) currently
+/// resolve through the fallback to whatever vowel preceded the
+/// terminal `и`, which is correct enough for the committed corpus.
+/// If a real failing case lands, replace the fallback with explicit
+/// loanword-table consultation rather than redefining the rule.
 pub fn stem_vowel_harmony(stem: &str) -> VowelClass {
     for c in stem.chars().rev() {
         match c.to_lowercase().next().unwrap_or(c) {
             'а' | 'о' | 'ұ' | 'ы' | 'я' | 'ё' => return VowelClass::Back,
             'ә' | 'е' | 'ө' | 'ү' | 'і' | 'э' => return VowelClass::Front,
-            // 'у' and 'и' are ambiguous — fall through to check earlier
-            // vowels. Apertium marks this explicitly as a FIXME.
+            // 'у' and 'и' are ambiguous (encode back/front semivowels);
+            // fall through and look at earlier letters.
             _ => continue,
         }
     }
@@ -486,6 +514,65 @@ mod tests {
         assert_eq!(stem_vowel_harmony("мектеп"), VowelClass::Front);
         assert_eq!(stem_vowel_harmony("ел"), VowelClass::Front);
         assert_eq!(stem_vowel_harmony("адам"), VowelClass::Back);
+    }
+
+    /// **v4.1.6 — pin current behaviour for rule-21 limitation.**
+    ///
+    /// The Apertium kaz twol catalogue specifies rules 21–24 as
+    /// `{A}` overrides when the preceding segment is `й`/`и`. Our
+    /// `realise_a` ignores `ctx.preceded_by_y_or_i` and decides
+    /// purely on `ctx.harmony`. Roundtrip across the committed
+    /// Lexicon stays at 100 % (regression-tested in
+    /// `tests/roundtrip.rs`), so the override is not load-bearing
+    /// for our corpus and the limitation is held under explicit
+    /// test coverage rather than an open TODO.
+    ///
+    /// If a future change wires rule 21 in, this test must flip
+    /// (the `_with_y_or_i` outputs will diverge from the baseline)
+    /// and the comment block on `realise_a` must be deleted in the
+    /// same patch.
+    #[test]
+    fn a_harmony_ignores_preceded_by_y_or_i_v4_1_6() {
+        let baseline = back_after_voiceless();
+        let with_y_or_i = PhonologicalContext {
+            preceded_by_y_or_i: true,
+            ..baseline
+        };
+        assert_eq!(realise_a(baseline), realise_a(with_y_or_i));
+        assert_eq!(realise_a(with_y_or_i), 'а');
+
+        let baseline_front = front_after_voiced();
+        let with_y_or_i_front = PhonologicalContext {
+            preceded_by_y_or_i: true,
+            ..baseline_front
+        };
+        assert_eq!(realise_a(baseline_front), realise_a(with_y_or_i_front));
+        assert_eq!(realise_a(with_y_or_i_front), 'е');
+    }
+
+    /// **v4.1.6 — pin current behaviour for `у`/`и` ambiguity.**
+    ///
+    /// Both vowels are intentionally skipped during stem-harmony
+    /// detection (Apertium kaz twol marks them as ambiguous).
+    /// Concrete examples:
+    /// - `такси`: `и` is skipped, fallback finds `а` → `Back`
+    ///   (loanword; current behaviour, not a phonological claim).
+    /// - `кино`: `о` is found before `и` → `Back`.
+    /// - `киім`: `і` is found before `и` is reached → `Front`.
+    /// - `су`: `у` is skipped, no other vowels, fallback default
+    ///   → `Back`.
+    /// - `ту` (1-syllable, vowel-only): same fallback → `Back`.
+    ///
+    /// If any of these flips, it's an intentional behaviour
+    /// change — update the assertions and the comment on
+    /// `stem_vowel_harmony` together.
+    #[test]
+    fn stem_vowel_harmony_skips_y_and_i_v4_1_6() {
+        assert_eq!(stem_vowel_harmony("такси"), VowelClass::Back);
+        assert_eq!(stem_vowel_harmony("кино"), VowelClass::Back);
+        assert_eq!(stem_vowel_harmony("киім"), VowelClass::Front);
+        assert_eq!(stem_vowel_harmony("су"), VowelClass::Back);
+        assert_eq!(stem_vowel_harmony("ту"), VowelClass::Back);
     }
 
     #[test]

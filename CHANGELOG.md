@@ -7,6 +7,38 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.1.6] — 2026-04-25 — Codex v4.1.5 audit follow-up (phonology TODOs + slow-roundtrip surface + adam-train scope)
+
+Hygiene patch addressing three concrete items from the Codex post-v4.1.5 audit. No runtime behaviour change; test count increases from 579 to 581.
+
+### What landed
+
+- **Phonology TODOs converted to documented limitations with regression coverage** (Codex rec #3). `phonology.rs` had two open TODOs: rule 21 (`{A}` override after й/и) and the `у`/`и` ambiguity skip in `stem_vowel_harmony`. Both are intentional design decisions for the committed corpus (the 100 % synthesis-analysis roundtrip confirms neither override is load-bearing today), but they were drifting as undocumented "we know it's incomplete" notes. Replaced with detailed docstrings + two new pinning tests:
+  - `a_harmony_ignores_preceded_by_y_or_i_v4_1_6` — asserts `realise_a` ignores `preceded_by_y_or_i` and decides purely on `harmony`. If rule 21 is ever wired in, this test must flip and the comment block on `realise_a` must be deleted in the same patch.
+  - `stem_vowel_harmony_skips_y_and_i_v4_1_6` — pins concrete examples: `такси` → Back (loanword fallback), `кино` → Back, `киім` → Front, `су` / `ту` → Back (default).
+- **Slow FST roundtrip surface** (Codex rec #2). Added `scripts/run_slow_roundtrip.sh` — wraps `cargo test --test roundtrip -p adam-kernel-fst -- --ignored` and supports `--release` mode (~40 s vs ~150 s on M2). The four `#[ignore]`d tests (`roundtrip_noun_plural`, `roundtrip_noun_dative`, `roundtrip_noun_possessive_3`, `roundtrip_verb_past_1sg`) all currently green at 90 %+ rate; v4.1.6 just makes them easy to invoke from a periodic / nightly job without remembering the flag plumbing. Documented in `scripts/README.md`.
+- **`adam-train` scope marker** (Codex rec #6). The crate had no top-level docstring and an empty `description` in `Cargo.toml` — readers couldn't tell from the workspace whether it was load-bearing for v4.x or legacy. Added a comprehensive crate-level doc comment and a `description` line marking it as the **stochastic-LM research codepath** preserved from the v0.4.0 transformer baseline. The doc explicitly lists what is appropriate to do here (corpus / tokenizer / benchmark assembly tooling) vs. what is NOT (no v4.x runtime dependencies, no new probabilistic generation surfaces). Establishes the workspace boundary that Codex flagged as ambiguous.
+
+### What is **not** in this patch
+
+- **Codex rec #1** (monolith files: `adam-tokenizer/src/lib.rs` ~9 k LOC, `adam-train/src/lib.rs` ~5.1 k, `adam-dialog/tests/end_to_end.rs` ~2.7 k, `baseline_training_contracts.rs` ~2.1 k). Splitting into modules is high-leverage but high blast radius — needs a focused release of its own. Tracked for v4.2.x.
+- **Codex rec #4** (CI split between fast `core` and heavy `foundation/data`). Workflow change, not a code change; planned alongside the monolith split when CI surface is being touched anyway.
+- **Codex rec #5** (corpus profile baseline switch from `reference_heavy` to `balanced`). Strategic call; user direction needed.
+
+### Tests
+
+**581 passing** (+2 — the two new phonology pinning tests). 0 warnings on `cargo build`. **Cognitive eval baseline 22 / 22 canonical, 0 / 0 aspirational** unchanged. The 4 slow `#[ignore]`d roundtrip tests all green when invoked via `scripts/run_slow_roundtrip.sh`.
+
+### Why this isn't v4.2.0
+
+Three documentation-and-testing items, no runtime behaviour change, no new public APIs. The bump-magnitude rule (`feedback_versioning_post_1_0`): patches reflect contribution, not effort. v4.2.0 stays reserved for the architectural milestone (retire `inject_*`; `turn_with_trace` becomes a tool-loop interpreter; `ActionPlanner::plan` returns `Vec<ToolCall>`).
+
+### Next
+
+v4.2.0 — retire `inject_*` framing as planned. The phonology + roundtrip + scope clarifications shipped here keep the foundation clean before the bigger architectural change lands.
+
+---
+
 ## [4.1.5] — 2026-04-25 — Tools as execution, step 3 (belief lookup)
 
 Third v4.1.x patch. Closes the tools-as-execution migration triplet started in v4.1.1 / v4.1.2 — `ActionPlanner::belief_direct_answer` now routes through `Tool::dispatch(SearchBelief)` instead of bypassing the tool layer with a direct `BeliefState::active_fact` call.

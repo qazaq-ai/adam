@@ -3,6 +3,7 @@ name = "adam-train"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+description = "adam — legacy / research crate from the v0.1–v0.4 transformer era. Preserves the stochastic-LM corpus / tokenizer / benchmark assembly tooling so the data-side foundation gate keeps running. Not part of the v4.x deterministic dialog stack — see crate root docstring for the boundary policy."
 
 [dependencies]
 adam-corpus = { path = "../adam-corpus" }

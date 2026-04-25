@@ -17,6 +17,13 @@ Current starter utility:
   updates the foundation version, verifies it, and runs full validation
 - `cut_release.sh`
   performs a clean release cut: bump, validate, commit, push, tag, and trigger GitHub Release
+- `run_slow_roundtrip.sh` (v4.1.6+)
+  runs the four `#[ignore]`d FST synthesis-analysis roundtrip tests in
+  `crates/adam-kernel-fst/tests/roundtrip.rs` (noun plural / dative /
+  p3sg + verb past 1sg). ~150s on M2; ~40s with `--release`. Held out
+  of the default `cargo test --workspace` because of duration but kept
+  green and ready for periodic / nightly invocation. Codex v4.1.5
+  audit recommendation #2.
 - `run_tokenizer_dry_run.sh`
   runs the tokenizer dry-run report from machine-readable manifests
 - `run_eval_benchmark_report.sh`

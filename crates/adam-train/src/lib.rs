@@ -1,3 +1,48 @@
+//! # `adam-train` — legacy / research crate (v0.1 – v0.4 transformer era)
+//!
+//! **Status as of v4.1.6**: this crate is the **stochastic-LM research
+//! codepath** preserved from the v0.4.0 transformer baseline. It is
+//! **not** part of the v4.x deterministic dialog stack — `adam_chat`,
+//! `adam_demo`, `adam_inspect`, the cognitive eval harness, and every
+//! `inject_*` / `Tool::dispatch` path live in `adam-dialog` /
+//! `adam-kernel-fst` / `adam-retrieval` / `adam-reasoning` and never
+//! call into `adam-train`.
+//!
+//! **Why it stays in the workspace.** The corpus / tokenizer /
+//! benchmark assembly tooling that lives here continues to drive:
+//!
+//! - the curated / training-pack manifest pipeline,
+//! - the BPE training data assembly + perplexity baseline,
+//! - the source-acceptance / source-scoring contract reports,
+//!
+//! all of which are referenced by `scripts/validate_foundation.sh` so
+//! the data side of the project doesn't drift. Removing the crate
+//! would break that gate; merging it into a runtime crate would
+//! pollute the deterministic stack with neural-LM types.
+//!
+//! **What you should NOT do here.**
+//!
+//! - Do not add code paths that the v4.x dialog stack depends on at
+//!   runtime. Anything load-bearing for `adam_chat` belongs in
+//!   `adam-dialog` (or one of the other deterministic crates).
+//! - Do not introduce new probabilistic generation surfaces. The
+//!   project's product commitment is "no ungrounded generation"
+//!   (see `README.md`); this crate's stochastic surfaces stay
+//!   archived, not extended.
+//!
+//! **What is appropriate here.**
+//!
+//! - Maintaining the existing perplexity / eval / consistency reports
+//!   so the data-side regression gate keeps working.
+//! - Schema migrations to keep this crate compiling against newer
+//!   `adam-corpus` / `adam-tokenizer` / `adam-eval` types.
+//! - Adding new corpus / training-manifest tooling that does not
+//!   participate in the v4.x runtime.
+//!
+//! Codex v4.1.6 audit recommendation #6: explicit scope marker so the
+//! workspace boundary between the deterministic v4.x stack and the
+//! legacy transformer research code stays unambiguous.
+
 pub mod data;
 pub mod model;
 
