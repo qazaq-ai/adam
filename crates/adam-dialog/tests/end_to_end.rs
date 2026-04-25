@@ -1544,7 +1544,10 @@ fn action_planner_classifies_reasoning_chain_intent_as_run_reasoner() {
     let (_, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
     use adam_dialog::{Action, OutputKind};
     assert_eq!(trace.action_digest.action, Action::RunReasoner);
-    assert_eq!(trace.action_digest.expected_output, OutputKind::DerivedAnswer);
+    assert_eq!(
+        trace.action_digest.expected_output,
+        OutputKind::DerivedAnswer
+    );
     assert!(
         !trace.action_plan.rationale.is_empty(),
         "action plan must carry rationale"
@@ -1587,7 +1590,10 @@ fn action_planner_social_intent() {
     let (_, trace) = conv.turn_with_trace("рахмет", &lex, &repo, 0);
     use adam_dialog::{Action, OutputKind};
     assert_eq!(trace.action_digest.action, Action::Social);
-    assert_eq!(trace.action_digest.expected_output, OutputKind::SocialPleasantry);
+    assert_eq!(
+        trace.action_digest.expected_output,
+        OutputKind::SocialPleasantry
+    );
 }
 
 /// v4.0.30 — Codex v4.0.29 review #1 regression. Turn counter must
