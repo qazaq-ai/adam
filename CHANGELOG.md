@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.1.5] — 2026-04-25 — Tools as execution, step 3 (belief lookup)
+
+Third v4.1.x patch. Closes the tools-as-execution migration triplet started in v4.1.1 / v4.1.2 — `ActionPlanner::belief_direct_answer` now routes through `Tool::dispatch(SearchBelief)` instead of bypassing the tool layer with a direct `BeliefState::active_fact` call.
+
+### Why minor jump (.2 → .5, not .3)
+
+The user's significance-driven versioning rule (`feedback_versioning_post_1_0`) — bump magnitude reflects contribution. v4.1.1 / v4.1.2 were narrow refactors; v4.1.5 closes the architectural triplet ("all three audit-mode tools now drive their actual data flow"). Skipping .3 / .4 reflects that the .5 mark is the more substantive milestone in this round.
+
+### What landed
+
+- `ToolCall::SearchBelief` gains `predicate: Option<String>`. Mirrors `SearchGraph`. Two output shapes:
+  - `predicate: None` (audit-friendly): every active fact for `subject` rendered as `"{subject} {predicate} {object}"` (preserves the v4.0.37 contract).
+  - `predicate: Some(p)` (typed-lookup-friendly): 0 or 1 findings respecting the single-active-fact invariant (v4.0.28); each finding is the **object string only** so callers can use it as a slot value without re-parsing.
+- `Tool::SearchBelief` dispatcher updated: filters on optional predicate, branches output rendering based on whether `predicate` is set.
+- `ActionPlanner::belief_direct_answer` rewritten: builds a minimal `ToolContext` (only `belief` populated; other fields empty/None — `SearchBelief` doesn't need them), dispatches `SearchBelief { subject: USER_SELF_KEY, predicate: Some(slot) }`, takes the single finding as the slot value. Reply text byte-identical to the pre-v4.1.5 `BeliefState::active_fact` path — same lookup, same invariant, just routed through the uniform tool channel.
+- Audit-mode `SearchBelief` dispatch in `turn_with_trace` updated to pass `predicate: None`. Trace continues to show full triples for human-readable audit.
+- `adam_chat --trace`: the `SearchBelief` tag now shows the `predicate=` filter (None or `Some("city")` etc.).
+
+### State after v4.1.5
+
+| Tool | Drives actual data flow | Driver |
+|---|---|---|
+| `SearchBelief` | ✓ | `ActionPlanner::belief_direct_answer` (v4.1.5) |
+| `SearchGraph` | — | (no inject path; reserved for future planner work) |
+| `SearchRetrieval` | ✓ | `Conversation::inject_retrieval_example` (v4.1.1) |
+| `RunLocalReasoner` | ✓ | `Conversation::inject_reasoning_chain` (v4.1.2) |
+
+Three of four tools now drive their actual code paths. **`SearchGraph` is reserved** — its consumers (an `ActionPlanner` branch that surfaces specific extracted facts on demand) don't exist yet; current dialog state never has a graph-search-typed answer to give. v4.2.0+ will introduce that consumer when the cognitive eval starts including `(subject, predicate)` lookup scenarios.
+
+### Tests
+
+**579 passing** (+2 — `search_belief_with_predicate_returns_object_only` and `search_belief_with_predicate_returns_empty_on_no_active` unit tests on the new predicate-filter mode; existing 5 SearchBelief tests updated for the new field). 0 warnings on `cargo build`. **Cognitive eval baseline 22 / 22 canonical, 0 / 0 aspirational** — reply text byte-identical to v4.1.2 across every scenario.
+
+### Why this matters
+
+Pre-v4.1.5 the `(slot, object)` lookup that drives `Action::AnswerDirect` had no audit trace at all — the `ActionPlanner` reached straight into `BeliefState`. A reader of `adam_chat --trace` could see the planner's chosen action and the rationale, but couldn't see *which belief query* drove the answer. Now every direct-answer turn records its `SearchBelief` dispatch on `TurnTrace.tool_calls` alongside the reasoning and retrieval lookups — full uniform audit across all three injection points.
+
+It also closes the architectural triplet: every audit-mode tool now drives a real consumer. The `inject_*` framing is no longer load-bearing — it's a thin wrapper layer ready to retire in v4.2.0 when the planner can return a list of `ToolCall`s directly and `turn_with_trace` becomes a tool-loop interpreter rather than an `inject_*` orchestrator.
+
+### Scope
+
+`Tool::SearchBelief` extended + `ActionPlanner::belief_direct_answer` rewritten + 1 `ToolCall` field added + audit-mode dispatch updated + `adam_chat` trace label updated + 5 existing tests adjusted + 2 new tests. No template change, no belief layer change, no new ToolCall variants.
+
+### Next
+
+**v4.2.0** retires `inject_*` framing. The two helpers (`inject_retrieval_example`, `inject_reasoning_chain`) become trivial shims that just return their `Tool::dispatch` result — the orchestration moves to a `turn_with_trace`-level tool-loop. `ActionPlanner::plan` may return `Vec<ToolCall>` for the orchestrator to execute, instead of inlining lookups via private helpers. That's the v4.2.0 minor — significant architectural shift, not just refactoring.
+
+---
+
 ## [4.1.2] — 2026-04-25 — Tools as execution, step 2 (reasoning path)
 
 Second v4.1.x patch. Continues the **tools-as-execution** migration started in v4.1.1. Pre-v4.1.2 `inject_reasoning_chain` did its own filter + score + IsA-depth tiebreak + render, while audit-mode `Tool::dispatch(RunLocalReasoner)` shadowed it with a simpler "top 3 raw triples" tool that had no IsA-depth knowledge — the two could disagree under tie-breaks. Now `Tool::RunLocalReasoner` *is* the picker + renderer, and `inject_reasoning_chain` is a thin wrapper.

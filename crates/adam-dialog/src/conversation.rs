@@ -442,9 +442,15 @@ impl Conversation {
             };
             // Belief consult — always cheap, surfaces what the
             // system already knows about USER for this topic.
+            // **v4.1.5** — uses `predicate: None` so findings render
+            // as full triples for the trace audit. The
+            // `ActionPlanner::belief_direct_answer` slot lookup uses
+            // a separate dispatch with `predicate: Some(slot)` for
+            // single-value retrieval.
             tool_calls.push(crate::tool::Tool::dispatch(
                 crate::tool::ToolCall::SearchBelief {
                     subject: crate::belief::USER_SELF_KEY.into(),
+                    predicate: None,
                 },
                 &tool_ctx,
             ));

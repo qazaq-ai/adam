@@ -291,6 +291,16 @@ impl ActionPlanner {
     /// belief-backed answer? Returns `(slot_name, object)` when yes.
     /// v4.0.31 covers the four user-profile slots; later phases may
     /// extend to arbitrary `(subject, predicate)` queries.
+    ///
+    /// **v4.1.5** — third step of "tools as execution". Pre-v4.1.5
+    /// this method called `BeliefState::active_fact` directly,
+    /// bypassing the tool layer entirely (no audit trace, no
+    /// uniform interface). Now it routes through
+    /// `Tool::dispatch(SearchBelief { subject, predicate: Some(slot) })`,
+    /// which honours the same single-active-fact invariant
+    /// (v4.0.28) and returns the object string as the single
+    /// finding. Reply text byte-identical — same lookup, same
+    /// invariant, just routed through the uniform tool channel.
     fn belief_direct_answer(
         intent: &Intent,
         belief: &BeliefState,
@@ -303,9 +313,28 @@ impl ActionPlanner {
             Intent::AskOccupation => "occupation",
             _ => return None,
         };
-        belief
-            .active_fact(USER_SELF_KEY, slot)
-            .map(|f| (slot, f.object.clone()))
+        let ctx = crate::tool::ToolContext {
+            belief,
+            extracted: &[],
+            derived: &[],
+            retrieval: None,
+            rank_config: None,
+        };
+        let result = crate::tool::Tool::dispatch(
+            crate::tool::ToolCall::SearchBelief {
+                subject: USER_SELF_KEY.into(),
+                predicate: Some(slot.into()),
+            },
+            &ctx,
+        );
+        if !result.success {
+            return None;
+        }
+        result
+            .findings
+            .into_iter()
+            .next()
+            .map(|object| (slot, object))
     }
 }
 

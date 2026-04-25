@@ -300,8 +300,8 @@ fn run_turn(
             println!("├─ tools:    {} audit call(s)", trace.tool_calls.len());
             for r in &trace.tool_calls {
                 let tag = match &r.call {
-                    adam_dialog::ToolCall::SearchBelief { subject } => {
-                        format!("SearchBelief({subject})")
+                    adam_dialog::ToolCall::SearchBelief { subject, predicate } => {
+                        format!("SearchBelief({subject}, {predicate:?})")
                     }
                     adam_dialog::ToolCall::SearchGraph { subject, predicate } => {
                         format!("SearchGraph({subject}, {predicate:?})")

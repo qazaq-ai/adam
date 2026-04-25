@@ -43,8 +43,22 @@ use adam_retrieval::MorphemeIndex;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ToolCall {
     /// Look up active belief facts by subject (e.g. user name,
-    /// city, occupation). v4.0.37 — fully implemented.
-    SearchBelief { subject: String },
+    /// city, occupation).
+    ///
+    /// **v4.1.5** — accepts an optional predicate filter so the
+    /// `ActionPlanner::belief_direct_answer` lookup can route through
+    /// the tool layer instead of bypassing it. Two output shapes:
+    /// - `predicate: None`  → audit-friendly: every active fact for
+    ///   `subject` rendered as `"{subject} {predicate} {object}"`
+    ///   (preserves the v4.0.37 contract).
+    /// - `predicate: Some(p)` → typed-lookup-friendly: 0 or 1
+    ///   findings (single-active-fact invariant, v4.0.28), each
+    ///   finding is the **object string only** so the caller can
+    ///   use it as a slot value without re-parsing.
+    SearchBelief {
+        subject: String,
+        predicate: Option<String>,
+    },
     /// Look up extracted (base) facts by subject and optional
     /// predicate. Proxies for "search the lexical graph" — the
     /// graph index itself isn't yet exposed, so we filter the flat
@@ -172,23 +186,33 @@ impl Tool {
         let mut trace = Vec::new();
         trace.push(format!("tool: dispatch {call:?}"));
         match &call {
-            ToolCall::SearchBelief { subject } => {
-                let active: Vec<String> = ctx
+            ToolCall::SearchBelief { subject, predicate } => {
+                let active: Vec<&crate::belief::BeliefFact> = ctx
                     .belief
                     .facts
                     .iter()
                     .filter(|f| f.subject == *subject && f.status == FactStatus::Active)
-                    .map(|f| format!("{} {} {}", f.subject, f.predicate, f.object))
+                    .filter(|f| match predicate {
+                        Some(p) => f.predicate == *p,
+                        None => true,
+                    })
                     .collect();
                 trace.push(format!(
-                    "search_belief: subject={subject} active_matches={}",
+                    "search_belief: subject={subject} predicate={:?} active_matches={}",
+                    predicate,
                     active.len()
                 ));
                 if active.is_empty() {
-                    ToolResult::empty(call, "search_belief: no active facts")
-                } else {
-                    ToolResult::ok(call, active, trace)
+                    return ToolResult::empty(call, "search_belief: no active facts");
                 }
+                let findings: Vec<String> = match predicate {
+                    Some(_) => active.iter().map(|f| f.object.clone()).collect(),
+                    None => active
+                        .iter()
+                        .map(|f| format!("{} {} {}", f.subject, f.predicate, f.object))
+                        .collect(),
+                };
+                ToolResult::ok(call, findings, trace)
             }
             ToolCall::SearchGraph { subject, predicate } => {
                 let matches: Vec<String> = ctx
@@ -380,6 +404,7 @@ mod tests {
         let r = Tool::dispatch(
             ToolCall::SearchBelief {
                 subject: USER_SELF_KEY.into(),
+                predicate: None,
             },
             &ctx(&belief, &[]),
         );
@@ -394,6 +419,7 @@ mod tests {
         let r = Tool::dispatch(
             ToolCall::SearchBelief {
                 subject: "nonexistent".into(),
+                predicate: None,
             },
             &ctx(&belief, &[]),
         );
@@ -409,10 +435,51 @@ mod tests {
         let r = Tool::dispatch(
             ToolCall::SearchBelief {
                 subject: USER_SELF_KEY.into(),
+                predicate: None,
             },
             &ctx(&belief, &[]),
         );
         assert!(!r.success, "contested facts must not surface as Active");
+    }
+
+    /// **v4.1.5** — when `predicate` is `Some(p)`, findings are the
+    /// raw object strings only (no `subject {predicate} object`
+    /// triple) so callers like `ActionPlanner::belief_direct_answer`
+    /// can use the value directly as a slot fill.
+    #[test]
+    fn search_belief_with_predicate_returns_object_only() {
+        let mut belief = BeliefState::new();
+        belief.record_user_fact(USER_SELF_KEY, "name", "Дәулет", 0);
+        belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 1);
+        let r = Tool::dispatch(
+            ToolCall::SearchBelief {
+                subject: USER_SELF_KEY.into(),
+                predicate: Some("city".into()),
+            },
+            &ctx(&belief, &[]),
+        );
+        assert!(r.success);
+        assert_eq!(r.findings, vec!["алматы".to_string()]);
+    }
+
+    /// **v4.1.5** — `predicate` filter respects single-active-fact
+    /// invariant: at most one finding for a given `(subject, predicate)`
+    /// because the same gate as `BeliefState::active_fact` applies.
+    #[test]
+    fn search_belief_with_predicate_returns_empty_on_no_active() {
+        let mut belief = BeliefState::new();
+        // Both contested → no Active fact for `city`.
+        belief.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        belief.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
+        let r = Tool::dispatch(
+            ToolCall::SearchBelief {
+                subject: USER_SELF_KEY.into(),
+                predicate: Some("city".into()),
+            },
+            &ctx(&belief, &[]),
+        );
+        assert!(!r.success);
+        assert!(r.findings.is_empty());
     }
 
     #[test]
@@ -518,6 +585,7 @@ mod tests {
         let belief = BeliefState::new();
         let call = ToolCall::SearchBelief {
             subject: "x".into(),
+            predicate: None,
         };
         let r = Tool::dispatch(call.clone(), &ctx(&belief, &[]));
         assert_eq!(r.call, call);
