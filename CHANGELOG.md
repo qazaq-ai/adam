@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.2.6] — 2026-04-25 — Cognitive eval expansion +8 (action routing × multi-slot lifecycle × compound flows)
+
+Continues Codex strategic rec #3 — cognitive eval grows from 30 → **38 scenarios** (76 % toward the 50+ target). All 8 new scenarios pass on first run; no aspirationals introduced. The expansion targets categories the previous patches under-covered: untested action-routing surfaces, multi-slot belief lifecycle, and compound state-then-ask flows.
+
+### What landed (all canonical, +8)
+
+**Action routing — 4 new scenarios closing untested intent classes:**
+- `action_routing_ask_time` — `сағат неше` → Action::Social, Certain (AskTime is in `is_social_intent`).
+- `action_routing_ask_weather` — `бүгін ауа райы қалай` → Social, Certain.
+- `action_routing_insult` — `ақымақсың` → Social, Certain (polite non-engagement, v1.1.0 design).
+- `action_routing_ask_family_unmapped` — `балаларың бар ма` → RefuseOutOfScope, Unknown. **Documents a gap**: AskFamily is NOT in `is_social_intent` AND has no `belief_direct_answer` slot mapping, so it falls through to RefuseOutOfScope. Tracked as canonical-but-noted; future capability work could map AskFamily to a family-related belief slot.
+
+**Belief lifecycle — 2 multi-slot scenarios:**
+- `multi_slot_lifecycle_no_conflict` — set name + city + occupation across 3 turns → 0 contradictions. Each Statement\* writes a fresh Active fact on a different `(subject, predicate)`, so the single-active-fact invariant (v4.0.28) doesn't trigger conflicts.
+- `multi_slot_conflict_two_slots_simultaneously` — name=A, city=X, name=B, city=Y → 2 contradictions. Validates that the invariant is per-`(subject, predicate)`, not global.
+
+**Compound flows — 2 scenarios combining state and ask:**
+- `compound_ask_after_multi_statement` — set name + city + age, then ask AskLocation → AnswerDirect with `алматы` in reply. Confirms that belief facts on different slots don't interfere with each other's lookup.
+- `reasoning_chain_coexists_with_active_belief` — set name (turn 0), then `жер туралы айтшы` with reasoning attached → Derived, output cites the «байланыс-» chain, verification supported. Belief absorption on turn 0 doesn't pollute the verification path because there's no contradiction on the topic.
+
+### State
+
+| | v4.2.5 | v4.2.6 |
+|---|---|---|
+| Cognitive eval | 30/30 canonical | **38/38 canonical, 0 aspirational** |
+| Codex rec #3 progress | 60 % | **76 %** toward 50+ target |
+| Workspace tests | 581 | 581 (cognitive_eval is one test) |
+
+### Tests
+
+**581 passing**, 0 warnings. **Cognitive eval baseline 38/38 canonical, 0 aspirational** — every scenario the harness has tracked since v4.0.34 still passes.
+
+### Why this matters
+
+After v4.2.5 closed the AnswerDirect rendering gap, the dialog's observable behaviour is rich enough that adding scenarios mostly *documents* what works instead of surfacing bugs. That's a healthy sign — the cognitive eval is shifting from "discovery harness" to "regression net". Both modes are useful: discovery surfaces latent bugs (v4.2.1 → v4.2.5), regression locks behaviour down so future patches don't drift.
+
+The AskFamily-unmapped scenario explicitly documents a real gap (no slot mapping exists for family). Tracked as canonical so the harness gates against accidental drift, with the description noting that future capability work could close it.
+
+### Scope
+
+Pure data: 8 new entries in `data/eval/cognitive_dialog_dataset.json`. No code change. No template change. No belief-layer change.
+
+### Next
+
+- v4.2.x patches: continue toward 50+ scenarios. Underexplored areas remaining: long-session goal continuity beyond MAX_HISTORY=32 (v4.0.30 fix should be regression-tested), compose mode (city swap) integration, parse-failure variants, retrieval-driven scenarios (need MorphemeIndex fixture).
+- Capability work per `project_v4_direction`: new World Core domains (require user review), new reasoning rules (R12+ candidates: Causes-transitivity, Has-PartOf inverse), morpheme coverage re-audit.
+
+---
+
 ## [4.2.5] — 2026-04-25 — Close AnswerDirect rendering gap + digit-token bug (cognitive baseline 30/30)
 
 Promotes all 5 v4.2.1 aspirational scenarios to canonical. Cognitive eval reaches **30/30 canonical, 0 aspirational** — full pass on every scenario the harness has tracked since v4.0.34.

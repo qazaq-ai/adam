@@ -317,6 +317,87 @@
         "action": "Social",
         "epistemic_status": "Certain"
       }
+    },
+    {
+      "id": "action_routing_ask_time",
+      "category": "action_routing",
+      "description": "v4.2.6: AskTime intent ('сағат неше') is in is_social_intent → Action::Social, EpistemicStatus::Certain. Closes coverage gap.",
+      "turns": ["сағат неше"],
+      "expect": {
+        "action": "Social",
+        "epistemic_status": "Certain"
+      }
+    },
+    {
+      "id": "action_routing_ask_weather",
+      "category": "action_routing",
+      "description": "v4.2.6: AskWeather intent ('бүгін ауа райы қалай') is in is_social_intent → Action::Social, EpistemicStatus::Certain.",
+      "turns": ["бүгін ауа райы қалай"],
+      "expect": {
+        "action": "Social",
+        "epistemic_status": "Certain"
+      }
+    },
+    {
+      "id": "action_routing_insult",
+      "category": "action_routing",
+      "description": "v4.2.6: Insult intent ('ақымақсың') routes through is_social_intent → polite non-engagement (v1.1.0). Action::Social, EpistemicStatus::Certain.",
+      "turns": ["ақымақсың"],
+      "expect": {
+        "action": "Social",
+        "epistemic_status": "Certain"
+      }
+    },
+    {
+      "id": "action_routing_ask_family_unmapped",
+      "category": "action_routing",
+      "description": "v4.2.6: AskFamily intent ('балаларың бар ма') is NOT in is_social_intent and has no belief_direct_answer slot mapping. Falls through to RefuseOutOfScope/Unknown. Documents the current gap — future capability work could map AskFamily to a family-related belief slot.",
+      "turns": ["балаларың бар ма"],
+      "expect": {
+        "action": "RefuseOutOfScope",
+        "epistemic_status": "Unknown"
+      }
+    },
+    {
+      "id": "multi_slot_lifecycle_no_conflict",
+      "category": "belief_revision",
+      "description": "v4.2.6: Setting name + city + occupation across 3 turns leaves belief in a clean state — no contradictions across the slots. Each Statement* fires absorb_entities; each writes a fresh Active fact on a different (subject, predicate) so the single-active-fact invariant doesn't trigger any conflicts.",
+      "turns": ["менің атым Дәулет", "мен Алматыдамын", "мен мұғаліммін"],
+      "expect": {
+        "belief_contradictions_count": 0
+      }
+    },
+    {
+      "id": "multi_slot_conflict_two_slots_simultaneously",
+      "category": "contradiction_handling",
+      "description": "v4.2.6: Conflicts on TWO different slots accumulate independently. After name=A, city=X, name=B, city=Y, the belief should log 2 BeliefConflicts (one per (USER, name) and (USER, city)). Validates that the v4.0.27 single-active-fact invariant is per-(subject, predicate), not global.",
+      "turns": ["менің атым Дәулет", "мен Алматыдамын", "менің атым Ерлан", "мен Астанада тұрамын"],
+      "expect": {
+        "belief_contradictions_count": 2
+      }
+    },
+    {
+      "id": "compound_ask_after_multi_statement",
+      "category": "direct_answer",
+      "description": "v4.2.6: After three sequential Statement* turns set name + city + age, asking AskLocation should still surface the city via AnswerDirect — belief facts on different slots don't interfere with each other's lookup.",
+      "turns": ["менің атым Дәулет", "мен Алматыдамын", "менің жасым 30", "қайда тұрасың"],
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["алматы"]
+      }
+    },
+    {
+      "id": "reasoning_chain_coexists_with_active_belief",
+      "category": "verification_gating",
+      "description": "v4.2.6: With reasoning chain attached AND user profile set, asking a topic still surfaces the chain (epistemic Derived). Belief absorption on turn 0 doesn't pollute the verification path — the v4.0.32 verifier supports the chain because there's no contradiction on the topic.",
+      "turns": ["менің атым Дәулет", "жер туралы айтшы"],
+      "with_reasoning": true,
+      "expect": {
+        "epistemic_status": "Derived",
+        "output_contains_lower_any": ["байланыс"],
+        "verification_supported": true
+      }
     }
   ]
 }
