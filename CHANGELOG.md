@@ -7,6 +7,58 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.2.7] — 2026-04-25 — Geography alias layer + safer location surface
+
+Continues the language-core cleanup track without changing the deterministic architecture. The main move is narrow but important: geography normalization now treats aliases as a thin layer over canonical `world_core` entities instead of forcing every historical or Russian-form variant to become a separate remembered string.
+
+### What landed
+
+**`language_core` geography alias layer**
+- `crates/adam-dialog/src/language_core.rs` now builds canonical geography entries from `data/world_core/geography_kz.jsonl` and then overlays a small alias map on top of those entries.
+- Historical / Russian-form variants like `Алма-Ата`, `Усть-Каменогорск`, `Семипалатинск`, `Уральск`, `Кустанай`, `Актобе`, `Кокшетау`, `Гурьев`, `Нұр-Сұлтан`, `Ақмола`, and `Целиноград` now resolve to their canonical Kazakh forms when the canonical entry already exists in `world_core`.
+- Descriptor phrases such as `Алматы қаласы`, `Каспий теңізі`, and `город Алматы` now normalize through the same canonical lookup path instead of requiring duplicate entries in the knowledge base.
+
+**Location extraction widened without duplicating morphology**
+- Added a deterministic string fallback for out-of-lexicon locative copula forms like `Алма-Атадамын` (`X-дамын / X-демін / X-тамын / X-темін`) so alias normalization can still fire even when the FST lexicon does not know the incoming surface form.
+- Origin-pattern extraction now recovers two-token geography phrases before `жақтанмын / маңынанмын`, so `Каспий теңізі жақтанмын` is linked back to canonical `Каспий`.
+
+**Safer user-facing location templates**
+- Removed the most fragile ablative user-facing templates from `statement_of_location` and `ask_location.with_known_user`. The smoke test surfaced `Өскеменден` on a normalized alias path; rather than ship a weak surface form, the release now prefers neutral location phrasing such as `мекеніңіз Өскемен екенін ұқтым` and `сіз Алматы жақтан екенсіз`.
+
+**Execution log**
+- Added `docs/language_core_hybrid_roadmap.md` as the dedicated working roadmap and daily log for this migration branch. This keeps the new language-core / hybrid work separate from the historical release roadmap.
+
+### Tests
+
+- `cargo test -p adam-dialog --tests`
+- targeted new regressions for:
+  - geography alias resolution in `language_core`
+  - descriptor-phrase normalization
+  - `Алма-Атадамын` → `Алматы`
+  - `Каспий теңізі жақтанмын` → `Каспий`
+- workspace regression pass completed cleanly before release cut
+
+### Why this matters
+
+This is the first real alias layer in the current deterministic stack. It improves understanding of user-provided place names without:
+- duplicating `world_core`
+- touching `adam-kernel-fst` morphology
+- introducing probabilistic correction
+
+That is exactly the intended migration pattern for the broader language-core program: canonical knowledge stays in one place, while normalization layers become thin, explicit, and auditable.
+
+### Scope
+
+Code + templates + tests + docs. No new reasoning rules. No new retrieval source. No change to the trust model.
+
+### Next
+
+- Move from canonical place strings toward canonical entity-aware memory.
+- Extend alias normalization beyond geography into people / organization names.
+- Define the contract for a future constrained generative surface layer without letting it invent facts.
+
+---
+
 ## [4.2.6] — 2026-04-25 — Cognitive eval expansion +8 (action routing × multi-slot lifecycle × compound flows)
 
 Continues Codex strategic rec #3 — cognitive eval grows from 30 → **38 scenarios** (76 % toward the 50+ target). All 8 new scenarios pass on first run; no aspirationals introduced. The expansion targets categories the previous patches under-covered: untested action-routing surfaces, multi-slot belief lifecycle, and compound state-then-ask flows.

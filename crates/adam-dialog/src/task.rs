@@ -164,8 +164,9 @@ impl TaskState {
     ///    - Any unresolved contradiction → `Blocked`.
     ///    - Any pending clarification question → `WaitingForUser`.
     ///    - Goal active AND the injected intent carries evidence
-    ///      (v4.0.30: `reasoning_chain.is_some()` or
-    ///      `example.is_some()`) → `ReadyToAnswer`.
+    ///      (v4.0.30+: `reasoning_chain.is_some()` or
+    ///      `example.is_some()` or `grounded_fact.is_some()`) →
+    ///      `ReadyToAnswer`.
     ///    - Goal active, no evidence yet → `GatheringEvidence`.
     ///    - No goal → `Idle`.
     ///
@@ -222,6 +223,7 @@ impl TaskState {
     /// (goal set but nothing to cite yet).
     ///
     /// Evidence sources for the v4.0.x dialog pipeline:
+    /// - `grounded_fact` populated by curated `SearchGraph`
     /// - `reasoning_chain` populated by `inject_reasoning_chain`
     /// - `example` populated by `inject_retrieval_example`
     ///
@@ -231,6 +233,9 @@ impl TaskState {
         matches!(
             intent,
             Intent::Unknown {
+                grounded_fact: Some(_),
+                ..
+            } | Intent::Unknown {
                 reasoning_chain: Some(_),
                 ..
             } | Intent::Unknown {
@@ -307,6 +312,7 @@ mod tests {
             raw_tokens: vec![topic.into()],
             noun_hint: Some(topic.into()),
             example: None,
+            grounded_fact: None,
             example_adapted: false,
             reasoning_chain: None,
         }
@@ -365,6 +371,7 @@ mod tests {
                 raw_tokens: vec!["ммм".into()],
                 noun_hint: None,
                 example: None,
+                grounded_fact: None,
                 example_adapted: false,
                 reasoning_chain: None,
             },
@@ -500,6 +507,7 @@ mod tests {
             raw_tokens: vec!["жер".into()],
             noun_hint: Some("жер".into()),
             example: None,
+            grounded_fact: None,
             example_adapted: false,
             reasoning_chain: Some("ой-тізбек: жер — аспан денесі".into()),
         };
@@ -509,10 +517,21 @@ mod tests {
             raw_tokens: vec!["жер".into()],
             noun_hint: Some("жер".into()),
             example: Some("Жер — біздің планета.".into()),
+            grounded_fact: None,
             example_adapted: false,
             reasoning_chain: None,
         };
         assert!(TaskState::intent_has_evidence(&with_example));
+
+        let with_grounded = Intent::Unknown {
+            raw_tokens: vec!["жер".into()],
+            noun_hint: Some("жер".into()),
+            example: None,
+            grounded_fact: Some("Жер — Күн жүйесіндегі планета.".into()),
+            example_adapted: false,
+            reasoning_chain: None,
+        };
+        assert!(TaskState::intent_has_evidence(&with_grounded));
 
         // Non-Unknown intents never carry evidence slots.
         assert!(!TaskState::intent_has_evidence(&Intent::Thanks));
@@ -530,6 +549,7 @@ mod tests {
             raw_tokens: vec!["жер".into()],
             noun_hint: Some("жер".into()),
             example: None,
+            grounded_fact: None,
             example_adapted: false,
             reasoning_chain: Some("ой-тізбек: жер — аспан денесі".into()),
         };
@@ -551,6 +571,7 @@ mod tests {
             raw_tokens: vec!["жер".into()],
             noun_hint: Some("жер".into()),
             example: Some("sample".into()),
+            grounded_fact: None,
             example_adapted: false,
             reasoning_chain: Some("chain".into()),
         };

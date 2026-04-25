@@ -411,64 +411,51 @@ fn main() -> ExitCode {
 /// render_derivation_as_kazakh` but kept inline here to avoid a bin →
 /// bin dep.
 fn render_kazakh_with_marker(d: &DerivedFact) -> String {
-    // v3.8.5 — grammatical case suffixes synthesised via FST instead
-    // of manual `"-ға"` dash-concatenation (which produced morpho-
-    // logically-invalid forms like `атау-ға` / `өсімдік-ға`). Must
-    // stay in lock-step with `conversation::render_derivation_as_kazakh`.
-    match d.predicate {
-        Predicate::IsA => format!(
-            "қорытынды: {} — {} (байланысты ой-тізбек арқылы)",
-            d.subject.root, d.object.root
-        ),
+    // Must stay in lock-step with `conversation::render_derivation_as_kazakh`.
+    let clause = match d.predicate {
+        Predicate::IsA => format!("{} — {}", d.subject.root, d.object.root),
         Predicate::Has => format!(
-            "ой-тізбек: {} {} қатысты иелік байланысы бар",
+            "{} {} ие болады",
             d.subject.root,
             inflect(&d.object.root, Case::Dative)
         ),
-        Predicate::RelatedTo => format!(
-            "{} пен {} бір-біріне байланысты екен",
-            d.subject.root, d.object.root
-        ),
+        Predicate::RelatedTo => {
+            format!("{} мен {} өзара байланысты", d.subject.root, d.object.root)
+        }
         Predicate::LivesIn => format!(
-            "{} {} орнымен байланысты мекендеу қорытындысы",
-            d.subject.root, d.object.root
+            "{} {} тұрады",
+            d.subject.root,
+            inflect(&d.object.root, Case::Locative)
         ),
         Predicate::GoesTo => format!(
-            "{} {} жағына байланысты қозғалыс",
-            d.subject.root, d.object.root
+            "{} {} барады",
+            d.subject.root,
+            inflect(&d.object.root, Case::Dative)
         ),
         Predicate::PartOf => format!(
-            "{} {} құрамына байланысты бөлігі",
+            "{} {} құрамына кіреді",
             d.subject.root,
             inflect(&d.object.root, Case::Dative)
         ),
         Predicate::Causes => format!(
-            "{} {} себеп болатыны (байланысты ой-тізбек арқылы)",
+            "{} {} себеп болады",
             d.subject.root,
             inflect(&d.object.root, Case::Dative)
         ),
         Predicate::After => format!(
-            "{} {} кейін (байланысты уақыт-тізбек арқылы)",
+            "{} {} кейін келеді",
             d.subject.root,
             inflect(&d.object.root, Case::Ablative)
         ),
-        Predicate::HasQuantity => {
-            format!(
-                "{} {} санды байланыс",
-                d.subject.root,
-                inflect(&d.object.root, Case::Instrumental)
-            )
-        }
-        Predicate::DoesTo => format!(
-            "{} {} үстінде байланысты әрекет иесі",
-            d.subject.root, d.object.root
-        ),
-        Predicate::InDomain => format!(
-            "{} {} байланысты мүше",
+        Predicate::HasQuantity => format!(
+            "{} {} қатысты сандық байланысқа ие",
             d.subject.root,
-            inflect(&d.object.root, Case::Dative)
+            inflect(&d.object.root, Case::Instrumental)
         ),
-    }
+        Predicate::DoesTo => format!("{} {} үстінде әрекет етеді", d.subject.root, d.object.root),
+        Predicate::InDomain => format!("{} {} саласына жатады", d.subject.root, d.object.root),
+    };
+    format!("байланыс бойынша, {clause}")
 }
 
 fn inflect(root: &str, case: Case) -> String {

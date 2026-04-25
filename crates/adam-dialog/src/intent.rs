@@ -8,6 +8,13 @@
 use adam_kernel_fst::morphotactics::Number;
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UnknownAnswerMode {
+    General,
+    Example,
+    Reasoning,
+}
+
 /// The top-level semantic category of a user utterance.
 ///
 /// v0.7.0 MVP covers 5 intents. Subsequent releases widen this enum —
@@ -124,6 +131,12 @@ pub enum Intent {
         /// `MorphemeIndex` is attached. Added v1.6.5.
         #[serde(default)]
         example: Option<String>,
+        /// v4.2.7: short grounded fact selected from the curated
+        /// graph (`SearchGraph`). Unlike `example`, this is not a
+        /// corpus quote; it is a direct knowledge statement the
+        /// verbalizer can surface without quotation marks.
+        #[serde(default)]
+        grounded_fact: Option<String>,
         /// v1.9.5: `true` iff the text in `example` was **adapted** from
         /// the retrieved corpus sample (e.g. a city mention was swapped
         /// to the user's session city via `ComposeMode::InSampleCitySwap`).
@@ -179,4 +192,28 @@ pub enum SubjectPerson {
 pub enum Politeness {
     Informal,
     Polite,
+}
+
+pub fn unknown_answer_mode(raw_tokens: &[String]) -> UnknownAnswerMode {
+    if raw_tokens.iter().any(|t| {
+        matches!(
+            t.as_str(),
+            "мысал" | "мысалы" | "дәйек" | "дәйексөз" | "үзінді"
+        )
+    }) {
+        return UnknownAnswerMode::Example;
+    }
+    if raw_tokens.iter().any(|t| {
+        matches!(
+            t.as_str(),
+            "неге" | "неліктен" | "себеп" | "себебі" | "байланыс" | "байланысты" | "қалайша"
+        )
+    }) {
+        return UnknownAnswerMode::Reasoning;
+    }
+    UnknownAnswerMode::General
+}
+
+pub fn unknown_prefers_quoted_example(raw_tokens: &[String]) -> bool {
+    unknown_answer_mode(raw_tokens) == UnknownAnswerMode::Example
 }

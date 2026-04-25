@@ -195,8 +195,23 @@ fn response_ask_how_are_you_casual() {
 }
 
 #[test]
+fn response_ask_how_are_you_missing_h_variant() {
+    assert_response_with_toml(
+        "Қалдарыңыз қалай?",
+        &[
+            "жақсымын, рахмет",
+            "жаман емеспін",
+            "жақсы, ал сіз қалайсыз",
+        ],
+    );
+}
+
+#[test]
 fn response_statement_of_wellbeing() {
-    assert_response_with_toml("жақсымын", &["жақсы екен", "қуанамын", "ал сіз қалайсыз"]);
+    assert_response_with_toml(
+        "жақсымын",
+        &["жақсы екен", "оны естігеніме қуаныштымын", "қуанып қалдым"],
+    );
 }
 
 #[test]
@@ -207,6 +222,27 @@ fn response_ask_name() {
 #[test]
 fn response_ask_name_polite() {
     assert_response_with_toml("атыңыз кім", &["менің атым адам", "мені адам деп атайды"]);
+}
+
+#[test]
+fn response_ask_name_with_known_user_profile() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+
+    for seed in 0..16u64 {
+        let out = conv.turn("атыңыз кім", &lex, &repo, seed);
+        assert!(
+            [
+                "сіздің атыңыз Дәулет",
+                "мен сізді Дәулет деп білемін",
+                "Дәулет деп танысқан едіңіз",
+            ]
+            .contains(&out.as_str()),
+            "seed={seed} unexpected known-user AskName output: {out:?}"
+        );
+    }
 }
 
 // --- v0.8.0 social-topic intents + PersonName extraction -------------------
@@ -250,10 +286,10 @@ fn response_statement_of_name_substitutes_slot() {
     assert_response_with_toml(
         "менің атым Дәулет",
         &[
-            "қош келдіңіз Дәулет",
-            "сәлем Дәулет",
+            "сәлем, Дәулет",
+            "Дәулет, танысқаныма қуаныштымын",
             "Дәулетпен танысқаныма қуаныштымын",
-            "Дәулетпен сөйлесу — құрмет",
+            "Дәулет деген атыңызды есте сақтаймын",
         ],
     );
 }
@@ -296,18 +332,71 @@ fn response_ask_location() {
 }
 
 #[test]
+fn response_ask_location_with_known_user_profile() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен Алматыданмын", &lex, &repo, 0);
+
+    for seed in 0..16u64 {
+        let out = conv.turn("қайда тұрасыз", &lex, &repo, seed);
+        assert!(
+            [
+                "сіз Алматыда тұрасыз",
+                "менің білуімше, мекеніңіз Алматы",
+                "сіз Алматы жақтан екенсіз",
+            ]
+            .contains(&out.as_str()),
+            "seed={seed} unexpected known-user AskLocation output: {out:?}"
+        );
+    }
+}
+
+#[test]
+fn response_ask_location_with_known_geo_feature_profile() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен каспий жақтанмын", &lex, &repo, 0);
+
+    for seed in 0..16u64 {
+        let out = conv.turn("қайда тұрасыз", &lex, &repo, seed);
+        assert!(
+            [
+                "менің білуімше, сіз Каспий жақтансыз",
+                "сіз Каспий маңынан екенсіз",
+                "Каспий — теңіз; соған жақын жақтансыз",
+            ]
+            .contains(&out.as_str()),
+            "seed={seed} unexpected known-geo AskLocation output: {out:?}"
+        );
+    }
+}
+
+#[test]
 fn response_statement_of_location() {
     assert_response_with_toml(
         "мен Алматыданмын",
         &[
-            "жақсы жер",
-            "әдемі аймақ",
-            "тамаша өлке",
-            "Алматы — әдемі қала",
-            "Алматы туралы көп естідім",
-            "Алматыда тұрасыз ба",
-            "Алматыдан хабар жақсы ма",
-            "Алматыға сапар шегу қызық",
+            "түсіндім",
+            "Алматы жақсы мекен екен",
+            "Алматы туралы естігенім бар",
+            "Алматыда тұратыныңызды түсіндім",
+            "мекеніңіз Алматы екенін ұқтым",
+            "Алматыда екеніңізді есте сақтаймын",
+            "Алматы жақтан екеніңізді білдім",
+        ],
+    );
+}
+
+#[test]
+fn response_statement_of_geo_feature_location() {
+    assert_response_with_toml(
+        "мен каспий жақтанмын",
+        &[
+            "Каспий жақтан екеніңізді ұқтым",
+            "Каспий маңынан екеніңізді түсіндім",
+            "Каспий — теңіз; соған жақын жақтан екеніңізді ұқтым",
         ],
     );
 }
@@ -325,17 +414,39 @@ fn response_ask_occupation() {
 }
 
 #[test]
+fn response_ask_occupation_with_known_user_profile() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен мұғаліммін", &lex, &repo, 0);
+
+    for seed in 0..16u64 {
+        let out = conv.turn("немен айналысасың", &lex, &repo, seed);
+        assert!(
+            [
+                "сіз мұғалім болып еңбек етіп жүрсіз",
+                "менің білуімше, мамандығыңыз мұғалім",
+                "мұғалім — сіздің кәсібіңіз",
+            ]
+            .contains(&out.as_str()),
+            "seed={seed} unexpected known-user AskOccupation output: {out:?}"
+        );
+    }
+}
+
+#[test]
 fn response_statement_of_occupation() {
     assert_response_with_toml(
         "мен мұғаліммін",
         &[
-            "жақсы кәсіп",
-            "сәттілік тілеймін",
-            "мақтанатын жұмыс",
-            "мұғалім — құрметті кәсіп",
-            "сіз мұғалім екенсіз",
-            "мұғалімдер — қажетті мамандық",
-            "мұғалімге сәттілік тілеймін",
+            "түсіндім",
+            "еңбегіңізге сәттілік",
+            "мұғалім екеніңізді түсіндім",
+            "мұғалім болу жауапты іс",
+            "сіз мұғалім болып еңбек етіп жүр екенсіз",
+            "мұғалімдер еңбегі маңызды",
+            "мұғалімдер қоғамға қажет",
+            "мұғалімге табыс тілеймін",
         ],
     );
 }
@@ -400,7 +511,7 @@ fn response_ask_time() {
 fn response_compliment() {
     assert_response_with_toml(
         "жарайсың",
-        &["рахмет", "сіз де өте жақсысыз", "қуаныштымын"],
+        &["рахмет", "жылы сөзіңізге рақмет", "сіз де жақсы жансыз"],
     );
 }
 
@@ -408,7 +519,7 @@ fn response_compliment() {
 fn response_request() {
     assert_response_with_toml(
         "көмектесіңізші",
-        &["әрине, айтыңыз", "қалай көмектесе аламын", "тыңдап тұрмын"],
+        &["әрине, айтыңыз", "қалай көмектесе аламын", "тыңдап отырмын"],
     );
 }
 
@@ -416,7 +527,7 @@ fn response_request() {
 fn response_well_wishes() {
     assert_response_with_toml(
         "сәттілік",
-        &["сізге де", "сәттілік сізге де", "тілегіңіз қабыл болсын"],
+        &["сізге де", "сәттілік сізге де", "ізгі тілегіңізге рақмет"],
     );
 }
 
@@ -457,10 +568,10 @@ fn response_insult_is_polite_non_engagement() {
     assert_response_with_toml(
         "сен ақымақсың",
         &[
-            "сізге ренжімеймін",
+            "ренжімеймін, бірақ сыпайы сөйлесейік",
             "мен адамды құрметтеймін",
-            "мейлі, сіз өз пікіріңізді айттыңыз",
-            "мен жауап бермеймін",
+            "қаласаңыз, әңгімені сабырмен жалғастырайық",
+            "сөйлесуді сыпайы жалғастырсақ дұрыс болар еді",
         ],
     );
 }
@@ -621,13 +732,13 @@ fn conversation_remembers_name_across_turns() {
     for seed in 0..16u64 {
         let out = conv.turn("сәлем", &lex, &repo, seed);
         assert!(!out.contains("{name}"), "unfilled slot leaked: {out:?}");
-        if out == "сәлем Дәулет" {
+        if out == "сәлем, Дәулет" {
             saw_personalised = true;
         }
     }
     assert!(
         saw_personalised,
-        "expected at least one seed in 0..16 to pick \"сәлем Дәулет\""
+        "expected at least one seed in 0..16 to pick \"сәлем, Дәулет\""
     );
 }
 
@@ -817,18 +928,19 @@ fn realiser_synthesises_locative_for_city_slot() {
     let _ = conv.turn("мен Алматыданмын", &lex, &repo, 0);
 
     // Explore the seed space; at least one seed should pick a
-    // {city|locative} template, producing "Алматыда тұрасыз ба".
+    // {city|locative} template, producing a locative acknowledgement.
     let mut saw_locative = false;
     for seed in 0..32u64 {
         let out = conv.turn("мен Алматыданмын", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
-        if out == "Алматыда тұрасыз ба" {
+        if out == "Алматыда тұратыныңызды түсіндім" || out == "Алматыда екеніңізді есте сақтаймын"
+        {
             saw_locative = true;
         }
     }
     assert!(
         saw_locative,
-        "expected at least one seed in 0..32 to synthesise Locative \"Алматыда тұрасыз ба\""
+        "expected at least one seed in 0..32 to synthesise a locative acknowledgement for Алматы"
     );
 }
 
@@ -860,7 +972,7 @@ fn realiser_synthesises_plural_for_occupation_slot() {
     for seed in 0..32u64 {
         let out = conv.turn("мен мұғаліммін", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
-        if out == "мұғалімдер — қажетті мамандық" {
+        if out == "мұғалімдер еңбегі маңызды" {
             saw_plural = true;
         }
     }
@@ -950,7 +1062,7 @@ fn cross_slot_greeting_fires_when_both_name_and_city_known() {
     for seed in 0..32u64 {
         let out = conv.turn("сәлем", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
-        if out == "сәлем Дәулет, Алматыдан хабар жақсы ма" {
+        if out == "сәлем, Дәулет, Алматыдан бәрі жақсы ма" {
             saw_cross = true;
         }
     }
@@ -1040,6 +1152,47 @@ fn unknown_with_retrieval_cites_corpus_example() {
     assert!(
         out.contains("«") && out.contains("»"),
         "expected retrieval-evidence template to quote an example, got: {out:?}"
+    );
+}
+
+#[test]
+fn unknown_with_grounded_fact_uses_nonquoted_verbalizer() {
+    use adam_reasoning::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let extracted = vec![Fact {
+        subject: SlotRef {
+            surface: "Қазақстан".into(),
+            root: "қазақстан".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "ел".into(),
+            root: "ел".into(),
+            pos: "noun".into(),
+        },
+        pattern: "world_core".into(),
+        source: FactSource {
+            pack: "world_core/geography_kz.jsonl".into(),
+            sample_id: "geo_001".into(),
+        },
+        confidence: ConfidenceKind::HumanApproved,
+        raw_text: "Қазақстан — Орталық Азиядағы ел.".into(),
+    }];
+
+    let mut conv = Conversation::new().with_reasoning_chains(extracted, vec![]);
+    let out = conv.turn("Қазақстан туралы айтшы", &lex, &repo, 0);
+    assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
+    assert!(
+        !out.contains("«") && !out.contains("»"),
+        "grounded-fact verbalizer should not quote direct facts, got: {out:?}"
+    );
+    assert!(
+        out.contains("Қазақстан — Орталық Азиядағы ел."),
+        "grounded fact should surface directly, got: {out:?}"
     );
 }
 
@@ -2618,6 +2771,22 @@ fn nelikten_is_not_absorbed_as_city() {
         !fresh.session.contains_key("city"),
         "bare «Неліктен?» must not set session.city on any seed"
     );
+}
+
+#[test]
+fn qaldarynyz_qalai_does_not_poison_city_memory() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    let _ = conv.turn("Қалдарыңыз қалай?", &lex, &repo, 0);
+    assert!(
+        !conv.session.contains_key("city"),
+        "wellbeing-style question must not be absorbed as session.city"
+    );
+
+    let _ = conv.turn("Мен Қашар ауылынанмын.", &lex, &repo, 0);
+    assert_eq!(conv.session.get("city"), Some(&"Қашар".to_string()));
 }
 
 /// v4.0.3: `Conversation::with_curated_only_reasoning(true)` — the

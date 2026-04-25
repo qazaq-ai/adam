@@ -11,6 +11,9 @@ use adam_kernel_fst::lexicon::LexiconV1;
 use adam_kernel_fst::parser::Analysis;
 
 use crate::intent::{GreetingKind, Intent, TimeOfDay};
+use crate::language_core::{
+    looks_like_named_place_candidate, normalize_place_name, normalize_proper_noun,
+};
 
 /// Entry point. Takes the raw input text; tokenises, lowercases, strips
 /// punctuation, then dispatches by keyword rules.
@@ -168,6 +171,7 @@ pub fn interpret_text_with_lexicon(
         raw_tokens: tokens,
         noun_hint,
         example: None,
+        grounded_fact: None,
         example_adapted: false,
         reasoning_chain: None,
     }
@@ -399,6 +403,7 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         raw_tokens: tokens,
         noun_hint: first_noun_root(parses),
         example: None,
+        grounded_fact: None,
         example_adapted: false,
         reasoning_chain: None,
     }
@@ -500,6 +505,8 @@ fn detect_ask_how_are_you(joined: &str) -> bool {
         || joined.contains("жағдайыңыз қалай")
         || joined.contains("халің қалай")
         || joined.contains("халіңіз қалай")
+        || joined.contains("қалдарың қалай")
+        || joined.contains("қалдарыңыз қалай")
         || joined == "қалың қалай"
 }
 
@@ -537,13 +544,13 @@ fn detect_statement_of_name(
     // Pattern 1: "атым X".
     if let Some(i) = tokens.iter().position(|t| t == "атым") {
         if let Some(name) = raw_tokens.get(i + 1) {
-            return Some(capitalise(name));
+            return Some(normalize_proper_noun(name));
         }
     }
     // Pattern 3: "есімім X".
     if let Some(i) = tokens.iter().position(|t| t == "есімім") {
         if let Some(name) = raw_tokens.get(i + 1) {
-            return Some(capitalise(name));
+            return Some(normalize_proper_noun(name));
         }
     }
     // Pattern 2: "мені X деп атайды".
@@ -554,22 +561,12 @@ fn detect_statement_of_name(
         ) {
             if end > start + 1 {
                 if let Some(name) = raw_tokens.get(start + 1) {
-                    return Some(capitalise(name));
+                    return Some(normalize_proper_noun(name));
                 }
             }
         }
     }
     None
-}
-
-/// Capitalise the first character of a Unicode string (Kazakh Cyrillic
-/// names should render title-cased regardless of user input casing).
-fn capitalise(s: &str) -> String {
-    let mut chars = s.chars();
-    match chars.next() {
-        Some(c) => c.to_uppercase().chain(chars).collect(),
-        None => String::new(),
-    }
 }
 
 fn detect_ask_age(joined: &str) -> bool {
@@ -678,6 +675,10 @@ fn detect_statement_of_location(
 ) -> Option<Option<String>> {
     use adam_kernel_fst::morphotactics::Case;
 
+    if !has_first_person_location_context(tokens, joined, parses) {
+        return None;
+    }
+
     // Primary: look for a parsed Noun in Ablative or Locative case.
     // Prefer Ablative (stronger signal for origin: "X-дан+мын") over
     // bare Locative. Also accept Locative if co-occurring with
@@ -702,16 +703,21 @@ fn detect_statement_of_location(
             }
             match features.case {
                 Some(Case::Ablative) if ablative_root.is_none() => {
-                    ablative_root = Some(capitalise(&root.root));
+                    ablative_root = Some(normalize_place_name(&root.root));
                 }
                 Some(Case::Locative) if locative_root.is_none() => {
-                    locative_root = Some(capitalise(&root.root));
+                    locative_root = Some(normalize_place_name(&root.root));
                 }
                 _ => {}
             }
         }
     }
     if let Some(c) = ablative_root {
+        if generic_place_root(&c) {
+            if let Some(name) = recover_named_place_before_generic_location(tokens, raw_tokens) {
+                return Some(Some(name));
+            }
+        }
         return Some(Some(c));
     }
     // v1.8.5: if a Noun stacks Locative + P1Sg ("Алматыдамын" = "I am
@@ -727,19 +733,144 @@ fn detect_statement_of_location(
             }
             if features.case == Some(Case::Locative) && features.predicate == Some(Predicate::P1Sg)
             {
-                return Some(Some(capitalise(&root.root)));
+                return Some(Some(normalize_place_name(&root.root)));
             }
         }
     }
     let live_verb = tokens.iter().any(|t| t == "тұрамын" || t == "тұрамыз");
     if live_verb {
         if let Some(c) = locative_root {
+            if generic_place_root(&c) {
+                if let Some(name) = recover_named_place_before_generic_location(tokens, raw_tokens)
+                {
+                    return Some(Some(name));
+                }
+            }
             return Some(Some(c));
         }
     }
 
     // Fallback for out-of-lexicon inputs: string-based heuristics.
     detect_statement_of_location_rule_based(tokens, raw_tokens, joined)
+}
+
+fn has_first_person_location_context(tokens: &[String], joined: &str, parses: &[Analysis]) -> bool {
+    use adam_kernel_fst::morphotactics::{Number, Person, Predicate};
+
+    if tokens.iter().any(|t| t == "мен" || t == "біз") {
+        return true;
+    }
+    if tokens.iter().any(|t| {
+        matches!(
+            t.as_str(),
+            "тұрамын" | "тұрамыз" | "келдім" | "келдік" | "тұрмын" | "тұрмыз"
+        )
+    }) {
+        return true;
+    }
+    if tokens.iter().any(|t| strip_ablative_copula(t).is_some()) {
+        return true;
+    }
+    if tokens.iter().any(|t| strip_locative_copula(t).is_some()) {
+        return true;
+    }
+    if joined.contains("данмын")
+        || joined.contains("денмін")
+        || joined.contains("танмын")
+        || joined.contains("тенмін")
+    {
+        return true;
+    }
+    parses.iter().any(|p| match p {
+        Analysis::Noun { features, .. } => {
+            matches!(features.predicate, Some(Predicate::P1Sg | Predicate::P1Pl))
+        }
+        Analysis::Verb { features, .. } => {
+            features.person == Some(Person::First)
+                && matches!(
+                    features.number,
+                    None | Some(Number::Singular) | Some(Number::Plural)
+                )
+        }
+    })
+}
+
+fn generic_place_root(root: &str) -> bool {
+    matches!(
+        root.to_lowercase().as_str(),
+        "ауыл" | "қала" | "аудан" | "облыс" | "өңір" | "кент" | "ел"
+    )
+}
+
+fn recover_named_place_before_generic_location(
+    tokens: &[String],
+    raw_tokens: &[String],
+) -> Option<String> {
+    for i in 1..tokens.len() {
+        if !token_mentions_generic_place(&tokens[i]) {
+            continue;
+        }
+        let prev_raw = raw_tokens.get(i - 1)?;
+        let prev_token = tokens.get(i - 1)?;
+        if NOT_A_TOPIC.contains(&prev_token.as_str()) || generic_place_root(prev_token) {
+            continue;
+        }
+        if raw_looks_like_named_place(prev_raw) {
+            return Some(normalize_place_name(prev_raw));
+        }
+    }
+    None
+}
+
+fn recover_named_place_before_origin_marker(
+    tokens: &[String],
+    raw_tokens: &[String],
+) -> Option<String> {
+    for i in 1..tokens.len() {
+        let marker = tokens[i].as_str();
+        if !matches!(
+            marker,
+            "жақтанмын" | "жақтанбыз" | "маңынанмын" | "маңынанбыз"
+        ) {
+            continue;
+        }
+        let prev_raw = raw_tokens.get(i - 1)?;
+        let prev_token = tokens.get(i - 1)?;
+        if i >= 2 && token_mentions_geo_descriptor(&tokens[i - 1]) {
+            let prev_prev_raw = raw_tokens.get(i - 2)?;
+            let prev_prev_token = tokens.get(i - 2)?;
+            if !NOT_A_TOPIC.contains(&prev_prev_token.as_str())
+                && !generic_place_root(prev_prev_token)
+                && raw_looks_like_named_place(prev_prev_raw)
+            {
+                let phrase = format!("{} {}", prev_prev_raw, prev_raw);
+                return Some(normalize_place_name(&phrase));
+            }
+        }
+        if NOT_A_TOPIC.contains(&prev_token.as_str()) || generic_place_root(prev_token) {
+            continue;
+        }
+        if raw_looks_like_named_place(prev_raw) {
+            return Some(normalize_place_name(prev_raw));
+        }
+    }
+    None
+}
+
+fn token_mentions_generic_place(token: &str) -> bool {
+    ["ауыл", "қала", "аудан", "облыс", "өңір", "кент", "ел"]
+        .iter()
+        .any(|stem| token.contains(stem))
+}
+
+fn token_mentions_geo_descriptor(token: &str) -> bool {
+    ["ауыл", "қала", "аудан", "облыс", "өңір", "кент", "ел", "өзен", "көл", "теңіз", "тау"]
+        .iter()
+        .any(|stem| token.contains(stem))
+}
+
+fn raw_looks_like_named_place(token: &str) -> bool {
+    looks_like_named_place_candidate(token)
 }
 
 /// Pre-v1.4.0 string-based heuristic retained as fallback when the FST
@@ -753,6 +884,9 @@ fn detect_statement_of_location_rule_based(
     // token ending in locative that precedes the verb.
     if let Some(verb_idx) = tokens.iter().position(|t| t == "тұрамын" || t == "тұрамыз")
     {
+        if let Some(name) = recover_named_place_before_generic_location(tokens, raw_tokens) {
+            return Some(Some(name));
+        }
         let city = (0..verb_idx)
             .rev()
             .find_map(|i| strip_locative(&tokens[i]).map(|_| raw_tokens[i].clone()))
@@ -760,13 +894,30 @@ fn detect_statement_of_location_rule_based(
         return Some(city);
     }
     // Ablative + 1sg copula: "Алматыданмын" → "Алматы".
+    if let Some(name) = recover_named_place_before_generic_location(tokens, raw_tokens) {
+        for token in tokens {
+            if token_mentions_generic_place(token) {
+                return Some(Some(name));
+            }
+        }
+    }
+    if let Some(name) = recover_named_place_before_origin_marker(tokens, raw_tokens) {
+        return Some(Some(name));
+    }
     for (i, t) in tokens.iter().enumerate() {
+        if let Some(root) = strip_locative_copula(t) {
+            let raw = raw_tokens
+                .get(i)
+                .map(|r| strip_locative_copula_preserving(r).unwrap_or_else(|| root.clone()))
+                .unwrap_or(root);
+            return Some(Some(normalize_place_name(&raw)));
+        }
         if let Some(root) = strip_ablative_copula(t) {
             let raw = raw_tokens
                 .get(i)
                 .map(|r| strip_ablative_copula_preserving(r).unwrap_or_else(|| root.clone()))
                 .unwrap_or(root);
-            return Some(Some(capitalise(&raw)));
+            return Some(Some(normalize_place_name(&raw)));
         }
     }
     // "келдім" + ауыл/қала somewhere — matched but no precise city.
@@ -821,6 +972,29 @@ fn strip_ablative_copula_preserving(token: &str) -> Option<String> {
     const MIN_STEM: usize = 3;
     let lower = token.to_lowercase();
     for suffix in ["данмын", "денмін", "танмын", "тенмін"] {
+        if lower.ends_with(suffix) && lower.chars().count() >= suffix.chars().count() + MIN_STEM {
+            let take = token.chars().count() - suffix.chars().count();
+            return Some(token.chars().take(take).collect());
+        }
+    }
+    None
+}
+
+fn strip_locative_copula(token: &str) -> Option<String> {
+    const MIN_STEM: usize = 3;
+    for suffix in ["дамын", "демін", "тамын", "темін"] {
+        if token.ends_with(suffix) && token.chars().count() >= suffix.chars().count() + MIN_STEM {
+            let take = token.chars().count() - suffix.chars().count();
+            return Some(token.chars().take(take).collect());
+        }
+    }
+    None
+}
+
+fn strip_locative_copula_preserving(token: &str) -> Option<String> {
+    const MIN_STEM: usize = 3;
+    let lower = token.to_lowercase();
+    for suffix in ["дамын", "демін", "тамын", "темін"] {
         if lower.ends_with(suffix) && lower.chars().count() >= suffix.chars().count() + MIN_STEM {
             let take = token.chars().count() - suffix.chars().count();
             return Some(token.chars().take(take).collect());
@@ -1117,6 +1291,83 @@ mod tests {
         assert_eq!(multiword_entity_hint("құс туралы айтшы"), None);
         assert_eq!(multiword_entity_hint("мектеп керек пе"), None);
         assert_eq!(multiword_entity_hint(""), None);
+    }
+
+    #[test]
+    fn generic_location_phrase_recovers_named_place_prefix() {
+        let got = interpret_text("Мен Қашар ауылында тұрамын", &[]);
+        assert_eq!(
+            got,
+            Intent::StatementOfLocation {
+                city: Some("Қашар".into())
+            }
+        );
+    }
+
+    #[test]
+    fn statement_of_name_normalises_lowercase_and_mixed_script() {
+        let got = interpret_text("атым дӘУЛEТ", &[]);
+        assert_eq!(
+            got,
+            Intent::StatementOfName {
+                name: "Дәулет".into()
+            }
+        );
+    }
+
+    #[test]
+    fn statement_of_location_recovers_lowercase_named_place_prefix() {
+        let got = interpret_text("мен қашар ауылында тұрамын", &[]);
+        assert_eq!(
+            got,
+            Intent::StatementOfLocation {
+                city: Some("Қашар".into())
+            }
+        );
+    }
+
+    #[test]
+    fn statement_of_location_normalises_mixed_script_city() {
+        let got = interpret_text("мен Aлматыданмын", &[]);
+        assert_eq!(
+            got,
+            Intent::StatementOfLocation {
+                city: Some("Алматы".into())
+            }
+        );
+    }
+
+    #[test]
+    fn statement_of_location_recovers_geo_feature_before_origin_marker() {
+        let got = interpret_text("мен каспий жақтанмын", &[]);
+        assert_eq!(
+            got,
+            Intent::StatementOfLocation {
+                city: Some("Каспий".into())
+            }
+        );
+    }
+
+    #[test]
+    fn statement_of_location_normalises_curated_geo_alias() {
+        let got = interpret_text("мен Алма-Атадамын", &[]);
+        assert_eq!(
+            got,
+            Intent::StatementOfLocation {
+                city: Some("Алматы".into())
+            }
+        );
+    }
+
+    #[test]
+    fn statement_of_location_recovers_geo_feature_phrase_before_origin_marker() {
+        let got = interpret_text("мен каспий теңізі жақтанмын", &[]);
+        assert_eq!(
+            got,
+            Intent::StatementOfLocation {
+                city: Some("Каспий".into())
+            }
+        );
     }
 
     /// v4.0.26 — Codex v4.0.23 residual: the v4.0.21 MULTIWORD_ENTITIES

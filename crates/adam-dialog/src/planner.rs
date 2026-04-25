@@ -11,7 +11,11 @@
 
 use std::collections::HashMap;
 
-use crate::intent::{GreetingKind, Intent, TimeOfDay};
+use crate::intent::{
+    GreetingKind, Intent, TimeOfDay, UnknownAnswerMode, unknown_answer_mode,
+    unknown_prefers_quoted_example,
+};
+use crate::language_core::geo_entity_kind;
 use crate::templates::TemplateRepository;
 
 /// Output of Layer 3 — what the realiser needs to produce text.
@@ -75,6 +79,11 @@ pub fn plan_response_with_session(
     let mut slots = session.clone();
     for (k, v) in extract_slots(intent) {
         slots.insert(k, v);
+    }
+    if let Some(city) = slots.get("city").cloned() {
+        if let Some(kind) = geo_entity_kind(&city) {
+            slots.entry("geo_kind".into()).or_insert(kind);
+        }
     }
     if !slots.is_empty() {
         trace.push(format!("planner: slots={slots:?}"));
@@ -172,7 +181,15 @@ pub fn plan_response_with_epistemic(
         (Intent::AskName, _) if session.contains_key("name") => Some("ask_name.with_known_user"),
         (Intent::AskAge, _) if session.contains_key("age") => Some("ask_age.with_known_user"),
         (Intent::AskLocation, _) if session.contains_key("city") => {
-            Some("ask_location.with_known_user")
+            if session
+                .get("city")
+                .and_then(|city| geo_entity_kind(city))
+                .is_some_and(|kind| uses_geo_feature_location_family(&kind))
+            {
+                Some("ask_location.with_known_user.geo_feature")
+            } else {
+                Some("ask_location.with_known_user")
+            }
         }
         (Intent::AskOccupation, _) if session.contains_key("occupation") => {
             Some("ask_occupation.with_known_user")
@@ -279,6 +296,9 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
         }
         Intent::StatementOfLocation { city: Some(city) } => {
             slots.insert("city".into(), city.clone());
+            if let Some(kind) = geo_entity_kind(city) {
+                slots.insert("geo_kind".into(), kind);
+            }
         }
         Intent::StatementOfOccupation {
             occupation: Some(occupation),
@@ -288,6 +308,7 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
         Intent::Unknown {
             noun_hint,
             example,
+            grounded_fact,
             reasoning_chain,
             ..
         } => {
@@ -296,6 +317,9 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
             }
             if let Some(ex) = example {
                 slots.insert("example".into(), ex.clone());
+            }
+            if let Some(fact) = grounded_fact {
+                slots.insert("fact".into(), fact.clone());
             }
             if let Some(chain) = reasoning_chain {
                 slots.insert("chain".into(), chain.clone());
@@ -306,9 +330,15 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
     slots
 }
 
+fn uses_geo_feature_location_family(kind: &str) -> bool {
+    let kind = kind.to_lowercase();
+    kind.contains("теңіз") || kind.contains("өзен") || kind.contains("көл") || kind.contains("тау")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::intent::Intent;
 
     #[test]
     fn template_without_placeholder_is_always_fillable() {
@@ -345,6 +375,45 @@ mod tests {
         slots.insert("city".into(), "Алматы".into());
         assert!(template_is_fillable("{city|locative} тұрамын", &slots));
     }
+
+    #[test]
+    fn reasoning_mode_routes_unknown_to_derived_chain_family() {
+        let intent = Intent::Unknown {
+            raw_tokens: vec!["абай".into(), "неге".into(), "байланысты".into()],
+            noun_hint: Some("абай".into()),
+            example: Some("Абайдың өлеңдері көп.".into()),
+            grounded_fact: Some("Абай Құнанбайұлы — қазақ ақыны.".into()),
+            example_adapted: false,
+            reasoning_chain: Some("байланыс бойынша, абай әдебиетке жатады.".into()),
+        };
+        assert_eq!(intent_key(&intent), "unknown.with_derived_chain");
+    }
+
+    #[test]
+    fn general_mode_keeps_grounded_fact_ahead_of_reasoning_chain() {
+        let intent = Intent::Unknown {
+            raw_tokens: vec![
+                "абай".into(),
+                "туралы".into(),
+                "не".into(),
+                "білесіз".into(),
+            ],
+            noun_hint: Some("абай".into()),
+            example: Some("Абайдың өлеңдері көп.".into()),
+            grounded_fact: Some("Абай Құнанбайұлы — қазақ ақыны.".into()),
+            example_adapted: false,
+            reasoning_chain: Some("байланыс бойынша, абай әдебиетке жатады.".into()),
+        };
+        assert_eq!(intent_key(&intent), "unknown.with_grounded_fact");
+    }
+
+    #[test]
+    fn geo_feature_location_routes_to_special_family() {
+        let intent = Intent::StatementOfLocation {
+            city: Some("Каспий".into()),
+        };
+        assert_eq!(intent_key(&intent), "statement_of_location.geo_feature");
+    }
 }
 
 /// Map an [`Intent`] to the template-repository key that holds its
@@ -371,6 +440,16 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::AskAge => "ask_age",
         Intent::StatementOfAge { .. } => "statement_of_age",
         Intent::AskLocation => "ask_location",
+        Intent::StatementOfLocation { city: Some(city) } => {
+            if geo_entity_kind(city)
+                .as_deref()
+                .is_some_and(uses_geo_feature_location_family)
+            {
+                "statement_of_location.geo_feature"
+            } else {
+                "statement_of_location"
+            }
+        }
         Intent::StatementOfLocation { .. } => "statement_of_location",
         Intent::AskOccupation => "ask_occupation",
         Intent::StatementOfOccupation { .. } => "statement_of_occupation",
@@ -384,35 +463,80 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::WellWishes => "well_wishes",
         Intent::Insult => "insult",
         Intent::Unknown {
+            raw_tokens,
             noun_hint,
             example,
+            grounded_fact,
             example_adapted,
             reasoning_chain,
             ..
         } => {
-            // v2.7: reasoning-chain takes priority over retrieval when
-            // both are available, because a derived chain shows how the
-            // system CONNECTED facts rather than just cited one. The
-            // `unknown.with_derived_chain` family always includes the
-            // «байланыс-» marker for user-side auditability (mirrors
-            // v1.9.5's «бейімд-» marker for adapted evidence).
+            // User-facing chat prefers grounded evidence over a
+            // reasoning-chain when both exist. This keeps the
+            // deterministic kernel's derivations available, but
+            // surfaces them only when we have no direct fact or safe
+            // retrieval quote to say first.
             //
             // v1.9.5: adapted-evidence routing (retrieval was rewritten
             // by compose_with_city); the «бейімд-» marker fires.
-            //
-            // v1.6.5: verbatim retrieval evidence.
+            // v1.6.5+: direct fact / retrieval evidence.
+            // v2.7: reasoning-chain fallback, marked with
+            // «байланыс-» for auditability.
             // v1.1.0: noun-echo acknowledgement when no retrieval hit.
             // v1.0.0: bare "түсінбедім" fallback.
-            if reasoning_chain.is_some() {
-                "unknown.with_derived_chain"
-            } else if example.is_some() && *example_adapted {
-                "unknown.with_adapted_evidence"
-            } else if example.is_some() {
-                "unknown.with_evidence"
-            } else if noun_hint.is_some() {
-                "unknown.with_noun"
-            } else {
-                "unknown"
+            match unknown_answer_mode(raw_tokens) {
+                UnknownAnswerMode::Example => {
+                    if example.is_some() && *example_adapted {
+                        "unknown.with_adapted_evidence"
+                    } else if example.is_some() {
+                        "unknown.with_evidence"
+                    } else if grounded_fact.is_some() {
+                        "unknown.with_grounded_fact"
+                    } else if reasoning_chain.is_some() {
+                        "unknown.with_derived_chain"
+                    } else if noun_hint.is_some() {
+                        "unknown.with_noun"
+                    } else {
+                        "unknown"
+                    }
+                }
+                UnknownAnswerMode::Reasoning => {
+                    if reasoning_chain.is_some() {
+                        "unknown.with_derived_chain"
+                    } else if grounded_fact.is_some() {
+                        "unknown.with_grounded_fact"
+                    } else if example.is_some() && *example_adapted {
+                        "unknown.with_adapted_evidence"
+                    } else if example.is_some() {
+                        "unknown.with_evidence"
+                    } else if noun_hint.is_some() {
+                        "unknown.with_noun"
+                    } else {
+                        "unknown"
+                    }
+                }
+                UnknownAnswerMode::General => {
+                    if example.is_some()
+                        && unknown_prefers_quoted_example(raw_tokens)
+                        && *example_adapted
+                    {
+                        "unknown.with_adapted_evidence"
+                    } else if example.is_some() && unknown_prefers_quoted_example(raw_tokens) {
+                        "unknown.with_evidence"
+                    } else if grounded_fact.is_some() {
+                        "unknown.with_grounded_fact"
+                    } else if example.is_some() && *example_adapted {
+                        "unknown.with_adapted_evidence"
+                    } else if example.is_some() {
+                        "unknown.with_evidence"
+                    } else if reasoning_chain.is_some() {
+                        "unknown.with_derived_chain"
+                    } else if noun_hint.is_some() {
+                        "unknown.with_noun"
+                    } else {
+                        "unknown"
+                    }
+                }
             }
         }
     }

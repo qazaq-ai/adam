@@ -167,6 +167,7 @@ mod tests {
             raw_tokens: vec![topic.unwrap_or("").into()],
             noun_hint: topic.map(|s| s.into()),
             example: example.map(|s| s.into()),
+            grounded_fact: None,
             example_adapted: false,
             reasoning_chain: chain.map(|s| s.into()),
         }

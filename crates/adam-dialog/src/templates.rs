@@ -107,12 +107,20 @@ impl TemplateRepository {
             "ask_location".into(),
             vec!["мен сандық әлемде тұрамын".into()],
         );
-        by_key.insert("statement_of_location".into(), vec!["жақсы жер".into()]);
+        by_key.insert("statement_of_location".into(), vec!["түсіндім".into()]);
+        by_key.insert(
+            "ask_location.with_known_user.geo_feature".into(),
+            vec!["менің білуімше, сіз {city} жақтансыз".into()],
+        );
+        by_key.insert(
+            "statement_of_location.geo_feature".into(),
+            vec!["{city} жақтан екеніңізді ұқтым".into()],
+        );
         by_key.insert(
             "ask_occupation".into(),
             vec!["мен сөйлесуге жаралғанмын".into()],
         );
-        by_key.insert("statement_of_occupation".into(), vec!["жақсы кәсіп".into()]);
+        by_key.insert("statement_of_occupation".into(), vec!["түсіндім".into()]);
         by_key.insert("ask_family".into(), vec!["мен жалғызбын".into()]);
         by_key.insert("statement_of_family".into(), vec!["қуаныштымын".into()]);
         by_key.insert("ask_weather".into(), vec!["менде терезе жоқ".into()]);
@@ -126,6 +134,10 @@ impl TemplateRepository {
         by_key.insert(
             "unknown.with_noun".into(),
             vec!["ах, {noun} туралы айтасыз ба".into()],
+        );
+        by_key.insert(
+            "unknown.with_grounded_fact".into(),
+            vec!["{noun} туралы қысқаша айтсам: {fact}".into()],
         );
         // fallback
         by_key.insert("unknown".into(), vec!["түсінбедім".into()]);

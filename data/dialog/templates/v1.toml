@@ -22,8 +22,8 @@ key = "greeting.casual"
 templates = [
     "сәлем",
     "сәлем достым",
-    "сәлем {name}",
-    "сәлем {name}, {city|ablative} хабар жақсы ма",
+    "сәлем, {name}",
+    "сәлем, {name}, {city|ablative} бәрі жақсы ма",
 ]
 
 [[families]]
@@ -31,8 +31,8 @@ key = "greeting.polite"
 templates = [
     "сәлеметсіз бе",
     "армысыз",
-    "сәлеметсіз бе {name}",
-    "сәлеметсіз бе {name}, {city|locative} қалай отырсыз",
+    "сәлеметсіз бе, {name}",
+    "сәлеметсіз бе, {name}, {city|ablative} бәрі аман ба",
 ]
 
 [[families]]
@@ -122,8 +122,8 @@ templates = [
 key = "statement_of_wellbeing"
 templates = [
     "жақсы екен",
-    "қуанамын",
-    "ал сіз қалайсыз",
+    "оны естігеніме қуаныштымын",
+    "қуанып қалдым",
 ]
 
 # User asked "атың кім" / "есімің қалай" → introduce self
@@ -141,9 +141,9 @@ templates = [
 [[families]]
 key = "ask_name.with_known_user"
 templates = [
-    "сіздің атыңыз — {name}",
-    "сіз {name|instrumental} таныстыңыз",
-    "{name}, есіңізде ме",
+    "сіздің атыңыз {name}",
+    "мен сізді {name} деп білемін",
+    "{name} деп танысқан едіңіз",
 ]
 
 # ---------- Social topics (v0.8.0 new) ----------
@@ -155,10 +155,10 @@ templates = [
 [[families]]
 key = "statement_of_name"
 templates = [
-    "қош келдіңіз {name}",
-    "сәлем {name}",
+    "сәлем, {name}",
+    "{name}, танысқаныма қуаныштымын",
     "{name|instrumental} танысқаныма қуаныштымын",
-    "{name|instrumental} сөйлесу — құрмет",
+    "{name} деген атыңызды есте сақтаймын",
 ]
 
 [[families]]
@@ -173,9 +173,9 @@ templates = [
 [[families]]
 key = "ask_age.with_known_user"
 templates = [
-    "сіздің жасыңыз — {age}",
+    "сіздің жасыңыз {age}",
     "сіз {age} жастасыз",
-    "{age} — сіздің жасыңыз",
+    "менің білуімше, жасыңыз {age}",
 ]
 
 [[families]]
@@ -202,21 +202,36 @@ templates = [
 key = "ask_location.with_known_user"
 templates = [
     "сіз {city|locative} тұрасыз",
-    "сіздің мекеніңіз — {city}",
-    "сіз {city|ablative} екенсіз",
+    "менің білуімше, мекеніңіз {city}",
+    "сіз {city} жақтан екенсіз",
+]
+
+[[families]]
+key = "ask_location.with_known_user.geo_feature"
+templates = [
+    "менің білуімше, сіз {city} жақтансыз",
+    "сіз {city} маңынан екенсіз",
+    "{city} — {geo_kind}; соған жақын жақтансыз",
 ]
 
 [[families]]
 key = "statement_of_location"
 templates = [
-    "жақсы жер",
-    "әдемі аймақ",
-    "тамаша өлке",
-    "{city} — әдемі қала",
-    "{city} туралы көп естідім",
-    "{city|locative} тұрасыз ба",
-    "{city|ablative} хабар жақсы ма",
-    "{city|dative} сапар шегу қызық",
+    "түсіндім",
+    "{city} жақсы мекен екен",
+    "{city} туралы естігенім бар",
+    "{city|locative} тұратыныңызды түсіндім",
+    "мекеніңіз {city} екенін ұқтым",
+    "{city|locative} екеніңізді есте сақтаймын",
+    "{city} жақтан екеніңізді білдім",
+]
+
+[[families]]
+key = "statement_of_location.geo_feature"
+templates = [
+    "{city} жақтан екеніңізді ұқтым",
+    "{city} маңынан екеніңізді түсіндім",
+    "{city} — {geo_kind}; соған жақын жақтан екеніңізді ұқтым",
 ]
 
 [[families]]
@@ -232,23 +247,24 @@ templates = [
 [[families]]
 key = "ask_occupation.with_known_user"
 templates = [
-    "сіз {occupation} екенсіз",
-    "сіздің мамандығыңыз — {occupation}",
+    "сіз {occupation} болып еңбек етіп жүрсіз",
+    "менің білуімше, мамандығыңыз {occupation}",
     "{occupation} — сіздің кәсібіңіз",
 ]
 
 [[families]]
 key = "statement_of_occupation"
 templates = [
-    "жақсы кәсіп",
-    "сәттілік тілеймін",
-    "мақтанатын жұмыс",
-    "{occupation} — құрметті кәсіп",
-    "сіз {occupation} екенсіз",
-    "{occupation|plural} — қажетті мамандық",
-    "{occupation|dative} сәттілік тілеймін",
-    "{name}, {occupation} — құрметті кәсіп",
-    "{name}, сіз {city|locative} {occupation} екенсіз",
+    "түсіндім",
+    "еңбегіңізге сәттілік",
+    "{occupation} екеніңізді түсіндім",
+    "{occupation} болу жауапты іс",
+    "сіз {occupation} болып еңбек етіп жүр екенсіз",
+    "{occupation|plural} еңбегі маңызды",
+    "{occupation|plural} қоғамға қажет",
+    "{occupation|dative} табыс тілеймін",
+    "{name}, {occupation} екеніңіз қуантады",
+    "{name}, сіз {city|locative} {occupation} болып еңбек етіп жүрсіз",
 ]
 
 [[families]]
@@ -295,10 +311,10 @@ templates = [
 key = "compliment"
 templates = [
     "рахмет",
-    "сіз де өте жақсысыз",
-    "қуаныштымын",
+    "жылы сөзіңізге рақмет",
+    "сіз де жақсы жансыз",
     "рахмет {name}",
-    "рахмет {name}, сіз де тамашасыз",
+    "рахмет {name}, жылы пікіріңізге қуандым",
 ]
 
 [[families]]
@@ -306,7 +322,7 @@ key = "request"
 templates = [
     "әрине, айтыңыз",
     "қалай көмектесе аламын",
-    "тыңдап тұрмын",
+    "тыңдап отырмын",
 ]
 
 [[families]]
@@ -314,7 +330,7 @@ key = "well_wishes"
 templates = [
     "сізге де",
     "сәттілік сізге де",
-    "тілегіңіз қабыл болсын",
+    "ізгі тілегіңізге рақмет",
 ]
 
 # ---------- Insult / rudeness (v1.1.0) ----------
@@ -322,10 +338,10 @@ templates = [
 [[families]]
 key = "insult"
 templates = [
-    "сізге ренжімеймін",
+    "ренжімеймін, бірақ сыпайы сөйлесейік",
     "мен адамды құрметтеймін",
-    "мейлі, сіз өз пікіріңізді айттыңыз",
-    "мен жауап бермеймін",
+    "қаласаңыз, әңгімені сабырмен жалғастырайық",
+    "сөйлесуді сыпайы жалғастырсақ дұрыс болар еді",
 ]
 
 # ---------- Fallback ----------
@@ -383,22 +399,32 @@ templates = [
 key = "unknown.with_evidence"
 templates = [
     # Original (v1.6.5) — no session slots required
-    "{noun} туралы мынадай бір жазба кездестірдім: «{example}»",
-    "{noun} жайында осындай мысал бар: «{example}»",
-    "{noun} деген сөзге қатысты бір жолым есіме түсті: «{example}»",
-    "мен {noun} туралы «{example}» деген дерек кездестіргенмін",
+    "{noun} туралы мынаны айта аламын: «{example}»",
+    "{noun} жайында қолда бар дерек мынау: «{example}»",
+    "{noun} туралы нақты бір мысал: «{example}»",
+    "мен {noun} жайында мынадай дерек таптым: «{example}»",
     # v1.8.0 — session-aware variants (literal slot interpolation)
-    "Сіз, {name}, {noun} туралы сұрап тұрсыз ба. Мынадай дерек бар: «{example}»",
-    "{name}, {noun} жайында осы жазба сізге қызық болуы мүмкін: «{example}»",
-    "Сіз {age} жасында-ақ {noun} жайында сұрайсыз екен. Дерек: «{example}»",
-    "{occupation} ретінде сіз үшін {noun} туралы дерек: «{example}»",
+    "{name}, {noun} туралы мынаны айта аламын: «{example}»",
+    "{name}, {noun} жайында сізге мына дерек қызық болуы мүмкін: «{example}»",
+    "{age} жаста болсаңыз да, {noun} туралы жақсы сұрақ қойдыңыз. Дерек: «{example}»",
+    "{occupation} ретінде сізге {noun} туралы мына дерек жақын болуы мүмкін: «{example}»",
     # v1.8.5 — FST-aware slot variants. `{city|locative}` renders via
     # synthesise_noun so the locative suffix is harmony-correct for the
     # actual city (Алматыда / Астанада / Өскеменде / Атырауда). The
     # previous `{city}-да` literal is both ugly (dangling hyphen) and
     # ignores vowel harmony for front/back stems.
     "{city|locative} тұратын сізге {noun} туралы мынадай дерек: «{example}»",
-    "{name}, {city|locative} отырып {noun} жайында ойланасыз ба. Дерек: «{example}»",
+    "{name}, {city|locative} отырып {noun} жайында мына деректі ұсына аламын: «{example}»",
+]
+
+[[families]]
+key = "unknown.with_grounded_fact"
+templates = [
+    "{noun} туралы қысқаша айтсам: {fact}",
+    "{noun} жайында негізгі дерек мынау: {fact}",
+    "{noun} туралы ең әуелі мынаны айтуға болады: {fact}",
+    "{name}, {noun} туралы қысқа жауап: {fact}",
+    "{city|locative} тұратын сізге {noun} жайында мына дерек маңызды болуы мүмкін: {fact}",
 ]
 
 # v1.9.5: Unknown with *adapted* retrieval evidence — the retrieved

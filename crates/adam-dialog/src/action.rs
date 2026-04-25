@@ -25,7 +25,9 @@
 //! before Phase 4 starts consuming it for gating.
 
 use crate::belief::BeliefState;
-use crate::intent::Intent;
+use crate::intent::{
+    Intent, UnknownAnswerMode, unknown_answer_mode, unknown_prefers_quoted_example,
+};
 use crate::task::{TaskState, TaskStatus};
 
 /// Coarse vocabulary of actions the system can take on a given turn.
@@ -183,33 +185,67 @@ impl ActionPlanner {
             );
         }
 
-        // 5. Unknown-with-evidence — reasoning chain takes priority
-        // over retrieval example (derivations are higher-trust
-        // per Codex v4.0.22 reranker policy).
+        // 5. Unknown-with-evidence — direct grounded evidence wins
+        // over a reasoning chain. The user-facing chat should prefer
+        // a curated fact or safe quote when available, and only fall
+        // back to derivation when no grounded evidence path exists.
         if let Intent::Unknown {
-            reasoning_chain: Some(_),
+            raw_tokens,
+            grounded_fact,
+            example,
+            reasoning_chain,
             ..
         } = intent
         {
-            return ActionPlan::new(
-                Action::RunReasoner,
-                OutputKind::DerivedAnswer,
-                vec!["intent carries injected reasoning_chain".into()],
-                vec!["intent.reasoning_chain".into()],
-            );
+            match unknown_answer_mode(raw_tokens) {
+                UnknownAnswerMode::Example if example.is_some() => {
+                    return ActionPlan::new(
+                        Action::RetrieveEvidence,
+                        OutputKind::EvidenceAnswer,
+                        vec!["intent explicitly asks for an example".into()],
+                        vec!["intent.example".into()],
+                    );
+                }
+                UnknownAnswerMode::Reasoning if reasoning_chain.is_some() => {
+                    return ActionPlan::new(
+                        Action::RunReasoner,
+                        OutputKind::DerivedAnswer,
+                        vec!["intent explicitly asks for a reason or relation".into()],
+                        vec!["intent.reasoning_chain".into()],
+                    );
+                }
+                _ => {}
+            }
+            if grounded_fact.is_some() {
+                return ActionPlan::new(
+                    Action::RetrieveEvidence,
+                    OutputKind::EvidenceAnswer,
+                    vec!["intent carries injected grounded_fact".into()],
+                    vec!["intent.grounded_fact".into()],
+                );
+            }
+            if example.is_some() {
+                let rationale = if unknown_prefers_quoted_example(raw_tokens) {
+                    "intent carries injected example"
+                } else {
+                    "intent carries injected grounded/retrieval example"
+                };
+                return ActionPlan::new(
+                    Action::RetrieveEvidence,
+                    OutputKind::EvidenceAnswer,
+                    vec![rationale.into()],
+                    vec!["intent.example".into()],
+                );
+            }
+            if reasoning_chain.is_some() {
+                return ActionPlan::new(
+                    Action::RunReasoner,
+                    OutputKind::DerivedAnswer,
+                    vec!["intent carries injected reasoning_chain".into()],
+                    vec!["intent.reasoning_chain".into()],
+                );
+            }
         }
-        if let Intent::Unknown {
-            example: Some(_), ..
-        } = intent
-        {
-            return ActionPlan::new(
-                Action::RetrieveEvidence,
-                OutputKind::EvidenceAnswer,
-                vec!["intent carries injected retrieval example".into()],
-                vec!["intent.example".into()],
-            );
-        }
-
         // 6. Unknown with a topic but no evidence — ask the user to
         // clarify (or narrow) rather than guess.
         if let Intent::Unknown {
@@ -370,6 +406,7 @@ mod tests {
             raw_tokens: vec![topic.unwrap_or("").into()],
             noun_hint: topic.map(|s| s.into()),
             example: example.map(|s| s.into()),
+            grounded_fact: None,
             example_adapted: false,
             reasoning_chain: chain.map(|s| s.into()),
         }
@@ -432,15 +469,62 @@ mod tests {
     }
 
     #[test]
-    fn reasoning_chain_wins_over_retrieval_when_both_present() {
+    fn grounded_example_wins_over_reasoning_chain_when_both_present() {
         let belief = BeliefState::new();
         let task = TaskState::new();
         let intent = unknown(Some("жер"), Some("chain"), Some("example"));
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(
             plan.action,
-            Action::RunReasoner,
-            "reasoning chain is higher-trust than retrieval — must win"
+            Action::RetrieveEvidence,
+            "grounded evidence should beat a derived chain when both exist"
+        );
+    }
+
+    #[test]
+    fn explicit_example_request_prefers_quote_over_grounded_fact() {
+        let belief = BeliefState::new();
+        let task = TaskState::new();
+        let intent = Intent::Unknown {
+            raw_tokens: vec![
+                "әке".into(),
+                "туралы".into(),
+                "мысал".into(),
+                "айтшы".into(),
+            ],
+            noun_hint: Some("әке".into()),
+            example: Some("Әке баласына ақыл айтты.".into()),
+            grounded_fact: Some("Әке — отбасының мүшесі.".into()),
+            example_adapted: false,
+            reasoning_chain: None,
+        };
+        let plan = ActionPlanner::plan(&intent, &belief, &task);
+        assert_eq!(plan.action, Action::RetrieveEvidence);
+        assert!(
+            plan.rationale
+                .iter()
+                .any(|r| r.contains("asks for an example"))
+        );
+    }
+
+    #[test]
+    fn explicit_reasoning_request_prefers_chain_over_grounded_fact() {
+        let belief = BeliefState::new();
+        let task = TaskState::new();
+        let intent = Intent::Unknown {
+            raw_tokens: vec!["жер".into(), "неге".into(), "байланысты".into()],
+            noun_hint: Some("жер".into()),
+            example: Some("Жер Күнді айналады.".into()),
+            grounded_fact: Some("Жер — Күн жүйесіндегі планета.".into()),
+            example_adapted: false,
+            reasoning_chain: Some("байланыс бойынша, жер аспан денесіне жатады.".into()),
+        };
+        let plan = ActionPlanner::plan(&intent, &belief, &task);
+        assert_eq!(plan.action, Action::RunReasoner);
+        assert!(
+            plan.rationale
+                .iter()
+                .any(|r| r.contains("asks for a reason or relation"))
         );
     }
 

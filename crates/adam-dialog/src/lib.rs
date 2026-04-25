@@ -31,6 +31,7 @@ pub mod action;
 pub mod belief;
 pub mod conversation;
 pub mod intent;
+pub mod language_core;
 pub mod planner;
 pub mod realiser;
 pub mod semantics;
@@ -48,6 +49,7 @@ pub use belief::{
 };
 pub use conversation::{ComposeMode, Conversation, IntentKind, TurnTrace};
 pub use intent::{GreetingKind, Intent, SubjectPerson};
+pub use language_core::{looks_like_named_place_candidate, normalize_proper_noun};
 pub use planner::{
     ResponsePlan, intent_key, plan_response, plan_response_with_epistemic, plan_response_with_repo,
     plan_response_with_session,

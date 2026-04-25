@@ -32,8 +32,8 @@
 //! Codex-reviewable independently.
 
 use crate::belief::{BeliefState, FactStatus};
-use adam_reasoning::Fact as ReasFact;
 use adam_reasoning::reasoner::DerivedFact;
+use adam_reasoning::{ConfidenceKind, Fact as ReasFact, Predicate as ReasPredicate};
 use adam_retrieval::MorphemeIndex;
 
 /// One callable internal tool. Each variant carries the inputs the
@@ -215,24 +215,35 @@ impl Tool {
                 ToolResult::ok(call, findings, trace)
             }
             ToolCall::SearchGraph { subject, predicate } => {
-                let matches: Vec<String> = ctx
+                let mut matches: Vec<&ReasFact> = ctx
                     .extracted
                     .iter()
                     .filter(|f| f.subject.root == *subject)
                     .filter(|f| match predicate {
-                        Some(p) => format!("{:?}", f.predicate).to_lowercase() == p.to_lowercase(),
+                        Some(p) => predicate_name_matches(f.predicate, p),
                         None => true,
                     })
-                    .map(|f| format!("{} {:?} {}", f.subject.root, f.predicate, f.object.root))
+                    .filter(|f| f.confidence == ConfidenceKind::HumanApproved)
+                    .collect();
+                matches.sort_by(|a, b| {
+                    user_facing_fact_priority(a)
+                        .cmp(&user_facing_fact_priority(b))
+                        .then_with(|| a.raw_text.chars().count().cmp(&b.raw_text.chars().count()))
+                        .then_with(|| a.raw_text.cmp(&b.raw_text))
+                });
+                let findings: Vec<String> = matches
+                    .into_iter()
+                    .filter_map(render_grounded_fact)
+                    .take(3)
                     .collect();
                 trace.push(format!(
-                    "search_graph: subject={subject} predicate={predicate:?} matches={}",
-                    matches.len()
+                    "search_graph: subject={subject} predicate={predicate:?} curated_matches={}",
+                    findings.len()
                 ));
-                if matches.is_empty() {
+                if findings.is_empty() {
                     ToolResult::empty(call, "search_graph: no matching facts")
                 } else {
-                    ToolResult::ok(call, matches, trace)
+                    ToolResult::ok(call, findings, trace)
                 }
             }
             ToolCall::SearchRetrieval { morphemes } => {
@@ -252,20 +263,22 @@ impl Tool {
                     }
                 };
                 let hits = index.rank(&refs, cfg);
-                let top: Vec<String> = hits
+                let safe_hits: Vec<_> = hits
                     .iter()
+                    .filter(|h| pack_is_chat_safe(&h.sref.pack))
                     .take(3)
                     .filter_map(|h| index.sample_text(&h.sref).map(String::from))
                     .collect();
                 trace.push(format!(
-                    "search_retrieval: morphemes={} hits={}",
+                    "search_retrieval: morphemes={} hits={} safe_hits={}",
                     morphemes.len(),
-                    hits.len()
+                    hits.len(),
+                    safe_hits.len()
                 ));
-                if top.is_empty() {
+                if safe_hits.is_empty() {
                     ToolResult::empty(call, "search_retrieval: no hits for given morphemes")
                 } else {
-                    ToolResult::ok(call, top, trace)
+                    ToolResult::ok(call, safe_hits, trace)
                 }
             }
             ToolCall::RunLocalReasoner {
@@ -336,6 +349,112 @@ impl Tool {
     }
 }
 
+pub(crate) fn pack_is_chat_safe(pack: &str) -> bool {
+    matches!(
+        pack,
+        "kazakh_classics_pack.json"
+            | "abai_wikisource_pack.json"
+            | "kazakh_proverbs_pack.json"
+            | "tatoeba_kazakh_pack.json"
+            | "common_voice_kk_pack.json"
+            | "wikipedia_kz_pack.json"
+            | "kazakh_textbooks_pack.json"
+    )
+}
+
+fn user_facing_fact_priority(fact: &ReasFact) -> (usize, usize, usize) {
+    let predicate_rank = match fact.predicate {
+        ReasPredicate::IsA => 0,
+        ReasPredicate::LivesIn => 1,
+        ReasPredicate::PartOf => 2,
+        ReasPredicate::Has => 3,
+        ReasPredicate::InDomain => 4,
+        ReasPredicate::RelatedTo => 5,
+        ReasPredicate::GoesTo => 6,
+        ReasPredicate::Causes => 7,
+        ReasPredicate::After => 8,
+        ReasPredicate::HasQuantity => 9,
+        ReasPredicate::DoesTo => 10,
+    };
+    let subject_surface_rank = if fact.subject.surface == fact.subject.root {
+        1
+    } else {
+        0
+    };
+    (
+        predicate_rank,
+        subject_surface_rank,
+        fact.object.root.chars().count(),
+    )
+}
+
+fn render_grounded_fact(fact: &ReasFact) -> Option<String> {
+    let subject = preferred_subject_text(&fact.subject);
+    let object = preferred_object_text(&fact.object);
+    let rendered = match fact.predicate {
+        ReasPredicate::IsA => None,
+        ReasPredicate::PartOf => Some(format!("{subject} {object} құрамына кіреді")),
+        ReasPredicate::RelatedTo => Some(format!("{subject} мен {object} өзара байланысты")),
+        ReasPredicate::InDomain => Some(format!("{subject} {object} саласына жатады")),
+        ReasPredicate::LivesIn => Some(format!("{subject} мекені — {object}")),
+        ReasPredicate::Has => Some(format!("{subject} {object} иеленеді")),
+        ReasPredicate::Causes => Some(format!("{subject} {object} себебі болады")),
+        ReasPredicate::GoesTo
+        | ReasPredicate::After
+        | ReasPredicate::HasQuantity
+        | ReasPredicate::DoesTo => None,
+    };
+    rendered
+        .filter(|text| !text.trim().is_empty())
+        .map(ensure_sentence_period)
+        .or_else(|| {
+            let text = fact.raw_text.trim();
+            if text.is_empty() {
+                None
+            } else {
+                Some(ensure_sentence_period(text.to_string()))
+            }
+        })
+}
+
+fn predicate_name_matches(predicate: ReasPredicate, needle: &str) -> bool {
+    let normalised = needle.to_lowercase().replace('_', "");
+    predicate.as_str().replace('_', "") == normalised
+}
+
+fn preferred_subject_text(slot: &adam_reasoning::SlotRef) -> String {
+    capitalise_first(preferred_slot_text(slot))
+}
+
+fn preferred_object_text(slot: &adam_reasoning::SlotRef) -> String {
+    preferred_slot_text(slot)
+}
+
+fn preferred_slot_text(slot: &adam_reasoning::SlotRef) -> String {
+    let text = if slot.surface.trim().is_empty() {
+        slot.root.trim()
+    } else {
+        slot.surface.trim()
+    };
+    text.to_string()
+}
+
+fn capitalise_first(text: String) -> String {
+    let mut chars = text.chars();
+    match chars.next() {
+        Some(c) => c.to_uppercase().chain(chars).collect(),
+        None => String::new(),
+    }
+}
+
+fn ensure_sentence_period(text: String) -> String {
+    if text.ends_with(['.', '!', '?']) {
+        text
+    } else {
+        format!("{text}.")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -361,7 +480,7 @@ mod tests {
                 sample_id: "t1".into(),
             },
             confidence: ConfidenceKind::Grammar,
-            raw_text: "test".into(),
+            raw_text: format!("{subject} — {object}"),
         }
     }
 
@@ -484,11 +603,13 @@ mod tests {
 
     #[test]
     fn search_graph_filters_by_subject() {
-        let extracted = vec![
-            fact("жер", Predicate::IsA, "аспан денесі"),
-            fact("күн", Predicate::IsA, "жұлдыз"),
-            fact("жер", Predicate::Has, "ауа"),
-        ];
+        let mut a = fact("жер", Predicate::IsA, "аспан денесі");
+        a.confidence = ConfidenceKind::HumanApproved;
+        let mut b = fact("күн", Predicate::IsA, "жұлдыз");
+        b.confidence = ConfidenceKind::HumanApproved;
+        let mut c = fact("жер", Predicate::Has, "ауа");
+        c.confidence = ConfidenceKind::HumanApproved;
+        let extracted = vec![a, b, c];
         let belief = BeliefState::new();
         let r = Tool::dispatch(
             ToolCall::SearchGraph {
@@ -503,10 +624,11 @@ mod tests {
 
     #[test]
     fn search_graph_filters_by_subject_and_predicate() {
-        let extracted = vec![
-            fact("жер", Predicate::IsA, "аспан денесі"),
-            fact("жер", Predicate::Has, "ауа"),
-        ];
+        let mut a = fact("жер", Predicate::IsA, "аспан денесі");
+        a.confidence = ConfidenceKind::HumanApproved;
+        let mut b = fact("жер", Predicate::Has, "ауа");
+        b.confidence = ConfidenceKind::HumanApproved;
+        let extracted = vec![a, b];
         let belief = BeliefState::new();
         let r = Tool::dispatch(
             ToolCall::SearchGraph {
@@ -518,6 +640,64 @@ mod tests {
         assert!(r.success);
         assert_eq!(r.findings.len(), 1);
         assert!(r.findings[0].contains("аспан денесі"));
+    }
+
+    #[test]
+    fn search_graph_only_surfaces_human_approved_facts() {
+        let mut curated = fact("қазақстан", Predicate::IsA, "мемлекет");
+        curated.confidence = ConfidenceKind::HumanApproved;
+        curated.raw_text = "Қазақстан — мемлекет".into();
+        let noisy = fact("қазақстан", Predicate::IsA, "ұйым");
+        let belief = BeliefState::new();
+        let r = Tool::dispatch(
+            ToolCall::SearchGraph {
+                subject: "қазақстан".into(),
+                predicate: None,
+            },
+            &ctx(&belief, &[curated, noisy]),
+        );
+        assert!(r.success);
+        assert_eq!(r.findings, vec!["Қазақстан — мемлекет.".to_string()]);
+    }
+
+    #[test]
+    fn grounded_fact_composer_renders_part_of_as_sentence() {
+        let mut fact = fact("әке", Predicate::PartOf, "отбасы");
+        fact.confidence = ConfidenceKind::HumanApproved;
+        fact.raw_text = "Әке — отбасының мүшесі".into();
+        assert_eq!(
+            render_grounded_fact(&fact),
+            Some("Әке отбасы құрамына кіреді.".to_string())
+        );
+    }
+
+    #[test]
+    fn grounded_fact_composer_falls_back_to_raw_text_when_needed() {
+        let mut fact = fact("таң", Predicate::After, "түн");
+        fact.confidence = ConfidenceKind::HumanApproved;
+        fact.raw_text = "Таң түннен кейін келеді".into();
+        assert_eq!(
+            render_grounded_fact(&fact),
+            Some("Таң түннен кейін келеді.".to_string())
+        );
+    }
+
+    #[test]
+    fn grounded_fact_keeps_richer_raw_text_for_is_a() {
+        let mut fact = fact("қазақстан", Predicate::IsA, "ел");
+        fact.confidence = ConfidenceKind::HumanApproved;
+        fact.raw_text = "Қазақстан — Орталық Азиядағы ел".into();
+        assert_eq!(
+            render_grounded_fact(&fact),
+            Some("Қазақстан — Орталық Азиядағы ел.".to_string())
+        );
+    }
+
+    #[test]
+    fn pack_allowlist_blocks_synthetic_and_cc100_for_chat() {
+        assert!(pack_is_chat_safe("abai_wikisource_pack.json"));
+        assert!(!pack_is_chat_safe("synthetic_sentences_pack.json"));
+        assert!(!pack_is_chat_safe("cc100_kk_pack.json"));
     }
 
     /// v4.0.38 — SearchRetrieval without a MorphemeIndex returns

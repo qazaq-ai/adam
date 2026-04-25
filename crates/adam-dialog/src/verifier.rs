@@ -129,6 +129,10 @@ impl Verifier {
             },
             Action::RetrieveEvidence => match intent {
                 Intent::Unknown {
+                    grounded_fact: Some(_),
+                    ..
+                } => evidence_count += 1,
+                Intent::Unknown {
                     example: Some(_), ..
                 } => evidence_count += 1,
                 _ => issues.push(VerificationIssue::MissingEvidence),
@@ -207,6 +211,9 @@ impl Verifier {
         matches!(
             intent,
             Intent::Unknown {
+                grounded_fact: Some(_),
+                ..
+            } | Intent::Unknown {
                 reasoning_chain: Some(_),
                 ..
             } | Intent::Unknown {
@@ -235,6 +242,7 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             raw_tokens,
             noun_hint,
             example: None,
+            grounded_fact: None,
             example_adapted: false,
             reasoning_chain: None,
         },
@@ -252,6 +260,7 @@ mod tests {
             raw_tokens: vec![topic.unwrap_or("").into()],
             noun_hint: topic.map(|s| s.into()),
             example: example.map(|s| s.into()),
+            grounded_fact: None,
             example_adapted: false,
             reasoning_chain: chain.map(|s| s.into()),
         }

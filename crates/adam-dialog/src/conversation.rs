@@ -576,11 +576,11 @@ impl Conversation {
     /// audit block enforced.
     ///
     /// Order is fixed and deterministic: SearchBelief (audit),
-    /// RunLocalReasoner (when `derived_facts` non-empty),
-    /// SearchRetrieval (when `morpheme_index` attached). Reply text
-    /// stays byte-identical to v4.1.6 because intent fields populated
-    /// by `apply_tool_results` are independent (one writes
-    /// `reasoning_chain`, another writes `example`).
+    /// SearchGraph (curated direct facts), SearchRetrieval (safe
+    /// packs only, when `morpheme_index` attached), then
+    /// RunLocalReasoner (when `derived_facts` non-empty). This gives
+    /// user-facing chat a grounded direct-fact path before evidence
+    /// quotes and keeps reasoning as the last fallback.
     fn tool_plan_for_turn(
         &self,
         intent: &Intent,
@@ -602,13 +602,13 @@ impl Conversation {
             predicate: None,
         });
 
-        // RunLocalReasoner — only meaningful when derived_facts
-        // attached. Honours `curated_only_reasoning` (v4.0.3
-        // investor-safe gate, v4.1.2 routed through the tool).
-        if !self.derived_facts.is_empty() {
-            plan.push(crate::tool::ToolCall::RunLocalReasoner {
-                topic: noun.clone(),
-                curated_only: self.curated_only_reasoning,
+        // SearchGraph — only human-approved direct facts are surfaced
+        // into user-facing chat. Grammar-extracted graph entries stay
+        // audit-only via the trace until they are curated.
+        if !self.extracted_facts.is_empty() {
+            plan.push(crate::tool::ToolCall::SearchGraph {
+                subject: noun.clone(),
+                predicate: None,
             });
         }
 
@@ -625,6 +625,16 @@ impl Conversation {
             plan.push(crate::tool::ToolCall::SearchRetrieval { morphemes });
         }
 
+        // RunLocalReasoner — only meaningful when derived_facts
+        // attached. Honours `curated_only_reasoning` (v4.0.3
+        // investor-safe gate, v4.1.2 routed through the tool).
+        if !self.derived_facts.is_empty() {
+            plan.push(crate::tool::ToolCall::RunLocalReasoner {
+                topic: noun.clone(),
+                curated_only: self.curated_only_reasoning,
+            });
+        }
+
         plan
     }
 
@@ -634,8 +644,9 @@ impl Conversation {
     /// the v4.0.37 → v4.1.5 `inject_*` helpers' intent-mutation
     /// logic with a single uniform fold.
     ///
-    /// `SearchBelief` and `SearchGraph` are audit-only — they record
-    /// on `TurnTrace.tool_calls` but never mutate the intent.
+    /// `SearchBelief` stays audit-only; `SearchGraph` can now seed a
+    /// grounded direct fact into `Intent::Unknown.example` before
+    /// retrieval or reasoning run.
     fn apply_tool_results(
         &self,
         intent: &mut Intent,
@@ -644,17 +655,31 @@ impl Conversation {
     ) {
         for result in results {
             match &result.call {
+                crate::tool::ToolCall::SearchGraph { .. } => {
+                    self.apply_graph_result(intent, result);
+                }
                 crate::tool::ToolCall::SearchRetrieval { .. } => {
                     self.apply_retrieval_result(intent, result, lexicon);
                 }
                 crate::tool::ToolCall::RunLocalReasoner { .. } => {
                     apply_reasoning_result(intent, result);
                 }
-                crate::tool::ToolCall::SearchBelief { .. }
-                | crate::tool::ToolCall::SearchGraph { .. } => {
+                crate::tool::ToolCall::SearchBelief { .. } => {
                     // Audit-only: no intent mutation.
                 }
             }
+        }
+    }
+
+    fn apply_graph_result(&self, intent: &mut Intent, result: &crate::tool::ToolResult) {
+        let Intent::Unknown { grounded_fact, .. } = intent else {
+            return;
+        };
+        if grounded_fact.is_some() {
+            return;
+        }
+        if let Some(text) = result.findings.first().cloned() {
+            *grounded_fact = Some(text);
         }
     }
 
@@ -674,6 +699,7 @@ impl Conversation {
         let Intent::Unknown {
             noun_hint: Some(noun),
             example,
+            grounded_fact: _,
             example_adapted,
             ..
         } = intent
@@ -689,7 +715,8 @@ impl Conversation {
         let candidate_text = result.findings.first().cloned().or_else(|| {
             index
                 .search(noun)
-                .first()
+                .iter()
+                .find(|s| crate::tool::pack_is_chat_safe(&s.pack))
                 .and_then(|s| index.sample_text(s).map(|t| t.to_string()))
         });
         if let Some(text) = candidate_text {
@@ -1035,102 +1062,73 @@ pub(crate) fn score_derivation(d: &DerivedFact, noun: &str) -> i32 {
 }
 
 pub(crate) fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
-    // Every arm MUST include the marker stem «байланыс-» (or one of its
-    // forms) so downstream consumers can distinguish a reasoning
-    // citation from a verbatim corpus quote at the textual level alone.
-    // v2.7 handled IsA + RelatedTo + generic fallback. v2.8 adds
-    // predicate-specific renderings for Has / GoesTo / LivesIn /
-    // PartOf so every derived variant produces idiomatic Kazakh.
-    //
-    // v3.8.5: all case suffixes synthesised via FST (no dash-
-    // concatenation) — the previous `"{}-ға"` template produced
-    // morphologically-invalid surfaces like `атау-ға` / `өсімдік-ға`
-    // which broke vowel harmony and the no-invalid-form invariant.
-    match d.predicate {
+    // Every output MUST keep the marker stem «байланыс-» so the user
+    // can distinguish a reasoned statement from a direct fact or a
+    // retrieval quote. The marker now lives in one consistent prefix;
+    // the predicate-specific clause that follows is kept short and
+    // human-readable.
+    let clause = match d.predicate {
         ReasPredicate::RelatedTo => {
-            // "X пен Y бір-біріне байланысты" — shared-type relation
-            format!(
-                "{} пен {} бір-біріне байланысты екен",
-                d.subject.root, d.object.root
-            )
+            format!("{} мен {} өзара байланысты", d.subject.root, d.object.root)
         }
-        ReasPredicate::IsA => {
-            // Transitivity-derived IsA — the reasoner chained.
-            format!(
-                "қорытынды: {} — {} (байланысты ой-тізбек арқылы)",
-                d.subject.root, d.object.root
-            )
-        }
+        ReasPredicate::IsA => format!("{} — {}", d.subject.root, d.object.root),
         ReasPredicate::Has => {
-            // Inheritance-derived Has via R2.
             format!(
-                "ой-тізбек: {} {} қатысты байланысы бар (иелік мұрагерлік)",
+                "{} {} ие болады",
                 d.subject.root,
                 inflect(&d.object.root, Case::Dative)
             )
         }
         ReasPredicate::GoesTo => {
             format!(
-                "{} {} жағына байланысты қозғалыс ретінде шықты",
-                d.subject.root, d.object.root
-            )
-        }
-        ReasPredicate::LivesIn => {
-            format!(
-                "{} {} орнымен байланысты мекендеу қорытындысы бар",
-                d.subject.root, d.object.root
-            )
-        }
-        ReasPredicate::PartOf => {
-            // v3.8.5 — use dative instead of genitive to sidestep the
-            // pre-v3.9 FST bug where genitive-after-vowel produces
-            // `қаладың` instead of `қаланың` (the `{D}{I}ң` template's
-            // {D} archiphoneme lacks the "after-vowel → н" rule that
-            // genitive requires but ablative does not).
-            format!(
-                "{} {} құрамына байланысты бір бөлігі ретінде шықты",
+                "{} {} барады",
                 d.subject.root,
                 inflect(&d.object.root, Case::Dative)
             )
         }
-        // v3.5.0 additions. Each keeps the «байланыс-» marker per the
-        // trust-stack invariant (test-enforced in v2.7+).
-        ReasPredicate::Causes => {
-            // v3.8.5 — same FST genitive bug → avoid genitive here too.
+        ReasPredicate::LivesIn => {
             format!(
-                "{} {} себеп болатыны байланысты ой-тізбек арқылы шықты",
+                "{} {} тұрады",
+                d.subject.root,
+                inflect(&d.object.root, Case::Locative)
+            )
+        }
+        ReasPredicate::PartOf => {
+            format!(
+                "{} {} құрамына кіреді",
+                d.subject.root,
+                inflect(&d.object.root, Case::Dative)
+            )
+        }
+        ReasPredicate::Causes => {
+            format!(
+                "{} {} себеп болады",
                 d.subject.root,
                 inflect(&d.object.root, Case::Dative)
             )
         }
         ReasPredicate::After => {
             format!(
-                "{} {} кейін болатындығы байланысты уақыт-тізбек арқылы шықты",
+                "{} {} кейін келеді",
                 d.subject.root,
                 inflect(&d.object.root, Case::Ablative)
             )
         }
         ReasPredicate::HasQuantity => {
             format!(
-                "{} {} байланысты санды қатынас ретінде шықты",
+                "{} {} қатысты сандық байланысқа ие",
                 d.subject.root,
                 inflect(&d.object.root, Case::Instrumental)
             )
         }
         ReasPredicate::DoesTo => {
-            format!(
-                "{} {} үстінде байланысты әрекет иесі ретінде шықты",
-                d.subject.root, d.object.root
-            )
+            format!("{} {} үстінде әрекет етеді", d.subject.root, d.object.root)
         }
         ReasPredicate::InDomain => {
-            format!(
-                "{} {} байланысты мүше ретінде шықты",
-                d.subject.root,
-                inflect(&d.object.root, Case::Dative)
-            )
+            format!("{} {} саласына жатады", d.subject.root, d.object.root)
         }
-    }
+    };
+    format!("байланыс бойынша, {clause}")
 }
 
 /// v3.8.5 — synthesise a noun in the requested grammatical case via FST.
