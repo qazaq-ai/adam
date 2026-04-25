@@ -380,7 +380,11 @@ impl Conversation {
         // Unknown, optionally composing it with session slots per
         // compose_mode. Deterministic throughout — ranker ties break
         // on (pack, sample_id), compose_with_city is a pure function.
-        self.inject_retrieval_example(&mut intent, &parses, lexicon);
+        // **v4.1.1** — `inject_retrieval_example` now routes through
+        // `Tool::dispatch(SearchRetrieval)`; we capture the resulting
+        // `ToolResult` here so the audit block below can record it
+        // instead of issuing a duplicate dispatch.
+        let retrieval_tool_result = self.inject_retrieval_example(&mut intent, &parses, lexicon);
 
         // v2.7: inject a rule-derived reasoning chain into Unknown
         // when `derived_facts` are attached and the noun_hint appears
@@ -433,6 +437,7 @@ impl Conversation {
                 extracted: &self.extracted_facts,
                 derived: &self.derived_facts,
                 retrieval: self.morpheme_index.as_ref(),
+                rank_config: self.rank_config.as_ref(),
             };
             // Belief consult — always cheap, surfaces what the
             // system already knows about USER for this topic.
@@ -452,21 +457,16 @@ impl Conversation {
                     &tool_ctx,
                 ));
             }
-            // Retrieval consult — only meaningful when an index is
-            // attached. The morphemes are the content roots from
-            // the parses (matches what `inject_retrieval_example`
-            // would have used internally).
-            if self.morpheme_index.is_some() {
-                let morphemes: Vec<String> = crate::semantics::content_roots(&parses);
-                let morphemes = if morphemes.is_empty() {
-                    vec![topic.clone()]
-                } else {
-                    morphemes
-                };
-                tool_calls.push(crate::tool::Tool::dispatch(
-                    crate::tool::ToolCall::SearchRetrieval { morphemes },
-                    &tool_ctx,
-                ));
+            // Retrieval consult — **v4.1.1** now driven by
+            // `inject_retrieval_example` (the actual data flow), so
+            // we record the dispatched `ToolResult` here instead of
+            // issuing a duplicate call. Pre-v4.1.1 the audit-mode
+            // dispatch shadowed the `inject_*` helper with a fresh
+            // call that used a hardcoded `RankConfig::default()`,
+            // diverging from the actual retrieval path whenever the
+            // conversation had a non-default `rank_config`.
+            if let Some(r) = retrieval_tool_result {
+                tool_calls.push(r);
             }
         }
 
@@ -743,58 +743,77 @@ impl Conversation {
     ///
     /// No-op for every non-Unknown intent, for unknown-without-noun,
     /// and when the index is absent.
+    /// **v4.1.1** — first step of "tools as execution" (Codex Phase 6
+    /// follow-up). Pre-v4.1.1 this method called `MorphemeIndex::rank`
+    /// directly; the audit-mode `Tool::dispatch(SearchRetrieval)` in
+    /// `turn_with_trace` shadowed it with a duplicate call. Now the
+    /// primary path *is* the tool dispatch — `Tool::SearchRetrieval`
+    /// honours `ToolContext.rank_config` so the per-conversation
+    /// `RankConfig` override is preserved. The single-morpheme
+    /// postings fallback (v1.6.5 path — `index.search(noun).first()`)
+    /// stays local because it's a different lookup mechanism, not a
+    /// ranked search.
+    ///
+    /// Returns the dispatched `ToolResult` so `turn_with_trace` can
+    /// record it on `TurnTrace.tool_calls` instead of issuing a
+    /// redundant audit-mode call.
     fn inject_retrieval_example(
         &self,
         intent: &mut Intent,
         parses: &[adam_kernel_fst::parser::Analysis],
         lexicon: &LexiconV1,
-    ) {
-        let Some(index) = self.morpheme_index.as_ref() else {
-            return;
-        };
-        if let Intent::Unknown {
+    ) -> Option<crate::tool::ToolResult> {
+        let index = self.morpheme_index.as_ref()?;
+        let Intent::Unknown {
             noun_hint: Some(noun),
             example,
             example_adapted,
             ..
         } = intent
-        {
-            if example.is_some() {
-                return;
-            }
-            // v1.7.0: rank over all content roots, not just the first.
-            let roots = content_roots(parses);
-            let root_refs: Vec<&str> = if roots.is_empty() {
-                vec![noun.as_str()]
-            } else {
-                roots.iter().map(|s| s.as_str()).collect()
-            };
-            let default_cfg;
-            let config = match self.rank_config.as_ref() {
-                Some(c) => c,
-                None => {
-                    default_cfg = RankConfig::default();
-                    &default_cfg
-                }
-            };
-            let ranked = index.rank(&root_refs, config);
-            let candidate_text = ranked
+        else {
+            return None;
+        };
+        if example.is_some() {
+            return None;
+        }
+        // v1.7.0: rank over all content roots, not just the first.
+        // Empty content_roots → fall back to the noun_hint as the
+        // single morpheme (matches pre-v4.1.1 behaviour).
+        let roots = content_roots(parses);
+        let morphemes: Vec<String> = if roots.is_empty() {
+            vec![noun.clone()]
+        } else {
+            roots
+        };
+        let tool_ctx = crate::tool::ToolContext {
+            belief: &self.belief,
+            extracted: &self.extracted_facts,
+            derived: &self.derived_facts,
+            retrieval: Some(index),
+            rank_config: self.rank_config.as_ref(),
+        };
+        let result = crate::tool::Tool::dispatch(
+            crate::tool::ToolCall::SearchRetrieval {
+                morphemes: morphemes.clone(),
+            },
+            &tool_ctx,
+        );
+        let candidate_text = result.findings.first().cloned().or_else(|| {
+            // Fallback: single-morpheme first-posting (v1.6.5 path).
+            // Stays local — `index.search()` is a postings-list lookup,
+            // not a ranked search, so it doesn't fit the
+            // `Tool::SearchRetrieval` semantics.
+            index
+                .search(noun)
                 .first()
-                .and_then(|hit| index.sample_text(&hit.sref).map(|s| s.to_string()))
-                .or_else(|| {
-                    // Fallback: single-morpheme first-posting (v1.6.5 path).
-                    index
-                        .search(noun)
-                        .first()
-                        .and_then(|s| index.sample_text(s).map(|t| t.to_string()))
-                });
-            let Some(text) = candidate_text else {
-                return;
-            };
+                .and_then(|s| index.sample_text(s).map(|t| t.to_string()))
+        });
+        if let Some(text) = candidate_text {
             let (composed_text, was_adapted) = self.maybe_compose(&text, lexicon);
             *example = Some(composed_text);
             *example_adapted = was_adapted;
         }
+        Some(result)
     }
 
     /// v1.9.0 option-B step. If [`compose_mode`](Self::compose_mode) is

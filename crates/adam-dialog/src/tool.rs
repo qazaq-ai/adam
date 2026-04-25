@@ -131,6 +131,16 @@ pub struct ToolContext<'a> {
     pub extracted: &'a [ReasFact],
     pub derived: &'a [DerivedFact],
     pub retrieval: Option<&'a MorphemeIndex>,
+    /// **v4.1.1** — caller-supplied retrieval ranker config. `None`
+    /// means "use [`adam_retrieval::RankConfig::default`]". Threaded
+    /// through `ToolContext` rather than the `ToolCall::SearchRetrieval`
+    /// payload because `RankConfig` is a sizeable struct (weights +
+    /// per-pack purity prior map) and would otherwise be cloned into
+    /// every tool call. Required for `inject_retrieval_example` to
+    /// route through `Tool::dispatch(SearchRetrieval)` while still
+    /// honouring `Conversation::rank_config` (the per-conversation
+    /// override).
+    pub rank_config: Option<&'a adam_retrieval::RankConfig>,
 }
 
 /// Pure-function dispatcher. Reads `ToolContext` references, never
@@ -191,8 +201,15 @@ impl Tool {
                     );
                 };
                 let refs: Vec<&str> = morphemes.iter().map(|s| s.as_str()).collect();
-                let cfg = adam_retrieval::RankConfig::default();
-                let hits = index.rank(&refs, &cfg);
+                let default_cfg;
+                let cfg = match ctx.rank_config {
+                    Some(c) => c,
+                    None => {
+                        default_cfg = adam_retrieval::RankConfig::default();
+                        &default_cfg
+                    }
+                };
+                let hits = index.rank(&refs, cfg);
                 let top: Vec<String> = hits
                     .iter()
                     .take(3)
@@ -293,6 +310,7 @@ mod tests {
             extracted,
             derived: &[],
             retrieval: None,
+            rank_config: None,
         }
     }
 
@@ -409,6 +427,7 @@ mod tests {
             extracted: &[],
             derived: &derived_facts,
             retrieval: None,
+            rank_config: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {

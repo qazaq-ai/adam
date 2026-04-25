@@ -7,6 +7,43 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.1.1] — 2026-04-25 — Tools as execution, step 1 (retrieval path)
+
+First v4.1.x patch. Begins the **tools-as-execution** migration the Codex strategic review queued after v4.0.38 wired audit-mode `Tool::dispatch`. Pre-v4.1.1 `inject_retrieval_example` called `MorphemeIndex::rank` directly while the audit-mode `Tool::dispatch(SearchRetrieval)` in `turn_with_trace` shadowed it with a duplicate call — same `MorphemeIndex`, same morphemes, but with a hardcoded `RankConfig::default()` that diverged from the conversation's actual `rank_config`. Now `inject_retrieval_example` *is* the tool dispatch.
+
+### What landed
+
+- `ToolContext` gains a `rank_config: Option<&'a RankConfig>` field. Threaded through context (not the `ToolCall::SearchRetrieval` payload) because `RankConfig` is a sizeable struct with a per-pack purity-prior `BTreeMap` — cloning it into every tool call would be wasteful.
+- `Tool::SearchRetrieval` dispatcher now uses `ctx.rank_config.unwrap_or(&RankConfig::default())` instead of always allocating a fresh default. The audit-mode dispatch and the conversation's actual retrieval path now share the exact same ranker config.
+- `Conversation::inject_retrieval_example` rewritten:
+  - Builds a `ToolContext` (with `rank_config: self.rank_config.as_ref()`).
+  - Calls `Tool::dispatch(ToolCall::SearchRetrieval { morphemes })` for the primary path.
+  - Takes the first finding text as the candidate quote.
+  - Falls back to the v1.6.5 single-morpheme postings lookup (`index.search(noun).first()`) only when the tool returned no hits — postings-list lookup is a different mechanism than ranked search and doesn't fit `Tool::SearchRetrieval` semantics.
+  - Applies `maybe_compose` for opt-in city swap (v1.9.0+).
+  - **Returns the dispatched `ToolResult`** so the caller can record it on `TurnTrace.tool_calls`.
+- `turn_with_trace` no longer issues a duplicate audit-mode `SearchRetrieval` dispatch. Instead it appends the captured `ToolResult` from `inject_retrieval_example` to `tool_calls`. `SearchBelief` and `RunLocalReasoner` audit dispatches are unchanged — they don't yet have actual data-flow callers, so they stay audit-only until v4.1.2 / v4.1.5.
+
+### Why this matters
+
+Pre-v4.1.1 the audit trail in `adam_chat --trace` claimed to record "what stores were consulted on this turn" but for `SearchRetrieval` the recorded call diverged from the actual retrieval — different config object, slightly different ranking. A user reading the trace got one answer in the reply text and a different ranker's view of the corpus in the audit lines. Now they're the same call.
+
+It's also the first concrete step toward making `Tool::dispatch` the executive path. Once `RunLocalReasoner` (v4.1.2) and `SearchBelief` (v4.1.5) get the same treatment, the `inject_*` helpers become trivial wrappers around `Tool::dispatch` — at that point the planner can branch on tool results directly instead of inspecting injected intent fields.
+
+### Tests
+
+**577 passing** (unchanged total — same code paths, different routing). 0 warnings on `cargo build`. **Cognitive eval baseline 22 / 22 canonical, 0 / 0 aspirational** — reply text byte-identical to v4.1.0 across every scenario.
+
+### Scope
+
+Single helper rewritten + one `ToolContext` field added + one redundant audit dispatch removed. No belief layer change, no template change, no new ToolCall variants. Reply text byte-identical.
+
+### Next
+
+v4.1.2 will give `inject_reasoning_chain` the same treatment: the data-flow path becomes `Tool::dispatch(RunLocalReasoner)` instead of a direct `derived_facts` scan. v4.1.5 plans to migrate `SearchBelief` (currently used by `belief_direct_answer` lookup-style logic that doesn't go through `Tool::dispatch` at all yet). After all three are tool-driven, the `inject_*` framing can be retired entirely — that's a v4.2.0 minor.
+
+---
+
 ## [4.1.0] — 2026-04-25 — Belief revision via user choice (close aspirational #2, cognitive baseline 22/22)
 
 **First minor in the v4.x track.** Closes the kernel's signature feature: auditable belief revision via user choice. With this, the cognitive_eval baseline reaches **22/22 canonical, 0 aspirational** — every scenario the harness tracked since v4.0.34 now passes.
