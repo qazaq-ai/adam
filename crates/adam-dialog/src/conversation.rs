@@ -26,7 +26,9 @@ use adam_reasoning::{Fact as ReasFact, Predicate as ReasPredicate};
 use adam_retrieval::{MorphemeIndex, RankConfig, compose::compose_with_city};
 
 use crate::intent::Intent;
-use crate::planner::plan_response_with_session;
+// v4.0.34 — turn loop now routes through plan_response_with_epistemic
+// (Codex Phase 5 part 2). The v4.0.33 `plan_response_with_session`
+// remains re-exported from the crate for external callers.
 use crate::realiser::realise;
 use crate::semantics::{content_roots, interpret_text_with_lexicon};
 use crate::templates::TemplateRepository;
@@ -430,7 +432,52 @@ impl Conversation {
             crate::verifier::strip_evidence(intent.clone())
         };
         self.record_intent(&intent);
-        let plan = plan_response_with_session(&intent_for_render, rng_seed, repo, &self.session);
+        // v4.0.34 Phase 5 part 2 — build `extra_slots` carrying
+        // conflict details if the epistemic policy landed on
+        // `Conflicted`. Pulled from the MOST RECENT conflict so
+        // re-contradictions replace older ones, and the
+        // single-active-fact invariant (v4.0.28) is respected.
+        let mut extra_slots: HashMap<String, String> = HashMap::new();
+        if epistemic_status == crate::uncertainty::EpistemicStatus::Conflicted {
+            if let Some(c) = self.belief.contradictions.last() {
+                let old = self
+                    .belief
+                    .facts
+                    .get(c.fact_a_index)
+                    .map(|f| f.object.clone())
+                    .unwrap_or_default();
+                let new = self
+                    .belief
+                    .facts
+                    .get(c.fact_b_index)
+                    .map(|f| f.object.clone())
+                    .unwrap_or_default();
+                // v4.0.34 — map the internal English predicate key
+                // onto a Kazakh surface form so the rendered
+                // conflict-surfacing template reads naturally.
+                // Unmapped predicates fall through to their raw
+                // form — better a slight stylistic oddity than a
+                // silent omission.
+                let predicate_kz = match c.predicate.as_str() {
+                    "name" => "атыңыз",
+                    "age" => "жасыңыз",
+                    "city" => "қалаңыз",
+                    "occupation" => "мамандығыңыз",
+                    other => other,
+                };
+                extra_slots.insert("predicate".into(), predicate_kz.into());
+                extra_slots.insert("old_value".into(), old);
+                extra_slots.insert("new_value".into(), new);
+            }
+        }
+        let plan = crate::planner::plan_response_with_epistemic(
+            &intent_for_render,
+            rng_seed,
+            repo,
+            &self.session,
+            epistemic_status,
+            &extra_slots,
+        );
         let output = realise(&plan);
         let trace = TurnTrace {
             parses,

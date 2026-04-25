@@ -108,6 +108,117 @@ pub fn plan_response_with_session(
     }
 }
 
+/// v4.0.34 — epistemic-aware planner entry (Codex roadmap Phase 5
+/// part 2). Runs the same template-selection algorithm as
+/// [`plan_response_with_session`] but additionally looks at the
+/// `EpistemicStatus` derived by [`crate::uncertainty::UncertaintyPolicy`]
+/// and — for `Intent::Unknown { noun_hint: Some(_), .. }` — overrides
+/// the template key to route conflict / tentative responses to their
+/// own template families.
+///
+/// Override rules:
+///
+/// - `EpistemicStatus::Conflicted` → `unknown.conflicted` (uses
+///   `{predicate}`, `{old_value}`, `{new_value}` slots supplied by
+///   the caller via `extra_slots`).
+/// - `EpistemicStatus::Tentative` → `unknown.tentative` (uses the
+///   `{noun}` slot, softer wording, invites clarification).
+/// - Any other status, or intent without `noun_hint`, or the
+///   overridden family not being present in the repo → falls back
+///   to the base `intent_key(intent)` key and the delegated
+///   [`plan_response_with_session`] path.
+///
+/// Non-`Unknown` intents (greetings, profile statements, etc.) are
+/// untouched — epistemic overrides only apply where the dialog
+/// currently routes `Unknown.with_noun` / `unknown.with_derived_chain` /
+/// `unknown`. This keeps the reply text byte-identical to v4.0.33 for
+/// every non-Unknown intent.
+pub fn plan_response_with_epistemic(
+    intent: &Intent,
+    rng_seed: u64,
+    repo: &TemplateRepository,
+    session: &HashMap<String, String>,
+    epistemic: crate::uncertainty::EpistemicStatus,
+    extra_slots: &HashMap<String, String>,
+) -> ResponsePlan {
+    let mut trace = Vec::new();
+    trace.push(format!("planner: seed={rng_seed}"));
+    trace.push(format!("planner: intent={intent:?}"));
+    trace.push(format!("planner: epistemic={epistemic:?}"));
+
+    let base_key = intent_key(intent);
+    let override_key = match (intent, epistemic) {
+        (
+            Intent::Unknown {
+                noun_hint: Some(_), ..
+            },
+            crate::uncertainty::EpistemicStatus::Conflicted,
+        ) => Some("unknown.conflicted"),
+        (
+            Intent::Unknown {
+                noun_hint: Some(_), ..
+            },
+            crate::uncertainty::EpistemicStatus::Tentative,
+        ) => Some("unknown.tentative"),
+        _ => None,
+    };
+
+    // Only apply the override if the repo actually has templates
+    // registered under the overridden key. Protects against
+    // template-pack regressions — if the v4.0.34 families were
+    // dropped from v1.toml, we fall back to v4.0.33 behaviour
+    // automatically.
+    let key = match override_key {
+        Some(k) if !repo.get(k).is_empty() => {
+            trace.push(format!("planner: epistemic override → {k}"));
+            k
+        }
+        _ => base_key,
+    };
+    trace.push(format!("planner: template_key={key}"));
+
+    let mut slots = session.clone();
+    for (k, v) in extract_slots(intent) {
+        slots.insert(k, v);
+    }
+    // Per-turn extras (e.g. conflict predicate / old_value /
+    // new_value) take precedence over session + intent-extracted
+    // slots since they describe this specific turn's state.
+    for (k, v) in extra_slots {
+        slots.insert(k.clone(), v.clone());
+    }
+    if !slots.is_empty() {
+        trace.push(format!("planner: slots={slots:?}"));
+    }
+
+    let applicable_all = repo.get(key);
+    let fillable: Vec<&String> = applicable_all
+        .iter()
+        .filter(|t| template_is_fillable(t, &slots))
+        .collect();
+    let effective: Vec<&String> = if fillable.is_empty() {
+        applicable_all.iter().collect()
+    } else {
+        fillable
+    };
+
+    let idx = (rng_seed as usize) % effective.len().max(1);
+    let chosen = effective.get(idx).map(|s| (*s).clone()).unwrap_or_default();
+    trace.push(format!(
+        "planner: applicable_total={} fillable={} chosen_index={} text='{}'",
+        applicable_all.len(),
+        effective.len(),
+        idx,
+        chosen,
+    ));
+
+    ResponsePlan {
+        literal: chosen,
+        slots,
+        trace,
+    }
+}
+
 /// True iff every `{placeholder}` appearing in `template` has a
 /// corresponding key in `slots`. Understands the `{slot|features}`
 /// syntax introduced in v0.9.5 — features don't affect fillability,

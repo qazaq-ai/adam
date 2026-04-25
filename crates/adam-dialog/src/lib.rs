@@ -48,7 +48,8 @@ pub use belief::{
 pub use conversation::{ComposeMode, Conversation, IntentKind, TurnTrace};
 pub use intent::{GreetingKind, Intent, SubjectPerson};
 pub use planner::{
-    ResponsePlan, intent_key, plan_response, plan_response_with_repo, plan_response_with_session,
+    ResponsePlan, intent_key, plan_response, plan_response_with_epistemic, plan_response_with_repo,
+    plan_response_with_session,
 };
 pub use realiser::realise;
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};

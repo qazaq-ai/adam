@@ -1596,6 +1596,69 @@ fn action_planner_social_intent() {
     );
 }
 
+/// v4.0.34 Phase 5 part 2 — conflict-surfacing template family
+/// actually fires when belief has a contradiction + Unknown intent
+/// with noun_hint. Pre-v4.0.34 the gate stripped evidence and the
+/// reply was a generic noun-echo; post-v4.0.34 the user sees the
+/// two conflicting claims + a clarifying question.
+#[test]
+fn conflict_surfaces_explicit_clarification_template() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+    let out = conv.turn("жер туралы айтшы", &lex, &repo, 2);
+
+    // Must contain both conflicting values — the whole point is
+    // making the user aware of the disagreement.
+    assert!(
+        out.to_lowercase().contains("алматы"),
+        "conflict reply must cite old value, got: {out:?}"
+    );
+    assert!(
+        out.to_lowercase().contains("астана"),
+        "conflict reply must cite new value, got: {out:?}"
+    );
+    // Must route to clarification — some question marker / kazakh
+    // clarification cue. All three `unknown.conflicted` templates
+    // end with a question; any of «?» / «дұрыс» / «ма» / «нақтылай»
+    // suffices.
+    let markers = ["?", "дұрыс", "нақтылай"];
+    assert!(
+        markers.iter().any(|m| out.contains(m)),
+        "conflict reply must look like a clarifying question, got: {out:?}"
+    );
+    // Sanity — must NOT still be the reasoning-chain marker.
+    assert!(
+        !out.contains("байланыс"),
+        "conflict path must not render a reasoning chain, got: {out:?}"
+    );
+}
+
+/// v4.0.34 — Kazakh predicate mapping in conflict slots. Raw
+/// `c.predicate` would be the English slot key («city»), which would
+/// read awkwardly in a Kazakh sentence. The turn loop maps it to
+/// «қалаңыз» before rendering.
+#[test]
+fn conflict_predicate_renders_in_kazakh() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+    let out = conv.turn("жер туралы айтшы", &lex, &repo, 2);
+    // At least one of the three templates mentions the predicate.
+    // When it does, it must be Kazakh, not the raw English slot key.
+    if out.contains("туралы") || out.contains("екі жауап") {
+        assert!(
+            !out.to_lowercase().contains("city"),
+            "conflict reply must not leak raw English predicate `city`, got: {out:?}"
+        );
+    }
+}
+
 /// v4.0.33 Phase 5 part 1 — `EpistemicStatus` maps each kind of turn
 /// to the right confidence band end-to-end. Reply text unchanged
 /// from v4.0.32 (the policy is a classifier in v4.0.33); v4.0.34

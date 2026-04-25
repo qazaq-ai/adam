@@ -401,3 +401,36 @@ templates = [
     "{name}, {noun} жайында мен мынадай байланысты таптым: {chain}.",
 ]
 
+
+# v4.0.34 — Phase 5 part 2 (Codex roadmap). Explicit conflict-
+# surfacing family. Selected by `plan_response_with_epistemic` when
+# `intent == Unknown`, `noun_hint.is_some()`, and
+# `EpistemicStatus::Conflicted`. Templates consume three slots
+# populated by `Conversation::turn_with_trace` from
+# `belief.contradictions.last()`:
+#   - {predicate} — the field that disagrees (e.g. "city", "name")
+#   - {old_value} — the earlier claim
+#   - {new_value} — the current claim
+# The user is explicitly asked which claim is correct rather than
+# the system silently picking one.
+[[families]]
+key = "unknown.conflicted"
+templates = [
+    "Сіз бұрын {predicate} — {old_value} дедіңіз, енді {new_value} дейсіз. Қайсысы дұрыс?",
+    "Түсінбедім: {predicate} {old_value} ма, әлде {new_value} ма?",
+    "{predicate} туралы екі жауап алдым: {old_value} және {new_value}. Нақтылай аласыз ба?",
+]
+
+# v4.0.34 — Phase 5 part 2. Soft-hedging family. Selected when
+# `intent == Unknown`, `noun_hint.is_some()`, and
+# `EpistemicStatus::Tentative` (typically: goal set but the Phase 4
+# verifier flagged MissingEvidence, so evidence was stripped before
+# render). Marks the response as uncertain and invites more context
+# instead of pretending to know.
+[[families]]
+key = "unknown.tentative"
+templates = [
+    "Бәлкім, {noun} туралы айтасыз ба",
+    "{noun} жайында анық емес — көбірек айта аласыз ба",
+    "{noun} туралы нақтырақ не білгіңіз келеді",
+]

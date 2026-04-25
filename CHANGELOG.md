@@ -7,6 +7,95 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.34] — 2026-04-24 — Conflict-surfacing + tentative templates (Codex roadmap Phase 5 part 2)
+
+Sixth architectural patch. Second half of Phase 5. **Reply text actually changes for Conflicted and Tentative cases** — the system for the first time **surfaces contradictions explicitly** in natural Kazakh instead of stripping to a generic fallback.
+
+### Why
+
+Codex roadmap Phase 5: *«Tentative → мягкая формулировка + запрос уточнения; Conflicted → явное указание на конфликт»*. Phase 5 part 1 (v4.0.33) added the `EpistemicStatus` band. Part 2 wires it into template selection.
+
+Before v4.0.34 (with the Phase 4 gate):
+```
+> мен алматыда тұрамын
+> мен астанада тұрамын
+> жер туралы айтшы
+→ «Астанада жер туралы қалай қарайды екен»     # generic noun-echo
+```
+
+After v4.0.34:
+```
+> жер туралы айтшы
+→ «қалаңыз туралы екі жауап алдым: Алматы және Астана. Нақтылай аласыз ба?»
+```
+
+### What landed
+
+**Two new template families** in `data/dialog/templates/v1.toml`:
+
+```toml
+[[families]]
+key = "unknown.conflicted"
+templates = [
+    "Сіз бұрын {predicate} — {old_value} дедіңіз, енді {new_value} дейсіз. Қайсысы дұрыс?",
+    "Түсінбедім: {predicate} {old_value} ма, әлде {new_value} ма?",
+    "{predicate} туралы екі жауап алдым: {old_value} және {new_value}. Нақтылай аласыз ба?",
+]
+
+[[families]]
+key = "unknown.tentative"
+templates = [
+    "Бәлкім, {noun} туралы айтасыз ба",
+    "{noun} жайында анық емес — көбірек айта аласыз ба",
+    "{noun} туралы нақтырақ не білгіңіз келеді",
+]
+```
+
+**New planner entry** `plan_response_with_epistemic`:
+- Runs the same selection algorithm as `plan_response_with_session`.
+- For `Intent::Unknown { noun_hint: Some(_), .. }`, overrides the template key based on `EpistemicStatus`:
+  - `Conflicted` → `unknown.conflicted` (if registered)
+  - `Tentative` → `unknown.tentative` (if registered)
+- Falls back to base `intent_key(intent)` if the override family isn't in the repo — template-pack regressions are recoverable.
+- Accepts `extra_slots: &HashMap<String, String>` for conflict-specific placeholders populated by the turn loop.
+
+**`Conversation::turn_with_trace`** now:
+1. Derives conflict slots from `self.belief.contradictions.last()`:
+   - `{predicate}` — Kazakh surface form («қалаңыз», «атыңыз», «жасыңыз», «мамандығыңыз»; unmapped keys pass through raw).
+   - `{old_value}`, `{new_value}` — from the two contested facts by their indices into `belief.facts`.
+2. Routes through `plan_response_with_epistemic` with the status + slots.
+3. The existing Phase 4 evidence-strip still runs first, so the conflict template sees a clean `Intent::Unknown` without injected chain/example.
+
+### Smoke-test
+
+| sequence | pre-v4.0.34 | post-v4.0.34 |
+|---|---|---|
+| `алматы → астана → жер?` | «Астанада жер туралы қалай қарайды екен» | **«қалаңыз туралы екі жауап алдым: Алматы және Астана. Нақтылай аласыз ба?»** |
+| `жер?` (no conflict, chain attached) | chain rendered | chain rendered (byte-identical) |
+
+Clean paths (all non-Conflicted / non-Tentative turns) are byte-identical to v4.0.33. Only the Conflicted / Tentative branches changed.
+
+### Tests
+
+**565 passing** (+2 from v4.0.33):
+
+- `conflict_surfaces_explicit_clarification_template` — headline v4.0.34 regression: after two conflicting city statements, the reply cites both values + carries a clarifying cue (`?` / «дұрыс» / «нақтылай»), and does NOT carry the «байланыс» reasoning marker.
+- `conflict_predicate_renders_in_kazakh` — raw English slot keys («city») never leak into user-facing reply text.
+
+### Scope
+
+**Phase 5 part 2.** No new Rust types, no data changes. Only `v1.toml` grew by two families and the turn loop by a conflict-slot builder.
+
+Reserved `VerificationIssue` variants (`WeakDerivation`, `IncompleteSlots`, `UnsafeGeneralization`) still not emitted — Phase 6 will wire retrieval-score and confidence-band signals into them.
+
+### Next
+
+Codex roadmap Phases 6–7 queued:
+- Phase 6: Tool layer (internal interface: `SearchBelief`, `SearchRetrieval`, `SearchGraph`, `RunLocalReasoner`).
+- Phase 7: Cognitive eval harness (goal continuity, contradiction handling, topic switching).
+
+---
+
 ## [4.0.33] — 2026-04-24 — UncertaintyPolicy classifier (Codex v4.0.26 roadmap Phase 5 part 1)
 
 Fifth architectural patch on Codex's v5.0 roadmap — **first half of Phase 5**. Adds a coarse `EpistemicStatus` band the dialog assigns to every turn. **v4.0.33 scope: classifier + trace only**. Reply text byte-identical to v4.0.32. v4.0.34 (Phase 5 part 2) will add the `unknown.conflicted` / `unknown.tentative` template families and wire the policy into rendering — that's when the reply text starts reflecting the status ("сіз бұрын X дедіңіз, қазір Y дейсіз…" instead of stripping to a generic fallback).
