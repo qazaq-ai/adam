@@ -225,6 +225,34 @@ impl ActionPlanner {
             );
         }
 
+        // 6.5. Parse failure: user typed something but nothing
+        // reducible to a topic, evidence, or chain came out.
+        // Distinct from step 7 (genuinely empty input) — here the
+        // user spoke, we just couldn't read it. Route to
+        // AskClarification (Tentative) with a rephrase prompt
+        // rather than RefuseOutOfScope (Unknown), so the dialog
+        // says "I didn't understand, rephrase?" instead of "out of
+        // scope". Closes aspirational scenario
+        // `aspirational_unparseable_input_distinguished_from_unknown_topic`
+        // (v4.0.35 finding, v4.0.40 fix).
+        if let Intent::Unknown {
+            raw_tokens,
+            noun_hint: None,
+            example: None,
+            reasoning_chain: None,
+            ..
+        } = intent
+        {
+            if raw_tokens.iter().any(|t| !t.is_empty()) {
+                return ActionPlan::new(
+                    Action::AskClarification,
+                    OutputKind::ClarifyingQuestion,
+                    vec!["input present but no topic / evidence / chain extracted".into()],
+                    vec!["intent.raw_tokens".into()],
+                );
+            }
+        }
+
         // 7. Everything else — safe fallback.
         ActionPlan::new(
             Action::RefuseOutOfScope,

@@ -207,11 +207,11 @@
       }
     },
     {
-      "id": "aspirational_unparseable_input_distinguished_from_unknown_topic",
-      "category": "aspirational_gaps",
-      "description": "v4.0.35 finding: the system cannot currently distinguish 'user asked about a topic I have no evidence for' (real noun, no chain → Tentative) from 'user said something I cannot even parse' (no noun_hint at all → currently RefuseOutOfScope+Unknown). Ideally the unparseable case would route to a distinct status like ParseFailure or stay Tentative with a 'rephrase please?' prompt. Tracked as aspirational until Phase 6/7 wires the distinction.",
+      "id": "parse_failure_distinguished_from_unknown_topic",
+      "category": "parse_failure",
+      "description": "v4.0.40: input that doesn't reduce to a topic, evidence, or chain (e.g. nonsense word) routes to AskClarification (epistemic Tentative, 'rephrase please?') instead of RefuseOutOfScope (epistemic Unknown). Distinct from the 'real topic, no evidence' branch (also Tentative, but says 'I don't have facts about X'). Was aspirational pre-v4.0.40 (cognitive_eval flagged it as gap in v4.0.35).",
       "turns": ["обфускаторий"],
-      "expected_failing": true,
+      "expected_failing": false,
       "expect": {
         "epistemic_status": "Tentative"
       }

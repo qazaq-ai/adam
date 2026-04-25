@@ -7,6 +7,56 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.40] — 2026-04-25 — Parse-failure path (close aspirational #1 / Codex roadmap follow-up)
+
+Eleventh release. Closes the first of two aspirational gaps Codex's strategic review left on the v4.0.36 cognitive eval roadmap: distinguishing "user typed something we couldn't parse" from "user asked about a topic we have no facts on". Both were rolled into the same RefuseOutOfScope/Unknown bucket pre-v4.0.40 — now they route differently.
+
+### What landed
+
+**New `ActionPlanner` branch 6.5: parse failure → AskClarification (Tentative).** Pre-v4.0.40 logic was:
+
+```
+6. Intent::Unknown { noun_hint: Some(t), .. } → AskClarification (Tentative, "I don't have facts about t")
+7. Everything else                            → RefuseOutOfScope (Unknown, "out of scope")
+```
+
+That meant input like «обфускаторий» (a nonsense word — no noun_hint extracted) fell to step 7 and got an Unknown safe-fallback. Cognitively this is wrong: the user *did* say something, we just couldn't read it. Now:
+
+```
+6.   Intent::Unknown { noun_hint: Some(t), ..        } → AskClarification, "no evidence on t"
+6.5. Intent::Unknown { noun_hint: None, raw_tokens != [] } → AskClarification, "input present, no topic extracted"
+7.   Everything else (genuinely empty / no Unknown intent at all) → RefuseOutOfScope
+```
+
+Both AskClarification paths produce `EpistemicStatus::Tentative` with `OutputKind::ClarifyingQuestion`. Distinct rationale strings make the trace auditable: a reader can tell whether the dialog is asking "tell me more about X" vs "could you rephrase?".
+
+### Aspirational → canonical
+
+The `aspirational_unparseable_input_distinguished_from_unknown_topic` scenario (turn = «обфускаторий», expects `epistemic_status = Tentative`) is renamed to `parse_failure_distinguished_from_unknown_topic`, moved to category `parse_failure`, and `expected_failing` flipped to `false`. Cognitive eval baseline:
+
+- v4.0.39: canonical 20/20, aspirational 0/2
+- v4.0.40: canonical **21/21**, aspirational 0/1
+
+One aspirational scenario remains: `aspirational_contradiction_resolution_via_user_choice` — multi-turn belief revision. Targeted for v4.0.41.
+
+### Tests
+
+**575 passing** (+1 — the freshly-promoted parse-failure scenario; all other tests unchanged). 0 warnings.
+
+### Why this matters
+
+This isn't UX polish. It's the kernel saying "I parsed nothing, here's what I literally received" instead of "out of scope" — a small but material bit of trace visibility. A user who sees "I didn't understand, rephrase?" can recover; a user who sees "out of scope" doesn't know whether they hit a parser limit or a domain limit.
+
+### Scope
+
+Single new branch in `ActionPlanner`. No change to belief layer, retrieval, or templates. No reply-text rewrite — output template renderer already handles `AskClarification` with no `noun_hint` via the generic clarify prompt.
+
+### Next
+
+v4.0.41 closes the second aspirational scenario: contradiction resolution via user choice (3-turn belief revision flow). Detection of "user is responding to my CheckContradiction question" + flipping the chosen value to Active and superseding others. This is the kernel's signature feature (auditable belief revision) and the first scenario where tools-as-execution starts to pay off.
+
+---
+
 ## [4.0.39] — 2026-04-25 — Hygiene cleanup (Codex v4.0.38 review)
 
 Tenth release. Closes the two hygiene-debt items Codex flagged in the v4.0.38 review. No reply text change, no architecture change — just keeping the codebase clean before the next round of execution work (Codex's recommended next step: tools-as-execution + close 2 aspirational scenarios).
