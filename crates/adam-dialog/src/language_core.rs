@@ -372,8 +372,17 @@ mod tests {
 
     #[test]
     fn geo_catalog_trims_descriptor_phrases() {
-        assert_eq!(canonical_geo_name("Алматы қаласы").as_deref(), Some("Алматы"));
-        assert_eq!(canonical_geo_name("Каспий теңізі").as_deref(), Some("Каспий"));
-        assert_eq!(canonical_geo_name("город Алматы").as_deref(), Some("Алматы"));
+        assert_eq!(
+            canonical_geo_name("Алматы қаласы").as_deref(),
+            Some("Алматы")
+        );
+        assert_eq!(
+            canonical_geo_name("Каспий теңізі").as_deref(),
+            Some("Каспий")
+        );
+        assert_eq!(
+            canonical_geo_name("город Алматы").as_deref(),
+            Some("Алматы")
+        );
     }
 }

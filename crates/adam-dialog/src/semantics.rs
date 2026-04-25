@@ -864,9 +864,21 @@ fn token_mentions_generic_place(token: &str) -> bool {
 }
 
 fn token_mentions_geo_descriptor(token: &str) -> bool {
-    ["ауыл", "қала", "аудан", "облыс", "өңір", "кент", "ел", "өзен", "көл", "теңіз", "тау"]
-        .iter()
-        .any(|stem| token.contains(stem))
+    [
+        "ауыл",
+        "қала",
+        "аудан",
+        "облыс",
+        "өңір",
+        "кент",
+        "ел",
+        "өзен",
+        "көл",
+        "теңіз",
+        "тау",
+    ]
+    .iter()
+    .any(|stem| token.contains(stem))
 }
 
 fn raw_looks_like_named_place(token: &str) -> bool {
