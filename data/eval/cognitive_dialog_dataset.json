@@ -205,6 +205,30 @@
       "expect": {
         "epistemic_status": "Conflicted"
       }
+    },
+    {
+      "id": "aspirational_unparseable_input_distinguished_from_unknown_topic",
+      "category": "aspirational_gaps",
+      "description": "v4.0.35 finding: the system cannot currently distinguish 'user asked about a topic I have no evidence for' (real noun, no chain → Tentative) from 'user said something I cannot even parse' (no noun_hint at all → currently RefuseOutOfScope+Unknown). Ideally the unparseable case would route to a distinct status like ParseFailure or stay Tentative with a 'rephrase please?' prompt. Tracked as aspirational until Phase 6/7 wires the distinction.",
+      "turns": ["обфускаторий"],
+      "expected_failing": true,
+      "expect": {
+        "epistemic_status": "Tentative"
+      }
+    },
+    {
+      "id": "aspirational_contradiction_resolution_via_user_choice",
+      "category": "aspirational_gaps",
+      "description": "Aspirational: user's clarification answer to a CheckContradiction reply should resolve the conflict — flip the chosen value to Active and clear the others to Superseded. Currently the dialog doesn't recognise 'мен астанада дұрыс' as a resolution, so the conflict persists. Phase 6 (tool layer) candidate: a SearchBelief tool could let the planner detect 'this turn is a conflict resolution' and update belief.",
+      "turns": [
+        "мен алматыда тұрамын",
+        "мен астанада тұрамын",
+        "астанада дұрыс"
+      ],
+      "expected_failing": true,
+      "expect": {
+        "belief_contradictions_count": 0
+      }
     }
   ]
 }

@@ -12,9 +12,20 @@
 //! then extend. If we add tools without a baseline, we can't tell
 //! whether Phase 6 improved or broke things.
 //!
-//! Initial baseline: every scenario must pass. Future scenarios can
-//! be marked `expected_failing: true` (not yet supported) to track
-//! aspirational coverage without gating CI red.
+//! Initial baseline: every non-aspirational scenario must pass.
+//! Scenarios marked `expected_failing: true` (v4.0.36) are tracked
+//! separately — their PASSes are reported as "ready to promote" but
+//! their FAILures don't gate CI red. This lets the dataset document
+//! known gaps as concrete tests without blocking releases.
+//!
+//! v4.0.36 — Codex review of v4.0.35 flagged two weaknesses fixed
+//! here:
+//! 1. The pre-v4.0.36 harness silently `return`-ed when lexicon or
+//!    dataset files were missing, so the test stayed green even
+//!    when no evaluation actually ran. Fixed: missing inputs now
+//!    panic with a clear message — the baseline is not skippable.
+//! 2. `expected_failing` was promised in the v4.0.35 docs but not
+//!    implemented. Fixed: full schema + harness support.
 //!
 //! The scenario JSON format is intentionally narrow — it covers what
 //! the v4.0.35 trace exposes (one final-state check per scenario,
@@ -47,6 +58,13 @@ struct Scenario {
     turns: Vec<String>,
     #[serde(default)]
     with_reasoning: bool,
+    /// v4.0.36 — when `true`, this scenario is **aspirational**: its
+    /// FAILures don't fail the test, but its PASSes are surfaced as
+    /// "ready to promote — change `expected_failing` to false". Lets
+    /// the dataset document known gaps as concrete tests without
+    /// gating CI red.
+    #[serde(default)]
+    expected_failing: bool,
     expect: Expect,
 }
 
@@ -80,14 +98,25 @@ fn load_repo() -> TemplateRepository {
     TemplateRepository::load_default().expect("templates v1.toml must exist")
 }
 
-fn load_lexicon() -> Option<LexiconV1> {
+fn load_lexicon() -> LexiconV1 {
+    // v4.0.36 — Codex review of v4.0.35: pre-v4.0.36 this returned
+    // Option and the test silently `return`ed when files were
+    // missing. That defeated the purpose of a baseline-protecting
+    // harness — the test stayed green even when no evaluation ran.
+    // Now: panic with a clear message if the files aren't there.
+    // CI environments must have them or the test fails red.
     let curated = "../../data/tokenizer/segmentation_roots.json";
     let apertium = "../../data/lexicon_v1/apertium_imported_roots.json";
-    if !Path::new(curated).exists() || !Path::new(apertium).exists() {
-        eprintln!("cognitive_eval: lexicon files not present, skipping");
-        return None;
-    }
-    LexiconV1::load(curated, apertium).ok()
+    assert!(
+        Path::new(curated).exists(),
+        "cognitive_eval requires lexicon at {curated}; missing — test cannot establish baseline"
+    );
+    assert!(
+        Path::new(apertium).exists(),
+        "cognitive_eval requires apertium roots at {apertium}; missing"
+    );
+    LexiconV1::load(curated, apertium)
+        .expect("cognitive_eval: lexicon files present but failed to parse")
 }
 
 /// A synthetic reasoning chain for «жер» — used by scenarios that
@@ -236,64 +265,113 @@ fn run_scenario(s: &Scenario, lex: &LexiconV1, repo: &TemplateRepository) -> Res
     Ok(())
 }
 
+/// Aggregated results for one category. Tracks the canonical /
+/// must-pass slice and the aspirational / `expected_failing` slice
+/// separately so the report can show both without conflating them.
+#[derive(Default)]
+struct CategoryReport {
+    canonical_passed: usize,
+    canonical_total: usize,
+    canonical_failures: Vec<String>,
+    aspirational_total: usize,
+    /// Aspirational scenarios that unexpectedly **passed** —
+    /// candidates to flip `expected_failing` off.
+    aspirational_promotions: Vec<String>,
+}
+
 #[test]
 fn cognitive_eval_baseline() {
-    let Some(lex) = load_lexicon() else { return };
+    // v4.0.36 — both loaders are now hard-required (Codex review of
+    // v4.0.35). If the workspace is in a state where lexicon or
+    // dataset is missing, the baseline harness must fail red, not
+    // silently pass.
+    let lex = load_lexicon();
     let repo = load_repo();
 
-    let raw = match std::fs::read_to_string(DATASET_PATH) {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("cognitive_eval: dataset not present at {DATASET_PATH}: {e}");
-            return;
-        }
-    };
+    let raw = std::fs::read_to_string(DATASET_PATH).unwrap_or_else(|e| {
+        panic!(
+            "cognitive_eval: dataset must exist at {DATASET_PATH} for the baseline gate — got {e}"
+        );
+    });
     let dataset: Dataset = serde_json::from_str(&raw).expect("dataset must parse");
+    assert!(
+        !dataset.scenarios.is_empty(),
+        "cognitive_eval dataset must contain at least one scenario"
+    );
 
-    let mut by_category: BTreeMap<String, (usize, usize, Vec<String>)> = BTreeMap::new();
-    let mut total_passed = 0;
-    let mut total = 0;
+    let mut by_category: BTreeMap<String, CategoryReport> = BTreeMap::new();
+    let mut canonical_passed_total = 0usize;
+    let mut canonical_total = 0usize;
+    let mut aspirational_total = 0usize;
+    let mut aspirational_promoted_total = 0usize;
 
     for s in &dataset.scenarios {
-        total += 1;
         let entry = by_category.entry(s.category.clone()).or_default();
-        entry.1 += 1;
-        match run_scenario(s, &lex, &repo) {
-            Ok(()) => {
-                total_passed += 1;
-                entry.0 += 1;
+        let outcome = run_scenario(s, &lex, &repo);
+        if s.expected_failing {
+            entry.aspirational_total += 1;
+            aspirational_total += 1;
+            if outcome.is_ok() {
+                aspirational_promoted_total += 1;
+                entry.aspirational_promotions.push(s.id.clone());
             }
-            Err(reason) => {
-                entry.2.push(format!("{}: {}", s.id, reason));
+        } else {
+            entry.canonical_total += 1;
+            canonical_total += 1;
+            match outcome {
+                Ok(()) => {
+                    entry.canonical_passed += 1;
+                    canonical_passed_total += 1;
+                }
+                Err(reason) => {
+                    entry
+                        .canonical_failures
+                        .push(format!("{}: {}", s.id, reason));
+                }
             }
         }
     }
 
     // Print baseline report — visible in `cargo test -- --nocapture`.
-    eprintln!("\n=== cognitive_eval baseline (v4.0.35) — total {total_passed}/{total} ===");
-    for (cat, (passed, total, failures)) in &by_category {
+    eprintln!(
+        "\n=== cognitive_eval baseline (v4.0.36) — canonical {canonical_passed_total}/{canonical_total}, aspirational promotions {aspirational_promoted_total}/{aspirational_total} ==="
+    );
+    for (cat, r) in &by_category {
         eprintln!(
-            "  {cat:30} {passed:2}/{total:2}  {}",
-            if failures.is_empty() {
+            "  {cat:30} canonical {:2}/{:2}  {}",
+            r.canonical_passed,
+            r.canonical_total,
+            if r.canonical_failures.is_empty() {
                 "OK".to_string()
             } else {
-                format!("FAILED ({})", failures.len())
+                format!("FAILED ({})", r.canonical_failures.len())
             }
         );
-        for f in failures {
+        for f in &r.canonical_failures {
             eprintln!("      ✗ {f}");
+        }
+        if r.aspirational_total > 0 {
+            eprintln!(
+                "  {cat:30} aspirational {}/{} ready-to-promote",
+                r.aspirational_promotions.len(),
+                r.aspirational_total
+            );
+            for id in &r.aspirational_promotions {
+                eprintln!("      ⤴ {id} — flip `expected_failing` to false");
+            }
         }
     }
     eprintln!();
 
-    // Initial baseline: every scenario must pass.
-    let failures: Vec<&String> = by_category
+    // Hard gate: every canonical scenario must pass. Aspirational
+    // failures are OK — that's their declared contract.
+    let canonical_failures: Vec<&String> = by_category
         .values()
-        .flat_map(|(_, _, fs)| fs.iter())
+        .flat_map(|r| r.canonical_failures.iter())
         .collect();
     assert!(
-        failures.is_empty(),
-        "{} scenario(s) failed; see report above",
-        failures.len()
+        canonical_failures.is_empty(),
+        "{} canonical scenario(s) failed; see report above",
+        canonical_failures.len()
     );
 }

@@ -7,6 +7,76 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.36] — 2026-04-24 — Cognitive Eval Harness fixes (Codex v4.0.35 review)
+
+Two fixes on the v4.0.35 baseline harness before Phase 6 builds on top. Codex flagged both — the harness as shipped wasn't actually defending the baseline.
+
+### #1 — Silent skip on missing inputs (real gate hole)
+
+`cognitive_eval_baseline()` pre-v4.0.36 returned early with `eprintln!` when lexicon or dataset files were missing. The test stayed **green** even when no evaluation actually ran, so a CI environment with a broken checkout couldn't detect the breakage. For a "lock in baseline before Phase 6" harness, that's a load-bearing failure.
+
+**Fix:** both loaders now panic with explicit messages:
+
+```rust
+assert!(Path::new(curated).exists(), "cognitive_eval requires lexicon at {curated}; missing — test cannot establish baseline");
+let raw = std::fs::read_to_string(DATASET_PATH).unwrap_or_else(|e| {
+    panic!("cognitive_eval: dataset must exist at {DATASET_PATH} for the baseline gate — got {e}");
+});
+```
+
+`load_lexicon` now returns `LexiconV1` (not `Option<LexiconV1>`) and the dataset read uses `unwrap_or_else(panic!)`. Empty-dataset case also asserted.
+
+### #2 — `expected_failing` promised but unimplemented
+
+The v4.0.35 harness docstring + roadmap claimed scenarios could be marked `expected_failing: true` for aspirational coverage that wouldn't gate CI. The field wasn't in the schema and wasn't honoured.
+
+**Fix:** full implementation:
+
+```rust
+struct Scenario {
+    // ...
+    #[serde(default)]
+    expected_failing: bool,
+    // ...
+}
+```
+
+Harness now tracks two slices independently:
+- **canonical** — scenarios where `expected_failing: false` (default). Failures fail the test red.
+- **aspirational** — scenarios with `expected_failing: true`. Failures are tracked but don't gate. Unexpected **passes** are surfaced as "ready to promote — flip `expected_failing` to false".
+
+Report shape:
+
+```
+=== cognitive_eval baseline (v4.0.36) — canonical 20/20, aspirational promotions 0/2 ===
+  action_routing                 canonical  4/ 4  OK
+  aspirational_gaps              canonical  0/ 0  OK
+  aspirational_gaps              aspirational 0/2 ready-to-promote
+  contradiction_handling         canonical  3/ 3  OK
+  ...
+```
+
+### Two aspirational scenarios added documenting v4.0.35 findings
+
+- `aspirational_unparseable_input_distinguished_from_unknown_topic` — system can't currently distinguish "topic I have no evidence for" from "input I can't even parse"; both hit `Unknown`. Phase 6/7 candidate.
+- `aspirational_contradiction_resolution_via_user_choice` — after a `CheckContradiction` reply, user saying «астанада дұрыс» should resolve the conflict (Active fact = астана, others Superseded). Currently the dialog doesn't recognise the resolution. Phase 6 (tool layer) candidate.
+
+Both fail today; their PASSes will surface as "ready to promote" once Phase 6/7 lands the underlying capability.
+
+### Tests
+
+**566 passing** — unchanged total; harness internals refactored without adding/removing scenarios from the canonical set. The two new aspirational scenarios live alongside.
+
+### Scope
+
+Both Codex review items closed. No production code changed — only the test harness + dataset.
+
+### Next
+
+Phase 6 (Tool Layer) now proceeds with a baseline that actually gates regressions and a clear "ready-to-promote" signal for aspirational scenarios.
+
+---
+
 ## [4.0.35] — 2026-04-24 — Cognitive Eval Harness (Codex roadmap Phase 7a, narrow scope)
 
 Seventh release on Codex's v5.0 roadmap. **Narrow Phase 7** ahead of Phase 6 per Codex sequencing: lock in a measurement baseline across all 5 cognitive phases (Belief→Task→Action→Verifier→Uncertainty) before adding tools. The argument was: if Phase 6 changes quality, we won't know whether tools helped or the existing contour broke without a baseline.
