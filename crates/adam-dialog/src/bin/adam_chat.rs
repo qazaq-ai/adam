@@ -293,6 +293,21 @@ fn run_turn(
         }
         // v4.0.33 — epistemic status (Codex Phase 5 part 1).
         println!("├─ epistem:  {:?}", trace.epistemic_status);
+        // v4.0.37 — tool calls (Codex Phase 6 part 1). Empty until
+        // v4.0.38 wires ActionPlanner through the tool dispatcher.
+        if trace.tool_calls.is_empty() {
+            println!("├─ tools:    none dispatched (v4.0.37 substrate)");
+        } else {
+            println!("├─ tools:    {} call(s)", trace.tool_calls.len());
+            for r in &trace.tool_calls {
+                println!(
+                    "├─ tool: {:?} success={} findings={}",
+                    r.call,
+                    r.success,
+                    r.findings.len()
+                );
+            }
+        }
         for t in &trace.plan_trace {
             println!("├─ {t}");
         }

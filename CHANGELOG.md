@@ -7,6 +7,86 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.37] — 2026-04-24 — Tool Layer substrate (Codex roadmap Phase 6 part 1)
+
+Eighth architectural patch on Codex's v5.0 roadmap — **first half of Phase 6**. Adds a controlled, traceable tool interface for internal lookups. Pre-v4.0.37 the dialog reached into belief / extracted_facts / retrieval index / derived_facts directly from `inject_*` helpers; each call was invisible to the trace and impossible for the planner to *intend* as a distinct action.
+
+**v4.0.37 scope: substrate only.** Reply text byte-identical to v4.0.36. The dispatcher exists and is fully reachable via `Tool::dispatch`, but `Conversation::turn_with_trace` doesn't yet auto-dispatch — `tool_calls: Vec<ToolResult>` on `TurnTrace` stays empty unless a caller invokes the dispatcher directly. v4.0.38 (Phase 6 part 2) will route the existing `inject_*` helpers through this layer.
+
+Splits Phase 6 across two releases — same pattern as Phase 1 (substrate v4.0.27 → fix v4.0.28), Phase 2 (v4.0.29 → v4.0.30), Phase 5 (v4.0.33 → v4.0.34). Each half Codex-reviewable independently.
+
+### What landed
+
+New module `crates/adam-dialog/src/tool.rs` (~330 lines, 8 unit tests).
+
+```rust
+pub enum ToolCall {
+    SearchBelief { subject: String },                    // v4.0.37 — fully implemented
+    SearchGraph { subject: String, predicate: Option<String> },  // v4.0.37 — fully implemented
+    SearchRetrieval { morphemes: Vec<String> },          // v4.0.37 — stub
+    RunLocalReasoner { topic: String },                  // v4.0.37 — stub
+}
+
+pub struct ToolResult {
+    pub call: ToolCall,
+    pub success: bool,
+    pub findings: Vec<String>,
+    pub trace: Vec<String>,
+}
+
+pub struct Tool;
+impl Tool {
+    pub fn dispatch(call: ToolCall, belief: &BeliefState, extracted: &[ReasFact]) -> ToolResult;
+}
+```
+
+### Implemented tools (v4.0.37)
+
+- **`SearchBelief`** — filters `belief.facts` to active matches by subject. Honours the v4.0.28 single-active-fact invariant: contested facts are not returned, so a session with two conflicting city statements gets an empty result rather than ambiguous data.
+- **`SearchGraph`** — filters extracted_facts by subject + optional predicate. Proxies for "search the lexical graph" — the graph index isn't exposed yet, so we filter the flat fact Vec.
+
+### Reserved (Phase 6 part 2)
+
+- **`SearchRetrieval`** — corpus retrieval via `MorphemeIndex::rank`. v4.0.37 returns `success=false` with `"v4.0.37 stub — SearchRetrieval not yet wired to MorphemeIndex; v4.0.38 will wire it"` in the trace.
+- **`RunLocalReasoner`** — invoke the reasoner on demand. Same stub pattern.
+
+### Integration
+
+- `TurnTrace` gains `tool_calls: Vec<ToolResult>` (empty in v4.0.37).
+- `adam_chat --trace` prints:
+  ```
+  ├─ tools:    none dispatched (v4.0.37 substrate)
+  ```
+  When v4.0.38 wires dispatch, this line shows `<n> call(s)` + per-tool detail.
+- `Tool::dispatch` is `pub` from the dialog crate — external callers can use it now (e.g. test harness, future eval scenarios).
+
+### Tests
+
+**574 passing** (+8 from v4.0.36):
+
+- `search_belief_finds_active_fact`
+- `search_belief_empty_on_no_match`
+- `search_belief_skips_contested_facts` — verifies the v4.0.28 invariant carries through to the tool layer.
+- `search_graph_filters_by_subject`
+- `search_graph_filters_by_subject_and_predicate`
+- `search_retrieval_is_stubbed_in_v4_0_37`
+- `run_local_reasoner_is_stubbed_in_v4_0_37`
+- `dispatch_records_call_in_result`
+
+### Scope
+
+**Phase 6 part 1 only.** No reply-text change; substrate proves the dispatcher works and integrates with belief / extracted_facts.
+
+### Next
+
+v4.0.38 (Phase 6 part 2) will:
+1. Route `inject_retrieval_example` through `ToolCall::SearchRetrieval` (wires `MorphemeIndex`).
+2. Route `inject_reasoning_chain` through `ToolCall::RunLocalReasoner` (or a related tool — TBD; reasoner currently consumes derived_facts, not raw topic).
+3. Have `ActionPlanner` populate intended `tool_calls` on `ActionPlan`.
+4. Possibly close one of the v4.0.36 aspirational scenarios (`aspirational_contradiction_resolution_via_user_choice`) by adding a recognise-resolution tool.
+
+---
+
 ## [4.0.36] — 2026-04-24 — Cognitive Eval Harness fixes (Codex v4.0.35 review)
 
 Two fixes on the v4.0.35 baseline harness before Phase 6 builds on top. Codex flagged both — the harness as shipped wasn't actually defending the baseline.

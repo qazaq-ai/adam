@@ -37,6 +37,7 @@ pub mod semantics;
 pub mod slot_syntax;
 pub mod task;
 pub mod templates;
+pub mod tool;
 pub mod uncertainty;
 pub mod verifier;
 
@@ -55,6 +56,7 @@ pub use realiser::realise;
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
 pub use task::{Goal, Subgoal, TaskDigest, TaskState, TaskStatus};
 pub use templates::{TemplateError, TemplateRepository};
+pub use tool::{Tool, ToolCall, ToolResult};
 pub use uncertainty::{EpistemicStatus, UncertaintyPolicy};
 pub use verifier::{VerificationIssue, VerificationReport, Verifier, strip_evidence};
 

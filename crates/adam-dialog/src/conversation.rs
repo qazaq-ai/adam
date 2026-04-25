@@ -194,6 +194,13 @@ pub struct TurnTrace {
     /// from `(plan, verification, intent, belief)`. Pure classifier
     /// output; not yet consumed by templates (v4.0.34 wires that).
     pub epistemic_status: crate::uncertainty::EpistemicStatus,
+    /// v4.0.37 — Phase 6 (part 1) tool-call audit log. Empty in
+    /// v4.0.37: the dispatcher exists and is reachable via
+    /// `Tool::dispatch`, but `turn_with_trace` doesn't yet
+    /// auto-dispatch. v4.0.38 (Phase 6 part 2) wires the existing
+    /// `inject_*` helpers through the tool layer and this Vec
+    /// starts populating.
+    pub tool_calls: Vec<crate::tool::ToolResult>,
     /// Per-step plan trace emitted by `plan_response_with_session`.
     pub plan_trace: Vec<String>,
 }
@@ -492,6 +499,7 @@ impl Conversation {
             action_plan,
             verification,
             epistemic_status,
+            tool_calls: Vec::new(),
             plan_trace: plan.trace.clone(),
         };
         (output, trace)
