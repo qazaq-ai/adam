@@ -309,8 +309,11 @@ fn run_turn(
                     adam_dialog::ToolCall::SearchRetrieval { morphemes } => {
                         format!("SearchRetrieval({} morphemes)", morphemes.len())
                     }
-                    adam_dialog::ToolCall::RunLocalReasoner { topic } => {
-                        format!("RunLocalReasoner({topic})")
+                    adam_dialog::ToolCall::RunLocalReasoner {
+                        topic,
+                        curated_only,
+                    } => {
+                        format!("RunLocalReasoner({topic}, curated_only={curated_only})")
                     }
                 };
                 println!(

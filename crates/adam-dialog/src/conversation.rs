@@ -388,9 +388,11 @@ impl Conversation {
 
         // v2.7: inject a rule-derived reasoning chain into Unknown
         // when `derived_facts` are attached and the noun_hint appears
-        // in a derivation. Pure function of (derived_facts, noun_hint);
-        // no RNG, no side-effects.
-        self.inject_reasoning_chain(&mut intent);
+        // in a derivation. **v4.1.2** — now routes through
+        // `Tool::dispatch(RunLocalReasoner)`; we capture the
+        // resulting `ToolResult` so the audit block below can record
+        // it instead of issuing a duplicate dispatch.
+        let reasoning_tool_result = self.inject_reasoning_chain(&mut intent);
 
         // v4.0.30 — unbounded monotone turn id (Codex v4.0.29 #1 fix).
         // Captured BEFORE absorption so belief.record_user_fact,
@@ -428,8 +430,7 @@ impl Conversation {
         // dispatch. Reply text byte-identical to v4.0.37.
         let mut tool_calls: Vec<crate::tool::ToolResult> = Vec::new();
         if let crate::intent::Intent::Unknown {
-            noun_hint: Some(topic),
-            ..
+            noun_hint: Some(_), ..
         } = &intent
         {
             let tool_ctx = crate::tool::ToolContext {
@@ -447,24 +448,21 @@ impl Conversation {
                 },
                 &tool_ctx,
             ));
-            // Reasoner consult — finds existing derivations on the
-            // topic. Only meaningful when derived_facts attached.
-            if !self.derived_facts.is_empty() {
-                tool_calls.push(crate::tool::Tool::dispatch(
-                    crate::tool::ToolCall::RunLocalReasoner {
-                        topic: topic.clone(),
-                    },
-                    &tool_ctx,
-                ));
+            // Reasoner consult — **v4.1.2** now driven by
+            // `inject_reasoning_chain` (the actual data flow), so we
+            // record the dispatched `ToolResult` here instead of
+            // issuing a duplicate call. Pre-v4.1.2 the audit-mode
+            // dispatch shadowed the `inject_*` helper with a simpler
+            // "top 3 raw triples" tool whose pick could disagree
+            // with the actual reasoning-chain rendering under
+            // tie-breaks (the audit dispatch had no IsA-depth
+            // knowledge). Now both paths share the full picker
+            // inside `Tool::RunLocalReasoner`.
+            if let Some(r) = reasoning_tool_result {
+                tool_calls.push(r);
             }
             // Retrieval consult — **v4.1.1** now driven by
-            // `inject_retrieval_example` (the actual data flow), so
-            // we record the dispatched `ToolResult` here instead of
-            // issuing a duplicate call. Pre-v4.1.1 the audit-mode
-            // dispatch shadowed the `inject_*` helper with a fresh
-            // call that used a hardcoded `RankConfig::default()`,
-            // diverging from the actual retrieval path whenever the
-            // conversation had a non-default `rank_config`.
+            // `inject_retrieval_example` (same pattern).
             if let Some(r) = retrieval_tool_result {
                 tool_calls.push(r);
             }
@@ -599,132 +597,55 @@ impl Conversation {
     /// Returns `usize::MAX` when unreachable so tied callers fall through
     /// to the canonical-triple tie-break. Guarded by `MAX_DEPTH = 8` to
     /// bound pathological cases (graph cycles blocked by `visited`).
-    fn isa_chain_depth(&self, subject: &str, target: &str) -> usize {
-        const MAX_DEPTH: usize = 8;
-        if subject == target {
-            return 0;
-        }
-        let mut visited: std::collections::HashSet<String> = std::collections::HashSet::new();
-        let mut frontier: Vec<String> = vec![subject.to_string()];
-        visited.insert(subject.to_string());
-        for depth in 1..=MAX_DEPTH {
-            let mut next: Vec<String> = Vec::new();
-            for node in &frontier {
-                for f in &self.extracted_facts {
-                    if f.predicate == ReasPredicate::IsA && f.subject.root == *node {
-                        if f.object.root == target {
-                            return depth;
-                        }
-                        if visited.insert(f.object.root.clone()) {
-                            next.push(f.object.root.clone());
-                        }
-                    }
-                }
-            }
-            if next.is_empty() {
-                break;
-            }
-            frontier = next;
-        }
-        usize::MAX
-    }
 
-    fn inject_reasoning_chain(&self, intent: &mut Intent) {
+    /// **v4.1.2** — second step of "tools as execution" (after the
+    /// retrieval-path migration in v4.1.1). Pre-v4.1.2 this method
+    /// scanned `self.derived_facts` directly with its own filter +
+    /// scorer + IsA-depth tiebreak + renderer; the audit-mode
+    /// `Tool::dispatch(RunLocalReasoner)` shadowed it with a simpler
+    /// "top 3 raw triples" tool that could disagree with the actual
+    /// pick under tie-breaks. Now `Tool::RunLocalReasoner` *is* the
+    /// pick + render — same scorer, same IsA-depth tiebreak, same
+    /// `render_derivation_as_kazakh` formatter — and this method
+    /// becomes a thin wrapper that dispatches the tool and writes
+    /// the result to `intent.reasoning_chain`.
+    ///
+    /// Returns the dispatched `ToolResult` so `turn_with_trace` can
+    /// record it on `TurnTrace.tool_calls` instead of issuing a
+    /// redundant audit-mode call.
+    fn inject_reasoning_chain(&self, intent: &mut Intent) -> Option<crate::tool::ToolResult> {
         if self.derived_facts.is_empty() {
-            return;
+            return None;
         }
-        if let Intent::Unknown {
+        let Intent::Unknown {
             noun_hint: Some(noun),
             reasoning_chain,
             ..
         } = intent
-        {
-            if reasoning_chain.is_some() {
-                return;
-            }
-            // Find the first derivation involving `noun`. Prefer the
-            // subject side so the rendered sentence starts with the
-            // user's mentioned word.
-            //
-            // v3.8.5 — two-pass to make this preference strict. Pre-
-            // v3.8.5 did `find(|d| subj == noun || obj == noun)`, which
-            // picks whichever side matches first in storage order — so
-            // `adam_demo` Part 4 could preview «неміс → халқы» but
-            // render «неміс → ара» (a different derivation with
-            // object=неміс earlier in the list). Subject-first makes
-            // the preview and the rendered text always refer to the
-            // same derivation.
-            //
-            // v4.0.3 — when `curated_only_reasoning` is on, every
-            // candidate derivation must pass
-            // `derivation_is_fully_curated` (every `source_chain`
-            // entry rooted in `world_core/`). Otherwise, no chain
-            // fires at all for this noun — the Unknown fallback
-            // continues with retrieval-only behaviour. This is the
-            // investor-safe chat mode promised by `adam_chat --safe`.
-            let passes_safety = |d: &&DerivedFact| -> bool {
-                !self.curated_only_reasoning
-                    || adam_reasoning::reasoner::derivation_is_fully_curated(d)
-            };
-            // v4.0.22 — Codex-reranker: score every candidate derivation
-            // involving `noun` and pick the highest-scoring one. Replaces
-            // the pre-v4.0.22 "first match wins" picker, which Codex
-            // flagged for surfacing weak chains («алматы күшке қатысты
-            // байланысы бар», «абай — маман») when stronger curated
-            // chains were available in the same set.
-            let matched = self
-                .derived_facts
-                .iter()
-                .filter(|d| (d.subject.root == *noun || d.object.root == *noun) && passes_safety(d))
-                .max_by(|a, b| {
-                    score_derivation(a, noun)
-                        .cmp(&score_derivation(b, noun))
-                        // v4.0.24 — graph-distance tie-break for IsA
-                        // derivations. Codex v4.0.23 re-review flagged
-                        // that for «математика туралы айтшы» we had 4
-                        // fully-curated R1 derivations all scoring 11
-                        // (math IsA білім / байлық / мәлімет / қазына).
-                        // The canonical-triple fallback picked байлық
-                        // (through the metaphorical proverb-chain
-                        // «білім IsA байлық») instead of the 1-hop
-                        // direct answer білім. Lower IsA-path depth
-                        // from subject to object wins — the direct
-                        // parent beats transitive ancestors.
-                        //
-                        // Lower depth sorts GREATER under max_by, so
-                        // `Ord::reverse` on the depth comparison makes
-                        // shorter paths win.
-                        .then_with(|| {
-                            if a.predicate == adam_reasoning::Predicate::IsA
-                                && b.predicate == adam_reasoning::Predicate::IsA
-                            {
-                                let da = self.isa_chain_depth(&a.subject.root, &a.object.root);
-                                let db = self.isa_chain_depth(&b.subject.root, &b.object.root);
-                                da.cmp(&db).reverse()
-                            } else {
-                                std::cmp::Ordering::Equal
-                            }
-                        })
-                        // Deterministic tie-break by canonical triple key
-                        // so runs stay byte-identical.
-                        .then_with(|| {
-                            (
-                                a.subject.root.as_str(),
-                                a.predicate.as_str(),
-                                a.object.root.as_str(),
-                            )
-                                .cmp(&(
-                                    b.subject.root.as_str(),
-                                    b.predicate.as_str(),
-                                    b.object.root.as_str(),
-                                ))
-                                .reverse() // lower triple wins on tie
-                        })
-                });
-            let Some(d) = matched else { return };
-            let rendered = render_derivation_as_kazakh(d);
+        else {
+            return None;
+        };
+        if reasoning_chain.is_some() {
+            return None;
+        }
+        let tool_ctx = crate::tool::ToolContext {
+            belief: &self.belief,
+            extracted: &self.extracted_facts,
+            derived: &self.derived_facts,
+            retrieval: self.morpheme_index.as_ref(),
+            rank_config: self.rank_config.as_ref(),
+        };
+        let result = crate::tool::Tool::dispatch(
+            crate::tool::ToolCall::RunLocalReasoner {
+                topic: noun.clone(),
+                curated_only: self.curated_only_reasoning,
+            },
+            &tool_ctx,
+        );
+        if let Some(rendered) = result.findings.first().cloned() {
             *reasoning_chain = Some(rendered);
         }
+        Some(result)
     }
 
     /// For `Intent::Unknown { noun_hint: Some(n), .. }`, if an index is
@@ -1037,7 +958,41 @@ impl Conversation {
 ///   + 1 if subject matches `noun` (preserves pre-v4.0.22 subject-first preference)
 ///
 /// Tie-break is by canonical triple (see `inject_reasoning_chain`).
-fn score_derivation(d: &DerivedFact, noun: &str) -> i32 {
+/// **v4.1.2** — extracted from `Conversation::isa_chain_depth` so the
+/// reasoning-chain tool dispatcher can compute IsA-depth tie-breaks
+/// without requiring a `Conversation` reference. Pure function over
+/// the extracted-fact slice.
+pub(crate) fn isa_chain_depth(extracted: &[ReasFact], subject: &str, target: &str) -> usize {
+    const MAX_DEPTH: usize = 8;
+    if subject == target {
+        return 0;
+    }
+    let mut visited: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut frontier: Vec<String> = vec![subject.to_string()];
+    visited.insert(subject.to_string());
+    for depth in 1..=MAX_DEPTH {
+        let mut next: Vec<String> = Vec::new();
+        for node in &frontier {
+            for f in extracted {
+                if f.predicate == ReasPredicate::IsA && f.subject.root == *node {
+                    if f.object.root == target {
+                        return depth;
+                    }
+                    if visited.insert(f.object.root.clone()) {
+                        next.push(f.object.root.clone());
+                    }
+                }
+            }
+        }
+        if next.is_empty() {
+            break;
+        }
+        frontier = next;
+    }
+    usize::MAX
+}
+
+pub(crate) fn score_derivation(d: &DerivedFact, noun: &str) -> i32 {
     let mut score: i32 = 0;
 
     // 1. Trust (source_chain provenance).
@@ -1097,7 +1052,7 @@ fn score_derivation(d: &DerivedFact, noun: &str) -> i32 {
     score
 }
 
-fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
+pub(crate) fn render_derivation_as_kazakh(d: &DerivedFact) -> String {
     // Every arm MUST include the marker stem «байланыс-» (or one of its
     // forms) so downstream consumers can distinguish a reasoning
     // citation from a verbatim corpus quote at the textual level alone.

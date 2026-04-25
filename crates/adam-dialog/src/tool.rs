@@ -61,14 +61,32 @@ pub enum ToolCall {
     /// `success=false` with an explicit reason.
     SearchRetrieval { morphemes: Vec<String> },
     /// Find an existing rule-derived chain involving the topic.
-    /// v4.0.38 — fully implemented; scans the `derived_facts`
-    /// vector for any derivation whose subject or object matches
-    /// `topic`, returns up to 3 rendered chains as `findings`. The
-    /// "local" qualifier reflects that this consumes pre-computed
-    /// derivations rather than re-running the reasoner; on-demand
-    /// reasoning over arbitrary topics is reserved for a future
-    /// phase.
-    RunLocalReasoner { topic: String },
+    ///
+    /// **v4.1.2** — full picker. Scans `derived_facts` for matches
+    /// (subject or object), filters by `curated_only` (when `true`,
+    /// only fully-curated derivations pass — same gate as
+    /// `Conversation::curated_only_reasoning`), scores each
+    /// candidate via `score_derivation`, breaks ties on IsA-chain
+    /// depth (closer parent wins) then on canonical-triple ordering
+    /// (deterministic), renders the top match via
+    /// `render_derivation_as_kazakh`, and returns it as a single
+    /// finding. Drives `Conversation::inject_reasoning_chain` —
+    /// reply-text identical to the pre-v4.1.2 direct-scan path.
+    ///
+    /// Pre-v4.1.2 this tool returned the top 3 raw triples for
+    /// audit only; the `inject_reasoning_chain` helper did its own
+    /// pick + render. The two paths could disagree under tie-breaks
+    /// because the audit dispatch had no IsA-depth knowledge. v4.1.2
+    /// makes the tool dispatch authoritative for reasoning-chain
+    /// resolution.
+    RunLocalReasoner {
+        topic: String,
+        /// **v4.1.2** — when `true`, only derivations whose every
+        /// `source_chain` entry is rooted in `world_core/` qualify
+        /// (mirrors `derivation_is_fully_curated`). When `false`,
+        /// any derivation involving the topic is in scope.
+        curated_only: bool,
+    },
 }
 
 /// What the tool returned. `findings` are short opaque strings the
@@ -226,27 +244,68 @@ impl Tool {
                     ToolResult::ok(call, top, trace)
                 }
             }
-            ToolCall::RunLocalReasoner { topic } => {
-                let matches: Vec<String> = ctx
+            ToolCall::RunLocalReasoner {
+                topic,
+                curated_only,
+            } => {
+                let passes_safety = |d: &&DerivedFact| -> bool {
+                    !curated_only || adam_reasoning::reasoner::derivation_is_fully_curated(d)
+                };
+                let candidates: Vec<&DerivedFact> = ctx
                     .derived
                     .iter()
-                    .filter(|d| d.subject.root == *topic || d.object.root == *topic)
-                    .take(3)
-                    .map(|d| {
-                        format!(
-                            "{} {:?} {} (rule={})",
-                            d.subject.root, d.predicate, d.object.root, d.rule_id
-                        )
+                    .filter(|d| {
+                        (d.subject.root == *topic || d.object.root == *topic) && passes_safety(d)
                     })
                     .collect();
                 trace.push(format!(
-                    "run_local_reasoner: topic={topic} matches={}",
-                    matches.len()
+                    "run_local_reasoner: topic={topic} curated_only={curated_only} candidates={}",
+                    candidates.len()
                 ));
-                if matches.is_empty() {
-                    ToolResult::empty(call, "run_local_reasoner: no derivation found for topic")
-                } else {
-                    ToolResult::ok(call, matches, trace)
+                let picked = candidates.iter().copied().max_by(|a, b| {
+                    crate::conversation::score_derivation(a, topic)
+                        .cmp(&crate::conversation::score_derivation(b, topic))
+                        .then_with(|| {
+                            if a.predicate == adam_reasoning::Predicate::IsA
+                                && b.predicate == adam_reasoning::Predicate::IsA
+                            {
+                                let da = crate::conversation::isa_chain_depth(
+                                    ctx.extracted,
+                                    &a.subject.root,
+                                    &a.object.root,
+                                );
+                                let db = crate::conversation::isa_chain_depth(
+                                    ctx.extracted,
+                                    &b.subject.root,
+                                    &b.object.root,
+                                );
+                                da.cmp(&db).reverse()
+                            } else {
+                                std::cmp::Ordering::Equal
+                            }
+                        })
+                        .then_with(|| {
+                            (
+                                a.subject.root.as_str(),
+                                a.predicate.as_str(),
+                                a.object.root.as_str(),
+                            )
+                                .cmp(&(
+                                    b.subject.root.as_str(),
+                                    b.predicate.as_str(),
+                                    b.object.root.as_str(),
+                                ))
+                                .reverse()
+                        })
+                });
+                match picked {
+                    None => {
+                        ToolResult::empty(call, "run_local_reasoner: no derivation found for topic")
+                    }
+                    Some(d) => {
+                        let rendered = crate::conversation::render_derivation_as_kazakh(d);
+                        ToolResult::ok(call, vec![rendered], trace)
+                    }
                 }
             }
         }
@@ -432,6 +491,7 @@ mod tests {
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {
                 topic: "жер".into(),
+                curated_only: false,
             },
             &context,
         );
@@ -446,6 +506,7 @@ mod tests {
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {
                 topic: "nonexistent".into(),
+                curated_only: false,
             },
             &ctx(&belief, &[]),
         );

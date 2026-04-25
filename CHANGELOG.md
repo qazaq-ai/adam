@@ -7,6 +7,39 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.1.2] — 2026-04-25 — Tools as execution, step 2 (reasoning path)
+
+Second v4.1.x patch. Continues the **tools-as-execution** migration started in v4.1.1. Pre-v4.1.2 `inject_reasoning_chain` did its own filter + score + IsA-depth tiebreak + render, while audit-mode `Tool::dispatch(RunLocalReasoner)` shadowed it with a simpler "top 3 raw triples" tool that had no IsA-depth knowledge — the two could disagree under tie-breaks. Now `Tool::RunLocalReasoner` *is* the picker + renderer, and `inject_reasoning_chain` is a thin wrapper.
+
+### What landed
+
+- `ToolCall::RunLocalReasoner` gains a `curated_only: bool` field. Mirrors `Conversation::curated_only_reasoning` — when `true`, only fully-curated derivations qualify (every `source_chain` entry rooted in `world_core/`).
+- `Tool::RunLocalReasoner` dispatcher rewritten: filters candidates (subject or object matches `topic`, plus `curated_only` gate), scores via `score_derivation`, breaks ties on IsA-chain depth (closer parent wins) then on canonical-triple ordering (deterministic), renders the top match via `render_derivation_as_kazakh`. Returns a single Kazakh-rendered chain as the finding (not the pre-v4.1.2 top-3 raw-triple list — that audit-only output is gone). 
+- `score_derivation`, `render_derivation_as_kazakh`, and a new free `isa_chain_depth(extracted, subject, target)` are now `pub(crate)` so the dispatcher can call them. `Conversation::isa_chain_depth` (the method wrapper) was removed once nothing internal called it.
+- `Conversation::inject_reasoning_chain` rewritten: builds `ToolContext` (with `extracted_facts` for IsA-depth, `derived_facts`, `curated_only_reasoning` passed via the call payload), dispatches `Tool::RunLocalReasoner { topic, curated_only }`, takes the single finding text, writes it to `intent.reasoning_chain`. Returns `Option<ToolResult>` so `turn_with_trace` can record it on `TurnTrace.tool_calls` instead of issuing a redundant audit-mode call.
+- `turn_with_trace` audit block updated: `RunLocalReasoner` no longer dispatched separately — the `ToolResult` from `inject_reasoning_chain` is appended to `tool_calls`. Same pattern as `SearchRetrieval` in v4.1.1. Only `SearchBelief` audit dispatch remains (no actual data-flow caller yet — v4.1.5 target).
+- `adam_chat --trace` updated: the `RunLocalReasoner` tag now shows `curated_only=` flag.
+
+### Why this matters
+
+Pre-v4.1.2 the audit dispatch and the actual reasoning-chain pick could surface different chains for the same topic, because the audit dispatch's "first 3 matches" picker had no concept of IsA-depth or curated-only safety. A trace reader saw one chain referenced in `tool_calls` and a different chain rendered in the reply. Post-v4.1.2 they're guaranteed identical.
+
+It also moves the heavy reasoning-chain logic out of the `inject_*` framing and into the Tool layer where it belongs. The picker is now a pure function of `(derived_facts, extracted_facts, topic, curated_only)` — testable in isolation, callable from any future planner that wants to surface a derivation.
+
+### Tests
+
+**577 passing** (unchanged total — same code paths, different routing). 0 warnings on `cargo build`. **Cognitive eval baseline 22 / 22 canonical, 0 / 0 aspirational** — reply text byte-identical to v4.1.1 across every scenario. The two existing `RunLocalReasoner` unit tests in `tool.rs` updated for the new field; both still pass (rendered Kazakh contains the matched object root).
+
+### Scope
+
+`Conversation::inject_reasoning_chain` rewritten + `Tool::RunLocalReasoner` rewritten + 3 helpers promoted to `pub(crate)` + 1 `ToolCall` field added + 1 redundant audit dispatch removed + `adam_chat` trace label updated + 2 unit tests adjusted. No template change, no belief layer change, no new ToolCall variants. Reply text byte-identical.
+
+### Next
+
+**v4.1.5** (not v4.1.3 — bump magnitude reflects work) gives `SearchBelief` the same treatment: the `ActionPlanner::belief_direct_answer` lookup currently bypasses `Tool::dispatch` entirely. After that, all three audit-mode tools (SearchBelief, RunLocalReasoner, SearchRetrieval) drive their respective actual code paths, the audit-mode block in `turn_with_trace` is gone, and `inject_*` helpers are trivial wrappers ready to be retired in v4.2.0.
+
+---
+
 ## [4.1.1] — 2026-04-25 — Tools as execution, step 1 (retrieval path)
 
 First v4.1.x patch. Begins the **tools-as-execution** migration the Codex strategic review queued after v4.0.38 wired audit-mode `Tool::dispatch`. Pre-v4.1.1 `inject_retrieval_example` called `MorphemeIndex::rank` directly while the audit-mode `Tool::dispatch(SearchRetrieval)` in `turn_with_trace` shadowed it with a duplicate call — same `MorphemeIndex`, same morphemes, but with a hardcoded `RankConfig::default()` that diverged from the conversation's actual `rank_config`. Now `inject_retrieval_example` *is* the tool dispatch.
