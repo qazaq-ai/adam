@@ -7,6 +7,64 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.2.0] — 2026-04-25 — Tools-as-execution endgame (retire `inject_*`; `turn_with_trace` is a tool-loop interpreter)
+
+**Second v4.x minor.** Closes the tools-as-execution arc started in v4.0.37 (Tool layer substrate) and continued through v4.0.38 (audit-mode wiring), v4.1.1 (retrieval drives data flow), v4.1.2 (reasoning drives data flow), v4.1.5 (belief lookup drives data flow). v4.2.0 retires the `inject_*` framing entirely — `turn_with_trace` now builds a `Vec<ToolCall>` declaring which tools to dispatch, executes them in one uniform loop, and folds results back into the intent through a single `apply_tool_results` function.
+
+**Why a minor and not v4.1.7:** the bump-magnitude rule (`feedback_versioning_post_1_0`) — significant architectural shift, not just a refactor. v4.1.x patches gradually moved each tool to drive its actual data flow; v4.2.0 changes the *control structure* of the dialog turn from "intent-mutation pipeline of imperative helpers" to "data-driven tool plan + uniform interpreter". Adding a new tool consult now means appending a `ToolCall` to the plan, not writing a new helper.
+
+### What landed
+
+- **`Conversation::tool_plan_for_turn(intent, parses) → Vec<ToolCall>`**. Declares the tool dispatch list for a turn. Currently produces (in order): `SearchBelief { subject: USER, predicate: None }` (always for `Unknown+noun_hint`), `RunLocalReasoner { topic, curated_only }` (when `derived_facts` non-empty), `SearchRetrieval { morphemes }` (when `morpheme_index` attached). Empty Vec for non-`Unknown` intents.
+- **`Conversation::apply_tool_results(intent, results, lexicon)`**. Folds tool results back into the intent: `SearchRetrieval` writes `intent.example` (with v1.9.0 city-swap composition + v1.9.5 `example_adapted` flag); `RunLocalReasoner` writes `intent.reasoning_chain`; `SearchBelief` and `SearchGraph` are audit-only (no intent mutation).
+- **`Conversation::apply_retrieval_result`** — a private helper preserving the v1.6.5 single-morpheme postings fallback (`index.search(noun).first()`). The fallback stays local because postings-list lookup is a different mechanism than ranked search and doesn't fit `Tool::SearchRetrieval` semantics.
+- **Free fn `apply_reasoning_result(intent, result)`** — pure function over intent + tool result. No `Conversation` dependency: the picker / IsA-depth tiebreak / renderer all live inside `Tool::RunLocalReasoner` since v4.1.2.
+- **`turn_with_trace`** restructured: build plan → dispatch all in one map → apply all in one fold. Replaces 4 separate code blocks (2 `inject_*` calls + audit dispatch + 2 captured `ToolResult` recordings) with 3 lines of orchestration.
+- **Removed**: `Conversation::inject_retrieval_example`, `Conversation::inject_reasoning_chain`. Their bodies are absorbed into `tool_plan_for_turn` (declares the call) + `apply_*_result` (folds the result). The `inject_*` framing is gone from the codebase.
+
+### State
+
+| | Pre-v4.2.0 | Post-v4.2.0 |
+|---|---|---|
+| Tool dispatch entry points | 4 (2 inject_*, audit block × 3 Tool::dispatch calls) | 1 (`tool_plan_for_turn` → map → `apply_tool_results`) |
+| `inject_*` helpers | 2 | **0** |
+| Adding a new tool consult | new helper + new audit branch + new `ToolResult` capture site | append a `ToolCall` to the plan |
+| `turn_with_trace` orchestration LOC | ~70 (helpers + audit) | ~25 (plan + map + apply) |
+| Reply text | 22/22 cognitive scenarios | **22/22 — byte-identical** |
+
+### Tests
+
+**581 passing** (unchanged — same code paths, different routing). 0 warnings on `cargo build`. **Cognitive eval baseline 22 / 22 canonical, 0 / 0 aspirational** — reply text byte-identical to v4.1.6 across every scenario.
+
+### Why this matters
+
+The v4.0.37 → v4.1.5 arc was about *making `Tool::dispatch` the authoritative call site for each lookup*. Useful, but the orchestration was still imperative: `inject_*` helpers ran in a fixed sequence, each one knew its own dispatch shape, the audit block separately tried to mirror them. Adding a new tool meant touching 3-4 places.
+
+v4.2.0 inverts the control: the **list of tools is data**. The orchestrator doesn't know what tools exist — it just dispatches whatever `tool_plan_for_turn` returns. The result interpreter (`apply_tool_results`) pattern-matches on the `ToolCall` variant and writes the appropriate intent field. Adding a new tool now means: new `ToolCall` variant, dispatcher arm, plan entry, apply arm — but every step is *adding to a list*, not weaving through orchestration code.
+
+This is the foundation needed for any future cognitive work that wants to:
+- run multi-tool sequences (`SearchBelief` → if no result, `RunLocalReasoner` → if no result, `SearchRetrieval`),
+- declare conditional dispatches based on tool results,
+- have `ActionPlanner` return a `Vec<ToolCall>` with the action it plans to take next.
+
+The architecture is now "done enough" — the next 5-10 patches can return to capability work (new World Core domains, new reasoning rules, cognitive eval expansion to 50+ scenarios) per `project_v4_direction`.
+
+### Scope
+
+`Conversation::turn_with_trace` reorganized + 2 `inject_*` helpers removed + 3 helpers added (`tool_plan_for_turn`, `apply_tool_results`, `apply_retrieval_result`) + 1 free fn added (`apply_reasoning_result`). No belief layer change, no template change, no new ToolCall variants, no new public APIs. Reply text byte-identical.
+
+### Next
+
+Per `project_v4_direction` patch cadence: capability work resumes. Candidate v4.2.x patches:
+- New World Core domains (target: 35+ domains, 1000+ entries).
+- New reasoning rules (R12+ — temporal / causal extensions).
+- Cognitive eval to 50+ scenarios (Codex strategic rec #3).
+- Re-run `morpheme_coverage` audit (last baseline v1.5.5: 79.48 %).
+
+Strategic items still open from the Codex v4.1.5 audit: monolith file splits (rec #1), CI core/foundation split (rec #4), corpus profile baseline (rec #5).
+
+---
+
 ## [4.1.6] — 2026-04-25 — Codex v4.1.5 audit follow-up (phonology TODOs + slow-roundtrip surface + adam-train scope)
 
 Hygiene patch addressing three concrete items from the Codex post-v4.1.5 audit. No runtime behaviour change; test count increases from 579 to 581.

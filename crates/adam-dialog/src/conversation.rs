@@ -376,23 +376,36 @@ impl Conversation {
         // purposes (planner picks a response without asking back).
         let mut intent = resolve_follow_up(raw_intent, input, self.active_intent);
 
-        // v1.6.5 / v1.7.0 / v1.9.0: inject a retrieval example into
-        // Unknown, optionally composing it with session slots per
-        // compose_mode. Deterministic throughout — ranker ties break
-        // on (pack, sample_id), compose_with_city is a pure function.
-        // **v4.1.1** — `inject_retrieval_example` now routes through
-        // `Tool::dispatch(SearchRetrieval)`; we capture the resulting
-        // `ToolResult` here so the audit block below can record it
-        // instead of issuing a duplicate dispatch.
-        let retrieval_tool_result = self.inject_retrieval_example(&mut intent, &parses, lexicon);
-
-        // v2.7: inject a rule-derived reasoning chain into Unknown
-        // when `derived_facts` are attached and the noun_hint appears
-        // in a derivation. **v4.1.2** — now routes through
-        // `Tool::dispatch(RunLocalReasoner)`; we capture the
-        // resulting `ToolResult` so the audit block below can record
-        // it instead of issuing a duplicate dispatch.
-        let reasoning_tool_result = self.inject_reasoning_chain(&mut intent);
+        // **v4.2.0** — tool-loop orchestration replaces the v4.0.37
+        // `inject_*` helpers + audit block with a single uniform
+        // pipeline: build a `Vec<ToolCall>` declaring which lookups
+        // this turn needs, dispatch them all once, fold the results
+        // back into the intent. Adding a new tool consult in the
+        // future means appending a `ToolCall` to the plan, not
+        // writing a new `inject_*` helper.
+        //
+        // - **Intent enrichment** (v1.6.5 retrieval example, v2.7
+        //   reasoning chain): driven by `apply_tool_results`. The
+        //   v1.9.0 city-swap composition still applies inside the
+        //   retrieval-result path; ranker ties still break on
+        //   `(pack, sample_id)`; the rendered reasoning chain still
+        //   carries the «байланыс-» trust marker.
+        // - **Audit-only tools** (`SearchBelief`, `SearchGraph`):
+        //   dispatched and recorded on `TurnTrace.tool_calls`; never
+        //   mutate the intent.
+        let tool_plan = self.tool_plan_for_turn(&intent, &parses);
+        let tool_ctx = crate::tool::ToolContext {
+            belief: &self.belief,
+            extracted: &self.extracted_facts,
+            derived: &self.derived_facts,
+            retrieval: self.morpheme_index.as_ref(),
+            rank_config: self.rank_config.as_ref(),
+        };
+        let tool_calls: Vec<crate::tool::ToolResult> = tool_plan
+            .into_iter()
+            .map(|call| crate::tool::Tool::dispatch(call, &tool_ctx))
+            .collect();
+        self.apply_tool_results(&mut intent, &tool_calls, lexicon);
 
         // v4.0.30 — unbounded monotone turn id (Codex v4.0.29 #1 fix).
         // Captured BEFORE absorption so belief.record_user_fact,
@@ -421,59 +434,6 @@ impl Conversation {
         // audit. The template planner below still drives the
         // surface form in v4.0.31 — the verifier (Phase 4) is what
         // will actually gate outputs on `ActionPlan`.
-        // v4.0.38 — Phase 6 part 2: AUDIT-mode tool dispatch.
-        // After the existing `inject_*` helpers have run, dispatch
-        // the corresponding ToolCalls so `tool_calls` on TurnTrace
-        // captures what stores were consulted on this turn. The
-        // existing helpers still drive the actual data flow —
-        // future phases can replace them entirely with tool-driven
-        // dispatch. Reply text byte-identical to v4.0.37.
-        let mut tool_calls: Vec<crate::tool::ToolResult> = Vec::new();
-        if let crate::intent::Intent::Unknown {
-            noun_hint: Some(_), ..
-        } = &intent
-        {
-            let tool_ctx = crate::tool::ToolContext {
-                belief: &self.belief,
-                extracted: &self.extracted_facts,
-                derived: &self.derived_facts,
-                retrieval: self.morpheme_index.as_ref(),
-                rank_config: self.rank_config.as_ref(),
-            };
-            // Belief consult — always cheap, surfaces what the
-            // system already knows about USER for this topic.
-            // **v4.1.5** — uses `predicate: None` so findings render
-            // as full triples for the trace audit. The
-            // `ActionPlanner::belief_direct_answer` slot lookup uses
-            // a separate dispatch with `predicate: Some(slot)` for
-            // single-value retrieval.
-            tool_calls.push(crate::tool::Tool::dispatch(
-                crate::tool::ToolCall::SearchBelief {
-                    subject: crate::belief::USER_SELF_KEY.into(),
-                    predicate: None,
-                },
-                &tool_ctx,
-            ));
-            // Reasoner consult — **v4.1.2** now driven by
-            // `inject_reasoning_chain` (the actual data flow), so we
-            // record the dispatched `ToolResult` here instead of
-            // issuing a duplicate call. Pre-v4.1.2 the audit-mode
-            // dispatch shadowed the `inject_*` helper with a simpler
-            // "top 3 raw triples" tool whose pick could disagree
-            // with the actual reasoning-chain rendering under
-            // tie-breaks (the audit dispatch had no IsA-depth
-            // knowledge). Now both paths share the full picker
-            // inside `Tool::RunLocalReasoner`.
-            if let Some(r) = reasoning_tool_result {
-                tool_calls.push(r);
-            }
-            // Retrieval consult — **v4.1.1** now driven by
-            // `inject_retrieval_example` (same pattern).
-            if let Some(r) = retrieval_tool_result {
-                tool_calls.push(r);
-            }
-        }
-
         let action_plan = crate::action::ActionPlanner::plan(&intent, &self.belief, &self.task);
         self.task.last_action = Some(action_plan.clone());
         // v4.0.32 Phase 4 — verify the chosen plan against evidence
@@ -604,93 +564,113 @@ impl Conversation {
     /// to the canonical-triple tie-break. Guarded by `MAX_DEPTH = 8` to
     /// bound pathological cases (graph cycles blocked by `visited`).
 
-    /// **v4.1.2** — second step of "tools as execution" (after the
-    /// retrieval-path migration in v4.1.1). Pre-v4.1.2 this method
-    /// scanned `self.derived_facts` directly with its own filter +
-    /// scorer + IsA-depth tiebreak + renderer; the audit-mode
-    /// `Tool::dispatch(RunLocalReasoner)` shadowed it with a simpler
-    /// "top 3 raw triples" tool that could disagree with the actual
-    /// pick under tie-breaks. Now `Tool::RunLocalReasoner` *is* the
-    /// pick + render — same scorer, same IsA-depth tiebreak, same
-    /// `render_derivation_as_kazakh` formatter — and this method
-    /// becomes a thin wrapper that dispatches the tool and writes
-    /// the result to `intent.reasoning_chain`.
+    /// **v4.2.0** — Build the list of `ToolCall`s the orchestrator
+    /// should dispatch for this turn, given the resolved intent and
+    /// parses. Replaces the hardcoded `inject_*` dispatch from v4.0.37
+    /// → v4.1.5. The resulting plan is **data**, not code: adding a
+    /// new tool consult means appending a `ToolCall` to this Vec,
+    /// not writing a new helper method.
     ///
-    /// Returns the dispatched `ToolResult` so `turn_with_trace` can
-    /// record it on `TurnTrace.tool_calls` instead of issuing a
-    /// redundant audit-mode call.
-    fn inject_reasoning_chain(&self, intent: &mut Intent) -> Option<crate::tool::ToolResult> {
-        if self.derived_facts.is_empty() {
-            return None;
-        }
+    /// Returns an empty Vec for non-`Intent::Unknown` intents and for
+    /// `Unknown` without a `noun_hint` — same gate the pre-v4.2.0
+    /// audit block enforced.
+    ///
+    /// Order is fixed and deterministic: SearchBelief (audit),
+    /// RunLocalReasoner (when `derived_facts` non-empty),
+    /// SearchRetrieval (when `morpheme_index` attached). Reply text
+    /// stays byte-identical to v4.1.6 because intent fields populated
+    /// by `apply_tool_results` are independent (one writes
+    /// `reasoning_chain`, another writes `example`).
+    fn tool_plan_for_turn(
+        &self,
+        intent: &Intent,
+        parses: &[adam_kernel_fst::parser::Analysis],
+    ) -> Vec<crate::tool::ToolCall> {
         let Intent::Unknown {
             noun_hint: Some(noun),
-            reasoning_chain,
             ..
         } = intent
         else {
-            return None;
+            return Vec::new();
         };
-        if reasoning_chain.is_some() {
-            return None;
-        }
-        let tool_ctx = crate::tool::ToolContext {
-            belief: &self.belief,
-            extracted: &self.extracted_facts,
-            derived: &self.derived_facts,
-            retrieval: self.morpheme_index.as_ref(),
-            rank_config: self.rank_config.as_ref(),
-        };
-        let result = crate::tool::Tool::dispatch(
-            crate::tool::ToolCall::RunLocalReasoner {
+        let mut plan = Vec::new();
+
+        // SearchBelief — always cheap audit. `predicate: None` so the
+        // findings render as full triples for the trace.
+        plan.push(crate::tool::ToolCall::SearchBelief {
+            subject: crate::belief::USER_SELF_KEY.into(),
+            predicate: None,
+        });
+
+        // RunLocalReasoner — only meaningful when derived_facts
+        // attached. Honours `curated_only_reasoning` (v4.0.3
+        // investor-safe gate, v4.1.2 routed through the tool).
+        if !self.derived_facts.is_empty() {
+            plan.push(crate::tool::ToolCall::RunLocalReasoner {
                 topic: noun.clone(),
                 curated_only: self.curated_only_reasoning,
-            },
-            &tool_ctx,
-        );
-        if let Some(rendered) = result.findings.first().cloned() {
-            *reasoning_chain = Some(rendered);
+            });
         }
-        Some(result)
+
+        // SearchRetrieval — only when an index is attached. Empty
+        // content_roots fall back to the bare `noun_hint` (matches
+        // pre-v4.2.0 behaviour).
+        if self.morpheme_index.is_some() {
+            let roots = content_roots(parses);
+            let morphemes = if roots.is_empty() {
+                vec![noun.clone()]
+            } else {
+                roots
+            };
+            plan.push(crate::tool::ToolCall::SearchRetrieval { morphemes });
+        }
+
+        plan
     }
 
-    /// For `Intent::Unknown { noun_hint: Some(n), .. }`, if an index is
-    /// attached, call `MorphemeIndex::rank` with every content root
-    /// parsed from the input (v1.7.0) and fill the `example` slot with
-    /// the top-1 hit's text. Falls back to `search(noun_hint)[0]` when
-    /// ranking returns nothing.
+    /// **v4.2.0** — Fold tool results back into the intent. Pattern-
+    /// matches on the originating `ToolCall` variant and writes the
+    /// finding into the appropriate `Intent::Unknown` field. Replaces
+    /// the v4.0.37 → v4.1.5 `inject_*` helpers' intent-mutation
+    /// logic with a single uniform fold.
     ///
-    /// v1.9.0: when [`compose_mode`](Self::compose_mode) is
-    /// `InSampleCitySwap` and the session has a recognised city, the
-    /// cited text is passed through `compose_with_city` before being
-    /// assigned to the `example` slot. If the composer reports a swap,
-    /// we use the rewritten version; otherwise we keep the verbatim
-    /// quote. Original-sample provenance is preserved on the `Hit` —
-    /// the swap is a cosmetic layer on top.
-    ///
-    /// No-op for every non-Unknown intent, for unknown-without-noun,
-    /// and when the index is absent.
-    /// **v4.1.1** — first step of "tools as execution" (Codex Phase 6
-    /// follow-up). Pre-v4.1.1 this method called `MorphemeIndex::rank`
-    /// directly; the audit-mode `Tool::dispatch(SearchRetrieval)` in
-    /// `turn_with_trace` shadowed it with a duplicate call. Now the
-    /// primary path *is* the tool dispatch — `Tool::SearchRetrieval`
-    /// honours `ToolContext.rank_config` so the per-conversation
-    /// `RankConfig` override is preserved. The single-morpheme
-    /// postings fallback (v1.6.5 path — `index.search(noun).first()`)
-    /// stays local because it's a different lookup mechanism, not a
-    /// ranked search.
-    ///
-    /// Returns the dispatched `ToolResult` so `turn_with_trace` can
-    /// record it on `TurnTrace.tool_calls` instead of issuing a
-    /// redundant audit-mode call.
-    fn inject_retrieval_example(
+    /// `SearchBelief` and `SearchGraph` are audit-only — they record
+    /// on `TurnTrace.tool_calls` but never mutate the intent.
+    fn apply_tool_results(
         &self,
         intent: &mut Intent,
-        parses: &[adam_kernel_fst::parser::Analysis],
+        results: &[crate::tool::ToolResult],
         lexicon: &LexiconV1,
-    ) -> Option<crate::tool::ToolResult> {
-        let index = self.morpheme_index.as_ref()?;
+    ) {
+        for result in results {
+            match &result.call {
+                crate::tool::ToolCall::SearchRetrieval { .. } => {
+                    self.apply_retrieval_result(intent, result, lexicon);
+                }
+                crate::tool::ToolCall::RunLocalReasoner { .. } => {
+                    apply_reasoning_result(intent, result);
+                }
+                crate::tool::ToolCall::SearchBelief { .. }
+                | crate::tool::ToolCall::SearchGraph { .. } => {
+                    // Audit-only: no intent mutation.
+                }
+            }
+        }
+    }
+
+    /// Apply a `SearchRetrieval` tool result to `Intent::Unknown.example`,
+    /// honouring (a) the v1.7.0 ranker's top-1 hit when present, (b) the
+    /// v1.6.5 single-morpheme postings fallback when the tool found
+    /// nothing, and (c) the v1.9.0 city-swap composition with the
+    /// v1.9.5 `example_adapted` flag. Postings fallback stays local
+    /// because `index.search()` is a different lookup mechanism than
+    /// ranked search and doesn't fit `Tool::SearchRetrieval` semantics.
+    fn apply_retrieval_result(
+        &self,
+        intent: &mut Intent,
+        result: &crate::tool::ToolResult,
+        lexicon: &LexiconV1,
+    ) {
         let Intent::Unknown {
             noun_hint: Some(noun),
             example,
@@ -698,38 +678,15 @@ impl Conversation {
             ..
         } = intent
         else {
-            return None;
+            return;
         };
         if example.is_some() {
-            return None;
+            return;
         }
-        // v1.7.0: rank over all content roots, not just the first.
-        // Empty content_roots → fall back to the noun_hint as the
-        // single morpheme (matches pre-v4.1.1 behaviour).
-        let roots = content_roots(parses);
-        let morphemes: Vec<String> = if roots.is_empty() {
-            vec![noun.clone()]
-        } else {
-            roots
+        let Some(index) = self.morpheme_index.as_ref() else {
+            return;
         };
-        let tool_ctx = crate::tool::ToolContext {
-            belief: &self.belief,
-            extracted: &self.extracted_facts,
-            derived: &self.derived_facts,
-            retrieval: Some(index),
-            rank_config: self.rank_config.as_ref(),
-        };
-        let result = crate::tool::Tool::dispatch(
-            crate::tool::ToolCall::SearchRetrieval {
-                morphemes: morphemes.clone(),
-            },
-            &tool_ctx,
-        );
         let candidate_text = result.findings.first().cloned().or_else(|| {
-            // Fallback: single-morpheme first-posting (v1.6.5 path).
-            // Stays local — `index.search()` is a postings-list lookup,
-            // not a ranked search, so it doesn't fit the
-            // `Tool::SearchRetrieval` semantics.
             index
                 .search(noun)
                 .first()
@@ -740,7 +697,6 @@ impl Conversation {
             *example = Some(composed_text);
             *example_adapted = was_adapted;
         }
-        Some(result)
     }
 
     /// v1.9.0 option-B step. If [`compose_mode`](Self::compose_mode) is
@@ -964,6 +920,26 @@ impl Conversation {
 ///   + 1 if subject matches `noun` (preserves pre-v4.0.22 subject-first preference)
 ///
 /// Tie-break is by canonical triple (see `inject_reasoning_chain`).
+/// **v4.2.0** — Apply a `RunLocalReasoner` tool result to the
+/// `Intent::Unknown.reasoning_chain` field. Pure function — no
+/// `Conversation` dependency since the picker + renderer (and the
+/// `curated_only` gate) live entirely inside `Tool::RunLocalReasoner`
+/// since v4.1.2; this helper only writes the rendered finding.
+fn apply_reasoning_result(intent: &mut Intent, result: &crate::tool::ToolResult) {
+    let Intent::Unknown {
+        reasoning_chain, ..
+    } = intent
+    else {
+        return;
+    };
+    if reasoning_chain.is_some() {
+        return;
+    }
+    if let Some(rendered) = result.findings.first().cloned() {
+        *reasoning_chain = Some(rendered);
+    }
+}
+
 /// **v4.1.2** — extracted from `Conversation::isa_chain_depth` so the
 /// reasoning-chain tool dispatcher can compute IsA-depth tie-breaks
 /// without requiring a `Conversation` reference. Pure function over

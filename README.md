@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.1.6-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.2.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -34,11 +34,13 @@
 
 ---
 
-## Why adam (v4.1)
+## Why adam (v4.2)
 
-adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced.
+adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced.
 
-**v4.1.0 milestone**: the cognitive eval harness reaches **22/22 canonical baseline, 0 aspirational scenarios remaining**. The kernel can now detect contradictions across turns, ask the user for resolution, and revise belief state with full audit trail (`Active`/`Superseded`/`Contested` statuses, `BeliefConflict` log, `ContradictionToResolve` pending question lifecycle). This is the kernel's signature feature: auditable belief revision via user choice.
+**v4.2.0 milestone**: the dialog turn is now a **data-driven tool-loop interpreter**. `Conversation::turn_with_trace` builds a `Vec<ToolCall>` declaring which lookups this turn needs (`SearchBelief`, `RunLocalReasoner`, `SearchRetrieval`), dispatches them in one uniform pass, and folds results back into the intent through a single `apply_tool_results` function. The `inject_*` framing of v4.0.37 → v4.1.5 is retired; adding a new tool consult is a one-line append to the plan, not a new helper + new audit branch.
+
+**v4.1.0 milestone**: the cognitive eval harness reaches **22/22 canonical baseline, 0 aspirational scenarios remaining**. The kernel can detect contradictions across turns, ask the user for resolution, and revise belief state with full audit trail (`Active`/`Superseded`/`Contested` statuses, `BeliefConflict` log, `ContradictionToResolve` pending question lifecycle).
 
 Three things make the trade viable specifically for Kazakh:
 
@@ -46,7 +48,7 @@ Three things make the trade viable specifically for Kazakh:
 - **Mathematical determinism** — same input + same session + same seed produces a byte-identical answer across runs. No temperature, no sampling, no GPU.
 - **No ungrounded generation by design** — every output is either a template realisation, a corpus quote, or a rule derivation with a full `source_chain`. There is no free-text generator anywhere in the pipeline that could invent content not traceable to its source.
 
-| | adam v4.1 | mainstream LLM |
+| | adam v4.2 | mainstream LLM |
 |---|---|---|
 | Outputs | template + verbatim quote + FST synthesis + **rule-derived chain** | probabilistic token generation |
 | Ungrounded generation | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) | non-zero, non-auditable |
@@ -62,9 +64,11 @@ Three things make the trade viable specifically for Kazakh:
 
 adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, auditable, and — as of v4.1.0 — capable of holding conflicting beliefs simultaneously, surfacing them to the user, and revising them on demand**, while every conclusion carries a textual trust marker and every fact carries a source chain.
 
-### Current state (v4.1.0 — honest numbers)
+### Current state (v4.2.0 — honest numbers)
 
-v4.1.0 is the **first v4.x minor**: it closes the kernel's signature feature — auditable belief revision via user choice — and brings the cognitive eval harness to **22/22 canonical baseline, 0 aspirational scenarios remaining**. World Core: **826 entries / 922 curated facts across 29 domains**. Reasoner: **10 of 11 rules firing** with **17 340 derived facts** over **15 448 extracted + curated facts**. Workspace: **577 tests passing**, 0 warnings. Every curated fact carries `ConfidenceKind::HumanApproved` with a named reviewer; every derivation has a `rule_id` + non-empty `source_chain`; every belief fact carries `Provenance` + `FactStatus`; nothing else can leave the system.
+v4.2.0 is the **second v4.x minor**: it retires the `inject_*` framing (v4.0.37 → v4.1.5) by inverting `turn_with_trace` into a **data-driven tool-loop interpreter** — the dispatch list is a `Vec<ToolCall>` built per turn, executed in one uniform pass, results folded back through a single `apply_tool_results` function. Reply text byte-identical to v4.1.6 across every cognitive scenario.
+
+Live numbers: cognitive eval **22 / 22 canonical, 0 aspirational**. World Core: **826 entries / 922 curated facts across 29 domains**. Reasoner: **10 of 11 rules firing** with **17 340 derived facts** over **15 448 extracted + curated facts**. Workspace: **581 tests passing**, 0 warnings. Every curated fact carries `ConfidenceKind::HumanApproved` with a named reviewer; every derivation has a `rule_id` + non-empty `source_chain`; every belief fact carries `Provenance` + `FactStatus`; every dialog turn's lookups are declared as `ToolCall`s and recorded as `ToolResult`s on `TurnTrace.tool_calls`. Nothing else can leave the system.
 
 | | value |
 |---|---|
