@@ -94,6 +94,11 @@ impl ToolResult {
         }
     }
 
+    /// Dispatch ran successfully, but the tool found nothing —
+    /// e.g. `SearchBelief` on a subject with no Active facts, or
+    /// `RunLocalReasoner` on a topic that has no derivations.
+    /// Distinct from [`unsupported`](Self::unsupported), which means
+    /// the tool *couldn't* run for lack of context.
     fn empty(call: ToolCall, reason: &str) -> Self {
         Self {
             call,
@@ -103,6 +108,10 @@ impl ToolResult {
         }
     }
 
+    /// Dispatch couldn't run — the `ToolContext` lacks the store
+    /// the tool needs (e.g. `SearchRetrieval` with no
+    /// `MorphemeIndex`). Distinct from [`empty`](Self::empty),
+    /// which means the tool ran fine and produced no findings.
     fn unsupported(call: ToolCall, why: &str) -> Self {
         Self {
             call,
@@ -148,7 +157,7 @@ impl Tool {
                     active.len()
                 ));
                 if active.is_empty() {
-                    ToolResult::unsupported(call, "search_belief: no active facts")
+                    ToolResult::empty(call, "search_belief: no active facts")
                 } else {
                     ToolResult::ok(call, active, trace)
                 }
@@ -169,7 +178,7 @@ impl Tool {
                     matches.len()
                 ));
                 if matches.is_empty() {
-                    ToolResult::unsupported(call, "search_graph: no matching facts")
+                    ToolResult::empty(call, "search_graph: no matching facts")
                 } else {
                     ToolResult::ok(call, matches, trace)
                 }
@@ -195,7 +204,7 @@ impl Tool {
                     hits.len()
                 ));
                 if top.is_empty() {
-                    ToolResult::unsupported(call, "search_retrieval: no hits for given morphemes")
+                    ToolResult::empty(call, "search_retrieval: no hits for given morphemes")
                 } else {
                     ToolResult::ok(call, top, trace)
                 }
@@ -218,10 +227,7 @@ impl Tool {
                     matches.len()
                 ));
                 if matches.is_empty() {
-                    ToolResult::unsupported(
-                        call,
-                        "run_local_reasoner: no derivation found for topic",
-                    )
+                    ToolResult::empty(call, "run_local_reasoner: no derivation found for topic")
                 } else {
                     ToolResult::ok(call, matches, trace)
                 }

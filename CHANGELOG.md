@@ -7,6 +7,50 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.0.39] — 2026-04-25 — Hygiene cleanup (Codex v4.0.38 review)
+
+Tenth release. Closes the two hygiene-debt items Codex flagged in the v4.0.38 review. No reply text change, no architecture change — just keeping the codebase clean before the next round of execution work (Codex's recommended next step: tools-as-execution + close 2 aspirational scenarios).
+
+### What landed
+
+**Dynamic version in cognitive_eval header.** Pre-v4.0.39 the test harness printed `(v4.0.36)` hardcoded — left over from the harness ship. Even with the v4.0.36 hard-fail loaders, this stale string would silently lie about which version produced the baseline. Now uses `env!("CARGO_PKG_VERSION")` so the header always reflects the running crate version.
+
+**Tool::empty / Tool::unsupported semantics distinguished.** Pre-v4.0.39 both constructors did the same thing and `empty` had the dead_code warning. Now:
+
+- `empty` — dispatch ran successfully, but the tool found nothing (e.g. `SearchBelief` with no Active facts; `RunLocalReasoner` with no derivations matching topic).
+- `unsupported` — dispatch couldn't run because the `ToolContext` lacks the store (e.g. `SearchRetrieval` with no `MorphemeIndex`).
+
+Updated callers to use the right constructor:
+- `SearchBelief` no Active → `empty`
+- `SearchGraph` no matches → `empty`
+- `SearchRetrieval` no `MorphemeIndex` → `unsupported`
+- `SearchRetrieval` no hits → `empty`
+- `RunLocalReasoner` no derivation → `empty`
+
+Both constructors produce the same `ToolResult` shape (`success=false`, empty findings, reason in trace) — semantic distinction is in the docstring + reason text. Future tools can branch on the trace prefix if needed.
+
+### Tests
+
+**575 passing** (unchanged total — hygiene-only patch). 0 warnings, 0 dead_code on cargo build.
+
+### Why this is its own release
+
+Both items individually trivial, but they document two real concerns Codex raised:
+1. The harness "lied" about its own version — auditors couldn't tell if the report was current.
+2. The tool layer had vestigial constructor that never fired — code rot Codex was right to call out.
+
+Shipping them as one tagged release rather than rolling them into v4.0.40 keeps the audit trail clean: Codex reviewed v4.0.38, v4.0.39 says "ack, hygiene fixed", v4.0.40+ resumes architectural work with a clean baseline.
+
+### Scope
+
+Hygiene only. No reply text change.
+
+### Next
+
+v4.0.40+ resumes Codex's recommended trajectory: replace `inject_*` with tool-driven dispatch (tools as execution, not audit), then close the two v4.0.36 aspirational scenarios.
+
+---
+
 ## [4.0.38] — 2026-04-24 — Tool Layer wiring + audit-mode dispatch (Codex roadmap Phase 6 part 2)
 
 Ninth architectural patch — second half of Phase 6. Wires the v4.0.37 tool dispatcher into the turn loop in **audit mode**: after the existing `inject_*` helpers run, the turn loop additionally dispatches the corresponding `ToolCall`s and records every `ToolResult` on `TurnTrace.tool_calls`. Reply text **byte-identical** to v4.0.37 — the existing helpers still drive data flow; tool calls are pure audit. Future phase will replace `inject_*` with tool-driven dispatch.

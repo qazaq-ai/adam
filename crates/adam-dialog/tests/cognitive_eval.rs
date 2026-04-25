@@ -334,7 +334,8 @@ fn cognitive_eval_baseline() {
 
     // Print baseline report — visible in `cargo test -- --nocapture`.
     eprintln!(
-        "\n=== cognitive_eval baseline (v4.0.36) — canonical {canonical_passed_total}/{canonical_total}, aspirational promotions {aspirational_promoted_total}/{aspirational_total} ==="
+        "\n=== cognitive_eval baseline (v{}) — canonical {canonical_passed_total}/{canonical_total}, aspirational promotions {aspirational_promoted_total}/{aspirational_total} ===",
+        env!("CARGO_PKG_VERSION")
     );
     for (cat, r) in &by_category {
         eprintln!(
