@@ -80,11 +80,7 @@ pub fn plan_response_with_session(
     for (k, v) in extract_slots(intent) {
         slots.insert(k, v);
     }
-    if let Some(city) = slots.get("city").cloned() {
-        if let Some(kind) = geo_entity_kind(&city) {
-            slots.entry("geo_kind".into()).or_insert(kind);
-        }
-    }
+    ensure_geo_kind_slot(&mut slots);
     if !slots.is_empty() {
         trace.push(format!("planner: slots={slots:?}"));
     }
@@ -181,10 +177,8 @@ pub fn plan_response_with_epistemic(
         (Intent::AskName, _) if session.contains_key("name") => Some("ask_name.with_known_user"),
         (Intent::AskAge, _) if session.contains_key("age") => Some("ask_age.with_known_user"),
         (Intent::AskLocation, _) if session.contains_key("city") => {
-            if session
-                .get("city")
-                .and_then(|city| geo_entity_kind(city))
-                .is_some_and(|kind| uses_geo_feature_location_family(&kind))
+            if session_geo_kind(session)
+                .is_some_and(|kind| uses_geo_feature_location_family(kind.as_str()))
             {
                 Some("ask_location.with_known_user.geo_feature")
             } else {
@@ -221,6 +215,7 @@ pub fn plan_response_with_epistemic(
     for (k, v) in extra_slots {
         slots.insert(k.clone(), v.clone());
     }
+    ensure_geo_kind_slot(&mut slots);
     if !slots.is_empty() {
         trace.push(format!("planner: slots={slots:?}"));
     }
@@ -251,6 +246,24 @@ pub fn plan_response_with_epistemic(
         slots,
         trace,
     }
+}
+
+fn ensure_geo_kind_slot(slots: &mut HashMap<String, String>) {
+    if slots.contains_key("geo_kind") {
+        return;
+    }
+    if let Some(city) = slots.get("city").cloned() {
+        if let Some(kind) = geo_entity_kind(&city) {
+            slots.insert("geo_kind".into(), kind);
+        }
+    }
+}
+
+fn session_geo_kind(session: &HashMap<String, String>) -> Option<String> {
+    session
+        .get("geo_kind")
+        .cloned()
+        .or_else(|| session.get("city").and_then(|city| geo_entity_kind(city)))
 }
 
 /// True iff every `{placeholder}` appearing in `template` has a

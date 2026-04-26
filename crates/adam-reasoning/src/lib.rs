@@ -60,6 +60,7 @@
 
 pub mod graph;
 pub mod harness;
+pub mod ontology;
 pub mod patterns;
 pub mod reasoner;
 pub mod world_core;

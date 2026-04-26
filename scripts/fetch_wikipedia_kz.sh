@@ -28,75 +28,9 @@ else
   echo "reusing existing $archive"
 fi
 
-echo "streaming extraction (bzcat + perl; articles separated by RS 0x1e)..."
+echo "streaming extraction (bzcat + Rust extractor; articles separated by RS 0x1e)..."
 
-# Perl one-liner:
-#   * tracks whether we're inside a <text xml:space="preserve">...</text> block
-#   * strips common MediaWiki markup:
-#       {{...}}           templates
-#       [[File:...]]      file links (incl. nested)
-#       [[foo|bar]]       piped links -> bar
-#       [[foo]]           simple links -> foo
-#       '''bold''', ''italic''
-#       <ref>...</ref>    references
-#       <!-- ... -->      comments
-#       <...>             remaining HTML/XML tags
-#       ==headings==      stripped
-#   * emits plain text separated by RS between articles
-perl_script="$out_dir/_extract_wikipedia_kz.pl"
-cat > "$perl_script" <<'PERL'
-use strict;
-use warnings;
-use utf8;
-binmode(STDIN, ":utf8");
-binmode(STDOUT, ":utf8");
-
-my $in_text = 0;
-my $buf = "";
-my $RS_CHAR = chr(0x1e);
-
-while (my $line = <STDIN>) {
-    if ($line =~ /<text[^>]*>/) {
-        $in_text = 1;
-        $line =~ s{.*?<text[^>]*>}{}s;
-    }
-    next unless $in_text;
-
-    if ($line =~ m{</text>}) {
-        $line =~ s{</text>.*}{}s;
-        $buf .= $line;
-
-        # Strip MediaWiki markup, applied in passes so nested templates collapse.
-        for my $_pass (1..4) {
-            $buf =~ s/\{\{[^{}]*\}\}//g;
-        }
-        $buf =~ s/\[\[File:[^\[\]]*\]\]//gi;
-        $buf =~ s/\[\[Сурет:[^\[\]]*\]\]//gi;
-        $buf =~ s/\[\[([^\[\]|]+)\|([^\[\]]+)\]\]/$2/g;
-        $buf =~ s/\[\[([^\[\]]+)\]\]/$1/g;
-        $buf =~ s/<ref[^>]*\/>//g;
-        $buf =~ s/<ref[^>]*>.*?<\/ref>//gs;
-        $buf =~ s/<!--.*?-->//gs;
-        $buf =~ s/<[^>]+>//g;
-        $buf =~ s/'{2,5}//g;
-        $buf =~ s/^={2,}.*?={2,}$//mg;
-        $buf =~ s/^[\*#]+//mg;
-        $buf =~ s/\s+/ /g;
-        $buf =~ s/^\s+|\s+$//g;
-
-        if (length($buf) > 100) {
-            print $buf, $RS_CHAR;
-        }
-        $in_text = 0;
-        $buf = "";
-    } else {
-        $buf .= $line;
-    }
-}
-PERL
-
-bzcat "$archive" | perl "$perl_script" > "$out_file"
-rm -f "$perl_script"
+bzcat "$archive" | cargo run --quiet -p adam-corpus --bin extract_wikipedia_plain > "$out_file"
 
 size=$(wc -c < "$out_file")
 articles=$(tr -cd $'\x1e' < "$out_file" | wc -c)

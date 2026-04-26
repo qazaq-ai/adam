@@ -50,9 +50,8 @@ else
     "data/training/baseline_training_manifest.json"
   )
 
-  for file in "${versioned_files[@]}"; do
-    perl -0pi -e "s/\\Q${current_version}\\E/${target_version}/g" "$file"
-  done
+  cargo run --quiet -p adam-train --bin bump_foundation_version -- \
+    "$current_version" "$target_version" "${versioned_files[@]}"
 
   # Regenerate Cargo.lock so workspace-member version entries (adam-corpus,
   # adam-eval, etc.) match the new Cargo.toml without disturbing transitive

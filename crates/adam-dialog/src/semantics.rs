@@ -77,6 +77,9 @@ pub fn interpret_text_with_lexicon(
     if let Some(name) = detect_statement_of_name(&tokens, &raw_tokens, &joined) {
         return Intent::StatementOfName { name };
     }
+    if detect_ask_how_are_you(&joined) {
+        return Intent::AskHowAreYou;
+    }
     if let Some(g) = detect_greeting(&tokens, &joined) {
         return g;
     }
@@ -91,9 +94,6 @@ pub fn interpret_text_with_lexicon(
     }
     if detect_apology(&tokens, &joined) {
         return Intent::Apology;
-    }
-    if detect_ask_how_are_you(&joined) {
-        return Intent::AskHowAreYou;
     }
     if detect_ask_name(&joined) {
         return Intent::AskName;
@@ -302,6 +302,7 @@ const MULTIWORD_ENTITIES: &[&str] = &[
     "жер бедері",
     "күн жүйесі",
     "туған жер",
+    "көрші елдер",
     "абай жолы",
     "темір жол",
     "қыз жібек",

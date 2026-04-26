@@ -124,6 +124,7 @@ pub enum FactStatus {
 /// about Дәулет before") without re-parsing history.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EntityMemory {
+    pub canonical_id: Option<String>,
     pub root: String,
     pub kind: EntityKind,
     pub first_seen_turn: usize,
@@ -360,18 +361,30 @@ impl BeliefState {
     /// sighting, otherwise updates `last_seen_turn` and appends a
     /// new alias when the surface form differs from the canonical
     /// root.
-    pub fn touch_entity(&mut self, key: &str, kind: EntityKind, surface: &str, turn_id: usize) {
+    pub fn touch_entity(
+        &mut self,
+        key: &str,
+        kind: EntityKind,
+        root: &str,
+        surface: &str,
+        canonical_id: Option<&str>,
+        turn_id: usize,
+    ) {
         let entry = self
             .entities
             .entry(key.to_string())
             .or_insert_with(|| EntityMemory {
-                root: key.to_string(),
+                canonical_id: canonical_id.map(|id| id.to_string()),
+                root: root.to_string(),
                 kind,
                 first_seen_turn: turn_id,
                 last_seen_turn: turn_id,
                 aliases: Vec::new(),
             });
         entry.last_seen_turn = turn_id;
+        if entry.canonical_id.is_none() {
+            entry.canonical_id = canonical_id.map(|id| id.to_string());
+        }
         if surface != entry.root && !entry.aliases.iter().any(|a| a == surface) {
             entry.aliases.push(surface.to_string());
         }
@@ -584,12 +597,36 @@ mod tests {
     #[test]
     fn touch_entity_tracks_first_and_last_seen() {
         let mut b = BeliefState::new();
-        b.touch_entity(USER_SELF_KEY, EntityKind::User, "Дәулет", 0);
-        b.touch_entity(USER_SELF_KEY, EntityKind::User, "Дәуі", 4);
+        b.touch_entity(
+            USER_SELF_KEY,
+            EntityKind::User,
+            "__self__",
+            "Дәулет",
+            None,
+            0,
+        );
+        b.touch_entity(USER_SELF_KEY, EntityKind::User, "__self__", "Дәуі", None, 4);
         let e = b.entities.get(USER_SELF_KEY).unwrap();
+        assert_eq!(e.canonical_id, None);
         assert_eq!(e.first_seen_turn, 0);
         assert_eq!(e.last_seen_turn, 4);
         assert_eq!(e.aliases, vec!["Дәулет".to_string(), "Дәуі".to_string()]);
+    }
+
+    #[test]
+    fn touch_entity_preserves_canonical_id_for_places() {
+        let mut b = BeliefState::new();
+        b.touch_entity(
+            "geo_kz_004",
+            EntityKind::Place,
+            "Алматы",
+            "Алматы",
+            Some("geo_kz_004"),
+            0,
+        );
+        let e = b.entities.get("geo_kz_004").expect("place entity");
+        assert_eq!(e.canonical_id.as_deref(), Some("geo_kz_004"));
+        assert_eq!(e.root, "Алматы");
     }
 
     #[test]

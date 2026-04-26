@@ -1,6 +1,6 @@
 # Repository Layout
 
-## Crates (10 total — workspace at v4.1.0)
+## Crates (10 total — workspace at v4.3.0)
 
 - `adam-kernel`
   shared identity, versioning, and foundation contracts (L0)
@@ -13,15 +13,19 @@
 - `adam-eval`
   evaluation suite, benchmark manifests, delta reports (L1)
 - `adam-dialog`
-  **dialog pipeline** (L1): 26-intent recognisers, `Conversation` session state + DST (`active_intent`, `intent_history`), session-aware template planner, slot-expanding realiser, `adam_chat` REPL + `adam_demo` scripted walkthrough + `adam_inspect` interactive knowledge query (v3.7.0+). `NOT_A_TOPIC` closed-class filter synced with reasoning crate (v3.9.5). **`BeliefState` belief layer** with `(Active, Superseded, Contested)` lifecycle + `BeliefConflict` log + `PendingQuestion` lifecycle (v4.0.27); single-active-fact invariant (v4.0.28); `ActionPlanner` + `Verifier` + `UncertaintyPolicy` (v4.0.31 → v4.0.34); `Tool::dispatch` audit-mode path (v4.0.37 → v4.0.39); **`BeliefState::resolve_contradiction` + `Conversation::try_resolve_pending_contradiction`** for user-driven belief revision (v4.1.0). Cognitive eval harness in `tests/cognitive_eval.rs` (22 / 22 canonical, 0 aspirational).
+  **dialog pipeline** (L1): 26-intent recognisers, `Conversation` session state + DST (`active_intent`, `intent_history`), session-aware template planner, slot-expanding realiser, `adam_chat` REPL + `adam_demo` scripted walkthrough + `adam_inspect` interactive knowledge query (v3.7.0+). `NOT_A_TOPIC` closed-class filter synced with reasoning crate (v3.9.5). **`BeliefState` belief layer** with `(Active, Superseded, Contested)` lifecycle + `BeliefConflict` log + `PendingQuestion` lifecycle (v4.0.27); single-active-fact invariant (v4.0.28); `ActionPlanner` + `Verifier` + `UncertaintyPolicy` (v4.0.31 → v4.0.34); `Tool::dispatch` (v4.0.37 → v4.3.0); **`BeliefState::resolve_contradiction` + `Conversation::try_resolve_pending_contradiction`** for user-driven belief revision (v4.1.0); **`tool_plan_for_turn` + `apply_tool_results` data-driven tool loop** (v4.2.0); **`language_core` module** with canonical geography entity resolver (v4.3.0); **`quality` module** with `audit_response` / `audit_trace_faithfulness` / `audit_typed_faithfulness` / `audit_graph_admissibility` (v4.3.0); typed `ToolEvidence` on every `ToolResult` (v4.3.0). Cognitive eval harness in `tests/cognitive_eval.rs` (38 / 38 canonical, 0 aspirational at v4.2.6).
 - `adam-retrieval` (v1.6.0+)
   **retrieval engine** (L1): `MorphemeIndex` inverted index, composite deterministic `rank` (v1.7.0), `compose::compose_with_city` opt-in in-sample swap with year guard + «бейімд-» marker (v1.9.0 – v1.9.5), `build_morpheme_index` binary
-- `adam-reasoning` (v2.1 → v4.1.0)
-  **ILMRR — reasoning engine** (L1): 11 FST-feature-checked pattern matchers (all 11 declared predicates), central `is_fragment_root` hygiene gate (v3.9.0), Lexical Graph projection (v2.3+), forward-chaining reasoner with **10 active rules** — R1 IsA-transitivity, R2 Has-inheritance, R3 Has-via-PartOf, R5 shared-IsA → RelatedTo, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf, R8 After-transitivity, R9 PartOf-transitivity, R10 InDomain-inheritance, R11 InDomain-shared-target. R4 IsA-symmetry curator-warning only. **World Core** human-authored knowledge packs with `ConfidenceKind::HumanApproved` exclusive tier (v3.9.0+), iteration harness (v3.1.0+), binaries: `extract_facts`, `run_reasoner`, `build_lexical_graph`, `validate_world_core`
+- `adam-reasoning` (v2.1 → v4.3.0)
+  **ILMRR — reasoning engine** (L1): 11 FST-feature-checked pattern matchers (all 11 declared predicates), central `is_fragment_root` hygiene gate (v3.9.0), Lexical Graph projection (v2.3+), forward-chaining reasoner with **10 active rules** — R1 IsA-transitivity, R2 Has-inheritance, R3 Has-via-PartOf, R5 shared-IsA → RelatedTo, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf, R8 After-transitivity, R9 PartOf-transitivity, R10 InDomain-inheritance, R11 InDomain-shared-target. R4 IsA-symmetry curator-warning only. **World Core** human-authored knowledge packs with `ConfidenceKind::HumanApproved` exclusive tier (v3.9.0+). **`ontology` module (v4.3.0)** — type constraints (`validate_fact`, `validate_derived_fact_with_supports`, `find_support_fact`) reject `RulePredicateMismatch` / `PlaceObjectRequired` / `TimeLikeRequired` / `EmptySupportChain` / `SupportPatternMismatch` / `MissingSupportSource`. Iteration harness (v3.1.0+), binaries: `extract_facts`, `run_reasoner`, `build_lexical_graph`, `validate_world_core`
 - `adam-scaling` (v3.2.0+)
   **scaling-law bench** (L1): deterministic 5-tier bench across committed + shard pool, `scaling_bench` + `audit_precision` binaries, normalized metrics (facts/10k-words, derivations/fact, predicate-coverage %, duplicate-rate %)
+- `adam-corpus` (v0.1+ → v4.3.0)
+  source acceptance, streaming processors, corpus assembly. **v4.3.0**: new Rust binaries `extract_wikipedia_plain` and `extract_html_paragraphs` replace the previous Perl one-liners in `scripts/fetch_wikipedia_kz.sh` / `scripts/fetch_kazakh_classics.sh`, enforcing the Rust-only repository invariant.
+- `adam-eval`
+  evaluation suite, benchmark manifests, delta reports. **v4.3.0**: new `tests/rust_only_contracts.rs` and `tests/graph_first_contracts.rs` enforce the repository policies — no non-Rust source files; no external graph stack markers (Cypher / SPARQL / Gremlin / `networkx` / `igraph` / `graph-tool`); canonical Rust graph entrypoints must exist.
 - `adam-train`
-  legacy transformer baseline (v0.1 – v0.4); kept for CI regression, not on the current codepath (L2)
+  legacy / research transformer baseline (v0.1 – v0.4); preserved for the data-side foundation gate. **v4.3.0**: new Rust binary `bump_foundation_version` replaces the `perl -0pi -e` invocation in `scripts/bump_foundation_version.sh`.
 
 ## Data
 
@@ -38,11 +42,11 @@
 - `data/dialog/`
   dialog-layer template repository (`templates/v1.toml`, 34+ families incl. v1.8.0 session-aware evidence, v1.9.5 adapted-evidence, v2.7 `unknown.with_derived_chain`, v4.0.34 Tentative / Conflicted families for epistemic banding; see `data/dialog/README.md`)
 - `data/world_core/` (v3.9.0+)
-  human-authored Kazakh knowledge packs — **29 domains, 826 entries / 922 curated facts** at v4.1.0: animals, astronomy, biology_basic, body_parts, clothing, colors, constellations_kz, cooking_methods, directions, emotions, food, geography_kz, house_parts, kinship_extended, kz_literature, language_features, materials, measurements, music_kz, numbers, plants, professions, proverbs, society, sports, time, tools_household, transport, weather_phenomena. All `approved` by `shaman`. Schema + authoring guide in `data/world_core/README.md`
+  human-authored Kazakh knowledge packs — **29 domains, 827 entries / 923 curated facts** at v4.3.0: animals, astronomy, biology_basic, body_parts, clothing, colors, constellations_kz, cooking_methods, directions, emotions, food, geography_kz, house_parts, kinship_extended, kz_literature, language_features, materials, measurements, music_kz, numbers, plants, professions, proverbs, society, sports, time, tools_household, transport, weather_phenomena. All `approved` by `shaman`. **`geography_kz.jsonl` is the canonical source for the v4.3.0 `language_core::canonical_geo_entity` resolver** — every place mention in dialog memory now carries the `geo_kz_NNN` id from this file as `EntityMemory.canonical_id`. Schema + authoring guide in `data/world_core/README.md`
 - `data/retrieval/`
-  morpheme inverted index (v1.6.0+), committed `facts.json` (v2.1+) — **mixed source at v3.9.0+** (text-extracted `Grammar` 14 526 facts + curated `HumanApproved` 922 facts = 15 448 total), `lexical_graph.json` (v2.3+), `derived_facts.json` (v2.4+; **17 340 derivations from 10 active rules at v4.1.0**)
+  morpheme inverted index (v1.6.0+), committed `facts.json` (v2.1+) — **mixed source at v3.9.0+** (text-extracted `Grammar` 14 526 facts + curated `HumanApproved` 923 facts = 15 449 total), `lexical_graph.json` (v2.3+), `derived_facts.json` (v2.4+; **17 340 derivations from 10 active rules**)
 - `data/eval/cognitive_dialog_dataset.json`
-  **22 canonical scenarios, 0 aspirational** (v4.1.0). Drives the `cognitive_eval` harness test in `crates/adam-dialog/tests/cognitive_eval.rs`. Each scenario is a turn-list + an `expect: { … }` block (epistemic_status, action, belief facts, contradiction count, etc.)
+  **38 canonical scenarios, 0 aspirational** (v4.2.6). Drives the `cognitive_eval` harness test in `crates/adam-dialog/tests/cognitive_eval.rs`. Each scenario is a turn-list + an `expect: { … }` block (epistemic_status, action, belief facts, contradiction count, etc.)
 - `data/scaling/` (v3.2.0+)
   `scaling_report.json` across 5 tiers from `adam-scaling::scaling_bench`
 - `data/eval/`

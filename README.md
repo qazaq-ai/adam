@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.2.7-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.3.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -20,27 +20,35 @@
 <p align="center">
   <img src="https://img.shields.io/badge/intents-26-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/surface-Kazakh--only-9CCC65?style=flat-square" alt="Kazakh only">
-  <img src="https://img.shields.io/badge/lexicon-14.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
+  <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-581%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-647%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/cognitive%20eval-38%2F38%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
-  <img src="https://img.shields.io/badge/world%20core-826%20curated%20/%20922%20facts-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/world%20core-827%20curated%20/%20923%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/domains-29-9CCC65?style=flat-square" alt="domains">
+  <img src="https://img.shields.io/badge/policy-Rust--only%20%2B%20Graph--first-1976D2?style=flat-square" alt="policies">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20by%20design-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
 
 ---
 
-## Why adam (v4.2)
+## Why adam (v4.3)
 
-adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced.
+adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced. Every layer is **Rust-only** and **graph-first** by repository invariant — both enforced by contract tests.
 
-**v4.2.0 milestone**: the dialog turn is now a **data-driven tool-loop interpreter**. `Conversation::turn_with_trace` builds a `Vec<ToolCall>` declaring which lookups this turn needs (`SearchBelief`, `RunLocalReasoner`, `SearchRetrieval`), dispatches them in one uniform pass, and folds results back into the intent through a single `apply_tool_results` function. The `inject_*` framing of v4.0.37 → v4.1.5 is retired; adding a new tool consult is a one-line append to the plan, not a new helper + new audit branch.
+**v4.3.0 milestone — language core, typed evidence, and ontology gates.** Three architectural layers landed in tandem:
 
-**v4.1.0 milestone**: the cognitive eval harness reaches **22/22 canonical baseline, 0 aspirational scenarios remaining**. The kernel can detect contradictions across turns, ask the user for resolution, and revise belief state with full audit trail (`Active`/`Superseded`/`Contested` statuses, `BeliefConflict` log, `ContradictionToResolve` pending question lifecycle).
+- **Language Core** (`crates/adam-dialog/src/language_core.rs`) — orthography, mixed-script Latin/Cyrillic cleanup, proper-noun normalization, and **canonical entity resolution** for geography. Place mentions like `Алма-Ата`, `Усть-Каменогорск`, `Каспий теңізі` resolve to stable `geo_kz_NNN` ids from `data/world_core/geography_kz.jsonl`. Memory now stores entities by canonical id, not surface string.
+- **Typed Evidence** (`ToolEvidence` in `crates/adam-dialog/src/tool.rs`) — `ToolResult` now carries machine-readable `Vec<ToolEvidence>` alongside textual `findings`, with variants `BeliefFact` / `GraphFact` / `RetrievalSample` / `DerivedFact { rule_id, support_chain }`. Higher layers verify *which typed claim* justifies a user-facing answer.
+- **Ontology Gates** (`crates/adam-reasoning/src/ontology.rs`) — type constraints on admissible facts (rule-predicate match, place-object validation for spatial predicates, time-like validation for temporal predicates). Graph and reasoner consumers reject structurally invalid facts before verbalisation.
+- **Quality Module** (`crates/adam-dialog/src/quality.rs`) — deterministic response-quality gate that audits every reply for placeholder leaks, Latin debug artifacts, surface-vs-trace faithfulness, and typed-evidence faithfulness.
+
+**v4.2.0 milestone**: the dialog turn is a **data-driven tool-loop interpreter**. `Conversation::turn_with_trace` builds a `Vec<ToolCall>`, dispatches in one uniform pass, folds results back through `apply_tool_results`. The `inject_*` framing is retired; adding a new tool consult is a one-line append.
+
+**v4.1.0 milestone**: cognitive eval reaches **22/22 canonical, 0 aspirational**. Kernel detects contradictions across turns, asks the user for resolution, revises belief state with full audit trail.
 
 Three things make the trade viable specifically for Kazakh:
 
@@ -48,15 +56,20 @@ Three things make the trade viable specifically for Kazakh:
 - **Mathematical determinism** — same input + same session + same seed produces a byte-identical answer across runs. No temperature, no sampling, no GPU.
 - **No ungrounded generation by design** — every output is either a template realisation, a corpus quote, or a rule derivation with a full `source_chain`. There is no free-text generator anywhere in the pipeline that could invent content not traceable to its source.
 
-| | adam v4.2 | mainstream LLM |
+| | adam v4.3 | mainstream LLM |
 |---|---|---|
 | Outputs | template + verbatim quote + FST synthesis + **rule-derived chain** | probabilistic token generation |
 | Ungrounded generation | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) | non-zero, non-auditable |
 | Inference | ms on laptop CPU | dollars on GPU / datacentre |
 | **Reasoning** | **forward-chaining over typed facts, every conclusion has a `rule_id`** | opaque emergent reasoning |
 | **Belief revision** | **explicit `BeliefState` with `Active`/`Superseded`/`Contested` lifecycle; user-driven contradiction resolution (v4.1.0)** | implicit, untraceable across turns |
-| **Provenance** | **`source_chain: Vec<FactSource>` per derivation; `(pack, sample_id)` per quote; `Provenance::UserStatement { turn_id }` per belief fact** | ~none for free-form output |
+| **Canonical entities (v4.3.0)** | **stable `geo_kz_NNN` ids resolved from `world_core/geography_kz.jsonl`; `Алма-Ата` / `Каспий теңізі` / typo aliases all collapse to one canonical record** | string-keyed; memory drift across surface forms |
+| **Typed evidence (v4.3.0)** | **`ToolResult.evidence: Vec<ToolEvidence>` carries `BeliefFact` / `GraphFact` / `RetrievalSample` / `DerivedFact { rule_id, support_chain }` per dispatch — every claim is auditable to its source class** | text-only, no machine-readable provenance |
+| **Ontology gates (v4.3.0)** | **`adam_reasoning::ontology` validates rule-predicate matches, place-object types for spatial predicates, time-like types for temporal predicates** | none |
+| **Response-quality audit (v4.3.0)** | **`audit_response` + `audit_trace_faithfulness` + `audit_typed_faithfulness` reject placeholder leaks, Latin debug artifacts, surface-vs-trace divergence, evidence-class mismatches** | none — generation isn't introspected |
+| **Provenance** | **`source_chain: Vec<FactSource>` per derivation; `(pack, sample_id)` per quote; `Provenance::UserStatement { turn_id }` per belief fact; `EntityMemory.canonical_id` per remembered place** | ~none for free-form output |
 | **Inference marker** | **«байланыс-» on every reasoned claim, test-enforced** | — |
+| **Stack policy** | **Rust-only + graph-first, contract-test enforced (no Python/JS/TS, no external graph DB, no Cypher/SPARQL)** | typically polyglot Python + neural runtime |
 | Determinism | byte-identical across runs for same `(input, session, seed)` | temperature-dependent |
 | Language coverage | Kazakh only | many, but shallow for low-resource |
 | Knowledge depth | bounded by curated corpus + deterministic rules | broad, but fabricated edges |
@@ -64,28 +77,57 @@ Three things make the trade viable specifically for Kazakh:
 
 adam is **intentionally narrower** than an LLM. In return it is **predictable, cheap, safe, auditable, and — as of v4.1.0 — capable of holding conflicting beliefs simultaneously, surfacing them to the user, and revising them on demand**, while every conclusion carries a textual trust marker and every fact carries a source chain.
 
-### Current state (v4.2.0 — honest numbers)
+### Rust-Only Policy
 
-v4.2.0 is the **second v4.x minor**: it retires the `inject_*` framing (v4.0.37 → v4.1.5) by inverting `turn_with_trace` into a **data-driven tool-loop interpreter** — the dispatch list is a `Vec<ToolCall>` built per turn, executed in one uniform pass, results folded back through a single `apply_tool_results` function. Reply text byte-identical to v4.1.6 across every cognitive scenario.
+The implementation language of `adam` is **Rust only**.
 
-Live numbers: cognitive eval **22 / 22 canonical, 0 aspirational**. World Core: **826 entries / 922 curated facts across 29 domains**. Reasoner: **10 of 11 rules firing** with **17 340 derived facts** over **15 448 extracted + curated facts**. Workspace: **581 tests passing**, 0 warnings. Every curated fact carries `ConfidenceKind::HumanApproved` with a named reviewer; every derivation has a `rule_id` + non-empty `source_chain`; every belief fact carries `Provenance` + `FactStatus`; every dialog turn's lookups are declared as `ToolCall`s and recorded as `ToolResult`s on `TurnTrace.tool_calls`. Nothing else can leave the system.
+- No Python runtime.
+- No Node / TypeScript runtime.
+- No auxiliary model code in a second language.
+- If the project needs a graph engine, verifier, trainer, retrieval index, or any other subsystem, it is either sourced from the Rust ecosystem or written in Rust inside this repository.
+- POSIX shell wrappers in `scripts/` are allowed only as thin launchers around `cargo run` / `cargo test`; they must not introduce a second execution runtime.
+
+This is a project invariant, not a preference. The repository carries contract tests that fail if non-Rust source files or foreign-language runtime invocations are introduced.
+
+### Graph-First Policy
+
+The graph layer of `adam` is **Rust-native and repository-native**.
+
+- No external graph database as a required runtime.
+- No Cypher / Gremlin / SPARQL query layer in the core pipeline.
+- No Python graph stack (`networkx`, `igraph`, `graph-tool`) hidden behind scripts.
+- The canonical graph representation, traversal, and artifact builders live in Rust crates and Rust binaries inside this repository.
+- Shell scripts may orchestrate graph builds only as thin wrappers around `cargo run`.
+
+This is also a repository invariant. Contract tests fail if a foreign graph stack is introduced or if the canonical Rust graph entrypoints disappear.
+
+### Current state (v4.3.0 — honest numbers)
+
+v4.3.0 is the **third v4.x minor**: it adds the **language-core / typed-evidence / ontology / response-quality stack** on top of the v4.2.0 tool-loop interpreter. The dialog now resolves canonical geography entities, threads structured `ToolEvidence` through every tool dispatch, gates derived facts through ontology type constraints, and audits every reply for placeholder leaks and trace faithfulness — all deterministic, all Rust, all in this repository.
+
+Live numbers: cognitive eval **38 / 38 canonical, 0 aspirational**. World Core: **827 entries / 923 curated facts across 29 domains**. Reasoner: **10 of 11 rules firing** with **17 340 derived facts** over **15 449 extracted + curated facts**. Workspace: **647 tests passing**, 0 warnings. Lexicon: **~25.5 k roots** (13 606 pure Kazakh + 11 919 Apertium imports). Every curated fact carries `ConfidenceKind::HumanApproved` with a named reviewer; every derivation has a `rule_id` + non-empty `source_chain`; every belief fact carries `Provenance` + `FactStatus`; every remembered place carries `EntityMemory.canonical_id`; every dialog turn's lookups are declared as `ToolCall`s and recorded as `ToolResult`s with typed `ToolEvidence` on `TurnTrace.tool_calls`. Nothing else can leave the system.
 
 | | value |
 |---|---|
 | Dialog intents | 26 |
 | Lexicon roots | **~25.5 k** (13 606 pure Kazakh + 11 919 Apertium imports, before deduplication) |
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
-| **World Core** | **826 entries / 922 curated facts across 29 domains**: animals, astronomy, biology_basic, body_parts, clothing, colors, constellations_kz, cooking_methods, directions, emotions, food, geography_kz, house_parts, kinship_extended, kz_literature, language_features, materials, measurements, music_kz, numbers, plants, professions, proverbs, society, sports, time, tools_household, transport, weather_phenomena. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
+| **World Core** | **827 entries / 923 curated facts across 29 domains**: animals, astronomy, biology_basic, body_parts, clothing, colors, constellations_kz, cooking_methods, directions, emotions, food, geography_kz, house_parts, kinship_extended, kz_literature, language_features, materials, measurements, music_kz, numbers, plants, professions, proverbs, society, sports, time, tools_household, transport, weather_phenomena. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **581 passing, 0 failing, 0 warnings** |
-| **Cognitive eval baseline** | **22/22 canonical, 0 aspirational** (v4.1.0). Closed scenarios: parse-failure distinction (v4.0.40), contradiction resolution via user choice (v4.1.0). Tracked in `data/eval/cognitive_dialog_dataset.json`; harness in `crates/adam-dialog/tests/cognitive_eval.rs` |
+| Workspace tests | **647 passing, 0 failing, 0 warnings** |
+| **Cognitive eval baseline** | **38/38 canonical, 0 aspirational** (v4.2.6). Closed scenarios: parse-failure distinction (v4.0.40), contradiction resolution (v4.1.0), AnswerDirect rendering + digit-token (v4.2.5), multi-slot lifecycle / compound flows (v4.2.6). Tracked in `data/eval/cognitive_dialog_dataset.json`; harness in `crates/adam-dialog/tests/cognitive_eval.rs` |
+| **Language Core (v4.3.0)** | `crates/adam-dialog/src/language_core.rs` — orthography + mixed-script Latin/Cyrillic cleanup + proper-noun normalization + canonical entity resolution. `canonical_geo_entity(surface)` → `GeoEntity { id, canonical, kind }` resolved from `data/world_core/geography_kz.jsonl`. Place mentions like `Алма-Ата`, `Усть-Каменогорск`, `Каспий теңізі` collapse to one stable `geo_kz_NNN` id. `EntityMemory.canonical_id` carries the id through belief; session has `city_id` + `geo_kind` alongside `city` |
+| **Typed Evidence (v4.3.0)** | `ToolResult.evidence: Vec<ToolEvidence>` carries machine-readable claims alongside textual `findings`. Variants: `BeliefFact { subject, predicate, object }`, `GraphFact { subject, predicate, object, confidence, rendered }`, `RetrievalSample { text }`, `DerivedFact { subject, predicate, object, rule_id, confidence, rendered, support_chain }`. Used by `audit_typed_faithfulness` to verify the user-facing answer is backed by the evidence class the planner intended |
+| **Ontology gates (v4.3.0)** | `crates/adam-reasoning/src/ontology.rs` — type constraints on admissible facts. `validate_fact` / `validate_derived_fact` reject `RulePredicateMismatch`, `PlaceObjectRequired` (spatial predicates need place-typed objects), `TimeLikeRequired` (temporal predicates need time-typed objects), `EmptySupportChain`, `SupportPatternMismatch`, `MissingSupportSource`. Graph admissibility audited via `audit_graph_admissibility` |
+| **Response-quality audit (v4.3.0)** | `crates/adam-dialog/src/quality.rs` — `audit_response` rejects empty / placeholder-leaked / Latin-debug-artifact / double-space replies. `audit_trace_faithfulness` verifies surface text matches the trace's chosen action + evidence. `audit_typed_faithfulness` verifies the surfaced answer comes from the right `ToolEvidence` class |
 | **Belief revision (v4.1.0)** | `BeliefState` with `Active`/`Superseded`/`Contested` lifecycle, `BeliefConflict` log, `ContradictionToResolve` pending-question lifecycle. `resolve_contradiction(subject, predicate, chosen_object)` flips chosen → Active, others → Superseded, drops the matching conflict + pending question. Single-active-fact invariant (v4.0.28) preserved across resolution; nothing is ever deleted |
+| **Stack policies (v4.3.0)** | **Rust-only**: no Python / Node / TypeScript / other-language source files in the repo (contract-tested in `crates/adam-eval/tests/rust_only_contracts.rs`). **Graph-first**: graph layer is Rust-native, no external graph DB, no Cypher / Gremlin / SPARQL (contract-tested in `crates/adam-eval/tests/graph_first_contracts.rs`). POSIX shell scripts in `scripts/` are thin wrappers around `cargo run` / `cargo test` only |
 | Pattern matchers | **11** — v2.x baseline (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
 | **Reasoning rules active** | **10 of 11 firing on v4.1.0 corpus** — R1 IsA-transitivity (**574**), R2 Has-inheritance (**1 110**), R3 Has-via-PartOf (**55**), R5 shared-IsA → RelatedTo (**13 566**), R6 LivesIn-via-PartOf (**81**), R7 GoesTo-via-PartOf (**505**), R8 After-transitivity (**999**), R9 PartOf-transitivity (**175**), R10 InDomain-inheritance (**124**), R11 InDomain-shared-target (**151**). R4 IsA-symmetry is curator-warning only. |
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | **Dialog closed-class sync** (v3.9.5) | `NOT_A_TOPIC` mirrors `adam_reasoning::patterns::is_closed_class` — closes the pre-v3.9.5 «Неліктен → Нелікте тұрасыз ба» misparse where the FST correctly analysed `Неліктен` as ablative of a noun stem but the dialog layer had no interrogative filter |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
-| Facts (committed runtime) | **15 448 total** = **14 526 extracted (Grammar)** + **922 curated (HumanApproved, 29 domains)**. T4_200k scale |
+| Facts (committed runtime) | **15 449 total** = **14 526 extracted (Grammar)** + **923 curated (HumanApproved, 29 domains)**. T4_200k scale |
 | **Rule-derived facts (committed runtime)** | **17 340 derivations** (10 active rules; numeric breakdown in the rules row above) |
 | Fact-graph nodes / edges | **3 515 / 13 725** (committed v4.0.20); most-connected content nouns scaled with Lexicon sync |
 | **Tooling throughput (v4.0.8 → v4.0.9 validation)** | `extract_facts --world-core-only` — v4.0.8 infra. v4.0.9 confirmed empirically: 3-domain batch (105 new facts, full rebuild of facts + derived_facts + lexical_graph) took **~4 s total** vs ~135 min under the pre-v4.0.8 per-domain workflow — **~2 000× pipeline speedup on a 3-domain batch**. |
@@ -101,12 +143,17 @@ The scale-up path is explicit: scale coverage of the four existing matchers to t
 ### Trust stack
 
 ```
- template realisation             →  recognised intent, 0 % fabrication
- verbatim quote «…»               →  corpus citation, byte-identical to source
- «бейімд-» adaptation marker      →  quote was rewritten (v1.9.5)
- «байланыс-» reasoning marker     →  derivation, not a quote (v3.0)
- BeliefFact { status, provenance }→  belief layer with audit lifecycle (v4.0.27)
- BeliefConflict + resolve_*       →  contradictions revisable on demand (v4.1.0)
+ template realisation              →  recognised intent, 0 % fabrication
+ verbatim quote «…»                →  corpus citation, byte-identical to source
+ «бейімд-» adaptation marker       →  quote was rewritten (v1.9.5)
+ «байланыс-» reasoning marker      →  derivation, not a quote (v3.0)
+ BeliefFact { status, provenance } →  belief layer with audit lifecycle (v4.0.27)
+ BeliefConflict + resolve_*        →  contradictions revisable on demand (v4.1.0)
+ ToolEvidence { typed, structured }→  every reply is back-tied to typed evidence (v4.3.0)
+ EntityMemory.canonical_id         →  remembered places stable as geo_kz_NNN ids (v4.3.0)
+ ontology::validate_*              →  structurally invalid facts rejected before render (v4.3.0)
+ audit_response + audit_*_faith    →  every reply audited for placeholder / faithfulness (v4.3.0)
+ contract: Rust-only + graph-first →  no Python/JS/TS, no external graph DB (v4.3.0)
 ```
 
 Every marker is test-enforced in both directions: it fires when and only when the underlying path fired.
@@ -420,16 +467,19 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | FST parser throughput | **1.155 ms / word** single-threaded M2 |
 | Dialog intents | **26** (v1.1.0 added Insult) |
 | Template families | **34+** (v3.0 added `unknown.with_derived_chain`; v4.0.34 added Tentative / Conflicted families for epistemic-status banding) |
-| Slot types (session) | `name`, `age`, `city`, `occupation` (plus `{slot\|features}` FST-aware variants) |
-| Cognitive eval baseline (v4.1.0) | **22 / 22 canonical, 0 aspirational** — every scenario the harness has tracked since v4.0.34 now passes |
+| Slot types (session) | `name`, `age`, `city`, `occupation` (string slots, plus `{slot\|features}` FST-aware variants); v4.3.0 adds canonical-id auxiliaries `city_id` + `geo_kind` for geography |
+| Canonical entity ids (v4.3.0) | `EntityMemory.canonical_id`; geography places stored under `geo_kz_NNN` ids resolved via `language_core::canonical_geo_entity` from `data/world_core/geography_kz.jsonl` |
+| Cognitive eval baseline (v4.2.6) | **38 / 38 canonical, 0 aspirational** — every scenario the harness has tracked since v4.0.34 now passes |
 | Belief revision (v4.1.0) | `BeliefState::resolve_contradiction(subject, predicate, chosen_object)` — flips chosen → Active, others → Superseded, drops matching `BeliefConflict` + `ContradictionToResolve` pending question |
-| Tool layer (v4.0.37 → v4.1.0) | `Tool::dispatch(call, ctx)` audit-mode path — `SearchBelief`, `SearchGraph`, `SearchRetrieval`, `RunLocalReasoner`. Distinct `empty` vs `unsupported` result semantics (v4.0.39). Used by `turn_with_trace` to populate `tool_calls` on `TurnTrace` for audit |
+| Tool layer (v4.0.37 → v4.3.0) | `Tool::dispatch(call, ctx)` — `SearchBelief`, `SearchGraph`, `SearchRetrieval`, `RunLocalReasoner`. v4.2.0 retired `inject_*`; `tool_plan_for_turn` declares the call list, `apply_tool_results` folds findings back. v4.3.0 added `ToolResult.evidence: Vec<ToolEvidence>` carrying typed claims (BeliefFact / GraphFact / RetrievalSample / DerivedFact) |
+| Ontology gates (v4.3.0) | `adam_reasoning::ontology` — type constraints on admissible facts; `validate_fact` / `validate_derived_fact_with_supports` / `find_support_fact` |
+| Response-quality audit (v4.3.0) | `adam_dialog::quality::audit_response` (placeholder leaks, Latin debug, double-space) + `audit_trace_faithfulness` + `audit_typed_faithfulness` + `audit_graph_admissibility` |
 | Pattern matchers | **11** — v2.x (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
 | Reasoning rules active | **10 of 11** — R1 IsA-transitivity, R2 Has-inheritance, R3 Has-via-PartOf, R5 shared-IsA → RelatedTo, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf, R8 After-transitivity, R9 PartOf-transitivity, R10 InDomain-inheritance, R11 InDomain-shared-target. R4 IsA-symmetry is curator-warning only |
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
-| Extracted / curated / derived facts (committed runtime) | **14 526 extracted + 922 curated (world_core) / 17 340 derived** (T4_200k text-extraction scale; numeric per-rule breakdown in the Capabilities table) |
+| Extracted / curated / derived facts (committed runtime) | **14 526 extracted + 923 curated (world_core) / 17 340 derived** (T4_200k text-extraction scale; numeric per-rule breakdown in the Capabilities table) |
 | Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
-| Workspace tests | **581 passing, 0 failing, 0 warnings** |
+| Workspace tests | **647 passing, 0 failing, 0 warnings** |
 | Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential |
 
 ## Directory layout

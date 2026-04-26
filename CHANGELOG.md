@@ -7,6 +7,108 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.3.0] — 2026-04-26 — Language Core + Typed Evidence + Ontology + Quality + Stack Policies
+
+**Third v4.x minor.** Five architectural layers landed in tandem on top of the v4.2.0 tool-loop interpreter and the v4.2.7 geography-alias work. The dialog now resolves canonical entities, threads structured evidence through every tool dispatch, gates derived facts through ontology type constraints, audits every reply for faithfulness, and enforces a Rust-only + graph-first stack via repository contract tests.
+
+### Why minor and not v4.2.8
+
+Bump magnitude reflects contribution (`feedback_versioning_post_1_0`). Five new architectural layers, two new repository invariants enforced via test, +66 workspace tests (581 → 647), one new module in `adam-reasoning` (`ontology`), one new module in `adam-dialog` (`quality`), substantial extensions to `language_core`, `tool`, `belief`, `conversation`, `planner`. This is a paradigm-shaping release for the dialog stack, not a patch.
+
+### What landed
+
+#### 1. Language Core layer
+
+- `crates/adam-dialog/src/language_core.rs` (~400 lines) — orthography, mixed-script Latin/Cyrillic cleanup, proper-noun normalization, **canonical entity resolution**.
+- New API: `canonical_geo_entity(surface) → GeoEntity { id, canonical, kind }`, `canonical_geo_id(surface) → Option<String>`, `geo_entity_kind(surface) → Option<String>`, `looks_like_named_place_candidate(token) → bool`, `normalize_proper_noun(input) → String`.
+- Place surfaces — canonical (`Алматы`), Russian-form aliases (`Алма-Ата`, `Усть-Каменогорск`, `Семипалатинск`, `Гурьев`), historical (`Целиноград`, `Нұр-Сұлтан`), descriptor phrases (`Каспий теңізі`, `Алматы қаласы`, `город Алматы`), mixed-case input (`Aлматы`, `дӘУЛEТ`) — all collapse to one stable `geo_kz_NNN` record from `data/world_core/geography_kz.jsonl`.
+- **Non-duplication**: morphology stays in `adam-kernel-fst`; geography stays in `world_core`; the Language Core is a thin canonical-resolution layer over both.
+
+#### 2. Canonical entity ids in memory
+
+- `EntityMemory.canonical_id: Option<String>` (new field) carries the stable id through `BeliefState`.
+- `BeliefState::touch_entity` signature extended: `(key, kind, root, surface, canonical_id, turn_id)` — passing `Some("geo_kz_004")` for known places, `None` otherwise.
+- Session adds `city_id` and `geo_kind` slots alongside `city` (which stays as the render-safe canonical surface form for templates). Future template work can branch on `geo_kind` for `теңіз` / `өзен` / `көл` / `тау`.
+- Regression coverage: `touch_entity_preserves_canonical_id_for_places`, end-to-end location absorption tests.
+
+#### 3. Typed Evidence
+
+- `ToolResult.evidence: Vec<ToolEvidence>` (new field) carries machine-readable claims alongside the textual `findings` Vec.
+- `ToolEvidence` variants:
+  - `BeliefFact { subject, predicate, object }`
+  - `GraphFact { subject, predicate, object, confidence, rendered }`
+  - `RetrievalSample { text }`
+  - `DerivedFact { subject, predicate, object, rule_id, confidence, rendered, support_chain: Vec<SupportFactEvidence> }`
+- The audit substrate for response-faithfulness: every dialog reply can be traced to which typed claim justified it.
+
+#### 4. Ontology gates
+
+- New crate module `crates/adam-reasoning/src/ontology.rs`.
+- `validate_fact(&Fact) → Result<(), OntologyIssue>` — type constraints on admissible facts:
+  - `RulePredicateMismatch { rule_id, predicate }` — derived fact's rule_id must match the head predicate it produces.
+  - `PlaceObjectRequired { predicate, object }` — spatial predicates (`LivesIn`, `GoesTo`, `PartOf` for spatial subjects) require place-typed objects.
+  - `TimeLikeRequired { subject, object }` — temporal predicates (`After`) require time-like objects.
+- `validate_derived_fact_with_supports(&DerivedFact, &[Fact])` — extends `validate_fact` with support-chain checks: `EmptySupportChain`, `SupportPatternMismatch { rule_id }`, `MissingSupportSource { pack, sample_id }`.
+- `find_support_fact(&DerivedFact, &[Fact])` — locate the corpus fact backing a derivation's source-chain entry.
+- Used by `audit_graph_admissibility` to report `GraphAdmissibilityIssue`s.
+
+#### 5. Response-quality audit
+
+- New crate module `crates/adam-dialog/src/quality.rs`.
+- `audit_response(output, trace) → ResponseQualityReport` — catches machine-visible defects: empty / whitespace-only output, leaked template placeholders (`{name}`, `{city|locative}`), Latin debug / internal artifacts in Kazakh-only output, repeated double-space fragments.
+- `audit_trace_faithfulness(output, trace) → TraceFaithfulnessReport` — surface-vs-trace consistency: rendered reply must match the action and evidence the trace records.
+- `audit_typed_faithfulness(output, trace) → TypedFaithfulnessReport` — ensures the surfaced answer is backed by the correct evidence class (graph fact vs retrieval sample vs rule-derived conclusion).
+- `audit_graph_admissibility(facts, derived_facts) → GraphAdmissibilityReport` — runs ontology gates over a fact set, surfaces `GraphAdmissibilityIssue` per offending fact.
+- All four audits are deterministic, machine-checked, and used by tests in `crates/adam-dialog/tests/end_to_end.rs` and `tests/cognitive_eval.rs`.
+
+#### 6. Stack policies
+
+- **Rust-only** (`crates/adam-eval/tests/rust_only_contracts.rs`): contract test rejects any source file with extension `.py`/`.pyw`/`.js`/`.mjs`/`.cjs`/`.ts`/`.tsx`/`.jsx`/`.java`/`.go`/`.rb`/`.php`/`.pl`/`.lua`/`.jl`/`.r`/`.scala`/`.kt`/`.swift`/`.cpp`/`.cc`/`.cxx`/`.c`/`.h`/`.hpp`. Also rejects shell scripts that invoke foreign-language runtimes and shebangs targeting them.
+- **Graph-first** (`crates/adam-eval/tests/graph_first_contracts.rs`): contract test rejects external graph stack markers (`Cypher`, `SPARQL`, `Gremlin`, `networkx`, `igraph`, `graph-tool`) and verifies that the canonical Rust graph entrypoints exist; README must declare the graph-first policy.
+- Both invariants documented in `README.md` (new "Rust-Only Policy" and "Graph-First Policy" sections).
+
+#### 7. Rust binaries replacing Perl one-liners
+
+- `crates/adam-corpus/src/bin/extract_wikipedia_plain.rs` — streaming Wikipedia article extractor (RS 0x1e separator), replaces the embedded Perl one-liner in `scripts/fetch_wikipedia_kz.sh`.
+- `crates/adam-corpus/src/bin/extract_html_paragraphs.rs` — `<p>…</p>` body extractor, replaces the Perl helper in `scripts/fetch_kazakh_classics.sh` and `scripts/fetch_abai_wikisource.sh`.
+- `crates/adam-train/src/bin/bump_foundation_version.rs` — version-bump file rewriter, replaces the `perl -0pi -e` invocation in `scripts/bump_foundation_version.sh`.
+- All three are required for the Rust-only contract test to stay green; their existence is what allows the shell scripts to be thin wrappers around `cargo run` only.
+
+#### 8. SearchGraph predicate hints
+
+- `Conversation::tool_plan_for_turn` now emits an additional `SearchGraph { subject, predicate: Some(p) }` dispatch when the intent has a recognised predicate hint (in addition to the general `predicate: None` audit dispatch). Lets the planner consult the graph by typed predicate before falling back to the wider scan.
+
+### Tests
+
+**647 passing** (was 581 at v4.2.6; v4.2.7 added +4, v4.3.0 added +62 from the new typed-faithfulness, ontology, graph-admissibility, language-core canonical-entity, end-to-end response-quality, and contract test suites). 0 warnings on `cargo build`. Cognitive eval baseline **38/38 canonical, 0 aspirational** — unchanged from v4.2.6, demonstrating that the new architectural layers are additive and don't regress observable dialog behaviour.
+
+### Why this matters
+
+Pre-v4.3.0 the dialog could *say* something traceable, but auditing the trace required cross-referencing several disjoint signals (action plan rationale, intent fields, tool calls). Post-v4.3.0:
+
+- Every place mention in memory has a stable canonical id (no surface-string drift).
+- Every tool dispatch returns typed evidence the dialog can verify.
+- Every derived fact is checked against ontology constraints before it can verbalise.
+- Every reply is audited for placeholder leaks and faithfulness to the trace.
+- The whole stack is contract-bound to be Rust-only and graph-first — no foreign runtimes can creep in via a script or a dependency.
+
+The Hybrid Surface Layer (`docs/language_core_hybrid_roadmap.md` Workstream D) — a future constrained generative verbalizer — has all the deterministic gates it needs to plug in safely without adding fabrication risk: ontology validates inputs, typed evidence validates outputs, response-quality audits the surface text, and the Rust-only / graph-first contracts keep the stack honest.
+
+### Scope
+
+Five new layers. Three new Rust binaries. Two contract-test invariants. +66 tests. **No regression on observable dialog behaviour** (cognitive eval 38/38 unchanged).
+
+### Next
+
+Per `docs/language_core_hybrid_roadmap.md` and `project_v4_direction`:
+
+- Person and organization canonical-entity layer (extending the v4.3.0 geography work).
+- Deterministic colloquial / typo alias guards on top of canonical geography.
+- Cognitive eval to 50+ scenarios (Codex strategic rec #3 — currently 38/38).
+- Hybrid Surface Layer scaffolding (Workstream D) — structured answer contract + verifier; constrained generative verbalizer disabled by default until verification is stable.
+
+---
+
 ## [4.2.7] — 2026-04-25 — Geography alias layer + safer location surface
 
 Continues the language-core cleanup track without changing the deterministic architecture. The main move is narrow but important: geography normalization now treats aliases as a thin layer over canonical `world_core` entities instead of forcing every historical or Russian-form variant to become a separate remembered string.

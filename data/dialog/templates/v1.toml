@@ -424,7 +424,7 @@ templates = [
     "{noun} жайында негізгі дерек мынау: {fact}",
     "{noun} туралы ең әуелі мынаны айтуға болады: {fact}",
     "{name}, {noun} туралы қысқа жауап: {fact}",
-    "{city|locative} тұратын сізге {noun} жайында мына дерек маңызды болуы мүмкін: {fact}",
+    "{noun} жайында нақты дерек: {fact}",
 ]
 
 # v1.9.5: Unknown with *adapted* retrieval evidence — the retrieved

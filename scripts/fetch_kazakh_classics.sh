@@ -64,21 +64,7 @@ for author in "${AUTHORS[@]}"; do
         url="https://kk.wikisource.org${path}"
         tmp_html=$(mktemp)
         if curl -sLA "$UA" "$url" -o "$tmp_html"; then
-            # Extract <p> bodies only, strip HTML, normalise whitespace.
-            perl -0777 -ne '
-              while (/<p[^>]*>(.*?)<\/p>/gs) {
-                $p = $1;
-                $p =~ s/<[^>]+>//g;
-                $p =~ s/&nbsp;/ /g;
-                $p =~ s/&amp;/&/g;
-                $p =~ s/&lt;/</g;
-                $p =~ s/&gt;/>/g;
-                $p =~ s/&quot;/"/g;
-                $p =~ s/\s+/ /g;
-                $p =~ s/^\s+|\s+$//g;
-                print "$p\n" if length($p) > 0;
-              }
-            ' "$tmp_html" >> "$out_file"
+            cargo run --quiet -p adam-corpus --bin extract_html_paragraphs -- "$tmp_html" >> "$out_file"
             printf "\x1e" >> "$out_file"
         fi
         rm -f "$tmp_html"

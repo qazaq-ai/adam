@@ -26,6 +26,7 @@ use adam_reasoning::{Fact as ReasFact, Predicate as ReasPredicate};
 use adam_retrieval::{MorphemeIndex, RankConfig, compose::compose_with_city};
 
 use crate::intent::Intent;
+use crate::language_core::canonical_geo_entity;
 // v4.0.34 — turn loop now routes through plan_response_with_epistemic
 // (Codex Phase 5 part 2). The v4.0.33 `plan_response_with_session`
 // remains re-exported from the crate for external callers.
@@ -69,8 +70,10 @@ pub enum ComposeMode {
 /// can continue to run the 26-intent pipeline stand-alone.
 #[derive(Debug, Clone, Default)]
 pub struct Conversation {
-    /// Entity slot values accumulated across turns
-    /// (`name`, `age`, `city`, `occupation`).
+    /// Entity slot values accumulated across turns. Core user-facing
+    /// slots stay stringly for template compatibility (`name`, `age`,
+    /// `city`, `occupation`), while auxiliary canonical slots such as
+    /// `city_id` and `geo_kind` carry stable identity for newer layers.
     pub session: HashMap<String, String>,
     /// Kind of the last recognised intent. `None` before the first turn.
     /// Used by follow-up resolution (v1.4.0).
@@ -606,6 +609,12 @@ impl Conversation {
         // into user-facing chat. Grammar-extracted graph entries stay
         // audit-only via the trace until they are curated.
         if !self.extracted_facts.is_empty() {
+            if let Some(predicate) = graph_predicate_hint(intent) {
+                plan.push(crate::tool::ToolCall::SearchGraph {
+                    subject: noun.clone(),
+                    predicate: Some(predicate),
+                });
+            }
             plan.push(crate::tool::ToolCall::SearchGraph {
                 subject: noun.clone(),
                 predicate: None,
@@ -842,31 +851,67 @@ impl Conversation {
         match intent {
             Intent::StatementOfName { name } => {
                 self.session.insert("name".into(), name.clone());
-                self.belief
-                    .touch_entity(USER_SELF_KEY, EntityKind::User, name, turn_id);
+                self.belief.touch_entity(
+                    USER_SELF_KEY,
+                    EntityKind::User,
+                    USER_SELF_KEY,
+                    name,
+                    None,
+                    turn_id,
+                );
                 self.belief
                     .record_user_fact(USER_SELF_KEY, "name", name, turn_id);
             }
             Intent::StatementOfAge { years: Some(years) } => {
                 self.session.insert("age".into(), years.to_string());
-                self.belief
-                    .touch_entity(USER_SELF_KEY, EntityKind::User, "__self__", turn_id);
+                self.belief.touch_entity(
+                    USER_SELF_KEY,
+                    EntityKind::User,
+                    USER_SELF_KEY,
+                    "__self__",
+                    None,
+                    turn_id,
+                );
                 self.belief
                     .record_user_fact(USER_SELF_KEY, "age", &years.to_string(), turn_id);
             }
             Intent::StatementOfLocation { city: Some(city) } => {
-                self.session.insert("city".into(), city.clone());
-                self.belief
-                    .touch_entity(city, EntityKind::Place, city, turn_id);
-                self.belief
-                    .record_user_fact(USER_SELF_KEY, "city", city, turn_id);
+                if let Some(entity) = canonical_geo_entity(city) {
+                    self.session.insert("city".into(), entity.canonical.clone());
+                    self.session.insert("city_id".into(), entity.id.clone());
+                    self.session.insert("geo_kind".into(), entity.kind.clone());
+                    self.belief.touch_entity(
+                        &entity.id,
+                        EntityKind::Place,
+                        &entity.canonical,
+                        city,
+                        Some(&entity.id),
+                        turn_id,
+                    );
+                    self.belief
+                        .record_user_fact(USER_SELF_KEY, "city", &entity.canonical, turn_id);
+                } else {
+                    self.session.insert("city".into(), city.clone());
+                    self.session.remove("city_id");
+                    self.session.remove("geo_kind");
+                    self.belief
+                        .touch_entity(city, EntityKind::Place, city, city, None, turn_id);
+                    self.belief
+                        .record_user_fact(USER_SELF_KEY, "city", city, turn_id);
+                }
             }
             Intent::StatementOfOccupation {
                 occupation: Some(occupation),
             } => {
                 self.session.insert("occupation".into(), occupation.clone());
-                self.belief
-                    .touch_entity(occupation, EntityKind::Occupation, occupation, turn_id);
+                self.belief.touch_entity(
+                    occupation,
+                    EntityKind::Occupation,
+                    occupation,
+                    occupation,
+                    None,
+                    turn_id,
+                );
                 self.belief
                     .record_user_fact(USER_SELF_KEY, "occupation", occupation, turn_id);
             }
@@ -965,6 +1010,25 @@ fn apply_reasoning_result(intent: &mut Intent, result: &crate::tool::ToolResult)
     if let Some(rendered) = result.findings.first().cloned() {
         *reasoning_chain = Some(rendered);
     }
+}
+
+fn graph_predicate_hint(intent: &Intent) -> Option<String> {
+    let Intent::Unknown { raw_tokens, .. } = intent else {
+        return None;
+    };
+    if raw_tokens
+        .iter()
+        .any(|token| token.starts_with("шектес") || token.starts_with("шекара"))
+    {
+        return Some("related_to".into());
+    }
+    if raw_tokens
+        .iter()
+        .any(|token| matches!(token.as_str(), "қанша" | "неше"))
+    {
+        return Some("has_quantity".into());
+    }
+    None
 }
 
 /// **v4.1.2** — extracted from `Conversation::isa_chain_depth` so the

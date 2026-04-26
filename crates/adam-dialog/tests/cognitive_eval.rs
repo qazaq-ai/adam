@@ -36,7 +36,10 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
-use adam_dialog::{Conversation, TemplateRepository};
+use adam_dialog::{
+    Conversation, TemplateRepository, audit_graph_admissibility, audit_response,
+    audit_trace_faithfulness, audit_typed_faithfulness,
+};
 use adam_kernel_fst::lexicon::LexiconV1;
 use adam_reasoning::reasoner::DerivedFact;
 use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
@@ -146,12 +149,36 @@ fn synthetic_jer_chain() -> Vec<DerivedFact> {
     }]
 }
 
+fn synthetic_jer_support_facts() -> Vec<adam_reasoning::Fact> {
+    vec![adam_reasoning::Fact {
+        subject: SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "ғаламшар".into(),
+            root: "ғаламшар".into(),
+            pos: "noun".into(),
+        },
+        pattern: "world_core/astronomy".into(),
+        source: FactSource {
+            pack: "world_core/celestial.jsonl".into(),
+            sample_id: "sky_01".into(),
+        },
+        confidence: ConfidenceKind::Grammar,
+        raw_text: "Жер — ғаламшар".into(),
+    }]
+}
+
 /// Run a single scenario; return `Ok(())` on pass or `Err(reason)`
 /// on first failed assertion. Doesn't panic — the harness aggregates
 /// results before deciding whether to fail the test.
 fn run_scenario(s: &Scenario, lex: &LexiconV1, repo: &TemplateRepository) -> Result<(), String> {
     let mut conv = if s.with_reasoning {
-        Conversation::new().with_reasoning_chains(vec![], synthetic_jer_chain())
+        Conversation::new()
+            .with_reasoning_chains(synthetic_jer_support_facts(), synthetic_jer_chain())
     } else {
         Conversation::new()
     };
@@ -260,6 +287,35 @@ fn run_scenario(s: &Scenario, lex: &LexiconV1, repo: &TemplateRepository) -> Res
                 "output_not_contains_lower: forbidden substring {b:?} present in {last_output:?}"
             ));
         }
+    }
+
+    let quality = audit_response(&last_output);
+    if !quality.is_clean() {
+        return Err(format!(
+            "response_quality: output {:?} failed with issues {:?}",
+            last_output, quality.issues
+        ));
+    }
+    let faithfulness = audit_trace_faithfulness(&last_output, &trace);
+    if !faithfulness.is_clean() {
+        return Err(format!(
+            "trace_faithfulness: output {:?} failed with issues {:?}",
+            last_output, faithfulness.issues
+        ));
+    }
+    let typed = audit_typed_faithfulness(&trace);
+    if !typed.is_clean() {
+        return Err(format!(
+            "typed_faithfulness: trace failed with issues {:?}",
+            typed.issues
+        ));
+    }
+    let graph = audit_graph_admissibility(&trace);
+    if !graph.is_clean() {
+        return Err(format!(
+            "graph_admissibility: trace failed with issues {:?}",
+            graph.issues
+        ));
     }
 
     Ok(())

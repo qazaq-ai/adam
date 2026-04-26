@@ -97,7 +97,7 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v4.1.0)
+## Current scale (v4.3.0)
 
 - `astronomy.jsonl` — 30 entries / 41 facts
 - `time.jsonl` — 20 entries / 38 facts
@@ -128,8 +128,11 @@ Validator checks:
 - `kinship_extended.jsonl` — 18 entries / 20 facts  *(new in v4.0.19)*
 - `constellations_kz.jsonl` — 6 entries / 6 facts  *(new in v4.0.19)*
 - `measurements.jsonl` — 10 entries / 10 facts  *(new in v4.0.19)*
-- **Total: 826 entries / 922 facts across 29 domains**, all `approved`
-  at `high` or `medium` confidence by `shaman`.
+- **Total: 827 entries / 923 facts across 29 domains** (v4.3.0), all `approved`
+  at `high` or `medium` confidence by `shaman`. `geography_kz.jsonl` doubles as
+  the canonical source for the v4.3.0 `language_core::canonical_geo_entity`
+  resolver — every place mention in dialog memory carries the matching
+  `geo_kz_NNN` id as `EntityMemory.canonical_id`.
 
 ## Roadmap
 

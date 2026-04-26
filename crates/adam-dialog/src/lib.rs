@@ -33,6 +33,7 @@ pub mod conversation;
 pub mod intent;
 pub mod language_core;
 pub mod planner;
+pub mod quality;
 pub mod realiser;
 pub mod semantics;
 pub mod slot_syntax;
@@ -49,16 +50,25 @@ pub use belief::{
 };
 pub use conversation::{ComposeMode, Conversation, IntentKind, TurnTrace};
 pub use intent::{GreetingKind, Intent, SubjectPerson};
-pub use language_core::{looks_like_named_place_candidate, normalize_proper_noun};
+pub use language_core::{
+    GeoEntity, canonical_geo_entity, canonical_geo_id, geo_entity_kind,
+    looks_like_named_place_candidate, normalize_proper_noun,
+};
 pub use planner::{
     ResponsePlan, intent_key, plan_response, plan_response_with_epistemic, plan_response_with_repo,
     plan_response_with_session,
+};
+pub use quality::{
+    GraphAdmissibilityIssue, GraphAdmissibilityReport, ResponseQualityIssue, ResponseQualityReport,
+    TraceFaithfulnessIssue, TraceFaithfulnessReport, TypedFaithfulnessIssue,
+    TypedFaithfulnessReport, audit_graph_admissibility, audit_response, audit_trace_faithfulness,
+    audit_typed_faithfulness,
 };
 pub use realiser::realise;
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
 pub use task::{Goal, Subgoal, TaskDigest, TaskState, TaskStatus};
 pub use templates::{TemplateError, TemplateRepository};
-pub use tool::{Tool, ToolCall, ToolContext, ToolResult};
+pub use tool::{Tool, ToolCall, ToolContext, ToolEvidence, ToolResult};
 pub use uncertainty::{EpistemicStatus, UncertaintyPolicy};
 pub use verifier::{VerificationIssue, VerificationReport, Verifier, strip_evidence};
 

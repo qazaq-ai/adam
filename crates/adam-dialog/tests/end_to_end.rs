@@ -9,8 +9,9 @@
 
 use adam_dialog::intent::{GreetingKind, Intent, TimeOfDay};
 use adam_dialog::{
-    Conversation, TemplateRepository, interpret_text, plan_response, realise, respond,
-    respond_with_repo,
+    Conversation, GraphAdmissibilityIssue, TemplateRepository, TraceFaithfulnessIssue,
+    audit_graph_admissibility, audit_response, audit_trace_faithfulness, audit_typed_faithfulness,
+    interpret_text, plan_response, realise, respond, respond_with_repo,
 };
 use adam_kernel_fst::lexicon::LexiconV1;
 
@@ -26,6 +27,208 @@ fn load_lexicon() -> Option<LexiconV1> {
         return None;
     }
     LexiconV1::load(curated, apertium).ok()
+}
+
+fn support_facts_for_derived(
+    derived: &[adam_reasoning::reasoner::DerivedFact],
+) -> Vec<adam_reasoning::Fact> {
+    derived
+        .iter()
+        .flat_map(support_facts_for_single_derived)
+        .collect()
+}
+
+fn support_facts_for_single_derived(
+    derived: &adam_reasoning::reasoner::DerivedFact,
+) -> Vec<adam_reasoning::Fact> {
+    let src = &derived.source_chain;
+    if src.is_empty() {
+        return Vec::new();
+    }
+    if src.len() == 1 {
+        return vec![make_support_fact(
+            &src[0],
+            "қолдау",
+            adam_reasoning::Predicate::IsA,
+            "ұғым",
+        )];
+    }
+    let mid_kind = "аралық";
+    let place_mid = "қала";
+    let time_mid = "түс";
+    match derived.rule_id.as_str() {
+        "R1_is_a_transitivity" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::IsA,
+                mid_kind,
+            ),
+            make_support_fact(
+                &src[1],
+                mid_kind,
+                adam_reasoning::Predicate::IsA,
+                &derived.object.root,
+            ),
+        ],
+        "R2_has_inheritance" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::IsA,
+                mid_kind,
+            ),
+            make_support_fact(
+                &src[1],
+                mid_kind,
+                adam_reasoning::Predicate::Has,
+                &derived.object.root,
+            ),
+        ],
+        "R3_has_inheritance_via_part_of" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::Has,
+                mid_kind,
+            ),
+            make_support_fact(
+                &src[1],
+                mid_kind,
+                adam_reasoning::Predicate::PartOf,
+                &derived.object.root,
+            ),
+        ],
+        "R5_shared_is_a_target" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::IsA,
+                mid_kind,
+            ),
+            make_support_fact(
+                &src[1],
+                &derived.object.root,
+                adam_reasoning::Predicate::IsA,
+                mid_kind,
+            ),
+        ],
+        "R6_lives_in_via_part_of" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::LivesIn,
+                place_mid,
+            ),
+            make_support_fact(
+                &src[1],
+                place_mid,
+                adam_reasoning::Predicate::PartOf,
+                &derived.object.root,
+            ),
+        ],
+        "R7_goes_to_via_part_of" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::GoesTo,
+                place_mid,
+            ),
+            make_support_fact(
+                &src[1],
+                place_mid,
+                adam_reasoning::Predicate::PartOf,
+                &derived.object.root,
+            ),
+        ],
+        "R8_after_transitivity" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::After,
+                time_mid,
+            ),
+            make_support_fact(
+                &src[1],
+                time_mid,
+                adam_reasoning::Predicate::After,
+                &derived.object.root,
+            ),
+        ],
+        "R9_part_of_transitivity" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::PartOf,
+                mid_kind,
+            ),
+            make_support_fact(
+                &src[1],
+                mid_kind,
+                adam_reasoning::Predicate::PartOf,
+                &derived.object.root,
+            ),
+        ],
+        "R10_in_domain_inheritance" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::IsA,
+                mid_kind,
+            ),
+            make_support_fact(
+                &src[1],
+                mid_kind,
+                adam_reasoning::Predicate::InDomain,
+                &derived.object.root,
+            ),
+        ],
+        "R11_in_domain_shared_target" => vec![
+            make_support_fact(
+                &src[0],
+                &derived.subject.root,
+                adam_reasoning::Predicate::InDomain,
+                mid_kind,
+            ),
+            make_support_fact(
+                &src[1],
+                &derived.object.root,
+                adam_reasoning::Predicate::InDomain,
+                mid_kind,
+            ),
+        ],
+        _ => vec![make_support_fact(
+            &src[0],
+            "қолдау",
+            adam_reasoning::Predicate::IsA,
+            "ұғым",
+        )],
+    }
+}
+
+fn make_support_fact(
+    source: &adam_reasoning::FactSource,
+    subject: &str,
+    predicate: adam_reasoning::Predicate,
+    object: &str,
+) -> adam_reasoning::Fact {
+    adam_reasoning::Fact {
+        subject: adam_reasoning::SlotRef {
+            surface: subject.into(),
+            root: subject.into(),
+            pos: "noun".into(),
+        },
+        predicate,
+        object: adam_reasoning::SlotRef {
+            surface: object.into(),
+            root: object.into(),
+            pos: "noun".into(),
+        },
+        pattern: "test_support".into(),
+        source: source.clone(),
+        confidence: adam_reasoning::ConfidenceKind::Grammar,
+        raw_text: format!("{subject} {} {object}", predicate.as_str()),
+    }
 }
 
 /// Assert that the pipeline recognises `input` as the given `expected_intent`
@@ -186,6 +389,18 @@ fn response_ask_how_are_you_polite() {
 fn response_ask_how_are_you_casual() {
     assert_response_with_toml(
         "қалайсың",
+        &[
+            "жақсымын, рахмет",
+            "жаман емеспін",
+            "жақсы, ал сіз қалайсыз",
+        ],
+    );
+}
+
+#[test]
+fn greeting_plus_how_are_you_routes_to_how_are_you() {
+    assert_response_with_toml(
+        "Сәлем қалайсың.",
         &[
             "жақсымын, рахмет",
             "жаман емеспін",
@@ -635,6 +850,8 @@ fn fst_ner_recognises_lexicon_place_name_as_city() {
     // Lexicon has 'алматы' (lowercased, v1.4.0). FST-NER primary path
     // returns the Lexicon root directly.
     assert_eq!(conv.session.get("city"), Some(&"Алматы".to_string()));
+    assert_eq!(conv.session.get("city_id"), Some(&"geo_kz_004".to_string()));
+    assert_eq!(conv.session.get("geo_kind"), Some(&"қала".to_string()));
 }
 
 #[test]
@@ -891,9 +1108,303 @@ fn conversation_absorbs_age_city_occupation() {
 
     let _ = conv.turn("мен Алматыданмын", &lex, &repo, 0);
     assert_eq!(conv.session.get("city"), Some(&"Алматы".to_string()));
+    assert_eq!(conv.session.get("city_id"), Some(&"geo_kz_004".to_string()));
+    assert_eq!(conv.session.get("geo_kind"), Some(&"қала".to_string()));
 
     let _ = conv.turn("мен мұғаліммін", &lex, &repo, 0);
     assert_eq!(conv.session.get("occupation"), Some(&"мұғалім".to_string()));
+}
+
+#[test]
+fn conversation_stores_places_by_canonical_geo_id_in_belief_memory() {
+    use adam_dialog::USER_SELF_KEY;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    let _ = conv.turn("мен Алматыданмын", &lex, &repo, 0);
+
+    let place = conv
+        .belief
+        .entities
+        .get("geo_kz_004")
+        .expect("canonical geo entity should be remembered by id");
+    assert_eq!(place.canonical_id.as_deref(), Some("geo_kz_004"));
+    assert_eq!(place.root, "Алматы");
+    assert_eq!(place.kind, adam_dialog::EntityKind::Place);
+    assert!(
+        !conv.belief.entities.contains_key("Алматы"),
+        "place memory should use canonical geo id as the entity key"
+    );
+    assert_eq!(
+        conv.belief
+            .active_fact(USER_SELF_KEY, "city")
+            .map(|f| f.object.as_str()),
+        Some("Алматы")
+    );
+}
+
+#[test]
+fn trace_faithfulness_passes_for_direct_answer_output() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+    let (out, trace) = conv.turn_with_trace("атың кім", &lex, &repo, 1);
+
+    let quality = audit_response(&out);
+    assert!(quality.is_clean(), "quality issues: {:?}", quality.issues);
+
+    let faithfulness = audit_trace_faithfulness(&out, &trace);
+    assert!(
+        faithfulness.is_clean(),
+        "faithfulness issues: {:?}",
+        faithfulness.issues
+    );
+}
+
+#[test]
+fn typed_faithfulness_passes_for_grounded_graph_answer() {
+    use adam_reasoning::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    conv.extracted_facts = vec![Fact {
+        subject: SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::PartOf,
+        object: SlotRef {
+            surface: "күн жүйесі".into(),
+            root: "күн жүйесі".into(),
+            pos: "noun".into(),
+        },
+        pattern: "world_core".into(),
+        source: FactSource {
+            pack: "world_core/astronomy.jsonl".into(),
+            sample_id: "earth_001".into(),
+        },
+        confidence: ConfidenceKind::HumanApproved,
+        raw_text: "Жер Күн жүйесінің құрамына кіреді".into(),
+    }];
+
+    let (out, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
+
+    let quality = audit_response(&out);
+    assert!(quality.is_clean(), "quality issues: {:?}", quality.issues);
+
+    let faithfulness = audit_trace_faithfulness(&out, &trace);
+    assert!(
+        faithfulness.is_clean(),
+        "faithfulness issues: {:?}",
+        faithfulness.issues
+    );
+
+    let typed = audit_typed_faithfulness(&trace);
+    assert!(typed.is_clean(), "typed issues: {:?}", typed.issues);
+
+    let graph = audit_graph_admissibility(&trace);
+    assert!(graph.is_clean(), "graph issues: {:?}", graph.issues);
+}
+
+#[test]
+fn typed_faithfulness_flags_missing_reasoner_support() {
+    use adam_dialog::TypedFaithfulnessIssue;
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "аспан денесі".into(),
+            root: "аспан денесі".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/celestial.jsonl".into(),
+            sample_id: "sky_01".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
+    let (_out, mut trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
+    trace.tool_calls.clear();
+
+    let typed = audit_typed_faithfulness(&trace);
+    assert!(
+        typed
+            .issues
+            .contains(&TypedFaithfulnessIssue::ReasoningChainMissingDerivedSupport),
+        "expected missing derived support issue, got {:?}",
+        typed.issues
+    );
+}
+
+#[test]
+fn graph_admissibility_flags_rule_predicate_mismatch() {
+    use adam_reasoning::Predicate;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let derived = vec![adam_reasoning::reasoner::DerivedFact {
+        subject: adam_reasoning::SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: adam_reasoning::SlotRef {
+            surface: "аспан денесі".into(),
+            root: "аспан денесі".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![adam_reasoning::FactSource {
+            pack: "world_core/celestial.jsonl".into(),
+            sample_id: "sky_01".into(),
+        }],
+        confidence: adam_reasoning::ConfidenceKind::RuleInferred,
+    }];
+    let (_out, mut trace) = Conversation::new()
+        .with_reasoning_chains(support_facts_for_derived(&derived), derived)
+        .turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
+
+    for result in &mut trace.tool_calls {
+        for evidence in &mut result.evidence {
+            if let adam_dialog::ToolEvidence::DerivedFact { predicate, .. } = evidence {
+                *predicate = Predicate::LivesIn;
+            }
+        }
+    }
+
+    let graph = audit_graph_admissibility(&trace);
+    assert!(
+        graph
+            .issues
+            .contains(&GraphAdmissibilityIssue::DerivedFactRulePredicateMismatch),
+        "expected rule/predicate mismatch, got {:?}",
+        graph.issues
+    );
+}
+
+#[test]
+fn graph_admissibility_flags_support_pattern_mismatch() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let derived = vec![adam_reasoning::reasoner::DerivedFact {
+        subject: adam_reasoning::SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: adam_reasoning::Predicate::IsA,
+        object: adam_reasoning::SlotRef {
+            surface: "аспан денесі".into(),
+            root: "аспан денесі".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![
+            adam_reasoning::FactSource {
+                pack: "world_core/celestial.jsonl".into(),
+                sample_id: "sky_01".into(),
+            },
+            adam_reasoning::FactSource {
+                pack: "world_core/celestial.jsonl".into(),
+                sample_id: "sky_02".into(),
+            },
+        ],
+        confidence: adam_reasoning::ConfidenceKind::RuleInferred,
+    }];
+    let (_out, mut trace) = Conversation::new()
+        .with_reasoning_chains(support_facts_for_derived(&derived), derived)
+        .turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
+
+    for result in &mut trace.tool_calls {
+        for evidence in &mut result.evidence {
+            if let adam_dialog::ToolEvidence::DerivedFact { support_chain, .. } = evidence {
+                if support_chain.len() >= 2 {
+                    support_chain[1].subject = "басқа".into();
+                }
+            }
+        }
+    }
+
+    let graph = audit_graph_admissibility(&trace);
+    assert!(
+        graph
+            .issues
+            .contains(&GraphAdmissibilityIssue::DerivedFactSupportPatternMismatch),
+        "expected support-pattern mismatch, got {:?}",
+        graph.issues
+    );
+}
+
+#[test]
+fn trace_faithfulness_flags_reasoning_leak_after_verification_failure() {
+    use adam_reasoning::reasoner::DerivedFact;
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let derived = vec![DerivedFact {
+        subject: SlotRef {
+            surface: "жер".into(),
+            root: "жер".into(),
+            pos: "noun".into(),
+        },
+        predicate: Predicate::IsA,
+        object: SlotRef {
+            surface: "аспан денесі".into(),
+            root: "аспан денесі".into(),
+            pos: "noun".into(),
+        },
+        rule_id: "R1_is_a_transitivity".into(),
+        source_chain: vec![FactSource {
+            pack: "world_core/celestial.jsonl".into(),
+            sample_id: "sky_01".into(),
+        }],
+        confidence: ConfidenceKind::RuleInferred,
+    }];
+
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
+    let _ = conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
+    let _ = conv.turn("мен астанада тұрамын", &lex, &repo, 1);
+    let (_out, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 2);
+
+    let leaked = match &trace.intent_after_injection {
+        Intent::Unknown {
+            reasoning_chain: Some(chain),
+            ..
+        } => chain.clone(),
+        other => panic!("expected injected reasoning chain, got {other:?}"),
+    };
+    let faithfulness = audit_trace_faithfulness(&leaked, &trace);
+    assert!(
+        faithfulness
+            .issues
+            .contains(&TraceFaithfulnessIssue::EvidenceLeakAfterVerificationFailure),
+        "expected evidence leak issue, got {:?}",
+        faithfulness.issues
+    );
 }
 
 #[test]
@@ -1196,6 +1707,132 @@ fn unknown_with_grounded_fact_uses_nonquoted_verbalizer() {
     );
 }
 
+#[test]
+fn quantity_question_prefers_has_quantity_graph_fact() {
+    use adam_reasoning::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let extracted = vec![
+        Fact {
+            subject: SlotRef {
+                surface: "Күн жүйесі".into(),
+                root: "күн жүйесі".into(),
+                pos: "noun".into(),
+            },
+            predicate: Predicate::PartOf,
+            object: SlotRef {
+                surface: "Құс жолы".into(),
+                root: "құс жолы".into(),
+                pos: "noun".into(),
+            },
+            pattern: "world_core".into(),
+            source: FactSource {
+                pack: "world_core/astronomy.jsonl".into(),
+                sample_id: "astro_022".into(),
+            },
+            confidence: ConfidenceKind::HumanApproved,
+            raw_text: "Күн жүйесі — Құс жолының бөлігі.".into(),
+        },
+        Fact {
+            subject: SlotRef {
+                surface: "Күн жүйесі".into(),
+                root: "күн жүйесі".into(),
+                pos: "noun".into(),
+            },
+            predicate: Predicate::HasQuantity,
+            object: SlotRef {
+                surface: "ғаламшар".into(),
+                root: "ғаламшар".into(),
+                pos: "noun".into(),
+            },
+            pattern: "world_core".into(),
+            source: FactSource {
+                pack: "world_core/astronomy.jsonl".into(),
+                sample_id: "astro_026".into(),
+            },
+            confidence: ConfidenceKind::HumanApproved,
+            raw_text: "Күн жүйесінде сегіз ғаламшар бар.".into(),
+        },
+    ];
+
+    let mut conv = Conversation::new().with_reasoning_chains(extracted, vec![]);
+    let out = conv.turn("Күн жүйесінде қанша планета бар?", &lex, &repo, 0);
+    assert!(
+        out.contains("Күн жүйесінде сегіз ғаламшар бар."),
+        "quantity question should surface the quantity fact, got: {out:?}"
+    );
+    assert!(
+        !out.contains("Құс жолының бөлігі"),
+        "quantity question should not fall back to a generic part_of fact, got: {out:?}"
+    );
+}
+
+#[test]
+fn border_question_prefers_border_graph_fact() {
+    use adam_reasoning::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let extracted = vec![
+        Fact {
+            subject: SlotRef {
+                surface: "Қазақстан".into(),
+                root: "қазақстан".into(),
+                pos: "noun".into(),
+            },
+            predicate: Predicate::IsA,
+            object: SlotRef {
+                surface: "ел".into(),
+                root: "ел".into(),
+                pos: "noun".into(),
+            },
+            pattern: "world_core".into(),
+            source: FactSource {
+                pack: "world_core/geography_kz.jsonl".into(),
+                sample_id: "geo_kz_002".into(),
+            },
+            confidence: ConfidenceKind::HumanApproved,
+            raw_text: "Қазақстан — Орталық Азиядағы ел.".into(),
+        },
+        Fact {
+            subject: SlotRef {
+                surface: "Қазақстан".into(),
+                root: "қазақстан".into(),
+                pos: "noun".into(),
+            },
+            predicate: Predicate::RelatedTo,
+            object: SlotRef {
+                surface: "көрші елдер".into(),
+                root: "көрші елдер".into(),
+                pos: "noun".into(),
+            },
+            pattern: "world_core".into(),
+            source: FactSource {
+                pack: "world_core/geography_kz.jsonl".into(),
+                sample_id: "geo_kz_027b".into(),
+            },
+            confidence: ConfidenceKind::HumanApproved,
+            raw_text:
+                "Қазақстан Ресеймен, Қытаймен, Қырғызстанмен, Өзбекстанмен және Түрікменстанмен шектеседі."
+                    .into(),
+        },
+    ];
+
+    let mut conv = Conversation::new().with_reasoning_chains(extracted, vec![]);
+    let out = conv.turn("Қазақстан қандай елдермен шектеседі?", &lex, &repo, 0);
+    assert!(
+        out.contains("Қазақстан Ресеймен, Қытаймен, Қырғызстанмен, Өзбекстанмен және Түрікменстанмен шектеседі."),
+        "border question should surface the curated border fact, got: {out:?}"
+    );
+    assert!(
+        !out.contains("Орталық Азиядағы ел"),
+        "border question should not fall back to a generic is_a fact, got: {out:?}"
+    );
+}
+
 /// v2.7: when derived facts are attached, `Intent::Unknown` whose
 /// noun_hint appears in a derivation should route to the
 /// `unknown.with_derived_chain` family. Trust invariant — every
@@ -1237,7 +1874,8 @@ fn unknown_with_reasoning_chain_cites_derivation() {
         confidence: ConfidenceKind::RuleInferred,
     }];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     let out = conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
     assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
     // Trust invariant: the marker stem MUST appear when a chain fires.
@@ -1288,7 +1926,8 @@ fn reasoning_chain_uses_fst_synthesis_not_dash_concatenation() {
         confidence: ConfidenceKind::RuleInferred,
     }];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     let out = conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
 
     // Trust invariant: marker still fires.
@@ -1386,7 +2025,8 @@ fn reranker_prefers_curated_over_text_only() {
     // Feed text-only FIRST so "first match wins" would pick it.
     let derived = vec![text_only, curated];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     let out = conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
     assert!(
         out.contains("құрал"),
@@ -1468,7 +2108,8 @@ fn reranker_prefers_is_a_over_other_predicates_on_tied_score() {
     // (InDomain < IsA lexicographically → lower triple wins).
     let derived = vec![in_domain, is_a];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     let out = conv.turn("немере туралы айтшы", &lex, &repo, 0);
     assert!(
         out.contains("адам"),
@@ -1693,7 +2334,8 @@ fn action_planner_classifies_reasoning_chain_intent_as_run_reasoner() {
         confidence: ConfidenceKind::RuleInferred,
     }];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     let (_, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
     use adam_dialog::{Action, OutputKind};
     assert_eq!(trace.action_digest.action, Action::RunReasoner);
@@ -1846,7 +2488,8 @@ fn epistemic_status_classifies_kinds_of_turn() {
         confidence: ConfidenceKind::RuleInferred,
     }];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     let (_, t1) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
     assert_eq!(t1.epistemic_status, EpistemicStatus::Derived);
 
@@ -1894,7 +2537,8 @@ fn verifier_gates_reasoning_chain_under_belief_contradiction() {
         confidence: ConfidenceKind::RuleInferred,
     }];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     conv.turn("мен алматыда тұрамын", &lex, &repo, 0);
     conv.turn("мен астанада тұрамын", &lex, &repo, 1);
     let (out, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 2);
@@ -1955,7 +2599,8 @@ fn verifier_passes_through_clean_reasoning_chain() {
         confidence: ConfidenceKind::RuleInferred,
     }];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     let (out, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
 
     assert!(
@@ -2055,7 +2700,8 @@ fn ready_to_answer_reachable_with_reasoning_chain() {
         confidence: ConfidenceKind::RuleInferred,
     }];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     conv.turn("жер туралы айтшы", &lex, &repo, 0);
     use adam_dialog::TaskStatus;
     assert_eq!(
@@ -2167,7 +2813,8 @@ fn turn_with_trace_returns_post_injection_intent() {
         confidence: ConfidenceKind::RuleInferred,
     }];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     let (out, trace) = conv.turn_with_trace("кітап туралы бірдеңе айт", &lex, &repo, 0);
 
     // Baseline: output and trace must agree — no divergence between
@@ -2257,7 +2904,8 @@ fn reranker_prefers_shorter_chain() {
     };
     let derived = vec![long_chain, short_chain];
 
-    let mut conv = Conversation::new().with_reasoning_chains(vec![], derived);
+    let mut conv =
+        Conversation::new().with_reasoning_chains(support_facts_for_derived(&derived), derived);
     let out = conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
     assert!(
         out.contains("құрал"),
@@ -2832,7 +3480,8 @@ fn safe_mode_rejects_text_source_chain_derivations() {
     }];
 
     // Default mode — chain fires (v4.0.2 baseline).
-    let mut default_conv = Conversation::new().with_reasoning_chains(vec![], derived.clone());
+    let mut default_conv = Conversation::new()
+        .with_reasoning_chains(support_facts_for_derived(&derived), derived.clone());
     let out_default = default_conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
     assert!(
         out_default.contains("байланыс"),
@@ -2841,7 +3490,7 @@ fn safe_mode_rejects_text_source_chain_derivations() {
 
     // Safe mode — chain refused, falls through to Unknown noun-echo.
     let mut safe_conv = Conversation::new()
-        .with_reasoning_chains(vec![], derived.clone())
+        .with_reasoning_chains(support_facts_for_derived(&derived), derived.clone())
         .with_curated_only_reasoning(true);
     let out_safe = safe_conv.turn("кітап туралы бірдеңе айт", &lex, &repo, 0);
     assert!(
@@ -2889,7 +3538,7 @@ fn safe_mode_still_cites_fully_curated_derivations() {
     }];
 
     let mut safe_conv = Conversation::new()
-        .with_reasoning_chains(vec![], derived)
+        .with_reasoning_chains(support_facts_for_derived(&derived), derived)
         .with_curated_only_reasoning(true);
     let out = safe_conv.turn("бөлу туралы бірдеңе айт", &lex, &repo, 0);
     assert!(

@@ -63,14 +63,21 @@ pub fn normalize_place_name(token: &str) -> String {
     canonical_geo_name(token).unwrap_or_else(|| normalize_proper_noun(token))
 }
 
-pub fn canonical_geo_name(token: &str) -> Option<String> {
+pub fn canonical_geo_entity(token: &str) -> Option<GeoEntity> {
     let key = normalize_lookup_key(token);
-    geo_catalog().get(&key).map(|entry| entry.canonical.clone())
+    geo_catalog().get(&key).cloned()
+}
+
+pub fn canonical_geo_name(token: &str) -> Option<String> {
+    canonical_geo_entity(token).map(|entry| entry.canonical)
+}
+
+pub fn canonical_geo_id(token: &str) -> Option<String> {
+    canonical_geo_entity(token).map(|entry| entry.id)
 }
 
 pub fn geo_entity_kind(token: &str) -> Option<String> {
-    let key = normalize_lookup_key(token);
-    geo_catalog().get(&key).map(|entry| entry.kind.clone())
+    canonical_geo_entity(token).map(|entry| entry.kind)
 }
 
 fn contains_cyrillic(s: &str) -> bool {
@@ -209,13 +216,17 @@ fn is_trailing_geo_descriptor(word: &str) -> bool {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct GeoCatalogEntry {
-    canonical: String,
-    kind: String,
+pub struct GeoEntity {
+    pub id: String,
+    pub canonical: String,
+    pub kind: String,
 }
+
+type GeoCatalogEntry = GeoEntity;
 
 #[derive(Debug, Deserialize)]
 struct WorldCoreGeoLine {
+    id: String,
     facts: Vec<WorldCoreGeoFact>,
     #[serde(default)]
     review_status: Option<String>,
@@ -249,6 +260,7 @@ fn build_geo_catalog() -> HashMap<String, GeoCatalogEntry> {
             }
             let key = normalize_lookup_key(&fact.subject);
             out.entry(key).or_insert_with(|| GeoCatalogEntry {
+                id: entry.id.clone(),
                 canonical: normalize_proper_noun(&fact.subject),
                 kind: fact.object,
             });
@@ -358,6 +370,7 @@ mod tests {
         assert_eq!(canonical_geo_name("алматы").as_deref(), Some("Алматы"));
         assert_eq!(canonical_geo_name("Aлматы").as_deref(), Some("Алматы"));
         assert_eq!(geo_entity_kind("каспий").as_deref(), Some("теңіз"));
+        assert_eq!(canonical_geo_id("алматы").as_deref(), Some("geo_kz_004"));
     }
 
     #[test]
@@ -368,6 +381,14 @@ mod tests {
             Some("Өскемен")
         );
         assert_eq!(geo_entity_kind("Кустанай").as_deref(), Some("қала"));
+    }
+
+    #[test]
+    fn geo_catalog_returns_full_entity_record() {
+        let entity = canonical_geo_entity("Каспий теңізі").expect("geo entity");
+        assert_eq!(entity.id, "geo_kz_023");
+        assert_eq!(entity.canonical, "Каспий");
+        assert_eq!(entity.kind, "теңіз");
     }
 
     #[test]

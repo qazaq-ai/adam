@@ -32,8 +32,11 @@
 //! Codex-reviewable independently.
 
 use crate::belief::{BeliefState, FactStatus};
+use adam_reasoning::ontology::{
+    find_support_fact, validate_derived_fact_with_supports, validate_fact,
+};
 use adam_reasoning::reasoner::DerivedFact;
-use adam_reasoning::{ConfidenceKind, Fact as ReasFact, Predicate as ReasPredicate};
+use adam_reasoning::{ConfidenceKind, Fact as ReasFact, FactSource, Predicate as ReasPredicate};
 use adam_retrieval::MorphemeIndex;
 
 /// One callable internal tool. Each variant carries the inputs the
@@ -113,15 +116,26 @@ pub struct ToolResult {
     pub call: ToolCall,
     pub success: bool,
     pub findings: Vec<String>,
+    /// Structured evidence backing `findings`. This stays machine-
+    /// readable so higher layers can audit not just "some string was
+    /// found", but which typed fact / derivation / retrieval sample
+    /// justified the user-facing answer.
+    pub evidence: Vec<ToolEvidence>,
     pub trace: Vec<String>,
 }
 
 impl ToolResult {
-    fn ok(call: ToolCall, findings: Vec<String>, trace: Vec<String>) -> Self {
+    fn ok(
+        call: ToolCall,
+        findings: Vec<String>,
+        evidence: Vec<ToolEvidence>,
+        trace: Vec<String>,
+    ) -> Self {
         Self {
             call,
             success: true,
             findings,
+            evidence,
             trace,
         }
     }
@@ -136,6 +150,7 @@ impl ToolResult {
             call,
             success: false,
             findings: Vec::new(),
+            evidence: Vec::new(),
             trace: vec![reason.to_string()],
         }
     }
@@ -149,9 +164,52 @@ impl ToolResult {
             call,
             success: false,
             findings: Vec::new(),
+            evidence: Vec::new(),
             trace: vec![why.to_string()],
         }
     }
+}
+
+/// Machine-readable typed evidence emitted by tools. This is the
+/// audit substrate for response faithfulness checks: the dialog layer
+/// can now verify that a surfaced grounded fact came from the graph,
+/// that a quote came from retrieval, and that a reasoning answer came
+/// from a rule-derived fact with real rule metadata.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ToolEvidence {
+    BeliefFact {
+        subject: String,
+        predicate: String,
+        object: String,
+    },
+    GraphFact {
+        subject: String,
+        predicate: ReasPredicate,
+        object: String,
+        confidence: ConfidenceKind,
+        rendered: String,
+    },
+    RetrievalSample {
+        text: String,
+    },
+    DerivedFact {
+        subject: String,
+        predicate: ReasPredicate,
+        object: String,
+        rule_id: String,
+        confidence: ConfidenceKind,
+        rendered: String,
+        support_chain: Vec<SupportFactEvidence>,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SupportFactEvidence {
+    pub subject: String,
+    pub predicate: ReasPredicate,
+    pub object: String,
+    pub confidence: ConfidenceKind,
+    pub source: FactSource,
 }
 
 /// v4.0.38 — bundle of read-only references the dispatcher needs.
@@ -205,6 +263,14 @@ impl Tool {
                 if active.is_empty() {
                     return ToolResult::empty(call, "search_belief: no active facts");
                 }
+                let evidence: Vec<ToolEvidence> = active
+                    .iter()
+                    .map(|f| ToolEvidence::BeliefFact {
+                        subject: f.subject.clone(),
+                        predicate: f.predicate.clone(),
+                        object: f.object.clone(),
+                    })
+                    .collect();
                 let findings: Vec<String> = match predicate {
                     Some(_) => active.iter().map(|f| f.object.clone()).collect(),
                     None => active
@@ -212,7 +278,7 @@ impl Tool {
                         .map(|f| format!("{} {} {}", f.subject, f.predicate, f.object))
                         .collect(),
                 };
-                ToolResult::ok(call, findings, trace)
+                ToolResult::ok(call, findings, evidence, trace)
             }
             ToolCall::SearchGraph { subject, predicate } => {
                 let mut matches: Vec<&ReasFact> = ctx
@@ -231,19 +297,34 @@ impl Tool {
                         .then_with(|| a.raw_text.chars().count().cmp(&b.raw_text.chars().count()))
                         .then_with(|| a.raw_text.cmp(&b.raw_text))
                 });
-                let findings: Vec<String> = matches
+                let total_matches = matches.len();
+                let skipped_inadmissible = matches
+                    .iter()
+                    .filter(|fact| {
+                        validate_fact(&fact.subject.root, fact.predicate, &fact.object.root)
+                            .is_err()
+                    })
+                    .count();
+                let surfaced: Vec<(String, ToolEvidence)> = matches
                     .into_iter()
-                    .filter_map(render_grounded_fact)
+                    .filter(|fact| {
+                        validate_fact(&fact.subject.root, fact.predicate, &fact.object.root).is_ok()
+                    })
+                    .filter_map(render_grounded_graph_evidence)
                     .take(3)
                     .collect();
+                let findings: Vec<String> = surfaced.iter().map(|(text, _)| text.clone()).collect();
+                let evidence: Vec<ToolEvidence> =
+                    surfaced.into_iter().map(|(_, evidence)| evidence).collect();
                 trace.push(format!(
-                    "search_graph: subject={subject} predicate={predicate:?} curated_matches={}",
+                    "search_graph: subject={subject} predicate={predicate:?} curated_matches={} admissible={} skipped_inadmissible={skipped_inadmissible}",
+                    total_matches,
                     findings.len()
                 ));
                 if findings.is_empty() {
                     ToolResult::empty(call, "search_graph: no matching facts")
                 } else {
-                    ToolResult::ok(call, findings, trace)
+                    ToolResult::ok(call, findings, evidence, trace)
                 }
             }
             ToolCall::SearchRetrieval { morphemes } => {
@@ -269,6 +350,10 @@ impl Tool {
                     .take(3)
                     .filter_map(|h| index.sample_text(&h.sref).map(String::from))
                     .collect();
+                let evidence: Vec<ToolEvidence> = safe_hits
+                    .iter()
+                    .map(|text| ToolEvidence::RetrievalSample { text: text.clone() })
+                    .collect();
                 trace.push(format!(
                     "search_retrieval: morphemes={} hits={} safe_hits={}",
                     morphemes.len(),
@@ -278,7 +363,7 @@ impl Tool {
                 if safe_hits.is_empty() {
                     ToolResult::empty(call, "search_retrieval: no hits for given morphemes")
                 } else {
-                    ToolResult::ok(call, safe_hits, trace)
+                    ToolResult::ok(call, safe_hits, evidence, trace)
                 }
             }
             ToolCall::RunLocalReasoner {
@@ -288,12 +373,31 @@ impl Tool {
                 let passes_safety = |d: &&DerivedFact| -> bool {
                     !curated_only || adam_reasoning::reasoner::derivation_is_fully_curated(d)
                 };
+                let support_chain_evidence = |d: &DerivedFact| -> Option<Vec<SupportFactEvidence>> {
+                    match validate_derived_fact_with_supports(d, ctx.extracted) {
+                        Ok(()) => Some(
+                            d.source_chain
+                                .iter()
+                                .filter_map(|source| find_support_fact(source, ctx.extracted))
+                                .map(|fact| SupportFactEvidence {
+                                    subject: fact.subject.root.clone(),
+                                    predicate: fact.predicate,
+                                    object: fact.object.root.clone(),
+                                    confidence: fact.confidence,
+                                    source: fact.source.clone(),
+                                })
+                                .collect(),
+                        ),
+                        Err(_) => None,
+                    }
+                };
                 let candidates: Vec<&DerivedFact> = ctx
                     .derived
                     .iter()
                     .filter(|d| {
                         (d.subject.root == *topic || d.object.root == *topic) && passes_safety(d)
                     })
+                    .filter(|d| support_chain_evidence(d).is_some())
                     .collect();
                 trace.push(format!(
                     "run_local_reasoner: topic={topic} curated_only={curated_only} candidates={}",
@@ -341,7 +445,18 @@ impl Tool {
                     }
                     Some(d) => {
                         let rendered = crate::conversation::render_derivation_as_kazakh(d);
-                        ToolResult::ok(call, vec![rendered], trace)
+                        let support_chain = support_chain_evidence(d)
+                            .expect("candidate passed validation so support chain must resolve");
+                        let evidence = vec![ToolEvidence::DerivedFact {
+                            subject: d.subject.root.clone(),
+                            predicate: d.predicate,
+                            object: d.object.root.clone(),
+                            rule_id: d.rule_id.clone(),
+                            confidence: d.confidence,
+                            rendered: rendered.clone(),
+                            support_chain,
+                        }];
+                        ToolResult::ok(call, vec![rendered], evidence, trace)
                     }
                 }
             }
@@ -366,14 +481,14 @@ fn user_facing_fact_priority(fact: &ReasFact) -> (usize, usize, usize) {
     let predicate_rank = match fact.predicate {
         ReasPredicate::IsA => 0,
         ReasPredicate::LivesIn => 1,
-        ReasPredicate::PartOf => 2,
-        ReasPredicate::Has => 3,
-        ReasPredicate::InDomain => 4,
-        ReasPredicate::RelatedTo => 5,
-        ReasPredicate::GoesTo => 6,
-        ReasPredicate::Causes => 7,
-        ReasPredicate::After => 8,
-        ReasPredicate::HasQuantity => 9,
+        ReasPredicate::HasQuantity => 2,
+        ReasPredicate::PartOf => 3,
+        ReasPredicate::Has => 4,
+        ReasPredicate::InDomain => 5,
+        ReasPredicate::RelatedTo => 6,
+        ReasPredicate::GoesTo => 7,
+        ReasPredicate::Causes => 8,
+        ReasPredicate::After => 9,
         ReasPredicate::DoesTo => 10,
     };
     let subject_surface_rank = if fact.subject.surface == fact.subject.root {
@@ -394,6 +509,9 @@ fn render_grounded_fact(fact: &ReasFact) -> Option<String> {
     let rendered = match fact.predicate {
         ReasPredicate::IsA => None,
         ReasPredicate::PartOf => Some(format!("{subject} {object} құрамына кіреді")),
+        ReasPredicate::RelatedTo if fact.raw_text.contains("шектес") => {
+            Some(fact.raw_text.trim().to_string())
+        }
         ReasPredicate::RelatedTo => Some(format!("{subject} мен {object} өзара байланысты")),
         ReasPredicate::InDomain => Some(format!("{subject} {object} саласына жатады")),
         ReasPredicate::LivesIn => Some(format!("{subject} мекені — {object}")),
@@ -415,6 +533,20 @@ fn render_grounded_fact(fact: &ReasFact) -> Option<String> {
                 Some(ensure_sentence_period(text.to_string()))
             }
         })
+}
+
+fn render_grounded_graph_evidence(fact: &ReasFact) -> Option<(String, ToolEvidence)> {
+    let rendered = render_grounded_fact(fact)?;
+    Some((
+        rendered.clone(),
+        ToolEvidence::GraphFact {
+            subject: fact.subject.root.clone(),
+            predicate: fact.predicate,
+            object: fact.object.root.clone(),
+            confidence: fact.confidence,
+            rendered,
+        },
+    ))
 }
 
 fn predicate_name_matches(predicate: ReasPredicate, needle: &str) -> bool {
@@ -499,7 +631,7 @@ mod tests {
             },
             rule_id: "R1_is_a_transitivity".into(),
             source_chain: vec![FactSource {
-                pack: "world_core/test.jsonl".into(),
+                pack: "test".into(),
                 sample_id: "t1".into(),
             }],
             confidence: ConfidenceKind::RuleInferred,
@@ -661,6 +793,23 @@ mod tests {
     }
 
     #[test]
+    fn search_graph_filters_out_ontology_invalid_facts() {
+        let mut invalid = fact("адам", Predicate::LivesIn, "ақын");
+        invalid.confidence = ConfidenceKind::HumanApproved;
+        invalid.raw_text = "Адам ақында тұрады".into();
+        let belief = BeliefState::new();
+        let r = Tool::dispatch(
+            ToolCall::SearchGraph {
+                subject: "адам".into(),
+                predicate: None,
+            },
+            &ctx(&belief, &[invalid]),
+        );
+        assert!(!r.success);
+        assert!(r.findings.is_empty());
+    }
+
+    #[test]
     fn grounded_fact_composer_renders_part_of_as_sentence() {
         let mut fact = fact("әке", Predicate::PartOf, "отбасы");
         fact.confidence = ConfidenceKind::HumanApproved;
@@ -727,10 +876,14 @@ mod tests {
             derived("жер", Predicate::IsA, "аспан денесі"),
             derived("күн", Predicate::IsA, "жұлдыз"),
         ];
+        let support_facts = vec![
+            fact("жер", Predicate::IsA, "ғаламшар"),
+            fact("күн", Predicate::IsA, "жұлдыз"),
+        ];
         let belief = BeliefState::new();
         let context = ToolContext {
             belief: &belief,
-            extracted: &[],
+            extracted: &support_facts,
             derived: &derived_facts,
             retrieval: None,
             rank_config: None,
@@ -758,6 +911,46 @@ mod tests {
             &ctx(&belief, &[]),
         );
         assert!(!r.success);
+    }
+
+    #[test]
+    fn run_local_reasoner_filters_out_ontology_invalid_derivations() {
+        let derived_facts = vec![DerivedFact {
+            subject: SlotRef {
+                surface: "жер".into(),
+                root: "жер".into(),
+                pos: "noun".into(),
+            },
+            predicate: Predicate::LivesIn,
+            object: SlotRef {
+                surface: "аспан денесі".into(),
+                root: "аспан денесі".into(),
+                pos: "noun".into(),
+            },
+            rule_id: "R1_is_a_transitivity".into(),
+            source_chain: vec![FactSource {
+                pack: "world_core/test.jsonl".into(),
+                sample_id: "t1".into(),
+            }],
+            confidence: ConfidenceKind::RuleInferred,
+        }];
+        let belief = BeliefState::new();
+        let context = ToolContext {
+            belief: &belief,
+            extracted: &[],
+            derived: &derived_facts,
+            retrieval: None,
+            rank_config: None,
+        };
+        let r = Tool::dispatch(
+            ToolCall::RunLocalReasoner {
+                topic: "жер".into(),
+                curated_only: false,
+            },
+            &context,
+        );
+        assert!(!r.success);
+        assert!(r.findings.is_empty());
     }
 
     #[test]
