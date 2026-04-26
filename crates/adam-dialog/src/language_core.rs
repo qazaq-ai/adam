@@ -80,6 +80,68 @@ pub fn geo_entity_kind(token: &str) -> Option<String> {
     canonical_geo_entity(token).map(|entry| entry.kind)
 }
 
+/// **v4.3.1** — person canonical entity resolver, symmetric to
+/// [`canonical_geo_entity`].
+///
+/// Persons differ from geography in two important ways:
+/// - There is no curated registry — adam can't ship a list of "all
+///   Kazakh person names". The canonical form is therefore *the
+///   normalized form itself*: the deterministic title-cased,
+///   homoglyph-cleaned proper-noun spelling.
+/// - We only collapse surfaces within the same script. A pure-Latin
+///   input like `Daulet` stays Latin (it might mean a different
+///   person than Cyrillic `Дәулет`); a mixed-script input like
+///   `дӘУЛEТ` is mapped to Cyrillic via [`normalize_proper_noun`]
+///   and then collapses to `Дәулет`.
+///
+/// The id format is `person:<canonical>` — distinct from the
+/// geography `geo_kz_NNN` namespace so a single belief store can
+/// hold both kinds of entities without key collisions.
+///
+/// Returns `None` for empty / single-char / non-alphabetic input,
+/// and for input that is already a known geography entity (we never
+/// want a place name to be silently re-classified as a person).
+pub fn canonical_person_entity(token: &str) -> Option<PersonEntity> {
+    if !looks_like_person_name(token) {
+        return None;
+    }
+    let canonical = normalize_proper_noun(token.trim());
+    if canonical.is_empty() {
+        return None;
+    }
+    Some(PersonEntity {
+        id: format!("person:{}", canonical),
+        canonical,
+    })
+}
+
+/// Lean accessor — id only. Symmetric with [`canonical_geo_id`].
+pub fn canonical_person_id(token: &str) -> Option<String> {
+    canonical_person_entity(token).map(|entry| entry.id)
+}
+
+/// Conservative shape guard for inputs that *may* be a person name.
+/// Rejects:
+/// - empty / single-character input,
+/// - input containing digits or symbols other than `-` / `'` / `’`,
+/// - input that already resolves to a known geography entity.
+///
+/// Does not look up any registry — it just checks orthographic
+/// shape. The actual canonical resolution happens in
+/// [`canonical_person_entity`].
+pub fn looks_like_person_name(token: &str) -> bool {
+    let trimmed = token.trim();
+    if trimmed.chars().count() < 2 {
+        return false;
+    }
+    if canonical_geo_entity(trimmed).is_some() {
+        return false;
+    }
+    trimmed
+        .chars()
+        .all(|c| c.is_alphabetic() || matches!(c, '-' | '\'' | '’'))
+}
+
 fn contains_cyrillic(s: &str) -> bool {
     s.chars().any(is_cyrillic)
 }
@@ -220,6 +282,21 @@ pub struct GeoEntity {
     pub id: String,
     pub canonical: String,
     pub kind: String,
+}
+
+/// Person canonical entity, returned by [`canonical_person_entity`].
+///
+/// Unlike [`GeoEntity`], persons have no `kind` field — every person
+/// is a person; the kind axis would only become meaningful with a
+/// future role layer (e.g., `kind: "user" | "third_party"`), and that
+/// belongs in `BeliefState`'s `EntityKind` rather than the
+/// language-core resolver.
+///
+/// **v4.3.1**.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PersonEntity {
+    pub id: String,
+    pub canonical: String,
 }
 
 type GeoCatalogEntry = GeoEntity;
@@ -405,5 +482,85 @@ mod tests {
             canonical_geo_name("город Алматы").as_deref(),
             Some("Алматы")
         );
+    }
+
+    /// **v4.3.1** — surface variants of a person's name collapse to
+    /// the same canonical entity. Verifies case fix, mixed-script
+    /// homoglyph cleanup, and trim handling. The `id` namespace is
+    /// `person:<canonical>`, never colliding with `geo_kz_NNN`.
+    #[test]
+    fn canonical_person_collapses_surface_variants() {
+        let cyr = canonical_person_entity("Дәулет").expect("cyr name");
+        assert_eq!(cyr.canonical, "Дәулет");
+        assert_eq!(cyr.id, "person:Дәулет");
+
+        let lower = canonical_person_entity("дәулет").expect("lowercase");
+        assert_eq!(lower, cyr, "case fix must collapse to the same entity");
+
+        let mixed = canonical_person_entity("дӘУЛEТ").expect("mixed-script");
+        assert_eq!(
+            mixed, cyr,
+            "Latin homoglyph cleanup must collapse to the same Cyrillic entity"
+        );
+
+        let padded = canonical_person_entity("  Дәулет  ").expect("padded");
+        assert_eq!(padded, cyr, "leading/trailing whitespace must not split");
+    }
+
+    /// **v4.3.1** — hyphenated names get per-segment title casing
+    /// (matches the `normalize_proper_noun` contract).
+    #[test]
+    fn canonical_person_handles_hyphenated_names() {
+        let entity = canonical_person_entity("әли-хан").expect("hyphenated");
+        assert_eq!(entity.canonical, "Әли-Хан");
+        assert_eq!(entity.id, "person:Әли-Хан");
+    }
+
+    /// **v4.3.1** — Latin-only inputs stay Latin (we don't have a
+    /// transliteration table; conflating `Daulet` with `Дәулет` would
+    /// be unsafe and is explicitly out of v4.3.1 scope).
+    #[test]
+    fn canonical_person_keeps_latin_inputs_separate() {
+        let cyr = canonical_person_entity("Дәулет").expect("cyr");
+        let lat = canonical_person_entity("Daulet").expect("lat");
+        assert_ne!(
+            cyr, lat,
+            "Latin and Cyrillic surfaces must produce distinct ids"
+        );
+        assert_eq!(lat.canonical, "Daulet");
+        assert_eq!(lat.id, "person:Daulet");
+    }
+
+    /// **v4.3.1** — known geography entities never get reclassified
+    /// as persons. The guard rejects them up-front.
+    #[test]
+    fn canonical_person_rejects_known_geography() {
+        assert_eq!(canonical_person_entity("Алматы"), None);
+        assert_eq!(canonical_person_entity("алматы"), None);
+        assert_eq!(canonical_person_entity("Каспий"), None);
+    }
+
+    /// **v4.3.1** — empty / single-char / digit-bearing / whitespace-
+    /// only input is rejected. Avoids producing `person:` (empty
+    /// canonical) or `person:1` (digit) ids.
+    #[test]
+    fn canonical_person_rejects_invalid_shape() {
+        assert_eq!(canonical_person_entity(""), None);
+        assert_eq!(canonical_person_entity("   "), None);
+        assert_eq!(canonical_person_entity("Д"), None);
+        assert_eq!(canonical_person_entity("Daulet99"), None);
+        assert_eq!(canonical_person_entity("123"), None);
+    }
+
+    /// **v4.3.1** — lean `canonical_person_id` accessor returns the
+    /// id only and tracks `canonical_person_entity` exactly.
+    #[test]
+    fn canonical_person_id_lean_accessor() {
+        assert_eq!(
+            canonical_person_id("дәулет").as_deref(),
+            Some("person:Дәулет")
+        );
+        assert_eq!(canonical_person_id("Алматы"), None);
+        assert_eq!(canonical_person_id(""), None);
     }
 }

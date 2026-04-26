@@ -3550,3 +3550,79 @@ fn safe_mode_still_cites_fully_curated_derivations() {
         "rendered chain must name both roots (got: {out:?})"
     );
 }
+
+/// **v4.3.1** — Person canonical entity in dialog memory.
+///
+/// `Conversation` routes `Intent::StatementOfName` through
+/// `language_core::canonical_person_entity`. After three statements
+/// of the same name in three different surface forms (`Дәулет`,
+/// `дәулет`, `дӘУЛEТ`):
+/// - `session["name"]` should be the canonical form `Дәулет`,
+/// - `session["name_id"]` should be the stable id `person:Дәулет`,
+/// - `belief.entities[USER_SELF_KEY].canonical_id` should be
+///   `person:Дәулет` from the first turn onwards (immutable across
+///   surface variants),
+/// - the active belief fact `(USER, name, …)` should carry the
+///   canonical form, not the raw surface, on every restatement.
+#[test]
+fn conversation_collapses_person_name_surface_variants() {
+    use adam_dialog::USER_SELF_KEY;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    // First statement: canonical Cyrillic.
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+    assert_eq!(conv.session.get("name"), Some(&"Дәулет".to_string()));
+    assert_eq!(
+        conv.session.get("name_id"),
+        Some(&"person:Дәулет".to_string()),
+        "session must carry the stable canonical id"
+    );
+    let user = conv
+        .belief
+        .entities
+        .get(USER_SELF_KEY)
+        .expect("user entity recorded on first StatementOfName");
+    assert_eq!(
+        user.canonical_id.as_deref(),
+        Some("person:Дәулет"),
+        "EntityMemory.canonical_id must capture the resolved person id"
+    );
+    assert_eq!(
+        conv.belief
+            .active_fact(USER_SELF_KEY, "name")
+            .map(|f| f.object.as_str()),
+        Some("Дәулет"),
+        "active belief fact must hold the canonical form"
+    );
+
+    // Second statement: lowercase surface — must not create a
+    // separate entity, must not clear the canonical id, must update
+    // session string slot to the canonical form (not the raw input).
+    let _ = conv.turn("менің атым дәулет", &lex, &repo, 1);
+    assert_eq!(
+        conv.session.get("name"),
+        Some(&"Дәулет".to_string()),
+        "lowercase restatement still produces canonical session value"
+    );
+    let user = conv.belief.entities.get(USER_SELF_KEY).expect("user");
+    assert_eq!(
+        user.canonical_id.as_deref(),
+        Some("person:Дәулет"),
+        "canonical_id must persist through restatement"
+    );
+
+    // Third statement: mixed-script — homoglyph cleanup collapses
+    // it to the same Cyrillic canonical, so still no new entity,
+    // still no contradiction (idempotent on canonical value).
+    let _ = conv.turn("менің атым дӘУЛEТ", &lex, &repo, 2);
+    assert_eq!(conv.session.get("name"), Some(&"Дәулет".to_string()));
+    assert_eq!(
+        conv.belief.contradictions.len(),
+        0,
+        "surface-variant restatements of the same canonical name \
+         must not register a contradiction"
+    );
+}

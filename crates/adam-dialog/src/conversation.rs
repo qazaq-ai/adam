@@ -850,17 +850,49 @@ impl Conversation {
         use crate::belief::{EntityKind, USER_SELF_KEY};
         match intent {
             Intent::StatementOfName { name } => {
-                self.session.insert("name".into(), name.clone());
-                self.belief.touch_entity(
-                    USER_SELF_KEY,
-                    EntityKind::User,
-                    USER_SELF_KEY,
-                    name,
-                    None,
-                    turn_id,
-                );
-                self.belief
-                    .record_user_fact(USER_SELF_KEY, "name", name, turn_id);
+                // **v4.3.1** — route the surface name through
+                // `language_core::canonical_person_entity`. When the
+                // resolver returns Some, the *canonical form*
+                // (title-cased, mixed-script-cleaned) is what we
+                // store in session and belief, and the stable
+                // `person:<canonical>` id is recorded as
+                // `EntityMemory.canonical_id` plus the auxiliary
+                // `name_id` session slot. Surface variants like
+                // `Дәулет` / `дәулет` / `дӘУЛEТ` therefore collapse
+                // to one memory record.
+                //
+                // When the resolver returns None (single-char input,
+                // digit-bearing, or a known geography name being
+                // mis-stated as a person), we fall back to the
+                // pre-v4.3.1 behaviour: store the raw surface and
+                // skip `name_id`.
+                if let Some(person) = crate::language_core::canonical_person_entity(name) {
+                    self.session.insert("name".into(), person.canonical.clone());
+                    self.session.insert("name_id".into(), person.id.clone());
+                    self.belief.touch_entity(
+                        USER_SELF_KEY,
+                        EntityKind::User,
+                        USER_SELF_KEY,
+                        name,
+                        Some(&person.id),
+                        turn_id,
+                    );
+                    self.belief
+                        .record_user_fact(USER_SELF_KEY, "name", &person.canonical, turn_id);
+                } else {
+                    self.session.insert("name".into(), name.clone());
+                    self.session.remove("name_id");
+                    self.belief.touch_entity(
+                        USER_SELF_KEY,
+                        EntityKind::User,
+                        USER_SELF_KEY,
+                        name,
+                        None,
+                        turn_id,
+                    );
+                    self.belief
+                        .record_user_fact(USER_SELF_KEY, "name", name, turn_id);
+                }
             }
             Intent::StatementOfAge { years: Some(years) } => {
                 self.session.insert("age".into(), years.to_string());

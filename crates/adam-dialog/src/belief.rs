@@ -629,6 +629,27 @@ mod tests {
         assert_eq!(e.root, "Алматы");
     }
 
+    /// **v4.3.1** — symmetric to the place test above. The user's
+    /// `EntityMemory` is keyed by `USER_SELF_KEY` (sentinel), but
+    /// `canonical_id` carries the `person:<canonical>` resolved form
+    /// so the planner can branch on canonical identity instead of
+    /// the (possibly drifted) surface alias.
+    #[test]
+    fn touch_entity_preserves_canonical_person_id() {
+        let mut b = BeliefState::new();
+        b.touch_entity(
+            USER_SELF_KEY,
+            EntityKind::User,
+            USER_SELF_KEY,
+            "Дәулет",
+            Some("person:Дәулет"),
+            0,
+        );
+        let e = b.entities.get(USER_SELF_KEY).expect("user entity");
+        assert_eq!(e.canonical_id.as_deref(), Some("person:Дәулет"));
+        assert_eq!(e.root, USER_SELF_KEY);
+    }
+
     #[test]
     fn active_fact_returns_latest_non_superseded() {
         let mut b = BeliefState::new();

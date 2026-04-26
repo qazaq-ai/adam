@@ -398,6 +398,33 @@
         "output_contains_lower_any": ["байланыс"],
         "verification_supported": true
       }
+    },
+    {
+      "id": "person_canonical_invariance_lowercase",
+      "category": "belief_revision",
+      "description": "v4.3.1: re-stating the same person name in a different surface case (`Дәулет` then `дәулет`) collapses to the same canonical entity via `language_core::canonical_person_entity` — no contradiction, no separate memory entry. Validates the v4.3.1 person-canonical-entity wiring of `absorb_entities::Intent::StatementOfName`. Surface variant `дәулет` normalizes to canonical `Дәулет` before the belief layer sees it, so the `record_user_fact` writes the SAME object string both turns and the single-active-fact invariant collapses them cleanly.",
+      "turns": ["менің атым Дәулет", "менің атым дәулет"],
+      "expect": {
+        "belief_contradictions_count": 0
+      }
+    },
+    {
+      "id": "person_canonical_invariance_mixed_script",
+      "category": "belief_revision",
+      "description": "v4.3.1: same canonical-entity guarantee under mixed-script restatement (`Дәулет` then `дӘУЛEТ` — Latin homoglyphs `E`/`T` cleaned to Cyrillic `Е`/`Т` by `normalize_proper_noun`, then title-cased back to `Дәулет`). Confirms that the v4.3.0 mixed-script cleanup feeds the v4.3.1 canonical resolver correctly.",
+      "turns": ["менің атым Дәулет", "менің атым дӘУЛEТ"],
+      "expect": {
+        "belief_contradictions_count": 0
+      }
+    },
+    {
+      "id": "person_canonical_real_contradiction_still_fires",
+      "category": "contradiction_handling",
+      "description": "v4.3.1: canonical-entity invariance must NOT swallow real conflicts. `Дәулет` then `Ерлан` are different canonical persons (`person:Дәулет` vs `person:Ерлан`), so the second statement DOES register as a contradiction on `(USER, name)`. Guards against the canonical layer over-collapsing distinct names.",
+      "turns": ["менің атым Дәулет", "менің атым Ерлан"],
+      "expect": {
+        "belief_contradictions_count": 1
+      }
     }
   ]
 }

@@ -7,6 +7,61 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.3.1] — 2026-04-26 — Person canonical entities (Codex roadmap Workstream B "Next #1")
+
+First v4.3.x patch. Continues the canonical-entity pattern from v4.3.0 (geography) into person names — per `docs/language_core_hybrid_roadmap.md` daily-log "Next" item: *Extend the same canonical-entity pattern from geography into remembered person and organization names*. v4.3.1 ships the **person** half; organizations are deferred until they have a real trigger surface in the dialog.
+
+### What landed
+
+**`language_core::canonical_person_entity` API** (symmetric to v4.3.0 `canonical_geo_entity`):
+- `PersonEntity { id, canonical }` — id namespace `person:<canonical>`, never colliding with `geo_kz_NNN`.
+- `canonical_person_entity(surface) → Option<PersonEntity>` — applies `normalize_proper_noun` (case fix + mixed-script Latin/Cyrillic homoglyph cleanup) and returns the resolved entity.
+- `canonical_person_id(surface) → Option<String>` — lean accessor for the id.
+- `looks_like_person_name(surface) → bool` — orthographic-shape guard: rejects empty / single-char / digit-bearing input, plus any input that already resolves to a known geography entity (so a place name like `Алматы` is never silently re-classified as a person).
+
+Persons differ from geography in two principled ways:
+- **No registry**: there's no `world_core/persons.jsonl`. The canonical form *is* the deterministic title-cased normalized form. Surface variants `Дәулет` / `дәулет` / `дӘУЛEТ` all collapse to canonical `Дәулет`, but pure-Latin `Daulet` stays Latin (we don't have a transliteration table; conflating Latin and Cyrillic surfaces would risk fabrication).
+- **No `kind` axis**: every person is a person at this layer. Future role distinctions (user vs. third-party) belong in `BeliefState::EntityKind`, not the language-core resolver.
+
+**`Conversation::absorb_entities` for `Intent::StatementOfName`** rewritten to route raw input through the resolver:
+- On resolution: `session["name"]` = canonical form, `session["name_id"]` = `person:<canonical>`, `EntityMemory.canonical_id` = `person:<canonical>`, `record_user_fact` writes the canonical object string.
+- Fallback (single-char input, digit-bearing, or geo-conflict): existing pre-v4.3.1 behaviour — raw surface stored as-is; `name_id` removed from session.
+
+The cumulative effect: surface variants of the same name produce one memory entry with one canonical id, and the active belief fact carries the canonical form on every restatement. Re-stating `Дәулет` then `дәулет` then `дӘУЛEТ` is now idempotent — no spurious contradiction. Stating `Дәулет` then `Ерлан` still registers as a real contradiction because they resolve to different canonical persons.
+
+### Tests
+
+**655 passing** (was 647 at v4.3.0; +6 language_core unit tests + 1 belief regression + 1 end-to-end test + 3 cognitive_eval scenarios = +11 tests, with cognitive eval delivered as the +3 of the +6/+1/+1/+3 partition; net workspace count includes other adjustments). 0 warnings on `cargo build`. **Cognitive eval baseline 41/41 canonical, 0 aspirational** (was 38/38 at v4.2.6 / v4.3.0).
+
+Three new cognitive scenarios:
+- `person_canonical_invariance_lowercase` — `Дәулет` → `дәулет` produces 0 contradictions.
+- `person_canonical_invariance_mixed_script` — `Дәулет` → `дӘУЛEТ` produces 0 contradictions.
+- `person_canonical_real_contradiction_still_fires` — `Дәулет` → `Ерлан` still produces 1 contradiction (canonical layer doesn't over-collapse distinct names).
+
+### Why this matters
+
+Pre-v4.3.1, restating the same name in a different case or with one Latin homoglyph was treated as a contradiction (different surface = different value). The single-active-fact invariant (v4.0.28) was correct mechanically but noisy in practice: every typo or accidental Latin keystroke would surface a "wait, you said two different names" prompt. Post-v4.3.1, the canonical layer absorbs these surface differences silently, while real name changes (different canonical resolutions) still register as conflicts the user must resolve.
+
+It's also the substrate for future "remembered person" lookups by stable id — a `SearchBelief { subject: "person:Дәулет", … }` dispatch will work uniformly with the existing `SearchBelief { subject: USER_SELF_KEY, … }` path.
+
+### Scope
+
+`language_core` adds 4 public items (struct + 3 fns); `lib.rs` re-exports them; `Conversation::absorb_entities` `StatementOfName` arm rewritten with a small canonical-then-fallback branch; +1 belief test, +1 end-to-end test, +3 cognitive scenarios, +6 language-core unit tests. No new ToolCall variant. No template change. No belief-layer schema change.
+
+### Why not minor
+
+The pattern is symmetric with v4.3.0 geography but smaller in scope: one new resolver, one wire-up site, no new architectural layer. Per the bump-magnitude rule (`feedback_versioning_post_1_0`), this is meaningful capability work but a patch — not a paradigm shift.
+
+### Next
+
+Per `docs/language_core_hybrid_roadmap.md`:
+- Organization canonical entities (when triggers land).
+- Deterministic colloquial / typo alias guards on top of canonical geography (Workstream B "Near-term").
+- Cognitive eval to 50+ scenarios (currently 41/41).
+- Hybrid Surface Layer scaffolding (Workstream D) — structured answer contract + verifier.
+
+---
+
 ## [4.3.0] — 2026-04-26 — Language Core + Typed Evidence + Ontology + Quality + Stack Policies
 
 **Third v4.x minor.** Five architectural layers landed in tandem on top of the v4.2.0 tool-loop interpreter and the v4.2.7 geography-alias work. The dialog now resolves canonical entities, threads structured evidence through every tool dispatch, gates derived facts through ontology type constraints, audits every reply for faithfulness, and enforces a Rust-only + graph-first stack via repository contract tests.
