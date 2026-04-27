@@ -145,7 +145,7 @@ impl Verifier {
                 // slot to look up, but the answer is also not
                 // unsupported — the system's identity is a build-time
                 // contract.
-                if matches!(intent, Intent::AskAboutSystem) {
+                if matches!(intent, Intent::AskAboutSystem { .. }) {
                     evidence_count += 1;
                 } else {
                     // Must have a matching active fact. The planner

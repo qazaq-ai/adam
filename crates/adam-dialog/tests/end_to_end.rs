@@ -3780,3 +3780,90 @@ fn ask_about_system_does_not_swallow_statement_of_name() {
         "StatementOfName must still record the name; AskAboutSystem detector must not preempt it"
     );
 }
+
+/// **v4.3.4** — `AskAboutSystem { aspect: General }` mentions the
+/// canonical name and the technical full name. Verifies the
+/// `system_name` and `system_full_name` slots are wired through
+/// the `ask_about_system` template family.
+#[test]
+fn ask_about_system_general_includes_name_and_full_name() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let out = conv.turn("сен кімсің", &lex, &repo, 0);
+    assert!(
+        out.to_lowercase().contains("адам"),
+        "general AskAboutSystem reply must mention `адам` (got: {out:?})"
+    );
+    assert!(
+        out.contains("Nano Language Model") || out.contains("NLM"),
+        "general AskAboutSystem reply must mention either the full name or the abbreviation \
+         (got: {out:?})"
+    );
+}
+
+/// **v4.3.4** — `AskAboutSystem { aspect: Creator }` surfaces the
+/// creator field from `SystemIdentity`. Verifies the creator name
+/// reaches the user-visible reply.
+#[test]
+fn ask_about_system_creator_aspect_mentions_creator() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let out = conv.turn("сені кім жасады", &lex, &repo, 0);
+    assert!(
+        out.contains("Баймурзин"),
+        "Creator aspect reply must mention the creator surname (got: {out:?})"
+    );
+    assert!(
+        out.contains("Даулет"),
+        "Creator aspect reply must mention the creator's first name (got: {out:?})"
+    );
+}
+
+/// **v4.3.4** — `AskAboutSystem { aspect: Birthdate }` surfaces the
+/// birthdate (repository creation date 2026-04-07).
+#[test]
+fn ask_about_system_birthdate_aspect_mentions_date() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let out = conv.turn("қашан пайда болдың", &lex, &repo, 0);
+    assert!(
+        out.contains("2026-04-07"),
+        "Birthdate aspect reply must mention the canonical birthdate (got: {out:?})"
+    );
+}
+
+/// **v4.3.4** — `AskAboutSystem { aspect: Architecture }` surfaces
+/// the architecture summary that distinguishes adam from
+/// mainstream LLMs.
+#[test]
+fn ask_about_system_architecture_aspect_mentions_difference() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let out = conv.turn("сенің ерекшелігің не", &lex, &repo, 0);
+    assert!(
+        out.contains("ереже") || out.contains("ережелер"),
+        "Architecture aspect reply must mention rule-based nature (got: {out:?})"
+    );
+    assert!(
+        out.contains("архитектур"),
+        "Architecture aspect reply must mention the word `архитектура` (got: {out:?})"
+    );
+}
+
+/// **v4.3.4** — alternate creator-question phrasing (`авторың кім`)
+/// also routes to the Creator aspect.
+#[test]
+fn ask_about_system_creator_aspect_alternate_phrasings() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let out = conv.turn("сенің авторың кім", &lex, &repo, 0);
+    assert!(
+        out.contains("Баймурзин"),
+        "alternate creator-question phrasing must still surface the creator name (got: {out:?})"
+    );
+}

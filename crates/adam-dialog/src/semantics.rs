@@ -95,13 +95,14 @@ pub fn interpret_text_with_lexicon(
     if detect_apology(&tokens, &joined) {
         return Intent::Apology;
     }
-    // **v4.3.3** — `сен кімсің` / `сіз кімсіз` etc. ask about adam's
-    // identity, not memory-recall the user's stored name. Must be
-    // checked BEFORE `detect_ask_name` (which keys on `атың кім` and
-    // would also match phrasings like `сен кімсің және атың кім`).
-    // Track B (self/other distinction) of the intelligence roadmap.
-    if detect_ask_about_system(&tokens, &joined) {
-        return Intent::AskAboutSystem;
+    // **v4.3.3 / v4.3.4** — `сен кімсің` / `сені кім жасады` /
+    // `қашан пайда болдың` / `ерекшелігің не` ask about adam's
+    // identity (general / creator / birthdate / architecture
+    // aspects). The detector returns the `SystemAspect` it matched
+    // so the planner can pick the right `ask_about_system.*`
+    // template family. Must be checked BEFORE `detect_ask_name`.
+    if let Some(aspect) = detect_ask_about_system(&tokens, &joined) {
+        return Intent::AskAboutSystem { aspect };
     }
     if detect_ask_name(&joined) {
         return Intent::AskName;
@@ -536,21 +537,89 @@ fn detect_ask_how_are_you(joined: &str) -> bool {
 /// path) to preserve the v4.2.5 cognitive scenarios that exercise
 /// the AnswerDirect rendering for stored user names. The
 /// pronoun-led patterns here are unambiguously about adam.
-fn detect_ask_about_system(tokens: &[String], joined: &str) -> bool {
+fn detect_ask_about_system(
+    tokens: &[String],
+    joined: &str,
+) -> Option<crate::system_identity::SystemAspect> {
+    use crate::system_identity::SystemAspect;
     let pronoun = tokens.iter().any(|t| t == "сен" || t == "сіз");
-    if !pronoun {
-        return false;
+    let has_addressee = pronoun || joined.contains("сені") || joined.contains("сізді");
+
+    // **v4.3.4** — Creator aspect: "who made you" / "who built you".
+    // Triggered by addressee-marker (сені/сізді/сен/сіз) plus
+    // creator-question keyword. Checked first so multi-question
+    // utterances ("сен кімсің және сені кім жасады?") pick this up
+    // when the creator part is present — the architecture/birthdate
+    // / general checks below all resolve to a less-specific aspect.
+    if has_addressee
+        && (joined.contains("кім жасады")
+            || joined.contains("кім құрды")
+            || joined.contains("кім жасап шығарды")
+            || joined.contains("кім ойлап тапты")
+            || joined.contains("авторың")
+            || joined.contains("авторыңыз")
+            || joined.contains("жасаушың")
+            || joined.contains("жасаушыңыз")
+            || joined.contains("кім құрастырды"))
+    {
+        return Some(SystemAspect::Creator);
     }
-    joined.contains("кімсің")
-        || joined.contains("кімсіз")
-        || joined.contains("қандай моделсің")
-        || joined.contains("қандай моделсіз")
-        || joined.contains("қандай ботсың")
-        || joined.contains("қандай ботсыз")
-        || joined.contains("қандай жасанды интеллектсің")
-        || joined.contains("қандай жасанды интеллектсіз")
-        || joined.contains("немен айналысасың")
-        || joined.contains("немен айналысасыз")
+
+    // **v4.3.4** — Birthdate aspect: "when were you born" / "when
+    // did you appear". Pronoun gate optional because phrasings like
+    // `туған күнің қашан` carry the addressee in the possessive
+    // suffix.
+    if joined.contains("қашан пайда болдың")
+        || joined.contains("қашан пайда болдыңыз")
+        || joined.contains("қашан жасалдың")
+        || joined.contains("қашан жасалдыңыз")
+        || joined.contains("қашан туылдың")
+        || joined.contains("қашан туылдыңыз")
+        || joined.contains("туған күнің")
+        || joined.contains("туған күніңіз")
+        || (has_addressee
+            && (joined.contains("қашан жасады")
+                || joined.contains("қашан құрды")
+                || joined.contains("қашан жасап шығарды")))
+    {
+        return Some(SystemAspect::Birthdate);
+    }
+
+    // **v4.3.4** — Architecture aspect: "how are you different" /
+    // "what's special about you". Pronoun-led; the question targets
+    // the system's distinguishing characteristics.
+    if has_addressee
+        && (joined.contains("ерекшелігің")
+            || joined.contains("ерекшелігіңіз")
+            || joined.contains("айырмашылығың")
+            || joined.contains("айырмашылығыңыз")
+            || joined.contains("неге басқашасың")
+            || joined.contains("неге басқашасыз")
+            || joined.contains("неге басқа модельдерден ерекшеленесің")
+            || joined.contains("неге басқа модельдерден ерекшеленесіз")
+            || joined.contains("қалай ерекшеленесің")
+            || joined.contains("қалай ерекшеленесіз"))
+    {
+        return Some(SystemAspect::Architecture);
+    }
+
+    // **v4.3.3** — General aspect: pronoun-led identity question.
+    if pronoun
+        && (joined.contains("кімсің")
+            || joined.contains("кімсіз")
+            || joined.contains("қандай моделсің")
+            || joined.contains("қандай моделсіз")
+            || joined.contains("қандай ботсың")
+            || joined.contains("қандай ботсыз")
+            || joined.contains("қандай жасанды интеллектсің")
+            || joined.contains("қандай жасанды интеллектсіз")
+            || joined.contains("немен айналысасың")
+            || joined.contains("немен айналысасыз"))
+    {
+        return Some(SystemAspect::General);
+    }
+
+    None
 }
 
 fn detect_ask_name(joined: &str) -> bool {

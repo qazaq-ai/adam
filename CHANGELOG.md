@@ -7,6 +7,115 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.3.4] — 2026-04-26 — SystemIdentity entity (intelligence roadmap Track B continued)
+
+Builds on v4.3.3 (self/other distinction): adam now has a structured **`SystemIdentity`** record and four aspect-specific answer paths so it can introduce itself, name its creator, give its birthdate, and explain how it differs from existing models.
+
+### What landed
+
+**`crates/adam-dialog/src/system_identity.rs`** — new module with two public types:
+
+- `SystemIdentity` struct — adam's build-time self-record. Default (`canonical()`) carries:
+  - `name = "адам"` (Kazakh canonical short name)
+  - `full_name = "Nano Language Model"` (English technical name)
+  - `abbreviation = "NLM"`
+  - `kind = "тілдік модель"` (Kazakh kind label)
+  - `creator = "Баймурзин Даулет Абузарович"` (per AUTHORS)
+  - `birthdate = "2026-04-07"` (repository creation date — adam's "birthday")
+  - `architecture_summary = "Мен қолданыстағы үлкен тілдік модельдерден өзгеше архитектурада құрылғанмын — ережелер мен таңбалық ой-тізбекке негізделген, статистикалық генерацияға арналмаған"`
+- `SystemAspect` enum — `General` / `Creator` / `Birthdate` / `Architecture`.
+
+`SystemIdentity::template_slots()` returns a 7-entry slot vector with the `system_` prefix (`system_name`, `system_full_name`, `system_abbreviation`, `system_kind`, `system_creator`, `system_birthdate`, `system_architecture`) — namespaced so the user-profile slots (`name`, `age`, `city`, `occupation`, `name_id`, `city_id`, `geo_kind`) never collide.
+
+**`Intent::AskAboutSystem`** now carries an `aspect: SystemAspect` payload. The detector returns `Option<SystemAspect>` based on which question shape was matched:
+
+- **Creator**: `сені кім жасады` / `сізді кім жасады` / `авторың кім` / `жасаушың кім` / `кім құрастырды` / etc.
+- **Birthdate**: `қашан пайда болдың` / `қашан жасалдың` / `қашан туылдың` / `туған күнің қашан` / formal variants.
+- **Architecture**: `ерекшелігің не` / `айырмашылығың не` / `неге басқашасың` / `неге басқа модельдерден ерекшеленесің` / formal variants.
+- **General**: `сен кімсің` / `сіз кімсіз` / `сен қандай моделсің` / `сен қандай ботсың` / `сен немен айналысасың` / formal variants.
+
+Aspect-specific phrases are checked first so a compound utterance routes to the most specific intent (`сен кімсің және сені кім жасады` → Creator, not General).
+
+**`Conversation::system_identity`** field — the canonical `SystemIdentity` by default. `turn_with_trace` injects all 7 `system_*` slots into `extra_slots` **only when** the intent is `AskAboutSystem`, keeping the slot scope tight and `template_is_fillable` accurate for unrelated templates.
+
+**Planner template selection** branches on the aspect:
+- `SystemAspect::General` → `ask_about_system`
+- `SystemAspect::Creator` → `ask_about_system.creator`
+- `SystemAspect::Birthdate` → `ask_about_system.birthdate`
+- `SystemAspect::Architecture` → `ask_about_system.architecture`
+
+**Templates** — 4 new families in `data/dialog/templates/v1.toml`, each interpolating the relevant `system_*` slots. Examples:
+
+```toml
+[[families]]
+key = "ask_about_system"
+templates = [
+    "менің атым {system_name}, толық атауым {system_full_name} ({system_abbreviation}). Мен — {system_kind}",
+    "{system_abbreviation} — Nano Language Model, мен {system_name} атты қазақша {system_kind}мін",
+    ...
+]
+
+[[families]]
+key = "ask_about_system.creator"
+templates = [
+    "мені {system_creator} жасады",
+    "менің авторым — {system_creator}",
+    "{system_creator} мені {system_birthdate} күні жасап шығарды",
+    ...
+]
+```
+
+**`Verifier`** — already special-cased `AskAboutSystem` AnswerDirect path in v4.3.3; the new aspect payload doesn't change verification (the `matches!(intent, Intent::AskAboutSystem { .. })` guard catches any aspect).
+
+### Quality gate update
+
+The v4.3.0 `audit_response` Latin-character check rejected ANY ASCII letter in Kazakh-only output — too strict. Adam's general self-introduction intentionally surfaces `Nano Language Model` and `NLM` (English technical name). v4.3.4 token-aware Latin check: walk consecutive ASCII-alphabetic runs into tokens, only flag tokens NOT in a curated whitelist (`adam` / `Adam` / `ADAM` / `Nano` / `Language` / `Model` / `NLM`). Cyrillic / digits / whitespace / punctuation reset the token boundary. Default stance remains "no Latin in Kazakh output"; the whitelist is a deliberate per-token allowance.
+
+### Tests
+
+**668 passing** (was 659 at v4.3.3, +9 net). 0 warnings on `cargo build`. **Cognitive eval baseline 48/48 canonical, 0 aspirational** (was 44/44 at v4.3.3).
+
+End-to-end (+5):
+- `ask_about_system_general_includes_name_and_full_name` — output contains both `адам` and (`Nano Language Model` OR `NLM`).
+- `ask_about_system_creator_aspect_mentions_creator` — output contains `Баймурзин` AND `Даулет`.
+- `ask_about_system_birthdate_aspect_mentions_date` — output contains `2026-04-07`.
+- `ask_about_system_architecture_aspect_mentions_difference` — output contains `ереже` and `архитектур`.
+- `ask_about_system_creator_aspect_alternate_phrasings` — `сенің авторың кім` also routes to Creator.
+
+Cognitive (+4):
+- `ask_about_system_creator_aspect_surfaces_creator` — pinned `сені кім жасады` → Creator output mentions `баймурзин`.
+- `ask_about_system_birthdate_aspect_surfaces_date` — pinned `қашан пайда болдың` → Birthdate output mentions `2026-04-07`.
+- `ask_about_system_architecture_aspect_surfaces_difference` — pinned `сенің ерекшелігің не` → Architecture output mentions `архитектур`.
+- `ask_about_system_general_aspect_surfaces_full_name` — pinned `сен қандай моделсің` → General output mentions `nano language model` or `nlm`.
+
+System-identity unit tests (+4 in `system_identity.rs`):
+- `canonical_identity_carries_all_required_fields`
+- `template_slots_use_system_prefix`
+- `aspect_template_key_suffix_is_deterministic`
+- `default_returns_canonical`
+
+### Why patch and not minor
+
+New module + new intent payload + 4 new template families + +9 tests. Bounded scope; no architectural shift. Per the bump-magnitude rule, this is patch-magnitude.
+
+### Coverage of the user request
+
+The user (2026-04-26) asked for adam to know:
+- ✅ It is "Nano Language Model (NLM)" — surfaced via `system_full_name` + `system_abbreviation` in the General template.
+- ✅ Its birthdate is the repository opening — `system_birthdate = "2026-04-07"`, surfaced in the Birthdate template.
+- ✅ Its creator is Баймурзин Даулет Абузарович — `system_creator`, surfaced in the Creator template.
+- ✅ It is built on a different architecture than existing models — `system_architecture` (rule-based, symbolic chains, not statistical), surfaced in the Architecture template.
+- ✅ It can answer questions about: who he is, what he is, how he differs, when he appeared, who created him — General / Creator / Birthdate / Architecture aspects each have a dedicated template family with 3-4 surface variants.
+
+### Next
+
+Per `docs/intelligence_roadmap.md`:
+- Track A: continue entity-extraction hardening (compound expressions like `жасанды интеллект` deserve a single multi-word lexicon entry — addresses the v4.3.2 root cause more permanently).
+- Track B continuation: bare `атың кім` semantic disambiguation, `Intent::AskOwnName` for `менің атым кім еді` self-referential phrasings.
+- **Phase 2 (Track C)** — belief-poisoning recovery (v4.4.0 minor target): `Action::DismissContradiction`, contradiction-priority cap, confidence decay.
+
+---
+
 ## [4.3.3] — 2026-04-26 — Self/other distinction (intelligence roadmap Track B Phase 1 #1)
 
 First Phase 1 patch from `docs/intelligence_roadmap.md` Track B (self/other distinction). The user-shared 2026-04-26 dialog test had this exchange:

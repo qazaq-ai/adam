@@ -142,6 +142,17 @@ pub struct Conversation {
     /// [`reset`](Self::reset). Saturating-add insures we never panic
     /// even at astronomical turn counts.
     pub turn_counter: usize,
+    /// **v4.3.4** — adam's self-identity record, used by the
+    /// `ask_about_system.*` template families when the user asks
+    /// who/what adam is. Defaults to
+    /// [`SystemIdentity::canonical`](crate::system_identity::SystemIdentity::canonical),
+    /// which carries the build-time identity (`name = адам`,
+    /// `full_name = Nano Language Model`, `creator =
+    /// Баймурзин Даулет Абузарович`, `birthdate = 2026-04-07`,
+    /// architecture summary of how adam differs from mainstream
+    /// LLMs). Tests may override individual fields by direct
+    /// construction; production callers should leave the default.
+    pub system_identity: crate::system_identity::SystemIdentity,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -256,7 +267,7 @@ impl From<&Intent> for IntentKind {
             Intent::AskHowAreYou => Self::AskHowAreYou,
             Intent::StatementOfWellbeing => Self::StatementOfWellbeing,
             Intent::AskName => Self::AskName,
-            Intent::AskAboutSystem => Self::AskAboutSystem,
+            Intent::AskAboutSystem { .. } => Self::AskAboutSystem,
             Intent::StatementOfName { .. } => Self::StatementOfName,
             Intent::AskAge => Self::AskAge,
             Intent::StatementOfAge { .. } => Self::StatementOfAge,
@@ -509,6 +520,18 @@ impl Conversation {
                 extra_slots.insert("predicate".into(), predicate_kz.into());
                 extra_slots.insert("old_value".into(), old);
                 extra_slots.insert("new_value".into(), new);
+            }
+        }
+        // **v4.3.4** — when the user is asking about adam itself,
+        // inject the `system_*` template slots so the
+        // `ask_about_system.*` family can render the canonical
+        // identity (name / creator / birthdate / architecture).
+        // Slots are only injected on this intent so the
+        // `system_*` namespace doesn't leak into unrelated
+        // templates and `template_is_fillable` stays accurate.
+        if matches!(intent, crate::intent::Intent::AskAboutSystem { .. }) {
+            for (k, v) in self.system_identity.template_slots() {
+                extra_slots.insert(k, v);
             }
         }
         let plan = crate::planner::plan_response_with_epistemic(

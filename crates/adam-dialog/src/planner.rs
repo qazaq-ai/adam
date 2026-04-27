@@ -449,7 +449,12 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::AskHowAreYou => "ask_how_are_you",
         Intent::StatementOfWellbeing => "statement_of_wellbeing",
         Intent::AskName => "ask_name",
-        Intent::AskAboutSystem => "ask_about_system",
+        Intent::AskAboutSystem { aspect } => match aspect {
+            crate::system_identity::SystemAspect::General => "ask_about_system",
+            crate::system_identity::SystemAspect::Creator => "ask_about_system.creator",
+            crate::system_identity::SystemAspect::Birthdate => "ask_about_system.birthdate",
+            crate::system_identity::SystemAspect::Architecture => "ask_about_system.architecture",
+        },
         Intent::StatementOfName { .. } => "statement_of_name",
         Intent::AskAge => "ask_age",
         Intent::StatementOfAge { .. } => "statement_of_age",

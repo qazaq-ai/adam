@@ -459,6 +459,50 @@
         "epistemic_status": "Certain",
         "output_contains_lower_any": ["адам"]
       }
+    },
+    {
+      "id": "ask_about_system_creator_aspect_surfaces_creator",
+      "category": "action_routing",
+      "description": "v4.3.4 (Track B Phase 1 #2): `сені кім жасады?` routes to Intent::AskAboutSystem { aspect: Creator }. Planner picks the `ask_about_system.creator` template family which interpolates the `system_creator` slot from Conversation::system_identity (canonical default: Баймурзин Даулет Абузарович). Output must mention the creator's surname.",
+      "turns": ["сені кім жасады"],
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["баймурзин"]
+      }
+    },
+    {
+      "id": "ask_about_system_birthdate_aspect_surfaces_date",
+      "category": "action_routing",
+      "description": "v4.3.4: `қашан пайда болдың?` routes to AskAboutSystem { aspect: Birthdate }. Planner picks `ask_about_system.birthdate` family with `system_birthdate` slot (canonical default: 2026-04-07, the repository creation date). Output must contain the ISO-formatted date string.",
+      "turns": ["қашан пайда болдың"],
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["2026-04-07"]
+      }
+    },
+    {
+      "id": "ask_about_system_architecture_aspect_surfaces_difference",
+      "category": "action_routing",
+      "description": "v4.3.4: `сенің ерекшелігің не?` routes to AskAboutSystem { aspect: Architecture }. Planner picks `ask_about_system.architecture` family with `system_architecture` slot (canonical default summary: rule-based, symbolic chains, not statistical). Output must mention `архитектур` (architecture).",
+      "turns": ["сенің ерекшелігің не"],
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["архитектур"]
+      }
+    },
+    {
+      "id": "ask_about_system_general_aspect_surfaces_full_name",
+      "category": "action_routing",
+      "description": "v4.3.4: `сен қандай моделсің?` routes to AskAboutSystem { aspect: General }. The `ask_about_system` family interpolates `system_full_name` and `system_abbreviation` so the reply mentions either `Nano Language Model` or `NLM` (along with the canonical name `адам`).",
+      "turns": ["сен қандай моделсің"],
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["nano language model", "nlm"]
+      }
     }
   ]
 }

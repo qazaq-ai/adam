@@ -181,7 +181,7 @@ impl ActionPlanner {
         // Action::AnswerDirect carries `EpistemicStatus::Certain`
         // through the existing UncertaintyPolicy mapping. Track B
         // of `docs/intelligence_roadmap.md`.
-        if matches!(intent, Intent::AskAboutSystem) {
+        if matches!(intent, Intent::AskAboutSystem { .. }) {
             return ActionPlan::new(
                 Action::AnswerDirect,
                 OutputKind::DirectAnswer,

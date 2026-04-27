@@ -146,21 +146,62 @@ templates = [
     "{name} деп танысқан едіңіз",
 ]
 
-# v4.3.3 — `Intent::AskAboutSystem`: user asked about adam itself
-# (`сен кімсің?` / `сіз қандай моделсіз?`). Renders adam's
-# self-introduction; never uses the user-stored name slot. Track B
-# of `docs/intelligence_roadmap.md` (self/other distinction).
+# v4.3.3 / v4.3.4 — `Intent::AskAboutSystem`: user asked about
+# adam itself. v4.3.4 introduces the `SystemIdentity` struct and
+# four aspect-specific template families:
+#   ask_about_system            → General (name + kind + abbreviation)
+#   ask_about_system.creator    → Creator
+#   ask_about_system.birthdate  → Birthdate
+#   ask_about_system.architecture → Architecture (how adam differs)
 #
-# The strings hardcode adam's identity. A future patch may move
-# them onto a `SystemIdentity` struct with `{system_name}` /
-# `{system_kind}` slots; for v4.3.3 the literal text is enough.
+# Slots `{system_name}` / `{system_full_name}` /
+# `{system_abbreviation}` / `{system_kind}` / `{system_creator}` /
+# `{system_birthdate}` / `{system_architecture}` are injected by
+# `Conversation::turn_with_trace` from `Conversation.system_identity`
+# only when the intent is `AskAboutSystem`. The slot scope stays
+# tight — `template_is_fillable` for unrelated templates is
+# unaffected.
+#
+# Track B (self/other distinction) of `docs/intelligence_roadmap.md`.
 [[families]]
 key = "ask_about_system"
 templates = [
-    "менің атым адам, мен қазақ тіліндегі тілдік моделмін",
-    "мені адам деп атайды, мен қазақша сөйлесуге арналған модельмін",
-    "мен — адам, тілдік модель",
-    "адаммын, қазақша сұхбаттасуға арналған модельмін",
+    "менің атым {system_name}, толық атауым {system_full_name} ({system_abbreviation}). Мен — {system_kind}",
+    "мені {system_name} деп атайды, мен қазақша сөйлесуге арналған {system_kind}мін",
+    "мен — {system_name}, {system_full_name} ({system_abbreviation}) деген {system_kind}",
+    "{system_abbreviation} — Nano Language Model, мен {system_name} атты қазақша {system_kind}мін",
+]
+
+# v4.3.4 — Creator aspect: "who made you". Surfaces the creator
+# field. Used when the user asks `сені кім жасады?` / `авторың кім?`.
+[[families]]
+key = "ask_about_system.creator"
+templates = [
+    "мені {system_creator} жасады",
+    "менің авторым — {system_creator}",
+    "{system_creator} мені {system_birthdate} күні жасап шығарды",
+    "мені {system_creator} құрды; ол менің авторым",
+]
+
+# v4.3.4 — Birthdate aspect: "when did you appear / when were you
+# born". Surfaces the birthdate (repository creation date).
+[[families]]
+key = "ask_about_system.birthdate"
+templates = [
+    "мен {system_birthdate} күні дүниеге келдім — adam репозиторийі ашылған кез",
+    "менің туған күнім — {system_birthdate}, дәл сол күні adam репозиторийі ашылды",
+    "{system_birthdate} күні мен пайда болдым; ол — менің туған күнім",
+]
+
+# v4.3.4 — Architecture aspect: "how are you different from
+# existing models". Surfaces the architecture summary that
+# distinguishes adam from mainstream large language models.
+[[families]]
+key = "ask_about_system.architecture"
+templates = [
+    "{system_architecture}",
+    "менің ерекшелігім: {system_architecture}",
+    "айырмашылығым мынада: {system_architecture}",
 ]
 
 # ---------- Social topics (v0.8.0 new) ----------

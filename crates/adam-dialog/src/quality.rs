@@ -452,8 +452,47 @@ fn latest_conflict_values(trace: &TurnTrace) -> Option<(String, String)> {
     Some((old_value, new_value))
 }
 
+/// **v4.3.4** — token-aware Latin check. Pre-v4.3.4 the predicate
+/// rejected ANY ASCII letter. That is too strict: legitimate
+/// Kazakh-dialog content can include the project name `adam`, the
+/// system's technical full name `Nano Language Model`, and the
+/// abbreviation `NLM`. The user-facing
+/// `Intent::AskAboutSystem { aspect: General }` reply intentionally
+/// surfaces all three.
+///
+/// Strategy: walk the string, collect consecutive ASCII-alphabetic
+/// runs into tokens, and only flag if a token is not on the
+/// whitelist. Cyrillic / digits / whitespace / punctuation reset
+/// the token boundary, so `NLM` (between `(` and `)`) or `adam`
+/// (between spaces) are scanned as standalone tokens.
 fn contains_latin(value: &str) -> bool {
-    value.chars().any(|ch| ch.is_ascii_alphabetic())
+    let mut current = String::new();
+    for ch in value.chars() {
+        if ch.is_ascii_alphabetic() {
+            current.push(ch);
+        } else {
+            if !current.is_empty() && !is_allowed_latin_token(&current) {
+                return true;
+            }
+            current.clear();
+        }
+    }
+    if !current.is_empty() && !is_allowed_latin_token(&current) {
+        return true;
+    }
+    false
+}
+
+/// Curated whitelist of Latin tokens that may appear in Kazakh-only
+/// output without tripping `LatinCharactersForbidden`. Currently
+/// covers adam's project name and its technical full-name + abbreviation.
+/// Add new entries here only after a deliberate review — the default
+/// stance remains "no Latin in Kazakh output".
+fn is_allowed_latin_token(token: &str) -> bool {
+    matches!(
+        token,
+        "adam" | "Adam" | "ADAM" | "Nano" | "Language" | "Model" | "NLM"
+    )
 }
 
 fn matching_graph_fact<'a>(trace: &'a TurnTrace, text: &str) -> Option<&'a ToolEvidence> {

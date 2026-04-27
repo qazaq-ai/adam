@@ -37,6 +37,7 @@ pub mod quality;
 pub mod realiser;
 pub mod semantics;
 pub mod slot_syntax;
+pub mod system_identity;
 pub mod task;
 pub mod templates;
 pub mod tool;
@@ -67,6 +68,7 @@ pub use quality::{
 };
 pub use realiser::realise;
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
+pub use system_identity::{SystemAspect, SystemIdentity};
 pub use task::{Goal, Subgoal, TaskDigest, TaskState, TaskStatus};
 pub use templates::{TemplateError, TemplateRepository};
 pub use tool::{Tool, ToolCall, ToolContext, ToolEvidence, ToolResult};

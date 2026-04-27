@@ -52,10 +52,14 @@ pub enum Intent {
     /// **v4.3.3** — "Who are you?" / "What kind of system are you?"
     /// addressed to adam itself. Distinct from `AskName` (which only
     /// asks about the addressee's *name*) — this asks about adam's
-    /// **identity / nature** as a system. Triggers on pronoun-led
-    /// patterns like `сен кімсің` / `сіз кімсіз` / `сен қандайсың` /
-    /// `сен немен айналысасың` where the user is clearly addressing
-    /// the system, not memory-checking themselves.
+    /// **identity / nature** as a system.
+    ///
+    /// **v4.3.4** — extended with `SystemAspect` so the planner can
+    /// differentiate the four self-introduction paths the user may
+    /// ask about: `General` (name + kind), `Creator` (who made you),
+    /// `Birthdate` (when did you appear), `Architecture` (how are
+    /// you different from existing models). All four resolve via
+    /// the `system_identity` slot family, never from belief.
     ///
     /// Pre-v4.3.3 these phrasings either fell through to Unknown or
     /// got accidentally routed via `AskName` substring matching, so
@@ -64,7 +68,9 @@ pub enum Intent {
     /// the failure mode (`А, сен кімсің және атың кім?` → `сіздің
     /// атыңыз Мәулет`). Tracked by `intelligence_roadmap.md` Track
     /// B (self/other distinction).
-    AskAboutSystem,
+    AskAboutSystem {
+        aspect: crate::system_identity::SystemAspect,
+    },
 
     // --- v0.8.0 social topic intents --------------------------------------
     /// User introduces self by name: "менің атым X", "мені X деп атайды".
