@@ -152,6 +152,43 @@ pub fn plan_response_with_epistemic(
     trace.push(format!("planner: epistemic={epistemic:?}"));
 
     let base_key = intent_key(intent);
+    // **v4.4.0** — when `extra_slots` carries the
+    // `__dismiss_contradiction__` marker, route through the
+    // `dismiss_contradiction` template family unconditionally.
+    // The marker is set by `Conversation::turn_with_trace` when
+    // the user opted out of resolving a pending contradiction
+    // ("екеуі де жоқ" / "білмеймін" / etc.). Bypasses epistemic
+    // overrides because dismissal is a deliberate state-transition
+    // ack, not an evidence-shaped reply.
+    if extra_slots.contains_key("__dismiss_contradiction__") {
+        let key = "dismiss_contradiction";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: dismiss_contradiction override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all
+                .get(idx)
+                .map(|s| s.clone())
+                .unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     let override_key = match (intent, epistemic) {
         (
             Intent::Unknown {

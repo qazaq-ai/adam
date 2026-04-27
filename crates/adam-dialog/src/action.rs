@@ -56,6 +56,15 @@ pub enum Action {
     /// Surface a belief contradiction to the user (two competing
     /// claims with the same `(subject, predicate)`).
     CheckContradiction,
+    /// **v4.4.0** — User opted out of resolving a pending
+    /// contradiction (replied "neither / I don't know / skip" to
+    /// a `CheckContradiction` prompt). The conflict has just been
+    /// dismissed by `BeliefState::dismiss_contradiction`; this
+    /// action surfaces a brief acknowledgement reply ("ұқтым,
+    /// екеуін де жадтан өшірдім") and clears the conversational
+    /// state. Distinct from `Social` because it carries
+    /// state-change semantics — belief was actually mutated.
+    DismissContradiction,
     /// User asked what the system knows about them. Enumerate
     /// active belief facts. v4.0.31 reserves the action but doesn't
     /// yet emit — no intent currently triggers it.
@@ -107,7 +116,7 @@ pub struct ActionPlan {
 }
 
 impl ActionPlan {
-    fn new(
+    pub(crate) fn new(
         action: Action,
         expected_output: OutputKind,
         rationale: Vec<String>,
@@ -133,13 +142,68 @@ impl ActionPlan {
 pub struct ActionPlanner;
 
 impl ActionPlanner {
+    /// **v4.4.0** — turn cap (in turns) the contradiction-priority
+    /// rule (step 1 of `plan`) waits before falling through to
+    /// other actions. After this many turns since
+    /// `BeliefConflict.detected_at_turn`, the planner stops
+    /// dominating the dialog with `CheckContradiction` and lets
+    /// the user move on. The contradiction stays in
+    /// `belief.contradictions` (audit trail preserved); only the
+    /// planner's priority handling changes.
+    ///
+    /// Set to 3 turns by default — long enough to give the user
+    /// two chances to resolve, short enough that a phantom
+    /// contradiction (like the v4.3.2 `Жасанды` bug) doesn't
+    /// permanently brick the dialog.
+    pub const CONTRADICTION_PRIORITY_TURNS: usize = 3;
+
+    /// Public entry point for production use — applies the v4.4.0
+    /// contradiction-priority cap. `current_turn` is the absolute
+    /// turn counter the dialog is currently on (`Conversation::turn_counter`).
+    pub fn plan_with_turn(
+        intent: &Intent,
+        belief: &BeliefState,
+        task: &TaskState,
+        current_turn: usize,
+    ) -> ActionPlan {
+        Self::plan_inner(intent, belief, task, Some(current_turn))
+    }
+
+    /// Backwards-compatible entry point — no contradiction-priority
+    /// cap. Existing test scaffolding uses this; the cap is opt-in
+    /// via `plan_with_turn` so legacy callers see unchanged behaviour.
     pub fn plan(intent: &Intent, belief: &BeliefState, task: &TaskState) -> ActionPlan {
+        Self::plan_inner(intent, belief, task, None)
+    }
+
+    fn plan_inner(
+        intent: &Intent,
+        belief: &BeliefState,
+        task: &TaskState,
+        current_turn: Option<usize>,
+    ) -> ActionPlan {
         // 1. Belief conflict dominates. Never answer on top of an
         // unresolved contradiction — even if evidence exists. This
         // enforces the Codex v4.0.28 "active_fact() == None at
         // conflict is legitimate state" directive at the action
         // layer.
-        if !belief.contradictions.is_empty() {
+        //
+        // **v4.4.0** — priority cap: only dominate while the
+        // freshest contradiction is younger than
+        // `CONTRADICTION_PRIORITY_TURNS`. After that, fall through
+        // to normal action paths so a stale (or phantom) conflict
+        // doesn't brick the dialog. The contradiction itself
+        // remains in `belief.contradictions` for audit; only
+        // priority handling changes.
+        let active_contradiction = if let Some(ct) = current_turn {
+            belief
+                .contradictions
+                .iter()
+                .any(|c| ct.saturating_sub(c.detected_at_turn) < Self::CONTRADICTION_PRIORITY_TURNS)
+        } else {
+            !belief.contradictions.is_empty()
+        };
+        if active_contradiction {
             let rationale = belief
                 .contradictions
                 .iter()

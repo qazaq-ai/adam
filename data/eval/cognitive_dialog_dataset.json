@@ -521,6 +521,29 @@
       "expect": {
         "epistemic_status": "Tentative"
       }
+    },
+    {
+      "id": "dismiss_contradiction_clears_both_cities",
+      "category": "contradiction_recovery",
+      "description": "v4.4.0 (Phase 2 Track C): user logs two contradictory residences (`Алматыда тұрамын` then `Астанада тұрамын`); the system asks `Алматы ма, әлде Астана ма?`. User replies `екеуі де жоқ` → Conversation::try_dismiss_pending_contradiction supersedes both facts and clears the pending question. Action routes to DismissContradiction; epistemic status is Certain (we acted, no false claim); output mentions «екеу» / «ұмыт» / «жад» so the user knows the slot is now blank.",
+      "turns": ["мен Алматыда тұрамын", "мен Астанада тұрамын", "екеуі де жоқ"],
+      "expect": {
+        "action": "DismissContradiction",
+        "epistemic_status": "Certain",
+        "belief_contradictions_count": 0,
+        "output_contains_lower_any": ["екеу", "ұмыт", "жад", "есепке"]
+      }
+    },
+    {
+      "id": "dismiss_contradiction_handles_dont_know",
+      "category": "contradiction_recovery",
+      "description": "v4.4.0: a softer dismissal — the user says `білмеймін` after the contradiction prompt. Same effect: both candidate facts marked Superseded, contradiction cleared from belief, DismissContradiction action.",
+      "turns": ["мен Алматыда тұрамын", "мен Астанада тұрамын", "білмеймін"],
+      "expect": {
+        "action": "DismissContradiction",
+        "epistemic_status": "Certain",
+        "belief_contradictions_count": 0
+      }
     }
   ]
 }

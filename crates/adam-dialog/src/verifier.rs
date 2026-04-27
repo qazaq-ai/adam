@@ -184,7 +184,10 @@ impl Verifier {
                     issues.push(VerificationIssue::MissingEvidence);
                 }
             }
-            Action::AskClarification | Action::Social | Action::RefuseOutOfScope => {
+            Action::AskClarification
+            | Action::Social
+            | Action::DismissContradiction
+            | Action::RefuseOutOfScope => {
                 // These actions do not need evidence by design;
                 // they're the system's "out" for unclear or
                 // meta-level turns.
@@ -285,7 +288,7 @@ mod tests {
             Action::RetrieveEvidence => OutputKind::EvidenceAnswer,
             Action::AnswerDirect => OutputKind::DirectAnswer,
             Action::CheckContradiction | Action::AskClarification => OutputKind::ClarifyingQuestion,
-            Action::Social => OutputKind::SocialPleasantry,
+            Action::Social | Action::DismissContradiction => OutputKind::SocialPleasantry,
             Action::RefuseOutOfScope | Action::SummarizeBelief => OutputKind::SafeFallback,
         };
         ActionPlan {

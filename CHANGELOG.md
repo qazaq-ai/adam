@@ -7,6 +7,48 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.0] — 2026-04-27 — Belief-poisoning recovery: dismiss_contradiction + priority cap (intelligence_roadmap Phase 2 Track C)
+
+The `intelligence_roadmap.md` Phase 2 / Track C ("belief-poisoning recovery") flagged a soft failure mode that survived the v4.3.2 phantom-city fix: once `BeliefState.contradictions` was non-empty for *any* reason — true conflict, transient typo, or upstream parse glitch — the action planner clamped every subsequent turn to `CheckContradiction`, with no clean exit. The dialog became hostage to the conflict log: there was no way for the user to say "neither — drop it" and continue, and no organic time-out either.
+
+v4.4.0 adds two complementary escape hatches: an **explicit user-initiated dismissal** and an **implicit time-bounded priority cap**. The contradiction itself stays in `belief.contradictions` for audit either way; only the planner's *priority* over it changes.
+
+### Track C (1) — `Action::DismissContradiction` + user-initiated escape
+
+**`BeliefState::dismiss_contradiction(subject, predicate)`** — symmetric to the v4.1.0 `resolve_contradiction`. Marks every contested fact (subject + predicate match) as `FactStatus::Superseded`, drops the matching `BeliefConflict` entry, and clears any `ContradictionToResolve` pending question. Returns `false` when nothing was contested for that slot, so callers can fall through to normal handling.
+
+**`Conversation::try_dismiss_pending_contradiction(input)`** — a small phrase detector that fires only when (a) `belief.contradictions` is non-empty AND (b) the input matches one of nine dismissal triggers: `екеуі де жоқ`, `екеуі де емес`, `ешқайсысы дұрыс емес`, `білмеймін`, `өткізіп жібер`, `маңызды емес`, `жадтан өшір`, `ұмыт`, `аластат`. On a hit, `dismiss_contradiction` runs *before* `try_resolve_pending_contradiction`, so a user who replies "білмеймін" doesn't accidentally pick a candidate.
+
+**Wire-up in `turn_with_trace`** — when dismissal fires, absorption is skipped (the input is a meta-reply, not a new fact) and the planner is short-circuited with a direct `ActionPlan::new(Action::DismissContradiction, OutputKind::SocialPleasantry, …)`. A new `__dismiss_contradiction__` marker slot routes the planner to a dedicated `dismiss_contradiction` template family with four KZ variants: `ұқтым, екеуін де жадтан өшірдім` / `түсіндім, екеуін де есепке алмаймын — қалаған кезде қайта айтып өтесіз` / `екеуінен де бас тарттым; кейін нақты болсын дегенде айтыңыз` / `жарайды, екі нұсқаны да ұмытайын`.
+
+**`Verifier`** — `Action::DismissContradiction` is non-evidence-required (we acted on belief, not on a claim) and maps to `OutputKind::SocialPleasantry`. **`UncertaintyPolicy`** maps it to `EpistemicStatus::Certain`: the dismissal *is* the deterministic act, no hedge needed.
+
+### Track C (2) — Contradiction-priority cap (`K = 3` turns)
+
+**`ActionPlanner::CONTRADICTION_PRIORITY_TURNS = 3`** + new `plan_with_turn(intent, belief, task, current_turn) → ActionPlan`. The legacy `plan(...)` still wraps `plan_inner(..., None)` for callers that don't track turn id; the dialog runtime now uses `plan_with_turn` exclusively, passing `self.turn_counter` so every belief-conflict check has the current turn.
+
+**Step 1 of `plan_inner`** — instead of "any contradiction dominates forever," it now dominates only while the freshest conflict is younger than `CONTRADICTION_PRIORITY_TURNS`. Math: a contradiction logged at `detected_at_turn = T` dominates turns `T`, `T+1`, `T+2`; on turn `T+3` it falls through. The conflict stays in `belief.contradictions` (audit, debugging, possible future re-prompt), only the planner stops insisting on it.
+
+This means a user who logs a typo-induced phantom conflict and then tries to move on with a different topic gets unblocked automatically after three turns — no need to know about the dismissal phrases. And a user who *does* know about them gets out instantly.
+
+### Tests + cognitive eval
+
+- 3 `BeliefState::dismiss_contradiction` unit tests (supersedes-all, no-op when empty, slot stays writable afterward).
+- 3 new `tests/end_to_end.rs` regressions:
+  - `dismiss_contradiction_clears_both_cities_on_neither_reply` — `екеуі де жоқ` after Алматы/Астана conflict.
+  - `dismiss_contradiction_handles_dont_know_phrasing` — `білмеймін` variant.
+  - `contradiction_priority_cap_lets_user_move_on` — turns within cap stay on `CheckContradiction`; on turn 4 (`detected_at_turn=1`, `4-1==3`, condition is `<`) a bare greeting routes to `Action::Social`; conflict still in belief.
+- 2 new cognitive scenarios in a new `contradiction_recovery` category: `dismiss_contradiction_clears_both_cities` + `dismiss_contradiction_handles_dont_know`. Cognitive baseline: **50/50 → 52/52 canonical**.
+
+### State
+
+| | v4.3.5 | v4.4.0 |
+|---|---|---|
+| `Action` variants | 8 | **9** (+`DismissContradiction`) |
+| Cognitive eval | 50/50 canonical | **52/52 canonical** (+1 category, +2 scenarios) |
+| Workspace tests | 672 | **678** (+3 unit + 3 e2e) |
+| Why minor | — | symmetric Belief op + planner contract change + new action variant + new template family — kernel-signature feature, not housekeeping |
+
 ## [4.3.5] — 2026-04-26 — Topic-marker extraction + famous Kazakhs data expansion (intelligence_roadmap Track A + Track D)
 
 Real-test 2026-04-26 dialog (user-shared, second session) revealed three more topic-extraction bugs in the same family as v4.3.2 (`Он — сан` from `Онда` parsing as `он+Locative`; common-noun `жазушы` winning over proper-noun `Мүсірепов`; adjective `әйгіл` mistaken for a topic). Fix shipped together with kz_literature + notable_kazakhstanis world_core expansion so the proper-noun extractions actually have data to surface.

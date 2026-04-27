@@ -204,6 +204,22 @@ templates = [
     "айырмашылығым мынада: {system_architecture}",
 ]
 
+# v4.4.0 — User opted out of resolving a pending contradiction
+# (replied "neither / I don't know / skip" to a CheckContradiction
+# prompt). `Conversation::try_dismiss_pending_contradiction` has
+# just set BOTH contested values to Superseded and dropped the
+# matching BeliefConflict. This template family acknowledges the
+# dismissal so the user knows belief was actually mutated. Track C
+# of `docs/intelligence_roadmap.md` (belief-poisoning recovery).
+[[families]]
+key = "dismiss_contradiction"
+templates = [
+    "ұқтым, екеуін де жадтан өшірдім",
+    "түсіндім, екеуін де есепке алмаймын — қалаған кезде қайта айтып өтесіз",
+    "екеуінен де бас тарттым; кейін нақты болсын дегенде айтыңыз",
+    "жарайды, екі нұсқаны да ұмытайын",
+]
+
 # ---------- Social topics (v0.8.0 new) ----------
 
 # User introduced self by name. `{name}` is substituted by the realiser

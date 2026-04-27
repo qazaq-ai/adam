@@ -357,6 +357,56 @@ impl BeliefState {
         true
     }
 
+    /// **v4.4.0 — Dismiss a pending contradiction without choosing
+    /// a value.**
+    ///
+    /// Symmetric counterpart to [`resolve_contradiction`]: when the
+    /// user responds to a `CheckContradiction` prompt with "neither
+    /// is right" / "I don't know" / "skip it" / "doesn't matter",
+    /// the dialog should drop **all** contested facts on
+    /// `(subject, predicate)` to `Superseded` rather than promote
+    /// one of them to `Active`. The slot becomes empty in belief;
+    /// future `Statement*` re-introduces a clean Active fact.
+    ///
+    /// Drops the matching `BeliefConflict` from `contradictions`
+    /// and the matching `ContradictionToResolve` pending question
+    /// (same teardown as `resolve_contradiction`). The single-
+    /// active-fact invariant (v4.0.28) is preserved: zero Active
+    /// facts on the slot after dismissal is a valid state.
+    ///
+    /// Returns `true` if at least one fact existed for the slot
+    /// (so something was actually demoted); `false` if there was
+    /// nothing to dismiss (no facts, no contradiction).
+    ///
+    /// Closes the v4.3.2 dialog-poisoning UX hazard: pre-v4.4.0,
+    /// once any contradiction landed in belief — phantom or real —
+    /// the planner blocked every other topic until the user
+    /// resolved it. With dismissal, the user has a clean exit.
+    pub fn dismiss_contradiction(&mut self, subject: &str, predicate: &str) -> bool {
+        let candidates: Vec<usize> = self
+            .facts
+            .iter()
+            .enumerate()
+            .filter(|(_, f)| f.subject == subject && f.predicate == predicate)
+            .map(|(i, _)| i)
+            .collect();
+        if candidates.is_empty() {
+            return false;
+        }
+        for &i in &candidates {
+            self.facts[i].status = FactStatus::Superseded;
+        }
+        self.contradictions
+            .retain(|c| !(c.subject == subject && c.predicate == predicate));
+        self.pending_questions.retain(|q| match &q.nature {
+            QuestionNature::ContradictionToResolve { predicate: p, .. } => {
+                !(q.about == subject && p == predicate)
+            }
+            _ => true,
+        });
+        true
+    }
+
     /// Register or refresh an entity bucket. Creates on first
     /// sighting, otherwise updates `last_seen_turn` and appends a
     /// new alias when the surface form differs from the canonical
@@ -592,6 +642,85 @@ mod tests {
         // State untouched
         assert_eq!(b.contradictions.len(), 1);
         assert!(b.facts.iter().all(|f| f.status == FactStatus::Contested));
+    }
+
+    /// **v4.4.0** — `dismiss_contradiction` drops all contested
+    /// facts to `Superseded` and clears the matching conflict +
+    /// pending question. The slot ends up with zero `Active` facts
+    /// — a valid state under the single-active-fact invariant.
+    #[test]
+    fn dismiss_contradiction_supersedes_all_contested_facts() {
+        let mut b = BeliefState::new();
+        b.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        b.record_user_fact(USER_SELF_KEY, "city", "астана", 2);
+        assert_eq!(b.contradictions.len(), 1);
+        assert_eq!(b.pending_questions.len(), 1);
+
+        let dismissed = b.dismiss_contradiction(USER_SELF_KEY, "city");
+        assert!(dismissed);
+
+        // Both city facts now Superseded; no Active fact for `city`.
+        let city_facts: Vec<_> = b
+            .facts
+            .iter()
+            .filter(|f| f.subject == USER_SELF_KEY && f.predicate == "city")
+            .collect();
+        assert_eq!(city_facts.len(), 2);
+        assert!(
+            city_facts
+                .iter()
+                .all(|f| f.status == FactStatus::Superseded),
+            "all city facts must be demoted to Superseded after dismissal"
+        );
+        assert!(
+            b.active_fact(USER_SELF_KEY, "city").is_none(),
+            "no Active city fact may survive a dismissal"
+        );
+
+        // Conflict and pending question both cleared.
+        assert!(b.contradictions.is_empty());
+        assert!(b.pending_questions.is_empty());
+    }
+
+    /// **v4.4.0** — `dismiss_contradiction` returns `false` for an
+    /// empty slot. Prevents callers from confusing "nothing to
+    /// dismiss" with "successfully dismissed".
+    #[test]
+    fn dismiss_contradiction_returns_false_when_no_facts_recorded() {
+        let mut b = BeliefState::new();
+        let dismissed = b.dismiss_contradiction(USER_SELF_KEY, "city");
+        assert!(!dismissed);
+        assert!(b.facts.is_empty());
+        assert!(b.contradictions.is_empty());
+    }
+
+    /// **v4.4.0** — Dismissal is idempotent: calling it on an
+    /// already-empty slot (e.g. after a previous dismissal) is a
+    /// no-op that returns `false`. Future `Statement*` on the slot
+    /// re-creates a clean Active fact, so dismissal does NOT lock
+    /// the slot.
+    #[test]
+    fn dismiss_contradiction_does_not_lock_slot_for_future_statements() {
+        let mut b = BeliefState::new();
+        b.record_user_fact(USER_SELF_KEY, "city", "алматы", 0);
+        b.record_user_fact(USER_SELF_KEY, "city", "астана", 1);
+        b.dismiss_contradiction(USER_SELF_KEY, "city");
+
+        // After dismissal: no Active. New Statement on turn 4 must
+        // create a fresh Active fact (no contradiction, since both
+        // priors were already Superseded).
+        b.record_user_fact(USER_SELF_KEY, "city", "шымкент", 4);
+        assert_eq!(
+            b.active_fact(USER_SELF_KEY, "city")
+                .map(|f| f.object.as_str()),
+            Some("шымкент"),
+            "post-dismissal Statement creates a fresh Active fact"
+        );
+        assert_eq!(
+            b.contradictions.len(),
+            0,
+            "no new contradiction is logged because both priors were Superseded"
+        );
     }
 
     #[test]

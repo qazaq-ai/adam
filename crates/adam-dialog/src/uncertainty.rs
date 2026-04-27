@@ -129,6 +129,12 @@ impl UncertaintyPolicy {
             Action::RunReasoner => EpistemicStatus::Derived,
             Action::AskClarification => EpistemicStatus::Tentative,
             Action::CheckContradiction => EpistemicStatus::Conflicted,
+            // **v4.4.0** — Dismissal is a deliberate user-driven
+            // belief-state change; the system has just performed
+            // exactly what was asked. `Certain` matches `Social`
+            // and `AnswerDirect`: high confidence in the action,
+            // not in any factual claim.
+            Action::DismissContradiction => EpistemicStatus::Certain,
             Action::SummarizeBelief => EpistemicStatus::Supported,
             Action::RefuseOutOfScope => EpistemicStatus::Unknown,
         }
@@ -179,7 +185,7 @@ mod tests {
             Action::RetrieveEvidence => OutputKind::EvidenceAnswer,
             Action::AnswerDirect => OutputKind::DirectAnswer,
             Action::CheckContradiction | Action::AskClarification => OutputKind::ClarifyingQuestion,
-            Action::Social => OutputKind::SocialPleasantry,
+            Action::Social | Action::DismissContradiction => OutputKind::SocialPleasantry,
             Action::RefuseOutOfScope | Action::SummarizeBelief => OutputKind::SafeFallback,
         };
         ActionPlan {

@@ -3854,6 +3854,128 @@ fn ask_about_system_architecture_aspect_mentions_difference() {
     );
 }
 
+/// **v4.4.0** — `Action::DismissContradiction` end-to-end.
+///
+/// User states two cities, dialog logs a contradiction (per
+/// v4.0.27), system asks `қалаңыз X пе, әлде Y ма`, user replies
+/// `екеуі де жоқ` (neither). Post-v4.4.0 this should drop both
+/// city facts to `Superseded` and acknowledge with a
+/// `dismiss_contradiction`-family reply. Pre-v4.4.0 the user had
+/// no clean exit — every subsequent turn would reroute back to
+/// `CheckContradiction` until the user picked one.
+#[test]
+fn dismiss_contradiction_clears_both_cities_on_neither_reply() {
+    use adam_dialog::USER_SELF_KEY;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    let _ = conv.turn("мен Алматыда тұрамын", &lex, &repo, 0);
+    let _ = conv.turn("мен Астанада тұрамын", &lex, &repo, 1);
+    assert_eq!(
+        conv.belief.contradictions.len(),
+        1,
+        "two distinct city statements must register a conflict"
+    );
+
+    let out = conv.turn("екеуі де жоқ", &lex, &repo, 2);
+    assert_eq!(
+        conv.belief.contradictions.len(),
+        0,
+        "dismissal must clear the BeliefConflict"
+    );
+    assert!(
+        conv.belief.active_fact(USER_SELF_KEY, "city").is_none(),
+        "both city facts must end Superseded after dismissal"
+    );
+    let lower = out.to_lowercase();
+    assert!(
+        lower.contains("ұқтым")
+            || lower.contains("түсіндім")
+            || lower.contains("ұмыт")
+            || lower.contains("тарт")
+            || lower.contains("есеп"),
+        "dismissal reply must signal acknowledgement, got: {out:?}"
+    );
+}
+
+/// **v4.4.0** — alternate dismissal phrasing (`білмеймін`,
+/// "I don't know") routes through the same path.
+#[test]
+fn dismiss_contradiction_handles_dont_know_phrasing() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен Алматыда тұрамын", &lex, &repo, 0);
+    let _ = conv.turn("мен Астанада тұрамын", &lex, &repo, 1);
+    assert_eq!(conv.belief.contradictions.len(), 1);
+
+    let _ = conv.turn("білмеймін", &lex, &repo, 2);
+    assert_eq!(
+        conv.belief.contradictions.len(),
+        0,
+        "білмеймін must dismiss the pending contradiction"
+    );
+}
+
+/// **v4.4.0** — contradiction-priority cap. Pre-v4.4.0 a pending
+/// contradiction blocked every subsequent turn forever. With the
+/// cap (K = 3 turns since `detected_at_turn`), the user can move
+/// on; the conflict stays in audit but stops dominating.
+///
+/// Setup: log conflict on turn 1. Turns 2–3 still route through
+/// CheckContradiction (within cap). Turns 4+ fall through —
+/// e.g. a `сәлем` greeting on turn 4 routes to `Action::Social`
+/// instead of `CheckContradiction`.
+#[test]
+fn contradiction_priority_cap_lets_user_move_on() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    // `Conversation::turn` takes `rng_seed` as the 4th arg; the
+    // *real* turn id is the internal `turn_counter`, which starts
+    // at 0 and increments on every call. So the 1st call uses
+    // turn_id 0, the 2nd uses 1, etc. — the seed values below are
+    // unrelated to the cap arithmetic.
+    let _ = conv.turn("мен Алматыда тұрамын", &lex, &repo, 0);
+    let _ = conv.turn("мен Астанада тұрамын", &lex, &repo, 1);
+    // Conflict detected on turn 1 (the second statement).
+    assert_eq!(conv.belief.contradictions.len(), 1);
+    assert_eq!(conv.belief.contradictions[0].detected_at_turn, 1);
+
+    // Turn id 2 (3rd call): within cap (2 - 1 == 1 < 3),
+    // a generic greeting still routes to CheckContradiction
+    // because contradiction priority dominates.
+    let (_, t2) = conv.turn_with_trace("сәлем", &lex, &repo, 0);
+    assert_eq!(
+        format!("{:?}", t2.action_digest.action),
+        "CheckContradiction",
+        "within the cap, contradiction priority must dominate even a greeting"
+    );
+
+    // Turn id 3 (4th call): still within cap (3 - 1 == 2 < 3).
+    let (_, t3) = conv.turn_with_trace("сәлем", &lex, &repo, 0);
+    assert_eq!(
+        format!("{:?}", t3.action_digest.action),
+        "CheckContradiction",
+        "turn 3 is the last one inside the cap"
+    );
+
+    // Turn id 4 (5th call): cap exceeded (4 - 1 == 3, condition is
+    // `<`, so the contradiction no longer dominates). A greeting
+    // must route to Action::Social, NOT CheckContradiction.
+    let (out, t4) = conv.turn_with_trace("сәлем", &lex, &repo, 0);
+    assert_eq!(
+        format!("{:?}", t4.action_digest.action),
+        "Social",
+        "after the priority cap, normal action paths must work — got action = {:?}, output = {out:?}",
+        t4.action_digest.action
+    );
+    // Conflict still in belief for audit — only priority changed.
+    assert_eq!(conv.belief.contradictions.len(), 1);
+}
+
 /// **v4.3.5** — `topic_marker_hint` regression battery, mirroring
 /// the user-shared 2026-04-26 dialog turns that exposed three
 /// distinct extraction failures.

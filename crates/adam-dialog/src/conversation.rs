@@ -437,8 +437,21 @@ impl Conversation {
         // so we don't double-record the chosen value as a fresh Active
         // fact. Closes aspirational scenario
         // `aspirational_contradiction_resolution_via_user_choice`.
-        let resolved_contradiction = self.try_resolve_pending_contradiction(input, &intent);
-        if !resolved_contradiction {
+        //
+        // **v4.4.0** — try DISMISSAL first (`try_dismiss_pending_contradiction`):
+        // when the user replies "neither / I don't know / skip" to a
+        // pending CheckContradiction, drop both contested values to
+        // Superseded without choosing one. Symmetric "neither" path
+        // alongside the v4.0.41 "pick one" path. If dismissal fires,
+        // also skip absorb_entities — it was a meta-dialog answer,
+        // not a fresh claim.
+        let dismissed_contradiction = self.try_dismiss_pending_contradiction(input);
+        let resolved_contradiction = if dismissed_contradiction {
+            false
+        } else {
+            self.try_resolve_pending_contradiction(input, &intent)
+        };
+        if !dismissed_contradiction && !resolved_contradiction {
             self.absorb_entities(&intent, turn_id);
         }
         // v4.0.29 — roll task state forward AFTER belief absorption,
@@ -451,7 +464,31 @@ impl Conversation {
         // audit. The template planner below still drives the
         // surface form in v4.0.31 — the verifier (Phase 4) is what
         // will actually gate outputs on `ActionPlan`.
-        let action_plan = crate::action::ActionPlanner::plan(&intent, &self.belief, &self.task);
+        //
+        // **v4.4.0** — when this turn just dismissed a pending
+        // contradiction (`try_dismiss_pending_contradiction`
+        // returned true above), short-circuit the planner with a
+        // dedicated `DismissContradiction` action. The contradiction
+        // has already been cleared from `self.belief`, so the
+        // planner's step 1 ("contradictions dominate") would NOT
+        // fire — but we still want the reply to acknowledge the
+        // dismissal explicitly rather than fall through to a
+        // generic "I don't understand". Mirrors the v4.0.41 short-
+        // circuit pattern for resolution turns.
+        let action_plan = if dismissed_contradiction {
+            crate::action::ActionPlan::new(
+                crate::action::Action::DismissContradiction,
+                crate::action::OutputKind::SocialPleasantry,
+                vec!["user dismissed pending contradiction; both values superseded".into()],
+                vec!["belief.dismiss_contradiction".into()],
+            )
+        } else {
+            // **v4.4.0** — `plan_with_turn` applies the
+            // contradiction-priority cap so a stale conflict
+            // doesn't dominate every turn. `turn_id` is the
+            // current turn we just consumed for absorption above.
+            crate::action::ActionPlanner::plan_with_turn(&intent, &self.belief, &self.task, turn_id)
+        };
         self.task.last_action = Some(action_plan.clone());
         // v4.0.32 Phase 4 — verify the chosen plan against evidence
         // present. If the verifier rejects (e.g. the plan is
@@ -533,6 +570,14 @@ impl Conversation {
             for (k, v) in self.system_identity.template_slots() {
                 extra_slots.insert(k, v);
             }
+        }
+        // **v4.4.0** — marker slot tells the planner to use the
+        // `dismiss_contradiction` template family. Sentinel name
+        // starts with `__` so it's filtered out of the slot map
+        // before realisation; the marker is meta-state, not a
+        // user-facing value.
+        if dismissed_contradiction {
+            extra_slots.insert("__dismiss_contradiction__".into(), "1".into());
         }
         let plan = crate::planner::plan_response_with_epistemic(
             &intent_for_render,
@@ -870,6 +915,64 @@ impl Conversation {
             }
         }
         any_resolved
+    }
+
+    /// **v4.4.0** — Companion to
+    /// [`try_resolve_pending_contradiction`]: instead of picking
+    /// one of the contested values, drop them all to `Superseded`
+    /// when the user explicitly opts out ("neither / I don't know
+    /// / skip it").
+    ///
+    /// Detector phrases (gated by an existing pending contradiction
+    /// — fires only when there is something to dismiss):
+    /// - `екеуі де жоқ` / `екеуі де емес` ("neither")
+    /// - `ешқайсысы дұрыс емес` ("none is correct")
+    /// - `білмеймін` ("I don't know")
+    /// - `өткізіп жібер` / `өткізіп жіберіңіз` ("skip it")
+    /// - `маңызды емес` ("doesn't matter")
+    /// - `аластат` / `жадтан өшір` / `ұмыт` ("clear / forget")
+    ///
+    /// Iterates over every pending contradiction and dismisses
+    /// each — the user's blanket "I don't know" opts out of all
+    /// pending conflicts at once, which is the natural UX. If
+    /// future patches need per-conflict dismissal, the detector
+    /// can be split.
+    ///
+    /// Returns `true` iff at least one contradiction was dismissed.
+    /// Caller (turn_with_trace) then skips `absorb_entities` for
+    /// the same reason `try_resolve_pending_contradiction` does:
+    /// the user's input was a meta-dialog answer, not a fresh
+    /// claim.
+    fn try_dismiss_pending_contradiction(&mut self, input: &str) -> bool {
+        if self.belief.contradictions.is_empty() {
+            return false;
+        }
+        let input_lc = input.to_lowercase();
+        let dismiss_phrase = input_lc.contains("екеуі де жоқ")
+            || input_lc.contains("екеуі де емес")
+            || input_lc.contains("ешқайсысы дұрыс емес")
+            || input_lc.contains("білмеймін")
+            || input_lc.contains("өткізіп жібер")
+            || input_lc.contains("маңызды емес")
+            || input_lc.contains("жадтан өшір")
+            || input_lc.contains("ұмыт")
+            || input_lc.contains("аластат");
+        if !dismiss_phrase {
+            return false;
+        }
+        let pending: Vec<(String, String)> = self
+            .belief
+            .contradictions
+            .iter()
+            .map(|c| (c.subject.clone(), c.predicate.clone()))
+            .collect();
+        let mut any_dismissed = false;
+        for (subject, predicate) in pending {
+            if self.belief.dismiss_contradiction(&subject, &predicate) {
+                any_dismissed = true;
+            }
+        }
+        any_dismissed
     }
 
     pub(crate) fn absorb_entities(&mut self, intent: &Intent, turn_id: usize) {
