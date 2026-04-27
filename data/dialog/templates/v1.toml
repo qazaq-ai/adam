@@ -146,6 +146,23 @@ templates = [
     "{name} деп танысқан едіңіз",
 ]
 
+# v4.3.3 — `Intent::AskAboutSystem`: user asked about adam itself
+# (`сен кімсің?` / `сіз қандай моделсіз?`). Renders adam's
+# self-introduction; never uses the user-stored name slot. Track B
+# of `docs/intelligence_roadmap.md` (self/other distinction).
+#
+# The strings hardcode adam's identity. A future patch may move
+# them onto a `SystemIdentity` struct with `{system_name}` /
+# `{system_kind}` slots; for v4.3.3 the literal text is enough.
+[[families]]
+key = "ask_about_system"
+templates = [
+    "менің атым адам, мен қазақ тіліндегі тілдік моделмін",
+    "мені адам деп атайды, мен қазақша сөйлесуге арналған модельмін",
+    "мен — адам, тілдік модель",
+    "адаммын, қазақша сұхбаттасуға арналған модельмін",
+]
+
 # ---------- Social topics (v0.8.0 new) ----------
 
 # User introduced self by name. `{name}` is substituted by the realiser

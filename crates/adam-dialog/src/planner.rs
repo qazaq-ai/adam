@@ -449,6 +449,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::AskHowAreYou => "ask_how_are_you",
         Intent::StatementOfWellbeing => "statement_of_wellbeing",
         Intent::AskName => "ask_name",
+        Intent::AskAboutSystem => "ask_about_system",
         Intent::StatementOfName { .. } => "statement_of_name",
         Intent::AskAge => "ask_age",
         Intent::StatementOfAge { .. } => "statement_of_age",

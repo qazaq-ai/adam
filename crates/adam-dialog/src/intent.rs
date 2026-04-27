@@ -49,6 +49,23 @@ pub enum Intent {
     /// "What's your name?": атың кім, есіміңіз қалай.
     AskName,
 
+    /// **v4.3.3** — "Who are you?" / "What kind of system are you?"
+    /// addressed to adam itself. Distinct from `AskName` (which only
+    /// asks about the addressee's *name*) — this asks about adam's
+    /// **identity / nature** as a system. Triggers on pronoun-led
+    /// patterns like `сен кімсің` / `сіз кімсіз` / `сен қандайсың` /
+    /// `сен немен айналысасың` where the user is clearly addressing
+    /// the system, not memory-checking themselves.
+    ///
+    /// Pre-v4.3.3 these phrasings either fell through to Unknown or
+    /// got accidentally routed via `AskName` substring matching, so
+    /// the dialog answered with the user's stored name instead of
+    /// adam's self-introduction. Real-test 2026-04-26 dialog showed
+    /// the failure mode (`А, сен кімсің және атың кім?` → `сіздің
+    /// атыңыз Мәулет`). Tracked by `intelligence_roadmap.md` Track
+    /// B (self/other distinction).
+    AskAboutSystem,
+
     // --- v0.8.0 social topic intents --------------------------------------
     /// User introduces self by name: "менің атым X", "мені X деп атайды".
     /// The extracted `name` is surfaced so templates can personalise:

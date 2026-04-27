@@ -223,6 +223,8 @@ pub enum IntentKind {
     AskHowAreYou,
     StatementOfWellbeing,
     AskName,
+    /// **v4.3.3** — companion to `Intent::AskAboutSystem`.
+    AskAboutSystem,
     StatementOfName,
     AskAge,
     StatementOfAge,
@@ -254,6 +256,7 @@ impl From<&Intent> for IntentKind {
             Intent::AskHowAreYou => Self::AskHowAreYou,
             Intent::StatementOfWellbeing => Self::StatementOfWellbeing,
             Intent::AskName => Self::AskName,
+            Intent::AskAboutSystem => Self::AskAboutSystem,
             Intent::StatementOfName { .. } => Self::StatementOfName,
             Intent::AskAge => Self::AskAge,
             Intent::StatementOfAge { .. } => Self::StatementOfAge,

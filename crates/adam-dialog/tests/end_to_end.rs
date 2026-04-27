@@ -3701,3 +3701,82 @@ fn jasandi_intellekt_does_not_break_dialog_with_false_city() {
         "topic reply must not surface the bogus city in a contradiction prompt (got: {out:?})"
     );
 }
+
+/// **v4.3.3** — `Intent::AskAboutSystem` (self/other distinction,
+/// Track B of `docs/intelligence_roadmap.md`).
+///
+/// The user-shared 2026-04-26 dialog test had:
+///
+/// ```text
+/// > А, сен кімсің және атың кім?
+/// сіздің атыңыз Мәулет
+/// ```
+///
+/// Pre-v4.3.3 the question routed through `Intent::AskName` (the
+/// `атың кім` substring matched `detect_ask_name`) and the v4.2.5
+/// slot-aware override emitted the user's stored name. Wrong:
+/// `сен кімсің` is unambiguously about adam.
+///
+/// v4.3.3 introduces `Intent::AskAboutSystem` and orders its
+/// detector before `detect_ask_name`, so any pronoun-led identity
+/// question routes to the system-introduction template family.
+/// This regression locks the behaviour: even after the user has
+/// stated their own name, asking `сен кімсің` returns adam's
+/// self-introduction (containing «адам» and a model-kind word),
+/// NOT the user's name.
+#[test]
+fn ask_about_system_returns_adam_identity_not_user_name() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    // User introduces themselves.
+    let _ = conv.turn("менің атым Мәулет", &lex, &repo, 0);
+    assert_eq!(conv.session.get("name"), Some(&"Мәулет".to_string()));
+
+    // Asking adam about adam — must surface adam's identity, not
+    // the stored user name.
+    let out = conv.turn("сен кімсің", &lex, &repo, 1);
+    let lower = out.to_lowercase();
+    assert!(
+        lower.contains("адам"),
+        "AskAboutSystem reply must mention adam's name (got: {out:?})"
+    );
+    assert!(
+        !lower.contains("мәулет"),
+        "AskAboutSystem reply must NOT echo back the user's stored name (got: {out:?})"
+    );
+}
+
+/// **v4.3.3** — pronoun-led identity question with the formal pronoun.
+/// `сіз кімсіз` resolves the same way as `сен кімсің`.
+#[test]
+fn ask_about_system_handles_formal_pronoun() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let out = conv.turn("сіз кімсіз", &lex, &repo, 0);
+    let lower = out.to_lowercase();
+    assert!(
+        lower.contains("адам"),
+        "formal-pronoun AskAboutSystem reply must mention `адам` (got: {out:?})"
+    );
+}
+
+/// **v4.3.3** — guard against false-positive routing. `менің атым
+/// Мәулет` (statement of name) must still classify as
+/// `StatementOfName`, not `AskAboutSystem` (no pronoun + no
+/// identity question). The detector's pronoun gate keeps the two
+/// cleanly separated.
+#[test]
+fn ask_about_system_does_not_swallow_statement_of_name() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("менің атым Мәулет", &lex, &repo, 0);
+    assert_eq!(
+        conv.session.get("name"),
+        Some(&"Мәулет".to_string()),
+        "StatementOfName must still record the name; AskAboutSystem detector must not preempt it"
+    );
+}

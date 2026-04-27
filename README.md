@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.3.2-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.3.3-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,8 +23,8 @@
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-656%20passing-2EA44F?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/cognitive%20eval-42%2F42%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
+  <img src="https://img.shields.io/badge/tests-659%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/cognitive%20eval-44%2F44%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
   <img src="https://img.shields.io/badge/world%20core-827%20curated%20/%20923%20facts-9CCC65?style=flat-square" alt="world core">
@@ -114,7 +114,7 @@ Live numbers: cognitive eval **38 / 38 canonical, 0 aspirational**. World Core: 
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
 | **World Core** | **827 entries / 923 curated facts across 29 domains**: animals, astronomy, biology_basic, body_parts, clothing, colors, constellations_kz, cooking_methods, directions, emotions, food, geography_kz, house_parts, kinship_extended, kz_literature, language_features, materials, measurements, music_kz, numbers, plants, professions, proverbs, society, sports, time, tools_household, transport, weather_phenomena. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **656 passing, 0 failing, 0 warnings** |
+| Workspace tests | **659 passing, 0 failing, 0 warnings** |
 | **Cognitive eval baseline** | **38/38 canonical, 0 aspirational** (v4.2.6). Closed scenarios: parse-failure distinction (v4.0.40), contradiction resolution (v4.1.0), AnswerDirect rendering + digit-token (v4.2.5), multi-slot lifecycle / compound flows (v4.2.6). Tracked in `data/eval/cognitive_dialog_dataset.json`; harness in `crates/adam-dialog/tests/cognitive_eval.rs` |
 | **Language Core (v4.3.0)** | `crates/adam-dialog/src/language_core.rs` — orthography + mixed-script Latin/Cyrillic cleanup + proper-noun normalization + canonical entity resolution. `canonical_geo_entity(surface)` → `GeoEntity { id, canonical, kind }` resolved from `data/world_core/geography_kz.jsonl`. Place mentions like `Алма-Ата`, `Усть-Каменогорск`, `Каспий теңізі` collapse to one stable `geo_kz_NNN` id. `EntityMemory.canonical_id` carries the id through belief; session has `city_id` + `geo_kind` alongside `city` |
 | **Typed Evidence (v4.3.0)** | `ToolResult.evidence: Vec<ToolEvidence>` carries machine-readable claims alongside textual `findings`. Variants: `BeliefFact { subject, predicate, object }`, `GraphFact { subject, predicate, object, confidence, rendered }`, `RetrievalSample { text }`, `DerivedFact { subject, predicate, object, rule_id, confidence, rendered, support_chain }`. Used by `audit_typed_faithfulness` to verify the user-facing answer is backed by the evidence class the planner intended |
@@ -479,7 +479,7 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | Extracted / curated / derived facts (committed runtime) | **14 526 extracted + 923 curated (world_core) / 17 340 derived** (T4_200k text-extraction scale; numeric per-rule breakdown in the Capabilities table) |
 | Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
-| Workspace tests | **656 passing, 0 failing, 0 warnings** |
+| Workspace tests | **659 passing, 0 failing, 0 warnings** |
 | Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential |
 
 ## Directory layout

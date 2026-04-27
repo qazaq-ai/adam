@@ -95,6 +95,14 @@ pub fn interpret_text_with_lexicon(
     if detect_apology(&tokens, &joined) {
         return Intent::Apology;
     }
+    // **v4.3.3** — `сен кімсің` / `сіз кімсіз` etc. ask about adam's
+    // identity, not memory-recall the user's stored name. Must be
+    // checked BEFORE `detect_ask_name` (which keys on `атың кім` and
+    // would also match phrasings like `сен кімсің және атың кім`).
+    // Track B (self/other distinction) of the intelligence roadmap.
+    if detect_ask_about_system(&tokens, &joined) {
+        return Intent::AskAboutSystem;
+    }
     if detect_ask_name(&joined) {
         return Intent::AskName;
     }
@@ -509,6 +517,40 @@ fn detect_ask_how_are_you(joined: &str) -> bool {
         || joined.contains("қалдарың қалай")
         || joined.contains("қалдарыңыз қалай")
         || joined == "қалың қалай"
+}
+
+/// **v4.3.3** — match identity-question phrasings clearly addressed
+/// to adam itself: pronoun + identity question.
+///
+/// Triggers (informal `сен` and formal `сіз` paired):
+/// - `сен кімсің` / `сіз кімсіз` ("who are you")
+/// - `сен қандай моделсің` / `сіз қандай моделсіз` ("what kind of
+///   model are you")
+/// - `сен қандайсың` / `сіз қандайсыз` ("what are you like" — used
+///   in "what kind of system" sense in this dialog domain)
+/// - `сен немен айналысасың` / `сіз немен айналысасыз` ("what do
+///   you do" — addressed to system as worker)
+///
+/// Does NOT include the bare `атың кім` / `есіміңіз` phrasings —
+/// those stay with `detect_ask_name` (and the v4.2.5 slot-aware
+/// path) to preserve the v4.2.5 cognitive scenarios that exercise
+/// the AnswerDirect rendering for stored user names. The
+/// pronoun-led patterns here are unambiguously about adam.
+fn detect_ask_about_system(tokens: &[String], joined: &str) -> bool {
+    let pronoun = tokens.iter().any(|t| t == "сен" || t == "сіз");
+    if !pronoun {
+        return false;
+    }
+    joined.contains("кімсің")
+        || joined.contains("кімсіз")
+        || joined.contains("қандай моделсің")
+        || joined.contains("қандай моделсіз")
+        || joined.contains("қандай ботсың")
+        || joined.contains("қандай ботсыз")
+        || joined.contains("қандай жасанды интеллектсің")
+        || joined.contains("қандай жасанды интеллектсіз")
+        || joined.contains("немен айналысасың")
+        || joined.contains("немен айналысасыз")
 }
 
 fn detect_ask_name(joined: &str) -> bool {

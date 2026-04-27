@@ -7,6 +7,84 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.3.3] — 2026-04-26 — Self/other distinction (intelligence roadmap Track B Phase 1 #1)
+
+First Phase 1 patch from `docs/intelligence_roadmap.md` Track B (self/other distinction). The user-shared 2026-04-26 dialog test had this exchange:
+
+```
+> А, сен кімсің және атың кім?
+сіздің атыңыз Мәулет
+```
+
+`сен кімсің?` is unambiguously asking adam about adam ("who are you"). Pre-v4.3.3 the question matched `detect_ask_name` via the `атың кім` substring of the compound utterance and the v4.2.5 slot-aware override emitted the user's stored name, conflating "what is YOUR name" with "what is the name we have on file". Wrong: adam should introduce ITSELF.
+
+### What landed
+
+**`Intent::AskAboutSystem`** — new intent variant for pronoun-led identity questions addressed to adam. Companion `IntentKind::AskAboutSystem` in `Conversation`.
+
+**`detect_ask_about_system(tokens, joined)`** — new detector in `semantics.rs`, gated by 2nd-person pronoun (`сен` / `сіз`) + identity question fragment:
+- `сен кімсің` / `сіз кімсіз` ("who are you")
+- `сен қандай моделсің` / `сіз қандай моделсіз` ("what kind of model")
+- `сен қандай ботсың` / `сіз қандай ботсыз` ("what kind of bot")
+- `сен қандай жасанды интеллектсің` / formal variant
+- `сен немен айналысасың` / formal variant ("what do you do")
+
+Order: detect_ask_about_system runs **after** `detect_ask_how_are_you` (so `сен қалайсың` stays AskHowAreYou) and **before** `detect_ask_name` (so the compound utterance `сен кімсің және атың кім` matches the pronoun-led pattern first).
+
+The pronoun gate is essential: `менің атым кім` (no `сен`/`сіз`) does NOT match AskAboutSystem and continues to fall through to other detectors, preserving the v4.2.5 behaviour for self-referential phrasings.
+
+**`ActionPlanner` branch** — `AskAboutSystem` → `Action::AnswerDirect` with rationale "intent is AskAboutSystem — render adam's self-introduction". Placed between the `is_social_intent` check and the `belief_direct_answer` lookup so it preempts both: this is not social (it deserves a real answer) and not belief-driven (system identity is hardcoded, not stored).
+
+**`Verifier::verify`** — special-cased `AskAboutSystem` AnswerDirect path: counts as self-evidence (no belief slot to look up; the answer is a build-time contract), so verification stays supported and the UncertaintyPolicy maps to `EpistemicStatus::Certain` correctly.
+
+**`planner::intent_key`** — `AskAboutSystem → "ask_about_system"`.
+
+**Templates** — new family `ask_about_system` in `data/dialog/templates/v1.toml`:
+
+```toml
+[[families]]
+key = "ask_about_system"
+templates = [
+    "менің атым адам, мен қазақ тіліндегі тілдік моделмін",
+    "мені адам деп атайды, мен қазақша сөйлесуге арналған модельмін",
+    "мен — адам, тілдік модель",
+    "адаммын, қазақша сұхбаттасуға арналған модельмін",
+]
+```
+
+Adam's identity is hardcoded for v4.3.3. A future patch may move this onto a `SystemIdentity` struct with `{system_name}` / `{system_kind}` slots; for the MVP the literal text is enough.
+
+### Tests
+
+**659 passing** (was 656 at v4.3.2, +3 net). 0 warnings on `cargo build`. **Cognitive eval baseline 44/44 canonical, 0 aspirational** (was 42/42 at v4.3.2; +2 new scenarios pass on first run).
+
+End-to-end (+3):
+- `ask_about_system_returns_adam_identity_not_user_name` — even after the user states their own name, `сен кімсің` returns adam's self-introduction containing «адам», NOT the user's stored name.
+- `ask_about_system_handles_formal_pronoun` — `сіз кімсіз` resolves the same way as `сен кімсің`.
+- `ask_about_system_does_not_swallow_statement_of_name` — `менің атым Мәулет` (no pronoun, no identity question) still classifies as `StatementOfName`; the pronoun gate keeps the two cleanly separated.
+
+Cognitive (+2):
+- `ask_about_system_returns_adam_identity` — pinned the canonical case after a name statement.
+- `ask_about_system_compound_question_routes_first_match` — pinned the user-shared `А, сен кімсің және атың кім?` exact phrasing: AskAboutSystem wins, output mentions «адам», NOT the stored user name.
+
+### What is **not** in this patch
+
+Per `docs/intelligence_roadmap.md` Track B / future-patch plan:
+
+- Bare `атың кім` / `атыңыз кім` (without pronoun) **still** routes to `Intent::AskName` and the v4.2.5 slot-aware override. Reason: changing this would break the v4.2.5 cognitive scenarios that exercise the AnswerDirect rendering for stored user names. The semantic ambiguity (does "your name" mean adam or the user?) is a separate concern, addressable in a future patch by introducing an explicit `Intent::AskOwnName` for self-referential `менің атым кім еді` phrasings.
+- `SystemIdentity` struct + slot interpolation. Hardcoded templates are sufficient for v4.3.3.
+- Memory-recall variants like `менің атым кім еді`. Future patch.
+
+### Why patch and not minor
+
+Single new intent variant, one detector, one planner branch, one verifier special-case, one new template family, +5 tests. Bounded scope; no architectural shift. Per the bump-magnitude rule, this is patch-magnitude.
+
+### Next
+
+Per `docs/intelligence_roadmap.md` Phase 1: continue Track A (entity-extraction hardening) and Track B (more identity-question coverage). Phase 2 (Track C, belief-poisoning recovery — `Action::DismissContradiction`, contradiction-priority cap) becomes the v4.4.0 minor when ready.
+
+---
+
 ## [4.3.2] — 2026-04-26 — Critical: phantom-city false positive fix + intelligence roadmap
 
 ### Why this patch ships immediately

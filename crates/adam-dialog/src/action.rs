@@ -173,6 +173,23 @@ impl ActionPlanner {
             );
         }
 
+        // **v4.3.3** — `AskAboutSystem` is the user asking adam about
+        // adam's identity (`сен кімсің?`, `сіз қандай моделсіз?`).
+        // Always renders adam's self-introduction from the
+        // `ask_about_system` template family, never from belief
+        // (belief stores facts about the USER, not the system).
+        // Action::AnswerDirect carries `EpistemicStatus::Certain`
+        // through the existing UncertaintyPolicy mapping. Track B
+        // of `docs/intelligence_roadmap.md`.
+        if matches!(intent, Intent::AskAboutSystem) {
+            return ActionPlan::new(
+                Action::AnswerDirect,
+                OutputKind::DirectAnswer,
+                vec!["intent is AskAboutSystem — render adam's self-introduction".into()],
+                vec!["system_identity".into()],
+            );
+        }
+
         // 4. Profile ask/state intents with matching belief — answer
         // from belief directly. E.g. «менің атым кім» and we have a
         // Confirmed name fact.

@@ -138,20 +138,31 @@ impl Verifier {
                 _ => issues.push(VerificationIssue::MissingEvidence),
             },
             Action::AnswerDirect => {
-                // Must have a matching active fact. The planner
-                // already checked this in `belief_direct_answer`,
-                // but the verifier re-checks defensively so future
-                // planner changes can't bypass the gate.
-                let slot = match intent {
-                    Intent::AskName => Some("name"),
-                    Intent::AskAge => Some("age"),
-                    Intent::AskLocation => Some("city"),
-                    Intent::AskOccupation => Some("occupation"),
-                    _ => None,
-                };
-                match slot.and_then(|s| belief.active_fact(USER_SELF_KEY, s)) {
-                    Some(_) => evidence_count += 1,
-                    None => issues.push(VerificationIssue::MissingEvidence),
+                // **v4.3.3** — `Intent::AskAboutSystem` answers from
+                // adam's hardcoded identity in the `ask_about_system`
+                // template family, not from belief. The verifier
+                // accepts this as self-evidence: there is no belief
+                // slot to look up, but the answer is also not
+                // unsupported — the system's identity is a build-time
+                // contract.
+                if matches!(intent, Intent::AskAboutSystem) {
+                    evidence_count += 1;
+                } else {
+                    // Must have a matching active fact. The planner
+                    // already checked this in `belief_direct_answer`,
+                    // but the verifier re-checks defensively so future
+                    // planner changes can't bypass the gate.
+                    let slot = match intent {
+                        Intent::AskName => Some("name"),
+                        Intent::AskAge => Some("age"),
+                        Intent::AskLocation => Some("city"),
+                        Intent::AskOccupation => Some("occupation"),
+                        _ => None,
+                    };
+                    match slot.and_then(|s| belief.active_fact(USER_SELF_KEY, s)) {
+                        Some(_) => evidence_count += 1,
+                        None => issues.push(VerificationIssue::MissingEvidence),
+                    }
                 }
             }
             Action::CheckContradiction => {

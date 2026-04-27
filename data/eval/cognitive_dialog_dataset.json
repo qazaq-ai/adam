@@ -437,6 +437,28 @@
       "expect": {
         "belief_contradictions_count": 0
       }
+    },
+    {
+      "id": "ask_about_system_returns_adam_identity",
+      "category": "action_routing",
+      "description": "v4.3.3 (Track B): `сен кімсің` is the pronoun-led identity question addressed to adam. New `Intent::AskAboutSystem` detector (gated by 2nd-person pronoun + identity question word) preempts `detect_ask_name`, so even after the user states their own name, the question routes to the `ask_about_system` template family that always surfaces adam's self-introduction. Action::AnswerDirect with epistemic Certain. Output must mention `адам` (the system's name), not the user's stored name.",
+      "turns": ["менің атым Мәулет", "сен кімсің"],
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["адам"]
+      }
+    },
+    {
+      "id": "ask_about_system_compound_question_routes_first_match",
+      "category": "action_routing",
+      "description": "v4.3.3 (Track B): the user-shared dialog turn `А, сен кімсің және атың кім?` mixes two identity questions — `сен кімсің` (about adam) and `атың кім` (would historically route to AskName). The new AskAboutSystem detector runs FIRST and matches the pronoun-led `сен кімсің` part, so the whole turn routes to AskAboutSystem and adam introduces itself rather than echoing the user's name. Locks the user-reported failure mode closed.",
+      "turns": ["менің атым Мәулет", "А, сен кімсің және атың кім?"],
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["адам"]
+      }
     }
   ]
 }
