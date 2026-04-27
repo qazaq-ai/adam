@@ -189,6 +189,47 @@ pub fn plan_response_with_epistemic(
             };
         }
     }
+    // **v4.4.5** — when `extra_slots` carries the
+    // `__check_contradiction__` marker, route through the
+    // `check_contradiction` template family unconditionally. The
+    // marker is set by `Conversation::turn_with_trace` whenever
+    // the action plan is `Action::CheckContradiction`. Pre-v4.4.5
+    // the action layer correctly chose CheckContradiction but the
+    // renderer fell through to `intent_key(intent)` (e.g.
+    // `statement_of_location`) and emitted a normal confirmation,
+    // committing to one of the contested values — the bug Codex
+    // flagged from a live REPL trace on 2026-04-27. Slots
+    // `{old_value}` / `{new_value}` are already populated by
+    // `Conversation` from the latest `BeliefConflict`.
+    if extra_slots.contains_key("__check_contradiction__") {
+        let key = "check_contradiction";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: check_contradiction override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all
+                .get(idx)
+                .map(|s| s.clone())
+                .unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     let override_key = match (intent, epistemic) {
         (
             Intent::Unknown {

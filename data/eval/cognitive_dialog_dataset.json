@@ -544,6 +544,30 @@
         "epistemic_status": "Certain",
         "belief_contradictions_count": 0
       }
+    },
+    {
+      "id": "check_contradiction_renders_clarifying_question",
+      "category": "contradiction_recovery",
+      "description": "v4.4.5 (Codex 2026-04-27 REPL trace): pre-v4.4.5 the action layer correctly chose `Action::CheckContradiction` after `Астана / Алматы` but the planner fell through to `intent_key(StatementOfLocation) = statement_of_location` and emitted a confirmation like «Алматыда екеніңізді есте сақтаймын» — committing to one of the contested values. New `check_contradiction` template family + `__check_contradiction__` marker slot in `Conversation::turn_with_trace` route the renderer to a clarifying question that names both candidates. The reply must surface both `астана` and `алматы` and end with the interrogative particle `ма` (or the question word `қайсысы`), and must NOT contain the confirmation phrasing `есте сақтаймын`.",
+      "turns": ["мен Астанада тұрамын", "мен Алматыда тұрамын"],
+      "expect": {
+        "action": "CheckContradiction",
+        "epistemic_status": "Conflicted",
+        "output_contains_lower_any": ["астана"],
+        "output_contains_lower_any_2": ["алматы"],
+        "output_not_contains_lower": ["есте сақтаймын"]
+      }
+    },
+    {
+      "id": "ask_age_self_recall_after_statement",
+      "category": "direct_answer",
+      "description": "v4.4.5: `менің жасым қанша?` after `менің жасым 40` must classify as `AskAge` and reply via `ask_age.with_known_user` template family with the stored value. Pre-v4.4.5 this matched `detect_statement_of_age` (which only keyed on `жасым`) and produced `StatementOfAge { years: None }` — semantically wrong even though the reply happened to surface 40 because `statement_of_age` interpolates session.age. Fix: question-particle guard in `detect_statement_of_age` (rejects `қанша/неше` matches) + extended `detect_ask_age` (accepts 1sg `жасым + қанша/неше`) + reordered detector dispatch.",
+      "turns": ["менің жасым 40", "менің жасым қанша?"],
+      "expect": {
+        "action": "AnswerDirect",
+        "epistemic_status": "Certain",
+        "output_contains_lower_any": ["40"]
+      }
     }
   ]
 }

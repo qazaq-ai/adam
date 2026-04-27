@@ -220,6 +220,26 @@ templates = [
     "жарайды, екі нұсқаны да ұмытайын",
 ]
 
+# v4.4.5 — `Action::CheckContradiction`. The planner's step 1
+# already routes here when the belief carries an unresolved
+# conflict; pre-v4.4.5 the renderer ignored the action and emitted
+# a confirmation from `intent_key(StatementOfLocation)` like
+# «Алматыда екеніңізді есте сақтаймын», which committed to one of
+# the two contested values. The new `__check_contradiction__`
+# marker (set in `Conversation::turn_with_trace` whenever
+# `ActionPlan.action == CheckContradiction`) routes here instead
+# and asks the clarifying question the action layer intended all
+# along. Slots `{old_value}` / `{new_value}` are populated from
+# `BeliefConflict.candidate_values` for the active conflict.
+[[families]]
+key = "check_contradiction"
+templates = [
+    "{old_value} ма, әлде {new_value} ма — қайсысы дұрыс?",
+    "екі нұсқа жазылып тұр: {old_value} мен {new_value}; қайсысын ұстанамыз?",
+    "сәл шатастым — сіз {old_value}-да ма, әлде {new_value}-да ма?",
+    "қайсысы нақты — {old_value} ма, {new_value} ма? нақтылап жіберсеңіз",
+]
+
 # ---------- Social topics (v0.8.0 new) ----------
 
 # User introduced self by name. `{name}` is substituted by the realiser

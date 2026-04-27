@@ -112,11 +112,20 @@ pub fn interpret_text_with_lexicon(
     // means the user is stating, not asking. Without this ordering,
     // "қайдан келдім" would hit AskLocation (because of "қайдан")
     // before StatementOfLocation (which keys on "келдім").
-    if let Some(years) = detect_statement_of_age(&tokens, &joined) {
-        return Intent::StatementOfAge { years };
-    }
+    // **v4.4.5** — `detect_ask_age` runs BEFORE
+    // `detect_statement_of_age` so a 1sg-self-recall like
+    // `менің жасым қанша?` reaches `AskAge` instead of being
+    // swallowed by `StatementOfAge { years: None }`. The 1sg-form
+    // overlap (`жасым` is both "my age (statement)" and "my age
+    // (in a self-recall question)") forced the change; the
+    // ask-form detector now also matches `жасым + қанша/неше` and
+    // the statement-form detector refuses to match when a
+    // question particle is present.
     if detect_ask_age(&joined) {
         return Intent::AskAge;
+    }
+    if let Some(years) = detect_statement_of_age(&tokens, &joined) {
+        return Intent::StatementOfAge { years };
     }
     if let Some(city) = detect_statement_of_location(&tokens, &raw_tokens, &joined, parses) {
         return Intent::StatementOfLocation { city };
@@ -809,10 +818,20 @@ fn detect_statement_of_name(
 }
 
 fn detect_ask_age(joined: &str) -> bool {
-    (joined.contains("жасың") && (joined.contains("неше") || joined.contains("қанша")))
-        || (joined.contains("жасыңыз") && (joined.contains("неше") || joined.contains("қанша")))
+    let has_q = joined.contains("неше") || joined.contains("қанша");
+    (joined.contains("жасың") && has_q)
+        || (joined.contains("жасыңыз") && has_q)
         || joined.contains("қанша жастасың")
         || joined.contains("қанша жастасыз")
+        // v4.4.5 — 1sg self-recall form: "менің жасым қанша?" /
+        // "жасым неше?". Pre-v4.4.5 this matched
+        // `detect_statement_of_age` (keyed on `жасым`) and emitted
+        // a confirmation template that interpolated session.age
+        // — coincidentally correct for the recorded value but
+        // wrong for any phrasing where the template doesn't echo
+        // the slot, and semantically misclassifying the user's
+        // question as a statement.
+        || (joined.contains("жасым") && has_q)
 }
 
 /// User reports age: "менің жасым N", "N жастамын", "N жасында".
@@ -826,6 +845,13 @@ fn detect_statement_of_age(tokens: &[String], joined: &str) -> Option<Option<u32
             .iter()
             .any(|t| t == "жастамын" || t == "жастаймын" || t == "жаспын");
     if !matched {
+        return None;
+    }
+    // v4.4.5 — guard: a question particle (`қанша`/`неше`) flips
+    // the polarity from statement → question. `detect_ask_age`
+    // runs first now, but this defends against any future caller
+    // ordering and keeps the matcher honest in isolation.
+    if joined.contains("қанша") || joined.contains("неше") {
         return None;
     }
     Some(parse_kazakh_age(tokens))

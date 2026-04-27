@@ -3976,6 +3976,78 @@ fn contradiction_priority_cap_lets_user_move_on() {
     assert_eq!(conv.belief.contradictions.len(), 1);
 }
 
+/// **v4.4.5** — `Action::CheckContradiction` must render the
+/// clarifying question, not a confirmation. Codex flagged this
+/// from a 2026-04-27 live REPL trace: action layer correctly
+/// chose CheckContradiction after Астана/Алматы, but the planner
+/// fell through to `intent_key(StatementOfLocation) =
+/// "statement_of_location"` and emitted
+/// «Алматыда екеніңізді есте сақтаймын» — committing to one of
+/// the contested values. Fix routes the renderer through the new
+/// `check_contradiction` template family via the
+/// `__check_contradiction__` marker slot.
+#[test]
+fn check_contradiction_action_renders_clarifying_question() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("мен Астанада тұрамын", &lex, &repo, 0);
+    let (out, trace) = conv.turn_with_trace("мен Алматыда тұрамын", &lex, &repo, 1);
+    assert_eq!(
+        format!("{:?}", trace.action_digest.action),
+        "CheckContradiction",
+        "second contradicting statement must trigger CheckContradiction action"
+    );
+    let lower = out.to_lowercase();
+    // The reply must mention BOTH contested values and ask the
+    // user to choose. The question marker `ма` (interrogative
+    // particle) is the linguistic anchor — every variant of the
+    // `check_contradiction` family carries it.
+    assert!(
+        lower.contains("астана") && lower.contains("алматы"),
+        "clarifying reply must surface both candidates — got {out:?}"
+    );
+    assert!(
+        lower.contains(" ма") || lower.contains("қайсысы"),
+        "clarifying reply must be a question, not a confirmation — got {out:?}"
+    );
+    // The pre-v4.4.5 confirmation phrasings must NOT leak
+    // through. These are the exact verbalizers the
+    // `statement_of_location` family used to emit before the
+    // override landed.
+    assert!(
+        !lower.contains("есте сақтаймын"),
+        "must not emit confirmation phrasing under conflict — got {out:?}"
+    );
+}
+
+/// **v4.4.5** — `менің жасым қанша?` after `менің жасым 40` must
+/// route to `Intent::AskAge` and answer from session storage,
+/// NOT to `StatementOfAge { years: None }`. Pre-v4.4.5
+/// `detect_statement_of_age` matched on the `жасым` substring
+/// before `detect_ask_age` ran; ask-age only checked the 2nd-
+/// person `жасың`/`жасыңыз` forms, so the 1sg-self-recall form
+/// was misclassified. The reply happened to read correctly only
+/// because the `statement_of_age` family interpolates
+/// `session.age`, but the underlying intent was wrong.
+#[test]
+fn ask_age_self_recall_returns_stored_value() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("менің жасым 40", &lex, &repo, 0);
+    let (out, trace) = conv.turn_with_trace("менің жасым қанша?", &lex, &repo, 1);
+    assert!(
+        matches!(trace.intent_after_verification, adam_dialog::Intent::AskAge),
+        "1sg-self-recall must classify as AskAge, got {:?}",
+        trace.intent_after_verification
+    );
+    assert!(
+        out.contains("40"),
+        "self-recall must surface the stored value — got {out:?}"
+    );
+}
+
 /// **v4.3.5** — `topic_marker_hint` regression battery, mirroring
 /// the user-shared 2026-04-26 dialog turns that exposed three
 /// distinct extraction failures.

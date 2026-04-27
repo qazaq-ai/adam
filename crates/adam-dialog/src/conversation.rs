@@ -527,7 +527,18 @@ impl Conversation {
         // re-contradictions replace older ones, and the
         // single-active-fact invariant (v4.0.28) is respected.
         let mut extra_slots: HashMap<String, String> = HashMap::new();
-        if epistemic_status == crate::uncertainty::EpistemicStatus::Conflicted {
+        // v4.4.5 — populate conflict slots whenever either the
+        // epistemic policy landed on Conflicted OR the action plan
+        // chose CheckContradiction. The two used to coincide, but
+        // we should not depend on that — `Action::CheckContradiction`
+        // is the upstream signal that the user-facing reply needs
+        // `{old_value}` / `{new_value}`, not the downstream band.
+        let conflict_render = epistemic_status == crate::uncertainty::EpistemicStatus::Conflicted
+            || matches!(
+                action_plan.action,
+                crate::action::Action::CheckContradiction
+            );
+        if conflict_render {
             if let Some(c) = self.belief.contradictions.last() {
                 let old = self
                     .belief
@@ -578,6 +589,23 @@ impl Conversation {
         // user-facing value.
         if dismissed_contradiction {
             extra_slots.insert("__dismiss_contradiction__".into(), "1".into());
+        }
+        // **v4.4.5** — symmetric marker for `Action::CheckContradiction`
+        // routes the renderer to the new `check_contradiction`
+        // template family. Pre-v4.4.5 the action layer correctly
+        // chose CheckContradiction whenever a fresh `BeliefConflict`
+        // landed (within the v4.4.0 priority cap), but the planner
+        // still keyed on `intent_key(intent)` and emitted a
+        // statement-of-* confirmation for one of the contested
+        // values. Using the action variant directly (not
+        // epistemic_status) is intentional — the action plan IS
+        // the source of truth for "which template family"; the
+        // epistemic band is downstream metadata.
+        if matches!(
+            action_plan.action,
+            crate::action::Action::CheckContradiction
+        ) {
+            extra_slots.insert("__check_contradiction__".into(), "1".into());
         }
         let plan = crate::planner::plan_response_with_epistemic(
             &intent_for_render,

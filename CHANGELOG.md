@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.5] — 2026-04-27 — Real-dialog adequacy fixes: CheckContradiction renderer + AskAge self-recall
+
+External review (Codex, 2026-04-27 live REPL trace) flagged two user-visible defects in v4.4.0 that the internal test suite missed. Both are renderer/classification mismatches where the cognitive contour was right but the surface text leaked an incorrect commitment.
+
+### Defect 1 — `Action::CheckContradiction` rendered as a confirmation
+
+**Repro** (verbatim from `adam_chat --safe --trace`, two turns):
+```
+turn 1: «мен Астанада тұрамын»
+turn 2: «мен Алматыда тұрамын»
+─ action:        CheckContradiction → ClarifyingQuestion
+─ epistem:       Conflicted
+─ belief:        contested=2 conflicts=1
+─ planner:       template_key = statement_of_location   ← intent_key wins
+─ output:        «Алматыда екеніңізді есте сақтаймын»   ← commits to Алматы
+```
+The action layer correctly identified the conflict and chose `CheckContradiction`, but the planner's template selection still keyed on `intent_key(intent) = "statement_of_location"` and emitted a confirmation for one of the contested values. v4.4.0's escape hatches (`Action::DismissContradiction` + priority cap) were therefore answering a question the user never saw asked.
+
+**Fix.** New `check_contradiction` template family in `data/dialog/templates/v1.toml` (4 KZ variants of `{old_value}-да ма, әлде {new_value}-да ма? қайсысы дұрыс?`). New `__check_contradiction__` marker slot set by `Conversation::turn_with_trace` whenever `action_plan.action == Action::CheckContradiction`. Planner gains a third override branch (parallel to `__dismiss_contradiction__` from v4.4.0 and the four `*.with_known_user` epistemic ones) that routes to the new family. Conflict slots `{old_value}` / `{new_value}` / `{predicate}` are now populated whenever EITHER the epistemic policy lands on `Conflicted` OR the action plan chose `CheckContradiction`, so the template never renders with empty placeholders.
+
+### Defect 2 — `менің жасым қанша?` misclassified as a statement
+
+**Repro:**
+```
+turn 1: «менің жасым 40»     →  StatementOfAge { years: Some(40) }   ✓
+turn 2: «менің жасым қанша?»  →  StatementOfAge { years: None }       ✗
+─ template_key: statement_of_age
+─ output:       «40 жас — тамаша кезең»
+```
+The reply happened to surface `40` only because `statement_of_age` interpolates `session.age`; the underlying intent classification was wrong. `detect_statement_of_age` keyed on the substring `жасым` and ran before `detect_ask_age`; ask-age only checked the 2nd-person `жасың`/`жасыңыз` forms, so the 1sg-self-recall form never reached `Intent::AskAge` and the dedicated `ask_age.with_known_user` template was unreachable.
+
+**Fix.** Three complementary changes in `crates/adam-dialog/src/semantics.rs`:
+1. `detect_ask_age` extended to also accept `жасым + қанша/неше` (1sg self-recall form alongside the existing 2nd-person variants).
+2. `detect_statement_of_age` returns `None` when a question particle (`қанша`/`неше`) is present — defends the matcher in isolation regardless of caller order.
+3. Detector dispatch order: `detect_ask_age` runs BEFORE `detect_statement_of_age`. With the question-particle guard above, this is now unconditional; with the v4.4.5 ask-age extension, 1sg-self-recall reaches `AskAge` cleanly.
+
+Post-fix REPL trace:
+```
+turn 2: «менің жасым қанша?»
+─ intent:        AskAge
+─ action:        AnswerDirect → DirectAnswer
+─ template_key:  ask_age.with_known_user
+─ output:        «сіздің жасыңыз 40»
+```
+
+### Tests
+
+- 2 new e2e regressions in `tests/end_to_end.rs`:
+  - `check_contradiction_action_renders_clarifying_question` — verifies the reply names both candidates, ends with `ма` or `қайсысы`, and never contains the pre-v4.4.5 confirmation phrasing `есте сақтаймын`.
+  - `ask_age_self_recall_returns_stored_value` — `менің жасым қанша?` after `менің жасым 40` must classify as `Intent::AskAge` and surface `40` in the reply.
+- 2 new cognitive scenarios:
+  - `check_contradiction_renders_clarifying_question` (new in `contradiction_recovery` category, alongside the v4.4.0 dismiss scenarios).
+  - `ask_age_self_recall_after_statement` (in `direct_answer`).
+
+### State
+
+| | v4.4.0 | v4.4.5 |
+|---|---|---|
+| Workspace tests | 678 | **680** (+2 e2e) |
+| Cognitive eval | 52/52 canonical | **54/54 canonical** (+2 scenarios) |
+| Template families | 48 | **49** (+`check_contradiction`) |
+| Why patch | — | small, focused renderer + detector fixes; no new architectural layer, no new `Action` variant |
+
 ## [4.4.0] — 2026-04-27 — Belief-poisoning recovery: dismiss_contradiction + priority cap (intelligence_roadmap Phase 2 Track C)
 
 The `intelligence_roadmap.md` Phase 2 / Track C ("belief-poisoning recovery") flagged a soft failure mode that survived the v4.3.2 phantom-city fix: once `BeliefState.contradictions` was non-empty for *any* reason — true conflict, transient typo, or upstream parse glitch — the action planner clamped every subsequent turn to `CheckContradiction`, with no clean exit. The dialog became hostage to the conflict log: there was no way for the user to say "neither — drop it" and continue, and no organic time-out either.
