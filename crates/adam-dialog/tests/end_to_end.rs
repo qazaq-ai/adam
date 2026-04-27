@@ -3626,3 +3626,78 @@ fn conversation_collapses_person_name_surface_variants() {
          must not register a contradiction"
     );
 }
+
+/// **v4.3.2 — regression**: «жасанды интеллект» dialog block.
+///
+/// Real test dialog (2026-04-26) revealed that stating a profession
+/// containing «жасанды интеллект» locked the dialog into a permanent
+/// `CheckContradiction` for every subsequent topic question. Root
+/// cause was in `semantics::token_mentions_generic_place`: it used
+/// `token.contains(stem)`, and the 2-char stem `ел` (country) is a
+/// substring of `интеллект` (`-ЕЛ-` at position 3-4). The
+/// false-positive made `recover_named_place_before_generic_location`
+/// promote the *previous* token `жасанды` to a city, the belief
+/// layer logged `(USER, city, Жасанды)` against the genuine
+/// `(USER, city, Атырау)`, and the planner thereafter routed every
+/// turn into `CheckContradiction`.
+///
+/// **v4.3.2 fix**: switch substring match → prefix match. This
+/// regression locks the bug closed: an occupation statement that
+/// happens to contain `интеллект` MUST classify as
+/// `StatementOfOccupation`, not `StatementOfLocation`, and the
+/// belief layer MUST end with one Active city fact (Атырау), no
+/// contradiction, and a regular Active occupation fact.
+///
+/// Mirrors the user-reported dialog turn-for-turn.
+#[test]
+fn jasandi_intellekt_does_not_break_dialog_with_false_city() {
+    use adam_dialog::USER_SELF_KEY;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+
+    // Establish a real city.
+    let _ = conv.turn("Мен Атырауданмын", &lex, &repo, 0);
+    assert_eq!(conv.session.get("city"), Some(&"Атырау".to_string()));
+    assert_eq!(conv.belief.contradictions.len(), 0);
+
+    // Profession statement that previously broke everything.
+    let _ = conv.turn(
+        "Мен жаңа жасанды интеллект моделін әзірлейтін бағдарламашымын",
+        &lex,
+        &repo,
+        1,
+    );
+
+    // Belief must record the OCCUPATION, not a bogus city.
+    assert_eq!(
+        conv.belief
+            .active_fact(USER_SELF_KEY, "occupation")
+            .map(|f| f.object.clone()),
+        Some("бағдарламашы".to_string()),
+        "occupation must be recorded from the бағдарламашы copula form"
+    );
+    assert_eq!(
+        conv.belief
+            .active_fact(USER_SELF_KEY, "city")
+            .map(|f| f.object.clone()),
+        Some("Атырау".to_string()),
+        "city must remain Атырау — `интеллект` containing the 2-char `ел` substring \
+         must NOT recover `жасанды` as a city"
+    );
+    assert_eq!(
+        conv.belief.contradictions.len(),
+        0,
+        "no contradiction may be logged on a clean profession statement"
+    );
+
+    // A topic question on the next turn must NOT be hijacked by a
+    // CheckContradiction. With the v4.3.2 fix, contradictions stays
+    // empty, so the planner routes Unknown+noun_hint normally.
+    let out = conv.turn("Қазақстан туралы не білесіз", &lex, &repo, 2);
+    assert!(
+        !out.to_lowercase().contains("жасанды"),
+        "topic reply must not surface the bogus city in a contradiction prompt (got: {out:?})"
+    );
+}

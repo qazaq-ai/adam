@@ -425,6 +425,18 @@
       "expect": {
         "belief_contradictions_count": 1
       }
+    },
+    {
+      "id": "occupation_with_intellekt_does_not_create_phantom_city",
+      "category": "contradiction_handling",
+      "description": "v4.3.2 regression: real-dialog test (2026-04-26) revealed that stating an occupation containing `жасанды интеллект` locked the dialog into a permanent CheckContradiction. Root cause: `token_mentions_generic_place` used substring match (`token.contains(stem)`) and the 2-char stem `ел` (country) appears inside `интеллект`. The false positive made `recover_named_place_before_generic_location` promote `жасанды` to a city, the belief layer logged a phantom `(USER, city, Жасанды)` against the genuine `(USER, city, Атырау)`, and every subsequent topic question routed into CheckContradiction. v4.3.2 switches the predicate to prefix match (`starts_with`); this scenario locks the regression closed.",
+      "turns": [
+        "Мен Атырауданмын",
+        "Мен жаңа жасанды интеллект моделін әзірлейтін бағдарламашымын"
+      ],
+      "expect": {
+        "belief_contradictions_count": 0
+      }
     }
   ]
 }

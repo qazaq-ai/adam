@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.3.2] — 2026-04-26 — Critical: phantom-city false positive fix + intelligence roadmap
+
+### Why this patch ships immediately
+
+A real test dialog (user-shared 2026-04-26) revealed that the dialog locked into a permanent `CheckContradiction` state after a benign user statement about being an AI-model programmer. Every subsequent topic question (Қазақстан / Ресей / Абай) returned the same contradiction prompt. The dialog was **unrecoverable** — no template, no intent, no resolver could surface a real answer. This is a critical regression for end-user dialog.
+
+### Root cause
+
+`semantics::token_mentions_generic_place` and `token_mentions_geo_descriptor` used substring matching:
+
+```rust
+fn token_mentions_generic_place(token: &str) -> bool {
+    [..., "ел"].iter().any(|stem| token.contains(stem))
+}
+```
+
+The 2-letter stem `ел` (country) is a substring of `интеллект` (positions 3–4: интЕЛлект). For the user input
+
+> «Мен жаңа жасанды интеллект моделін әзірлейтін бағдарламашымын»
+
+— `token_mentions_generic_place("интеллект") = true`, so `recover_named_place_before_generic_location` promoted the *previous* token `жасанды` to a city. The belief layer logged `(USER, city, Жасанды)` against the genuine `(USER, city, Атырау)` from the prior turn → contradiction → `Action::CheckContradiction` for every subsequent turn (per `ActionPlanner::plan` step 1: contradictions dominate).
+
+Other affected words (any token containing `ел` as a substring): `келдім`, `белгі`, `елес`, `сенделді`, etc. The bug was latent across a wide surface; the AI-modeling sentence happened to combine all the conditions to expose it.
+
+### What landed
+
+Switch `token.contains(stem)` → `token.starts_with(stem)`:
+
+```rust
+fn token_mentions_generic_place(token: &str) -> bool {
+    [..., "ел"].iter().any(|stem| token.starts_with(stem))
+}
+```
+
+Prefix matching captures every real Kazakh word formation that starts with a generic-place stem (`қалада`, `ауылдан`, `елде`, `елден`, `өңірде`, `кенттен`) without false positives on intra-word substrings (`интеллект`, `келдім`, `белгі`).
+
+The same fix applies to `token_mentions_geo_descriptor` (the wider set including `өзен`, `көл`, `теңіз`, `тау`, also vulnerable to the same shape of bug).
+
+### Tests
+
+**656 passing** (was 655 at v4.3.1; +1 end-to-end regression: `jasandi_intellekt_does_not_break_dialog_with_false_city`). 0 warnings on `cargo build`. **Cognitive eval baseline 42/42 canonical, 0 aspirational** (was 41/41 at v4.3.1).
+
+New cognitive scenario:
+- `occupation_with_intellekt_does_not_create_phantom_city` — the exact failing dialog turn (`Мен Атырауданмын` → `Мен жаңа жасанды интеллект моделін әзірлейтін бағдарламашымын`) now produces 0 contradictions. Locks the regression closed.
+
+The new end-to-end test asserts the full state shape: occupation correctly recorded, city remains Атырау, no contradiction, topic-question reply does not surface the bogus city.
+
+### Intelligence roadmap (`docs/intelligence_roadmap.md`)
+
+The user-shared dialog also revealed three other deficits that v4.3.2 does **not** fix but documents as the next-quarter program:
+
+1. **Self/other distinction** — `сен кімсің?` (asking adam) and `менің атым кім?` (asking about user) currently collapse to the same `AskName`. Adam answers with the user's stored name in both cases.
+2. **No recovery from a poisoned belief** — once *any* contradiction is logged, the planner blocks all other topics until resolution. There is no "neither", no automatic decay, no contradiction-priority cap.
+3. **Knowledge breadth** — bare topic questions (`Қазақстан туралы`, `Ресей дегеніміз не`) get a generic refusal. The world_core has facts; the dialog's `SearchGraph` path doesn't surface them on this kind of question.
+
+`docs/intelligence_roadmap.md` lays out five parallel tracks (entity extraction, self/other, belief recovery, knowledge breadth, lexicon growth) and sequences them into Phases 1–4 (v4.3.x → v4.7.x). Every track stays inside the deterministic Rust-only / graph-first architecture; no probabilistic runtime component is required.
+
+### Scope
+
+`semantics.rs`: 2 helper predicates flipped substring → prefix (with detailed regression-prevention comments). `tests/end_to_end.rs`: +1 regression test. `data/eval/cognitive_dialog_dataset.json`: +1 scenario. `docs/intelligence_roadmap.md`: new strategy document. No belief layer, template, or API change.
+
+### Why patch and not minor
+
+A bug fix + a strategy document. The fix is two lines; the test coverage and roadmap are the heavy parts. Per `feedback_versioning_post_1_0`, this is patch-magnitude.
+
+### Next
+
+Per `docs/intelligence_roadmap.md` Phase 1: more entity-extraction hardening (Track A) + self/other intent distinction (Track B). Both are bounded patches. Belief-recovery (Track C) follows as a v4.4.x minor.
+
+---
+
 ## [4.3.1] — 2026-04-26 — Person canonical entities (Codex roadmap Workstream B "Next #1")
 
 First v4.3.x patch. Continues the canonical-entity pattern from v4.3.0 (geography) into person names — per `docs/language_core_hybrid_roadmap.md` daily-log "Next" item: *Extend the same canonical-entity pattern from geography into remembered person and organization names*. v4.3.1 ships the **person** half; organizations are deferred until they have a real trigger surface in the dialog.

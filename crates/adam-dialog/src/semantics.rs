@@ -858,12 +858,39 @@ fn recover_named_place_before_origin_marker(
     None
 }
 
+/// **v4.3.2 — fix: prefix match, not substring match.**
+///
+/// Pre-v4.3.2 this used `token.contains(stem)`. The 2-letter stem
+/// `ел` (country) is incidentally a substring of common modern
+/// Kazakh tokens — `интеллект`, `келдім`, `белгі`, `сенделді`, etc.
+/// — and produced a false positive that propagated up through
+/// `recover_named_place_before_generic_location`, mis-extracting
+/// the *preceding* word as a city. Concrete failure mode (real
+/// dialog test): the input
+///
+///   «Мен жаңа жасанды интеллект моделін әзірлейтін бағдарламашымын»
+///
+/// matched `token.contains("ел")` on `интеллект`, so the recoverer
+/// promoted `жасанды` to a city, the belief layer logged
+/// `(USER, city, Жасанды)` against `(USER, city, Атырау)`, the
+/// planner went into a permanent `CheckContradiction` for every
+/// subsequent topic question, and the dialog became unrecoverable.
+///
+/// Switching to `starts_with` keeps every real word-formation
+/// pattern that mentions a generic place (`қалада`, `ауылдан`,
+/// `елде`, `елден`, `өңірде`) and rejects intra-word substring
+/// matches. Validated by a regression test that re-runs the exact
+/// failing dialog turn.
 fn token_mentions_generic_place(token: &str) -> bool {
     ["ауыл", "қала", "аудан", "облыс", "өңір", "кент", "ел"]
         .iter()
-        .any(|stem| token.contains(stem))
+        .any(|stem| token.starts_with(stem))
 }
 
+/// **v4.3.2 — same fix as `token_mentions_generic_place`** for the
+/// wider geo-descriptor set used by
+/// `recover_named_place_before_origin_marker`. Same false-positive
+/// risk, same prefix-match resolution.
 fn token_mentions_geo_descriptor(token: &str) -> bool {
     [
         "ауыл",
@@ -879,7 +906,7 @@ fn token_mentions_geo_descriptor(token: &str) -> bool {
         "тау",
     ]
     .iter()
-    .any(|stem| token.contains(stem))
+    .any(|stem| token.starts_with(stem))
 }
 
 fn raw_looks_like_named_place(token: &str) -> bool {
