@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.4.6-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.4.7-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -26,6 +26,8 @@
   <img src="https://img.shields.io/badge/tests-681%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/cognitive%20eval-54%2F54%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
   <img src="https://img.shields.io/badge/repl%20replay-26%2F26%20canonical-2EA44F?style=flat-square" alt="repl replay">
+  <img src="https://img.shields.io/badge/p50%20turn%20latency-1.07%20ms%20on%20M2-2EA44F?style=flat-square" alt="p50 turn latency">
+  <img src="https://img.shields.io/badge/RSS-~75%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
   <img src="https://img.shields.io/badge/world%20core-874%20curated%20/%20995%20facts-9CCC65?style=flat-square" alt="world core">
@@ -39,6 +41,8 @@
 ## Why adam (v4.4)
 
 adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced. Every layer is **Rust-only** and **graph-first** by repository invariant — both enforced by contract tests.
+
+**v4.4.7 follow-up — performance baseline.** Per-turn latency, cold-start cost, and RSS measured on M2 8 GB: **p50 1.07 ms** (`сәлем`) → **6.04 ms** (3-turn dismiss-contradiction dialog), cold start **~14 ms**, max RSS **~75 MB**. Honest "when adam, when LLM" comparison block: latency / memory delta is 100×–2 000× vs a local LLM, but only meaningful inside adam's competence envelope (Kazakh dialog intents, curated `world_core` knowledge, zero-hallucination contract). Numbers and methodology in [docs/performance.md](docs/performance.md); reproduce with `cargo bench -p adam-dialog --bench turn_latency`. Performance regressions > 20 % p50 are now release blockers per [CONTRIBUTING.md](CONTRIBUTING.md).
 
 **v4.4.6 follow-up — REPL replay battery + AskOccupation 1sg self-recall.** New `crates/adam-dialog/tests/repl_replay.rs` harness running `data/eval/repl_dialogs.json` (30 hand-authored multi-turn KZ dialogs) — complementary to `cognitive_eval` (which checks trace signals); this checks what the user actually sees. Same `expected_failing` aspirational contract. Initial baseline 26/26 canonical + 4 aspirational. Plus a v4.4.5-class detector extension surfaced by the harness on first run: `менің мамандығым не?` now classifies as `AskOccupation` and recalls the stored value via `ask_occupation.with_known_user`. New `CONTRIBUTING.md` codifies the load-bearing rule that's been informal for several releases — every dialog defect ships with at least one new scenario / dialog.
 

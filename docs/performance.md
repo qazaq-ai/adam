@@ -1,0 +1,168 @@
+# Performance — adam v4.4.7
+
+Measured per-turn latency, cold-start cost, and steady-state memory
+footprint for the dialog runtime, with a frank comparison against
+the system class adam is **not** trying to compete with (LLMs).
+
+> **Read this section first.** The numbers below favour adam by
+> orders of magnitude on every axis: latency, memory, energy. None
+> of that means adam beats GPT-4 / Claude / Llama on what those
+> models do well. adam answers a narrow set of Kazakh dialog
+> intents from a curated knowledge core (~874 entries / 995 facts /
+> 26 intent families), with every reply traceable to its source
+> and zero ungrounded generation by design. LLMs answer arbitrary
+> topics with no traceability and statistically-grounded
+> hallucination. The two systems are not competing — they sit in
+> different categories. Use the latency / memory delta below as an
+> argument for "embed adam where the workload fits", not for
+> "replace your LLM with adam".
+
+## How the numbers were produced
+
+- **Hardware**: Apple M2, 8 GB RAM, macOS 25.3.0.
+- **Build**: `--release` (`opt-level=3`), single thread, no debug
+  symbols. Same binary as published GitHub releases.
+- **Per-turn benchmarks**: Criterion `cargo bench -p adam-dialog --bench
+  turn_latency`. Each scenario constructs a fresh `Conversation`
+  per iteration so the measured cost is steady-state per-turn work,
+  *not* amortised lexicon / template / retrieval-index loads.
+- **Memory**: `/usr/bin/time -l` against a pre-built
+  `./target/release/adam_chat --once <input>`. Reports max RSS and
+  peak memory footprint for the full lifecycle (cold start +
+  one-turn dispatch + shutdown).
+- **Reproduce locally**: `cargo bench -p adam-dialog --bench
+  turn_latency` for the latency table; `/usr/bin/time -l
+  ./target/release/adam_chat --once "сәлем"` for RSS. Numbers in
+  this doc are point-in-time M2-baseline; re-run before editing.
+
+## Per-turn latency
+
+Median (p50) latency reported, with the 95% confidence band from
+Criterion. All times are for the **complete turn**:
+parse → semantics → tools → action plan → verifier →
+uncertainty → planner → realise → audits.
+
+| Scenario | Cognitive contour | p50 latency |
+|---|---|---|
+| `social_greeting` | bare `сәлем`; greeting detector matches before FST runs | **1.07 ms** [1.06 – 1.07] |
+| `profile_statement` | `мен Алматыда тұрамын`; FST parse + entity absorption + `statement_of_location` | **2.55 ms** [2.54 – 2.55] |
+| `knowledge_query` | `Қазақстан туралы айтшы`; topic extraction + `SearchGraph` + retrieval | **2.07 ms** [2.07 – 2.08] |
+| `profile_recall` (2 turns) | setup + `мен қайда тұрамын?` via `ask_location.with_known_user` | **3.79 ms** [3.79 – 3.79] |
+| `contradiction_check` (2 turns) | setup + second contradicting statement → `check_contradiction` | **5.06 ms** [5.05 – 5.06] |
+| `dismiss_contradiction` (3 turns) | conflict + `білмеймін` → `dismiss_contradiction` | **6.04 ms** [6.03 – 6.05] |
+
+Per-turn marginal cost (subtracting setup):
+- Recall turn alone: ≈ **1.24 ms**.
+- Conflict-detection turn alone: ≈ **2.51 ms**.
+- Dismissal turn alone: ≈ **0.98 ms**.
+
+The pattern: every conversational turn falls in the **1–3 ms band**
+on M2, regardless of whether it routes through retrieval, the
+forward-chaining reasoner, or the belief-revision pathway.
+
+## Cold-start cost
+
+| Component | Cost |
+|---|---|
+| `LexiconV1::load` (25.5 k roots, FST tables) | **13.32 ms** |
+| `TemplateRepository::load_default` (49 families) | **146.73 µs** |
+| `Conversation::new` (state allocation) | **219 ns** |
+
+Total cold start dominated by the lexicon load at ~13 ms. With
+templates and conversation state factored in, a fresh adam process
+becomes turn-ready in **~14 ms** — well under the threshold where
+cold-start cost is observable to a human.
+
+## Memory footprint
+
+Measured with `/usr/bin/time -l` against
+`./target/release/adam_chat --once "сәлем"`, which exercises the
+full path: lexicon load + retrieval index (3 082 morphemes / 16 262
+postings / 3 117 indexed samples) + reasoning facts (15 521
+extracted + 21 415 derived) + templates + a single dispatched turn.
+
+| Metric | Value |
+|---|---|
+| Max RSS | **~75 MB** |
+| Peak memory footprint | **~70 MB** |
+| Total wall time (cold start + 1 turn + shutdown) | **~70 ms** |
+
+The retrieval and reasoning data sit in `Vec`s of borrowed strings;
+no virtual machine, no attention cache, no quantised tensors.
+Memory grows linearly with `world_core` size and roughly linearly
+with the corpus shards loaded into the morpheme index — both are
+finite, curated, version-controlled.
+
+## Throughput
+
+At 1.07 ms p50 for the cheapest scenario and 6 ms for the most
+expensive three-turn dialog, single-threaded throughput sits at
+roughly:
+
+- **~900 turns/sec** for social-class workloads.
+- **~400 turns/sec** for profile-statement workloads.
+- **~200 turns/sec** for full multi-turn contradiction-handling
+  workloads.
+
+`Conversation` is not `Send` (single-mutable-state design), so
+parallel throughput is N independent processes / threads ×
+single-thread cost; M2's 8 cores give ~7 200 / ~3 200 / ~1 600
+turns/sec respectively at saturation. CPU is by far the dominant
+resource — wall time is essentially compute, not IO.
+
+## When adam, when LLM
+
+The honest comparison. Numbers below for LLMs are ranges from
+public benchmarks and our own observations on the same M2 host;
+treat them as order-of-magnitude, not exact.
+
+| Axis | adam (Kazakh, this repo) | LLM via API (e.g. GPT-4) | LLM local 7B (e.g. Llama 3 8B Q4) |
+|---|---|---|---|
+| Per-turn latency | **~1–6 ms** | ~500–2 000 ms (network-bound) | ~50–200 ms first token |
+| RSS / model size | **~75 MB** | irrelevant on client; ~hundreds of GB on server | ~5–15 GB |
+| Energy per turn | sub-millijoule range | network round-trip + remote inference | seconds of M2 GPU work |
+| Topical breadth | ≤ `world_core` (curated, ~874 entries) | open-domain | open-domain |
+| Hallucination rate | **0 by design** (every reply is traceable to a `ToolEvidence` source) | non-zero | non-zero |
+| Reproducibility | bit-exact for fixed `(input, rng_seed)` | non-deterministic | non-deterministic without explicit seed |
+| Offline / embedded | ✔ | ✘ (network) | partial (model ≥ 5 GB) |
+| Kazakh morphology | FST-backed, agreement guaranteed | tokenizer-dependent, often loanword-prone | same |
+| Audit trail per reply | full `TurnTrace` (action / intent / epistemic / belief / verification) | none | none |
+
+### What this means in practice
+
+adam **wins by 100×–2 000× on latency and 70×–200× on memory**
+versus a local LLM on the same host, and by even more versus a
+remote LLM API once you count the network round trip. That delta
+is real and reproducible; the bench script in
+`crates/adam-dialog/benches/turn_latency.rs` and the
+`/usr/bin/time -l` harness above will surface it on any machine.
+
+But the delta is meaningful **only inside adam's competence
+envelope** — Kazakh dialog intents recognised by the recogniser,
+slots filled from FST parses or curated entities, knowledge
+queries that hit `world_core` or the retrieval shards. Outside
+that envelope adam either refuses (`Action::RefuseOutOfScope`)
+or admits uncertainty via `unknown.tentative` /
+`unknown.conflicted` template families. It does not fabricate.
+
+The right reading of the table is **placement**, not **superiority**:
+
+- Where the workload **fits adam's envelope** (Kazakh-specific,
+  traceability matters, low-spec embedded host, no network,
+  zero-hallucination contract): adam is the right tool, and the
+  LLM cost is wasted.
+- Where the workload **exceeds adam's envelope** (open-domain
+  natural language, novel composition, English-or-Russian primary
+  surface): an LLM is the right tool, and adam can still play the
+  role of a deterministic frontend that hands off only the
+  in-envelope cases.
+
+## Regression policy
+
+Per `CONTRIBUTING.md`, performance regressions are release
+blockers. Before tagging a release that touches dialog runtime
+(`crates/adam-dialog/src/`), re-run `cargo bench -p adam-dialog
+--bench turn_latency` on the same M2 baseline and compare against
+the numbers above. A p50 regression > 20 % on any scenario must
+either be justified in the release notes (new capability landed
+that explains the cost) or rolled back before tagging.

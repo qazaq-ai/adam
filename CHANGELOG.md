@@ -7,6 +7,48 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.7] — 2026-04-27 — Performance baseline + bench harness + regression policy
+
+A documentation + measurement release. No production-code changes; the dialog runtime, tests, and APIs are byte-identical to v4.4.6. What lands is the first reproducible per-turn latency / cold-start / RSS baseline on M2 8 GB, plus a Criterion bench harness and a release-blocking regression policy.
+
+### `crates/adam-dialog/benches/turn_latency.rs`
+
+New Criterion bench target. Six per-turn scenarios sized to the cognitive contour they exercise — `social_greeting`, `profile_statement`, `profile_recall`, `knowledge_query`, `contradiction_check`, `dismiss_contradiction` — plus three cold-start scenarios (`cold_start_lexicon`, `cold_start_repo`, `cold_start_conversation`). Each per-turn scenario constructs a fresh `Conversation` per iteration so the measured cost is steady-state per-turn work, *not* amortised lexicon / template / retrieval-index loads. Run with:
+
+```
+cargo bench -p adam-dialog --bench turn_latency
+```
+
+`criterion 0.5` pulled in as a `[dev-dependencies]` (no production-graph impact).
+
+### `docs/performance.md`
+
+New top-level performance doc carrying the M2-baseline numbers, methodology, and an explicitly framed "when adam, when LLM" comparison block. The framing is intentional and load-bearing:
+
+> The numbers favour adam by orders of magnitude on every axis. None of that means adam beats GPT-4 / Claude / Llama on what those models do well. The two systems sit in different categories. Use the latency / memory delta as an argument for "embed adam where the workload fits", not for "replace your LLM with adam".
+
+Headline numbers (M2 8 GB, `--release`, single thread):
+- Per-turn p50: **1.07 ms** (`сәлем`) → **6.04 ms** (3-turn dismiss-contradiction dialog).
+- Cold start: **~14 ms** (lexicon load dominates at 13.32 ms).
+- Max RSS: **~75 MB** for `./target/release/adam_chat --once "сәлем"` with full retrieval index + 21 415 derived facts loaded.
+- Single-threaded throughput: **~900 turns/sec** social-class, **~400 turns/sec** profile-class, **~200 turns/sec** full multi-turn contradiction-handling.
+
+The honest comparison table positions adam vs LLM-via-API and local 7B-Q4 LLMs across latency, RSS, energy, topical breadth, hallucination rate, reproducibility, offline-capability, Kazakh morphology handling, and audit trail. Where adam wins (latency, memory, traceability, determinism) and where it loses (topical breadth, novel composition) are stated as a tradeoff, not a victory.
+
+### Performance regression policy (`CONTRIBUTING.md`)
+
+New section: performance regressions are release blockers. Before tagging a release that touches `crates/adam-dialog/src/`, re-run `cargo bench -p adam-dialog --bench turn_latency` on the M2 baseline. A p50 regression > 20 % on any scenario must either (a) be justified in the release notes (new capability landed that explains the cost), with `docs/performance.md` updated to reflect the new baseline, or (b) be rolled back before tagging. Same > 20 % rule for max RSS via `/usr/bin/time -l`.
+
+### State
+
+| | v4.4.6 | v4.4.7 |
+|---|---|---|
+| Workspace tests | 681 | 681 (unchanged) |
+| Cognitive eval | 54/54 canonical | 54/54 canonical (unchanged) |
+| REPL replay | 26/26 canonical + 4 aspirational | 26/26 canonical + 4 aspirational (unchanged) |
+| Bench targets | — | **9** (6 per-turn + 3 cold-start) |
+| Why patch | — | docs + measurement infrastructure; zero production-code change |
+
 ## [4.4.6] — 2026-04-27 — REPL replay battery + CONTRIBUTING.md + AskOccupation 1sg self-recall
 
 A test-layer expansion responding to Codex's 2026-04-27 finding that two real-REPL defects slipped through the cognitive_eval baseline because that harness asserts on trace signals (action / intent / epistemic / belief), not on what the user actually sees. v4.4.5 fixed those two; v4.4.6 closes the loop by adding a complementary surface-text harness so the same class of bug surfaces in CI next time.

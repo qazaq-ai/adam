@@ -117,6 +117,29 @@ locked-down surface invariants).
   on a tag that's been live for hours, use a fresh patch number
   instead.
 
+## Performance regression policy (v4.4.7+)
+
+Performance regressions are release blockers. Before tagging a
+release that touches dialog runtime
+(`crates/adam-dialog/src/`), re-run
+
+```
+cargo bench -p adam-dialog --bench turn_latency
+```
+
+on the same M2-baseline reference machine and compare against the
+numbers in [docs/performance.md](docs/performance.md). A p50
+regression **> 20 %** on any scenario must either be:
+
+1. justified in the release notes (a new capability landed that
+   explains the cost), with `docs/performance.md` updated to
+   reflect the new baseline, or
+2. rolled back before tagging.
+
+`/usr/bin/time -l ./target/release/adam_chat --once "сәлем"` is
+the secondary check for max RSS regressions; the same
+> 20 % rule applies.
+
 ## Documentation refresh on every release
 
 `README.md`, `CHANGELOG.md`, and `docs/roadmap.md` must be refreshed
