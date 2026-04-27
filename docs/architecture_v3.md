@@ -6,13 +6,18 @@ This is the **single canonical description** of the v3.0 system. It freezes the 
 >
 > The v2.0 architecture reference at [`architecture_v2.md`](architecture_v2.md) remains valid as a snapshot of the v2.0–v2.3 retrieval era; this file supersedes it for v3.0.
 
-> **v4.x continuity note.** Everything in this document is still load-bearing in v4.1.0 — the FST, retrieval, reasoning, and trust-marker layers are unchanged. v4.x **adds** layers on top, it does not replace what v3.0 describes:
-> - **Belief layer** (v4.0.27 → v4.1.0): `BeliefState` with `(Active, Superseded, Contested)` lifecycle, `BeliefConflict` log, `PendingQuestion::ContradictionToResolve` lifecycle, single-active-fact invariant (v4.0.28), `resolve_contradiction` for user-driven belief revision (v4.1.0).
-> - **Action / verifier / epistemic banding** (v4.0.31 → v4.0.34): `ActionPlanner` chooses an explicit action; `Verifier` gates evidence-bearing plans; `UncertaintyPolicy` derives `EpistemicStatus { Certain, Supported, Derived, Tentative, Conflicted, Unknown }`; templates branch on the band.
-> - **Tool layer** (v4.0.37 → v4.0.39): `Tool::dispatch` audit-mode path with distinct `empty` / `unsupported` semantics; `tool_calls: Vec<ToolResult>` on `TurnTrace`.
-> - **Reasoning rules**: 5 active in v3.0 → **10 active in v4.1.0** (R8 After-transitivity, R9 PartOf-transitivity, R10 InDomain-inheritance, R11 InDomain-shared-target landed across v4.0.x).
-> - **World Core**: 14 domains in v4.0.7 → **29 domains, 826 entries / 922 facts at v4.1.0**.
-> - **Cognitive eval harness** (v4.0.34 → v4.1.0): `crates/adam-dialog/tests/cognitive_eval.rs` over `data/eval/cognitive_dialog_dataset.json`. Baseline at v4.1.0: **22 / 22 canonical, 0 aspirational**.
+> **v4.x continuity note.** Everything in this document is still load-bearing in v4.4.7 — the FST, retrieval, reasoning, and trust-marker layers are unchanged. v4.x **adds** layers on top, it does not replace what v3.0 describes:
+> - **Belief layer** (v4.0.27 → v4.4.0): `BeliefState` with `(Active, Superseded, Contested)` lifecycle, `BeliefConflict` log, `PendingQuestion::ContradictionToResolve` lifecycle, single-active-fact invariant (v4.0.28), `resolve_contradiction` for user-driven belief revision (v4.1.0), `dismiss_contradiction` for belief-poisoning recovery (v4.4.0), `ActionPlanner::CONTRADICTION_PRIORITY_TURNS = 3` time-bounded priority cap (v4.4.0).
+> - **Action / verifier / epistemic banding** (v4.0.31 → v4.0.34): `ActionPlanner` chooses an explicit action (9 variants at v4.4.0 incl. `DismissContradiction`); `Verifier` gates evidence-bearing plans; `UncertaintyPolicy` derives `EpistemicStatus { Certain, Supported, Derived, Tentative, Conflicted, Unknown }`; templates branch on the band.
+> - **Tool layer** (v4.0.37 → v4.3.0): `Tool::dispatch` with distinct `empty` / `unsupported` semantics; `tool_calls: Vec<ToolResult>` on `TurnTrace`; v4.2.0 retired `inject_*` for a data-driven tool loop; v4.3.0 added typed `ToolEvidence` (`BeliefFact` / `GraphFact` / `RetrievalSample` / `DerivedFact`) on every `ToolResult`.
+> - **Language Core** (v4.3.0): canonical entity resolution for geography (`canonical_geo_entity` → `geo_kz_NNN`) and persons (`canonical_person_entity` → `person:<canonical>` at v4.3.1).
+> - **Quality / ontology audits** (v4.3.0): `audit_response`, `audit_trace_faithfulness`, `audit_typed_faithfulness`, `audit_graph_admissibility`; `adam_reasoning::ontology` with `validate_fact` / `validate_derived_fact_with_supports`.
+> - **System identity + dialog adequacy** (v4.3.4 → v4.4.5): `SystemIdentity` self-record + four `ask_about_system.*` aspect families; `check_contradiction` template family + planner override.
+> - **Reasoning rules**: 5 active in v3.0 → **10 active at v4.4.7** (R8 After-transitivity, R9 PartOf-transitivity, R10 InDomain-inheritance, R11 InDomain-shared-target landed across v4.0.x).
+> - **World Core**: 14 domains in v4.0.7 → **30 domains, 874 entries / 995 facts at v4.4.7**.
+> - **Cognitive eval harness** (v4.0.34 → v4.4.5): `crates/adam-dialog/tests/cognitive_eval.rs` over `data/eval/cognitive_dialog_dataset.json`. Baseline at v4.4.5: **54 / 54 canonical, 0 aspirational**.
+> - **REPL replay harness** (v4.4.6+): `crates/adam-dialog/tests/repl_replay.rs` over `data/eval/repl_dialogs.json`. Baseline at v4.4.6: **27 canonical + 3 aspirational** dialogs across 11 categories.
+> - **Performance baseline** (v4.4.7+): `crates/adam-dialog/benches/turn_latency.rs` Criterion bench; M2 8 GB numbers in [`docs/performance.md`](performance.md); > 20 % p50 regression is a release blocker.
 >
 > See [`docs/foundation_scope.md`](foundation_scope.md) for the comprehensive v4.x scope. This file (`architecture_v3.md`) is kept as the canonical description of the deterministic retrieval-and-reasoning core that the v4.x layers sit on.
 

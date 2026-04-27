@@ -128,11 +128,16 @@ Validator checks:
 - `kinship_extended.jsonl` — 18 entries / 20 facts  *(new in v4.0.19)*
 - `constellations_kz.jsonl` — 6 entries / 6 facts  *(new in v4.0.19)*
 - `measurements.jsonl` — 10 entries / 10 facts  *(new in v4.0.19)*
-- **Total: 827 entries / 923 facts across 29 domains** (v4.3.0), all `approved`
-  at `high` or `medium` confidence by `shaman`. `geography_kz.jsonl` doubles as
-  the canonical source for the v4.3.0 `language_core::canonical_geo_entity`
-  resolver — every place mention in dialog memory carries the matching
-  `geo_kz_NNN` id as `EntityMemory.canonical_id`.
+- **Total: 874 entries / 995 facts across 30 domains** (v4.4.7), all `approved`
+  at `high` or `medium` confidence by `shaman`. v4.3.5 added **kz_literature
+  surname-keyed entries** (Әуезов / Сейфуллин / Мүсірепов / Жұмабаев / …) and a
+  new **`notable_kazakhstanis.jsonl` domain** (presidents, khans, scientists,
+  war heroes, athletes, judges). `geography_kz.jsonl` doubles as the canonical
+  source for the v4.3.0 `language_core::canonical_geo_entity` resolver — every
+  place mention in dialog memory carries the matching `geo_kz_NNN` id as
+  `EntityMemory.canonical_id`. Verify in-tree with
+  `find data/world_core -name '*.jsonl' | xargs cat | jq -s 'length'`
+  (entries) and `... | jq -s 'map(.facts | length) | add'` (facts).
 
 ## Roadmap
 

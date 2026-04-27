@@ -7,6 +7,52 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.8] — 2026-04-27 — Doc currency sweep: stale-number scrub + claim-scope sharpenings (post-Codex audit)
+
+A documentation-only release responding to Codex's 2026-04-27 doc-currency audit. The core was confirmed honest (`cargo test --workspace`: 681 / 0 / 4 ignored; foundation validation passes; bench numbers reproduced within ±5 % of v4.4.7 claims). What landed: every stale numeric claim refreshed against `cargo` / `jq` / `grep -c` re-runs, and five claim wordings tightened so they match the underlying scope rather than overstating it.
+
+### Stale numbers refreshed against verified counts
+
+All numbers below were verified in-tree before edit (commands shown so future audits can re-verify):
+
+| File | Stale claim | Refreshed value | Verification |
+|---|---|---|---|
+| `README.md` (badges) | `repl replay 26/26 canonical` | `27/27 canonical` | `jq '.dialogs \| map(.expected_failing // false) \| ...' data/eval/repl_dialogs.json` |
+| `README.md` (Why-adam follow-up line) | `26/26 canonical + 4 aspirational` | `27/27 canonical + 3 aspirational` | same |
+| `README.md` (Current state block) | `v4.3.0 — honest numbers ... 38/38 ... 827/923/29 ... 17 340 ... 15 449 ... 647 tests` | `v4.4.7 — honest numbers, verified 2026-04-27 ... 54/54 ... 874/995/30 ... 21 415 ... 15 521 ... 681 tests` | `cargo test --workspace`, `jq` over world_core packs, `data/retrieval/{facts,derived_facts}.json` `.counts` blocks |
+| `README.md` (Capabilities table) | `Template families 34+` | `49 families` | `grep -c '^\[\[families\]\]' data/dialog/templates/v1.toml` |
+| `README.md` (RSS phrasing) | `~75 MB` | `~76–80 MB depending on metric` (`maximum resident set size` ≈ 80 MB vs `peak memory footprint` ≈ 76 MB on the same `/usr/bin/time -l` run) | `/usr/bin/time -l ./target/release/adam_chat --once "сәлем"` |
+| `data/README.md` | v4.3.0 numbers | refreshed to v4.4.7 numbers | per-row recomputation |
+| `data/world_core/README.md` | `827 / 923 / 29 domains` | `874 / 995 / 30` | `find data/world_core -name '*.jsonl' \| xargs cat \| jq -s 'length'` (entries) and `... \| jq -s 'map(.facts \| length) \| add'` (facts) |
+| `data/dialog/README.md` | `34+ families` | `49 families` | grep above |
+| `docs/foundation_scope.md` | `In scope (v1.0.0 → v4.3.0)` + v4.3.0-frozen numbers throughout | refreshed to `v4.4.7` + current numbers | per-row recomputation |
+| `docs/repository_layout.md` | `Crates (10 total — workspace at v4.3.0)` + stale dialog / retrieval / world_core / cognitive eval rows | refreshed to v4.4.7 + REPL replay + Criterion bench rows | per-row recomputation |
+| `docs/architecture_v3.md` | v4.x continuity note frozen at v4.1.0 (`29 domains, 826 / 922 ... 22 / 22 canonical`) | refreshed to v4.4.7 (`30 domains, 874 / 995 ... 54 / 54 canonical`) + new lines for Language Core / quality audits / system identity / REPL replay / performance baseline | per-row recomputation |
+
+### Five claim wordings sharpened to match scope
+
+Codex flagged five places where the wording was technically defensible but invited misreading. Tightened in `README.md` and `docs/foundation_scope.md`:
+
+1. **"100 % tokenizer"** → **"464 / 464 on the hand-authored segmentation eval"** (`data/eval/tokenizer_segmentation_eval_dataset.json`). Not a general "Kazakh tokenizer accuracy" benchmark — that would require a held-out segmented corpus, which we do not yet have.
+2. **"100 % training validation"** → **"15 / 15 next-token validation checks on the tiny clean prototype"** (`data/training/baseline_training_manifest.json`). Not an ML-model accuracy claim.
+3. **`benchmark_manifest.json`** → reframed as **"coverage / contract benchmark manifest"** (4 task families + guards + layers), not a single AI-benchmark score.
+4. **"Zero hallucination" / "Ungrounded generation: none by design"** → **"zero ungrounded generation inside the deterministic recognised / grounded runtime path"** (refusal or `unknown.tentative` outside the envelope). Not a general open-domain hallucination benchmark; it's a runtime-path contract enforced by `audit_response` + `audit_typed_faithfulness` + `audit_trace_faithfulness` + `audit_graph_admissibility`. Badge text updated correspondingly.
+5. **Scaling report**: T5 tier targeted 1 M, scanned **940 288** before `status: "timed_out"`. Useful as a scaling artefact (per-tier `facts_per_10k_words`, `derivations_per_fact`, `predicate_coverage_pct`); **not** a "1 M benchmark completed without caveat".
+
+### New: `Verified-on-2026-04-27` quick-reference table
+
+The `README.md` Current-state section now carries a 13-row table with the verified value for every load-bearing numeric claim, paired with the exact `cargo` / `jq` / `grep` / `time` command that verifies it. Future audits run those commands and either match or surface a delta.
+
+### State
+
+| | v4.4.7 | v4.4.8 |
+|---|---|---|
+| Workspace tests | 681 | 681 (unchanged — doc-only release) |
+| Cognitive eval | 54/54 canonical | 54/54 canonical (unchanged) |
+| REPL replay | 26/26 canonical + 4 aspirational | **27/27 canonical + 3 aspirational** (no test data changed; the v4.4.7 release notes had the badge / notes wrong by 1 — fixed here) |
+| Production code | — | unchanged |
+| Why patch | — | docs only; no production-code change, no new dependency, no API surface change |
+
 ## [4.4.7] — 2026-04-27 — Performance baseline + bench harness + regression policy
 
 A documentation + measurement release. No production-code changes; the dialog runtime, tests, and APIs are byte-identical to v4.4.6. What lands is the first reproducible per-turn latency / cold-start / RSS baseline on M2 8 GB, plus a Criterion bench harness and a release-blocking regression policy.

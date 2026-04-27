@@ -6,7 +6,7 @@ Template repository for the predictable Kazakh dialog pipeline
 
 ## Files
 
-- `templates/v1.toml` — current template repository (**34+ families** at v4.1.0; grew over v1.8.0 session-aware evidence + v1.9.5 adapted-evidence + v2.7 `unknown.with_derived_chain` reasoning-marker family + v4.0.34 Tentative / Conflicted families for epistemic-status banding). One file per major schema version. Older schema versions, when they arrive, will live alongside as `v2.toml`, `v3.toml`, … with the crate loader picking the newest it supports.
+- `templates/v1.toml` — current template repository (**49 families** at v4.4.7; grew over v1.8.0 session-aware evidence + v1.9.5 adapted-evidence + v2.7 `unknown.with_derived_chain` reasoning-marker family + v4.0.34 Tentative / Conflicted families + v4.3.4 four `ask_about_system.*` aspect families + v4.4.0 `dismiss_contradiction` + v4.4.5 `check_contradiction`). Verify in-tree with `grep -c '^\[\[families\]\]' data/dialog/templates/v1.toml`. One file per major schema version. Older schema versions, when they arrive, will live alongside as `v2.toml`, `v3.toml`, … with the crate loader picking the newest it supports.
 
 ## Schema (v1)
 

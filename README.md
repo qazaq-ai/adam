@@ -25,15 +25,15 @@
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
   <img src="https://img.shields.io/badge/tests-681%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/cognitive%20eval-54%2F54%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
-  <img src="https://img.shields.io/badge/repl%20replay-26%2F26%20canonical-2EA44F?style=flat-square" alt="repl replay">
+  <img src="https://img.shields.io/badge/repl%20replay-27%2F27%20canonical-2EA44F?style=flat-square" alt="repl replay">
   <img src="https://img.shields.io/badge/p50%20turn%20latency-1.07%20ms%20on%20M2-2EA44F?style=flat-square" alt="p50 turn latency">
-  <img src="https://img.shields.io/badge/RSS-~75%20MB-2EA44F?style=flat-square" alt="rss">
+  <img src="https://img.shields.io/badge/RSS-~76--80%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
   <img src="https://img.shields.io/badge/world%20core-874%20curated%20/%20995%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/domains-30-9CCC65?style=flat-square" alt="domains">
   <img src="https://img.shields.io/badge/policy-Rust--only%20%2B%20Graph--first-1976D2?style=flat-square" alt="policies">
-  <img src="https://img.shields.io/badge/ungrounded%20generation-none%20by%20design-2EA44F?style=flat-square" alt="ungrounded generation">
+  <img src="https://img.shields.io/badge/ungrounded%20generation-none%20on%20deterministic%20path-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
 
 ---
@@ -42,9 +42,9 @@
 
 adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced. Every layer is **Rust-only** and **graph-first** by repository invariant — both enforced by contract tests.
 
-**v4.4.7 follow-up — performance baseline.** Per-turn latency, cold-start cost, and RSS measured on M2 8 GB: **p50 1.07 ms** (`сәлем`) → **6.04 ms** (3-turn dismiss-contradiction dialog), cold start **~14 ms**, max RSS **~75 MB**. Honest "when adam, when LLM" comparison block: latency / memory delta is 100×–2 000× vs a local LLM, but only meaningful inside adam's competence envelope (Kazakh dialog intents, curated `world_core` knowledge, zero-hallucination contract). Numbers and methodology in [docs/performance.md](docs/performance.md); reproduce with `cargo bench -p adam-dialog --bench turn_latency`. Performance regressions > 20 % p50 are now release blockers per [CONTRIBUTING.md](CONTRIBUTING.md).
+**v4.4.7 follow-up — performance baseline.** Per-turn latency, cold-start cost, and RSS measured on M2 8 GB: **p50 1.07 ms** (`сәлем`) → **6.04 ms** (3-turn dismiss-contradiction dialog), cold start **~14 ms**, max RSS **~76–80 MB** depending on the metric (`/usr/bin/time -l` reports `maximum resident set size` ≈ 80 MB and `peak memory footprint` ≈ 76 MB on the same run). Honest "when adam, when LLM" comparison block: latency / memory delta is 100×–2 000× vs a local LLM, but only meaningful **inside adam's competence envelope** — Kazakh dialog intents recognised by the recogniser, slots filled from FST parses or curated entities, knowledge queries that hit `world_core` or the retrieval shards. Outside that envelope adam refuses or admits uncertainty; it does not fabricate. Numbers and methodology in [docs/performance.md](docs/performance.md); reproduce with `cargo bench -p adam-dialog --bench turn_latency`. Performance regressions > 20 % p50 are release blockers per [CONTRIBUTING.md](CONTRIBUTING.md).
 
-**v4.4.6 follow-up — REPL replay battery + AskOccupation 1sg self-recall.** New `crates/adam-dialog/tests/repl_replay.rs` harness running `data/eval/repl_dialogs.json` (30 hand-authored multi-turn KZ dialogs) — complementary to `cognitive_eval` (which checks trace signals); this checks what the user actually sees. Same `expected_failing` aspirational contract. Initial baseline 26/26 canonical + 4 aspirational. Plus a v4.4.5-class detector extension surfaced by the harness on first run: `менің мамандығым не?` now classifies as `AskOccupation` and recalls the stored value via `ask_occupation.with_known_user`. New `CONTRIBUTING.md` codifies the load-bearing rule that's been informal for several releases — every dialog defect ships with at least one new scenario / dialog.
+**v4.4.6 follow-up — REPL replay battery + AskOccupation 1sg self-recall.** New `crates/adam-dialog/tests/repl_replay.rs` harness running `data/eval/repl_dialogs.json` (30 hand-authored multi-turn KZ dialogs) — complementary to `cognitive_eval` (which checks trace signals); this checks what the user actually sees. Same `expected_failing` aspirational contract. Current baseline **27/27 canonical + 3 aspirational** (the 3 aspirational document a real `statement_of_*` slot-echo gap; promotion-ready when every variant interpolates the slot). Plus a v4.4.5-class detector extension surfaced by the harness on first run: `менің мамандығым не?` now classifies as `AskOccupation` and recalls the stored value via `ask_occupation.with_known_user`. New `CONTRIBUTING.md` codifies the load-bearing rule that's been informal for several releases — every dialog defect ships with at least one new scenario / dialog.
 
 **v4.4.5 follow-up — real-dialog adequacy fixes.** External review (Codex, 2026-04-27 live REPL) caught two user-visible defects the internal suite missed: (1) `Action::CheckContradiction` rendered as a confirmation because the planner kept keying on `intent_key(intent)` instead of the action — answer was «Алматыда екеніңізді есте сақтаймын» where it should have been a clarifying question; (2) `менің жасым қанша?` misclassified as `StatementOfAge` because the detector keyed on substring `жасым` and ran before `detect_ask_age`. Both fixed via a new `check_contradiction` template family + planner override and a question-particle guard with reordered detector dispatch. The cognitive contour was already correct in v4.4.0 — only the surface text and 1sg-self-recall classification leaked.
 
@@ -115,21 +115,43 @@ The graph layer of `adam` is **Rust-native and repository-native**.
 
 This is also a repository invariant. Contract tests fail if a foreign graph stack is introduced or if the canonical Rust graph entrypoints disappear.
 
-### Current state (v4.3.0 — honest numbers)
+### Current state (v4.4.7 — honest numbers, verified 2026-04-27)
 
-v4.3.0 is the **third v4.x minor**: it adds the **language-core / typed-evidence / ontology / response-quality stack** on top of the v4.2.0 tool-loop interpreter. The dialog now resolves canonical geography entities, threads structured `ToolEvidence` through every tool dispatch, gates derived facts through ontology type constraints, and audits every reply for placeholder leaks and trace faithfulness — all deterministic, all Rust, all in this repository.
+The cognitive contour shipped through v4.3.0 (language core, typed evidence, ontology gates, response-quality audit, stack policies) and v4.4.0 (belief-poisoning recovery: `Action::DismissContradiction` + contradiction-priority cap) remains the architectural baseline. v4.4.5–v4.4.7 added real-dialog adequacy fixes (`check_contradiction` template family + age/occupation 1sg-self-recall), the REPL replay battery, `CONTRIBUTING.md`, and a measurement / regression-policy layer. No new architectural layer in the v4.4.x patch series — those land at minor bumps.
 
-Live numbers: cognitive eval **38 / 38 canonical, 0 aspirational**. World Core: **827 entries / 923 curated facts across 29 domains**. Reasoner: **10 of 11 rules firing** with **17 340 derived facts** over **15 449 extracted + curated facts**. Workspace: **647 tests passing**, 0 warnings. Lexicon: **~25.5 k roots** (13 606 pure Kazakh + 11 919 Apertium imports). Every curated fact carries `ConfidenceKind::HumanApproved` with a named reviewer; every derivation has a `rule_id` + non-empty `source_chain`; every belief fact carries `Provenance` + `FactStatus`; every remembered place carries `EntityMemory.canonical_id`; every dialog turn's lookups are declared as `ToolCall`s and recorded as `ToolResult`s with typed `ToolEvidence` on `TurnTrace.tool_calls`. Nothing else can leave the system.
+Live numbers (verified 2026-04-27 against the actual repo): cognitive eval **54 / 54 canonical, 0 aspirational**. REPL replay: **27 / 27 canonical + 3 aspirational** (3 documenting a real `statement_of_*` slot-echo gap). World Core: **874 entries / 995 curated facts across 30 domains**. Reasoner: **10 of 11 rules firing** with **21 415 derived facts** over **15 521 extracted + curated facts**. Workspace: **681 tests passing**, 0 warnings. Lexicon: **~25.5 k roots** (13 606 pure Kazakh + 11 919 Apertium imports). Every curated fact carries `ConfidenceKind::HumanApproved` with a named reviewer; every derivation has a `rule_id` + non-empty `source_chain`; every belief fact carries `Provenance` + `FactStatus`; every remembered place carries `EntityMemory.canonical_id`; every dialog turn's lookups are declared as `ToolCall`s and recorded as `ToolResult`s with typed `ToolEvidence` on `TurnTrace.tool_calls`. Nothing ungrounded leaves the deterministic recognised / grounded runtime path.
+
+#### Verified-on-2026-04-27 quick reference
+
+| Claim | Verified value | Verification path |
+|---|---|---|
+| Workspace tests | **681 passing, 0 failing, 4 ignored** | `cargo test --workspace` |
+| Cognitive eval canonical | **54 / 54** | `cargo test -p adam-dialog --test cognitive_eval` |
+| REPL replay | **27 canonical + 3 aspirational** | `cargo test -p adam-dialog --test repl_replay` |
+| World Core entries / facts / domains | **874 / 995 / 30** | `find data/world_core -name '*.jsonl' \| xargs cat \| jq -s 'length'` |
+| Extracted runtime facts | **15 521** | `jq '.counts.facts_total' data/retrieval/facts.json` |
+| Derived facts | **21 415** | `jq '.counts.derived_facts' data/retrieval/derived_facts.json` |
+| Template families | **49** | `grep -c '^\[\[families\]\]' data/dialog/templates/v1.toml` |
+| Tokenizer segmentation eval | **464 / 464 hand-authored** | `data/eval/tokenizer_segmentation_eval_dataset.json` (this is a hand-authored coverage eval, **not** a general "Kazakh tokenizer accuracy" benchmark) |
+| Tiny training validation | **15 / 15 next-token checks on tiny clean prototype** | `data/training/baseline_training_manifest.json` (this is a clean-pipeline prototype check, **not** an ML-model accuracy claim) |
+| `data/eval/benchmark_manifest.json` | **coverage / contract benchmark manifest** with 4 task families + guards + layers | not a single AI-benchmark score; see `docs/foundation_scope.md` for scope |
+| Scaling report | T5 target was 1 M, scanned **940 288** before `status: "timed_out"` | `data/scaling/scaling_report.json`; useful as a scaling artefact, **not** a "1 M benchmark completed without caveat" |
+| Per-turn p50 latency | **1.07 ms → 6.04 ms** by scenario class | `cargo bench -p adam-dialog --bench turn_latency` (M2 8 GB, `--release`) |
+| Cold-start (lexicon-dominated) | **~14 ms** | same bench file — `cold_start_lexicon` ≈ 13.32 ms |
+| Max RSS, one-shot dispatch | **~76–80 MB** depending on metric | `/usr/bin/time -l ./target/release/adam_chat --once "сәлем"` reports `maximum resident set size` ≈ 80 MB and `peak memory footprint` ≈ 76 MB |
+| Hallucination contract | **zero ungrounded generation inside the deterministic recognised / grounded runtime path** (refusal or `unknown.tentative` outside the envelope) | `crates/adam-dialog/src/quality.rs::audit_response` + `audit_typed_faithfulness` + `audit_trace_faithfulness` + `audit_graph_admissibility` |
 
 | | value |
 |---|---|
 | Dialog intents | 26 |
 | Lexicon roots | **~25.5 k** (13 606 pure Kazakh + 11 919 Apertium imports, before deduplication) |
 | Corpus (committed / local) | **4.57 M** (v3.5.0: 10 textbooks) / 77.9 M words across 9 committed source packs |
-| **World Core** | **827 entries / 923 curated facts across 29 domains**: animals, astronomy, biology_basic, body_parts, clothing, colors, constellations_kz, cooking_methods, directions, emotions, food, geography_kz, house_parts, kinship_extended, kz_literature, language_features, materials, measurements, music_kz, numbers, plants, professions, proverbs, society, sports, time, tools_household, transport, weather_phenomena. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
+| **World Core** | **874 entries / 995 curated facts across 30 domains** (v4.3.5 added kz_literature surname keyings + new `notable_kazakhstanis` domain): animals, astronomy, biology_basic, body_parts, clothing, colors, constellations_kz, cooking_methods, directions, emotions, food, geography_kz, house_parts, kinship_extended, kz_literature, language_features, materials, measurements, music_kz, notable_kazakhstanis, numbers, plants, professions, proverbs, society, sports, time, tools_household, transport, weather_phenomena. All `approved` by `shaman`. Schema + validator: `data/world_core/README.md` |
 | Morpheme coverage over committed corpus | 79.48 % |
-| Workspace tests | **672 passing, 0 failing, 0 warnings** |
-| **Cognitive eval baseline** | **38/38 canonical, 0 aspirational** (v4.2.6). Closed scenarios: parse-failure distinction (v4.0.40), contradiction resolution (v4.1.0), AnswerDirect rendering + digit-token (v4.2.5), multi-slot lifecycle / compound flows (v4.2.6). Tracked in `data/eval/cognitive_dialog_dataset.json`; harness in `crates/adam-dialog/tests/cognitive_eval.rs` |
+| Workspace tests | **681 passing, 0 failing, 4 ignored** |
+| **Cognitive eval baseline** | **54 / 54 canonical, 0 aspirational** (v4.4.5). Closed scenarios: parse-failure distinction (v4.0.40), contradiction resolution (v4.1.0), AnswerDirect rendering + digit-token (v4.2.5), multi-slot lifecycle / compound flows (v4.2.6), self/other distinction + SystemIdentity (v4.3.3–4), topic-marker extraction + famous Kazakhs (v4.3.5), belief-poisoning recovery (v4.4.0), CheckContradiction renderer + AskAge self-recall (v4.4.5). Tracked in `data/eval/cognitive_dialog_dataset.json`; harness in `crates/adam-dialog/tests/cognitive_eval.rs` |
+| **REPL replay baseline (v4.4.6)** | **27 / 27 canonical + 3 aspirational** (3 document a real `statement_of_*` slot-echo gap). Tracked in `data/eval/repl_dialogs.json`; harness in `crates/adam-dialog/tests/repl_replay.rs`. Asserts on what the user actually sees, complementary to `cognitive_eval` which asserts on trace signals |
+| **Performance baseline (v4.4.7, M2 8 GB)** | Per-turn p50 **1.07 ms → 6.04 ms** by scenario class; cold start **~14 ms** (lexicon load dominates); max RSS **~76–80 MB** for `./target/release/adam_chat --once "сәлем"` with full retrieval index + 21 415 derived facts loaded; throughput ~900 / ~400 / ~200 turns/sec single-thread by class. Numbers + methodology + honest "when adam, when LLM" tradeoff block in `docs/performance.md`; reproduce with `cargo bench -p adam-dialog --bench turn_latency` |
 | **Language Core (v4.3.0)** | `crates/adam-dialog/src/language_core.rs` — orthography + mixed-script Latin/Cyrillic cleanup + proper-noun normalization + canonical entity resolution. `canonical_geo_entity(surface)` → `GeoEntity { id, canonical, kind }` resolved from `data/world_core/geography_kz.jsonl`. Place mentions like `Алма-Ата`, `Усть-Каменогорск`, `Каспий теңізі` collapse to one stable `geo_kz_NNN` id. `EntityMemory.canonical_id` carries the id through belief; session has `city_id` + `geo_kind` alongside `city` |
 | **Typed Evidence (v4.3.0)** | `ToolResult.evidence: Vec<ToolEvidence>` carries machine-readable claims alongside textual `findings`. Variants: `BeliefFact { subject, predicate, object }`, `GraphFact { subject, predicate, object, confidence, rendered }`, `RetrievalSample { text }`, `DerivedFact { subject, predicate, object, rule_id, confidence, rendered, support_chain }`. Used by `audit_typed_faithfulness` to verify the user-facing answer is backed by the evidence class the planner intended |
 | **Ontology gates (v4.3.0)** | `crates/adam-reasoning/src/ontology.rs` — type constraints on admissible facts. `validate_fact` / `validate_derived_fact` reject `RulePredicateMismatch`, `PlaceObjectRequired` (spatial predicates need place-typed objects), `TimeLikeRequired` (temporal predicates need time-typed objects), `EmptySupportChain`, `SupportPatternMismatch`, `MissingSupportSource`. Graph admissibility audited via `audit_graph_admissibility` |
@@ -141,8 +163,8 @@ Live numbers: cognitive eval **38 / 38 canonical, 0 aspirational**. World Core: 
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
 | **Dialog closed-class sync** (v3.9.5) | `NOT_A_TOPIC` mirrors `adam_reasoning::patterns::is_closed_class` — closes the pre-v3.9.5 «Неліктен → Нелікте тұрасыз ба» misparse where the FST correctly analysed `Неліктен` as ablative of a noun stem but the dialog layer had no interrogative filter |
 | **Lexicon gap candidates queued for review (v3.4.0)** | **200** pre-tagged roots in `docs/lexicon_gap_candidates.md` (top-ranked of 104 657 distinct uncovered surfaces across the 4.32 M-word committed pool) |
-| Facts (committed runtime) | **15 449 total** = **14 526 extracted (Grammar)** + **923 curated (HumanApproved, 29 domains)**. T4_200k scale |
-| **Rule-derived facts (committed runtime)** | **17 340 derivations** (10 active rules; numeric breakdown in the rules row above) |
+| Facts (committed runtime) | **15 521 total** = **14 526 extracted (Grammar)** + **995 curated (HumanApproved, 30 domains)**. T4_200k scale |
+| **Rule-derived facts (committed runtime)** | **21 415 derivations** (10 active rules; numeric breakdown in the rules row above) |
 | Fact-graph nodes / edges | **3 515 / 13 725** (committed v4.0.20); most-connected content nouns scaled with Lexicon sync |
 | **Tooling throughput (v4.0.8 → v4.0.9 validation)** | `extract_facts --world-core-only` — v4.0.8 infra. v4.0.9 confirmed empirically: 3-domain batch (105 new facts, full rebuild of facts + derived_facts + lexical_graph) took **~4 s total** vs ~135 min under the pre-v4.0.8 per-domain workflow — **~2 000× pipeline speedup on a 3-domain batch**. |
 | **Predicate coverage (v3.9.5)** | **11 / 11 = 100 %** — every declared predicate fires. Causes = 6, InDomain = 5 (v3.9.5 biology/anatomy/society entries extended the v3.9.0 foothold) |
@@ -480,10 +502,11 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | FST synthesis → analysis roundtrip | **100.0 %** on 36 238 forms |
 | FST parser throughput | **1.155 ms / word** single-threaded M2 |
 | Dialog intents | **26** (v1.1.0 added Insult) |
-| Template families | **34+** (v3.0 added `unknown.with_derived_chain`; v4.0.34 added Tentative / Conflicted families for epistemic-status banding) |
+| Template families | **49** (`grep -c '^\[\[families\]\]' data/dialog/templates/v1.toml`); v4.4.0 added `dismiss_contradiction`, v4.4.5 added `check_contradiction`, v4.3.4 added the four `ask_about_system.*` aspect families |
 | Slot types (session) | `name`, `age`, `city`, `occupation` (string slots, plus `{slot\|features}` FST-aware variants); v4.3.0 adds canonical-id auxiliaries `city_id` + `geo_kind` for geography |
 | Canonical entity ids (v4.3.0) | `EntityMemory.canonical_id`; geography places stored under `geo_kz_NNN` ids resolved via `language_core::canonical_geo_entity` from `data/world_core/geography_kz.jsonl` |
-| Cognitive eval baseline (v4.2.6) | **38 / 38 canonical, 0 aspirational** — every scenario the harness has tracked since v4.0.34 now passes |
+| Cognitive eval baseline (v4.4.5) | **54 / 54 canonical, 0 aspirational** — every scenario the harness has tracked since v4.0.34 now passes; growth log in `docs/roadmap.md` |
+| REPL replay baseline (v4.4.6) | **27 / 27 canonical + 3 aspirational** — the 3 aspirational document a real `statement_of_*` slot-echo gap (some variants don't interpolate the slot value); promotion-ready when every variant interpolates |
 | Belief revision (v4.1.0) | `BeliefState::resolve_contradiction(subject, predicate, chosen_object)` — flips chosen → Active, others → Superseded, drops matching `BeliefConflict` + `ContradictionToResolve` pending question |
 | Tool layer (v4.0.37 → v4.3.0) | `Tool::dispatch(call, ctx)` — `SearchBelief`, `SearchGraph`, `SearchRetrieval`, `RunLocalReasoner`. v4.2.0 retired `inject_*`; `tool_plan_for_turn` declares the call list, `apply_tool_results` folds findings back. v4.3.0 added `ToolResult.evidence: Vec<ToolEvidence>` carrying typed claims (BeliefFact / GraphFact / RetrievalSample / DerivedFact) |
 | Ontology gates (v4.3.0) | `adam_reasoning::ontology` — type constraints on admissible facts; `validate_fact` / `validate_derived_fact_with_supports` / `find_support_fact` |
@@ -491,9 +514,9 @@ Multi-entity templates fire only when every referenced slot is filled. Eligibili
 | Pattern matchers | **11** — v2.x (4) + v3.5.0 (6) + v3.5.5 structural_part_of, all behind v3.9.0's `is_fragment_root` central hygiene gate |
 | Reasoning rules active | **10 of 11** — R1 IsA-transitivity, R2 Has-inheritance, R3 Has-via-PartOf, R5 shared-IsA → RelatedTo, R6 LivesIn-via-PartOf, R7 GoesTo-via-PartOf, R8 After-transitivity, R9 PartOf-transitivity, R10 InDomain-inheritance, R11 InDomain-shared-target. R4 IsA-symmetry is curator-warning only |
 | Predicates defined | **11** — IsA, LivesIn, Has, GoesTo, PartOf, RelatedTo, Causes, After, HasQuantity, DoesTo, InDomain |
-| Extracted / curated / derived facts (committed runtime) | **14 526 extracted + 923 curated (world_core) / 17 340 derived** (T4_200k text-extraction scale; numeric per-rule breakdown in the Capabilities table) |
-| Ungrounded generation rate | **none by construction** (retrieval quotes verbatim; reasoner derives only from typed facts) |
-| Workspace tests | **672 passing, 0 failing, 0 warnings** |
+| Extracted / curated / derived facts (committed runtime) | **14 526 extracted + 995 curated (world_core, 30 domains) / 21 415 derived** (T4_200k text-extraction scale; numeric per-rule breakdown in the Capabilities table) |
+| Ungrounded generation rate | **zero ungrounded generation inside the deterministic recognised / grounded runtime path** — retrieval quotes verbatim, reasoner derives only from typed facts, refusal or `unknown.tentative` outside the envelope. Not a general open-domain hallucination benchmark; it's a runtime-path contract |
+| Workspace tests | **681 passing, 0 failing, 4 ignored** |
 | Extraction throughput (v3.1.0) | **~3 000 samples / 12 s** on M2 8-core (Rayon) — ~3.5× over v3.0 sequential |
 
 ## Directory layout
