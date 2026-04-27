@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.4.5-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.4.6-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,8 +23,9 @@
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-680%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-681%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/cognitive%20eval-54%2F54%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
+  <img src="https://img.shields.io/badge/repl%20replay-26%2F26%20canonical-2EA44F?style=flat-square" alt="repl replay">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
   <img src="https://img.shields.io/badge/world%20core-874%20curated%20/%20995%20facts-9CCC65?style=flat-square" alt="world core">
@@ -38,6 +39,8 @@
 ## Why adam (v4.4)
 
 adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced. Every layer is **Rust-only** and **graph-first** by repository invariant — both enforced by contract tests.
+
+**v4.4.6 follow-up — REPL replay battery + AskOccupation 1sg self-recall.** New `crates/adam-dialog/tests/repl_replay.rs` harness running `data/eval/repl_dialogs.json` (30 hand-authored multi-turn KZ dialogs) — complementary to `cognitive_eval` (which checks trace signals); this checks what the user actually sees. Same `expected_failing` aspirational contract. Initial baseline 26/26 canonical + 4 aspirational. Plus a v4.4.5-class detector extension surfaced by the harness on first run: `менің мамандығым не?` now classifies as `AskOccupation` and recalls the stored value via `ask_occupation.with_known_user`. New `CONTRIBUTING.md` codifies the load-bearing rule that's been informal for several releases — every dialog defect ships with at least one new scenario / dialog.
 
 **v4.4.5 follow-up — real-dialog adequacy fixes.** External review (Codex, 2026-04-27 live REPL) caught two user-visible defects the internal suite missed: (1) `Action::CheckContradiction` rendered as a confirmation because the planner kept keying on `intent_key(intent)` instead of the action — answer was «Алматыда екеніңізді есте сақтаймын» where it should have been a clarifying question; (2) `менің жасым қанша?` misclassified as `StatementOfAge` because the detector keyed on substring `жасым` and ran before `detect_ask_age`. Both fixed via a new `check_contradiction` template family + planner override and a question-particle guard with reordered detector dispatch. The cognitive contour was already correct in v4.4.0 — only the surface text and 1sg-self-recall classification leaked.
 

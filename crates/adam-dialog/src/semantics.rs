@@ -1315,6 +1315,19 @@ fn detect_ask_occupation(joined: &str) -> bool {
         || joined.contains("кәсібіңіз")
         || joined.contains("мамандығың")
         || joined.contains("мамандығыңыз")
+        // v4.4.6 — 1sg self-recall form: "менің мамандығым не?",
+        // "менің кәсібім қандай?". Mirrors the v4.4.5 fix to
+        // `detect_ask_age` for `менің жасым қанша?`. Pre-v4.4.6
+        // these fell through to `Intent::Unknown` with
+        // `noun_hint = мамандық/кәсіп` and routed to
+        // `unknown.with_grounded_fact`, surfacing a generic
+        // definition («Мамандық — адамның кәсібі») instead of
+        // recalling the user's stored value via
+        // `ask_occupation.with_known_user`. The 1sg-possessive
+        // morphemes (`-ым`/`-ім`) plus a question particle
+        // (`не`/`қандай`) are an unambiguous self-recall signal.
+        || ((joined.contains("мамандығым") || joined.contains("кәсібім"))
+            && (joined.contains("не") || joined.contains("қандай")))
 }
 
 /// User states occupation.

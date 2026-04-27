@@ -1,0 +1,264 @@
+{
+  "_comment": "v4.4.6 REPL replay battery — checks user-facing surface text after Codex 2026-04-27 caught two defects (CheckContradiction renderer, AskAge self-recall) that the cognitive_eval harness missed because the trace signals were correct, only the rendered text was wrong. Complementary to cognitive_dialog_dataset.json: cognitive eval asserts on trace fields (action / intent / epistemic / belief), this asserts on what the user actually sees. Per CONTRIBUTING.md, every surface-text defect ships with at least one new dialog here.",
+  "version": "v4.4.6",
+  "dialogs": [
+    {
+      "id": "name_introduction_acknowledged",
+      "category": "profile_building",
+      "description": "User introduces self by name; the reply must surface the name back so the user sees they were heard.",
+      "turns": [
+        {"user": "менің атым Дәулет", "output_contains_lower_any": ["дәулет"]}
+      ]
+    },
+    {
+      "id": "city_statement_acknowledged",
+      "category": "profile_building",
+      "description": "User states their city; the reply must surface the canonical name back. ASPIRATIONAL: pre-v4.4.6 the `statement_of_location` family includes generic acknowledgements like «түсіндім» that don't echo the slot — the seed-0 path picks one of those. Promote to canonical when every variant in the family interpolates `{city}`.",
+      "expected_failing": true,
+      "turns": [
+        {"user": "Алматыда тұрамын", "output_contains_lower_any": ["алматы"]}
+      ]
+    },
+    {
+      "id": "age_statement_acknowledged",
+      "category": "profile_building",
+      "description": "User states their age; the reply must surface the number. ASPIRATIONAL: same UX gap as `city_statement_acknowledged` — `statement_of_age` family contains «жақсы жас» / «қуатты кезеңіңіз» variants that don't surface `{age}`. Promote when every variant interpolates the number.",
+      "expected_failing": true,
+      "turns": [
+        {"user": "менің жасым 40", "output_contains_lower_any": ["40"]}
+      ]
+    },
+    {
+      "id": "occupation_statement_acknowledged",
+      "category": "profile_building",
+      "description": "User states profession; the reply must surface the role. ASPIRATIONAL: same UX gap — `statement_of_occupation` family has bare «түсіндім» variants. Promote when every variant interpolates `{occupation}`.",
+      "expected_failing": true,
+      "turns": [
+        {"user": "мен мұғаліммін", "output_contains_lower_any": ["мұғалім"]}
+      ]
+    },
+    {
+      "id": "name_recall_after_introduction",
+      "category": "profile_recall",
+      "description": "After introducing a name, asking `менің атым кім?` must return the stored name, not a generic placeholder.",
+      "turns": [
+        {"user": "менің атым Дәулет", "output_contains_lower_any": ["дәулет"]},
+        {"user": "менің атым кім?", "output_contains_lower_any": ["дәулет"]}
+      ]
+    },
+    {
+      "id": "city_recall_after_statement",
+      "category": "profile_recall",
+      "description": "After stating a city, asking `мен қайда тұрамын?` must surface the stored city via `ask_location.with_known_user`. Setup turn (turn 0) deliberately carries no assertion — the recall (turn 1) is the load-bearing check.",
+      "turns": [
+        {"user": "Астанада тұрамын"},
+        {"user": "мен қайда тұрамын?", "output_contains_lower_any": ["астана"]}
+      ]
+    },
+    {
+      "id": "age_self_recall_v4_4_5",
+      "category": "profile_recall",
+      "description": "v4.4.5 regression — `менің жасым қанша?` after `менің жасым 40` was misclassified as StatementOfAge { years: None } pre-v4.4.5; the reply happened to surface 40 only because statement_of_age interpolates session.age. Post-v4.4.5 this routes to AskAge / ask_age.with_known_user. Setup turn carries no assertion (the statement_of_age family has bare variants — see aspirational `age_statement_acknowledged`).",
+      "turns": [
+        {"user": "менің жасым 40"},
+        {"user": "менің жасым қанша?", "output_contains_lower_any": ["40"]}
+      ]
+    },
+    {
+      "id": "occupation_recall_after_statement",
+      "category": "profile_recall",
+      "description": "After stating occupation, the system must be able to surface it on a follow-up self-question via `ask_occupation.with_known_user`.",
+      "turns": [
+        {"user": "мен мұғаліммін"},
+        {"user": "менің мамандығым не?", "output_contains_lower_any": ["мұғалім"]}
+      ]
+    },
+    {
+      "id": "contradiction_logged_renders_clarifying_question_v4_4_5",
+      "category": "contradiction_recovery",
+      "description": "v4.4.5 (Codex 2026-04-27 REPL): two contradictory city statements must produce a clarifying question that names BOTH candidates. Pre-v4.4.5 the renderer fell through to statement_of_location and emitted «Алматыда екеніңізді есте сақтаймын» — committing to one of the contested values. The `output_not_contains_lower` assertion on turn 1 locks the bug closed; setup turn (turn 0) carries no assertion since the statement_of_location family has bare variants (see aspirational `city_statement_acknowledged`).",
+      "turns": [
+        {"user": "мен Астанада тұрамын"},
+        {"user": "мен Алматыда тұрамын", "output_contains_lower_any": ["алматы"], "output_not_contains_lower": ["есте сақтаймын"]}
+      ]
+    },
+    {
+      "id": "contradiction_dismissed_via_dont_know",
+      "category": "contradiction_recovery",
+      "description": "v4.4.0 dismissal: after a contradiction is logged, replying `білмеймін` clears both candidates from belief and the reply must acknowledge the dismissal — no statement-of-* confirmation.",
+      "turns": [
+        {"user": "мен Алматыда тұрамын"},
+        {"user": "мен Астанада тұрамын"},
+        {"user": "білмеймін", "output_not_contains_lower": ["есте сақтаймын"]}
+      ]
+    },
+    {
+      "id": "contradiction_dismissed_via_ekewi_de_zhok",
+      "category": "contradiction_recovery",
+      "description": "v4.4.0 dismissal alternative trigger: `екеуі де жоқ` after the conflict prompt; same effect as `білмеймін`.",
+      "turns": [
+        {"user": "мен Алматыда тұрамын"},
+        {"user": "мен Астанада тұрамын"},
+        {"user": "екеуі де жоқ", "output_not_contains_lower": ["есте сақтаймын"]}
+      ]
+    },
+    {
+      "id": "ask_about_system_general",
+      "category": "system_identity",
+      "description": "v4.3.4: `сен кімсің` must surface adam's identity, including either the abbreviation NLM or the full name Nano Language Model.",
+      "turns": [
+        {"user": "сен кімсің?", "output_contains_lower_any": ["адам", "nlm", "nano language model"]}
+      ]
+    },
+    {
+      "id": "ask_about_system_creator",
+      "category": "system_identity",
+      "description": "v4.3.4 Creator aspect: `сені кім жасады` must surface the creator's surname.",
+      "turns": [
+        {"user": "сені кім жасады?", "output_contains_lower_any": ["баймурзин"]}
+      ]
+    },
+    {
+      "id": "ask_about_system_birthdate",
+      "category": "system_identity",
+      "description": "v4.3.4 Birthdate aspect: `қашан пайда болдың` must surface the canonical date 2026-04-07.",
+      "turns": [
+        {"user": "қашан пайда болдың?", "output_contains_lower_any": ["2026-04-07"]}
+      ]
+    },
+    {
+      "id": "ask_about_system_architecture",
+      "category": "system_identity",
+      "description": "v4.3.4 Architecture aspect: `сенің ерекшелігің не` must mention `архитектур`.",
+      "turns": [
+        {"user": "сенің ерекшелігің не?", "output_contains_lower_any": ["архитектур"]}
+      ]
+    },
+    {
+      "id": "topic_query_geography_canonical",
+      "category": "knowledge_query",
+      "description": "v4.3.0 canonical geography: asking about Қазақстан must surface a substantive reply (not a refusal), since geography_kz.jsonl carries curated entries.",
+      "turns": [
+        {"user": "Қазақстан туралы айтшы", "output_not_contains_lower": ["түсінбедім"]}
+      ]
+    },
+    {
+      "id": "topic_query_classical_writer",
+      "category": "knowledge_query",
+      "description": "v4.3.5 famous Kazakhs: asking about Әуезов via `туралы` marker must surface a substantive reply, since kz_literature.jsonl carries the curated entry.",
+      "turns": [
+        {"user": "Әуезов туралы не білесіз?", "output_not_contains_lower": ["түсінбедім"]}
+      ]
+    },
+    {
+      "id": "topic_query_unknown_proper_noun",
+      "category": "knowledge_query",
+      "description": "Asking about an unknown proper noun via `туралы` should produce a tentative / clarifying reply that surfaces the topic itself, not a confident-sounding fabrication.",
+      "turns": [
+        {"user": "Малқаров туралы айтшы", "output_contains_lower_any": ["малқаров"]}
+      ]
+    },
+    {
+      "id": "social_greeting_returns_greeting",
+      "category": "social",
+      "description": "Bare `сәлем` must return a greeting, not a refusal or error.",
+      "turns": [
+        {"user": "сәлем", "output_not_contains_lower": ["түсінбедім"]}
+      ]
+    },
+    {
+      "id": "social_thanks_acknowledged",
+      "category": "social",
+      "description": "`рахмет` returns a non-empty social acknowledgement.",
+      "turns": [
+        {"user": "рахмет", "output_not_contains_lower": ["түсінбедім"]}
+      ]
+    },
+    {
+      "id": "social_apology_acknowledged",
+      "category": "social",
+      "description": "`кешіріңіз` returns a non-empty social acknowledgement, not a refusal.",
+      "turns": [
+        {"user": "кешіріңіз", "output_not_contains_lower": ["түсінбедім"]}
+      ]
+    },
+    {
+      "id": "edge_case_empty_input_safe",
+      "category": "edge_case",
+      "description": "Empty / whitespace input must not crash and must produce a graceful refusal or fallback, not a confident statement.",
+      "turns": [
+        {"user": "   ", "output_not_contains_lower": ["есте сақтаймын"]}
+      ]
+    },
+    {
+      "id": "edge_case_pure_punctuation_safe",
+      "category": "edge_case",
+      "description": "Pure punctuation input is gracefully rejected.",
+      "turns": [
+        {"user": "???", "output_not_contains_lower": ["есте сақтаймын"]}
+      ]
+    },
+    {
+      "id": "edge_case_mixed_script_name_normalised",
+      "category": "edge_case",
+      "description": "v4.3.1 person canonicalisation: lowercase / mixed-case name forms collapse to canonical title-cased form when echoed back.",
+      "turns": [
+        {"user": "менің атым дәулет", "output_contains_lower_any": ["дәулет"]}
+      ]
+    },
+    {
+      "id": "phantom_city_does_not_break_dialog_v4_3_2",
+      "category": "regression",
+      "description": "v4.3.2 phantom-city fix: `мен жасанды интеллектпен айналысамын` must NOT log a phantom city `Жасанды`. The reply should not commit to any city; subsequent topic turn must work normally.",
+      "turns": [
+        {"user": "мен жасанды интеллектпен айналысамын"},
+        {"user": "Қазақстан туралы айтшы", "output_not_contains_lower": ["түсінбедім"]}
+      ]
+    },
+    {
+      "id": "topic_marker_picks_proper_noun_v4_3_5",
+      "category": "regression",
+      "description": "v4.3.5 topic_marker_hint: `Жазушы Мүсірепов туралы не білесіз?` must extract `Мүсірепов` (proper noun before `туралы`) as the topic, not `жазушы` (common noun won pre-v4.3.5). The reply surfaces the proper noun.",
+      "turns": [
+        {"user": "Жазушы Мүсірепов туралы не білесіз?", "output_contains_lower_any": ["мүсірепов"]}
+      ]
+    },
+    {
+      "id": "compound_identity_question_routes_to_system",
+      "category": "system_identity",
+      "description": "v4.3.3: compound `А, сен кімсің және атың кім?` after a name introduction must route to AskAboutSystem (the pronoun-led `сен кімсің` part wins), so adam introduces itself rather than echoing the user's name.",
+      "turns": [
+        {"user": "менің атым Мәулет"},
+        {"user": "А, сен кімсің және атың кім?", "output_contains_lower_any": ["адам", "nlm", "nano"]}
+      ]
+    },
+    {
+      "id": "goal_continuity_same_topic_repeated",
+      "category": "goal_continuity",
+      "description": "Asking about the same topic twice in a row must not produce a regressive reply; both turns surface a substantive answer.",
+      "turns": [
+        {"user": "жер туралы айтшы", "output_not_contains_lower": ["түсінбедім"]},
+        {"user": "жер туралы айтшы", "output_not_contains_lower": ["түсінбедім"]}
+      ]
+    },
+    {
+      "id": "name_then_age_then_city_session_persists",
+      "category": "session_persistence",
+      "description": "A multi-slot profile build: name, age, city all in sequence. The first turn checks the slot echo (statement_of_name reliably interpolates `{name}`); the next two have no assertion because their families have bare variants (aspirational tracking via `age_statement_acknowledged` / `city_statement_acknowledged`). The point of THIS dialog is just that the multi-turn sequence runs without crash or refusal — session-persistence sanity.",
+      "turns": [
+        {"user": "менің атым Айгүл", "output_contains_lower_any": ["айгүл"]},
+        {"user": "менің жасым 25"},
+        {"user": "Шымкентте тұрамын"}
+      ]
+    },
+    {
+      "id": "self_correction_replaces_value",
+      "category": "belief_revision",
+      "description": "v4.1.0 belief revision: explicit self-correction `жоқ, мен Алматыда тұрамын` after a city statement updates the active fact. Final reply surfaces the corrected city via the belief_revision template family which interpolates `{new_value}` deterministically.",
+      "turns": [
+        {"user": "мен Астанада тұрамын"},
+        {"user": "жоқ, мен Алматыда тұрамын", "output_contains_lower_any": ["алматы"]}
+      ]
+    }
+  ]
+}

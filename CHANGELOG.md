@@ -7,6 +7,44 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.6] — 2026-04-27 — REPL replay battery + CONTRIBUTING.md + AskOccupation 1sg self-recall
+
+A test-layer expansion responding to Codex's 2026-04-27 finding that two real-REPL defects slipped through the cognitive_eval baseline because that harness asserts on trace signals (action / intent / epistemic / belief), not on what the user actually sees. v4.4.5 fixed those two; v4.4.6 closes the loop by adding a complementary surface-text harness so the same class of bug surfaces in CI next time.
+
+### `tests/repl_replay.rs` + `data/eval/repl_dialogs.json`
+
+New test target `repl_replay_baseline` runs each entry from `data/eval/repl_dialogs.json` through `Conversation::turn` with a deterministic seed (`turn_index as u64`), then asserts on per-turn substring expectations (`output_contains_lower_any`, `output_not_contains_lower`). Mirrors the v4.0.36 cognitive_eval contract structurally:
+
+- Aggregates by category, prints a baseline report, hard-gates CI red on canonical failures.
+- Supports `expected_failing: true` for aspirational dialogs that document known surface-text gaps without blocking releases. Aspirational PASSes are reported as "ready to promote".
+
+Initial dataset: **30 dialogs** across 11 categories (`profile_building`, `profile_recall`, `contradiction_recovery`, `system_identity`, `knowledge_query`, `social`, `edge_case`, `regression`, `goal_continuity`, `session_persistence`, `belief_revision`). Baseline lands as **26/26 canonical, 4 aspirational** — three documenting a real `statement_of_*` family gap (some variants don't echo the stored slot value) plus one carry-over locked closed.
+
+### Authoring policy — `CONTRIBUTING.md`
+
+New `CONTRIBUTING.md` codifies the load-bearing test-layer rule that has been operating informally since v4.3.2:
+
+> **Every dialog defect ships with at least one new cognitive scenario.**
+>
+> Defects from external review, real REPL traces, or user reports are not "fixed" until the scenario reproducing the bug lives in `data/eval/cognitive_dialog_dataset.json`.
+
+Plus a parallel rule for v4.4.6+: **every surface-text defect ships with at least one new REPL replay dialog.** The two rules converge on the same outcome — every defect leaves behind a permanent regression lock — but the harness it lands in depends on whether the bug was in the cognitive contour or in the rendered text.
+
+### `detect_ask_occupation` 1sg self-recall (v4.4.5-class fix)
+
+Surfaced by the new harness on first run: `менің мамандығым не?` after `мен мұғаліммін` was misclassified as `Intent::Unknown { noun_hint: Some("мамандық") }` and routed to `unknown.with_grounded_fact`, surfacing a generic definition («Мамандық — адамның кәсібі») instead of recalling the user's stored value via `ask_occupation.with_known_user`. Same pattern as v4.4.5's `detect_ask_age` fix — `detect_ask_occupation` only matched 2nd-person `мамандығың`/`мамандығыңыз` forms; the 1sg-possessive `мамандығым` plus a question particle (`не`/`қандай`) is the additional self-recall signal added.
+
+Subsequent in-scope follow-ups — `менің атым кім?` triggering a phantom contradiction when "Кім" gets parsed as a name — surfaced too but are deferred to v4.4.7. The harness is doing its job by surfacing them; per the new CONTRIBUTING policy, each one ships with its own dialog.
+
+### State
+
+| | v4.4.5 | v4.4.6 |
+|---|---|---|
+| Workspace tests | 680 | **681** (+1 = new repl_replay test) |
+| Cognitive eval | 54/54 canonical | 54/54 canonical (unchanged) |
+| REPL replay | — | **26/26 canonical + 4 aspirational** (new harness) |
+| Why patch | — | test infrastructure + 1 detector extension; no architectural change |
+
 ## [4.4.5] — 2026-04-27 — Real-dialog adequacy fixes: CheckContradiction renderer + AskAge self-recall
 
 External review (Codex, 2026-04-27 live REPL trace) flagged two user-visible defects in v4.4.0 that the internal test suite missed. Both are renderer/classification mismatches where the cognitive contour was right but the surface text leaked an incorrect commitment.
