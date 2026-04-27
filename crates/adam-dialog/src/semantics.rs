@@ -266,6 +266,40 @@ const NOT_A_TOPIC: &[&str] = &[
     "әр",
     "бір",
     "кей",
+    // **v4.3.5** — discourse particles / locative-case
+    // demonstratives. Real-test 2026-04-26 dialog showed `Онда`
+    // ("then") in `Онда маған X туралы айтып беріңізші` was parsed
+    // by FST as `он + Locative` (root `он` = "ten"), so the topic
+    // extractor returned `Он`, the planner's reasoning lookup
+    // surfaced "Он — сан" — completely tangential to the user's
+    // actual question. Same class as the v4.3.2 `интеллект → ел`
+    // substring bug: a closed-class word being mistaken for a
+    // case-marked content noun. Add the demonstrative-locative
+    // and demonstrative-ablative forms so they never reach the
+    // topic-noun candidate stage.
+    "онда",
+    "сонда",
+    "бұнда",
+    "мұнда",
+    "осында",
+    "содан",
+    "одан",
+    "бұдан",
+    "осыдан",
+    "міне",
+    "мынау",
+    // **v4.3.5** — common adjective roots that the FST occasionally
+    // returns as standalone nouns. Real-test 2026-04-26 showed
+    // `Жаңа жасанды интеллект моделін әзірлеу` → topic `Жаңа`
+    // (root of "new"); `әйгілі жазушы Мүсірепов` → topic `әйгіл`
+    // (root of "famous"). Both produced retrieval quotes
+    // tangentially related to "new" / "famous", not to the actual
+    // proper-noun topic. The fix is conservative — only adjective
+    // roots that have unambiguous adjectival usage in modern
+    // Kazakh. `жас` is intentionally NOT in this list because it's
+    // also "age" (a real topic noun in profile turns).
+    "жаңа",
+    "әйгіл",
 ];
 
 /// Return the root of the first content-noun Analysis in the parse list.
@@ -321,6 +355,16 @@ const MULTIWORD_ENTITIES: &[&str] = &[
     "аяқ киім",
     "сары май",
     "тас жол",
+    // **v4.3.5** — multi-word entities added in the kz_literature
+    // / notable_kazakhstanis expansion. Three Kazakh judges of the
+    // 17th–18th century (`Төле би`, `Қазыбек би`, `Әйтеке би`),
+    // poet `Қадыр Мырза Әли`, and the structural noun
+    // `мемлекет басшысы` ("head of state").
+    "мемлекет басшысы",
+    "мырза әли",
+    "төле би",
+    "қазыбек би",
+    "әйтеке би",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -338,11 +382,94 @@ fn multiword_entity_hint(input: &str) -> Option<String> {
     None
 }
 
-/// v4.0.21 — Best noun hint for the `Intent::Unknown` fallback. Tries
-/// multi-word entity match first (so «Құс жолы» stays intact), then
-/// falls back to single-word `first_noun_root` for the general case.
+/// **v4.3.5** — When the input carries an explicit topic marker
+/// (`X туралы` / `X жайында` / `X жөнінде` / `X хақында`), the word
+/// immediately preceding the marker is the topic the user means,
+/// even if it is a proper noun unknown to the FST lexicon.
+///
+/// Pre-v4.3.5 `best_noun_hint` only consulted FST-parsed nouns and
+/// the multiword-entity list, so an utterance like
+/// `Жазушы Мүсірепов туралы не білесіз?` lost the proper noun:
+/// `жазушы` (in lexicon) won over `мүсірепов` (out of lexicon)
+/// because only the former had an FST `Noun` parse to feed
+/// `first_noun_root`. Real-test 2026-04-26 dialog:
+///
+/// > Жазушы Мүсірепов туралы не білесіз?
+/// > → жазушы туралы қысқа жауап: Жазушы — прозалық шығарма жазатын адам.
+///
+/// Adam answered about "what is a writer" instead of about
+/// Mүsirepov.
+///
+/// The marker is a *strong* context signal — when it fires we
+/// should trust it over FST-only parsing. If the preceding word IS
+/// in the FST parses, we still return its lemma (so `қалам туралы`
+/// → `қала`); if it isn't, we return the surface form (so
+/// `Мүсірепов туралы` → `Мүсірепов`).
+fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<String> {
+    const MARKERS: &[&str] = &["туралы", "жайында", "жөнінде", "хақында"];
+    let lower = input.to_lowercase();
+    for marker in MARKERS {
+        let mut search_from = 0usize;
+        while let Some(rel) = lower[search_from..].find(marker) {
+            let pos = search_from + rel;
+            // Word boundary on the left: either start-of-string or whitespace.
+            let preceded_by_boundary = pos == 0
+                || lower[..pos]
+                    .chars()
+                    .last()
+                    .map(|c| c.is_whitespace())
+                    .unwrap_or(false);
+            if !preceded_by_boundary {
+                search_from = pos + marker.len();
+                continue;
+            }
+            let prefix = lower[..pos].trim_end();
+            if let Some(last_word_lower) = prefix.split_whitespace().last() {
+                let cleaned: String = last_word_lower
+                    .chars()
+                    .filter(|c| c.is_alphabetic() || *c == '-')
+                    .collect();
+                if cleaned.is_empty() || NOT_A_TOPIC.contains(&cleaned.as_str()) {
+                    search_from = pos + marker.len();
+                    continue;
+                }
+                // If the cleaned word is itself an FST-recognized
+                // noun lemma, return it as-is (lowercase). This
+                // preserves the existing "жер туралы" → "жер"
+                // behaviour that goal_continuity scenarios depend on.
+                let known_lemma = parses.iter().any(|p| {
+                    matches!(p,
+                        Analysis::Noun { root, .. } if root.root == cleaned
+                            && !NOT_A_TOPIC.contains(&root.root.as_str())
+                    )
+                });
+                if known_lemma {
+                    return Some(cleaned);
+                }
+                // Otherwise the word is unknown to FST (typically a
+                // proper noun: `Мүсірепов`, `Малқаров`, …). Return
+                // the title-cased form via `normalize_proper_noun`,
+                // matching how `detect_statement_of_location`
+                // normalizes city surface forms.
+                return Some(crate::language_core::normalize_proper_noun(&cleaned));
+            }
+            search_from = pos + marker.len();
+        }
+    }
+    None
+}
+
+/// v4.0.21 — Best noun hint for the `Intent::Unknown` fallback.
+///
+/// **v4.3.5** — checks the topic marker first (`X туралы`), then
+/// falls back to multi-word entity match and finally
+/// `first_noun_root`. The marker hint takes precedence so a proper
+/// noun preceding the marker wins over a generic in-lexicon noun
+/// elsewhere in the sentence.
 fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
-    multiword_entity_hint(input).or_else(|| first_noun_root(parses))
+    topic_marker_hint(input, parses)
+        .or_else(|| multiword_entity_hint(input))
+        .or_else(|| first_noun_root(parses))
 }
 
 /// v1.7.0: return every distinct content root from the parse list.

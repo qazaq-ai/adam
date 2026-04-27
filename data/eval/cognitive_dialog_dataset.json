@@ -503,6 +503,24 @@
         "epistemic_status": "Certain",
         "output_contains_lower_any": ["nano language model", "nlm"]
       }
+    },
+    {
+      "id": "topic_marker_picks_proper_noun_over_common_noun",
+      "category": "action_routing",
+      "description": "v4.3.5 (Track A): real-test 2026-04-26 dialog turn `Жазушы Мүсірепов туралы не білесіз?` was answered with a generic 'what is a writer' template because `жазушы` (in lexicon) won over `мүсірепов` (out of lexicon) for the noun_hint. New `topic_marker_hint` consults the marker `туралы` first and picks the immediately preceding word — proper noun extracted correctly. AskClarification fires (no v4.3.5 world_core entry yet for surname-only Müsirepov; that comes with the kz_literature expansion in the same release).",
+      "turns": ["Жазушы Мүсірепов туралы не білесіз?"],
+      "expect": {
+        "epistemic_status": "Tentative"
+      }
+    },
+    {
+      "id": "topic_marker_skips_onda_discourse_particle",
+      "category": "action_routing",
+      "description": "v4.3.5 (Track A): real-test 2026-04-26 dialog turn `Онда маған X туралы айтып беріңізші` had `Онда` parsed as `он + Locative` (root `он` = ten), so the topic extractor returned `Он` and the planner emitted `Он — сан`. Now `онда`/`сонда`/`бұнда`/`мұнда` are in NOT_A_TOPIC; topic_marker_hint correctly picks the proper noun before `туралы` (`Малқаров`).",
+      "turns": ["Онда маған ақын Омарбай Малқаров туралы айтып беріңізші"],
+      "expect": {
+        "epistemic_status": "Tentative"
+      }
     }
   ]
 }

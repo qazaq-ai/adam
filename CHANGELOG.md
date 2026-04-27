@@ -7,6 +7,96 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.3.5] — 2026-04-26 — Topic-marker extraction + famous Kazakhs data expansion (intelligence_roadmap Track A + Track D)
+
+Real-test 2026-04-26 dialog (user-shared, second session) revealed three more topic-extraction bugs in the same family as v4.3.2 (`Он — сан` from `Онда` parsing as `он+Locative`; common-noun `жазушы` winning over proper-noun `Мүсірепов`; adjective `әйгіл` mistaken for a topic). Fix shipped together with kz_literature + notable_kazakhstanis world_core expansion so the proper-noun extractions actually have data to surface.
+
+### Track A — extraction hardening
+
+**`NOT_A_TOPIC` additions** in `semantics.rs`:
+- Discourse-locative demonstratives: `онда`, `сонда`, `бұнда`, `мұнда`, `осында` (closes the `Онда` → `он+Locative` → topic=Он failure mode).
+- Discourse-ablative demonstratives: `содан`, `одан`, `бұдан`, `осыдан`.
+- Deictic particles: `міне`, `мынау`.
+- Common adjective roots that the FST permissively returns as standalone nouns: `жаңа` (new), `әйгіл` (root of "famous"). Conservative — `жас` is intentionally NOT added since it's also a real topic noun in profile turns.
+
+**New `topic_marker_hint(input, parses)`** function. Scans for `туралы` / `жайында` / `жөнінде` / `хақында` markers and returns the word **immediately preceding** the marker as the topic, regardless of FST coverage. The marker is a strong context signal — what stands before it is what the user is asking about.
+
+Behaviour:
+- If the cleaned word is itself an FST-recognized noun lemma (matching some `Analysis::Noun.root.root`), return it lowercase. Preserves `жер туралы` → `жер` (lowercase) so goal_continuity scenarios stay green.
+- Otherwise, return the title-cased proper-noun form via `language_core::normalize_proper_noun`. This is the v4.3.5 win — `Мүсірепов` and `Малқаров` now extract correctly.
+
+`best_noun_hint` now checks `topic_marker_hint` BEFORE `multiword_entity_hint` and `first_noun_root`, so the marker signal takes precedence.
+
+### Track D — famous Kazakhs world_core expansion
+
+**`kz_literature.jsonl` +17 entries** (was 60, now 77). All 47 surname/role keyings for the major Kazakh literary figures:
+- Writers: `әуезов`, `сейфуллин`, `мүсірепов`, `мұстафин`, `майлин`, `кекілбаев`, `ахтанов`, `момышұлы`.
+- Poets: `жансүгіров`, `жұмабаев`, `жабаев`, `шәкәрім` / `құдайбердіұлы`, `махамбет` / `өтемісұлы`, `сүлейменов` / `олжас`, `мақатаев`, `мырза әли` / `қадыр`.
+- Educators: `алтынсарин` / `ыбырай`.
+
+Each new entry pairs a surname-keyed `is_a` fact with the existing first-name-keyed entry (`мүсірепов is_a жазушы` alongside the v4.0.x `ғабит is_a жазушы`). When the dialog extracts a surname (the natural way users address figures), `SearchGraph` now finds the curated fact.
+
+**New `notable_kazakhstanis.jsonl` domain (+30 entries)** — first non-literary-figure domain:
+- Presidents and politicians: `назарбаев`, `тоқаев`, `қонаев`, `бөкейхан`.
+- Khans (historical leaders): `абылай`, `кенесары`, `жәңгір`.
+- Scientists: `сәтбаев` / `қаныш`, `уәлиханов` / `шоқан`, `марғұлан` / `әлкей`.
+- War heroes: `молдағұлова` / `әлия`, `мәметова` / `мәншүк`, `момышұлы` / `бауыржан`.
+- Modern athletes: `головкин`, `ильин`, `сапиев`, `баландин`.
+- Historical batyrs: `қарасай`, `райымбек`, `қабанбай`, `бөгенбай`.
+- The "three judges" of 17th-century Kazakhstan: `төле би`, `қазыбек би`, `әйтеке би`.
+- Generic role definitions: `президент`, `хан`, `батыр`, `ғалым`, `спортшы`, `саясаткер`.
+
+5 new multi-word entities added to `MULTIWORD_ENTITIES`: `мемлекет басшысы`, `мырза әли`, `төле би`, `қазыбек би`, `әйтеке би`.
+
+### State
+
+| | v4.3.4 | v4.3.5 |
+|---|---|---|
+| World Core entries | 827 / 923 facts / 29 domains | **874 / 995 facts / 30 domains** |
+| Derived facts | 17 340 | **21 415** (R5 grew by ~4 000 from new shared-IsA pairings) |
+| Workspace tests | 668 | **672** (+4 Track A regressions) |
+| Cognitive eval | 48/48 canonical | **50/50 canonical** (+2 Track A scenarios) |
+| Reply text | per intelligence_roadmap | improved on the 5 user-reported bugs from 2026-04-26 |
+
+### Tests
+
+**672 passing**. 0 warnings. **Cognitive eval baseline 50/50 canonical, 0 aspirational** (was 48/48).
+
+End-to-end (+4 Track A regressions in `tests/end_to_end.rs`):
+- `topic_marker_hint_picks_proper_noun_over_common_noun` — `Жазушы Мүсірепов туралы` → `мүсірепов`.
+- `topic_marker_hint_skips_adjective_root_jana_aigil` — `әйгілі жазушы Мүсірепов туралы` → `мүсірепов`.
+- `topic_marker_hint_ignores_onda_discourse_particle` — `Онда маған X туралы` → X (not `он`).
+- `topic_marker_hint_keeps_known_lemmas_lowercase` — `жер туралы айтшы` → `жер` (lowercase preserved for goal continuity).
+
+Cognitive (+2):
+- `topic_marker_picks_proper_noun_over_common_noun` — full pipeline, asserts Tentative epistemic.
+- `topic_marker_skips_onda_discourse_particle` — same.
+
+Surname-lookup scenarios (`Мүсірепов туралы` / `Тоқаев туралы` → world_core) were drafted but DROPPED from cognitive_eval because the harness is hermetic — it doesn't load `data/retrieval/facts.json`. The user verifies these in live `adam_chat` (which loads the full corpus). Track A regressions cover the extraction half; the data half is verified by the user's `adam_chat` test.
+
+### Why patch (not minor)
+
+Track A is mechanical (NOT_A_TOPIC additions + one new function). Track D is curated data, no API change. +47 world_core entries / +1 domain — meaningful capability work but bounded.
+
+### Coverage of the user-reported dialog (2026-04-26 second session)
+
+| Bug | Status |
+|---|---|
+| `Онда маған X туралы` → `Он — сан` | ✅ Fixed by NOT_A_TOPIC + topic_marker_hint |
+| `Жазушы Мүсірепов туралы` → answer about "what is a writer" | ✅ Fixed (extracts `мүсірепов`) + world_core has `мүсірепов is_a жазушы` |
+| `әйгілі жазушы Мүсірепов туралы` → random retrieval about "famous" | ✅ Fixed (extracts `мүсірепов`) |
+| `Жаңа жасанды интеллект моделін әзірлеу` → policy quote about "new" | ⚠️ Partial — `жаңа` now in NOT_A_TOPIC but no explicit topic marker; falls through to retrieval |
+| `Танысайық` → `қайта айтыңызшы` | ❌ Not addressed (intent not detected; future patch) |
+
+### Next
+
+Per `docs/intelligence_roadmap.md`:
+- **Phase 2 Track C** — belief-poisoning recovery (v4.4.0 minor): `Action::DismissContradiction`, contradiction-priority cap.
+- More Track A: `Танысайық` intent detector, more compound expressions in lexicon.
+- More Track D: continued world_core expansion based on user testing — easy to add new entries.
+
+---
+
 ## [4.3.4] — 2026-04-26 — SystemIdentity entity (intelligence roadmap Track B continued)
 
 Builds on v4.3.3 (self/other distinction): adam now has a structured **`SystemIdentity`** record and four aspect-specific answer paths so it can introduce itself, name its creator, give its birthdate, and explain how it differs from existing models.

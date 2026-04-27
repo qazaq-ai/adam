@@ -3854,6 +3854,118 @@ fn ask_about_system_architecture_aspect_mentions_difference() {
     );
 }
 
+/// **v4.3.5** — `topic_marker_hint` regression battery, mirroring
+/// the user-shared 2026-04-26 dialog turns that exposed three
+/// distinct extraction failures.
+///
+/// Pre-v4.3.5:
+/// - `Жазушы Мүсірепов туралы не білесіз?` → `noun_hint = жазушы`
+///   (common noun in lexicon won over proper noun out-of-lexicon).
+/// - `Мен әйгілі жазушы Мүсірепов туралы сұрап отырмын` →
+///   `noun_hint = әйгіл` (adjective root mistaken for noun).
+/// - `Онда маған X туралы` → `noun_hint = он` (`Онда` parsed as
+///   `он + Locative`; closed-class discourse particle leaked).
+///
+/// Post-v4.3.5: all three extract the **proper noun preceding the
+/// `туралы` marker**, regardless of FST coverage. The marker is a
+/// strong context signal — the word in front of it is what the
+/// user is asking about.
+#[test]
+fn topic_marker_hint_picks_proper_noun_over_common_noun() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("Жазушы Мүсірепов туралы не білесіз?", &lex, &repo, 0);
+    let trace = conv.intent_history.last().copied();
+    // Last recognised intent should be Unknown (no evidence path),
+    // but the `noun_hint` should be the proper noun, not the
+    // generic "жазушы".
+    let _ = trace; // intent_history records IntentKind only; check via re-parse below
+    let intent = adam_dialog::interpret_text_with_lexicon(
+        "Жазушы Мүсірепов туралы не білесіз?",
+        &[],
+        Some(&lex),
+    );
+    if let adam_dialog::Intent::Unknown { noun_hint, .. } = intent {
+        assert_eq!(
+            noun_hint.as_deref().map(str::to_lowercase).as_deref(),
+            Some("мүсірепов"),
+            "topic must be the proper noun before `туралы`, not the generic `жазушы`"
+        );
+    } else {
+        panic!("expected Intent::Unknown for the topic question");
+    }
+}
+
+#[test]
+fn topic_marker_hint_skips_adjective_root_jana_aigil() {
+    let Some(lex) = load_lexicon() else { return };
+    let intent = adam_dialog::interpret_text_with_lexicon(
+        "Мен әйгілі жазушы Мүсірепов туралы сұрап отырмын",
+        &[],
+        Some(&lex),
+    );
+    if let adam_dialog::Intent::Unknown { noun_hint, .. } = intent {
+        assert_eq!(
+            noun_hint.as_deref().map(str::to_lowercase).as_deref(),
+            Some("мүсірепов"),
+            "the adjective `әйгіл` must NOT win over the proper noun before `туралы`"
+        );
+    } else {
+        panic!("expected Intent::Unknown");
+    }
+}
+
+#[test]
+fn topic_marker_hint_ignores_onda_discourse_particle() {
+    let Some(lex) = load_lexicon() else { return };
+    let intent = adam_dialog::interpret_text_with_lexicon(
+        "Онда маған ақын Омарбай Малқаров туралы айтып беріңізші",
+        &[],
+        Some(&lex),
+    );
+    if let adam_dialog::Intent::Unknown { noun_hint, .. } = intent {
+        let lower = noun_hint.as_deref().map(str::to_lowercase);
+        assert_eq!(
+            lower.as_deref(),
+            Some("малқаров"),
+            "topic must be the surname before `туралы`, NOT `он` from `онда → он+Locative`"
+        );
+    } else {
+        panic!("expected Intent::Unknown");
+    }
+}
+
+/// **v4.3.5** — bare-noun topics (`жер туралы`) MUST stay
+/// lowercase, mirroring how `first_noun_root` normalizes content
+/// nouns. The goal_continuity scenarios depend on the lemma being
+/// `жер`, not `Жер`. Locks the regression closed.
+///
+/// Routes through `Conversation::turn_with_trace` rather than
+/// `interpret_text_with_lexicon` directly so the FST parses are
+/// available — `topic_marker_hint`'s lowercase branch fires when
+/// the cleaned word matches an FST-recognized noun lemma in the
+/// parse list.
+#[test]
+fn topic_marker_hint_keeps_known_lemmas_lowercase() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let (_out, trace) = conv.turn_with_trace("жер туралы айтшы", &lex, &repo, 0);
+    if let adam_dialog::Intent::Unknown { noun_hint, .. } = &trace.intent_after_injection {
+        assert_eq!(
+            noun_hint.as_deref(),
+            Some("жер"),
+            "known content-noun lemmas must come back lowercase"
+        );
+    } else {
+        panic!(
+            "expected Intent::Unknown, got {:?}",
+            trace.intent_after_injection
+        );
+    }
+}
+
 /// **v4.3.4** — alternate creator-question phrasing (`авторың кім`)
 /// also routes to the Creator aspect.
 #[test]
