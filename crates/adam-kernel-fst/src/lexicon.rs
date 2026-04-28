@@ -82,6 +82,18 @@ impl LexiconV1 {
         let curated: RootsFile = read_json(curated_path)?;
         let apertium: RootsFile = read_json(apertium_path)?;
 
+        // **v4.4.13** — `by_surface` is intentionally lossy single-POS
+        // lookup; downstream consumers that need fast root → entry
+        // resolution (and don't care about POS — e.g. spelling /
+        // morphology lookups) get one entry per surface. `entries_ordered`
+        // below is the **complete** set, no dedup — that's the source
+        // of truth the FST analyser iterates over. Pre-v4.4.13 both
+        // were lossy because `entries_ordered` was rebuilt from
+        // `by_surface.values()`, so multi-POS homonyms like `тау`
+        // (verb + noun) silently lost one reading and the FST returned
+        // only the wrong POS. Closes the v4.4.12 carry-forward where
+        // `тау` parsed only as a verb root despite `noun_apt_tau`
+        // existing in the lexicon.
         let mut by_surface: HashMap<String, RootEntry> = HashMap::new();
         for e in &curated.roots {
             by_surface.insert(e.root.clone(), e.clone());
@@ -92,12 +104,29 @@ impl LexiconV1 {
                 .or_insert_with(|| e.clone());
         }
 
-        // v3.2.0 — build a root-alphabetical Vec for deterministic
-        // `parser::analyse` iteration without paying BTreeMap
-        // lookup cost. Cost: one `Vec::clone` × N (16k entries) at
-        // load time + a sort. Amortised across the process lifetime.
-        let mut entries_ordered: Vec<RootEntry> = by_surface.values().cloned().collect();
-        entries_ordered.sort_by(|a, b| a.root.cmp(&b.root).then_with(|| a.id.cmp(&b.id)));
+        // v3.2.0 + v4.4.13 — build a root-alphabetical Vec for
+        // deterministic `parser::analyse` iteration. Source is the
+        // **full union** of curated + apertium entries, deduplicated
+        // only by `id` (catches exact-duplicate copies of the same
+        // root entry across both files, e.g. `noun_apt_tau` appearing
+        // in both pure_kazakh and apertium). Multiple entries with the
+        // same `root` but different `id` (and hence different POS or
+        // semantic class) are preserved — the analyser tries each in
+        // turn, so multi-POS homonyms produce multi-POS analyses as
+        // expected.
+        let mut entries_ordered: Vec<RootEntry> = curated
+            .roots
+            .iter()
+            .chain(apertium.roots.iter())
+            .cloned()
+            .collect();
+        entries_ordered.sort_by(|a, b| {
+            a.root
+                .cmp(&b.root)
+                .then_with(|| a.id.cmp(&b.id))
+                .then_with(|| a.part_of_speech.cmp(&b.part_of_speech))
+        });
+        entries_ordered.dedup_by(|a, b| a.id == b.id && a.part_of_speech == b.part_of_speech);
 
         Ok(Self {
             by_surface,

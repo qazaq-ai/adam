@@ -298,6 +298,30 @@
       ]
     },
     {
+      "id": "kazakhstan_rivers_via_locative_attributive_v4_4_13",
+      "category": "knowledge_query",
+      "description": "v4.4.13: `Қазақстандағы өзендер қандай?` surfaces the rivers list-summary fact. Pre-v4.4.13 this was already failing, just less obviously: with v4.4.10's first_noun_root fallback, `өзен` (now parseable post-v4.4.13 lexicon-dedup fix) would mask the locative-attributive signal. v4.4.13 reordered `best_noun_hint` to run `locative_attributive_hint` BEFORE `first_noun_root` because `-дағы` is a strong topic-narrowing signal (semantically equivalent to a `туралы` marker for the word it attaches to).",
+      "turns": [
+        {"user": "Қазақстандағы өзендер қандай?", "output_contains_lower_any": ["ертіс"]}
+      ]
+    },
+    {
+      "id": "kazakhstan_lakes_via_locative_attributive_v4_4_13",
+      "category": "knowledge_query",
+      "description": "v4.4.13: `Қазақстандағы көлдер қандай?` surfaces the lakes list-summary fact. Same chain as the rivers dialog above.",
+      "turns": [
+        {"user": "Қазақстандағы көлдер қандай?", "output_contains_lower_any": ["балқаш"]}
+      ]
+    },
+    {
+      "id": "kazakhstan_deserts_via_locative_attributive_v4_4_13",
+      "category": "knowledge_query",
+      "description": "v4.4.13: `Қазақстандағы шөлдер қандай?` surfaces the deserts list-summary fact.",
+      "turns": [
+        {"user": "Қазақстандағы шөлдер қандай?", "output_contains_lower_any": ["бетпақдала"]}
+      ]
+    },
+    {
       "id": "kazakhstan_mountains_via_locative_attributive_v4_4_12",
       "category": "knowledge_query",
       "description": "v4.4.12 (closes v4.4.11 carry-forward): `Қазақстандағы таулар қандай?` — the locative-attributive `-дағы` suffix is not yet modelled in FST morphotactics, so `қазақстандағы` returns no FST analysis. v4.4.12 added a string-level `locative_attributive_hint` fallback that strips the 4-char `-дағы / -дегі / -тағы / -тегі` tail and recovers the base noun. Combined with v4.4.11's input-overlap reranker, the question now surfaces the mountains list-summary fact.",

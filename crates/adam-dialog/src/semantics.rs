@@ -542,17 +542,28 @@ fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<String> {
 /// elsewhere in the sentence.
 fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
     topic_marker_hint(input, parses)
+        // v4.4.13 — locative-attributive suffix recovery, promoted
+        // to run BEFORE multiword/first_noun strategies. The
+        // `-дағы / -дегі / -тағы / -тегі` morpheme is a strong
+        // "specifically located in X" topic-narrowing signal,
+        // semantically equivalent to a `туралы` marker for the
+        // word it attaches to. When present, the recovered stem
+        // (e.g. `қазақстан` from `қазақстандағы`) is the most
+        // specific topic in the question and should win over any
+        // generic content noun (e.g. `тау` from `таулар`) found
+        // elsewhere. Pre-v4.4.13 this ran AFTER `first_noun_root`
+        // (introduced in v4.4.12 as a fallback when FST recovered
+        // nothing), which silently masked the locative-attributive
+        // signal whenever the FST happened to recognise a content
+        // noun in the surrounding text. v4.4.13's lexicon-dedup
+        // fix (which unblocked `тау` / `су` / `ер` noun readings)
+        // made that masking visible as a regression on the
+        // v4.4.12 `kazakhstan_mountains_via_locative_attributive_v4_4_12`
+        // dialog. Reordering closes the regression and matches
+        // the original v4.4.12 design intent.
+        .or_else(|| locative_attributive_hint(input))
         .or_else(|| multiword_entity_hint(input))
         .or_else(|| first_noun_root(parses))
-        // v4.4.12 — locative-attributive suffix fallback. When the
-        // FST and earlier strategies return nothing because the
-        // input contains a `-дағы / -дегі / -тағы / -тегі` form
-        // that the morphotactics doesn't yet model, strip the
-        // suffix string-side and recover the base noun. Closes
-        // the v4.4.11 carry-forward where «Қазақстандағы таулар
-        // қандай?» fell through to `unknown` because
-        // `қазақстандағы` had no FST analysis.
-        .or_else(|| locative_attributive_hint(input))
 }
 
 /// **v4.4.12** — string-level locative-attributive suffix strip.

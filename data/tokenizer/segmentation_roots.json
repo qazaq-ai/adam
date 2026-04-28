@@ -1,5 +1,5 @@
 {
-  "version": "4.4.12",
+  "version": "4.4.13",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -32917,6 +32917,27 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_su",
+      "root": "су",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_ot",
+      "root": "от",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_er",
+      "root": "ер",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
     }
   ]
 }

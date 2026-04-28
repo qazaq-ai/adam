@@ -4280,6 +4280,54 @@ fn kazakhstan_world_core_carries_all_17_oblasts() {
     );
 }
 
+/// **v4.4.13** — `тау` (mountain) must parse as a noun, not only
+/// as a verb root. Pre-v4.4.13 `Lexicon::load` deduplicated by
+/// surface root via a HashMap, so multi-POS homonyms lost one
+/// reading. The verb_tau / noun_apt_tau pair both keyed on
+/// `тау`, and only the last-inserted reading survived in
+/// `entries_ordered` — which the FST analyser iterates. v4.4.13
+/// separates `entries_ordered` (full union, no dedup) from
+/// `by_surface` (single-POS lookup table).
+#[test]
+fn lexicon_preserves_multi_pos_homonyms_for_tau() {
+    let Some(lex) = load_lexicon() else { return };
+    let analyses = adam_kernel_fst::parser::analyse("тау", &lex);
+    let has_noun = analyses
+        .iter()
+        .any(|a| matches!(a, adam_kernel_fst::parser::Analysis::Noun { .. }));
+    let has_verb = analyses
+        .iter()
+        .any(|a| matches!(a, adam_kernel_fst::parser::Analysis::Verb { .. }));
+    assert!(
+        has_noun,
+        "v4.4.13 lexicon-dedup fix: `тау` must parse as noun (mountain), not only as verb"
+    );
+    assert!(
+        has_verb,
+        "verb reading of `тау` must also still be available (homonym)"
+    );
+}
+
+/// **v4.4.13** — core nouns added to fill long-standing gaps in
+/// the FST lexicon: `су` (water), `от` (fire), `ер` (saddle /
+/// man-as-hero). All three were genuinely absent from the
+/// curated + apertium lexicon files until v4.4.13, so any input
+/// containing them returned no analysis.
+#[test]
+fn lexicon_includes_core_nouns_su_ot_er() {
+    let Some(lex) = load_lexicon() else { return };
+    for root in ["су", "от", "ер"] {
+        let analyses = adam_kernel_fst::parser::analyse(root, &lex);
+        let has_noun = analyses
+            .iter()
+            .any(|a| matches!(a, adam_kernel_fst::parser::Analysis::Noun { .. }));
+        assert!(
+            has_noun,
+            "v4.4.13 core-noun additions: `{root}` must parse as a noun"
+        );
+    }
+}
+
 /// **v4.4.12** — locative-attributive suffix recovery. The
 /// Kazakh `-дағы / -дегі / -тағы / -тегі` derivation (locative +
 /// attributive `-ғы`) is not yet modelled in the FST

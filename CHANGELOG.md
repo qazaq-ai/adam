@@ -7,6 +7,76 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.13] — 2026-04-28 — Lexicon hygiene patch: multi-POS homonym dedup + missing core nouns + `best_noun_hint` reorder
+
+Closes the two carry-forward FST/lexicon defects flagged at v4.4.12.
+
+### Defect #1 — multi-POS homonym dedup in `Lexicon::load`
+
+Pre-v4.4.13 `Lexicon::load` deduplicated by surface root via a `HashMap<String, RootEntry>`:
+
+```rust
+for e in &curated.roots { by_surface.insert(e.root.clone(), e.clone()); }
+for e in &apertium.roots { by_surface.entry(e.root.clone()).or_insert_with(...); }
+let entries_ordered: Vec<RootEntry> = by_surface.values().cloned().collect();
+```
+
+For `тау`, `pure_kazakh_roots.json` carried both `verb_tau` (verb) and `noun_apt_tau` (noun) entries, both keyed on `"тау"`. `HashMap::insert` returned the previous value but kept only the last write — so only ONE reading survived in `entries_ordered`, the source of truth the FST analyser iterates. Result: `тау` parsed only as a verb root, the noun "mountain" reading was inaccessible.
+
+This silently affected ~2 000 multi-POS homonyms (lexicon_stats: 14 528 entries kept out of 16 621 input rows; the gap was largely homonym dedup, not exact duplicates).
+
+**Fix.** Separate `entries_ordered` (full union of curated + apertium files, deduplicated only by `id` + `part_of_speech` to handle exact-copy entries that appear in both files) from `by_surface` (intentionally lossy single-POS lookup table preserved unchanged for downstream code that uses it for spelling/morphology lookups). The FST analyser iterates `entries_ordered` and tries each entry in turn, so multi-POS homonyms now produce multi-POS analyses as expected.
+
+### Defect #2 — three core nouns absent from the lexicon entirely
+
+Audit during the v4.4.13 trace found:
+- `су` (water) — missing
+- `от` (fire) — missing
+- `ер` (saddle / man-as-hero) — missing
+
+These are foundational Kazakh nouns appearing in everyday speech and the `world_core/geography_kz.jsonl` IsA-bridge facts. Added to `data/tokenizer/segmentation_roots.json` with the standard schema (`vowel_harmony`, `final_sound_class`).
+
+### Knock-on fix #3 — `best_noun_hint` chain reorder
+
+v4.4.12 added `locative_attributive_hint` as a fallback AFTER `first_noun_root` — correct at the time, when the FST recognised neither the locative-attributive `қазақстандағы` nor the surrounding content nouns like `таулар`. v4.4.13's lexicon-dedup fix unblocked content-noun parsing (`таулар → тау +Plural`), which made `first_noun_root` start returning `тау` and silently masking the locative-attributive signal. The v4.4.12 dialog `kazakhstan_mountains_via_locative_attributive_v4_4_12` regressed accordingly.
+
+**Fix.** Reordered `best_noun_hint` to run `locative_attributive_hint` immediately after `topic_marker_hint`, before `multiword_entity_hint` and `first_noun_root`. The `-дағы / -дегі / -тағы / -тегі` morpheme is a strong "specifically located in X" topic-narrowing signal, semantically equivalent to a `туралы` marker for the word it attaches to. When present, the recovered stem (`қазақстан` from `қазақстандағы`) is the most specific topic in the question and should win over any generic content noun (`тау` from `таулар`) found elsewhere.
+
+### Verified end-to-end (M2 8 GB release REPL)
+
+All 5 listing-style questions answer correctly with **both** locative and locative-attributive phrasings:
+
+| Question | Answer post-v4.4.13 |
+|---|---|
+| `Қазақстандағы таулар қандай?` | «Қазақстандағы ірі тау жоталары: Алтай, Тянь-Шань, Жетісу Алатауы, Қаратау, Ұлытау; биік шыңы — Хан Тәңірі.» |
+| `Қазақстандағы өзендер қандай?` | «Қазақстандағы ірі өзендер: Ертіс, Сырдария, Іле, Жайық, Есіл, Тобыл, Шу, Қаратал, Талас.» |
+| `Қазақстандағы көлдер қандай?` | «Қазақстандағы ірі көлдер мен теңіздер: Балқаш, Каспий, Арал, Зайсан, Алакөл, Тенгіз, Маркакөл.» |
+| `Қазақстандағы шөлдер қандай?` | «Қазақстандағы шөлдер: Бетпақдала, Қызылқұм, Үстірт, Мойынқұм.» |
+| `Қазақстанда қанша облыс бар?` | «Қазақстанда 17 облыс бар.» |
+
+### Tests
+
+- 2 new e2e regressions: `lexicon_preserves_multi_pos_homonyms_for_tau` (locks the verb + noun reading invariant), `lexicon_includes_core_nouns_su_ot_er` (locks the `су`/`от`/`ер` additions).
+- 3 new REPL replay dialogs: `kazakhstan_rivers_via_locative_attributive_v4_4_13`, `kazakhstan_lakes_via_locative_attributive_v4_4_13`, `kazakhstan_deserts_via_locative_attributive_v4_4_13`.
+
+Cognitive eval **59/59 canonical** (unchanged — the locking is at the REPL replay layer, since the affected behaviour is surface-text, not trace-signal). REPL replay **40/40 → 43/43 canonical**. Workspace **690 → 692**.
+
+### Deferred to a future minor
+
+A proper `Case::LocativeAttributive` variant in FST morphotactics (mentioned in v4.4.12) remains the right long-term fix; v4.4.13's string-side `locative_attributive_hint` is still in place as a fallback. Rolling them up together with full `-ғы / -гі / -қы / -кі` round-trip support is minor-tier work.
+
+### State
+
+| | v4.4.12 | v4.4.13 |
+|---|---|---|
+| Workspace tests | 690 | **692** (+2 e2e: lexicon-dedup + core-noun checks) |
+| Cognitive eval | 59/59 canonical | 59/59 canonical (unchanged) |
+| REPL replay | 40/40 canonical | **43/43 canonical** (+3 locative-attributive listing dialogs) |
+| FST analysis (`тау`) | verb only | **noun + verb** |
+| FST analysis (`су`) | no analysis | **noun** |
+| Lexicon entries surviving dedup | ~14 528 (HashMap-collapsed) | preserves multi-POS homonyms; `entries_ordered` carries the full union deduplicated only by id+POS |
+| Why patch | — | data + dispatch-tier; no new module / Action variant / predicate; backward-compatible (`by_surface` API unchanged, only `entries_ordered` widens) |
+
 ## [4.4.12] — 2026-04-28 — Locative-attributive `-дағы / -дегі / -тағы / -тегі` suffix recovery
 
 Closes the v4.4.11 carry-forward: `Қазақстандағы таулар қандай?` now answers with the literal mountains list.
