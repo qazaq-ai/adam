@@ -436,6 +436,7 @@ impl ActionPlanner {
             derived: &[],
             retrieval: None,
             rank_config: None,
+            query_input: None,
         };
         let result = crate::tool::Tool::dispatch(
             crate::tool::ToolCall::SearchBelief {

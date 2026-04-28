@@ -417,6 +417,10 @@ impl Conversation {
             derived: &self.derived_facts,
             retrieval: self.morpheme_index.as_ref(),
             rank_config: self.rank_config.as_ref(),
+            // v4.4.11 — pass the raw user input so SearchGraph can
+            // rerank candidate facts by content-token overlap with
+            // the question, not just by predicate centrality.
+            query_input: Some(input),
         };
         let tool_calls: Vec<crate::tool::ToolResult> = tool_plan
             .into_iter()

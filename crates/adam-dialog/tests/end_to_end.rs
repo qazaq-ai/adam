@@ -4280,6 +4280,43 @@ fn kazakhstan_world_core_carries_all_17_oblasts() {
     );
 }
 
+/// **v4.4.11** — list-summary world_core anchors. v4.4.11 added the
+/// input-morpheme-overlap reranker (`query_input` on
+/// `ToolContext`) and a `raw_text`-preserving renderer for
+/// `RelatedTo` facts whose object root contains «тізім». Combined,
+/// the system now surfaces the literal list when the user asks a
+/// listing-style question. This test locks the data-layer floor:
+/// every list-summary fact must contain its category name + a
+/// representative member, so the reranker has something concrete
+/// to surface.
+#[test]
+fn world_core_list_summary_facts_present_for_kazakhstan() {
+    let path = "../../data/world_core/geography_kz.jsonl";
+    if !std::path::Path::new(path).exists() {
+        return;
+    }
+    let raw = std::fs::read_to_string(path).expect("read geography_kz");
+    let summaries: &[(&str, &[&str])] = &[
+        ("аймақтары", &["17 облыс", "республикалық"]),
+        ("көлдер", &["Балқаш", "Каспий", "Зайсан"]),
+        ("өзендер", &["Ертіс", "Жайық", "Сырдария"]),
+        ("тау жоталары", &["Алтай", "Тянь-Шань", "Хан Тәңірі"]),
+        ("шөлдер", &["Бетпақдала", "Қызылқұм", "Үстірт"]),
+    ];
+    for (category, members) in summaries {
+        assert!(
+            raw.contains(category),
+            "world_core list-summary must mention category {category:?}"
+        );
+        for member in *members {
+            assert!(
+                raw.contains(member),
+                "world_core list-summary for {category} must mention {member:?}"
+            );
+        }
+    }
+}
+
 /// **v4.3.5** — `topic_marker_hint` regression battery, mirroring
 /// the user-shared 2026-04-26 dialog turns that exposed three
 /// distinct extraction failures.

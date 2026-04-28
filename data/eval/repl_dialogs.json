@@ -282,6 +282,38 @@
       ]
     },
     {
+      "id": "kazakhstan_oblast_list_v4_4_11",
+      "category": "knowledge_query",
+      "description": "v4.4.11 (closes v4.4.10 carry-forward): `Қазақстан аймақтарының атауларын білесіз бе?` — input-morpheme-overlap reranker now picks the `қазақстан related_to аймақтар тізімі` fact (`raw_text`: «Қазақстанның аймақтары — 17 облыс пен 3 республикалық маңызы бар қала.») over the most-central «Қазақстан — Орталық Азиядағы ел» IsA fact. Pre-v4.4.11 the predicate-rank tier (IsA=0, RelatedTo=6) made IsA always win regardless of query content.",
+      "turns": [
+        {"user": "Қазақстан аймақтарының атауларын білесіз бе?", "output_contains_lower_any": ["17 облыс"]}
+      ]
+    },
+    {
+      "id": "kazakhstan_lakes_list_v4_4_11",
+      "category": "knowledge_query",
+      "description": "v4.4.11: `Қазақстанда қандай көлдер бар?` surfaces the lakes list-summary fact. The reranker scores «көлдер» as a content-token match against the fact's `raw_text` («Қазақстандағы ірі көлдер мен теңіздер: Балқаш, Каспий, Арал, Зайсан, Алакөл, Тенгіз, Маркакөл.»), and the v4.4.11 RelatedTo renderer surfaces `raw_text` because the object root «көлдер тізімі» contains «тізім».",
+      "turns": [
+        {"user": "Қазақстанда қандай көлдер бар?", "output_contains_lower_any": ["балқаш"]}
+      ]
+    },
+    {
+      "id": "kazakhstan_mountains_list_v4_4_11",
+      "category": "knowledge_query",
+      "description": "v4.4.11: `Қазақстанда қандай таулар бар?` surfaces the mountains list-summary fact (raw_text: «Қазақстандағы ірі тау жоталары: Алтай, Тянь-Шань, Жетісу Алатауы, Қаратау, Ұлытау; биік шыңы — Хан Тәңірі.»). Note: the alternate phrasing `Қазақстандағы таулар қандай?` does NOT yet route correctly — the FST stumbles on the compound `-дағы` suffix and `қазақстандағы` is not recognised as a topic. Tracked for a future FST-coverage patch.",
+      "turns": [
+        {"user": "Қазақстанда қандай таулар бар?", "output_contains_lower_any": ["алтай"]}
+      ]
+    },
+    {
+      "id": "kazakhstan_deserts_list_v4_4_11",
+      "category": "knowledge_query",
+      "description": "v4.4.11: `Қазақстанда қандай шөлдер бар?` surfaces the deserts list-summary fact.",
+      "turns": [
+        {"user": "Қазақстанда қандай шөлдер бар?", "output_contains_lower_any": ["бетпақдала"]}
+      ]
+    },
+    {
       "id": "first_meeting_full_introduction_flow_v4_4_10",
       "category": "session_persistence",
       "description": "v4.4.10 multi-turn introduction flow mirroring the 2026-04-28 real-REPL transcript opening: greeting → wellbeing → intro proposal → name introduction. All four turns must produce non-refusal replies that progress the dialog.",

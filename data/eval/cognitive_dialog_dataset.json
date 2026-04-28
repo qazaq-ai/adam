@@ -589,6 +589,15 @@
       }
     },
     {
+      "id": "kazakhstan_listing_question_routes_to_knowledge_path",
+      "category": "action_routing",
+      "description": "v4.4.11: listing-style knowledge queries («аймақтарының атауларын») reach the knowledge-query / Unknown path. The actual reranker / list-summary surface-text is asserted in REPL replay's `kazakhstan_oblast_list_v4_4_11` (which loads runtime artefacts and exercises the full retrieval path); here we only lock the action-routing tier. With the cognitive-eval harness running with empty retrieval, epistemic lands on `Tentative` (no evidence to upgrade to Supported) — that's the correct floor and what we assert here.",
+      "turns": ["Қазақстан аймақтарының атауларын білесіз бе?"],
+      "expect": {
+        "epistemic_status": "Tentative"
+      }
+    },
+    {
       "id": "ask_name_self_recall_after_introduction",
       "category": "direct_answer",
       "description": "v4.4.9 (REPL replay surfaced this in v4.4.6, deferred through v4.4.8): `менің атым кім?` after `менің атым Дәулет` must classify as `AskName` and reply via `ask_name.with_known_user` template family with the stored name. Pre-v4.4.9 the 1sg-possessive `атым` matched `detect_statement_of_name`'s pattern 1 (`атым X` → name is the next token) and grabbed the literal `Кім` as the user's name, then logged a phantom `BeliefConflict` (Дәулет vs Кім) followed by a clarifying question that asked the user to pick between their actual name and the question word. Symmetric to v4.4.5 `detect_ask_age` fix but worse: belief got mutated, not just the surface text. Fix: interrogative-pronoun guard in `detect_statement_of_name` (refuses `кім / не / қандай / қайсысы` as name across all three patterns) + extended `detect_ask_name` (accepts 1sg `атым / есімім + кім / не`).",

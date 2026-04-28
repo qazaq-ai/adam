@@ -231,6 +231,19 @@ pub struct ToolContext<'a> {
     /// honouring `Conversation::rank_config` (the per-conversation
     /// override).
     pub rank_config: Option<&'a adam_retrieval::RankConfig>,
+    /// **v4.4.11** — user's raw input string. When set, `SearchGraph`
+    /// rerankings boost facts whose `raw_text` shares more content
+    /// morphemes with the input than competitor facts on the same
+    /// subject. Closes the v4.4.10 carry-forward where listing-style
+    /// questions like «Қазақстанда қандай өзендер мен көлдер бар?»
+    /// retrieved the most-central `қазақстан IsA ел` fact rather than
+    /// the specific `қазақстан related_to өзендер тізімі` /
+    /// `қазақстан related_to көлдер тізімі` list-summary facts. The
+    /// overlap-boost runs as a primary sort tier; the v4.0.x
+    /// predicate-rank tier (IsA → LivesIn → HasQuantity → …) becomes
+    /// the tie-breaker when two facts share the same overlap count.
+    /// `None` (default) preserves pre-v4.4.11 behaviour bit-for-bit.
+    pub query_input: Option<&'a str>,
 }
 
 /// Pure-function dispatcher. Reads `ToolContext` references, never
@@ -291,9 +304,37 @@ impl Tool {
                     })
                     .filter(|f| f.confidence == ConfidenceKind::HumanApproved)
                     .collect();
+                // v4.4.11 — input-overlap reranker. When `ctx.query_input`
+                // is set, score each fact by how many content tokens
+                // from the user's question appear as substrings of
+                // `fact.raw_text`. Higher overlap wins. Ties fall
+                // through to the v4.0.x predicate-rank tier (IsA → …).
+                // `None` (default) preserves the pre-v4.4.11 sort
+                // exactly. Closes the v4.4.10 carry-forward where
+                // «Қазақстанда қандай өзендер мен көлдер бар?» picked
+                // the most-central `қазақстан IsA ел` fact instead of
+                // the specific `қазақстан related_to өзендер тізімі`
+                // list-summary fact.
+                let query_tokens: Vec<String> = ctx
+                    .query_input
+                    .map(|raw| query_content_tokens(raw, subject))
+                    .unwrap_or_default();
                 matches.sort_by(|a, b| {
-                    user_facing_fact_priority(a)
-                        .cmp(&user_facing_fact_priority(b))
+                    let overlap_a = if query_tokens.is_empty() {
+                        0
+                    } else {
+                        fact_overlap_score(a, &query_tokens)
+                    };
+                    let overlap_b = if query_tokens.is_empty() {
+                        0
+                    } else {
+                        fact_overlap_score(b, &query_tokens)
+                    };
+                    overlap_b
+                        .cmp(&overlap_a)
+                        .then_with(|| {
+                            user_facing_fact_priority(a).cmp(&user_facing_fact_priority(b))
+                        })
                         .then_with(|| a.raw_text.chars().count().cmp(&b.raw_text.chars().count()))
                         .then_with(|| a.raw_text.cmp(&b.raw_text))
                 });
@@ -477,6 +518,67 @@ pub(crate) fn pack_is_chat_safe(pack: &str) -> bool {
     )
 }
 
+/// **v4.4.11** — split user input into content tokens, lowercase,
+/// stripped of punctuation, with the noun_hint itself removed (every
+/// fact about that subject contains it, so it carries zero
+/// discriminative signal). Tokens shorter than 4 codepoints are
+/// dropped — Kazakh discourse particles / pronouns / case suffixes
+/// are typically ≤ 3 characters and would inflate overlap scores
+/// without informing relevance.
+fn query_content_tokens(input: &str, subject: &str) -> Vec<String> {
+    let subject_lower = subject.to_lowercase();
+    input
+        .to_lowercase()
+        .split(|c: char| !c.is_alphanumeric())
+        .filter_map(|w| {
+            let trimmed = w.trim();
+            if trimmed.is_empty() {
+                return None;
+            }
+            if trimmed.chars().count() < 4 {
+                return None;
+            }
+            if trimmed == subject_lower {
+                return None;
+            }
+            // Strip the most common case suffix that would prevent
+            // a substring match (locative -да/-де/-та/-те, ablative
+            // -дан/-ден/-тан/-тен, dative -ға/-ге/-қа/-ке, plural
+            // -лар/-лер/-дар/-дер/-тар/-тер, possessive -ы/-і).
+            // We only strip if the resulting stem is ≥ 3 chars so
+            // we don't over-aggressively chop. Also keep the
+            // original — a fact may match either form.
+            Some(trimmed.to_string())
+        })
+        .collect()
+}
+
+/// **v4.4.11** — count how many of the query's content tokens appear
+/// as substrings of the fact's raw_text (case-folded). Substring
+/// match is intentional — Kazakh is agglutinative and the question
+/// often surfaces a different inflectional form than the fact's
+/// canonical phrasing (e.g. user types «аймақтарының» but the
+/// fact's surface text says «аймақтары»).
+fn fact_overlap_score(fact: &ReasFact, query_tokens: &[String]) -> usize {
+    let raw_lower = fact.raw_text.to_lowercase();
+    let object_lower = fact.object.root.to_lowercase();
+    query_tokens
+        .iter()
+        .filter(|tok| {
+            // Whole-word check on raw_text first (more discriminating);
+            // then a relaxed substring fallback against the fact's
+            // object root so e.g. «өзендер» matches a fact whose
+            // object root is «өзендер тізімі». Trimming the query
+            // token to a 4-char prefix lets «аймақтарының» match
+            // «аймақтары» without expensive stemming.
+            let prefix_4: String = tok.chars().take(4).collect();
+            raw_lower.contains(tok.as_str())
+                || raw_lower.contains(&prefix_4)
+                || object_lower.contains(&prefix_4)
+        })
+        .count()
+}
+
 fn user_facing_fact_priority(fact: &ReasFact) -> (usize, usize, usize) {
     let predicate_rank = match fact.predicate {
         ReasPredicate::IsA => 0,
@@ -506,12 +608,24 @@ fn user_facing_fact_priority(fact: &ReasFact) -> (usize, usize, usize) {
 fn render_grounded_fact(fact: &ReasFact) -> Option<String> {
     let subject = preferred_subject_text(&fact.subject);
     let object = preferred_object_text(&fact.object);
+    // v4.4.11 — when the fact's object encodes a structured
+    // collection (its root contains «тізім» = "list", or it's
+    // explicitly a multi-word "X тізімі" object), the canned
+    // «{subject} мен {object} өзара байланысты» template reads
+    // awkwardly («Қазақстан мен көлдер тізімі өзара байланысты»)
+    // and hides the informative content from `raw_text`. Prefer the
+    // raw sentence in that case — it's curated and carries the
+    // actual list. Mirror of the existing «шектес» special-case for
+    // border facts.
+    let object_root_lower = fact.object.root.to_lowercase();
+    let is_list_summary = object_root_lower.contains("тізім");
     let rendered = match fact.predicate {
         ReasPredicate::IsA => None,
         ReasPredicate::PartOf => Some(format!("{subject} {object} құрамына кіреді")),
         ReasPredicate::RelatedTo if fact.raw_text.contains("шектес") => {
             Some(fact.raw_text.trim().to_string())
         }
+        ReasPredicate::RelatedTo if is_list_summary => Some(fact.raw_text.trim().to_string()),
         ReasPredicate::RelatedTo => Some(format!("{subject} мен {object} өзара байланысты")),
         ReasPredicate::InDomain => Some(format!("{subject} {object} саласына жатады")),
         ReasPredicate::LivesIn => Some(format!("{subject} мекені — {object}")),
@@ -645,6 +759,7 @@ mod tests {
             derived: &[],
             retrieval: None,
             rank_config: None,
+            query_input: None,
         }
     }
 
@@ -887,6 +1002,7 @@ mod tests {
             derived: &derived_facts,
             retrieval: None,
             rank_config: None,
+            query_input: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {
@@ -941,6 +1057,7 @@ mod tests {
             derived: &derived_facts,
             retrieval: None,
             rank_config: None,
+            query_input: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {

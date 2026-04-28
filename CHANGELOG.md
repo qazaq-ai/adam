@@ -7,6 +7,64 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.11] — 2026-04-28 — Input-overlap retrieval reranker + list-summary renderer fix
+
+Closes the v4.4.10 carry-forward: listing-style questions now answer with literal lists.
+
+### The bug
+
+v4.4.10 authored 76 new geography world_core entries (17 oblasts, 6 rivers, 4 lakes, 5 mountains, 4 deserts, …) plus 6 list-summary entries whose `raw_text` carried the actual answer to listing-style questions like «Қазақстан аймақтарының атауларын білесіз бе?». The data was in place — the answer wasn't. Two reasons:
+
+1. **Predicate-rank picked IsA over RelatedTo.** `Tool::dispatch(SearchGraph)` sorted candidate facts by `user_facing_fact_priority`, which encodes a static predicate hierarchy (IsA=0, LivesIn=1, HasQuantity=2, …, RelatedTo=6). Among facts about `Қазақстан`, the bare «Қазақстан — Орталық Азиядағы ел» (IsA, rank 0) always beat «Қазақстан-related-to-аймақтар-тізімі» (RelatedTo, rank 6) regardless of what the user asked.
+2. **`RelatedTo` rendering hid the informative `raw_text`.** Even if a list-summary fact got picked, `render_grounded_fact` emitted the canned «{subject} мен {object} өзара байланысты» template — «Қазақстан мен көлдер тізімі өзара байланысты» — which is grammatical but unhelpful (the fact's `raw_text` «Қазақстандағы ірі көлдер мен теңіздер: Балқаш, Каспий, Арал, Зайсан, Алакөл, Тенгіз, Маркакөл.» was the actual answer).
+
+### Fix #1 — input-morpheme-overlap reranker
+
+`ToolContext` gained a `query_input: Option<&'a str>` field (default `None`, preserving pre-v4.4.11 behaviour bit-for-bit). `Conversation::turn_with_trace` populates it with the raw user input. `Tool::dispatch(SearchGraph)` now computes a content-token overlap score per candidate fact:
+
+- `query_content_tokens(input, subject)` — splits the input on non-alphanumeric chars, lowercases, drops tokens shorter than 4 codepoints (Kazakh case suffixes / pronouns), drops the noun_hint itself (zero discriminative signal — every fact about Қазақстан contains it).
+- `fact_overlap_score(fact, query_tokens)` — counts how many query tokens appear as substring matches in the fact's `raw_text` (case-folded). Uses a 4-char prefix fallback so agglutinative inflection («аймақтарының» vs «аймақтары») still matches.
+
+Higher overlap wins; the v4.0.x `user_facing_fact_priority` predicate-rank tier becomes the **tie-breaker**, not the primary signal. For «Қазақстан аймақтарының атауларын білесіз бе?» the «аймақ» token now matches the list-summary fact's `raw_text` while missing the IsA fact, so the list-summary wins.
+
+### Fix #2 — list-summary RelatedTo renderer
+
+`render_grounded_fact` gained a special-case for `RelatedTo` facts whose object root contains «тізім» (= "list"). In that case the renderer surfaces `fact.raw_text` directly, mirroring the existing «шектес» (border) special-case. Avoids the awkward «X мен Y өзара байланысты» phrasing for structured-collection objects.
+
+### Verified end-to-end
+
+All 5 listing-style questions from the v4.4.10 carry-forward now answer with literal lists (M2 8 GB release REPL):
+
+| Question | Pre-v4.4.11 | Post-v4.4.11 |
+|---|---|---|
+| `Қазақстан аймақтарының атауларын білесіз бе?` | «Қазақстан — Орталық Азиядағы ел.» | «Қазақстанның аймақтары — 17 облыс пен 3 республикалық маңызы бар қала.» |
+| `Қазақстанда қандай көлдер бар?` | (same generic) | «Қазақстандағы ірі көлдер мен теңіздер: Балқаш, Каспий, Арал, Зайсан, Алакөл, Тенгіз, Маркакөл.» |
+| `Қазақстанда қандай таулар бар?` | (same generic) | «Қазақстандағы ірі тау жоталары: Алтай, Тянь-Шань, Жетісу Алатауы, Қаратау, Ұлытау; биік шыңы — Хан Тәңірі.» |
+| `Қазақстанда қандай шөлдер бар?` | (same generic) | «Қазақстандағы шөлдер: Бетпақдала, Қызылқұм, Үстірт, Мойынқұм.» |
+| `Қазақстанда қанша облыс бар?` | «Қазақстанда 17 облыс бар.» (was already working via HasQuantity) | unchanged |
+
+### Tests
+
+- 1 new e2e regression `world_core_list_summary_facts_present_for_kazakhstan` locking the data-layer floor (every list-summary fact must mention its category + representative members).
+- 1 new cognitive scenario `kazakhstan_listing_question_routes_to_knowledge_path` (action_routing).
+- 4 new REPL replay dialogs (`kazakhstan_oblast_list_v4_4_11`, `kazakhstan_lakes_list_v4_4_11`, `kazakhstan_mountains_list_v4_4_11`, `kazakhstan_deserts_list_v4_4_11`) running with the v4.4.10 runtime-artefact loader, asserting on the literal answer text.
+
+Cognitive eval **57/57 → 58/58 canonical**. REPL replay **35/35 → 39/39 canonical**. Workspace **687 → 688**.
+
+### Carry-forward to v4.4.12
+
+`Қазақстандағы таулар қандай?` (alternate phrasing using `-дағы` compound suffix) still doesn't route correctly — the FST stumbles on `қазақстандағы` and the topic extractor doesn't recover `қазақстан`. Tracked for an FST-coverage patch. The locative phrasing «Қазақстанда қандай таулар бар?» works.
+
+### State
+
+| | v4.4.10 | v4.4.11 |
+|---|---|---|
+| Workspace tests | 687 | **688** (+1 e2e) |
+| Cognitive eval | 57/57 canonical | **58/58 canonical** (+1 scenario) |
+| REPL replay | 35/35 canonical | **39/39 canonical** (+4 dialogs) |
+| `ToolContext` | 5 fields | **6 fields** (+`query_input`) |
+| Why patch | — | retrieval-rerank + renderer special-case; no new module, no new `Action` variant, no new predicate; backward-compatible (default `None` preserves v4.4.10 behaviour) |
+
 ## [4.4.10] — 2026-04-28 — Kazakhstan administrative + physical geography expansion + `Танысайық` intent + `Қысқасы` topic-marker guard
 
 A real-REPL-driven release. User shared a 2026-04-28 transcript that surfaced **5 distinct issues** — 3 knowledge gaps (oblast count, oblast list, rivers/lakes), 2 dialog issues (`Танысайық` falling through to refusal, `Қысқасы` mispoarsing as topic-noun and triggering proverb misfire). All five addressed in one patch.
