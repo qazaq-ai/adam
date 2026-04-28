@@ -4280,6 +4280,56 @@ fn kazakhstan_world_core_carries_all_17_oblasts() {
     );
 }
 
+/// **v4.4.12** — locative-attributive suffix recovery. The
+/// Kazakh `-дағы / -дегі / -тағы / -тегі` derivation (locative +
+/// attributive `-ғы`) is not yet modelled in the FST
+/// morphotactics, so `қазақстандағы` returns no analysis and the
+/// pre-v4.4.12 `best_noun_hint` chain fell through to None.
+/// v4.4.12 added a string-level fallback `locative_attributive_hint`
+/// that strips the 4-char suffix tail and recovers the base noun.
+/// Closes the v4.4.11 carry-forward where `Қазақстандағы таулар
+/// қандай?` answered with the generic refusal.
+#[test]
+fn locative_attributive_suffix_recovers_topic_noun_for_kazakhstan() {
+    let Some(lex) = load_lexicon() else { return };
+    // The fallback works string-side on the raw input, so we
+    // don't need to thread parses through. The FST returns no
+    // analysis for `қазақстандағы` (the unmodelled `-дағы`
+    // suffix) — that's exactly what triggers the fallback.
+    let intent =
+        adam_dialog::interpret_text_with_lexicon("Қазақстандағы таулар қандай?", &[], Some(&lex));
+    if let adam_dialog::Intent::Unknown { noun_hint, .. } = intent {
+        assert_eq!(
+            noun_hint.as_deref(),
+            Some("қазақстан"),
+            "locative-attributive `қазақстандағы` must recover topic noun `қазақстан`"
+        );
+    } else {
+        panic!("unexpected intent: not Unknown");
+    }
+}
+
+/// **v4.4.12** — same fix verified on a different input shape:
+/// `Алматыдағы` (city + locative-attributive). The string-level
+/// fallback handles both back-vowel (`-дағы`) and front-vowel
+/// (`-дегі`) allomorphs because we strip a fixed suffix string,
+/// not a phonological pattern.
+#[test]
+fn locative_attributive_suffix_recovers_topic_noun_for_almaty() {
+    let Some(lex) = load_lexicon() else { return };
+    let intent =
+        adam_dialog::interpret_text_with_lexicon("Алматыдағы қалалар қандай?", &[], Some(&lex));
+    if let adam_dialog::Intent::Unknown { noun_hint, .. } = intent {
+        assert_eq!(
+            noun_hint.as_deref(),
+            Some("алматы"),
+            "locative-attributive `алматыдағы` must recover topic noun `алматы`"
+        );
+    } else {
+        panic!("unexpected intent: not Unknown");
+    }
+}
+
 /// **v4.4.11** — list-summary world_core anchors. v4.4.11 added the
 /// input-morpheme-overlap reranker (`query_input` on
 /// `ToolContext`) and a `raw_text`-preserving renderer for

@@ -589,6 +589,15 @@
       }
     },
     {
+      "id": "locative_attributive_suffix_recovers_topic_noun",
+      "category": "parse_failure",
+      "description": "v4.4.12: `Қазақстандағы таулар қандай?` — the locative-attributive `-дағы` suffix has no FST morphotactics rule yet, so `қазақстандағы` returns no analysis. v4.4.12 added a string-level fallback that strips the 4-char `-дағы` tail and recovers `қазақстан` as the topic noun. The cognitive-side invariant: epistemic must NOT land on Unknown (which is what happened pre-v4.4.12 when noun_hint was None) — Tentative is the correct floor since the recovered topic enables retrieval.",
+      "turns": ["Қазақстандағы таулар қандай?"],
+      "expect": {
+        "epistemic_status": "Tentative"
+      }
+    },
+    {
       "id": "kazakhstan_listing_question_routes_to_knowledge_path",
       "category": "action_routing",
       "description": "v4.4.11: listing-style knowledge queries («аймақтарының атауларын») reach the knowledge-query / Unknown path. The actual reranker / list-summary surface-text is asserted in REPL replay's `kazakhstan_oblast_list_v4_4_11` (which loads runtime artefacts and exercises the full retrieval path); here we only lock the action-routing tier. With the cognitive-eval harness running with empty retrieval, epistemic lands on `Tentative` (no evidence to upgrade to Supported) — that's the correct floor and what we assert here.",

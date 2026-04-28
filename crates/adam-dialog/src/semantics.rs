@@ -544,6 +544,65 @@ fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
     topic_marker_hint(input, parses)
         .or_else(|| multiword_entity_hint(input))
         .or_else(|| first_noun_root(parses))
+        // v4.4.12 — locative-attributive suffix fallback. When the
+        // FST and earlier strategies return nothing because the
+        // input contains a `-дағы / -дегі / -тағы / -тегі` form
+        // that the morphotactics doesn't yet model, strip the
+        // suffix string-side and recover the base noun. Closes
+        // the v4.4.11 carry-forward where «Қазақстандағы таулар
+        // қандай?» fell through to `unknown` because
+        // `қазақстандағы` had no FST analysis.
+        .or_else(|| locative_attributive_hint(input))
+}
+
+/// **v4.4.12** — string-level locative-attributive suffix strip.
+/// Kazakh forms a "located in X" attributive by attaching `-ғы /
+/// -гі / -қы / -кі` to the locative-cased stem, yielding four
+/// surface allomorphs `-дағы / -дегі / -тағы / -тегі`. The current
+/// FST morphotactics does not model this derivation, so words
+/// like «қазақстандағы», «алматыдағы», «мектептегі» return no
+/// analysis and the topic extractor recovers nothing useful.
+///
+/// This fallback is purely string-level: it scans whitespace-
+/// separated tokens, finds those ending in one of the four
+/// allomorphs, and strips the entire 4-char tail to recover the
+/// base noun. The recovered stem must be ≥ 3 codepoints and not
+/// in `NOT_A_TOPIC`. Returns the first qualifying stem.
+///
+/// Conservative by design — does not validate the stem against
+/// the lexicon (the FST gap is precisely that `тау` isn't always
+/// surfaced as a noun even when present in the lexicon). The
+/// 3-codepoint minimum is sufficient against false positives in
+/// practice — any random word ending in `-дағы` that ISN'T the
+/// locative-attributive of a real noun (e.g. as part of a longer
+/// derivation) is rare enough that the dialog layer's downstream
+/// retrieval/refusal handling absorbs the noise. Promote to a
+/// proper FST morphotactics rule when adding the
+/// `Case::LocativeAttributive` variant in a future minor.
+fn locative_attributive_hint(input: &str) -> Option<String> {
+    const SUFFIXES: &[&str] = &["дағы", "дегі", "тағы", "тегі"];
+    let lower = input.to_lowercase();
+    for raw_word in lower.split_whitespace() {
+        let word: String = raw_word
+            .chars()
+            .filter(|c| c.is_alphabetic() || *c == '-')
+            .collect();
+        let word_len = word.chars().count();
+        if word_len < 7 {
+            // Need ≥ 3 stem chars + 4 suffix chars.
+            continue;
+        }
+        for suffix in SUFFIXES {
+            if word.ends_with(suffix) {
+                let stem_chars = word_len - suffix.chars().count();
+                let stem: String = word.chars().take(stem_chars).collect();
+                if stem.chars().count() >= 3 && !NOT_A_TOPIC.contains(&stem.as_str()) {
+                    return Some(stem);
+                }
+            }
+        }
+    }
+    None
 }
 
 /// v1.7.0: return every distinct content root from the parse list.

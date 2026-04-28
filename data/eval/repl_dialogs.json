@@ -298,6 +298,14 @@
       ]
     },
     {
+      "id": "kazakhstan_mountains_via_locative_attributive_v4_4_12",
+      "category": "knowledge_query",
+      "description": "v4.4.12 (closes v4.4.11 carry-forward): `Қазақстандағы таулар қандай?` — the locative-attributive `-дағы` suffix is not yet modelled in FST morphotactics, so `қазақстандағы` returns no FST analysis. v4.4.12 added a string-level `locative_attributive_hint` fallback that strips the 4-char `-дағы / -дегі / -тағы / -тегі` tail and recovers the base noun. Combined with v4.4.11's input-overlap reranker, the question now surfaces the mountains list-summary fact.",
+      "turns": [
+        {"user": "Қазақстандағы таулар қандай?", "output_contains_lower_any": ["алтай"]}
+      ]
+    },
+    {
       "id": "kazakhstan_mountains_list_v4_4_11",
       "category": "knowledge_query",
       "description": "v4.4.11: `Қазақстанда қандай таулар бар?` surfaces the mountains list-summary fact (raw_text: «Қазақстандағы ірі тау жоталары: Алтай, Тянь-Шань, Жетісу Алатауы, Қаратау, Ұлытау; биік шыңы — Хан Тәңірі.»). Note: the alternate phrasing `Қазақстандағы таулар қандай?` does NOT yet route correctly — the FST stumbles on the compound `-дағы` suffix and `қазақстандағы` is not recognised as a topic. Tracked for a future FST-coverage patch.",

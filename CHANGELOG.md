@@ -7,6 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.12] — 2026-04-28 — Locative-attributive `-дағы / -дегі / -тағы / -тегі` suffix recovery
+
+Closes the v4.4.11 carry-forward: `Қазақстандағы таулар қандай?` now answers with the literal mountains list.
+
+### The bug
+
+Kazakh forms «located in X» attributives by attaching the derivational suffix `-ғы / -гі / -қы / -кі` to a locative-cased stem, yielding four surface allomorphs `-дағы / -дегі / -тағы / -тегі` (back-vowel + voiced, front-vowel + voiced, back-vowel + voiceless, front-vowel + voiceless). The current FST morphotactics encodes the seven canonical cases (Nominative … Instrumental) but not this locative-attributive derivation. Result: `қазақстандағы` returns no FST analysis at all, so `best_noun_hint` falls through to None and the dialog layer routes to `unknown` with the safe-fallback refusal «бұл туралы білмеймін».
+
+Trace pre-v4.4.12:
+```
+input:    Қазақстандағы таулар қандай?
+parses:   [ qandai ]                     ← only қандай parsed; қазақстандағы skipped
+intent:   Unknown { noun_hint: None }
+action:   AskClarification → ClarifyingQuestion
+output:   бұл туралы білмеймін
+```
+
+### Fix — `locative_attributive_hint` string-level fallback
+
+New helper in `crates/adam-dialog/src/semantics.rs`. Scans whitespace-separated input tokens, finds those ending in any of the four allomorphs, strips the 4-char tail, and returns the first stem that is ≥ 3 codepoints and not in `NOT_A_TOPIC`. Wired into `best_noun_hint` after `first_noun_root` so it only fires when FST + earlier strategies recovered nothing.
+
+This is **conservative by design** — pure string-level, no lexicon lookup. The 3-codepoint minimum filters obvious noise, and any random word ending in `-дағы` that isn't actually a locative-attributive is rare enough that downstream retrieval/refusal absorbs it. The proper fix is a `Case::LocativeAttributive` variant in the FST morphotactics, queued for a future minor; v4.4.12 unblocks the user-facing flow without that depth of change.
+
+Post-v4.4.12 trace:
+```
+input:    Қазақстандағы таулар қандай?
+locative_attributive_hint("қазақстандағы") → Some("қазақстан")
+intent:   Unknown { noun_hint: Some("қазақстан") }
+SearchGraph(subject=қазақстан) + v4.4.11 input-overlap reranker + list-summary renderer
+output:   Қазақстандағы ірі тау жоталары: Алтай, Тянь-Шань, Жетісу Алатауы, Қаратау, Ұлытау; биік шыңы — Хан Тәңірі.
+```
+
+### Tests
+
+- 2 new e2e regressions: `locative_attributive_suffix_recovers_topic_noun_for_kazakhstan` (locks `қазақстандағы → қазақстан`), `locative_attributive_suffix_recovers_topic_noun_for_almaty` (locks `алматыдағы → алматы`).
+- 1 new cognitive scenario `locative_attributive_suffix_recovers_topic_noun` (parse_failure category).
+- 1 new REPL replay dialog `kazakhstan_mountains_via_locative_attributive_v4_4_12` running through the full retrieval path.
+
+Cognitive eval **58/58 → 59/59 canonical**. REPL replay **39/39 → 40/40 canonical**. Workspace **688 → 690**.
+
+### Carry-forward to a future minor
+
+A proper `Case::LocativeAttributive` variant in `crates/adam-kernel-fst/src/morphotactics.rs` would: (a) parse `қазақстандағы` natively as a noun analysis with the new case, (b) make the v4.4.12 string-side fallback redundant, (c) enable round-trip synthesis. Out of patch scope; tracked.
+
+Side-issue surfaced during the v4.4.12 trace: `тау` (mountain) parses ONLY as a verb root in the current FST output, even though the `noun_apt_tau` lexicon entry exists. Looks like a noun-vs-verb POS arbitration filter excluding the apertium-import noun reading. Same with `су` (water) — apparently absent from the lexicon entirely. Both queued for an FST/lexicon-level patch.
+
+### State
+
+| | v4.4.11 | v4.4.12 |
+|---|---|---|
+| Workspace tests | 688 | **690** (+2 e2e) |
+| Cognitive eval | 58/58 canonical | **59/59 canonical** (+1 scenario) |
+| REPL replay | 39/39 canonical | **40/40 canonical** (+1 dialog) |
+| `best_noun_hint` chain | 3 strategies | **4 strategies** (+ `locative_attributive_hint`) |
+| Why patch | — | string-level fallback in dialog semantics; no FST/morphotactics change, no new module / Action variant / predicate; backward-compatible (only fires when earlier strategies returned None) |
+
 ## [4.4.11] — 2026-04-28 — Input-overlap retrieval reranker + list-summary renderer fix
 
 Closes the v4.4.10 carry-forward: listing-style questions now answer with literal lists.
