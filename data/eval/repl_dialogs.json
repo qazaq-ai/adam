@@ -13,8 +13,7 @@
     {
       "id": "city_statement_acknowledged",
       "category": "profile_building",
-      "description": "User states their city; the reply must surface the canonical name back. ASPIRATIONAL: pre-v4.4.6 the `statement_of_location` family includes generic acknowledgements like «түсіндім» that don't echo the slot — the seed-0 path picks one of those. Promote to canonical when every variant in the family interpolates `{city}`.",
-      "expected_failing": true,
+      "description": "v4.4.9 PROMOTED: user states their city, reply surfaces the canonical name. The pre-v4.4.6 «түсіндім» bare variant at index 0 of `statement_of_location` was rewritten in v4.4.9 to «{city} екен, түсіндім» so every variant interpolates `{city}`. The dialog is now canonical and locks the slot-echo invariant against future regressions.",
       "turns": [
         {"user": "Алматыда тұрамын", "output_contains_lower_any": ["алматы"]}
       ]
@@ -22,8 +21,7 @@
     {
       "id": "age_statement_acknowledged",
       "category": "profile_building",
-      "description": "User states their age; the reply must surface the number. ASPIRATIONAL: same UX gap as `city_statement_acknowledged` — `statement_of_age` family contains «жақсы жас» / «қуатты кезеңіңіз» variants that don't surface `{age}`. Promote when every variant interpolates the number.",
-      "expected_failing": true,
+      "description": "v4.4.9 PROMOTED: user states their age, reply surfaces the number. Pre-v4.4.6 the `statement_of_age` family had two bare variants («жақсы жас», «қуатты кезеңіңіз») that didn't echo `{age}`. v4.4.9 rewrote them as «{age} — жақсы жас» / «{age} — қуатты кезеңіңіз» so every variant interpolates the number.",
       "turns": [
         {"user": "менің жасым 40", "output_contains_lower_any": ["40"]}
       ]
@@ -31,8 +29,7 @@
     {
       "id": "occupation_statement_acknowledged",
       "category": "profile_building",
-      "description": "User states profession; the reply must surface the role. ASPIRATIONAL: same UX gap — `statement_of_occupation` family has bare «түсіндім» variants. Promote when every variant interpolates `{occupation}`.",
-      "expected_failing": true,
+      "description": "v4.4.9 PROMOTED: user states profession, reply surfaces the role. Pre-v4.4.6 the `statement_of_occupation` family had two bare variants («түсіндім», «еңбегіңізге сәттілік») that didn't echo `{occupation}`. v4.4.9 rewrote them as «{occupation} екен, түсіндім» / «{occupation} еңбегіңізге сәттілік».",
       "turns": [
         {"user": "мен мұғаліммін", "output_contains_lower_any": ["мұғалім"]}
       ]
@@ -40,27 +37,27 @@
     {
       "id": "name_recall_after_introduction",
       "category": "profile_recall",
-      "description": "After introducing a name, asking `менің атым кім?` must return the stored name, not a generic placeholder.",
+      "description": "v4.4.9-tightened: after introducing a name, asking `менің атым кім?` must return the stored name AND must NOT echo the question word `кім` as if it were a name (the latter half locks v4.4.9's interrogative-pronoun guard in place — pre-v4.4.9 the reply contained both `Дәулет` and `Кім` as a phantom-contradiction clarifying question, so the dialog passed the substring check by accident).",
       "turns": [
         {"user": "менің атым Дәулет", "output_contains_lower_any": ["дәулет"]},
-        {"user": "менің атым кім?", "output_contains_lower_any": ["дәулет"]}
+        {"user": "менің атым кім?", "output_contains_lower_any": ["дәулет"], "output_not_contains_lower": ["кім"]}
       ]
     },
     {
       "id": "city_recall_after_statement",
       "category": "profile_recall",
-      "description": "After stating a city, asking `мен қайда тұрамын?` must surface the stored city via `ask_location.with_known_user`. Setup turn (turn 0) deliberately carries no assertion — the recall (turn 1) is the load-bearing check.",
+      "description": "v4.4.9-tightened: after stating a city, asking `мен қайда тұрамын?` must surface the stored city via `ask_location.with_known_user`. Both turns now carry slot-echo assertions — the v4.4.9 `statement_of_location` rewrite made the setup turn assertable.",
       "turns": [
-        {"user": "Астанада тұрамын"},
+        {"user": "Астанада тұрамын", "output_contains_lower_any": ["астана"]},
         {"user": "мен қайда тұрамын?", "output_contains_lower_any": ["астана"]}
       ]
     },
     {
       "id": "age_self_recall_v4_4_5",
       "category": "profile_recall",
-      "description": "v4.4.5 regression — `менің жасым қанша?` after `менің жасым 40` was misclassified as StatementOfAge { years: None } pre-v4.4.5; the reply happened to surface 40 only because statement_of_age interpolates session.age. Post-v4.4.5 this routes to AskAge / ask_age.with_known_user. Setup turn carries no assertion (the statement_of_age family has bare variants — see aspirational `age_statement_acknowledged`).",
+      "description": "v4.4.5 regression — `менің жасым қанша?` after `менің жасым 40` was misclassified as StatementOfAge { years: None } pre-v4.4.5; the reply happened to surface 40 only because statement_of_age interpolates session.age. Post-v4.4.5 this routes to AskAge / ask_age.with_known_user. v4.4.9-tightened: setup turn now carries an `age` slot-echo assertion (the statement_of_age family rewrite made it assertable).",
       "turns": [
-        {"user": "менің жасым 40"},
+        {"user": "менің жасым 40", "output_contains_lower_any": ["40"]},
         {"user": "менің жасым қанша?", "output_contains_lower_any": ["40"]}
       ]
     },
@@ -76,9 +73,9 @@
     {
       "id": "contradiction_logged_renders_clarifying_question_v4_4_5",
       "category": "contradiction_recovery",
-      "description": "v4.4.5 (Codex 2026-04-27 REPL): two contradictory city statements must produce a clarifying question that names BOTH candidates. Pre-v4.4.5 the renderer fell through to statement_of_location and emitted «Алматыда екеніңізді есте сақтаймын» — committing to one of the contested values. The `output_not_contains_lower` assertion on turn 1 locks the bug closed; setup turn (turn 0) carries no assertion since the statement_of_location family has bare variants (see aspirational `city_statement_acknowledged`).",
+      "description": "v4.4.5 (Codex 2026-04-27 REPL): two contradictory city statements must produce a clarifying question that names BOTH candidates. Pre-v4.4.5 the renderer fell through to statement_of_location and emitted «Алматыда екеніңізді есте сақтаймын» — committing to one of the contested values. The `output_not_contains_lower` assertion on turn 1 locks the bug closed. v4.4.9-tightened: setup turn (turn 0) now carries a `city` slot-echo assertion.",
       "turns": [
-        {"user": "мен Астанада тұрамын"},
+        {"user": "мен Астанада тұрамын", "output_contains_lower_any": ["астана"]},
         {"user": "мен Алматыда тұрамын", "output_contains_lower_any": ["алматы"], "output_not_contains_lower": ["есте сақтаймын"]}
       ]
     },
@@ -244,11 +241,20 @@
     {
       "id": "name_then_age_then_city_session_persists",
       "category": "session_persistence",
-      "description": "A multi-slot profile build: name, age, city all in sequence. The first turn checks the slot echo (statement_of_name reliably interpolates `{name}`); the next two have no assertion because their families have bare variants (aspirational tracking via `age_statement_acknowledged` / `city_statement_acknowledged`). The point of THIS dialog is just that the multi-turn sequence runs without crash or refusal — session-persistence sanity.",
+      "description": "A multi-slot profile build: name, age, city all in sequence. v4.4.9-tightened: every turn now asserts on its own slot echo (the statement_of_age + statement_of_location rewrite removed the bare variants that made age/city turns unassertable pre-v4.4.9).",
       "turns": [
         {"user": "менің атым Айгүл", "output_contains_lower_any": ["айгүл"]},
-        {"user": "менің жасым 25"},
-        {"user": "Шымкентте тұрамын"}
+        {"user": "менің жасым 25", "output_contains_lower_any": ["25"]},
+        {"user": "Шымкентте тұрамын", "output_contains_lower_any": ["шымкент"]}
+      ]
+    },
+    {
+      "id": "ask_name_self_recall_no_phantom_kim_v4_4_9",
+      "category": "regression",
+      "description": "v4.4.9 explicit lock for the bug REPL replay surfaced in v4.4.6 and v4.4.8 deferred. Pre-v4.4.9 `менің атым кім?` parsed as `StatementOfName { name: Кім }` because `detect_statement_of_name`'s pattern 1 (`атым X`) blindly grabbed the next token. Once a real name was already stored, this logged a phantom `BeliefConflict` (Дәулет vs Кім) and emitted a clarifying-question reply naming both. Post-v4.4.9: interrogative-pronoun guard in `detect_statement_of_name` + 1sg-self-recall extension to `detect_ask_name` route this to `Intent::AskName` and the `ask_name.with_known_user` template family.",
+      "turns": [
+        {"user": "менің атым Дәулет"},
+        {"user": "менің атым кім?", "output_contains_lower_any": ["дәулет"], "output_not_contains_lower": ["кім", "ма, әлде"]}
       ]
     },
     {

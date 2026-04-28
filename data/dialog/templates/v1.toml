@@ -272,11 +272,18 @@ templates = [
     "менің білуімше, жасыңыз {age}",
 ]
 
+# v4.4.9 — every variant interpolates `{age}`. Pre-v4.4.9 the
+# family had two bare acknowledgment variants («жақсы жас»,
+# «қуатты кезеңіңіз») that read fine in isolation but broke the
+# user-facing read of the v4.4.6 REPL replay battery: the user had
+# just told the system a number, and the seed-0 reply came back
+# without echoing it. Promoted aspirational dialog
+# `age_statement_acknowledged` to canonical at v4.4.9.
 [[families]]
 key = "statement_of_age"
 templates = [
-    "жақсы жас",
-    "қуатты кезеңіңіз",
+    "{age} — жақсы жас",
+    "{age} — қуатты кезеңіңіз",
     "{age} жас — тамаша кезең",
     "жасыңыз {age} екен",
     "{name}, {age} жастасыз, тамаша",
@@ -308,10 +315,17 @@ templates = [
     "{city} — {geo_kind}; соған жақын жақтансыз",
 ]
 
+# v4.4.9 — every variant interpolates `{city}`. Pre-v4.4.9 the
+# bare «түсіндім» variant at index 0 broke the seed-0 read in the
+# v4.4.6 REPL replay battery and made the
+# `contradiction_logged_renders_clarifying_question_v4_4_5` setup
+# turn unassertable. Replaced with a city-echoing acknowledgment.
+# Promoted aspirational dialog `city_statement_acknowledged` to
+# canonical at v4.4.9.
 [[families]]
 key = "statement_of_location"
 templates = [
-    "түсіндім",
+    "{city} екен, түсіндім",
     "{city} жақсы мекен екен",
     "{city} туралы естігенім бар",
     "{city|locative} тұратыныңызды түсіндім",
@@ -346,11 +360,18 @@ templates = [
     "{occupation} — сіздің кәсібіңіз",
 ]
 
+# v4.4.9 — every variant interpolates `{occupation}`. Pre-v4.4.9
+# two bare variants («түсіндім», «еңбегіңізге сәттілік») broke
+# the seed-0 read in the v4.4.6 REPL replay battery (the user had
+# just told the system their profession, the reply came back
+# without echoing it). Replaced with occupation-echoing
+# acknowledgments. Promoted aspirational dialog
+# `occupation_statement_acknowledged` to canonical at v4.4.9.
 [[families]]
 key = "statement_of_occupation"
 templates = [
-    "түсіндім",
-    "еңбегіңізге сәттілік",
+    "{occupation} екен, түсіндім",
+    "{occupation} еңбегіңізге сәттілік",
     "{occupation} екеніңізді түсіндім",
     "{occupation} болу жауапты іс",
     "сіз {occupation} болып еңбек етіп жүр екенсіз",

@@ -523,11 +523,16 @@ fn response_ask_age() {
 
 #[test]
 fn response_statement_of_age() {
+    // v4.4.9 — every variant in `statement_of_age` interpolates
+    // `{age}`. Pre-v4.4.9 «жақсы жас» / «қуатты кезеңіңіз» were
+    // bare; the v4.4.9 rewrite prepended the slot to make the
+    // family seed-uniform on slot-echo. Promoted aspirational
+    // dialog `age_statement_acknowledged` to canonical at v4.4.9.
     assert_response_with_toml(
         "менің жасым отыз",
         &[
-            "жақсы жас",
-            "қуатты кезеңіңіз",
+            "30 — жақсы жас",
+            "30 — қуатты кезеңіңіз",
             "30 жас — тамаша кезең",
             "жасыңыз 30 екен",
         ],
@@ -590,10 +595,14 @@ fn response_ask_location_with_known_geo_feature_profile() {
 
 #[test]
 fn response_statement_of_location() {
+    // v4.4.9 — every variant in `statement_of_location`
+    // interpolates `{city}`. Pre-v4.4.9 the bare «түсіндім» at
+    // index 0 broke the seed-0 read of the v4.4.6 REPL replay
+    // battery; rewritten as «{city} екен, түсіндім».
     assert_response_with_toml(
         "мен Алматыданмын",
         &[
-            "түсіндім",
+            "Алматы екен, түсіндім",
             "Алматы жақсы мекен екен",
             "Алматы туралы естігенім бар",
             "Алматыда тұратыныңызды түсіндім",
@@ -651,11 +660,15 @@ fn response_ask_occupation_with_known_user_profile() {
 
 #[test]
 fn response_statement_of_occupation() {
+    // v4.4.9 — every variant in `statement_of_occupation`
+    // interpolates `{occupation}`. Pre-v4.4.9 «түсіндім» and
+    // «еңбегіңізге сәттілік» were bare; rewritten to prepend the
+    // occupation so the family is seed-uniform on slot-echo.
     assert_response_with_toml(
         "мен мұғаліммін",
         &[
-            "түсіндім",
-            "еңбегіңізге сәттілік",
+            "мұғалім екен, түсіндім",
+            "мұғалім еңбегіңізге сәттілік",
             "мұғалім екеніңізді түсіндім",
             "мұғалім болу жауапты іс",
             "сіз мұғалім болып еңбек етіп жүр екенсіз",
@@ -4045,6 +4058,86 @@ fn ask_age_self_recall_returns_stored_value() {
     assert!(
         out.contains("40"),
         "self-recall must surface the stored value — got {out:?}"
+    );
+}
+
+/// **v4.4.9** — `менің атым кім?` after `менің атым Дәулет` must
+/// route to `Intent::AskName` and answer from session storage. The
+/// REPL replay battery surfaced this on first run in v4.4.6 and
+/// v4.4.8 deferred it; the bug was symmetric to the v4.4.5 AskAge
+/// fix and v4.4.6 AskOccupation fix but **worse**: pre-v4.4.9 the
+/// 1sg-possessive `атым` matched
+/// `detect_statement_of_name`'s "атым X" pattern and grabbed the
+/// literal `Кім` as the user's name, then logged a phantom
+/// `BeliefConflict` (Дәулет vs Кім) followed by a clarifying
+/// question that asked the user to pick between their actual name
+/// and the question word. Two complementary fixes:
+/// 1. `detect_statement_of_name` refuses interrogative pronouns
+///    (`кім` / `не` / `қандай` / `қайсысы`) as the candidate
+///    name across all three patterns.
+/// 2. `detect_ask_name` extended to match the 1sg form
+///    (`атым / есімім + кім / не`) so the question reaches the
+///    `ask_name.with_known_user` template family.
+#[test]
+fn ask_name_self_recall_returns_stored_value_no_phantom_conflict() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+    let (out, trace) = conv.turn_with_trace("менің атым кім?", &lex, &repo, 1);
+    assert!(
+        matches!(
+            trace.intent_after_verification,
+            adam_dialog::Intent::AskName
+        ),
+        "1sg-self-recall must classify as AskName, got {:?}",
+        trace.intent_after_verification
+    );
+    let lower = out.to_lowercase();
+    assert!(
+        lower.contains("дәулет"),
+        "self-recall must surface the stored name — got {out:?}"
+    );
+    assert!(
+        !lower.contains("кім"),
+        "reply must not echo the question word as if it were a name — got {out:?}"
+    );
+    // No phantom contradiction was logged: belief still has one
+    // active name fact, no conflicts.
+    assert_eq!(
+        conv.belief.contradictions.len(),
+        0,
+        "self-recall question must not trigger a phantom BeliefConflict"
+    );
+}
+
+/// **v4.4.9** — bare interrogative pronoun guard. Even without a
+/// session-stored name, `менің атым кім?` must NOT pre-commit
+/// `Кім` as a name; it should refuse / answer-tentatively rather
+/// than misclassify. Belongs in the same regression family as the
+/// stored-name test above.
+#[test]
+fn ask_name_self_recall_with_empty_session_does_not_capture_kim() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let (_out, trace) = conv.turn_with_trace("менің атым кім?", &lex, &repo, 0);
+    // The intent must NOT be StatementOfName{Кім}. AskName is
+    // the correct classification (the templates will land on
+    // `ask_name`, the bare-self-introduction family, since no
+    // name is stored yet).
+    assert!(
+        !matches!(
+            trace.intent_after_verification,
+            adam_dialog::Intent::StatementOfName { .. }
+        ),
+        "interrogative pronoun must never be captured as a name; got {:?}",
+        trace.intent_after_verification
+    );
+    // Session must remain empty — no `name` slot was filled.
+    assert!(
+        conv.session.get("name").is_none(),
+        "session must not capture `Кім` as a name"
     );
 }
 

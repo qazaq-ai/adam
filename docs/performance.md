@@ -35,6 +35,37 @@ the system class adam is **not** trying to compete with (LLMs).
   ./target/release/adam_chat --once "сәлем"` for RSS. Numbers in
   this doc are point-in-time M2-baseline; re-run before editing.
 
+### Thermal-state caveat (v4.4.9)
+
+The numbers below are **M2 in cool steady state** — the chip
+hasn't been under sustained compute for the last few minutes. On
+this hardware, sustained `cargo` activity (full workspace test
+sweeps, repeated `cargo bench` runs, large `cargo build` rebuilds)
+will warm the package enough to engage thermal throttling, which
+on the 8 GB MacBook Air uniformly drops single-core boost clock
+from ~3.5 GHz to ~2.0 GHz. Under throttled state, every bench
+scenario reports **~70 % higher p50** (e.g. `social_greeting`
+1.07 ms → ~1.85 ms, `cold_start_conversation` 219 ns → ~370 ns).
+
+This is purely an environment-vs-environment difference, not a
+code regression. v4.4.9 was tagged after a stash-and-re-bench
+showed the same throttled numbers with code reverted to v4.4.8 —
+proving the elevation was thermal, not algorithmic.
+
+**To reproduce the cool-state numbers below:**
+
+1. Quit other heavy processes (browsers, IDE rebuilders).
+2. Wait ~5 minutes from the last `cargo` invocation, or work on a
+   freshly-rebooted Mac.
+3. Run `cargo bench -p adam-dialog --bench turn_latency` once and
+   discard the result (warmup).
+4. Run again — the second result is the steady-state cool number.
+
+If you only have a thermally-warm Mac available, divide observed
+p50 by ~1.7 to estimate the cool baseline. The performance
+regression policy in `CONTRIBUTING.md` was clarified at v4.4.9 to
+require apples-to-apples thermal state when comparing.
+
 ## Per-turn latency
 
 Median (p50) latency reported, with the 95% confidence band from

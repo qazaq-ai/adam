@@ -763,6 +763,24 @@ fn detect_ask_name(joined: &str) -> bool {
         || (joined.contains("атыңыз") && joined.contains("кім"))
         || joined.contains("есімің")
         || joined.contains("есіміңіз")
+        // v4.4.9 — 1sg self-recall form: "менің атым кім?",
+        // "есімім кім / не / қандай?". Mirrors the v4.4.5 fix to
+        // `detect_ask_age` for `менің жасым қанша?` and the v4.4.6
+        // fix to `detect_ask_occupation` for `менің мамандығым не?`.
+        // Pre-v4.4.9 the 1sg-possessive `атым` matched
+        // `detect_statement_of_name`'s pattern 1 ("атым X") and
+        // grabbed the literal `кім` as the user's name, then logged
+        // a phantom contradiction (Дәулет vs Кім) the next time the
+        // session already had a real name. The asymmetric guard in
+        // `detect_statement_of_name` (refuses interrogative
+        // pronouns as names) is the actual bug fix; this extension
+        // routes the 1sg-self-recall question to `Intent::AskName`
+        // so it answers from session storage via
+        // `ask_name.with_known_user`.
+        || (joined.contains("атым")
+            && (joined.contains("кім") || joined.contains("не")))
+        || (joined.contains("есімім")
+            && (joined.contains("кім") || joined.contains("не")))
 }
 
 fn detect_statement_of_wellbeing(tokens: &[String], joined: &str) -> bool {
@@ -789,15 +807,40 @@ fn detect_statement_of_name(
     raw_tokens: &[String],
     joined: &str,
 ) -> Option<String> {
+    // v4.4.9 — interrogative-pronoun guard. The 1sg-possessive
+    // forms `атым` / `есімім` collide with the user asking about
+    // their OWN stored name: `менің атым кім?` lexes as
+    // `[менің, атым, кім, ?]`, pattern 1 below ("атым X" → name
+    // is the next token) would grab the literal `Кім` as a name
+    // and — once a real name was already stored — log a phantom
+    // `BeliefConflict` (Дәулет vs Кім) followed by a clarifying
+    // question that asked the user to pick between their actual
+    // name and the question word. Refuse the match when the
+    // candidate is an interrogative pronoun. Mirror of v4.4.5
+    // `detect_statement_of_age` question-particle guard.
+    let is_interrogative_pronoun = |t: &str| {
+        let lower = t.to_lowercase();
+        matches!(
+            lower.as_str(),
+            "кім" | "кiм" | "не" | "қандай" | "қайсысы" | "ким"
+        )
+    };
+
     // Pattern 1: "атым X".
     if let Some(i) = tokens.iter().position(|t| t == "атым") {
         if let Some(name) = raw_tokens.get(i + 1) {
+            if is_interrogative_pronoun(name) {
+                return None;
+            }
             return Some(normalize_proper_noun(name));
         }
     }
     // Pattern 3: "есімім X".
     if let Some(i) = tokens.iter().position(|t| t == "есімім") {
         if let Some(name) = raw_tokens.get(i + 1) {
+            if is_interrogative_pronoun(name) {
+                return None;
+            }
             return Some(normalize_proper_noun(name));
         }
     }
@@ -809,6 +852,9 @@ fn detect_statement_of_name(
         ) {
             if end > start + 1 {
                 if let Some(name) = raw_tokens.get(start + 1) {
+                    if is_interrogative_pronoun(name) {
+                        return None;
+                    }
                     return Some(normalize_proper_noun(name));
                 }
             }

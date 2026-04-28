@@ -134,11 +134,23 @@ regression **> 20 %** on any scenario must either be:
 1. justified in the release notes (a new capability landed that
    explains the cost), with `docs/performance.md` updated to
    reflect the new baseline, or
-2. rolled back before tagging.
+2. rolled back before tagging, or
+3. shown to be **thermal**, not algorithmic, by reverting the
+   patch (e.g. `git stash`) and re-benching from the same shell —
+   if the elevation persists with code reverted, it's
+   environmental and not a regression.
+
+The third option is the v4.4.9 clarification. Sustained `cargo`
+activity warms the M2 package enough to engage thermal throttling,
+which uniformly drops every scenario's p50 by ~70 %. Compare on
+the same thermal state — both runs after ≥5 min idle from a cool
+start, or both after a deliberate warmup loop. The
+[docs/performance.md](docs/performance.md) "Thermal-state caveat"
+section has the reproduction protocol.
 
 `/usr/bin/time -l ./target/release/adam_chat --once "сәлем"` is
-the secondary check for max RSS regressions; the same
-> 20 % rule applies.
+the secondary check for max RSS regressions; the same > 20 % rule
+applies.
 
 ## Documentation refresh on every release
 

@@ -7,6 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.9] — 2026-04-27 — AskName 1sg self-recall + slot-echo aspirationals promoted
+
+Two complementary patches that close the v4.4.6-surfaced backlog and tighten the test layer.
+
+### Defect — AskName 1sg self-recall (REPL-replay-surfaced, deferred from v4.4.6)
+
+**Repro pre-v4.4.9:**
+```
+turn 1: «менің атым Дәулет»  →  StatementOfName { name: "Дәулет" }   ✓
+turn 2: «менің атым кім?»     →  StatementOfName { name: "Кім" }     ✗
+                              →  belief: contested=2 conflicts=1 (Дәулет vs Кім)
+                              →  output: «сәл шатастым — сіз Дәулет-да ма, әлде Кім-да ма?»
+```
+The 1sg-possessive `атым` matched `detect_statement_of_name`'s pattern 1 (`атым X`), grabbed the question word `Кім` as the "name", logged a phantom `BeliefConflict`, and emitted a clarifying question naming both. **Worse than the v4.4.5 / v4.4.6 self-recall bugs**: belief got mutated, not just surface text. The REPL replay battery surfaced this on its v4.4.6 first run; deferred through v4.4.7 / v4.4.8.
+
+**Fix.** Two complementary changes in `crates/adam-dialog/src/semantics.rs`:
+1. **Interrogative-pronoun guard in `detect_statement_of_name`** — refuses `кім / не / қандай / қайсысы` as the candidate name across all three patterns (`атым X`, `есімім X`, `мені X деп атайды`). Mirror of the v4.4.5 question-particle guard in `detect_statement_of_age`.
+2. **`detect_ask_name` extended for 1sg** — accepts `атым / есімім + кім / не` so the 1sg-self-recall question reaches `Intent::AskName` and the `ask_name.with_known_user` template family.
+
+Post-fix: `intent = AskName`, `template_key = ask_name.with_known_user`, output «сіздің атыңыз Дәулет», `belief.contradictions.len() = 0`.
+
+### Promotion — 3 v4.4.6 aspirational REPL replay dialogs to canonical
+
+Pre-v4.4.9 the `statement_of_age`, `statement_of_location`, `statement_of_occupation` template families each carried 1–2 bare acknowledgment variants («түсіндім», «жақсы жас», «қуатты кезеңіңіз», «еңбегіңізге сәттілік») that didn't interpolate the slot. Seed-0 routinely landed on these and the v4.4.6 REPL replay battery flagged the gap with three `expected_failing: true` aspirational dialogs.
+
+**Fix.** Rewrote 5 bare variants in `data/dialog/templates/v1.toml` to prepend the slot, preserving the acknowledgment tone:
+- `"түсіндім"` (location) → `"{city} екен, түсіндім"`
+- `"жақсы жас"` → `"{age} — жақсы жас"`
+- `"қуатты кезеңіңіз"` → `"{age} — қуатты кезеңіңіз"`
+- `"түсіндім"` (occupation) → `"{occupation} екен, түсіндім"`
+- `"еңбегіңізге сәттілік"` → `"{occupation} еңбегіңізге сәттілік"`
+
+All three aspirational dialogs (`city_statement_acknowledged`, `age_statement_acknowledged`, `occupation_statement_acknowledged`) flipped to canonical. Three multi-turn dependent dialogs (`city_recall_after_statement`, `age_self_recall_v4_4_5`, `contradiction_logged_renders_clarifying_question_v4_4_5`, `name_then_age_then_city_session_persists`) had their previously-removed setup-turn assertions restored. The existing `name_recall_after_introduction` dialog tightened with an `output_not_contains_lower: ["кім"]` assertion that locks the v4.4.9 fix in place.
+
+Three e2e tests in `crates/adam-dialog/tests/end_to_end.rs` (`response_statement_of_age`, `response_statement_of_location`, `response_statement_of_occupation`) updated to match the new family contents — those are exact-match tests on every variant.
+
+### Tests
+
+- 2 new e2e regressions: `ask_name_self_recall_returns_stored_value_no_phantom_conflict`, `ask_name_self_recall_with_empty_session_does_not_capture_kim`.
+- 1 new cognitive scenario: `ask_name_self_recall_after_introduction` (in `direct_answer`) with `belief_contradictions_count: 0` assertion locking the no-phantom-conflict invariant.
+- 1 new REPL replay regression dialog: `ask_name_self_recall_no_phantom_kim_v4_4_9`.
+
+### Performance regression policy clarified
+
+The post-v4.4.9 release-readiness rerun of `cargo bench -p adam-dialog --bench turn_latency` showed every scenario elevated by ~70 % (e.g. `social_greeting` 1.07 ms → 1.85 ms, `cold_start_conversation` 219 ns → 367 ns). Flagged by the > 20 % rule in `CONTRIBUTING.md` — investigated via `git stash` of v4.4.9 code changes followed by re-bench from the same shell. **Same elevated numbers persisted with code reverted**, proving the slowdown was purely thermal throttling on the M2 8 GB after sustained `cargo` activity, not algorithmic. Documented in `docs/performance.md` "Thermal-state caveat" section + `CONTRIBUTING.md` regression policy gained a third clause: a regression that persists with code reverted is environmental, not a release blocker.
+
+### State
+
+| | v4.4.8 | v4.4.9 |
+|---|---|---|
+| Workspace tests | 681 | **683** (+2 e2e: AskName self-recall battery) |
+| Cognitive eval | 54/54 canonical | **55/55 canonical** (+1 scenario) |
+| REPL replay | 27/27 canonical + 3 aspirational | **31/31 canonical + 0 aspirational** (3 promotions + 1 new regression dialog) |
+| Template families | 49 (some with bare variants) | 49 (every `statement_of_*` variant interpolates its slot) |
+| Why patch | — | small detector edits + 5 template-text rewrites + test additions; no new architectural layer, no new `Action` variant |
+
 ## [4.4.8] — 2026-04-27 — Doc currency sweep: stale-number scrub + claim-scope sharpenings (post-Codex audit)
 
 A documentation-only release responding to Codex's 2026-04-27 doc-currency audit. The core was confirmed honest (`cargo test --workspace`: 681 / 0 / 4 ignored; foundation validation passes; bench numbers reproduced within ±5 % of v4.4.7 claims). What landed: every stale numeric claim refreshed against `cargo` / `jq` / `grep -c` re-runs, and five claim wordings tightened so they match the underlying scope rather than overstating it.
