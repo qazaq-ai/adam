@@ -54,7 +54,7 @@ usage:
 noun flags (any combination):
   --plural
   --poss <1sg|2sg|3|1pl>
-  --case <nom|gen|dat|acc|loc|abl|ins>
+  --case <nom|gen|dat|acc|loc|abl|ins|locattr>
 
 verb flags (any combination):
   --voice <active|passive|reflexive|reciprocal|causative>
@@ -122,6 +122,9 @@ fn parse_noun_flags(args: &[String]) -> NounFeatures {
             "loc" => Case::Locative,
             "abl" => Case::Ablative,
             "ins" => Case::Instrumental,
+            // v4.5.0 — locative-attributive derivation
+            // (`-дағы / -дегі / -тағы / -тегі`).
+            "locattr" => Case::LocativeAttributive,
             _ => {
                 eprintln!("unknown case: {v}");
                 std::process::exit(2);

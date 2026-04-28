@@ -271,6 +271,15 @@ fn try_noun_analyses(surface: &str, entry: &RootEntry, out: &mut Vec<Analysis>) 
         Some(Case::Locative),
         Some(Case::Ablative),
         Some(Case::Instrumental),
+        // v4.5.0 — locative-attributive derivation enumerated here
+        // so analyse() recognises surface forms ending in
+        // `-дағы / -дегі / -тағы / -тегі` and reverse-parses them
+        // to the base noun. Previously these returned no analysis,
+        // which was the v4.4.11 carry-forward closed by the
+        // string-side `locative_attributive_hint` fallback in
+        // v4.4.12. v4.5.0 supersedes the fallback as the primary
+        // path and enables round-trip synthesis.
+        Some(Case::LocativeAttributive),
     ];
     // v1.4.0: also enumerate predicate-person copula suffix.
     let predicates = [

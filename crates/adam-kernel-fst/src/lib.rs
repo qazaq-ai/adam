@@ -17,7 +17,8 @@
 //! - [`morphotactics`] — state machines for noun and verb inflection
 //!   chains. Given `(root, feature_bundle)` emits a sequence of
 //!   archiphoneme atoms that `phonology` then realises. 36 suffix
-//!   templates covering 7 cases × 2 numbers × 7 possessives × 11
+//!   templates covering 7 inflectional cases + 1 derivational
+//!   locative-attributive (v4.5.0) × 2 numbers × 7 possessives × 11
 //!   derivations × 7 predicate-person copulas.
 //! - [`parser`] — inverse direction. Given a surface form, enumerates
 //!   every `(root, features)` analysis whose synthesis matches.

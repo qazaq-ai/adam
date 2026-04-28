@@ -7,6 +7,66 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.5.0] — 2026-04-28 — `Case::LocativeAttributive` FST morphotactics rule
+
+The third v4.x minor. Replaces the v4.4.12 string-side `locative_attributive_hint` fallback with a proper morphotactics rule, providing native FST round-trip support for the Kazakh locative-attributive derivation `-дағы / -дегі / -тағы / -тегі`.
+
+### What landed
+
+**New `Case::LocativeAttributive` variant** in `crates/adam-kernel-fst/src/morphotactics.rs::Case`. Treated as a Case for pragmatic reasons — `try_noun_analyses` enumerates Cases when reverse-parsing, and exposing the locative-attributive there is the cleanest way to make `қазақстандағы` round-trip through synth + analyse. Strictly speaking it's a derivational rather than inflectional case (it stacks the attributive `-ғы/-гі` morpheme on top of the locative `-да/-те`), but the type-level distinction wasn't worth a separate `Derivation` enum field for one variant.
+
+**New `LOCATIVE_ATTRIBUTIVE` suffix template** `-{D}{A}{G}{I}` using the existing archiphoneme machinery:
+- `D` realises as д (after voiced or vowel) or т (after voiceless)
+- `A` realises as а (back) or е (front) — harmonic with stem
+- `G` realises as ғ (back, voiced) or г (front, voiced) — voiced because preceding `A` vowel
+- `I` realises as ы (back) or і (front) — harmonic with stem
+
+This produces all four allomorphs automatically without per-allomorph branching:
+
+| Stem | Class | Surface |
+|---|---|---|
+| `қазақстан` | back, voiced consonant | `қазақстандағы` |
+| `алматы` | back, vowel-final | `алматыдағы` |
+| `мектеп` | front, voiceless | `мектептегі` |
+| `ел` | front, voiced consonant | `елдегі` |
+
+**Pronominal-н buffer rule** extended to fire on P3 + LocativeAttributive (mirrors the existing rule for accusative / dative / ablative / locative / instrumental).
+
+**Parser wiring** — `try_noun_analyses` enumerates `Some(Case::LocativeAttributive)` so `analyse()` reverse-parses surface forms back to their base noun:
+```
+analyse("қазақстандағы") → Noun(root: қазақстан, case: LocativeAttributive)
+analyse("мектептегі")    → Noun(root: мектеп,    case: LocativeAttributive)
+```
+
+**CLI** gained `--case locattr` for `adam_fst synthesise`.
+
+### Backstop kept in place
+
+The v4.4.12 string-side `locative_attributive_hint` in `crates/adam-dialog/src/semantics.rs` **stays in place** as a backstop for inputs whose stem isn't yet in the lexicon (the FST returns no analysis when the base noun is unknown). It now runs as a third-tier fallback after `topic_marker_hint` + `multiword_entity_hint` + `first_noun_root` — the FST's native LocativeAttributive analysis is what the dialog layer sees first via `first_noun_root`. Removing the string-side helper would lose graceful degradation; keeping it is harmless (only fires when earlier strategies recovered nothing).
+
+### Why minor
+
+Per the post-1.0 versioning cadence (`feedback_versioning_post_1_0` memory): "Minor x.y.0 — significant: new code-level architectural addition (new module, new Action variant, new predicate, new module layer)". A new `Case` enum variant is an architectural type-system change, even though the implementation footprint is small (~30 lines). The bump magnitude reflects contribution, not effort.
+
+### Tests
+
+- 1 new FST unit test `noun_locative_attributive_round_trip_all_allomorphs` in `morphotactics.rs::tests` verifying synthesis across all 4 vowel/voicing combinations.
+- Existing v4.4.12 string-side fallback tests (`locative_attributive_suffix_recovers_topic_noun_for_kazakhstan`, `..._for_almaty`) still pass — confirming the backstop continues to work alongside the new FST native path.
+- Existing v4.4.12/13 REPL replay dialogs (`kazakhstan_mountains_via_locative_attributive_v4_4_12`, `kazakhstan_rivers_..._v4_4_13`, `..._lakes_...`, `..._deserts_...`) all continue to pass — the FST native path produces the same surface results as the string-side fallback did.
+
+Workspace **692 → 693** (+1 FST round-trip test). Cognitive eval **59/59 canonical**. REPL replay **43/43 canonical**.
+
+### State
+
+| | v4.4.13 | v4.5.0 |
+|---|---|---|
+| Workspace tests | 692 | **693** (+1 FST round-trip) |
+| Cognitive eval | 59/59 canonical | 59/59 canonical (unchanged) |
+| REPL replay | 43/43 canonical | 43/43 canonical (unchanged) |
+| FST cases | 7 inflectional | **7 inflectional + 1 derivational** (`LocativeAttributive`) |
+| FST round-trip | All 7 cases | **All 8 forms** including `-дағы / -дегі / -тағы / -тегі` |
+| Why minor | — | new code-level Case variant + morphotactics rule + round-trip synthesis support; architectural addition |
+
 ## [4.4.13] — 2026-04-28 — Lexicon hygiene patch: multi-POS homonym dedup + missing core nouns + `best_noun_hint` reorder
 
 Closes the two carry-forward FST/lexicon defects flagged at v4.4.12.

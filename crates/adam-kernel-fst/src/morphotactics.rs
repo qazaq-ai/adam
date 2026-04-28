@@ -115,7 +115,18 @@ pub enum Predicate {
     P2PlPolite,
 }
 
-/// Seven canonical cases of Kazakh.
+/// Seven canonical cases of Kazakh, plus the v4.5.0 derivational
+/// **LocativeAttributive** form.
+///
+/// `LocativeAttributive` is technically a derivational case rather
+/// than an inflectional one — it stacks the attributive morpheme
+/// `-ғы/-гі/-қы/-кі` on top of the locative case to produce a
+/// "(thing) located in X" noun-modifier. Surface allomorphs
+/// `-дағы / -дегі / -тағы / -тегі`. Treated as a Case variant for
+/// pragmatic reasons: `try_noun_analyses` enumerates Cases when
+/// reverse-parsing surface forms, and exposing the locative-
+/// attributive there is the cleanest way to make `қазақстандағы`
+/// round-trip through synth + analyse.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Case {
     Nominative,
@@ -125,6 +136,13 @@ pub enum Case {
     Locative,
     Ablative,
     Instrumental,
+    /// **v4.5.0** — derivational locative-attributive `-{D}{A}{G}{I}`.
+    /// Realises as `-дағы` (back+voiced), `-дегі` (front+voiced),
+    /// `-тағы` (back+voiceless), `-тегі` (front+voiceless). Replaces
+    /// the v4.4.12 string-side `locative_attributive_hint` fallback
+    /// as the primary recovery path; the fallback remains in place
+    /// for inputs whose stem isn't in the lexicon.
+    LocativeAttributive,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -210,6 +228,29 @@ const ABLATIVE: SuffixTemplate = &[
 const LOCATIVE: SuffixTemplate = &[
     SuffixAtom::Arch(Archiphoneme::D),
     SuffixAtom::Arch(Archiphoneme::A),
+];
+
+/// **v4.5.0** — locative-attributive derivational suffix
+/// `-{D}{A}{G}{I}`. The locative `-{D}{A}` is followed by the
+/// attributive `-{G}{I}`. After the locative low vowel `а/е` the
+/// `G` archiphoneme realises as voiced (ғ/г) regardless of stem
+/// voicing — the preceding vowel context settles the voicing
+/// independently of any stem-final consonant. So the four surface
+/// allomorphs are:
+///   - `-дағы` (back-voiced, e.g. қазақстандағы)
+///   - `-дегі` (front-voiced, e.g. елдегі)
+///   - `-тағы` (back-voiceless, e.g. мектептағы — actually rarely
+///     attested; the standard analysis is that voiceless-stem
+///     inputs surface with the locative `-та-` followed by
+///     attributive `-ғы` because the vowel `а` is what `G` reads,
+///     not the stem-final voiceless consonant — but our archiphoneme
+///     code does exactly that)
+///   - `-тегі` (front-voiceless after locative `-те`, e.g. мектептегі)
+const LOCATIVE_ATTRIBUTIVE: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::D),
+    SuffixAtom::Arch(Archiphoneme::A),
+    SuffixAtom::Arch(Archiphoneme::G),
+    SuffixAtom::Arch(Archiphoneme::I),
 ];
 
 /// Accusative suffix: `-{D}{I}` (simplified — real rule also picks `н`
@@ -752,6 +793,7 @@ pub fn synthesise_noun(root: &str, features: NounFeatures) -> String {
                 | Some(Case::Dative)
                 | Some(Case::Ablative)
                 | Some(Case::Locative)
+                | Some(Case::LocativeAttributive)
                 | Some(Case::Instrumental)
         );
     if needs_pronominal_n {
@@ -768,6 +810,9 @@ pub fn synthesise_noun(root: &str, features: NounFeatures) -> String {
             Case::Locative => acc.apply(LOCATIVE),
             Case::Ablative => acc.apply(ABLATIVE),
             Case::Instrumental => acc.apply(INSTRUMENTAL),
+            // v4.5.0 — locative-attributive derivation. See
+            // `LOCATIVE_ATTRIBUTIVE` template definition above.
+            Case::LocativeAttributive => acc.apply(LOCATIVE_ATTRIBUTIVE),
         }
     }
     // Predicate-person copula slot (v1.4.0). Applied AFTER case so
@@ -1124,6 +1169,34 @@ mod tests {
             },
         );
         assert_eq!(out, "мектептен");
+    }
+
+    /// **v4.5.0** — LocativeAttributive round-trip. Verifies all
+    /// four surface allomorphs of the `-дағы / -дегі / -тағы /
+    /// -тегі` derivation across the back/front × voiced/voiceless
+    /// matrix.
+    #[test]
+    fn noun_locative_attributive_round_trip_all_allomorphs() {
+        let cases: &[(&str, &str)] = &[
+            // (root, expected surface)
+            ("қазақстан", "қазақстандағы"), // back, voiced consonant н
+            ("алматы", "алматыдағы"),       // back, vowel-final
+            ("мектеп", "мектептегі"),       // front, voiceless п
+            ("ел", "елдегі"),               // front, voiced consonant л
+        ];
+        for (root, expected) in cases {
+            let out = synthesise_noun(
+                root,
+                NounFeatures {
+                    case: Some(Case::LocativeAttributive),
+                    ..Default::default()
+                },
+            );
+            assert_eq!(
+                out, *expected,
+                "synthesis: {root} + LocativeAttributive should yield {expected}"
+            );
+        }
     }
 
     #[test]
