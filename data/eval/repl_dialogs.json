@@ -258,6 +258,40 @@
       ]
     },
     {
+      "id": "intro_proposal_volunteers_self_intro_v4_4_10",
+      "category": "social",
+      "description": "v4.4.10 (2026-04-28 real-REPL transcript): `Танысайық.` («let's get acquainted») must trigger `greeting.intro_proposal` and surface adam's name. Pre-v4.4.10 the form fell through every greeting branch and landed on the safe-fallback refusal `қайта айтыңызшы`. The new `GreetingKind::IntroProposal` variant + `greeting.intro_proposal` template family routes this correctly.",
+      "turns": [
+        {"user": "Танысайық.", "output_contains_lower_any": ["адам"], "output_not_contains_lower": ["қайта айтыңызшы"]}
+      ]
+    },
+    {
+      "id": "kazakhstan_oblast_count_v4_4_10",
+      "category": "knowledge_query",
+      "description": "v4.4.10 (2026-04-28 real-REPL transcript): `Қазақстанда қанша облыс бар?` must surface a fact containing `17`. Pre-v4.4.10 the system had no fact about oblast count and regurgitated the basic «Қазақстан — Орталық Азиядағы ел». v4.4.10 authored 17 oblast entries + a `қазақстан has_quantity облыс` fact with surface text «Қазақстанда 17 облыс бар.».",
+      "turns": [
+        {"user": "Қазақстанда қанша облыс бар?", "output_contains_lower_any": ["17"]}
+      ]
+    },
+    {
+      "id": "qysqasy_does_not_misfire_to_proverb_v4_4_10",
+      "category": "regression",
+      "description": "v4.4.10 (2026-04-28 real-REPL transcript): `Қысқасы, сен ештеңе білмейсің.` must NOT surface a proverb about wives («Әйеліммен кеңессем ештеңе етпей ме?»). Pre-v4.4.10 the FST returned root `қысқа` and retrieval matched a tangential proverb keyed on `қысқа`. NOT_A_TOPIC additions for `қысқа` + `ештеңе` block the misfire. Acceptable downstream behaviour: a Tentative refusal or a generic acknowledgement, but no proverb output.",
+      "turns": [
+        {"user": "Қысқасы, сен ештеңе білмейсің.", "output_not_contains_lower": ["әйелім", "кеңес"]}
+      ]
+    },
+    {
+      "id": "first_meeting_full_introduction_flow_v4_4_10",
+      "category": "session_persistence",
+      "description": "v4.4.10 multi-turn introduction flow mirroring the 2026-04-28 real-REPL transcript opening: greeting → wellbeing → intro proposal → name introduction. All four turns must produce non-refusal replies that progress the dialog.",
+      "turns": [
+        {"user": "Сәлем", "output_not_contains_lower": ["қайта айтыңызшы"]},
+        {"user": "Танысайық.", "output_contains_lower_any": ["адам"], "output_not_contains_lower": ["қайта айтыңызшы"]},
+        {"user": "Менің атым Андрей.", "output_contains_lower_any": ["андрей"]}
+      ]
+    },
+    {
       "id": "self_correction_replaces_value",
       "category": "belief_revision",
       "description": "v4.1.0 belief revision: explicit self-correction `жоқ, мен Алматыда тұрамын` after a city statement updates the active fact. Final reply surfaces the corrected city via the belief_revision template family which interpolates `{new_value}` deterministically.",

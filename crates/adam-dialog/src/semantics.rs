@@ -309,6 +309,29 @@ const NOT_A_TOPIC: &[&str] = &[
     // also "age" (a real topic noun in profile turns).
     "жаңа",
     "әйгіл",
+    // **v4.4.10** — discourse adverbial particle. Real-REPL
+    // 2026-04-28: `Қысқасы, сен ештеңе білмейсің.` ("In short,
+    // you don't know anything.") — `Қысқасы` is a sentence
+    // adverbial meaning "briefly" / "in short", not a topic. Pre-
+    // v4.4.10 it parsed as `қысқа + 3sg-poss + Nominative`
+    // (root «қысқа» = "short"), the topic extractor returned
+    // `қысқа`, retrieval surfaced an unrelated proverb keyed on
+    // `қысқа`. Same class as v4.3.5 `Онда → он` and `Жаңа → жаңа`:
+    // a closed-class discourse word being mistaken for a content
+    // noun. Stem form added; `қысқасы` (full surface) is its own
+    // entry below if needed (FST returns the stem `қысқа` first).
+    "қысқа",
+    // **v4.4.10** — indefinite-quantifier pronoun. Same
+    // 2026-04-28 trace: `сен ештеңе білмейсің` ("you know
+    // nothing") — `ештеңе` ("nothing") is a quantifier pronoun,
+    // not a topic noun. Pre-v4.4.10 (after `қысқа` was muted)
+    // the topic extractor fell through to `ештеңе`, retrieval
+    // matched a tangential proverb. Adding here closes the
+    // misfire from the same trace.
+    "ештеңе",
+    "ешкім",
+    "ешбір",
+    "еш",
 ];
 
 /// Return the root of the first content-noun Analysis in the parse list.
@@ -374,6 +397,48 @@ const MULTIWORD_ENTITIES: &[&str] = &[
     "төле би",
     "қазыбек би",
     "әйтеке би",
+    // **v4.4.10** — Kazakhstan administrative + physical-geography
+    // expansion. 17 oblast names (compound `<adjective/proper>
+    // облысы`), the structural-bridge nouns `әкімшілік бөлік` /
+    // `су денесі` / `жер бедері` / `елді мекен` /
+    // `табиғи аймақ` / `республикалық маңызы бар қала`, the
+    // mountain-range entity `Жетісу алатауы`, the peak `Хан Тәңірі`,
+    // and the canyon `Шарын каньоны`. Sorted longest-first so
+    // `find_multiword_entity`'s longest-match scan picks the
+    // compound before the simpler substring.
+    "республикалық маңызы бар қала",
+    "солтүстік қазақстан облысы",
+    "батыс қазақстан облысы",
+    "шығыс қазақстан облысы",
+    "маңғыстау облысы",
+    "қарағанды облысы",
+    "қостанай облысы",
+    "қызылорда облысы",
+    "түркістан облысы",
+    "ұлытау облысы",
+    "ақмола облысы",
+    "ақтөбе облысы",
+    "алматы облысы",
+    "атырау облысы",
+    "жамбыл облысы",
+    "жетісу облысы",
+    "павлодар облысы",
+    "абай облысы",
+    "шарын каньоны",
+    "жетісу алатауы",
+    "әкімшілік бөлік",
+    "табиғи аймақ",
+    "елді мекен",
+    "хан тәңірі",
+    "су денесі",
+    // **v4.4.10** — list-summary fact objects (compound nouns
+    // that play the role of `қазақстан related_to <list>`).
+    // Required by `world_core_multiword_coverage` contract test.
+    "облыстар тізімі",
+    "өзендер тізімі",
+    "көлдер тізімі",
+    "таулар тізімі",
+    "шөлдер тізімі",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -594,6 +659,25 @@ fn detect_greeting(tokens: &[String], joined: &str) -> Option<Intent> {
     if tokens.first().is_some_and(|t| t == "сәлем") {
         return Some(Intent::Greeting {
             kind: GreetingKind::Casual,
+        });
+    }
+    // v4.4.10 — Introduction proposal: «танысайық» / «танысалық»
+    // («let's get acquainted») as a stand-alone opener, plus
+    // compound forms «танысып алайық» / «танысып алыңыз».
+    // Surfaced by a 2026-04-28 real-REPL trace that landed on the
+    // generic unknown refusal pre-v4.4.10. The polite imperative
+    // `танысайық` is a 1pl exhortative, not a greeting in the
+    // strict sense, but it opens an introduction exchange and
+    // belongs in the Greeting bucket so the planner volunteers
+    // adam's name and asks for the user's.
+    if tokens
+        .iter()
+        .any(|t| t == "танысайық" || t == "танысалық" || t == "танысыңыз")
+        || joined.contains("танысып алайық")
+        || joined.contains("танысып алыңыз")
+    {
+        return Some(Intent::Greeting {
+            kind: GreetingKind::IntroProposal,
         });
     }
     None

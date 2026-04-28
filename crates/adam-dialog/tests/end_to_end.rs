@@ -4141,6 +4141,145 @@ fn ask_name_self_recall_with_empty_session_does_not_capture_kim() {
     );
 }
 
+/// **v4.4.10** — `Танысайық` («let's get acquainted») must route
+/// to `Intent::Greeting { kind: IntroProposal }` and produce a
+/// reply that surfaces adam's own name AND asks for the user's.
+/// Pre-v4.4.10 the surface form fell through every greeting
+/// branch (no `қайырлы`, no `сәлеметсіз`, first token isn't
+/// `сәлем`) and landed on the generic refusal `қайта айтыңызшы`
+/// — surfaced by a 2026-04-28 real-REPL transcript.
+#[test]
+fn intro_proposal_routes_to_greeting_intro_proposal_family() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let (out, trace) = conv.turn_with_trace("Танысайық.", &lex, &repo, 0);
+    assert!(
+        matches!(
+            trace.intent_after_verification,
+            adam_dialog::Intent::Greeting {
+                kind: adam_dialog::GreetingKind::IntroProposal
+            }
+        ),
+        "Танысайық must classify as Greeting{{IntroProposal}}, got {:?}",
+        trace.intent_after_verification
+    );
+    let lower = out.to_lowercase();
+    assert!(
+        lower.contains("адам"),
+        "intro-proposal reply must surface adam's name — got {out:?}"
+    );
+    assert!(
+        !lower.contains("қайта айтыңызшы"),
+        "intro-proposal must not fall through to the safe-fallback refusal — got {out:?}"
+    );
+}
+
+/// **v4.4.10** — `Танысалық` and `танысып алайық` are alternative
+/// imperative forms of the same exhortative; both must reach the
+/// IntroProposal branch.
+#[test]
+fn intro_proposal_variants_route_to_intro_proposal_family() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    for variant in ["Танысалық", "Танысып алайық", "Танысып алыңыз"]
+    {
+        let mut conv = Conversation::new();
+        let (_out, trace) = conv.turn_with_trace(variant, &lex, &repo, 0);
+        assert!(
+            matches!(
+                trace.intent_after_verification,
+                adam_dialog::Intent::Greeting {
+                    kind: adam_dialog::GreetingKind::IntroProposal
+                }
+            ),
+            "variant {variant:?} must classify as Greeting{{IntroProposal}}, got {:?}",
+            trace.intent_after_verification
+        );
+    }
+}
+
+/// **v4.4.10** — `Қысқасы` («briefly / in short») is a discourse
+/// adverbial particle, not a topic noun. Pre-v4.4.10 the FST
+/// returned root `қысқа` (= "short") and the topic extractor
+/// surfaced it, leading to a tangential proverb keyed on `қысқа`
+/// in a 2026-04-28 real-REPL transcript. Post-v4.4.10 NOT_A_TOPIC
+/// includes `қысқа`, so `Қысқасы` no longer mispoarses as a topic.
+#[test]
+fn qysqasy_does_not_get_extracted_as_topic() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = Conversation::new();
+    let (_out, trace) = conv.turn_with_trace("Қысқасы, сен ештеңе білмейсің.", &lex, &repo, 0);
+    // The intent will land somewhere — most likely Unknown or a
+    // refusal path. The invariant we lock here is that
+    // `noun_hint` is NOT `қысқа` and not `ештеңе`.
+    if let adam_dialog::Intent::Unknown { noun_hint, .. } = &trace.intent_after_verification {
+        let hint_lower = noun_hint.as_deref().map(str::to_lowercase);
+        let hint_str = hint_lower.as_deref();
+        assert_ne!(
+            hint_str,
+            Some("қысқа"),
+            "discourse particle Қысқасы must not be extracted as topic noun"
+        );
+        assert_ne!(
+            hint_str,
+            Some("ештеңе"),
+            "indefinite-quantifier ештеңе must not be extracted as topic noun"
+        );
+    }
+}
+
+/// **v4.4.10** — the v4.4.10 geography expansion authored 17
+/// oblast entries + a `has_quantity` fact about the count. The
+/// dialog-side surface assertion lives in
+/// `data/eval/repl_dialogs.json`'s `kazakhstan_oblast_count_v4_4_10`
+/// dialog, which exercises the full retrieval + reasoning path.
+/// This data-layer test verifies the world_core file carries every
+/// 17 oblast entry — the retrieval / reasoning chains all derive
+/// from that ground truth, so a missing entry here breaks every
+/// downstream surface.
+#[test]
+fn kazakhstan_world_core_carries_all_17_oblasts() {
+    let path = "../../data/world_core/geography_kz.jsonl";
+    if !std::path::Path::new(path).exists() {
+        return;
+    }
+    let raw = std::fs::read_to_string(path).expect("read geography_kz");
+    let oblasts = [
+        "абай облысы",
+        "ақмола облысы",
+        "ақтөбе облысы",
+        "алматы облысы",
+        "атырау облысы",
+        "батыс қазақстан облысы",
+        "жамбыл облысы",
+        "жетісу облысы",
+        "қарағанды облысы",
+        "қостанай облысы",
+        "қызылорда облысы",
+        "маңғыстау облысы",
+        "павлодар облысы",
+        "солтүстік қазақстан облысы",
+        "түркістан облысы",
+        "ұлытау облысы",
+        "шығыс қазақстан облысы",
+    ];
+    for oblast in oblasts {
+        assert!(
+            raw.to_lowercase().contains(oblast),
+            "geography_kz.jsonl must contain world_core entry for {oblast:?}"
+        );
+    }
+    // The has_quantity fact for the country-wide count must also
+    // be present so retrieval has a fact to surface for
+    // «Қазақстанда қанша облыс бар?».
+    assert!(
+        raw.contains("Қазақстанда 17 облыс бар"),
+        "world_core must carry the country-wide oblast count fact"
+    );
+}
+
 /// **v4.3.5** — `topic_marker_hint` regression battery, mirroring
 /// the user-shared 2026-04-26 dialog turns that exposed three
 /// distinct extraction failures.

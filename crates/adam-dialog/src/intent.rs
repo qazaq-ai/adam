@@ -193,6 +193,14 @@ pub enum GreetingKind {
     Polite,
     /// Time-specific "қайырлы таң" / "қайырлы күн" / "қайырлы кеш".
     TimeOfDay(TimeOfDay),
+    /// **v4.4.10** — introduction-proposal opener: «танысайық» /
+    /// «танысалық» / «танысып алайық» / «танысып алыңыз». User
+    /// invites a name exchange, equivalent to «давайте знакомиться».
+    /// Routes to a dedicated template family that volunteers
+    /// adam's own self-intro and asks the user for theirs. Surfaced
+    /// by a 2026-04-28 real-REPL transcript that landed on the
+    /// generic refusal `qайта айтыңызшы` pre-v4.4.10.
+    IntroProposal,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

@@ -570,6 +570,25 @@
       }
     },
     {
+      "id": "intro_proposal_routes_to_greeting_family",
+      "category": "action_routing",
+      "description": "v4.4.10: `Танысайық` («let's get acquainted») must route to `Intent::Greeting { kind: IntroProposal }` — not to the generic-refusal Unknown path. Pre-v4.4.10 the form fell through every greeting branch (no `қайырлы`, no `сәлеметсіз`, first token isn't `сәлем`) and landed on the safe-fallback refusal `қайта айтыңызшы`. Surfaced by a 2026-04-28 real-REPL transcript. New `GreetingKind::IntroProposal` variant + new `greeting.intro_proposal` template family that volunteers adam's name and asks for the user's.",
+      "turns": ["Танысайық."],
+      "expect": {
+        "action": "Social",
+        "epistemic_status": "Certain"
+      }
+    },
+    {
+      "id": "qysqasy_discourse_particle_does_not_capture_topic",
+      "category": "parse_failure",
+      "description": "v4.4.10: `Қысқасы, сен ештеңе білмейсің.` («In short, you don't know anything») — `Қысқасы` is a discourse adverbial (= 'briefly/in short'), not a topic noun. Pre-v4.4.10 it parsed as `қысқа + 3sg-poss + Nominative`, the topic extractor returned `қысқа`, retrieval surfaced an unrelated proverb keyed on `қысқа`. Same defect class as v4.3.5 `Онда → он` and `Жаңа → жаңа`. v4.4.10 added `қысқа`, `ештеңе`, `ешкім`, `ешбір`, `еш` to NOT_A_TOPIC. The lock invariant: epistemic must land on Tentative (a clarifying-uncertain reply, not a confident grounded fact about `қысқа` or `ештеңе`).",
+      "turns": ["Қысқасы, сен ештеңе білмейсің."],
+      "expect": {
+        "epistemic_status": "Tentative"
+      }
+    },
+    {
       "id": "ask_name_self_recall_after_introduction",
       "category": "direct_answer",
       "description": "v4.4.9 (REPL replay surfaced this in v4.4.6, deferred through v4.4.8): `менің атым кім?` after `менің атым Дәулет` must classify as `AskName` and reply via `ask_name.with_known_user` template family with the stored name. Pre-v4.4.9 the 1sg-possessive `атым` matched `detect_statement_of_name`'s pattern 1 (`атым X` → name is the next token) and grabbed the literal `Кім` as the user's name, then logged a phantom `BeliefConflict` (Дәулет vs Кім) followed by a clarifying question that asked the user to pick between their actual name and the question word. Symmetric to v4.4.5 `detect_ask_age` fix but worse: belief got mutated, not just the surface text. Fix: interrogative-pronoun guard in `detect_statement_of_name` (refuses `кім / не / қандай / қайсысы` as name across all three patterns) + extended `detect_ask_name` (accepts 1sg `атым / есімім + кім / не`).",

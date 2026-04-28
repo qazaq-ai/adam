@@ -7,6 +7,65 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.4.10] — 2026-04-28 — Kazakhstan administrative + physical geography expansion + `Танысайық` intent + `Қысқасы` topic-marker guard
+
+A real-REPL-driven release. User shared a 2026-04-28 transcript that surfaced **5 distinct issues** — 3 knowledge gaps (oblast count, oblast list, rivers/lakes), 2 dialog issues (`Танысайық` falling through to refusal, `Қысқасы` mispoarsing as topic-noun and triggering proverb misfire). All five addressed in one patch.
+
+### Knowledge expansion — 73 new world_core entries in `data/world_core/geography_kz.jsonl`
+
+World Core grew **874 entries / 995 facts → 947 entries / 1116 facts**. Reasoner regenerated: extracted facts **15 521 → 15 642**, derived **21 415 → 22 387 (+972)** from new IsA-hub bridge facts. Lexical graph **3 562 → 3 604 nodes / 13 791 → 13 911 edges**.
+
+Authored entries (geo_kz_031 through geo_kz_109):
+
+- **9 IsA-hub bridge facts** for high R5/R1 leverage (`өзен / көл / теңіз IsA су денесі`, `тау / шөл / каньон IsA жер бедері`, `облыс IsA әкімшілік бөлік`, `қала / ауыл IsA елді мекен`). The bridge-fact pattern documented in `project_bridge_fact_leverage.md` paid off: +972 derivations on the new refresh.
+- **3 republican-cities upgrade**: Астана / Алматы / Шымкент now `IsA республикалық маңызы бар қала`.
+- **17 oblast entries**: Абай, Ақмола, Ақтөбе, Алматы, Атырау, Батыс Қазақстан, Жамбыл, Жетісу, Қарағанды, Қостанай, Қызылорда, Маңғыстау, Павлодар, Солтүстік Қазақстан, Түркістан, Ұлытау, Шығыс Қазақстан — each as `IsA облыс` + `PartOf қазақстан`.
+- **4 new admin-center cities** previously absent (Қонаев, Петропавл, Жезқазған, Түркістан-the-city).
+- **17 oblast → admin-center mappings**: Семей `PartOf` Абай облысы, Көкшетау `PartOf` Ақмола облысы, …, Қонаев `PartOf` Алматы облысы (post-2022 reform), Петропавл `PartOf` Солтүстік Қазақстан облысы, Жезқазған `PartOf` Ұлытау облысы, Түркістан `PartOf` Түркістан облысы. The other 14 are reflected in the existing city entries (Семей already had `PartOf қазақстан`; v4.4.10 adds the more-specific `PartOf <oblast>` mapping).
+- **6 quantity facts**: country-wide `қазақстан has_quantity облыс` (17), `has_quantity республикалық маңызы бар қала` (3), `has_quantity халық` (~20 млн), plus per-republic-city populations (Алматы ~2 млн, Астана ~1.5 млн, Шымкент ~1.2 млн).
+- **6 new rivers**: Жайық, Есіл, Тобыл, Шу, Қаратал, Талас (existing 3: Ертіс, Сырдария, Іле).
+- **4 new lakes**: Зайсан, Алакөл, Тенгіз, Маркакөл (existing 1: Балқаш).
+- **5 mountains / mountain ranges**: Тянь-Шань, Жетісу Алатауы, Хан Тәңірі (highest peak), Қаратау, Ұлытау (existing 2: Алатау, Алтай).
+- **4 deserts**: Бетпақдала, Қызылқұм, Үстірт, Мойынқұм.
+- **Шарын каньоны** (canyon).
+- **Бурабай** (`IsA табиғи аймақ`).
+- **6 list-summary entries**: country-level enumerations of oblasts / rivers / lakes / mountains / deserts / regions, surface text written as readable Kazakh sentences for retrieval composition.
+
+### Dialog layer — `Танысайық` intent + `Қысқасы` guard
+
+- **New `GreetingKind::IntroProposal` variant** + extended `detect_greeting` matches «танысайық», «танысалық», «танысып алайық», «танысып алыңыз». Was falling through every existing greeting branch and landing on the safe-fallback refusal `қайта айтыңызшы`. New **`greeting.intro_proposal` template family** (4 variants) volunteers adam's name and asks for the user's. Template family count 49 → **50**.
+- **NOT_A_TOPIC additions**: `қысқа` (discourse adverbial — pre-v4.4.10 the FST returned this as the root of `Қысқасы` and the topic extractor surfaced it, retrieval matched a tangential proverb). `ештеңе` / `ешкім` / `ешбір` / `еш` (indefinite-quantifier pronouns — same defect class). Mirror of v4.3.5 `Онда → он` and `Жаңа → жаңа` fixes.
+- **MULTIWORD_ENTITIES sync** for the 25 new compound nouns introduced by the geography batch (oblast names, bridge nouns, peak/canyon names) plus 5 list-summary objects. The `world_core_multiword_coverage` contract test enforces this sync.
+
+### REPL replay harness extended
+
+`crates/adam-dialog/tests/repl_replay.rs` gained `load_runtime_artefacts` — when `data/retrieval/{facts,derived_facts,morpheme_index}.json` are present, the harness builds the `Conversation` with the same retrieval / reasoning state production `adam_chat` carries, so retrieval-dependent dialogs (e.g. the new oblast-count question) reach the same code path as production. Pre-v4.4.10 the harness ran with empty retrieval, so any knowledge-query dialog defaulted to refusal regardless of fact-content.
+
+### Tests
+
+- 4 new e2e regressions in `crates/adam-dialog/tests/end_to_end.rs`: `intro_proposal_routes_to_greeting_intro_proposal_family`, `intro_proposal_variants_route_to_intro_proposal_family`, `qysqasy_does_not_get_extracted_as_topic`, `kazakhstan_world_core_carries_all_17_oblasts`.
+- 2 new cognitive scenarios: `intro_proposal_routes_to_greeting_family` (action_routing), `qysqasy_discourse_particle_does_not_capture_topic` (parse_failure).
+- 4 new REPL replay dialogs from the actual transcript: `intro_proposal_volunteers_self_intro_v4_4_10`, `kazakhstan_oblast_count_v4_4_10`, `qysqasy_does_not_misfire_to_proverb_v4_4_10`, `first_meeting_full_introduction_flow_v4_4_10`.
+
+Cognitive eval **55/55 → 57/57 canonical**. REPL replay **31/31 → 35/35 canonical**. Workspace **683 → 687**.
+
+### Known limitations carried forward
+
+The user's transcript also asked `Қазақстан аймақтарының атауларын білесіз бе?` and `Қазақстанда қандай өзендер мен көлдер бар екенін білесіз бе?` — listing-style questions. v4.4.10 authored the answer-bearing list-summary facts (geo_kz_104–108), but adam's retrieval picks the most-central fact about `Қазақстан` (the basic IsA-ел fact) rather than the specific list-summary. This is a **retrieval-ranking limitation**, not a data gap — the data is in place, surfacing it correctly is a v4.4.11+ retrieval-rerank concern. Documented; not blocking.
+
+### State
+
+| | v4.4.9 | v4.4.10 |
+|---|---|---|
+| Workspace tests | 683 | **687** (+4 e2e) |
+| Cognitive eval | 55/55 canonical | **57/57 canonical** (+2 scenarios) |
+| REPL replay | 31/31 canonical | **35/35 canonical** (+4 dialogs) |
+| World Core | 874 entries / 995 facts | **947 entries / 1116 facts** (+73 entries / +121 facts) |
+| Extracted runtime facts | 15 521 | **15 642** |
+| Derived facts | 21 415 | **22 387** (+972 from bridge facts) |
+| Template families | 49 | **50** (+`greeting.intro_proposal`) |
+| Why patch | — | per `feedback_versioning_post_1_0` v4.4.10 clarification: data-batch + dispatch-tier intent recogniser stay patch-tier regardless of fact count; magnitude of architectural change is the signal, not curation volume |
+
 ## [4.4.9] — 2026-04-27 — AskName 1sg self-recall + slot-echo aspirationals promoted
 
 Two complementary patches that close the v4.4.6-surfaced backlog and tighten the test layer.

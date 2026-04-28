@@ -128,15 +128,24 @@ Validator checks:
 - `kinship_extended.jsonl` — 18 entries / 20 facts  *(new in v4.0.19)*
 - `constellations_kz.jsonl` — 6 entries / 6 facts  *(new in v4.0.19)*
 - `measurements.jsonl` — 10 entries / 10 facts  *(new in v4.0.19)*
-- **Total: 874 entries / 995 facts across 30 domains** (v4.4.7), all `approved`
+- **Total: 947 entries / 1116 facts across 30 domains** (v4.4.10), all `approved`
   at `high` or `medium` confidence by `shaman`. v4.3.5 added **kz_literature
   surname-keyed entries** (Әуезов / Сейфуллин / Мүсірепов / Жұмабаев / …) and a
   new **`notable_kazakhstanis.jsonl` domain** (presidents, khans, scientists,
-  war heroes, athletes, judges). `geography_kz.jsonl` doubles as the canonical
-  source for the v4.3.0 `language_core::canonical_geo_entity` resolver — every
-  place mention in dialog memory carries the matching `geo_kz_NNN` id as
-  `EntityMemory.canonical_id`. Verify in-tree with
-  `find data/world_core -name '*.jsonl' | xargs cat | jq -s 'length'`
+  war heroes, athletes, judges). v4.4.10 added **73 entries to `geography_kz`**:
+  all 17 Kazakh oblasts as administrative entities, oblast → administrative-center
+  mappings, three cities of republican significance upgrade, country + 3-republic-city
+  population facts, 6 new rivers (Жайық / Есіл / Тобыл / Шу / Қаратал / Талас),
+  4 new lakes (Зайсан / Алакөл / Тенгіз / Маркакөл), 5 mountains (Тянь-Шань /
+  Жетісу Алатауы / Хан Тәңірі / Қаратау / Ұлытау), 4 deserts (Бетпақдала /
+  Қызылқұм / Үстірт / Мойынқұм), Шарын каньоны, Бурабай, plus 9 IsA-hub bridge
+  facts (`өзен/көл/теңіз IsA су денесі`, `тау/шөл/каньон IsA жер бедері`,
+  `облыс IsA әкімшілік бөлік`, `қала/ауыл IsA елді мекен`) which delivered
+  +972 R1/R2/R5 derivations on the next reasoner re-run.
+  `geography_kz.jsonl` doubles as the canonical source for the v4.3.0
+  `language_core::canonical_geo_entity` resolver — every place mention in dialog
+  memory carries the matching `geo_kz_NNN` id as `EntityMemory.canonical_id`.
+  Verify in-tree with `find data/world_core -name '*.jsonl' | xargs cat | jq -s 'length'`
   (entries) and `... | jq -s 'map(.facts | length) | add'` (facts).
 
 ## Roadmap

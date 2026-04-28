@@ -518,6 +518,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             GreetingKind::TimeOfDay(TimeOfDay::Morning) => "greeting.morning",
             GreetingKind::TimeOfDay(TimeOfDay::Day) => "greeting.day",
             GreetingKind::TimeOfDay(TimeOfDay::Evening) => "greeting.evening",
+            GreetingKind::IntroProposal => "greeting.intro_proposal",
         },
         Intent::Farewell => "farewell",
         Intent::Affirmation => "affirmation",

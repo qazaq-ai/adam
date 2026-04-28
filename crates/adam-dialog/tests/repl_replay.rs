@@ -21,9 +21,15 @@ use std::path::Path;
 
 use adam_dialog::{Conversation, TemplateRepository};
 use adam_kernel_fst::lexicon::LexiconV1;
+use adam_reasoning::Fact as ReasFact;
+use adam_reasoning::reasoner::DerivedFact;
+use adam_retrieval::MorphemeIndex;
 use serde::Deserialize;
 
 const DATASET_PATH: &str = "../../data/eval/repl_dialogs.json";
+const FACTS_PATH: &str = "../../data/retrieval/facts.json";
+const DERIVED_FACTS_PATH: &str = "../../data/retrieval/derived_facts.json";
+const MORPHEME_INDEX_PATH: &str = "../../data/retrieval/morpheme_index.json";
 
 #[derive(Debug, Deserialize)]
 struct Dataset {
@@ -73,11 +79,63 @@ fn load_lexicon() -> LexiconV1 {
         .expect("repl_replay: lexicon files present but failed to parse")
 }
 
+/// v4.4.10 — load the retrieval / reasoning artefacts so dialogs
+/// that depend on knowledge-query retrieval (e.g. the v4.4.10
+/// Kazakhstan oblast-count question) reach the same code path as
+/// the production `adam_chat` binary. Returns `None` if any
+/// artefact is missing — in that case the harness runs with the
+/// pre-v4.4.10 retrieval-empty behaviour.
+fn load_runtime_artefacts() -> Option<(MorphemeIndex, Vec<ReasFact>, Vec<DerivedFact>)> {
+    if !Path::new(MORPHEME_INDEX_PATH).exists()
+        || !Path::new(FACTS_PATH).exists()
+        || !Path::new(DERIVED_FACTS_PATH).exists()
+    {
+        return None;
+    }
+
+    #[derive(Deserialize)]
+    struct FactsFile {
+        facts: Vec<ReasFact>,
+    }
+    #[derive(Deserialize)]
+    struct DerivedFile {
+        derived: Vec<DerivedFact>,
+    }
+
+    let mut index: MorphemeIndex =
+        serde_json::from_str(&std::fs::read_to_string(MORPHEME_INDEX_PATH).ok()?).ok()?;
+    index.refresh_stats();
+
+    let extracted = serde_json::from_str::<FactsFile>(&std::fs::read_to_string(FACTS_PATH).ok()?)
+        .ok()?
+        .facts;
+
+    let derived =
+        serde_json::from_str::<DerivedFile>(&std::fs::read_to_string(DERIVED_FACTS_PATH).ok()?)
+            .ok()?
+            .derived;
+
+    Some((index, extracted, derived))
+}
+
 /// Run a single dialog. Returns `Ok(())` on pass or `Err(reason)` on
 /// the first failed assertion. Doesn't panic — the harness aggregates
 /// before deciding whether to fail the test.
-fn run_dialog(d: &Dialog, lex: &LexiconV1, repo: &TemplateRepository) -> Result<(), String> {
+fn run_dialog(
+    d: &Dialog,
+    lex: &LexiconV1,
+    repo: &TemplateRepository,
+    runtime: Option<&(MorphemeIndex, Vec<ReasFact>, Vec<DerivedFact>)>,
+) -> Result<(), String> {
     let mut conv = Conversation::new();
+    if let Some((index, extracted, derived)) = runtime {
+        // Cloning per-dialog mirrors the per-iteration cost the
+        // bench harness reports — turn p50s under retrieval are
+        // ~2 ms vs ~1 ms greeting-only, well inside the test budget.
+        conv = conv
+            .with_morpheme_index(index.clone())
+            .with_reasoning_chains(extracted.clone(), derived.clone());
+    }
     for (i, t) in d.turns.iter().enumerate() {
         let out = conv.turn(&t.user, lex, repo, i as u64);
         let lower = out.to_lowercase();
@@ -114,6 +172,7 @@ struct CategoryReport {
 fn repl_replay_baseline() {
     let lex = load_lexicon();
     let repo = load_repo();
+    let runtime = load_runtime_artefacts();
 
     let raw = std::fs::read_to_string(DATASET_PATH).unwrap_or_else(|e| {
         panic!("repl_replay: dataset must exist at {DATASET_PATH} for the baseline gate — got {e}")
@@ -132,7 +191,7 @@ fn repl_replay_baseline() {
 
     for d in &dataset.dialogs {
         let entry = by_category.entry(d.category.clone()).or_default();
-        let outcome = run_dialog(d, &lex, &repo);
+        let outcome = run_dialog(d, &lex, &repo, runtime.as_ref());
         if d.expected_failing {
             entry.aspirational_total += 1;
             aspirational_total += 1;

@@ -57,6 +57,20 @@ templates = [
     "қайырлы кеш {name}",
 ]
 
+# v4.4.10 — Introduction proposal opener: user said «танысайық» /
+# «танысалық» / «танысып алайық» / «танысып алыңыз». adam volunteers
+# its own name and asks for the user's. Surfaced by a 2026-04-28
+# real-REPL transcript that landed on the generic unknown refusal
+# «қайта айтыңызшы» pre-v4.4.10.
+[[families]]
+key = "greeting.intro_proposal"
+templates = [
+    "иә, әрине! Менің атым адам. Сіздің атыңыз кім?",
+    "танысып алайық. Мен — адам, ал сізді қалай атаймын?",
+    "қуана-қуана. Мен — қазақша сөйлесуге арналған nlm, атым адам. Атыңызды айта аласыз ба?",
+    "әрине, танысайық. Менің атым адам — сіз қалай танысамыз?",
+]
+
 # ---------- Farewell ----------
 
 [[families]]
