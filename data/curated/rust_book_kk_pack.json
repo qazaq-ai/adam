@@ -1,0 +1,434 @@
+{
+  "version": "1.0.0",
+  "name": "adam-rust-book-kk-pack",
+  "target_language": "kk",
+  "script": "Cyrillic",
+  "source_license": "MIT/Apache-2.0",
+  "source_url": "https://doc.rust-lang.org/book/",
+  "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
+  "chapters_translated": 1,
+  "sentences_total": 60,
+  "sample_count": 60,
+  "samples": [
+    {
+      "id": "rust_book_01_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Бастау Осы тарауда `Rust` тілімен жұмыс істеуді қалай бастау керектігін көрсетеді."
+    },
+    {
+      "id": "rust_book_01_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Алдымен қажетті құралдарды орнатамыз, содан кейін бірінші бағдарламаны жазып, оны Cargo көмегімен басқаруды үйренеміз."
+    },
+    {
+      "id": "rust_book_01_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Тарау үш бөлімнен тұрады: **Орнату** — `rustup` арқылы `Rust` құрал жинағын орнату. **Hello, World!** — алғашқы `Rust` бағдарламасын жазу және орындау. **Hello, Cargo!** — Cargo көмегімен жобаны жасау, құрастыру және басқару."
+    },
+    {
+      "id": "rust_book_01_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Тараудың соңында сіз өз компьютеріңізде `Rust` бағдарламасын жаза алатын және оны орындай алатын боласыз. 1.1."
+    },
+    {
+      "id": "rust_book_01_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Орнату `rustup` дегеніміз не `Rust`-ты орнатудың ең сенімді жолы — `rustup` атты ресми құрал арқылы орнату. `rustup` — `Rust` нұсқаларын басқаратын құрал."
+    },
+    {
+      "id": "rust_book_01_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Ол сізге қажетті нұсқаны орнатады, оны жаңартады және әртүрлі құрастыру мақсаттарына арналған құрал жинақтарын қосады. `rustup` арқылы орнатқанда, сіздің машинаңызға бірнеше зат қатар келеді: `rustc` компиляторы, `cargo` құрылыс құралы, `rustfmt` пішімдеуші және бастапқы Rust стандартты кітапханасы. Linux немесе macOS жүйесінде орнату Егер сіз Linux немесе macOS жүйесінде жұмыс істейтін болсаңыз, терминалды ашып, келесі команданы енгізіңіз: Бұл команда `rustup` орнатушы сценарийін жүктеп алады және оны орындайды."
+    },
+    {
+      "id": "rust_book_01_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Сценарий сізге орнату нұсқаларын ұсынады; әдетте әдепкі нұсқа жеткілікті, сондықтан `1` пернесін басып немесе `Enter` пернесін басып жалғастырыңыз."
+    },
+    {
+      "id": "rust_book_01_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Орнату аяқталғаннан кейін терминалды қайта іске қосыңыз."
+    },
+    {
+      "id": "rust_book_01_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Бұл `Rust` командаларын жүйелік `PATH` айнымалысына қосу үшін қажет. `Rust`-тың сәтті орнатылғанын тексеру үшін терминалда келесі команданы енгізіңіз: Сіз қазіргі нұсқаны, коммит идентификаторын және коммит күнін көресіз."
+    },
+    {
+      "id": "rust_book_01_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Мысалы: Windows жүйесінде орнату Windows жүйесінде https://www.rust-lang.org/tools/install сайтындағы нұсқауларға сәйкес `rustup-init.exe` файлын жүктеп алып, оны іске қосыңыз."
+    },
+    {
+      "id": "rust_book_01_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Орнатушы сізге қандай орнату түрін қолданатыныңызды сұрайды; әдепкі нұсқаны таңдау жеткілікті. Windows-та `Rust`-ты құрастыру үшін `MSVC build tools` орнатылған болуы керек."
+    },
+    {
+      "id": "rust_book_01_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Орнатушы сізге қажет болса оны алдын ала жүктеп алуды ұсынады."
+    },
+    {
+      "id": "rust_book_01_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Жаңарту және өшіру `Rust`-ты жаңарту үшін терминалда мынаны енгізіңіз: Өшіру үшін: Жергілікті құжаттама `Rust`-ты орнатқан кезде құжаттаманың жергілікті көшірмесі де орнатылады, оны интернетке шықпай-ақ оқуға болады."
+    },
+    {
+      "id": "rust_book_01_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Терминалда `rustup doc` командасын енгізсеңіз, шолғышта стандартты кітапхана құжаттамасы ашылады. 1.2. Hello, World! `Rust`-ты орнатқан соң, бірінші бағдарламаны жазайық."
+    },
+    {
+      "id": "rust_book_01_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Дәстүр бойынша жаңа тілмен танысқанда «Hello, world!» сөзін экранға шығаратын кішкене бағдарламадан бастау қабылданған."
+    },
+    {
+      "id": "rust_book_01_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Біз де солай етеміз."
+    },
+    {
+      "id": "rust_book_01_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Жоба қалтасын жасау Алдымен `Rust` кодыңызды сақтайтын қалта жасаңыз. `Rust`-қа кодтың қайда тұрғаны маңызды емес, бірақ біз бұл кітаптағы жаттығулар үшін `projects` атты қалта жасап, ішінде барлық жобаларды сақтауды ұсынамыз."
+    },
+    {
+      "id": "rust_book_01_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Терминалда келесі командаларды енгізіңіз: Windows-та `cmd` ішінде: `Rust` бағдарламасын жазу және орындау Жаңа бастапқы файл жасап, оны `main.rs` деп атаңыз. `Rust` файлдарының кеңейтімі әрқашан `.rs` болады."
+    },
+    {
+      "id": "rust_book_01_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Егер файл атауында бірнеше сөз болса, оларды астыңғы сызық арқылы бөлу қабылданған: мысалы, `hello_world.rs` (бірақ `helloworld.rs` емес). `main.rs` файлын ашып, ішіне мына кодты жазыңыз: Файлды сақтап, терминалға қайтыңыз. Linux немесе macOS жүйесінде келесі екі команданы енгізіңіз: Windows-та `./main` орнына `.\\main.exe` жазыңыз."
+    },
+    {
+      "id": "rust_book_01_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Қай жүйеде болса да, экранда `Hello, world!` сөзі шығуы керек."
+    },
+    {
+      "id": "rust_book_01_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Егер шықпаса, орнату қадамына қайтып, барлығы дұрыс орындалғанын тексеріңіз. `Rust` бағдарламасының құрылымы Жаңа жазған бағдарламаны жолма-жол қарастырайық."
+    },
+    {
+      "id": "rust_book_01_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Бірінші жолда: Бұл жол `main` атты функцияны жариялайды. `main` функциясы — кез келген орындалатын `Rust` бағдарламасында ең бірінші іске қосылатын код."
+    },
+    {
+      "id": "rust_book_01_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Ашатын дөңгелек жақшалардың ішінде параметрлер болады; бұл жағдайда олар жоқ."
+    },
+    {
+      "id": "rust_book_01_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Әрі қарай, функция денесі фигуралық жақшалармен оралады."
+    },
+    {
+      "id": "rust_book_01_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Функция денесінде бір ғана сөйлем бар: Бұл сөйлем «Hello, world!» сөзін экранға шығарады."
+    },
+    {
+      "id": "rust_book_01_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Назар аударатын төрт жайт: `Rust` стилі төрт бос орынмен шегініс жасайды, ал tabulation символын қолданбайды. `println!` — бұл функция емес, **макрос**."
+    },
+    {
+      "id": "rust_book_01_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Леп белгісі (`!`) макросты функциядан ажыратып тұр."
+    },
+    {
+      "id": "rust_book_01_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Макростар туралы 19-тарауда айтылады."
+    },
+    {
+      "id": "rust_book_01_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Жолды дөңгелек жақшалардың ішінде «Hello, world!» жолын беріп шақырамыз — бұл аргумент."
+    },
+    {
+      "id": "rust_book_01_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Сөйлем нүктелі үтірмен (`;`) аяқталады."
+    },
+    {
+      "id": "rust_book_01_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Нүктелі үтір сөйлемнің біткенін білдіреді және келесісі басталуы мүмкін екенін көрсетеді. `Rust` кодының көп сөйлемі нүктелі үтірмен аяқталады."
+    },
+    {
+      "id": "rust_book_01_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Құрастыру мен орындау — бұл екі бөлек қадам `Rust` — алдын ала құрастырылатын тіл."
+    },
+    {
+      "id": "rust_book_01_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Бағдарламаны орындамас бұрын оны `rustc` компиляторы арқылы орындалатын файлға айналдыру керек."
+    },
+    {
+      "id": "rust_book_01_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Біз дәл осыны жоғарыда жасадық: `rustc main.rs` командасы `main.rs` файлынан `main` (немесе Windows-та `main.exe`) деген орындалатын файл жасады."
+    },
+    {
+      "id": "rust_book_01_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Содан кейін біз сол файлды тікелей орындай алдық."
+    },
+    {
+      "id": "rust_book_01_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Бұл интерпретатор тілдерінен (мысалы Python немесе JavaScript) өзгеше: онда сіз кодты жазып, `python script.py` деп тікелей орындайсыз. `Rust`-та екі қадам бөлек: алдымен құрастыру, содан кейін орындау."
+    },
+    {
+      "id": "rust_book_01_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Бір рет құрастырылған орындалатын файлды бастапқы кодсыз да басқа компьютерге жіберіп орындай беруге болады."
+    },
+    {
+      "id": "rust_book_01_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Бұл — алдын ала құрастырылатын тілдердің артықшылықтарының бірі."
+    },
+    {
+      "id": "rust_book_01_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Бірақ `rustc` арқылы тікелей құрастыру тек қарапайым бағдарламалар үшін ыңғайлы."
+    },
+    {
+      "id": "rust_book_01_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Жоба үлкейген сайын тәуелділіктер пайда болады, оларды басқару қиындай түседі."
+    },
+    {
+      "id": "rust_book_01_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Сондықтан келесі бөлімде Cargo туралы айтамыз — ол тура осы мақсатқа арналған құрал. 1.3. Hello, Cargo! Cargo — `Rust`-тың құрылыс жүйесі әрі бума менеджері. Cargo сіздің кодыңызды құрастырады, оның тәуелділіктерін жүктеп алады, тестілерді іске қосады және басқа да көмекші тапсырмаларды орындайды. `Rust` қауымдастығы жобаларының басым көпшілігі Cargo арқылы басқарылады, сондықтан бұл бөлімде оны қолдануды үйренеміз. Cargo `rustup` арқылы `Rust`-пен бірге орнатылады. Cargo орнатылғанын тексеру үшін терминалда келесі команданы енгізіңіз: Cargo көмегімен жоба жасау Жаңа жобаны Cargo арқылы жасайық. `projects` қалтасына өтіп, мынаны енгізіңіз: `cargo new hello_cargo` командасы `hello_cargo` атты жаңа қалта жасайды және оның ішінде жобаға қажетті құрылымды дайындайды."
+    },
+    {
+      "id": "rust_book_01_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Қалтаны ашып қарасаңыз, Cargo сізге үшеуін дайындағанын көресіз: `Cargo.toml` файлы, `src` атты қалта және оның ішінде `main.rs` файлы. Cargo сонымен қатар `git` жобасын бастайды (егер `hello_cargo` бұған дейін `git` қоймасында болмаса). `Cargo.toml` файлын мәтін редакторымен ашыңыз."
+    },
+    {
+      "id": "rust_book_01_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Ішінде мынадай нәрсе болады: Бұл файл — TOML пішіміндегі баптау файлы."
+    },
+    {
+      "id": "rust_book_01_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Алғашқы бөлік — `[package]` — жобаның атауын, нұсқасын және `Rust`-тың қай басылымын қолданатынын сипаттайды."
+    },
+    {
+      "id": "rust_book_01_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Екінші бөлік — `[dependencies]` — жобаның тәуелділіктерін тізбелейтін бөлік. `Rust`-та тәуелділіктер «сандық» (`crate`) деп аталады; бұл жобада әзірге тәуелділік жоқ."
+    },
+    {
+      "id": "rust_book_01_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Енді `src/main.rs` файлын ашыңыз. Cargo сізге дайын `Hello, world!` бағдарламасын жасап қойған: Cargo жобаның бастапқы кодын `src` қалтасына сақтайтыны шартты."
+    },
+    {
+      "id": "rust_book_01_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Жобаның түбірлік қалтасы тек `Cargo.toml`, `README.md`, лицензия және басқа да конфигурация файлдары үшін. Cargo жобасын құрастыру және орындау `hello_cargo` қалтасында тұрып келесіні енгізіңіз: Бұл команда `target/debug/hello_cargo` (немесе Windows-та `target\\debug\\hello_cargo.exe`) деген орындалатын файлды жасайды."
+    },
+    {
+      "id": "rust_book_01_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Әдепкі бойынша Cargo `dev` (даму) бейіні арқылы құрастырады — бұл құрастыру жылдам, бірақ кодтың орындалу жылдамдығы жоғары емес."
+    },
+    {
+      "id": "rust_book_01_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Орындалатын файлды іске қосу үшін: Бірақ әдетте жоғарыдағы екі қадамды бір команда арқылы орындау ыңғайлы: `cargo run` командасы алдымен жобаны құрастырады (өзгеріс болса), содан кейін орындайды."
+    },
+    {
+      "id": "rust_book_01_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Әзірлеуші ретінде сіз бұл команданы ең жиі қолданасыз."
+    },
+    {
+      "id": "rust_book_01_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Тағы пайдалы команда — `cargo check`: `cargo check` кодтың құрастырылатынын тексереді, бірақ нақты орындалатын файл жасамайды."
+    },
+    {
+      "id": "rust_book_01_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Сондықтан ол `cargo build`-тен әлдеқайда жылдам жұмыс істейді."
+    },
+    {
+      "id": "rust_book_01_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Әзірлеу барысында кодтың дұрыс жазылғанын жиі тексеріп отыруға ыңғайлы."
+    },
+    {
+      "id": "rust_book_01_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Шығарылым үшін құрастыру Бағдарламаны соңғы пайдаланушыға берерде немесе оның жылдамдығын өлшегенде оны `cargo build --release` арқылы құрастырыңыз: Бұл команда оптимизациялары қосылған, орындалу жылдамдығы жоғары орындалатын файлды жасайды; нәтиже `target/release` қалтасына түседі."
+    },
+    {
+      "id": "rust_book_01_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Оптимизация құрастыру уақытын ұзартады, бірақ бағдарламаның орындалу жылдамдығын едәуір арттырады."
+    },
+    {
+      "id": "rust_book_01_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Сондықтан Cargo-ның екі бейіні бар: даму бейіні (жылдам құрастыру, жөндеу үшін) және шығарылым бейіні (баяу құрастыру, жылдам орындау). Cargo — шартты келісім Қарапайым жобалар үшін Cargo `rustc` арқылы тікелей құрастырумен салыстырғанда үлкен артықшылық бермейді."
+    },
+    {
+      "id": "rust_book_01_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Бірақ жоба үлкейген сайын Cargo-ның пайдасы анығырақ көрінеді: тәуелділіктерді қосу, сынақтарды іске қосу, бірнеше сандықтан тұратын кітапхананы басқару — бәрі Cargo арқылы оңай жасалады. `Rust` қауымдастығының жобалары `cargo new` арқылы жасалатын құрылымды ұстанады."
+    },
+    {
+      "id": "rust_book_01_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Сондықтан кез келген ашық кодты `Rust` жобасын жүктеп алып, оны: командаларымен құрастыра аласыз."
+    },
+    {
+      "id": "rust_book_01_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Осы тарауда сіз `Rust`-ты орнаттыңыз, бірінші бағдарламаңызды жаздыңыз және Cargo көмегімен жобаны қалай басқаруды үйрендіңіз."
+    },
+    {
+      "id": "rust_book_01_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_01",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда нағыз жаттығу — санды табу ойыны — арқылы тілдің негізгі ұғымдарымен жақын танысамыз: айнымалылар, мәлімет түрлері, басқару құрылымдары, сыртқы сандықтарды қосу."
+    }
+  ]
+}

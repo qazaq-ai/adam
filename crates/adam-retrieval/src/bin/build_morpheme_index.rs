@@ -62,6 +62,12 @@ const SOURCE_PACKS: &[&str] = &[
     "kazakh_proverbs_pack.json",
     "synthetic_sentences_pack.json",
     "kazakh_classics_pack.json",
+    // **v4.7.1** — Rust Book Kazakh translation, phase 2 of Rust
+    // knowledge ingestion (chapter-per-patch cadence on the v4.7.x
+    // minor). Each chapter under `data/raw/rust_book_kk/` is
+    // sentence-extracted into this pack via
+    // `scripts/build_rust_book_pack.py` and indexed here.
+    "rust_book_kk_pack.json",
 ];
 
 const PROGRESS_EVERY: usize = 10_000;

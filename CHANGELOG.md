@@ -7,6 +7,44 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.1] — 2026-04-29 — Rust Book Chapter 1 (Бастау) translated, ingested into morpheme_index (phase 2 begins)
+
+First chapter under the «глава = патч» cadence. Full Kazakh translation of the Rust Book Chapter 1 — Getting Started — covering installation (rustup, Linux/macOS, Windows, troubleshooting, updating, local docs), Hello World (project directory, writing/running the first program, anatomy of a Rust program, compile-vs-run as separate steps), and Hello Cargo (Cargo project creation, build/run/check, release build, Cargo as convention).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_01.md` — full Kazakh translation, ~3 000 words, code blocks preserved verbatim, all v4.7.0 terminology decisions applied (иелік / қарызға алу / сандық / трейт / енам / структ).
+- New `data/raw/rust_book_kk/LICENSE.md` — MIT/Apache-2.0 attribution to the original Rust Book.
+- New `data/raw/rust_book_kk/README.md` — phase-2 status, pipeline diagram, chapter status table.
+
+### Pipeline integration
+
+- New `crates/adam-corpus/src/bin/process_rust_book_kk.rs` — Rust binary that reads `data/raw/rust_book_kk/chapter_*.md`, strips fenced code blocks and markdown decoration, splits Kazakh prose into sentences (preserving backtick-quoted technical spans so the dot in `Cargo.toml` is not a sentence boundary), and emits the standard adam corpus-pack format. Replaces an initial Python prototype (rejected by the Rust-only contract test). Carries 4 unit tests covering fenced-block stripping, Cyrillic-uppercase sentence splitting, backtick-span preservation, and short-fragment rejection.
+- Generated `data/curated/rust_book_kk_pack.json`: 60 sentence-level samples from chapter 1, in the standard adam corpus-pack format with full attribution metadata.
+- Pack registered in `SOURCE_PACKS` of `build_morpheme_index.rs`, `morpheme_coverage.rs`, and `mine_lexicon_gaps.rs`.
+
+### Morpheme index impact
+
+- Indexed samples: 3 117 → **3 251** (+134 incl. 60 from rust_book_kk; remainder from per-pack indexing-limit interactions).
+- Distinct morphemes: 3 082 → **3 213** (+131).
+- Total postings: 16 262 → **17 637** (+1 375).
+- 60 chapter-1 sentences are present in `sample_texts`; 247 morphemes now reference rust_book samples.
+
+### Tests + counters
+
+- 1 new e2e test (`rust_book_chapter_01_indexed_in_morpheme_index`) — verifies ≥50 rust_book samples in the index and that chapter-1-specific morphemes (`тәуелділік`, `орнату`) have postings.
+- 4 new unit tests inside `process_rust_book_kk.rs`.
+- Workspace tests: 740 → **745** passing.
+- Cognitive eval / REPL replay unchanged.
+
+### Retrieval behaviour notes
+
+The retrieval ranker prefers `world_core` definitions over corpus citations — that is the correct priority. Chapter-1 sentences surface when (a) the query hits a Rust-specific morpheme that has no `world_core` definition AND (b) the chapter sentence outranks competing samples. As more chapters land, this ratio shifts in the chapter content's favour. No ranker tuning was done in this patch — observed behaviour is the existing ranker working as designed.
+
+### Known limitation carried from v4.7.0
+
+Direct Latin-name queries («Rust дегеніміз не?», «Cargo дегеніміз не?», «rustc дегеніміз не?») still don't tokenize through the Cyrillic-only FST. The v4.7.1 chapter has these terms in backticks (e.g. ``` `Rust` ```, ``` `Cargo` ```) which keeps them in the index but doesn't fix tokenization on the input side. ASCII-identifier passthrough remains deferred.
+
 ## [4.7.0] — 2026-04-29 — `programming_rust.jsonl` glossary + corpus-purity carve-out for technical text (phase 1 of Rust knowledge ingestion)
 
 Fifth v4.x minor. Strategic ask from user: «обучить нашу модель языку программирования Rust». Honest scope: adam can't generate code (retrieval-only architecture, `project_retrieval_not_neural_v2`), but it CAN serve as a deterministic Kazakh-language Rust glossary — and Kazakh-language Rust documentation virtually doesn't exist outside this domain. v4.7.0 = phase 1 (curated glossary). Phases 2+ = Rust Book chapter translations as patch releases (v4.7.1, v4.7.2, …).

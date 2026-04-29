@@ -48,6 +48,8 @@ const SOURCE_PACKS: &[&str] = &[
     "kazakh_proverbs_pack.json",
     "synthetic_sentences_pack.json",
     "kazakh_classics_pack.json",
+    // v4.7.1 — Rust Book Kazakh translation pack.
+    "rust_book_kk_pack.json",
 ];
 
 const LEXICON_FILES: &[&str] = &[

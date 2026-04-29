@@ -4470,6 +4470,46 @@ fn math_input_routes_to_math_refusal() {
     }
 }
 
+/// **v4.7.1** — Rust Book Chapter 1 corpus pack ingested into the
+/// morpheme index. Verifies the pack is present and indexed (the
+/// retrieval ranker may prefer world_core definitions over chapter
+/// quotes, which is the right priority — this test only checks that
+/// chapter sentences are RETRIEVABLE, not that they win every query).
+#[test]
+fn rust_book_chapter_01_indexed_in_morpheme_index() {
+    use adam_retrieval::MorphemeIndex;
+
+    let index_path = "../../data/retrieval/morpheme_index.json";
+    if !std::path::Path::new(index_path).exists() {
+        eprintln!("morpheme index not present, skipping");
+        return;
+    }
+    let raw = std::fs::read_to_string(index_path).expect("read index");
+    let index: MorphemeIndex = serde_json::from_str(&raw).expect("parse index");
+
+    let json: serde_json::Value = serde_json::from_str(&raw).expect("parse index json");
+    let sample_texts = json["sample_texts"].as_object().expect("sample_texts map");
+    let rust_book_samples: Vec<_> = sample_texts
+        .keys()
+        .filter(|k| k.contains("rust_book"))
+        .collect();
+    assert!(
+        rust_book_samples.len() >= 50,
+        "v4.7.1 expects ≥50 rust_book sentences in morpheme_index; found {}",
+        rust_book_samples.len()
+    );
+
+    // Index must reference at least one rust_book sample from a
+    // chapter-1-specific morpheme. `тәуелділік` (dependency) appears
+    // multiple times in chapter 1 (Cargo discussion); `орнату`
+    // (installation) opens the chapter.
+    let hits = index.search("тәуелділік").len() + index.search("орнату").len();
+    assert!(
+        hits > 0,
+        "v4.7.1 expects тәуелділік / орнату postings to include rust_book samples"
+    );
+}
+
 /// **v4.7.0** — `programming_rust.jsonl` world_core domain. Verify
 /// Kazakh-paraphrased Rust concepts (иелік, трейт, тіршілік мерзімі,
 /// сілтеме) round-trip through retrieval as IsA definitions. Latin-

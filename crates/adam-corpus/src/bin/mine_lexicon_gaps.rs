@@ -77,6 +77,8 @@ const SOURCE_PACKS: &[&str] = &[
     "synthetic_sentences_pack.json",
     "kazakh_classics_pack.json",
     "kazakh_textbooks_pack.json",
+    // v4.7.1 — Rust Book Kazakh translation pack.
+    "rust_book_kk_pack.json",
 ];
 
 #[derive(Debug, Deserialize)]
