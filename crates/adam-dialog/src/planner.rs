@@ -537,6 +537,8 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             crate::system_identity::SystemAspect::Capabilities => "ask_about_system.capabilities",
             crate::system_identity::SystemAspect::Knowledge => "ask_about_system.knowledge",
             crate::system_identity::SystemAspect::Limitations => "ask_about_system.limitations",
+            // v4.6.5 — operational principles aspect.
+            crate::system_identity::SystemAspect::Principles => "ask_about_system.principles",
         },
         Intent::StatementOfName { .. } => "statement_of_name",
         Intent::AskAge => "ask_age",

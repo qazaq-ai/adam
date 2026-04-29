@@ -877,7 +877,26 @@ fn detect_ask_about_system(
             || joined.contains("авторыңыз")
             || joined.contains("жасаушың")
             || joined.contains("жасаушыңыз")
-            || joined.contains("кім құрастырды"))
+            || joined.contains("кім құрастырды")
+            // **v4.6.1** — additional creator-question verb forms
+            // surfaced by a 2026-04-29 real-REPL transcript:
+            //   «Ал сені кім жаратты?»     (created)
+            //   «Сізді кім дамытқан?»      (developed)
+            //   «Сізді қай бағдарламашы дайындады?» (which programmer prepared)
+            // The first two key off the verb directly; the third
+            // also covers the «бағдарламашы» (programmer) framing
+            // since that's a creator-role question even without
+            // a `кім жасады`-style verb.
+            || joined.contains("кім жаратты")
+            || joined.contains("кім дамытқан")
+            || joined.contains("кім дамытты")
+            || joined.contains("кім дайындады")
+            || joined.contains("жаратушың")
+            || joined.contains("жаратушыңыз")
+            || joined.contains("қай бағдарламашы")
+            || joined.contains("қандай бағдарламашы")
+            || joined.contains("бағдарламашы дайындады")
+            || joined.contains("бағдарламашы жасады"))
     {
         return Some(SystemAspect::Creator);
     }
@@ -994,6 +1013,29 @@ fn detect_ask_about_system(
         || joined.contains("білімініз қандай");
     if knowledge_general_marker || knowledge_explicit_marker {
         return Some(SystemAspect::Knowledge);
+    }
+
+    // **v4.6.5** — Principles aspect: "what are your principles?".
+    // Surface forms: `принциптерің / ұстанымдарың / заңдарың /
+    // ережелерің / құндылықтарың` plus an interrogative qualifier
+    // (`не`, `қандай`). The articulation layer — adam states the
+    // values it upholds (respect humans, no fabrication, no
+    // incitement, privacy, no illegal assistance, audit trail,
+    // Kazakh-cultural respect, scope discipline). The underlying
+    // guarantees are already safe-by-construction; this aspect
+    // makes the value contract discoverable.
+    let principles_marker = joined.contains("принциптерің")
+        || joined.contains("принциптеріңіз")
+        || joined.contains("ұстанымдарың")
+        || joined.contains("ұстанымдарыңыз")
+        || joined.contains("заңдарың")
+        || joined.contains("заңдарыңыз")
+        || joined.contains("ережелерің")
+        || joined.contains("ережелеріңіз")
+        || joined.contains("құндылықтарың")
+        || joined.contains("құндылықтарыңыз");
+    if principles_marker {
+        return Some(SystemAspect::Principles);
     }
 
     // **v4.3.3** — General aspect: pronoun-led identity question.

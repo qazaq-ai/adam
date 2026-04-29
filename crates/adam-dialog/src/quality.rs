@@ -46,6 +46,18 @@ pub enum ResponseQualityIssue {
     PlaceholderLeak,
     LatinCharactersForbidden,
     RepeatedWhitespace,
+    /// **v4.6.5** — forbidden-pattern leak. The reply contains a
+    /// substring that the principle layer of `SystemIdentity`
+    /// declares adam will not emit (slurs, hate-speech markers,
+    /// incitement-to-violence verbs). adam's deterministic
+    /// retrieval-only design makes these unreachable through
+    /// normal flow — every output is either a curated template,
+    /// a verbatim corpus quote, an FST-synthesised slot, or a
+    /// rule-derived chain, all human-reviewed. This filter is a
+    /// **defensive backstop** against future authoring mistakes
+    /// (e.g. a regression that lets through a stale slur from an
+    /// unfiltered corpus pack), not the primary safety mechanism.
+    ForbiddenPatternLeak,
 }
 
 /// Audit a rendered dialog response for deterministic quality issues.
@@ -63,10 +75,41 @@ pub fn audit_response(output: &str) -> ResponseQualityReport {
     if !output.trim().is_empty() && output.contains("  ") {
         issues.push(ResponseQualityIssue::RepeatedWhitespace);
     }
+    if contains_forbidden_pattern(output) {
+        issues.push(ResponseQualityIssue::ForbiddenPatternLeak);
+    }
     ResponseQualityReport {
         output_len: output.chars().count(),
         issues,
     }
+}
+
+/// **v4.6.5** — defensive backstop checking the rendered reply
+/// against a small list of forbidden Kazakh substrings. Every
+/// pattern here represents an output adam's principles say should
+/// never reach the user (slurs / explicit hate-speech / incitement
+/// verbs in surface form). The list is intentionally minimal —
+/// adam's retrieval-only design keeps the *real* safety surface
+/// at the curation layer. This filter just catches a regression
+/// that bypasses curation. Match is case-insensitive substring.
+fn contains_forbidden_pattern(output: &str) -> bool {
+    const FORBIDDEN: &[&str] = &[
+        // Insults / slurs aimed at humans. Kept minimal +
+        // observable-in-real-world; not an exhaustive blocklist.
+        "ақымақ",
+        "есуас",
+        "жындыңыз",
+        "өлтіремін",
+        "өлтіреміз",
+        // Russian / English profanity that the Kazakh-only surface
+        // policy already blocks via `contains_latin`, but keeping
+        // explicit substring guards for any Cyrillic-transliterated
+        // forms.
+        "сволочь",
+        "ублюдок",
+    ];
+    let lower = output.to_lowercase();
+    FORBIDDEN.iter().any(|p| lower.contains(p))
 }
 
 /// Summary of a response-vs-trace faithfulness audit.

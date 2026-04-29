@@ -256,6 +256,19 @@ templates = [
     "өзімнің білмейтінімді ашық айтайын: {system_limitations}",
 ]
 
+# v4.6.5 — Principles aspect: «принциптерің / ұстанымдарың /
+# заңдарың не?». Renders the `system_principles` slot — the
+# operational values adam upholds. Articulation layer; the
+# underlying guarantees (no fabrication, refuse-out-of-scope, no
+# novel generation) are already safe-by-construction.
+[[families]]
+key = "ask_about_system.principles"
+templates = [
+    "{system_principles}",
+    "менің ұстанымдарым: {system_principles}",
+    "қандай принциптер бойынша жұмыс істеймін: {system_principles}",
+]
+
 # v4.4.0 — User opted out of resolving a pending contradiction
 # (replied "neither / I don't know / skip" to a CheckContradiction
 # prompt). `Conversation::try_dismiss_pending_contradiction` has

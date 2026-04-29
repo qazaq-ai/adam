@@ -238,6 +238,48 @@ fn assert_intent(input: &str, expected: Intent) {
     assert_eq!(got, expected, "input={input:?}");
 }
 
+/// **v4.6.5** — apply the same orthographic passes `realiser::realise`
+/// uses on the final reply: (1) capitalise the first alphabetic
+/// codepoint past any leading punctuation, (2) append `.` if the
+/// reply ends with an alphabetic character AND is at least 10
+/// codepoints long. Templates throughout
+/// `data/dialog/templates/v1.toml` are authored lowercase without
+/// trailing periods, but production replies surface capitalised
+/// + sentence-final — the e2e helpers below fold both transforms
+/// into the `allowed` list so expectations stay readable in their
+/// raw template form.
+fn capitalise_expected(s: &str) -> String {
+    // Step 1: capitalise first letter.
+    let mut cased = String::with_capacity(s.len() + 1);
+    let mut chars = s.chars();
+    let mut capitalised = false;
+    for ch in chars.by_ref() {
+        if !capitalised && ch.is_alphabetic() {
+            for u in ch.to_uppercase() {
+                cased.push(u);
+            }
+            capitalised = true;
+        } else {
+            cased.push(ch);
+        }
+    }
+    // Step 2: append sentence-final period (mirrors
+    // `ensure_sentence_final` in `realiser.rs`).
+    let trimmed = cased.trim_end().to_string();
+    if trimmed.chars().count() < 10 {
+        return cased;
+    }
+    match trimmed.chars().last() {
+        Some(last) if matches!(last, '.' | '!' | '?' | '…' | '»' | '"' | ')' | ']') => cased,
+        Some(last) if last.is_alphabetic() => {
+            let mut out = trimmed;
+            out.push('.');
+            out
+        }
+        _ => cased,
+    }
+}
+
 /// Assert the final response text is one of `allowed` (accounting for
 /// the planner's stochastic pick across different seeds).
 fn assert_response_in_set(input: &str, allowed: &[&str]) {
@@ -245,11 +287,12 @@ fn assert_response_in_set(input: &str, allowed: &[&str]) {
         return;
     };
     // Cycle seeds 0..8 to sample the planner's output space.
+    let allowed_caps: Vec<String> = allowed.iter().map(|s| capitalise_expected(s)).collect();
     for seed in 0..8u64 {
         let out = respond(input, &lex, seed);
         assert!(
-            allowed.contains(&out.as_str()),
-            "input={input:?} seed={seed} output={out:?} not in allowed={allowed:?}",
+            allowed_caps.iter().any(|a| a == &out),
+            "input={input:?} seed={seed} output={out:?} not in allowed={allowed_caps:?}",
         );
     }
 }
@@ -262,11 +305,12 @@ fn assert_response_with_toml(input: &str, allowed: &[&str]) {
         return;
     };
     let repo = load_repo();
+    let allowed_caps: Vec<String> = allowed.iter().map(|s| capitalise_expected(s)).collect();
     for seed in 0..16u64 {
         let out = respond_with_repo(input, &lex, &repo, seed);
         assert!(
-            allowed.contains(&out.as_str()),
-            "input={input:?} seed={seed} output={out:?} not in allowed={allowed:?}",
+            allowed_caps.iter().any(|a| a == &out),
+            "input={input:?} seed={seed} output={out:?} not in allowed={allowed_caps:?}",
         );
     }
 }
@@ -450,9 +494,10 @@ fn response_ask_name_with_known_user_profile() {
         let out = conv.turn("атыңыз кім", &lex, &repo, seed);
         assert!(
             [
-                "сіздің атыңыз Дәулет",
-                "мен сізді Дәулет деп білемін",
-                "Дәулет деп танысқан едіңіз",
+                // v4.6.5 — replies arrive sentence-cased + period (≥10 chars).
+                "Сіздің атыңыз Дәулет.",
+                "Мен сізді Дәулет деп білемін.",
+                "Дәулет деп танысқан едіңіз.",
             ]
             .contains(&out.as_str()),
             "seed={seed} unexpected known-user AskName output: {out:?}"
@@ -562,9 +607,10 @@ fn response_ask_location_with_known_user_profile() {
         let out = conv.turn("қайда тұрасыз", &lex, &repo, seed);
         assert!(
             [
-                "сіз Алматыда тұрасыз",
-                "менің білуімше, мекеніңіз Алматы",
-                "сіз Алматы жақтан екенсіз",
+                // v4.6.5 — sentence-cased + period.
+                "Сіз Алматыда тұрасыз.",
+                "Менің білуімше, мекеніңіз Алматы.",
+                "Сіз Алматы жақтан екенсіз.",
             ]
             .contains(&out.as_str()),
             "seed={seed} unexpected known-user AskLocation output: {out:?}"
@@ -583,9 +629,10 @@ fn response_ask_location_with_known_geo_feature_profile() {
         let out = conv.turn("қайда тұрасыз", &lex, &repo, seed);
         assert!(
             [
-                "менің білуімше, сіз Каспий жақтансыз",
-                "сіз Каспий маңынан екенсіз",
-                "Каспий — теңіз; соған жақын жақтансыз",
+                // v4.6.5 — sentence-cased + period.
+                "Менің білуімше, сіз Каспий жақтансыз.",
+                "Сіз Каспий маңынан екенсіз.",
+                "Каспий — теңіз; соған жақын жақтансыз.",
             ]
             .contains(&out.as_str()),
             "seed={seed} unexpected known-geo AskLocation output: {out:?}"
@@ -648,9 +695,10 @@ fn response_ask_occupation_with_known_user_profile() {
         let out = conv.turn("немен айналысасың", &lex, &repo, seed);
         assert!(
             [
-                "сіз мұғалім болып еңбек етіп жүрсіз",
-                "менің білуімше, мамандығыңыз мұғалім",
-                "мұғалім — сіздің кәсібіңіз",
+                // v4.6.5 — sentence-cased + period.
+                "Сіз мұғалім болып еңбек етіп жүрсіз.",
+                "Менің білуімше, мамандығыңыз мұғалім.",
+                "Мұғалім — сіздің кәсібіңіз.",
             ]
             .contains(&out.as_str()),
             "seed={seed} unexpected known-user AskOccupation output: {out:?}"
@@ -962,13 +1010,14 @@ fn conversation_remembers_name_across_turns() {
     for seed in 0..16u64 {
         let out = conv.turn("сәлем", &lex, &repo, seed);
         assert!(!out.contains("{name}"), "unfilled slot leaked: {out:?}");
-        if out == "сәлем, Дәулет" {
+        // v4.6.5 — replies surface sentence-cased + period (≥10 chars).
+        if out == "Сәлем, Дәулет." {
             saw_personalised = true;
         }
     }
     assert!(
         saw_personalised,
-        "expected at least one seed in 0..16 to pick \"сәлем, Дәулет\""
+        "expected at least one seed in 0..16 to pick \"Сәлем, Дәулет.\""
     );
 }
 
@@ -978,12 +1027,12 @@ fn conversation_without_name_never_emits_unfilled_greeting() {
     let repo = load_repo();
     let mut conv = Conversation::new();
     // No introduction: no name in session. Every seed must produce a
-    // literal-only greeting.
+    // literal-only greeting. v4.6.5 — sentence-cased + period (≥10 chars).
     for seed in 0..16u64 {
         let out = conv.turn("сәлем", &lex, &repo, seed);
         assert!(!out.contains("{"), "slot placeholder leaked: {out:?}");
         assert!(
-            out == "сәлем" || out == "сәлем достым",
+            out == "Сәлем" || out == "Сәлем достым.",
             "unexpected greeting w/o name: {out:?}"
         );
     }
@@ -1457,7 +1506,8 @@ fn realiser_synthesises_locative_for_city_slot() {
     for seed in 0..32u64 {
         let out = conv.turn("мен Алматыданмын", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
-        if out == "Алматыда тұратыныңызды түсіндім" || out == "Алматыда екеніңізді есте сақтаймын"
+        // v4.6.5 — replies surface sentence-cased + period.
+        if out == "Алматыда тұратыныңызды түсіндім." || out == "Алматыда екеніңізді есте сақтаймын."
         {
             saw_locative = true;
         }
@@ -1496,7 +1546,8 @@ fn realiser_synthesises_plural_for_occupation_slot() {
     for seed in 0..32u64 {
         let out = conv.turn("мен мұғаліммін", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
-        if out == "мұғалімдер еңбегі маңызды" {
+        // v4.6.5 — sentence-cased + period.
+        if out == "Мұғалімдер еңбегі маңызды." {
             saw_plural = true;
         }
     }
@@ -1586,7 +1637,8 @@ fn cross_slot_greeting_fires_when_both_name_and_city_known() {
     for seed in 0..32u64 {
         let out = conv.turn("сәлем", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
-        if out == "сәлем, Дәулет, Алматыдан бәрі жақсы ма" {
+        // v4.6.5 — sentence-cased + period.
+        if out == "Сәлем, Дәулет, Алматыдан бәрі жақсы ма." {
             saw_cross = true;
         }
     }
@@ -4326,6 +4378,111 @@ fn lexicon_includes_core_nouns_su_ot_er() {
             "v4.4.13 core-noun additions: `{root}` must parse as a noun"
         );
     }
+}
+
+/// **v4.6.5** — Creator detector +3 verb forms (real-REPL
+/// 2026-04-29 transcript). Pre-v4.6.5 the Creator detector
+/// matched only `кім жасады / кім құрды / кім жасап шығарды /
+/// авторың / жасаушың / кім құрастырды / кім ойлап тапты`. The
+/// transcript carried «Ал сені кім жаратты?», «Сізді кім
+/// дамытқан?», «Сізді қай бағдарламашы дайындады?» — all 3 fell
+/// through to refusal. v4.6.5 adds `жаратты / дамытқан /
+/// дамытты / дайындады / жаратушың / қай бағдарламашы`.
+#[test]
+fn creator_detector_recognises_v4_6_5_verb_forms() {
+    let Some(lex) = load_lexicon() else { return };
+    for input in [
+        "Ал сені кім жаратты?",
+        "Сізді кім дамытқан?",
+        "Сізді кім дамытты?",
+        "Сізді қай бағдарламашы дайындады?",
+        "Сенің жаратушың кім?",
+    ] {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert!(
+            matches!(
+                intent,
+                adam_dialog::Intent::AskAboutSystem {
+                    aspect: adam_dialog::SystemAspect::Creator
+                }
+            ),
+            "v4.6.5 creator question {input:?} must route to Creator aspect, got {intent:?}"
+        );
+    }
+}
+
+/// **v4.6.5** — orthographic pass: capitalisation of first letter
+/// + sentence-final period for declarative replies. Verifies
+/// realiser output via the live `Conversation::turn` path.
+#[test]
+fn realiser_capitalises_and_periods_declarative_replies() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = adam_dialog::Conversation::new();
+    // Long enough reply to trigger the period gate.
+    let _ = conv.turn("менің атым Дәулет", &lex, &repo, 0);
+    let out = conv.turn("атыңыз кім", &lex, &repo, 0);
+    assert!(
+        out.starts_with(|c: char| c.is_uppercase()),
+        "v4.6.5 capitalisation: reply must start with uppercase, got {out:?}"
+    );
+    if out.chars().count() >= 10 {
+        let last = out.chars().last().unwrap();
+        assert!(
+            matches!(last, '.' | '!' | '?' | '…' | '»' | '"'),
+            "v4.6.5 period gate: declarative reply must end with sentence-final punctuation, got {out:?}"
+        );
+    }
+}
+
+/// **v4.6.5** — Principles aspect routes to AskAboutSystem.
+#[test]
+fn ask_principles_routes_to_principles_aspect() {
+    let Some(lex) = load_lexicon() else { return };
+    for input in [
+        "Принциптерің қандай?",
+        "Ұстанымдарың не?",
+        "Ережелерің қандай?",
+        "Заңдарың не?",
+    ] {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert!(
+            matches!(
+                intent,
+                adam_dialog::Intent::AskAboutSystem {
+                    aspect: adam_dialog::SystemAspect::Principles
+                }
+            ),
+            "v4.6.5 principles question {input:?} must route to Principles aspect, got {intent:?}"
+        );
+    }
+}
+
+/// **v4.6.5** — forbidden-pattern filter in `audit_response`.
+/// Defensive backstop for outputs that bypass curation. Verifies
+/// the issue surfaces in the audit report.
+#[test]
+fn quality_audit_flags_forbidden_pattern_leak() {
+    use adam_dialog::quality::{ResponseQualityIssue, audit_response};
+    let report = audit_response("сен ақымақ");
+    assert!(
+        report
+            .issues
+            .iter()
+            .any(|i| matches!(i, ResponseQualityIssue::ForbiddenPatternLeak)),
+        "v4.6.5 quality audit must flag forbidden patterns; got {:?}",
+        report.issues
+    );
+    // Clean reply must have no ForbiddenPatternLeak issue.
+    let clean = audit_response("Сәлем достым");
+    assert!(
+        !clean
+            .issues
+            .iter()
+            .any(|i| matches!(i, ResponseQualityIssue::ForbiddenPatternLeak)),
+        "v4.6.5 quality audit must NOT flag clean replies; got {:?}",
+        clean.issues
+    );
 }
 
 /// **v4.6.0** — closed-class additions: `өте` (intensifier) and

@@ -68,6 +68,21 @@ pub struct SystemIdentity {
     /// the envelope rather than fabricating, and the limitations
     /// list makes the envelope explicit.
     pub limitations_summary: String,
+    /// **v4.6.5** — multi-line Kazakh prose listing adam's
+    /// operational principles (the values it upholds). Rendered
+    /// into `ask_about_system.principles` when the user asks
+    /// «принциптерің / ұстанымдарың / заңдарың не?». Operationally
+    /// grounded, not theological — every principle maps to actual
+    /// code/data invariants in this repository (e.g. "respect
+    /// humans" → the existing `insult` template family redirects
+    /// to «мен адамды құрметтеймін»; "no fabrication" → the
+    /// `audit_typed_faithfulness` quality gate; "audit trail" →
+    /// `TurnTrace.tool_calls`). Articulating principles makes
+    /// adam's value contract discoverable without changing what
+    /// the system can actually do — those guarantees are already
+    /// safe-by-construction in a deterministic retrieval-only
+    /// system.
+    pub principles_summary: String,
 }
 
 impl SystemIdentity {
@@ -115,6 +130,15 @@ impl SystemIdentity {
                 ғылыми тақырыптар әлі жоқ; егер сұрағыңыз менің білімімнің шегінен шықса, \
                 ойдан жасамаймын — оның орнына білмейтінімді ашық айтамын"
                 .into(),
+            principles_summary: "Менің ұстанымдарым: адамды құрметтеймін, ешкімді кемсітпеймін \
+                және қорламаймын; жалған сөйлемеймін — білмейтінімді ашық айтамын, ойдан \
+                ештеңе шығармаймын; зорлық-зомбылыққа, өшпенділікке немесе кемсітушілікке \
+                шақырмаймын; жеке өмір құпиясын құрметтеймін — пайдаланушының деректерін \
+                сақтаймын, бөтенге бермеймін; заңсыз әрекетке, зиянды нұсқауларға көмектеспеймін; \
+                әрбір жауабымды дереккөзіне жалғап аудит ете аламын; қазақ тілі мен мәдениетіне \
+                адал болып, оны құрметтеп таратуға тырысамын; өзімнің шегімді біліп, шегімнен \
+                шықпаймын — қажет кезінде сыпайы түрде бас тартамын"
+                .into(),
         }
     }
 
@@ -151,6 +175,8 @@ impl SystemIdentity {
                 "system_limitations".into(),
                 self.limitations_summary.clone(),
             ),
+            // v4.6.5 — operational principles slot.
+            ("system_principles".into(), self.principles_summary.clone()),
         ]
     }
 }
@@ -195,6 +221,17 @@ pub enum SystemAspect {
     /// fabricating, so an explicit limitations list makes the
     /// envelope discoverable.
     Limitations,
+    /// **v4.6.5** — "What are your principles?" — surface form:
+    /// `принциптерің қандай?` / `ұстанымдарың не?` / `заңдарың
+    /// қандай?` / `ережелерің не?`. Renders the
+    /// `principles_summary` field. Operational values adam
+    /// upholds: respect humans, no fabrication, no incitement,
+    /// privacy, no illegal-act assistance, audit trail,
+    /// Kazakh-cultural respect, scope discipline. Articulation
+    /// layer — the underlying guarantees are already
+    /// safe-by-construction in this deterministic retrieval-only
+    /// system; this aspect makes the value contract discoverable.
+    Principles,
 }
 
 impl SystemAspect {
@@ -210,6 +247,7 @@ impl SystemAspect {
             SystemAspect::Capabilities => ".capabilities",
             SystemAspect::Knowledge => ".knowledge",
             SystemAspect::Limitations => ".limitations",
+            SystemAspect::Principles => ".principles",
         }
     }
 }
@@ -269,6 +307,10 @@ mod tests {
             SystemAspect::Limitations.template_key_suffix(),
             ".limitations"
         );
+        assert_eq!(
+            SystemAspect::Principles.template_key_suffix(),
+            ".principles"
+        );
     }
 
     /// **v4.6.0** — verify the new self-awareness fields are
@@ -282,6 +324,7 @@ mod tests {
             ("capabilities", &id.capabilities_summary),
             ("knowledge", &id.knowledge_summary),
             ("limitations", &id.limitations_summary),
+            ("principles", &id.principles_summary),
         ] {
             assert!(
                 value.len() >= 100,

@@ -625,6 +625,24 @@
       }
     },
     {
+      "id": "creator_detector_v4_6_5_verb_forms",
+      "category": "action_routing",
+      "description": "v4.6.5: real-REPL 2026-04-29 transcript carried «Ал сені кім жаратты?» / «Сізді кім дамытқан?» / «Сізді қай бағдарламашы дайындады?» — Creator detector matched none. v4.6.5 added `жаратты / дамытқан / дамытты / дайындады / жаратушың / қай бағдарламашы` patterns. Routes to AskAboutSystem(Creator).",
+      "turns": ["Ал сені кім жаратты?"],
+      "expect": {
+        "epistemic_status": "Certain"
+      }
+    },
+    {
+      "id": "principles_aspect_v4_6_5",
+      "category": "action_routing",
+      "description": "v4.6.5: «Принциптерің қандай?» routes to AskAboutSystem(Principles). New `principles_summary` field on SystemIdentity articulates operational values adam upholds (respect humans, no fabrication, no incitement, privacy, no illegal-act assistance, audit trail, Kazakh-cultural respect, scope discipline). Articulation layer — the underlying guarantees are already safe-by-construction.",
+      "turns": ["Принциптерің қандай?"],
+      "expect": {
+        "epistemic_status": "Certain"
+      }
+    },
+    {
       "id": "discourse_anaphora_onda_resolves_to_previous_topic_v4_6_0",
       "category": "goal_continuity",
       "description": "v4.6.0 discourse-anaphora resolution. After turn 1 establishes қазақстан as the discourse topic, turn 2's «Ал онда қанша аймақ бар?» must reuse қазақстан as the topic noun (not surface «Он — сан» from the FST misanalysis of `онда`). New `discourse.rs` module + `last_query_topic` session slot. The cognitive-side invariant: turn 2's epistemic must NOT land on Unknown (the pre-v4.6.0 floor) — Tentative or better is correct since the recovered topic enables retrieval.",

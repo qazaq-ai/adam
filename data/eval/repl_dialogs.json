@@ -298,6 +298,46 @@
       ]
     },
     {
+      "id": "creator_detector_zharatty_v4_6_5",
+      "category": "system_identity",
+      "description": "v4.6.5: «Ал сені кім жаратты?» routes to AskAboutSystem(Creator). Pre-v4.6.5 `жаратты` was missing from the Creator detector verb list.",
+      "turns": [
+        {"user": "Ал сені кім жаратты?", "output_contains_lower_any": ["баймурзин"]}
+      ]
+    },
+    {
+      "id": "creator_detector_damytqan_v4_6_5",
+      "category": "system_identity",
+      "description": "v4.6.5: «Сізді кім дамытқан?» (developed) routes to Creator.",
+      "turns": [
+        {"user": "Сізді кім дамытқан?", "output_contains_lower_any": ["баймурзин"]}
+      ]
+    },
+    {
+      "id": "creator_detector_qay_baghdarlamasy_v4_6_5",
+      "category": "system_identity",
+      "description": "v4.6.5: «Сізді қай бағдарламашы дайындады?» (which programmer prepared) routes to Creator.",
+      "turns": [
+        {"user": "Сізді қай бағдарламашы дайындады?", "output_contains_lower_any": ["баймурзин"]}
+      ]
+    },
+    {
+      "id": "principles_aspect_articulates_values_v4_6_5",
+      "category": "system_identity",
+      "description": "v4.6.5: «Принциптерің қандай?» surfaces adam's operational principles list — respect humans, no fabrication, no incitement, privacy, etc.",
+      "turns": [
+        {"user": "Принциптерің қандай?", "output_contains_lower_any": ["құрметтеймін"]}
+      ]
+    },
+    {
+      "id": "capitalised_replies_start_with_uppercase_v4_6_5",
+      "category": "regression",
+      "description": "v4.6.5: every reply starts with an uppercase letter (sentence-case). This is the lock for the realiser's `capitalise_first_letter` orthographic pass — implemented as substring assertions because uppercase-prefix can't be expressed via the existing `output_contains_lower_any` check (which lowercases). Use a positive control: the input «Сәлем» replies with the verbatim greeting which starts with capital `С`. The harness's `output_not_contains_lower` checks against a lowercased copy, so we can't directly assert capitalisation here — covered by the `realiser_capitalises_and_periods_declarative_replies` e2e test instead. This dialog locks the surface form remains non-empty under the orthographic pass.",
+      "turns": [
+        {"user": "Сәлем", "output_contains_lower_any": ["сәлем"], "output_not_contains_lower": ["{"]}
+      ]
+    },
+    {
       "id": "ask_capabilities_lists_what_adam_can_do_v4_6_0",
       "category": "system_identity",
       "description": "v4.6.0: «Не істей аласың?» must surface the capabilities list (KZ morphology, slot recall, KZ geography knowledge, etc.). Pre-v4.6.0 fell through to «басқа сұрақ қойсаңыз» generic refusal — no detector matched. New SystemAspect::Capabilities + ask_about_system.capabilities template family.",

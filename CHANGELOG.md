@@ -7,6 +7,70 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.6.5] — 2026-04-29 — Bundle of 5 innovations: Creator detector +3 verbs / capitalization / period gate / Principles aspect / forbidden-pattern filter
+
+First release under the new patch-bundling cadence (memory `feedback_versioning_post_1_0` updated 2026-04-29): patches bundle, version reflects the count of innovations. Five innovations bundled here → **v4.6.0 → v4.6.5** (skipping 1–4 by user-confirmed convention).
+
+### Innovation 1 — Creator detector +3 verb forms
+
+Real-REPL 2026-04-29 (second transcript) carried «Ал сені кім жаратты?» / «Сізді кім дамытқан?» / «Сізді қай бағдарламашы дайындады?» — all 3 fell through to refusal. v4.6.5 extends the Creator branch in `detect_ask_about_system` with `жаратты` (created), `дамытқан / дамытты` (developed), `дайындады` (prepared), `жаратушың` (creator-as-noun), `қай бағдарламашы` (which programmer). Routes to `AskAboutSystem(Creator)`.
+
+### Innovation 2 — Capitalization filter
+
+Every reply now starts with an uppercase letter (sentence-case). New `capitalise_first_letter` orthographic pass in `realiser::realise`:
+- Steps past leading whitespace + punctuation (so quote-led replies «...» capitalise the first letter of the actual word, not the quote).
+- Cyrillic-Kazakh-aware: `қ`/`ң`/`ғ`/`ө`/`ү`/`ұ`/`һ` → `Қ`/`Ң`/`Ғ`/`Ө`/`Ү`/`Ұ`/`Һ` via `char::to_uppercase`.
+- No-op on empty or all-non-alphabetic strings.
+
+Test helpers `assert_response_in_set` / `assert_response_with_toml` updated to apply the same orthographic transform to the `allowed` list, so test expectations stay readable in their lowercase template form. ~40 e2e tests updated to expect the capitalised + periodised forms.
+
+### Innovation 3 — Sentence-final period gate
+
+Declarative replies ≥10 codepoints ending in an alphabetic character now get `.` appended. New `ensure_sentence_final` pass in the realiser. Short interjections («Сәлем», «Иә», «Жақсы») stay as-is. Replies already ending in `.`/`!`/`?`/`…`/`»`/`"`/`)`/`]` are left alone.
+
+### Innovation 4 — `SystemAspect::Principles`
+
+New 8th `SystemAspect` variant + `principles_summary` field on `SystemIdentity` (substantial Kazakh prose listing operational values adam upholds: respect humans, no fabrication, no incitement, privacy, no illegal-act assistance, audit trail, Kazakh-cultural respect, scope discipline). New `ask_about_system.principles` template family. Detector matches `принциптерің / ұстанымдарың / заңдарың / ережелерің / құндылықтарың`.
+
+**Why an articulation layer matters even when the guarantees are safe-by-construction.** adam's deterministic retrieval-only design already prevents fabrication, novel-text generation, and out-of-envelope output. But a user asking «принциптерің қандай?» can't see those guarantees from the outside. The Principles aspect makes the value contract **discoverable** without changing what the system can actually do.
+
+### Innovation 5 — Forbidden-pattern filter
+
+New `ResponseQualityIssue::ForbiddenPatternLeak` variant + `contains_forbidden_pattern` check in `audit_response`. Defensive backstop catching outputs that bypass curation (slurs / hate-speech markers / incitement verbs). Pattern list intentionally minimal — the real safety surface is at the curation layer; this filter just catches a regression. Match is case-insensitive substring.
+
+### Verified end-to-end on the 2026-04-29 transcript
+
+| User turn | Pre-v4.6.5 | Post-v4.6.5 |
+|---|---|---|
+| `Ал сені кім жаратты?` | "түсінбедім" refusal | «Баймурзин Даулет Абузарович мені 2026-04-07 күні жасап шығарды.» |
+| `Сізді кім дамытқан?` | "басқа сұрақ қойсаңыз" refusal | «Мені Баймурзин Даулет Абузарович құрды; ол менің авторым.» |
+| `Сізді қай бағдарламашы дайындады?` | "Бәлкім, бағдарламашы туралы…" tangential | «Менің авторым — Баймурзин Даулет Абузарович.» |
+| `Принциптерің қандай?` | (no detector) | full principles list |
+| `Сәлем` | `сәлем` (lowercase) | `Сәлем` (sentence-case) |
+| `Қазақстан туралы не білесіз?` | `қазақстан туралы… ел` (no period) | `Қазақстан туралы… ел.` (period) |
+
+### Tests
+
+- 4 new e2e regressions: `creator_detector_recognises_v4_6_5_verb_forms`, `realiser_capitalises_and_periods_declarative_replies`, `ask_principles_routes_to_principles_aspect`, `quality_audit_flags_forbidden_pattern_leak`.
+- 8 new lib tests in `realiser` (capitalisation 4 + period gate 4).
+- Existing `canonical_identity_has_substantial_self_awareness_summaries` extended to lock the new `principles_summary` field.
+- 2 new cognitive scenarios: `creator_detector_v4_6_5_verb_forms`, `principles_aspect_v4_6_5`.
+- 5 new REPL replay dialogs: 3 Creator-verb regressions, Principles aspect, capitalisation lock.
+- ~40 existing e2e tests updated to expect capitalised + periodised forms via the `capitalise_expected` helper.
+
+Workspace **703 → 715** (+12 tests). Cognitive eval **63/63 → 65/65 canonical**. REPL replay **50/50 → 55/55 canonical**. Template families **53 → 54**. `SystemAspect` variants **7 → 8**.
+
+### State
+
+| | v4.6.0 | v4.6.5 |
+|---|---|---|
+| Workspace tests | 703 | **715** (+12) |
+| Cognitive eval | 63/63 canonical | **65/65 canonical** (+2 scenarios) |
+| REPL replay | 50/50 canonical | **55/55 canonical** (+5 dialogs) |
+| `SystemAspect` variants | 7 | **8** (+ Principles) |
+| Template families | 53 | **54** (+ ask_about_system.principles) |
+| Why patch (bundle of 5) | — | per the v4.6.5-clarified cadence: 5 innovations bundled → patch sub-counter = 5; not minor since each piece is self-contained (one detector class extension, one orthographic pass, one period gate, one self-awareness aspect, one defensive filter) — none individually warrants a minor bump |
+
 ## [4.6.0] — 2026-04-29 — Self-awareness layer + discourse anaphora + closed-class hygiene
 
 The fourth v4.x minor. Real-REPL 2026-04-29 transcript surfaced 6 distinct defects + a strategic ask: "make adam understand that he's an entity with a name, knowledge, and abilities — and that he should know what he can and cannot do yet". All landed in one release.
