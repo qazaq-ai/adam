@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.9] — 2026-04-29 — Rust Book Chapter 9 (Қатені өңдеу) translated, in pack
+
+Ninth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 9 — Error Handling — covering Rust's two-tier error model: **unrecoverable errors with `panic!`** (the panic message format, the array-indexing example, `RUST_BACKTRACE=1`, the `panic = "abort"` profile setting and unwind-vs-abort trade-off) and **recoverable errors with `Result<T, E>`** (the `Result` enum definition, `File::open` returning `Result<File, io::Error>`, matching on the error to take different actions, distinguishing error kinds via `error.kind()` and the deeply-nested-match trade-off, `unwrap` and `expect` as shortcuts for prototypes/tests, propagating errors with explicit `match`, the `?` operator and how it short-circuits to return `Err` from the function, the `?`-chained call style, the standard-library `fs::read_to_string` as the canonical fully-condensed form, error type conversion via the `From` trait, where `?` may be used (`Result`, `Option`, `main` returning `Result<(), Box<dyn Error>>`)). Tarau ends with **when to panic vs when to return Result** guidelines (prototypes/tests, contract violations, parsing user input, trait-encoded invariants like the `Guess` 1–100 example).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_09.md` — ~4 000 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-9-specific terminology decisions: error propagation → **қатені тарату**, error conversion → **қатені түрлендіру**, backtrace → **шегініс ізі**, stack unwinding → **стек жадын кері айналдыру**, abort → **үзу**, type alias → **тип лақап аты** (deferred — not used in this chapter), panic → **panic** (kept as `panic!` macro reference); `Result<T, E>` and `Option<T>` keep the v4.7.0/4.7.6-locked enam-нұсқалары terminology.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 8 chapters / 608 samples → **9 chapters / 675 samples** (+67 from chapter 9).
+- Morpheme index: **unchanged** at 3 362 morphemes / 22 145 postings / 3 691 indexed samples — pack still at the 500-per-pack default-mode ceiling. Chapter-9 sentences live in the pack file (auditable, `--full`-mode ready) but do not contribute to the committed-mode morpheme index.
+
+### Tests + counters
+
+- E2E threshold remains ≥490 rust_book sentences.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.10 = Chapter 10 (Generic Types, Traits, and Lifetimes) — the most theoretically dense chapter of the book.
+
 ## [4.7.8] — 2026-04-29 — Rust Book Chapter 8 (Жалпы ұжымдар) translated, in pack (past committed-index ceiling)
 
 Eighth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 8 — Common Collections — covering the three most-used standard-library collection types: `Vec<T>` (creating with `Vec::new` and `vec!` macro, updating via `push`, reading with `&v[i]` panic vs. `v.get(i)` `Option`, the borrow rule preventing concurrent index reads with `push` due to potential reallocation, iterating over `&v` and `&mut v` with `*i` dereferencing, storing multiple types via enum variants, drop semantics); `String` (UTF-8 commitment as the source of complexity, creating with `String::new` / `to_string` / `String::from`, updating with `push_str` / `push` / `+` / `format!`, why indexing is forbidden with the `Здравствуйте` 24-byte example, byte-aligned slicing with `&s[a..b]` and panic on mid-codepoint cut, iterating with `chars` for Unicode scalars and `bytes` for raw bytes, why grapheme clusters require external crates); `HashMap<K, V>` (creating, `get` returning `Option<&V>` with `.copied().unwrap_or(0)` idiom, ownership transfer for non-`Copy` keys/values, three update strategies — `insert` overwriting, `entry().or_insert()` for missing-key insertion, the word-counter `*count += 1` pattern with mutable references, the SipHash default and DoS-resistance trade-off).

@@ -49,6 +49,7 @@ The pack is registered in `SOURCE_PACKS` constants of:
 | 6 — Енам мен үлгіге сай келтіру (Enums and Pattern Matching) | `chapter_06.md` | v4.7.6 | translated, in pack |
 | 7 — Бумалармен, сандықтармен, модульдермен жобаны басқару (Packages, Crates, Modules) | `chapter_07.md` | v4.7.7 | translated, in pack |
 | 8 — Жалпы ұжымдар (Common Collections) | `chapter_08.md` | v4.7.8 | translated, in pack (past committed-index ceiling) |
+| 9 — Қатені өңдеу (Error Handling) | `chapter_09.md` | v4.7.9 | translated, in pack (past committed-index ceiling) |
 
 ## Corpus-purity rule
 
