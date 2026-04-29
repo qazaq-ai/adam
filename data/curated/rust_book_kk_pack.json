@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 2,
-  "sentences_total": 134,
-  "sample_count": 134,
+  "chapters_translated": 3,
+  "sentences_total": 231,
+  "sample_count": 231,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -947,6 +947,685 @@
       "source_id": "chapter_02",
       "domain": "programming_rust",
       "text": "Келесі тарауда осы ұғымдардың әрқайсысын тереңірек қарастырамыз: `Rust`-тың негізгі типтері, айнымалылар мен тұрақтылар, функциялар мен басқару құрылымдары жайлы егжей-тегжей айтамыз."
+    },
+    {
+      "id": "rust_book_03_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жалпы бағдарламалау ұғымдары Бұл тарауда `Rust`-та кездесетін негізгі бағдарламалау ұғымдарын қарастырамыз — олардың көпшілігі басқа тілдерде де кездеседі, бірақ `Rust`-тың өзіндік мағынасы бар."
+    },
+    {
+      "id": "rust_book_03_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Айнымалылар, мәлімет түрлері, функциялар, түсініктемелер және басқару құрылымдары — осы бес ұғымды үйренсеңіз, кез келген `Rust` бағдарламасын оқи аласыз. 3.1."
+    },
+    {
+      "id": "rust_book_03_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Айнымалылар мен өзгермелілік `Rust`-та айнымалылар әдепкі бойынша **тұрақты** болады."
+    },
+    {
+      "id": "rust_book_03_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust`-тың сізге ұсынатын маңызды кепілдіктерінің бірі: егер атау бір рет мәнге байланса, ол мән кездейсоқ түрде өзгермейді."
+    },
+    {
+      "id": "rust_book_03_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Сонымен, кодты оқыған кезде сіз белгілі бір атау тек оған бекітілген мәнді ғана көрсетеді деп сене аласыз."
+    },
+    {
+      "id": "rust_book_03_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Алайда өзгерту қажет болатын жағдайлар бар."
+    },
+    {
+      "id": "rust_book_03_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Соларға арналған `mut` кілтсөзін қарастырайық."
+    },
+    {
+      "id": "rust_book_03_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жаңа жоба құрып, келесі кодты `src/main.rs` файлына жазыңыз: Бағдарламаны құрастырғанда қате аламыз: Қате анық: тұрақты айнымалыға қайта тағайындау мүмкін емес."
+    },
+    {
+      "id": "rust_book_03_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Компилятор сізге қалай түзеуге болатынын ескертіп отыр — `mut` кілтсөзін қосыңыз: Енді бағдарлама дұрыс орындалады және «x мәні: 5», «x мәні: 6» деп шығарады."
+    },
+    {
+      "id": "rust_book_03_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Тұрақтылар Тұрақтылар (`const`) — бұл өзгермейтін айнымалыларға ұқсас, бірақ оларда бірнеше маңызды айырмашылық бар: `const` арқылы жарияланған тұрақтыға `mut` қолдануға болмайды — олар әрқашан өзгермейді, бұл — `Rust`-тың кепілдігі."
+    },
+    {
+      "id": "rust_book_03_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Тұрақтыны жариялағанда оның түрін **міндетті түрде** көрсету керек: `const X: u32 = 100;`."
+    },
+    {
+      "id": "rust_book_03_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Айнымалымен (`let`) салыстырғанда, түрді компилятор қорытындылай алмайды."
+    },
+    {
+      "id": "rust_book_03_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Тұрақтыны кез келген аумақта, оның ішінде ғаламдық аумақта жариялауға болады."
+    },
+    {
+      "id": "rust_book_03_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бұл бірнеше функцияға ортақ мәнді жасауға ыңғайлы."
+    },
+    {
+      "id": "rust_book_03_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Тұрақтының мәні — компиляция кезінде есептелетін өрнек болуы керек."
+    },
+    {
+      "id": "rust_book_03_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Орындалу кезінде ғана белгілі болатын мән (мысалы, пайдаланушы енгізген сан) тұрақты бола алмайды. `Rust` шарты бойынша тұрақтыларды БАС ҚАРПЕН АТАЙ_БІРЛІГІ_МЕН_БӨЛІП жазу қабылданған: Бұл атаулар шартты бекемдікті көрсетеді — кодты оқып шыққан адам тұрақтыны бірден тани алады."
+    },
+    {
+      "id": "rust_book_03_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Көлеңкелеу `Rust`-та сіз бір атпен жаңа айнымалы жариялап, бұрынғыны жаба аласыз."
+    },
+    {
+      "id": "rust_book_03_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Мұны **көлеңкелеу** (shadowing) деп атайды."
+    },
+    {
+      "id": "rust_book_03_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Көлеңкелеу — `let` арқылы бір атпен жаңа байланыстыру жасау."
+    },
+    {
+      "id": "rust_book_03_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Айнымалыны қайта тағайындау емес — бұл жаңа айнымалы."
+    },
+    {
+      "id": "rust_book_03_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бұл бағдарлама алдымен `x`-ке 5 мәнін бекітеді."
+    },
+    {
+      "id": "rust_book_03_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Содан кейін `x = x + 1` сөйлемі (бірақ `let` арқылы) `x`-тің жаңа айнымалысын жасайды, оның мәні Ішкі фигуралық жақшалардағы аумақта тағы бір `let x = x * 2` жасайды, бұл аумақта `x` мәні 12."
+    },
+    {
+      "id": "rust_book_03_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Аумақ біткен соң, ішкі көлеңке жоғалады, ал сыртқы көлеңке (`x = 6`) қайта көрінеді."
+    },
+    {
+      "id": "rust_book_03_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Сондықтан бағдарлама былай шығарады: Көлеңкелеу `mut`-тан өзгеше: `mut`-та біз бар айнымалының мәнін ауыстырамыз; көлеңкелеуде біз жаңа айнымалы жасаймыз."
+    },
+    {
+      "id": "rust_book_03_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Айырмашылықтың маңыздылығы — көлеңкелеу арқылы біз айнымалының *типін* де ауыстыра аламыз, ал `mut` бұған рұқсат етпейді: Бірінші `spaces` — жол, екінші `spaces` — сан. `mut` арқылы бұл мүмкін емес болар еді, өйткені `mut` түрді сақтайды. 3.2."
+    },
+    {
+      "id": "rust_book_03_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Мәлімет түрлері `Rust` — статикалық тип жүйесі бар тіл: әрбір мәннің түрі компиляция кезінде белгілі."
+    },
+    {
+      "id": "rust_book_03_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Көп жағдайда компилятор түрді қолданысқа қарап өзі шеше алады, бірақ кейде сізге нақты белгілеу керек болады."
+    },
+    {
+      "id": "rust_book_03_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Мысалы, `parse` арқылы жолды санға айналдырғанда: Егер `: u32` түр-белгісін алып тастасаңыз, компилятор «қандай түр?» деп сұрап, қателік шығарады. `Rust` түрлерін екі топқа бөлуге болады: жалғыз (scalar) және құрама (compound) типтер."
+    },
+    {
+      "id": "rust_book_03_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жалғыз типтер Жалғыз тип бір мәнді көрсетеді. `Rust`-та төрт негізгі жалғыз тип бар: бүтін сандар, қалқымалы үтірлі сандар, логикалық мәндер және символдар."
+    },
+    {
+      "id": "rust_book_03_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бүтін сан түрлері Бүтін сан түрі — бөлшегі жоқ сандарды сақтайтын түр. `Rust`-та бүтін сан түрлерінің көп нұсқасы бар: | Ұзындық | Таңбалы | Таңбасыз | |---|---|---| | 8 бит | `i8` | `u8` | | 16 бит | `i16` | `u16` | | 32 бит | `i32` | `u32` | | 64 бит | `i64` | `u64` | | 128 бит | `i128` | `u128` | | архитектураға тәуелді | `isize` | `usize` | Таңбалы түрлер теріс және оң мәндерді қабылдайды; таңбасыздар тек оң мәндерді (және нөлді). 8 биттік `i8` `-128`-ден `127`-ге дейінгі мәндерді, ал `u8` `0`-ден `255`-ке дейінгі мәндерді сақтай алады. `isize` және `usize` түрлерінің ұзындығы машинаның сәулетіне сай: 64 биттік жүйеде 64 бит, 32 биттік жүйеде 32 бит."
+    },
+    {
+      "id": "rust_book_03_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бұл түрлерді әдетте жадтағы индексті немесе ұзындықты сақтау үшін қолданады."
+    },
+    {
+      "id": "rust_book_03_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Әдепкі бойынша `Rust` бүтін сан литералын `i32` түрінде қабылдайды."
+    },
+    {
+      "id": "rust_book_03_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бүтін санның асып кетуі Айталық, `u8` түрінде сақталған санға одан да үлкен мәнді (мысалы, 256-ны) жазсаңыз — бұл *асып кету* (overflow) деп аталады. `Rust` бұған екі түрлі көзқараспен қарайды: **Жөндеу режимінде** (`cargo run`-сіз `--release` жалаушасы) асып кету panic-қа ауысады — бағдарлама тоқтайды."
+    },
+    {
+      "id": "rust_book_03_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бұл — қателерді ертерек табу үшін қолайлы. **Шығарылым режимінде** (`cargo run --release`) асып кету **айналу** семантикасына көшеді: 256 → 0, 257 → 1 және т.б."
+    },
+    {
+      "id": "rust_book_03_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бұл panic-сыз, бірақ күтпеген нәтижелер беруі мүмкін, сондықтан асып кетуді нақты ниетпен өңдеу керек."
+    },
+    {
+      "id": "rust_book_03_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапхана `wrapping_add`, `checked_add`, `overflowing_add` және `saturating_add` сияқты әдістерді ұсынады — әрқайсысы асып кетуді басқаша өңдейді."
+    },
+    {
+      "id": "rust_book_03_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Қалқымалы үтірлі сандар Қалқымалы үтірлі сан түрлері — бөлшекті бар сандар. `Rust`-та екеу: `f32` (32 биттік) және `f64` (64 биттік)."
+    },
+    {
+      "id": "rust_book_03_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Әдепкі бойынша `f64` қолданылады, өйткені қазіргі CPU-ларда оның жылдамдығы `f32`-ге жуық, бірақ дәлдігі жоғарырақ."
+    },
+    {
+      "id": "rust_book_03_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Сандық амалдар `Rust` стандартты математикалық амалдарды қолдайды: қосу, азайту, көбейту, бөлу, бөлудің қалдығы: Бөлгенде `Rust` екі санның түрін шешуге тырысады."
+    },
+    {
+      "id": "rust_book_03_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бүтін санды бүтін санға бөлгенде нәтиже бүтін болады, бөлшегі тасталады."
+    },
+    {
+      "id": "rust_book_03_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Логикалық тип Логикалық тип `bool` — екі ғана мәнді қабылдайды: `true` және `false`."
+    },
+    {
+      "id": "rust_book_03_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жадта 1 байт алады. `if` өрнегі мен басқа да басқару құрылымдарының басты шарты болып табылады."
+    },
+    {
+      "id": "rust_book_03_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Символ түрі `char` түрі бір Unicode символын сақтайды. `Rust`-тың `char`-ы 4 байт және мүмкіндігі бойынша ASCII-ден көп: эмодзилерді, грек әріптерін, қазақ кириллицасын — бәрін бір символ ретінде ұстайды."
+    },
+    {
+      "id": "rust_book_03_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бір тырнақша (`'`) — символ литералы; қос тырнақша (`\"`) — жол литералы."
+    },
+    {
+      "id": "rust_book_03_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Құрама типтер Құрама тип — бір атпен бірнеше мәнді топтастыратын тип. `Rust`-тың екі негізгі құрама типі бар: кортеж және жиым."
+    },
+    {
+      "id": "rust_book_03_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Кортеж типі Кортеж — әртүрлі типті мәндерді бір топ ретінде ұстайтын тұрақты ұзындықты құрылым."
+    },
+    {
+      "id": "rust_book_03_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Кортеждің ұзындығын кейін өзгертуге болмайды."
+    },
+    {
+      "id": "rust_book_03_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Кортеждің элементтерін екі тәсілмен алуға болады."
+    },
+    {
+      "id": "rust_book_03_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Біріншісі — **бөлшектеу** (destructuring): Бөлшектеу кортеждің әр элементін жеке атаулы айнымалыға бөліп алады."
+    },
+    {
+      "id": "rust_book_03_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Екінші тәсіл — нүкте мен индекс арқылы тікелей қол жеткізу: Кортеждің индексі нөлден басталады. `()` — арнайы кортеж: ол ешбір элементі жоқ кортеж, *unit* деп аталады."
+    },
+    {
+      "id": "rust_book_03_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Көп жағдайда бұл «мән жоқ» дегенді білдіреді — мысалы, өрнегі жоқ сөйлемнің жасырын қайтару мәні."
+    },
+    {
+      "id": "rust_book_03_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жиым типі Жиым — бір типтегі элементтерден тұратын, тұрақты ұзындықты тізбек."
+    },
+    {
+      "id": "rust_book_03_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Кортежден айырмашылығы — барлық элементтер бір типке тиесілі."
+    },
+    {
+      "id": "rust_book_03_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жиымның ұзындығын кейін өзгерту мүмкін емес."
+    },
+    {
+      "id": "rust_book_03_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жиым стек жадында сақталады."
+    },
+    {
+      "id": "rust_book_03_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Егер сізге динамикалық ұзындықты ұжым керек болса, `Vec` түрін қолдану керек (8-тарауда қарастырылады)."
+    },
+    {
+      "id": "rust_book_03_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жиымның түрін мен ұзындығын нақты белгілеуге болады: Барлық элементі бір мәнмен толтырылған жиым жасау үшін: Жиым элементтерін индекс арқылы алуға болады: Егер сіз жиымның шегінен тыс индексті қолдансаңыз (мысалы, `a[10]`), `Rust` panic-қа барады."
+    },
+    {
+      "id": "rust_book_03_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust`-тың қауіпсіздік кепілдігі: сіз тиісті емес жадқа жазып немесе оқимай, қате туралы анық хабарлама аласыз. 3.3."
+    },
+    {
+      "id": "rust_book_03_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Функциялар Функция — қайта қолданылатын код блогы."
+    },
+    {
+      "id": "rust_book_03_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бір рет жазып, бірнеше жерден шақыруға болады. `Rust`-та функция `fn` кілтсөзімен жарияланады; әр бағдарламаның `main` функциясы — кіру нүктесі. `Rust` функция атауларында жалаудай (snake_case) стиль қабылданған — сөздер арасында астыңғы сызық."
+    },
+    {
+      "id": "rust_book_03_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Функция кез келген орында, тіпті оны шақырғаннан кейін де жариялануы мүмкін: `Rust` бағдарламаның бүкіл кеңістігінен функцияларды табады."
+    },
+    {
+      "id": "rust_book_03_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Параметрлер Функцияға кіріс мәнін беру үшін параметрлерді қолданамыз: Параметрдің түрін **міндетті түрде** көрсету керек: `x: i32`."
+    },
+    {
+      "id": "rust_book_03_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust` дизайнының саналы шешімі: компилятор сізге не дегенді нақты білуі керек, ал кодты оқыған адам функцияның интерфейсін бір қарап-ақ түсінсе болады."
+    },
+    {
+      "id": "rust_book_03_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бір функцияда бірнеше параметр болуы мүмкін — әрбірі қос нүктемен бөлінеді: Сөйлемдер мен өрнектер `Rust`-та өрнек пен сөйлемнің айырмашылығы маңызды. **Сөйлем** — әрекет орындайтын бірлік, ол мән қайтармайды. **Өрнек** — мән өндіретін бірлік."
+    },
+    {
+      "id": "rust_book_03_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Мысалы: `let y = 6;` — сөйлем."
+    },
+    {
+      "id": "rust_book_03_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Ол `y`-ке 6-ны бекітеді, бірақ ол мән қайтармайды; сондықтан `let x = (let y = 6);` сияқты жазуға болмайды."
+    },
+    {
+      "id": "rust_book_03_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Өрнек кодтың көп бөлігін құрайды."
+    },
+    {
+      "id": "rust_book_03_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жай шақыру (`5 + 6`), функция шақыруы (`add(2, 3)`), макрос шақыруы (`println!()`), фигуралық жақшамен оралған блок — бәрі өрнек: Ішкі блоктың мәні — соңғы өрнек, `x + 1`."
+    },
+    {
+      "id": "rust_book_03_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Маңызды: бұл өрнек **нүктелі үтірмен аяқталмайды**."
+    },
+    {
+      "id": "rust_book_03_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Егер нүктелі үтір қоятын болсаңыз, ол сөйлемге айналады және мән қайтармайды."
+    },
+    {
+      "id": "rust_book_03_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Сондықтан блок өзінің ішіндегі ең соңғы өрнектің мәніне айналады."
+    },
+    {
+      "id": "rust_book_03_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Мән қайтаратын функциялар Функция мән қайтара алады."
+    },
+    {
+      "id": "rust_book_03_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Қайтару типін `->` арқылы көрсетесіз: `five` функциясы `i32` қайтарады."
+    },
+    {
+      "id": "rust_book_03_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Денесі — бір ғана өрнек: `5`."
+    },
+    {
+      "id": "rust_book_03_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Ол нүктелі үтірсіз, сондықтан өрнек ретінде функцияның қайтарар мәніне айналады. `return` кілтсөзін де қолдана аламыз — әсіресе функцияны ертерек шығарғанда: `x + 1` соңғы өрнек, нүктелі үтірсіз, сондықтан ол қайтарылады."
+    },
+    {
+      "id": "rust_book_03_0076",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Егер нүктелі үтір қойсаңыз — қате аласыз: «expected `i32`, found `()`». 3.4."
+    },
+    {
+      "id": "rust_book_03_0077",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Түсініктемелер Кодқа түсініктемелер қосу — оқу мен ой бөлісу үшін маңызды. `Rust`-та түсініктемелер `//` арқылы басталады және жол соңына дейін созылады: Көп жолды түсініктемені әдетте әр жолды жеке `//` арқылы жазу қабылданған: `Rust` `/* ... */` стиліндегі блок түсініктемелерін де қабылдайды, бірақ жолдық `//` стилі әлдеқайда жиі қолданылады."
+    },
+    {
+      "id": "rust_book_03_0078",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Сонымен қатар `Rust`-та *құжаттама түсініктемесі* (`///`) бар — ол сыртқы кітапханаларға арналған құжаттаманы автоматты түрде шығаруға мүмкіндік береді. 14-тарауда олар туралы толығырақ айтамыз. 3.5."
+    },
+    {
+      "id": "rust_book_03_0079",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Басқару құрылымдары Шартты тармақтау мен цикл — бағдарламалаудың негізгі құралдары. `Rust`-та екі негізгі басқару құрылымы бар: `if` өрнегі және циклдер. `if` өрнегі `if` өрнегі шартты тексеріп, тармақ таңдайды."
+    },
+    {
+      "id": "rust_book_03_0080",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Шарт `bool` түрінде болуы керек — `Rust` басқа тілдерден өзгешелігі сонда: «нөл — жалған, нөлсіз — шын» сияқты автоматты түрлендіру жасамайды. `else if` арқылы бірнеше шартты тізбектеуге болады: Бірнеше `else if` блогы кодты жайыр етеді."
+    },
+    {
+      "id": "rust_book_03_0081",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Көбіне `match` өрнегін қолдану ыңғайлырақ — 6-тарауда қарастырылады. `if` өрнегін `let` сөйлеміне қосу `if` — өрнек, сондықтан оның нәтижесін айнымалыға бекітуге болады: Маңызды: `if` мен `else` тармақтарының түрлері бірдей болуы керек."
+    },
+    {
+      "id": "rust_book_03_0082",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Жоғарыдағы мысалда екі тармақ та `i32` мәнін қайтарады."
+    },
+    {
+      "id": "rust_book_03_0083",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Егер сіз бір тармақта сан, екіншісінде жол қайтарсаңыз, компилятор қателікке барады."
+    },
+    {
+      "id": "rust_book_03_0084",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Циклдар `Rust` үш цикл құрылымын ұсынады: `loop`, `while`, `for`. `loop` — шарт жоқ цикл `loop` денесін шарт қойылғанша қайталай береді."
+    },
+    {
+      "id": "rust_book_03_0085",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Циклдан тек `break` арқылы шығуға болады: Бұл бағдарлама мәңгілікке «Қайтадан!» деп шығарып отырады. `Ctrl-C` арқылы тоқтатуға тура келеді."
+    },
+    {
+      "id": "rust_book_03_0086",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Циклдан мән қайтару `break` сөзінен кейін өрнек көрсетсеңіз — ол мән цикл өрнегінің мәніне айналады: Цикл `counter` 10-ға жеткенде `counter * 2 = 20`-ны қайтарып шығады."
+    },
+    {
+      "id": "rust_book_03_0087",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Сол мән `result`-ке бекітіледі."
+    },
+    {
+      "id": "rust_book_03_0088",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Цикл белгілері Бір циклдан екіншісіне `break` арқылы шығу — ыңғайсыз."
+    },
+    {
+      "id": "rust_book_03_0089",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Сондықтан `Rust` **цикл белгілерін** ұсынады."
+    },
+    {
+      "id": "rust_book_03_0090",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Белгі апостроф пен атаудан тұрады. `break` немесе `continue` нақты қай циклді көздегеніңізді осы белгімен көрсетесіз: Сыртқы цикл `'counting_up` деген белгімен жарияланған. `break 'counting_up` ішкі циклден шығып, бірден сыртқы циклді де үзеді. `while` цикл `while` цикл шарт ақиқат болғанда денесін қайталайды: `while` — `loop` мен `if`-тың қосындысы."
+    },
+    {
+      "id": "rust_book_03_0091",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бар санды нөлге дейін кеміту немесе шарт орындалғанша күту — `while`-тың әдеттегі қолданысы. `for` цикл Жиым немесе диапазон бойынша жүруге `for` цикл ыңғайлы."
+    },
+    {
+      "id": "rust_book_03_0092",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Ол `Rust`-та ең жиі қолданылатын цикл түрі. `for` циклы итераторды аралайды."
+    },
+    {
+      "id": "rust_book_03_0093",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Бұл `while` арқылы жасағанға қарағанда қауіпсіз: жиым ұзындығы өзгерсе де, индекс шегінен шығып кету мүмкіндігі жоқ."
+    },
+    {
+      "id": "rust_book_03_0094",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Тек белгілі санға дейінгі сандарды кезу үшін **диапазон өрнегін** қолдануға болады: `1..4` — қамтылмаған диапазон: 1, 2, 3 (4 кірмейді). `1..=4` — қамтылған диапазон: 1, 2, 3, 4. `.rev()` әдісі диапазонды кері тәртіппен жүреді: Бұл «3!», «2!», «1!», «Аттан!» деп шығарады. 3.6."
+    },
+    {
+      "id": "rust_book_03_0095",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Бұл тарауда `Rust`-тың негізгі ұғымдарын қарастырдық: айнымалылар мен тұрақтылар, өзгермелілік, көлеңкелеу, мәлімет түрлері (бүтін сандар, қалқымалы сандар, символдар, кортеждер, жиымдар), функциялар (параметрлер, қайтару мәндері, өрнек пен сөйлем айырмашылығы), түсініктемелер, басқару құрылымдары (`if`, `loop`, `while`, `for`)."
+    },
+    {
+      "id": "rust_book_03_0096",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда `Rust`-тың ең ерекше және ең күшті ұғымына — иелік жүйесіне көшеміз."
+    },
+    {
+      "id": "rust_book_03_0097",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_03",
+      "domain": "programming_rust",
+      "text": "Иелік модельі дегеніміз — `Rust`-тың жадыны қалай қауіпсіз басқаратынының негізі, бұл басқа жүйелік тілдерде кездеспейтін тұжырымдама."
     }
   ]
 }

@@ -7,6 +7,30 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.3] — 2026-04-29 — Rust Book Chapter 3 (Жалпы бағдарламалау ұғымдары) translated, ingested
+
+Third chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 3 — Common Programming Concepts — covering the foundational concepts that recur throughout Rust: variables and mutability (default-immutable bindings, `mut` keyword, constants `const` with mandatory type annotation and SCREAMING_SNAKE_CASE convention, shadowing via `let` and how it differs from `mut` including type-changing); data types (scalar — integer types `i8`/`i16`/`i32`/`i64`/`i128` and unsigned/signed pairs with `usize`/`isize` machine-dependent forms, integer overflow behaviour in debug vs. release, floating-point `f32`/`f64`, numeric operations, boolean, character; compound — tuples with destructuring and dot-index access, the unit `()`, arrays with type/length annotation `[i32; 5]` and out-of-bounds panic); functions (`fn` keyword, snake_case convention, parameters with mandatory type annotations, the critical statement-vs-expression distinction, block expressions, return values via `->`); comments (`//`, `/* */`, doc comments `///`); control flow (`if` / `else if` / `else` with bool-only conditions, `if` as an expression in `let`, `loop` with `break value`, loop labels for nested loops, `while`, `for` over arrays and ranges, range expressions `1..4` exclusive vs `1..=4` inclusive, `.rev()`).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_03.md` — ~5 000 words, code blocks preserved verbatim, all v4.7.0/4.7.1/4.7.2 terminology applied.
+- Chapter-3-specific terminology decisions: scalar → **жалғыз**, compound → **құрама**, integer overflow → **бүтін санның асып кетуі**, floating-point → **қалқымалы үтірлі**, numeric operations → **сандық амалдар**, tuple destructuring → **бөлшектеу**, statement vs expression → **сөйлем мен өрнек**, function call → **функция шақыруы**, doc comment → **құжаттама түсініктемесі**, loop label → **цикл белгісі**, range → **диапазон**, inclusive/exclusive range → **қамтылған/қамтылмаған диапазон**, mutability → **өзгермелілік**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 2 chapters / 134 samples → **3 chapters / 231 samples** (+97 from chapter 3).
+- Morpheme index: distinct morphemes 3 265 → **3 307** (+42); total postings 18 485 → **19 447** (+962); indexed samples 3 325 → **3 422** (+97).
+
+### Tests + counters
+
+- E2E `rust_book_chapter_01_indexed_in_morpheme_index` threshold raised from ≥120 to ≥200 rust_book sentences (chapters 1 + 2 + 3).
+- Workspace tests: **745 passing** (no count change; threshold tightening only).
+- Cognitive eval / REPL replay unchanged.
+
+### Cadence
+
+Per user-confirmed convention «каждую главу считать за патч при релизе»: each chapter = +1 patch. Next: v4.7.4 = Chapter 4 (Understanding Ownership) — the central, hardest chapter of the book.
+
 ## [4.7.2] — 2026-04-29 — Rust Book Chapter 2 (Санды табу ойыны) translated, ingested
 
 Second chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 2 — Programming a Guessing Game — covering the hands-on guessing game project: setting up a new Cargo project, processing user input via `std::io::stdin().read_line()`, mutable variables (`let mut guess = String::new()`), references and mutable references (`&mut guess`), `Result`-based error handling with `.expect()`, adding the external `rand` crate as a Cargo dependency (`Cargo.toml` `[dependencies]` block, semantic versioning `^0.8.5`), generating random integers in a range (`rand::thread_rng().gen_range(1..=100)`), comparing values with `std::cmp::Ordering` and `match` expressions (`Less / Greater / Equal`), type mismatch errors and shadowing for type conversion (`let guess: u32 = guess.trim().parse().expect(...)`), looping with `loop`, breaking on success, and graceful invalid-input handling via `match Result { Ok(num) => num, Err(_) => continue }`.
