@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 5,
-  "sentences_total": 402,
-  "sample_count": 402,
+  "chapters_translated": 6,
+  "sentences_total": 464,
+  "sample_count": 464,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -2823,6 +2823,440 @@
       "source_id": "chapter_05",
       "domain": "programming_rust",
       "text": "Онда сіз `Option`, `Result` сияқты `Rust`-тың ең жиі қолданылатын типтерінің ішкі құрылымын көресіз."
+    },
+    {
+      "id": "rust_book_06_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Енам мен үлгіге сай келтіру Бұл тарауда **енам** (enumeration) — кейде «енам» немесе «алгебралық тип» деп те аталатын — типтің мүмкіндіктерін қарастырамыз."
+    },
+    {
+      "id": "rust_book_06_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Енам арқылы біз тиісті тип мынадай немесе мынадай бір нұсқада бола алады деген ережені бекітеміз."
+    },
+    {
+      "id": "rust_book_06_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Алдымен `Rust`-та енамды қалай анықтауға және оны қалай қолдануға болатынын көрсетеміз."
+    },
+    {
+      "id": "rust_book_06_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Содан кейін `Option` деп аталатын аса пайдалы енамды қарастырамыз — ол арқылы мән болуы немесе болмауы мүмкін екендігін бірден типтегі сипаттаймыз."
+    },
+    {
+      "id": "rust_book_06_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Тарау соңында үлгіге сай келтіру (pattern matching) арқылы әр нұсқаны жеке-жеке өңдеуді үйренеміз — бұл `Rust`-тағы `match` өрнегінің күші. 6.1."
+    },
+    {
+      "id": "rust_book_06_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Енамды анықтау Структ — бірнеше байланысты өрістерді бір орынға жинақтайды."
+    },
+    {
+      "id": "rust_book_06_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Енам — басқаша мәселені шешеді: типтің бір ғана мәні болады, бірақ ол сол мүмкін нұсқалардың бірінде ғана."
+    },
+    {
+      "id": "rust_book_06_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Мысалы, IP мекенжайы IPv4 немесе IPv6 форматында бола алады."
+    },
+    {
+      "id": "rust_book_06_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бір IP мекенжайы екеуі бірден бола алмайды — тек біреуі."
+    },
+    {
+      "id": "rust_book_06_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Енам осыны типтегі тура көрсетуге мүмкіндік береді: `IpAddrKind` — біз жариялаған тип."
+    },
+    {
+      "id": "rust_book_06_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Оның екі **нұсқасы** бар: `V4` пен `V6`."
+    },
+    {
+      "id": "rust_book_06_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Енамның данасын осы нұсқалар арқылы жасаймыз: Назар аударыңыз: `IpAddrKind::V4` пен `IpAddrKind::V6` бір типке — `IpAddrKind`-қа жатады."
+    },
+    {
+      "id": "rust_book_06_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бұл — енамның бірінші артықшылығы: екі түрлі нұсқа бір типтік шатырдың астында жиналған."
+    },
+    {
+      "id": "rust_book_06_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Сондықтан сіз кез келген `IpAddrKind` мәнін ескере алатын функция жаза аласыз: Нұсқаға деректерді бекіту Жоғарыдағы мысал нұсқаны ажыратады, бірақ мекенжайдың өзін сақтамайды."
+    },
+    {
+      "id": "rust_book_06_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Структпен қосайық: Бұл жұмыс істейді, бірақ `Rust`-та неғұрлым ыңғайлы тәсіл бар — енамның нұсқасына **тікелей деректерді бекіту**: Енді әр нұсқа өзінің деректерін «ішіне» алады."
+    },
+    {
+      "id": "rust_book_06_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Структ бөлек керек емес — енам осы рөлді өзі атқарады."
+    },
+    {
+      "id": "rust_book_06_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Әр нұсқаның түрлі деректері болуы мүмкін: `V4` нұсқасы төрт байтты сақтайды, `V6` — жолды."
+    },
+    {
+      "id": "rust_book_06_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бір типте әртүрлі ішкі деректер."
+    },
+    {
+      "id": "rust_book_06_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапханада бар `IpAddr` түрі дәл осындай құрылған."
+    },
+    {
+      "id": "rust_book_06_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Енам нұсқалары — структтың кез келген түріне ұқсас бола алады: Бір типте: ешбір деректі жоқ нұсқа, аталған өрістері бар нұсқа, кортеж- нұсқа."
+    },
+    {
+      "id": "rust_book_06_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бұл — енамның күші: біз жөн ережелерді типтегі тікелей бекітеміз."
+    },
+    {
+      "id": "rust_book_06_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Енамға әдістер Структ сияқты, енамда да `impl` блогында әдістерді жариялауға болады: Әдіс ішінен `self`-тің қандай нұсқа екенін `match` арқылы анықтайды. `match` туралы алда айтамыз. `Option` енамы `Option` — `Rust`-тың стандартты кітапханасында тұрған, бағдарламашының күн сайын қолданатын ең маңызды енамдарының бірі."
+    },
+    {
+      "id": "rust_book_06_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Ол: «мән болуы мүмкін немесе мән болмауы мүмкін» деген тұжырымдаманы типтік жүйеге келтіреді."
+    },
+    {
+      "id": "rust_book_06_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Көп тілдерде «нөлдік мән» (`null`) ұғымы бар: айнымалы белгілі мәнге сілтейді немесе ешнәрсеге сілтемейді. `Tony Hoare`, `null` ұғымын ойлап тапқан адам, оны өзінің «миллиард долларлық қатесі» деп сипаттады: бағдарламашылар тұрақты түрде «нөл бола алатынын» ұмытып, бағдарламалары құлайды. `Rust`-та `null` жоқ."
+    },
+    {
+      "id": "rust_book_06_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Оның орнына `Option` енамы бар: `<T>` — жалпылама тип параметрі (10-тарауда қарастырамыз)."
+    },
+    {
+      "id": "rust_book_06_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Қазірге оны: «`T` — кез келген тип» деп ұғынайық."
+    },
+    {
+      "id": "rust_book_06_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Сондықтан `Option<i32>` — бұл бар не жоқ `i32`; `Option<String>` — бар не жоқ `String`. `Option` стандартты кітапханада бекітілген, оны импорттаудың керегі жоқ."
+    },
+    {
+      "id": "rust_book_06_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Сонымен қатар оның `Some` мен `None` нұсқалары да тікелей қолжетімді — `Option::Some` немесе тек `Some` деп жазуға болады: `Some(5)` — компилятор `Option<i32>` екенін шеше алады. `None` жағдайында тип белгісіз болғандықтан, оны ашық белгілеу керек: `Option<i32>`. `Option<T>` пен `T` бөлек типтер."
+    },
+    {
+      "id": "rust_book_06_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Сонымен бірден жұмыс істей алмайсыз: Қате: `i8` мен `Option<i8>` — әртүрлі типтер."
+    },
+    {
+      "id": "rust_book_06_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бір санды басқаға қосу үшін біз `y`-тің ішінде шынымен сан барын тексеріп, оны шығарып алуымыз керек."
+    },
+    {
+      "id": "rust_book_06_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust`-тың `null`-ге тыйым салуы: компилятор сізге мәнді қолданбас бұрын оның бар-жоғын тексеруді міндеттейді."
+    },
+    {
+      "id": "rust_book_06_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Сонымен — `Option<T>`-нің ішіндегі `T`-ге қалай қол жеткізуге болады?"
+    },
+    {
+      "id": "rust_book_06_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Соған арналған негізгі құрал — `match` өрнегі. 6.2. `match` басқару құрылымы `match` — `Rust`-тың ең күшті басқару құрылымдарының бірі."
+    },
+    {
+      "id": "rust_book_06_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Ол мәнді бірнеше **үлгіге** қарсы салыстырады және сай келген тармақтың кодын орындайды."
+    },
+    {
+      "id": "rust_book_06_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Үлгілер литералдардан, айнымалылардан, орынтолтырғыштардан, тіпті құрама құрылымдардан тұра алады. `match` мүмкіндігі компилятордың **әр нұсқаны қамтығаныңызды тексеруі**нен туындайды — бірде-бір нұсқа ұмытылмайды."
+    },
+    {
+      "id": "rust_book_06_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Қарапайым мысал: тиынның мәнін анықтау. `match` арқылы біз `coin`-ды әр нұсқаға қарсы тексереміз."
+    },
+    {
+      "id": "rust_book_06_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Стрелка `=>` үлгіні нәтижеге байланыстырады."
+    },
+    {
+      "id": "rust_book_06_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Әр тармақ `,` арқылы бөлінеді."
+    },
+    {
+      "id": "rust_book_06_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Тармақтардың денесі бір өрнек болуы мүмкін (мысал жоғарыда), немесе бірнеше сөйлемнен тұратын блок: Мәнге байланысатын үлгілер Енамның нұсқасы дерек ұстаса, `match` арқылы оны шығарып ала аламыз."
+    },
+    {
+      "id": "rust_book_06_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Мысалы, штатпен байланысты `Quarter` нұсқасын қарастырайық: `Coin::Quarter(state)` үлгісі — `Quarter` нұсқасына сәйкес келгенде, ішіндегі мән `state` атты айнымалыға бекітіледі."
+    },
+    {
+      "id": "rust_book_06_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бұл — үлгіге сай келтірудің күшті жағы: үлгі арқылы біз нұсқаны таниды әрі оның ішкі мәнін шығарып аламыз. `Option<T>`-мен сай келтіру `Option<T>`-ге практикалық мысал."
+    },
+    {
+      "id": "rust_book_06_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Айталық, `Some(i32)` мәніне 1 қосып, `None` болса оны өзгертпейтін функция жазайық: `Some(5)`-ке `plus_one` шақырылғанда `Some(i)` үлгісі сай, `i` 5 болады, сондықтан `Some(i + 1)` = `Some(6)` қайтарылады. `None` шақырылғанда `None` үлгісіне сай — `None` қайтарылады. `match` барлық нұсқаны қамтуы керек Маңызды кепілдік: `match` өрнегінде сіз барлық мүмкін нұсқаларды қарастыруыңыз керек."
+    },
+    {
+      "id": "rust_book_06_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Әйтпесе компилятор қателікке барады: Қате: `Rust` сізге ұмытылған нұсқаны атап беріп тұр."
+    },
+    {
+      "id": "rust_book_06_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бұл — компилятордың сіздің кодыңызды толық қамтығаныңызды тексеруі."
+    },
+    {
+      "id": "rust_book_06_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Әрбір ықтимал жағдай ескерілген."
+    },
+    {
+      "id": "rust_book_06_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Жалпы тармақ және `_` Кейде сізге барлық қалған нұсқаларды бір жалпы тармақпен өңдеу керек."
+    },
+    {
+      "id": "rust_book_06_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Мысалы, ойын бағдарламасында тек 3 пен 7 саны арнайы әсер береді: `other` — айнымалы үлгісі."
+    },
+    {
+      "id": "rust_book_06_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Ол бұрын жазылғандардан тыс кез келген мәнге сай келеді және сол мәнді өзіне байланыстырады."
+    },
+    {
+      "id": "rust_book_06_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Егер сізге қалған мәннің өзі керек емес болса — оны еш жерге қолданбасаңыз — `_` (астыңғы сызық) орынтолтырғышын қолданыңыз. `_` кез келген мәнге сай келеді, бірақ оны ешбір айнымалыға байланыстырмайды: Тіпті ештеңе жасамай, бір кортежді (`()`) қайтарып шықсаңыз болады: Бұл «басқа барлық жағдайда — ешнәрсе істеме» дегенді білдіреді. 6.3. `if let` арқылы қысқа басқару Кейде `match` шектен тыс ұзын болады — сізге бір ғана нұсқаны қамту керек."
+    },
+    {
+      "id": "rust_book_06_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Сондай үшін `Rust`-та `if let` синтаксисі бар."
+    },
+    {
+      "id": "rust_book_06_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Мысалы, `Option<u8>`-та мән бар болса оны шығаратын код: Бұл коды `if let` арқылы қысқартайық: `if let` синтаксисі үлгіні (`Some(max)`) және өрнекті (`config_max`) теңдікпен бөлеп жазады."
+    },
+    {
+      "id": "rust_book_06_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Үлгі сай болса, ішіндегі айнымалы (`max`) бекітіледі және блок орындалады."
+    },
+    {
+      "id": "rust_book_06_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Сай болмаса — өткізіледі. `if let` `match`-тен қысқа, бірақ бір кемшілік бар: `Rust` сізге қалған нұсқаларды қамтуды міндеттемейді."
+    },
+    {
+      "id": "rust_book_06_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бұл — сіз қалаған тарифтерден тыс жатыр; өзіңіз шеше беріңіз."
+    },
+    {
+      "id": "rust_book_06_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Сонымен бірге `else` тармағын қосуға болады: Бұл `match coin { Coin::Quarter(state) => ..., _ => count += 1 }` дегенге тең. `if let` — `match`-тың қысқа баламасы."
+    },
+    {
+      "id": "rust_book_06_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Тек бір нұсқаны өңдегіңіз келсе — `if let` жинақы әрі оқуға жеңіл."
+    },
+    {
+      "id": "rust_book_06_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Бірақ толық қамту керек жағдайда `match` дұрыс таңдау."
+    },
+    {
+      "id": "rust_book_06_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Кодыңызды оқыған адам үшін екеуі де айқын болсын. 6.4."
+    },
+    {
+      "id": "rust_book_06_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Енам — `Rust` типтік жүйесінің ең күшті құралдарының бірі."
+    },
+    {
+      "id": "rust_book_06_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Ол арқылы сіз: бір типтің бірнеше нұсқасы болатынын; әр нұсқаның өзіндік деректері болуы мүмкін екенін; және компилятор сізге әр нұсқаны қамтуды міндеттейтінін бекітесіз. `Option<T>` арқылы «нөлдік мән» проблемасы типтік жүйеде шешілген: мәнді қолданбас бұрын `match` немесе `if let` арқылы бар-жоғын тексеруге тура келеді. `match` өрнегі — `Rust`-тағы тармақтаудың негізі."
+    },
+    {
+      "id": "rust_book_06_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Үлгіге сай келтіру арқылы біз: нұсқаны таниды; ішкі деректерді шығарады; компилятор қамтудың толықтығын тексереді. `if let` — `match`-тың қысқа баламасы бір нұсқаны ғана өңдегенде ыңғайлы."
+    },
+    {
+      "id": "rust_book_06_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_06",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда үлкенірек жобалар жайында айтамыз: модулдер, сандықтар, жұмыс кеңістігі. `Rust`-тың құрылыс жүйесі арқылы кодты бөлуге, қайта пайдалануға және басқа адамдармен бірге жұмыс істеуге болады."
     }
   ]
 }

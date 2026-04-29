@@ -46,6 +46,7 @@ The pack is registered in `SOURCE_PACKS` constants of:
 | 3 — Жалпы бағдарламалау ұғымдары (Common Programming Concepts) | `chapter_03.md` | v4.7.3 | translated, in pack |
 | 4 — Иелікті түсіну (Understanding Ownership) | `chapter_04.md` | v4.7.4 | translated, in pack |
 | 5 — Байланысты деректерді структ арқылы құру (Using Structs to Structure Related Data) | `chapter_05.md` | v4.7.5 | translated, in pack |
+| 6 — Енам мен үлгіге сай келтіру (Enums and Pattern Matching) | `chapter_06.md` | v4.7.6 | translated, in pack |
 
 ## Corpus-purity rule
 

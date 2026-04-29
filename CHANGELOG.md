@@ -7,6 +7,30 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.6] — 2026-04-29 — Rust Book Chapter 6 (Енам мен үлгіге сай келтіру) translated, ingested
+
+Sixth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 6 — Enums and Pattern Matching — covering: defining enums (variants, attaching data of different types per variant, enums with `impl` blocks for methods); the `Option<T>` enum and the philosophical case against `null` (Tony Hoare's "billion-dollar mistake"); `Some(T)` vs `None` and why `Option<T>` and `T` are separate types; the `match` control flow construct (matching on enum variants, patterns that bind to inner values, exhaustiveness checking by the compiler, catch-all patterns with named binding vs `_` placeholder, the unit `()` for "do nothing" arms); and `if let` as concise syntax for matching only one variant, with optional `else` branch.
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_06.md` — ~3 500 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-6-specific terminology decisions: variant → **нұсқа**, exhaustive → **барлық нұсқаны қамту**, catch-all pattern → **жалпы тармақ**, placeholder `_` → **орынтолтырғыш**, null → **нөлдік мән**, pattern matching → **үлгіге сай келтіру**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 5 chapters / 402 samples → **6 chapters / 464 samples** (+62 from chapter 6).
+- Morpheme index: 3 339 → **3 350 morphemes** (+11); 21 121 → **21 747 postings** (+626); 3 593 → **3 655 indexed samples** (+62).
+
+### Tests + counters
+
+- E2E threshold raised from ≥380 to ≥440 rust_book sentences (chapters 1–6).
+- Workspace tests: **745 passing**.
+- Mid-release disk-space exhaustion required `target/` cleanup (per `project_v4_direction` memory: clean when <15 GB free); release continued post-cleanup.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.7 = Chapter 7 (Managing Growing Projects with Packages, Crates, and Modules).
+
 ## [4.7.5] — 2026-04-29 — Rust Book Chapter 5 (Байланысты деректерді структ арқылы құру) translated, ingested
 
 Fifth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 5 — Using Structs to Structure Related Data — covering: defining and instantiating structs (named-field structs, dot-access, mutability of the whole instance, field init shorthand, struct update syntax with `..` and how it interacts with ownership/`Copy`); tuple structs and unit-like structs; struct data ownership (why `String` is preferred over `&str` in struct fields without lifetime annotations); a worked rectangle-area example showing the progression `(width, height)` separate variables → tuple → struct; derived traits (`#[derive(Debug)]`, `{:?}` and `{:#?}` pretty-print, `dbg!` macro); method syntax (`impl` blocks, `&self` / `&mut self` / `self` first parameters, automatic referencing/dereferencing, methods with extra parameters like `can_hold`); associated functions (no `self`, `Self` as the impl's type, conventional constructors, `::` call syntax); multiple `impl` blocks for one type.
