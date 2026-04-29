@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.5] — 2026-04-29 — Rust Book Chapter 5 (Байланысты деректерді структ арқылы құру) translated, ingested
+
+Fifth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 5 — Using Structs to Structure Related Data — covering: defining and instantiating structs (named-field structs, dot-access, mutability of the whole instance, field init shorthand, struct update syntax with `..` and how it interacts with ownership/`Copy`); tuple structs and unit-like structs; struct data ownership (why `String` is preferred over `&str` in struct fields without lifetime annotations); a worked rectangle-area example showing the progression `(width, height)` separate variables → tuple → struct; derived traits (`#[derive(Debug)]`, `{:?}` and `{:#?}` pretty-print, `dbg!` macro); method syntax (`impl` blocks, `&self` / `&mut self` / `self` first parameters, automatic referencing/dereferencing, methods with extra parameters like `can_hold`); associated functions (no `self`, `Self` as the impl's type, conventional constructors, `::` call syntax); multiple `impl` blocks for one type.
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_05.md` — ~4 000 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-5-specific terminology decisions: field init shorthand → **өрісті қысқа жариялау**, struct update syntax → **структты жаңарту синтаксисі**, derived trait → **алынған трейт**, automatic referencing/dereferencing → **автоматты сілтемелеу**, pretty-print → **әдемі басып шығару**, instance → **дана**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 4 chapters / 328 samples → **5 chapters / 402 samples** (+74 from chapter 5).
+- Morpheme index: 3 330 → **3 339 morphemes** (+9); 20 430 → **21 121 postings** (+691); 3 519 → **3 593 indexed samples** (+74).
+
+### Tests + counters
+
+- E2E threshold raised from ≥300 to ≥380 rust_book sentences (chapters 1–5).
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.6 = Chapter 6 (Enums and Pattern Matching).
+
 ## [4.7.4] — 2026-04-29 — Rust Book Chapter 4 (Иелікті түсіну) translated, ingested
 
 Fourth chapter — the central, most conceptual chapter of the entire book. Full Kazakh translation of Rust Book Chapter 4 — Understanding Ownership — covering the language's defining idea: stack vs heap, the three ownership rules, variable scope, the `String` type vs string literals, memory allocation and `drop`, ownership transfer (move), `clone` for deep copy, the `Copy` trait, ownership and function calls, return values; references and borrowing (`&T` immutable, `&mut T` mutable, the two reference rules — exclusivity of mutable references vs. shared immutable references — and how data races are prevented at compile time, dangling reference prevention); the slice type (`&str` string slices, `&[T]` array slices, range `..` syntax variants `[a..b]` / `[..n]` / `[m..]` / `[..]`, `&str` as the more general parameter type vs. `&String`).

@@ -10,9 +10,9 @@
     "kazakh_classics_pack.json",
     "rust_book_kk_pack.json"
   ],
-  "total_postings": 20430,
-  "unique_morphemes": 3330,
-  "samples_indexed": 3461,
+  "total_postings": 21121,
+  "unique_morphemes": 3339,
+  "samples_indexed": 3535,
   "postings": {
     "-бөл": [
       {
@@ -946,6 +946,10 @@
         "sample_id": "rust_book_03_0063"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00413"
       },
@@ -1844,6 +1848,10 @@
         "sample_id": "rust_book_03_0078"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0073"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00287"
       },
@@ -1992,6 +2000,10 @@
         "sample_id": "cv_kk_00348"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00084"
       }
@@ -2024,6 +2036,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0006"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -2119,6 +2135,14 @@
       }
     ],
     "айқын": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0007"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
+      },
       {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00048"
@@ -2682,6 +2706,38 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0097"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0006"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0044"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0045"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0072"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -3508,6 +3564,14 @@
         "sample_id": "rust_book_03_0058"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00064"
       },
@@ -4144,6 +4208,10 @@
         "sample_id": "rust_book_04_0093"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000104"
       },
@@ -4236,6 +4304,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0021"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -4346,6 +4418,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0061"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0017"
       }
     ],
     "арыз": [
@@ -4706,6 +4782,46 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0097"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0026"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0038"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0064"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -5656,6 +5772,26 @@
         "sample_id": "rust_book_03_0094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0006"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0007"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00029"
       },
@@ -5790,6 +5926,26 @@
         "sample_id": "rust_book_04_0070"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0025"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00114"
       },
@@ -5820,6 +5976,10 @@
         "sample_id": "rust_book_04_0070"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0025"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00405"
       }
@@ -5840,6 +6000,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0050"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
       }
     ],
     "атан": [
@@ -5954,6 +6130,34 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0090"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0008"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0011"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0020"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0041"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -6112,6 +6316,18 @@
         "sample_id": "rust_book_02_0050"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00190"
       },
@@ -6224,6 +6440,10 @@
       {
         "pack": "common_voice_kk_pack.json",
         "sample_id": "cv_kk_00145"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -6612,6 +6832,10 @@
         "sample_id": "rust_book_04_0079"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000164"
       },
@@ -6776,6 +7000,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -7272,6 +7500,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0014"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0017"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -8768,6 +9004,42 @@
         "sample_id": "rust_book_04_0059"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0038"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0060"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0064"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0070"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00066"
       },
@@ -9548,6 +9820,34 @@
         "sample_id": "rust_book_04_0094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0006"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0014"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00068"
       },
@@ -9900,6 +10200,26 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0089"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0023"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0072"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -10366,6 +10686,18 @@
         "sample_id": "rust_book_04_0094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0034"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0035"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00409"
       }
@@ -10552,6 +10884,10 @@
         "sample_id": "rust_book_04_0055"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0045"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000319"
       }
@@ -10612,6 +10948,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0014"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0007"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
       }
     ],
     "бер": [
@@ -10854,6 +11206,26 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0078"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0020"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0032"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0065"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -11158,6 +11530,10 @@
     ],
     "биіктік": [
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0039"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00178"
       },
@@ -11180,6 +11556,22 @@
         "sample_id": "rust_book_03_0080"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0053"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0060"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0065"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00094"
       },
@@ -11196,6 +11588,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0080"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0065"
       }
     ],
     "блок": [
@@ -11226,6 +11622,26 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0053"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0060"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0065"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0066"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -11478,6 +11894,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0073"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0011"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -12140,6 +12560,38 @@
         "sample_id": "rust_book_04_0090"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0026"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0033"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0060"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00039"
       },
@@ -12638,6 +13090,30 @@
         "sample_id": "rust_book_04_0090"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0026"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0060"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00109"
       },
@@ -12866,6 +13342,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_02_0070"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -13170,6 +13650,10 @@
         "sample_id": "rust_book_04_0078"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00098"
       },
@@ -13310,6 +13794,14 @@
         "sample_id": "rust_book_03_0090"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0023"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00105"
       },
@@ -13382,6 +13874,10 @@
       {
         "pack": "common_voice_kk_pack.json",
         "sample_id": "cv_kk_00428"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -13826,6 +14322,22 @@
         "sample_id": "rust_book_04_0073"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0056"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00251"
       },
@@ -14106,6 +14618,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0033"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -14964,6 +15484,58 @@
         "sample_id": "rust_book_04_0096"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0023"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0038"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0050"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0065"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00135"
       },
@@ -15260,6 +15832,42 @@
         "sample_id": "rust_book_04_0094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0018"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0037"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0039"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0047"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00015"
       },
@@ -15358,6 +15966,10 @@
         "sample_id": "rust_book_04_0005"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00172"
       },
@@ -15420,6 +16032,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0064"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0025"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0071"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -15742,6 +16370,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0086"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -16420,6 +17056,58 @@
         "sample_id": "rust_book_04_0095"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0003"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0007"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0016"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0017"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0023"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0025"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0039"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0065"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00319"
       },
@@ -17078,6 +17766,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0043"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
       }
     ],
     "бәсеке": [
@@ -17200,6 +17892,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_02_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0037"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -18322,6 +19022,22 @@
         "sample_id": "rust_book_04_0069"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0047"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0060"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0064"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00011"
       },
@@ -18776,6 +19492,22 @@
         "sample_id": "rust_book_04_0090"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0017"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0019"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00413"
       },
@@ -18896,6 +19628,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0086"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0033"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -19056,11 +19792,35 @@
         "sample_id": "cc100_kk_0000112"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000198"
       }
     ],
     "деректер": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
+      },
       {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000198"
@@ -19672,6 +20432,10 @@
         "sample_id": "rust_book_03_0009"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00279"
       },
@@ -20218,6 +20982,10 @@
         "sample_id": "rust_book_04_0053"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000006"
       },
@@ -20454,6 +21222,10 @@
         "sample_id": "rust_book_04_0074"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00430"
       }
@@ -20482,6 +21254,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0087"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -20660,6 +21436,18 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0038"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -21410,6 +22198,38 @@
         "sample_id": "rust_book_04_0055"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0007"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0017"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0022"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0064"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00133"
       },
@@ -21580,6 +22400,22 @@
         "sample_id": "rust_book_04_0047"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0039"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00049"
       },
@@ -21620,6 +22456,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_02_0046"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0073"
       }
     ],
     "енгіз": [
@@ -21878,6 +22718,18 @@
         "sample_id": "rust_book_04_0047"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00049"
       },
@@ -21980,6 +22832,12 @@
       {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000285"
+      }
+    ],
+    "ені": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0039"
       }
     ],
     "еп": [
@@ -22980,6 +23838,18 @@
         "sample_id": "rust_book_03_0080"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0007"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00047"
       },
@@ -23404,6 +24274,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0011"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
       }
     ],
     "ешк": [
@@ -23684,6 +24558,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0092"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0074"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -24152,6 +25030,14 @@
         "sample_id": "rust_book_04_0035"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0016"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0056"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00058"
       },
@@ -24230,6 +25116,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0077"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0065"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -24530,6 +25424,16 @@
       {
         "pack": "abai_wikisource_pack.json",
         "sample_id": "abai_00194"
+      }
+    ],
+    "жалпылама": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0026"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0066"
       }
     ],
     "жалпыұлттық": [
@@ -25322,6 +26226,14 @@
         "sample_id": "rust_book_04_0075"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0019"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0032"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00195"
       },
@@ -25862,6 +26774,10 @@
         "sample_id": "rust_book_04_0073"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00020"
       },
@@ -25922,6 +26838,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_02_0034"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -25999,6 +26919,10 @@
       }
     ],
     "жату": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
       {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000289"
@@ -26868,6 +27792,10 @@
         "sample_id": "rust_book_02_0031"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0038"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00059"
       },
@@ -26962,6 +27890,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0068"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
       }
     ],
     "жақын": [
@@ -27234,6 +28170,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0091"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0014"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0063"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -27936,6 +28888,14 @@
         "sample_id": "rust_book_04_0094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00216"
       },
@@ -28460,6 +29420,18 @@
         "sample_id": "cc100_kk_0000364"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00049"
       },
@@ -28496,6 +29468,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0015"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0020"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -28538,6 +29514,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0015"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0020"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -28632,6 +29612,10 @@
       {
         "pack": "kazakh_proverbs_pack.json",
         "sample_id": "proverb_066"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -28876,6 +29860,18 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0088"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0014"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0074"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -29290,6 +30286,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -29720,6 +30724,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -30158,6 +31166,26 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0020"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0025"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0070"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -31418,6 +32446,18 @@
         "sample_id": "rust_book_04_0094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0037"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0072"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000327"
       },
@@ -31954,6 +32994,10 @@
         "sample_id": "rust_book_04_0087"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00419"
       },
@@ -32294,6 +33338,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0087"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -33086,6 +34134,22 @@
         "sample_id": "rust_book_04_0093"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0003"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0008"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0018"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00031"
       },
@@ -33534,6 +34598,18 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0033"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0044"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0050"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -34000,6 +35076,14 @@
         "sample_id": "rust_book_04_0093"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000157"
       },
@@ -34042,6 +35126,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
       }
     ],
     "иелігін": [
@@ -34052,6 +35140,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0081"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0057"
       }
     ],
     "иелік": [
@@ -34168,6 +35260,30 @@
         "sample_id": "rust_book_04_0094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0017"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0033"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00126"
       }
@@ -34184,6 +35300,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
       }
     ],
     "изе": [
@@ -35006,6 +36130,10 @@
         "sample_id": "rust_book_04_0031"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0014"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000357"
       },
@@ -35046,6 +36174,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0027"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0020"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -35220,6 +36356,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0080"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0026"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -35730,6 +36874,10 @@
         "sample_id": "rust_book_04_0076"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0032"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00145"
       }
@@ -35902,6 +37050,26 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0081"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0008"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0047"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -36604,6 +37772,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0080"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0007"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
       }
     ],
     "кодексі": [
@@ -36810,6 +37986,26 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0056"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0004"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0006"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0023"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0038"
       }
     ],
     "кофе": [
@@ -36874,6 +38070,12 @@
       {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00329"
+      }
+    ],
+    "кілтсөз": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0008"
       }
     ],
     "кім": [
@@ -37460,6 +38662,10 @@
         "sample_id": "rust_book_03_0078"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000260"
       }
@@ -37478,6 +38684,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_01_0015"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0035"
       }
     ],
     "кішкентай": [
@@ -38296,6 +39506,10 @@
         "sample_id": "rust_book_04_0001"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00381"
       },
@@ -38440,6 +39654,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -40200,6 +41418,14 @@
         "sample_id": "rust_book_03_0023"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0004"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0074"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00184"
       },
@@ -40324,6 +41550,18 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0068"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -40604,6 +41842,10 @@
         "sample_id": "rust_book_04_0093"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0018"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00149"
       },
@@ -40654,6 +41896,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
       }
     ],
     "көшіріл": [
@@ -40664,6 +41910,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0018"
       }
     ],
     "көңіл": [
@@ -40962,6 +42212,10 @@
         "sample_id": "cv_kk_00037"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00393"
       },
@@ -41122,6 +42376,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0041"
       }
     ],
     "мақал": [
@@ -41202,6 +42460,10 @@
       {
         "pack": "common_voice_kk_pack.json",
         "sample_id": "cv_kk_00062"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0039"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -42020,6 +43282,42 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0008"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0026"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0066"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -42944,6 +44242,22 @@
         "sample_id": "rust_book_04_0084"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0019"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0033"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0034"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00123"
       },
@@ -43296,6 +44610,26 @@
         "sample_id": "rust_book_04_0094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0011"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0022"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00089"
       },
@@ -43472,6 +44806,18 @@
         "sample_id": "rust_book_04_0081"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0037"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0062"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00444"
       },
@@ -43574,6 +44920,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0033"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0062"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -44152,6 +45506,10 @@
         "sample_id": "rust_book_03_0095"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0002"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00118"
       },
@@ -44372,6 +45730,26 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0081"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0016"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0017"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
       }
     ],
     "мәнді": [
@@ -44442,6 +45820,18 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0081"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
       }
     ],
     "мәнерле": [
@@ -44486,6 +45876,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0053"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
       }
     ],
     "мәртебе": [
@@ -45054,6 +46452,18 @@
         "sample_id": "rust_book_03_0090"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0034"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00031"
       },
@@ -45586,6 +46996,14 @@
         "sample_id": "rust_book_04_0093"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00043"
       },
@@ -45824,6 +47242,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0050"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
       }
     ],
     "нүкте": [
@@ -45838,6 +47260,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0064"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0064"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -45974,6 +47404,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0030"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
       }
     ],
     "нұсқасын": [
@@ -46186,6 +47620,14 @@
       {
         "pack": "cc100_kk_pack.json",
         "sample_id": "cc100_kk_0000436"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0007"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
       }
     ],
     "нөсер": [
@@ -46570,6 +48012,34 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0097"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0011"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0018"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0066"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -47278,6 +48748,26 @@
         "sample_id": "rust_book_04_0091"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0017"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0032"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00030"
       },
@@ -47670,6 +49160,30 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0097"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0011"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0018"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0066"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -48076,6 +49590,42 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0094"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0002"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0003"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0045"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0074"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -48556,6 +50106,10 @@
         "sample_id": "rust_book_04_0091"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0072"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00319"
       },
@@ -48852,6 +50406,14 @@
         "sample_id": "rust_book_04_0081"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00032"
       },
@@ -48966,6 +50528,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0063"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
       }
     ],
     "оқытушы": [
@@ -49114,6 +50680,10 @@
         "sample_id": "cv_kk_00431"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00368"
       },
@@ -49210,6 +50780,30 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0087"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0054"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0060"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0070"
       }
     ],
     "парламент": [
@@ -49258,6 +50852,10 @@
       {
         "pack": "common_voice_kk_pack.json",
         "sample_id": "cv_kk_00435"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0039"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -49468,6 +51066,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_01_0043"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
       }
     ],
     "пұл": [
@@ -50266,6 +51868,30 @@
         "sample_id": "rust_book_04_0095"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0011"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0020"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0062"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00211"
       },
@@ -50390,6 +52016,22 @@
         "sample_id": "rust_book_04_0095"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0062"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000003"
       },
@@ -50462,6 +52104,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0095"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0062"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -50574,6 +52232,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0079"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0065"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -51338,6 +53000,10 @@
         "sample_id": "rust_book_04_0055"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0038"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00110"
       },
@@ -51964,6 +53630,10 @@
         "sample_id": "rust_book_04_0049"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00387"
       }
@@ -52184,6 +53854,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_02_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
       }
     ],
     "семей": [
@@ -52654,6 +54328,10 @@
       {
         "pack": "cc100_kk_pack.json",
         "sample_id": "cc100_kk_0000274"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0073"
       }
     ],
     "серіктестер": [
@@ -52750,6 +54428,22 @@
         "sample_id": "rust_book_04_0058"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0064"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0074"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000060"
       },
@@ -52794,6 +54488,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0064"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0074"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -53192,6 +54902,22 @@
         "sample_id": "rust_book_04_0080"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0017"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0019"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0022"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0063"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00102"
       },
@@ -53316,6 +55042,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0078"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -53492,6 +55222,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0080"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0021"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -53878,6 +55612,110 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0096"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0002"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0003"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0004"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0006"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0008"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0025"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0030"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0033"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0034"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0044"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0053"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0071"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0073"
       }
     ],
     "студент": [
@@ -54852,6 +56690,14 @@
         "sample_id": "rust_book_04_0094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0074"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00258"
       },
@@ -55006,6 +56852,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
       }
     ],
     "сілтеме": [
@@ -55072,6 +56934,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
       }
     ],
     "сің": [
@@ -55254,6 +57132,10 @@
         "sample_id": "cc100_kk_0000453"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00036"
       },
@@ -55266,6 +57148,10 @@
       {
         "pack": "cc100_kk_pack.json",
         "sample_id": "cc100_kk_0000191"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -55470,6 +57356,10 @@
         "sample_id": "rust_book_04_0054"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00087"
       },
@@ -55534,6 +57424,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0054"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
       }
     ],
     "сұран": [
@@ -55788,6 +57682,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_02_0048"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -56370,6 +58268,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
       }
     ],
     "сөйтіп": [
@@ -56462,6 +58364,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0040"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0011"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -56690,6 +58596,14 @@
       {
         "pack": "kazakh_classics_pack.json",
         "sample_id": "kz_classics_00107"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -57030,6 +58944,10 @@
         "sample_id": "rust_book_04_0092"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0002"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00142"
       },
@@ -57148,6 +59066,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0092"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0002"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -57332,6 +59254,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0094"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0011"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -57968,6 +59894,10 @@
     ],
     "тағайындай": [
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00212"
       },
@@ -58068,6 +59998,10 @@
         "sample_id": "rust_book_04_0096"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0050"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00497"
       },
@@ -58162,6 +60096,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0096"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0050"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -58498,6 +60436,10 @@
         "sample_id": "cc100_kk_0000439"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00254"
       }
@@ -58672,6 +60614,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0089"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0014"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -59344,6 +61302,10 @@
         "sample_id": "rust_book_04_0033"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00025"
       },
@@ -59408,6 +61370,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0033"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -59502,6 +61468,32 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      }
+    ],
+    "типтік": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0023"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0037"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0072"
       }
     ],
     "тисе": [
@@ -59766,6 +61758,10 @@
         "sample_id": "rust_book_03_0078"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00149"
       },
@@ -59802,6 +61798,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_02_0070"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0032"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -59962,6 +61962,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0046"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -60150,6 +62154,30 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0026"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0044"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0047"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0066"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
       }
     ],
     "туа": [
@@ -60370,6 +62398,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0078"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0073"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -60836,6 +62868,10 @@
         "sample_id": "rust_book_03_0057"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0041"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00342"
       },
@@ -61288,6 +63324,84 @@
         "sample_id": "wiki_kz_0000473"
       }
     ],
+    "тіктөртбұрыш": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0035"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0054"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      }
+    ],
+    "тіктөртбұрышт": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0035"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0054"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      }
+    ],
+    "тіктөртбұрышты": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0035"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0040"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0054"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      }
+    ],
     "тіл": [
       {
         "pack": "abai_wikisource_pack.json",
@@ -61452,6 +63566,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0091"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0002"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -61782,6 +63904,14 @@
       {
         "pack": "kazakh_proverbs_pack.json",
         "sample_id": "proverb_060"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0032"
       }
     ],
     "тірі": [
@@ -62486,6 +64616,26 @@
         "sample_id": "rust_book_04_0090"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0062"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0071"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00353"
       },
@@ -63046,6 +65196,10 @@
         "sample_id": "rust_book_04_0048"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0037"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00126"
       },
@@ -63268,6 +65422,10 @@
         "sample_id": "rust_book_04_0093"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00022"
       },
@@ -63318,6 +65476,10 @@
         "sample_id": "abai_00186"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0066"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000071"
       },
@@ -63335,6 +65497,10 @@
       }
     ],
     "тұсын": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0066"
+      },
       {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000071"
@@ -63644,6 +65810,10 @@
         "sample_id": "rust_book_04_0012"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0026"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00026"
       },
@@ -63700,6 +65870,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0041"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
       }
     ],
     "тәсілдер": [
@@ -64324,6 +66502,10 @@
         "sample_id": "rust_book_03_0029"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00128"
       },
@@ -64758,6 +66940,10 @@
         "sample_id": "rust_book_04_0035"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00478"
       }
@@ -64976,6 +67162,46 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0088"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0022"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0042"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0060"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0061"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0064"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0070"
       }
     ],
     "хабарлағандай": [
@@ -66430,6 +68656,10 @@
         "sample_id": "rust_book_04_0063"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0064"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00306"
       },
@@ -66462,6 +68692,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0068"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
       }
     ],
     "шақырушы": [
@@ -66504,6 +68738,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0063"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
       }
     ],
     "шақырым": [
@@ -66630,6 +68868,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_01_0026"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
       }
     ],
     "шежіре": [
@@ -66814,6 +69056,10 @@
         "sample_id": "rust_book_04_0021"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00401"
       }
@@ -66850,6 +69096,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0021"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -66932,6 +69182,10 @@
         "sample_id": "rust_book_04_0081"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00184"
       },
@@ -66968,6 +69222,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0081"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -67578,6 +69836,10 @@
         "sample_id": "rust_book_03_0088"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000297"
       },
@@ -68120,6 +70382,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0041"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0037"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -68814,6 +71080,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0091"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0044"
       }
     ],
     "ыңғайлы": [
@@ -68848,6 +71118,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0091"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0044"
       }
     ],
     "ыңғайсыз": [
@@ -69808,6 +72082,18 @@
         "sample_id": "rust_book_04_0084"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00194"
       },
@@ -69902,6 +72188,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0048"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0074"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -70002,6 +72292,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0048"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0074"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -70206,6 +72500,18 @@
         "sample_id": "rust_book_04_0084"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000045"
       },
@@ -70344,6 +72650,14 @@
         "sample_id": "rust_book_04_0037"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000045"
       },
@@ -70400,6 +72714,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_02_0039"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
       }
     ],
     "іім": [
@@ -70880,6 +73198,10 @@
         "sample_id": "rust_book_03_0077"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00317"
       },
@@ -70912,6 +73234,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0077"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
       }
     ],
     "қабылдан": [
@@ -71074,6 +73400,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_01_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0038"
       }
     ],
     "қадамды": [
@@ -71162,6 +73492,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0053"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -71946,6 +74280,10 @@
         "sample_id": "rust_book_02_0062"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0038"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00008"
       },
@@ -72300,6 +74638,10 @@
         "sample_id": "rust_book_03_0059"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00145"
       },
@@ -72384,6 +74726,12 @@
         "sample_id": "synth_00331"
       }
     ],
+    "қайталау": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      }
+    ],
     "қайтар": [
       {
         "pack": "rust_book_kk_pack.json",
@@ -72440,6 +74788,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0041"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -72778,6 +75134,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0072"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0043"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -73240,6 +75600,10 @@
         "sample_id": "kz_classics_00094"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0057"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00074"
       },
@@ -73490,6 +75854,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0022"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -73886,6 +76254,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0028"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -74622,6 +76994,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
       }
     ],
     "қарызға": [
@@ -74648,6 +77024,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
       }
     ],
     "қарым-қатынас": [
@@ -74850,12 +77230,22 @@
     ],
     "қасиет": [
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0072"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00312"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00242"
+      }
+    ],
+    "қасиеті": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0072"
       }
     ],
     "қасиетін": [
@@ -75224,6 +77614,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0081"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0045"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -75762,6 +78160,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0023"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -76860,6 +79262,14 @@
         "sample_id": "rust_book_04_0095"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0062"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00061"
       },
@@ -77282,6 +79692,10 @@
         "sample_id": "rust_book_04_0092"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00269"
       }
@@ -77420,6 +79834,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -77614,6 +80032,10 @@
         "sample_id": "rust_book_04_0033"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00253"
       },
@@ -77754,6 +80176,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0017"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0049"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -78906,6 +81336,14 @@
         "sample_id": "cc100_kk_0000488"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00053"
       },
@@ -79618,6 +82056,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0079"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0050"
       }
     ],
     "құрт": [
@@ -81512,6 +83958,42 @@
         "sample_id": "rust_book_04_0088"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0007"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0008"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0050"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00001"
       },
@@ -82638,6 +85120,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0046"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0033"
       }
     ],
     "ұстан": [
@@ -82732,6 +85218,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0088"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
       }
     ],
     "ұсына": [
@@ -82768,6 +85262,10 @@
         "sample_id": "rust_book_03_0089"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00194"
       }
@@ -82794,6 +85292,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0088"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
       }
     ],
     "ұсыныла": [
@@ -82814,6 +85316,10 @@
       {
         "pack": "cc100_kk_pack.json",
         "sample_id": "cc100_kk_0000437"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0046"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -83036,6 +85542,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0073"
       }
     ],
     "ұқ": [
@@ -83066,6 +85576,18 @@
         "sample_id": "rust_book_04_0055"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0002"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0004"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000498"
       }
@@ -83088,6 +85610,18 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0002"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0004"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
       }
     ],
     "ұқсастық": [
@@ -83228,6 +85762,10 @@
         "sample_id": "abai_00316"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00016"
       },
@@ -83328,6 +85866,18 @@
         "sample_id": "rust_book_03_0091"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0057"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0062"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00161"
       },
@@ -83362,6 +85912,10 @@
         "sample_id": "rust_book_03_0077"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0062"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000427"
       }
@@ -83374,6 +85928,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0091"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0057"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
       }
     ],
     "әділ": [
@@ -83456,6 +86018,46 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0097"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0003"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0053"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0054"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0057"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0070"
       }
     ],
     "әдістеме": [
@@ -83476,6 +86078,22 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0097"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0003"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0053"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0059"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0069"
       }
     ],
     "әдісі": [
@@ -84016,6 +86634,10 @@
         "sample_id": "rust_book_03_0077"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
+      },
+      {
         "pack": "wikipedia_kz_pack.json",
         "sample_id": "wiki_kz_0000348"
       },
@@ -84036,6 +86658,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0077"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -84368,6 +86994,10 @@
         "sample_id": "rust_book_04_0069"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0019"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00018"
       },
@@ -84658,6 +87288,10 @@
         "sample_id": "rust_book_04_0043"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00025"
       },
@@ -84690,6 +87324,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0043"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
       },
       {
         "pack": "wikipedia_kz_pack.json",
@@ -84818,6 +87456,14 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0075"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0032"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -85054,6 +87700,10 @@
         "sample_id": "rust_book_03_0075"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0066"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00244"
       },
@@ -85272,6 +87922,18 @@
         "sample_id": "cc100_kk_0000263"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0001"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0067"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00316"
       },
@@ -85422,9 +88084,17 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0093"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
       }
     ],
     "өзгерт": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
       {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00048"
@@ -85914,6 +88584,14 @@
         "sample_id": "rust_book_03_0027"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0052"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0055"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00242"
       },
@@ -86038,6 +88716,10 @@
         "sample_id": "rust_book_04_0041"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0029"
+      },
+      {
         "pack": "tatoeba_kazakh_pack.json",
         "sample_id": "tatoeba_kz_00212"
       },
@@ -86084,6 +88766,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_04_0086"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0072"
       },
       {
         "pack": "synthetic_sentences_pack.json",
@@ -86588,6 +89274,10 @@
         "sample_id": "rust_book_04_0014"
       },
       {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0036"
+      },
+      {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00113"
       },
@@ -86784,6 +89474,10 @@
       {
         "pack": "kazakh_proverbs_pack.json",
         "sample_id": "proverb_064"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0027"
       },
       {
         "pack": "tatoeba_kazakh_pack.json",
@@ -87594,6 +90288,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0095"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
       }
     ],
     "өрнекті": [
@@ -87604,6 +90302,10 @@
       {
         "pack": "rust_book_kk_pack.json",
         "sample_id": "rust_book_03_0071"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0051"
       }
     ],
     "өрт": [
@@ -87621,6 +90323,86 @@
       }
     ],
     "өріс": [
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0002"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0005"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0006"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0009"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0010"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0011"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0012"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0013"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0014"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0015"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0016"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0020"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0024"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0025"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0028"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0031"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0033"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0048"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0058"
+      },
+      {
+        "pack": "rust_book_kk_pack.json",
+        "sample_id": "rust_book_05_0068"
+      },
       {
         "pack": "synthetic_sentences_pack.json",
         "sample_id": "synth_00478"
@@ -90386,6 +93168,80 @@
     "rust_book_kk_pack.json::rust_book_04_0095": "Уақыт өте келе бұл ережелерге үйреніп, оларды ой автоматы ретінде қолданасыз.",
     "rust_book_kk_pack.json::rust_book_04_0096": "Келесі тарауда `Rust`-тың тағы бір негізгі құрылымына — структтарға — көшеміз.",
     "rust_book_kk_pack.json::rust_book_04_0097": "Олар арқылы өзіңіздің тип жасап, оған әдістер бекіте аласыз.",
+    "rust_book_kk_pack.json::rust_book_05_0001": "Байланысты деректерді структ арқылы құру Структ — өзара байланысты бірнеше мәнді бір аталған типке біріктіру тәсілі.",
+    "rust_book_kk_pack.json::rust_book_05_0002": "Объектілі-бағытталған тілдерден таныс болсаңыз, структ — оның **мәлімет** бөлігіне (өрістер) ұқсас.",
+    "rust_book_kk_pack.json::rust_book_05_0003": "Бұл тарауда `Rust`-та структты қалай анықтайтынды, оны қалай дана етіп жасайтынды және оған әдістерді қалай бекітетінді қарастырамыз.",
+    "rust_book_kk_pack.json::rust_book_05_0004": "Структ алдыңғы тарауда көрген кортежге біршама ұқсас.",
+    "rust_book_kk_pack.json::rust_book_05_0005": "Кортеж сияқты, структ те бірнеше мәнді бір топ ретінде сақтайды; әр өріс әртүрлі типке жатуы мүмкін.",
+    "rust_book_kk_pack.json::rust_book_05_0006": "Ал кортежден айырмашылығы: структтың әр өрісінде ат бар.",
+    "rust_book_kk_pack.json::rust_book_05_0007": "Бұл аттар коды оқырман үшін айқын етеді — нөмір емес, мағыналы белгі. 5.1.",
+    "rust_book_kk_pack.json::rust_book_05_0008": "Структ анықтау және дана жасау Структты жариялау үшін `struct` кілтсөзі мен типке атау керек.",
+    "rust_book_kk_pack.json::rust_book_05_0009": "Содан кейін фигуралы жақшалардың ішіне әр өрістің атауы мен типін көрсетеміз: Бұл `User` атты структты жариялайды; оның төрт өрісі бар.",
+    "rust_book_kk_pack.json::rust_book_05_0010": "Енді осы типтен **дана** (instance) жасайық: Дана жасау үшін структ атын жазып, фигуралы жақшалардың ішінде әр өрістің мәнін көрсетеміз.",
+    "rust_book_kk_pack.json::rust_book_05_0011": "Өрістердің реті анықтаудағы ретпен сай болмауы мүмкін — `Rust` оларды атау бойынша табады.",
+    "rust_book_kk_pack.json::rust_book_05_0012": "Өрістерге қол жеткізу Дананың өрісіне нүкте арқылы қол жеткіземіз: Егер дана өзгермелі болса, өрісті қайта тағайындай аламыз: Назар аударыңыз: бүкіл дана өзгермелі. `Rust`-та тек жекелеген өрістерді ғана өзгермелі ете алмайсыз — мәннің бүкіл иесі өзгермелі немесе тұрақты.",
+    "rust_book_kk_pack.json::rust_book_05_0013": "Өрісті жаңа дананы қайтаратын функциядан құру Жиі функция бір параметрді қабылдап, жаңа дана құрып, оны қайтарады: Параметр пен өрістің атаулары бірдей болғанда — оны қайталау артық. `Rust` ұсынатын **өрісті қысқа жариялау** (field init shorthand) синтаксисі мынадай: Тек ат жазсаңыз — `Rust` сол атты параметрден алады.",
+    "rust_book_kk_pack.json::rust_book_05_0014": "Бар данадан жаңа дана: жаңарту синтаксисі Жиі бар данадан жаңа дана жасап, тек кейбір өрістерді ауыстырамыз.",
+    "rust_book_kk_pack.json::rust_book_05_0015": "Қолдан бәрін көшіруге тура келмеу үшін **структты жаңарту синтаксисі** бар: `..user1` сөйлемі: «қалған өрістерді `user1`-ден ал».",
+    "rust_book_kk_pack.json::rust_book_05_0016": "Бұл жазылмаған өрістерді (`active`, `username`, `sign_in_count`) `user1`-дегі мәндермен толтырады.",
+    "rust_book_kk_pack.json::rust_book_05_0017": "Маңызды: бұл синтаксис де иелік ережелеріне бағынады. `username` — `String`, ол `Copy` емес, сондықтан мән `user1`-ден `user2`-ге **ауысады**. `user1.username` ары қарай жарамсыз.",
+    "rust_book_kk_pack.json::rust_book_05_0018": "Бірақ `active` (bool) және `sign_in_count` (u64) — `Copy`, олар көшіріледі.",
+    "rust_book_kk_pack.json::rust_book_05_0019": "Сондықтан мысалда `user1.active` пен `user1.sign_in_count` әлі де жарамды.",
+    "rust_book_kk_pack.json::rust_book_05_0020": "Кортеж-структ Кейде өрістерге арнайы атау берудің керегі жоқ — өрістердің реті жеткілікті семантика береді.",
+    "rust_book_kk_pack.json::rust_book_05_0021": "Соған арналған **кортеж-структ** бар: `Color` мен `Point` екеуі де `(i32, i32, i32)` түрімен сай, бірақ кортеж-структтер басқа типтерге жатады.",
+    "rust_book_kk_pack.json::rust_book_05_0022": "Сондықтан `Color`-ды күтетін функцияға `Point` беру мүмкін емес.",
+    "rust_book_kk_pack.json::rust_book_05_0023": "Бұл — типтік қауіпсіздік: семантикасы басқа болғанда бір кортежді басқасына шатастырмайсыз.",
+    "rust_book_kk_pack.json::rust_book_05_0024": "Кортеж-структтың өрістеріне нөмір арқылы қол жеткіземіз: Бірлік структ Кейде ешбір өрісі жоқ структ жасау керек — таза семантикалық белгі ретінде.",
+    "rust_book_kk_pack.json::rust_book_05_0025": "Ондай структты **бірлік структ** деп атайды: Бұл өріс жоқ дана.",
+    "rust_book_kk_pack.json::rust_book_05_0026": "Кейін трейттер мен жалпылама типтер арқылы оған тәртіп бекітуге болады.",
+    "rust_book_kk_pack.json::rust_book_05_0027": "Бірлік структтер таза белгі — типтік жүйедегі тег ретінде ғана өмір сүреді.",
+    "rust_book_kk_pack.json::rust_book_05_0028": "Структ деректерінің иелігі Жоғарыдағы `User` структындағы `username` мен `email` өрістері `String` түрінде болды — `&str` емес.",
+    "rust_book_kk_pack.json::rust_book_05_0029": "Бұл — саналы шешім: біз бұл структтың әр өзінің деректеріне иелік ететінін, олар жасырын түрде басқа жерден қарызға алынбайтынын қалаймыз.",
+    "rust_book_kk_pack.json::rust_book_05_0030": "Структтың бүкіл аумағы бар болғанша, оның деректері де бар болады.",
+    "rust_book_kk_pack.json::rust_book_05_0031": "Структтың өрісінде сілтеме сақтау мүмкін — бірақ ол үшін **тіршілік мерзімі белгісі** қажет.",
+    "rust_book_kk_pack.json::rust_book_05_0032": "Тіршілік мерзімі ол сілтеменің әрқашан жарамды болатынына кепілдік береді. 10-тарауда тіршілік мерзімдерін толық қарастырамыз.",
+    "rust_book_kk_pack.json::rust_book_05_0033": "Қазірге дейін структ өрістерінде иелікті ұстайтын типтерді (мысалы `String`) қолданатын боламыз. 5.2.",
+    "rust_book_kk_pack.json::rust_book_05_0034": "Структты қолданатын мысал бағдарлама Структтың пайдасын нақты бағдарламамен көрейік.",
+    "rust_book_kk_pack.json::rust_book_05_0035": "Тіктөртбұрыштың ауданын есептейтін кішкене бағдарлама жазайық.",
+    "rust_book_kk_pack.json::rust_book_05_0036": "Алдымен қарапайым нұсқа — екі бөлек айнымалы: Жұмыс істейді, бірақ қате осы кодта анық емес. `width` пен `height` өзара байланысты — олар бір тіктөртбұрыштың өлшемдері.",
+    "rust_book_kk_pack.json::rust_book_05_0037": "Кодты оқып шыққанда мұны түсінесіз, бірақ `Rust`-тың типтік жүйесі мұны қолдамайды: `width` пен `height` бір-бірінен бөлек тұр.",
+    "rust_book_kk_pack.json::rust_book_05_0038": "Кортежпен жетілдіру Алдымен кортеж арқылы біріктірейік: Бір қадам жақсы — қазір екі сан байланысты.",
+    "rust_book_kk_pack.json::rust_book_05_0039": "Бірақ `dimensions.0` пен `dimensions.1` — бұл *ені* пе, *биіктігі* ме?",
+    "rust_book_kk_pack.json::rust_book_05_0040": "Бұл коды оқыған адам тіктөртбұрышты тоқытайтын жерде болса, оны еске сақтап тұру керек.",
+    "rust_book_kk_pack.json::rust_book_05_0041": "Кодтың мағынасы атаулардан тыс жатыр.",
+    "rust_book_kk_pack.json::rust_book_05_0042": "Структпен жетілдіру Енді структ арқылы: Енді функция нақты не қабылдайтынын білдіреді: тіктөртбұрыштың сілтемесін (`&Rectangle`).",
+    "rust_book_kk_pack.json::rust_book_05_0043": "Шақырылғанда `&rect1` дейміз — бұл `rect1`-ге сілтеме, иеліктен айырмайды. `main` функциясы `rect1`-дің иесі болып қала береді.",
+    "rust_book_kk_pack.json::rust_book_05_0044": "Алынған трейттермен пайдалы мүмкіндіктер Жөндеу барысында структты экранда көрсету ыңғайлы.",
+    "rust_book_kk_pack.json::rust_book_05_0045": "Мынадайды жасайық: Қате аламыз: `Rectangle` `Display` трейтін бекітпеген — `Rust` қайдан білсін, оны қалай экранға шығаруды?",
+    "rust_book_kk_pack.json::rust_book_05_0046": "Жасамшы әр құрылымның жеке-жеке басу әдісін шешеді. `println!(\"{:?}\", rect1)` арқылы біз **Debug** форматын сұраймыз — жөндеу үшін ұсынылған шығу пішімі.",
+    "rust_book_kk_pack.json::rust_book_05_0047": "Бірақ оған да трейт бекіту керек.",
+    "rust_book_kk_pack.json::rust_book_05_0048": "Структтың үстіне `#[derive(Debug)]` атрибутын қосамыз: Енді бағдарлама шығарады: Үлкенірек құрылымдар үшін `{:#?}` (әдемі басып шығару) — әр өрісті жаңа жолға қойып, шегініспен пішімдейді: Шығаратыны: `derive` атрибуты — `Rust`-тың күшті құралы.",
+    "rust_book_kk_pack.json::rust_book_05_0049": "Стандартты кітапхана ұсынатын `Debug`, `Clone`, `Copy`, `PartialEq`, `Eq`, `Hash`, `Default` сияқты трейттерді бір қатармен типке бекітуге мүмкіндік береді. 10-тарау мен Қосымшадан толығырақ ала аласыз.",
+    "rust_book_kk_pack.json::rust_book_05_0050": "Жөндеу үшін тағы бір пайдалы құрал — `dbg!` макросы.",
+    "rust_book_kk_pack.json::rust_book_05_0051": "Ол өрнектің мәнін экранға шығарып, мәнді қайтарады: `dbg!` файл атауын мен жол нөмірін көрсетеді — қайдан шыққанын анық білесіз. 5.3.",
+    "rust_book_kk_pack.json::rust_book_05_0052": "Әдіс синтаксисі **Әдіс** — функцияға ұқсас, бірақ ол бір типтің контекстінде анықталады және оның бірінші параметрі әрқашан `self` (мәннің өзі) болады. `self` параметрі арқылы әдіс типтің данасына қол жеткізеді.",
+    "rust_book_kk_pack.json::rust_book_05_0053": "Әдістерді анықтау Структтың әдістерін `impl` блогында жариялаймыз.",
+    "rust_book_kk_pack.json::rust_book_05_0054": "Тіктөртбұрыштың ауданын есептеуге `area` функциясын `Rectangle`-ге әдіске айналдырайық: Бірінші параметр — `&self`.",
+    "rust_book_kk_pack.json::rust_book_05_0055": "Бұл — `self: &Self` дегеннің қысқа жазылуы; `Self` — әдіс жасалған типтің өзі (мұнда — `Rectangle`). `&self` дегеніміз — тек оқу үшін иелікті алмайтын сілтеме.",
+    "rust_book_kk_pack.json::rust_book_05_0056": "Біз дананың мазмұнын өзгерткіміз келсе, `&mut self` жазамыз.",
+    "rust_book_kk_pack.json::rust_book_05_0057": "Әдіс мәннің иелігін алмайтыны — әдеттегі қалып.",
+    "rust_book_kk_pack.json::rust_book_05_0058": "Әдіс пен өрістің атаулары бірдей болуы мүмкін — `Rust` контексттен ажыратады. `rect1.area` — өріс; `rect1.area()` — әдіс шақыруы. `Rust` сонымен бірге **автоматты сілтемелеу** ұсынады. C/C++ тілдерінде біз `obj.method()` пен `ptr->method()`-ті ажыратамыз. `Rust`-та сізге ондай ажырату керек емес: `rect1.area()` шақырғанда, `Rust` `&rect1`, `&mut rect1` немесе `rect1` ішіндегі қандай да формасына дұрыс автоматты түрде өзгертеді — әдістің `self` параметрінің түріне сәйкес.",
+    "rust_book_kk_pack.json::rust_book_05_0059": "Қосымша параметрлері бар әдістер Әдіске әдеттегі параметрлерді қосуға болады. `can_hold` атты әдісті жазайық — басқа тіктөртбұрышты ішінде сыйғыза ма, жоқ па? `can_hold` екі параметрді қабылдайды — біріншісі `self` (мысал данасы), екіншісі — басқа `Rectangle`-ге сілтеме.",
+    "rust_book_kk_pack.json::rust_book_05_0060": "Байланысты функциялар `impl` блогында `self` параметрсіз функцияны да жариялауға болады.",
+    "rust_book_kk_pack.json::rust_book_05_0061": "Олар **байланысты функциялар** деп аталады — типке тиесілі, бірақ нақты данасына емес.",
+    "rust_book_kk_pack.json::rust_book_05_0062": "Әдетте конструктор ретінде қолданылады: `Self` — `impl` блогының түрі (мұнда `Rectangle`).",
+    "rust_book_kk_pack.json::rust_book_05_0063": "Сондықтан `Self { width: size, height: size }` — жаңа `Rectangle` дана.",
+    "rust_book_kk_pack.json::rust_book_05_0064": "Байланысты функцияны нүктемен емес, `::` арқылы шақырамыз: `Rectangle::square(3)`. `String::from`, `Vec::new` сияқты — солар да байланысты функциялар.",
+    "rust_book_kk_pack.json::rust_book_05_0065": "Бірнеше `impl` блогы `Rust` бір типке бірнеше `impl` блогын жариялауға рұқсат береді: Бұл бір блокта жазумен пара-пар.",
+    "rust_book_kk_pack.json::rust_book_05_0066": "Бірнеше блок әсіресе жалпылама типтер мен трейттер тұсында пайдалы — оларды 10-тарауда қарастырамыз. 5.4.",
+    "rust_book_kk_pack.json::rust_book_05_0067": "Тарау қорытындысы Структ — өзара байланысты деректерді бір аталған типке біріктіру тәсілі.",
+    "rust_book_kk_pack.json::rust_book_05_0068": "Аталған өрістер кодтың мағынасын айқын етеді — `dimensions.0` қатарына `rectangle.width` жазу әлдеқайда оқуға жеңіл.",
+    "rust_book_kk_pack.json::rust_book_05_0069": "Структтың үстінен `#[derive(...)]` атрибуты арқылы стандартты трейттерді бір қатармен бекітуге болады; `impl` блогында әдістер мен байланысты функцияларды жариялаймыз.",
+    "rust_book_kk_pack.json::rust_book_05_0070": "Әдіс — алғашқы параметрі `self` болатын функция; байланысты функция — `self` жоқ.",
+    "rust_book_kk_pack.json::rust_book_05_0071": "Кортеж-структ пен бірлік структ — структтың арнайы түрлері.",
+    "rust_book_kk_pack.json::rust_book_05_0072": "Барлық структтердің ортақ қасиеті: типтік жүйеде өзіндік орын алады, басқа типтермен араластырылмайды.",
+    "rust_book_kk_pack.json::rust_book_05_0073": "Келесі тарауда структтың серіктес ұғымы — енам — туралы айтамыз.",
+    "rust_book_kk_pack.json::rust_book_05_0074": "Онда сіз `Option`, `Result` сияқты `Rust`-тың ең жиі қолданылатын типтерінің ішкі құрылымын көресіз.",
     "synthetic_sentences_pack.json::synth_00001": "тоғыз айы іздестіреді.",
     "synthetic_sentences_pack.json::synth_00002": "жаңа шежіре сайын.",
     "synthetic_sentences_pack.json::synth_00003": "тоғыз -ын ұласады.",

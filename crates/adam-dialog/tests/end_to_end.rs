@@ -4494,8 +4494,8 @@ fn rust_book_chapter_01_indexed_in_morpheme_index() {
         .filter(|k| k.contains("rust_book"))
         .collect();
     assert!(
-        rust_book_samples.len() >= 300,
-        "v4.7.4 expects ≥300 rust_book sentences in morpheme_index (chapters 1-4); found {}",
+        rust_book_samples.len() >= 380,
+        "v4.7.5 expects ≥380 rust_book sentences in morpheme_index (chapters 1-5); found {}",
         rust_book_samples.len()
     );
 

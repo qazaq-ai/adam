@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 4,
-  "sentences_total": 328,
-  "sample_count": 328,
+  "chapters_translated": 5,
+  "sentences_total": 402,
+  "sample_count": 402,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -2305,6 +2305,524 @@
       "source_id": "chapter_04",
       "domain": "programming_rust",
       "text": "Олар арқылы өзіңіздің тип жасап, оған әдістер бекіте аласыз."
+    },
+    {
+      "id": "rust_book_05_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Байланысты деректерді структ арқылы құру Структ — өзара байланысты бірнеше мәнді бір аталған типке біріктіру тәсілі."
+    },
+    {
+      "id": "rust_book_05_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Объектілі-бағытталған тілдерден таныс болсаңыз, структ — оның **мәлімет** бөлігіне (өрістер) ұқсас."
+    },
+    {
+      "id": "rust_book_05_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бұл тарауда `Rust`-та структты қалай анықтайтынды, оны қалай дана етіп жасайтынды және оған әдістерді қалай бекітетінді қарастырамыз."
+    },
+    {
+      "id": "rust_book_05_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Структ алдыңғы тарауда көрген кортежге біршама ұқсас."
+    },
+    {
+      "id": "rust_book_05_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Кортеж сияқты, структ те бірнеше мәнді бір топ ретінде сақтайды; әр өріс әртүрлі типке жатуы мүмкін."
+    },
+    {
+      "id": "rust_book_05_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Ал кортежден айырмашылығы: структтың әр өрісінде ат бар."
+    },
+    {
+      "id": "rust_book_05_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бұл аттар коды оқырман үшін айқын етеді — нөмір емес, мағыналы белгі. 5.1."
+    },
+    {
+      "id": "rust_book_05_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Структ анықтау және дана жасау Структты жариялау үшін `struct` кілтсөзі мен типке атау керек."
+    },
+    {
+      "id": "rust_book_05_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Содан кейін фигуралы жақшалардың ішіне әр өрістің атауы мен типін көрсетеміз: Бұл `User` атты структты жариялайды; оның төрт өрісі бар."
+    },
+    {
+      "id": "rust_book_05_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Енді осы типтен **дана** (instance) жасайық: Дана жасау үшін структ атын жазып, фигуралы жақшалардың ішінде әр өрістің мәнін көрсетеміз."
+    },
+    {
+      "id": "rust_book_05_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Өрістердің реті анықтаудағы ретпен сай болмауы мүмкін — `Rust` оларды атау бойынша табады."
+    },
+    {
+      "id": "rust_book_05_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Өрістерге қол жеткізу Дананың өрісіне нүкте арқылы қол жеткіземіз: Егер дана өзгермелі болса, өрісті қайта тағайындай аламыз: Назар аударыңыз: бүкіл дана өзгермелі. `Rust`-та тек жекелеген өрістерді ғана өзгермелі ете алмайсыз — мәннің бүкіл иесі өзгермелі немесе тұрақты."
+    },
+    {
+      "id": "rust_book_05_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Өрісті жаңа дананы қайтаратын функциядан құру Жиі функция бір параметрді қабылдап, жаңа дана құрып, оны қайтарады: Параметр пен өрістің атаулары бірдей болғанда — оны қайталау артық. `Rust` ұсынатын **өрісті қысқа жариялау** (field init shorthand) синтаксисі мынадай: Тек ат жазсаңыз — `Rust` сол атты параметрден алады."
+    },
+    {
+      "id": "rust_book_05_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бар данадан жаңа дана: жаңарту синтаксисі Жиі бар данадан жаңа дана жасап, тек кейбір өрістерді ауыстырамыз."
+    },
+    {
+      "id": "rust_book_05_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Қолдан бәрін көшіруге тура келмеу үшін **структты жаңарту синтаксисі** бар: `..user1` сөйлемі: «қалған өрістерді `user1`-ден ал»."
+    },
+    {
+      "id": "rust_book_05_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бұл жазылмаған өрістерді (`active`, `username`, `sign_in_count`) `user1`-дегі мәндермен толтырады."
+    },
+    {
+      "id": "rust_book_05_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Маңызды: бұл синтаксис де иелік ережелеріне бағынады. `username` — `String`, ол `Copy` емес, сондықтан мән `user1`-ден `user2`-ге **ауысады**. `user1.username` ары қарай жарамсыз."
+    },
+    {
+      "id": "rust_book_05_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бірақ `active` (bool) және `sign_in_count` (u64) — `Copy`, олар көшіріледі."
+    },
+    {
+      "id": "rust_book_05_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Сондықтан мысалда `user1.active` пен `user1.sign_in_count` әлі де жарамды."
+    },
+    {
+      "id": "rust_book_05_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Кортеж-структ Кейде өрістерге арнайы атау берудің керегі жоқ — өрістердің реті жеткілікті семантика береді."
+    },
+    {
+      "id": "rust_book_05_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Соған арналған **кортеж-структ** бар: `Color` мен `Point` екеуі де `(i32, i32, i32)` түрімен сай, бірақ кортеж-структтер басқа типтерге жатады."
+    },
+    {
+      "id": "rust_book_05_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Сондықтан `Color`-ды күтетін функцияға `Point` беру мүмкін емес."
+    },
+    {
+      "id": "rust_book_05_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бұл — типтік қауіпсіздік: семантикасы басқа болғанда бір кортежді басқасына шатастырмайсыз."
+    },
+    {
+      "id": "rust_book_05_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Кортеж-структтың өрістеріне нөмір арқылы қол жеткіземіз: Бірлік структ Кейде ешбір өрісі жоқ структ жасау керек — таза семантикалық белгі ретінде."
+    },
+    {
+      "id": "rust_book_05_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Ондай структты **бірлік структ** деп атайды: Бұл өріс жоқ дана."
+    },
+    {
+      "id": "rust_book_05_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Кейін трейттер мен жалпылама типтер арқылы оған тәртіп бекітуге болады."
+    },
+    {
+      "id": "rust_book_05_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бірлік структтер таза белгі — типтік жүйедегі тег ретінде ғана өмір сүреді."
+    },
+    {
+      "id": "rust_book_05_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Структ деректерінің иелігі Жоғарыдағы `User` структындағы `username` мен `email` өрістері `String` түрінде болды — `&str` емес."
+    },
+    {
+      "id": "rust_book_05_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бұл — саналы шешім: біз бұл структтың әр өзінің деректеріне иелік ететінін, олар жасырын түрде басқа жерден қарызға алынбайтынын қалаймыз."
+    },
+    {
+      "id": "rust_book_05_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Структтың бүкіл аумағы бар болғанша, оның деректері де бар болады."
+    },
+    {
+      "id": "rust_book_05_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Структтың өрісінде сілтеме сақтау мүмкін — бірақ ол үшін **тіршілік мерзімі белгісі** қажет."
+    },
+    {
+      "id": "rust_book_05_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Тіршілік мерзімі ол сілтеменің әрқашан жарамды болатынына кепілдік береді. 10-тарауда тіршілік мерзімдерін толық қарастырамыз."
+    },
+    {
+      "id": "rust_book_05_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Қазірге дейін структ өрістерінде иелікті ұстайтын типтерді (мысалы `String`) қолданатын боламыз. 5.2."
+    },
+    {
+      "id": "rust_book_05_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Структты қолданатын мысал бағдарлама Структтың пайдасын нақты бағдарламамен көрейік."
+    },
+    {
+      "id": "rust_book_05_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Тіктөртбұрыштың ауданын есептейтін кішкене бағдарлама жазайық."
+    },
+    {
+      "id": "rust_book_05_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Алдымен қарапайым нұсқа — екі бөлек айнымалы: Жұмыс істейді, бірақ қате осы кодта анық емес. `width` пен `height` өзара байланысты — олар бір тіктөртбұрыштың өлшемдері."
+    },
+    {
+      "id": "rust_book_05_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Кодты оқып шыққанда мұны түсінесіз, бірақ `Rust`-тың типтік жүйесі мұны қолдамайды: `width` пен `height` бір-бірінен бөлек тұр."
+    },
+    {
+      "id": "rust_book_05_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Кортежпен жетілдіру Алдымен кортеж арқылы біріктірейік: Бір қадам жақсы — қазір екі сан байланысты."
+    },
+    {
+      "id": "rust_book_05_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бірақ `dimensions.0` пен `dimensions.1` — бұл *ені* пе, *биіктігі* ме?"
+    },
+    {
+      "id": "rust_book_05_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бұл коды оқыған адам тіктөртбұрышты тоқытайтын жерде болса, оны еске сақтап тұру керек."
+    },
+    {
+      "id": "rust_book_05_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Кодтың мағынасы атаулардан тыс жатыр."
+    },
+    {
+      "id": "rust_book_05_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Структпен жетілдіру Енді структ арқылы: Енді функция нақты не қабылдайтынын білдіреді: тіктөртбұрыштың сілтемесін (`&Rectangle`)."
+    },
+    {
+      "id": "rust_book_05_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Шақырылғанда `&rect1` дейміз — бұл `rect1`-ге сілтеме, иеліктен айырмайды. `main` функциясы `rect1`-дің иесі болып қала береді."
+    },
+    {
+      "id": "rust_book_05_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Алынған трейттермен пайдалы мүмкіндіктер Жөндеу барысында структты экранда көрсету ыңғайлы."
+    },
+    {
+      "id": "rust_book_05_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Мынадайды жасайық: Қате аламыз: `Rectangle` `Display` трейтін бекітпеген — `Rust` қайдан білсін, оны қалай экранға шығаруды?"
+    },
+    {
+      "id": "rust_book_05_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Жасамшы әр құрылымның жеке-жеке басу әдісін шешеді. `println!(\"{:?}\", rect1)` арқылы біз **Debug** форматын сұраймыз — жөндеу үшін ұсынылған шығу пішімі."
+    },
+    {
+      "id": "rust_book_05_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бірақ оған да трейт бекіту керек."
+    },
+    {
+      "id": "rust_book_05_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Структтың үстіне `#[derive(Debug)]` атрибутын қосамыз: Енді бағдарлама шығарады: Үлкенірек құрылымдар үшін `{:#?}` (әдемі басып шығару) — әр өрісті жаңа жолға қойып, шегініспен пішімдейді: Шығаратыны: `derive` атрибуты — `Rust`-тың күшті құралы."
+    },
+    {
+      "id": "rust_book_05_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапхана ұсынатын `Debug`, `Clone`, `Copy`, `PartialEq`, `Eq`, `Hash`, `Default` сияқты трейттерді бір қатармен типке бекітуге мүмкіндік береді. 10-тарау мен Қосымшадан толығырақ ала аласыз."
+    },
+    {
+      "id": "rust_book_05_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Жөндеу үшін тағы бір пайдалы құрал — `dbg!` макросы."
+    },
+    {
+      "id": "rust_book_05_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Ол өрнектің мәнін экранға шығарып, мәнді қайтарады: `dbg!` файл атауын мен жол нөмірін көрсетеді — қайдан шыққанын анық білесіз. 5.3."
+    },
+    {
+      "id": "rust_book_05_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Әдіс синтаксисі **Әдіс** — функцияға ұқсас, бірақ ол бір типтің контекстінде анықталады және оның бірінші параметрі әрқашан `self` (мәннің өзі) болады. `self` параметрі арқылы әдіс типтің данасына қол жеткізеді."
+    },
+    {
+      "id": "rust_book_05_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Әдістерді анықтау Структтың әдістерін `impl` блогында жариялаймыз."
+    },
+    {
+      "id": "rust_book_05_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Тіктөртбұрыштың ауданын есептеуге `area` функциясын `Rectangle`-ге әдіске айналдырайық: Бірінші параметр — `&self`."
+    },
+    {
+      "id": "rust_book_05_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бұл — `self: &Self` дегеннің қысқа жазылуы; `Self` — әдіс жасалған типтің өзі (мұнда — `Rectangle`). `&self` дегеніміз — тек оқу үшін иелікті алмайтын сілтеме."
+    },
+    {
+      "id": "rust_book_05_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Біз дананың мазмұнын өзгерткіміз келсе, `&mut self` жазамыз."
+    },
+    {
+      "id": "rust_book_05_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Әдіс мәннің иелігін алмайтыны — әдеттегі қалып."
+    },
+    {
+      "id": "rust_book_05_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Әдіс пен өрістің атаулары бірдей болуы мүмкін — `Rust` контексттен ажыратады. `rect1.area` — өріс; `rect1.area()` — әдіс шақыруы. `Rust` сонымен бірге **автоматты сілтемелеу** ұсынады. C/C++ тілдерінде біз `obj.method()` пен `ptr->method()`-ті ажыратамыз. `Rust`-та сізге ондай ажырату керек емес: `rect1.area()` шақырғанда, `Rust` `&rect1`, `&mut rect1` немесе `rect1` ішіндегі қандай да формасына дұрыс автоматты түрде өзгертеді — әдістің `self` параметрінің түріне сәйкес."
+    },
+    {
+      "id": "rust_book_05_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Қосымша параметрлері бар әдістер Әдіске әдеттегі параметрлерді қосуға болады. `can_hold` атты әдісті жазайық — басқа тіктөртбұрышты ішінде сыйғыза ма, жоқ па? `can_hold` екі параметрді қабылдайды — біріншісі `self` (мысал данасы), екіншісі — басқа `Rectangle`-ге сілтеме."
+    },
+    {
+      "id": "rust_book_05_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Байланысты функциялар `impl` блогында `self` параметрсіз функцияны да жариялауға болады."
+    },
+    {
+      "id": "rust_book_05_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Олар **байланысты функциялар** деп аталады — типке тиесілі, бірақ нақты данасына емес."
+    },
+    {
+      "id": "rust_book_05_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Әдетте конструктор ретінде қолданылады: `Self` — `impl` блогының түрі (мұнда `Rectangle`)."
+    },
+    {
+      "id": "rust_book_05_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Сондықтан `Self { width: size, height: size }` — жаңа `Rectangle` дана."
+    },
+    {
+      "id": "rust_book_05_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Байланысты функцияны нүктемен емес, `::` арқылы шақырамыз: `Rectangle::square(3)`. `String::from`, `Vec::new` сияқты — солар да байланысты функциялар."
+    },
+    {
+      "id": "rust_book_05_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бірнеше `impl` блогы `Rust` бір типке бірнеше `impl` блогын жариялауға рұқсат береді: Бұл бір блокта жазумен пара-пар."
+    },
+    {
+      "id": "rust_book_05_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Бірнеше блок әсіресе жалпылама типтер мен трейттер тұсында пайдалы — оларды 10-тарауда қарастырамыз. 5.4."
+    },
+    {
+      "id": "rust_book_05_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Структ — өзара байланысты деректерді бір аталған типке біріктіру тәсілі."
+    },
+    {
+      "id": "rust_book_05_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Аталған өрістер кодтың мағынасын айқын етеді — `dimensions.0` қатарына `rectangle.width` жазу әлдеқайда оқуға жеңіл."
+    },
+    {
+      "id": "rust_book_05_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Структтың үстінен `#[derive(...)]` атрибуты арқылы стандартты трейттерді бір қатармен бекітуге болады; `impl` блогында әдістер мен байланысты функцияларды жариялаймыз."
+    },
+    {
+      "id": "rust_book_05_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Әдіс — алғашқы параметрі `self` болатын функция; байланысты функция — `self` жоқ."
+    },
+    {
+      "id": "rust_book_05_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Кортеж-структ пен бірлік структ — структтың арнайы түрлері."
+    },
+    {
+      "id": "rust_book_05_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Барлық структтердің ортақ қасиеті: типтік жүйеде өзіндік орын алады, басқа типтермен араластырылмайды."
+    },
+    {
+      "id": "rust_book_05_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда структтың серіктес ұғымы — енам — туралы айтамыз."
+    },
+    {
+      "id": "rust_book_05_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_05",
+      "domain": "programming_rust",
+      "text": "Онда сіз `Option`, `Result` сияқты `Rust`-тың ең жиі қолданылатын типтерінің ішкі құрылымын көресіз."
     }
   ]
 }
