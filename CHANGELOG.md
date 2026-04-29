@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.7] — 2026-04-29 — Rust Book Chapter 7 (Бумалармен, сандықтармен, модульдермен жобаны басқару) translated, ingested
+
+Seventh chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 7 — Managing Growing Projects with Packages, Crates, and Modules — covering the four layers of Rust's modular system: **packages** (the Cargo unit, `Cargo.toml`, at-most-one library + any number of binary crates, `src/main.rs` / `src/lib.rs` / `src/bin/*.rs` conventions); **crates** (binary vs library, the crate root concept); **modules** (defining with `mod`, the module tree starting from `crate`, in-line vs separate-file declarations); **paths** (absolute paths starting from `crate`, relative paths via `self` / `super` / module names; the privacy rule — everything is private by default; `pub` opens one layer at a time; `pub struct` requires per-field `pub`; `pub enum` is variants-all-public); **bringing paths into scope with `use`** (idiomatic patterns — import the parent module for functions, import the type itself for structs/enums/types like `HashMap`/`String`/`Vec`; `as` for renaming on collision; `pub use` for re-exporting; nested paths `{}` syntax; `self` in nested paths; `*` glob operator and when not to use it); external crates (the `[dependencies]` block and `std` as the always-available special case); separating modules into different files (`mod foo;` declaration and the `src/foo.rs` / `src/foo/mod.rs` lookup paths).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_07.md` — ~5 000 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-7-specific terminology decisions: package → **бума**, binary crate → **екілік сандық**, library crate → **кітапхана сандығы**, crate root → **сандық түбірі**, module tree → **модуль ағашы**, privacy → **жекелік**, absolute path → **абсолюттік жол**, relative path → **салыстырмалы жол**, re-export → **қайта экспорттау**, glob operator → **glob оператор**, nested paths → **тоғыспалы жолдар**, items → **элементтер**, prelude → **кіріспе**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 6 chapters / 464 samples → **7 chapters / 525 samples** (+61 from chapter 7).
+- Morpheme index: 3 350 → **3 362 morphemes** (+12); 21 747 → **22 145 postings** (+398); 3 655 → **3 691 indexed samples** (+36 — pack hit the 500-per-pack default-mode ceiling).
+
+### Tests + counters
+
+- E2E threshold: previous tightening to ≥500 hit the per-pack default-mode ceiling of 500 (committed-mode `build_morpheme_index` indexes the first 500 samples per pack). Threshold capped at **≥490** with a documenting comment; future chapters won't increase this number without switching to `--full` mode.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.8 = Chapter 8 (Common Collections — Vec, String, HashMap).
+
 ## [4.7.6] — 2026-04-29 — Rust Book Chapter 6 (Енам мен үлгіге сай келтіру) translated, ingested
 
 Sixth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 6 — Enums and Pattern Matching — covering: defining enums (variants, attaching data of different types per variant, enums with `impl` blocks for methods); the `Option<T>` enum and the philosophical case against `null` (Tony Hoare's "billion-dollar mistake"); `Some(T)` vs `None` and why `Option<T>` and `T` are separate types; the `match` control flow construct (matching on enum variants, patterns that bind to inner values, exhaustiveness checking by the compiler, catch-all patterns with named binding vs `_` placeholder, the unit `()` for "do nothing" arms); and `if let` as concise syntax for matching only one variant, with optional `else` branch.

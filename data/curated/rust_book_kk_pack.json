@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 6,
-  "sentences_total": 464,
-  "sample_count": 464,
+  "chapters_translated": 7,
+  "sentences_total": 525,
+  "sample_count": 525,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -3257,6 +3257,433 @@
       "source_id": "chapter_06",
       "domain": "programming_rust",
       "text": "Келесі тарауда үлкенірек жобалар жайында айтамыз: модулдер, сандықтар, жұмыс кеңістігі. `Rust`-тың құрылыс жүйесі арқылы кодты бөлуге, қайта пайдалануға және басқа адамдармен бірге жұмыс істеуге болады."
+    },
+    {
+      "id": "rust_book_07_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Үлкейіп жатқан жобаларды бумалармен, сандықтармен және модульдермен басқару Жоба өсіп бара жатса, кодты бөлектеу — оны кеңейтуге, тестілеуге және қолдауға қажетті шарт."
+    },
+    {
+      "id": "rust_book_07_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бір файлда бар бағдарлама уақыт өте қиындай түседі: оқу қиын, өзгерту қауіпті, жекелік шектеулі. `Rust`-та осы мәселені шешуге арналған бірнеше қабат бар."
+    },
+    {
+      "id": "rust_book_07_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Кішіден үлкенге қарай: **Бума** (package) — бір немесе бірнеше сандықты бір жобаға біріктіретін бірлік."
+    },
+    {
+      "id": "rust_book_07_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бумада `Cargo.toml` файлы болады. **Сандық** (crate) — компиляция бірлігі."
+    },
+    {
+      "id": "rust_book_07_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Сандық не **екілік** (`bin`), не **кітапхана** (`lib`) бола алады. **Модуль** (module) — сандық ішіндегі кодты топтастыратын бөлік."
+    },
+    {
+      "id": "rust_book_07_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Модульдер бір-бірінің ішіне ұя жасап, ағаш құрылымын құрайды. **Жол** (path) — модуль ағашындағы белгілі элементті атау тәсілі."
+    },
+    {
+      "id": "rust_book_07_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Барлығы Cargo басқаруына бағынады: ол сізге бума мен сандық құрылымын ұсынады, тәуелділіктерді шешеді, құрастыру тәртібін орнатады."
+    },
+    {
+      "id": "rust_book_07_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Тарауда бір-бір бөлектеп қарастырамыз. 7.1."
+    },
+    {
+      "id": "rust_book_07_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бумалар мен сандықтар **Сандық** дегеніміз — `Rust` компиляторына біруақытта берілетін код жинағы."
+    },
+    {
+      "id": "rust_book_07_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Сандық не екілік (бағдарлама) не кітапхана (қайта пайдалану үшін) бола алады. **Екілік сандық** — `main` функциясы бар, орындалатын файлды құрастыруға арналған."
+    },
+    {
+      "id": "rust_book_07_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Мысалы, бұған дейін біз жасаған `hello_world` мен `guessing_game` — екеуі де екілік сандықтар. **Кітапхана сандығы** — `main` функциясы жоқ, орындалатын файл құрастырмайды; оның мақсаты — басқа сандықтарға пайдалы код ұсыну. `rand` сандығы — нақты осы. «Сандық» терминін біз стандартты кітапхана құжаттамасында кездестіреміз."
+    },
+    {
+      "id": "rust_book_07_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Кез келген сандықта **сандық түбірі** деп аталатын файл бар — компилятор сол файлдан бастап барлық кодты табады. **Бума** — бір немесе бірнеше сандықты біріктіретін бірлік. `Cargo` бумаларды жасайды; бір бумада әрқашан `Cargo.toml` файлы болады."
+    },
+    {
+      "id": "rust_book_07_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бумада: **ең көп бір** кітапхана сандығы; **қалаған көлемде** екілік сандықтар; бірақ кем дегенде бір сандық — болуы керек. `cargo new my_project` командасы жаңа екілік буманы жасайды: Cargo конвенциялары: `src/main.rs` — бумамен бірдей атауы бар екілік сандықтың түбірі. `src/lib.rs` — бумамен бірдей атауы бар кітапхана сандығының түбірі. `src/bin/` қалтасының ішіндегі әр `.rs` файл — қосымша екілік сандық."
+    },
+    {
+      "id": "rust_book_07_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Сондықтан бір бумада бір кітапхана + бірнеше екілік сандық бола алады: Бұл құрылым Cargo-ның шартты келісімі (convention over configuration) жетістігі: сіз файлды дұрыс орынға қоясыз — Cargo қалғанын біледі. 7.2."
+    },
+    {
+      "id": "rust_book_07_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Жекелік пен аумақты модульдер арқылы басқару **Модуль** — сандық ішіндегі кодты топтастыратын құрылым."
+    },
+    {
+      "id": "rust_book_07_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Олар екі мақсатқа қызмет етеді: **Аумақты ұйымдастыру**: байланысты функцияларды, типтерді, тұрақтыларды бір атпен біріктіру. **Жекелікті басқару**: қандай элемент сыртқа ашық, қайсысы тек ішкі қолданысқа арналған — соны нақты бекіту."
+    },
+    {
+      "id": "rust_book_07_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Жаңа кітапхана сандығын жасап, көрейік. `cargo new restaurant --lib` командасы кітапхана сандығын жасайды. `src/lib.rs` файлында мынадай код жазайық: Бұл — мейрамхана типтес жобаның модульдік құрылымы. `front_of_house` («алдыңғы жұмыс») модулі ішінде `hosting` мен `serving` ішкі модульдері бар."
+    },
+    {
+      "id": "rust_book_07_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Әр модулде функциялар жарияланған."
+    },
+    {
+      "id": "rust_book_07_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Модульдер — иерархиялық."
+    },
+    {
+      "id": "rust_book_07_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Сандықтың жасырын **түбір модулі** — `crate` — болады."
+    },
+    {
+      "id": "rust_book_07_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Жоғарыдағы код мынадай ағашты жасайды: Бұл ағаш — компилятордың модульдер мен олардағы функцияларды табу картасы. `Rust`-та модуль ағашы әрдайым `crate`-тен басталады."
+    },
+    {
+      "id": "rust_book_07_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Модульдерді әр жерде жариялауға болады: **Сандық түбірінде** (`src/lib.rs`-та) `mod hosting;` сөйлемі компиляторды `src/hosting.rs` немесе `src/hosting/mod.rs` файлынан модулді іздеуге шақырады. **Басқа модуль ішінде** (`mod hosting { ... }`) — модулді сол жерде тікелей жариялайды (in-line). 7.3."
+    },
+    {
+      "id": "rust_book_07_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Модуль ағашындағы элементтерге жол Модуль ішіндегі функцияны, структты немесе тұрақтыны атау үшін біз **жол** (path) қолданамыз."
+    },
+    {
+      "id": "rust_book_07_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Жол екі түрлі болады: **Абсолюттік жол** — `crate` түбірінен басталады. **Салыстырмалы жол** — қазіргі модульден басталады және `self`, `super` немесе модуль атымен жалғасады."
+    },
+    {
+      "id": "rust_book_07_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Мысалы, `front_of_house::hosting::add_to_waitlist` функциясын сандық түбірінде шақырайық: Біздің кодты компиляция жасасақ — қате аламыз: Бұл — `Rust`-тың жекелік ережесінің бірі: **барлық элементтер әдепкі бойынша жекеше**."
+    },
+    {
+      "id": "rust_book_07_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Сыртқы модуль ішкі модульдің жасырын элементтерін көре алмайды."
+    },
+    {
+      "id": "rust_book_07_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Ішкі модуль өзінің сыртқы модулін көре алады, бірақ керісінше жоқ."
+    },
+    {
+      "id": "rust_book_07_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Қажетті элементті ашық қылу үшін `pub` кілтсөзін қосамыз: Енді `hosting` модулі сыртқа ашық, `add_to_waitlist` функциясы да ашық."
+    },
+    {
+      "id": "rust_book_07_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бірақ маңызды нәрсе: `pub` бір қабат қана ашады."
+    },
+    {
+      "id": "rust_book_07_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Модулді `pub` ету — ішіндегі бәрін автоматты түрде ашпайды."
+    },
+    {
+      "id": "rust_book_07_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Ішіндегі функцияларды бөлек `pub` ету керек. `super` арқылы салыстырмалы жол Кейде ағашта бір қабат жоғары шығу керек. `super` — «бір қабат жоғарыға» дегенді білдіреді."
+    },
+    {
+      "id": "rust_book_07_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Үлкен мысалда: `back_of_house` модулі сыртында тұрған `deliver_order` функциясын шақыру үшін `super::deliver_order()` дейміз. `super` — `back_of_house`-тан бір қабат жоғары — яғни сандық түбірі."
+    },
+    {
+      "id": "rust_book_07_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Сондықтан `super::deliver_order` және `crate::deliver_order` — бір нәрсе. `super` пайдалы, өйткені модуль ішкі қайта орналастырылған кезде көп жолды қайта жазудың керегі болмайды."
+    },
+    {
+      "id": "rust_book_07_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Ашық структ пен ашық енам `pub` сөйлемі структ пен енамға да жатады, бірақ оларда нюанс бар. **Ашық структ** ұқсас жағдайда тұрады: оны `pub` ету — өрістерін автоматты ашпайды."
+    },
+    {
+      "id": "rust_book_07_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Әр өрісті жеке `pub` ету керек: `Breakfast::summer` байланысты функциясы құрылыс-конструктор ретінде қызмет етеді — себебі `seasonal_fruit` жекеше, оны сырттан тікелей тағайындау мүмкін емес."
+    },
+    {
+      "id": "rust_book_07_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Сондықтан кітапхана өзіне қажетсіз жекелікті ұстай отырып, пайдалы интерфейсті ашады. **Ашық енам** — структтан өзгеше: `pub enum Foo { A, B }` дейміз — оның **барлық нұсқалары** автоматты түрде ашық."
+    },
+    {
+      "id": "rust_book_07_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бұл табиғи: енамның мақсаты — нұсқаларын ашу, оны жасыру семантикалық мағынасыз. 7.4. `use` арқылы жолдарды аумаққа енгізу Жолдарды толық жазу — қайталаушы жұмыс. `eat_at_restaurant` функциясын қарасақ, әр шақыруда `front_of_house::hosting::add_to_waitlist()` деп жазып отырамыз."
+    },
+    {
+      "id": "rust_book_07_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Қысқартуға арналған құрал — `use` сөйлемі."
+    },
+    {
+      "id": "rust_book_07_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Ол модульдік жолды ағымдағы аумаққа қысқа атпен енгізеді: `use crate::front_of_house::hosting;` арқылы біз `hosting`-ты ағымдағы аумаққа енгіздік."
+    },
+    {
+      "id": "rust_book_07_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Енді тек `hosting::add_to_waitlist()` деп жаза аламыз. `use` арқылы импортталатын элементтер аумақтың ережелеріне бағынады: басқа модульде сол `use` сөйлемі қолжетімсіз."
+    },
+    {
+      "id": "rust_book_07_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Идиоматиялық `use` `use` сөйлемінде функцияны тікелей емес, оның ата-модулін енгізу — идиоматиялық: Бұл функцияны шақырғанда оның қай модульдікі екенін көріп тұруға мүмкіндік береді."
+    },
+    {
+      "id": "rust_book_07_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Олай етпей тікелей функцияны импорттайтын болсақ: — бұл шарт қарап оқуға қиынырақ."
+    },
+    {
+      "id": "rust_book_07_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бірақ структ, енам мен басқа аталған типтерді тікелей импорттау — идиоматиялық. `HashMap`, `String`, `Vec` сияқты: `as` арқылы атау өзгерту Егер екі модульден бірдей атаумен типтер импорттасаңыз — соқтығыс пайда болады."
+    },
+    {
+      "id": "rust_book_07_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Шешімі — `as` арқылы атауды ауыстыру: Енді бір аумақта екі түрлі `Result` бар: біріншісі — `fmt::Result`, екіншісі — `IoResult`. `pub use` арқылы қайта экспорттау `use` сөйлемі әдепкі бойынша **жекеше**: импорттаған атау тек ағымдағы аумақта көрінеді."
+    },
+    {
+      "id": "rust_book_07_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бірақ `pub use` дегеннен кейін атау ашық болады — оны сыртқы код көреді."
+    },
+    {
+      "id": "rust_book_07_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бұл — **қайта экспорттау**: Енді сыртқы код `restaurant::hosting::add_to_waitlist()` деп шақыра алады — `front_of_house` модулін көре алмаса да."
+    },
+    {
+      "id": "rust_book_07_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Қайта экспорттау кітапхананың сыртқы интерфейсін ішкі құрылымынан бөлуге мүмкіндік береді."
+    },
+    {
+      "id": "rust_book_07_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Сыртқы бумаларды қолдану Сыртқы сандықты қосу үшін `Cargo.toml` ішіне тәуелділікті жазып, `use` арқылы аумаққа енгіземіз. `rand` сандығын мысалға алсақ: Стандартты кітапхана `std` де сыртқы сандық — бірақ онымен жұмыс істеу үшін `Cargo.toml`-ге қосу керек емес: ол әрқашан қолжетімді."
+    },
+    {
+      "id": "rust_book_07_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Мысалы: Тоғыспалы жолдар Бір модульден бірнеше элементті импорттасаңыз — тоғыспалы жол синтаксисі ыңғайлы: `self` арқылы ата-модульдің өзін де қосуға болады: `glob` оператор Бар бір модульдің барлық ашық элементтерін бірден импорттау керек болса — `*` (glob) операторы: Бұл сирек қолданылады, өйткені кодты оқыған адам қандай атаулар импортталғанын анық көре алмайды."
+    },
+    {
+      "id": "rust_book_07_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Тестерде немесе арнайы `prelude` модулінде ыңғайлы. 7.5."
+    },
+    {
+      "id": "rust_book_07_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Модульдерді әртүрлі файлдарға бөлу Жоба үлкейген сайын барлық модульді бір файлда ұстау қолайсыз."
+    },
+    {
+      "id": "rust_book_07_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Әр модулді өз файлына бөлуге болады."
+    },
+    {
+      "id": "rust_book_07_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бар мысалымызды бөлектейік. `src/lib.rs` ішіне мынадай: `mod front_of_house;` — бұл «модулдің денесі осы файлда емес, басқа жерде табу керек» дегенді білдіреді."
+    },
+    {
+      "id": "rust_book_07_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Компилятор екі жерден іздейді: `src/front_of_house.rs` — жалпы файл; `src/front_of_house/mod.rs` — ескі стиль (қалта + `mod.rs`). `src/front_of_house.rs` файлын жасап, ішіне жазайық: Және `src/front_of_house/hosting.rs` файлы: Қалта құрылымы: Бұл жұмыс істейді."
+    },
+    {
+      "id": "rust_book_07_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Файлдарды бөлектегеннен кейін бағдарламаның семантикасы өзгермейді — модуль ағашы дәл сондай."
+    },
+    {
+      "id": "rust_book_07_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Бөлу — таза ұйымдастырушылық."
+    },
+    {
+      "id": "rust_book_07_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Үлкен жобаларда модульдердің тереңдігі үш-төрт қабатқа жетуі мүмкін. Cargo, `pub`, `use` мен модуль ағашы бар болғанда — ондай жобалар жинақы әрі айқын ұйымдастырылады. 7.6."
+    },
+    {
+      "id": "rust_book_07_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы `Rust`-тың модульдік жүйесі төрт қабат: бума, сандық, модуль, жол. Cargo бума мен сандықты басқарады; модульдер сандық ішіндегі кодты ағашқа топтайды; жолдар арқылы біз элементтерге қол жеткіземіз; `pub` арқылы жекелікті, `use` арқылы импортты басқарамыз. `pub use` (қайта экспорттау), тоғыспалы жолдар, `as` арқылы атау өзгерту, `super`, `self` — бұлар модульдік жүйенің ыңғайлы құралдары."
+    },
+    {
+      "id": "rust_book_07_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Біршама үйренгенше, көп нәрсе танымайтын болып көрінуі мүмкін; бірақ бірнеше нақты жобаны ұйымдастырып шыққанда олардың табиғи болып келетінін көресіз."
+    },
+    {
+      "id": "rust_book_07_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда стандартты кітапхананың ұжымдық типтерімен — `Vec`, `String`, `HashMap` — танысамыз."
+    },
+    {
+      "id": "rust_book_07_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_07",
+      "domain": "programming_rust",
+      "text": "Олар әр `Rust` бағдарламашысының күн сайынғы құралдары."
     }
   ]
 }
