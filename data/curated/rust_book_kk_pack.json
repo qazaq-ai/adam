@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 7,
-  "sentences_total": 525,
-  "sample_count": 525,
+  "chapters_translated": 8,
+  "sentences_total": 608,
+  "sample_count": 608,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -3684,6 +3684,587 @@
       "source_id": "chapter_07",
       "domain": "programming_rust",
       "text": "Олар әр `Rust` бағдарламашысының күн сайынғы құралдары."
+    },
+    {
+      "id": "rust_book_08_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жалпы ұжымдар `Rust`-тың стандартты кітапханасы бірнеше пайдалы **ұжымдық** деректер құрылымын ұсынады."
+    },
+    {
+      "id": "rust_book_08_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Ұжым — бір немесе бірнеше мәнді сақтайтын құрылым."
+    },
+    {
+      "id": "rust_book_08_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жиым (`array`) мен кортежден айырмашылығы — ұжымдар үймеде сақталады, сондықтан олардың саны компиляция кезінде белгілі болмауы мүмкін."
+    },
+    {
+      "id": "rust_book_08_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бағдарлама орындалу кезінде ұжым өсіп немесе кішірейе алады."
+    },
+    {
+      "id": "rust_book_08_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бұл тарауда үш жалпы қолданылатын ұжыммен танысамыз: **Vector (`Vec<T>`)** — өсетін, сан бойынша индекстелетін бір типтегі мәндердің тізбегі. **String (`String`)** — UTF-8 кодталған өсетін мәтін. **Hash Map (`HashMap<K, V>`)** — кілт пен мәнді жұптап сақтайтын, кілт бойынша жылдам іздейтін құрылым."
+    },
+    {
+      "id": "rust_book_08_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Үшеуінің ортақ қасиеті — ұзындығы орындалу кезінде өзгереді әрі деректері үймеде сақталады."
+    },
+    {
+      "id": "rust_book_08_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Әр ұжымның мақсаты, өнімділік сипаттамасы, ыңғайлы қолданысы әр түрлі."
+    },
+    {
+      "id": "rust_book_08_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапханада басқа да ұжымдар бар (`VecDeque`, `BTreeMap`, `HashSet` және басқалары) — олар арнайы жағдайларға арналған. 8.1. Vector — мәндер тізбегін сақтау `Vec<T>` (ауызекі тілде «вектор») — өсетін жиым іспетті, бір типтегі мәндерді сан бойынша индекстеп сақтайды."
+    },
+    {
+      "id": "rust_book_08_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Барлық элементтер бір типке тиесілі болуы керек."
+    },
+    {
+      "id": "rust_book_08_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жаңа вектор жасау Бос вектор жасау үшін `Vec::new` шақырамыз."
+    },
+    {
+      "id": "rust_book_08_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Тип белгісі бергеніміз — вектордың қандай мәндерді ұстайтынын `Rust`-қа айту: Көп жағдайда вектор алғашқы мәндермен бірден жасалады, сондықтан түрді қолмен белгілеудің керегі болмайды."
+    },
+    {
+      "id": "rust_book_08_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Соған арналған `vec!` макросы: `vec![1, 2, 3]` — `Vec<i32>` түріндегі вектор, үш элементі бар. `Rust` типті өзі шығарып алады."
+    },
+    {
+      "id": "rust_book_08_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Векторды жаңарту Векторға элемент қосу үшін `push` әдісін қолданамыз."
+    },
+    {
+      "id": "rust_book_08_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бұл вектордың өзгеретінін білдіреді — оны `mut` етіп жариялау керек: `push` алғашқы шақыруда `i32` берілгендіктен, `Rust` `v`-ні `Vec<i32>` ретінде шешеді."
+    },
+    {
+      "id": "rust_book_08_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бұдан былай оған тек `i32` мәндерін қосуға болады."
+    },
+    {
+      "id": "rust_book_08_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Вектор элементтеріне қол жеткізу Вектор элементін екі тәсілмен оқуға болады: индекс арқылы (`&v[i]`) және `get` әдісі арқылы (`v.get(i)`)."
+    },
+    {
+      "id": "rust_book_08_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Айырмашылық — қате болған жағдайда не болады: `&v[i]` — индекс шектен шықса panic-қа барады."
+    },
+    {
+      "id": "rust_book_08_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бағдарлама тоқтайды. `v.get(i)` — `Option<&T>` қайтарады."
+    },
+    {
+      "id": "rust_book_08_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Шектен тыс болса `None`."
+    },
+    {
+      "id": "rust_book_08_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бұл — күтілетін, өңдеуге келетін қате."
+    },
+    {
+      "id": "rust_book_08_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Қайсысын таңдау керек?"
+    },
+    {
+      "id": "rust_book_08_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Көбіне индекс шегінде болатынына сенімді болсаңыз — `&v[i]` оқуға жеңіл."
+    },
+    {
+      "id": "rust_book_08_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Сенімді болмасаңыз — `get` арқылы Option-ды нақты өңдеген жөн."
+    },
+    {
+      "id": "rust_book_08_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Иелік пен сілтемелерге қатысты ережелер Векторды қарызға алу мен өзгерту әдеттегі сілтеме ережелеріне бағынады."
+    },
+    {
+      "id": "rust_book_08_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Мысалы, бар тұрақты сілтеме мен өзгермелі сілтеме бір уақытта болмауы керек: Неге қате?"
+    },
+    {
+      "id": "rust_book_08_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Себебі `push` векторды үлкейтуі мүмкін — соған арналған жадты жаңа жерге көшіруі мүмкін."
+    },
+    {
+      "id": "rust_book_08_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Сонда `first`-тің көрсеткіші ескі (босатылған) жерге сілтеп қалады. `Rust` бұған тыйым салады — компилятор `push` үшін өзгермелі сілтеме қажет екенін, ал бұрыннан `first` тұрақты сілтеме ұстайтынын біледі."
+    },
+    {
+      "id": "rust_book_08_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Вектор бойынша жүру Вектордың әр элементін аралау үшін `for` цикл қолданамыз: Әр элементті өзгерту керек болса — өзгермелі сілтемемен: `*i` — **деreferense** (сілтеме қарама-қарсы). `i` — `&mut i32` түріндегі сілтеме; `*i` — оның ішіндегі `i32`-ге қол жеткізеді."
+    },
+    {
+      "id": "rust_book_08_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Сілтемемен жұмыс істегенде осы дереференс операторы кездесетін болады."
+    },
+    {
+      "id": "rust_book_08_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Әр түрлі типтерді бір векторда сақтау: енам арқылы Векторда барлық элементтер бір типте болуы керек."
+    },
+    {
+      "id": "rust_book_08_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бұл шектеу ыңғайсыз болуы мүмкін."
+    },
+    {
+      "id": "rust_book_08_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Шешімі — енамды қолдану."
+    },
+    {
+      "id": "rust_book_08_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Енам әртүрлі нұсқаларды бір типке біріктіреді: Енді вектор үш әр түрлі мәнді сақтайды, бірақ типтік жүйе тұрғысынан олардың бәрі — `SpreadsheetCell`. `match` арқылы қай нұсқа екенін шешуге болады."
+    },
+    {
+      "id": "rust_book_08_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Вектор аяқталғанда Вектор өз аумағынан шыққанда — `drop` шақырылады, оның барлық элементтері де өшіріледі. `Rust` бұл туралы алаңдамауыңызды кепіл етеді: бір вектор жоғалғанда, оның элементтері де жойылады, ешбір ағытпа болмайды. 8.2. UTF-8 кодталған мәтінді String арқылы сақтау `String` — `Rust`-та өсетін, өзгертілетін, иелігі бар UTF-8 кодталған мәтінді сақтайтын тип."
+    },
+    {
+      "id": "rust_book_08_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жол литералы (`&str`) — компиляция кезінде белгілі тұрақты мәтін; `String` — орындалу кезінде құрылатын динамикалық мәтін. `Rust`-тың жолдары — басқа тілдермен салыстырғанда күрделі."
+    },
+    {
+      "id": "rust_book_08_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Себебі `Rust` UTF-8 кодтауын бекітіп, барлық жолдарды қазақ, эмодзи, әр түрлі тілдердің таңбаларымен жұмыс істеуге дайындайды."
+    },
+    {
+      "id": "rust_book_08_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бұл — қуат, бірақ кейбір қарапайым операциялар (мысалы, индекстеу) күтпеген жерде күрделі болады."
+    },
+    {
+      "id": "rust_book_08_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жаңа жол жасау Бос жолды `String::new` арқылы жасаймыз: Жол литералынан жасау үшін `to_string` немесе `String::from`: Үшеуі де бір нәтиже береді."
+    },
+    {
+      "id": "rust_book_08_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Стиль — қалаған жолыңыз."
+    },
+    {
+      "id": "rust_book_08_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жолды жаңарту Жолды өсіру жалпыдан арнайыға қарай: бір таңба, жол үстіне, екі жолды қосу. `push_str` — жолға басқа жолды (`&str`) жалғайды: `push_str` өзіне берілген аргументтің иелігін алмайды — `&str` сілтеме ғана."
+    },
+    {
+      "id": "rust_book_08_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Сондықтан төмендегі код жұмыс істейді: `push` — бір таңба қосады: `+` операторы — екі жолды біріктіреді, бірақ нюанс бар: иелікті ауыстырады: Себебі `+` операторы шынында `add` әдісін шақырады, оның қолтаңбасы шамамен мынадай: `fn add(self, other: &str) -> String`. `self` иелікті алады; нәтиже жаңа `String`."
+    },
+    {
+      "id": "rust_book_08_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Сондықтан `s1` иелігін жоғалтады."
+    },
+    {
+      "id": "rust_book_08_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Үш жолды біріктіру керек болса — `+` операторы шатастырады."
+    },
+    {
+      "id": "rust_book_08_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Сондықтан `format!` макросын қолданайық: `format!` арзан, оқуға жеңіл, иелікті алмайды."
+    },
+    {
+      "id": "rust_book_08_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бірнеше жолды біріктіру үшін — соны қолданыңыз."
+    },
+    {
+      "id": "rust_book_08_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жолды индекстеу Көп тілдерде жолдағы белгілі бір таңбаны `s[i]` арқылы алуға болады. `Rust`-та бұл мүмкін емес: Неге?"
+    },
+    {
+      "id": "rust_book_08_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Себебі UTF-8 кодтауында бір таңба бір байт алмауы мүмкін."
+    },
+    {
+      "id": "rust_book_08_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Мысалы: — бұл орыс жолының ұзындығы 24 байт (12 таңба × 2 байт), бірақ көзбен қарасаңыз 12 таңба."
+    },
+    {
+      "id": "rust_book_08_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Қазақ кириллицасы да солай — әр таңба екі байт алады."
+    },
+    {
+      "id": "rust_book_08_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Эмодзи — төрт байт."
+    },
+    {
+      "id": "rust_book_08_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Сондықтан `&s[0]` нені қайтару керек?"
+    },
+    {
+      "id": "rust_book_08_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бірінші **байтты** ма?"
+    },
+    {
+      "id": "rust_book_08_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бірінші **таңбаны** ма?"
+    },
+    {
+      "id": "rust_book_08_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бірінші **графема кластерін** ма (көзбен бір таңба ретінде көрінетін бөлік)?"
+    },
+    {
+      "id": "rust_book_08_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Әртүрлі сұраққа әртүрлі жауап. `Rust` бұл шатастыратын мәселеден аулақ — индекстеуге тыйым салынған."
+    },
+    {
+      "id": "rust_book_08_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Орнына — әр түрлі сұраққа арналған әдістер бар."
+    },
+    {
+      "id": "rust_book_08_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жолдан тілім алу Аралық тілім (`&s[a..b]`) — байт аралығымен: Бұл әлі де байт-аралықпен жұмыс істейді."
+    },
+    {
+      "id": "rust_book_08_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Егер сіз байт шегінде емес жерде қиып алсаңыз — panic."
+    },
+    {
+      "id": "rust_book_08_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Мысалы `&hello[0..1]` — panic, өйткені бір байт «З» таңбасының жартысы ғана."
+    },
+    {
+      "id": "rust_book_08_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жолды аралау Әр **таңбаны** (Unicode скаляр-мән) аралау үшін `chars`: Әр **байтты** аралау үшін `bytes`: Графема кластерлерін (көзге бір таңба ретінде көрінетін бөліктерді) аралау стандартты кітапханада жоқ — оған сыртқы сандық қолдану керек."
+    },
+    {
+      "id": "rust_book_08_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бұл саналы шешім: графема кластерін есептеу күрделі. 8.3."
+    },
+    {
+      "id": "rust_book_08_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Кілт-мән жұптарын Hash Map арқылы сақтау `HashMap<K, V>` — кілт пен мәнді жұптап сақтайтын ұжым."
+    },
+    {
+      "id": "rust_book_08_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Кілт арқылы мәнді жылдам табуға болады."
+    },
+    {
+      "id": "rust_book_08_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Кейбір тілдерде «dictionary», «associative array», «hash» немесе «map» деп аталатын құрылым."
+    },
+    {
+      "id": "rust_book_08_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жаңа hash map жасау Hash map стандартты кітапханада тұр, бірақ оны қолдану үшін `use` сөйлемі керек: `HashMap::new` — бос hash map жасайды."
+    },
+    {
+      "id": "rust_book_08_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Кілт мен мәннің типтері алғашқы `insert` шақыруларынан шығарылады."
+    },
+    {
+      "id": "rust_book_08_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Барлық кілттер бір типте, барлық мәндер бір типте болуы керек."
+    },
+    {
+      "id": "rust_book_08_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Мәндерге қол жеткізу Кілтпен мәнді табуға `get` әдісін қолданамыз: `get` `Option<&V>` қайтарады — кілт жоқ болса `None`. `.copied()` ішкі мәнді көшіріп, `Option<V>`-ге айналдырады. `.unwrap_or(0)` `Some`-ты ашады, `None` болса 0 қайтарады. Hash map бойынша жүру — `for` циклмен."
+    },
+    {
+      "id": "rust_book_08_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бірақ ретте: hash map ретсіз — итерацияның реті анықталмаған: Hash map пен иелік `Copy` бекітілмеген типтерді (`String` сияқты) hash map-қа кіргізсеңіз — иелік hash map-қа ауысады: `i32` сияқты `Copy` типтер — hash map-қа көшіріледі, бастапқысы әлі жарамды. Hash map жаңарту Hash map-та бір кілттің тек бір мәні болады."
+    },
+    {
+      "id": "rust_book_08_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жаңарту тәсілдері: **1."
+    },
+    {
+      "id": "rust_book_08_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Мәнді басып ауыстыру.** `insert` тек қосып қана қоймайды — кілт бұрыннан болса, оның мәнін жаңалап жазады: **2."
+    },
+    {
+      "id": "rust_book_08_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Тек жоқ болғанда қосу.** `entry` API-ды қолданамыз: `or_insert` кілт бар болса — оның бар мәніне сілтеме қайтарады; жоқ болса — берген мәнді кіргізіп, оның сілтемесін қайтарады. **3."
+    },
+    {
+      "id": "rust_book_08_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бар мәнге сүйеніп жаңарту.** Сөздерді санайтын мысал: `or_insert` — `&mut V` сілтеме қайтарады."
+    },
+    {
+      "id": "rust_book_08_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Біз оны `*count += 1` арқылы дереференстеп өзгертеміз."
+    },
+    {
+      "id": "rust_book_08_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Циклдан кейін `map`-та әр сөз қайталанған санын ұстайды. Hash функциялары `HashMap` әдепкі бойынша **SipHash** атты криптографиялық қауіпсіз hash функциясын қолданады."
+    },
+    {
+      "id": "rust_book_08_0076",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Бұл — DoS шабуылдарына қарсы қорғаныс."
+    },
+    {
+      "id": "rust_book_08_0077",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Мысалы, сіз веб-серверде көп пайдаланушыдан кілт қабылдасаңыз — олар арнайы кілттерді жасап, hash функциясын тиімсіз жұмыс істетуге тырысуы мүмкін. SipHash осыған қарсы тұрады — ал тұрады биік ескертумен: ол ең жылдам hash функциясы емес."
+    },
+    {
+      "id": "rust_book_08_0078",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Жылдамдық сізге өте маңызды болса — `BuildHasher` трейтін бекітетін басқа hash алгоритмін қолдануға болады. `crates.io`-да бірнеше дайын нұсқа бар (`fxhash`, `ahash` және басқалары). 8.4."
+    },
+    {
+      "id": "rust_book_08_0079",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Үш жалпы ұжым: `Vec<T>` — индекстелетін бір типтегі тізбек; `String` — UTF-8 мәтін; `HashMap<K, V>` — кілт-мән жұптары."
+    },
+    {
+      "id": "rust_book_08_0080",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Әр ұжымның өзіндік пайдасы, шектеулері мен идиомалары бар. `Vec` индекстеу мен push/pop үшін жылдам, бір типті ұжымдар үшін әдепкі таңдау. `String` — `Rust`-тың UTF-8-ге адалдығының салдары; индекстеу жоқ, ал `chars` пен `bytes` арқылы аралау бар. `HashMap` — кілт бойынша іздеу қажет болғанда; иелік ережелеріне бағынады."
+    },
+    {
+      "id": "rust_book_08_0081",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапхана басқа ұжымдарды да ұсынады: `VecDeque` — екі жағынан қосуға келетін кезек, `BTreeMap` — реттелген кілт-мән, `HashSet` — қайталанбайтын элементтер жинағы."
+    },
+    {
+      "id": "rust_book_08_0082",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Олар арнайы жағдайларда жеңіл әрі тиімді шешімдер береді."
+    },
+    {
+      "id": "rust_book_08_0083",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_08",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда `Rust`-тың қателерді өңдеу жүйесін қарастырамыз — `panic!` пен `Result<T, E>` түрінің практикалық қолданыстарын, `?` операторын, қашан панелге барып, қашан қатені шақырушыға қайтарып жіберу керектігін."
     }
   ]
 }

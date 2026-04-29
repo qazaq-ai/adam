@@ -7,6 +7,33 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.8] — 2026-04-29 — Rust Book Chapter 8 (Жалпы ұжымдар) translated, in pack (past committed-index ceiling)
+
+Eighth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 8 — Common Collections — covering the three most-used standard-library collection types: `Vec<T>` (creating with `Vec::new` and `vec!` macro, updating via `push`, reading with `&v[i]` panic vs. `v.get(i)` `Option`, the borrow rule preventing concurrent index reads with `push` due to potential reallocation, iterating over `&v` and `&mut v` with `*i` dereferencing, storing multiple types via enum variants, drop semantics); `String` (UTF-8 commitment as the source of complexity, creating with `String::new` / `to_string` / `String::from`, updating with `push_str` / `push` / `+` / `format!`, why indexing is forbidden with the `Здравствуйте` 24-byte example, byte-aligned slicing with `&s[a..b]` and panic on mid-codepoint cut, iterating with `chars` for Unicode scalars and `bytes` for raw bytes, why grapheme clusters require external crates); `HashMap<K, V>` (creating, `get` returning `Option<&V>` with `.copied().unwrap_or(0)` idiom, ownership transfer for non-`Copy` keys/values, three update strategies — `insert` overwriting, `entry().or_insert()` for missing-key insertion, the word-counter `*count += 1` pattern with mutable references, the SipHash default and DoS-resistance trade-off).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_08.md` — ~4 500 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-8-specific terminology decisions: collection → **ұжым** (already in lexicon), grapheme cluster → **графема кластері**, hash function → **хэш функциясы**, dereference → **дереференс**, byte boundary → **байт шегі**, Unicode scalar → **Unicode скаляр-мән**, SipHash → **SipHash** (kept as-is, named algorithm).
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 7 chapters / 525 samples → **8 chapters / 608 samples** (+83 from chapter 8).
+- Morpheme index: **unchanged** at 3 362 morphemes / 22 145 postings / 3 691 indexed samples — the rust_book pack hit the 500-per-pack default-mode ceiling at v4.7.7. Chapter-8 sentences live in the pack file (auditable, `--full`-mode ready) but do not contribute to the committed-mode morpheme index.
+
+### Tests + counters
+
+- E2E threshold remains ≥490; pack-level growth no longer changes the committed-mode index.
+- Workspace tests: **745 passing**.
+
+### Architectural note
+
+We are now past the committed-mode morpheme-index ceiling for the rust_book pack. Future chapters continue to grow `data/raw/rust_book_kk/` and `data/curated/rust_book_kk_pack.json` (auditable record + ready for full-mode reindex), but the committed `data/retrieval/morpheme_index.json` does not change for rust_book content. To take advantage of all chapters in retrieval, a follow-up patch will either (a) raise the per-pack limit specifically for rust_book, or (b) switch to `--full` mode for the committed index. Decision deferred until the chapter set is more complete.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.9 = Chapter 9 (Error Handling).
+
 ## [4.7.7] — 2026-04-29 — Rust Book Chapter 7 (Бумалармен, сандықтармен, модульдермен жобаны басқару) translated, ingested
 
 Seventh chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 7 — Managing Growing Projects with Packages, Crates, and Modules — covering the four layers of Rust's modular system: **packages** (the Cargo unit, `Cargo.toml`, at-most-one library + any number of binary crates, `src/main.rs` / `src/lib.rs` / `src/bin/*.rs` conventions); **crates** (binary vs library, the crate root concept); **modules** (defining with `mod`, the module tree starting from `crate`, in-line vs separate-file declarations); **paths** (absolute paths starting from `crate`, relative paths via `self` / `super` / module names; the privacy rule — everything is private by default; `pub` opens one layer at a time; `pub struct` requires per-field `pub`; `pub enum` is variants-all-public); **bringing paths into scope with `use`** (idiomatic patterns — import the parent module for functions, import the type itself for structs/enums/types like `HashMap`/`String`/`Vec`; `as` for renaming on collision; `pub use` for re-exporting; nested paths `{}` syntax; `self` in nested paths; `*` glob operator and when not to use it); external crates (the `[dependencies]` block and `std` as the always-available special case); separating modules into different files (`mod foo;` declaration and the `src/foo.rs` / `src/foo/mod.rs` lookup paths).
