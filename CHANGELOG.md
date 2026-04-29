@@ -7,6 +7,90 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.6.12] — 2026-04-29 — Bundle of 7 more innovations (12 total on the v4.6.x minor): polite-plural greeting / template grammar fix / Russian-input refusal / Birthdate verbs / self-age form / math refusal / case-suffix hygiene
+
+Real-REPL 2026-04-29 (third transcript) surfaced 7 distinct issues. All landed in one bundle. Per the v4.6.5-clarified cadence: patch sub-counter is **cumulative on the minor**, so v4.6.5 + 7 = **v4.6.12**.
+
+### Innovation 1 — AskHowAreYou polite-plural «Қалыңыз қалай?»
+
+`detect_ask_how_are_you` extended with the polite-plural surface form. Pre-v4.6.12 «Қалыңыз қалай?» fell through to refusal.
+
+### Innovation 2 — `greeting.intro_proposal` template grammar fix
+
+Pre-v4.6.12 the 4th variant said «Менің атым адам — сіз қалай танысамыз?» — grammatically incoherent (2sg-polite pronoun «сіз» + 1pl-future verb «танысамыз»). Replaced with «сізді қалай атаймын?» («what shall I call you?») — same conversational function, grammatically correct.
+
+### Innovation 3 — Russian-input refusal
+
+New `discourse::input_is_likely_russian` detector. Two-signal logic: (a) any high-frequency Russian function word appears (`это / что / кто / как / где / почему / тебя / меня / очень / спасибо / привет / пока / ...`); (b) input contains zero Kazakh-specific letters (`ә / ң / ғ / ө / ү / ұ / қ / і / һ`). When both fire, conversation layer sets `__non_kazakh__` marker, planner routes to new `unknown.non_kazakh` template family which politely refuses in Kazakh and asks for Kazakh-language input.
+
+Conservative — mixed code-switching inputs (Kazakh sentence with one Russian word) still flow through the standard pipeline; only obviously-Russian inputs short-circuit.
+
+### Innovation 4 — Birthdate detector +verb forms
+
+Mirrors the v4.6.5 Creator extension. Real-REPL: «Ал ол сені қашан жаратты?» fell through pre-v4.6.12. Added: `қашан жаратты / қашан дамытты / қашан дамытқан / қашан дайындады`.
+
+### Innovation 5 — AskAge +«неше жастасың/жастасыз» surface forms
+
+Pre-v4.6.12 only matched `қанша жастасың/жастасыз`. Real-REPL: «Сіз неше жастасыз?» fell through. With no `session.age`, AskAge correctly falls through to the bare `ask_age` family («менің жасым адамзат жасындай», «мен әлі жаспын») — the right system-self response for adam.
+
+### Innovation 6 — Math-expression refusal
+
+New `discourse::input_is_math_expression` detector. Two-signal logic:
+1. Arithmetic operators (`+`, `-`, `*`, `/`, `:`, `=`) appearing within 3 bytes of digits.
+2. Kazakh math verbs (`көбейту / көбейтсем / көбейткенде / бөлу / бөлсем / бөліңіз / қосу / қоссам / алу / алсам / есепте / ...`) alongside digits OR Kazakh numeral words (`бір / екі / ... / алты / жеті / ... / жүз / мың`). The numeral-word check uses prefix-match (≤+3 chars) to handle case-inflected forms like `алтыны` (six-acc) and `екіге` (two-dat).
+
+When fired, conversation layer sets `__math_input__` marker, planner routes to new `math_refusal` template family. Closes:
+- «5+5» / «7 + 3 =» / «6:2=» (pure arithmetic)
+- «5-ті 7-ге көбейткенде неше болады?» (Kazakh math verb + numerals)
+- «Алтыны екіге бөліңіз, нәтижесі қандай?» (also resolves the алты/алтын homonym ambiguity by short-circuiting BEFORE topic extraction — pre-v4.6.12 surfaced «Алтын — сары түс»)
+
+### Innovation 7 — Closed-class case-suffix hygiene
+
+Bare case suffixes (`ге / ке / де / те / да / та / бе / ма`) added to `NOT_A_TOPIC`. Real-REPL: «5-ті 7-ге көбейткенде» pre-v4.6.12 extracted bare `ге` as topic — now suppressed.
+
+### Verified end-to-end on the 2026-04-29 transcript
+
+| User turn | Pre-v4.6.12 | Post-v4.6.12 |
+|---|---|---|
+| `Қалыңыз қалай?` | "Түсінбедім." | "Жақсы, ал сіз қалайсыз." |
+| `Танысайық.` (template seed-3) | «...сіз қалай танысамыз?» (ungrammatical) | «...сізді қалай атаймын?» |
+| `Это очень круто, а кто тебя создал?` | half-RU half-KZ hybrid | «Мен қазақша ғана білемін; орысша немесе ағылшынша түсінбеймін.» |
+| `Ал ол сені қашан жаратты?` | "Түсінбедім." | «Менің туған күнім — 2026-04-07.» |
+| `Сіз неше жастасыз?` | tangential proverb | «Менің жасым адамзат жасындай.» |
+| `5+5` / `7+3=` / `6:2=` | "Түсінбедім" / "Басқа сұрақ қойсаңыз" | math refusal |
+| `5-ті 7-ге көбейткенде неше болады?` | proverb + bare-suffix `ге` topic | math refusal |
+| `Алтыны екіге бөліңіз, нәтижесі қандай?` | «Алтын — сары түс» (gold) | math refusal |
+
+### Tests
+
+- 5 new e2e regressions covering all 7 innovations.
+- 4 new lib tests in `discourse::math_tests` (positive math forms + non-math discrimination).
+- 4 new lib tests in `discourse::russian_tests` (positive Russian + Kazakh + mixed + empty).
+- 7 new REPL replay dialogs from the actual transcript.
+- 0 new cognitive scenarios (the affected behaviour is surface-text-level; locks at REPL replay layer).
+
+Workspace **715 → 727** (+12). REPL replay **55/55 → 62/62 canonical** (+7). Cognitive eval **65/65** (unchanged — locks at REPL replay).
+
+### Out of scope, deferred to a future release
+
+The user also asked for **school math + informatics curriculum knowledge** and **graph-based dialogue logic understanding**. Push back: adam already has graphs (lexical / fact / reasoning) and a finite-state dialogue model (`task::TaskState` / `task::TaskVariant`); what's missing is broader intent coverage + curated math/informatics knowledge as world_core data. Concrete plan for a future bundle:
+- New world_core domains `mathematics_basic.jsonl` + `informatics_basic.jsonl` (definitions / concepts / multiplication tables as facts).
+- Optional: deterministic `Tool::Calculate` dispatch for integer arithmetic — patch-tier, no novel-generation guarantee broken.
+- Goal-tracking enhancement in `task.rs` to track conversational goals across multiple turns.
+
+These would be cumulative innovations on top of v4.6.12, bundled as v4.6.13+ in the next bundle.
+
+### State
+
+| | v4.6.5 | v4.6.12 |
+|---|---|---|
+| Workspace tests | 715 | **727** (+12) |
+| Cognitive eval | 65/65 canonical | 65/65 canonical (unchanged) |
+| REPL replay | 55/55 canonical | **62/62 canonical** (+7) |
+| Template families | 54 | **56** (+ unknown.non_kazakh, math_refusal) |
+| `discourse.rs` helpers | 1 (input_contains_discourse_anaphor) | **3** (+ input_is_likely_russian, input_is_math_expression) |
+| Why patch-bundle | — | per the cumulative-counter cadence: 7 additional innovations on top of v4.6.5 → 5 + 7 = 12; sub-counter accumulates on the minor |
+
 ## [4.6.5] — 2026-04-29 — Bundle of 5 innovations: Creator detector +3 verbs / capitalization / period gate / Principles aspect / forbidden-pattern filter
 
 First release under the new patch-bundling cadence (memory `feedback_versioning_post_1_0` updated 2026-04-29): patches bundle, version reflects the count of innovations. Five innovations bundled here → **v4.6.0 → v4.6.5** (skipping 1–4 by user-confirmed convention).

@@ -69,6 +69,267 @@ pub fn input_contains_discourse_anaphor(input: &str) -> bool {
         .any(|word| DISCOURSE_ANAPHORS.contains(&word))
 }
 
+/// Russian function-word markers — common high-frequency Russian
+/// pronouns / particles / question words that don't have an
+/// orthographic homograph in Kazakh. Matching any of these is a
+/// strong signal the user is typing Russian, not Kazakh. Used by
+/// `input_is_likely_russian` below.
+const RUSSIAN_MARKERS: &[&str] = &[
+    "это",
+    "что",
+    "кто",
+    "как",
+    "где",
+    "почему",
+    "когда",
+    "тебя",
+    "себя",
+    "тебе",
+    "меня",
+    "мне",
+    "тоже",
+    "очень",
+    "круто",
+    "спасибо",
+    "пожалуйста",
+    "привет",
+    "пока",
+    "также",
+    "если",
+    "потому",
+    "поэтому",
+    "сейчас",
+    "сегодня",
+];
+
+/// **v4.6.12** — surface-level Russian-input detection. Real-REPL
+/// 2026-04-29 transcript carried «Это очень круто, а кто тебя
+/// создал?» — adam parsed it partially, surfaced a half-Russian
+/// half-Kazakh refusal which violates the Kazakh-only directive
+/// (`project_kazakh_only_directive`). adam should refuse such
+/// inputs cleanly with a "Kazakh-only" message.
+///
+/// The detector matches on **two signals**:
+/// 1. Any of `RUSSIAN_MARKERS` appears as a whitespace-separated
+///    token (high-frequency Russian function words that don't
+///    overlap with common Kazakh).
+/// 2. The input contains **no Kazakh-specific letters**
+///    (`ә / ң / ғ / ө / ү / ұ / қ / і / һ`). A real Kazakh
+///    sentence almost always carries at least one of these even
+///    in short utterances; their absence + Russian-marker
+///    presence is a confident "not Kazakh" signal.
+///
+/// Conservative by design — this short-circuits adam's normal
+/// pipeline only when both signals fire. Mixed code-switching
+/// inputs (Kazakh sentence with one Russian word) still flow
+/// through the standard path; only obviously-Russian inputs
+/// route to the dedicated refusal.
+pub fn input_is_likely_russian(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_russian_marker = lower
+        .split(|c: char| !c.is_alphabetic())
+        .any(|word| RUSSIAN_MARKERS.contains(&word));
+    if !has_russian_marker {
+        return false;
+    }
+    let has_kazakh_specific = lower
+        .chars()
+        .any(|c| matches!(c, 'ә' | 'ң' | 'ғ' | 'ө' | 'ү' | 'ұ' | 'қ' | 'і' | 'һ'));
+    !has_kazakh_specific
+}
+
+#[cfg(test)]
+mod russian_tests {
+    use super::input_is_likely_russian;
+
+    #[test]
+    fn detects_russian_only_input() {
+        assert!(input_is_likely_russian("Это очень круто"));
+        assert!(input_is_likely_russian("Кто тебя создал?"));
+        assert!(input_is_likely_russian("Привет, как дела?"));
+        assert!(input_is_likely_russian("Спасибо большое"));
+    }
+
+    #[test]
+    fn does_not_match_kazakh_input() {
+        // Real Kazakh — at least one ә/ң/ғ/ө/ү/ұ/қ/і/һ.
+        assert!(!input_is_likely_russian("Қазақстан туралы не білесіз?"));
+        assert!(!input_is_likely_russian("Сәлем"));
+        assert!(!input_is_likely_russian("Менің атым Дәулет"));
+        assert!(!input_is_likely_russian("Алматыда тұрамын"));
+    }
+
+    #[test]
+    fn does_not_match_mixed_codeswitch() {
+        // Mixed input with at least one Kazakh-specific letter
+        // stays on the standard pipeline (no Russian short-circuit).
+        // The Russian word appears but the sentence is still mostly
+        // Kazakh per the orthographic signal.
+        assert!(!input_is_likely_russian("Сәлем, как дела?"));
+    }
+
+    #[test]
+    fn empty_or_no_markers_is_not_russian() {
+        assert!(!input_is_likely_russian(""));
+        assert!(!input_is_likely_russian("123"));
+        assert!(!input_is_likely_russian("xyz abc"));
+    }
+}
+
+/// **v4.6.12** — math-expression detection. Real-REPL 2026-04-29
+/// transcript carried «5+5» / «7 + 3 =» / «6:2=» / «5-ті 7-ге
+/// көбейткенде неше болады?» / «алтыны екіге бөліңіз» — adam
+/// surfaced tangential proverbs (the system extracted whatever
+/// noun leaked through). adam doesn't compute math (per
+/// `limitations_summary`), so these inputs should refuse cleanly
+/// with the dedicated `math_refusal` template family.
+///
+/// Detector matches on **two signals**:
+/// 1. Arithmetic operators (`+`, `-`, `*`, `/`, `:`, `=`) appear
+///    between digits or near digits.
+/// 2. Kazakh math verbs / nouns (`көбейту / көбейткенде /
+///    көбейтсем / бөлу / бөліңіз / қосу / қоссаңыз / алу /
+///    алыңыз / есептеу`) appear alongside numeric tokens.
+///
+/// Conservative — fires only on clear math-input shapes. Pure
+/// numerics like «17» (e.g. asking about Kazakhstan's 17 oblasts)
+/// don't fire because they're not paired with operators or math
+/// verbs.
+pub fn input_is_math_expression(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Signal 1: arithmetic operator surrounded by digit context.
+    let has_arithmetic_form = {
+        let bytes = input.as_bytes();
+        let mut found = false;
+        for (i, &b) in bytes.iter().enumerate() {
+            if matches!(b, b'+' | b'-' | b'*' | b'/' | b':' | b'=') {
+                // Look for a digit within 3 bytes either side.
+                let near_digit_left = bytes
+                    .iter()
+                    .skip(i.saturating_sub(3))
+                    .take(3)
+                    .any(|&c| c.is_ascii_digit());
+                let near_digit_right = bytes
+                    .iter()
+                    .skip(i + 1)
+                    .take(3)
+                    .any(|&c| c.is_ascii_digit());
+                if near_digit_left || near_digit_right {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        found
+    };
+    if has_arithmetic_form {
+        return true;
+    }
+    // Signal 2: math verb/noun + presence of numeric tokens
+    // (digit-only or Kazakh numeral words).
+    const MATH_VERBS: &[&str] = &[
+        "көбейту",
+        "көбейтсем",
+        "көбейтсеңіз",
+        "көбейткенде",
+        "көбейтіңіз",
+        "бөлу",
+        "бөлсем",
+        "бөлсеңіз",
+        "бөліңіз",
+        "бөлгенде",
+        "қосу",
+        "қоссам",
+        "қоссаңыз",
+        "қосыңыз",
+        "қосқанда",
+        "алу",
+        "алсам",
+        "алсаңыз",
+        "алыңыз",
+        "алғанда",
+        "есепте",
+        "есептеңіз",
+        "есептесеңіз",
+    ];
+    const KAZAKH_NUMERALS: &[&str] = &[
+        "бір",
+        "екі",
+        "үш",
+        "төрт",
+        "бес",
+        "алты",
+        "жеті",
+        "сегіз",
+        "тоғыз",
+        "он",
+        "жиырма",
+        "отыз",
+        "қырық",
+        "елу",
+        "алпыс",
+        "жетпіс",
+        "сексен",
+        "тоқсан",
+        "жүз",
+        "мың",
+    ];
+    let words: Vec<&str> = lower.split(|c: char| !c.is_alphabetic()).collect();
+    let has_math_verb = words
+        .iter()
+        .any(|w| MATH_VERBS.iter().any(|v| !w.is_empty() && w.starts_with(v)));
+    if !has_math_verb {
+        return false;
+    }
+    let has_digit = input.chars().any(|c| c.is_ascii_digit());
+    // **v4.6.12** — match inflected forms via prefix. Real-REPL
+    // input «алтыны екіге бөліңіз» — `алтыны` is `алты` +
+    // accusative, `екіге` is `екі` + dative. A pure
+    // `KAZAKH_NUMERALS.contains(&w)` check misses both. Allowing
+    // a numeral as a 2-4-char prefix of the surface word covers
+    // case-inflected forms without false-positive matching on
+    // unrelated content nouns (no Kazakh numeral overlaps with a
+    // common content-noun stem of the same prefix length).
+    let has_numeral_word = words.iter().any(|w| {
+        if w.is_empty() {
+            return false;
+        }
+        KAZAKH_NUMERALS
+            .iter()
+            .any(|n| w.starts_with(n) && w.chars().count() <= n.chars().count() + 3)
+    });
+    has_digit || has_numeral_word
+}
+
+#[cfg(test)]
+mod math_tests {
+    use super::input_is_math_expression;
+
+    #[test]
+    fn detects_pure_arithmetic() {
+        assert!(input_is_math_expression("5+5"));
+        assert!(input_is_math_expression("7 + 3 ="));
+        assert!(input_is_math_expression("6:2="));
+        assert!(input_is_math_expression("12 * 4"));
+    }
+
+    #[test]
+    fn detects_kazakh_math_verb_with_numerals() {
+        assert!(input_is_math_expression(
+            "5-ті 7-ге көбейткенде неше болады?"
+        ));
+        assert!(input_is_math_expression("Алтыны екіге бөліңіз"));
+        assert!(input_is_math_expression("Үшке төртті қоссаңыз"));
+    }
+
+    #[test]
+    fn does_not_match_non_math_kazakh() {
+        assert!(!input_is_math_expression("Қазақстанда 17 облыс бар."));
+        assert!(!input_is_math_expression("Менің жасым 30"));
+        assert!(!input_is_math_expression("Алты қаласы Қазақстанда"));
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

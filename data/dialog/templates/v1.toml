@@ -57,18 +57,22 @@ templates = [
     "қайырлы кеш {name}",
 ]
 
-# v4.4.10 — Introduction proposal opener: user said «танысайық» /
-# «танысалық» / «танысып алайық» / «танысып алыңыз». adam volunteers
-# its own name and asks for the user's. Surfaced by a 2026-04-28
-# real-REPL transcript that landed on the generic unknown refusal
-# «қайта айтыңызшы» pre-v4.4.10.
+# v4.4.10 / v4.6.12 — Introduction proposal opener: user said
+# «танысайық» / «танысалық» / «танысып алайық» / «танысып
+# алыңыз». adam volunteers its own name and asks for the user's.
+# v4.6.12 grammar fix on the 4th variant (real-REPL 2026-04-29):
+# «сіз қалай танысамыз?» mixed 2sg-polite pronoun «сіз» with
+# 1pl-future verb «танысамыз», which is grammatically incoherent
+# (subject and verb don't agree). Replaced with «сізді қалай
+# атаймын?» («what shall I call you?») — same conversational
+# function, grammatically correct.
 [[families]]
 key = "greeting.intro_proposal"
 templates = [
     "иә, әрине! Менің атым адам. Сіздің атыңыз кім?",
     "танысып алайық. Мен — адам, ал сізді қалай атаймын?",
     "қуана-қуана. Мен — қазақша сөйлесуге арналған nlm, атым адам. Атыңызды айта аласыз ба?",
-    "әрине, танысайық. Менің атым адам — сіз қалай танысамыз?",
+    "әрине, танысайық. Менің атым адам — сізді қалай атаймын?",
 ]
 
 # ---------- Farewell ----------
@@ -267,6 +271,33 @@ templates = [
     "{system_principles}",
     "менің ұстанымдарым: {system_principles}",
     "қандай принциптер бойынша жұмыс істеймін: {system_principles}",
+]
+
+# v4.6.12 — Non-Kazakh input refusal. Surfaced by a 2026-04-29
+# real-REPL transcript where «Это очень круто, а кто тебя
+# создал?» (Russian) produced a half-Russian half-Kazakh reply
+# violating the Kazakh-only directive. Now `discourse::
+# input_is_likely_russian` flags such inputs and the planner
+# routes here. Politely informs the user adam only speaks Kazakh.
+[[families]]
+key = "unknown.non_kazakh"
+templates = [
+    "кешіріңіз, мен тек қазақ тілінде сөйлеймін. Сұрағыңызды қазақша қойсаңыз, көмектесе аламын",
+    "тек қазақ тілінде ғана сөйлесе аламын — басқа тілдерді түсінбеймін. Сұрағыңызды қазақша жазып көріңізші",
+    "мен қазақша ғана білемін; орысша немесе ағылшынша түсінбеймін. Қазақ тілінде қайта жазсаңыз, жауап беремін",
+]
+
+# v4.6.12 — Math / arithmetic refusal. Surfaced by 2026-04-29
+# real-REPL: «5+5», «7 + 3 =», «6:2=», «5-ті 7-ге көбейткенде»,
+# «алтыны екіге бөліңіз». adam doesn't compute math — the
+# limitations_summary already says so. Routed here when the
+# `discourse::input_is_math_expression` detector fires.
+[[families]]
+key = "math_refusal"
+templates = [
+    "кешіріңіз, мен математикалық есептеулер жасамаймын — менің білімім тілдік деректерге бағытталған",
+    "санақ-есептеу әлі менің мүмкіндігімде жоқ; калькулятор немесе математикалық қолданбаны пайдаланғаныңыз дұрыс",
+    "математика шегінен тыс — мен сандар мен амалдарды есептей алмаймын. Тілдік сұрақ қойсаңыз, көмектесе аламын",
 ]
 
 # v4.4.0 — User opted out of resolving a pending contradiction

@@ -419,6 +419,27 @@ impl Conversation {
             }
         }
 
+        // **v4.6.12** — Russian-input detection. When the user types
+        // Russian («Это очень круто, а кто тебя создал?») the
+        // standard pipeline tries to extract a topic noun from
+        // whatever leaks through (e.g. `Это`) and surfaces a
+        // half-Russian half-Kazakh refusal. Per
+        // `project_kazakh_only_directive`, adam is Kazakh-only —
+        // Russian inputs should refuse cleanly. Mark the intent so
+        // the planner picks the dedicated `unknown.non_kazakh`
+        // template family.
+        let russian_input = crate::discourse::input_is_likely_russian(input);
+
+        // **v4.6.12** — Math-expression detection. Real-REPL
+        // 2026-04-29: «5+5» / «7 + 3 =» / «6:2=» / «5-ті 7-ге
+        // көбейткенде» / «алтыны екіге бөліңіз» — adam doesn't
+        // compute math (per `limitations_summary`), so route to
+        // the dedicated `math_refusal` template family. Detection
+        // requires a clear math shape (operator near digits OR
+        // math verb + numeric tokens) — pure mentions of numbers
+        // («Қазақстанда 17 облыс бар») don't trigger.
+        let math_input = crate::discourse::input_is_math_expression(input);
+
         // **v4.2.0** — tool-loop orchestration replaces the v4.0.37
         // `inject_*` helpers + audit block with a single uniform
         // pipeline: build a `Vec<ToolCall>` declaring which lookups
@@ -636,6 +657,18 @@ impl Conversation {
             crate::action::Action::CheckContradiction
         ) {
             extra_slots.insert("__check_contradiction__".into(), "1".into());
+        }
+        // v4.6.12 — Russian-input marker (set above based on
+        // `input_is_likely_russian`). Carried into the planner so
+        // the `unknown.non_kazakh` template family fires.
+        if russian_input {
+            extra_slots.insert("__non_kazakh__".into(), "1".into());
+        }
+        // v4.6.12 — Math-input marker (set above based on
+        // `input_is_math_expression`). Carried into the planner
+        // so the `math_refusal` template family fires.
+        if math_input {
+            extra_slots.insert("__math_input__".into(), "1".into());
         }
         let plan = crate::planner::plan_response_with_epistemic(
             &intent_for_render,

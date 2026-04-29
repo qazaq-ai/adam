@@ -230,6 +230,75 @@ pub fn plan_response_with_epistemic(
             };
         }
     }
+    // **v4.6.12** — Russian-input marker. When the user types
+    // Russian / non-Kazakh Cyrillic, route to the dedicated
+    // `unknown.non_kazakh` template family that explains adam's
+    // Kazakh-only policy. Set by `Conversation::turn_with_trace`
+    // via `discourse::input_is_likely_russian`. Bypasses the rest
+    // of the planner because the input wasn't Kazakh in the first
+    // place — no FST analysis or topic recovery would be
+    // meaningful.
+    // **v4.6.12** — Math-input marker. Routes to the dedicated
+    // `math_refusal` template family explaining adam doesn't
+    // compute arithmetic. Mirrors the non-Kazakh override below.
+    if extra_slots.contains_key("__math_input__") {
+        let key = "math_refusal";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: math_refusal override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all
+                .get(idx)
+                .map(|s| s.clone())
+                .unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    if extra_slots.contains_key("__non_kazakh__") {
+        let key = "unknown.non_kazakh";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: non_kazakh override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all
+                .get(idx)
+                .map(|s| s.clone())
+                .unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     let override_key = match (intent, epistemic) {
         (
             Intent::Unknown {

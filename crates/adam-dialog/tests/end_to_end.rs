@@ -4380,6 +4380,96 @@ fn lexicon_includes_core_nouns_su_ot_er() {
     }
 }
 
+/// **v4.6.12** — AskHowAreYou polite-plural «Қалыңыз қалай»
+/// detector extension. Real-REPL 2026-04-29.
+#[test]
+fn ask_how_are_you_recognises_polite_plural_form() {
+    let Some(lex) = load_lexicon() else { return };
+    let intent = adam_dialog::interpret_text_with_lexicon("Қалыңыз қалай?", &[], Some(&lex));
+    assert!(
+        matches!(intent, adam_dialog::Intent::AskHowAreYou),
+        "v4.6.12 «Қалыңыз қалай?» must route to AskHowAreYou; got {intent:?}"
+    );
+}
+
+/// **v4.6.12** — Birthdate detector verb-form extension. Real-REPL
+/// 2026-04-29: «Ал ол сені қашан жаратты?» fell through pre-v4.6.12.
+#[test]
+fn birthdate_detector_recognises_v4_6_12_verb_forms() {
+    let Some(lex) = load_lexicon() else { return };
+    for input in [
+        "Ал ол сені қашан жаратты?",
+        "Сені қашан дамытқан?",
+        "Сені қашан дайындады?",
+    ] {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert!(
+            matches!(
+                intent,
+                adam_dialog::Intent::AskAboutSystem {
+                    aspect: adam_dialog::SystemAspect::Birthdate
+                }
+            ),
+            "v4.6.12 birthdate question {input:?} must route to Birthdate; got {intent:?}"
+        );
+    }
+}
+
+/// **v4.6.12** — AskAge handles «неше жастасың/жастасыз» (alongside
+/// the existing «қанша жастасың/жастасыз»). Self-age inquiry to
+/// adam routes here; with no session.age, the planner falls
+/// through to the bare `ask_age` family which is the correct
+/// system-self response.
+#[test]
+fn ask_age_recognises_neshe_jastasyz_form() {
+    let Some(lex) = load_lexicon() else { return };
+    for input in ["Сіз неше жастасыз?", "Сен неше жастасың?"] {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert!(
+            matches!(intent, adam_dialog::Intent::AskAge),
+            "v4.6.12 «{input}» must route to AskAge; got {intent:?}"
+        );
+    }
+}
+
+/// **v4.6.12** — Russian-input detection short-circuits to the
+/// `unknown.non_kazakh` template family.
+#[test]
+fn russian_input_routes_to_non_kazakh_refusal() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = adam_dialog::Conversation::new();
+    let out = conv.turn("Это очень круто, а кто тебя создал?", &lex, &repo, 0);
+    let lower = out.to_lowercase();
+    assert!(
+        lower.contains("қазақ") && lower.contains("сөйле"),
+        "v4.6.12 Russian-input refusal must mention Kazakh-only policy; got {out:?}"
+    );
+}
+
+/// **v4.6.12** — Math-expression detection short-circuits to the
+/// `math_refusal` template family.
+#[test]
+fn math_input_routes_to_math_refusal() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = adam_dialog::Conversation::new();
+    for math in [
+        "5+5",
+        "7 + 3 =",
+        "6:2=",
+        "5-ті 7-ге көбейткенде неше болады?",
+        "Алтыны екіге бөліңіз, нәтижесі қандай?",
+    ] {
+        let out = conv.turn(math, &lex, &repo, 0);
+        let lower = out.to_lowercase();
+        assert!(
+            lower.contains("математик") || lower.contains("есепте") || lower.contains("санақ"),
+            "v4.6.12 math refusal must surface for {math:?}; got {out:?}"
+        );
+    }
+}
+
 /// **v4.6.5** — Creator detector +3 verb forms (real-REPL
 /// 2026-04-29 transcript). Pre-v4.6.5 the Creator detector
 /// matched only `кім жасады / кім құрды / кім жасап шығарды /

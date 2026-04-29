@@ -341,6 +341,23 @@ const NOT_A_TOPIC: &[&str] = &[
     // v4.4.10's `қысқа` / `ештеңе` additions.
     "өте",
     "жалпы",
+    // **v4.6.12** — bare case-suffix leaks. Real-REPL 2026-04-29
+    // transcript: «5-ті 7-ге көбейткенде неше болады?» — the
+    // FST analysed `7-ге` as a fragment of `7` + `-ге` (dative
+    // suffix), and the topic extractor picked up the bare
+    // suffix `ге` (from `-Ге` written as a standalone token).
+    // Bare case-suffix forms `ге / ге / ке / бе / пе / да / де
+    // / та / те / мен / нен / нан / тан / тен / нен / ден / тен
+    // / ден` are never legitimate topic nouns; they're
+    // morphological tail fragments. Add the most-leaky ones.
+    "ге",
+    "ке",
+    "де",
+    "те",
+    "да",
+    "та",
+    "бе",
+    "ма",
     // **v4.6.0** — bare numeral roots that the FST occasionally
     // returns as Locative parses of discourse demonstratives.
     // `Онда` ("then / in it") parses as `он + Locative` (root = "он"
@@ -835,6 +852,15 @@ fn detect_ask_how_are_you(joined: &str) -> bool {
         || joined.contains("қалдарың қалай")
         || joined.contains("қалдарыңыз қалай")
         || joined == "қалың қалай"
+        // **v4.6.12** — polite singular/plural forms surfaced by a
+        // 2026-04-29 real-REPL transcript: «Қалыңыз қалай?». Maps
+        // to «How is your state?» / «How are you (polite)?» —
+        // standard Kazakh greeting-inquiry. Also covers the bare
+        // 2sg-informal «қалың қалай» that was already there as an
+        // exact-match (now matched as substring for robustness in
+        // sentences like «Айтшы, қалың қалай?»).
+        || joined.contains("қалыңыз қалай")
+        || joined.contains("қалың қалай")
 }
 
 /// **v4.3.3** — match identity-question phrasings clearly addressed
@@ -916,7 +942,19 @@ fn detect_ask_about_system(
         || (has_addressee
             && (joined.contains("қашан жасады")
                 || joined.contains("қашан құрды")
-                || joined.contains("қашан жасап шығарды")))
+                || joined.contains("қашан жасап шығарды")
+                // **v4.6.12** — additional creation-verb forms
+                // mirroring the v4.6.5 Creator-aspect extension.
+                // Real-REPL 2026-04-29: «Ал ол сені қашан
+                // жаратты?» fell through pre-v4.6.12. Same
+                // surface-level reasoning: `жаратты / дамытты /
+                // дамытқан / дайындады` are common Kazakh
+                // creation verbs that should pair with `қашан`
+                // for the Birthdate aspect.
+                || joined.contains("қашан жаратты")
+                || joined.contains("қашан дамытты")
+                || joined.contains("қашан дамытқан")
+                || joined.contains("қашан дайындады")))
     {
         return Some(SystemAspect::Birthdate);
     }
@@ -1182,6 +1220,18 @@ fn detect_ask_age(joined: &str) -> bool {
         || (joined.contains("жасыңыз") && has_q)
         || joined.contains("қанша жастасың")
         || joined.contains("қанша жастасыз")
+        // **v4.6.12** — `неше` (alongside `қанша`) variant of the
+        // adessive-copula age question. Real-REPL 2026-04-29:
+        // «Сіз неше жастасыз?» (= "how many years old are you,
+        // polite") fell through to topic-extraction on `неше`
+        // pre-v4.6.12, surfaced a tangential proverb. Adding the
+        // `неше жастасың / неше жастасыз` patterns. Also catches
+        // adam-self age questions: with no session.age, the path
+        // falls through to the `ask_age` family («менің жасым
+        // адамзат жасындай», «мен әлі жаспын») which is the
+        // correct response for system-self age inquiries.
+        || joined.contains("неше жастасың")
+        || joined.contains("неше жастасыз")
         // v4.4.5 — 1sg self-recall form: "менің жасым қанша?" /
         // "жасым неше?". Pre-v4.4.5 this matched
         // `detect_statement_of_age` (keyed on `жасым`) and emitted

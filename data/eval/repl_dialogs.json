@@ -298,6 +298,62 @@
       ]
     },
     {
+      "id": "ask_how_are_you_polite_plural_v4_6_12",
+      "category": "social",
+      "description": "v4.6.12: «Қалыңыз қалай?» (polite-plural form) routes to AskHowAreYou. Pre-v4.6.12 fell through to refusal.",
+      "turns": [
+        {"user": "Қалыңыз қалай?", "output_contains_lower_any": ["жақсы", "рахмет"]}
+      ]
+    },
+    {
+      "id": "intro_proposal_grammar_fix_v4_6_12",
+      "category": "social",
+      "description": "v4.6.12: `greeting.intro_proposal` template grammar fix. Pre-v4.6.12 the 4th variant said «сіз қалай танысамыз?» which is grammatically incoherent (2sg-polite pronoun + 1pl-future verb). Replaced with «сізді қалай атаймын?». Reply must NOT contain the broken phrasing.",
+      "turns": [
+        {"user": "Танысайық.", "output_not_contains_lower": ["сіз қалай танысамыз"]}
+      ]
+    },
+    {
+      "id": "russian_input_refusal_v4_6_12",
+      "category": "regression",
+      "description": "v4.6.12: Russian-only input («Это очень круто, а кто тебя создал?») routes to `unknown.non_kazakh` template family. Real-REPL 2026-04-29: pre-v4.6.12 surfaced half-Russian half-Kazakh hybrid response violating the Kazakh-only directive.",
+      "turns": [
+        {"user": "Это очень круто, а кто тебя создал?", "output_contains_lower_any": ["қазақ"]}
+      ]
+    },
+    {
+      "id": "birthdate_zharatty_v4_6_12",
+      "category": "system_identity",
+      "description": "v4.6.12: «Ал ол сені қашан жаратты?» routes to AskAboutSystem(Birthdate). Pre-v4.6.12 `қашан жаратты` was missing from Birthdate detector verb list.",
+      "turns": [
+        {"user": "Ал ол сені қашан жаратты?", "output_contains_lower_any": ["2026-04-07"]}
+      ]
+    },
+    {
+      "id": "ask_age_neshe_jastasyz_v4_6_12",
+      "category": "system_identity",
+      "description": "v4.6.12: «Сіз неше жастасыз?» routes to AskAge; with no session.age, falls through to the bare `ask_age` family which is the correct system-self response.",
+      "turns": [
+        {"user": "Сіз неше жастасыз?", "output_contains_lower_any": ["жас"]}
+      ]
+    },
+    {
+      "id": "math_refusal_pure_arithmetic_v4_6_12",
+      "category": "regression",
+      "description": "v4.6.12: pure arithmetic input «5+5» routes to `math_refusal` template family. Pre-v4.6.12 fell through to «Түсінбедім».",
+      "turns": [
+        {"user": "5+5", "output_contains_lower_any": ["математик", "есепте", "санақ"]}
+      ]
+    },
+    {
+      "id": "math_refusal_kazakh_math_verbs_v4_6_12",
+      "category": "regression",
+      "description": "v4.6.12: «Алтыны екіге бөліңіз» routes to math_refusal. Pre-v4.6.12 surfaced «Алтын — сары түс» (gold/six homonym ambiguity) — math detection now intercepts before topic extraction.",
+      "turns": [
+        {"user": "Алтыны екіге бөліңіз, нәтижесі қандай?", "output_contains_lower_any": ["математик", "есепте", "санақ"]}
+      ]
+    },
+    {
       "id": "creator_detector_zharatty_v4_6_5",
       "category": "system_identity",
       "description": "v4.6.5: «Ал сені кім жаратты?» routes to AskAboutSystem(Creator). Pre-v4.6.5 `жаратты` was missing from the Creator detector verb list.",
