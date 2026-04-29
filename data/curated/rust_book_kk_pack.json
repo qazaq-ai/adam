@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 1,
-  "sentences_total": 60,
-  "sample_count": 60,
+  "chapters_translated": 2,
+  "sentences_total": 134,
+  "sample_count": 134,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -429,6 +429,524 @@
       "source_id": "chapter_01",
       "domain": "programming_rust",
       "text": "Келесі тарауда нағыз жаттығу — санды табу ойыны — арқылы тілдің негізгі ұғымдарымен жақын танысамыз: айнымалылар, мәлімет түрлері, басқару құрылымдары, сыртқы сандықтарды қосу."
+    },
+    {
+      "id": "rust_book_02_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Санды табу ойыны Осы тарауда нақты бағдарлама — санды табу ойыны — арқылы `Rust`-тың бірнеше негізгі ұғымымен танысамыз."
+    },
+    {
+      "id": "rust_book_02_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Ойынның жұмысы қарапайым: бағдарлама кездейсоқ түрде 1-ден 100-ге дейінгі сан таңдайды, ойыншыдан санды табуды сұрайды, әр болжамға «тым кіші», «тым үлкен» немесе «дұрыс» деп жауап береді."
+    },
+    {
+      "id": "rust_book_02_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Ойынша санды дұрыс тапқанша жалғасады."
+    },
+    {
+      "id": "rust_book_02_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Жол барысында сіз мынаны үйренесіз: айнымалыларды жариялау, пайдаланушы енгізген мәтінді оқу, `Cargo` арқылы сыртқы сандықты қосу, `Result` енамымен қатені өңдеу, `match` өрнегі, цикл құру және цикл ішінде шартқа қарап шығу."
+    },
+    {
+      "id": "rust_book_02_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл тарау бүкіл кітаптың қалған бөлігінде кездесетін негізгі ұғымдарды бір ұйымдасқан мысалда көрсетеді. 2.1."
+    },
+    {
+      "id": "rust_book_02_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Жаңа жоба құру `projects` қалтасына өтіп, `Cargo` арқылы жаңа жоба жасаңыз: `cargo new` командасы сізге даяр құрылым ұсынады: `Cargo.toml` жобаны сипаттайды, `src/main.rs` файлы алғашқы кодты сақтайды."
+    },
+    {
+      "id": "rust_book_02_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Алдыңғы тарауда қарағанымыздай, Cargo сізге дайын `Hello, world!` бағдарламасын ұсынып қояды: Жобаны бірден іске қосып, дайын құрылыс жұмыс істеп тұрғанын тексерейік: Жақсы."
+    },
+    {
+      "id": "rust_book_02_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Енді нақты ойынды жазуға кірісейік. 2.2."
+    },
+    {
+      "id": "rust_book_02_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Болжамды өңдеу Бағдарламаның бірінші бөлігі — пайдаланушыдан санды сұрау, оны енгізуді күту, енгізілген мәтінді оқу және оны экранда қайта көрсету."
+    },
+    {
+      "id": "rust_book_02_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Файл `src/main.rs` ішіндегі кодты келесімен ауыстырыңыз: Жолма-жол қарастырайық."
+    },
+    {
+      "id": "rust_book_02_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бірінші жолда `use std::io;` сөйлемі тұр."
+    },
+    {
+      "id": "rust_book_02_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл сөйлем `Rust`-тың стандартты кітапханасының `io` модулін аумаққа енгізеді."
+    },
+    {
+      "id": "rust_book_02_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапхана көптеген пайдалы заттарды ұсынады, бірақ олардың бәрі автоматты түрде қолжетімді емес: `io` сияқты бөлектерді қолданғанда оларды нақты `use` арқылы шақыру керек. `main` функциясының ішіндегі бірінші екі сөйлем — `println!` арқылы ойынның тақырыбын мен нұсқауын экранға шығару."
+    },
+    {
+      "id": "rust_book_02_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Содан кейін: Бұл сөйлем `guess` атты жаңа айнымалы жариялайды. `Rust`-та айнымалылар әдетте тұрақты болады — олардың мәнін қайта тағайындау мүмкін емес."
+    },
+    {
+      "id": "rust_book_02_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бірақ бізге пайдаланушының жауабын осы айнымалыға жазу керек, сондықтан `mut` кілтсөзін қосамыз. `mut` өзгермелі дегенді білдіреді, яғни мәнін кейін ауыстыруға болады."
+    },
+    {
+      "id": "rust_book_02_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Теңдік белгісінің оң жағында `String::new()` шақыруы тұр."
+    },
+    {
+      "id": "rust_book_02_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл стандартты кітапхана ұсынатын `String` типінің жаңа, бос данасын қайтаратын байланысты функция. `String` — өсетін, өзгертілетін, UTF-8 кодталған жол түрі."
+    },
+    {
+      "id": "rust_book_02_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Әрі қарай: `io::stdin()` функциясы стандартты енгізуді көрсететін `Stdin` данасын қайтарады. `.read_line(&mut guess)` әдісі стандартты енгізуден бір жолды оқиды және оны `guess` айнымалысына жазады."
+    },
+    {
+      "id": "rust_book_02_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Назар аударыңыз: біз `guess` айнымалысына өзгермелі сілтеме береміз — `&mut guess`. `&` белгісі — сілтеме, ал `mut` — өзгермелі."
+    },
+    {
+      "id": "rust_book_02_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Сілтеме иелікті ауыстырмастан мәнге қол жеткізуге мүмкіндік береді; өзгермелі сілтеме мәнді өзгертуге рұқсат етеді. `read_line` тек жолды жинақтап қана қоймайды, ол сонымен бірге `Result` типін қайтарады. `Result` — стандартты кітапхана ұсынатын енам; нұсқалары екеу — `Ok` (сәтті) және `Err` (қате)."
+    },
+    {
+      "id": "rust_book_02_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Көптеген функциялар сондай түрде жазылған: операцияның сәтті немесе сәтсіз болуы мүмкін, нәтиже соған сай қапталады."
+    },
+    {
+      "id": "rust_book_02_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Біз `Result`-ты `.expect(\"Жолды оқу мүмкін болмады\")` арқылы өңдейміз."
+    },
+    {
+      "id": "rust_book_02_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Егер нәтиже `Err` болса, `expect` бағдарламаны тоқтатып, берілген хабарламаны экранда көрсетеді."
+    },
+    {
+      "id": "rust_book_02_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Егер нәтиже `Ok` болса, ол ішіндегі мәнді қайтарады."
+    },
+    {
+      "id": "rust_book_02_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл — оңай, бірақ дөрекі тәсіл. 9-тарауда қатені нақтырақ өңдеудің тәсілдерін көрсетеміз."
+    },
+    {
+      "id": "rust_book_02_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Соңғы сөйлем: `{guess}` — `println!` макросының орынтолтырғышы."
+    },
+    {
+      "id": "rust_book_02_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Айнымалының мәнін қапсырылған жолдың тиісті жеріне қояды."
+    },
+    {
+      "id": "rust_book_02_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бір сөйлемде бірнеше орынтолтырғыш болуы мүмкін; олар тізбе бойынша аргументтерге сай келеді."
+    },
+    {
+      "id": "rust_book_02_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бағдарламаны іске қосып көрейік: Бірінші бөлік дайын — пайдаланушы енгізген сан экранға шықты. 2.3."
+    },
+    {
+      "id": "rust_book_02_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Құпия санды генерациялау Енді ойыншы табуы керек құпия санды жасайық."
+    },
+    {
+      "id": "rust_book_02_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Әр ойын кезінде сан өзгеретін болғаны жақсы — әйтпесе ойын қызықсыз."
+    },
+    {
+      "id": "rust_book_02_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Кездейсоқ сан жасау үшін `rand` сандығын қолданамыз."
+    },
+    {
+      "id": "rust_book_02_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл `Rust` стандартты кітапханасында жоқ, сондықтан оны сыртқы тәуелділік ретінде қосу керек."
+    },
+    {
+      "id": "rust_book_02_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Сыртқы сандықты қосу `Cargo.toml` файлын ашып, `[dependencies]` бөліміне `rand` сандығын қосыңыз: `Cargo.toml` ішіндегі әр сөйлем нақты бір бөлімге жатады. `[dependencies]` бөлімі — жобаның тәуелділіктерін тізбелейтін орын."
+    },
+    {
+      "id": "rust_book_02_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Мұнда `rand = \"0.8.5\"` сөйлемі: «`rand` сандығының 0.8.5 нұсқасына сай немесе үйлесімді нұсқаны қолдан» дегенді білдіреді."
+    },
+    {
+      "id": "rust_book_02_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл — семантикалық нұсқалаудың (semver) шартты түрі: `^0.8.5` дегенге пара-пар, яғни 0.8.5-тен жоғары, бірақ 0.9.0-ден төмен кез келген нұсқа жарамды."
+    },
+    {
+      "id": "rust_book_02_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Енді `cargo build` командасын іске қосыңыз. Cargo сандықтың тізілімі — crates.io — арқылы `rand` пен оған тәуелді басқа сандықтарды жүктеп алады және бәрін бірге құрастырады: Алғашқы құрастырудан кейін `Cargo.lock` файлы жасалады."
+    },
+    {
+      "id": "rust_book_02_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Ол сіздің жобаңыз қандай нақты нұсқалармен құрастырылғанын тіркейді — басқа машинада немесе келесі құрастыруда дәл сондай нұсқалар қолданылсын дегенді кепілдейді."
+    },
+    {
+      "id": "rust_book_02_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Кездейсоқ санды жасау Енді кодқа кездейсоқ сан генерациясын қосайық. `src/main.rs` файлының басына жаңа `use` сөйлемін, ал кодтың ішіне сан жасайтын бөлік қосыңыз: `use rand::Rng;` сөйлемі `Rng` трейтін аумаққа енгізеді."
+    },
+    {
+      "id": "rust_book_02_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл трейт кездейсоқ сан генераторларынан күтілетін әдістерді сипаттайды. 10-тарауда трейттер туралы толығырақ айтамыз; қазір бізге `Rng` арқылы `gen_range` әдісіне қол жеткізу қажет екенін білу жеткілікті. `rand::thread_rng()` функциясы біз қолданатын кездейсоқ сан генераторын қайтарады — ол операциялық жүйеден алынады және ағынға тиесілі. `.gen_range(1..=100)` шақыруы 1-ден 100-ге дейінгі (екі шеті де қосылған) кездейсоқ бүтін санды қайтарады. `1..=100` — бұл диапазон өрнегі."
+    },
+    {
+      "id": "rust_book_02_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Сонымен, `let secret_number = rand::thread_rng().gen_range(1..=100);` сөйлемі құпия санды құрып, оны `secret_number` атты тұрақты айнымалыға жазады."
+    },
+    {
+      "id": "rust_book_02_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бағдарламаны бірнеше рет іске қосыңыз — әр рет әр түрлі сан шығатын болады. > **Ескерту.** Әзірге `Құпия сан: {secret_number}` жолын қалдырыңыз — ол > жөндеу үшін ыңғайлы."
+    },
+    {
+      "id": "rust_book_02_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Кейін, ойынды толық жасап болғанда, бұл жолды > өшіріп тастаймыз. 2.4."
+    },
+    {
+      "id": "rust_book_02_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Болжамды құпия санмен салыстыру Енді ойыншының болжамын құпия санмен салыстырып, нәтижесін айту керек."
+    },
+    {
+      "id": "rust_book_02_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл үшін `match` өрнегі мен `std::cmp::Ordering` енамын қолданамыз."
+    },
+    {
+      "id": "rust_book_02_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Файлдың басына тағы бір `use` сөйлемін қосыңыз және салыстыратын `match` блогын жазыңыз: `Ordering` — стандартты кітапхана ұсынатын енам, оның үш нұсқасы бар: `Less` (кіші), `Greater` (үлкен), `Equal` (тең). `cmp` әдісі екі мәнді салыстырып, осы нұсқалардың бірін қайтарады. `match` өрнегі салыстыру нәтижесіне қарай тармақ таңдайды."
+    },
+    {
+      "id": "rust_book_02_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Әр тармақ өрнектің ұқсастық үлгісімен (`Ordering::Less`, `Ordering::Greater`, `Ordering::Equal`) және оған сай орындалатын кодпен жазылады. `match` өрнектерін `Rust` бағдарламашысы күн сайын қолданады; 6-тарауда оларға арналған толық бөлім бар."
+    },
+    {
+      "id": "rust_book_02_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Тип сәйкестігі мәселесі Бірақ бұл код әлі құрастырылмайды. `cargo build` командасын іске қосыңыз және мынандай қатені көресіз: Қате — типтердің сәйкес келмеуі. `guess` — `String`, ал `secret_number` — бүтін сан. `Rust` екеуін салыстыруға келіспейді, өйткені олар әртүрлі типтер."
+    },
+    {
+      "id": "rust_book_02_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл мәселені шешу үшін `guess` ішіндегі мәтінді бүтін санға айналдыру керек."
+    },
+    {
+      "id": "rust_book_02_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Кодты келесімен жалғастырыңыз: Маңызды нәрсе: біз `guess` атты жаңа айнымалы жариялаймыз."
+    },
+    {
+      "id": "rust_book_02_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл бұрынғы `guess`-ті *көлеңкелейді*, яғни жаңа атпен жаңа мәнді бекітеміз. `Rust`-та көлеңкелеу — әдеттегі тәсіл; ол бір айнымалының түрін өзгертіп, бірақ оған жаңа атау таппай-ақ жалғастырғанда қолайлы."
+    },
+    {
+      "id": "rust_book_02_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Мысалы, бұл жерде ескі `guess` — `String`, жаңа `guess` — `u32`. `guess.trim()` — жолдың алды-артындағы бос орындар мен жол аяқталу символын алып тастайды (`read_line` соңында `\\n` қалдырады). `parse()` әдісі жолды бір санға айналдырады. `parse` қандай түрге айналдыратынын білу үшін біз нақты тип белгіледік: `let guess: u32`."
+    },
+    {
+      "id": "rust_book_02_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust`-қа «жолды 32 биттік таңбасыз бүтін санға айналдыр» деген сигнал. `parse` қатеге ұшырауы мүмкін: егер енгізілген мәтін санға келмесе (мысалы, «hello»)."
+    },
+    {
+      "id": "rust_book_02_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Сондықтан `parse` `Result` қайтарады, ал біз оны `.expect(\"Сан енгізіңіз!\")` арқылы өңдейміз. `u32` түрін `secret_number`-мен салыстыру үшін `Rust` екі санның түрін бірге шешеді: `secret_number` бұрын белгілі бір бүтін сан түрі болмаған (тек `i32` әдепкісі), бірақ `guess` — `u32`."
+    },
+    {
+      "id": "rust_book_02_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Сондықтан `secret_number` де `u32` болады."
+    },
+    {
+      "id": "rust_book_02_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бұл түр-қорытынды (type inference) деп аталады."
+    },
+    {
+      "id": "rust_book_02_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Енді `cargo run` командасын тағы іске қосыңыз — салыстыру жұмыс істейді: 2.5."
+    },
+    {
+      "id": "rust_book_02_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Цикл арқылы бірнеше болжамға рұқсат беру Қазір ойын тек бір болжамды қабылдайды да тоқтайды."
+    },
+    {
+      "id": "rust_book_02_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Жөндейік: бағдарлама ойыншыдан бірнеше рет санды сұрап, әр рет жауап беріп отырсын."
+    },
+    {
+      "id": "rust_book_02_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Ол үшін `loop` кілтсөзін қолданамыз."
+    },
+    {
+      "id": "rust_book_02_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Кодтың `let secret_number` сөйлемінен кейінгі бөлігін `loop { ... }` блогына салыңыз: `loop` шарт жоқ цикл — бағдарлама циклден тек `break` арқылы шыға алады."
+    },
+    {
+      "id": "rust_book_02_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Қазір `break` жоқ, сондықтан ойын мәңгілікке жалғасады."
+    },
+    {
+      "id": "rust_book_02_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Терминалда бағдарламаны `Ctrl-C` арқылы тоқтатыңыз."
+    },
+    {
+      "id": "rust_book_02_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Дұрыс болжам кезінде шығу Ойынды дұрыс жобалау үшін: ойыншы дұрыс жауап тапса, бағдарлама циклден шықсын. `Ordering::Equal` тармағында `break` сөзін қосыңыз: Назар аударыңыз: `Ordering::Equal` тармағында енді бір емес, екі сөйлем бар."
+    },
+    {
+      "id": "rust_book_02_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Сондықтан оның денесін фигуралық жақшалармен ораймыз. `break` циклден ағымдағы итерацияны үзіп шығады. 2.6."
+    },
+    {
+      "id": "rust_book_02_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Қате енгізілген санды қалай өңдеу Қазіргі бағдарлама `parse` ішіндегі `expect` арқасында қателі енгізу кезінде apatка ұшырайды: Бұл — пайдаланушы үшін жұмсақ тәжірибе емес."
+    },
+    {
+      "id": "rust_book_02_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Қатеге сүрінбей, бағдарлама тек қана сұрауды қайталайтын болсын."
+    },
+    {
+      "id": "rust_book_02_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Парсингтің `Result` түрін `match` арқылы тікелей өңдеуге болады: `parse` `Result` қайтарады."
+    },
+    {
+      "id": "rust_book_02_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Біз оны `match` арқылы тексереміз: егер `Ok` болса (сан сәтті алынса), `num` мәнін шығарамыз; егер `Err` болса, цикл басына қайтып, келесі итерацияны бастаймыз. `_` — бұл «қандай нақты қатеге қарамаймыз» деген ұқсастық үлгісі. `continue` цикл денесінің қалған бөлігін өткізіп жіберіп, келесі итерацияға өтеді."
+    },
+    {
+      "id": "rust_book_02_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Енді бағдарлама толық болды: > **Ескерту.** Жөндеу мақсатында тұрған `println!(\"Құпия сан: ...\")` > жолын кодтан өшіріңіз — ойыншы құпия санды көрмеуі керек. `cargo run` арқылы ойынды бірнеше рет ойнап көріңіз."
+    },
+    {
+      "id": "rust_book_02_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Бағдарлама енді: құпия санды кездейсоқ түрде таңдайды; пайдаланушы дұрыс санды табуды күтіп, болжамдарды қабылдайды; әр болжамға «тым кіші», «тым үлкен» деп жауап береді; қате енгізілген мәтінді тыныш қабылдап, қайтадан сұрайды; дұрыс жауап табылғанда «Дәл таптыңыз!» деп шығады. 2.7."
+    },
+    {
+      "id": "rust_book_02_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Бұл тарауда сіз `Rust`-тың бірнеше негізгі ұғымымен жұмыс істеуді үйрендіңіз: `let` арқылы айнымалыларды жариялау, `mut` арқылы оларды өзгермелі ету, `match` өрнегімен тармақтау, `loop` арқылы цикл жасау, `break` арқылы циклден шығу, `Result` енамымен қатені өңдеу, `Cargo.toml` арқылы сыртқы сандықты қосу."
+    },
+    {
+      "id": "rust_book_02_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Сонымен қатар сіз `String`, `u32` сияқты типтермен танысып, көлеңкелеу мен типке сай талдау сияқты тәсілдерді пайдаландыңыз."
+    },
+    {
+      "id": "rust_book_02_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_02",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда осы ұғымдардың әрқайсысын тереңірек қарастырамыз: `Rust`-тың негізгі типтері, айнымалылар мен тұрақтылар, функциялар мен басқару құрылымдары жайлы егжей-тегжей айтамыз."
     }
   ]
 }

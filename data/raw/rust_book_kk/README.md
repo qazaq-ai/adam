@@ -42,6 +42,7 @@ The pack is registered in `SOURCE_PACKS` constants of:
 | Chapter | File | Patch | Status |
 |---|---|---|---|
 | 1 — Бастау (Getting Started) | `chapter_01.md` | v4.7.1 | translated, in pack |
+| 2 — Санды табу ойыны (Programming a Guessing Game) | `chapter_02.md` | v4.7.2 | translated, in pack |
 
 ## Corpus-purity rule
 

@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.2] — 2026-04-29 — Rust Book Chapter 2 (Санды табу ойыны) translated, ingested
+
+Second chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 2 — Programming a Guessing Game — covering the hands-on guessing game project: setting up a new Cargo project, processing user input via `std::io::stdin().read_line()`, mutable variables (`let mut guess = String::new()`), references and mutable references (`&mut guess`), `Result`-based error handling with `.expect()`, adding the external `rand` crate as a Cargo dependency (`Cargo.toml` `[dependencies]` block, semantic versioning `^0.8.5`), generating random integers in a range (`rand::thread_rng().gen_range(1..=100)`), comparing values with `std::cmp::Ordering` and `match` expressions (`Less / Greater / Equal`), type mismatch errors and shadowing for type conversion (`let guess: u32 = guess.trim().parse().expect(...)`), looping with `loop`, breaking on success, and graceful invalid-input handling via `match Result { Ok(num) => num, Err(_) => continue }`.
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_02.md` — ~3 500 words, code blocks preserved verbatim, all v4.7.0 terminology applied (иелік / қарызға алу / сандық / трейт / енам / структ); chapter-2-specific terminology decisions: random number → **кездейсоқ сан**, mutable variable → **өзгермелі айнымалы**, scope → **аумақ**, parse → **талдау**, type inference → **түр-қорытынды**, semantic versioning → **семантикалық нұсқалау**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 1 chapter / 60 samples → **2 chapters / 134 samples**.
+- Morpheme index: distinct morphemes 3 213 → **3 265** (+52); total postings 17 637 → **18 485** (+848); indexed samples 3 251 → **3 325** (+74 from chapter 2).
+
+### Tests + counters
+
+- E2E `rust_book_chapter_01_indexed_in_morpheme_index` threshold raised from ≥50 to ≥120 rust_book sentences (chapters 1 + 2).
+- Workspace tests: **745 passing** (no count change; threshold tightening only).
+- Cognitive eval / REPL replay unchanged.
+
+### Cadence
+
+Per user-confirmed convention «каждую главу считать за патч при релизе»: each chapter = +1 patch. Next: v4.7.3 = Chapter 3 (Common Programming Concepts).
+
 ## [4.7.1] — 2026-04-29 — Rust Book Chapter 1 (Бастау) translated, ingested into morpheme_index (phase 2 begins)
 
 First chapter under the «глава = патч» cadence. Full Kazakh translation of the Rust Book Chapter 1 — Getting Started — covering installation (rustup, Linux/macOS, Windows, troubleshooting, updating, local docs), Hello World (project directory, writing/running the first program, anatomy of a Rust program, compile-vs-run as separate steps), and Hello Cargo (Cargo project creation, build/run/check, release build, Cargo as convention).
