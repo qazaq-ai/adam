@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 3,
-  "sentences_total": 231,
-  "sample_count": 231,
+  "chapters_translated": 4,
+  "sentences_total": 328,
+  "sample_count": 328,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -1626,6 +1626,685 @@
       "source_id": "chapter_03",
       "domain": "programming_rust",
       "text": "Иелік модельі дегеніміз — `Rust`-тың жадыны қалай қауіпсіз басқаратынының негізі, бұл басқа жүйелік тілдерде кездеспейтін тұжырымдама."
+    },
+    {
+      "id": "rust_book_04_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иелікті түсіну Иелік (ownership) — `Rust`-тың ең ерекше және ең күшті ұғымы."
+    },
+    {
+      "id": "rust_book_04_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Ол `Rust` бағдарламаларына жадыны қоқыс жинаушысыз да, әрбір `malloc`/`free` жұбын қолмен басқарусыз да басқаруға мүмкіндік береді."
+    },
+    {
+      "id": "rust_book_04_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бұл иеліктің қалай жұмыс істейтіні маңызды — өйткені сіздің кодыңыз `Rust`-та қалай жазылатыны иелікке тікелей байланысты."
+    },
+    {
+      "id": "rust_book_04_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иелік жүйесі үш ұғымнан тұрады: **иелік**, **қарызға алу** (борровинг) және **тілімдер** (slices)."
+    },
+    {
+      "id": "rust_book_04_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Осы тарауда үшеуін бірге қарастырамыз. 4.1."
+    },
+    {
+      "id": "rust_book_04_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иелік дегеніміз не?"
+    },
+    {
+      "id": "rust_book_04_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иелік — `Rust` бағдарламасы жадыны қалай басқарады деген сұраққа жауап."
+    },
+    {
+      "id": "rust_book_04_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Кейбір тілдер қоқыс жинаушыны (garbage collector) қолданады — ол бағдарлама жүріп жатқанда қажетсіз жадты іздеп тазалайды."
+    },
+    {
+      "id": "rust_book_04_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Басқа тілдерде программист жадты қолмен бөліп, қолмен босатады. `Rust` үшінші жолды таңдады: жад **иелік ережелерімен** басқарылады, оларды компилятор тексереді."
+    },
+    {
+      "id": "rust_book_04_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Егер ережелер бұзылса, бағдарлама құрастырылмайды."
+    },
+    {
+      "id": "rust_book_04_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Орындалу кезінде иелік жүйесі ешбір жылдамдықты «жемейді» — бар тексерулер компиляцияда жасалады."
+    },
+    {
+      "id": "rust_book_04_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Стек пен үйме Иелікті түсіну үшін стек пен үйме арасындағы айырмашылықты есте сақтау маңызды. **Стек** — соңғы кірген бірінші шығатын (LIFO) тәртіппен жұмыс істейтін жад аймағы."
+    },
+    {
+      "id": "rust_book_04_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Стекке нәрсе салу мен алу жылдам, өйткені орналасу қашан да үстіңгі жағында болады."
+    },
+    {
+      "id": "rust_book_04_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бірақ стекке тек өлшемі белгілі мәндерді сақтауға болады. **Үйме** — өлшемі алдын ала белгісіз, не өлшемі орындалу кезінде өзгеретін мәндер сақталатын жад аймағы."
+    },
+    {
+      "id": "rust_book_04_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Үймеге бір нәрсе сақтау үшін операциялық жүйе жеткілікті орынды табу керек, оны белгілеу керек және оның **сілтемесін** қайтару керек."
+    },
+    {
+      "id": "rust_book_04_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бұл стекпен салыстырғанда баяуырақ."
+    },
+    {
+      "id": "rust_book_04_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Үймедегі жадқа қол жеткізу үшін бір қосымша «секіру» (сілтемесімен жүру) керек."
+    },
+    {
+      "id": "rust_book_04_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Функция шақырылған кезде оның параметрлері мен жергілікті айнымалылары (олардың кейбірі үймедегі мәндерге сілтемелер болуы мүмкін) стекке тіркеледі."
+    },
+    {
+      "id": "rust_book_04_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Функция аяқталғанда сол мәндердің бәрі стектен босатылады."
+    },
+    {
+      "id": "rust_book_04_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иелік жүйесі осы жадты қалай ұтымды басқару дегенге жауап береді."
+    },
+    {
+      "id": "rust_book_04_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Дұбликаттарды табу, қажетсіз жадты тазалау, артық көшіру жасамау — бұларды компилятор иелік ережелері арқылы автоматты түрде шешеді."
+    },
+    {
+      "id": "rust_book_04_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иелік ережелері Иеліктің үш негізгі ережесі бар; оларды есте ұстаңыз — қалған бәрі осы үшеуінің салдары: `Rust`-тағы әрбір мәннің **иесі** деп аталатын бір айнымалысы бар."
+    },
+    {
+      "id": "rust_book_04_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бір уақытта мәннің тек бір ғана иесі болуы мүмкін."
+    },
+    {
+      "id": "rust_book_04_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иесі аумақтан шыққанда мән өшіріледі."
+    },
+    {
+      "id": "rust_book_04_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Алғашқы екі ереже статикалық: компилятор тексереді."
+    },
+    {
+      "id": "rust_book_04_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Үшінші ереже — динамикалық: бағдарлама орындалу кезінде орындалады."
+    },
+    {
+      "id": "rust_book_04_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Айнымалы аумағы Айнымалының аумағы — бағдарламаның ол жарамды болатын бөлігі."
+    },
+    {
+      "id": "rust_book_04_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Айнымалы жарияланғаннан бастап оны қамтитын блок аяқталғанша жарамды: Бұл `s` айнымалысы ішкі блок ішінде ғана белсенді."
+    },
+    {
+      "id": "rust_book_04_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Блок бітісімен `s`-тің аумағы аяқталады. `String` түрі Бұрын біз `&str` (жол литералы) типімен таныстық."
+    },
+    {
+      "id": "rust_book_04_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жол литералы кодқа қатты жазылатын тұрақты мән — оның мазмұны мен ұзындығы компиляция кезінде белгілі."
+    },
+    {
+      "id": "rust_book_04_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бірақ кейбір жағдайларда бізге **өсетін, өзгертілетін** жол керек."
+    },
+    {
+      "id": "rust_book_04_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Соған арналған тип — `String`. `String` үймеде сақталады, ұзындығы орындалу кезінде өзгеруі мүмкін."
+    },
+    {
+      "id": "rust_book_04_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жол литералынан `String` жасау үшін `from` функциясын қолданамыз: `::` операторы мұнда `from` функциясы `String` түріне тиесілі екенін білдіреді. `String` түрі өзгертуге келеді — егер `mut` қойсаңыз, оған жаңа таңбаларды қосуға болады: Енді негізгі сұрақ: **неге** `String` өзгертуге келеді, ал жол литералы келмейді?"
+    },
+    {
+      "id": "rust_book_04_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жауабы — олардың жадпен жұмыс істеу тәсілінде."
+    },
+    {
+      "id": "rust_book_04_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жад және бөлу Жол литералы жылдам, өйткені оның мазмұны компилятор тарапынан тікелей орындалатын файлға жазылады."
+    },
+    {
+      "id": "rust_book_04_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жол литералын өзгерту мүмкін емес — өйткені оның көлемі компиляция кезінде белгілі. `String` үшін орындалу кезінде көлемі өзгеруі мүмкін мәтінді сақтай білу керек."
+    },
+    {
+      "id": "rust_book_04_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бұған жадты үймеден алу қажет: Жадты бөлу үшін біз операциялық жүйеден бір рет сұраймыз — `String::from` ішінде."
+    },
+    {
+      "id": "rust_book_04_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жадты пайдалану біткеннен кейін біз операциялық жүйеге қайтаратын тәсіл керек."
+    },
+    {
+      "id": "rust_book_04_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бірінші бөлік сізге таныс — бірақ екінші бөлік әртүрлі тілдерде әртүрлі жасалады."
+    },
+    {
+      "id": "rust_book_04_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Қоқыс жинаушысы бар тілдерде ол автоматты түрде орындалады (GC қолданылмайтынды табады және босатады)."
+    },
+    {
+      "id": "rust_book_04_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Қоқыс жинаушысы жоқ тілдерде программист жадты қолмен босатады — бұған бір ұмытсаңыз, жад жоғалады (ағытпа); екі рет босатсаңыз — қате; кеш босатсаңыз — қате. `Rust`-тың тәсілі екеуінен де өзгеше: айнымалы өзінің аумағынан шыққан сәтте жад **автоматты түрде** қайтарылады."
+    },
+    {
+      "id": "rust_book_04_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бұл механизмді `drop` функциясы жасайды; ол ішкі әрі үнсіз шақырылады, бірақ оны мысалдың соңында ашық түрде көрсетсек: Бұл — иеліктің ең қарапайым көрінісі."
+    },
+    {
+      "id": "rust_book_04_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иеліктің көшуі Бірнеше айнымалы бір мәнмен әртүрлі түрде «байланысты» болуы мүмкін. `Rust`-та бұл түрлер тиянақты түрде ажыратылған."
+    },
+    {
+      "id": "rust_book_04_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бүтін санның жағдайын қарастырайық: `x` пен `y` екеуі де 5 мәнімен байланысты."
+    },
+    {
+      "id": "rust_book_04_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Стектегі бүтін санның көлемі тұрақты және белгілі — `5`-тің көшірмесі стектегі `y`-ге сақталады."
+    },
+    {
+      "id": "rust_book_04_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Әр айнымалы өз дербес мәніне ие."
+    },
+    {
+      "id": "rust_book_04_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Енді `String` үшін: Бір қарағанда бұл бүтін санның мысалына ұқсайды."
+    },
+    {
+      "id": "rust_book_04_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бірақ `String` басқаша жасалған. `String` ішкі түрде **үш бөліктен** тұрады: үймедегі мәтінге сілтейтін көрсеткіш, ұзындық және сыйымдылық."
+    },
+    {
+      "id": "rust_book_04_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Осы үшеуі стекте сақталады. `let s2 = s1;` сөйлемі стектегі үш мәнді (көрсеткіш + ұзындық + сыйымдылық) көшіреді — бірақ үймедегі мәтін көшірілмейді."
+    },
+    {
+      "id": "rust_book_04_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Олай болса, `s1` мен `s2` екеуі де бір үймедегі мәтінге сілтейді."
+    },
+    {
+      "id": "rust_book_04_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бұл — мәселе!"
+    },
+    {
+      "id": "rust_book_04_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Аумақ біткенде екеуі де `drop`-қа барады, екеуі де бір жадты босатуға тырысады. **Қос босату қатесі** — қауіпсіздік мәселесі. `Rust`-тың шешімі: `let s2 = s1;` сөйлемінен кейін **`s1` ары қарай жарамсыз болады**. `Rust` көрсеткішті `s1`-ден `s2`-ге **«ауыстырды» (moved)**, ал `s1`-ді істен шығарды: Компилятор бұған қателік бере алады: Бұл — иелікті ауыстыру (move). `String`-ке арналған «терең көшіру» жоқ — тек иелік ауысады."
+    },
+    {
+      "id": "rust_book_04_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Терең көшіру: `clone` Егер сізге `String` мәнін шынымен көшіріп алу қажет болса, `clone` әдісін қолданыңыз."
+    },
+    {
+      "id": "rust_book_04_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Ол үймедегі мазмұнды да көшіреді: `clone` шақырылғанда бағдарлама шынымен жадтан жаңа орын сұрайды және мазмұнды копиялайды."
+    },
+    {
+      "id": "rust_book_04_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бұл арзан емес — `clone` бар жерде сіз жадты дублирлеп жатқаныңызды біліп тұрсыз. `Copy` трейті Бүтін сандар, `bool`, `char`, `f32`/`f64`, ұқсас стек қана түрлер — жоғарыдағы «move» проблемасы оларда жоқ. `let y = x;` соларда — әркез жай көшірме. `Rust` мұны **`Copy` трейті** арқылы көрсетеді: `Copy` бекітілген типті айнымалыны басқаға тағайындағанда — иелік ауыспайды, тек жаңа көшірме жасалады. `Copy` бекітілген түрлер: Барлық бүтін сан түрлері (`i32`, `u64`, `usize` т.б.). `bool`, `char`. `f32`, `f64`."
+    },
+    {
+      "id": "rust_book_04_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Тек `Copy`-ден тұратын кортеж: `(i32, i32)` — `Copy`; `(i32, String)` — жоқ. `Copy` бар жерде move жоқ."
+    },
+    {
+      "id": "rust_book_04_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust` дизайнының тағы бір сипаты: қарапайым стек-түрлерді еркін қолдана беруге болады."
+    },
+    {
+      "id": "rust_book_04_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иелік пен функциялар Айнымалыны функцияға беру де `let`-ке тағайындау сияқты — иелікті ауыстыру немесе көшіру жасайды."
+    },
+    {
+      "id": "rust_book_04_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Қай тип екеніне байланысты: Функцияға `String` берсеңіз — иелік сіздің иеліктен функцияның иелігіне ауысады."
+    },
+    {
+      "id": "rust_book_04_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Функция аяқталғанда жад босатылады."
+    },
+    {
+      "id": "rust_book_04_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сіздің бастапқы айнымалыңыз ары қарай жарамсыз."
+    },
+    {
+      "id": "rust_book_04_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Функцияға `i32` берсеңіз — `Copy` бекітілгендіктен, көшірме жасалады және бастапқы айнымалы әлі де жарамды."
+    },
+    {
+      "id": "rust_book_04_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Қайтару мәні мен иелік Қайтару мәндері де иелікті ауыстыра алады: Бірақ әр функция шақырылған сайын иелікті алып, кейін қайтарып отыру қолайсыз."
+    },
+    {
+      "id": "rust_book_04_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сондықтан `Rust`-та **қарызға алу** ұғымы бар. 4.2."
+    },
+    {
+      "id": "rust_book_04_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сілтемелер мен қарызға алу Сілтеме (reference) — мәнге **иеленбей** қол жеткізуге мүмкіндік беретін құрылым."
+    },
+    {
+      "id": "rust_book_04_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сілтеме арқылы біз функцияға мәнді көрсетеміз, бірақ оның иелігін бермейміз."
+    },
+    {
+      "id": "rust_book_04_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сілтемені жасау — `&` операторы: `&s1` — `s1`-ге сілтеме."
+    },
+    {
+      "id": "rust_book_04_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сілтеме мәнді көрсетеді, бірақ оған иелік бермейді."
+    },
+    {
+      "id": "rust_book_04_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сондықтан `calculate_length` функциясы аяқталғанда `s` аумақтан шықса да, ол сілтеген мән (яғни `s1`-дегі мәтін) `drop`-қа бармайды. `s1` `main`-да әлі де жарамды, оны әрі қарай қолдана беруге болады."
+    },
+    {
+      "id": "rust_book_04_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Біз сілтемені жасап, оны функцияға беру тәсілін **қарызға алу** (borrowing) деп атаймыз."
+    },
+    {
+      "id": "rust_book_04_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сілтеме арқылы біз мәнді уақытша «қарызға» аламыз."
+    },
+    {
+      "id": "rust_book_04_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Қарыз біткенде иелік иесінде қалады."
+    },
+    {
+      "id": "rust_book_04_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Өзгермелі сілтемелер Әдепкі бойынша сілтеме арқылы біз мәнді **өзгерте алмаймыз**: Өзгертуге рұқсат алу үшін **өзгермелі сілтеме** жасау керек: Үш өзгеріс: `s` `mut` болуы керек; `&mut s` арқылы өзгермелі сілтеме жасаймыз; функцияның параметрі `&mut String` түрінде болады."
+    },
+    {
+      "id": "rust_book_04_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сілтемелердің екі ережесі `Rust`-тың сілтеме жүйесінің негізі — екі қатаң ереже: Бір уақытта мәнге **бір ғана** өзгермелі сілтеме болуы мүмкін; немесе **бірнеше** тұрақты сілтеме болуы мүмкін; бірақ екеуі бірдей бола алмайды."
+    },
+    {
+      "id": "rust_book_04_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сілтемелер әрқашан жарамды болуы керек (жабайы сілтеме жоқ)."
+    },
+    {
+      "id": "rust_book_04_0076",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бірінші ереже — **жарыс шарты** (data race) проблемасына қарсы кепілдік."
+    },
+    {
+      "id": "rust_book_04_0077",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жарыс шарты — екі ағын бір жадқа бір уақытта жазып жатқанда болатын мәселе."
+    },
+    {
+      "id": "rust_book_04_0078",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сондай қателер табуы өте қиын. `Rust` бұған компиляцияда тыйым салады: Бұл бір аумаққа екі өзгермелі сілтеме болуға тырысқан үшін `Rust` рұқсат бермейді."
+    },
+    {
+      "id": "rust_book_04_0079",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Бірнеше тұрақты сілтеме — мәнді тек оқу үшін — рұқсат: Тұрақты және өзгермелі сілтемені бір аумақта араластыруға тыйым: Сілтеменің аумағы бұл жерде — соңғы пайдаланудан кейін жабылады."
+    },
+    {
+      "id": "rust_book_04_0080",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сондықтан келесі код заңды: Жабайы сілтемелер Жабайы сілтеме (dangling reference) — мән жоғалғаннан кейін соған сілтеп тұратын сілтеме."
+    },
+    {
+      "id": "rust_book_04_0081",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Көп тілдерде бұл қателіктің бір көзі: бағдарлама жадтан тазартылған орынды оқуға тырысады. `Rust` мұны компиляцияда тыйым салады: Компилятор: Бұл қатеге шешім — функция мәнді қайтарып, оның иелігін шақырушыға ауыстыру керек: 4.3."
+    },
+    {
+      "id": "rust_book_04_0082",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Тілім түрі Тілім (slice) — иелігі жоқ, ұжымның бір бөлігіне сілтейтін сілтеме."
+    },
+    {
+      "id": "rust_book_04_0083",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жиі жолдың немесе жиымның белгілі бір бөлігін сипаттау үшін қолданылады."
+    },
+    {
+      "id": "rust_book_04_0084",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жол тілімі `String` ішінен бір сөзді алу мысалы: `&s[0..i]` — `String` ішіндегі **жол тілімі**."
+    },
+    {
+      "id": "rust_book_04_0085",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Ол `&str` түрінде болады және үймедегі `String`-тің бір бөлігіне сілтейді."
+    },
+    {
+      "id": "rust_book_04_0086",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жол тілімі — иелігі жоқ көрініс, өзіндік жадты алмайды. `..` — диапазон синтаксисі: `[a..b]` `a`-дан бастап `b`-ге дейінгі (b кірмейді) бөлікке сілтейді. `[..n]` нөлден бастап `n`-ге дейінгі; `[m..]` `m`-нен жолдың соңына дейін; `[..]` бүкіл жолға."
+    },
+    {
+      "id": "rust_book_04_0087",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жол тілімдері параметр ретінде Функция параметр түрін `&String`-тен `&str`-ге өзгертсек, ол `String` және жол литералы екеуімен де жұмыс істей алады: `&str` — `&String`-тен жалпырақ тип."
+    },
+    {
+      "id": "rust_book_04_0088",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Сол үшін `Rust`-та функция параметрін `&str` түрінде жариялау жиі ұсынылады."
+    },
+    {
+      "id": "rust_book_04_0089",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Басқа тілімдер Тілім тек жолға арналмаған."
+    },
+    {
+      "id": "rust_book_04_0090",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Жиым тілімі де бар: Бұл `&[i32]` түрінде болады — i32 элементтерінен тұратын тілім."
+    },
+    {
+      "id": "rust_book_04_0091",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Тілім жадтан жаңа орын алмайды; ол жай ғана бар жиымның бір бөлігіне сілтейді. 4.4."
+    },
+    {
+      "id": "rust_book_04_0092",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Бұл тарауда сіз `Rust`-тың ең ерекше ұғымы — иелік жүйесімен таныстыңыз."
+    },
+    {
+      "id": "rust_book_04_0093",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иелік ережелері (бір ие, иелік ауысады немесе көшіріледі, аумақ біткенде жад босатылады), сілтемелер мен қарызға алу (тұрақты және өзгермелі сілтеме, екі ереже), жабайы сілтемелердің тыйым салынуы, тілімдер (жолдың не жиымның бір бөлігіне иелігі жоқ көрініс) — `Rust`-тың қауіпсіздік кепілдіктерінің барлығы осы ұғымдарға арналған."
+    },
+    {
+      "id": "rust_book_04_0094",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Иелік жүйесі күрделі болып көрінуі мүмкін, бірақ оның бір артықшылығы бар: компилятор сізге тиісті жерде ескертеді, бағдарлама орындалмастан бұрын қателіктер табылады."
+    },
+    {
+      "id": "rust_book_04_0095",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Уақыт өте келе бұл ережелерге үйреніп, оларды ой автоматы ретінде қолданасыз."
+    },
+    {
+      "id": "rust_book_04_0096",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда `Rust`-тың тағы бір негізгі құрылымына — структтарға — көшеміз."
+    },
+    {
+      "id": "rust_book_04_0097",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_04",
+      "domain": "programming_rust",
+      "text": "Олар арқылы өзіңіздің тип жасап, оған әдістер бекіте аласыз."
     }
   ]
 }

@@ -7,6 +7,32 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.4] — 2026-04-29 — Rust Book Chapter 4 (Иелікті түсіну) translated, ingested
+
+Fourth chapter — the central, most conceptual chapter of the entire book. Full Kazakh translation of Rust Book Chapter 4 — Understanding Ownership — covering the language's defining idea: stack vs heap, the three ownership rules, variable scope, the `String` type vs string literals, memory allocation and `drop`, ownership transfer (move), `clone` for deep copy, the `Copy` trait, ownership and function calls, return values; references and borrowing (`&T` immutable, `&mut T` mutable, the two reference rules — exclusivity of mutable references vs. shared immutable references — and how data races are prevented at compile time, dangling reference prevention); the slice type (`&str` string slices, `&[T]` array slices, range `..` syntax variants `[a..b]` / `[..n]` / `[m..]` / `[..]`, `&str` as the more general parameter type vs. `&String`).
+
+This is the chapter for which the v4.7.0 terminology decisions (иелік / қарызға алу / қарыз тексергіш / тіршілік мерзімі / сілтеме / өзгермелі / тұрақты / структ / енам) were specifically locked. They are now applied throughout the canonical translation.
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_04.md` — ~6 000 words, code blocks preserved verbatim, all v4.7.0/4.7.1/4.7.2/4.7.3 terminology applied, ownership-specific terms added below.
+- Chapter-4-specific terminology decisions: ownership rules → **иелік ережелері**, move → **иелікті ауыстыру**, deep copy → **терең көшіру**, clone → `clone` (transliteration, kept as English for the method name; conceptual term «терең көшіру»), data race → **жарыс шарты**, dangling reference → **жабайы сілтеме**, slice → **тілім**, string slice → **жол тілімі**, byte literal → **байт литералы**, `Copy` trait → `Copy` **трейті**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 3 chapters / 231 samples → **4 chapters / 328 samples** (+97 from chapter 4).
+- Morpheme index: distinct morphemes 3 307 → **3 330** (+23); total postings 19 447 → **20 430** (+983); indexed samples 3 422 → **3 519** (+97).
+
+### Tests + counters
+
+- E2E `rust_book_chapter_01_indexed_in_morpheme_index` threshold raised from ≥200 to ≥300 rust_book sentences (chapters 1–4).
+- Workspace tests: **745 passing** (no count change; threshold tightening only).
+- Cognitive eval / REPL replay unchanged.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.5 = Chapter 5 (Using Structs to Structure Related Data).
+
 ## [4.7.3] — 2026-04-29 — Rust Book Chapter 3 (Жалпы бағдарламалау ұғымдары) translated, ingested
 
 Third chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 3 — Common Programming Concepts — covering the foundational concepts that recur throughout Rust: variables and mutability (default-immutable bindings, `mut` keyword, constants `const` with mandatory type annotation and SCREAMING_SNAKE_CASE convention, shadowing via `let` and how it differs from `mut` including type-changing); data types (scalar — integer types `i8`/`i16`/`i32`/`i64`/`i128` and unsigned/signed pairs with `usize`/`isize` machine-dependent forms, integer overflow behaviour in debug vs. release, floating-point `f32`/`f64`, numeric operations, boolean, character; compound — tuples with destructuring and dot-index access, the unit `()`, arrays with type/length annotation `[i32; 5]` and out-of-bounds panic); functions (`fn` keyword, snake_case convention, parameters with mandatory type annotations, the critical statement-vs-expression distinction, block expressions, return values via `->`); comments (`//`, `/* */`, doc comments `///`); control flow (`if` / `else if` / `else` with bool-only conditions, `if` as an expression in `let`, `loop` with `break value`, loop labels for nested loops, `while`, `for` over arrays and ranges, range expressions `1..4` exclusive vs `1..=4` inclusive, `.rev()`).
