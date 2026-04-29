@@ -48,6 +48,26 @@ pub struct SystemIdentity {
     /// mainstream large language models. Rendered when the user
     /// asks about distinguishing characteristics.
     pub architecture_summary: String,
+    /// **v4.6.0** — multi-line Kazakh prose listing adam's current
+    /// capabilities (what it can do). Rendered into the
+    /// `ask_about_system.capabilities` template family when the
+    /// user asks «не істей аласың?». Honest and grounded — every
+    /// item must reflect actual code/data in this repository.
+    pub capabilities_summary: String,
+    /// **v4.6.0** — multi-line Kazakh prose listing adam's
+    /// knowledge domains (what it has facts about). Rendered into
+    /// the `ask_about_system.knowledge` template family when the
+    /// user asks «не білесің?». Mirrors the `world_core/` domain
+    /// inventory.
+    pub knowledge_summary: String,
+    /// **v4.6.0** — multi-line Kazakh prose listing adam's known
+    /// limitations (what it does **not** do yet). Rendered into
+    /// the `ask_about_system.limitations` template family when the
+    /// user asks «нені істей алмайсың?» / «несің әлсіз?». Honest
+    /// scope-statement. Critical for trust — adam refuses outside
+    /// the envelope rather than fabricating, and the limitations
+    /// list makes the envelope explicit.
+    pub limitations_summary: String,
 }
 
 impl SystemIdentity {
@@ -64,6 +84,36 @@ impl SystemIdentity {
             architecture_summary: "Мен қолданыстағы үлкен тілдік модельдерден өзгеше \
                 архитектурада құрылғанмын — ережелер мен таңбалық ой-тізбекке негізделген, \
                 статистикалық генерацияға арналмаған"
+                .into(),
+            capabilities_summary: "Қазақ тілінде сөйлесе аламын; есіміңізді, жасыңызды, \
+                қалаңызды және мамандығыңызды есте сақтап, қажет болса айтып бере аламын; \
+                Қазақстанның географиясы (17 облыс, әкімшілік орталықтар, өзендер, көлдер, \
+                таулар, шөлдер) туралы білемін; қазақ әдебиеті мен танымал қазақстандықтар \
+                жайлы дерек таба аламын; сіздің сөзіңіздегі қайшылықтарды байқап, \
+                нақтылауды сұрай аламын; білмейтін нәрселерден бас тартып, ойдан шығармаймын; \
+                әрбір жауабымның дереккөзін аудитке көрсете аламын"
+                .into(),
+            knowledge_summary: "Менің білімім негізінен Қазақстан туралы: 17 облыс пен \
+                әкімшілік орталықтары, ірі қалалар, тұрғын саны; ірі өзендер (Ертіс, \
+                Сырдария, Іле, Жайық, Есіл, Тобыл, Шу, Қаратал, Талас); көлдер мен теңіздер \
+                (Балқаш, Каспий, Арал, Зайсан, Алакөл, Тенгіз, Маркакөл); таулар (Алтай, \
+                Тянь-Шань, Жетісу Алатауы, Қаратау, Ұлытау, Хан Тәңірі); шөлдер (Бетпақдала, \
+                Қызылқұм, Үстірт, Мойынқұм); көрікті жерлер (Бурабай, Шарын каньоны). Қазақ \
+                әдебиеті: Әуезов, Сейфуллин, Мүсірепов, Жансүгіров, Жұмабаев, Махамбет, \
+                Шәкәрім, Алтынсарин. Танымал қазақстандықтар: Назарбаев, Тоқаев, Қонаев, \
+                Бөкейхан, Абылай хан, Сәтбаев, Уәлиханов, Молдағұлова. Жалпы білім: \
+                жануарлар, өсімдіктер, дене мүшелері, киім, тағам, түстер, кәсіптер, \
+                құрал-сайман, көлік, ауа-райы, аспан денелері, өлшемдер, ыдыс-аяқ, \
+                туыстық, музыка, мақал-мәтелдер"
+                .into(),
+            limitations_summary: "Мен әлі мынаны істей алмаймын: тек қазақ тілінде ғана \
+                сөйлесемін, орысша немесе ағылшынша түсінбеймін; жаңа мәтін шығармаймын — \
+                тек жинақталған деректерден алып айтамын; әңгімеден жаттап алмаймын — әр \
+                жаңа сұхбатта мен жадымды жаңадан бастайтын дерек қорынан бастап шығамын; \
+                интернетке шықпаймын; сурет, дауыс, видео жоқ — тек жазбаша мәтін; \
+                математикалық есептеулер жасамаймын; жаңалықтарды білмеймін; кейбір күрделі \
+                ғылыми тақырыптар әлі жоқ; егер сұрағыңыз менің білімімнің шегінен шықса, \
+                ойдан жасамаймын — оның орнына білмейтінімді ашық айтамын"
                 .into(),
         }
     }
@@ -87,6 +137,19 @@ impl SystemIdentity {
             (
                 "system_architecture".into(),
                 self.architecture_summary.clone(),
+            ),
+            // v4.6.0 — capabilities / knowledge / limitations
+            // self-introspection slots. Mirror the
+            // architecture_summary slot's pattern: long Kazakh
+            // prose suitable for direct interpolation.
+            (
+                "system_capabilities".into(),
+                self.capabilities_summary.clone(),
+            ),
+            ("system_knowledge".into(), self.knowledge_summary.clone()),
+            (
+                "system_limitations".into(),
+                self.limitations_summary.clone(),
             ),
         ]
     }
@@ -113,6 +176,25 @@ pub enum SystemAspect {
     /// "How are you different from existing models?" — surface
     /// form: `ерекшелігің не?`, `неге басқашасың?`.
     Architecture,
+    /// **v4.6.0** — "What can you do?" — surface form:
+    /// `не істей аласың?` / `не істей аласыз?` / `мүмкіндіктерің не?`.
+    /// Renders the `capabilities_summary` field as a structured
+    /// list of what adam can actually do (KZ morphology, slot
+    /// recall, knowledge-domain answers, contradiction handling,
+    /// out-of-scope refusal, audit trail).
+    Capabilities,
+    /// **v4.6.0** — "What do you know?" — surface form:
+    /// `не білесің?` / `не білесіз?` / `қандай тақырыптар жайлы
+    /// дерегің бар?`. Renders the `knowledge_summary` field — a
+    /// digest of the world_core domain inventory.
+    Knowledge,
+    /// **v4.6.0** — "What can't you do yet?" — surface form:
+    /// `нені істей алмайсың?` / `несің әлсіз?` / `шектеулерің
+    /// қандай?`. Renders the `limitations_summary` field. Critical
+    /// for trust: adam refuses outside the envelope rather than
+    /// fabricating, so an explicit limitations list makes the
+    /// envelope discoverable.
+    Limitations,
 }
 
 impl SystemAspect {
@@ -125,6 +207,9 @@ impl SystemAspect {
             SystemAspect::Creator => ".creator",
             SystemAspect::Birthdate => ".birthdate",
             SystemAspect::Architecture => ".architecture",
+            SystemAspect::Capabilities => ".capabilities",
+            SystemAspect::Knowledge => ".knowledge",
+            SystemAspect::Limitations => ".limitations",
         }
     }
 }
@@ -174,6 +259,49 @@ mod tests {
         assert_eq!(
             SystemAspect::Architecture.template_key_suffix(),
             ".architecture"
+        );
+        assert_eq!(
+            SystemAspect::Capabilities.template_key_suffix(),
+            ".capabilities"
+        );
+        assert_eq!(SystemAspect::Knowledge.template_key_suffix(), ".knowledge");
+        assert_eq!(
+            SystemAspect::Limitations.template_key_suffix(),
+            ".limitations"
+        );
+    }
+
+    /// **v4.6.0** — verify the new self-awareness fields are
+    /// non-empty + Kazakh-only in canonical identity. Each must
+    /// be substantial prose (not a placeholder), since they're
+    /// rendered directly into user-facing replies.
+    #[test]
+    fn canonical_identity_has_substantial_self_awareness_summaries() {
+        let id = SystemIdentity::canonical();
+        for (label, value) in [
+            ("capabilities", &id.capabilities_summary),
+            ("knowledge", &id.knowledge_summary),
+            ("limitations", &id.limitations_summary),
+        ] {
+            assert!(
+                value.len() >= 100,
+                "{label}_summary must be substantial Kazakh prose; got len={}",
+                value.len()
+            );
+            // Sanity: must contain real Kazakh content (Cyrillic).
+            assert!(
+                value
+                    .chars()
+                    .any(|c| ('а'..='я').contains(&c) || c == 'қ' || c == 'ң'),
+                "{label}_summary must be Kazakh text"
+            );
+        }
+        // The canonical identity should mention what adam refuses
+        // (limitations) — load-bearing for the trust contract.
+        assert!(
+            id.limitations_summary.contains("білмеймін")
+                || id.limitations_summary.contains("істей алмаймын"),
+            "limitations must explicitly state what adam refuses to do"
         );
     }
 

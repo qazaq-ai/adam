@@ -393,6 +393,32 @@ impl Conversation {
         // purposes (planner picks a response without asking back).
         let mut intent = resolve_follow_up(raw_intent, input, self.active_intent);
 
+        // **v4.6.0** — discourse-anaphora resolution. When the user's
+        // input contains a discourse anaphor («онда / сонда / осында
+        // / мұнда / бұнда / одан / содан / бұдан / осыдан»),
+        // **override** the current turn's noun_hint with the most-
+        // recent query topic (`session["last_query_topic"]`). Real-
+        // REPL 2026-04-29 transcript: «Ал онда қанша аймақ бар?»
+        // following «Қазақстан туралы не білесіз?» — `онда` refers
+        // to Қазақстан (locative). The override is unconditional
+        // (not gated on `noun_hint == None`) because the FST often
+        // does recover SOME content noun from the same turn (e.g.
+        // `аймақ` here), but that content noun is the predicate of
+        // the question, not its topic. The previous-turn topic is
+        // the right subject; the current-turn content noun stays
+        // in the user's raw input and continues to influence
+        // retrieval ranking via the v4.4.11 input-overlap reranker.
+        if crate::discourse::input_contains_discourse_anaphor(input) {
+            if let Some(prev_topic) = self.session.get("last_query_topic").cloned() {
+                if let Intent::Unknown {
+                    ref mut noun_hint, ..
+                } = intent
+                {
+                    *noun_hint = Some(prev_topic);
+                }
+            }
+        }
+
         // **v4.2.0** — tool-loop orchestration replaces the v4.0.37
         // `inject_*` helpers + audit block with a single uniform
         // pipeline: build a `Vec<ToolCall>` declaring which lookups
@@ -620,6 +646,23 @@ impl Conversation {
             &extra_slots,
         );
         let output = realise(&plan);
+
+        // **v4.6.0** — capture the topic noun this turn answered
+        // about into `session["last_query_topic"]` so the next
+        // turn's discourse-anaphora resolver («Ал онда қанша
+        // аймақ бар?») can recover it. Updated only when the
+        // current turn carried a recognised topic — empty / refused
+        // turns leave the previous value intact (so a follow-up
+        // anaphor still resolves to whatever was actually being
+        // discussed).
+        if let Intent::Unknown {
+            noun_hint: Some(topic),
+            ..
+        } = &intent_for_render
+        {
+            self.session
+                .insert("last_query_topic".into(), topic.clone());
+        }
         let trace = TurnTrace {
             parses,
             intent_after_injection: intent,

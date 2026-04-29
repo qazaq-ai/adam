@@ -30,6 +30,7 @@
 pub mod action;
 pub mod belief;
 pub mod conversation;
+pub mod discourse;
 pub mod intent;
 pub mod language_core;
 pub mod planner;

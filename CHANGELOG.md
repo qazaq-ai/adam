@@ -7,6 +7,102 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.6.0] — 2026-04-29 — Self-awareness layer + discourse anaphora + closed-class hygiene
+
+The fourth v4.x minor. Real-REPL 2026-04-29 transcript surfaced 6 distinct defects + a strategic ask: "make adam understand that he's an entity with a name, knowledge, and abilities — and that he should know what he can and cannot do yet". All landed in one release.
+
+### Self-awareness layer — three new SystemAspect variants
+
+`SystemIdentity` extended with three new fields rendered as substantial Kazakh prose:
+- `capabilities_summary` — what adam can do (KZ morphology, slot recall, KZ geography knowledge, contradiction handling, refuse-out-of-scope, audit trail).
+- `knowledge_summary` — world_core domain inventory digest.
+- `limitations_summary` — what adam doesn't do yet (Kazakh-only; no novel generation; no online learning; no internet; no multimedia; no math; admits ignorance instead of fabricating).
+
+`SystemAspect` enum gained three new variants:
+- `Capabilities` — surface forms `не істей аласың?` / `мүмкіндіктерің не?` / `қолыңнан не келеді?`.
+- `Knowledge` — surface forms `не білесің?` (standalone, no `туралы`) / `қандай тақырыптар жайлы білесің?`.
+- `Limitations` — surface forms `нені істей алмайсың?` / `шектеулерің қандай?` / `несің әлсіз?`.
+
+The Limitations detector requires an explicit interrogative marker (`?` / `не` / `нені` / `қандай` / `қалай` / `бе` / `ма`) so declarative criticism «сен ештеңе білмейсің» (= "you know nothing") does NOT route here. That preserves the v4.4.10 `qysqasy_discourse_particle_does_not_capture_topic` cognitive scenario's Tentative floor.
+
+Three new template families: `ask_about_system.capabilities` / `.knowledge` / `.limitations` — each renders the corresponding SystemIdentity slot directly. Total template family count **50 → 53**.
+
+### Discourse anaphora resolution
+
+New module `crates/adam-dialog/src/discourse.rs` + new session slot `last_query_topic`. When the user's input contains a discourse anaphor («онда / сонда / осында / мұнда / бұнда / одан / содан / бұдан / осыдан»), the conversation layer **overrides** the current turn's `noun_hint` with the previous turn's topic. Implementation is intentionally simple — single-slot LRU; no coreference chains, no discourse stacks. The 80%-case observed in real REPL traces.
+
+Pre-v4.6.0 trace:
+```
+T1: «Қазақстан туралы не білесіз?»  → topic = қазақстан, surfaced as basic IsA fact
+T2: «Ал онда қанша аймақ бар?»     → noun_hint = "он" (FST misanalysis of онда)
+                                     → output: «Он — сан» (tangential)
+```
+
+Post-v4.6.0:
+```
+T1: same → session["last_query_topic"] = "қазақстан"
+T2: «Ал онда қанша аймақ бар?»     → discourse anaphor detected → noun_hint
+                                     overridden to "қазақстан"; v4.4.11
+                                     reranker scores «аймақ» content overlap
+                                     → surfaces «Қазақстанның аймақтары — 17
+                                     облыс пен 3 республикалық маңызы бар қала»
+```
+
+### Closed-class hygiene
+
+Added to NOT_A_TOPIC:
+- `өте` (intensifier "very") — pre-v4.6.0 leaked as topic on «Бұл өте қызықты, бірақ жалпы не істей аласыз?», surfaced a tangential proverb about borders.
+- `жалпы` (in-general adverb) — same defect class.
+- `он` / `сон` — bare numeral roots that the FST misanalyses as `Locative(он/сон)` for surface forms `онда / сонда`. v4.3.5 added the SURFACE forms but `first_noun_root` filters on the **root**, so the Locative analysis still surfaced `он` as a topic. The discourse-anaphora module above also leans on this filter — without it, `first_noun_root` would return `он` and pre-empt the anaphora resolver.
+
+### Compound self-introduction request
+
+Extended `detect_ask_about_system` to fire on `өзіңіз туралы айт` opener pattern. Real-REPL: «Өзіңіз туралы айтып беріңізші, сізді кім жаратты, не істей аласыз?» (compound self-intro + creator + capabilities) — pre-v4.6.0 fell through to a generic clarification refusal. Post-v4.6.0 routes to AskAboutSystem(General); the user can drill into specific aspects in follow-up turns.
+
+### World Core landmarks list-summary
+
+New entry `geo_kz_110`: «Қазақстандағы көрікті жерлер мен табиғи орындар: Бурабай, Шарын каньоны, Хан Тәңірі, Жетісу Алатауы, …». New entry `geo_kz_111` with country-area quantity. World Core **947 → 949 entries / 1116 → 1120 facts**.
+
+### Verified end-to-end on the 2026-04-29 transcript
+
+| User turn | Pre-v4.6.0 | Post-v4.6.0 |
+|---|---|---|
+| `Бұл өте қызықты, бірақ жалпы не істей аласыз?` | tangential proverb keyed on `өте` | capabilities list (Capabilities aspect fires; `өте/жалпы` filtered) |
+| `Не істей аласың?` | «басқа сұрақ қойсаңыз» refusal | full capabilities list |
+| `Қандай салаларды білесіз?` | tangential proverb | (still TBD — see carry-forward below) |
+| `Ал онда қанша аймақ бар?` | «Он — сан» | «Қазақстанның аймақтары — 17 облыс пен 3 республикалық маңызы бар қала» |
+| `Қазақстанда қандай көрікті жерлер бар?` | basic IsA fact | landmarks list |
+| `Өзіңіз туралы айтып беріңізші, …` | refusal | self-introduction (General aspect) |
+
+### Tests
+
+- 6 new e2e regressions: `discourse_intensifiers_and_demonstrative_locatives_not_topics`, `ask_capabilities_routes_to_capabilities_aspect`, `ask_knowledge_routes_to_knowledge_aspect_only_when_standalone`, `ask_limitations_requires_interrogative`, `discourse_anaphora_resolves_to_previous_query_topic`, `self_intro_request_routes_to_ask_about_system`.
+- 3 new lib tests in `discourse.rs` covering positive/negative/punctuation cases.
+- 1 new lib test `canonical_identity_has_substantial_self_awareness_summaries` locking the new SystemIdentity field shape + content.
+- 4 new cognitive scenarios: `ask_capabilities_routes_…`, `ask_knowledge_routes_…`, `ask_limitations_routes_…`, `discourse_anaphora_onda_resolves_…`.
+- 7 new REPL replay dialogs: capabilities/knowledge/limitations/self-intro/discourse-anaphora/öте-жалпы/landmarks.
+
+Cognitive eval **59/59 → 63/63 canonical**. REPL replay **43/43 → 50/50 canonical**. Workspace **693 → 703**. Template families **50 → 53**.
+
+### Carry-forward to v4.6.1+
+
+«Қандай салаларды білесіз?» — user is asking what knowledge domains adam covers. Currently routes to Unknown/topic-query (because `сала` is a content noun without `туралы` modifier and without explicit Knowledge marker pattern). Adding a Knowledge-aspect detector for `сала / тақырып + білесің / білесіз` would close it.
+
+«Қалдарыңыз қалай?» (plural addressee form of «как ваши дела») — currently misclassifies. Pre-existing minor issue, not regression.
+
+### State
+
+| | v4.5.0 | v4.6.0 |
+|---|---|---|
+| Workspace tests | 693 | **703** (+10 e2e/lib/cognitive/repl) |
+| Cognitive eval | 59/59 canonical | **63/63 canonical** (+4 scenarios) |
+| REPL replay | 43/43 canonical | **50/50 canonical** (+7 dialogs) |
+| `SystemAspect` variants | 4 (General / Creator / Birthdate / Architecture) | **7** (+ Capabilities / Knowledge / Limitations) |
+| Template families | 50 | **53** (+3 ask_about_system.* aspect families) |
+| `crates/adam-dialog/src/` modules | 16 | **17** (+`discourse.rs`) |
+| World Core | 947/1116/30 | **949/1120/30** (+1 landmarks list-summary + 1 country-area fact) |
+| Why minor | — | 3 new `SystemAspect` enum variants + 1 new module (`discourse.rs`) + 1 new session-state slot + 3 new SystemIdentity fields — multiple architectural type-system additions |
+
 ## [4.5.0] — 2026-04-28 — `Case::LocativeAttributive` FST morphotactics rule
 
 The third v4.x minor. Replaces the v4.4.12 string-side `locative_attributive_hint` fallback with a proper morphotactics rule, providing native FST round-trip support for the Kazakh locative-attributive derivation `-дағы / -дегі / -тағы / -тегі`.

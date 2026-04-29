@@ -332,6 +332,31 @@ const NOT_A_TOPIC: &[&str] = &[
     "ешкім",
     "ешбір",
     "еш",
+    // **v4.6.0** — additional discourse adverbials surfaced by the
+    // 2026-04-28 real-REPL transcript. `өте` (= "very") and `жалпы`
+    // (= "in general / overall") are intensifier / scope adverbs,
+    // not topic nouns. Pre-v4.6.0 «Бұл өте қызықты, бірақ жалпы не
+    // істей аласыз?» extracted `өте` as the topic and surfaced a
+    // tangential proverb keyed on it. Same misanalysis class as
+    // v4.4.10's `қысқа` / `ештеңе` additions.
+    "өте",
+    "жалпы",
+    // **v4.6.0** — bare numeral roots that the FST occasionally
+    // returns as Locative parses of discourse demonstratives.
+    // `Онда` ("then / in it") parses as `он + Locative` (root = "он"
+    // = number ten). v4.3.5 added the SURFACE forms (`онда / сонда
+    // / осында / мұнда / бұнда`) but `first_noun_root` filters on
+    // the **root**, not the surface — so `он + Locative` still
+    // surfaced `он` as the topic and retrieval matched «Он — сан»
+    // («Ten is a number») unrelated to the user's question. Adding
+    // the bare numeral roots closes the leak; they're rare-enough
+    // standalone topics that the false-negative cost is low. The
+    // proper fix is the discourse-anaphora module below, which
+    // resolves «онда» to the previous turn's topic — but that
+    // module also leans on `first_noun_root` returning None for
+    // these inputs, so this filter is a precondition.
+    "он",
+    "сон",
 ];
 
 /// Return the root of the first content-noun Analysis in the parse list.
@@ -439,6 +464,8 @@ const MULTIWORD_ENTITIES: &[&str] = &[
     "көлдер тізімі",
     "таулар тізімі",
     "шөлдер тізімі",
+    // **v4.6.0** — landmarks list-summary object.
+    "көрікті жерлер тізімі",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -893,7 +920,96 @@ fn detect_ask_about_system(
         return Some(SystemAspect::Architecture);
     }
 
+    // **v4.6.0** — Capabilities aspect: "what can you do?".
+    // Pronoun-led OR `сені/сізді`-marked OR a 2sg/2pl ability-modal
+    // copula (`істей аласың / істей аласыз`). The verb form
+    // `аласың / аласыз` is itself the addressee marker even without
+    // a free-standing pronoun (the morpheme `-сың/-сыз` is 2nd
+    // person), so the pronoun gate is loosened here. Real-REPL
+    // 2026-04-29 transcript: «Не істей аласың?» (no leading pronoun).
+    let capabilities_marker = joined.contains("істей аласың")
+        || joined.contains("істей аласыз")
+        || joined.contains("қолыңнан не келеді")
+        || joined.contains("қолыңыздан не келеді")
+        || joined.contains("мүмкіндіктерің")
+        || joined.contains("мүмкіндіктеріңіз")
+        || (has_addressee
+            && (joined.contains("не істей аласың")
+                || joined.contains("не істей аласыз")
+                || joined.contains("қандай мүмкіндіктер")));
+    if capabilities_marker {
+        return Some(SystemAspect::Capabilities);
+    }
+
+    // **v4.6.0** — Limitations aspect: "what CAN'T you do?". Same
+    // 2nd-person ability marker but in the negative — `алмайсың /
+    // алмайсыз`. Gated on an explicit interrogative marker
+    // (question pronouns / particles / question mark) so a
+    // declarative criticism «сен ештеңе білмейсің» (= "you know
+    // nothing") doesn't accidentally route here — that's user
+    // venting, not a query about limitations. The cognitive eval
+    // scenario `qysqasy_discourse_particle_does_not_capture_topic`
+    // pinned this distinction at v4.4.10 and the gate keeps it.
+    let has_interrogative = joined.contains("?")
+        || joined.contains("не ")
+        || joined.ends_with("не")
+        || joined.contains("нені")
+        || joined.contains("қандай")
+        || joined.contains("қалай")
+        || joined.contains(" бе")
+        || joined.ends_with("бе")
+        || joined.contains(" ма")
+        || joined.ends_with("ма");
+    let limitations_marker_active = joined.contains("істей алмайсың")
+        || joined.contains("істей алмайсыз")
+        || joined.contains("шектеулерің")
+        || joined.contains("шектеулеріңіз")
+        || joined.contains("әлсіз тұстарың")
+        || joined.contains("әлсіз тұстарыңыз")
+        || joined.contains("несің әлсіз")
+        || joined.contains("несіз әлсіз");
+    let limitations_marker_passive = joined.contains("білмейсің") || joined.contains("білмейсіз");
+    if limitations_marker_active || (limitations_marker_passive && has_interrogative) {
+        return Some(SystemAspect::Limitations);
+    }
+
+    // **v4.6.0** — Knowledge aspect: "what do you know?". Surface
+    // forms: `не білесің / не білесіз`, `қандай тақырыптар / қандай
+    // салалар жайлы білесің`. Note: bare `Қазақстан туралы не
+    // білесіз` should NOT route here (that's an Unknown topic
+    // query about қазақстан). The disambiguator: `не білесің` /
+    // `не білесіз` as standalone or with general scope qualifiers
+    // (`қандай / жалпы`), but if there's a content noun + туралы
+    // before it, fall through to the Unknown path.
+    let knowledge_general_marker = (joined.contains("не білесің") || joined.contains("не білесіз"))
+        && !joined.contains("туралы")
+        && !joined.contains("жайында")
+        && !joined.contains("жөнінде");
+    let knowledge_explicit_marker = joined.contains("қандай салаларды білесің")
+        || joined.contains("қандай салаларды білесіз")
+        || joined.contains("қандай тақырыптар")
+        || joined.contains("қандай тақырыптарды")
+        || joined.contains("білімің не")
+        || joined.contains("білімің қандай")
+        || joined.contains("білімініз қандай");
+    if knowledge_general_marker || knowledge_explicit_marker {
+        return Some(SystemAspect::Knowledge);
+    }
+
     // **v4.3.3** — General aspect: pronoun-led identity question.
+    // **v4.6.0** — Also fires on `өзіңіз туралы айт` style requests
+    // (compound self-introduction openers from a 2026-04-29 real-
+    // REPL transcript: «Өзіңіз туралы айтып беріңізші, …»). The
+    // marker `өзің / өзіңіз` + `туралы` + speech-act verb (айт /
+    // айтып бер / таныстыр) is unambiguous self-reference.
+    let self_intro_request = (joined.contains("өзің туралы")
+        || joined.contains("өзіңіз туралы")
+        || joined.contains("өзің жайлы")
+        || joined.contains("өзіңіз жайлы"))
+        && (joined.contains("айт")
+            || joined.contains("таныс")
+            || joined.contains("берші")
+            || joined.contains("беріңіз"));
     if pronoun
         && (joined.contains("кімсің")
             || joined.contains("кімсіз")
@@ -905,6 +1021,7 @@ fn detect_ask_about_system(
             || joined.contains("қандай жасанды интеллектсіз")
             || joined.contains("немен айналысасың")
             || joined.contains("немен айналысасыз"))
+        || self_intro_request
     {
         return Some(SystemAspect::General);
     }

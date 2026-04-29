@@ -4328,6 +4328,180 @@ fn lexicon_includes_core_nouns_su_ot_er() {
     }
 }
 
+/// **v4.6.0** — closed-class additions: `өте` (intensifier) and
+/// `жалпы` (in-general adverb) leak'ed as topics in the
+/// 2026-04-29 transcript. The bare numeral roots `он` / `сон`
+/// also leak'd via the FST analysing `онда / сонда` as
+/// `Locative(он/сон)`. Adding all four to NOT_A_TOPIC closes
+/// the leak.
+#[test]
+fn discourse_intensifiers_and_demonstrative_locatives_not_topics() {
+    let Some(lex) = load_lexicon() else { return };
+    let cases = [
+        ("Бұл өте қызықты бастама.", "өте"),
+        ("Жалпы алғанда жақсы.", "жалпы"),
+    ];
+    for (input, leaking_root) in cases {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        if let adam_dialog::Intent::Unknown { noun_hint, .. } = intent {
+            assert_ne!(
+                noun_hint.as_deref(),
+                Some(leaking_root),
+                "v4.6.0 NOT_A_TOPIC: {leaking_root:?} must not be extracted as a topic"
+            );
+        }
+    }
+}
+
+/// **v4.6.0** — `Не істей аласың?` must route to
+/// `Intent::AskAboutSystem { aspect: Capabilities }` and trigger
+/// the `ask_about_system.capabilities` template family. Real-REPL
+/// 2026-04-29 transcript: pre-v4.6.0 this fell through to
+/// "басқа сұрақ қойсаңыз" generic refusal.
+#[test]
+fn ask_capabilities_routes_to_capabilities_aspect() {
+    let Some(lex) = load_lexicon() else { return };
+    for input in [
+        "Не істей аласың?",
+        "Не істей аласыз?",
+        "Қандай мүмкіндіктерің бар?",
+    ] {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert!(
+            matches!(
+                intent,
+                adam_dialog::Intent::AskAboutSystem {
+                    aspect: adam_dialog::SystemAspect::Capabilities
+                }
+            ),
+            "v4.6.0 capability question {input:?} must route to AskAboutSystem(Capabilities), got {intent:?}"
+        );
+    }
+}
+
+/// **v4.6.0** — `Не білесің?` (standalone, no `туралы` topic
+/// modifier) routes to Knowledge aspect. With a `туралы` topic
+/// modifier — fall through to Unknown topic-query path so the
+/// existing «Х туралы не білесіз?» behaviour is preserved.
+#[test]
+fn ask_knowledge_routes_to_knowledge_aspect_only_when_standalone() {
+    let Some(lex) = load_lexicon() else { return };
+
+    let standalone = adam_dialog::interpret_text_with_lexicon("Не білесің?", &[], Some(&lex));
+    assert!(
+        matches!(
+            standalone,
+            adam_dialog::Intent::AskAboutSystem {
+                aspect: adam_dialog::SystemAspect::Knowledge
+            }
+        ),
+        "v4.6.0 standalone «Не білесің?» must route to Knowledge, got {standalone:?}"
+    );
+
+    // With `туралы` — falls through to Unknown topic-query path.
+    let topic_query =
+        adam_dialog::interpret_text_with_lexicon("Қазақстан туралы не білесіз?", &[], Some(&lex));
+    assert!(
+        !matches!(
+            topic_query,
+            adam_dialog::Intent::AskAboutSystem {
+                aspect: adam_dialog::SystemAspect::Knowledge
+            }
+        ),
+        "v4.6.0 topic-modified «X туралы не білесіз?» must NOT hijack Knowledge aspect; got {topic_query:?}"
+    );
+}
+
+/// **v4.6.0** — Limitations aspect requires an interrogative
+/// marker. Declarative criticism «сен ештеңе білмейсің» must
+/// NOT route to Limitations; it falls through to Unknown so
+/// the existing `qysqasy_discourse_particle_does_not_capture_topic`
+/// cognitive scenario keeps its Tentative epistemic floor.
+#[test]
+fn ask_limitations_requires_interrogative() {
+    let Some(lex) = load_lexicon() else { return };
+
+    // Question form — fires.
+    for q in ["Нені істей алмайсың?", "Шектеулерің қандай?"] {
+        let intent = adam_dialog::interpret_text_with_lexicon(q, &[], Some(&lex));
+        assert!(
+            matches!(
+                intent,
+                adam_dialog::Intent::AskAboutSystem {
+                    aspect: adam_dialog::SystemAspect::Limitations
+                }
+            ),
+            "v4.6.0 «{q}» must route to Limitations aspect, got {intent:?}"
+        );
+    }
+
+    // Declarative criticism — does NOT fire.
+    let criticism =
+        adam_dialog::interpret_text_with_lexicon("сен ештеңе білмейсің.", &[], Some(&lex));
+    assert!(
+        !matches!(
+            criticism,
+            adam_dialog::Intent::AskAboutSystem {
+                aspect: adam_dialog::SystemAspect::Limitations
+            }
+        ),
+        "v4.6.0 declarative criticism must NOT route to Limitations; got {criticism:?}"
+    );
+}
+
+/// **v4.6.0** — discourse-anaphora resolution. After a turn that
+/// sets `last_query_topic = қазақстан`, a follow-up like «Ал онда
+/// қанша аймақ бар?» must reuse `қазақстан` as the topic noun
+/// instead of falling through to refusal or surfacing «Он — сан».
+#[test]
+fn discourse_anaphora_resolves_to_previous_query_topic() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = adam_dialog::Conversation::new();
+
+    // Turn 1: establishes қазақстан as the discourse topic.
+    let _ = conv.turn("Қазақстан туралы не білесіз?", &lex, &repo, 0);
+    assert_eq!(
+        conv.session.get("last_query_topic").map(String::as_str),
+        Some("қазақстан"),
+        "v4.6.0 turn 1 must capture қазақстан into last_query_topic"
+    );
+
+    // Turn 2: the discourse anaphor «онда» must resolve.
+    let (_out, trace) = conv.turn_with_trace("Ал онда қанша аймақ бар?", &lex, &repo, 1);
+    if let adam_dialog::Intent::Unknown { noun_hint, .. } = &trace.intent_after_verification {
+        assert_eq!(
+            noun_hint.as_deref(),
+            Some("қазақстан"),
+            "v4.6.0 discourse anaphor must resolve to previous query topic"
+        );
+    } else {
+        panic!(
+            "expected Unknown with resolved topic; got {:?}",
+            trace.intent_after_verification
+        );
+    }
+}
+
+/// **v4.6.0** — compound self-introduction request. The 2026-04-29
+/// transcript carried «Өзіңіз туралы айтып беріңізші, сізді кім
+/// жаратты, не істей аласыз?» — a triple-compound (self-intro +
+/// creator + capabilities). Pre-v4.6.0 it fell through to a
+/// generic refusal because no detector matched. The
+/// `өзіңіз туралы айт` opener now triggers AskAboutSystem(General)
+/// and the user can drill into the specific aspects in follow-up
+/// turns.
+#[test]
+fn self_intro_request_routes_to_ask_about_system() {
+    let Some(lex) = load_lexicon() else { return };
+    let intent =
+        adam_dialog::interpret_text_with_lexicon("Өзіңіз туралы айтып беріңізші.", &[], Some(&lex));
+    assert!(
+        matches!(intent, adam_dialog::Intent::AskAboutSystem { .. }),
+        "v4.6.0 «Өзіңіз туралы айтып беріңізші» must route to AskAboutSystem; got {intent:?}"
+    );
+}
+
 /// **v4.4.12** — locative-attributive suffix recovery. The
 /// Kazakh `-дағы / -дегі / -тағы / -тегі` derivation (locative +
 /// attributive `-ғы`) is not yet modelled in the FST

@@ -298,6 +298,63 @@
       ]
     },
     {
+      "id": "ask_capabilities_lists_what_adam_can_do_v4_6_0",
+      "category": "system_identity",
+      "description": "v4.6.0: «Не істей аласың?» must surface the capabilities list (KZ morphology, slot recall, KZ geography knowledge, etc.). Pre-v4.6.0 fell through to «басқа сұрақ қойсаңыз» generic refusal — no detector matched. New SystemAspect::Capabilities + ask_about_system.capabilities template family.",
+      "turns": [
+        {"user": "Не істей аласың?", "output_contains_lower_any": ["қазақ тілінде сөйлесе аламын"]}
+      ]
+    },
+    {
+      "id": "ask_knowledge_lists_what_adam_knows_v4_6_0",
+      "category": "system_identity",
+      "description": "v4.6.0: «Не білесің?» (standalone, no `туралы`) routes to SystemAspect::Knowledge and surfaces the world_core inventory digest.",
+      "turns": [
+        {"user": "Не білесің?", "output_contains_lower_any": ["менің білімім"]}
+      ]
+    },
+    {
+      "id": "ask_limitations_lists_what_adam_cannot_do_v4_6_0",
+      "category": "system_identity",
+      "description": "v4.6.0: «Нені істей алмайсың?» routes to SystemAspect::Limitations. Critical for trust — explicit limitations make the envelope discoverable.",
+      "turns": [
+        {"user": "Нені істей алмайсың?", "output_contains_lower_any": ["істей алмаймын"]}
+      ]
+    },
+    {
+      "id": "self_intro_request_routes_to_general_aspect_v4_6_0",
+      "category": "system_identity",
+      "description": "v4.6.0: «Өзіңіз туралы айтып беріңізші» routes to SystemAspect::General — adam introduces itself. Real-REPL 2026-04-29 transcript: pre-v4.6.0 fell through to «Бәлкім, өзіңіз туралы айтасыз ба» which is a refusal-clarification.",
+      "turns": [
+        {"user": "Өзіңіз туралы айтып беріңізші.", "output_contains_lower_any": ["адам", "nlm", "nano language model"]}
+      ]
+    },
+    {
+      "id": "discourse_anaphora_onda_resolves_to_kazakhstan_v4_6_0",
+      "category": "knowledge_query",
+      "description": "v4.6.0 discourse-anaphora resolution. Multi-turn: «Қазақстан туралы не білесіз?» sets last_query_topic; «Ал онда қанша аймақ бар?» must answer about Kazakhstan's regions, not «Он — сан». New `discourse.rs` module + `last_query_topic` session slot.",
+      "turns": [
+        {"user": "Қазақстан туралы не білесіз?", "output_contains_lower_any": ["қазақстан"]},
+        {"user": "Ал онда қанша аймақ бар?", "output_contains_lower_any": ["17 облыс"]}
+      ]
+    },
+    {
+      "id": "ote_jalpy_not_topics_v4_6_0",
+      "category": "regression",
+      "description": "v4.6.0 NOT_A_TOPIC additions: `өте` (intensifier) and `жалпы` (in general) must not leak as topics. Pre-v4.6.0: «Бұл өте қызықты, бірақ жалпы не істей аласыз?» surfaced a tangential proverb keyed on `өте`. Post-v4.6.0: capabilities aspect fires (the «істей аласың» marker) and `өте/жалпы` are filtered out anyway.",
+      "turns": [
+        {"user": "Бұл өте қызықты, бірақ жалпы не істей аласыз?", "output_not_contains_lower": ["құрлық шекарасы", "жасын тыймай"]}
+      ]
+    },
+    {
+      "id": "landmarks_list_summary_v4_6_0",
+      "category": "knowledge_query",
+      "description": "v4.6.0: «Қазақстанда қандай көрікті жерлер бар?» surfaces the new `geo_kz_110` landmarks list-summary fact (Бурабай, Шарын каньоны, Хан Тәңірі, …).",
+      "turns": [
+        {"user": "Қазақстанда қандай көрікті жерлер бар?", "output_contains_lower_any": ["бурабай"]}
+      ]
+    },
+    {
       "id": "kazakhstan_rivers_via_locative_attributive_v4_4_13",
       "category": "knowledge_query",
       "description": "v4.4.13: `Қазақстандағы өзендер қандай?` surfaces the rivers list-summary fact. Pre-v4.4.13 this was already failing, just less obviously: with v4.4.10's first_noun_root fallback, `өзен` (now parseable post-v4.4.13 lexicon-dedup fix) would mask the locative-attributive signal. v4.4.13 reordered `best_noun_hint` to run `locative_attributive_hint` BEFORE `first_noun_root` because `-дағы` is a strong topic-narrowing signal (semantically equivalent to a `туралы` marker for the word it attaches to).",

@@ -218,6 +218,44 @@ templates = [
     "айырмашылығым мынада: {system_architecture}",
 ]
 
+# v4.6.0 — Capabilities aspect: «не істей аласың?». Renders the
+# `system_capabilities` slot from `SystemIdentity` (long Kazakh
+# prose listing what adam can actually do — KZ morphology, slot
+# recall, knowledge-domain answers, contradiction handling,
+# out-of-scope refusal, audit trail). Honest and grounded; every
+# item maps to actual repo code/data.
+[[families]]
+key = "ask_about_system.capabilities"
+templates = [
+    "{system_capabilities}",
+    "істей алатынымды тізсем: {system_capabilities}",
+    "менің қазіргі мүмкіндіктерім: {system_capabilities}",
+]
+
+# v4.6.0 — Knowledge aspect: «не білесің?». Renders the
+# `system_knowledge` slot — a digest of the world_core/ domain
+# inventory (geography, literature, notable Kazakhstanis, plus
+# general nouns).
+[[families]]
+key = "ask_about_system.knowledge"
+templates = [
+    "{system_knowledge}",
+    "қазіргі білімімнің ауқымы: {system_knowledge}",
+    "мен мынадай тақырыптар жайлы білемін: {system_knowledge}",
+]
+
+# v4.6.0 — Limitations aspect: «нені істей алмайсың?». Renders
+# the `system_limitations` slot. Critical for trust — adam refuses
+# outside the envelope rather than fabricating; this template
+# makes the envelope explicit.
+[[families]]
+key = "ask_about_system.limitations"
+templates = [
+    "{system_limitations}",
+    "әлі шектеулерім бар: {system_limitations}",
+    "өзімнің білмейтінімді ашық айтайын: {system_limitations}",
+]
+
 # v4.4.0 — User opted out of resolving a pending contradiction
 # (replied "neither / I don't know / skip" to a CheckContradiction
 # prompt). `Conversation::try_dismiss_pending_contradiction` has

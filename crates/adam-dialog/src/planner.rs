@@ -533,6 +533,10 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             crate::system_identity::SystemAspect::Creator => "ask_about_system.creator",
             crate::system_identity::SystemAspect::Birthdate => "ask_about_system.birthdate",
             crate::system_identity::SystemAspect::Architecture => "ask_about_system.architecture",
+            // v4.6.0 — three new self-awareness aspects.
+            crate::system_identity::SystemAspect::Capabilities => "ask_about_system.capabilities",
+            crate::system_identity::SystemAspect::Knowledge => "ask_about_system.knowledge",
+            crate::system_identity::SystemAspect::Limitations => "ask_about_system.limitations",
         },
         Intent::StatementOfName { .. } => "statement_of_name",
         Intent::AskAge => "ask_age",
