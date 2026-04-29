@@ -301,6 +301,185 @@ pub fn input_is_math_expression(input: &str) -> bool {
     has_digit || has_numeral_word
 }
 
+/// **v4.6.15** — best-effort integer-arithmetic evaluator.
+/// Pure deterministic computation — no novel-text generation, so
+/// the no-fabrication invariant stays intact. Handles `+`, `-`,
+/// `*`, `/`, `:` (Russian-style division) over signed integers
+/// with operator precedence (`*` `/` `:` before `+` `-`). Returns:
+///
+/// - `Some(value)` for parseable pure-arithmetic input (e.g.
+///   `5+5`, `7 * 3`, `100 - 25 / 5`, `7 + 3 =`, `6:2=`).
+/// - `None` for unparseable input, division by zero, integer
+///   overflow, or any non-integer division remainder. The planner
+///   falls back to the existing `math_refusal` template family
+///   when this returns `None`.
+///
+/// Limitations (intentional — keep the v4.6.15 scope tight):
+/// - Integer-only; no fractions / decimals.
+/// - No parentheses.
+/// - No Kazakh-language phrasings («Алтыны екіге бөліңіз») — those
+///   continue to refuse via `math_refusal`.
+/// - No variables / session-bound computation.
+pub fn try_evaluate_arithmetic(input: &str) -> Option<i64> {
+    // Normalise: strip whitespace, drop trailing `=`, normalise
+    // Russian-style division `:` to `/`.
+    let cleaned: String = input
+        .chars()
+        .filter(|c| !c.is_whitespace())
+        .map(|c| if c == ':' { '/' } else { c })
+        .collect();
+    let cleaned = cleaned.trim_end_matches('=').trim_end_matches('?');
+    if cleaned.is_empty() {
+        return None;
+    }
+    // Reject if any non-arithmetic character is present (digit /
+    // operator / leading minus only).
+    if !cleaned
+        .chars()
+        .all(|c| c.is_ascii_digit() || matches!(c, '+' | '-' | '*' | '/'))
+    {
+        return None;
+    }
+    // Tokenise into numbers and operators.
+    let mut tokens: Vec<ArithToken> = Vec::new();
+    let bytes = cleaned.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        let b = bytes[i];
+        if b.is_ascii_digit() {
+            // Read full number.
+            let start = i;
+            while i < bytes.len() && bytes[i].is_ascii_digit() {
+                i += 1;
+            }
+            let n: i64 = cleaned[start..i].parse().ok()?;
+            tokens.push(ArithToken::Num(n));
+        } else if matches!(b, b'+' | b'-' | b'*' | b'/') {
+            // Leading `-` (start of expression) or `-` after another
+            // operator → unary minus on the next number.
+            let unary = b == b'-'
+                && (tokens.is_empty() || matches!(tokens.last(), Some(ArithToken::Op(_))));
+            if unary {
+                // Read the digits that follow as a negative number.
+                i += 1;
+                let start = i;
+                while i < bytes.len() && bytes[i].is_ascii_digit() {
+                    i += 1;
+                }
+                if start == i {
+                    return None;
+                }
+                let n: i64 = cleaned[start..i].parse().ok()?;
+                tokens.push(ArithToken::Num(-n));
+            } else {
+                tokens.push(ArithToken::Op(b as char));
+                i += 1;
+            }
+        } else {
+            return None;
+        }
+    }
+    // Two-pass evaluation: first pass collapses `*` `/` left-to-right,
+    // second pass collapses `+` `-`.
+    let mut acc: Vec<ArithToken> = Vec::new();
+    let mut iter = tokens.into_iter();
+    let first = iter.next()?;
+    acc.push(first);
+    while let Some(tok) = iter.next() {
+        match tok {
+            ArithToken::Op(op) if op == '*' || op == '/' => {
+                let right = iter.next()?;
+                let left = acc.pop()?;
+                let (l, r) = match (left, right) {
+                    (ArithToken::Num(l), ArithToken::Num(r)) => (l, r),
+                    _ => return None,
+                };
+                let result = if op == '*' {
+                    l.checked_mul(r)?
+                } else {
+                    if r == 0 || l % r != 0 {
+                        return None;
+                    }
+                    l.checked_div(r)?
+                };
+                acc.push(ArithToken::Num(result));
+            }
+            _ => acc.push(tok),
+        }
+    }
+    // Second pass: + / -.
+    let mut iter = acc.into_iter();
+    let mut value = match iter.next()? {
+        ArithToken::Num(n) => n,
+        ArithToken::Op(_) => return None,
+    };
+    while let Some(op_tok) = iter.next() {
+        let op = match op_tok {
+            ArithToken::Op(c) if c == '+' || c == '-' => c,
+            _ => return None,
+        };
+        let right = match iter.next()? {
+            ArithToken::Num(n) => n,
+            ArithToken::Op(_) => return None,
+        };
+        value = if op == '+' {
+            value.checked_add(right)?
+        } else {
+            value.checked_sub(right)?
+        };
+    }
+    Some(value)
+}
+
+#[derive(Debug, Clone, Copy)]
+enum ArithToken {
+    Num(i64),
+    Op(char),
+}
+
+#[cfg(test)]
+mod arithmetic_tests {
+    use super::try_evaluate_arithmetic;
+
+    #[test]
+    fn evaluates_pure_arithmetic() {
+        assert_eq!(try_evaluate_arithmetic("5+5"), Some(10));
+        assert_eq!(try_evaluate_arithmetic("7 + 3 ="), Some(10));
+        assert_eq!(try_evaluate_arithmetic("6:2="), Some(3));
+        assert_eq!(try_evaluate_arithmetic("100-25"), Some(75));
+        assert_eq!(try_evaluate_arithmetic("12*4"), Some(48));
+    }
+
+    #[test]
+    fn respects_operator_precedence() {
+        // 2 + 3 * 4 = 2 + 12 = 14 (multiplication first)
+        assert_eq!(try_evaluate_arithmetic("2+3*4"), Some(14));
+        // 100 - 25 / 5 = 100 - 5 = 95
+        assert_eq!(try_evaluate_arithmetic("100-25/5"), Some(95));
+    }
+
+    #[test]
+    fn handles_division_zero_and_remainder() {
+        assert_eq!(try_evaluate_arithmetic("5/0"), None);
+        assert_eq!(try_evaluate_arithmetic("7/2"), None); // non-integer
+    }
+
+    #[test]
+    fn handles_unary_minus() {
+        assert_eq!(try_evaluate_arithmetic("-5"), Some(-5));
+        assert_eq!(try_evaluate_arithmetic("10+-3"), Some(7));
+        assert_eq!(try_evaluate_arithmetic("10*-3"), Some(-30));
+    }
+
+    #[test]
+    fn rejects_non_arithmetic_input() {
+        assert_eq!(try_evaluate_arithmetic("5-ті 7-ге көбейткенде"), None);
+        assert_eq!(try_evaluate_arithmetic("Алтыны екіге бөліңіз"), None);
+        assert_eq!(try_evaluate_arithmetic("hello"), None);
+        assert_eq!(try_evaluate_arithmetic(""), None);
+    }
+}
+
 #[cfg(test)]
 mod math_tests {
     use super::input_is_math_expression;

@@ -4448,16 +4448,16 @@ fn russian_input_routes_to_non_kazakh_refusal() {
 }
 
 /// **v4.6.12** — Math-expression detection short-circuits to the
-/// `math_refusal` template family.
+/// `math_refusal` template family. **v4.6.15** narrows refusal to
+/// inputs that contain math vocabulary but no parseable digit
+/// expression — pure-arithmetic strings now hit the `Tool::Calculate`
+/// evaluator (see `calculator_evaluates_pure_arithmetic` below).
 #[test]
 fn math_input_routes_to_math_refusal() {
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = adam_dialog::Conversation::new();
     for math in [
-        "5+5",
-        "7 + 3 =",
-        "6:2=",
         "5-ті 7-ге көбейткенде неше болады?",
         "Алтыны екіге бөліңіз, нәтижесі қандай?",
     ] {
@@ -4466,6 +4466,70 @@ fn math_input_routes_to_math_refusal() {
         assert!(
             lower.contains("математик") || lower.contains("есепте") || lower.contains("санақ"),
             "v4.6.12 math refusal must surface for {math:?}; got {out:?}"
+        );
+    }
+}
+
+/// **v4.6.15** — `mathematics_basic.jsonl` and `informatics_basic.jsonl`
+/// world_core domains supply IsA definitions for school-curriculum
+/// concepts: математика, алгоритм, информатика, файл, бағдарлама,
+/// функция, etc. Verify a selection round-trips through the
+/// retrieval-aware reasoning path (mirrors adam_chat's wiring).
+#[test]
+fn mathematics_and_informatics_world_core_facts_surface() {
+    use adam_reasoning::Fact;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let facts_path = "../../data/retrieval/facts.json";
+    if !std::path::Path::new(facts_path).exists() {
+        eprintln!("facts.json not present, skipping");
+        return;
+    }
+    let raw = std::fs::read_to_string(facts_path).expect("read facts");
+    let parsed: serde_json::Value = serde_json::from_str(&raw).expect("parse facts");
+    let extracted: Vec<Fact> = serde_json::from_value(parsed["facts"].clone())
+        .expect("facts.json[\"facts\"] must deserialise into Vec<Fact>");
+
+    let mut conv = adam_dialog::Conversation::new().with_reasoning_chains(extracted, vec![]);
+    for (question, expected_substring) in [
+        ("Математика дегеніміз не?", "ғылым"),
+        ("Информатика дегеніміз не?", "ғылым"),
+        ("Алгоритм дегеніміз не?", "қадам"),
+        ("Бағдарлама дегеніміз не?", "нұсқау"),
+        ("Файл дегеніміз не?", "дерек"),
+    ] {
+        let out = conv.turn(question, &lex, &repo, 0);
+        let lower = out.to_lowercase();
+        assert!(
+            lower.contains(expected_substring),
+            "v4.6.15 world_core domain answer must contain {expected_substring:?} for {question:?}; got {out:?}"
+        );
+    }
+}
+
+/// **v4.6.15** — Pure integer arithmetic short-circuits to the
+/// `math_answer` template family with the computed numeric result.
+/// Real-REPL 2026-04-29 transcript surfaced «5+5», «6:2=», «12*4»
+/// hitting refusal; the v4.6.15 evaluator answers them deterministically.
+#[test]
+fn calculator_evaluates_pure_arithmetic() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = adam_dialog::Conversation::new();
+    for (input, expected) in [
+        ("5+5", "10"),
+        ("7 + 3 =", "10"),
+        ("6:2=", "3"),
+        ("12*4", "48"),
+        ("100-37", "63"),
+        ("2+3*4", "14"),
+    ] {
+        let out = conv.turn(input, &lex, &repo, 0);
+        assert!(
+            out.contains(expected),
+            "v4.6.15 calculator must surface {expected} for {input:?}; got {out:?}"
         );
     }
 }

@@ -483,6 +483,52 @@ const MULTIWORD_ENTITIES: &[&str] = &[
     "шөлдер тізімі",
     // **v4.6.0** — landmarks list-summary object.
     "көрікті жерлер тізімі",
+    // **v4.6.15** — mathematics_basic + informatics_basic domains.
+    // Compound objects (and one subject) that appear in `facts` of
+    // the two new world_core domains. Required by
+    // `world_core_multiword_coverage` contract test. Sorted
+    // longest-first within each length bucket so
+    // `find_multiword_entity`'s longest-match scan resolves the
+    // compound before any contained simpler form.
+    "математикалық тәуелділік",
+    "компьютерлер жиынтығы",
+    "қорғаныс бағдарламасы",
+    "математикалық қатынас",
+    "математикалық әрекет",
+    "геометриялық фигура",
+    "математикалық өрнек",
+    "математикалық кесте",
+    "бағдарлама құрылымы",
+    "геометриялық объект",
+    "бағдарламалық шама",
+    "математикалық ұғым",
+    "бағдарламалау тілі",
+    "арифметикалық амал",
+    "электронды құрылғы",
+    "парақтар жиынтығы",
+    "зиянды бағдарлама",
+    "деректер жиынтығы",
+    "математика саласы",
+    "деректер құрылымы",
+    "бағдарлама бөлігі",
+    "таңбалар тізбегі",
+    "енгізу құрылғысы",
+    "шығару құрылғысы",
+    "операциялық жүйе",
+    "қадамдар тізбегі",
+    "сақтау құрылғысы",
+    "деректер базасы",
+    "ақпарат бірлігі",
+    "көбейту кестесі",
+    "ақпарат қоймасы",
+    "нұсқаулар жиыны",
+    "өлшем бірлігі",
+    "формалды тіл",
+    "натурал сан",
+    "бүтін сан",
+    "жұп сан",
+    "тақ сан",
+    "жай сан",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns

@@ -128,7 +128,9 @@ Validator checks:
 - `kinship_extended.jsonl` — 18 entries / 20 facts  *(new in v4.0.19)*
 - `constellations_kz.jsonl` — 6 entries / 6 facts  *(new in v4.0.19)*
 - `measurements.jsonl` — 10 entries / 10 facts  *(new in v4.0.19)*
-- **Total: 947 entries / 1116 facts across 30 domains** (v4.4.10), all `approved`
+- `mathematics_basic.jsonl` — 37 entries / 37 facts  *(new in v4.6.15)*
+- `informatics_basic.jsonl` — 40 entries / 40 facts  *(new in v4.6.15)*
+- **Total: 1032 entries / 1195 facts across 32 domains** (v4.6.15), all `approved`
   at `high` or `medium` confidence by `shaman`. v4.3.5 added **kz_literature
   surname-keyed entries** (Әуезов / Сейфуллин / Мүсірепов / Жұмабаев / …) and a
   new **`notable_kazakhstanis.jsonl` domain** (presidents, khans, scientists,

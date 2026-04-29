@@ -7,6 +7,41 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.6.15] — 2026-04-29 — Bundle of 3 more innovations (15 total on the v4.6.x minor): integer arithmetic calculator + `mathematics_basic` world_core domain + `informatics_basic` world_core domain
+
+User strategic ask: «необходимо дать ему знания школьной программы по математике и информатике … Он должен понимать диалог, того, что от него хотят». v4.6.12 detected math expressions and refused; v4.6.15 evaluates them deterministically and adds two new world_core domains so adam knows what the school terms *mean*. Per the v4.6.5-clarified cadence, patch sub-counter is **cumulative on the minor**: v4.6.12 + 3 = **v4.6.15**.
+
+### Innovation 1 — `Tool::Calculate` integer arithmetic
+
+New `discourse::try_evaluate_arithmetic`: deterministic two-pass tokeniser/evaluator over `+ - * / :` (`:` normalised to `/`), respects `*//` precedence over `+/-`, rejects non-integer results, division-by-zero, and overflow. When the v4.6.12 math detector fires, the conversation layer first attempts evaluation; on success the planner routes to a new `math_answer` template family with the computed `{math_value}` slot. On failure (Kazakh math verbs without parseable digits) the existing `math_refusal` route still fires.
+
+Closes from real-REPL: «5+5 → 10», «7 + 3 = → 10», «6:2= → 3», «12*4 → 48», «100-37 → 63», «2+3*4 → 14». No external numeric library — pure stdlib `i64` arithmetic.
+
+### Innovation 2 — `mathematics_basic.jsonl` world_core domain (37 entries / 37 facts)
+
+New domain: математика, сан, амал, қосу/азайту/көбейту/бөлу, теңдік, теңдеу, бөлшек, пайыз, алгебра/геометрия/тригонометрия, фигура, нүкте, түзу, бұрыш, шеңбер, дөңгелек, үшбұрыш/төртбұрыш/шаршы/тіктөртбұрыш/көпбұрыш, жұп/тақ/жай/бүтін/натурал сан, көбейту кестесі, аудан/көлем/периметр, шама, функция. All curated, `approved` by `shaman`, `confidence: high`.
+
+### Innovation 3 — `informatics_basic.jsonl` world_core domain (40 entries / 40 facts)
+
+New domain: информатика, ақпарат, дерек, алгоритм, бағдарлама, бағдарламалау, бағдарламалау тілі, компьютер, процессор, жад, дискі, файл, қалта, бит/байт, айнымалы, тұрақты, цикл, шарт, функция, жиым, деректер базасы, желі, интернет, сайт, шолғыш, сервер, кодтау, шифрлау, пароль, вирус/антивирус, операциялық жүйе, драйвер, қолданба, пернетақта/тінтуір/монитор/принтер/сканер. All curated, `approved` by `shaman`, `confidence: high`.
+
+### Pipeline impact
+
+- `data/retrieval/facts.json`: 15 644 → **15 721** (+77 from the two new domains).
+- `data/retrieval/derived_facts.json`: 22 387 → **22 962** (+575 derived facts via R1/R2/R5/R8 inheritance through the new IsA hubs `ғылым / бағдарлама / құрылғы / арифметикалық амал / математикалық ұғым / геометриялық фигура`).
+- world_core total: **1 032 entries / 1 195 facts across 32 domains**.
+- 41 new compounds added to `MULTIWORD_ENTITIES` (e.g. `арифметикалық амал`, `геометриялық фигура`, `бағдарламалық шама`, `операциялық жүйе`) so the longest-match scan picks the compound before any contained simpler form.
+- 3 loanword roots added to `data/tokenizer/segmentation_roots.json` (информатика, компьютер, функция) — math-side loanwords like `алгоритм`, `бағдарлама`, `файл`, `цикл`, `шарт` were already present.
+
+### Tests
+
+- New e2e: `calculator_evaluates_pure_arithmetic` (6 inputs / 6 expected integer results).
+- New e2e: `mathematics_and_informatics_world_core_facts_surface` (5 «X дегеніміз не?» queries through the retrieval-aware `Conversation`).
+- Updated e2e: `math_input_routes_to_math_refusal` now restricted to inputs that contain math vocabulary but no parseable digit expression (Kazakh-numeral-word forms) — pure-arithmetic strings now exercise the calculator path.
+- New REPL replay dialog: `math_calculator_pure_arithmetic_v4_6_15` (4 turns).
+- New REPL replay dialog: `world_core_math_informatics_definitions_v4_6_15` (3 turns).
+- All 155 dialog lib tests pass; full workspace `cargo test --release` green.
+
 ## [4.6.12] — 2026-04-29 — Bundle of 7 more innovations (12 total on the v4.6.x minor): polite-plural greeting / template grammar fix / Russian-input refusal / Birthdate verbs / self-age form / math refusal / case-suffix hygiene
 
 Real-REPL 2026-04-29 (third transcript) surfaced 7 distinct issues. All landed in one bundle. Per the v4.6.5-clarified cadence: patch sub-counter is **cumulative on the minor**, so v4.6.5 + 7 = **v4.6.12**.

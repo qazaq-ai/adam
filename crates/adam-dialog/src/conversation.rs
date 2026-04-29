@@ -667,8 +667,19 @@ impl Conversation {
         // v4.6.12 — Math-input marker (set above based on
         // `input_is_math_expression`). Carried into the planner
         // so the `math_refusal` template family fires.
+        // **v4.6.15** — when input parses as pure integer
+        // arithmetic, compute the result and pass it through
+        // `__math_answer__` so the planner picks `math_answer`
+        // instead of the refusal family. Falls through to
+        // `__math_input__` (math_refusal) when computation
+        // returns None — Kazakh-language phrasings, complex
+        // expressions, division-by-zero, etc.
         if math_input {
-            extra_slots.insert("__math_input__".into(), "1".into());
+            if let Some(value) = crate::discourse::try_evaluate_arithmetic(input) {
+                extra_slots.insert("__math_answer__".into(), value.to_string());
+            } else {
+                extra_slots.insert("__math_input__".into(), "1".into());
+            }
         }
         let plan = crate::planner::plan_response_with_epistemic(
             &intent_for_render,

@@ -338,11 +338,24 @@
       ]
     },
     {
-      "id": "math_refusal_pure_arithmetic_v4_6_12",
-      "category": "regression",
-      "description": "v4.6.12: pure arithmetic input «5+5» routes to `math_refusal` template family. Pre-v4.6.12 fell through to «Түсінбедім».",
+      "id": "world_core_math_informatics_definitions_v4_6_15",
+      "category": "knowledge_query",
+      "description": "v4.6.15: `mathematics_basic.jsonl` and `informatics_basic.jsonl` add school-curriculum IsA definitions for математика, информатика, алгоритм, бағдарлама, файл — verifiable through retrieval-aware Conversation.",
       "turns": [
-        {"user": "5+5", "output_contains_lower_any": ["математик", "есепте", "санақ"]}
+        {"user": "Математика дегеніміз не?", "output_contains_lower_any": ["ғылым"]},
+        {"user": "Информатика дегеніміз не?", "output_contains_lower_any": ["ғылым"]},
+        {"user": "Алгоритм дегеніміз не?", "output_contains_lower_any": ["қадам"]}
+      ]
+    },
+    {
+      "id": "math_calculator_pure_arithmetic_v4_6_15",
+      "category": "regression",
+      "description": "v4.6.15: pure-arithmetic input «5+5» routes to the `math_answer` family with the computed result. Pre-v4.6.12 fell through to «Түсінбедім»; v4.6.12 routed to refusal; v4.6.15 evaluates and answers with the integer.",
+      "turns": [
+        {"user": "5+5", "output_contains_lower_any": ["10"]},
+        {"user": "6:2=", "output_contains_lower_any": ["3"]},
+        {"user": "12*4", "output_contains_lower_any": ["48"]},
+        {"user": "2+3*4", "output_contains_lower_any": ["14"]}
       ]
     },
     {

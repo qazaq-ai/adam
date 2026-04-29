@@ -238,6 +238,44 @@ pub fn plan_response_with_epistemic(
     // of the planner because the input wasn't Kazakh in the first
     // place — no FST analysis or topic recovery would be
     // meaningful.
+    // **v4.6.15** — Math-answer marker. Set when
+    // `discourse::try_evaluate_arithmetic` parsed the input as
+    // pure integer arithmetic and computed a result. Routes to
+    // `math_answer` template family with the `{math_value}`
+    // slot pre-filled. Pre-v4.6.15 even computable inputs like
+    // «5+5» refused via `math_refusal` — adam now ANSWERS the
+    // arithmetic deterministically (no novel-text generation;
+    // `try_evaluate_arithmetic` is a pure function).
+    if let Some(value) = extra_slots.get("__math_answer__") {
+        let key = "math_answer";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: math_answer override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all
+                .get(idx)
+                .map(|s| s.clone())
+                .unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            slots.insert("math_value".into(), value.clone());
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v4.6.12** — Math-input marker. Routes to the dedicated
     // `math_refusal` template family explaining adam doesn't
     // compute arithmetic. Mirrors the non-Kazakh override below.

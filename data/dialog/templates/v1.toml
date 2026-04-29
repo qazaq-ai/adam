@@ -291,13 +291,29 @@ templates = [
 # real-REPL: «5+5», «7 + 3 =», «6:2=», «5-ті 7-ге көбейткенде»,
 # «алтыны екіге бөліңіз». adam doesn't compute math — the
 # limitations_summary already says so. Routed here when the
-# `discourse::input_is_math_expression` detector fires.
+# `discourse::input_is_math_expression` detector fires AND the
+# input doesn't parse as pure integer arithmetic (Kazakh-language
+# phrasings, complex expressions, division-by-zero, non-integer
+# results all fall here).
 [[families]]
 key = "math_refusal"
 templates = [
-    "кешіріңіз, мен математикалық есептеулер жасамаймын — менің білімім тілдік деректерге бағытталған",
-    "санақ-есептеу әлі менің мүмкіндігімде жоқ; калькулятор немесе математикалық қолданбаны пайдаланғаныңыз дұрыс",
-    "математика шегінен тыс — мен сандар мен амалдарды есептей алмаймын. Тілдік сұрақ қойсаңыз, көмектесе аламын",
+    "кешіріңіз, мен Қазақ тілінде сұраған математикалық есептеулерді әзірге өңдемеймін; қарапайым сандық өрнекті (мысалы «5+5», «7*3») жазсаңыз, есептеп беремін",
+    "санақ-есептеу әлі қазақша сөйлемдер арқылы менің мүмкіндігімде жоқ; «X+Y» немесе «X*Y» түрінде сандармен жазып берсеңіз, шығарып беремін",
+    "Қазақ тілінде өрнектелген математикалық есепті әлі шеше алмаймын — қарапайым сандық өрнекті жазсаңыз («5+5», «12/4»), есептейтін боламын",
+]
+
+# v4.6.15 — Math answer template family. When
+# `discourse::try_evaluate_arithmetic` parses the input as pure
+# integer arithmetic and computes a value, the planner injects
+# `{math_value}` and routes here. Deterministic computation —
+# no novel-text generation, no fabrication risk.
+[[families]]
+key = "math_answer"
+templates = [
+    "{math_value}",
+    "нәтижесі: {math_value}",
+    "жауабы — {math_value}",
 ]
 
 # v4.4.0 — User opted out of resolving a pending contradiction
