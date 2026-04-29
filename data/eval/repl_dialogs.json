@@ -338,6 +338,47 @@
       ]
     },
     {
+      "id": "reflexive_self_question_routes_general_v4_6_20",
+      "category": "system_identity",
+      "description": "v4.6.20: «Өзіңізді кім деп санайсыз?» routes to AskAboutSystem(General). Pre-v4.6.20 fell through to «Бәлкім, өзіңіз туралы айтасыз ба» (misclassified as user-self-intro request).",
+      "turns": [
+        {"user": "Өзіңізді кім деп санайсыз?", "output_contains_lower_any": ["адам", "nlm", "тілдік модель"]}
+      ]
+    },
+    {
+      "id": "self_comparison_aspect_v4_6_20",
+      "category": "system_identity",
+      "description": "v4.6.20: «Басқа жасанды интеллект модельдерінен несімен артықсыз?» routes to AskAboutSystem(SelfComparison) and surfaces an honest trade-off statement. Pre-v4.6.20 grabbed `басқа` and quoted random poetry.",
+      "turns": [
+        {"user": "Басқа жасанды интеллект модельдерінен несімен артықсыз?", "output_contains_lower_any": ["басқашамын", "ауқымы тар"]},
+        {"user": "Қолданыстағы модельдерден қалай жақсырақ бола аласыз?", "output_contains_lower_any": ["басқашамын", "ауқымы тар"]}
+      ]
+    },
+    {
+      "id": "compound_adj_noun_topic_v4_6_20",
+      "category": "regression",
+      "description": "v4.6.20: «Машиналық оқыту туралы айтып беріңізші» preserves the modifier `машиналық` in the noun-hint. Pre-v4.6.20 reduced to `оқыту` and surfaced a generic education quote.",
+      "turns": [
+        {"user": "Машиналық оқыту туралы айтып беріңізші", "output_contains_lower_any": ["машиналық оқыту"]}
+      ]
+    },
+    {
+      "id": "preamble_stripper_unmasks_question_v4_6_20",
+      "category": "regression",
+      "description": "v4.6.20: discourse preamble «Айтайын дегенім, …» stripped before parsing so the residual clause's intent (here SelfComparison) surfaces correctly. Pre-v4.6.20 the preamble caused noun-hint extraction to grab `қолданыс` and quote contract-template prose.",
+      "turns": [
+        {"user": "Айтайын дегенім, қолданыстағы модельдерден қалай жақсырақсыз?", "output_contains_lower_any": ["басқашамын", "ауқымы тар"]}
+      ]
+    },
+    {
+      "id": "user_acknowledgement_routes_polite_v4_6_20",
+      "category": "social",
+      "description": "v4.6.20: «Мен сенің әлі бәрін білмейтініңді … түсіндім» (multi-clause empathetic admission) routes to the new UserAcknowledgement intent + dedicated polite template family. Pre-v4.6.20 grabbed the closed-class adverb `әлі` and pulled a random poetry quote.",
+      "turns": [
+        {"user": "Мен сенің әлі бәрін білмейтініңді және әлі де көп жаттығу керек екенін түсіндім.", "output_contains_lower_any": ["рахмет", "түсінгеніңіз", "дамып"]}
+      ]
+    },
+    {
       "id": "world_core_math_informatics_definitions_v4_6_15",
       "category": "knowledge_query",
       "description": "v4.6.15: `mathematics_basic.jsonl` and `informatics_basic.jsonl` add school-curriculum IsA definitions for математика, информатика, алгоритм, бағдарлама, файл — verifiable through retrieval-aware Conversation.",

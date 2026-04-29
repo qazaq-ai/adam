@@ -83,6 +83,20 @@ pub struct SystemIdentity {
     /// safe-by-construction in a deterministic retrieval-only
     /// system.
     pub principles_summary: String,
+    /// **v4.6.20** — multi-line Kazakh prose answering "how are you
+    /// better/different from other AI models?". Distinct from
+    /// `architecture_summary` in tone: that field is a neutral
+    /// statement of architectural difference (rules vs.
+    /// transformer); this field articulates the *trade-off* —
+    /// adam's narrow Kazakh-only competence with strong invariants
+    /// (no hallucination, full audit, deterministic) vs. the broad
+    /// generative coverage of mainstream LLMs. Honest framing — not
+    /// claiming superiority, claiming a different position on the
+    /// trade-off curve. Rendered into
+    /// `ask_about_system.self_comparison` when the user asks
+    /// «басқа модельдерден несімен артықсыз / қалай жақсырақсыз /
+    /// айырмашылығың не».
+    pub self_comparison_summary: String,
 }
 
 impl SystemIdentity {
@@ -139,6 +153,19 @@ impl SystemIdentity {
                 адал болып, оны құрметтеп таратуға тырысамын; өзімнің шегімді біліп, шегімнен \
                 шықпаймын — қажет кезінде сыпайы түрде бас тартамын"
                 .into(),
+            self_comparison_summary: "Мен басқа жасанды интеллект модельдерінен жақсырақ деп \
+                айта алмаймын — басқашамын. Үлкен тілдік модельдер (GPT, Llama және басқалары) \
+                көп тілде, кез келген тақырыпта еркін мәтін жазады, бірақ кейде жоқ нәрсені \
+                ойдан шығарып, дереккөзін көрсете алмайды. Мен керісінше: тек қазақ тілінде, \
+                тек өзім нақты білетін шектеулі тақырыпта жұмыс істеймін; бірақ айтқан \
+                сөзімнің әрбір дерегін `world_core` немесе мәтіндік корпустағы нақты \
+                дереккөзге жалғай аламын; ойдан ештеңе шығармаймын — білмейтінімді ашық \
+                айтамын; шешімдер ережелер арқылы жасалады, статистикалық генерация жоқ, \
+                сондықтан жауабым қайталанатын әрі тексеруге келеді; жұмысыма үлкен есептеу \
+                қуаты керек емес — қарапайым ноутбукте бір секундтың бөлшегінде жауап беремін. \
+                Қысқасы: ауқымы тар, бірақ сенімді — қазақ тіліндегі шектеулі салаға арналған \
+                адал құрал"
+                .into(),
         }
     }
 
@@ -177,6 +204,12 @@ impl SystemIdentity {
             ),
             // v4.6.5 — operational principles slot.
             ("system_principles".into(), self.principles_summary.clone()),
+            // v4.6.20 — self-comparison slot for «басқа модельдерден
+            // несімен артықсыз?» style questions.
+            (
+                "system_self_comparison".into(),
+                self.self_comparison_summary.clone(),
+            ),
         ]
     }
 }
@@ -232,6 +265,18 @@ pub enum SystemAspect {
     /// safe-by-construction in this deterministic retrieval-only
     /// system; this aspect makes the value contract discoverable.
     Principles,
+    /// **v4.6.20** — "How are you better/different from other AI
+    /// models?" — surface form: «басқа модельдерден несімен
+    /// артықсыз?», «қалай жақсырақсыз?», «ерекшелігің не?» (when
+    /// scoped to comparison with other models). Renders the
+    /// `self_comparison_summary` field. Honest framing of the
+    /// trade-off: narrow Kazakh-only scope with strong invariants
+    /// (no hallucination, full audit, deterministic) vs. the broad
+    /// generative coverage of mainstream LLMs. Distinct from
+    /// Architecture: Architecture states *what* adam is built from
+    /// (rules, not transformer); SelfComparison states *why* that
+    /// matters and what the trade-off looks like.
+    SelfComparison,
 }
 
 impl SystemAspect {
@@ -248,6 +293,7 @@ impl SystemAspect {
             SystemAspect::Knowledge => ".knowledge",
             SystemAspect::Limitations => ".limitations",
             SystemAspect::Principles => ".principles",
+            SystemAspect::SelfComparison => ".self_comparison",
         }
     }
 }
@@ -310,6 +356,10 @@ mod tests {
         assert_eq!(
             SystemAspect::Principles.template_key_suffix(),
             ".principles"
+        );
+        assert_eq!(
+            SystemAspect::SelfComparison.template_key_suffix(),
+            ".self_comparison"
         );
     }
 

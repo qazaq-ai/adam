@@ -7,6 +7,41 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.6.20] — 2026-04-29 — Bundle of 5 more innovations (20 total on the v4.6.x minor): reflexive identity question + adj+noun compound noun-hint + SelfComparison aspect + preamble stripper + UserAcknowledgement intent
+
+Real-REPL 2026-04-29 (fifth transcript) surfaced 5 distinct defects all sharing a theme: adam couldn't make sense of long, multi-clause Kazakh sentences. Greedy first-noun-hint extraction grabbed closed-class adverbs (`әлі`) or modifier-stripped head nouns (`оқыту` from «машиналық оқыту`), then surfaced random poetry/contract quotes. v4.6.20 attacks the defect class with five targeted fixes — no architectural rewrite, no synthetic-grammar parser, just better pre-classification. Per the cumulative-counter cadence: 15 (v4.6.15) + 5 = **v4.6.20**.
+
+### Innovation 1 — Reflexive identity question detector
+
+«Өзіңізді кім деп санайсыз?» / «Өзіңді қалай таныстырасың?» / «Өзіңізді қалай көресіз?». The marker is `өзіңді / өзіңізді` (reflexive accusative) plus a 2nd-person verb. Extends `detect_ask_about_system` to route these to `SystemAspect::General`. Pre-v4.6.20 fell through to «Бәлкім, өзіңіз туралы айтасыз ба» (misclassified as a request that the user describe themselves).
+
+### Innovation 2 — Adj+noun compound noun-hint
+
+`discourse::find_adj_noun_compound` returns the longest matching closed-list compound (`машиналық оқыту`, `жасанды интеллект`, `табиғи тіл`, `терең оқыту`, `нейрондық желі`, …) found in the input. Wired as the FIRST strategy in `best_noun_hint`, ahead of topic-marker / locative-attributive / multiword / first-noun. Pre-v4.6.20 reduced «Машиналық оқыту туралы …» to noun_hint=`оқыту` (head only), losing the modifier and retrieving generic education quotes.
+
+### Innovation 3 — `SystemAspect::SelfComparison`
+
+Ninth `SystemAspect` variant + `system_self_comparison` slot + `ask_about_system.self_comparison` template family. Detector lives in `discourse::input_is_self_comparison_question` as a pair (comparison marker `артық/жақсырақ/озасың` + addressee marker including the `-сың/-сыз` ability suffix). Honest framing — adam articulates the *trade-off* (narrow Kazakh-only competence with strong invariants vs. broad LLM coverage) rather than claiming superiority. Closes from real-REPL: «Басқа жасанды интеллект модельдерінен несімен артықсыз?», «Қолданыстағы модельдерден қалай жақсырақ бола аласыз?».
+
+### Innovation 4 — Discourse preamble stripper
+
+`discourse::strip_preamble` runs at the top of `Conversation::turn_with_trace` BEFORE FST parsing. Closed list of 24 leading preambles (`айтайын дегенім`, `қысқаша айтқанда`, `шынында`, `сұрағым мынау`, `жалпы алғанда`, `айтпақшы`, …); when matched at input start with a clause separator after, the preamble is removed and the residual goes to the parser. Russian/math/anaphor detection still see the raw input (those operate on surface signals where preambles never interfere). Closes from real-REPL: «Айтайын дегенім, қолданыстағы модельдерден қалай жақсырақ бола аласыз?» — preamble stripped, residual routes to SelfComparison.
+
+### Innovation 5 — `UserAcknowledgement` intent + template family
+
+New `Intent::UserAcknowledgement` variant + `user_acknowledgement` template family. Detector: addressee marker (`сенің / сені / сіздің / сізді`) + 1sg perfective realisation verb (`түсіндім / білдім / көрдім / байқадым / ұқтым / аңғардым / сезіндім`) + not-a-question. Polite acknowledgement reply («рахмет, түсінгеніңізге қуаныштымын. Мен әлі дамып келемін …»). Pre-v4.6.20 grabbed the closed-class adverb `әлі` from «Мен сенің әлі бәрін білмейтініңді … түсіндім» and surfaced a random poetry quote about feelings.
+
+### Tests + counters
+
+- 5 new e2e tests (`reflexive_self_question_routes_to_ask_about_system_general`, `adj_noun_compound_noun_hint_preserves_modifier`, `self_comparison_question_routes_to_self_comparison_aspect`, `preamble_stripper_unmasks_underlying_question`, `user_acknowledgement_routes_to_dedicated_template`).
+- 5 new REPL replay dialogs.
+- `discourse.rs` helpers: 3 → **7** (`strip_preamble`, `input_is_user_acknowledgement`, `input_is_self_comparison_question`, `find_adj_noun_compound` added).
+- `SystemAspect` variants: 8 → **9** (+ `SelfComparison`).
+- `Intent` variants: 26 → **27** (+ `UserAcknowledgement`).
+- Template families: 57 → **59** (+ `ask_about_system.self_comparison`, `user_acknowledgement`).
+- REPL replay: 63/63 → **68/68 canonical**.
+- Workspace: 734 → **739 tests passing**.
+
 ## [4.6.15] — 2026-04-29 — Bundle of 3 more innovations (15 total on the v4.6.x minor): integer arithmetic calculator + `mathematics_basic` world_core domain + `informatics_basic` world_core domain
 
 User strategic ask: «необходимо дать ему знания школьной программы по математике и информатике … Он должен понимать диалог, того, что от него хотят». v4.6.12 detected math expressions and refused; v4.6.15 evaluates them deterministically and adds two new world_core domains so adam knows what the school terms *mean*. Per the v4.6.5-clarified cadence, patch sub-counter is **cumulative on the minor**: v4.6.12 + 3 = **v4.6.15**.

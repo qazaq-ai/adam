@@ -252,6 +252,7 @@ pub enum IntentKind {
     Request,
     WellWishes,
     Insult,
+    UserAcknowledgement,
     Unknown,
 }
 
@@ -284,6 +285,7 @@ impl From<&Intent> for IntentKind {
             Intent::Request => Self::Request,
             Intent::WellWishes => Self::WellWishes,
             Intent::Insult => Self::Insult,
+            Intent::UserAcknowledgement => Self::UserAcknowledgement,
             Intent::Unknown { .. } => Self::Unknown,
         }
     }
@@ -384,8 +386,21 @@ impl Conversation {
         repo: &TemplateRepository,
         rng_seed: u64,
     ) -> (String, TurnTrace) {
-        let parses = crate::parse_input_public(input, lexicon);
-        let raw_intent = interpret_text_with_lexicon(input, &parses, Some(lexicon));
+        // **v4.6.20** — preamble stripper. Real-REPL surfaced
+        // sentences like «Айтайын дегенім, қолданыстағы жасанды
+        // интеллект модельдерінен қалай жақсырақ бола аласыз?» —
+        // the leading clause carries no semantic content but the
+        // greedy noun-hint extractor still grabbed the first
+        // content noun (`қолданыс`) and pulled a contract-template
+        // quote, missing the actual question. Strip the preamble
+        // BEFORE parsing so all downstream layers see only the
+        // meaningful clause. Math/Russian/anaphor detection still
+        // sees the raw input below — those checks operate on
+        // surface signals (digits, Cyrillic-script class) where
+        // preambles never interfere.
+        let stripped = crate::discourse::strip_preamble(input);
+        let parses = crate::parse_input_public(stripped, lexicon);
+        let raw_intent = interpret_text_with_lexicon(stripped, &parses, Some(lexicon));
 
         // v1.4.0: follow-up resolution. "ал сіз?" after AskHowAreYou
         // becomes a re-interpretation: "user is asking me the same

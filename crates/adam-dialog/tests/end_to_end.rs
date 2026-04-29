@@ -4470,6 +4470,138 @@ fn math_input_routes_to_math_refusal() {
     }
 }
 
+/// **v4.6.20** — Reflexive identity question «Өзіңізді кім деп
+/// санайсыз?» / «Өзіңді қалай таныстырасың?» routes to the
+/// `AskAboutSystem(General)` aspect. Pre-v4.6.20 fell through to
+/// the noun-hint fallback ("Бәлкім, өзіңіз туралы айтасыз ба"),
+/// misclassifying as a request that the user describe themselves.
+#[test]
+fn reflexive_self_question_routes_to_ask_about_system_general() {
+    let Some(lex) = load_lexicon() else { return };
+    for input in [
+        "Өзіңізді кім деп санайсыз?",
+        "Өзіңді кім деп санайсың?",
+        "Өзіңізді қалай таныстырасыз?",
+        "Өзіңді қалай атайсың?",
+    ] {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert!(
+            matches!(
+                intent,
+                adam_dialog::Intent::AskAboutSystem {
+                    aspect: adam_dialog::SystemAspect::General
+                }
+            ),
+            "v4.6.20 reflexive self-question {input:?} must route to AskAboutSystem(General); got {intent:?}"
+        );
+    }
+}
+
+/// **v4.6.20** — Adj+noun compound noun-hint extraction.
+/// «Машиналық оқыту туралы айтып беріңізші» pre-v4.6.20 reduced
+/// to noun_hint=`оқыту` (head noun only). v4.6.20 returns the
+/// full compound `машиналық оқыту`.
+#[test]
+fn adj_noun_compound_noun_hint_preserves_modifier() {
+    let Some(lex) = load_lexicon() else { return };
+    for (input, expected) in [
+        ("Машиналық оқыту туралы айтып беріңізші", "машиналық оқыту"),
+        ("Жасанды интеллект дегеніміз не?", "жасанды интеллект"),
+        ("Терең оқыту туралы білемін", "терең оқыту"),
+    ] {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        match intent {
+            adam_dialog::Intent::Unknown {
+                noun_hint: Some(hint),
+                ..
+            } => assert_eq!(
+                hint, expected,
+                "v4.6.20 adj+noun compound {input:?} must return {expected:?} as noun_hint"
+            ),
+            other => panic!(
+                "v4.6.20 adj+noun compound {input:?} expected Unknown with noun_hint={expected:?}, got {other:?}"
+            ),
+        }
+    }
+}
+
+/// **v4.6.20** — `SystemAspect::SelfComparison` routes
+/// «Басқа модельдерден несімен артықсыз?» / «… қалай жақсырақ
+/// бола аласыз?» style questions to the new template family.
+/// Pre-v4.6.20 these fell through to greedy retrieval and pulled
+/// random contract-template quotes.
+#[test]
+fn self_comparison_question_routes_to_self_comparison_aspect() {
+    let Some(lex) = load_lexicon() else { return };
+    for input in [
+        "Басқа жасанды интеллект модельдерінен несімен артықсыз?",
+        "Қолданыстағы модельдерден қалай жақсырақ бола аласыз?",
+        "Сіз олардан қалай артық?",
+    ] {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert!(
+            matches!(
+                intent,
+                adam_dialog::Intent::AskAboutSystem {
+                    aspect: adam_dialog::SystemAspect::SelfComparison
+                }
+            ),
+            "v4.6.20 self-comparison {input:?} must route to AskAboutSystem(SelfComparison); got {intent:?}"
+        );
+    }
+}
+
+/// **v4.6.20** — Discourse preamble stripper. «Айтайын дегенім, X»
+/// / «Қысқаша айтқанда, X» / «Сұрағым мынау: X» — the leading
+/// preamble carries no content; the parser should see only the
+/// residual clause.
+#[test]
+fn preamble_stripper_unmasks_underlying_question() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = adam_dialog::Conversation::new();
+    // After preamble strip, this becomes a SelfComparison question.
+    let out = conv.turn(
+        "Айтайын дегенім, қолданыстағы модельдерден қалай жақсырақсыз?",
+        &lex,
+        &repo,
+        0,
+    );
+    let lower = out.to_lowercase();
+    assert!(
+        lower.contains("басқашамын") || lower.contains("қазақ тіл"),
+        "v4.6.20 preamble strip should expose SelfComparison; got {out:?}"
+    );
+}
+
+/// **v4.6.20** — User-acknowledgement detector. «Мен сенің әлі
+/// бәрін білмейтініңді … түсіндім» — multi-clause empathetic
+/// statement about adam ending in a 1sg perfective realisation
+/// verb. Pre-v4.6.20 grabbed `әлі` and quoted poetry.
+#[test]
+fn user_acknowledgement_routes_to_dedicated_template() {
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+    let mut conv = adam_dialog::Conversation::new();
+    for input in [
+        "Мен сенің әлі бәрін білмейтініңді және әлі де көп жаттығу керек екенін түсіндім.",
+        "Сенің шектеулі екеніңді көрдім.",
+        "Сізді әлі дамып келе жатқаныңызды байқадым.",
+    ] {
+        let intent = adam_dialog::interpret_text_with_lexicon(input, &[], Some(&lex));
+        assert!(
+            matches!(intent, adam_dialog::Intent::UserAcknowledgement),
+            "v4.6.20 acknowledgement {input:?} must route to UserAcknowledgement; got {intent:?}"
+        );
+        let out = conv.turn(input, &lex, &repo, 0);
+        let lower = out.to_lowercase();
+        assert!(
+            lower.contains("рахмет") || lower.contains("түсінгеніңіз") || lower.contains("дамып"),
+            "v4.6.20 acknowledgement {input:?} must surface a polite acknowledgement template; got {out:?}"
+        );
+    }
+}
+
 /// **v4.6.15** — `mathematics_basic.jsonl` and `informatics_basic.jsonl`
 /// world_core domains supply IsA definitions for school-curriculum
 /// concepts: математика, алгоритм, информатика, файл, бағдарлама,

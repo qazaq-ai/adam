@@ -437,6 +437,212 @@ enum ArithToken {
     Op(char),
 }
 
+/// **v4.6.20** — discourse preambles. Surface forms a Kazakh
+/// speaker uses to introduce the actual question/statement that
+/// follows. Pre-v4.6.20 a sentence like
+/// «Айтайын дегенім, қолданыстағы жасанды интеллект модельдерінен
+/// қалай жақсырақ бола аласыз?» had its first content noun
+/// (`қолданыс`) grabbed by the greedy noun-hint extractor — adam
+/// answered with a contract-template quote about `usage`,
+/// completely missing the actual question. Stripping the preamble
+/// leaves only the meaningful clause for downstream parsing.
+///
+/// Each entry is a lowercase preamble that, when matched at the
+/// start of the input, is removed up to (and including) the next
+/// clause separator (`,`, `—`, `:`, `;`). The list is checked
+/// longest-first by `strip_preamble` so longer phrases like
+/// `қысқаша айтқанда` always win over shorter prefixes.
+const PREAMBLES: &[&str] = &[
+    "айтайын дегенім",
+    "айтайын дегенімді",
+    "айтайын деп тұрғаным",
+    "айтайын деп едім",
+    "қысқаша айтқанда",
+    "ашығын айтқанда",
+    "шындығына келгенде",
+    "сұрағым мынау",
+    "сұрағым мынадай",
+    "сұрақ мынадай",
+    "сұрағым бар",
+    "сұрағым келгені",
+    "білгім келгені",
+    "білгім келеді",
+    "түсінсем дейтінім",
+    "ойымдағы сұрақ",
+    "айтпағым",
+    "айтпақшы",
+    "шынында",
+    "шындап келгенде",
+    "жалпы алғанда",
+    "жалпы айтқанда",
+    "иә, айтпақшы",
+    "айта кетсем",
+];
+
+/// Clause-separator characters that terminate a preamble. The
+/// punctuation char is consumed too so the residual starts at the
+/// next non-whitespace character.
+const PREAMBLE_SEPARATORS: &[char] = &[',', '—', '–', '-', ':', ';'];
+
+/// **v4.6.20** — strip a leading discourse preamble from the
+/// input, returning the residual. If the input does not start with
+/// a known preamble (or has no clause separator after it), returns
+/// the input unchanged. Trim preserves the user's original casing
+/// of the residual; only leading whitespace is dropped.
+///
+/// Pure surface-level — no FST, no parsing. The preamble list is
+/// closed and audited; expanding it is a v4.6.x patch.
+pub fn strip_preamble(input: &str) -> &str {
+    let trimmed = input.trim_start();
+    let lower = trimmed.to_lowercase();
+    // Sort longest-first via length comparison on the matched prefix.
+    let mut best: Option<usize> = None;
+    for &p in PREAMBLES {
+        if lower.starts_with(p) {
+            // Need a clause separator after the preamble.
+            let after = &trimmed[p.len()..];
+            if let Some(sep_pos) = after.find(|c: char| PREAMBLE_SEPARATORS.contains(&c)) {
+                let cut = p.len() + sep_pos + after[sep_pos..].chars().next().unwrap().len_utf8();
+                if best.map_or(true, |b| cut > b) {
+                    best = Some(cut);
+                }
+            }
+        }
+    }
+    if let Some(cut) = best {
+        trimmed[cut..].trim_start()
+    } else {
+        input
+    }
+}
+
+/// **v4.6.20** — detect a long, gracious user-acknowledgement.
+/// Real-REPL: «Мен сенің әлі бәрін білмейтініңді және әлі де көп
+/// жаттығу керек екенін түсіндім» — adam grabbed `әлі` and quoted
+/// poetry. The input is a multi-clause statement *about* adam,
+/// usually empathetic, ending in a 1sg perfective verb of
+/// understanding/realisation.
+///
+/// Two-signal detector:
+/// - Contains addressee marker `сенің / сені / сізді / сіздің`.
+/// - Contains 1sg perfective realisation verb: `түсіндім / білдім
+///   / көрдім / байқадым / ұқтым / аңғардым / сезіндім`.
+/// Plus the sentence is not a question (no `?`, no question
+/// pronoun) — questions like «Сені кім жасады?» also contain
+/// `сені` but are not acknowledgements.
+pub fn input_is_user_acknowledgement(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_addressee = lower.contains("сенің")
+        || lower.contains("сені")
+        || lower.contains("сіздің")
+        || lower.contains("сізді");
+    let has_realisation_verb = lower.contains("түсіндім")
+        || lower.contains("білдім")
+        || lower.contains("көрдім")
+        || lower.contains("байқадым")
+        || lower.contains("ұқтым")
+        || lower.contains("аңғардым")
+        || lower.contains("сезіндім");
+    let is_question = lower.contains('?')
+        || lower.contains("қалай")
+        || lower.contains("неге")
+        || lower.contains("кім")
+        || lower.contains("қашан")
+        || lower.contains("қайда");
+    has_addressee && has_realisation_verb && !is_question
+}
+
+/// **v4.6.20** — detect "how are you better than other AI
+/// models?" style questions. Routes to
+/// `SystemAspect::SelfComparison`. Two-signal detector:
+/// - Contains a "comparison" marker: `артық / артықсың / артықсыз
+///   / жақсырақ / жақсырақсың / жақсырақсыз / озасың / озасыз /
+///   айырмашылық`.
+/// - Contains an addressee anchor (any of `сен / сіз / сені /
+///   сізді / -сың/-сыз verb suffix already in marker).
+/// The list is closed; mainstream "ерекшелік" stays under
+/// Architecture (which v4.3.4 already routes correctly).
+pub fn input_is_self_comparison_question(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let has_comparison = lower.contains("артық")
+        || lower.contains("жақсырақ")
+        || lower.contains("озасың")
+        || lower.contains("озасыз")
+        || lower.contains("қалай үстем")
+        || lower.contains("несімен бөлек")
+        || lower.contains("неге сенемін")
+        || lower.contains("несімен ерекше")
+        || lower.contains("неге таңдау керек");
+    if !has_comparison {
+        return false;
+    }
+    // Must reference adam (the addressee) — a comparison between
+    // two third parties shouldn't trigger. Either a free-standing
+    // 2nd-person pronoun (`сен / сіз / сені / сізді`) or a 2nd-
+    // person verb ending (`-сың / -сыз` on a copula or modal,
+    // including the `аласың / аласыз` ability form). The `сың/сыз`
+    // suffix is itself the addressee marker even without a free-
+    // standing pronoun.
+    let has_pronoun = lower.contains(" сен")
+        || lower.contains(" сіз")
+        || lower.starts_with("сен")
+        || lower.starts_with("сіз")
+        || lower.contains("сені")
+        || lower.contains("сізді");
+    let has_addressee_suffix = lower.contains("аласың")
+        || lower.contains("аласыз")
+        || lower.contains("артықсың")
+        || lower.contains("артықсыз")
+        || lower.contains("жақсырақсың")
+        || lower.contains("жақсырақсыз")
+        || lower.contains("озасың")
+        || lower.contains("озасыз");
+    has_pronoun || has_addressee_suffix
+}
+
+/// **v4.6.20** — Adjective+noun compound noun-hint extraction.
+/// Real-REPL: «Машиналық оқыту туралы айтып беріңізші» — pre-v4.6.20
+/// the noun-hint extractor returned `оқыту` (the second word) and
+/// dropped the modifier `машиналық`, then retrieved a generic quote
+/// about education. v4.6.20 detects the `<adj> <noun>` shape via a
+/// closed, audited list of compound topics seen in real REPL traces
+/// and returns the joined compound as the hint.
+///
+/// The list is intentionally narrow — broader compound recognition
+/// belongs in `MULTIWORD_ENTITIES` (semantics.rs) which is already
+/// the canonical home for multi-token recognised topics. This
+/// function exists for the specific case where the adj+noun form is
+/// a topical compound (a *kind* of thing) rather than a named
+/// entity.
+const ADJ_NOUN_COMPOUND_HINTS: &[&str] = &[
+    "машиналық оқыту",
+    "терең оқыту",
+    "жасанды интеллект",
+    "табиғи тіл",
+    "компьютерлік ғылым",
+    "ақпараттық технология",
+    "сандық технология",
+    "сандық экономика",
+    "жасанды нейрон",
+    "жасанды нейрондық желі",
+    "нейрондық желі",
+];
+
+/// **v4.6.20** — return the longest matching adj+noun compound
+/// hint contained in the lowercased input, if any. Used by the
+/// noun-hint extractor in `semantics.rs` to override the
+/// FST-derived first-noun pick.
+pub fn find_adj_noun_compound(input: &str) -> Option<&'static str> {
+    let lower = input.to_lowercase();
+    let mut best: Option<&'static str> = None;
+    for &c in ADJ_NOUN_COMPOUND_HINTS {
+        if lower.contains(c) && best.map_or(true, |b| c.len() > b.len()) {
+            best = Some(c);
+        }
+    }
+    best
+}
+
 #[cfg(test)]
 mod arithmetic_tests {
     use super::try_evaluate_arithmetic;

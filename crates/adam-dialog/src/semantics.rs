@@ -168,6 +168,16 @@ pub fn interpret_text_with_lexicon(
     if detect_insult(&tokens, &joined) {
         return Intent::Insult;
     }
+    // **v4.6.20** — long, gracious user-acknowledgement: «Мен
+    // сенің әлі бәрін білмейтініңді … түсіндім». Detected by the
+    // pair (addressee + 1sg perfective realisation verb) in
+    // `discourse::input_is_user_acknowledgement`. Must be checked
+    // BEFORE the noun-hint fallback so the greedy `әлі`-grabbing
+    // path is suppressed. Not gated on `pronoun` because the
+    // realisation verb itself carries 1sg agreement.
+    if crate::discourse::input_is_user_acknowledgement(&joined) {
+        return Intent::UserAcknowledgement;
+    }
     if detect_statement_of_wellbeing(&tokens, &joined) {
         return Intent::StatementOfWellbeing;
     }
@@ -631,6 +641,16 @@ fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<String> {
 /// noun preceding the marker wins over a generic in-lexicon noun
 /// elsewhere in the sentence.
 fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
+    // **v4.6.20** — adj+noun compound topic ("машиналық оқыту",
+    // "жасанды интеллект", "табиғи тіл"). Pre-v4.6.20 the first-
+    // noun-root strategy returned only the head noun (`оқыту`)
+    // and silently dropped the modifier, so retrieval matched on
+    // a generic concept instead of the compound. The compound
+    // list is closed and audited in `discourse.rs`. Runs first so
+    // the more-specific compound wins over any single-noun fallback.
+    if let Some(c) = crate::discourse::find_adj_noun_compound(input) {
+        return Some(c.to_string());
+    }
     topic_marker_hint(input, parses)
         // v4.4.13 — locative-attributive suffix recovery, promoted
         // to run BEFORE multiword/first_noun strategies. The
@@ -1122,6 +1142,21 @@ fn detect_ask_about_system(
         return Some(SystemAspect::Principles);
     }
 
+    // **v4.6.20** — SelfComparison aspect: "how are you
+    // better/different from other AI models?". Real-REPL
+    // 2026-04-29 transcript surfaced two phrasings —
+    // «Басқа жасанды интеллект модельдерінен несімен артықсыз?»
+    // and «… қалай жақсырақ бола аласыз?». Pre-v4.6.20 these fell
+    // through to the greedy noun-hint path which grabbed
+    // `басқа` / `қолданыс` and quoted random corpus material.
+    // The detector lives in `discourse.rs` as a pair-signal
+    // (comparison marker + addressee anchor); routing here
+    // makes the planner pick the dedicated `self_comparison`
+    // family that articulates the trade-off honestly.
+    if crate::discourse::input_is_self_comparison_question(joined) {
+        return Some(SystemAspect::SelfComparison);
+    }
+
     // **v4.3.3** — General aspect: pronoun-led identity question.
     // **v4.6.0** — Also fires on `өзіңіз туралы айт` style requests
     // (compound self-introduction openers from a 2026-04-29 real-
@@ -1136,6 +1171,24 @@ fn detect_ask_about_system(
             || joined.contains("таныс")
             || joined.contains("берші")
             || joined.contains("беріңіз"));
+    // **v4.6.20** — reflexive identity questions where the user
+    // asks adam to *describe itself* in 2nd-person reflexive form:
+    // «Өзіңді кім деп санайсың?» / «Өзіңізді кім деп санайсыз?» /
+    // «Өзіңді қалай таныстырасың?» / «Өзіңізді қалай көресіз?». The
+    // marker is `өзіңді / өзіңізді` (reflexive accusative) plus a
+    // 2nd-person verb. Real-REPL 2026-04-29 fell through to a
+    // misclassification ("user wants to talk about themselves").
+    let reflexive_self_question = (joined.contains("өзіңді") || joined.contains("өзіңізді"))
+        && (joined.contains("санайсың")
+            || joined.contains("санайсыз")
+            || joined.contains("таныстырасың")
+            || joined.contains("таныстырасыз")
+            || joined.contains("көресің")
+            || joined.contains("көресіз")
+            || joined.contains("қалай атайсың")
+            || joined.contains("қалай атайсыз")
+            || joined.contains("кім дейсің")
+            || joined.contains("кім дейсіз"));
     if pronoun
         && (joined.contains("кімсің")
             || joined.contains("кімсіз")
@@ -1148,6 +1201,7 @@ fn detect_ask_about_system(
             || joined.contains("немен айналысасың")
             || joined.contains("немен айналысасыз"))
         || self_intro_request
+        || reflexive_self_question
     {
         return Some(SystemAspect::General);
     }

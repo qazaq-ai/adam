@@ -137,6 +137,19 @@ pub enum Intent {
     /// or retaliate. Added v1.1.0.
     Insult,
 
+    /// **v4.6.20** — User-acknowledgement: a long, gracious admission
+    /// or observation about adam's state, abilities, or limits.
+    /// Surface form: «Мен сенің әлі бәрін білмейтініңді … түсіндім /
+    /// білдім / көрдім / байқадым / ұқтым / аңғардым». Distinct from
+    /// [`Compliment`] (which is short praise like «жарайсың»):
+    /// acknowledgement is a multi-clause statement *about* adam,
+    /// often empathetic, often containing closed-class words like
+    /// `әлі / бәрін / сенің / сізді`. Pre-v4.6.20 the greedy
+    /// noun-hint extractor grabbed an adverb like `әлі` and pulled a
+    /// random poetry quote — fixing that misclassification is the
+    /// reason this variant exists.
+    UserAcknowledgement,
+
     /// Nothing matched. Fallback may carry a `noun_hint` extracted from
     /// the input by the FST parser so the response can at least
     /// acknowledge what the user is talking about, rather than blank

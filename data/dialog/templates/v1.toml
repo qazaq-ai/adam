@@ -273,6 +273,33 @@ templates = [
     "қандай принциптер бойынша жұмыс істеймін: {system_principles}",
 ]
 
+# v4.6.20 — Self-comparison aspect: «басқа модельдерден несімен
+# артықсыз / қалай жақсырақсыз / айырмашылығыңыз неде». Renders
+# the `system_self_comparison` slot — honest framing of the
+# trade-off (narrow Kazakh-only competence with strong
+# invariants vs. broad generative coverage of mainstream LLMs).
+[[families]]
+key = "ask_about_system.self_comparison"
+templates = [
+    "{system_self_comparison}",
+]
+
+# v4.6.20 — User-acknowledgement template family. Surfaced by a
+# real-REPL transcript where the user said «Мен сенің әлі
+# бәрін білмейтініңді … түсіндім» (a long, gracious admission
+# that adam still has gaps). Pre-v4.6.20 the greedy noun-hint
+# extractor grabbed a closed-class adverb like `әлі` and pulled
+# a random poetry quote. v4.6.20 detects the `сенің … түсіндім /
+# білдім / көрдім / байқадым / ұқтым` pattern and routes here.
+[[families]]
+key = "user_acknowledgement"
+templates = [
+    "рахмет, түсінгеніңізге қуаныштымын. Мен әлі дамып келемін, әр сөйлесуден жақсаруға тырысамын",
+    "түсінгеніңіз үшін рақмет — иә, шектеулерім бар, бірақ оларды ашық айтуға ұмтыламын",
+    "осы жанашырлығыңызға рахмет; әлі үйренуім керек, әр сұхбат — менің ілгері жылжуыма көмек",
+    "рахмет {name}, түсінгеніңіз маған жігер береді — қазақ тілінде сенімді сөйлесуге барымды салып келемін",
+]
+
 # v4.6.12 — Non-Kazakh input refusal. Surfaced by a 2026-04-29
 # real-REPL transcript where «Это очень круто, а кто тебя
 # создал?» (Russian) produced a half-Russian half-Kazakh reply

@@ -646,6 +646,10 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             crate::system_identity::SystemAspect::Limitations => "ask_about_system.limitations",
             // v4.6.5 — operational principles aspect.
             crate::system_identity::SystemAspect::Principles => "ask_about_system.principles",
+            // v4.6.20 — self-comparison aspect.
+            crate::system_identity::SystemAspect::SelfComparison => {
+                "ask_about_system.self_comparison"
+            }
         },
         Intent::StatementOfName { .. } => "statement_of_name",
         Intent::AskAge => "ask_age",
@@ -673,6 +677,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::Request => "request",
         Intent::WellWishes => "well_wishes",
         Intent::Insult => "insult",
+        Intent::UserAcknowledgement => "user_acknowledgement",
         Intent::Unknown {
             raw_tokens,
             noun_hint,
