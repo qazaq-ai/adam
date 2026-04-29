@@ -127,8 +127,25 @@ struct DomainStats {
 /// Returns `Some(reason)` if the Kazakh sentence contains characters
 /// outside the allowed set. Allowed: Cyrillic (Kazakh alphabet), ASCII
 /// digits, dash, common punctuation, whitespace, em-dash, quotes.
+///
+/// **v4.7.0** — corpus-purity carve-out for technical text:
+/// backtick-quoted spans (`fn`, `let`, `Vec<T>`, `Cargo.toml` etc.)
+/// are treated as code identifiers and bypass the Cyrillic-only
+/// check. The carve-out applies ONLY inside paired backticks; bare
+/// Latin prose outside backticks is still flagged. This lets the
+/// `programming_rust.jsonl` domain (and any future technical
+/// domain) embed Rust keywords / types / commands verbatim while
+/// keeping the Kazakh-only directive intact for free prose.
 fn non_kazakh_reason(kk: &str) -> Option<String> {
+    let mut in_code = false;
     for ch in kk.chars() {
+        if ch == '`' {
+            in_code = !in_code;
+            continue;
+        }
+        if in_code {
+            continue;
+        }
         let ok = ch.is_whitespace()
             || matches!(
                 ch,

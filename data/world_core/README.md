@@ -65,7 +65,13 @@ Validator checks:
    dash-prefixed fragment roots.
 4. `id` is globally unique across all domain files.
 5. `kk` contains only Kazakh Cyrillic letters + standard punctuation
-   (no Latin, no Chinese, no Arabic script).
+   (no Latin, no Chinese, no Arabic script). **v4.7.0 carve-out**:
+   text inside paired backticks is treated as a code identifier and
+   bypasses the Cyrillic-only check, so technical domains may embed
+   keywords / type names / commands verbatim (e.g.
+   ``` `let` арқылы анықталатын ```, ``` `Vec<T>` ```,
+   ``` `Cargo.toml` ```). The carve-out applies ONLY inside backticks;
+   bare Latin prose outside backticks is still flagged.
 
 ## Adding an entry
 
@@ -130,7 +136,8 @@ Validator checks:
 - `measurements.jsonl` — 10 entries / 10 facts  *(new in v4.0.19)*
 - `mathematics_basic.jsonl` — 37 entries / 37 facts  *(new in v4.6.15)*
 - `informatics_basic.jsonl` — 40 entries / 40 facts  *(new in v4.6.15)*
-- **Total: 1032 entries / 1195 facts across 32 domains** (v4.6.15), all `approved`
+- `programming_rust.jsonl` — 110 entries / 110 facts  *(new in v4.7.0)*
+- **Total: 1142 entries / 1305 facts across 33 domains** (v4.7.0), all `approved`
   at `high` or `medium` confidence by `shaman`. v4.3.5 added **kz_literature
   surname-keyed entries** (Әуезов / Сейфуллин / Мүсірепов / Жұмабаев / …) and a
   new **`notable_kazakhstanis.jsonl` domain** (presidents, khans, scientists,

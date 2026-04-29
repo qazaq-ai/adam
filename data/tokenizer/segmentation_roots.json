@@ -1,5 +1,5 @@
 {
-  "version": "4.6.20",
+  "version": "4.7.0",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -32959,6 +32959,174 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_7_0_модуль",
+      "root": "модуль",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_тәуелділік",
+      "root": "тәуелділік",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_стек",
+      "root": "стек",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_үйме",
+      "root": "үйме",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_7_0_структ",
+      "root": "структ",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_енам",
+      "root": "енам",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_трейт",
+      "root": "трейт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_кортеж",
+      "root": "кортеж",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_тілім",
+      "root": "тілім",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_итератор",
+      "root": "итератор",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_компилятор",
+      "root": "компилятор",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_оператор",
+      "root": "оператор",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_операция",
+      "root": "операция",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_7_0_параметр",
+      "root": "параметр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_ресурс",
+      "root": "ресурс",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_канал",
+      "root": "канал",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_7_0_шектеу",
+      "root": "шектеу",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_v4_7_0_жалпылама",
+      "root": "жалпылама",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_7_0_қарызға",
+      "root": "қарызға",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_7_0_көшіру",
+      "root": "көшіру",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_7_0_көлеңкелеу",
+      "root": "көлеңкелеу",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_7_0_баптау",
+      "root": "баптау",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_7_0_блогы",
+      "root": "блогы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_7_0_кілтсөз",
+      "root": "кілтсөз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
     }
   ]
 }

@@ -4470,6 +4470,44 @@ fn math_input_routes_to_math_refusal() {
     }
 }
 
+/// **v4.7.0** — `programming_rust.jsonl` world_core domain. Verify
+/// Kazakh-paraphrased Rust concepts (иелік, трейт, тіршілік мерзімі,
+/// сілтеме) round-trip through retrieval as IsA definitions. Latin-
+/// name queries («Rust дегеніміз не?») are NOT covered here — that's
+/// a deferred limitation, the Cyrillic-only FST doesn't tokenize
+/// `Rust` / `Cargo` / `rustc` directly. Resolved in a later patch
+/// once Rust Book chapter content lands.
+#[test]
+fn programming_rust_kazakh_paraphrased_facts_surface() {
+    use adam_reasoning::Fact;
+
+    let Some(lex) = load_lexicon() else { return };
+    let repo = load_repo();
+
+    let facts_path = "../../data/retrieval/facts.json";
+    if !std::path::Path::new(facts_path).exists() {
+        eprintln!("facts.json not present, skipping");
+        return;
+    }
+    let raw = std::fs::read_to_string(facts_path).expect("read facts");
+    let parsed: serde_json::Value = serde_json::from_str(&raw).expect("parse facts");
+    let extracted: Vec<Fact> = serde_json::from_value(parsed["facts"].clone())
+        .expect("facts.json[\"facts\"] must deserialise into Vec<Fact>");
+
+    let mut conv = adam_dialog::Conversation::new().with_reasoning_chains(extracted, vec![]);
+    for (question, expected_substring) in [
+        ("Иелік дегеніміз не?", "жад"),
+        ("Трейт дегеніміз не?", "абстракция"),
+    ] {
+        let out = conv.turn(question, &lex, &repo, 0);
+        let lower = out.to_lowercase();
+        assert!(
+            lower.contains(expected_substring),
+            "v4.7.0 programming_rust answer must contain {expected_substring:?} for {question:?}; got {out:?}"
+        );
+    }
+}
+
 /// **v4.6.20** — Reflexive identity question «Өзіңізді кім деп
 /// санайсыз?» / «Өзіңді қалай таныстырасың?» routes to the
 /// `AskAboutSystem(General)` aspect. Pre-v4.6.20 fell through to

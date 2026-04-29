@@ -7,6 +7,48 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.0] — 2026-04-29 — `programming_rust.jsonl` glossary + corpus-purity carve-out for technical text (phase 1 of Rust knowledge ingestion)
+
+Fifth v4.x minor. Strategic ask from user: «обучить нашу модель языку программирования Rust». Honest scope: adam can't generate code (retrieval-only architecture, `project_retrieval_not_neural_v2`), but it CAN serve as a deterministic Kazakh-language Rust glossary — and Kazakh-language Rust documentation virtually doesn't exist outside this domain. v4.7.0 = phase 1 (curated glossary). Phases 2+ = Rust Book chapter translations as patch releases (v4.7.1, v4.7.2, …).
+
+### `data/world_core/programming_rust.jsonl` (110 entries / 110 facts)
+
+110 curated entries covering: Rust core (Rust, Cargo, rustc, сандық/crate, модуль, тәуелділік), ownership / borrowing / lifetimes (иелік, иелік моделі, сілтеме, қарызға алу, қарыз тексергіш, тіршілік мерзімі, өзгермелі/тұрақты сілтеме, иелікті ауыстыру, көшіру семантикасы, стек, үйме), variables and functions (айнымалы, тұрақты, көлеңкелеу, функция, main функциясы, параметр, қайтару мәні, өрнек, сөйлем), primitive types (i32, i64, u32, u64, usize, f32, f64, bool, char, str, String, кортеж, жиым, тілім), collections (Vec, HashMap, BTreeMap, HashSet, VecDeque), structs and enums (структ, өріс, кортеж-структ, бірлік структ, әдіс, байланысты функция, impl блогы, енам, енам нұсқасы, Option/Some/None, Result/Ok/Err), control flow (if өрнегі, match өрнегі, loop, while, for, break, continue, үлгі), traits and generics (трейт, трейт-нысан, derive макросы, жалпылама тип, тип параметрі, шектеу), error handling (қате өңдеу, panic, unwrap, expect, ? операторы, Drop трейті), smart pointers and concurrency (Box, Rc, Arc, RefCell, Mutex, ағын, канал, async функция, await, Future), iterators (итератор, map, filter, collect, жабу), unsafe blocks, modules / visibility (use, pub, mod, crates.io), and Cargo workflow (cargo build / run / test / check, clippy, rustfmt).
+
+Terminology decisions (locked at start of phase 1; will guide all chapter translations in phase 2):
+- `ownership` → **иелік**, `borrow / borrowing` → **қарызға алу**, `borrow checker` → **қарыз тексергіш**.
+- `reference` → **сілтеме**, `lifetime` → **тіршілік мерзімі**, `mutable` / `immutable` → **өзгермелі** / **тұрақты**.
+- `crate` → **сандық** (preserves the wooden-crate metaphor of the original).
+- `trait` → **трейт** (transliteration; native `қасиет` already saturated in general use).
+- `enum` / `struct` → **енам** / **структ** (transliterations).
+- Code identifiers (`Vec<T>`, `Option::Some`, `match`, `let`, `fn`) — **never translated**, kept verbatim in backticks.
+
+### Corpus-purity carve-out for technical text
+
+`validate_world_core::non_kazakh_reason` now skips characters inside paired backticks. The carve-out applies ONLY inside backtick spans; bare Latin prose outside backticks is still flagged. This lets the `programming_rust.jsonl` domain (and future technical domains) embed Rust keywords / type names / commands verbatim while keeping the Kazakh-only directive intact for free prose. Documented in `data/world_core/README.md` as the v4.7.0 schema rule.
+
+### Pipeline impact
+
+- `data/retrieval/facts.json`: 15 721 → **15 831** (+110 from the new domain).
+- `data/retrieval/derived_facts.json`: 22 962 → **23 418** (+456 derived facts via R1/R2/R5/R8 inheritance through new IsA hubs `бағдарламалау тілі / мәлімет түрі / ұжымдық тип / басқару құрылымы / жад моделі / трейт`).
+- world_core total: **1142 entries / 1305 facts across 33 domains**.
+- 52 new compounds added to `MULTIWORD_ENTITIES`.
+- 24 new noun roots added to `data/tokenizer/segmentation_roots.json` (сандық, модуль, трейт, енам, структ, кортеж, тілім, итератор, оператор, операция, параметр, ресурс, канал, жабу, шектеу, өріс, көшіру, әдіс, баптау, тармақ, шама, блок, кілтсөз, жалпылама).
+
+### Known limitations (resolved in later phases)
+
+- **Direct Latin-name queries** («Rust дегеніміз не?», «Cargo дегеніміз не?», «rustc дегеніміз не?») don't tokenize through the Cyrillic-only FST and fall through to the Unknown path. Kazakh-paraphrased queries (Иелік / Трейт / Сілтеме / Тіршілік мерзімі / Сандық) work correctly. Resolution: ASCII-identifier passthrough in the parser, deferred to a later patch once Rust Book chapter content surfaces enough Latin-prose context to justify it.
+- **No code generation.** adam will not write Rust code on demand — that remains outside the retrieval-only architecture. The glossary supports definitional and conceptual queries, not «write me an HTTP server» asks.
+
+### Tests + counters
+
+- 1 new e2e test (`programming_rust_kazakh_paraphrased_facts_surface`).
+- 1 new REPL replay dialog (`programming_rust_kazakh_paraphrased_v4_7_0`).
+- REPL replay: 68/68 → **69/69 canonical**.
+- Workspace: 739 → **740 tests passing**.
+
+Why minor: new world_core domain (most domains have shipped as patches, but this one ships with the corpus-purity rule which is an architectural carve-out) + 24-root lexicon expansion + 52-compound MULTIWORD_ENTITIES growth + 110-fact knowledge base — qualifies as a minor by the post-1.0 cadence rule.
+
 ## [4.6.20] — 2026-04-29 — Bundle of 5 more innovations (20 total on the v4.6.x minor): reflexive identity question + adj+noun compound noun-hint + SelfComparison aspect + preamble stripper + UserAcknowledgement intent
 
 Real-REPL 2026-04-29 (fifth transcript) surfaced 5 distinct defects all sharing a theme: adam couldn't make sense of long, multi-clause Kazakh sentences. Greedy first-noun-hint extraction grabbed closed-class adverbs (`әлі`) or modifier-stripped head nouns (`оқыту` from «машиналық оқыту`), then surfaced random poetry/contract quotes. v4.6.20 attacks the defect class with five targeted fixes — no architectural rewrite, no synthetic-grammar parser, just better pre-classification. Per the cumulative-counter cadence: 15 (v4.6.15) + 5 = **v4.6.20**.

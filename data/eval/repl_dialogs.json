@@ -338,6 +338,15 @@
       ]
     },
     {
+      "id": "programming_rust_kazakh_paraphrased_v4_7_0",
+      "category": "knowledge_query",
+      "description": "v4.7.0: programming_rust.jsonl world_core domain (110 entries). Kazakh-paraphrased Rust concepts (иелік, трейт, тіршілік мерзімі, сілтеме) surface as IsA definitions through retrieval. Latin-name queries (Rust/Cargo/rustc) are a known v4.7.0 gap — deferred to a later patch once Rust Book chapter content surfaces enough context to justify ASCII-identifier passthrough.",
+      "turns": [
+        {"user": "Иелік дегеніміз не?", "output_contains_lower_any": ["жад"]},
+        {"user": "Трейт дегеніміз не?", "output_contains_lower_any": ["абстракция"]}
+      ]
+    },
+    {
       "id": "reflexive_self_question_routes_general_v4_6_20",
       "category": "system_identity",
       "description": "v4.6.20: «Өзіңізді кім деп санайсыз?» routes to AskAboutSystem(General). Pre-v4.6.20 fell through to «Бәлкім, өзіңіз туралы айтасыз ба» (misclassified as user-self-intro request).",
