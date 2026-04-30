@@ -7,6 +7,39 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.9.0] — 2026-04-30 — `chemistry_school.jsonl` world_core domain (school-curriculum chemistry, Kazakh)
+
+Seventh v4.x minor. Second in the **non-Rust domain expansion** track. `chemistry_school.jsonl` is a curated 105-entry Kazakh glossary covering school-curriculum chemistry across seven sections.
+
+### Sections covered
+
+- **Foundation (~9 entries)** — химия, бейорганикалық/органикалық химия, биохимия; зат, таза зат, қоспа (біртекті/әртекті), жай/күрделі зат.
+- **Periodic table & elements (~16 entries)** — химиялық элемент, периодтық жүйе, Менделеев заңы, топ, период, реттік нөмір, атомдық масса, валенттілік; металл/бейметалл/инертті газ, сілтілік металдар, галогендер; сутек, оттек, көміртек, азот, темір, алтын, күміс, мыс, алюминий, натрий, калий, хлор, гелий, неон.
+- **Chemical bonds (~9 entries)** — химиялық байланыс (иондық, ковалентті, металдық, сутектік); ион, катион, анион, электртерістік.
+- **Reactions (~10 entries)** — химиялық реакция (қосылу, ыдырау, орынбасу, алмасу, тотығу, тотықсыздану, бейтараптану, жану), катализатор, заттардың сақталу заңы.
+- **Acids, bases, salts, oxides (~13 entries)** — қышқыл (тұз/күкірт/азот), негіз, сілті, натрий гидроксиді, тұз, натрий хлориді, оксид, көмірқышқыл газы, су.
+- **Solutions (~7 entries)** — ерітінді, еріткіш, концентрация, сутектік көрсеткіш (`pH`), моль, молярлық масса, Авогадро саны, электролиз.
+- **Organic & biomolecules (~28 entries)** — көмірсутек (алкан/алкен/алкин), метан, этан, этилен, бензол; спирт, этанол, альдегид, карбон қышқылы, сірке қышқылы, эфир; биомолекулалар — көмірсу (глюкоза, сахароза, крахмал), май, ақуыз, амин қышқылы, фермент; полимер, мономер, пластмасса; ДНК, РНК, нуклеин қышқылы.
+
+### Pipeline impact
+
+- world_core: 1 244 → **1 349 entries** (+105); 1 407 → **1 512 facts** (+105); 34 → **35 domains**.
+- `data/retrieval/facts.json`: 15 933 → **16 038** (+105).
+- `MULTIWORD_ENTITIES` += **56 chemistry compounds** (sorted longest-first; including `материя түрі` carry-over from physics).
+- Lexicon: **+51 noun roots** (химия, биохимия, қоспа, валенттілік, галогендер, сутек/оттек/көміртек/азот, темір/алтын/күміс/мыс/алюминий, натрий/калий, хлор, гелий, неон, катион/анион, электртерістік, катализатор, реакция, қышқыл/сілті/тұз/оксид, су, ерітінді/еріткіш, концентрация, моль, авогадро, электролиз, көмірсутек, алкан/алкен/алкин, метан/этан/этилен/бензол, спирт/этанол, альдегид, эфир, көмірсу/глюкоза/сахароза/крахмал, май, ақуыз, фермент, полимер/мономер, пластмасса, ДНК/РНК, ион, негіз, гидроксид, менделеев, топ).
+
+### Tests + counters
+
+- Workspace tests: **745 passing**.
+- `world_core_multiword_coverage` contract test passes after fixing one missed compound (`материя түрі` was inherited from physics; added to MULTIWORD_ENTITIES alongside chemistry compounds).
+
+### Cadence
+
+Minor (v4.9.0) — new world_core domain. The non-Rust domain expansion track continues:
+
+- **v4.10.0** — `biology_school.jsonl` (school-curriculum biology, Kazakh)
+- **v4.11.0** — `history_kazakhstan.jsonl` (Kazakhstan history, Kazakh)
+
 ## [4.8.0] — 2026-04-30 — `physics_school.jsonl` world_core domain (school-curriculum physics, Kazakh)
 
 Sixth v4.x minor. First in the **non-Rust domain expansion** track that follows the v4.7.x Rust Book series. `physics_school.jsonl` is a curated 102-entry Kazakh glossary covering school-curriculum physics across five sections: mechanics, thermodynamics, electricity & magnetism, waves & optics, atomic & modern physics. The domain mirrors the structure of `mathematics_basic` and `informatics_basic` (v4.6.15) and `programming_rust` (v4.7.0): one curated definition per concept, all `confidence: high`, all `review_status: approved`, reviewer `shaman`.
