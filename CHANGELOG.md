@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.17] — 2026-04-29 — Rust Book Chapter 17 (Rust-тың объектілі-бағытталған мүмкіндіктері) translated, in pack
+
+Seventeenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 17 — Object-Oriented Programming Features of Rust — covering Rust's relationship to OOP: characteristics of OO languages and how Rust delivers (or deliberately doesn't deliver) each — encapsulation via `pub` keyword (`AveragedCollection` worked example with private fields and a public API maintaining an internal invariant); Rust's deliberate absence of inheritance and the trade-off reasoning (over-coupling, hierarchy rigidity), with default trait implementations and trait objects as the practical replacements; static vs dynamic polymorphism (generics with `<T: Trait>` for compile-time monomorphization vs `Box<dyn Trait>` trait objects for runtime dispatch); using **trait objects** for collections of mixed types (the GUI `Draw` / `Screen` example, `Vec<Box<dyn Draw>>`, vtable-based dynamic dispatch, the **object-safe trait** rules — methods on `&self`/`&mut self`, no generic parameters, no `Self` return, why `Clone` cannot be made into `Box<dyn Clone>`); implementing the **state pattern** (the blog-post lifecycle Draft → PendingReview → Published example), first in classical OOP style with `Box<dyn State>` and the `self: Box<Self>` consuming method pattern, then in idiomatic Rust style with each state as a separate type (`DraftPost` / `PendingReviewPost` / `Post`), with the trade-off discussion: classical OOP allows runtime extensibility; type-encoded states catch errors at compile time.
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_17.md` — ~5 500 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-17-specific terminology decisions: object-oriented programming → **объектілі-бағытталған бағдарламалау**, encapsulation → **тұсаулау**, inheritance → **мұрагерлік**, polymorphism → **көп пішінділік**, dynamic dispatch → **динамикалық таратпа**, static dispatch → **статикалық таратпа**, vtable → kept verbatim, object-safe → **нысан-қауіпсіз**, state pattern → **күй үлгісі**, design pattern → **жобалау үлгісі**, trait object → **трейт-нысан** (already locked since v4.7.0).
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 16 chapters / 1 200 samples → **17 chapters / 1 289 samples** (+89 from chapter 17).
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.18 = Chapter 18 (Patterns and Matching — pattern syntax in `match`, `if let`, `while let`, `for`, `let`, function parameters, and refutability).
+
 ## [4.7.16] — 2026-04-29 — Rust Book Chapter 16 (Қорқынышсыз қатарлас орындау) translated, in pack
 
 Sixteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 16 — Fearless Concurrency — covering Rust's compile-time-enforced concurrency primitives: spawning OS threads with `std::thread::spawn` and waiting for them with `JoinHandle::join`, the closure-with-`move` pattern for transferring ownership into a thread; message-passing concurrency via `std::sync::mpsc::channel` (transmitter `tx` / receiver `rx`, ownership transfer on `send`, blocking `recv` vs non-blocking `try_recv`, iterating `for received in rx`, multiple producers via `tx.clone()`); shared-state concurrency via `Mutex<T>` (the `lock()` API returning a `MutexGuard`, `Drop`-based auto-release, the `Arc<Mutex<T>>` combination for cross-thread shared mutable state with the 10-thread counter example); the `Send` and `Sync` marker traits as the type-system foundation that makes this all safe (the `Rc<T>` / `Arc<T>` distinction explained via these traits, `RefCell<T>` not being `Sync`, why manual `unsafe impl Send/Sync` is rare and dangerous).

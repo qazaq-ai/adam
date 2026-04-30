@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 16,
-  "sentences_total": 1200,
-  "sample_count": 1200,
+  "chapters_translated": 17,
+  "sentences_total": 1289,
+  "sample_count": 1289,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -8409,6 +8409,629 @@
       "source_id": "chapter_16",
       "domain": "programming_rust",
       "text": "Иерархияны жалпылама типтер мен трейттер арқылы қалай жасауға болатынын; динамикалық сипаттаулы трейт-нысандарды қалай қолдануды; кейбір объектілі-бағытталған үлгілерді `Rust`-та қалай өрнектеуге болатынын көреміз."
+    },
+    {
+      "id": "rust_book_17_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "17-тарау. `Rust`-тың объектілі-бағытталған мүмкіндіктері Объектілі-бағытталған бағдарламалау (ОО) — кодты ұйымдастырудың тарихи жиі қолданылатын тәсілі. Smalltalk, Java, C++, Python, Ruby — бәрі осы парадигма дәстүрі. `Rust` — ОО тілі емес, бірақ оның типтік жүйесі көп ОО-үлгіні **басқа жолдармен** жасауға мүмкіндік береді."
+    },
+    {
+      "id": "rust_book_17_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бұл тарауда: ОО тілдерінің ерекшеліктері. `Rust` оларды қалай беретінін, не үшін беретінін, қайсысы оның дизайнына сай емес екенін. **Трейт-нысандар** (trait objects) — әр түрлі типтегі мәндерді бір ұжымда ұстайтын құрал."
+    },
+    {
+      "id": "rust_book_17_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "ОО **жобалау үлгісінің** мысалы: **күй үлгісі** (state pattern)."
+    },
+    {
+      "id": "rust_book_17_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Оны `Rust`-тың типтік жүйесімен қалай жұмсартуға болатынын. `Rust`-тың тұрғысы: «бар проблеманы шеш, оның үшін типке арналған нақты механизмді қолдан»."
+    },
+    {
+      "id": "rust_book_17_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "ОО-парадигма үшін «инеленемесе» барлық — тек кейбірі. 17.1."
+    },
+    {
+      "id": "rust_book_17_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Объектілі-бағытталған тілдердің сипаттамалары ОО тілдеріне ортақ қандай сипат?"
+    },
+    {
+      "id": "rust_book_17_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Ең әйгілі дәстүрлі дереккөз — Gang of Four кітабы (Design Patterns, 1994) — мынаны айтады: > Объектілі-бағытталған бағдарламалар нысандардан құрылады."
+    },
+    {
+      "id": "rust_book_17_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Нысан > деректер мен тәртіптерді қамтиды. `Rust`-тың `struct` пен `enum` — деректер; оларға бекітілетін `impl`-те — тәртіп."
+    },
+    {
+      "id": "rust_book_17_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Сонымен `Rust`-та нысандарға ұқсас не бар."
+    },
+    {
+      "id": "rust_book_17_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Өзін «толық ОО» деп атау керек пе?"
+    },
+    {
+      "id": "rust_book_17_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бұл — терминологиялық сұрақ."
+    },
+    {
+      "id": "rust_book_17_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Маңыздысы — `Rust`-тың қандай тұжырымдамаларды қалай беретіні."
+    },
+    {
+      "id": "rust_book_17_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Тұсаулау **Тұсаулау** (encapsulation) — нысанның ішкі мәліметтері сыртқа жасырын болатыны."
+    },
+    {
+      "id": "rust_book_17_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Сыртқы код нысанмен оның ашық интерфейсі арқылы ғана жұмыс істей алады. `Rust`-та тұсаулау `pub` кілтсөзі арқылы: `AveragedCollection` өрістері — `list` пен `average` — жасырын. `add`, `remove`, `average` — ашық интерфейс."
+    },
+    {
+      "id": "rust_book_17_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Сыртқы код тек осы үш әдіс арқылы кіреді."
+    },
+    {
+      "id": "rust_book_17_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Ішкі `update_average` — жасырын; орташа мән үнемі дұрыс ұсталынуын сақтайды. `Rust` тұсаулауды толық қолдайды."
+    },
+    {
+      "id": "rust_book_17_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Мұрагерлік: жоқ **Мұрагерлік** (inheritance) — бір типтің басқа типтен мінез-құлықты автоматты түрде «алуы». Java-да `class A extends B` — `A` `B`-нің барлық әдістерін мұрагерлікпен алады. `Rust`-та осындай мұрагерлік **жоқ**."
+    },
+    {
+      "id": "rust_book_17_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Ол шешім — саналы."
+    },
+    {
+      "id": "rust_book_17_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Себептер: **Мұрагерлік жиі шамадан көп бөлектерді біріктіреді.** Сізге `B`-ден тек бір әдіс керек болуы мүмкін, бірақ мұрагерлік арқылы барлығы келеді — қажетсіздіктерімен бірге. **Мұрагерлік иерархия қатаюы.** Уақыт өте келе тарих беру арқылы құрылған жүйенің табиғаты қозғалады, бірақ қатаң иерархияны өзгерту қиынырақ. `Rust`-та оны екі балама арқылы шешеді: **Әдепкі іске асыру** — трейттердегі әдіске әдепкі дене жазуға болады."
+    },
+    {
+      "id": "rust_book_17_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бекітіп алған тип — оны қолданады, немесе өзіндік нұсқасын жазып, оны ауыстырады. **Трейт-нысан** — әр түрлі типтерді бір интерфейс арқылы біріктіру."
+    },
+    {
+      "id": "rust_book_17_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бұлар бірге — мұрагерліктің барлық пайдалы жақтарын береді, тіке мұрагерлік құрылымынсыз."
+    },
+    {
+      "id": "rust_book_17_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Көп пішінділік **Көп пішінділік** (polymorphism) — бір интерфейспен әр түрлі типтерді ұстау мүмкіндігі."
+    },
+    {
+      "id": "rust_book_17_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Жалпы тілмен айтсақ — «бір атаумен бірнеше тип»."
+    },
+    {
+      "id": "rust_book_17_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Көп ОО тілдерде көп пішінділік тек мұрагерлікпен бірге келеді. `Rust`-та екеуі — бөлек: **Жалпылама типтер** — статикалық полиморфизм (компиляцияда әр нақты тип үшін мономорфтау). **Трейт-нысандар** — динамикалық полиморфизм (орындалу кезінде таратпа)."
+    },
+    {
+      "id": "rust_book_17_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бір кодты қай типтермен жасайтыныңыз — соған қарай таңдау. 17.2."
+    },
+    {
+      "id": "rust_book_17_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Трейт-нысандар арқылы әр түрлі типтердегі мәндерді ұстау Айталық, GUI кітапханасы жасап жатсыз."
+    },
+    {
+      "id": "rust_book_17_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Сізде тізім бар: ол кез келген GUI элементін — батырмаларды, жолды-енгізу алаңдарын, белгілерді, суреттерді — ұстауы керек."
+    },
+    {
+      "id": "rust_book_17_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Барлық элементтер бір ортақ әдіске ие — `draw()`."
+    },
+    {
+      "id": "rust_book_17_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бірақ түрлі типтер."
+    },
+    {
+      "id": "rust_book_17_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бір ұжымда `Vec<i32>` сияқты әр элемент бір типте болуы керек."
+    },
+    {
+      "id": "rust_book_17_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Ал бізге қажет — әр түрлі тип, бірақ ортақ интерфейс."
+    },
+    {
+      "id": "rust_book_17_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Шешімі — **трейт-нысан**."
+    },
+    {
+      "id": "rust_book_17_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Ортақ тәртіпке арналған трейт жариялау Бұл — `Draw` трейті."
+    },
+    {
+      "id": "rust_book_17_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Барлық GUI элементтері соны бекітуі керек."
+    },
+    {
+      "id": "rust_book_17_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Трейт-нысандардың ұжымы `Box<dyn Draw>` — **трейт-нысан**."
+    },
+    {
+      "id": "rust_book_17_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Ол: «`Draw` трейтін бекітетін қандай да бір тип, оның дәл түрі компиляцияда белгісіз» дегенді білдіреді. `dyn` кілтсөзі — динамикалық таратпа."
+    },
+    {
+      "id": "rust_book_17_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Тізім — `Vec<Box<dyn Draw>>` — әр түрлі типтерді біріктіре алады."
+    },
+    {
+      "id": "rust_book_17_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Әр элемент жадта `Draw` трейтінің виртуальды кесте (vtable)-сімен сақталады."
+    },
+    {
+      "id": "rust_book_17_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Трейтті бекіту Енді `Button` мен `SelectBox` екеуі де `Draw`-ды бекіткен."
+    },
+    {
+      "id": "rust_book_17_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Оларды бір ұжымға қосуға болады: `screen.run()` — әр элементте `draw()` шакырады."
+    },
+    {
+      "id": "rust_book_17_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Орындалу кезінде `Rust` нақты типтің vtable-індегі сай функцияны табады және орындайды."
+    },
+    {
+      "id": "rust_book_17_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Динамикалық таратпа vs статикалық таратпа Бір сұрақ туады: неліктен `Box<dyn Draw>` емес, `<T: Draw>` жалпылама тип параметрін қолданбасқа?"
+    },
+    {
+      "id": "rust_book_17_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бұл нұсқа жұмыс істейді — бірақ айырмашылық: **`Vec<T>` (жалпылама)** — `T` бір нақты тип."
+    },
+    {
+      "id": "rust_book_17_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Ұжым бір ғана типтегі элементтерге шектелген (мысалы, тек `Button`-дар)."
+    },
+    {
+      "id": "rust_book_17_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Компиляцияда мономорфтау; орындалу кезінде ешбір қосымша таратпа жоқ. **`Vec<Box<dyn Draw>>` (трейт-нысан)** — әр элемент әр түрлі типте болуы мүмкін."
+    },
+    {
+      "id": "rust_book_17_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Компиляция кезінде мүмкіндік төмен; орындалу кезінде vtable арқылы динамикалық таратпа."
+    },
+    {
+      "id": "rust_book_17_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Жобаға қарай: Тек бір типтегі ұжым жеткілікті болса — жалпылама, ол жылдамырақ."
+    },
+    {
+      "id": "rust_book_17_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бірнеше типтерді біріктіру керек болса — трейт-нысан."
+    },
+    {
+      "id": "rust_book_17_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Нысан-қауіпсіз трейттер Барлық трейт трейт-нысан бола алмайды."
+    },
+    {
+      "id": "rust_book_17_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Тек **нысан-қауіпсіз** (object-safe) трейттер."
+    },
+    {
+      "id": "rust_book_17_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Қарапайым ережелер: Трейттің барлық әдістері `&self` немесе `&mut self`-пен басталу керек."
+    },
+    {
+      "id": "rust_book_17_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Әдістерде жалпылама тип параметрлері болмауы керек."
+    },
+    {
+      "id": "rust_book_17_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Әдіс `Self`-ті қайтару керек емес."
+    },
+    {
+      "id": "rust_book_17_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Мысалы, `Clone` трейтінің `clone(&self) -> Self` әдісі — `Self`-ті қайтарады."
+    },
+    {
+      "id": "rust_book_17_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Сондықтан `Box<dyn Clone>` мүмкін емес."
+    },
+    {
+      "id": "rust_book_17_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Компилятор сізге айтады: Шешім — трейтті бөлектеу: бір нысан-қауіпсіз бөлік, бір емес. 17.3."
+    },
+    {
+      "id": "rust_book_17_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Объектілі-бағытталған жобалау үлгісін жасау Бір нақты ОО-үлгісі — **күй үлгісі** (state pattern)."
+    },
+    {
+      "id": "rust_book_17_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Ол: бір нысанның мінез-құлқы оның ішкі күйіне байланысты ауысуын білдіреді."
+    },
+    {
+      "id": "rust_book_17_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Күй — жасырын; сыртқы код тек интерфейсті қолданады."
+    },
+    {
+      "id": "rust_book_17_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Мысалы, блог пост циклы: **Жоба** (Draft) күйі — пост құрылды, жариялауға дайын емес. **Тексеруге** (PendingReview) күйі — автор тексеруді сұрады. **Жарияланған** (Published) күйі — пост жарияланды, барлығы көре алады."
+    },
+    {
+      "id": "rust_book_17_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Әр күйде нысанның мінез-құлқы әр түрлі: «жариялау» командасы тек **Жарияланған** күйде ғана нақты тиімді."
+    },
+    {
+      "id": "rust_book_17_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Әр күйдің өз ережесі."
+    },
+    {
+      "id": "rust_book_17_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Дәстүрлі ОО-нұсқа: трейт-нысандармен `Post` структы күй-нысанын ұстайды."
+    },
+    {
+      "id": "rust_book_17_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Күй — `State` трейтін бекітетін кез келген тип: Тестілеу: Әр күй өз әдістерін бекіткен."
+    },
+    {
+      "id": "rust_book_17_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Күй ауысқанда нысанның мінез-құлқы автоматты түрде өзгереді. `self: Box<Self>` ерекше: бұл әдіс шакырылғанда күй-нысанының иелігін алады."
+    },
+    {
+      "id": "rust_book_17_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Сондықтан күй ауысқанда — ескі күй-нысаны тазалынып, жаңасы орнына шығады."
+    },
+    {
+      "id": "rust_book_17_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Артықшылықтары мен кемшіліктері ОО-нұсқаның артықшылықтары: Күй-нысандар бір-бірінен бөлек."
+    },
+    {
+      "id": "rust_book_17_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Жаңа күйді қосу — жаңа структ + `State` бекіту."
+    },
+    {
+      "id": "rust_book_17_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Күйді ауыстыру — бір орында, нысан ішінде; сыртқы код өзгермейді."
+    },
+    {
+      "id": "rust_book_17_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Кемшіліктері: Күйлер арасындағы байланыс қатты — `Draft::request_review` нақты `PendingReview`-ке өткізеді."
+    },
+    {
+      "id": "rust_book_17_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Жаңа күй қосу барлық бар күйлерді өзгертуді талап етеді."
+    },
+    {
+      "id": "rust_book_17_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бірнеше әдістерде ұқсас шифрлеу — `if let Some(s) = self.state.take()` үлгісі қайталанады. `Rust`-стилінде күйді типтерде кодтау `Rust`-тың типтік жүйесі күрделірек: біз күйді *типтермен* кодтай аламыз."
+    },
+    {
+      "id": "rust_book_17_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Әр күй — өзіндік типке."
+    },
+    {
+      "id": "rust_book_17_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Енді әр күй — нақты тип: `DraftPost`-та — тек `add_text` және `request_review`. `content` әдісі жоқ. `PendingReviewPost`-та — тек `approve`. `add_text` де, `content` да жоқ. `Post` — соңғы күй; ол `content` ұсынады. `request_review` бар нысанды (иелікімен) қабылдап, жаңасын қайтарады."
+    },
+    {
+      "id": "rust_book_17_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Сондықтан ескі `DraftPost` ары қарай қол жетімсіз — типтік жүйе оны бекітеді."
+    },
+    {
+      "id": "rust_book_17_0076",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Шакыру: Бұл нұсқа қатарынан: **Жариялануға дайын болмаған пост** — `content` шакыру мүмкін емес; компилятор тыйым салады."
+    },
+    {
+      "id": "rust_book_17_0077",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Күйлер арасындағы ауысу — нақты типтегі функция шакыру."
+    },
+    {
+      "id": "rust_book_17_0078",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Ешбір `match` немесе `Option::take` керек емес."
+    },
+    {
+      "id": "rust_book_17_0079",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "ОО-нұсқа — динамикалық, кеңейтуге келе беретін."
+    },
+    {
+      "id": "rust_book_17_0080",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Жаңа күй қосуға — жаңа структ + `State` бекіту жеткілікті, бар код өзгермейді. `Rust`-стиль — статикалық, типтік жүйеде кодталған."
+    },
+    {
+      "id": "rust_book_17_0081",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Әр операция нақты күйде ғана."
+    },
+    {
+      "id": "rust_book_17_0082",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Бірақ жаңа күй қосу — функциялардың қолтаңбаларын қайта жазу."
+    },
+    {
+      "id": "rust_book_17_0083",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Жобаға не керек — соны таңдаңыз. `Rust` екеуіне де келеді. 17.4."
+    },
+    {
+      "id": "rust_book_17_0084",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы `Rust` — ОО-тіл емес, бірақ ОО-тілдердің көп ұғымдарын қолдайды: **Тұсаулау** — `pub` арқылы. **Көп пішінділік** — жалпылама типтер (статикалық) немесе трейт-нысандар (динамикалық). **Мұрагерлік жоқ**, бірақ оның практикалық пайдасы — әдепкі іске асырулар + трейт-нысандар арқылы."
+    },
+    {
+      "id": "rust_book_17_0085",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "ОО-жобалау үлгілерін `Rust`-та екі жолмен жасауға болады: дәстүрлі ОО-стиль (трейт-нысандар) немесе `Rust`-тың типтік жүйесін қолдану (күйді типтерге кодтау)."
+    },
+    {
+      "id": "rust_book_17_0086",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Көп жағдайда екіншісі қателерді ертерек ұстайды. `Rust`-тың тұжырымдамасы: «парадигмаға тиісті болма; есепті ең қауіпсіз әрі тиімді жолмен шеш»."
+    },
+    {
+      "id": "rust_book_17_0087",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "ОО — ең көп бағдарламалаушыға таныс модель; бірақ `Rust` сізге одан да жақсы балама ұсынады тағы өкінбейтін."
+    },
+    {
+      "id": "rust_book_17_0088",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда — **үлгілер мен сай келтіру** туралы кеңірек айтамыз."
+    },
+    {
+      "id": "rust_book_17_0089",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_17",
+      "domain": "programming_rust",
+      "text": "Біз `match` мен `if let` ұғымдарымен таныс болсақ, енді үлгілердің толық мүмкіндіктерін қарастырамыз: оларды функция параметрлерінде, `while let`-те, `for`-да, `let`-те қолдану."
     }
   ]
 }

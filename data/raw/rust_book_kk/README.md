@@ -57,6 +57,7 @@ The pack is registered in `SOURCE_PACKS` constants of:
 | 14 — Cargo пен Crates.io туралы тереңірек (More about Cargo and Crates.io) | `chapter_14.md` | v4.7.14 | translated, in pack (past committed-index ceiling) |
 | 15 — Ақылды сілтемелер (Smart Pointers) | `chapter_15.md` | v4.7.15 | translated, in pack (past committed-index ceiling) |
 | 16 — Қорқынышсыз қатарлас орындау (Fearless Concurrency) | `chapter_16.md` | v4.7.16 | translated, in pack (past committed-index ceiling) |
+| 17 — `Rust`-тың объектілі-бағытталған мүмкіндіктері (OOP Features of Rust) | `chapter_17.md` | v4.7.17 | translated, in pack (past committed-index ceiling) |
 
 ## Corpus-purity rule
 
