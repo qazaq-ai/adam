@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.19] — 2026-04-29 — Rust Book Chapter 19 (Жетілдірілген мүмкіндіктер) translated, in pack
+
+Nineteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 19 — Advanced Features — the broadest chapter of the book, surveying five distinct advanced topic areas: **`unsafe` Rust** (the five superpowers — dereferencing raw pointers `*const T` / `*mut T`, calling `unsafe fn`, accessing/modifying `static mut`, implementing an `unsafe trait`, accessing `union` fields; the FFI layer `extern "C"` block and `#[no_mangle]` for outbound; building safe abstractions over unsafe code with the `split_at_mut` worked example); **advanced traits** (associated types `type Item` vs generic `<T>` and why each fits, default generic type parameters with the `Add<Rhs = Self>` operator-overloading example, fully-qualified syntax `<Type as Trait>::method` for disambiguating same-named methods, supertraits with `OutlinePrint: fmt::Display`, the **newtype pattern** for working around the orphan rule); **advanced types** (newtype for type-safety wrappers `struct Years(i64)` / `struct Days(i64)`, type aliases with `type` keyword, the never type `!` and how it unifies with any type, dynamically-sized types `?Sized` and the implicit `Sized` bound on generics); **advanced functions and closures** (function pointers `fn(T) -> U` distinct from `Fn` traits, returning closures via `Box<dyn Fn(...) -> ...>` or `impl Fn(...) -> ...`); **macros** (declarative `macro_rules!` with the `vec!` walkthrough, procedural macros split into derive / attribute / function-like, the `proc-macro` crate convention with `syn` + `quote`).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_19.md` — ~6 500 words (the largest single-chapter translation), code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-19-specific terminology decisions: raw pointer → **шикі көрсеткіш**, FFI → **шетел функцияларының интерфейсі**, union → **одақ**, associated type → **байланысты тип**, supertrait → **ата-трейт**, newtype pattern → **жаңатип үлгісі**, type alias → **тип бүркеншегі**, never type → **ешқашан-тип `!`**, dynamically-sized type → **динамикалық өлшемді тип**, function pointer → **функция көрсеткіші**, declarative macro → **декларативті макрос**, procedural macro → **процедуралық макрос**, attribute macro → **атрибут макрос**, function-like macro → **функция-сияқты макрос**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 18 chapters / 1 339 samples → **19 chapters / 1 459 samples** (+120 from chapter 19 — the largest per-chapter contribution so far).
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.20 = Chapter 20 (Final project — building a multithreaded web server). The final chapter; closes the Rust Book translation series.
+
 ## [4.7.18] — 2026-04-29 — Rust Book Chapter 18 (Үлгілер мен сай келтіру) translated, in pack
 
 Eighteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 18 — Patterns and Matching — covering pattern syntax across all the places it can appear in `Rust`: `match` arms, `if let` (with chained `else if let`), `while let` (the stack-popping example), `for` loops (with `enumerate` destructuring), `let` statements (irrefutable destructuring), function parameters (the `&(x, y): &(i32, i32)` example); the **refutability** distinction (irrefutable patterns always succeed and are required by `let`/`for`/parameters; refutable patterns may fail and are required by `if let`/`while let`/`match`, with the `let else` form for the early-return on failure idiom). Pattern syntax taxonomy: matching literals, named-variable patterns and shadowing inside `match` scopes, multiple patterns with `|`, range patterns `..=` (numeric and `char`), destructuring (struct, enum, tuple, deeply-nested combinations), ignoring values (`_` placeholder vs `_x` named-but-unused — and how `_` doesn't move ownership while `_x` does), `..` for ignoring remaining parts of structs/tuples, **match guards** (`Some(x) if x % 2 == 0`), and the `@` binding operator for combining a range check with capture.

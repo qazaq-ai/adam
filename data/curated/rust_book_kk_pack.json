@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 18,
-  "sentences_total": 1339,
-  "sample_count": 1339,
+  "chapters_translated": 19,
+  "sentences_total": 1459,
+  "sample_count": 1459,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -9382,6 +9382,846 @@
       "source_id": "chapter_18",
       "domain": "programming_rust",
       "text": "Ол `unsafe` блок, жетіленген трейттер, жетіленген типтер, жетіленген функциялар, макростар сияқты — ілгері Rust бағдарламашысы үшін маңызды құралдар."
+    },
+    {
+      "id": "rust_book_19_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жетілдірілген мүмкіндіктер Бұл тарауда `Rust`-тың әлдеқайда сирек кездесетін, бірақ кейбір жобаларда маңызды мүмкіндіктерін қарастырамыз: `unsafe` блоктар, жетілдірілген трейттер мен типтер, функция көрсеткіштері, кейін макростар."
+    },
+    {
+      "id": "rust_book_19_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бұлар — күн сайынғы код үшін емес, белгілі жағдайларда қажет болатын құралдар."
+    },
+    {
+      "id": "rust_book_19_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Олардың әрқайсысы туралы кітап деңгейіндегі кітап жазуға болады; біз — қысқаша шолу. 19.1."
+    },
+    {
+      "id": "rust_book_19_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қауіпсіз емес `Rust` `Rust` сізге қауіпсіздіктің бірқатар кепілдіктерін береді — иелік, қарыз ережелері, тип қауіпсіздігі, шексіздіктен қорғау."
+    },
+    {
+      "id": "rust_book_19_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ бар бағдарламалау мәселелерін шешуге сол кепілдіктер жеткіліксіз."
+    },
+    {
+      "id": "rust_book_19_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Кейде сізге `Rust`-тың тыйымдарынан тыс шығу керек: Аппараттық қамтамасыз етумен төменгі деңгейде сөйлесу. C тілінде жазылған кітапханамен мендесу."
+    },
+    {
+      "id": "rust_book_19_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапхананың ішкі (төменгі деңгейлі) бөліктерін жасау."
+    },
+    {
+      "id": "rust_book_19_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Соған **`unsafe`** блок арналған. `unsafe` ішінде сіз `Rust`-тың кепілдіктеріне сенуге емес, өзіңіздің инвариантыңызды дәлелдейтін кодты жаза аласыз. `unsafe` бес «суперкүш» береді."
+    },
+    {
+      "id": "rust_book_19_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Әдеттегі `Rust`-та мынау мүмкін емес: **Шикі көрсеткішке дереф жасау** (`*const T`, `*mut T`). **Қауіпсіз емес функция немесе әдіс шакыру** (`unsafe fn`). **Өзгермелі статикалық айнымалыға қол жеткізу немесе оны өзгерту** (`static mut`). **Қауіпсіз емес трейтті бекіту** (`unsafe impl`). **Одақтың (`union`) өрістеріне қол жеткізу**. `unsafe` сізге **қарыз тексергішті өшірмейді**."
+    },
+    {
+      "id": "rust_book_19_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сіз әлі де иелік ережелеріне сай жазасыз."
+    },
+    {
+      "id": "rust_book_19_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Тек жоғарыдағы бес мүмкіндік қосылады."
+    },
+    {
+      "id": "rust_book_19_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Шикі көрсеткіш Шикі көрсеткіштер — C-нің көрсеткіштеріне ұқсайды: Кез келген сан мәніне сілтей алады (тіпті дұрыс емес адреске)."
+    },
+    {
+      "id": "rust_book_19_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бір уақытта көп шикі көрсеткіш бір жадқа сілтей алады, оның кейбірі өзгермелі болғанмен."
+    },
+    {
+      "id": "rust_book_19_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Иесіз — тазалаудың автоматты жолы жоқ. `null` болуы мүмкін."
+    },
+    {
+      "id": "rust_book_19_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Шикі көрсеткішті жасау `unsafe`-те **қажет емес**."
+    },
+    {
+      "id": "rust_book_19_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ оны **дереф жасау** — `unsafe`-те ғана: `unsafe` арқылы сіз компиляторға айтасыз: «Мен бұл шикі көрсеткіштің жарамдылығына кепіл боламын»."
+    },
+    {
+      "id": "rust_book_19_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қателесіп қалсаңыз — бағдарламаңыз бұзылады."
+    },
+    {
+      "id": "rust_book_19_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қауіпсіз емес функция `unsafe fn` — функция өзінің барлық шакырушысына қандай да бір шартты қою керек, әйтпесе оны шакыру қауіпсіз емес."
+    },
+    {
+      "id": "rust_book_19_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Шакырғанда `unsafe` блогы ішінде болуы керек: Стандартты кітапханада `unsafe fn` мысалдары бар: `String::from_utf8_unchecked` (байттардың дұрыс UTF-8 екенін сіз кепілдеп жатсыз), `Vec::set_len` (көрсеткен ұзындықтың дұрыстығын сіз кепілдеп жатсыз) және басқалары."
+    },
+    {
+      "id": "rust_book_19_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қауіпсіз абстракцияны қауіпсіз емес кодтың үстінен жасау `unsafe` блок ішінде функция бола береді — бірақ функцияның **сыртқы интерфейсі** қауіпсіз болуы мүмкін."
+    },
+    {
+      "id": "rust_book_19_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапхана `Vec`, `HashMap`, тіпті `String` — бәрі ішінде `unsafe` қолданады."
+    },
+    {
+      "id": "rust_book_19_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ сіз олармен жұмыс істегенде ешбір `unsafe` керек емес."
+    },
+    {
+      "id": "rust_book_19_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Мысал — `split_at_mut`."
+    },
+    {
+      "id": "rust_book_19_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Стандартты функция: вектордың ортасынан екі тілімге бөліп қайтарады."
+    },
+    {
+      "id": "rust_book_19_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Әр тілім — өзгермелі."
+    },
+    {
+      "id": "rust_book_19_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қарыз ережелері бойынша бір вектордан екі өзгермелі сілтеме жасау тыйым."
+    },
+    {
+      "id": "rust_book_19_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ **әр тілім бөлек байттарды қамтыса** — қауіпсіз."
+    },
+    {
+      "id": "rust_book_19_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қарыз тексергіш бұны түсінбейді; ал бағдарламашы — біледі. `unsafe` блогы ішінде шикі көрсеткіштермен жұмыс."
+    },
+    {
+      "id": "rust_book_19_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ функцияның сыртқы интерфейсі (`fn split_at_mut`) — қауіпсіз."
+    },
+    {
+      "id": "rust_book_19_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Шакырғыш ешбір `unsafe`-ке кірмейді. `assert!(mid <= len)` — функцияның инвариантын тексеру."
+    },
+    {
+      "id": "rust_book_19_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бұл функция сертификациясы. `extern` функциялар: FFI **Foreign Function Interface (FFI)** — басқа тілде жазылған кодпен сөйлесу. C кітапханалары — мысал. `Rust`-та `extern` блок арқылы: `\"C\"` — Application Binary Interface (ABI). C-нің стандартты ABI-ы. `extern` блок ішінде сіз қандай функциялар сыртта бар екенін мәлімдейсіз."
+    },
+    {
+      "id": "rust_book_19_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Шакыру — `unsafe`, өйткені `Rust` C функциясының дұрыс жазылғанын кепілдей алмайды."
+    },
+    {
+      "id": "rust_book_19_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қарама-қарсы бағыт — басқа тілдер `Rust` функцияларын шакыру керек болса: `#[no_mangle]` атрибуты — компиляторға «бұл функцияның атауын өзгертпе» деп айтады."
+    },
+    {
+      "id": "rust_book_19_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сонда C коды оны атаумен таба алады."
+    },
+    {
+      "id": "rust_book_19_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Өзгермелі статикалық айнымалылар Әдеттегі `static` — глобальды тұрақты: `static` `const`-тан өзгеше: оның жадтағы орналасуы тұрақты, ал `const` қолданғанша ішке тиеленеді. `static mut` — ағындар арасында ортақ."
+    },
+    {
+      "id": "rust_book_19_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сондықтан оған қол жеткізу **қауіпсіз емес**: Бірнеше ағыннан `add_to_count` шакырылса — жарыс шарты болуы мүмкін."
+    },
+    {
+      "id": "rust_book_19_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сондықтан `static mut` өте сирек қолданылады."
+    },
+    {
+      "id": "rust_book_19_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Көп жағдайда оған балама — `Mutex<T>` немесе атомдық типтер."
+    },
+    {
+      "id": "rust_book_19_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қауіпсіз емес трейттер Кейде трейтті бекіткеннің инварианттарын `Rust` өзі тексере алмайды."
+    },
+    {
+      "id": "rust_book_19_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сондықтан тип сол трейтке сай ма деп бағдарламашы кепіл бола алады: `Send` және `Sync` — стандартты `unsafe` трейттердің мысалы."
+    },
+    {
+      "id": "rust_book_19_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қарапайым типтерде олар автоматты түрде бекітіледі; сирек жағдайда сіз `unsafe impl Send for ...` жазып, инвариантты қолмен дәлелдейсіз."
+    },
+    {
+      "id": "rust_book_19_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Одақ `union` — C-нің одағына ұқсас тип."
+    },
+    {
+      "id": "rust_book_19_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Барлық өрістер бір жадты бөлесіп ұстайды, бірақ бір сәтте бір ғана өрісті оқысаңыз дұрыс."
+    },
+    {
+      "id": "rust_book_19_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Дұрыс емес өрісті оқу — қауіпсіз емес. `union` — С-кодпен өзара әрекеттесуде сирек қолданылады; әдетте `enum` (тегtagged union) дұрыс таңдау. 19.2."
+    },
+    {
+      "id": "rust_book_19_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жетілдірілген трейттер Байланысты типтер **Байланысты тип** — трейттің жариялауында қолданылатын типтік орынтолтырғыш."
+    },
+    {
+      "id": "rust_book_19_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жалпылама тип параметріне ұқсас, бірақ айырмашылық бар. `Iterator` трейтін еске сақтаймыз: `type Item` — байланысты тип."
+    },
+    {
+      "id": "rust_book_19_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Әр бекіту үшін **бір ғана** тип болады: Жалпылама түрмен айырмашылық: `<T>` түрімен бір типке бір нұсқадан артық бекіту мүмкін болар еді (`impl Iterator<i32> for Counter`, `impl Iterator<f64> for Counter` — екеуі де)."
+    },
+    {
+      "id": "rust_book_19_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Байланысты типтермен — тек **бір** бекіту, сондықтан `next()` қандай типке қайтаратынын шакырушы кодта анық."
+    },
+    {
+      "id": "rust_book_19_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Әдепкі жалпылама тип параметрлері `<T = SomeType>` — жалпылама параметрге әдепкі тип беруге болады: `Rhs = Self` — әдепкі бойынша оң жақ операнд `Self` түрінде."
+    },
+    {
+      "id": "rust_book_19_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сондықтан `a + b`-та екеуі бір типте болады."
+    },
+    {
+      "id": "rust_book_19_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ басқа типпен қосу керек болса: Әдепкі типті ауыстырып, `Millimeters + Meters` амалын анықтадық."
+    },
+    {
+      "id": "rust_book_19_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Толық қолтаңбамен айқындау Бір типке бірнеше трейт ұқсас атпен әдіс берсе — қайсы шакырылады? **Толық қолтаңбамен айқындау** көмекке келеді: Әдістер `&self`-пен — байланысты функциялар (`Self` параметрсіз) үшін толық қолтаңбамен жазу: `<Type as Trait>::method` — толық, әрқашан жұмыс істейтін форма."
+    },
+    {
+      "id": "rust_book_19_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Ата-трейттер Кейде сіздің трейтіңізге басқа трейттің бекітуі қажет: `OutlinePrint: fmt::Display` — `OutlinePrint` тек `Display` бекіткен типтерге бекітіледі. **Ата-трейт** — `Display`."
+    },
+    {
+      "id": "rust_book_19_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сондықтан `outline_print` ішінде `self.to_string()` жұмыс істейді."
+    },
+    {
+      "id": "rust_book_19_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Орфан-ережені айналдыру: жаңатип үлгісі 7-тарауда орфан-ережесі туралы айттық: трейтті типке тек өзіңіздің сандығыңыздан болса ғана бекіте аласыз."
+    },
+    {
+      "id": "rust_book_19_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ сізге `Display` трейтін `Vec<T>` түріне бекіткіңіз келсе ше?"
+    },
+    {
+      "id": "rust_book_19_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Екеуі де стандартты кітапханада."
+    },
+    {
+      "id": "rust_book_19_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Шешім — **жаңатип** (newtype) үлгісі: `Vec<T>`-ті өзіңіздің тегіңізбен орап аласыз: `Wrapper` — біздің сандықта; `Display` — стандартты кітапханада; бекіту — заңды."
+    },
+    {
+      "id": "rust_book_19_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Кемшілігі — `Wrapper`-да `Vec`-тің әдістері тікелей қол жетімді емес."
+    },
+    {
+      "id": "rust_book_19_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қажетін `impl` арқылы өткізе аласыз, бірақ ыңғайсыз."
+    },
+    {
+      "id": "rust_book_19_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жалпы — жаңатип шектеулі мақсат үшін. 19.3."
+    },
+    {
+      "id": "rust_book_19_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жетілдірілген типтер Жаңатип үлгісі — типтік қауіпсіздік үшін Жаңатип үлгісінің тағы пайда: бір негізгі типтен бірнеше әртүрлі семантикалық типті жасау."
+    },
+    {
+      "id": "rust_book_19_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Мысалы: Енді `Years` пен `Days` екеуі — әртүрлі типтер."
+    },
+    {
+      "id": "rust_book_19_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Тіпті ішінде екеуі де `i64` болса да, біреуінің орнына екіншісін беру мүмкін емес — компилятор қателікке барады."
+    },
+    {
+      "id": "rust_book_19_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бұл — типтік жүйе арқылы мағыналы қателерді тыюшы."
+    },
+    {
+      "id": "rust_book_19_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Тип бүркеншегі `type` кілтсөзі — бар типке басқа атау беруге: `Kilometers` — `i32`-нің бүркеншегі."
+    },
+    {
+      "id": "rust_book_19_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жаңатип емес — біреуін екіншісімен араластыруға болады."
+    },
+    {
+      "id": "rust_book_19_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Тек код оқуға айқындау үшін."
+    },
+    {
+      "id": "rust_book_19_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Көп жағдайда қолданылатын ұзын типтерді қысқартуға арналған: `Thunk` — оқуға бір қарап түсінікті; ал `Box<dyn Fn() + Send + 'static>` әр функция сигнатурасында ұзын болады."
+    },
+    {
+      "id": "rust_book_19_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Ешқашан-тип `!` Кейбір өрнектер ешқашан мән қайтармайды — олар `panic!`-қа барады, қайтарусыз орындалады, не циклге қайтарылмай қалады."
+    },
+    {
+      "id": "rust_book_19_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Олардың типі — **ешқашан-тип `!`** (the never type, «empty type»)."
+    },
+    {
+      "id": "rust_book_19_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Мысалы: `panic!` `!` қайтарады. `!` кез келген типке аударылады, сондықтан оны кез келген контексте қолдануға болады. `continue` — `!` қайтарады: `Ok(num) => num` — `u32` қайтарады. `Err(_) => continue` — `!`."
+    },
+    {
+      "id": "rust_book_19_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Екі тармақтың типі бір болуы керек, бірақ `!` кез келгенге сай — сондықтан жалпы тип `u32` болады."
+    },
+    {
+      "id": "rust_book_19_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Динамикалық өлшемді типтер мен `Sized` `Rust`-та көп тип компиляция кезінде белгілі мөлшерде болады."
+    },
+    {
+      "id": "rust_book_19_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ кейбір типтер — өлшемі тек орындалу кезінде белгілі болады. `str` — мысал."
+    },
+    {
+      "id": "rust_book_19_0076",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бір жолдың мөлшері әр жолға бөлек."
+    },
+    {
+      "id": "rust_book_19_0077",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сондықтан тікелей `str` түрінде айнымалы жасау мүмкін емес: Бірақ `&str` — жұмыс істейді, өйткені `&str` — екі мән (көрсеткіш ұзындық), мөлшері белгілі."
+    },
+    {
+      "id": "rust_book_19_0078",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жалпылама функцияда жалпылама тип параметрі әдетте `Sized` (мөлшері белгілі) болуы шартталған."
+    },
+    {
+      "id": "rust_book_19_0079",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жасырын сипат: — шынында: `T: ?Sized` — динамикалық мөлшерлі типтерді де қабылдайтын ерекше синтаксис: `?Sized` тек жалпылама параметрлерге қолданылады. `t` — `&T` ретінде келуі керек, өйткені `T` мөлшері белгісіз болуы мүмкін. 19.4."
+    },
+    {
+      "id": "rust_book_19_0080",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жетілдірілген функциялар мен жабулар Функция көрсеткіштері Әдеттегі жабудан басқа — **функция көрсеткіштері**."
+    },
+    {
+      "id": "rust_book_19_0081",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Тек `Fn` емес, **`fn`** (шағын `f`): `fn(i32) -> i32` — `Fn`/`FnMut`/`FnOnce`-ке ұқсас, бірақ нақты функция көрсеткіші."
+    },
+    {
+      "id": "rust_book_19_0082",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Барлық функция көрсеткіштері `Fn` де."
+    },
+    {
+      "id": "rust_book_19_0083",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сондықтан жалпылама `<F: Fn(...)>` орнына нақты `fn(...)` қолдану — кейбір жағдайларда дұрыс (мысалы, FFI-да C функция көрсеткіштерін қабылдау)."
+    },
+    {
+      "id": "rust_book_19_0084",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Жабуды қайтару Функцияға жалпылама параметр беру оңай."
+    },
+    {
+      "id": "rust_book_19_0085",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ функциядан жабу қайтару — қиынырақ."
+    },
+    {
+      "id": "rust_book_19_0086",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Себебі әр жабудың типі — анонимді, сізде нақты атау жоқ."
+    },
+    {
+      "id": "rust_book_19_0087",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Шешім — `Box<dyn Fn(...) -> ...>`: Box арқылы жабудың дәл түрін жасырамыз; шакырушы `Fn(i32) -> i32` интерфейсіне сүйенеді."
+    },
+    {
+      "id": "rust_book_19_0088",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Кейбір жағдайда `impl Fn(...) -> ...` де жұмыс істейді (Rust 1.26+): — қарапайым; бір нақты жабуға арналған."
+    },
+    {
+      "id": "rust_book_19_0089",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ `match` ішінде әр түрлі жабу қайтаратын болсаңыз — `Box<dyn Fn>` керек, өйткені `impl Trait` тек бір нақты типке арналған. 19.5."
+    },
+    {
+      "id": "rust_book_19_0090",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Макростар Макрос — кодты *кодтан* шығаратын код."
+    },
+    {
+      "id": "rust_book_19_0091",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Функциядан өзгеше: функция мәндерді алады, нәтиже қайтарады."
+    },
+    {
+      "id": "rust_book_19_0092",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Макрос — синтаксистік ағашты алады, жаңа синтаксистік ағаш қайтарады. `Rust`-та екі үлкен макрос түрі бар: **Декларативті макростар** (`macro_rules!`). **Процедуралық макростар** — үш кіші түрі: derive, attribute, function-like."
+    },
+    {
+      "id": "rust_book_19_0093",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Декларативті макростар `vec!` мысалы: `vec!` — макрос."
+    },
+    {
+      "id": "rust_book_19_0094",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Оның жариялауы шамамен былай: `$( $x:expr ),*` — синтаксис: бөлектелген өрнектердің жиыны. `$x` — айнымалы; `expr` — оның түрі; `,` — бөлектегіш; `*` — қайталану."
+    },
+    {
+      "id": "rust_book_19_0095",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Шакырылғанда — `vec![1, 2, 3]` деп — макрос ішке `1, 2, 3`-ті алады және әр өрнек үшін `temp_vec.push($x)` қайталауын жасайды."
+    },
+    {
+      "id": "rust_book_19_0096",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Нәтиже — жаңа кіші вектор. `#[macro_export]` — макросты сандықтан сыртқа экспорттайды."
+    },
+    {
+      "id": "rust_book_19_0097",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Декларативті макростар — қарапайым шаблон-сай келтіру."
+    },
+    {
+      "id": "rust_book_19_0098",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Көп жағдайда жеткілікті, бірақ шектеулері бар."
+    },
+    {
+      "id": "rust_book_19_0099",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Процедуралық макростар Процедуралық макрос — синтаксистік ағашты қабылдайды, өзгертеді, қайтарады."
+    },
+    {
+      "id": "rust_book_19_0100",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Нақты функция, бірақ компиляция кезінде орындалады. derive макросы `#[derive(Debug)]` — derive макросының мысалы."
+    },
+    {
+      "id": "rust_book_19_0101",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Біз де өзіміздің жасай аламыз."
+    },
+    {
+      "id": "rust_book_19_0102",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Олар бір сандықта — `proc-macro` сандығында — жүзеге асырылады, басқа сандықтан қолданылады."
+    },
+    {
+      "id": "rust_book_19_0103",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қарапайым `HelloMacro` мысалы: Шакырылғанда: Шығатыны: `Hello, Macro! Менің атым Pancakes!` `syn` — синтаксис талдау; `quote` — синтаксис генерация."
+    },
+    {
+      "id": "rust_book_19_0104",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Олар — екі стандартты сандық."
+    },
+    {
+      "id": "rust_book_19_0105",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Атрибут макростары `#[route(GET, \"/\")]` сияқты атрибуттарды жасауға арналған. Web-кең жобаларда (Actix, Rocket) маршрут жариялау сондай."
+    },
+    {
+      "id": "rust_book_19_0106",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Функция-сияқты макростар Декларативті `macro_rules!`-ке ұқсайды, бірақ кеңірек."
+    },
+    {
+      "id": "rust_book_19_0107",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Айырмашылық — шакыру синтаксисі: `my_macro!(...)`."
+    },
+    {
+      "id": "rust_book_19_0108",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Мысалы, SQL-сұраныстарды компиляция кезінде тексеретін `sqlx::query!` — функция-сияқты процедуралық макрос."
+    },
+    {
+      "id": "rust_book_19_0109",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Функция vs макрос Қашан макрос, қашан функция: **Айнымалы санды аргумент.** `println!`, `vec!` — қандай саны болса да аргумент қабылдайды."
+    },
+    {
+      "id": "rust_book_19_0110",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Функция — фиксацияланған сан. **Кодтан кодты шығару.** `derive` арқылы трейттің бекітуін автоматты."
+    },
+    {
+      "id": "rust_book_19_0111",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Функция мұндайды жасай алмайды. **Әр трейт бекітуінің атауын қолдан жазудың керегі болмауы.** Бір рет макрос жазсаңыз — барлық типке бекітіледі."
+    },
+    {
+      "id": "rust_book_19_0112",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ макростар: Күрделі, түсіну мен debug қиынырақ."
+    },
+    {
+      "id": "rust_book_19_0113",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Қателер хабарламасы жетімсіз болуы мүмкін."
+    },
+    {
+      "id": "rust_book_19_0114",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірінші — функция; қажет болса — макрос. 19.6."
+    },
+    {
+      "id": "rust_book_19_0115",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Бұл — `Rust`-тың жетілдірілген тұсы: **`unsafe`** — қарапайым ережелерден тыс шығу."
+    },
+    {
+      "id": "rust_book_19_0116",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Шикі көрсеткіш, қауіпсіз емес функция, FFI, `static mut`, `unsafe trait`, `union`."
+    },
+    {
+      "id": "rust_book_19_0117",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Сирек қолданылады, көбіне стандартты кітапхана ішінде. **Жетілдірілген трейттер** — байланысты типтер, әдепкі жалпылама параметрлер, толық қолтаңба, ата-трейттер, жаңатип үлгісі. **Жетілдірілген типтер** — жаңатип, тип бүркеншегі, ешқашан-тип `!`, динамикалық өлшемді типтер мен `?Sized`. **Функция көрсеткіштері мен жабу қайтару** — `fn` түрі, `Box<dyn Fn>`, `impl Fn`. **Макростар** — `macro_rules!` (декларативті), процедуралық (derive, attribute, function-like)."
+    },
+    {
+      "id": "rust_book_19_0118",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бұл құралдар — әр жобада қажет емес."
+    },
+    {
+      "id": "rust_book_19_0119",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Бірақ бар Rust бағдарламашысы өзінің бір күні `unsafe`-ке кірмесін, тип бүркеншегін қолданбасын, макрос жазып шықпасын деп біле алмайды."
+    },
+    {
+      "id": "rust_book_19_0120",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_19",
+      "domain": "programming_rust",
+      "text": "Соңғы — 20-тарау — бар бұрын үйренгенімізді бір жобаға жинау: көп ағынды веб-сервер."
     }
   ]
 }
