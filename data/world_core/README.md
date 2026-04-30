@@ -140,7 +140,8 @@ Validator checks:
 - `physics_school.jsonl` — 102 entries / 102 facts  *(new in v4.8.0)*
 - `chemistry_school.jsonl` — 105 entries / 105 facts  *(new in v4.9.0)*
 - `biology_school.jsonl` — 120 entries / 120 facts  *(new in v4.10.0)*
-- **Total: 1469 entries / 1632 facts across 36 domains** (v4.10.0), all `approved`
+- `history_kazakhstan.jsonl` — 124 entries / 124 facts  *(new in v4.11.0)*
+- **Total: 1593 entries / 1756 facts across 37 domains** (v4.11.0), all `approved`
   at `high` or `medium` confidence by `shaman`. v4.3.5 added **kz_literature
   surname-keyed entries** (Әуезов / Сейфуллин / Мүсірепов / Жұмабаев / …) and a
   new **`notable_kazakhstanis.jsonl` domain** (presidents, khans, scientists,

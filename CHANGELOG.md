@@ -7,6 +7,41 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.11.0] — 2026-04-30 — `history_kazakhstan.jsonl` world_core domain (history of Kazakhstan, Kazakh)
+
+Ninth v4.x minor. **Final** in the **non-Rust domain expansion** track. `history_kazakhstan.jsonl` is a curated 124-entry Kazakh glossary covering the major periods, polities, events, and symbols of Kazakhstan's history — from Bronze Age archaeology through the present day.
+
+### Sections covered
+
+- **Archaeological / pre-Türkic (~7 entries)** — қола дәуірі, темір дәуірі, андрон мәдениеті, беғазы-дәндібай мәдениеті, сақтар, ғұндар, үйсіндер.
+- **Türkic period (~10 entries)** — түрік қағанаты, батыс түрік қағанаты, түргеш қағанаты, қарлұқ, оғыз, кимек, қарахан, қыпшақ; күлтегін ескерткіші, орхон жазулары.
+- **Mongol / Golden Horde (~6 entries)** — моңғол шапқыншылығы, шыңғыс хан, алтын орда, ақ орда, көк орда, әмір темір.
+- **Kazakh Khanate (~16 entries)** — қазақ хандығы (1465), керей хан, жәнібек хан, бұрындық хан, қасым хан, хақназар хан, тәуекел хан, есім хан, жәңгір хан, тәуке хан, жеті жарғы, абылай хан, кенесары хан; үш жүз — ұлы / орта / кіші жүз.
+- **Jungar wars (~5 entries)** — жоңғар хандығы, ақтабан шұбырынды (1723), бұланты шайқасы (1726), аңырақай шайқасы (1729), төле / қазыбек / әйтеке билер.
+- **Russian colonization (~10 entries)** — әбілқайыр хан 1731, кенесары көтерілісі 1837–1847, сырым датұлы, исатай / махамбет, абай құнанбайұлы, шоқан уәлиханов, ыбырай алтынсарин, 1916 жылғы көтеріліс, амангелді иманов.
+- **Soviet period (~22 entries)** — алаш орда, әлихан бөкейхан, ахмет байтұрсынұлы, мағжан жұмабаев, мұстафа шоқай; қазақ асср → қазақ сср; коллективтендіру, 1930 жылдардағы ашаршылық, голощёкин, сталиндік репрессиялар, карлаг / алжир, депортация, ұлы отан соғысы, бауыржан момышұлы, тың игеру (1954), семей полигоны, байқоңыр ғарыш айлағы, желтоқсан көтерілісі (1986), қонаев.
+- **Independence era (~13 entries)** — назарбаев, тәуелсіздік 1991, 1995 конституция, теңге (1993), астана (1997), нур-сұлтан, тоқаев, қаңтар оқиғалары (2022).
+- **Symbols & holidays (~10 entries)** — рәміздер: ту, елтаңба, әнұран; шаңырақ, көк бөрі, қыран; тәуелсіздік күні, наурыз мейрамы, ұлттық киімдер.
+- **Silk Road & monuments (~8 entries)** — отырар, тараз, сауран, сығанақ; ходжа ахмет ясауи кесенесі, айша бибі кесенесі, бесшатыр, таңбалы, түркістан.
+
+### Pipeline impact
+
+- world_core: 1 469 → **1 593 entries** (+124); 1 632 → **1 756 facts** (+124); 36 → **37 domains**.
+- `data/retrieval/facts.json`: 16 158 → **16 282** (+124).
+- `MULTIWORD_ENTITIES` += **145 history compounds** (longest-first ordering preserved).
+- Lexicon: **+64 noun roots** (тарих, сақтар, ғұндар, түрік, қағанат, моңғол, шыңғыс, абылай, кенесары, наурыз, шаңырақ, тоқаев, etc.).
+- `derived_facts.json`: 29 976 derived facts in 5 passes.
+- `lexical_graph.json`: 4 267 nodes, 14 542 edges.
+
+### Tests + counters
+
+- `world_core_multiword_coverage` contract test passes.
+- `validate_world_core` clean: 1 593 / 1 593 approved / 1 756 facts.
+
+### Cadence
+
+Minor (v4.11.0) — new world_core domain. **Concludes the non-Rust expansion track** (v4.8.0 physics → v4.9.0 chemistry → v4.10.0 biology → v4.11.0 history). Roman numerals (`IX`, `XV`, `XIII`, …) wrap in backticks per the v4.7.0 carve-out, so century notation in Kazakh prose round-trips cleanly through `validate_world_core`.
+
 ## [4.10.0] — 2026-04-30 — `biology_school.jsonl` world_core domain (school-curriculum biology, Kazakh)
 
 Eighth v4.x minor. Third in the **non-Rust domain expansion** track. `biology_school.jsonl` is a curated 120-entry Kazakh glossary covering school-curriculum biology across eight sections.
