@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 10,
-  "sentences_total": 767,
-  "sample_count": 767,
+  "chapters_translated": 11,
+  "sentences_total": 832,
+  "sample_count": 832,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -5378,6 +5378,461 @@
       "source_id": "chapter_10",
       "domain": "programming_rust",
       "text": "Сіз `Rust`-та тестті қалай жазатынды, қалай іске қосатыныңды, тестілер арқылы кодыңыздың дұрыстығын қалай қамтамасыз ететіндігіңізді көресіз."
+    },
+    {
+      "id": "rust_book_11_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Автоматты сынақтар жазу Сынақ — кодты жалғастырмастан бұрын оның дұрыстығын тексеретін бағдарлама."
+    },
+    {
+      "id": "rust_book_11_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Әр жаңа мүмкіндік қосылғанда, бар сынақтар сізге кодыңыздың ескі мінезі жоғалмағанын мойнына алады."
+    },
+    {
+      "id": "rust_book_11_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Олардың нәтижесінде сіз дауысты түрде «менің кодым жұмыс істеп тұр» дей аласыз — қарап тұрып емес, сынақтармен дәлелдеп. `Rust`-та сынақ жазу тілдің құрамдас бөлігі."
+    },
+    {
+      "id": "rust_book_11_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Жаңа жобада дайын дайындаулар бар: `cargo test` командасымен әр жаңартудан кейін сынақтар жүгіртіледі; жаңа функцияға арналған сынақты жазу — бір атрибут пен бір функция."
+    },
+    {
+      "id": "rust_book_11_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бұл тарауда үш бөлік бар: **Сынақты қалай жазу** — `#[test]` атрибуты, `assert!`-дер тобы, panic-күтілуі, тестілерде `Result` қолдану. **Сынақтардың жұмысын қалай басқаруға болады** — параллельді / дәйекті, шығаруларды көру, ішкі жиынды жүгірту, елемеу. **Сынақтарды ұйымдастыру** — бірлік тесттері vs интеграциялық тесттер; жасырын функцияларды тестілеу. 11.1."
+    },
+    {
+      "id": "rust_book_11_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сынақты қалай жазу `Rust`-та сынақ — әдеттегі функция, бірақ оның үстінде `#[test]` атрибуты тұрады. `cargo test` командасы атрибутпен белгіленген барлық функцияларды табады, оларды бөлек жүгіртеді және әрбірінің сәтті өтуін немесе кетпеуін тіркейді."
+    },
+    {
+      "id": "rust_book_11_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сынақтың құрылымы `cargo new adder --lib` командасымен жаңа кітапхана сандығын жасайық. Cargo сізге дайын тестпен `src/lib.rs` файлын ұсынады: Жолма-жол қарастырайық: `#[cfg(test)]` атрибуты — модулді тек `cargo test` ішінде құрастыруды білдіреді."
+    },
+    {
+      "id": "rust_book_11_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Кәдімгі құрастыруда (`cargo build` / `cargo run`) бұл модуль орындалатын файлға қосылмайды."
+    },
+    {
+      "id": "rust_book_11_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сондықтан тест коды оқырманға қол жетімді, әрі шығарылым бағдарламаны үлкейтпейді. `mod tests { ... }` — тесттерге арналған модуль."
+    },
+    {
+      "id": "rust_book_11_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Шарт емес, бірақ — идиоматикалық. `use super::*;` — ата модульдің барлық элементтерін аумаққа енгізеді."
+    },
+    {
+      "id": "rust_book_11_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Біздің жағдайда — `add` функциясын. `#[test]` атрибуты — функцияны сынақ ретінде белгілейді. `assert_eq!(result, 4)` — макрос, екі мәнді теңдеу."
+    },
+    {
+      "id": "rust_book_11_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Тең емес болса — panic-қа барады, сынақ кетеді. `cargo test` орындасаңыз, шығатын: Cargo сізге қанша сынақ өткенін, қанша кеткенін, қанша еленбегенін көрсетеді."
+    },
+    {
+      "id": "rust_book_11_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сынақтың сәтсіз өтуі Сынақ panic-қа барса — ол кетеді."
+    },
+    {
+      "id": "rust_book_11_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Әдейі бір кететін сынақ қосайық: `cargo test` шығаратыны: Сынақтардың бір-бірінен айырмасы жоқ — біреу кетсе, басқалары жалғаса береді."
+    },
+    {
+      "id": "rust_book_11_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Жалпы қорытынды соңында: барлық сынақтар тізімі, кеткені және себептер. `assert!` макросы `assert!(condition)` — шарт `true` болуын тексереді. `false` болса — panic. `assert!` бір аргумент алады — логикалық өрнек."
+    },
+    {
+      "id": "rust_book_11_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Әсер мақсатына сай — кез келген өрнекті тексеруге болады. `assert_eq!` пен `assert_ne!` `assert_eq!(left, right)` — екі мәннің тең болуын тексереді. `assert_ne!(left, right)` — тең *болмауын*."
+    },
+    {
+      "id": "rust_book_11_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Қарапайым `assert!(a == b)`-тан артықшылығы — кетсе, екі мәнді де экранға шығарады: Шығатыны: `left` — нақты мән, `right` — күтілген."
+    },
+    {
+      "id": "rust_book_11_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Кеткенде дереу қатенің көлемі анық: 4 келді, 5 күтілді. `assert!`-пен бұл дәл осындай ыңғайлы емес болар еді. `assert_eq!` мен `assert_ne!` мәндерді салыстыру үшін `PartialEq` трейтін, ал басып шығару үшін `Debug` трейтін талап етеді."
+    },
+    {
+      "id": "rust_book_11_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сондықтан сіздің өзіңіздің құрылымдарыңызды салыстыруға дайындау үшін `#[derive(PartialEq, Debug)]` қосу керек."
+    },
+    {
+      "id": "rust_book_11_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Қате хабарламасын қосу Әдепкі хабарлама нақты болмаса — өзіңіздікін қосуға болады: `assert!`-тің екінші аргументі — `format!`-қа ұқсас формат жолы. `assert_eq!` мен `assert_ne!`-та да дәл солай. `should_panic` арқылы panic-ты тексеру Кейде дұрыс мінез — қатеге panic-қа бару."
+    },
+    {
+      "id": "rust_book_11_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Соны тексеру керек болса `#[should_panic]` атрибутын қосыңыз: Сынақ panic-қа бармаса — кетеді. Panic-қа барса — өтеді. `should_panic` тым кең болуы мүмкін — кез келген panic сай келеді, тіпті сіз күтпеген."
+    },
+    {
+      "id": "rust_book_11_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Нақтырақ ету үшін `expected` параметрі бар: Сынақ panic хабарламасында «1 мен 100 арасында» деген сөз болғанда ғана өтеді."
+    },
+    {
+      "id": "rust_book_11_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Басқа себептен panic болса — кетеді."
+    },
+    {
+      "id": "rust_book_11_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Тестілерде `Result<T, E>` Сынақ функциясы `Result<T, E>` қайтаратындай етіп жазуға болады: Бұл стиль `?` операторы арқылы көп әрекетті тізбектегенде ыңғайлы."
+    },
+    {
+      "id": "rust_book_11_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бірақ `should_panic` атрибутын `Result` қайтаратын сынаққа қолдануға болмайды — себебі сынақ `Err` қайтаруы керек, сондықтан panic-тан тыс шарт өзінде бар. 11.2."
+    },
+    {
+      "id": "rust_book_11_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сынақтардың жұмысын басқару `cargo test` нөлдік параметрлерсіз барлық сынақтарды бөлек ағындарда параллельді жүгіртеді."
+    },
+    {
+      "id": "rust_book_11_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бұл әдеттен — қажетсіз болғанда — өзгертуге болады. `cargo test` командасы екі жалаушаны бөліп қабылдайды: біреуі — `cargo test`-тің өзіне, екіншісі — сынақ бинарлы файлына (test runner-ге)."
+    },
+    {
+      "id": "rust_book_11_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Ажырату — `--`."
+    },
+    {
+      "id": "rust_book_11_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Мысалы: Параллельді vs дәйекті жүгірту Әдепкі бойынша сынақтар — параллельді."
+    },
+    {
+      "id": "rust_book_11_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бұл — жылдам, бірақ: ортақ файлмен жұмыс істейтін сынақтар бір-бірін кедергі жасауы мүмкін; ортақ ортаға айнымалылар әсер етуі ықтимал; буфер шығармаларынан бөтен әсер шығып кетеді."
+    },
+    {
+      "id": "rust_book_11_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Параллельдікті өшіру: Барлық сынақтар бірден бір ағында дәйекті жүгіреді."
+    },
+    {
+      "id": "rust_book_11_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Баяу болады, бірақ бір-біріне әсер ету мүмкіндігі жоқ."
+    },
+    {
+      "id": "rust_book_11_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Шығаруларды көру Әдепкі бойынша өткен сынақтың `println!`-ден шыққан мәтіні басылмайды — тек сынақтың өту/кетуі көрсетіледі."
+    },
+    {
+      "id": "rust_book_11_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Кеткен сынақтың шығарулары басылады."
+    },
+    {
+      "id": "rust_book_11_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Барлық шығаруды (өткендердікі де) көру керек болса: Сынақ атымен таңдау Барлық сынақты емес, тек белгілі бір аттарды жүгірту керек болса — атау `cargo test`-ке аргумент ретінде беріледі: Бұл — substring-сай: атын құрамына ұқсас барлық сынақтар жүгіреді."
+    },
+    {
+      "id": "rust_book_11_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сынақтарды елемеу Кейде белгілі бір сынақ ұзақ — әр шакыруда жүгіртудің керегі жоқ."
+    },
+    {
+      "id": "rust_book_11_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Соған `#[ignore]` атрибуты: `cargo test` командасы оны өткізіп жібереді."
+    },
+    {
+      "id": "rust_book_11_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Тек белгіленген сынақтарды жүгірту керек болса: Барлық сынақтарды (елемегендерді қоса) жүгірту: Бұл — ыңғайлы тірі-тіріге: жылдам сынақтарды әр өзгертіс кейін, ұзақ сынақтарды (немесе ауыр сценарийлерді) тек CI-да немесе арнайы команда бойынша жүгіртесіз. 11.3."
+    },
+    {
+      "id": "rust_book_11_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сынақтарды ұйымдастыру `Rust` қауымдастығы сынақтарды екі үлкен топқа бөледі: **бірлік тесттері** (unit tests) және **интеграциялық тесттер** (integration tests). **Бірлік тесттері** — бір модульге шектелген, ішкі логиканы тексереді."
+    },
+    {
+      "id": "rust_book_11_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Жасырын функцияларды да тексере алады."
+    },
+    {
+      "id": "rust_book_11_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сол модуль ішінде `#[cfg(test)]` мен `mod tests` блогы арқылы орналастырылады. **Интеграциялық тесттер** — кітапханаңызды сыртқы пайдаланушы сияқты қолданады."
+    },
+    {
+      "id": "rust_book_11_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Жобаның түбіріндегі `tests/` қалтасында өздеріндік файл ретінде болады."
+    },
+    {
+      "id": "rust_book_11_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Екеуінің мақсаты әртүрлі."
+    },
+    {
+      "id": "rust_book_11_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бірлік тесттері — ішкі модульдердің ұсақ-түйекті жұмысын тексереді."
+    },
+    {
+      "id": "rust_book_11_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Интеграциялық тесттер — кітапхананың жалпы интерфейсі дұрыс жұмыс істейтінін, бөліктер бір-бірімен бірге жұмыс істейтінін."
+    },
+    {
+      "id": "rust_book_11_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бірлік тесттері Бірлік тесттері — нақты модулмен бір файлда тұрады: `internal_adder` — жасырын функция (модульден сыртқа `pub` етілмеген)."
+    },
+    {
+      "id": "rust_book_11_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бірақ `tests` модулі сол модульдің ішінде тұрғандықтан — оған еш қиналмай қолжетімді."
+    },
+    {
+      "id": "rust_book_11_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бұл — бірлік тестілердің мықты жағы: ішкі логиканы сыртқа шығармай тексеруге болады. `#[cfg(test)]` атрибуты — компилятордың сынақ модулін тек `cargo test` ішінде құрастыруды кепілдейді."
+    },
+    {
+      "id": "rust_book_11_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Интеграциялық тесттер Интеграциялық тесттер — кітапхана сандығын сыртқа таныстырғандай қолданатын жеке файлдар."
+    },
+    {
+      "id": "rust_book_11_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Олар жобаның түбіріндегі `tests/` қалтасында тұрады. Cargo сол қалтаны автоматты түрде интеграциялық тесттер деп қарастырады."
+    },
+    {
+      "id": "rust_book_11_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Алдыңғы мысалымыздағы `adder` сандығына интеграциялық тест қосайық: `tests/integration_test.rs`: Әрбір `tests/` файлы — өзінің бөлек сандығы."
+    },
+    {
+      "id": "rust_book_11_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сондықтан кітапхананы `use adder::add_two` арқылы жариялаймыз — `super` арқылы емес."
+    },
+    {
+      "id": "rust_book_11_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Жасырын функцияларға кірудің мүмкіндігі жоқ — тек ашық интерфейс. `cargo test` шығатыны: Cargo бірлік тесттері мен интеграциялық тесттерді бөлек шығарады."
+    },
+    {
+      "id": "rust_book_11_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бір немесе екеуі кетсе — қайсысы екені анық."
+    },
+    {
+      "id": "rust_book_11_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Интеграциялық тесттерде ішкі модуль Бірнеше интеграциялық тест ортақ көмекші кодты қолданғыңыз келсе — жай ғана `tests/common.rs` жасасаңыз — ол өзімен жеке тест ретінде жүгіртіледі."
+    },
+    {
+      "id": "rust_book_11_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бұл — кейде ыңғайсыз. `Rust` шарты бойынша — ортақ кодты `tests/common/mod.rs` файлында ұстайды: `tests/common/mod.rs`: `tests/integration_test.rs`: `tests/common/mod.rs` стилі — Cargo-ға бұл файл өздігімен тест емес, тек ортақ модуль екенін айтады."
+    },
+    {
+      "id": "rust_book_11_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Екілік сандықтар үшін интеграциялық тесттер Жобаңыз тек `src/main.rs`-те екілік сандық болса — `tests/` қалтасынан функциялар импорттай алмайсыз."
+    },
+    {
+      "id": "rust_book_11_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сондықтан `Rust` қауымдастығы — кодтың көп бөлігін `src/lib.rs`-ке шығарып, `src/main.rs` тек оны шақыратын тонкый қабат жасайды: Бар басты логика `src/lib.rs`-та."
+    },
+    {
+      "id": "rust_book_11_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сол кітапхана сандығына `tests/` ішінен — әдеттегі жолмен — интеграциялық тест жазуға болады. 11.4."
+    },
+    {
+      "id": "rust_book_11_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы `Rust`-тың сынақ инфрақұрылымы — қарапайым әрі күшті. `#[test]` атрибутымен функцияны белгілейсіз; `assert!`-дер тобымен шарттарды тексересіз; `should_panic` арқылы күтілетін қателерді тексересіз; `Result<T, E>` сынақтарымен `?`-операторды қолдана аласыз. `cargo test` командасы сынақтарды параллельді жүгіртеді — әдеттен тыс жағдайларда оны өзгертуге болады."
+    },
+    {
+      "id": "rust_book_11_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сынақ атымен таңдау, `#[ignore]` арқылы ұзақ сынақтарды кейінге қалдыру, `--show-output` арқылы шығаруларды көру — бұл шеберлік деңгейіндегі құралдар."
+    },
+    {
+      "id": "rust_book_11_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сынақтарды бірлік пен интеграцияға бөлу — кодыңыздың ішкі ұсақ-түйектерін де, сыртқы интерфейсінің әрекетшілдігін де кепілдейді."
+    },
+    {
+      "id": "rust_book_11_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Бірлік тесттері модульмен бірге; интеграциялық тесттер `tests/` қалтасында жеке файлдарда."
+    },
+    {
+      "id": "rust_book_11_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда осы үйренгенімізді практикада қолданып, шынайы бағдарлама — мини-`grep` — жазамыз."
+    },
+    {
+      "id": "rust_book_11_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_11",
+      "domain": "programming_rust",
+      "text": "Сол арқылы қалай тиісті жобаны бастан бастап жасауға, қателерді өңдеуге, кодты модульдерге бөлуге, сынақтармен қорғауға болатынын көреміз."
     }
   ]
 }

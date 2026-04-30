@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.11] — 2026-04-29 — Rust Book Chapter 11 (Автоматты сынақтар жазу) translated, in pack
+
+Eleventh chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 11 — Writing Automated Tests — covering Rust's built-in testing infrastructure: how to write tests (the `#[test]` attribute, anatomy of a test function, `assert!` / `assert_eq!` / `assert_ne!`, custom failure messages with `format!`-style trailing args, `#[should_panic]` and `expected = "..."` for narrowing the expected panic, tests that return `Result<T, E>` with the `?` operator); controlling how tests are run (the `cargo test` vs test-runner flag separation via `--`, parallel-vs-sequential execution with `--test-threads=1`, `--show-output` for printing successful tests' stdout, name filtering by substring, `#[ignore]` and `--ignored` / `--include-ignored`); and test organization (unit tests inside `#[cfg(test)] mod tests` testing private functions; integration tests in the `tests/` directory as separate crates that exercise the public API only; `tests/common/mod.rs` shared helper convention; the lib-vs-bin split for testable binary crates).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_11.md` — ~4 000 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-11-specific terminology decisions: automated test → **автоматты сынақ**, assertion → **бекіту**, test runner → **тест жүгіртушісі**, parallel → **параллельді**, sequential → **дәйекті**, subset → **ішкі жиын**, ignore → **елемеу**, unit test → **бірлік тесті**, integration test → **интеграциялық тест**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 10 chapters / 767 samples → **11 chapters / 832 samples** (+65 from chapter 11).
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.12 = Chapter 12 (An I/O Project: Building a Command Line Program / mini-grep).
+
 ## [4.7.10] — 2026-04-29 — Rust Book Chapter 10 (Жалпылама типтер, трейттер мен тіршілік мерзімі) translated, in pack
 
 Tenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 10 — Generic Types, Traits, and Lifetimes — the most theoretically dense chapter of the entire book. Three abstraction layers in one chapter: types (via generic type parameters), behaviour (via traits) and references' validity (via lifetimes).
