@@ -54,6 +54,7 @@ The pack is registered in `SOURCE_PACKS` constants of:
 | 11 — Автоматты сынақтар жазу (Writing Automated Tests) | `chapter_11.md` | v4.7.11 | translated, in pack (past committed-index ceiling) |
 | 12 — Кіріс-шығыс жобасы: команда жолы бағдарламасын құру (An I/O Project) | `chapter_12.md` | v4.7.12 | translated, in pack (past committed-index ceiling) |
 | 13 — Функционал тілдік мүмкіндіктер: итераторлар мен жабулар (Iterators and Closures) | `chapter_13.md` | v4.7.13 | translated, in pack (past committed-index ceiling) |
+| 14 — Cargo пен Crates.io туралы тереңірек (More about Cargo and Crates.io) | `chapter_14.md` | v4.7.14 | translated, in pack (past committed-index ceiling) |
 
 ## Corpus-purity rule
 

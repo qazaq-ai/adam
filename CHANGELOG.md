@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.14] — 2026-04-29 — Rust Book Chapter 14 (Cargo пен Crates.io туралы тереңірек) translated, in pack
+
+Fourteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 14 — More about Cargo and Crates.io — covering the day-to-day Cargo features that go beyond the basic build/run cycle: customising builds with **release profiles** (`[profile.dev]` vs `[profile.release]`, `opt-level` 0 → 3); publishing crates to **crates.io** (writing useful doc comments with `///`, the testable-examples gate via `cargo test`, contained-item comments with `//!`, exporting a convenient public API with `pub use` re-exports, the crates.io account + API token + `cargo login` workflow, required `Cargo.toml` metadata fields, the publish process with `cargo publish` and the irreversibility of publication, semantic-versioning bumps for new versions, deprecating versions with `cargo yank`); Cargo **workspaces** for multi-crate projects (the root `Cargo.toml` `[workspace]` section, member crates, internal `path = "..."` dependencies, the shared `target/` and `Cargo.lock`); installing **binary crates** with `cargo install` (the `~/.cargo/bin/` install location, the `ripgrep` example); extending Cargo with **custom commands** (the `cargo-foo` → `cargo foo` convention, popular extensions like `cargo-edit`, `cargo-watch`, `cargo-audit`, `cargo-tree`).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_14.md` — ~4 000 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-14-specific terminology decisions: profile → **бейін** (already locked); release profile → **шығарылым бейіні**; publishing → **жариялау**; workspace → **жұмыс кеңістігі**; metadata → **метамәлімет**; license → **лицензия**; description → **сипаттама**; account → **есептік жазба**; API token → **API токен**; yank → **жойылған деп белгілеу**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 13 chapters / 985 samples → **14 chapters / 1 061 samples** (+76 from chapter 14). Pack passed the 1 000-sample mark.
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.15 = Chapter 15 (Smart Pointers — `Box<T>`, `Rc<T>`, `RefCell<T>`, the `Deref` and `Drop` traits, reference cycles).
+
 ## [4.7.13] — 2026-04-29 — Rust Book Chapter 13 (Функционал тілдік мүмкіндіктер: итераторлар мен жабулар) translated, in pack
 
 Thirteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 13 — Functional Language Features: Iterators and Closures — covering Rust's two key functional-programming primitives: closures (anonymous functions that capture their environment, the three-tier `FnOnce` / `FnMut` / `Fn` trait hierarchy, `move` keyword for ownership transfer to a closure body, the `Vec::sort_by_key` worked example) and iterators (the `Iterator` trait and the `next` method, `iter` / `iter_mut` / `into_iter` distinction, lazy evaluation, consuming adapters like `sum` / `count` / `collect` vs producing adapters like `map` / `filter`, chaining `(1..=10).filter(...).map(...).sum()`, capturing closures inside iterator chains). Then refactoring the v4.7.12 minigrep using these tools (removing `clone` from `Config::build` by passing an iterator instead of a slice, condensing the `search` / `search_case_insensitive` functions to one-line iterator chains, the loops-vs-iterators discussion). Closes with the **zero-cost abstraction** explanation: iterator chains compile to assembly indistinguishable from hand-rolled loops; sometimes more efficient because the rigid abstraction shape gives the compiler stronger optimisation guarantees.

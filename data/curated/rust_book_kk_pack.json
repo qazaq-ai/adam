@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 13,
-  "sentences_total": 985,
-  "sample_count": 985,
+  "chapters_translated": 14,
+  "sentences_total": 1061,
+  "sample_count": 1061,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -6904,6 +6904,538 @@
       "source_id": "chapter_13",
       "domain": "programming_rust",
       "text": "Келесі тарауда — `Cargo` мен `crates.io`-ның жетіленген мүмкіндіктерін қарастырамыз: бейіндер (профилдер), құжаттама жариялау, жұмыс кеңістіктері, бинарларды орнату, өзіндік командалар."
+    },
+    {
+      "id": "rust_book_14_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "14-тарау. Cargo пен Crates.io туралы тереңірек Cargo алдыңғы тарауларда жобаңызды құрастыру, орындау және сынау үшін жеткілікті құрал болатынын көрсетті."
+    },
+    {
+      "id": "rust_book_14_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бірақ оның мүмкіндіктері әлдеқайда кең."
+    },
+    {
+      "id": "rust_book_14_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бұл тарауда: Шығарылым **бейіндерін** (release profiles) баптау; Кодыңызды `crates.io`-ға **жариялау**; **Жұмыс кеңістігі** (workspaces) — бірнеше байланысты сандықтың жобасын ұйымдастыру; `crates.io`-дан бинарларды **орнату**; Cargo-ны өзіндік командалармен **кеңейту**."
+    },
+    {
+      "id": "rust_book_14_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Осы құралдар арқылы сіз кодыңызды қауымдастықпен бөлісуге, үлкен жобаларды басқаруға, жұмысыңызды басқалардың пайдасына шығаруға қабілетті боласыз. 14.1."
+    },
+    {
+      "id": "rust_book_14_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Шығарылым бейіндерімен құрастыруды баптау Cargo сізге **бейіндер** (profiles) ұсынады — әрқайсысы өз баптамасы бар құрастыру конфигурациялары."
+    },
+    {
+      "id": "rust_book_14_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Стандартты екеуі: **`dev`** бейіні — `cargo build` және `cargo run` шакыратынында қолданылады."
+    },
+    {
+      "id": "rust_book_14_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Жылдам құрастыруға арналған, оптимизация төмен. **`release`** бейіні — `cargo build --release` шакыратынында қолданылады."
+    },
+    {
+      "id": "rust_book_14_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Шығарылым (production) кодын оптимизациялауға арналған."
+    },
+    {
+      "id": "rust_book_14_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Әдепкі баптамалар жеткілікті көп жағдайда."
+    },
+    {
+      "id": "rust_book_14_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бірақ Cargo сізге `Cargo.toml` ішінде оларды қайта анықтауға мүмкіндік береді: `opt-level` — оптимизация деңгейі. 0-ден 3-ке дейінгі бүтін сан."
+    },
+    {
+      "id": "rust_book_14_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Жоғары деңгей — кодыңыз жылдамырақ орындалады, бірақ құрастыру ұзағырақ."
+    },
+    {
+      "id": "rust_book_14_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Әдепкі бойынша: `dev` бейінінде `opt-level = 0` — мүлдем оптимизация жоқ."
+    },
+    {
+      "id": "rust_book_14_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сондықтан құрастыру жылдам. `release` бейінінде `opt-level = 3` — толық оптимизация."
+    },
+    {
+      "id": "rust_book_14_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Кейде `dev` бейінінде сізге қандай да бір оптимизация керек болады (мысалы, тестілерді жылдамдатуға)."
+    },
+    {
+      "id": "rust_book_14_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сонда `Cargo.toml`-да жоғарғы мысалдағыдай `opt-level`-ді өзгертіп жасасаңыз болады. Cargo сіздің баптамаңызды әдепкінің үстіне жазады. 14.2."
+    },
+    {
+      "id": "rust_book_14_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сандықты Crates.io-ға жариялау [crates.io](https://crates.io) — Rust сандықтарының ресми орталық қоймасы."
+    },
+    {
+      "id": "rust_book_14_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сіз де өзіңіздің сандығыңызды осында жариялап, басқа программистерге пайдаланды шығара аласыз."
+    },
+    {
+      "id": "rust_book_14_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Пайдалы құжаттама түсініктемелерін жасау `Rust`-та арнайы **құжаттама түсініктемелері** бар."
+    },
+    {
+      "id": "rust_book_14_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Олар `///` (үш қиғаш) немесе `//!` арқылы басталады және Markdown синтаксисін қолдайды. `cargo doc` командасы сол түсініктемелерден HTML құжаттама жасайды."
+    },
+    {
+      "id": "rust_book_14_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Әдеттегі функцияға арналған құжаттама: `cargo doc --open` командасы құжаттаманы құрастырып, оны браузерде ашады."
+    },
+    {
+      "id": "rust_book_14_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сіздің `add_one` функциясы әдемі түрде көрсетіледі — қысқа сипаттамасымен, мысалымен, типтерімен."
+    },
+    {
+      "id": "rust_book_14_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Кездейсоқ ескертулерге арналған бөлімдер Құжаттама түсініктемелеріне арнайы бөлімдер қосу қабылданған: **`# Examples`** — мысалдар. **`# Panics`** — қандай жағдайда `panic!`-қа барады. **`# Errors`** — қандай қателер болуы мүмкін (функция `Result` қайтаратын болса). **`# Safety`** — функция `unsafe` болса, оны қалай қауіпсіз қолдану керек."
+    },
+    {
+      "id": "rust_book_14_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бұл бөлімдер кездессе — `cargo doc` оларды арнайы пішімдейді."
+    },
+    {
+      "id": "rust_book_14_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Қауымдастық осыларды жаппай қолданады, сондықтан сіздің сандығыңыз осы рәсімге сай болса — оны пайдаланушы тез түсінеді."
+    },
+    {
+      "id": "rust_book_14_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Тестілеу мысалдар арқылы Құжаттамадағы `### Мысалдар` бөлімінде жазылған код **орындалатын тест** болады. `cargo test` оларды табады, құрастырады және орындайды."
+    },
+    {
+      "id": "rust_book_14_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сондықтан сіз құжаттамадағы мысалдардың әрқашан жұмыс істейтінін жастатуыңыз керек — оларды компилятор әр шакыруда тексереді."
+    },
+    {
+      "id": "rust_book_14_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бұл — өте күшті: құжаттамадағы код *ескірмейді*."
+    },
+    {
+      "id": "rust_book_14_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сіздің API өзгерсе — мысалдар да тура өзгеруі керек, әйтпесе тестілер кетеді."
+    },
+    {
+      "id": "rust_book_14_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Контейнер ішіне арналған түсініктеме `//!` түсініктемелері — модульдің **ішінен** жазылады және сол модульді немесе сандықты сипаттайды: `//!` `src/lib.rs` файлының басына қойылса — бүкіл сандыққа арналған түсініктеме болады. `pub use` арқылы ыңғайлы ашық API экспорттау Сандықтың ішкі ұйымдастыру жиі сыртқы пайдаланушыға қажетсіз."
+    },
+    {
+      "id": "rust_book_14_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Олардың қажеті — қарапайым ашық API, бір қалтада жинақталған."
+    },
+    {
+      "id": "rust_book_14_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Соған `pub use` қызмет етеді: Кітапхананы пайдаланушы: жаза алады — `art::kinds::PrimaryColor` жолы керек емес."
+    },
+    {
+      "id": "rust_book_14_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сонымен қатар `art::kinds::PrimaryColor` де жұмыс істейді — сіз ішкі ұйымдастыруды сақтайсыз. `pub use` тек қосымша «жанама» экспорт жасайды. `crates.io`-да есептік жазба құру Жариялау үшін: https://crates.io сайтына кіріңіз. GitHub арқылы кіруге болады. https://crates.io/me бетінен API токен алыңыз."
+    },
+    {
+      "id": "rust_book_14_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Терминалда `cargo login <api-token>` орындаңыз. Cargo токенді `~/.cargo/credentials.toml` файлында сақтайды."
+    },
+    {
+      "id": "rust_book_14_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Ол — жасырын."
+    },
+    {
+      "id": "rust_book_14_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Оны бөтенге бермеңіз."
+    },
+    {
+      "id": "rust_book_14_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сандыққа метамәліметтерді қосу `Cargo.toml`-да міндетті өрістер: **`name`** — бүкіл `crates.io`-да бір ғана."
+    },
+    {
+      "id": "rust_book_14_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Біреу алып қойса — басқаны таңдау керек. **`version`** — әрбір жариялау сайын ауыстыру керек. **Семантикалық нұсқалау** ережелерін ұстаңыз: тек кейде өзгертіңіз (`MAJOR.MINOR.PATCH`). **`description`** — қысқаша сипаттама, бір сөйлем. **`license`** — әдеттегі ашық кодты лицензия идентификаторы. `MIT`, `Apache-2.0`, `MIT OR Apache-2.0` — Rust қауымдастығының жиі таңдауы."
+    },
+    {
+      "id": "rust_book_14_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Қосымша өрістер: `repository` (қойма URL-ы), `homepage`, `documentation`, `keywords`, `categories`, `readme`."
+    },
+    {
+      "id": "rust_book_14_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Көп болғаны — пайдаланушыға жылдамырақ табуға, түсінуге көмек."
+    },
+    {
+      "id": "rust_book_14_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Жариялау `cargo publish` сандықты `crates.io`-ға жібереді."
+    },
+    {
+      "id": "rust_book_14_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Жариялау — **қайтымсыз**: бір рет жіберілген код әрдайым сол нұсқада қол жетімді болады."
+    },
+    {
+      "id": "rust_book_14_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Себебі басқа адамдар сіздің сандығыңызға тәуелді жобаларын құрастыруы мүмкін."
+    },
+    {
+      "id": "rust_book_14_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сондықтан жариялауға дейін: `cargo publish --dry-run` — нені жіберетіндігіңізді көруге."
+    },
+    {
+      "id": "rust_book_14_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Кодты — әсіресе ашық API-ды — жақсы тестілеп шығу керек."
+    },
+    {
+      "id": "rust_book_14_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Семантикалық нұсқалауды нақты ұстау керек."
+    },
+    {
+      "id": "rust_book_14_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Жаңа нұсқаны жариялау Кодыңызды өзгертіп, жаңа нұсқаны жариялау керек болса — `Cargo.toml`-да `version`-ды көтеріп, `cargo publish` шакырыңыз."
+    },
+    {
+      "id": "rust_book_14_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Семантикалық нұсқалауға сай: **PATCH** (`0.1.0 → 0.1.1`) — қосалқы ішкі түзетулер, бар API өзгерген жоқ. **MINOR** (`0.1.0 → 0.2.0`) — жаңа қосылған мүмкіндіктер; бар API бұзылған жоқ. **MAJOR** (`0.1.0 → 1.0.0` немесе `1.0.0 → 2.0.0`) — бар API өзгерді немесе бұзылды."
+    },
+    {
+      "id": "rust_book_14_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Нұсқаларды `cargo yank` арқылы өшіру Бір нұсқаны жариялап, кейін онда қате бар екенін көрсеңіз — оны жоюға болмайды."
+    },
+    {
+      "id": "rust_book_14_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бірақ оны **«жойылған» деп белгілеу** мүмкін."
+    },
+    {
+      "id": "rust_book_14_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сонда жаңа жобалар оны қолданбайды, ал бұрын солған жобалар әлі де жұмыс істей береді."
+    },
+    {
+      "id": "rust_book_14_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Кері қайтару: `yank` — қатесі бар нұсқалар үшін, мысалы қауіпсіздік мәселесі бар нұсқа."
+    },
+    {
+      "id": "rust_book_14_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Жоюға келеді, бірақ ескі қолданушылар сақталады. 14.3. Cargo жұмыс кеңістігі Жоба үлкейіп, кітапхана сандығы бірнеше тәуелсіз бөліктен тұратын болса — оларды бір бумада ұстау ыңғайсыз. **Жұмыс кеңістігі** дегеніміз — бір тамырлы Cargo бумалар-жинағы, бір `target/` қалтасында бірлескен."
+    },
+    {
+      "id": "rust_book_14_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Жұмыс кеңістігін құру `add` атты қалта жасайық, ішінде `Cargo.toml`: Содан кейін `cargo new adder` — `add` қалтасының ішінде."
+    },
+    {
+      "id": "rust_book_14_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Және `cargo new add_one --lib` тағы солай."
+    },
+    {
+      "id": "rust_book_14_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Қалта құрылымы: `adder` — екілік сандық; `add_one` — кітапхана."
+    },
+    {
+      "id": "rust_book_14_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Әрқайсының өз `Cargo.toml`-ы бар."
+    },
+    {
+      "id": "rust_book_14_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Жұмыс кеңістігінің ұялы файлы (root) ортақ `target/` қалтасын анықтайды."
+    },
+    {
+      "id": "rust_book_14_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бумалардың арасындағы тәуелділік `adder/Cargo.toml`-да: Енді `adder/src/main.rs` ішінде: Жұмыс кеңістігінде `cargo build` барлық сандықты бір өткелде құрастырады. `cargo run -p adder` — нақты `adder` бумасын іске қосады."
+    },
+    {
+      "id": "rust_book_14_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Жұмыс кеңістігіндегі сыртқы тәуелділіктер Әр бума өзінің `Cargo.toml`-да тәуелділіктерді жеке тізбелейді."
+    },
+    {
+      "id": "rust_book_14_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Стандартты тұрақты — бір тәуелділікті бір ғана нұсқада қолдану."
+    },
+    {
+      "id": "rust_book_14_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сондықтан жұмыс кеңістігінде ортақ `Cargo.lock` файлы қолданылады — барлық бумалар бір нұсқалармен құрастырылады."
+    },
+    {
+      "id": "rust_book_14_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сынақтарды жұмыс кеңістігінде `cargo test` бүкіл жұмыс кеңістігіндегі сынақтарды жүгіртеді. `cargo test -p add_one` — нақты бумадағы сынақтарды. 14.4. `cargo install` арқылы бинарларды Crates.io-дан орнату `cargo install` командасы `crates.io`-дан **бинарлы сандықтарды** орнатуға мүмкіндік береді."
+    },
+    {
+      "id": "rust_book_14_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бинарлы сандық — `src/main.rs` (немесе `src/bin/`) бар, орындалатын бағдарлама шығаратын сандық."
+    },
+    {
+      "id": "rust_book_14_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бинарлы сандықты орнату: `ripgrep` — `grep`-тің `Rust`-та жазылған, әлдеқайда жылдам нұсқасы. `cargo install` оны `~/.cargo/bin/` қалтасына орнатады."
+    },
+    {
+      "id": "rust_book_14_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Ол сіздің `PATH`-те болуы керек — `rustup` орнатқан кезде ол автоматты түрде қосылады."
+    },
+    {
+      "id": "rust_book_14_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Орнатылғаннан кейін `rg` командасы қол жетімді: `cargo install` көп жағдайда сізге Rust қауымдастығының жасаған қызыңды қызметтерді бір команданмен орнатуға мүмкіндік береді."
+    },
+    {
+      "id": "rust_book_14_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Әсіресе пайдалы: `ripgrep`, `bat`, `fd-find`, `tokei`, `cargo-watch`, `cargo-edit`. 14.5. Cargo-ны өзіндік командалармен кеңейту Cargo бір қызықты ерекшелікке ие: егер сізде `~/.cargo/bin/` ішінде `cargo-something` атты бинар болса — оны `cargo something` арқылы шакыруға болады. Cargo сол бинарды табады және оны ішкі команда ретінде орындайды."
+    },
+    {
+      "id": "rust_book_14_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Мысалы, `cargo install cargo-watch` орнатқаннан кейін: — `cargo watch` командасы бар; іс жүзінде ол `cargo-watch` бинары."
+    },
+    {
+      "id": "rust_book_14_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бұл — Cargo-ны кеңейтудің оңай жолы."
+    },
+    {
+      "id": "rust_book_14_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Қауымдастық сансыз пайдалы кеңейтулерді жасап шығарды: **`cargo-edit`** — `Cargo.toml`-ды редакторсыз өзгерту командалары (`cargo add`, `cargo rm`). **`cargo-watch`** — өзгерістерді бақылап, командаларды автоматты түрде қайта шакыру. **`cargo-audit`** — тәуелділіктерде белгілі қауіпсіздік ақаулықтарын тексеру. **`cargo-tree`** — тәуелділік ағашын көрсету. **`cargo-bloat`** — бинарды кім үлкейтіп жатқанын анықтау."
+    },
+    {
+      "id": "rust_book_14_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Сіз де өзіңіздің `cargo-foo` бинарын жазып, оны кейіннен `cargo foo` арқылы пайдалана аласыз. 14.6."
+    },
+    {
+      "id": "rust_book_14_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Cargo — `Rust` экожүйесінің тірегі."
+    },
+    {
+      "id": "rust_book_14_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Шығарылым бейіндері кодтың қалай құрастырылуын баптауға, `crates.io` коды қауымдастықпен бөлісуге, жұмыс кеңістіктері үлкен жобаларды ұйымдастыруға, `cargo install` дайын құралдарды орнатуға, өзіндік командалар Cargo-ны кеңейтуге мүмкіндік береді."
+    },
+    {
+      "id": "rust_book_14_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Бұл — сіздің күн сайынғы жұмысыңызды жеңілдететін практикалық ұғымдар. `crates.io`-ға бір рет кодыңызды жариялап шыққаннан кейін — осы экожүйенің бір бөлігі болатыныңыз."
+    },
+    {
+      "id": "rust_book_14_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда — `Box`, `Rc`, `RefCell`, `Deref` мен `Drop` сияқты ақылды сілтемелер туралы айтамыз."
+    },
+    {
+      "id": "rust_book_14_0076",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_14",
+      "domain": "programming_rust",
+      "text": "Олар арқылы сіз `Rust`-тың иелік ережелерін кеңейтіп, иелікті бөлісу немесе жұмыс уақытында тексеру сияқты сценарийлерді жүзеге асыра аласыз."
     }
   ]
 }
