@@ -1,9 +1,18 @@
 name: Release
 
+# v4.7.10 — auto-trigger disabled. GitHub Actions billing was
+# blocking auto-runs on every tag push, causing failed-job noise
+# in the Actions tab on every release. Releases are created via
+# direct GitHub REST API POST (see CHANGELOG entries from v4.7.9
+# onward), so this workflow is not on the critical path. Keeping
+# the YAML in the repo so that:
+#   (1) the validation scripts (verify_release_version.sh,
+#       validate_foundation.sh) remain auditable;
+#   (2) re-enabling auto-trigger is one revert when billing is
+#       fully restored. To run manually: Actions tab →
+#       "Release" workflow → Run workflow.
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
 
 permissions:
   contents: write

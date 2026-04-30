@@ -1,9 +1,16 @@
 name: Rust
 
+# v4.7.10 — auto-trigger disabled. GitHub Actions billing was
+# blocking runs on every push to main, causing failed-job noise.
+# All gates this workflow enforces (cargo fmt, cargo test,
+# validate_foundation) are also run locally before every commit
+# per `feedback_cargo_fmt_pre_commit` / `feedback_release_docs`,
+# so disabling auto-trigger does not lose real safety. Keeping the
+# YAML so it can be re-enabled with a one-line revert when billing
+# is fully restored. Manual runs available via Actions tab →
+# "Rust" workflow → Run workflow.
 on:
-  push:
-    branches: ["main"]
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   verify:
