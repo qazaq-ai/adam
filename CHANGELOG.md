@@ -7,6 +7,41 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.10.0] — 2026-04-30 — `biology_school.jsonl` world_core domain (school-curriculum biology, Kazakh)
+
+Eighth v4.x minor. Third in the **non-Rust domain expansion** track. `biology_school.jsonl` is a curated 120-entry Kazakh glossary covering school-curriculum biology across eight sections.
+
+### Sections covered
+
+- **Foundation (~9 entries)** — биология, цитология, ботаника, зоология, анатомия, физиология, генетика, экология, микробиология.
+- **Cell biology (~17 entries)** — жасуша, мембрана, цитоплазма, ядро, митохондрия, рибосома, хлоропласт, эндоплазмалық тор, гольджи аппараты, лизосома, вакуоль, жасуша қабырғасы, прокариот, эукариот, бактерия, вирус, митоз, мейоз.
+- **Botany / plants (~13 entries)** — өсімдік, гүлді өсімдік, қылқан жапырақты өсімдік, папоротник, мүк, балдыр, тамыр, сабақ, жапырақ, гүл, жеміс, тұқым, фотосинтез, хлорофилл, тыныс алу.
+- **Zoology / animals (~13 entries)** — жануар, омыртқалы/омыртқасыз жануарлар, балық, қосмекенді, бауырмен жорғалаушы, құс, сүтқоректі, бунақденелі, өрмекші тәрізділер, шаянтәрізділер, моллюскілер, құрттар.
+- **Human anatomy (~23 entries)** — адам ағзасы, қаңқа, сүйек, бұлшықет, жүрек, қан, қан тамыры (артерия, көктамыр, капилляр), өкпе, кеңірдек, ас қазан, ішек, бауыр, бүйрек, ми, жұлын, нерв, тері, көз, құлақ, тіл.
+- **Body systems (~10 entries)** — жүйке жүйесі, қан айналымы жүйесі, тыныс алу жүйесі, ас қорыту жүйесі, тірек-қимыл жүйесі, бөліп шығару жүйесі, эндокриндік жүйе, иммундық жүйе, көбею жүйесі, сезім мүшелері.
+- **Genetics (~8 entries)** — тұқым қуалаушылық, ген (доминантты/рецессивті), хромосома, мутация, генотип, фенотип.
+- **Evolution & ecology (~14 entries)** — эволюция, табиғи сұрыпталу, түр, популяция, қоғамдастық, экожүйе, биосфера, тіршілік ортасы, тағамдық тізбек (продуцент, консумент, редуцент), симбиоз, биоалуантүрлілік.
+- **Classification (~7 entries)** — таксономия, дүние, тип, класс, отряд, тұқымдас, тек.
+- **Other biomolecules (~3 entries)** — гормон, витамин, антитене.
+
+### Pipeline impact
+
+- world_core: 1 349 → **1 469 entries** (+120); 1 512 → **1 632 facts** (+120); 35 → **36 domains**.
+- `data/retrieval/facts.json`: 16 038 → **16 158** (+120).
+- `MULTIWORD_ENTITIES` += **50 biology compounds**.
+- Lexicon: **+51 noun roots**.
+
+### Tests + counters
+
+- Workspace tests: **745 passing**.
+- `world_core_multiword_coverage` contract test passes.
+
+### Cadence
+
+Minor (v4.10.0) — new world_core domain. Track continues:
+
+- **v4.11.0** — `history_kazakhstan.jsonl` (final domain in the non-Rust expansion sequence).
+
 ## [4.9.0] — 2026-04-30 — `chemistry_school.jsonl` world_core domain (school-curriculum chemistry, Kazakh)
 
 Seventh v4.x minor. Second in the **non-Rust domain expansion** track. `chemistry_school.jsonl` is a curated 105-entry Kazakh glossary covering school-curriculum chemistry across seven sections.

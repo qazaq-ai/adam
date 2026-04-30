@@ -1,5 +1,5 @@
 {
-  "version": "4.9.0",
+  "version": "4.10.0",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -33820,6 +33820,363 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_цитология",
+      "root": "цитология",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_ботаника",
+      "root": "ботаника",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_физиология",
+      "root": "физиология",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_генетика",
+      "root": "генетика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_микробиология",
+      "root": "микробиология",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_таксономия",
+      "root": "таксономия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_мембрана",
+      "root": "мембрана",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_цитоплазма",
+      "root": "цитоплазма",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_митохондрия",
+      "root": "митохондрия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_рибосома",
+      "root": "рибосома",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_хлоропласт",
+      "root": "хлоропласт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_лизосома",
+      "root": "лизосома",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_вакуоль",
+      "root": "вакуоль",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_прокариот",
+      "root": "прокариот",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_эукариот",
+      "root": "эукариот",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_бактерия",
+      "root": "бактерия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_митоз",
+      "root": "митоз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_мейоз",
+      "root": "мейоз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_папоротник",
+      "root": "папоротник",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_балдыр",
+      "root": "балдыр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_фотосинтез",
+      "root": "фотосинтез",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_хлорофилл",
+      "root": "хлорофилл",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_қосмекенді",
+      "root": "қосмекенді",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_бунақденелі",
+      "root": "бунақденелі",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_моллюскілер",
+      "root": "моллюскілер",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_қаңқа",
+      "root": "қаңқа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_бұлшықет",
+      "root": "бұлшықет",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_қан",
+      "root": "қан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_артерия",
+      "root": "артерия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_көктамыр",
+      "root": "көктамыр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_капилляр",
+      "root": "капилляр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_кеңірдек",
+      "root": "кеңірдек",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_ми",
+      "root": "ми",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_хромосома",
+      "root": "хромосома",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_мутация",
+      "root": "мутация",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_генотип",
+      "root": "генотип",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_фенотип",
+      "root": "фенотип",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_эволюция",
+      "root": "эволюция",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_популяция",
+      "root": "популяция",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_қоғамдастық",
+      "root": "қоғамдастық",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_биосфера",
+      "root": "биосфера",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_10_0_симбиоз",
+      "root": "симбиоз",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_биоалуантүрлілік",
+      "root": "биоалуантүрлілік",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_продуцент",
+      "root": "продуцент",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_консумент",
+      "root": "консумент",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_редуцент",
+      "root": "редуцент",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_класс",
+      "root": "класс",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_отряд",
+      "root": "отряд",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_гормон",
+      "root": "гормон",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_витамин",
+      "root": "витамин",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_10_0_антитене",
+      "root": "антитене",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
     }
   ]
 }

@@ -139,7 +139,8 @@ Validator checks:
 - `programming_rust.jsonl` — 110 entries / 110 facts  *(new in v4.7.0)*
 - `physics_school.jsonl` — 102 entries / 102 facts  *(new in v4.8.0)*
 - `chemistry_school.jsonl` — 105 entries / 105 facts  *(new in v4.9.0)*
-- **Total: 1349 entries / 1512 facts across 35 domains** (v4.9.0), all `approved`
+- `biology_school.jsonl` — 120 entries / 120 facts  *(new in v4.10.0)*
+- **Total: 1469 entries / 1632 facts across 36 domains** (v4.10.0), all `approved`
   at `high` or `medium` confidence by `shaman`. v4.3.5 added **kz_literature
   surname-keyed entries** (Әуезов / Сейфуллин / Мүсірепов / Жұмабаев / …) and a
   new **`notable_kazakhstanis.jsonl` domain** (presidents, khans, scientists,

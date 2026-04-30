@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.9.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.10.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -30,8 +30,8 @@
   <img src="https://img.shields.io/badge/RSS-~76--80%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
-  <img src="https://img.shields.io/badge/world%20core-1349%20curated%20/%201512%20facts-9CCC65?style=flat-square" alt="world core">
-  <img src="https://img.shields.io/badge/domains-35-9CCC65?style=flat-square" alt="domains">
+  <img src="https://img.shields.io/badge/world%20core-1469%20curated%20/%201632%20facts-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/domains-36-9CCC65?style=flat-square" alt="domains">
   <img src="https://img.shields.io/badge/policy-Rust--only%20%2B%20Graph--first-1976D2?style=flat-square" alt="policies">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20on%20deterministic%20path-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
@@ -41,6 +41,8 @@
 ## Why adam (v4.4)
 
 adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced. Every layer is **Rust-only** and **graph-first** by repository invariant — both enforced by contract tests.
+
+**v4.10.0 milestone — `biology_school.jsonl` world_core domain (school-curriculum biology, Kazakh).** Eighth v4.x minor; third in the non-Rust domain expansion track. New 120-entry curated Kazakh glossary covering: foundation (биология, цитология, ботаника, зоология, анатомия, физиология, генетика, экология, микробиология); cell biology (жасуша + 11 organelles, прокариот/эукариот, бактерия, вирус, митоз, мейоз); plants (өсімдік + 6 plant types, тамыр/сабақ/жапырақ/гүл/жеміс/тұқым, фотосинтез, хлорофилл, тыныс алу); animals (жануар, омыртқалы/омыртқасыз, 6 vertebrate classes, 5 invertebrate groups); human anatomy (қаңқа/сүйек/бұлшықет, жүрек/қан/тамырлар, өкпе/кеңірдек, ас қазан/ішек/бауыр, бүйрек, ми/жұлын/нерв, тері, сезім мүшелері); body systems (10 systems); genetics (тұқым қуалаушылық, ген, хромосома, мутация, генотип/фенотип); evolution & ecology (эволюция, табиғи сұрыпталу, түр/популяция/экожүйе/биосфера, тағамдық тізбек, симбиоз, биоалуантүрлілік); taxonomy (7-level classification); biomolecules (гормон, витамин, антитене). Pipeline: world_core 1 349→**1 469 entries**, 1 512→**1 632 facts**, 35→**36 domains**; `MULTIWORD_ENTITIES` +50 biology compounds; lexicon +51 noun roots. Workspace 745 unchanged.
 
 **v4.9.0 milestone — `chemistry_school.jsonl` world_core domain (school-curriculum chemistry, Kazakh).** Seventh v4.x minor; second in the non-Rust domain expansion track. New 105-entry curated Kazakh glossary covering: foundation (химия, бейорганикалық/органикалық, биохимия, зат/қоспа/таза зат, жай/күрделі зат); periodic table & elements (Менделеев заңы, период/топ/реттік нөмір/атомдық масса/валенттілік, металл/бейметалл/инертті газ, сілтілік металдар, галогендер, ~12 specific elements); chemical bonds (иондық/ковалентті/металдық/сутектік байланыс, ион/катион/анион, электртерістік); reactions (қосылу/ыдырау/орынбасу/алмасу/тотығу/тотықсыздану/бейтараптану/жану, катализатор, заттардың сақталу заңы); acids/bases/salts/oxides (қышқыл — тұз/күкірт/азот, негіз/сілті, тұз — натрий хлориді, оксид — су/көмірқышқыл газы); solutions (ерітінді/еріткіш, концентрация, сутектік көрсеткіш `pH`, моль, молярлық масса, Авогадро саны, электролиз); organic & biomolecules (көмірсутек/алкан/алкен/алкин, метан/этан/этилен/бензол, спирт/этанол, альдегид, карбон қышқылы/сірке қышқылы, эфир, биомолекулалар — көмірсу/глюкоза/сахароза/крахмал, май, ақуыз/амин қышқылы/фермент, полимер/мономер/пластмасса, ДНК/РНК). Pipeline: world_core 1 244→**1 349 entries**, 1 407→**1 512 facts**, 34→**35 domains**; `MULTIWORD_ENTITIES` +56 chemistry compounds; lexicon +51 noun roots. Workspace 745 unchanged.
 
@@ -198,7 +200,7 @@ Live numbers (verified 2026-04-29 against the actual repo): cognitive eval **65 
 | Workspace tests | **727 passing, 0 failing, 4 ignored** | `cargo test --workspace` |
 | Cognitive eval canonical | **59 / 59** | `cargo test -p adam-dialog --test cognitive_eval` |
 | REPL replay | **62 / 62 canonical + 0 aspirational** | `cargo test -p adam-dialog --test repl_replay` |
-| World Core entries / facts / domains | **1349 / 1512 / 35** | `find data/world_core -name '*.jsonl' \| xargs cat \| jq -s 'length'` |
+| World Core entries / facts / domains | **1469 / 1632 / 36** | `find data/world_core -name '*.jsonl' \| xargs cat \| jq -s 'length'` |
 | Extracted runtime facts | **15 642** | `jq '.counts.facts_total' data/retrieval/facts.json` |
 | Derived facts | **23 418** | sum of `data/retrieval/derived_facts.json` `.counts.by_rule` values |
 | Template families | **50** | `grep -c '^\[\[families\]\]' data/dialog/templates/v1.toml` |
