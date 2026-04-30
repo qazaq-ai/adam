@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.13] — 2026-04-29 — Rust Book Chapter 13 (Функционал тілдік мүмкіндіктер: итераторлар мен жабулар) translated, in pack
+
+Thirteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 13 — Functional Language Features: Iterators and Closures — covering Rust's two key functional-programming primitives: closures (anonymous functions that capture their environment, the three-tier `FnOnce` / `FnMut` / `Fn` trait hierarchy, `move` keyword for ownership transfer to a closure body, the `Vec::sort_by_key` worked example) and iterators (the `Iterator` trait and the `next` method, `iter` / `iter_mut` / `into_iter` distinction, lazy evaluation, consuming adapters like `sum` / `count` / `collect` vs producing adapters like `map` / `filter`, chaining `(1..=10).filter(...).map(...).sum()`, capturing closures inside iterator chains). Then refactoring the v4.7.12 minigrep using these tools (removing `clone` from `Config::build` by passing an iterator instead of a slice, condensing the `search` / `search_case_insensitive` functions to one-line iterator chains, the loops-vs-iterators discussion). Closes with the **zero-cost abstraction** explanation: iterator chains compile to assembly indistinguishable from hand-rolled loops; sometimes more efficient because the rigid abstraction shape gives the compiler stronger optimisation guarantees.
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_13.md` — ~5 000 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-13-specific terminology decisions: closure → **жабу** (already locked since v4.7.0 programming_rust glossary), capture → **ұстау**, `Fn`/`FnMut`/`FnOnce` → **`Fn` / `FnMut` / `FnOnce` трейттері** (transliterated, kept verbatim), iterator adapter → **итератор-бейімдеуіш**, lazy evaluation → **лазай есептеу**, zero-cost abstraction → **нөлдік шығынды абстракция**, consuming adapter → **тұтынатын бейімдеу**, producing adapter → **жаңа итератор шығаратын бейімдеу**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 12 chapters / 911 samples → **13 chapters / 985 samples** (+74 from chapter 13).
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.14 = Chapter 14 (More about Cargo and Crates.io — release profiles, publishing, workspaces, `cargo install`, custom Cargo extensions).
+
 ## [4.7.12] — 2026-04-29 — Rust Book Chapter 12 (Кіріс-шығыс жобасы: команда жолы бағдарламасын құру) translated, in pack
 
 Twelfth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 12 — An I/O Project: Building a Command Line Program (mini-grep) — the largest practical chapter that ties together everything from chapters 1–11 into one real working CLI program. Sections: 12.1 accepting command-line arguments via `std::env::args`; 12.2 reading a file with `std::fs::read_to_string`; 12.3 refactoring for modularity and error handling (separation of concerns, extracting `parse_config` and then a `Config` struct, the `Config::build` constructor pattern, fixing error handling with `Result` + `unwrap_or_else` + `eprintln!` + `process::exit`, extracting a `run` function, splitting code into a library crate `src/lib.rs`); 12.4 TDD development of the `search` function (writing a failing test first, implementing the minimum code to pass, then refactoring); 12.5 working with environment variables (`env::var("IGNORE_CASE")`, the `search_case_insensitive` companion function); 12.6 writing error messages to standard error instead of standard output (`eprintln!` vs `println!`, the Unix stdout/stderr separation, `> output.txt` redirection demonstration).

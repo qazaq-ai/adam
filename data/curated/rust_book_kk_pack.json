@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 12,
-  "sentences_total": 911,
-  "sample_count": 911,
+  "chapters_translated": 13,
+  "sentences_total": 985,
+  "sample_count": 985,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -6386,6 +6386,524 @@
       "source_id": "chapter_12",
       "domain": "programming_rust",
       "text": "Олар сіздің кодыңызды әлдеқайда жинақы әрі тиімді ете алады."
+    },
+    {
+      "id": "rust_book_13_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Функционал тілдік мүмкіндіктер: итераторлар мен жабулар `Rust`-тың дизайны функционал бағдарламалаудан көп нәрсе алды. Lisp, Haskell, ML сияқты тілдерден шыққан **жабу** (closure) мен **итератор** ұғымдары `Rust`-тың ажырамас бөлігі болды."
+    },
+    {
+      "id": "rust_book_13_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Олар арқылы кодты әлдеқайда жинақы әрі мағыналы жазуға болады — арнайы өнімділік шығынынсыз."
+    },
+    {
+      "id": "rust_book_13_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Бұл тарауда: Жабу не екенін, оның қалай қоршаған ортадан мәндерді ұстайтынын, `Fn` / `FnMut` / `FnOnce` трейттерінің айырмашылығын."
+    },
+    {
+      "id": "rust_book_13_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Итератор не екенін, лазай есептеу стилін, итератор-бейімдеуіштер тізбегін."
+    },
+    {
+      "id": "rust_book_13_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Алдыңғы тарауда жасаған `minigrep` бағдарламасын осы құралдармен қалай тазалауға болатынын."
+    },
+    {
+      "id": "rust_book_13_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Цикл vs итератор: өнімділік қалай. 13.1."
+    },
+    {
+      "id": "rust_book_13_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Жабулар: қоршаған ортасын ұстайтын атаусыз функциялар **Жабу** — атаусыз функция; ол функцияға жалақыша, бірақ айырмашылығы сонда — оны бір айнымалыға бекітіп, кейін шакыруға, басқа функцияға аргумент ретінде беруге болады."
+    },
+    {
+      "id": "rust_book_13_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Қосылған пайда: жабу қоршаған ортадан — ол жасалған кодтың аумағынан — мәндерді ұстай алады."
+    },
+    {
+      "id": "rust_book_13_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Жабу мысалы Қарапайым жабу: `|x| x + 1` — жабудың денесі."
+    },
+    {
+      "id": "rust_book_13_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Тік жақшалардың ішінде параметрлер; артынан — өрнек."
+    },
+    {
+      "id": "rust_book_13_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Кешенді жабудың денесі фигуралы жақшалардың ішіне қойылады: `Rust` жабудың параметр түрі мен қайтару түрін көп жағдайда өзі шеше алады."
+    },
+    {
+      "id": "rust_book_13_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Әдеттегідей біз тек қажет кезде нақты белгілейміз."
+    },
+    {
+      "id": "rust_book_13_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Қоршаған ортасын ұстау Жабу функциядан айырмасы — ол өзі жасалған аумақтан айнымалыларды ұстай алады: `only_borrows` — `list`-ке тұрақты сілтеме арқылы сілтейтін жабу. `list` әлі бар тұра береді — жабу оны еленуге ғана пайдаланды."
+    },
+    {
+      "id": "rust_book_13_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Өзгермелі сілтеме арқылы ұстау: `borrows_mutably` `list`-ке өзгермелі сілтеме ұстайды (өйткені `push` оны өзгертеді)."
+    },
+    {
+      "id": "rust_book_13_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Жабу шакырылғанға дейін `list`-ке басқа жерден қол жеткізе алмаймыз. `move` арқылы иелікті ұстау Кейбір жағдайларда сізге **иелікті** жабудың ішіне ауыстыру керек."
+    },
+    {
+      "id": "rust_book_13_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Әсіресе жабуды басқа ағынға беру керек болса."
+    },
+    {
+      "id": "rust_book_13_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Соған `move` кілтсөзі: `move ||` — жабу `list`-ті өз иелігіне алады. `thread::spawn` жаңа ағынды бастайды; егер `list` сілтеме арқылы алынса — ағындар арасында тіршілік мерзімі шатастырады. `move` арқылы иелік жабуға өтеді, ағында қауіпсіз қалады. `Fn`, `FnMut`, `FnOnce` трейттері Жабудың қоршаған орта мәндерімен жұмыс жасау тәсілі — оның қандай трейтті бекітуіне әсер етеді."
+    },
+    {
+      "id": "rust_book_13_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапханада үш трейт бар: **`FnOnce`** — жабу бір рет шакырылса жетеді."
+    },
+    {
+      "id": "rust_book_13_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Иелікті алып, «жұтып» жіберетін жабулар осы трейтті ғана бекітеді. **`FnMut`** — жабу бірнеше рет шакырылса болады, бірақ ол ұсталған мәндерді өзгерте алады. **`Fn`** — жабу бірнеше рет шакырылса болады, әрі ол ешбір мәнді өзгертпейді (тек оқу үшін)."
+    },
+    {
+      "id": "rust_book_13_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Барлық жабу `FnOnce` бекітеді."
+    },
+    {
+      "id": "rust_book_13_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Олардың кейбірі `FnMut`-ты да; кейбірі үшеуін де."
+    },
+    {
+      "id": "rust_book_13_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Қарапайым ереже: жабу қаншалықты «тыныш» — соншалықты көп трейт бекітіледі."
+    },
+    {
+      "id": "rust_book_13_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Мысал — стандартты кітапхананың `Option::unwrap_or_else`: `F: FnOnce() -> T` — `f` бір рет ғана шакырылуы мүмкін."
+    },
+    {
+      "id": "rust_book_13_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Бұл — қатаң шектеу: `unwrap_or_else` бір ғана рет жабуды шакырады, сондықтан жабу кеңірек трейтті бекіту керек емес."
+    },
+    {
+      "id": "rust_book_13_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Әдетте параметрді `Fn`-ден бастап шектеудің керегі жоқ — `FnOnce` немесе `FnMut` керектігін анықтап, сол ғана жазсаңыз — кодты қажетсіз тарылтпайсыз."
+    },
+    {
+      "id": "rust_book_13_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Жабудың қызметтік мысалы `Vec`-ке арналған `sort_by_key` әдісі — жабу қабылдайтын мысал: `|r| r.width` — әр элемент үшін кілт қайтаратын жабу. `sort_by_key` жабуды әр элементте шакырып, кілт бойынша сұрыптайды. 13.2."
+    },
+    {
+      "id": "rust_book_13_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Итераторлар арқылы элементтер тізбегін өңдеу **Итератор** — элементтердің тізбегінде бір-бірлеп жүруге арналған типтік интерфейс. `Rust`-та итератор — `Iterator` трейтін бекітетін кез келген тип. `Iterator` трейтінің негізі — `next` әдісі: `type Item` — итератор қайтаратын элементтердің типі. `next` — келесі элементті қайтарады; элементтер бітсе — `None`."
+    },
+    {
+      "id": "rust_book_13_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Итератор жасау Кез келген ұжымнан итератор жасауға болады: `iter()` — тұрақты сілтемелер беретін итератор. `iter_mut()` — өзгермелі сілтемелер беретін итератор. `into_iter()` — иелікті алатын итератор. `for` циклы итераторды аралайды."
+    },
+    {
+      "id": "rust_book_13_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Әр итерация — `next` шакыруы."
+    },
+    {
+      "id": "rust_book_13_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Цикл аяқталу — `next` `None` қайтарғанда."
+    },
+    {
+      "id": "rust_book_13_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Итераторлар лазай `Rust`-тың итераторлары — **лазай**."
+    },
+    {
+      "id": "rust_book_13_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Сіз итераторды жасаған кезде ешбір есептеу болмайды."
+    },
+    {
+      "id": "rust_book_13_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Тек `next` шакырылғанда нақты жұмыс жасалады: Бұл — лазай есептеудің күші: сіз бірнеше итератор-операцияны тізбекке қосып шакыра аласыз; бірақ нақты жұмыс ең соңында ғана басталады."
+    },
+    {
+      "id": "rust_book_13_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Тұтынатын бейімдеулер Кейбір әдістер итераторды **тұтынады** — оны соңына дейін аралап шығып, бір нәтиже қайтарады."
+    },
+    {
+      "id": "rust_book_13_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Мысалы, `sum`: `sum` — итератордың барлық элементін қосып, нәтижені қайтарады."
+    },
+    {
+      "id": "rust_book_13_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Шакырылғаннан соң итератор жоғалады — оны қайта пайдалану мүмкін емес."
+    },
+    {
+      "id": "rust_book_13_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Сондықтан тұтынатын деп аталады."
+    },
+    {
+      "id": "rust_book_13_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Басқа тұтынатын бейімдеулер: `count`, `last`, `min`, `max`, `collect`, `for_each`."
+    },
+    {
+      "id": "rust_book_13_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Жаңа итератор шығаратын бейімдеулер Кейбір әдістер итерторды бір итератордан екіншіге **айналдырады**."
+    },
+    {
+      "id": "rust_book_13_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Олар лазай — нәтиже әлі есептелмейді, бірақ кейін шакырылады. `map` — әр элементті жабудан өткізеді: `map(|x| x + 1)` — жаңа итератор қайтарады."
+    },
+    {
+      "id": "rust_book_13_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Бірақ есептеу әлі жасалмаған. `.collect()` — соңында итераторды тұтынып, нәтижені векторға жинайды. `filter` — шартқа сай элементтерді ғана өткізеді: Бұл екі бейімдеу — `map` пен `filter` — `Rust`-та (және басқа функционал тілдерде) ең жиі қолданылады."
+    },
+    {
+      "id": "rust_book_13_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Тізбек құруға болады: Бір тізбекте: 1-ден 10-ға дейінгі сандар → жұптарын сүзу → әрбірін квадраттау → қосу."
+    },
+    {
+      "id": "rust_book_13_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Бірнеше итератор-бейімдеу бір өрнекте; нәтиже — бір сан."
+    },
+    {
+      "id": "rust_book_13_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Цикл арқылы жазсаңыз 5-6 жол кетер еді."
+    },
+    {
+      "id": "rust_book_13_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Жабу арқылы қоршаған ортаны ұстау Итератор-бейімдеулерге берілген жабулар сол жабудың туылған аумағынан мәндерді ұстай алады."
+    },
+    {
+      "id": "rust_book_13_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Мысалы: `|s| s.size == shoe_size` жабуы `shoe_size` параметрін ұстайды."
+    },
+    {
+      "id": "rust_book_13_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Әр аяқкиім үшін оның өлшемі сұралған өлшемге тең бе тексеріледі."
+    },
+    {
+      "id": "rust_book_13_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Сондай жеңіл, оқуға анық код. 13.3."
+    },
+    {
+      "id": "rust_book_13_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Кіріс-шығыс жобамызды жетілдіру Алдыңғы тарауда `minigrep` бағдарламасын жасадық."
+    },
+    {
+      "id": "rust_book_13_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Енді оны итераторлар мен жабулар арқылы тазалап-жинақтайық. `Config::build`-тен `clone` алып тастау Бұрынғы код: `clone` арқылы біз `String`-терді көшіріп жатырмыз. `args` — `&[String]`; оған иелік жоқ."
+    },
+    {
+      "id": "rust_book_13_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Бірақ `Config` иелікке мұқтаж — өйткені оны `main`-нен сыртқа тарату керек."
+    },
+    {
+      "id": "rust_book_13_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Енді `args` орнына итераторды берсек ше?"
+    },
+    {
+      "id": "rust_book_13_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Иеліктегі мәндерді шығарып ала аламыз: `impl Iterator<Item = String>` — кез келген `String` беретін итератор. `next` шакыруы итерациядан `String` — иелігімен — алады."
+    },
+    {
+      "id": "rust_book_13_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Сондықтан `clone` керек емес. `main` ішінде: Біз `env::args()`-ті тура `Config::build`-ке береміз. `env::args` — итератор қайтарады; ол `String`-ті — иелігімен — береді. `search` функциясын итератор-бейімдеулермен қысқарту Бұрынғы: Итератор стилімен: Бір өрнекте: жолдарды аралап → `query` бар жолдарды сүзіп → жинау. 6 жолдан 1 жолға қысқарды."
+    },
+    {
+      "id": "rust_book_13_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Әрі — мағыналырақ. `search_case_insensitive` де ұқсас: Цикл vs итератор: қайсы дұрыс?"
+    },
+    {
+      "id": "rust_book_13_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Көп `Rust` бағдарламашылары — егер сізге қандай да бір ыңғайлы стиль болса — оны қолдана беруді ұсынады."
+    },
+    {
+      "id": "rust_book_13_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Бірақ практика бойынша: **Итератор** — деректерді өңдеу кездесінде ыңғайлы."
+    },
+    {
+      "id": "rust_book_13_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Сүзу, түрлендіру, жинақтау — итератор стилі айқынырақ. **Цикл** — қарапайым жағдайда (бір айнымалыны өсіру, есеп) ыңғайлы."
+    },
+    {
+      "id": "rust_book_13_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Уақыт өте келе бір көзқарас — функционал стиль *неғұрлым* идиомаға сай болады. `Rust` қауымдастығы оны жиі таңдайды."
+    },
+    {
+      "id": "rust_book_13_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Және ең маңыздысы — өнімділік сондай. 13.4."
+    },
+    {
+      "id": "rust_book_13_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Өнімділік: цикл vs итератор Біріншіден, теориялық уағдалас: «жалпы абстракция баяу болады» дегенмен келісеміз."
+    },
+    {
+      "id": "rust_book_13_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Бірақ `Rust` бұған тыйым салады. `Rust`-та абстракциялар — **нөлдік шығынды** (zero-cost) деп аталады."
+    },
+    {
+      "id": "rust_book_13_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Бұл: «егер сіз кодты қолмен оптимизацияланған цикл түрінде жазсаңыз, ол итератор-стильдегі кодпен бір жылдамдықта жұмыс істейді» дегенді білдіреді."
+    },
+    {
+      "id": "rust_book_13_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Бұның дәлелі — `rustc` компиляторында."
+    },
+    {
+      "id": "rust_book_13_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Итератор-тізбегі мономорфтаудан кейін шындыққа айналады: `map` мен `filter` — арнайы функциялар емес; олар компиляцияда жоғарыдағы циклмен бір қалыпта орналастырылады."
+    },
+    {
+      "id": "rust_book_13_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Кейінгі оптимизация (мысалы, цикл-ішінде функция шакыруларын ішке сіңіру) — олар жасалғандай, тура цикл түрінде орындалады."
+    },
+    {
+      "id": "rust_book_13_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Іс жүзінде, кейбір итератор-кодтар қолмен жазылған циклден де **тиімдірек** жұмыс істейді — себебі компиляторға қатаң спецификация беріледі: «осы қадамдар тізбегі — әр элементте лек-лек жүреді»."
+    },
+    {
+      "id": "rust_book_13_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Ондай тура спецификация жоғары деңгейде сақталғанда — компилятор оны жоғарырақ оптимизациялауы жеңілірек."
+    },
+    {
+      "id": "rust_book_13_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Сондықтан, дұрыс шешім: **жабулар мен итераторларды еркін қолданыңыз.** Олар сізге кодты қысқа жазуға, идеяны айқын жеткізуге, бағдарламаны тазалауға мүмкіндік береді — әрі өнімділік үшін «төлеудің» керегі жоқ. 13.5."
+    },
+    {
+      "id": "rust_book_13_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Жабу — қоршаған ортаны ұстайтын атаусыз функция."
+    },
+    {
+      "id": "rust_book_13_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Жабудың үш мінез-түрі — `FnOnce`, `FnMut`, `Fn` — олардың нені қалай ұстайтынына сай. `move` арқылы жабуға иелікті ауыстыруға болады."
+    },
+    {
+      "id": "rust_book_13_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Итератор — элементтер тізбегімен жұмыс істеудің типтік интерфейсі. `Iterator` трейті, `next` әдісі, лазай есептеу — олардың негізі. `map`, `filter`, `collect`, `sum` — стандарт құралдар. `Rust`-та функционал стиль — өнімділіктен айырылмайтын стиль."
+    },
+    {
+      "id": "rust_book_13_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Сондықтан кодты тазарту үшін, мағынасын анық беру үшін, циклдерді қысқарту үшін — итераторлар мен жабуларды еркін қолданыңыз."
+    },
+    {
+      "id": "rust_book_13_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_13",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда — `Cargo` мен `crates.io`-ның жетіленген мүмкіндіктерін қарастырамыз: бейіндер (профилдер), құжаттама жариялау, жұмыс кеңістіктері, бинарларды орнату, өзіндік командалар."
     }
   ]
 }
