@@ -1,5 +1,5 @@
 {
-  "version": "4.7.21",
+  "version": "4.8.0",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -33127,6 +33127,342 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_механика",
+      "root": "механика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_термодинамика",
+      "root": "термодинамика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_электродинамика",
+      "root": "электродинамика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_оптика",
+      "root": "оптика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_масса",
+      "root": "масса",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_тығыздық",
+      "root": "тығыздық",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_үдеу",
+      "root": "үдеу",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_инерция",
+      "root": "инерция",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_импульс",
+      "root": "импульс",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_энергия",
+      "root": "энергия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_термометр",
+      "root": "термометр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_цельсий",
+      "root": "цельсий",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_кельвин",
+      "root": "кельвин",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_балқу",
+      "root": "балқу",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_қату",
+      "root": "қату",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_қайнау",
+      "root": "қайнау",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_булану",
+      "root": "булану",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_конденсация",
+      "root": "конденсация",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_сублимация",
+      "root": "сублимация",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_заряд",
+      "root": "заряд",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_протон",
+      "root": "протон",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_нейтрон",
+      "root": "нейтрон",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_электрон",
+      "root": "электрон",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_изотоп",
+      "root": "изотоп",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_радиоактивтілік",
+      "root": "радиоактивтілік",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_альфа",
+      "root": "альфа",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_бета",
+      "root": "бета",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_гамма",
+      "root": "гамма",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_диэлектрик",
+      "root": "диэлектрик",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_магнит",
+      "root": "магнит",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_электромагнит",
+      "root": "электромагнит",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_амплитуда",
+      "root": "амплитуда",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_период",
+      "root": "период",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_жиілік",
+      "root": "жиілік",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_линза",
+      "root": "линза",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_призма",
+      "root": "призма",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_спектр",
+      "root": "спектр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_архимед",
+      "root": "архимед",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_ньютон",
+      "root": "ньютон",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_ом",
+      "root": "ом",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_плазма",
+      "root": "плазма",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_ыдырау",
+      "root": "ыдырау",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_синтез",
+      "root": "синтез",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_реакция",
+      "root": "реакция",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_шкала",
+      "root": "шкала",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_конденсатор",
+      "root": "конденсатор",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_8_0_ионизация",
+      "root": "ионизация",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_8_0_вакуум",
+      "root": "вакуум",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
     }
   ]
 }

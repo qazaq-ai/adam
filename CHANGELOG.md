@@ -7,6 +7,40 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.8.0] — 2026-04-30 — `physics_school.jsonl` world_core domain (school-curriculum physics, Kazakh)
+
+Sixth v4.x minor. First in the **non-Rust domain expansion** track that follows the v4.7.x Rust Book series. `physics_school.jsonl` is a curated 102-entry Kazakh glossary covering school-curriculum physics across five sections: mechanics, thermodynamics, electricity & magnetism, waves & optics, atomic & modern physics. The domain mirrors the structure of `mathematics_basic` and `informatics_basic` (v4.6.15) and `programming_rust` (v4.7.0): one curated definition per concept, all `confidence: high`, all `review_status: approved`, reviewer `shaman`.
+
+### `data/world_core/physics_school.jsonl` (102 entries / 102 facts)
+
+- **Mechanics & general (~30 entries)** — физика, механика, термодинамика, электродинамика, оптика, атомдық физика; дене, материя, масса, көлем, тығыздық; қозғалыс, жылдамдық, үдеу (бірқалыпты/үдемелі), күш; Ньютонның үш заңы; инерция, импульс; тартылыс күші, ауырлық күші, үйкеліс күші, серпімділік күші; еркін түсу; жұмыс, энергия (кинетикалық/потенциалдық), энергияның сақталу заңы, қуат, қысым, Архимед заңы.
+- **States of matter & thermodynamics (~12 entries)** — қатты дене, сұйық, газ, плазма; температура, жылу, термометр; Цельсий шкаласы, Кельвин шкаласы; балқу, қату, қайнау, булану, конденсация, сублимация; меншікті жылу сыйымдылық, жылу өткізгіштік.
+- **Electricity & magnetism (~16 entries)** — электр заряды (оң/теріс), электр өрісі, электр тоғы, кернеу, кедергі, Ом заңы, электр тізбегі; өткізгіш, диэлектрик, жартылай өткізгіш; магнит, магнит өрісі, электромагнит, электромагниттік индукция.
+- **Waves & optics (~20 entries)** — толқын, толқын ұзындығы, жиілік, период, амплитуда; көлденең/бойлық толқын; дыбыс, дыбыс жылдамдығы; жарық, жарық жылдамдығы, жарықтың шағылуы, жарықтың сынуы; линза (жинаушы/шашыратушы), призма, спектр, ультракүлгін сәуле, инфрақызыл сәуле.
+- **Atomic & modern physics (~14 entries)** — атом, атом ядросы, протон, нейтрон, электрон, изотоп, молекула; радиоактивтілік, альфа/бета/гамма сәулесі; ядролық реакция, ядролық синтез, ядролық ыдырау.
+
+### Pipeline impact
+
+- world_core: 1 142 → **1 244 entries** (+102); 1 305 → **1 407 facts** (+102); 33 → **34 domains**.
+- `data/retrieval/facts.json`: 15 831 → **15 933** (+102 from new domain).
+- `data/retrieval/derived_facts.json`: regenerated; new IsA hubs (`физика саласы`, `физикалық шама`, `физика заңы`, `толқын түрі`, `қозғалыс түрі`, `энергия түрі`, `зат күйі`, `радиоактивті сәуле`) drive new R1/R2/R5/R8 derivations.
+- `MULTIWORD_ENTITIES` += 73 physics compounds (sorted longest-first within length buckets so `find_multiword_entity`'s longest-match scan resolves the compound before any contained simpler form).
+- Lexicon: +48 noun roots (механика, термодинамика, оптика, масса, тығыздық, үдеу, инерция, импульс, энергия, термометр, цельсий, кельвин, балқу, қату, қайнау, булану, конденсация, заряд, протон, нейтрон, электрон, изотоп, радиоактивтілік, альфа, бета, гамма, диэлектрик, магнит, электромагнит, амплитуда, период, жиілік, линза, призма, спектр, архимед, ньютон, ом, плазма, сұйық, ыдырау, синтез, реакция, сәуле, шкала, конденсатор, ионизация, вакуум).
+
+### Tests + counters
+
+- E2E threshold for rust_book stays at ≥1 500 (v4.7.21 baseline).
+- Workspace tests: **745 passing**.
+- `world_core_multiword_coverage` contract test passes — all 73 new compounds registered.
+
+### Cadence note
+
+Minor (v4.8.0) — new world_core domain, not a patch on v4.7.x. The non-Rust expansion track gets its own minor sequence: v4.8.0 (physics_school) → v4.9.0 (chemistry_school) → v4.10.0 (biology_school) → v4.11.0 (history_kazakhstan).
+
+### Why minor
+
+Per `feedback_versioning_post_1_0`: minor x.y.0 = significant capability. New world_core domain with 102 curated entries + 73 compound entities + 48 lexicon roots is a substantive capability addition.
+
 ## [4.7.21] — 2026-04-30 — Per-pack limit override for `rust_book_kk_pack.json`: full chapter 1–20 content now in committed morpheme_index
 
 Architectural follow-up to the v4.7.20 series-completion. Closes the limitation that has carried since v4.7.7: the committed `data/retrieval/morpheme_index.json` capped each pack at `COMMITTED_DEFAULT_LIMIT = 500` samples; the Rust Book pack outgrew that cap at chapter 7 and chapters 8–20 (a further ~835 sentences) were in `data/curated/rust_book_kk_pack.json` (auditable, `--full`-mode-ready) but did not contribute to the committed index.

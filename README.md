@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.7.21-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.8.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -30,8 +30,8 @@
   <img src="https://img.shields.io/badge/RSS-~76--80%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
-  <img src="https://img.shields.io/badge/world%20core-1142%20curated%20/%201305%20facts-9CCC65?style=flat-square" alt="world core">
-  <img src="https://img.shields.io/badge/domains-33-9CCC65?style=flat-square" alt="domains">
+  <img src="https://img.shields.io/badge/world%20core-1244%20curated%20/%201407%20facts-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/domains-34-9CCC65?style=flat-square" alt="domains">
   <img src="https://img.shields.io/badge/policy-Rust--only%20%2B%20Graph--first-1976D2?style=flat-square" alt="policies">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20on%20deterministic%20path-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
@@ -41,6 +41,8 @@
 ## Why adam (v4.4)
 
 adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced. Every layer is **Rust-only** and **graph-first** by repository invariant — both enforced by contract tests.
+
+**v4.8.0 milestone — `physics_school.jsonl` world_core domain (school-curriculum physics, Kazakh).** Sixth v4.x minor; first in the **non-Rust domain expansion** track that follows the v4.7.x Rust Book series. New 102-entry curated Kazakh glossary covering: mechanics & general (физика, механика, дене, материя, масса, көлем, тығыздық, қозғалыс, жылдамдық, үдеу, күш, Ньютонның үш заңы, инерция, импульс, тартылыс/ауырлық/үйкеліс/серпімділік күші, еркін түсу, жұмыс, энергия — кинетикалық/потенциалдық, энергияның сақталу заңы, қуат, қысым, Архимед заңы); states of matter & thermodynamics (қатты дене, сұйық, газ, плазма, температура, жылу, термометр, Цельсий/Кельвин шкаласы, балқу/қату/қайнау/булану/конденсация/сублимация, меншікті жылу сыйымдылық); electricity & magnetism (электр заряды/өрісі/тоғы, кернеу, кедергі, Ом заңы, тізбек, өткізгіш/диэлектрик/жартылай өткізгіш, магнит/магнит өрісі/электромагнит, электромагниттік индукция); waves & optics (толқын, толқын ұзындығы, жиілік, период, амплитуда, көлденең/бойлық толқын, дыбыс, жарық, жарықтың шағылуы/сынуы, линза, призма, спектр, ультракүлгін/инфрақызыл сәуле); atomic & modern physics (атом, атом ядросы, протон/нейтрон/электрон, изотоп, молекула, радиоактивтілік, альфа/бета/гамма сәулесі, ядролық реакция/синтез/ыдырау). Pipeline: world_core 1 142→**1 244 entries**, 1 305→**1 407 facts**, 33→**34 domains**; `MULTIWORD_ENTITIES` +73 physics compounds; lexicon +48 noun roots. Cadence note: minor x.y.0 = significant capability per `feedback_versioning_post_1_0`. Workspace 745 unchanged. The non-Rust expansion track continues: v4.9.0 chemistry_school → v4.10.0 biology_school → v4.11.0 history_kazakhstan.
 
 **v4.7.21 follow-up — per-pack limit override for `rust_book_kk_pack.json`: full chapter 1–20 content now in committed morpheme_index.** Architectural follow-up to the v4.7.20 series-completion. Closes the ceiling that has carried since v4.7.7: the committed `data/retrieval/morpheme_index.json` capped each pack at `COMMITTED_DEFAULT_LIMIT = 500` samples, so chapters 8–20 (~835 sentences) were in the pack file but did not contribute to retrieval. New `PER_PACK_LIMIT_OVERRIDES` table in `build_morpheme_index.rs` registers `("rust_book_kk_pack.json", None)` — no per-pack cap. Other packs unchanged. Committed morpheme_index: 3 691 → **4 734 indexed samples** (+1 043 — exactly the 1 543 − 500 previously clipped); 3 362 → **3 502 morphemes** (+140); 22 145 → **30 919 postings** (+8 774). File size 3.9 MB (well under the 50 MB gitignore threshold). E2E threshold raised from ≥490 to ≥1 500. Workspace 745 unchanged.
 
@@ -194,7 +196,7 @@ Live numbers (verified 2026-04-29 against the actual repo): cognitive eval **65 
 | Workspace tests | **727 passing, 0 failing, 4 ignored** | `cargo test --workspace` |
 | Cognitive eval canonical | **59 / 59** | `cargo test -p adam-dialog --test cognitive_eval` |
 | REPL replay | **62 / 62 canonical + 0 aspirational** | `cargo test -p adam-dialog --test repl_replay` |
-| World Core entries / facts / domains | **1142 / 1305 / 33** | `find data/world_core -name '*.jsonl' \| xargs cat \| jq -s 'length'` |
+| World Core entries / facts / domains | **1244 / 1407 / 34** | `find data/world_core -name '*.jsonl' \| xargs cat \| jq -s 'length'` |
 | Extracted runtime facts | **15 642** | `jq '.counts.facts_total' data/retrieval/facts.json` |
 | Derived facts | **23 418** | sum of `data/retrieval/derived_facts.json` `.counts.by_rule` values |
 | Template families | **50** | `grep -c '^\[\[families\]\]' data/dialog/templates/v1.toml` |
