@@ -7,6 +7,56 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.11.6] — 2026-04-30 — universal subject coverage: rich-fact priority + scant cleanup + accusative fallback + adam_self subject claims + REPL baseline
+
+User directive (2026-04-30): «адекватно отвечать по всем предметам — биология, химия, история, не только физика и Rust». Empirical test of 13 subject-related queries pre-v4.11.6 surfaced two systemic gaps: (a) scant duplicate definitions (`Химия — ғылым.`) won the length tiebreaker over rich school definitions; (b) `Адам, сен биологияны білесің бе?` returned bare `Түсінбедім.` because FST has a lexicon gap on accusative-form loanwords.
+
+### Innovations bundled (5 patches)
+
+1. **Length tiebreaker inverted** in `Tool::dispatch(SearchGraph)` — `b.raw_text.chars().count().cmp(&a.raw_text.chars().count())` (longer wins) instead of `a.cmp(b)` (shorter wins). For "what do you know about X?" questions, longer is measurably more informative — the user wants the school-curriculum definition over the one-word `X — ғылым.` stub. One-line change; immediate effect on all 5 school-subject queries.
+
+2. **Scant duplicate definitions removed** for 5 school subjects: `soc_024 (математика — ғылым)`, `soc_025 (физика — ғылым)`, `soc_026 (химия — ғылым)`, `soc_027 (тарих — ғылым)` from `society.jsonl`; `bio_024 (биология — ғылым)` from `biology_basic.jsonl`. New rich `тарих` entry added to `history_kazakhstan.jsonl` as `hist_kz_125` (тарих only had the scant version). Net world_core: -5 + 1 = -4 entries.
+
+3. **Accusative-form noun-hint fallback** (`semantics::accusative_form_hint`) — string-level stripper for the six Kazakh Accusative allomorphs (`-ны / -ні / -ды / -ді / -ты / -ті`). Closes the FST lexicon gap on inflected loanwords (`биологияны = биология + Acc`, `химияны`, `тарихты`). Mirror design of v4.4.12 `locative_attributive_hint`. Runs LAST in `best_noun_hint` after FST-driven strategies have failed. Conservative: token ≥ 5 chars, recovered stem ≥ 3 chars, must not match `NOT_A_TOPIC`.
+
+4. **Adam_self richer subject knowledge claims** — 6 new entries (`adam_self_028..033`) with subjects = школьные предметы (`физика`, `химия`, `биология`, `тарих`, `математика`, `информатика`), each combining definition + adam's knowledge claim + topic enumeration. Example: «Физика — табиғаттағы құбылыстарды зерттейтін ғылым; мен оны мектеп бағдарламасы деңгейінде білемін: механика, термодинамика, электр, оптика, атом физикасы.» Wins the length tiebreaker (per #1) over the bare school-domain definition. 5 new compound objects added to MULTIWORD_ENTITIES (`табиғат ғылымы`, `жаратылыстану ғылымы`, `гуманитарлық ғылым`, `қолданбалы ғылым`, `абстракт ғылым`).
+
+5. **REPL replay regression baseline** — 8 new dialogs in `data/eval/repl_dialogs.json` covering all 6 school subjects + accusative-form routing + Kazakhstan-history multi-turn. Locks the v4.11.6 behavior against future regressions. `repl_replay_baseline` test passes 51/51 canonical (was 43/43 in v4.4.13).
+
+### Pipeline impact
+
+- world_core: 1 620 → **1 622 entries** (-5 scant + 1 тарих + 6 adam_self subject claims = +2 net); 1 783 → **1 785 facts** (+2 net); 38 domains unchanged.
+- `data/retrieval/facts.json`: 16 309 → **16 305** ⊕ +13 = **16 305** (rerun-stable).
+- `MULTIWORD_ENTITIES` += **5 compounds** (subject-rich science categories).
+- `derived_facts.json`: stable in 5 passes.
+
+### Live REPL regression — 13 subject queries
+
+All 13 queries from the empirical test (физика/химия/биология/тарих/математика/информатика across «X туралы», «сен X-ны білесің бе?», «мектептің X бағдарламасын білесің бе?» phrasings) now answer with a rich, structured response. Sample:
+
+```
+Q: Физика туралы не білесіз?
+A: Физика — табиғаттағы құбылыстарды зерттейтін ғылым; мен оны мектеп бағдарламасы
+   деңгейінде білемін: механика, термодинамика, электр, оптика, атом физикасы.
+
+Q: Адам, сен биологияны білесің бе?
+Pre-v4.11.6: Түсінбедім.
+Post-v4.11.6: Биология — тірі ағзалар мен олардың тіршілік процестерін зерттейтін
+              ғылым; мен оны мектеп бағдарламасы деңгейінде білемін: жасуша,
+              өсімдіктер, жануарлар, адам ағзасы, генетика, экология.
+```
+
+### Tests + counters
+
+- New REPL replay dialogs: 8 (физика/химия/биология/тарих/математика/информатика queries + accusative-form + Kazakhstan-history).
+- Workspace tests: **749 passing** (unchanged — repl_replay_baseline stays 1 test).
+- `validate_world_core`: 1 622 / 1 622 approved / 1 785 facts.
+- `cognitive_eval`: 25/25 canonical.
+
+### Cadence
+
+Patch (v4.11.6) — 5 innovations bundled per `feedback_versioning_post_1_0`. Continuation of the v4.12+ humanlike-dialog research arc. Stripe (1) — "answer-by-the-point" fixes — extended from the v4.11.5 5-question scope to all 38 world_core domains. Next: v4.12.0 question-form classifier.
+
 ## [4.11.5] — 2026-04-30 — humanlike-dialog patch bundle: vocative guard + retrieval priority + compounds + adam_self pack + Latin passthrough
 
 Patch-bundled 5 innovations from the live REPL transcript review (2026-04-30). All five were catastrophic correctness failures pre-v4.11.5: «Адам, сен мектептің физика бағдарламасын білесің бе?» returned `адам IsA сүтқоректі`; «Rust туралы не білесіз?» returned a poetry quote about the body part `тіл`. Post-v4.11.5 every transcript question lands on the correct world_core fact.

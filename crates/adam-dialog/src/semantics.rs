@@ -984,6 +984,14 @@ const MULTIWORD_ENTITIES: &[&str] = &[
     "rust білімі",
     "жалпы білім",
     "ғылым салалары",
+    // **v4.11.6** — adam_self subject-rich knowledge claim
+    // categories. Compound objects from `adam_self_028..033`
+    // (subject = школьный предмет, IsA = категория ғылым).
+    "жаратылыстану ғылымы",
+    "гуманитарлық ғылым",
+    "қолданбалы ғылым",
+    "табиғат ғылымы",
+    "абстракт ғылым",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -1223,6 +1231,16 @@ fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
         // elsewhere via `first_noun_root`.
         .or_else(|| locative_attributive_hint(input))
         .or_else(|| first_noun_root(parses))
+        // **v4.11.6** — accusative-form fallback. Closes the
+        // «биологияны білесің бе?» → "Түсінбедім" gap from the
+        // 2026-04-30 transcript: FST has a lexicon gap on
+        // `биологияны / химияны / тарихты` (loanword roots in
+        // Accusative case) and emits no Noun analysis, so all
+        // upstream strategies yield None. String-level stripper of
+        // the six Accusative allomorphs recovers the bare stem.
+        // Runs LAST as a fallback after FST-driven strategies
+        // have all failed.
+        .or_else(|| accusative_form_hint(input))
 }
 
 /// **v4.4.12** — string-level locative-attributive suffix strip.
@@ -1249,6 +1267,44 @@ fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
 /// retrieval/refusal handling absorbs the noise. Promote to a
 /// proper FST morphotactics rule when adding the
 /// `Case::LocativeAttributive` variant in a future minor.
+/// **v4.11.6** — string-level accusative-form fallback. Kazakh
+/// Accusative attaches one of six surface allomorphs by vowel
+/// harmony + final-sound class: `-ны / -ні` after vowel, `-ды /
+/// -ді` after voiced consonant, `-ты / -ті` after voiceless
+/// consonant. The current FST has lexicon gaps on inflected
+/// loanword roots (e.g. `биологияны = биология + Acc`,
+/// `химияны = химия + Acc`, `тарихты = тарих + Acc`) and emits no
+/// Noun analysis, so all upstream noun-hint strategies yield None
+/// and the conversation falls to bare `unknown` → "Түсінбедім.".
+///
+/// Conservative: only fires on tokens of ≥ 5 chars (≥ 3 stem +
+/// 2 suffix), recovered stem must be ≥ 3 codepoints, must not
+/// match `NOT_A_TOPIC`. Returns the first qualifying stem.
+fn accusative_form_hint(input: &str) -> Option<String> {
+    const SUFFIXES: &[&str] = &["ны", "ні", "ды", "ді", "ты", "ті"];
+    let lower = input.to_lowercase();
+    for raw_word in lower.split_whitespace() {
+        let word: String = raw_word
+            .chars()
+            .filter(|c| c.is_alphabetic() || *c == '-')
+            .collect();
+        let word_len = word.chars().count();
+        if word_len < 5 {
+            continue;
+        }
+        for suffix in SUFFIXES {
+            if word.ends_with(suffix) {
+                let stem_chars = word_len - suffix.chars().count();
+                let stem: String = word.chars().take(stem_chars).collect();
+                if stem.chars().count() >= 3 && !NOT_A_TOPIC.contains(&stem.as_str()) {
+                    return Some(stem);
+                }
+            }
+        }
+    }
+    None
+}
+
 fn locative_attributive_hint(input: &str) -> Option<String> {
     const SUFFIXES: &[&str] = &["дағы", "дегі", "тағы", "тегі"];
     let lower = input.to_lowercase();

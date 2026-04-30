@@ -335,7 +335,20 @@ impl Tool {
                         .then_with(|| {
                             user_facing_fact_priority(a).cmp(&user_facing_fact_priority(b))
                         })
-                        .then_with(|| a.raw_text.chars().count().cmp(&b.raw_text.chars().count()))
+                        // **v4.11.6** — longer fact wins after overlap +
+                        // priority tie. Pre-v4.11.6 the tiebreaker was
+                        // `length(a) cmp length(b)` (shorter wins),
+                        // which surfaced the scant definition
+                        // `Химия — ғылым.` over the rich
+                        // `Химия — заттардың құрамын, құрылысын,
+                        // қасиеттерін және түрленулерін зерттейтін
+                        // ғылым.` whenever both matched the same
+                        // morpheme and predicate. For "what do you
+                        // know about X?" questions, longer is
+                        // measurably more informative — the user
+                        // wants the school-curriculum definition
+                        // over the one-word `X — ғылым.` stub.
+                        .then_with(|| b.raw_text.chars().count().cmp(&a.raw_text.chars().count()))
                         .then_with(|| a.raw_text.cmp(&b.raw_text))
                 });
                 let total_matches = matches.len();

@@ -579,6 +579,70 @@
         {"user": "мен Астанада тұрамын"},
         {"user": "жоқ, мен Алматыда тұрамын", "output_contains_lower_any": ["алматы"]}
       ]
+    },
+    {
+      "id": "physics_query_surfaces_subject_v4_11_6",
+      "category": "knowledge_query",
+      "description": "v4.11.6: «Физика туралы не білесіз?» must surface the physics definition AND adam's knowledge claim with topic enumeration (mechanics/thermodynamics/electricity/optics/atomic physics). Locks the rich-fact-wins-on-tiebreak ordering against future regressions.",
+      "turns": [
+        {"user": "Физика туралы не білесіз?", "output_contains_lower_any": ["механика"]}
+      ]
+    },
+    {
+      "id": "chemistry_query_surfaces_subject_v4_11_6",
+      "category": "knowledge_query",
+      "description": "v4.11.6: «Химия туралы не білесіз?» must surface chemistry definition + adam's knowledge claim with topic enumeration. Pre-v4.11.6 surfaced the scant `Химия — ғылым.` from society.jsonl due to shorter-wins length tiebreak.",
+      "turns": [
+        {"user": "Химия туралы не білесіз?", "output_contains_lower_any": ["периодтық жүйе"]}
+      ]
+    },
+    {
+      "id": "biology_query_surfaces_subject_v4_11_6",
+      "category": "knowledge_query",
+      "description": "v4.11.6: «Биология туралы не білесіз?» must surface biology definition + adam's knowledge claim with topic enumeration.",
+      "turns": [
+        {"user": "Биология туралы не білесіз?", "output_contains_lower_any": ["жасуша"]}
+      ]
+    },
+    {
+      "id": "history_query_surfaces_subject_v4_11_6",
+      "category": "knowledge_query",
+      "description": "v4.11.6: «Тарих туралы не білесіз?» must surface a rich тарих definition + adam's claim with epoch enumeration. Pre-v4.11.6 only the scant `Тарих — ғылым.` existed; v4.11.6 added rich тарих entry to history_kazakhstan.jsonl + adam_self knowledge claim.",
+      "turns": [
+        {"user": "Тарих туралы не білесіз?", "output_contains_lower_any": ["қазақ хандығы"]}
+      ]
+    },
+    {
+      "id": "math_query_surfaces_subject_v4_11_6",
+      "category": "knowledge_query",
+      "description": "v4.11.6: «Математика туралы не білесіз?» must surface math definition + adam's claim with topic enumeration.",
+      "turns": [
+        {"user": "Математика туралы не білесіз?", "output_contains_lower_any": ["теңдеу"]}
+      ]
+    },
+    {
+      "id": "informatics_query_surfaces_subject_v4_11_6",
+      "category": "knowledge_query",
+      "description": "v4.11.6: «Информатика туралы не білесіз?» must surface informatics definition + adam's claim with topic enumeration.",
+      "turns": [
+        {"user": "Информатика туралы не білесіз?", "output_contains_lower_any": ["алгоритм"]}
+      ]
+    },
+    {
+      "id": "biology_accusative_routing_v4_11_6",
+      "category": "knowledge_query",
+      "description": "v4.11.6: «Адам, сен биологияны білесің бе?» — pre-v4.11.6 returned bare `Түсінбедім.` because FST has lexicon gap on accusative-form loanwords (`биологияны = биология + Acc`) and no upstream noun-hint strategy recovered the stem. v4.11.6 added string-level accusative-allomorph stripper as a final fallback in `best_noun_hint`. Combined with v4.11.5 vocative guard, the response now grounds on the biology definition.",
+      "turns": [
+        {"user": "Адам, сен биологияны білесің бе?", "output_contains_lower_any": ["биология"]}
+      ]
+    },
+    {
+      "id": "history_kazakhstan_query_v4_11_6",
+      "category": "knowledge_query",
+      "description": "v4.11.6: «Қазақстан тарихы туралы не білесіз?» surfaces the rich Kazakhstan-history multiword fact. Locks the inherited v4.11.0 history domain plus v4.11.5 multiword-first priority.",
+      "turns": [
+        {"user": "Қазақстан тарихы туралы не білесіз?", "output_contains_lower_any": ["қазақстан"]}
+      ]
     }
   ]
 }
