@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 17,
-  "sentences_total": 1289,
-  "sample_count": 1289,
+  "chapters_translated": 18,
+  "sentences_total": 1339,
+  "sample_count": 1339,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -9032,6 +9032,356 @@
       "source_id": "chapter_17",
       "domain": "programming_rust",
       "text": "Біз `match` мен `if let` ұғымдарымен таныс болсақ, енді үлгілердің толық мүмкіндіктерін қарастырамыз: оларды функция параметрлерінде, `while let`-те, `for`-да, `let`-те қолдану."
+    },
+    {
+      "id": "rust_book_18_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үлгілер мен сай келтіру Үлгі (pattern) — `Rust`-тың арнайы синтаксисі, мәннің құрылымына сай келтіру үшін."
+    },
+    {
+      "id": "rust_book_18_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үлгі арқылы біз: мәннің ішкі бөліктерін ажырата аламыз; оларды атаулы айнымалыларға бөлектей аламыз; қандайда бір нұсқаны сүзе аламыз. `match` пен `if let`-ті біз бұрын көрдік — олар үлгі қолданатын жерлер."
+    },
+    {
+      "id": "rust_book_18_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Бұл тарауда: Үлгілер қандай орындарда қолданылады. **Жоққа шығаруға келетін** vs **жоққа шығаруға келмейтін** үлгілер."
+    },
+    {
+      "id": "rust_book_18_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үлгілер синтаксисінің толық тізімі. 18.1."
+    },
+    {
+      "id": "rust_book_18_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үлгілер қандай орындарда қолданылады `match` тармақтары Ең әйгілі қолданыс — `match` өрнегі: Әр тармақ бір үлгіні және оған сай орындалатын кодты ұстайды. `match` толық қамтылуы керек — барлық мүмкін мәндерді қарастыру. `if let` өрнектері `if let` — бір үлгіге сай болғанда орындалатын код: `if let` жоққа шығаруға келетін үлгілерді қабылдайды (көп жағдайда `Option` немесе `Result`)."
+    },
+    {
+      "id": "rust_book_18_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Сай болмаса — `else` тармағы орындалады. `while let` циклы `while let` — үлгі сай болғанша қайталанатын цикл: `stack.pop()` `Option<T>` қайтарады. `Some(top)` сай болса — цикл жалғасады; `None` болса — тоқтайды."
+    },
+    {
+      "id": "rust_book_18_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Шығарады: `3`, `2`, `1`. `for` цикл `for` циклында да үлгі қолданылады: `(index, value)` — кортежді бөлшектеу үлгісі. `enumerate` `(usize, T)` жұптарын береді; `for` оларды бөлшектейді. `let` сөйлемдері `let` те үлгі қабылдайды: `(x, y, z)` — үлгі."
+    },
+    {
+      "id": "rust_book_18_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Кортежді бөлшектеп, үш атаулы айнымалыға бөлеміз. `let x = 5;` — қарапайым жағдай, бірақ ол да үлгі: `x` — атау-үлгісі; ол кез келген мәнге сай болады."
+    },
+    {
+      "id": "rust_book_18_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Функция параметрлері Функция параметрлері — солай үлгі."
+    },
+    {
+      "id": "rust_book_18_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Қарапайым `fn foo(x: i32)`-те `x` атау-үлгісі."
+    },
+    {
+      "id": "rust_book_18_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Бірақ кортежді тікелей бөлшектеп қабылдауға болады: `&(x, y)` — параметрді бөлшектеу."
+    },
+    {
+      "id": "rust_book_18_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Функцияға кортеж сілтемесі келеді, ол ішінде екі бөлек айнымалыға таратылады. 18.2."
+    },
+    {
+      "id": "rust_book_18_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Қабылдамаушылық: үлгінің сай болмауы мүмкіндігі Үлгінің екі үлкен түрі бар: **Жоққа шығаруға келмейтін** (irrefutable) үлгі — кез келген мәнге сай."
+    },
+    {
+      "id": "rust_book_18_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Сай болмауы мүмкін емес. **Жоққа шығаруға келетін** (refutable) үлгі — кейбір мәндерге сай болмауы мүмкін."
+    },
+    {
+      "id": "rust_book_18_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Мысалы: `let x = 5;` — `x` атау-үлгісі, **жоққа шығаруға келмейтін**."
+    },
+    {
+      "id": "rust_book_18_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Кез келген мәнге сай. `if let Some(x) = a_value` — `Some(x)` **жоққа шығаруға келетін**. `a_value` `None` болса — сай болмайды. `let`, `for`, функция параметрлері — **жоққа шығаруға келмейтін** үлгілерді ғана қабылдайды (өйткені сай болмаса не істеу керек — ережесі жоқ). `if let`, `while let`, `match` — қабылдамаушы үлгілерді қабылдайды (олардың сай болмауын өңдейтін бөлек тармақтары бар)."
+    },
+    {
+      "id": "rust_book_18_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Сондықтан мынадай код қате: Қате: `Some(x)` — қабылдамаушы; `let` оны қолдамайды."
+    },
+    {
+      "id": "rust_book_18_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Шешім — `if let` немесе `let else`: `let else` (Rust 1.65+) — `Some` сай болса жалғасады; `None` болса `else` блогы орындалады, ол мүлдем `return` немесе `panic` сияқты шығарушы өрнекпен аяқталу керек. 18.3."
+    },
+    {
+      "id": "rust_book_18_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үлгілер синтаксисі Үлгілер синтаксисі мол."
+    },
+    {
+      "id": "rust_book_18_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Бар нұсқаларды қарастырайық."
+    },
+    {
+      "id": "rust_book_18_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Литералдарға сай келтіру Литерал — `1`, `'a'`, `\"сәлем\"` — нақты мәнге сай."
+    },
+    {
+      "id": "rust_book_18_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Атаулы айнымалылар Атаулы үлгі — кез келген мәнге сай, мәнді сол атпен ұстайды: `Some(y)` — `Some`-ге сай."
+    },
+    {
+      "id": "rust_book_18_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Ішіндегі мәнді `y`-ке байлайды."
+    },
+    {
+      "id": "rust_book_18_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Бірақ ескертіңіз: `match` өзінің жаңа аумағын ашады, сондықтан ішкі `y` сыртқы кез келген `y`-ден бөлек."
+    },
+    {
+      "id": "rust_book_18_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Көп үлгі (`|`) Бірнеше үлгіні бір тармаққа біріктіру: `1 | 2` — `1` де, `2` де сай."
+    },
+    {
+      "id": "rust_book_18_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Диапазонға сай (`..=`) Сан немесе символ диапазондары: `1..=5` — `1` бен `5` арасы (екі шеті де қосылған)."
+    },
+    {
+      "id": "rust_book_18_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Тек сан немесе `char` түрлерімен қолданылады."
+    },
+    {
+      "id": "rust_book_18_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Бөлшектеу Бөлшектеу — мәннің ішкі бөліктерін атаулы айнымалыларға тарату."
+    },
+    {
+      "id": "rust_book_18_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Структты бөлшектеу Стандартты қысқа жазу — өрістің атын сақтау: `match`-те жекелеген жайттарды бөлектеу: Енамды бөлшектеу Енамның әр нұсқасы өзіне сай бөлшектелу синтаксисімен жазылады."
+    },
+    {
+      "id": "rust_book_18_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Тоғыспалы құрылымдарды бөлшектеу Тоғыспалы — енам ішінде енам, кортеж ішінде кортеж және басқалары."
+    },
+    {
+      "id": "rust_book_18_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үлгі сондай тереңдікте жазылады."
+    },
+    {
+      "id": "rust_book_18_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Структ пен кортежді бірге Бір сөйлемде кортеж + структ + ішкі кортеж бөлшектелді."
+    },
+    {
+      "id": "rust_book_18_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үлгіде мәнді елемеу Кейде үлгінің бір бөлігі сізге қызық емес. `_` (астыңғы сызық) `_` — кез келген мәнге сай, бірақ оны айнымалыға байламайды. `match` ішінде: `_x` (атаулы, бірақ елемеу) `_`-пен басталатын атау — компилятор «қолданбадың» деген ескертуді шығармайды: Бірақ `_x` — атау-үлгісі әрі де иелікті алады. `_` — иелікті алмайды."
+    },
+    {
+      "id": "rust_book_18_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Айырмашылық: `..` — бөліктің қалғанын елемеу `..` — структтың қалған өрістерін елемейді."
+    },
+    {
+      "id": "rust_book_18_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Кортеждерде де: `..` — кортеждің ортасында, тек бір рет қана."
+    },
+    {
+      "id": "rust_book_18_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Анық емес болса компилятор жол бермейді. `match` шарттары (match guards) Кейде үлгідегі шартты тереңірек тексеру керек: `if x % 2 == 0` — **match шарты**."
+    },
+    {
+      "id": "rust_book_18_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үлгі сай болғаннан кейін қосымша шартты тексереді."
+    },
+    {
+      "id": "rust_book_18_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Шарт орындалмаса — тармақ өткізіледі. Match шарттары — үлгілерден тыс шарттарды қосу үшін; үлгілердің өздерінде өрнектер жоқ."
+    },
+    {
+      "id": "rust_book_18_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Бірнеше үлгі мен match шартын біріктіруге болады: Бұл жерде `4 | 5 | 6` және `if y` — екеуі бірге. `if y` барлық үш санға қатысты. `@` байланыстыру `@` — мәнді ұстауымен қатар оны үлгіге де тексергім келеді: `id_variable @ 3..=7` — `id` 3-7 арасында ма дегенді тексереді **және** оны `id_variable`-ге байлайды."
+    },
+    {
+      "id": "rust_book_18_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Сонда бір үлгіде екеуі — диапазон тексеру + айнымалыға байлау. `@`-сіз `Message::Hello { id: 10..=12 }` жазсаңыз — `id`-ні қолдану мүмкіндігіңіз жоқ. `@`-пен бар. 18.4."
+    },
+    {
+      "id": "rust_book_18_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Үлгілер `Rust`-тың айқын-күшті құралы."
+    },
+    {
+      "id": "rust_book_18_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Олар арқылы: Мәннің құрылымына сай келтіріп ажыратамыз."
+    },
+    {
+      "id": "rust_book_18_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Ішкі бөліктерді атаулы айнымалыларға бөлеміз."
+    },
+    {
+      "id": "rust_book_18_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Сүзу логикасын типтік деңгейде жасаймыз."
+    },
+    {
+      "id": "rust_book_18_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үлгі қолданылатын орындар: `match`, `if let`, `while let`, `for`, `let`, функция параметрлері."
+    },
+    {
+      "id": "rust_book_18_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Әрқайсысы өзіндік қажеттілік бойынша қабылдамаушы (refutable) немесе жоққа шығаруға келмейтін (irrefutable) үлгілерді талап етеді."
+    },
+    {
+      "id": "rust_book_18_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Бар синтаксис: литералдар, атаулар, `|` көп үлгі, `..=` диапазон, бөлшектеу (структ, енам, кортеж, тоғыспалы), елемеу (`_`, `..`, `_x`), match шарттары (`if ...`), `@` байланыстыру."
+    },
+    {
+      "id": "rust_book_18_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Үйренуі кейде күрделі болуы мүмкін, бірақ тәжірибеде үлгілер кодты қысқа әрі мағыналы етеді — ондаған жолдағы шарттарды бір ыңғайлы тармаққа жинайды."
+    },
+    {
+      "id": "rust_book_18_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда — `Rust`-тың жетіленген тақырыптары туралы."
+    },
+    {
+      "id": "rust_book_18_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_18",
+      "domain": "programming_rust",
+      "text": "Ол `unsafe` блок, жетіленген трейттер, жетіленген типтер, жетіленген функциялар, макростар сияқты — ілгері Rust бағдарламашысы үшін маңызды құралдар."
     }
   ]
 }

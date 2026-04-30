@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.18] — 2026-04-29 — Rust Book Chapter 18 (Үлгілер мен сай келтіру) translated, in pack
+
+Eighteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 18 — Patterns and Matching — covering pattern syntax across all the places it can appear in `Rust`: `match` arms, `if let` (with chained `else if let`), `while let` (the stack-popping example), `for` loops (with `enumerate` destructuring), `let` statements (irrefutable destructuring), function parameters (the `&(x, y): &(i32, i32)` example); the **refutability** distinction (irrefutable patterns always succeed and are required by `let`/`for`/parameters; refutable patterns may fail and are required by `if let`/`while let`/`match`, with the `let else` form for the early-return on failure idiom). Pattern syntax taxonomy: matching literals, named-variable patterns and shadowing inside `match` scopes, multiple patterns with `|`, range patterns `..=` (numeric and `char`), destructuring (struct, enum, tuple, deeply-nested combinations), ignoring values (`_` placeholder vs `_x` named-but-unused — and how `_` doesn't move ownership while `_x` does), `..` for ignoring remaining parts of structs/tuples, **match guards** (`Some(x) if x % 2 == 0`), and the `@` binding operator for combining a range check with capture.
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_18.md` — ~4 000 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-18-specific terminology decisions: pattern → **үлгі** (already locked); refutable → **жоққа шығаруға келетін**; irrefutable → **жоққа шығаруға келмейтін**; match guard → **match шарты**; `@` binding → **`@` байланыстыру**; destructuring → **бөлшектеу** (already locked since v4.7.3).
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 17 chapters / 1 289 samples → **18 chapters / 1 339 samples** (+50 from chapter 18).
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.19 = Chapter 19 (Advanced Features — `unsafe` Rust, advanced traits, advanced types, advanced functions and closures, macros). The penultimate chapter of the book.
+
 ## [4.7.17] — 2026-04-29 — Rust Book Chapter 17 (Rust-тың объектілі-бағытталған мүмкіндіктері) translated, in pack
 
 Seventeenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 17 — Object-Oriented Programming Features of Rust — covering Rust's relationship to OOP: characteristics of OO languages and how Rust delivers (or deliberately doesn't deliver) each — encapsulation via `pub` keyword (`AveragedCollection` worked example with private fields and a public API maintaining an internal invariant); Rust's deliberate absence of inheritance and the trade-off reasoning (over-coupling, hierarchy rigidity), with default trait implementations and trait objects as the practical replacements; static vs dynamic polymorphism (generics with `<T: Trait>` for compile-time monomorphization vs `Box<dyn Trait>` trait objects for runtime dispatch); using **trait objects** for collections of mixed types (the GUI `Draw` / `Screen` example, `Vec<Box<dyn Draw>>`, vtable-based dynamic dispatch, the **object-safe trait** rules — methods on `&self`/`&mut self`, no generic parameters, no `Self` return, why `Clone` cannot be made into `Box<dyn Clone>`); implementing the **state pattern** (the blog-post lifecycle Draft → PendingReview → Published example), first in classical OOP style with `Box<dyn State>` and the `self: Box<Self>` consuming method pattern, then in idiomatic Rust style with each state as a separate type (`DraftPost` / `PendingReviewPost` / `Post`), with the trade-off discussion: classical OOP allows runtime extensibility; type-encoded states catch errors at compile time.
