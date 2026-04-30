@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.16] — 2026-04-29 — Rust Book Chapter 16 (Қорқынышсыз қатарлас орындау) translated, in pack
+
+Sixteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 16 — Fearless Concurrency — covering Rust's compile-time-enforced concurrency primitives: spawning OS threads with `std::thread::spawn` and waiting for them with `JoinHandle::join`, the closure-with-`move` pattern for transferring ownership into a thread; message-passing concurrency via `std::sync::mpsc::channel` (transmitter `tx` / receiver `rx`, ownership transfer on `send`, blocking `recv` vs non-blocking `try_recv`, iterating `for received in rx`, multiple producers via `tx.clone()`); shared-state concurrency via `Mutex<T>` (the `lock()` API returning a `MutexGuard`, `Drop`-based auto-release, the `Arc<Mutex<T>>` combination for cross-thread shared mutable state with the 10-thread counter example); the `Send` and `Sync` marker traits as the type-system foundation that makes this all safe (the `Rc<T>` / `Arc<T>` distinction explained via these traits, `RefCell<T>` not being `Sync`, why manual `unsafe impl Send/Sync` is rare and dangerous).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_16.md` — ~5 500 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-16-specific terminology decisions: thread → **ағын** (already locked); message passing → **хабарлама арқылы алмасу**; channel → **канал** (already); transmitter → **жіберуші**; receiver → **қабылдаушы**; mutex → kept as `Mutex` (the `Rust` type) plus the conceptual term **өзара эксклюзивтілік**; shared state → **ортақ күй**; atomic reference counting → **атомдық сілтеме-есептеу**; `Send` / `Sync` → kept verbatim (marker trait names); deadlock → **өзара тосқауыл**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 15 chapters / 1 136 samples → **16 chapters / 1 200 samples** (+64 from chapter 16).
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.17 = Chapter 17 (Object-Oriented Programming Features of Rust — encapsulation, trait objects for polymorphism, `Box<dyn Trait>`, the state pattern).
+
 ## [4.7.15] — 2026-04-29 — Rust Book Chapter 15 (Ақылды сілтемелер) translated, in pack
 
 Fifteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 15 — Smart Pointers — covering Rust's smart-pointer ecosystem and how each kind extends the basic reference model: `Box<T>` for heap allocation and recursive types (the cons-list example showing why a recursive enum's size is unbounded without `Box`); the `Deref` trait and how it enables `*` on smart pointers (writing a `MyBox<T>` from scratch and implementing `Deref::deref`), deref coercion as the compiler-driven chain `&MyBox<String>` → `&String` → `&str`; the `Drop` trait for cleanup logic that runs when a value goes out of scope, why `drop()` may not be called manually but `std::mem::drop` may be; `Rc<T>` for multiple ownership in single-threaded contexts (the cons-list example showing how cloning increments `strong_count`, why `Rc<T>` is read-only); `RefCell<T>` and the **interior mutability** pattern that defers borrow checking to runtime (the mock-object pattern, panic on rule violation); combining `Rc<RefCell<T>>` for the shared-ownership-with-mutation use case; reference cycles as a memory-leak shape Rust's ownership system does not prevent, and `Weak<T>` references that don't extend the lifetime of the pointed-to value (the parent-child node tree example with strong children + weak parent links).

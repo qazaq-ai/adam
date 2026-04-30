@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 15,
-  "sentences_total": 1136,
-  "sample_count": 1136,
+  "chapters_translated": 16,
+  "sentences_total": 1200,
+  "sample_count": 1200,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -7961,6 +7961,454 @@
       "source_id": "chapter_15",
       "domain": "programming_rust",
       "text": "Көп ағынды бағдарламалар — олардың `Arc<T>` пен `Mutex<T>` нұсқалары — келесі тарауда қарастырылатын болады."
+    },
+    {
+      "id": "rust_book_16_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қорқынышсыз қатарлас орындау Қатарлас орындау (concurrency) — бағдарламаның бөлектерін бір уақытта жүргізу мүмкіндігі."
+    },
+    {
+      "id": "rust_book_16_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Әдетте қателер табуы өте қиын: екі ағын бір жадқа бір сәтте жазғанда — нәтиже тосын болады."
+    },
+    {
+      "id": "rust_book_16_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Жарыс шарттары (data races), өзара тосқауылдар (deadlocks), әлсіз синхрондау — осы санаттан қателер. `Rust`-тың дизайн тұжырымдамасы ерекше: **қорқынышсыз қатарлас орындау**."
+    },
+    {
+      "id": "rust_book_16_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Тілдің типтік жүйесі мен қарыз тексергіш ағын-қауіпсіздіктің негізгі санатын **компиляция кезінде** ұстайды."
+    },
+    {
+      "id": "rust_book_16_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Сондықтан сіздің бағдарламаңыз орындалу кезінде көп жағдайда жарыс шартына кездеспейді — ол одан да құрастырылмайды."
+    },
+    {
+      "id": "rust_book_16_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бұл тарауда: Ағындарды құру және басқару."
+    },
+    {
+      "id": "rust_book_16_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Ағындар арасында **хабарлама арқылы алмасу** (`mpsc::channel`). **Ортақ күйді** қорғау (`Mutex<T>` пен `Arc<T>`). `Send` пен `Sync` трейттері — қатарлас орындаудың типтік негізі. 16.1."
+    },
+    {
+      "id": "rust_book_16_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бір уақытта код орындау үшін ағындарды қолдану **Ағын** (thread) — операциялық жүйенің ұсынатын орындалудың параллель жолы. `Rust`-та жаңа ағынды бастау үшін `std::thread::spawn` функциясын қолданамыз: `thread::spawn` жабу қабылдайды; жабу — жаңа ағында орындалатын код."
+    },
+    {
+      "id": "rust_book_16_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Шығатын тізбек кездейсоқ түрде араласуы мүмкін: Бірақ бір нәрсе анық: `main` функциясы аяқталғанда — барлық ағындар тоқтатылады."
+    },
+    {
+      "id": "rust_book_16_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қосалқы ағынның 9-ға дейінгі есептеулері жетпей қалуы мүмкін."
+    },
+    {
+      "id": "rust_book_16_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Ағынды күту Ағынның аяқталуын күту үшін **қосылу-білдіргіш** (join handle) қолданамыз. `spawn` `JoinHandle<T>` қайтарады; оның `join` әдісі — ағынның аяқталуын күтеді: Енді `main` `handle.join()` шакыруда тоқтайды; қосалқы ағын аяқталғанда жалғасады."
+    },
+    {
+      "id": "rust_book_16_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Сондықтан барлық 9 рет шығады. `join` `Result` қайтарады — ағын `panic!`-қа барса, `Err`. `unwrap` — оны қарапайым өңдеу. `move` арқылы иелікті ағынға беру Жабу ішінен қоршаған ортадан мән керек болса — мәселе туады: Қате: `Rust` `v`-ні шакырушы аумақтан қарызға алу әрекетін көреді, бірақ ағынның қаншалықты ұзақ жұмыс істейтінін білмейді."
+    },
+    {
+      "id": "rust_book_16_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Шакырушы аумақ бітсе де ағын әлі тірі болуы мүмкін — `v` жабайы сілтемеге айналады."
+    },
+    {
+      "id": "rust_book_16_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Шешімі — `move` жабуы: `move ||` — жабу `v`-нің **иелігін** алады. `v` сыртта енді жарамсыз; ағын ішінде ол толық тірі."
+    },
+    {
+      "id": "rust_book_16_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Иелік алмасу — қарапайым әрі қауіпсіз. 16.2."
+    },
+    {
+      "id": "rust_book_16_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Хабарлама арқылы ағындар арасында дерек жіберу Қатарлас орындау моделдерінің бірі — **хабарлама арқылы алмасу**: бір ағын мәнді басқа ағынға «жібереді», иелікті де солай ауыстырады."
+    },
+    {
+      "id": "rust_book_16_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Мұндай моделді Go тілі айқын мақтайды («Don't communicate by sharing memory; share memory by communicating»). `Rust`-та хабарлама-каналдарды стандартты кітапхана `std::sync::mpsc` ұсынады. **MPSC** — *multiple producer, single consumer* (көп жіберуші, бір қабылдаушы)."
+    },
+    {
+      "id": "rust_book_16_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қарапайым канал `mpsc::channel()` — екі ұшты қайтарады: `tx` (transmitter, жіберуші) және `rx` (receiver, қабылдаушы)."
+    },
+    {
+      "id": "rust_book_16_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қосалқы ағында: `tx.send(val)` — `val`-ды каналға жібереді. `send` иелікті алады — содан соң `val`-ды басқа жерде қолдану мүмкін емес."
+    },
+    {
+      "id": "rust_book_16_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust`-тың кепілдігі: жіберілген мәнді жіберуші өзгерте алмайды, дер бір ғана нысан оны иеленеді."
+    },
+    {
+      "id": "rust_book_16_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Негізгі ағында: `rx.recv()` — каналдан хабарлама күтеді."
+    },
+    {
+      "id": "rust_book_16_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Ол блок жасайды (ағын мәнді алғанша тоқтап тұрады). `Result` қайтарады: `Ok(val)` мән алынды; `Err` — канал жабылған. `recv` блокты, `try_recv` — блок жасамай тексереді; жоқ болса — бірден `Err`."
+    },
+    {
+      "id": "rust_book_16_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бірнеше мән жіберу `for received in rx` — `rx`-ты итератор ретінде қарастырамыз."
+    },
+    {
+      "id": "rust_book_16_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Ол блок жасайды; жаңа хабарлама келгенше күтеді; канал жабылғанда (`tx` аумақтан шыққанда) цикл аяқталады."
+    },
+    {
+      "id": "rust_book_16_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бірнеше жіберуші `mpsc` — *multiple producer*."
+    },
+    {
+      "id": "rust_book_16_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бір каналға бірнеше ағын жібере алады. `tx`-ты `clone` арқылы көшіреміз: Екі ағын бір каналға жібереді."
+    },
+    {
+      "id": "rust_book_16_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қабылдаушы — бір."
+    },
+    {
+      "id": "rust_book_16_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Ретсіз араласқан тізбек шығады."
+    },
+    {
+      "id": "rust_book_16_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Ағындар арасында ешбір синхрондау — `mpsc`-тің өзі бәрін жөндейді. 16.3."
+    },
+    {
+      "id": "rust_book_16_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Ортақ күйді қорғау: `Mutex<T>` пен `Arc<T>` Хабарлама-канал — бір модель."
+    },
+    {
+      "id": "rust_book_16_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Басқа модель — **ортақ күй**: бірнеше ағын бір мәнге қол жеткізеді, синхрондау арқылы. `Rust`-тың стандартты кітапханасы ортақ күйді қорғау үшін `Mutex<T>` ұсынады. **Mutex** — Mutual Exclusion (өзара эксклюзивтілік): бір уақытта бір ғана ағынға мәнге қол жеткізуге рұқсат."
+    },
+    {
+      "id": "rust_book_16_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қалғандары — кезек күтеді."
+    },
+    {
+      "id": "rust_book_16_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бір ағынды Mutex `Mutex::new(5)` — мәнді ұстайтын мутекс. `lock()` — мутекстіге блокпен иелік сұрайды; `Result` қайтарады; әдеттегідей `unwrap`."
+    },
+    {
+      "id": "rust_book_16_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Алынған `MutexGuard` — `RefMut`-қа ұқсас, `Deref` арқылы ішкі мәнге қол жеткіземіз."
+    },
+    {
+      "id": "rust_book_16_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Аумақ біткенде — `Drop` арқылы автоматты түрде босатылады."
+    },
+    {
+      "id": "rust_book_16_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Үлгі — қарызды ағындар арасында бөлуге арналған, бірақ алдымен бір ағында жұмыс істегенін көреміз."
+    },
+    {
+      "id": "rust_book_16_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бірнеше ағында Mutex қолдану `Mutex<T>` ағындар арасында бөлу үшін бірнеше ие болуы керек. `Rc<T>` бар — бірақ ол **бір ағында ғана**."
+    },
+    {
+      "id": "rust_book_16_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Көп ағын үшін — `Arc<T>` (Atomic Reference Counted): аналог, бірақ есептеуіш атомдық, ағын-қауіпсіз. 10 ағын — әрқайсысы есептеуішті бір көтереді. `Arc::clone(&counter)` — есептеуішті көтереді (атомдық!). `move` арқылы клон ағынға өтеді."
+    },
+    {
+      "id": "rust_book_16_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Әр ағын: `lock` — мутекс ал; `*num += 1` — есептеуішті жоғары шығар; аумақ бітсе — мутекс автоматты босатылады."
+    },
+    {
+      "id": "rust_book_16_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Барлық ағындар аяқталғанда — `counter` 10-ға тең."
+    },
+    {
+      "id": "rust_book_16_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Ешбір жарыс шарты, ешбір тосқауыл. `Mutex<T>` пен `RefCell<T>` ұқсастығы `Mutex<T>` пен `RefCell<T>` арасында үлгі ұқсастығы бар: Екеуі де **ішкі өзгермелілік** ұсынады."
+    },
+    {
+      "id": "rust_book_16_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Сыртта тұрақты, ішінде өзгертуге келеді. `RefCell<T>` тек бір ағында; `Mutex<T>` — ағындар арасында. `RefCell<T>` қарыз ережелерін **жұмыс кезінде** тексереді — бұзылса panic. `Mutex<T>` — басқа ағын `lock` ұстаса блок жасайды."
+    },
+    {
+      "id": "rust_book_16_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қос-нышан: | Бір ағын | Ағындар арасында | |---|---| | `Cell<T>` / `RefCell<T>` | `Mutex<T>` / `RwLock<T>` | | `Rc<T>` | `Arc<T>` | Бір ағында әдетте `RefCell` пен `Rc` жеткілікті; ағындар арасында — `Mutex` пен `Arc`. 16.4. `Send` пен `Sync` — типтік қатарлас орындау интерфейсі Барлық алдындағы кепілдіктер — компиляция кезіндегі."
+    },
+    {
+      "id": "rust_book_16_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Олардың тірегі — екі трейт: **`Send`** — типтің мәнін бір ағыннан екіншіге **иелікпен ауыстыруға** болады. **`Sync`** — типке бірнеше ағын **бір уақытта сілтеме арқылы** қол жеткізе алады."
+    },
+    {
+      "id": "rust_book_16_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бұл екеуі — **маркер трейттер**."
+    },
+    {
+      "id": "rust_book_16_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Олардың әдіс-денесі жоқ; тек тип ағын-қауіпсіздікке сай ма, жоқ па деп білдіреді."
+    },
+    {
+      "id": "rust_book_16_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Көп тип `Send` мен `Sync`-ті бекітеді — компилятор оларды құрылымның ішкі жайтына қарап анықтайды."
+    },
+    {
+      "id": "rust_book_16_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Мысалы: `i32`, `String`, `Vec<i32>` — `Send` пен `Sync`. `Rc<T>` — `Send` емес, `Sync` емес."
+    },
+    {
+      "id": "rust_book_16_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Себебі есептеуіші атомдық емес. `Arc<T>` — `Send` пен `Sync` (егер `T: Send + Sync` болса). `Mutex<T>` — `Send` пен `Sync` (`T: Send` шарты). `RefCell<T>` — `Send`, бірақ `Sync` емес."
+    },
+    {
+      "id": "rust_book_16_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Себебі бірнеше ағын бір RefCell-ге сілтеме ұстаса — runtime borrow check қаупі бар. `thread::spawn` функциясы өзінің жабуынан `Send` талап етеді: `F: Send` — жабу ағынға ауысатынын; `'static` — ол өзі тарыққан аумақтан кейін де тірі болатынын білдіреді."
+    },
+    {
+      "id": "rust_book_16_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Сондықтан компилятор тура осы шарттарды тексереді."
+    },
+    {
+      "id": "rust_book_16_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қолмен `Send`/`Sync` бекіту `Send` мен `Sync` көп жағдайда автоматты түрде бекітіледі."
+    },
+    {
+      "id": "rust_book_16_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қолмен бекіту — `unsafe`."
+    },
+    {
+      "id": "rust_book_16_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Мысал, шикі көрсеткіш (`*const T` / `*mut T`) — `Send` пен `Sync` емес."
+    },
+    {
+      "id": "rust_book_16_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бірақ сіздің кодыңыз белгілі бір инвариантты кепілдеп, көрсеткішті ағындар арасында қауіпсіз қолдана алса — `unsafe impl Send` жазып жасай аласыз."
+    },
+    {
+      "id": "rust_book_16_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Бірақ онда қауіпсіздік сіздің жауапкершілікке жатады."
+    },
+    {
+      "id": "rust_book_16_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Қарапайым ереже: бірінші — стандартты типтерді (`Mutex`, `Arc`) қолданыңыз. `unsafe impl` — өте сирек. 16.5."
+    },
+    {
+      "id": "rust_book_16_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы `Rust`-тың қатарлас орындау моделі екі тірекке негізделген: **Компиляция-кездік типтік тексерулер** — `Send` пен `Sync` трейттері арқылы, иелік ережелерімен бірге. **Кітапхана құралдары** — `thread::spawn`, `mpsc::channel`, `Mutex<T>`, `Arc<T>` — әрқайсысы өз сценарийі үшін."
+    },
+    {
+      "id": "rust_book_16_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Хабарлама-канал моделі — мәнді ағындар арасында **жіберу**."
+    },
+    {
+      "id": "rust_book_16_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Ортақ күй моделі — `Arc<Mutex<T>>` арқылы **бөлу**."
+    },
+    {
+      "id": "rust_book_16_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Екі модель де `Rust`-та тең қолданылатын; жобаға не жөндірек — соны таңдайсыз. `Send` мен `Sync` — Rust қатарлас орындау моделінің концептуалды негізі."
+    },
+    {
+      "id": "rust_book_16_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Көбіне сізде олармен тікелей жұмыс істеудің керегі болмайды — бірақ компилятор сізге ағын-қауіпсіздік туралы хабарлама шығарғанда — осы ұғымдар арқылы оны түсінуге болады."
+    },
+    {
+      "id": "rust_book_16_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда — `Rust`-тың объектілі-бағытталған бағдарламалау тұрғысын қарастырамыз."
+    },
+    {
+      "id": "rust_book_16_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_16",
+      "domain": "programming_rust",
+      "text": "Иерархияны жалпылама типтер мен трейттер арқылы қалай жасауға болатынын; динамикалық сипаттаулы трейт-нысандарды қалай қолдануды; кейбір объектілі-бағытталған үлгілерді `Rust`-та қалай өрнектеуге болатынын көреміз."
     }
   ]
 }
