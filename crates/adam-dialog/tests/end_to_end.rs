@@ -4493,17 +4493,16 @@ fn rust_book_chapter_01_indexed_in_morpheme_index() {
         .keys()
         .filter(|k| k.contains("rust_book"))
         .collect();
-    // **v4.7.7** — ceiling note: `build_morpheme_index` runs in
-    // default mode with `COMMITTED_DEFAULT_LIMIT = 500` samples per
-    // pack. The rust_book pack now has 525 sentences across
-    // chapters 1–7, but only the first ~499 (after FST-tokenisation
-    // filtering) make it into the committed index. Threshold capped
-    // at ≥490 — the realistic ceiling under the per-pack limit.
-    // Future chapters that grow the pack past 500 sentences won't
-    // raise this threshold without switching to `--full` mode.
+    // **v4.7.21** — per-pack limit override removed the v4.7.7 cap.
+    // `build_morpheme_index::PER_PACK_LIMIT_OVERRIDES` now sets
+    // `rust_book_kk_pack.json` to unlimited; all 1 543 sentences
+    // across chapters 1–20 contribute to the committed
+    // morpheme_index. The threshold is set conservatively at
+    // ≥1 500 — the realistic floor after FST-tokenisation filtering
+    // drops a few un-tokenisable sentences.
     assert!(
-        rust_book_samples.len() >= 490,
-        "v4.7.7 expects ≥490 rust_book sentences in morpheme_index (chapters 1-7, capped by per-pack limit); found {}",
+        rust_book_samples.len() >= 1500,
+        "v4.7.21 expects ≥1500 rust_book sentences in morpheme_index (chapters 1-20, full pack); found {}",
         rust_book_samples.len()
     );
 

@@ -66,9 +66,35 @@ const SOURCE_PACKS: &[&str] = &[
     // knowledge ingestion (chapter-per-patch cadence on the v4.7.x
     // minor). Each chapter under `data/raw/rust_book_kk/` is
     // sentence-extracted into this pack via
-    // `scripts/build_rust_book_pack.py` and indexed here.
+    // `crates/adam-corpus/src/bin/process_rust_book_kk.rs` and
+    // indexed here.
     "rust_book_kk_pack.json",
 ];
+
+/// **v4.7.21** — per-pack default-mode limit overrides. Default
+/// committed-mode runs cap each pack at `COMMITTED_DEFAULT_LIMIT`
+/// (500 samples) to keep the committed `morpheme_index.json` small
+/// for CI + integration tests. But some curated packs are too
+/// valuable to clip. The Rust Book Kazakh translation (`rust_book_kk_pack.json`)
+/// hit the 500-sample ceiling at v4.7.7 (chapter 7) and chapters
+/// 8–20 (a further ~835 sentences) lived in the pack file but did
+/// not contribute to the committed index. With the v4.7.20 series
+/// finished, this override removes the cap so all 1 543 rust_book
+/// sentences contribute to retrieval.
+///
+/// Format: `(pack filename, override)`. `Some(n)` raises/lowers the
+/// per-pack cap; `None` removes the cap entirely. Packs not listed
+/// here use the global `COMMITTED_DEFAULT_LIMIT`.
+const PER_PACK_LIMIT_OVERRIDES: &[(&str, Option<usize>)] = &[("rust_book_kk_pack.json", None)];
+
+fn effective_limit(pack: &str, default: Option<usize>) -> Option<usize> {
+    for (name, override_limit) in PER_PACK_LIMIT_OVERRIDES {
+        if *name == pack {
+            return *override_limit;
+        }
+    }
+    default
+}
 
 const PROGRESS_EVERY: usize = 10_000;
 
@@ -138,8 +164,9 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
+        let pack_limit = effective_limit(pack_name, limit);
         for (i, sample) in pack.samples.iter().enumerate() {
-            if let Some(n) = limit {
+            if let Some(n) = pack_limit {
                 if i >= n {
                     break;
                 }

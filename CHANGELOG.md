@@ -7,6 +7,32 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.21] — 2026-04-30 — Per-pack limit override for `rust_book_kk_pack.json`: full chapter 1–20 content now in committed morpheme_index
+
+Architectural follow-up to the v4.7.20 series-completion. Closes the limitation that has carried since v4.7.7: the committed `data/retrieval/morpheme_index.json` capped each pack at `COMMITTED_DEFAULT_LIMIT = 500` samples; the Rust Book pack outgrew that cap at chapter 7 and chapters 8–20 (a further ~835 sentences) were in `data/curated/rust_book_kk_pack.json` (auditable, `--full`-mode-ready) but did not contribute to the committed index.
+
+### Implementation
+
+- New `PER_PACK_LIMIT_OVERRIDES` table in `crates/adam-retrieval/src/bin/build_morpheme_index.rs` mapping pack filename → optional limit override (`None` removes the cap entirely, `Some(n)` raises/lowers it).
+- New helper `effective_limit(pack: &str, default: Option<usize>) -> Option<usize>` consulted in the per-pack indexing loop.
+- Override registered: `("rust_book_kk_pack.json", None)` — no per-pack cap. Other packs still use the global `COMMITTED_DEFAULT_LIMIT = 500`.
+
+This keeps the committed-index size budget tight for unchanged packs (Wikipedia, CC-100, Tatoeba etc. were always well under 500 anyway, so no impact) while letting curated packs whose ceiling is *the entire pack content* by design get fully indexed.
+
+### Pipeline impact
+
+- Committed `data/retrieval/morpheme_index.json`: 3 691 → **4 734 indexed samples** (+1 043 — exactly the 1 543 − 500 previously clipped); distinct morphemes 3 362 → **3 502** (+140); total postings 22 145 → **30 919** (+8 774).
+- File size: ~3.9 MB (well under the 50 MB gitignore policy threshold from `feedback_git_ignore_policy`).
+
+### Tests + counters
+
+- E2E threshold raised from ≥490 to **≥1 500** rust_book sentences in the morpheme index. Test passes with 1 543 found.
+- Workspace tests: **745 passing**.
+
+### Cadence note
+
+Patch — a single per-pack config-table change, surgical scope. Per `feedback_versioning_post_1_0` cadence rules: small architectural carve-out fits the patch level (not a minor).
+
 ## [4.7.20] — 2026-04-29 — Rust Book Chapter 20 (Соңғы жоба: көп ағынды веб-сервер) translated, in pack — **TRANSLATION SERIES COMPLETE**
 
 Twentieth and **final** chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 20 — Final Project: Building a Multithreaded Web Server — the capstone chapter that ties together everything from chapters 1–19 into one real, working program: a multithreaded HTTP server with graceful shutdown.
