@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 11,
-  "sentences_total": 832,
-  "sample_count": 832,
+  "chapters_translated": 12,
+  "sentences_total": 911,
+  "sample_count": 911,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -5833,6 +5833,559 @@
       "source_id": "chapter_11",
       "domain": "programming_rust",
       "text": "Сол арқылы қалай тиісті жобаны бастан бастап жасауға, қателерді өңдеуге, кодты модульдерге бөлуге, сынақтармен қорғауға болатынын көреміз."
+    },
+    {
+      "id": "rust_book_12_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Кіріс-шығыс жобасы: команда жолы бағдарламасын құру Бұрын біз жекелеген ұғымдарды үйрендік."
+    },
+    {
+      "id": "rust_book_12_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Енді оларды бір нақты бағдарламада біріктірейік."
+    },
+    {
+      "id": "rust_book_12_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Жоба — `grep` атты әйгілі Unix құралының кіші көшірмесі. `grep` («Globally search a Regular Expression and Print») — файлдан немесе енгізуден белгілі бір сөздерді табатын құрал."
+    },
+    {
+      "id": "rust_book_12_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Біздің нұсқамыз оны жеңілдетіп, бір файлдан жай ғана жолдарды іздейді."
+    },
+    {
+      "id": "rust_book_12_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Қандай ұғымдар бір жобаға жиналады: Кодты модульдерге бөлу (7-тарау). `Vec` пен `String` қолдану (8-тарау)."
+    },
+    {
+      "id": "rust_book_12_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Қателерді өңдеу (9-тарау)."
+    },
+    {
+      "id": "rust_book_12_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Трейттер мен тіршілік мерзімі (10-тарау)."
+    },
+    {
+      "id": "rust_book_12_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Сынақтар жазу (11-тарау)."
+    },
+    {
+      "id": "rust_book_12_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Орта айнымалылары мен стандартты шығаруларды басқару — жаңа."
+    },
+    {
+      "id": "rust_book_12_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Жолдан-жолдан өсіп шығатын мысал арқылы біз: жаман кодтан жақсы кодқа қарай қалай дамуға болатынын; не үшін кодты бөлектеп, кітапханаға шығаратынын; тестке негізделген әзірлеудің (TDD) қалай жұмыс істейтінін көреміз. 12.1."
+    },
+    {
+      "id": "rust_book_12_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Командалық жол аргументтерін қабылдау Жаңа жоба — `cargo new minigrep` — жасайық: `grep`-ке ұқсас, бағдарламаға екі аргумент керек: ізделетін сөз және файл атауы."
+    },
+    {
+      "id": "rust_book_12_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Командалық жол аргументтерін оқу үшін стандартты кітапхана ұсынатын `std::env::args` функциясын қолданамыз: `env::args()` итератор қайтарады; `.collect()` оны векторға айналдырады."
+    },
+    {
+      "id": "rust_book_12_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Векторды нақты `Vec<String>` ретінде жариялау — типті анық беру үшін."
+    },
+    {
+      "id": "rust_book_12_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бағдарламаны екі аргументпен іске қосайық: Біріншісі — бағдарламаның өзінің атауы."
+    },
+    {
+      "id": "rust_book_12_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Қалғандары — біз берген аргументтер."
+    },
+    {
+      "id": "rust_book_12_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Аргументтерді нақты айнымалыларға сақтайық: `&args[1]` — `String`-ке сілтеме."
+    },
+    {
+      "id": "rust_book_12_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бұл нұсқа — әзірге жұмыс істейді, бірақ қатерлі: егер пайдаланушы аргументтер бермесе — `args[1]` panic-қа барады."
+    },
+    {
+      "id": "rust_book_12_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Кейінірек жөндейміз. 12.2."
+    },
+    {
+      "id": "rust_book_12_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Файлды оқу Іздеу үшін файлдың мазмұны керек. `std::fs::read_to_string` функциясы файлды оқып, оның мазмұнын `String` ретінде қайтарады: Жоба түбіріне `poem.txt` атты файл жасайық: `cargo run -- the poem.txt` орындағанда: Жұмыс істейді."
+    },
+    {
+      "id": "rust_book_12_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бірақ код әлі бір функцияда — оны қайта ұйымдастыру керек. 12.3."
+    },
+    {
+      "id": "rust_book_12_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Модульдік және қате өңдеуді жақсартуға қайта құрастыру Біздің `main` бүкіл логиканы орындап тұр: аргумент талдау, файл оқу, көп жайт."
+    },
+    {
+      "id": "rust_book_12_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бұл бірнеше мәселеге апарады: **Жауапкершіліктерді бөлмеу.** Жұмыс үстелі үлкейген сайын — бір функция көп нәрсеге жауапты болғанда — кодты қолдау қиынырақ. **Қате өңдеу нашар.** `expect` дөрекі: пайдаланушыға техникалық хабарлама шығады, бар адам оның мағынасын түсінбейді. **Тестілеу қиын.** `main` функциясы тек байт-байт жазылғанда жұмыс істейді."
+    },
+    {
+      "id": "rust_book_12_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Оны бөлектеген кезде ғана сынақ жазу мүмкін болады."
+    },
+    {
+      "id": "rust_book_12_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Қайта құрастырудың жоспары: Аргумент талдауды бөлек функцияға шығару."
+    },
+    {
+      "id": "rust_book_12_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Конфигурация мәндерін бір структқа жинау. `Config::build` атты «конструкторды» жасау."
+    },
+    {
+      "id": "rust_book_12_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Қате өңдеуді — `Result` арқылы."
+    },
+    {
+      "id": "rust_book_12_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Логиканы `main`-нен `lib.rs`-ке шығару."
+    },
+    {
+      "id": "rust_book_12_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Аргумент талдауды бөлектеу Қазір аргумент талдау бөлек функцияда."
+    },
+    {
+      "id": "rust_book_12_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бірақ кортежпен қайтару — ыңғайсыз: қандай мән — `query`, қандай мән — `file_path`?"
+    },
+    {
+      "id": "rust_book_12_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Конфигурацияны структқа жинау Кортеждің орнына — структ: `clone` арқылы біз `String`-тің көшірмесін жасап жатырмыз."
+    },
+    {
+      "id": "rust_book_12_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бұл — ұнамсыз өнімділік-айыппұл."
+    },
+    {
+      "id": "rust_book_12_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бірақ `args`-тан қарызға алу әлдеқайда күрделі болар еді — әзірге `clone` дұрыс таңдау."
+    },
+    {
+      "id": "rust_book_12_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Қарапайымдылық — бірінші кезекте. `main` енді мынадай: Конструктор `parse_config` функциясын `Config::build` әдісіне айналдырамыз — конструктор стилі: Енді ол `Result` қайтарады."
+    },
+    {
+      "id": "rust_book_12_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Аргументтер жетіспесе — анық қате; жеткілікті болса — `Config`. `&'static str` — қате типі ретінде тұрақты жол."
+    },
+    {
+      "id": "rust_book_12_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Қателерді жөнді өңдеу `main` ішінде: `unwrap_or_else` — `Result`-та бар әдіс. `Ok` болса — мәнді шығарады. `Err` болса — берген жабуды (closure) шақырады."
+    },
+    {
+      "id": "rust_book_12_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Жабу қатені аргумент ретінде алады, экранға шығарады, әрі бағдарламаны 1-кодпен тоқтатады. `eprintln!` — `println!`-ге ұқсас, бірақ стандартты қатеге (stderr) жазады, стандартты шығаруға (stdout) емес."
+    },
+    {
+      "id": "rust_book_12_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бұл — Unix дәстүрі: қалыпты шығу — нәтиже; қателер — бөлек ағында."
+    },
+    {
+      "id": "rust_book_12_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Логиканы `main`-нен бөлектеу Бағдарлама үлкейіп бара жатса — `main` өте қарапайым болуы керек: тек аргументтерді алу, қатені қайтару."
+    },
+    {
+      "id": "rust_book_12_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Барлық басты логиканы `run` атты функцияға шығарамыз: `Box<dyn Error>` — кез келген қате типін қабылдайтын **трейт-нысан**."
+    },
+    {
+      "id": "rust_book_12_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бұл — функция қайтаратын қате типін шектемей, кез келген «қателі нәрсе»-ні қабылдай алатын тәсіл. `run` нәтижесін `if let Err(e) = ...` арқылы өңдейміз."
+    },
+    {
+      "id": "rust_book_12_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Кодты кітапхана сандығына шығару Соңғы қадам — `Config` пен `run`-ды `lib.rs`-ке шығару, `main.rs`-ті қарапайым ету. `src/lib.rs`: `src/main.rs`: Енді `main` тек арматура; бар логика — кітапханада."
+    },
+    {
+      "id": "rust_book_12_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Ол сынауға қол жетімді, басқа бағдарламаларға қайта пайдалануға болады. 12.4. TDD арқылы кітапхананың функцияларын дамыту Әзірге іздеу логикасы жоқ — біз жай ғана файлдың мазмұнын экранға шығарамыз."
+    },
+    {
+      "id": "rust_book_12_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Енді нақты `search` функциясын — берілген сөзді ұстайтын жолдарды табатынын — жазайық."
+    },
+    {
+      "id": "rust_book_12_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бірақ оны бөлек жолмен жазамыз: алдымен сынақ, содан кейін код."
+    },
+    {
+      "id": "rust_book_12_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бұл — **тестке негізделген әзірлеу** (test-driven development, TDD). TDD циклі — үш қадам: Жобаланатын мінезге сай тест жазу."
+    },
+    {
+      "id": "rust_book_12_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Тест бастан кетеді (өйткені код әлі жоқ)."
+    },
+    {
+      "id": "rust_book_12_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Сынақты өткізетін минимум кодты жазу."
+    },
+    {
+      "id": "rust_book_12_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Сынақ өткеннен соң — кодты жұмыс ұстатпай тазарту."
+    },
+    {
+      "id": "rust_book_12_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Кетіп жатқан сынақты жазу `src/lib.rs`-те: Сынақ айтады: `search(\"duct\", \"...\")` шакыруы `[\"safe, fast, productive.\"]` векторын қайтаруы керек, өйткені бұл жалғыз жол `duct` сөзін ұстайды. `search` функциясы әлі жоқ. `cargo test` орындағанда — кетеді: Күтілген."
+    },
+    {
+      "id": "rust_book_12_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Енді `search` функциясын жазамыз."
+    },
+    {
+      "id": "rust_book_12_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Сынақты өткізетін кодты жазу Тіршілік мерзімі `'a` — нәтиже векторы `contents`-ке сілтейтін тілімдерді ұстайды."
+    },
+    {
+      "id": "rust_book_12_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Сондықтан нәтиженің тіршілігі — `contents`-тің тіршілігіне байлы."
+    },
+    {
+      "id": "rust_book_12_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Логика: жолдан-жолдан, әрбір жолда `query` бар-жоғын тексереміз; бар болса — нәтижеге қосамыз. `cargo test` орындасақ — өтеді! `run` ішінде `search` шакыру Енді `run` функциясын жөндейміз: Іздеу нәтижесі — әр жолды басып шығарамыз. `cargo run -- the poem.txt` орындасақ: Жұмыс істейді — `the` сөзін ұстайтын жолдар. 12.5."
+    },
+    {
+      "id": "rust_book_12_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Орта айнымалыларымен жұмыс істеу Енді бір мүмкіндік қосайық: пайдаланушы әріп регистрін ескермей іздегісі келсе ше?"
+    },
+    {
+      "id": "rust_book_12_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Біз оған **орта айнымалысы** — `IGNORE_CASE` — арқылы басқартамыз."
+    },
+    {
+      "id": "rust_book_12_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Регистрсіз іздеу үшін сынақ `#[cfg(test)] mod tests`-те: `Rust` пен `Trust` екеуі де `rUsT`-қа сай (регистрді ескермей). `search_case_insensitive` функциясын жазу `to_lowercase` — әріптерді кіші регистрге айналдырады."
+    },
+    {
+      "id": "rust_book_12_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Сонда `RuST` пен `Rust` бір қалыпта тұрады."
+    },
+    {
+      "id": "rust_book_12_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Назар аударыңыз: `to_lowercase` жаңа `String` жасайды."
+    },
+    {
+      "id": "rust_book_12_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Сондықтан `query` енді `String`, ал `line.to_lowercase()` — әр итерацияда `String`."
+    },
+    {
+      "id": "rust_book_12_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бұл — аздап өнімділікке зиян, бірақ дұрыстық — алдымен. `Config`-ке regі-set параметрін қосу `build` ішінде орта айнымалысын тексереміз: `env::var(\"IGNORE_CASE\")` — `Result` қайтарады."
+    },
+    {
+      "id": "rust_book_12_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Орта айнымалысы бар болса — `Ok`, жоқ болса — `Err`. `.is_ok()` — `true` или `false`. `run` ішінде: Тестілеу: Айырмашылық: екінші шакыруда `To` (бас әріппен) да табылды. 12.6."
+    },
+    {
+      "id": "rust_book_12_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Қате хабарламаларын стандартты шығаруға емес, стандартты қатеге жазу Қазіргі бағдарламамыз барлық шығаруларды (нәтижелерді *пен* қателерді) `println!` арқылы шығарып отыр."
+    },
+    {
+      "id": "rust_book_12_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бұл — Unix дәстүрімен сай емес: қалыпты шығу — стандартты шығаруға (stdout); қателер — стандартты қатеге (stderr)."
+    },
+    {
+      "id": "rust_book_12_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бөлек ағындар — пайдаланушыға бағдарламаны жоғары деңгейде басқаруға мүмкіндік береді: нәтижелерді файлға бағыттай аласыз, бірақ қателер экранда қалады. `eprintln!` пен `println!` `eprintln!` — стандартты қатеге жазады. `println!` — стандартты шығаруға."
+    },
+    {
+      "id": "rust_book_12_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Біз бұған дейін `Аргумент қатесі: ...` пен `Қолданба қатесі: ...` хабарламаларында `eprintln!`-ді қолдандық — олар қателер."
+    },
+    {
+      "id": "rust_book_12_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Енді тексерейік: бағдарламаның қалыпты шығаруын файлға жазайық. `> output.txt` — стандартты шығаруды файлға бағыттайды."
+    },
+    {
+      "id": "rust_book_12_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Файл `output.txt` ішінде: — табылған жолдар."
+    },
+    {
+      "id": "rust_book_12_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Қателер де болса (мысалы, аргументтер жоқ болса): Экранда: — `eprintln!` арқылы."
+    },
+    {
+      "id": "rust_book_12_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Файл `output.txt` бос."
+    },
+    {
+      "id": "rust_book_12_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Сондай дұрыс мінез-құлық бар: қалыпты шығару бағытталған, қателер — экранда. 12.7."
+    },
+    {
+      "id": "rust_book_12_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Бұл тарауда сіз шынайы команда жолы бағдарламасын жасадыңыз."
+    },
+    {
+      "id": "rust_book_12_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Жолда: Аргументтерді `env::args` арқылы оқу; Файлды `fs::read_to_string` арқылы оқу; Кодты `lib.rs`-ке бөлектеу; Қате-түрлерді `Result` арқылы өңдеу; `Config::build` атты конструктор стилін; TDD циклі арқылы `search` функциясын дамыту; Орта айнымалысын `env::var` арқылы оқу; `eprintln!` арқылы қателерді стандартты қатеге жазу."
+    },
+    {
+      "id": "rust_book_12_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust`-тың практикасында өнім жобасын құру керек болғанда сізге керек болатын негізгі үлгілер."
+    },
+    {
+      "id": "rust_book_12_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Кейінгі тарауларда осы жобаны функционал бағдарламалаудың кейбір тәсілдерімен — итераторлар мен жабулармен — қысқартуға қарастырамыз."
+    },
+    {
+      "id": "rust_book_12_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Мини-`grep` өзі — толық бағдарлама."
+    },
+    {
+      "id": "rust_book_12_0076",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Сіз оны өз есебіңізге жетілдіре аласыз: реттік өрнектерді қолдау, бірнеше файлда іздеу, түсті шығару, жол нөмірлерін көрсету."
+    },
+    {
+      "id": "rust_book_12_0077",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Әр осындай қосым — Rust-та жаттығудың ыңғайлы әдісі."
+    },
+    {
+      "id": "rust_book_12_0078",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Келесі тарауда — функционал стиль ұғымдары: жабулар (closures) мен итераторлар."
+    },
+    {
+      "id": "rust_book_12_0079",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_12",
+      "domain": "programming_rust",
+      "text": "Олар сіздің кодыңызды әлдеқайда жинақы әрі тиімді ете алады."
     }
   ]
 }

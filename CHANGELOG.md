@@ -7,6 +7,31 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.12] — 2026-04-29 — Rust Book Chapter 12 (Кіріс-шығыс жобасы: команда жолы бағдарламасын құру) translated, in pack
+
+Twelfth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 12 — An I/O Project: Building a Command Line Program (mini-grep) — the largest practical chapter that ties together everything from chapters 1–11 into one real working CLI program. Sections: 12.1 accepting command-line arguments via `std::env::args`; 12.2 reading a file with `std::fs::read_to_string`; 12.3 refactoring for modularity and error handling (separation of concerns, extracting `parse_config` and then a `Config` struct, the `Config::build` constructor pattern, fixing error handling with `Result` + `unwrap_or_else` + `eprintln!` + `process::exit`, extracting a `run` function, splitting code into a library crate `src/lib.rs`); 12.4 TDD development of the `search` function (writing a failing test first, implementing the minimum code to pass, then refactoring); 12.5 working with environment variables (`env::var("IGNORE_CASE")`, the `search_case_insensitive` companion function); 12.6 writing error messages to standard error instead of standard output (`eprintln!` vs `println!`, the Unix stdout/stderr separation, `> output.txt` redirection demonstration).
+
+This is the practical chapter that demonstrates how all earlier chapters' concepts come together: modules, ownership, references, traits, error handling, tests — all in one ~150-line program.
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_12.md` — ~5 500 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-12-specific terminology decisions: command-line argument → **командалық жол аргументі**, separation of concerns → **жауапкершіліктерді бөлу**, test-driven development (TDD) → **тестке негізделген әзірлеу**, standard output → **стандартты шығару**, standard error → **стандартты қате**, environment variable → **орта айнымалысы**, case-insensitive → **әріп регистрін ескермеу**, constructor → **конструктор** (transliteration), trait object → **трейт-нысан**.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 11 chapters / 832 samples → **12 chapters / 911 samples** (+79 from chapter 12).
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.13 = Chapter 13 (Functional Language Features — Iterators and Closures).
+
 ## [4.7.11] — 2026-04-29 — Rust Book Chapter 11 (Автоматты сынақтар жазу) translated, in pack
 
 Eleventh chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 11 — Writing Automated Tests — covering Rust's built-in testing infrastructure: how to write tests (the `#[test]` attribute, anatomy of a test function, `assert!` / `assert_eq!` / `assert_ne!`, custom failure messages with `format!`-style trailing args, `#[should_panic]` and `expected = "..."` for narrowing the expected panic, tests that return `Result<T, E>` with the `?` operator); controlling how tests are run (the `cargo test` vs test-runner flag separation via `--`, parallel-vs-sequential execution with `--test-threads=1`, `--show-output` for printing successful tests' stdout, name filtering by substring, `#[ignore]` and `--ignored` / `--include-ignored`); and test organization (unit tests inside `#[cfg(test)] mod tests` testing private functions; integration tests in the `tests/` directory as separate crates that exercise the public API only; `tests/common/mod.rs` shared helper convention; the lib-vs-bin split for testable binary crates).
