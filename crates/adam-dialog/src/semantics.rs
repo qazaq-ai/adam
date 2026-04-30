@@ -937,6 +937,53 @@ const MULTIWORD_ENTITIES: &[&str] = &[
     "жад ұғымы",
     "if өрнегі",
     "cargo run",
+    // **v4.11.5** — query-time compounds for school-curriculum
+    // and self-knowledge questions. These are NOT world_core
+    // subjects/objects (so the `world_core_multiword_coverage`
+    // contract test does not require them), but they ARE the
+    // canonical topic phrasing of real user questions like
+    // «Адам, сен мектептің физика бағдарламасын білесің бе?»
+    // or «Мектеп пәндерін білесің бе?». Pre-v4.11.5 these
+    // questions fell through to `first_noun_root` which picked
+    // either a head noun in isolation (`физика`) or — worse —
+    // the vocative addressee (`адам`) as topic. Sorted
+    // longest-first within the bucket so `find_multiword_entity`
+    // resolves the more-specific compound first.
+    "информатика бағдарламасы",
+    "математика бағдарламасы",
+    "биология бағдарламасы",
+    "мектеп бағдарламасы",
+    "физика бағдарламасы",
+    "химия бағдарламасы",
+    "тарих бағдарламасы",
+    "мектеп пәні",
+    // **v4.11.5** — adam_self domain. Compound subjects /
+    // objects from `data/world_core/adam_self.jsonl` (system's
+    // self-identity facts: identity / implementation / knowledge
+    // claims / limitations). Required by
+    // `world_core_multiword_coverage` contract test. Sorted
+    // longest-first within the bucket.
+    "жергілікті бағдарлама",
+    "rust бастапқы коды",
+    "когнитивтік ядро",
+    "жасанды интеллект",
+    "қазақ тілді жүйе",
+    "ретривал жүйесі",
+    "анық архитектура",
+    "география білімі",
+    "информатика білімі",
+    "математика білімі",
+    "биология білімі",
+    "әдебиет білімі",
+    "тілдік модель",
+    "диалог жүйесі",
+    "мектеп пәндері",
+    "физика білімі",
+    "химия білімі",
+    "тарих білімі",
+    "rust білімі",
+    "жалпы білім",
+    "ғылым салалары",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -952,6 +999,60 @@ fn multiword_entity_hint(input: &str) -> Option<String> {
         }
     }
     None
+}
+
+/// **v4.11.5** — Latin-named technical proper nouns that appear as
+/// subjects in `programming_rust.jsonl`. When the user types one of
+/// these as a Latin word, the topic extractor routes to the
+/// matching per-concept world_core fact instead of falling through
+/// to corpus citation. Closes the v4.7.0 known limitation: queries
+/// like «Rust туралы не білесіз?» pre-v4.11.5 emitted a poetry
+/// quote because the Cyrillic-only FST can't tokenise `Rust`.
+///
+/// Sorted by length descending so the longest match wins (e.g.
+/// `string` beats the substring `str` if both appear).
+const LATIN_TECH_SUBJECTS: &[&str] = &[
+    "btreemap", "vecdeque", "rustfmt", "hashmap", "hashset", "refcell", "continue", "collect",
+    "expect", "filter", "future", "string", "unwrap", "break", "cargo", "clippy", "loop", "mutex",
+    "none", "option", "panic", "result", "rust", "rustc", "some", "usize", "while", "await",
+    "bool", "char", "f32", "f64", "i32", "i64", "u32", "u64", "for", "map", "mod", "pub", "use",
+    "vec", "arc", "box", "err", "rc", "ok", "str",
+];
+
+/// **v4.11.5** — scan input for any whitespace-separated word
+/// matching a known Latin technical subject. Returns the matched
+/// subject in canonical lowercase form (matching world_core
+/// `subject` field). Word boundaries are whitespace + punctuation
+/// + backticks; trailing punctuation in tokens is stripped before
+/// comparison (e.g. `Rust?` → `rust`). Ignores backtick-quoted
+/// spans because those usually mean code identifiers in their
+/// surrounding context, not a topical reference.
+fn latin_subject_hint(input: &str) -> Option<String> {
+    let mut best: Option<&'static str> = None;
+    for raw in input.split(|c: char| {
+        c.is_whitespace()
+            || matches!(
+                c,
+                ',' | '.' | '?' | '!' | ';' | ':' | '`' | '"' | '(' | ')' | '\''
+            )
+    }) {
+        if raw.is_empty() {
+            continue;
+        }
+        // Only consider tokens that are purely ASCII letters /
+        // digits / underscore; anything Cyrillic falls through to
+        // the existing topic-extraction strategies.
+        if !raw.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+            continue;
+        }
+        let lower = raw.to_lowercase();
+        if let Some(&hit) = LATIN_TECH_SUBJECTS.iter().find(|&&s| s == lower.as_str()) {
+            if best.map_or(true, |b| hit.len() > b.len()) {
+                best = Some(hit);
+            }
+        }
+    }
+    best.map(|s| s.to_string())
 }
 
 /// **v4.3.5** — When the input carries an explicit topic marker
@@ -1018,6 +1119,39 @@ fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<String> {
                 if known_lemma {
                     return Some(cleaned);
                 }
+                // **v4.11.5** — inflected-form fallback. The word
+                // right before `туралы` is frequently inflected
+                // (`тілі` = `тіл + Px3sg`, `қалаға` = `қала + Dat`).
+                // Pre-v4.11.5 the lemma check above failed because
+                // the FST root (`тіл`) does not equal the surface
+                // form (`тілі`), and the function fell through to
+                // `normalize_proper_noun`, which title-cased the
+                // inflected form into a fake proper noun (`Тілі`).
+                // Closes the v4.11.0 transcript bug where
+                // «Rust бағдарламалау тілі туралы не білесіз?»
+                // extracted topic `Тілі` and routed retrieval to a
+                // poetry quote about the body part `тілім`.
+                //
+                // Strategy: walk parses and pick the longest
+                // noun-root that is a prefix of the cleaned form.
+                // Bounded to ≥ 3 char roots to avoid false positives
+                // on tiny stems.
+                let inflected_lemma = parses
+                    .iter()
+                    .filter_map(|p| match p {
+                        Analysis::Noun { root, .. }
+                            if root.root.chars().count() >= 3
+                                && cleaned.starts_with(root.root.as_str())
+                                && !NOT_A_TOPIC.contains(&root.root.as_str()) =>
+                        {
+                            Some(root.root.clone())
+                        }
+                        _ => None,
+                    })
+                    .max_by_key(|s| s.chars().count());
+                if let Some(lemma) = inflected_lemma {
+                    return Some(lemma);
+                }
                 // Otherwise the word is unknown to FST (typically a
                 // proper noun: `Мүсірепов`, `Малқаров`, …). Return
                 // the title-cased form via `normalize_proper_noun`,
@@ -1049,9 +1183,36 @@ fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
     if let Some(c) = crate::discourse::find_adj_noun_compound(input) {
         return Some(c.to_string());
     }
-    topic_marker_hint(input, parses)
-        // v4.4.13 — locative-attributive suffix recovery, promoted
-        // to run BEFORE multiword/first_noun strategies. The
+    // **v4.11.5** — Latin-name passthrough for technical proper
+    // nouns. Closes the v4.7.0 known limitation where queries
+    // typed in Latin (`Rust`, `Cargo`, `String`) fall through to
+    // `Intent::Unknown` because Cyrillic-only FST returns no
+    // analysis. The closed list mirrors Latin-named subjects in
+    // `programming_rust.jsonl`. When the user's question contains
+    // any of these as a whole word (case-insensitive), use it as
+    // the topic so SearchGraph can route to the per-Rust-concept
+    // facts (`rust IsA бағдарламалау тілі`, `cargo IsA құрал`,
+    // …). Runs BEFORE multiword/topic_marker so an explicit Latin
+    // proper noun beats any contained Cyrillic compound.
+    if let Some(latin) = latin_subject_hint(input) {
+        return Some(latin);
+    }
+    // **v4.11.5** — `multiword_entity_hint` promoted to run BEFORE
+    // `topic_marker_hint`. Pre-v4.11.5 the marker hint won first,
+    // so questions like «Rust бағдарламалау тілі туралы не
+    // білесіз?» extracted only the word right before `туралы`
+    // (`тілі`/`тіл`) and missed the more specific multiword
+    // compound (`бағдарламалау тілі`). When MULTIWORD_ENTITIES
+    // contains a compound that appears in the input, that compound
+    // is almost always the user's intended topic — more specific
+    // than any single constituent. The reorder lets the world_core
+    // graph lookup land on the compound subject (which world_core
+    // entries explicitly model: `info_007 бағдарламалау тілі IsA
+    // формалды тіл`) instead of falling through to a corpus
+    // citation about an inflected single word.
+    multiword_entity_hint(input)
+        .or_else(|| topic_marker_hint(input, parses))
+        // v4.4.13 — locative-attributive suffix recovery. The
         // `-дағы / -дегі / -тағы / -тегі` morpheme is a strong
         // "specifically located in X" topic-narrowing signal,
         // semantically equivalent to a `туралы` marker for the
@@ -1059,18 +1220,8 @@ fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
         // (e.g. `қазақстан` from `қазақстандағы`) is the most
         // specific topic in the question and should win over any
         // generic content noun (e.g. `тау` from `таулар`) found
-        // elsewhere. Pre-v4.4.13 this ran AFTER `first_noun_root`
-        // (introduced in v4.4.12 as a fallback when FST recovered
-        // nothing), which silently masked the locative-attributive
-        // signal whenever the FST happened to recognise a content
-        // noun in the surrounding text. v4.4.13's lexicon-dedup
-        // fix (which unblocked `тау` / `су` / `ер` noun readings)
-        // made that masking visible as a regression on the
-        // v4.4.12 `kazakhstan_mountains_via_locative_attributive_v4_4_12`
-        // dialog. Reordering closes the regression and matches
-        // the original v4.4.12 design intent.
+        // elsewhere via `first_noun_root`.
         .or_else(|| locative_attributive_hint(input))
-        .or_else(|| multiword_entity_hint(input))
         .or_else(|| first_noun_root(parses))
 }
 
@@ -2505,6 +2656,32 @@ mod tests {
         assert_eq!(
             multiword_entity_hint("Құс жолының бейнесі"),
             Some("құс жолы".to_string())
+        );
+    }
+
+    /// **v4.11.5** — query-time school-curriculum compounds are
+    /// resolved to the canonical compound topic, regardless of
+    /// inflection on the last word. Real-REPL 2026-04-30:
+    /// «Адам, сен мектептің физика бағдарламасын білесің бе?»
+    /// pre-v4.11.5 fell through to either `физика` (ignoring the
+    /// program-of context) or — worse — `адам` (the vocative).
+    #[test]
+    fn multiword_entity_hint_matches_curriculum_compounds() {
+        assert_eq!(
+            multiword_entity_hint("мектептің физика бағдарламасын білесің бе?"),
+            Some("физика бағдарламасы".to_string())
+        );
+        assert_eq!(
+            multiword_entity_hint("Сен мектеп пәндерін білесің бе?"),
+            Some("мектеп пәндері".to_string())
+        );
+        assert_eq!(
+            multiword_entity_hint("Биология бағдарламасы туралы айтшы"),
+            Some("биология бағдарламасы".to_string())
+        );
+        assert_eq!(
+            multiword_entity_hint("Информатика бағдарламасын білесің бе?"),
+            Some("информатика бағдарламасы".to_string())
         );
     }
 

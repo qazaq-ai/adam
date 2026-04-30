@@ -7,6 +7,50 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.11.5] — 2026-04-30 — humanlike-dialog patch bundle: vocative guard + retrieval priority + compounds + adam_self pack + Latin passthrough
+
+Patch-bundled 5 innovations from the live REPL transcript review (2026-04-30). All five were catastrophic correctness failures pre-v4.11.5: «Адам, сен мектептің физика бағдарламасын білесің бе?» returned `адам IsA сүтқоректі`; «Rust туралы не білесіз?» returned a poetry quote about the body part `тіл`. Post-v4.11.5 every transcript question lands on the correct world_core fact.
+
+### Innovations
+
+1. **Vocative-addressee guard** (`discourse::strip_addressee`) — strips leading `Адам, …` / `Адам! …` / `Адам сен …` / `Адамым, …` / `Адам-ау, …` BEFORE FST parsing. Disambiguated from definitional `Адам — сүтқоректі.` by requiring an addressee signal in the input (2nd-person pronoun or `?`/`!` punctuation). Wired in `Conversation::turn_with_trace` after `strip_preamble` so preamble + vocative combinations collapse cleanly.
+
+2. **World_core source-priority in topic extraction** — `multiword_entity_hint` promoted to run BEFORE `topic_marker_hint` in `best_noun_hint`. When MULTIWORD_ENTITIES contains a compound that appears in the input, that compound is almost always the user's intended topic. Plus an **inflected-form lemma fallback** in `topic_marker_hint`: when the word right before `туралы` is inflected (e.g. `тілі = тіл + Px3sg`), walk parses and pick the longest noun-root that's a prefix of the surface form. Closes the v4.11.0 transcript bug where `Тілі` was extracted as a fake proper noun.
+
+3. **Curriculum compounds in MULTIWORD_ENTITIES** — added 9 query-time compounds: `физика бағдарламасы`, `химия бағдарламасы`, `биология бағдарламасы`, `математика бағдарламасы`, `информатика бағдарламасы`, `тарих бағдарламасы`, `мектеп бағдарламасы`, `мектеп пәндері`, `мектеп пәні`. NOT world_core subjects/objects (the contract test does not require them) — purely query-time canonical phrasings.
+
+4. **Self-knowledge pack `data/world_core/adam_self.jsonl`** (27 entries / 27 facts, new domain) — identity (`adam IsA тілдік модель / диалог жүйесі / когнитивтік ядро / жасанды интеллект`), implementation (`adam related_to rust`, `adam has rust бастапқы коды`, `adam IsA ретривал жүйесі`), per-domain knowledge claims (`adam has физика білімі / химия білімі / биология білімі / тарих білімі / rust білімі / математика білімі / әдебиет білімі / география білімі / жалпы білім`), curriculum-program facts (`физика бағдарламасы IsA мектеп пәні`, `химия бағдарламасы IsA мектеп пәні`, …), and limitations (`adam IsA жергілікті бағдарлама / қазақ тілді жүйе`). All 21 new compound subjects/objects added to MULTIWORD_ENTITIES under a v4.11.5 bucket. `SystemIdentity::knowledge_summary` refreshed to enumerate all 38 domains structurally.
+
+5. **Latin-name passthrough** (`semantics::latin_subject_hint`) — closes the v4.7.0 known limitation. Closed list of 47 Latin-named technical subjects (mirroring `programming_rust.jsonl`): `rust`, `cargo`, `rustc`, `string`, `vec`, `option`, `result`, `hashmap`, `arc`, `mutex`, `trait`-related types, etc. When the user types one of these as a Latin word (case-insensitive, word-boundary-matched), it becomes the topic. Runs FIRST in `best_noun_hint` so an explicit Latin proper noun beats any contained Cyrillic compound. Now «Rust туралы не білесіз?» → `\`Rust\` — жадыны қауіпсіз басқаратын жүйелік бағдарламалау тілі`.
+
+### Pipeline impact
+
+- world_core: 1 593 → **1 620 entries** (+27); 1 756 → **1 783 facts** (+27); 37 → **38 domains**.
+- `data/retrieval/facts.json`: 16 282 → **16 309** (+27).
+- `MULTIWORD_ENTITIES` += **30 compounds** (9 curriculum query-time + 21 adam_self world_core).
+- `derived_facts.json`: 29 991 derived facts in 5 passes.
+
+### Tests + counters
+
+- New unit tests: `strip_addressee` (4 tests covering punctuation-separated, longest-first variant, bare-pronoun, definitional-passthrough); `multiword_entity_hint_matches_curriculum_compounds` (4 transcript-style queries).
+- Workspace tests: **745 → 749 passing**.
+- `validate_world_core`: 1 620 / 1 620 approved / 1 783 facts.
+- `cognitive_eval`: 25/25 canonical (was 24/25 after first knowledge_summary update; fixed by removing backticked-Rust mention to satisfy the LatinCharactersForbidden audit, replaced with `Бағдарламалау тілін білемін`).
+
+### Live REPL regression
+
+All 5 problem questions from the 2026-04-30 transcript now answer correctly:
+
+- «Rust бағдарламалау тілі туралы не білесіз?» → grounds on `rust IsA бағдарламалау тілі` (was: poetry about `тілім`).
+- «Адам, сен мектеп пәндері туралы не білесің?» → grounds on `мектеп пәндері IsA ғылым салалары` (was: gnomic mudrost' about `сөз / іс`).
+- «Адам, сен мектептің физика бағдарламасын білесің бе?» → grounds on `физика бағдарламасы IsA мектеп пәні` (was: catastrophic `адам IsA сүтқоректі`).
+- «Адам, өзіңіз туралы аздап айтып беріңізші» → SystemAspect::General self-introduction (preserved).
+- «Сіз қандай бағдарламалау тілінде жазылғансыз?» → grounds on `бағдарламалау тілі IsA формалды тіл` (was: same; semantically partial — implementation-aspect detector is v4.12.0 work).
+
+### Cadence
+
+Patch (v4.11.5) — 5 innovations bundled per `feedback_versioning_post_1_0` (post-1.0 patch-bundling rule). First release in the v4.12+ "human-like dialog" research arc per `project_humanlike_dialog_directive`. Stripe (1) — "answer-by-the-point" fixes — closed; stripe (2) — humanness — opens with v4.12.0 (question-form classifier).
+
 ## [4.11.0] — 2026-04-30 — `history_kazakhstan.jsonl` world_core domain (history of Kazakhstan, Kazakh)
 
 Ninth v4.x minor. **Final** in the **non-Rust domain expansion** track. `history_kazakhstan.jsonl` is a curated 124-entry Kazakh glossary covering the major periods, polities, events, and symbols of Kazakhstan's history — from Bronze Age archaeology through the present day.

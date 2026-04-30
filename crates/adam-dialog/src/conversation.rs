@@ -398,7 +398,18 @@ impl Conversation {
         // sees the raw input below — those checks operate on
         // surface signals (digits, Cyrillic-script class) where
         // preambles never interfere.
-        let stripped = crate::discourse::strip_preamble(input);
+        // **v4.11.5** — vocative-addressee stripper runs after the
+        // v4.6.20 preamble stripper so a preamble + vocative
+        // combination (e.g. «Айтпақшы, адам, мектептің физика
+        // бағдарламасын білесің бе?») collapses cleanly. Pre-
+        // v4.11.5 the leading vocative `адам` was taken as the
+        // first content noun and routed retrieval to
+        // `адам IsA сүтқоректі` — completely off-topic. Stripping
+        // happens BEFORE FST parsing so all downstream layers
+        // (parses, noun_hint, retrieval) see only the meaningful
+        // residual; surface-level checks (Russian/math detection)
+        // still operate on the raw input above.
+        let stripped = crate::discourse::strip_addressee(crate::discourse::strip_preamble(input));
         let parses = crate::parse_input_public(stripped, lexicon);
         let raw_intent = interpret_text_with_lexicon(stripped, &parses, Some(lexicon));
 

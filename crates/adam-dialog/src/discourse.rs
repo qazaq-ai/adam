@@ -516,6 +516,112 @@ pub fn strip_preamble(input: &str) -> &str {
     }
 }
 
+/// **v4.11.5** — leading vocative addressees (`адам`, `адамым`,
+/// `адам-ау`, `адам ау`) declared longest-first. The match list
+/// is closed: vocative use of "адам" addressing the system itself,
+/// not the common-noun "адам" (= person/human) which must remain
+/// available as a topic when not at clause-initial position.
+const ADDRESSEES: &[&str] = &["адам-ау", "адам ау", "адамым", "адам"];
+
+/// Punctuation that terminates a vocative form. Encompasses comma
+/// (canonical), exclamation, em/en dash, hyphen, colon, semicolon.
+const ADDRESSEE_SEPARATORS: &[char] = &[',', '!', '—', '–', '-', ':', ';'];
+
+/// **v4.11.5** — strip a leading vocative addressee from the input,
+/// returning the residual. Real-REPL 2026-04-30: «Адам, сен
+/// мектептің физика бағдарламасын білесің бе?» — pre-v4.11.5 the
+/// noun-hint extractor took the vocative `адам` itself as the topic
+/// and answered with `адам IsA сүтқоректі`, completely missing the
+/// actual subject of the question (`физика бағдарламасы`).
+///
+/// Recognises two clause shapes after the vocative:
+/// 1. **punctuation-separated** — `Адам, …` / `Адам! …` / `Адам — …`
+///    (any `ADDRESSEE_SEPARATORS` char). Strips the vocative AND the
+///    separator.
+/// 2. **bare-pronoun continuation** — `Адам сен …` / `Адам сіз …`
+///    (vocative + space + 2nd-person pronoun). Strips just the
+///    vocative; the pronoun stays so 1sg/2sg-self-recall layers
+///    still see it.
+///
+/// **Disambiguation from definitional `Адам — сүтқоректі.`:** the
+/// stripper fires only when the FULL input also carries an
+/// addressee signal — a 2nd-person pronoun (`сен / сіз / сенің /
+/// сізді / …`) or `?` / `!` punctuation. Definitional sentences
+/// have neither and are passed through unchanged, preserving
+/// `адам` as a legitimate common-noun topic.
+///
+/// Pure surface-level — no FST. Run AFTER `strip_preamble` so a
+/// preamble + vocative combination collapses cleanly.
+pub fn strip_addressee(input: &str) -> &str {
+    if !has_addressee_signal(input) {
+        return input;
+    }
+    let trimmed = input.trim_start();
+    let lower = trimmed.to_lowercase();
+    let mut best: Option<usize> = None;
+    for &name in ADDRESSEES {
+        if !lower.starts_with(name) {
+            continue;
+        }
+        let after = &trimmed[name.len()..];
+        let after_lower = after.to_lowercase();
+        let cut: Option<usize> =
+            if let Some(sep_pos) = after.find(|c: char| ADDRESSEE_SEPARATORS.contains(&c)) {
+                // Cut after the punctuation separator so residual starts clean.
+                let sep_char = after[sep_pos..].chars().next().unwrap();
+                Some(name.len() + sep_pos + sep_char.len_utf8())
+            } else if after_lower.starts_with(" сен") || after_lower.starts_with(" сіз") {
+                // Bare-pronoun continuation: strip only the vocative.
+                Some(name.len())
+            } else {
+                None
+            };
+        if let Some(c) = cut {
+            if best.map_or(true, |b| c > b) {
+                best = Some(c);
+            }
+        }
+    }
+    if let Some(cut) = best {
+        trimmed[cut..].trim_start()
+    } else {
+        input
+    }
+}
+
+/// **v4.11.5** — does the input carry any signal of being addressed
+/// to adam (2nd-person reference or interrogative/exclamation
+/// punctuation)? Used by `strip_addressee` to disambiguate the
+/// vocative form `Адам, …` from the definitional `Адам — …`.
+fn has_addressee_signal(input: &str) -> bool {
+    if input.contains('?') || input.contains('!') {
+        return true;
+    }
+    let lower = input.to_lowercase();
+    // 2nd-person free pronouns + bound suffixes that are reliable
+    // 2nd-person markers in surface text. Bare `сен` could be a
+    // postposition in some contexts; the leading space prevents
+    // matching word-internal occurrences (e.g. `мүсенжай`).
+    [
+        " сен",
+        " сіз",
+        "сенің",
+        "сені ",
+        "сіздің",
+        "сізді",
+        "сендей",
+        "сіздей",
+        "сізге",
+        "сізден",
+        " өзің",
+        "өзіңіз",
+        "өзіңді",
+        "өзіңнің",
+    ]
+    .iter()
+    .any(|m| lower.contains(m))
+}
+
 /// **v4.6.20** — detect a long, gracious user-acknowledgement.
 /// Real-REPL: «Мен сенің әлі бәрін білмейтініңді және әлі де көп
 /// жаттығу керек екенін түсіндім» — adam grabbed `әлі` and quoted
@@ -755,5 +861,54 @@ mod tests {
         assert!(input_contains_discourse_anaphor("Ал онда?"));
         assert!(input_contains_discourse_anaphor("онда, иә"));
         assert!(input_contains_discourse_anaphor("онда."));
+    }
+
+    #[test]
+    fn strips_leading_addressee_with_comma() {
+        // Real-REPL 2026-04-30: vocative `Адам,` masked the actual
+        // topic «физика бағдарламасы» behind retrieval of
+        // `адам IsA сүтқоректі`.
+        assert_eq!(
+            strip_addressee("Адам, сен мектептің физика бағдарламасын білесің бе?"),
+            "сен мектептің физика бағдарламасын білесің бе?"
+        );
+        assert_eq!(strip_addressee("Адам! Қалайсың?"), "Қалайсың?");
+        assert_eq!(strip_addressee("Адам — қаласың?"), "қаласың?");
+    }
+
+    #[test]
+    fn strips_addressee_variants_longest_first() {
+        assert_eq!(strip_addressee("Адам-ау, не білесің?"), "не білесің?");
+        assert_eq!(
+            strip_addressee("Адамым, өзің туралы айтшы"),
+            "өзің туралы айтшы"
+        );
+    }
+
+    #[test]
+    fn strips_addressee_before_bare_pronoun() {
+        // No punctuation between vocative and `сен/сіз` — strip just
+        // the vocative; the pronoun stays so 1sg-self-recall still
+        // sees it.
+        assert_eq!(
+            strip_addressee("Адам сен мектеп пәндерін білесің бе?"),
+            "сен мектеп пәндерін білесің бе?"
+        );
+        assert_eq!(
+            strip_addressee("Адам сіз қандай тілде жазылғансыз?"),
+            "сіз қандай тілде жазылғансыз?"
+        );
+    }
+
+    #[test]
+    fn preserves_input_when_addressee_not_leading() {
+        // Bare common-noun "адам" at non-initial position is a
+        // legitimate topic and must NOT be stripped.
+        assert_eq!(strip_addressee("Адам — сүтқоректі."), "Адам — сүтқоректі.");
+        assert_eq!(
+            strip_addressee("Қазақстандағы адам туралы не білесіз?"),
+            "Қазақстандағы адам туралы не білесіз?"
+        );
+        assert_eq!(strip_addressee("Сәлем"), "Сәлем");
     }
 }
