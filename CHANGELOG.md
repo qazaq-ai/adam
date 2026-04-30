@@ -7,6 +7,41 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.10] — 2026-04-29 — Rust Book Chapter 10 (Жалпылама типтер, трейттер мен тіршілік мерзімі) translated, in pack
+
+Tenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 10 — Generic Types, Traits, and Lifetimes — the most theoretically dense chapter of the entire book. Three abstraction layers in one chapter: types (via generic type parameters), behaviour (via traits) and references' validity (via lifetimes).
+
+### Translation
+
+Three sections cover the full Rust abstraction stack:
+
+- **10.1 Жалпылама мәлімет түрлері** — generics in functions (`largest<T: PartialOrd>`), structs (`Point<T>`, `Point<T, U>`), enums (`Option<T>`, `Result<T, E>`), and methods (`impl<T> Point<T>`, type-restricted `impl Point<f64>`); the **monomorphization** explanation — generic abstractions cost zero at runtime because the compiler emits a specialized copy per concrete type.
+- **10.2 Трейттер: ортақ тәртіпті анықтау** — defining traits (`Summary`), implementing them on types (`impl Summary for NewsArticle`), the **orphan rule** (you can implement a trait on a type only if either the trait or the type is defined in your crate), default implementations and how they can call other trait methods, traits as parameters via `&impl Summary` shorthand vs `<T: Summary>` trait-bound syntax, multiple bounds with `+`, the `where` clause for readability, returning `impl Trait`, conditionally-implemented methods (`impl<T: Display + PartialOrd> Pair<T>`), blanket implementations (`impl<T: Display> ToString for T`).
+- **10.3 Тіршілік мерзімі арқылы сілтемелерді растау** — preventing dangling references, the borrow checker, generic lifetimes in functions (`fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`), thinking in terms of lifetimes, lifetimes in struct definitions (`ImportantExcerpt<'a>`), the three lifetime elision rules, lifetimes in method definitions (`impl<'a> ImportantExcerpt<'a>`), the `'static` lifetime (string literals, when not to use it), generic types + trait bounds + lifetimes combined in one signature.
+
+### Translation notes
+
+- New `data/raw/rust_book_kk/chapter_10.md` — ~5 500 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-10-specific terminology decisions: monomorphization → **мономорфтау**, default implementation → **әдепкі іске асыру**, blanket implementation → **жалпы іске асыру**, trait bound → **трейт шектеуі**, where clause → **where клаузасы**, lifetime elision → **тіршілік мерзімін түсіріп жазу**, orphan rule → **орфан-ереже**, `impl Trait` syntax → kept as `impl Trait`.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 9 chapters / 675 samples → **10 chapters / 767 samples** (+92 from chapter 10).
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.11 = Chapter 11 (Writing Automated Tests).
+
+### Release-process note
+
+GitHub Actions stub-release workflow blocked by billing payment failure (user-side); resolved by user updating payment data. Release continued normally.
+
 ## [4.7.9] — 2026-04-29 — Rust Book Chapter 9 (Қатені өңдеу) translated, in pack
 
 Ninth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 9 — Error Handling — covering Rust's two-tier error model: **unrecoverable errors with `panic!`** (the panic message format, the array-indexing example, `RUST_BACKTRACE=1`, the `panic = "abort"` profile setting and unwind-vs-abort trade-off) and **recoverable errors with `Result<T, E>`** (the `Result` enum definition, `File::open` returning `Result<File, io::Error>`, matching on the error to take different actions, distinguishing error kinds via `error.kind()` and the deeply-nested-match trade-off, `unwrap` and `expect` as shortcuts for prototypes/tests, propagating errors with explicit `match`, the `?` operator and how it short-circuits to return `Err` from the function, the `?`-chained call style, the standard-library `fs::read_to_string` as the canonical fully-condensed form, error type conversion via the `From` trait, where `?` may be used (`Result`, `Option`, `main` returning `Result<(), Box<dyn Error>>`)). Tarau ends with **when to panic vs when to return Result** guidelines (prototypes/tests, contract violations, parsing user input, trait-encoded invariants like the `Guess` 1–100 example).

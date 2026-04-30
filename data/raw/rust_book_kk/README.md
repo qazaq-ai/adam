@@ -50,6 +50,7 @@ The pack is registered in `SOURCE_PACKS` constants of:
 | 7 — Бумалармен, сандықтармен, модульдермен жобаны басқару (Packages, Crates, Modules) | `chapter_07.md` | v4.7.7 | translated, in pack |
 | 8 — Жалпы ұжымдар (Common Collections) | `chapter_08.md` | v4.7.8 | translated, in pack (past committed-index ceiling) |
 | 9 — Қатені өңдеу (Error Handling) | `chapter_09.md` | v4.7.9 | translated, in pack (past committed-index ceiling) |
+| 10 — Жалпылама типтер, трейттер мен тіршілік мерзімі (Generic Types, Traits, and Lifetimes) | `chapter_10.md` | v4.7.10 | translated, in pack (past committed-index ceiling) |
 
 ## Corpus-purity rule
 

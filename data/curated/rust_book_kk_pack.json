@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 9,
-  "sentences_total": 675,
-  "sample_count": 675,
+  "chapters_translated": 10,
+  "sentences_total": 767,
+  "sample_count": 767,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -4734,6 +4734,650 @@
       "source_id": "chapter_09",
       "domain": "programming_rust",
       "text": "Олар арқылы әр түрлі типке жарамды коды бір рет жазып, көп ретте қолдана аласыз."
+    },
+    {
+      "id": "rust_book_10_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Жалпылама типтер, трейттер мен тіршілік мерзімі Әр бағдарламалау тілінде — қайталануды азайтуға арналған құралдар бар. `Rust`-тың сондай құралдарының бірі — **жалпылама типтер**: типтің орнына тип параметрін қойып, бір функцияны немесе бір типті бірнеше нақты тип үшін қайтадан жазбай қолдану."
+    },
+    {
+      "id": "rust_book_10_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Жалпылама типтермен бірге **трейттер** келеді — олар жалпылама типтердің қандай тәртіп көрсетуге қабілетті екенін бекітеді."
+    },
+    {
+      "id": "rust_book_10_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Ал тіршілік мерзімі — жалпылама түрдің ерекше түрі — компиляторға сілтемелердің жарамды болып тұратын кезеңін айтады."
+    },
+    {
+      "id": "rust_book_10_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бұл тарау — `Rust`-тағы абстракцияның үш қабатын біріктіреді: типтер, тәртіп, тіршілік."
+    },
+    {
+      "id": "rust_book_10_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Үшеуін бір-бірімен араластырып қолданып үйрену — үлкен `Rust` жобасын жазудың кілті. 10.1."
+    },
+    {
+      "id": "rust_book_10_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Жалпылама мәлімет түрлері Жалпылама типтер арқылы біз функцияны, структты, енамды немесе әдісті бірнеше нақты тип үшін бір рет жазамыз."
+    },
+    {
+      "id": "rust_book_10_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Функцияда жалпылама Жиымның ең үлкен элементін табатын функцияны қарастырайық."
+    },
+    {
+      "id": "rust_book_10_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Алдымен `i32` үшін: Содан кейін `char` үшін: Кодтың денесі бірдей — тек тип ауысады."
+    },
+    {
+      "id": "rust_book_10_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Жалпылама типтер арқылы екеуін біріктірейік: `<T: PartialOrd>` — бұл тип параметрі. `T` — кез келген тип бола алады, бірақ `PartialOrd` трейтін бекітетін болуы керек (екі мәнді салыстыру қабілеті). `largest::<i32>([1, 2, 3])` және `largest::<char>(['a', 'b'])` екеуі де жұмыс істейді."
+    },
+    {
+      "id": "rust_book_10_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Структта жалпылама Структтың өрістерін жалпылама типке байлайық."
+    },
+    {
+      "id": "rust_book_10_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Қарапайым нүкте координаттары: `Point<i32>` мен `Point<f64>` — әртүрлі типтер."
+    },
+    {
+      "id": "rust_book_10_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Әр тип үшін `Rust` бөлек машиналық код шығарады. `x` мен `y` бөлек типтерде болуы мүмкін болса — екі параметр енгіземіз: Енамда жалпылама Сізге таныс `Option<T>` пен `Result<T, E>` — жалпылама типтер: `Option<T>` бір параметрмен — мүмкін мәннің типі. `Result<T, E>` екеуімен — сәтті нәтиже мен қате типі."
+    },
+    {
+      "id": "rust_book_10_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Сондықтан стандартты кітапханада сансыз жағдайда `Option<u32>`, `Option<String>`, `Result<File, io::Error>` сияқты комбинациялар табылады."
+    },
+    {
+      "id": "rust_book_10_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Әдісте жалпылама Жалпылама структқа әдіс жариялау үшін `impl<T>` қолданамыз: `impl<T>` — бұл тип параметрі `Point<T>` структының өзімен сай."
+    },
+    {
+      "id": "rust_book_10_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Кез келген `Point` (мысалы, `Point<i32>`, `Point<f64>`) `x()` әдісіне ие."
+    },
+    {
+      "id": "rust_book_10_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Кейде нақты бір типке арналған әдістерді жариялау керек: Бұл әдіс тек `Point<f64>`-та бар — `Point<i32>`-та жоқ."
+    },
+    {
+      "id": "rust_book_10_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Себебі `powi` мен `sqrt` тек қалқымалы үтірлі типтерде болады."
+    },
+    {
+      "id": "rust_book_10_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Жалпылама кодтың өнімділігі Жалпылама типтерді қолдану ешбір қосымша баяу жасамайды — себебі `Rust` **мономорфтау** жасайды."
+    },
+    {
+      "id": "rust_book_10_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Компилятор кодты әр нақты тип үшін бөлек жасайды."
+    },
+    {
+      "id": "rust_book_10_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Жоғарыдағы `largest<T>` функциясы `i32`-пен бір рет, `char`-мен екінші рет шақырылса — компилятор екі бөлек функцияны жасайды: `largest_i32` мен `largest_char` сияқты."
+    },
+    {
+      "id": "rust_book_10_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Орындалу кезінде ешбір динамикалық таңдау, ешбір қосымша көрсеткіш шақыруы жоқ."
+    },
+    {
+      "id": "rust_book_10_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust`-тың дизайн принципі: **абстракция — жоғары; өнімділік — төмен қабылданбайды**."
+    },
+    {
+      "id": "rust_book_10_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Сіз жалпылама код жазасыз, компилятор оны нақты кодқа айналдырады. 10.2."
+    },
+    {
+      "id": "rust_book_10_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Трейттер: ортақ тәртіпті анықтау Трейт — әр түрлі типтерге ортақ болған тәртіпті бекітетін абстракция. `Rust`-та трейт басқа тілдерде «интерфейс» немесе «протокол» деп аталатын ұғымға ұқсайды."
+    },
+    {
+      "id": "rust_book_10_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Трейт жариялау Әр түрлі мәтін типтерінен қысқа қорытынды (`summarize`) жасайтын трейт жариялайық: `Summary` — трейттің атауы."
+    },
+    {
+      "id": "rust_book_10_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Ішінде бір ғана әдіс қолтаңбасы бар — `summarize`, ол `String` қайтарады."
+    },
+    {
+      "id": "rust_book_10_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Әдістің денесі жоқ — ол әр типте жеке іске асырылатын болады."
+    },
+    {
+      "id": "rust_book_10_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Трейтті типке бекіту Енді трейттің бекітуін жазайық."
+    },
+    {
+      "id": "rust_book_10_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бір мысал — мақала, екіншісі — твит: `impl <Trait> for <Type>` синтаксисі — бұл `<Type>`-ке `<Trait>`-тың бекітуін бекітеді."
+    },
+    {
+      "id": "rust_book_10_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Енді `NewsArticle` мен `Tweet` екеуі де `summarize()` әдісіне ие."
+    },
+    {
+      "id": "rust_book_10_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Орфан-ереже Бір маңызды ереже — **орфан-ереже**: сіз трейтті типке тек өзіңіздің сандығыңыздағы трейт болса немесе типтің өзі сіздің сандығыңыздан болса ғана бекіте аласыз."
+    },
+    {
+      "id": "rust_book_10_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Мысалы, сіз `Display`-ді `Vec<T>`-ке бекіте алмайсыз — өйткені екеуі де стандартты кітапханадан."
+    },
+    {
+      "id": "rust_book_10_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бірақ өзіңіздің `MyType`-ке `Display` бекіту — мүмкін; өзіңіздің `MyTrait`-ті `Vec<T>`-ке бекіту — де мүмкін."
+    },
+    {
+      "id": "rust_book_10_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бұл ереже сандықтар арасындағы дау-дамайды болдырмайды."
+    },
+    {
+      "id": "rust_book_10_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Әдепкі іске асыру Трейт ішінде әдістің **әдепкі денесін** жазуға болады."
+    },
+    {
+      "id": "rust_book_10_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тип бекітуінде ол қайта анықталмаса — әдепкі қолданылады: Әдепкі іске асыру ішінде трейттің басқа әдістерін шақыруға болады — тіпті ол әдістер әдепкі денесі жоқ болса да: Енді `Summary`-ді бекітетін типтер тек `summarize_author`-ды жазса жеткілікті — `summarize` әдепкі бойынша келеді."
+    },
+    {
+      "id": "rust_book_10_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Трейт параметр ретінде Функция кез келген `Summary`-ді бекітетін типті қабылдау керек болса: `&impl Summary` — «`Summary` трейтін бекітетін кез келген типке сілтеме». `notify(&article)` мен `notify(&tweet)` — екеуі де жұмыс істейді."
+    },
+    {
+      "id": "rust_book_10_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Трейт шектеуі `impl Trait` синтаксисі қысқа, бірақ кейде нақты тип параметрі ыңғайлы: `<T: Summary>` — «`T` `Summary` трейтін бекітеді» дегенді білдіреді."
+    },
+    {
+      "id": "rust_book_10_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бұл — **трейт шектеуі**."
+    },
+    {
+      "id": "rust_book_10_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Көп параметрлер бір типте болуы керек жағдайда шектеу синтаксисі қажет: `impl Summary` синтаксисімен `item1` мен `item2` бір типте болатынын бекіту мүмкін емес."
+    },
+    {
+      "id": "rust_book_10_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бірнеше трейт шектеуі Бір тип бірнеше трейтті бекітуі керек болса — `+` операторы: Үлкен қолтаңбалар оқуға қиын болады."
+    },
+    {
+      "id": "rust_book_10_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Сондықтан **`where` клаузасы**: `where` арқылы шектеулер функция қолтаңбасынан кейінгі бөлек блокта жазылады."
+    },
+    {
+      "id": "rust_book_10_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бұл — оқуға жеңіл."
+    },
+    {
+      "id": "rust_book_10_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Трейтті қайтару Функция трейтті бекітетін типті **қайтара** алады: Қайтару типі `impl Summary` — «`Summary`-ді бекітетін бір тип» дегенді білдіреді."
+    },
+    {
+      "id": "rust_book_10_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Шақырушы нақты қандай тип қайтарылғанын білмейді — тек `Summary` интерфейсіне сүйеніп жұмыс істей алады."
+    },
+    {
+      "id": "rust_book_10_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бірақ нюанс: `impl Summary` тек **бір** нақты тип қайтаруға болады."
+    },
+    {
+      "id": "rust_book_10_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Егер функция шартқа қарап `Tweet` немесе `NewsArticle` қайтаратын болса — ол қателікке барады."
+    },
+    {
+      "id": "rust_book_10_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Әр түрлі нақты типтерді бір функциядан қайтару үшін динамикалық сипаттаулы жөндеулер (`Box<dyn Summary>`) керек — 17-тарауда қарастырамыз."
+    },
+    {
+      "id": "rust_book_10_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Шектеулі әдістер Трейт шектеуі арқылы әдісті тек қалаған типтерде ғана жариялауға болады: `new` барлық `Pair<T>` түрінде бар."
+    },
+    {
+      "id": "rust_book_10_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бірақ `cmp_display` — тек `Display` пен `PartialOrd` екеуін бекітетін `T`-да бар."
+    },
+    {
+      "id": "rust_book_10_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Қалғандарында — жоқ."
+    },
+    {
+      "id": "rust_book_10_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Стандартты кітапхана осы үлгіні көп қолданады."
+    },
+    {
+      "id": "rust_book_10_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Мысалы, `ToString` трейті — кез келген `Display`-ді бекітетін типке автоматты түрде бекітіледі: Бұл — **жалпы іске асыру** (blanket implementation). `T: Display` бар болғанда `T` автоматты түрде `ToString` бекітеді."
+    },
+    {
+      "id": "rust_book_10_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Сондықтан кез келген типте `.to_string()` шақыруға болады, егер ол `Display`-ді бекітетін болса. 10.3."
+    },
+    {
+      "id": "rust_book_10_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тіршілік мерзімі арқылы сілтемелерді растау Біз 4-тарауда бар сілтемелерден сөз қозғадық, бірақ оларда жасырын бір сипат бар екенін айтпай қалдық — әр сілтеменің **тіршілік мерзімі** бар."
+    },
+    {
+      "id": "rust_book_10_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тіршілік мерзімі — сілтеменің жарамды болып тұратын аумақ."
+    },
+    {
+      "id": "rust_book_10_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Көп жағдайда тіршілік мерзімі бөлектен туындайды — сілтеме типтері сияқты."
+    },
+    {
+      "id": "rust_book_10_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бірақ кейде функция параметрі әртүрлі мерзімдегі сілтемелерді қабылдай алатын кезде, біз компиляторға тіршілік мерзімдерінің байланысын ашық айтуымыз керек."
+    },
+    {
+      "id": "rust_book_10_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Жабайы сілтемелерді болдырмау Тіршілік мерзімінің бар болуының басты мақсаты — жабайы сілтемелерді болдырмау. 4-тарауда көрген мысалды еске сақтайық: `x` ішкі блокта жасалған — блок аяқталғанда `x` `drop`-қа барады. `r` бірақ сыртта тұр — ол ішкі `x`-ке сілтейді, ал `x` жоғалған."
+    },
+    {
+      "id": "rust_book_10_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бұл — типтік жабайы сілтеме. `Rust` мұны компиляцияда тоқтатады."
+    },
+    {
+      "id": "rust_book_10_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Қарыз тексергіш Компилятор бұған қалай көз жеткізеді? **Қарыз тексергіш** — мердікке сілтеменің тіршілік мерзімдерін салыстырады. `r`-дің мерзімі сыртқы блок (`'a`); `x`-тің мерзімі ішкі блок (`'b`). `'b` `'a`-дан қысқа болғандықтан, `r = &x` сілтемесі қауіпсіз емес."
+    },
+    {
+      "id": "rust_book_10_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Функцияда жалпылама тіршілік мерзімі Кейде функция әртүрлі мерзімдегі сілтемелерді қабылдайды: Бұл құрастырылмайды: Компилятор: «нәтижеге сілтеме қайтарасыз, бірақ ол `x`-тен бе, `y`-тан ба — білмеймін»."
+    },
+    {
+      "id": "rust_book_10_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тіршілік мерзімін ашық белгілеу керек: `'a` — тіршілік мерзімінің параметрі."
+    },
+    {
+      "id": "rust_book_10_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Ол: «`x`, `y` және нәтиже — үшеуінің тіршілік мерзімі бір — `'a`» дегенді білдіреді."
+    },
+    {
+      "id": "rust_book_10_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Шақырушы кодқа бұл шектеу: екі сілтеме шакырылғанда олардың кесінді мерзімі — нәтиженің жарамды болатын аумағы."
+    },
+    {
+      "id": "rust_book_10_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тіршілік мерзімінің атаулары әдетте `'a`, `'b`, `'c` сияқты қысқа жазылады."
+    },
+    {
+      "id": "rust_book_10_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тіршілік мерзімдерін ойлау Әр функция қолтаңбасында өз ішкі тіршілік мерзімі болады."
+    },
+    {
+      "id": "rust_book_10_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Ережелер: Әр кіріс параметр сілтеме болса — оның өз тіршілік мерзімі бар."
+    },
+    {
+      "id": "rust_book_10_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Қайтару сілтеме — қандайда бір кіріс мерзіміне сай болуы керек."
+    },
+    {
+      "id": "rust_book_10_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тіршілік мерзімі параметрі қайдан туындайтынын — біз белгілеуіміз керек, әйтпесе компилятор шеше алмайды."
+    },
+    {
+      "id": "rust_book_10_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Структта тіршілік мерзімі Структ ішінде сілтеме болса, оған тіршілік мерзімі қажет: `ImportantExcerpt<'a>` — бұл структың `part` өрісі қандайда бір тіршілік мерзіміне `'a`-ға сай."
+    },
+    {
+      "id": "rust_book_10_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Мән осыдан соң `i` `novel` бар болғанда ғана жарамды."
+    },
+    {
+      "id": "rust_book_10_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тіршілік мерзімін түсіріп жазу Жоғарыдағы `longest` функциясынан байқағанымыздай — тіршілік мерзімдерін жиі жазудың керегі болуы мүмкін."
+    },
+    {
+      "id": "rust_book_10_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бірақ кейбір қарапайым жағдайларда компилятор оларды өзі шеше алады."
+    },
+    {
+      "id": "rust_book_10_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Соған **тіршілік мерзімін түсіріп жазу ережелері** (lifetime elision rules) бар: **Бірінші ереже:** әр кіріс сілтеме параметрге өзіндік мерзімі беріледі. **Екінші ереже:** егер тек бір кіріс мерзімі бар болса — қайтару сілтеменің мерзімі сондай болады. **Үшінші ереже:** әдістерде, бірінші параметр `&self` немесе `&mut self` болса — қайтару сілтеменің мерзімі — `self`-тікі."
+    },
+    {
+      "id": "rust_book_10_0076",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Қарапайым мысал: Тіршілік мерзімі жазылмаған, бірақ компилятор шешеді: бір кіріс сілтеме — қайтару сондай мерзімде."
+    },
+    {
+      "id": "rust_book_10_0077",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Сондықтан бұл код: — бір нәрсе."
+    },
+    {
+      "id": "rust_book_10_0078",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Әдісте тіршілік мерзімі `impl` блогында тіршілік мерзімі параметрі `<'a>` арқылы жарияланады: Үшінші ережеге сай — `announce_and_return_part`-та қайтару `self.part`-тікі мерзімінде."
+    },
+    {
+      "id": "rust_book_10_0079",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Сондықтан жазудың керегі жоқ. `'static` тіршілік мерзімі `'static` — арнайы тіршілік мерзімі."
+    },
+    {
+      "id": "rust_book_10_0080",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Ол: «бағдарламаның бүкіл өмірлік аумағы» дегенді білдіреді."
+    },
+    {
+      "id": "rust_book_10_0081",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Барлық жол литералдары — `'static`: Жол литералы бағдарламаның бинарлы файлында тікелей жазылған, сондықтан ол әрдайым жарамды. `'static` мерзімін шектеу ретінде жиі қолдану қажет емес."
+    },
+    {
+      "id": "rust_book_10_0082",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Кейде компилятор сізге `'static` ұсынады — бірақ оған бару алдында шынында жабайы сілтемені жасап жатпағаныңызды тексеріңіз."
+    },
+    {
+      "id": "rust_book_10_0083",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Көбіне дұрыс шешім — сілтеме емес, иелік типтерін қолдану."
+    },
+    {
+      "id": "rust_book_10_0084",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Жалпылама тип параметрлері, трейт шектеулері мен тіршілік мерзімі бір кодта Үш ұғымды бір функцияда жинау — жиі кездеседі: Мұнда: `'a` — тіршілік мерзімі параметрі, `x` мен `y`-ке арналған. `T` — жалпылама тип, `ann` параметрі үшін. `T: Display` — трейт шектеуі (where клаузасы арқылы)."
+    },
+    {
+      "id": "rust_book_10_0085",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Үшеуі бірге жұмыс істейді."
+    },
+    {
+      "id": "rust_book_10_0086",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust`-тағы абстракцияның толық суреті: типтер, мерзімдер, тәртіп. 10.4."
+    },
+    {
+      "id": "rust_book_10_0087",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Жалпылама типтер арқылы біз кодты бір рет жазып, бірнеше нақты типке қолдана аламыз."
+    },
+    {
+      "id": "rust_book_10_0088",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Трейттер арқылы біз ортақ тәртіпті бекітіп, әр түрлі типтер — бір интерфейспен — бір функцияға беріле алатынын кепілдейміз."
+    },
+    {
+      "id": "rust_book_10_0089",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Тіршілік мерзімі арқылы біз сілтемелердің жабайы болмауын бекітеміз."
+    },
+    {
+      "id": "rust_book_10_0090",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Үш ұғым бір кодта араласқанда — `Rust` өзінің ең күшті жағын көрсетеді: сіз абстрактты, жинақы код жазасыз; компилятор оны нақты, тиімді машиналық кодқа айналдырады; орындалу кезінде ешбір қосымша баяулау жоқ; жадтың қауіпсіздігі компиляция кезінде кепілделген."
+    },
+    {
+      "id": "rust_book_10_0091",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Келесі тарау — тестілер туралы."
+    },
+    {
+      "id": "rust_book_10_0092",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_10",
+      "domain": "programming_rust",
+      "text": "Сіз `Rust`-та тестті қалай жазатынды, қалай іске қосатыныңды, тестілер арқылы кодыңыздың дұрыстығын қалай қамтамасыз ететіндігіңізді көресіз."
     }
   ]
 }
