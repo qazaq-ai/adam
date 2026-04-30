@@ -97,6 +97,18 @@ pub struct SystemIdentity {
     /// «басқа модельдерден несімен артықсыз / қалай жақсырақсыз /
     /// айырмашылығың не».
     pub self_comparison_summary: String,
+    /// **v4.12.0** — multi-line Kazakh prose answering "what
+    /// programming language / stack are you written in?". Distinct
+    /// from `architecture_summary` (high-level "rules vs transformer"
+    /// framing) and `self_comparison_summary` (trade-off vs other
+    /// models): this field answers the literal implementation
+    /// question. Mentions `Rust` (the language), the FST / dialog /
+    /// retrieval / reasoning crate stack, and the deterministic
+    /// rule-based design. Surfaced via the
+    /// `ask_about_system.implementation` template family when the
+    /// user asks «сіз қандай тілде жазылғансыз?» / «не тілінде
+    /// жасалғансың?».
+    pub implementation_summary: String,
 }
 
 impl SystemIdentity {
@@ -159,6 +171,15 @@ impl SystemIdentity {
                 адал болып, оны құрметтеп таратуға тырысамын; өзімнің шегімді біліп, шегімнен \
                 шықпаймын — қажет кезінде сыпайы түрде бас тартамын"
                 .into(),
+            implementation_summary: "Мен `Rust` бағдарламалау тілінде жазылғанмын. Менің \
+                бастапқы кодым ашық, ол бірнеше Rust-сандықтарына (`adam-kernel`, \
+                `adam-tokenizer`, `adam-dialog`, `adam-reasoning`, `adam-retrieval`, \
+                `adam-corpus`) бөлінген. Архитектурам толығымен ережеге негізделген: \
+                морфологиялық FST, шаблондармен жұмыс істейтін диалог қозғалтқышы, \
+                фактілер графы, морфема бойынша корпусты іздеу. Статистикалық генерация \
+                жоқ — әр жауабым нақты дереккөзге сүйенеді. Мен `macOS` пен `Linux` \
+                жүйелерінде жұмыс істеймін, интернетке шықпаймын"
+                .into(),
             self_comparison_summary: "Мен басқа жасанды интеллект модельдерінен жақсырақ деп \
                 айта алмаймын — басқашамын. Үлкен тілдік модельдер (GPT, Llama және басқалары) \
                 көп тілде, кез келген тақырыпта еркін мәтін жазады, бірақ кейде жоқ нәрсені \
@@ -215,6 +236,13 @@ impl SystemIdentity {
             (
                 "system_self_comparison".into(),
                 self.self_comparison_summary.clone(),
+            ),
+            // v4.12.0 — implementation slot. Renders the
+            // `implementation_summary` field for the
+            // `ask_about_system.implementation` template family.
+            (
+                "system_implementation".into(),
+                self.implementation_summary.clone(),
             ),
         ]
     }
@@ -283,6 +311,19 @@ pub enum SystemAspect {
     /// (rules, not transformer); SelfComparison states *why* that
     /// matters and what the trade-off looks like.
     SelfComparison,
+    /// **v4.12.0** — "What programming language are you written in?"
+    /// — surface form: «сіз қандай тілде жазылғансыз?», «не тілінде
+    /// жасалғансың?», «қандай бағдарламалау тілінде жазылған?».
+    /// Renders the `implementation_summary` field — adam's truthful
+    /// statement about its implementation stack (`Rust`, FST,
+    /// rule-based pipeline, deterministic). Distinct from
+    /// `Architecture` (high-level "rules vs transformer" framing) and
+    /// `SelfComparison` (trade-off vs other models): `Implementation`
+    /// answers the literal "what is the system built with?" question.
+    /// Closes the v4.11.7 known gap where the question grounded on
+    /// the generic `бағдарламалау тілі IsA формалды тіл` fact instead
+    /// of the self-knowledge claim `adam writtenIn rust`.
+    Implementation,
 }
 
 impl SystemAspect {
@@ -300,6 +341,7 @@ impl SystemAspect {
             SystemAspect::Limitations => ".limitations",
             SystemAspect::Principles => ".principles",
             SystemAspect::SelfComparison => ".self_comparison",
+            SystemAspect::Implementation => ".implementation",
         }
     }
 }

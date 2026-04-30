@@ -192,6 +192,15 @@ pub enum Intent {
         /// `unknown.with_derived_chain` template family.
         #[serde(default)]
         reasoning_chain: Option<String>,
+        /// **v4.12.0** — question shape detected at the top of
+        /// `Conversation::turn_with_trace` via
+        /// `crate::question_shape::detect`. Routes the planner to
+        /// the right template family per `(intent, question_shape)`.
+        /// `None` when the input does not look like a question at
+        /// all (statement, greeting, etc.) — falls back to the
+        /// existing v4.11.x template selection.
+        #[serde(default)]
+        question_shape: Option<crate::question_shape::QuestionShape>,
     },
 }
 

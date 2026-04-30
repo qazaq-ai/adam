@@ -35,6 +35,7 @@ pub mod intent;
 pub mod language_core;
 pub mod planner;
 pub mod quality;
+pub mod question_shape;
 pub mod realiser;
 pub mod semantics;
 pub mod slot_syntax;
@@ -67,6 +68,7 @@ pub use quality::{
     TypedFaithfulnessReport, audit_graph_admissibility, audit_response, audit_trace_faithfulness,
     audit_typed_faithfulness,
 };
+pub use question_shape::{QuestionShape, detect as detect_question_shape};
 pub use realiser::realise;
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
 pub use system_identity::{SystemAspect, SystemIdentity};

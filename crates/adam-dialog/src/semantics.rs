@@ -195,6 +195,10 @@ pub fn interpret_text_with_lexicon(
     // v4.0.21 — prefer multi-word entity match before single-noun fallback
     // so «Құс жолы туралы айтшы» stays intact (not reduced to «құс»).
     let noun_hint = best_noun_hint(input, parses);
+    // **v4.12.0** — detect question shape at the same point we
+    // populate `noun_hint`. Pure surface-level scan; cheap and
+    // independent of the FST analyses. `None` for non-questions.
+    let question_shape = crate::question_shape::detect(input);
     Intent::Unknown {
         raw_tokens: tokens,
         noun_hint,
@@ -202,6 +206,7 @@ pub fn interpret_text_with_lexicon(
         grounded_fact: None,
         example_adapted: false,
         reasoning_chain: None,
+        question_shape,
     }
 }
 
@@ -1415,6 +1420,10 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         grounded_fact: None,
         example_adapted: false,
         reasoning_chain: None,
+        // **v4.12.0** — legacy path has no raw input, so question
+        // shape cannot be detected (the detector is surface-level).
+        // Always None on this code path.
+        question_shape: None,
     }
 }
 
@@ -1668,6 +1677,32 @@ fn detect_ask_about_system(
     // a free-standing pronoun (the morpheme `-сың/-сыз` is 2nd
     // person), so the pronoun gate is loosened here. Real-REPL
     // 2026-04-29 transcript: «Не істей аласың?» (no leading pronoun).
+    // **v4.12.0** — Implementation aspect. Surface forms:
+    // «сіз қандай тілде жазылғансыз?», «не тілінде жасалғансың?»,
+    // «қандай бағдарламалау тілінде жазылған?», «архитектурада не
+    // тілі қолданылған?». Distinct from `Architecture` ("how are
+    // you different?") and `SelfComparison` ("trade-off vs other
+    // models"): this asks the literal "what programming language /
+    // stack are you written with?". Closes the v4.11.7 known gap.
+    // Runs BEFORE Capabilities (which has overlap on `жазылған`-
+    // suffix forms).
+    let implementation_marker = joined.contains("қандай тілде жазылған")
+        || joined.contains("қандай тілде жазылғансың")
+        || joined.contains("қандай тілде жазылғансыз")
+        || joined.contains("не тілінде жазылған")
+        || joined.contains("не тілінде жасалғансың")
+        || joined.contains("не тілінде жасалғансыз")
+        || joined.contains("қандай бағдарламалау тілінде жазылған")
+        || joined.contains("қандай бағдарламалау тілінде жазылғансың")
+        || joined.contains("қандай бағдарламалау тілінде жазылғансыз")
+        || joined.contains("кодыңыз қай тілде")
+        || joined.contains("коды қай тілде")
+        || joined.contains("қандай тілде жасалғансыз")
+        || joined.contains("қандай тілде жасалғансың");
+    if implementation_marker {
+        return Some(SystemAspect::Implementation);
+    }
+
     let capabilities_marker = joined.contains("істей аласың")
         || joined.contains("істей аласыз")
         || joined.contains("қолыңнан не келеді")

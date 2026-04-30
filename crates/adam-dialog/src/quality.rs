@@ -509,8 +509,33 @@ fn latest_conflict_values(trace: &TurnTrace) -> Option<(String, String)> {
 /// the token boundary, so `NLM` (between `(` and `)`) or `adam`
 /// (between spaces) are scanned as standalone tokens.
 fn contains_latin(value: &str) -> bool {
+    // **v4.12.0** — backtick-quoted spans bypass the Latin-character
+    // check, mirroring the v4.7.0 corpus-purity carve-out for
+    // world_core entries. Technical proper nouns (`Rust`, `Cargo`,
+    // `String`, `macOS`, `Linux`, …) and crate identifiers
+    // (`adam-kernel`, `adam-tokenizer`) appear verbatim in adam's
+    // user-facing output when sourced from world_core kk text or
+    // SystemIdentity::implementation_summary. The carve-out applies
+    // ONLY inside paired backticks; bare Latin prose outside
+    // backticks is still flagged.
     let mut current = String::new();
+    let mut in_backtick = false;
     for ch in value.chars() {
+        if ch == '`' {
+            // Toggle backtick mode. Flush any accumulated unguarded
+            // Latin token first (it ended at this backtick).
+            if !current.is_empty() && !is_allowed_latin_token(&current) {
+                return true;
+            }
+            current.clear();
+            in_backtick = !in_backtick;
+            continue;
+        }
+        if in_backtick {
+            // Skip everything inside a backtick span — that's a code
+            // identifier / technical name, exempt from the audit.
+            continue;
+        }
         if ch.is_ascii_alphabetic() {
             current.push(ch);
         } else {
@@ -749,6 +774,47 @@ mod tests {
             report
                 .issues
                 .contains(&ResponseQualityIssue::RepeatedWhitespace)
+        );
+    }
+
+    /// **v4.12.0** — backtick-quoted Latin spans pass the
+    /// LatinCharactersForbidden gate, mirroring the v4.7.0
+    /// corpus-purity carve-out. Technical proper nouns surface
+    /// verbatim in adam's user-facing output (e.g. the Implementation
+    /// aspect mentions `Rust` / `macOS` / `Linux` / `adam-kernel`).
+    #[test]
+    fn backticked_latin_passes() {
+        let report = audit_response("Мен `Rust` бағдарламалау тілінде жазылғанмын.");
+        assert!(
+            !report
+                .issues
+                .contains(&ResponseQualityIssue::LatinCharactersForbidden),
+            "backticked `Rust` must not trip Latin filter; got {:?}",
+            report.issues
+        );
+    }
+
+    /// Bare (non-backticked) Latin prose still trips the filter.
+    /// Distinguishes legitimate technical-name carve-out from
+    /// accidental Latin-debug-artifact leaks.
+    #[test]
+    fn bare_latin_outside_backticks_still_fails() {
+        let report = audit_response("Мен Rust тілінде жазылғанмын");
+        assert!(
+            report
+                .issues
+                .contains(&ResponseQualityIssue::LatinCharactersForbidden),
+            "bare Latin `Rust` outside backticks must still trip filter"
+        );
+    }
+
+    #[test]
+    fn multiple_backticked_spans_all_pass() {
+        let report = audit_response("`Rust` пен `Cargo` — `Rust`-тың құралдары.");
+        assert!(
+            !report
+                .issues
+                .contains(&ResponseQualityIssue::LatinCharactersForbidden)
         );
     }
 }

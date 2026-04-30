@@ -643,6 +643,38 @@
       "turns": [
         {"user": "Қазақстан тарихы туралы не білесіз?", "output_contains_lower_any": ["қазақстан"]}
       ]
+    },
+    {
+      "id": "implementation_aspect_routes_to_rust_v4_12_0",
+      "category": "system_self_introspection",
+      "description": "v4.12.0: «Сіз қандай тілде жазылғансыз?» / «Сіз қандай бағдарламалау тілінде жазылғансыз?» routes to SystemAspect::Implementation and surfaces the Rust + crate-stack self-knowledge claim. Pre-v4.12.0 grounded on the generic `бағдарламалау тілі IsA формалды тіл` fact instead of adam's actual implementation language. Also locks the v4.12.0 backtick carve-out in `audit_response::contains_latin` — without it the Latin tokens `Rust`, `adam-kernel`, `macOS`, `Linux` would trip LatinCharactersForbidden.",
+      "turns": [
+        {"user": "Сіз қандай тілде жазылғансыз?", "output_contains_lower_any": ["rust"]}
+      ]
+    },
+    {
+      "id": "implementation_aspect_alt_phrasing_v4_12_0",
+      "category": "system_self_introspection",
+      "description": "v4.12.0: alternative phrasing «Не тілінде жасалғансың?» also routes to SystemAspect::Implementation. Locks the implementation-marker detector in `detect_ask_about_system`.",
+      "turns": [
+        {"user": "Не тілінде жасалғансың?", "output_contains_lower_any": ["rust"]}
+      ]
+    },
+    {
+      "id": "causal_question_hedges_honestly_v4_12_0",
+      "category": "knowledge_query",
+      "description": "v4.12.0: «Неліктен жасуша өледі?» pre-v4.12.0 surfaced the most-central IsA fact (`жасуша IsA материя` or similar) — logically wrong because adam asserted what жасуша IS when the user asked WHY it dies. v4.12.0 routes QuestionShape::Causal to `unknown.causal.with_fact` template which states the available context AND explicitly says adam can't pinpoint the cause. Honest epistemic hedging.",
+      "turns": [
+        {"user": "Неліктен жасуша өледі?", "output_contains_lower_any": ["себебін", "себептік"]}
+      ]
+    },
+    {
+      "id": "causal_question_with_addressee_v4_12_0",
+      "category": "knowledge_query",
+      "description": "v4.12.0: «Адам, неліктен су қайнайды?» — vocative-stripped, then QuestionShape::Causal routes to causal template. Verifies the v4.11.5 vocative guard composes cleanly with the v4.12.0 question-shape detector.",
+      "turns": [
+        {"user": "Адам, неліктен су қайнайды?", "output_contains_lower_any": ["себебін", "себептік"]}
+      ]
     }
   ]
 }

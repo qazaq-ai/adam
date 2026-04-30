@@ -251,6 +251,7 @@ pub fn strip_evidence(intent: Intent) -> Intent {
         Intent::Unknown {
             raw_tokens,
             noun_hint,
+            question_shape,
             ..
         } => Intent::Unknown {
             raw_tokens,
@@ -259,6 +260,9 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: None,
+            // **v4.12.0** — preserve question_shape across the
+            // strip; it's an analytical signal, not evidence.
+            question_shape,
         },
         other => other,
     }
@@ -277,6 +281,7 @@ mod tests {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: chain.map(|s| s.into()),
+            question_shape: None,
         }
     }
 

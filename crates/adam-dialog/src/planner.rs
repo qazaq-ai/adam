@@ -583,6 +583,7 @@ mod tests {
             grounded_fact: Some("Абай Құнанбайұлы — қазақ ақыны.".into()),
             example_adapted: false,
             reasoning_chain: Some("байланыс бойынша, абай әдебиетке жатады.".into()),
+            question_shape: None,
         };
         assert_eq!(intent_key(&intent), "unknown.with_derived_chain");
     }
@@ -601,6 +602,7 @@ mod tests {
             grounded_fact: Some("Абай Құнанбайұлы — қазақ ақыны.".into()),
             example_adapted: false,
             reasoning_chain: Some("байланыс бойынша, абай әдебиетке жатады.".into()),
+            question_shape: None,
         };
         assert_eq!(intent_key(&intent), "unknown.with_grounded_fact");
     }
@@ -650,6 +652,11 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             crate::system_identity::SystemAspect::SelfComparison => {
                 "ask_about_system.self_comparison"
             }
+            // v4.12.0 — implementation aspect (programming language /
+            // stack adam is built with).
+            crate::system_identity::SystemAspect::Implementation => {
+                "ask_about_system.implementation"
+            }
         },
         Intent::StatementOfName { .. } => "statement_of_name",
         Intent::AskAge => "ask_age",
@@ -685,8 +692,30 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             grounded_fact,
             example_adapted,
             reasoning_chain,
+            question_shape,
             ..
         } => {
+            // **v4.12.0** — `QuestionShape::Causal` short-circuits the
+            // standard unknown routing. Pre-v4.12.0 «Неліктен жасуша
+            // өледі?» surfaced a generic IsA fact about жасуша, which
+            // is logically wrong (adam asserted "жасуша IsA X" when
+            // the user asked "why does жасуша die?"). The causal
+            // template family hedges honestly: offers the IsA / Has
+            // context if available, then explicitly states adam
+            // cannot pinpoint the cause from its dataset.
+            if matches!(
+                question_shape,
+                Some(crate::question_shape::QuestionShape::Causal)
+            ) {
+                if grounded_fact.is_some() {
+                    return "unknown.causal.with_fact";
+                }
+                if noun_hint.is_some() {
+                    return "unknown.causal.bare";
+                }
+                // Fall through to bare unknown when no topic at all.
+            }
+
             // User-facing chat prefers grounded evidence over a
             // reasoning-chain when both exist. This keeps the
             // deterministic kernel's derivations available, but

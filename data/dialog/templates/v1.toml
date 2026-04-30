@@ -284,6 +284,49 @@ templates = [
     "{system_self_comparison}",
 ]
 
+# v4.12.0 — Implementation aspect: "what programming language are
+# you written in?" / "what stack are you built with?". Renders the
+# `system_implementation` slot which mentions Rust, the FST + dialog
+# + reasoning + retrieval crate stack, and the deterministic
+# rule-based design. Distinct from `architecture` (high-level "rules
+# vs transformer") and `self_comparison` (trade-off framing).
+# Closes the v4.11.7 known gap on «Сіз қандай тілде жазылғансыз?»
+# which previously grounded on the generic `бағдарламалау тілі IsA
+# формалды тіл` fact.
+[[families]]
+key = "ask_about_system.implementation"
+templates = [
+    "{system_implementation}",
+]
+
+# v4.12.0 — Causal-reasoning template family for `QuestionShape::Causal`.
+# Surfaced by «Неліктен X?» / «X неге?» questions where adam has
+# context about X but no Causes-predicate fact. Honest hedging: adam
+# offers the IsA / Has fact it has, then explicitly states it cannot
+# pinpoint the cause. Pre-v4.12.0 these questions surfaced a generic
+# IsA fact about X, which is logically wrong — adam asserted "X is Y"
+# when the user asked "why does X happen?". The template family makes
+# the epistemic limit explicit.
+#
+# Variants by available context:
+# - `unknown.causal.with_fact` — grounded_fact present (definition
+#    or related context for X)
+# - `unknown.causal.bare` — only noun_hint, no fact
+[[families]]
+key = "unknown.causal.with_fact"
+templates = [
+    "{noun} жөнінде білетінім: {fact} Дәл себебін нақты айта алмаймын — менің білім қорымда нақты себептік дерек жоқ.",
+    "{noun} туралы мынаны айта аламын: {fact} Бірақ оның дәл себебін айтуға деректерім жетпейді.",
+    "{noun} жайында білетінім: {fact} Себептік байланысты толық біле бермеймін, тек осы фактіні айта аламын.",
+]
+
+[[families]]
+key = "unknown.causal.bare"
+templates = [
+    "{noun} себебін нақты айта алмаймын — менің білім қорымда бұл туралы дерек жоқ.",
+    "{noun} неге болатынын дәл біле бермеймін; нақты себептік дерек қорымда жоқ.",
+]
+
 # v4.6.20 — User-acknowledgement template family. Surfaced by a
 # real-REPL transcript where the user said «Мен сенің әлі
 # бәрін білмейтініңді … түсіндім» (a long, gracious admission

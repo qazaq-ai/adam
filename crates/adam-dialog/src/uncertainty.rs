@@ -176,6 +176,7 @@ mod tests {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: chain.map(|s| s.into()),
+            question_shape: None,
         }
     }
 

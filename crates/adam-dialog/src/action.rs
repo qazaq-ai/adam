@@ -491,6 +491,7 @@ mod tests {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: chain.map(|s| s.into()),
+            question_shape: None,
         }
     }
 
@@ -579,6 +580,7 @@ mod tests {
             grounded_fact: Some("Әке — отбасының мүшесі.".into()),
             example_adapted: false,
             reasoning_chain: None,
+            question_shape: None,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RetrieveEvidence);
@@ -600,6 +602,7 @@ mod tests {
             grounded_fact: Some("Жер — Күн жүйесіндегі планета.".into()),
             example_adapted: false,
             reasoning_chain: Some("байланыс бойынша, жер аспан денесіне жатады.".into()),
+            question_shape: None,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RunReasoner);

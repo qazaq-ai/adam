@@ -7,6 +7,81 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.12.0] — 2026-04-30 — humanness milestone: question-shape classifier + Implementation aspect + causal-reasoning routing + backtick carve-out for user output
+
+**First minor in the v4.12+ humanness research arc.** Three patches in v4.11.5/.6/.7 closed stripe (1) — "answer-by-the-point" — across all 38 world_core domains. v4.12.0 opens stripe (2) — "human-like reasoning" — by giving the planner an analytical signal it never had: the **form** of the user's question (definition vs causal vs listing vs comparison vs yes/no), independent of topic.
+
+### Architectural addition: `QuestionShape`
+
+A new module `crates/adam-dialog/src/question_shape.rs` introduces:
+
+- **`QuestionShape` enum** — five variants: `Definition` (default), `Causal`, `YesNoCheck`, `Listing`, `Comparison`. Orthogonal to `Intent`: the same `Intent::Unknown` can carry any shape, and the planner picks different template families per `(intent, shape)`.
+- **`question_shape::detect(input: &str) -> Option<QuestionShape>`** — pure surface-level detector (regex-style substring matching, no FST). Order: more specific shapes first (Causal → Comparison → Listing → YesNoCheck), Definition as the catch-all. Returns `None` for non-questions.
+- **`Intent::Unknown.question_shape: Option<QuestionShape>`** — new field, populated at the top of `interpret_text_with_lexicon`. Strip-and-restore preserved across `verifier::strip_evidence`.
+
+### Innovations bundled
+
+1. **`question_shape` module** — 6 unit tests cover the five shapes + non-question fallthrough + Listing/Definition disambiguation (`Қандай X бар?` is Listing; `X қандай?` is Definition).
+
+2. **`SystemAspect::Implementation`** + detector + template family `ask_about_system.implementation`. Closes the v4.11.7 known gap on «Сіз қандай (бағдарламалау) тілінде жазылғансыз?» / «Не тілінде жасалғансың?». New `SystemIdentity::implementation_summary` field renders a comprehensive answer mentioning `Rust`, the crate stack (`adam-kernel`, `adam-tokenizer`, `adam-dialog`, `adam-reasoning`, `adam-retrieval`, `adam-corpus`), the FST + rule-based architecture, and platform support (`macOS`, `Linux`).
+
+3. **Causal-reasoning routing** — when `Intent::Unknown` carries `QuestionShape::Causal`, the planner short-circuits to `unknown.causal.with_fact` (when grounded_fact present) or `unknown.causal.bare` (noun-only). Honest hedging: adam states what it knows about X, then explicitly says it cannot pinpoint the cause from its dataset. Pre-v4.12.0 «Неліктен жасуша өледі?» surfaced a generic `жасуша IsA материя` fact — logically wrong because the user asked WHY жасуша dies, not WHAT it is.
+
+4. **Backtick carve-out in `audit_response::contains_latin`** — mirrors the v4.7.0 corpus-purity carve-out for world_core, now applied to user-facing output. Backtick-quoted spans bypass the `LatinCharactersForbidden` audit so technical proper nouns (`Rust`, `Cargo`, `String`, `macOS`, `Linux`, `adam-kernel`) appear verbatim. Bare Latin prose outside backticks still trips the gate. 3 new unit tests lock the behavior.
+
+5. **REPL replay regression dialogs** — 5 new dialogs in `data/eval/repl_dialogs.json` covering Implementation aspect (2 phrasings) + Causal questions (2 variants including vocative composition) + reuse of v4.11.5 vocative-strip + v4.12.0 question-shape detector together.
+
+### Pipeline impact
+
+- `Intent::Unknown` gains the `question_shape: Option<QuestionShape>` field; all construction sites updated.
+- New `SystemAspect::Implementation` variant + `template_key_suffix` returns `.implementation`.
+- `data/dialog/templates/v1.toml`: 3 new families (`ask_about_system.implementation`, `unknown.causal.with_fact`, `unknown.causal.bare`).
+- `audit_response::contains_latin` now backtick-aware; 3 new tests, 0 regressions on existing 5.
+
+### Live REPL regression
+
+Both v4.11.7-known gaps now answer correctly:
+
+```
+Q: Неліктен жасуша өледі?
+Pre-v4.12.0:  Жасуша туралы мынадай байланыс анықтадым: байланыс
+              бойынша, жасуша — физикалық субстанция.
+Post-v4.12.0: Жасуша жөнінде білетінім: Жасуша — тірі ағзаның
+              құрылыс және функционалды бірлігі. Дәл себебін нақты
+              айта алмаймын — менің білім қорымда нақты себептік
+              дерек жоқ.
+
+Q: Сіз қандай тілде жазылғансыз?
+Pre-v4.12.0:  Бағдарламалау тілі туралы қысқаша айтсам: Бағдарламалау
+              тілі — бағдарлама жазуға арналған формалды тіл.
+Post-v4.12.0: Мен `Rust` бағдарламалау тілінде жазылғанмын. Менің
+              бастапқы кодым ашық, ол бірнеше Rust-сандықтарына
+              (`adam-kernel`, `adam-tokenizer`, `adam-dialog`,
+              `adam-reasoning`, `adam-retrieval`, `adam-corpus`)
+              бөлінген. Архитектурам толығымен ережеге негізделген:
+              морфологиялық FST, шаблондармен жұмыс істейтін диалог
+              қозғалтқышы, фактілер графы, морфема бойынша корпусты
+              іздеу. Статистикалық генерация жоқ — әр жауабым нақты
+              дереккөзге сүйенеді. Мен `macOS` пен `Linux` жүйелерінде
+              жұмыс істеймін, интернетке шықпаймын.
+```
+
+### Tests + counters
+
+- New unit tests: `question_shape::tests` (6) + `quality::tests::backticked_latin_passes` / `bare_latin_outside_backticks_still_fails` / `multiple_backticked_spans_all_pass` (3) = **+9**.
+- New REPL replay dialogs: **+5** (Implementation × 2 + Causal × 2 + history_kazakhstan_query carryover unchanged).
+- Workspace tests: 749 → **758 passing**.
+- `validate_world_core`: 1 625 / 1 625 approved / 1 791 facts (unchanged).
+- `cognitive_eval`: 25/25 canonical (unchanged).
+
+### Cadence
+
+**Minor (v4.12.0)** — substantial architectural work per `feedback_versioning_post_1_0`: new module + new `Intent` field + new `SystemAspect` variant + new template family + new audit carve-out. **Stripe (2) — humanness — opens.** Next patches in this arc:
+
+- **v4.12.5** — discourse-acknowledgement (Иә/Әрине/Менің білуімше) + template-rotation against repetition + follow-up offers.
+- **v4.13.0** — graph-cohesion answer composition (PageRank top-N neighbours of topic node, 2-3 sentence verbalisation).
+- **v4.13.5** — multi-turn coherence (extend `last_query_topic` to `(topic, domain, turn_id)` + follow-up resolver).
+
 ## [4.11.7] — 2026-04-30 — coverage gap closure: question-particle filter + object-length priority + bare-name geo + birthdate verbs + language-capability detector
 
 User directive 2026-04-30: confirm v4.12.0 readiness via live-REPL test. 20-question battery surfaced 5 systemic gaps that should ship as a patch before the minor bump, so v4.12.0 starts on a clean baseline.

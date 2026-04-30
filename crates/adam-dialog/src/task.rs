@@ -315,6 +315,7 @@ mod tests {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: None,
+            question_shape: None,
         }
     }
 
@@ -374,6 +375,7 @@ mod tests {
                 grounded_fact: None,
                 example_adapted: false,
                 reasoning_chain: None,
+                question_shape: None,
             },
         ];
         for intent in social {
@@ -510,6 +512,7 @@ mod tests {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: Some("ой-тізбек: жер — аспан денесі".into()),
+            question_shape: None,
         };
         assert!(TaskState::intent_has_evidence(&with_chain));
 
@@ -520,6 +523,7 @@ mod tests {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: None,
+            question_shape: None,
         };
         assert!(TaskState::intent_has_evidence(&with_example));
 
@@ -530,6 +534,7 @@ mod tests {
             grounded_fact: Some("Жер — Күн жүйесіндегі планета.".into()),
             example_adapted: false,
             reasoning_chain: None,
+            question_shape: None,
         };
         assert!(TaskState::intent_has_evidence(&with_grounded));
 
@@ -552,6 +557,7 @@ mod tests {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: Some("ой-тізбек: жер — аспан денесі".into()),
+            question_shape: None,
         };
         t.roll_forward(&intent, &belief, 0);
         assert_eq!(t.status, TaskStatus::ReadyToAnswer);
@@ -574,6 +580,7 @@ mod tests {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: Some("chain".into()),
+            question_shape: None,
         };
         t.roll_forward(&intent, &belief, 2);
         assert_eq!(t.status, TaskStatus::Blocked);
