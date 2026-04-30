@@ -60,6 +60,7 @@ The pack is registered in `SOURCE_PACKS` constants of:
 | 17 — `Rust`-тың объектілі-бағытталған мүмкіндіктері (OOP Features of Rust) | `chapter_17.md` | v4.7.17 | translated, in pack (past committed-index ceiling) |
 | 18 — Үлгілер мен сай келтіру (Patterns and Matching) | `chapter_18.md` | v4.7.18 | translated, in pack (past committed-index ceiling) |
 | 19 — Жетілдірілген мүмкіндіктер (Advanced Features) | `chapter_19.md` | v4.7.19 | translated, in pack (past committed-index ceiling) |
+| 20 — Соңғы жоба: көп ағынды веб-сервер (Final Project: Multithreaded Web Server) | `chapter_20.md` | v4.7.20 | **translated, in pack — series complete** |
 
 ## Corpus-purity rule
 

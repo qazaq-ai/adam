@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 19,
-  "sentences_total": 1459,
-  "sample_count": 1459,
+  "chapters_translated": 20,
+  "sentences_total": 1543,
+  "sample_count": 1543,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -10222,6 +10222,594 @@
       "source_id": "chapter_19",
       "domain": "programming_rust",
       "text": "Соңғы — 20-тарау — бар бұрын үйренгенімізді бір жобаға жинау: көп ағынды веб-сервер."
+    },
+    {
+      "id": "rust_book_20_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Соңғы жоба: көп ағынды веб-сервер `Rust` Book-тың соңғы тарауы."
+    },
+    {
+      "id": "rust_book_20_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бұған дейін біз ұсақ-түйекті ұғымдарды үйрендік: иелік, типтер, трейттер, ағындар, каналдар, ақылды сілтемелер, макростар."
+    },
+    {
+      "id": "rust_book_20_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Енді — бәрін бір нақты жобада біріктіреміз."
+    },
+    {
+      "id": "rust_book_20_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Біз кішкене, бірақ толық — **көп ағынды веб-сервер** жасаймыз."
+    },
+    {
+      "id": "rust_book_20_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Жоба үш кезеңде өтеді: Бір ағынды HTTP-сервер құру."
+    },
+    {
+      "id": "rust_book_20_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Оны көп ағынды етіп қайта құрастыру (ағын-жинағы арқылы)."
+    },
+    {
+      "id": "rust_book_20_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Жайлап тоқтауды (graceful shutdown) жүзеге асыру."
+    },
+    {
+      "id": "rust_book_20_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Соңында сізде болатыны: TCP қосылымдарды қабылдайтын, HTTP сұраныстарды талдайтын, HTML қайтаратын, көптеген клиентке параллельді қызмет көрсететін, дұрыс түрде тоқтайтын бағдарлама."
+    },
+    {
+      "id": "rust_book_20_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Күрделі жоқ — бар оқыған ұғымдардың практикалық қолданысы. 20.1."
+    },
+    {
+      "id": "rust_book_20_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бір ағынды веб-сервер құру `Rust`-тың стандартты кітапханасы TCP пен UDP-дан жұмыс жасайтын типтерді ұсынады. HTTP — TCP үстіндегі мәтіндік протокол."
+    },
+    {
+      "id": "rust_book_20_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бізге HTTP-кітапхана керек емес — өзіміз талдайтын боламыз."
+    },
+    {
+      "id": "rust_book_20_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Шектелген, бірақ жұмыс жасайтын нұсқа. `cargo new hello` командасымен жобаны бастайық. TCP қосылымды тыңдау `std::net::TcpListener` арқылы порт ашамыз: `bind` — порт пен мекенжайды ашады. `127.0.0.1:7878` — жергілікті машина, 7878 порт. `7878` — себебі ASCII-да «rust» сөзінің сандары (R=18, U=21, S=19, T=20 — ауысты). `listener.incoming()` итератор қайтарады; әр итерация — жаңа қосылым. `stream` — `TcpStream` түрінде."
+    },
+    {
+      "id": "rust_book_20_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бірақ ол `Result` ішінде, өйткені қосылым кей кезде сәтсіз болуы мүмкін. `cargo run` шакырғанда — бағдарлама порт ашады және кезекте тұрады."
+    },
+    {
+      "id": "rust_book_20_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Браузерден `http://127.0.0.1:7878` кіріп көрсеңіз — терминалда «Қосылым орнатылды!» деген жол шығады, бірақ браузерде ешбір нәрсе көрінбейді — біз әлі жауап жібермейміз."
+    },
+    {
+      "id": "rust_book_20_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Сұранысты оқу HTTP сұранысы — мәтін."
+    },
+    {
+      "id": "rust_book_20_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Әр жол `\\r\\n` арқылы аяқталады."
+    },
+    {
+      "id": "rust_book_20_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Мысал: Бірінші жол — **сұраныс-жол** (request line): метод, жол, HTTP нұсқасы."
+    },
+    {
+      "id": "rust_book_20_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Қалғаны — **тақырыптар**."
+    },
+    {
+      "id": "rust_book_20_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бос жол сұраныстың аяқталғанын білдіреді."
+    },
+    {
+      "id": "rust_book_20_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Біз сұранысты оқып, экранда көрсетейік: `BufReader::new(&mut stream)` — TcpStream-ді буферлеп оқуға кесеміз. `.lines()` — итератор, `Result<String>` қайтарады. `.map(|r| r.unwrap())` қателерді `unwrap`-пен ашамыз. `.take_while(|line| !line.is_empty())` — бос жол кездескенше алады."
+    },
+    {
+      "id": "rust_book_20_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Шығатыны: Енді біз сұранысты «оқыдық»."
+    },
+    {
+      "id": "rust_book_20_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бірақ браузер әлі күтіп тұр — біз жауап жіберуіміз керек."
+    },
+    {
+      "id": "rust_book_20_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Жауап жазу HTTP жауабы — солай мәтін."
+    },
+    {
+      "id": "rust_book_20_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Формат: Бірінші жол — **жағдай-жол**: HTTP-нұсқа, мәртебе кодт (200 — OK), түсіндірме."
+    },
+    {
+      "id": "rust_book_20_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Содан кейін — мазмұн."
+    },
+    {
+      "id": "rust_book_20_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Кодты қосайық: Жауапты `stream.write_all` арқылы жібереміз. `as_bytes()` — жолды байттарға айналдырады (TCP байттармен жұмыс істейді)."
+    },
+    {
+      "id": "rust_book_20_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Жауапта мазмұн жоқ — бос."
+    },
+    {
+      "id": "rust_book_20_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Браузерде ақ парақ көрінеді."
+    },
+    {
+      "id": "rust_book_20_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Шынайы HTML қайтару Жобаға `hello.html` файлын қосайық: Кодта файлды оқып, жауапқа қосамыз: `Content-Length` тақырыбы — браузерге мазмұнның мөлшерін айтады."
+    },
+    {
+      "id": "rust_book_20_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Браузер сонша байт оқиды. `cargo run` шакырғанда және браузерден кіргенде — HTML беті көрінеді."
+    },
+    {
+      "id": "rust_book_20_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Сұранысты тексеріп, түрлі жауап беру Әзірге біз барлық сұранысқа бір жауап беріп жатырмыз."
+    },
+    {
+      "id": "rust_book_20_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бірақ нақты сервер: `/` жолына — басты бет; қалған жолдарға — 404."
+    },
+    {
+      "id": "rust_book_20_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Сұраныс-жолды тексерейік: `404.html` файлын да дайындаймыз: `cargo run` — қазір `/` бойынша `hello.html`, басқа жолдарда `404.html` қайтарылады. 20.2."
+    },
+    {
+      "id": "rust_book_20_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бір ағынды серверді көп ағындыға айналдыру Біздің сервер бір ағында жұмыс істеп жатыр."
+    },
+    {
+      "id": "rust_book_20_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Әр сұраныс кезек күтуі керек."
+    },
+    {
+      "id": "rust_book_20_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Егер бір сұраныс баяу — қалғандары да баяу."
+    },
+    {
+      "id": "rust_book_20_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Демонстрация үшін «`/sleep`» жолын қосайық: ол 5 секунд күтеді, содан кейін жауап беретін болады."
+    },
+    {
+      "id": "rust_book_20_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Енді тестілеу: екі браузер-табын ашыңыз."
+    },
+    {
+      "id": "rust_book_20_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Біріншісінде `/sleep`-ке кіріңіз — ол 5 секунд күтеді."
+    },
+    {
+      "id": "rust_book_20_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Екіншісінде сол кезде `/`-ке кіріңіз — ол да 5 секунд күтеді!"
+    },
+    {
+      "id": "rust_book_20_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Себебі сервер бір сұранысты әлі бітірмей, екіншісін бастамайды."
+    },
+    {
+      "id": "rust_book_20_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Кез келген клиент бір баяу сұраныстың кесірінен зардап шегеді."
+    },
+    {
+      "id": "rust_book_20_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Шешім — әр сұранысты бөлек ағында өңдеу."
+    },
+    {
+      "id": "rust_book_20_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бірақ әр сұранысқа жаңа ағын ашу — алуан түрлі шектелген проблемаға келеді: жүйе мың ағын құра алмауы мүмкін, мындаған ағын — ресурс үнемдеу емес."
+    },
+    {
+      "id": "rust_book_20_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Дұрыс шешім — **ағын-жинағы** (thread pool)."
+    },
+    {
+      "id": "rust_book_20_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Алдын ала тіркелген шектелген ағындар жинағы."
+    },
+    {
+      "id": "rust_book_20_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Әр сұранысты бар бір ағынға тапсырып, ол өңдейді."
+    },
+    {
+      "id": "rust_book_20_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Барлық ағын банс болса — сұраныстар кезекте күтеді, бірақ серверге зиян келмейді. `ThreadPool` құрылымын жоспарлау Біздің мақсат — `ThreadPool` атты типке мынадай интерфейс жасау: Шакырғанда — `execute` ішіндегі жабу банс ағынға тапсырылады."
+    },
+    {
+      "id": "rust_book_20_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бұл жасырын мысал — Rust қауымдастығы оны «компилятормен бағытталған әзірлеу» (compiler-driven development) деп атайды: біз мысалды жазамыз, компилятор қателер арқылы бізге қажетін айтады. `main`-ді қазірден бастап жаңарта береміз: Енді `ThreadPool`-ды тиісінше жасайық. `ThreadPool` структы `src/lib.rs` файлында (жаңа кітапхана сандығы): `ThreadPool` — жұмысшыларды (`Worker`) және `mpsc::Sender`-ді ұстайды. `Job` — кез келген орындалатын жабу. `Worker` — id және ағынды ұстайды. `new` функциясы — `n` жұмысшыны жасайды."
+    },
+    {
+      "id": "rust_book_20_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Әр жұмысшы — бір ағын."
+    },
+    {
+      "id": "rust_book_20_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Әр ағын каналды тыңдайды. `mpsc::channel` — біздің тапсырмалар каналы. **Бір** жіберуші (`sender`); **көп** қабылдаушы (барлық жұмысшылар бірге қабылдайды). `mpsc` mpsc — multiple producer, single consumer — бірақ біз керісінше қажет етеміз."
+    },
+    {
+      "id": "rust_book_20_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Мысал арқылы шешім: receiver-ды `Arc<Mutex<...>>` ішінде қойсақ — бар жұмысшылар оған бөлек қол жеткізе алады, бірақ бір сәтте бір ғана `recv`-ке қол жеткізеді."
+    },
+    {
+      "id": "rust_book_20_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Әр жұмысшы — өзінің ағынында."
+    },
+    {
+      "id": "rust_book_20_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Циклда `recv` шакырады — каналдан жұмыс келгенше блок жасайды."
+    },
+    {
+      "id": "rust_book_20_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Жұмыс келгенде орындайды; қайтадан тыңдайды."
+    },
+    {
+      "id": "rust_book_20_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Канал жабылғанда (`Err`) — цикл тоқтайды. `receiver.lock().unwrap().recv()` — мутекс алып, мәнді алу. Lock бөлектен босайды әр итерация соңында (мутекс-күзетшінің `Drop`-ы арқылы)."
+    },
+    {
+      "id": "rust_book_20_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Қазір бізде жұмыс жасайтын ағын-жинағы бар. `cargo run` шакырғанда: Тестке енді бірнеше ағын. `ThreadPool` ішінде 4 ағын — бір уақытта 4 баяу сұранысты ұстай алады."
+    },
+    {
+      "id": "rust_book_20_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бесінші ғана кезекте күтеді. 20.3."
+    },
+    {
+      "id": "rust_book_20_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Жайлап тоқтау мен тазалау Сервер `Ctrl-C` арқылы тоқтатылса — ағындар амалсыз тоқтатылады."
+    },
+    {
+      "id": "rust_book_20_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бар жұмыс жоғалуы мүмкін."
+    },
+    {
+      "id": "rust_book_20_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Сондай-ақ ресурстарды дұрыс тазалаудың кепілдігі жоқ."
+    },
+    {
+      "id": "rust_book_20_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Шешім — `Drop` трейтін `ThreadPool`-да бекіту. `Drop` ішінде: Каналды жабу (sender-ды `drop` ету)."
+    },
+    {
+      "id": "rust_book_20_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бар жұмысшы ағындарының аяқталуын күту (`join`). `self.sender.take()` — `Option`-нан мәнді алу, `Option`-да `None` қалдырады."
+    },
+    {
+      "id": "rust_book_20_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Соның `drop` шакырылғанда — канал жабылады."
+    },
+    {
+      "id": "rust_book_20_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Барлық жұмысшылар `recv` `Err` алады — олар циклден шығады. `worker.thread.take()` — солай. `JoinHandle`-ды алу, нысан бос қалдыру. `thread.join()` — ағынның аяқталуын күтеді."
+    },
+    {
+      "id": "rust_book_20_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Соларды қалай тестілеу? `main`-да тек алғашқы 2 сұранысты қабылдау шектеуін қойсақ — `for stream in listener.incoming().take(2)`."
+    },
+    {
+      "id": "rust_book_20_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Содан кейін бағдарлама `main`-нен шығады, `pool` `Drop`-қа барады, сервер жайлап тоқтайды."
+    },
+    {
+      "id": "rust_book_20_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Шакырылғанда: 2 сұраныс өңделеді, содан кейін бағдарлама шығу процессін бастайды."
+    },
+    {
+      "id": "rust_book_20_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Шығатыны: Барлығы дұрыс — әр жұмысшы дұрыс тазаланды, ешбір жұмыс жоғалмады. 20.4."
+    },
+    {
+      "id": "rust_book_20_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Финал қорытындысы Сіз `Rust`-тың Book-нің соңғы тарауын тіндеп шықтыңыз."
+    },
+    {
+      "id": "rust_book_20_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бір жобада бар біз үйренгенімізді қолдандық: **TCP программалау** — `TcpListener`, `TcpStream` (16-тарауда айтылған ағындармен бірге). **Қателерді өңдеу** — `unwrap`, `Result` (9-тарау). **Файл оқу** — `fs::read_to_string` (12-тараудан minigrep). **Жабулар мен `Box<dyn FnOnce>`** — `execute(F: FnOnce + Send + 'static)` (13 + 19-тараулар). **Каналдар** — `mpsc::channel` (16-тарау). **`Mutex<T>` пен `Arc<T>`** — receiver-ды бөлу (15 + 16-тараулар). **`Drop` трейті** — жайлап тоқтату (15-тарау). **`Option::take`** — `Option`-да жасырылған мәнді шығарып алу (6 + 15-тараулар)."
+    },
+    {
+      "id": "rust_book_20_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бұл — **сіздің** жасаған `Rust` бағдарламаңыз."
+    },
+    {
+      "id": "rust_book_20_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Шынайы жұмыс жасайды, шынайы инвариантты ұстайды, шынайы жүйелік жоба түрде жүреді."
+    },
+    {
+      "id": "rust_book_20_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Кеңеюі: tokio немесе async-std негізінде асинхронды нұсқасына ауыстыру; HTTP-ді hyper кітапханасына; маршрутизация мен middleware қосу — Rocket немесе Actix-web фреймворктерін зерттеу. `Rust`-та сізге толық экожүйе ашылды."
+    },
+    {
+      "id": "rust_book_20_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Жүйе бағдарламалау, веб, ендірме жүйелер, ойындар, машиналық оқыту — әрбір саланың Rust-та қызықты кітапханалары мен қауымдастығы бар. `Rust` Book — бар Rust оқу жолының бір бөлігі."
+    },
+    {
+      "id": "rust_book_20_0076",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Кейінгі қадамдар: **Rust by Example** — мысалдармен қысқа сабақтар. **Rustlings** — кішкене жаттығулар. **The Rustonomicon** — `unsafe` Rust-тың тереңірек қарастырылуы. **Rust Reference** — тілдің ресми сипаттамасы."
+    },
+    {
+      "id": "rust_book_20_0077",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Қауымдастық: [users.rust-lang.org](https://users.rust-lang.org), [r/rust](https://reddit.com/r/rust), [rust-lang/rust](https://github.com/rust-lang/rust) GitHub-та. `Rust`-та ойдағыдай жобалар жасап шығарыңыз! --- Қазақ тіліндегі аударманың бір қорытындысы Бұл — `Rust` Book-тің 20-тарауының соңы."
+    },
+    {
+      "id": "rust_book_20_0078",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Қазақ тіліне аударылған толық кітап — Тарау 1-ден 20-ға дейін, ~80 000 сөз — енді сіздің қолыңызда."
+    },
+    {
+      "id": "rust_book_20_0079",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бұл — `Rust`-ты қазақ тілінде үйренудің бастапқы ресурсы."
+    },
+    {
+      "id": "rust_book_20_0080",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Терминология `data/world_core/programming_rust.jsonl` файлында тіркелген; пайдалы анықтамалар."
+    },
+    {
+      "id": "rust_book_20_0081",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Аударма — ашық, MIT/Apache-2.0 лицензиясы бойынша."
+    },
+    {
+      "id": "rust_book_20_0082",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Кез келген оқушы, мұғалім, жобалаушы — оны қолдана алады, өзгерте алады, өз жобасына қоса алады."
+    },
+    {
+      "id": "rust_book_20_0083",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Қазақ тілінде сапалы технологиялық оқу-материалдарының жетіспеуі — бар проблеманың бір бөлігі."
+    },
+    {
+      "id": "rust_book_20_0084",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_20",
+      "domain": "programming_rust",
+      "text": "Бұл аударма сол жетіспеушілікті, ең болмаса, бір бөлікте — Rust бағдарламалау тілін үйрену үшін — жабатын шамамыз."
     }
   ]
 }

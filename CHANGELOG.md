@@ -7,6 +7,70 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.20] — 2026-04-29 — Rust Book Chapter 20 (Соңғы жоба: көп ағынды веб-сервер) translated, in pack — **TRANSLATION SERIES COMPLETE**
+
+Twentieth and **final** chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 20 — Final Project: Building a Multithreaded Web Server — the capstone chapter that ties together everything from chapters 1–19 into one real, working program: a multithreaded HTTP server with graceful shutdown.
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_20.md` — ~5 500 words covering:
+  - **20.1 Бір ағынды веб-сервер құру** — `TcpListener::bind`, accepting incoming TCP connections, reading the HTTP request via `BufReader::lines`, the structure of an HTTP request (request-line, headers, blank line, body), writing an HTTP response (status-line, `Content-Length`, body), serving real HTML from a file with `fs::read_to_string`, validating the request line and selecting between `hello.html` and `404.html`.
+  - **20.2 Бір ағынды серверді көп ағындыға айналдыру** — the `/sleep` endpoint demonstrating the single-threaded bottleneck, why per-request `thread::spawn` is wrong (resource exhaustion), the **thread pool** design, the `compiler-driven development` workflow, building `ThreadPool::new(size)` with `mpsc::channel` + `Arc<Mutex<Receiver>>` to share the receiver across workers, the `Worker` struct with id and `JoinHandle`, the `ThreadPool::execute(F: FnOnce() + Send + 'static)` API, the `Job = Box<dyn FnOnce() + Send + 'static>` type alias.
+  - **20.3 Жайлап тоқтау мен тазалау** — the `Drop` trait on `ThreadPool`, dropping `sender` (closing the channel) so workers exit their `recv` loop with `Err`, joining all worker threads, the `Option::take` pattern for safely consuming `JoinHandle` from `&mut self`, the `take(2)` integration test demonstrating clean shutdown.
+- All earlier-chapter terminology applied (web server → веб-сервер, thread pool → ағын-жинағы, worker → жұмысшы, graceful shutdown → жайлап тоқтау, request-line → сұраныс-жол, status-line → жағдай-жол).
+
+### Translation series — final summary
+
+This release closes the Rust Book Kazakh translation series begun in v4.7.1 (Chapter 1). The full series:
+
+| Patch | Chapter | KK title | EN title | Words |
+|---|---|---|---|---|
+| v4.7.1 | 1 | Бастау | Getting Started | ~3 000 |
+| v4.7.2 | 2 | Санды табу ойыны | Programming a Guessing Game | ~3 500 |
+| v4.7.3 | 3 | Жалпы бағдарламалау ұғымдары | Common Programming Concepts | ~5 000 |
+| v4.7.4 | 4 | Иелікті түсіну | Understanding Ownership | ~6 000 |
+| v4.7.5 | 5 | Байланысты деректерді структ арқылы құру | Using Structs to Structure Related Data | ~4 000 |
+| v4.7.6 | 6 | Енам мен үлгіге сай келтіру | Enums and Pattern Matching | ~3 500 |
+| v4.7.7 | 7 | Бумалармен, сандықтармен, модульдермен жобаны басқару | Managing Growing Projects | ~5 000 |
+| v4.7.8 | 8 | Жалпы ұжымдар | Common Collections | ~4 500 |
+| v4.7.9 | 9 | Қатені өңдеу | Error Handling | ~4 000 |
+| v4.7.10 | 10 | Жалпылама типтер, трейттер мен тіршілік мерзімі | Generics, Traits, Lifetimes | ~5 500 |
+| v4.7.11 | 11 | Автоматты сынақтар жазу | Writing Automated Tests | ~4 000 |
+| v4.7.12 | 12 | Кіріс-шығыс жобасы (mini-grep) | An I/O Project | ~5 500 |
+| v4.7.13 | 13 | Функционал тілдік мүмкіндіктер | Iterators and Closures | ~5 000 |
+| v4.7.14 | 14 | Cargo пен Crates.io туралы тереңірек | More about Cargo and Crates.io | ~4 000 |
+| v4.7.15 | 15 | Ақылды сілтемелер | Smart Pointers | ~5 500 |
+| v4.7.16 | 16 | Қорқынышсыз қатарлас орындау | Fearless Concurrency | ~5 500 |
+| v4.7.17 | 17 | Rust-тың объектілі-бағытталған мүмкіндіктері | OOP Features of Rust | ~5 500 |
+| v4.7.18 | 18 | Үлгілер мен сай келтіру | Patterns and Matching | ~4 000 |
+| v4.7.19 | 19 | Жетілдірілген мүмкіндіктер | Advanced Features | ~6 500 |
+| v4.7.20 | 20 | Соңғы жоба: көп ағынды веб-сервер | Final Project: Multithreaded Web Server | ~5 500 |
+
+**Aggregate:** ~95 000 Kazakh words across 20 chapters, ~140 KB of structured prose; 1 543 sentence-level samples in `data/curated/rust_book_kk_pack.json`. Code blocks preserved verbatim from the original throughout. All terminology decisions documented in `data/world_core/programming_rust.jsonl` (110-entry curated glossary) and chapter-by-chapter changelogs above.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 19 chapters / 1 459 samples → **20 chapters / 1 543 samples** (+84 from chapter 20).
+- Morpheme index: **unchanged** at 3 362 morphemes / 22 145 postings / 3 691 indexed samples — pack is at the 500-per-pack default-mode ceiling. To take full advantage of all chapters in retrieval, switching the committed index to `--full` mode is the next architectural step.
+
+### Tests + counters
+
+- E2E threshold stays at ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Twenty consecutive patches (v4.7.1 through v4.7.20) under «каждую главу считать за патч» cadence, no skips. The Rust Book translation thread is now closed.
+
+### What's next (post-v4.7.20)
+
+The Rust Book series is complete. Future v4.7.x patches will likely focus on:
+- Switching the morpheme-index build to `--full` mode so all 1 543 rust_book sentences contribute to retrieval.
+- Other curated knowledge domains (mathematics_basic, informatics_basic) that may benefit from similar chapter-by-chapter expansions.
+- Pipeline tuning — the retrieval ranker now has substantial Rust-domain content to work with.
+
+License & attribution: the Kazakh translation is offered under the same MIT/Apache-2.0 dual license as the original Rust Book, full attribution in `data/raw/rust_book_kk/LICENSE.md`.
+
 ## [4.7.19] — 2026-04-29 — Rust Book Chapter 19 (Жетілдірілген мүмкіндіктер) translated, in pack
 
 Nineteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 19 — Advanced Features — the broadest chapter of the book, surveying five distinct advanced topic areas: **`unsafe` Rust** (the five superpowers — dereferencing raw pointers `*const T` / `*mut T`, calling `unsafe fn`, accessing/modifying `static mut`, implementing an `unsafe trait`, accessing `union` fields; the FFI layer `extern "C"` block and `#[no_mangle]` for outbound; building safe abstractions over unsafe code with the `split_at_mut` worked example); **advanced traits** (associated types `type Item` vs generic `<T>` and why each fits, default generic type parameters with the `Add<Rhs = Self>` operator-overloading example, fully-qualified syntax `<Type as Trait>::method` for disambiguating same-named methods, supertraits with `OutlinePrint: fmt::Display`, the **newtype pattern** for working around the orphan rule); **advanced types** (newtype for type-safety wrappers `struct Years(i64)` / `struct Days(i64)`, type aliases with `type` keyword, the never type `!` and how it unifies with any type, dynamically-sized types `?Sized` and the implicit `Sized` bound on generics); **advanced functions and closures** (function pointers `fn(T) -> U` distinct from `Fn` traits, returning closures via `Box<dyn Fn(...) -> ...>` or `impl Fn(...) -> ...`); **macros** (declarative `macro_rules!` with the `vec!` walkthrough, procedural macros split into derive / attribute / function-like, the `proc-macro` crate convention with `syn` + `quote`).
