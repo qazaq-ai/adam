@@ -368,6 +368,16 @@ const NOT_A_TOPIC: &[&str] = &[
     "та",
     "бе",
     "ма",
+    // **v4.11.7** — Kazakh yes/no question particles (`ба` / `ме`,
+    // sister forms of the existing `бе` / `ма`). Real-REPL test
+    // 2026-04-30: «Сіз қазақша сөйлей аласыз ба?» pre-v4.11.7
+    // extracted `ба` as topic and surfaced a poetry quote about
+    // `ұқпасын ба`. The four-form set (`ба / бе / ма / ме`) is the
+    // closed Kazakh interrogative-particle paradigm, never a
+    // standalone topic noun. The lexicon has `ба` registered as a
+    // particle, but FST occasionally emits a Noun reading too.
+    "ба",
+    "ме",
     // **v4.6.0** — bare numeral roots that the FST occasionally
     // returns as Locative parses of discourse demonstratives.
     // `Онда` ("then / in it") parses as `он + Locative` (root = "он"
@@ -992,6 +1002,9 @@ const MULTIWORD_ENTITIES: &[&str] = &[
     "қолданбалы ғылым",
     "табиғат ғылымы",
     "абстракт ғылым",
+    // **v4.11.7** — `тарихи өңір` (historical region) compound
+    // object from new bare-subject Жетісу / Ұлытау geo_kz entries.
+    "тарихи өңір",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -1664,7 +1677,33 @@ fn detect_ask_about_system(
         || (has_addressee
             && (joined.contains("не істей аласың")
                 || joined.contains("не істей аласыз")
-                || joined.contains("қандай мүмкіндіктер")));
+                || joined.contains("қандай мүмкіндіктер")))
+        // **v4.11.7** — language-capability questions. Real-REPL
+        // 2026-04-30: «Сіз қазақша білесіз бе?» pre-v4.11.7
+        // returned "Түсінбедім." because no detector matched the
+        // {language}-ша + 2nd-person-knowledge-verb pattern.
+        // Routes to Capabilities aspect because
+        // `capabilities_summary` already states «Қазақ тілінде
+        // сөйлесе аламын». Pattern: closed list of common
+        // language adverbs (`қазақша / орысша / ағылшынша /
+        // түрікше`) paired with `білесің / білесіз / сөйлей
+        // аласың / сөйлей аласыз / түсінесің / түсінесіз`.
+        || joined.contains("қазақша білесің")
+        || joined.contains("қазақша білесіз")
+        || joined.contains("қазақша сөйлей аласың")
+        || joined.contains("қазақша сөйлей аласыз")
+        || joined.contains("қазақша түсінесің")
+        || joined.contains("қазақша түсінесіз")
+        || joined.contains("орысша білесің")
+        || joined.contains("орысша білесіз")
+        || joined.contains("орысша сөйлей аласың")
+        || joined.contains("орысша сөйлей аласыз")
+        || joined.contains("ағылшынша білесің")
+        || joined.contains("ағылшынша білесіз")
+        || joined.contains("ағылшынша сөйлей аласың")
+        || joined.contains("ағылшынша сөйлей аласыз")
+        || joined.contains("түрікше білесің")
+        || joined.contains("түрікше білесіз");
     if capabilities_marker {
         return Some(SystemAspect::Capabilities);
     }
@@ -1937,6 +1976,18 @@ fn detect_ask_age(joined: &str) -> bool {
         // correct response for system-self age inquiries.
         || joined.contains("неше жастасың")
         || joined.contains("неше жастасыз")
+        // **v4.11.7** — verb-form variants of the age question.
+        // `жасайсың / жасайсыз` (= 2nd-person of `жасау` "to live")
+        // is colloquial Kazakh for "how old are you?" alongside the
+        // adessive `жастасың / жастасыз`. Live REPL 2026-04-30:
+        // «Қанша жасайсыз?» pre-v4.11.7 returned "Түсінбедім."
+        // because the existing `жастасың/жастасыз` patterns required
+        // the adessive form. Adds the four `қанша/неше + жасайсың/
+        // жасайсыз` permutations; pairs with v4.6.12's adessive set.
+        || joined.contains("қанша жасайсың")
+        || joined.contains("қанша жасайсыз")
+        || joined.contains("неше жасайсың")
+        || joined.contains("неше жасайсыз")
         // v4.4.5 — 1sg self-recall form: "менің жасым қанша?" /
         // "жасым неше?". Pre-v4.4.5 this matched
         // `detect_statement_of_age` (keyed on `жасым`) and emitted

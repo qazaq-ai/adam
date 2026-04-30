@@ -7,6 +7,71 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.11.7] — 2026-04-30 — coverage gap closure: question-particle filter + object-length priority + bare-name geo + birthdate verbs + language-capability detector
+
+User directive 2026-04-30: confirm v4.12.0 readiness via live-REPL test. 20-question battery surfaced 5 systemic gaps that should ship as a patch before the minor bump, so v4.12.0 starts on a clean baseline.
+
+### Innovations bundled (5 patches)
+
+1. **Question-particle filter in `NOT_A_TOPIC`** — added `ба` and `ме` (sister forms of the existing `бе` / `ма`). Real-REPL gap: «Сіз қазақша сөйлей аласыз ба?» pre-v4.11.7 extracted `ба` as topic and surfaced a poetry quote about `ұқпасын ба`. The four-form set (`ба / бе / ма / ме`) is the closed Kazakh interrogative-particle paradigm; the lexicon has `ба` registered as a particle, but FST occasionally emits a Noun reading too.
+
+2. **Object-length component in `user_facing_fact_priority` inverted to longer-wins** — was `+(object.root.chars().count())` (ASC, shorter wins), now `-(...)` (DESC, longer wins). For "what is X?" / "tell me about X" questions, the more informative object wins: `жасуша IsA тіршілік бірлігі` (compound) over `жасуша IsA материя` (bare noun); `физика IsA табиғат ғылымы` (compound) over `физика IsA ғылым`. Pre-v4.11.7 the v4.11.6 length tiebreaker never fired because this priority tier already chose the scant version.
+
+3. **Bare-name geo aliases + case-insensitive subject lookup** — three new geo_kz entries (`geo_kz_112..114`) with bare subjects `жетісу`, `ақмола`, `ұлытау` (oblasts only known via compound subject `<X> облысы` pre-v4.11.7). Plus `Tool::dispatch(SearchGraph)` lowercases the requested subject before equality comparison, so a title-cased proper-noun form like `Ұлытау` (returned by `normalize_proper_noun` when FST has no lemma) matches lowercase world_core subjects. Closes the live-REPL gap on `Жетісу / Ұлытау туралы` queries that pre-v4.11.7 fell to `unknown.tentative` ("Бәлкім, ... айтасыз ба"). +1 compound `тарихи өңір` to MULTIWORD_ENTITIES.
+
+4. **Birthdate detector verb-form variants** — `қанша/неше + жасайсың/жасайсыз` added alongside the existing adessive `жастасың/жастасыз` patterns. `жасайсың/жасайсыз` (= 2nd-person of `жасау` "to live") is colloquial Kazakh for "how old are you?". Real-REPL: «Қанша жасайсыз?» pre-v4.11.7 returned "Түсінбедім" because the existing `жастасың/жастасыз` patterns required the adessive form.
+
+5. **Language-capability detector** — closed list of {language adverb} + {2nd-person knowledge verb} pairs added to `capabilities_marker`. Catches «Сіз қазақша білесіз бе?», «Сіз ағылшынша сөйлей аласыз ба?», «Сен қазақша түсінесің бе?» (and same for орысша/түрікше). Routes to `SystemAspect::Capabilities` so adam surfaces its `capabilities_summary` («Қазақ тілінде сөйлесе аламын; …»). Pre-v4.11.7 these queries returned "Түсінбедім" because no detector matched the `{lang}-ша + білесің/білесіз/сөйлей аласың/сөйлей аласыз/түсінесің/түсінесіз` pattern.
+
+### Pipeline impact
+
+- world_core: 1 622 → **1 625 entries** (+3 bare-name geo); 1 785 → **1 791 facts** (+6 — geo entries carry IsA + PartOf each).
+- `MULTIWORD_ENTITIES` += **1 compound** (`тарихи өңір`).
+- `data/retrieval/facts.json`: rerun-stable.
+
+### Live REPL regression — 20 subject queries
+
+All 20 queries from the empirical 2026-04-30 battery now answer correctly. Sample changes pre-v4.11.7 → post-v4.11.7:
+
+```
+Q: Жасуша туралы айт
+Pre:  Жасуша — тірі материя.
+Post: Жасуша — тірі ағзаның құрылыс және функционалды бірлігі.
+
+Q: Жетісу туралы не білесіз?
+Pre:  Бәлкім, Жетісу туралы айтасыз ба.
+Post: Жетісу — Қазақстанның оңтүстік-шығысындағы тарихи өңір;
+      орталығы Талдықорған қаласы, әкімшілік атауы — Жетісу облысы.
+
+Q: Қанша жасайсыз?
+Pre:  Түсінбедім.
+Post: Менің жасым адамзат жасындай.
+
+Q: Сіз қазақша білесіз бе?
+Pre:  Түсінбедім.
+Post: Қазақ тілінде сөйлесе аламын; есіміңізді, жасыңызды,
+      қалаңызды және мамандығыңызды есте сақтап, …
+
+Q: Сіз қазақша сөйлей аласыз ба?
+Pre:  Ба туралы мынаны айта аламын: «Өз өнері тұр таяу, …»
+Post: Қазақ тілінде сөйлесе аламын; …
+```
+
+### Known remaining limitations (deferred to v4.12+)
+
+- **Causal reasoning**: «Адам, неліктен жасуша өледі?» returns a generic IsA fact instead of a causal chain. Requires the question-form classifier (v4.12.0).
+- **Implementation aspect**: «Сіз қандай бағдарламалау тілінде жазылғансыз?» grounds on the generic `бағдарламалау тілі IsA формалды тіл` instead of `adam writtenIn Rust`. Requires implementation-aspect detection (v4.12.0).
+
+### Tests + counters
+
+- Workspace tests: **749 passing** (unchanged).
+- `validate_world_core`: 1 625 / 1 625 approved / 1 791 facts.
+- Live REPL battery: **20/20 answer correctly** (3 catastrophic + 2 partial gaps closed).
+
+### Cadence
+
+Patch (v4.11.7) — 5 innovations bundled per `feedback_versioning_post_1_0`. Third patch in the v4.12+ humanlike-dialog research arc. Stripe (1) — "answer-by-the-point" fixes — closed for the breadth of single-turn subject queries across all 38 world_core domains. Next: **v4.12.0 — question-form classifier + discourse acknowledgement** (first humanness work).
+
 ## [4.11.6] — 2026-04-30 — universal subject coverage: rich-fact priority + scant cleanup + accusative fallback + adam_self subject claims + REPL baseline
 
 User directive (2026-04-30): «адекватно отвечать по всем предметам — биология, химия, история, не только физика и Rust». Empirical test of 13 subject-related queries pre-v4.11.6 surfaced two systemic gaps: (a) scant duplicate definitions (`Химия — ғылым.`) won the length tiebreaker over rich school definitions; (b) `Адам, сен биологияны білесің бе?` returned bare `Түсінбедім.` because FST has a lexicon gap on accusative-form loanwords.

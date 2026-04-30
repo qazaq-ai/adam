@@ -294,10 +294,23 @@ impl Tool {
                 ToolResult::ok(call, findings, evidence, trace)
             }
             ToolCall::SearchGraph { subject, predicate } => {
+                // **v4.11.7** — case-insensitive subject lookup. The
+                // upstream noun-hint extractor occasionally returns a
+                // title-cased proper-noun form (`Ұлытау` via
+                // `normalize_proper_noun` when the FST has no lemma
+                // for the surface), but world_core stores subjects
+                // lowercase. Pre-v4.11.7 the direct equality
+                // `f.subject.root == *subject` failed on case
+                // mismatch and the planner fell to
+                // `unknown.tentative` ("Бәлкім, Ұлытау туралы
+                // айтасыз ба") even though `subject="ұлытау"` facts
+                // existed. Closes the live-REPL gap on Ұлытау /
+                // Жетісу-style bare proper-noun queries.
+                let subject_lower = subject.to_lowercase();
                 let mut matches: Vec<&ReasFact> = ctx
                     .extracted
                     .iter()
-                    .filter(|f| f.subject.root == *subject)
+                    .filter(|f| f.subject.root.to_lowercase() == subject_lower)
                     .filter(|f| match predicate {
                         Some(p) => predicate_name_matches(f.predicate, p),
                         None => true,
@@ -592,7 +605,7 @@ fn fact_overlap_score(fact: &ReasFact, query_tokens: &[String]) -> usize {
         .count()
 }
 
-fn user_facing_fact_priority(fact: &ReasFact) -> (usize, usize, usize) {
+fn user_facing_fact_priority(fact: &ReasFact) -> (usize, usize, isize) {
     let predicate_rank = match fact.predicate {
         ReasPredicate::IsA => 0,
         ReasPredicate::LivesIn => 1,
@@ -611,10 +624,21 @@ fn user_facing_fact_priority(fact: &ReasFact) -> (usize, usize, usize) {
     } else {
         0
     };
+    // **v4.11.7** — object-length component now NEGATED so longer
+    // objects win in the priority ASC sort. For "what is X?" /
+    // "tell me about X" questions, the more informative object
+    // wins — `жасуша IsA тіршілік бірлігі` (compound) over
+    // `жасуша IsA материя` (bare noun); `физика IsA табиғат
+    // ғылымы` (compound) over `физика IsA ғылым`. Pre-v4.11.7 the
+    // ASC sort preferred shorter objects, which favoured
+    // generic over specific. Live REPL test 2026-04-30 confirmed
+    // the regression on `Жасуша туралы не білесіз?` where the
+    // v4.11.6 length tiebreaker never fired because this priority
+    // tier already chose the scant version.
     (
         predicate_rank,
         subject_surface_rank,
-        fact.object.root.chars().count(),
+        -(fact.object.root.chars().count() as isize),
     )
 }
 
