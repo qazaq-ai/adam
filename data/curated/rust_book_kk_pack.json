@@ -6,9 +6,9 @@
   "source_license": "MIT/Apache-2.0",
   "source_url": "https://doc.rust-lang.org/book/",
   "attribution": "Translated from The Rust Programming Language by Steve Klabnik, Carol Nichols, and the Rust community. Translation maintained by adam project.",
-  "chapters_translated": 14,
-  "sentences_total": 1061,
-  "sample_count": 1061,
+  "chapters_translated": 15,
+  "sentences_total": 1136,
+  "sample_count": 1136,
   "samples": [
     {
       "id": "rust_book_01_0001",
@@ -7436,6 +7436,531 @@
       "source_id": "chapter_14",
       "domain": "programming_rust",
       "text": "Олар арқылы сіз `Rust`-тың иелік ережелерін кеңейтіп, иелікті бөлісу немесе жұмыс уақытында тексеру сияқты сценарийлерді жүзеге асыра аласыз."
+    },
+    {
+      "id": "rust_book_15_0001",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Ақылды сілтемелер **Сілтеме** (`&T`) — `Rust`-тың негізгі мән-сілтеу механизмі."
+    },
+    {
+      "id": "rust_book_15_0002",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бірақ кейде сізге одан да күшті құрылым керек болады: автоматты тазалау, есептеуіш-есеп, бір мәнге бірнеше иеленуші, орындалу кезіндегі қарыз-тексеру."
+    },
+    {
+      "id": "rust_book_15_0003",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Соған **ақылды сілтемелер** (smart pointers) арналған. «Ақылды» сөзі: ол жай көрсеткіш қана емес — оған қосымша мінез-құлық бекітілген."
+    },
+    {
+      "id": "rust_book_15_0004",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Мысалы, иесі аумақтан шыққанда жадты автоматты тазарту, сілтейтін мәнге қол жеткізу синтаксисін қарапайымдау, сілтеулер санын есептеу. `Rust`-тың стандартты кітапханасында бірнеше ақылды сілтеме түрі бар."
+    },
+    {
+      "id": "rust_book_15_0005",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бұл тарауда жиі кездесетіндерін қарастырамыз: **`Box<T>`** — мәнді үймеге орналастырады. **`Rc<T>`** — бір мәнге бірнеше иеленуші болуға мүмкіндік береді (тек бір ағында). **`Ref<T>`** мен **`RefMut<T>`** (қол жеткізу `RefCell<T>` арқылы) — орындалу кезінде қарыз ережелерін тексереді. **`Weak<T>`** — иеленуші емес, әлсіз сілтеме (циклдерді болдырмау үшін)."
+    },
+    {
+      "id": "rust_book_15_0006",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бұл тарау сізге стандартты сілтемелерден шектеу нәрсе керек болғанда қандай таңдау жасау керектігін, әр құралдың айырмашылықтарын көрсетеді. 15.1. `Box<T>` — мәнге үймеде сілтеу `Box<T>` — `Rust`-тың ең қарапайым ақылды сілтемесі."
+    },
+    {
+      "id": "rust_book_15_0007",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Ол мәнді стектен үймеге шығарып, оған сілтеме сақтайды."
+    },
+    {
+      "id": "rust_book_15_0008",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Әдеттегі айнымалымен айырмашылық: `b` стекте тұрған сілтеме (Box-тың өзі), ал нақты `5` саны — үймеде."
+    },
+    {
+      "id": "rust_book_15_0009",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бұл жалғыз ғана көрінбейтін қосым — сипат бейтарап сезілмейді. `Box<T>`-тың пайдасы келесі жағдайларда көрінеді: Сізге компиляция кезінде мөлшері белгісіз тип қажет, бірақ оны нақты мөлшері белгілі контексте қолданғыңыз келеді."
+    },
+    {
+      "id": "rust_book_15_0010",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Сізге өте үлкен мәнді көшіруге емес, иелікті ауыстыруға қажет болғанда."
+    },
+    {
+      "id": "rust_book_15_0011",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Сізге белгілі бір мәнді ие болу қажет, бірақ оның қандай нақты типке жататынын маңызсыз — тек қандай трейтті бекіткені."
+    },
+    {
+      "id": "rust_book_15_0012",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Рекурсивті типтер Қарапайым мысал: cons-тізім (LISP-тен келген рекурсивті тізім)."
+    },
+    {
+      "id": "rust_book_15_0013",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Әр элемент келесі элементті ұстайды, тізім соңы — `Nil` нұсқасы."
+    },
+    {
+      "id": "rust_book_15_0014",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бұл құрастырылмайды: `Rust` `List`-тің мөлшерін есептей алмайды. `Cons(i32, List)` — `i32` плюс тағы бір `List`."
+    },
+    {
+      "id": "rust_book_15_0015",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Ал `List`-тің мөлшері = `i32` + тағы бір `List`-тің мөлшері."
+    },
+    {
+      "id": "rust_book_15_0016",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Тізбек шексіз — мөлшерсіз."
+    },
+    {
+      "id": "rust_book_15_0017",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Шешімі — `Box`: Енді `Cons` ішіндегі `List` — `Box<List>`-ке (фиксацияланған мөлшерлі сілтеме) сай."
+    },
+    {
+      "id": "rust_book_15_0018",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Компилятор `List`-тің мөлшерін есептей алады: `i32` + `Box`-тың мөлшері (көрсеткіш — әдетте 8 байт). Cons-тізімді жасау: Бұл `1 → 2 → 3 → Nil` тізбегі. `Box` рекурсивті типті жұмыстайды. 15.2. `Deref` трейті — ақылды сілтемені қарапайым сілтеме сияқты пайдалану `*` операторы (дереф-оператор) кәдімгі сілтемені оның ішіндегі мәнге түрлендіреді. `*&5` — 5 саны. `Box<T>` те солай: `*Box::new(5)` — 5 саны."
+    },
+    {
+      "id": "rust_book_15_0019",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бұл жұмысты `Deref` трейті бекітеді."
+    },
+    {
+      "id": "rust_book_15_0020",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Сіз өзіңіздің ақылды сілтемені жасап, оған `Deref` бекітсеңіз — `*` операторы соған да арнап жұмыс істейді."
+    },
+    {
+      "id": "rust_book_15_0021",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Өзіндік ақылды сілтеме жасау `MyBox<T>` атты қарапайым нұсқаны жазайық: Бұл жай ғана структ, ішінде бір мән бар."
+    },
+    {
+      "id": "rust_book_15_0022",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Қазірге `MyBox`-та `*` оператор жұмыс істемейді: `Deref` бекітсек: `Deref::deref` ішкі мәнге сілтеме қайтарады."
+    },
+    {
+      "id": "rust_book_15_0023",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Енді `*y` жұмыс істейді — компилятор оны `*(y.deref())` деп қарайды."
+    },
+    {
+      "id": "rust_book_15_0024",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Деref-итеру (Deref Coercion) `Rust`-тың тағы бір ыңғайлы мүмкіндігі — **деref-итеру**: `&T` керек жерде сіз `&Smart<T>` берсеңіз, компилятор автоматты түрде `Deref`-ті қолданып түрлендіреді."
+    },
+    {
+      "id": "rust_book_15_0025",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Мысалы, `&str` күтетін функция бар: `&m` — `&MyBox<String>`."
+    },
+    {
+      "id": "rust_book_15_0026",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бірақ `hello` `&str` күтеді."
+    },
+    {
+      "id": "rust_book_15_0027",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Деref-итеру: `&MyBox<String>` → `MyBox::deref` → `&String` `&String` → `String::deref` → `&str` Екі қадамды компилятор автоматты жасайды."
+    },
+    {
+      "id": "rust_book_15_0028",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Сіз кодта `&m` жазсаңыз да — функция `&str` алады."
+    },
+    {
+      "id": "rust_book_15_0029",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бұл — өте ыңғайлы. `&String`-ті алатын жерлерде `&Box<String>`, `&Rc<String>`, `&MyBox<String>` — бәрі сай. 15.3. `Drop` трейті — тазалау логикасын орындау `Drop` трейті — мән аумақтан шыққанда орындалатын кодты бекітеді. `Box`, `String`, `Vec` — бәрі `Drop` арқылы өздерінің жадын тазартады."
+    },
+    {
+      "id": "rust_book_15_0030",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Мысал: Шығаратыны: Соңғы екі жол — `main` бітпей `drop` функциялары шакырылды."
+    },
+    {
+      "id": "rust_book_15_0031",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Тазалау — кері тәртіппен (соңғы жасалғандай — алдында тазаланады)."
+    },
+    {
+      "id": "rust_book_15_0032",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Мерзімінен бұрын `drop` шакыру `drop` әдісін қолмен шакыру тыйым салынған — өйткені сонда мән екі рет тазалану қаупі туады."
+    },
+    {
+      "id": "rust_book_15_0033",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бірақ `std::mem::drop` функциясы сізге мәнді мерзімінен бұрын тазалатуға мүмкіндік береді: Шығатыны: `std::mem::drop` иелікті алады, `drop` функциясын шакырады, мәнді тазартады. 15.4. `Rc<T>` — есептелетін иеленушілер ақылды сілтемесі `Box<T>` бір ие — мәннің бір ғана иесі."
+    },
+    {
+      "id": "rust_book_15_0034",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Кей жағдайда сізге **бірнеше ие** қажет: бір мәнге бірнеше нысан сілтейтін болуы керек, мәннің тазалануы — соңғысы кеткеннен кейін болсын."
+    },
+    {
+      "id": "rust_book_15_0035",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Соған `Rc<T>` (Reference Counted) арналған."
+    },
+    {
+      "id": "rust_book_15_0036",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Ол ішкі есептеуішті ұстайды; әр клон есептеуішті бір көтереді, әр `drop` бір азайтады; есептеуіш нөлге жетсе — мән тазаланады. > **Маңызды ескерту:** `Rc<T>` тек **бір ағында** қолдануға арналған. > Ағындар арасында бөлесу үшін `Arc<T>` бар (16-тарауда қарастырамыз). `Rc<T>` мысалы Cons-тізіммен қайталайық, бірақ екі тізім бір бөлікті ортақ ие болсын: Шығатыны: Әр `Rc::clone` есептеуішті бір көтерді, әрі `c` аумақтан шыққан кезде оның `drop` есептеуішті бір азайтты. `a`-ның мәні әлі бар — `b` оны ие. `Rc::clone` — арзан: ол үймеде орналасқан мәнді **көшірмейді**, тек есептеуішті бір көтереді. `String::clone`-мен шатастырмаңыз: ол шынында жадты дублирлейді. `Rc<T>` тек **тұрақты сілтеме** — оның мәнін өзгерту мүмкін емес."
+    },
+    {
+      "id": "rust_book_15_0037",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бірнеше ие бір мәнді өзгертсе — әркімнің көзқарасы мәнге басқа болу мүмкін."
+    },
+    {
+      "id": "rust_book_15_0038",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Сондықтан `Rc<T>` көп оқитын, азғантай өзгертетін деректерге ыңғайлы. 15.5. `RefCell<T>` мен ішкі өзгермелілік үлгісі Қарапайым `Rust`-та қарыз ережелері — компиляция кезінде."
+    },
+    {
+      "id": "rust_book_15_0039",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бірақ кейбір тестілеу мен жобалар үшін бұл шектен тыс қатаң. **Ішкі өзгермелілік (interior mutability)** — бір тип сырттан тұрақты сияқты көрінсе де, ішінен мәнін өзгерте алатын үлгі."
+    },
+    {
+      "id": "rust_book_15_0040",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Сонымен қатар қарыз ережелері сақталатынын жұмыс уақытында тексереміз."
+    },
+    {
+      "id": "rust_book_15_0041",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Соған `RefCell<T>` арналған. `RefCell<T>` пен жұмыс уақытындағы қарыз тексеру `RefCell<T>` бекіткен мәнді сыртқы көрініс **тұрақты** болады."
+    },
+    {
+      "id": "rust_book_15_0042",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бірақ ішінде өзгертуге келеді: `borrow()` — `Ref<T>` (тұрақты сілтеме) қайтарады. `borrow_mut()` — `RefMut<T>` (өзгермелі сілтеме) қайтарады. `RefCell<T>` есептеуішті ұстайды: қанша белсенді тұрақты, қанша өзгермелі сілтеме бар."
+    },
+    {
+      "id": "rust_book_15_0043",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Қарыз ережелері бұзылса — `panic!`: Бір уақытта тек **бір** өзгермелі сілтеме болуы мүмкін."
+    },
+    {
+      "id": "rust_book_15_0044",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Немесе **көп** тұрақты сілтеме."
+    },
+    {
+      "id": "rust_book_15_0045",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Айырмашылығы тек: тексеру **жұмыс кезінде** жүреді."
+    },
+    {
+      "id": "rust_book_15_0046",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Компилятор келісімсіз болғанда — `RefCell` оны ұстайды."
+    },
+    {
+      "id": "rust_book_15_0047",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Өзгермелілік ішке шегеру қажет ме?"
+    },
+    {
+      "id": "rust_book_15_0048",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Әдетте керек емес. `Rust`-тың дизайны сізге өзгермелілікті анық білдіруге шакырады."
+    },
+    {
+      "id": "rust_book_15_0049",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бірақ кейде: Тестілеу барысында **mock-нысан** жасау керек. Mock — нақты тип сияқты көрінетін, бірақ сынақ ішінде есептегі сақтайтын дайындалмыш нысан. Tip-тің әдістері `&self` ала отырып, ол ішкі есептегін өзгертуі керек."
+    },
+    {
+      "id": "rust_book_15_0050",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Сондай — `RefCell` арқылы."
+    },
+    {
+      "id": "rust_book_15_0051",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Графты немесе циклдік құрылымды жасау керек."
+    },
+    {
+      "id": "rust_book_15_0052",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Стандартты ережелер тым қатаң болады."
+    },
+    {
+      "id": "rust_book_15_0053",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Ережені қысқа есте сақтаңыз: алдымен компиляция-кездік қарыз-тексеруді қолданыңыз. `RefCell`-ді тек шынында қажет болғанда. Mock-нысан мысалы Аналогты қажетті жұмысын тестілеу үшін: `Messenger` трейті `send(&self, ...)` бекітеді — өзгермейтін интерфейс."
+    },
+    {
+      "id": "rust_book_15_0054",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бірақ `MockMessenger` тестілеу барысында хабарламаларды есептеуі керек. `RefCell` арқылы `send` ішінде ішкі векторды өзгерте аламыз. `Rc<T>` пен `RefCell<T>` бірге Кейде бізге **бірнеше иеленуші** бар, әрі **өзгертуге болатын** тип қажет."
+    },
+    {
+      "id": "rust_book_15_0055",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Шешімі: `Rc<RefCell<T>>`. `value` 5-ке тағайындалған; кейін біз оны 15-ке өзгертеміз."
+    },
+    {
+      "id": "rust_book_15_0056",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Ол `a`, `b`, `c` — үш тізімнің ортақ бөлігі."
+    },
+    {
+      "id": "rust_book_15_0057",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Барлық үшеуі жаңартылған мәнді көреді. 15.6."
+    },
+    {
+      "id": "rust_book_15_0058",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Сілтеме циклдары жадтың ағытпасына апаруы мүмкін `Rust`-тың иелік жүйесі ерекше: ол сізге қауіпсіз код жазуды кепілдейді, бірақ **ағытпаны** (memory leak) толық алып тастамайды. `Rc<T>` мен `RefCell<T>` бірге **сілтеме циклы** жасауға мүмкіндік береді: екі мән бір-біріне сілтейді, есептеуіштер ешқашан нөлге жетпейді, жад босатылмайды."
+    },
+    {
+      "id": "rust_book_15_0059",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Мысалы, тізімнің бір элементі екіншіге сілтейді, екіншісі — біріншіге. `Rc::strong_count` екеуінде де 1-ден жоғары — ешбір аумақ шықпайды, ешбір тазалау болмайды."
+    },
+    {
+      "id": "rust_book_15_0060",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бұл — ағытпа."
+    },
+    {
+      "id": "rust_book_15_0061",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бағдарлама орналасты бекіттеу, бірақ жадын ұзақ ұстайды. `Weak<T>` арқылы циклдерді болдырмау `Rc<T>` — **күшті** сілтеме."
+    },
+    {
+      "id": "rust_book_15_0062",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Оның есептеуіші иелік сипатын білдіреді: есептеуіш нөлге жетпегенше — мән өшпейді. `Weak<T>` — **әлсіз** сілтеме."
+    },
+    {
+      "id": "rust_book_15_0063",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Ол есептеуішке әсер етпейді (`weak_count` бөлек есептеуіш)."
+    },
+    {
+      "id": "rust_book_15_0064",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Иелік ережесі: мәнді тек күшті сілтемелер ұстайды."
+    },
+    {
+      "id": "rust_book_15_0065",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Күшті есептеуіш нөлге жетсе — мән тазаланады, әлсіз сілтемелер бос болады. `Weak<T>`-тің мәніне қол жеткізу үшін `upgrade` әдісі: ол `Option<Rc<T>>` қайтарады."
+    },
+    {
+      "id": "rust_book_15_0066",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Мән әлі тірі болса — `Some(Rc::clone)`."
+    },
+    {
+      "id": "rust_book_15_0067",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Тазаланған болса — `None`."
+    },
+    {
+      "id": "rust_book_15_0068",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Атасы-баласы құрылымы Мысал — атасы мен баласы: ата бар балаларға күшті сілтейді, бала атасына әлсіз сілтейді."
+    },
+    {
+      "id": "rust_book_15_0069",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Цикл жоқ — ата кеткенде бала да жоғалады; бала кеткенде ата сақталады (өйткені бала оны әлсіз ұстайды). `Rc::downgrade(&branch)` — `Weak<Node>` жасайды. `branch` — `leaf`-тің ата-нысаны; `leaf.parent` — `branch`-қа әлсіз сілтеме."
+    },
+    {
+      "id": "rust_book_15_0070",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Цикл жоқ — есептеуіштер дұрыс жұмыс істейді. `leaf.parent.borrow().upgrade()` — `Option<Rc<Node>>`."
+    },
+    {
+      "id": "rust_book_15_0071",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Ата тірі болса — сізге `Rc<Node>` беріледі. 15.7."
+    },
+    {
+      "id": "rust_book_15_0072",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Тарау қорытындысы Ақылды сілтемелер `Rust`-тың сілтеме жүйесінің кеңейтілген бөлігі."
+    },
+    {
+      "id": "rust_book_15_0073",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Әр жұмыс түрі үшін өзіндік құралы бар: **`Box<T>`** — үймеде сақтау, рекурсивті типтер, белгісіз-мөлшерлі типтер. **`Rc<T>`** — бірнеше ие, тек оқуға арналған, бір ағында. **`RefCell<T>`** — ішкі өзгермелілік, орындалу кезіндегі қарыз тексеру. **`Weak<T>`** — ие емес сілтеме, циклдерді болдырмау үшін. **`Deref`** трейті — `*` операторын өзіңіздің ақылды сілтемелеріңізге бекіту, деref-итеру. **`Drop`** трейті — мән аумақтан шыққанда тазалау логикасы."
+    },
+    {
+      "id": "rust_book_15_0074",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Бұл құралдар көпшілігі бір ағындағы қолданысқа арналған."
+    },
+    {
+      "id": "rust_book_15_0075",
+      "pack_name": "adam-rust-book-kk-pack",
+      "source_id": "chapter_15",
+      "domain": "programming_rust",
+      "text": "Көп ағынды бағдарламалар — олардың `Arc<T>` пен `Mutex<T>` нұсқалары — келесі тарауда қарастырылатын болады."
     }
   ]
 }

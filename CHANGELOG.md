@@ -7,6 +7,29 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.7.15] — 2026-04-29 — Rust Book Chapter 15 (Ақылды сілтемелер) translated, in pack
+
+Fifteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 15 — Smart Pointers — covering Rust's smart-pointer ecosystem and how each kind extends the basic reference model: `Box<T>` for heap allocation and recursive types (the cons-list example showing why a recursive enum's size is unbounded without `Box`); the `Deref` trait and how it enables `*` on smart pointers (writing a `MyBox<T>` from scratch and implementing `Deref::deref`), deref coercion as the compiler-driven chain `&MyBox<String>` → `&String` → `&str`; the `Drop` trait for cleanup logic that runs when a value goes out of scope, why `drop()` may not be called manually but `std::mem::drop` may be; `Rc<T>` for multiple ownership in single-threaded contexts (the cons-list example showing how cloning increments `strong_count`, why `Rc<T>` is read-only); `RefCell<T>` and the **interior mutability** pattern that defers borrow checking to runtime (the mock-object pattern, panic on rule violation); combining `Rc<RefCell<T>>` for the shared-ownership-with-mutation use case; reference cycles as a memory-leak shape Rust's ownership system does not prevent, and `Weak<T>` references that don't extend the lifetime of the pointed-to value (the parent-child node tree example with strong children + weak parent links).
+
+### Translation
+
+- New `data/raw/rust_book_kk/chapter_15.md` — ~5 500 words, code blocks preserved verbatim, all earlier-chapter terminology applied.
+- Chapter-15-specific terminology decisions: smart pointer → **ақылды сілтеме** (already locked since v4.7.0), recursive type → **рекурсивті тип**, deref coercion → **деref-итеру**, interior mutability → **ішкі өзгермелілік**, mock object → **mock-нысан**, reference count → **сілтемелер санағы**, reference cycle → **сілтеме циклы**, memory leak → **жад ағытпасы**, weak reference → **әлсіз сілтеме**, `Rc::strong_count` / `Rc::weak_count` → kept verbatim.
+
+### Pipeline impact
+
+- `data/curated/rust_book_kk_pack.json`: 14 chapters / 1 061 samples → **15 chapters / 1 136 samples** (+75 from chapter 15).
+- Morpheme index: **unchanged** — pack still at the 500-per-pack default-mode ceiling.
+
+### Tests + counters
+
+- E2E threshold remains ≥490.
+- Workspace tests: **745 passing**.
+
+### Cadence
+
+Per «каждую главу считать за патч»: each chapter = +1 patch. Next: v4.7.16 = Chapter 16 (Fearless Concurrency — threads, message passing with `mpsc`, shared state with `Mutex<T>` + `Arc<T>`, the `Send` and `Sync` traits).
+
 ## [4.7.14] — 2026-04-29 — Rust Book Chapter 14 (Cargo пен Crates.io туралы тереңірек) translated, in pack
 
 Fourteenth chapter under «глава = патч» cadence. Full Kazakh translation of Rust Book Chapter 14 — More about Cargo and Crates.io — covering the day-to-day Cargo features that go beyond the basic build/run cycle: customising builds with **release profiles** (`[profile.dev]` vs `[profile.release]`, `opt-level` 0 → 3); publishing crates to **crates.io** (writing useful doc comments with `///`, the testable-examples gate via `cargo test`, contained-item comments with `//!`, exporting a convenient public API with `pub use` re-exports, the crates.io account + API token + `cargo login` workflow, required `Cargo.toml` metadata fields, the publish process with `cargo publish` and the irreversibility of publication, semantic-versioning bumps for new versions, deprecating versions with `cargo yank`); Cargo **workspaces** for multi-crate projects (the root `Cargo.toml` `[workspace]` section, member crates, internal `path = "..."` dependencies, the shared `target/` and `Cargo.lock`); installing **binary crates** with `cargo install` (the `~/.cargo/bin/` install location, the `ripgrep` example); extending Cargo with **custom commands** (the `cargo-foo` → `cargo foo` convention, popular extensions like `cargo-edit`, `cargo-watch`, `cargo-audit`, `cargo-tree`).
