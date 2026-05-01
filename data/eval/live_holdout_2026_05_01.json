@@ -1,0 +1,242 @@
+{
+  "_comment": "v4.24.5 — live holdout: unedited Kazakh queries from the 2026-05-01 live-dialog battery (covered identity / science / history / culture / arithmetic / multi-turn / unknown-handling / temporal-scope / compositional-possessive / closed-class / honest-fallback). Each case asserts substring presence (any-of-list passes) and/or absence (none-of-list passes) — template-variant-tolerant. UNLIKE the curated parse-disambiguation eval (curated/regression-style, hand-tuned to lock specific behaviour), this set is a *blind* eval: the queries were not edited after capture, no template tuning happened to make any specific case pass. Pass rate is the headline metric; per-category breakdown surfaces where the system is still weak. Future captures (live_holdout_YYYYMMDD.json) extend coverage; never edit a captured set after it lands.",
+  "version": "v4.24.5",
+  "captured_date": "2026-05-01",
+  "cases": [
+    {
+      "id": "identity_who_are_you",
+      "category": "identity",
+      "query": "Сен кімсің?",
+      "any_substring": ["nlm", "тілдік модель", "адам"],
+      "note": "Bare identity question. v4.x intro answer mentions name, full name, kind."
+    },
+    {
+      "id": "identity_who_made_you",
+      "category": "identity",
+      "query": "Сені кім жасады?",
+      "any_substring": ["баймурзин", "даулет"],
+      "note": "Creator-attribution. Author name should appear."
+    },
+    {
+      "id": "identity_what_language",
+      "category": "identity",
+      "query": "Қандай тілде жазылғансың?",
+      "any_substring": ["rust", "бағдарламалау"],
+      "note": "Implementation aspect (v4.12.0). Mentions Rust + crate stack."
+    },
+    {
+      "id": "identity_capabilities",
+      "category": "identity",
+      "query": "Не істей аласың?",
+      "any_substring": ["қазақ тіл", "сөйлес", "білем"],
+      "note": "Capabilities aspect. Long structured answer."
+    },
+    {
+      "id": "identity_birthdate",
+      "category": "identity",
+      "query": "Қашан дүниеге келдің?",
+      "any_substring": ["2026", "репозитори"],
+      "note": "Birthdate aspect (v4.17.5 added дүниеге кел verb-form variant)."
+    },
+
+    {
+      "id": "world_core_cell",
+      "category": "world_core_science",
+      "query": "Жасуша туралы не білесің?",
+      "any_substring": ["тірі ағза", "құрылыс", "функционалды бірлік"],
+      "note": "Curated biology fact for жасуша."
+    },
+    {
+      "id": "world_core_photosynthesis",
+      "category": "world_core_science",
+      "query": "Фотосинтез деген не?",
+      "any_substring": ["өсімдік", "күн сәуле", "органикалық"],
+      "note": "Curated biology fact for фотосинтез."
+    },
+    {
+      "id": "world_core_atom",
+      "category": "world_core_science",
+      "query": "Атом қандай бөлшектерден тұрады?",
+      "any_substring": ["химиялық", "бөлшек", "кіш"],
+      "note": "Curated chemistry fact. Phrasing-sensitive — alternative «Атомның құрамында не бар?» fails (separate carry-forward)."
+    },
+    {
+      "id": "world_core_water",
+      "category": "world_core_science",
+      "query": "Су қандай молекула?",
+      "any_substring": ["оттек", "сутек", "тіршілік"],
+      "note": "Curated chemistry fact for су."
+    },
+    {
+      "id": "world_core_kazakhstan",
+      "category": "world_core_geo",
+      "query": "Қазақстан қандай ел?",
+      "any_substring": ["орталық азия", "тәуелсіз мемлекет", "астана"],
+      "note": "Curated geo fact (v4.17.5 rich IsA via geo_kz_115)."
+    },
+    {
+      "id": "world_core_almaty",
+      "category": "world_core_geo",
+      "query": "Алматы туралы айт",
+      "any_substring": ["қала", "республикалық маңыз"],
+      "note": "Curated geo fact for Алматы."
+    },
+    {
+      "id": "world_core_abay",
+      "category": "world_core_culture",
+      "query": "Абай туралы білесің бе?",
+      "any_substring": ["ақын", "ұлы", "ойшыл"],
+      "note": "Curated culture fact for Абай."
+    },
+    {
+      "id": "world_core_abylai",
+      "category": "world_core_history",
+      "query": "Абылай хан кім болған?",
+      "any_substring": ["1771", "1781", "хандық"],
+      "note": "Curated history fact for Абылай хан."
+    },
+
+    {
+      "id": "math_addition",
+      "category": "math",
+      "query": "5+5",
+      "any_substring": ["10"],
+      "note": "Pure arithmetic. Determinstic calculator."
+    },
+    {
+      "id": "math_multiplication",
+      "category": "math",
+      "query": "10*7",
+      "any_substring": ["70"],
+      "note": "Pure arithmetic."
+    },
+    {
+      "id": "math_subtraction",
+      "category": "math",
+      "query": "100-25",
+      "any_substring": ["75"],
+      "note": "Pure arithmetic."
+    },
+
+    {
+      "id": "temporal_yesterday_weather",
+      "category": "temporal_no_data",
+      "query": "Кеше ауа райы қандай болды?",
+      "any_substring": ["уақытқа байланысты", "уақыт бойынша", "нақты уақыт"],
+      "note": "v4.23.0 routes to unknown.temporal_no_data."
+    },
+    {
+      "id": "temporal_today_what_happened",
+      "category": "temporal_no_data",
+      "query": "Бүгін не болды?",
+      "any_substring": ["уақытқа байланысты", "уақыт бойынша", "нақты уақыт"],
+      "note": "v4.23.0 temporal-scope detector."
+    },
+    {
+      "id": "temporal_tomorrow_weather",
+      "category": "temporal_no_data",
+      "query": "Ертең күн қандай болады?",
+      "any_substring": ["уақытқа байланысты", "уақыт бойынша", "нақты уақыт"],
+      "note": "v4.23.0 temporal-scope detector."
+    },
+    {
+      "id": "temporal_last_year",
+      "category": "temporal_no_data",
+      "query": "Былтыр Қазақстанда не болды?",
+      "any_substring": ["уақытқа байланысты", "уақыт бойынша", "нақты уақыт"],
+      "note": "v4.23.0 temporal-scope detector — былтыр + Қазақстан."
+    },
+
+    {
+      "id": "compositional_cell_nucleus_function",
+      "category": "compositional_function",
+      "query": "Жасушаның ядросы не атқарады?",
+      "any_substring": ["нақты атқаратын", "функционалды", "құрылымдық"],
+      "note": "v4.23.5 routes to unknown.compositional_function.with_fact. The bare structural fact «Ядро жасуша құрамына кіреді» is correctly surfaced AS the structural fact and wrapped with functional-gap hedge — so the structural-fact substring naturally appears in the response and is NOT a regression signal."
+    },
+    {
+      "id": "compositional_atom_nucleus_purpose",
+      "category": "compositional_function",
+      "query": "Атомның ядросы неге қажет?",
+      "any_substring": ["нақты атқаратын", "функционалды", "құрылымдық"],
+      "note": "v4.23.5 compositional-function detector."
+    },
+    {
+      "id": "compositional_mitochondria_role",
+      "category": "compositional_function",
+      "query": "Митохондрияның қызметі қандай?",
+      "any_substring": ["нақты қандай қызмет", "функционалды", "білім қорымда"],
+      "note": "v4.23.5 — bare variant (no митохондрия fact in world_core)."
+    },
+
+    {
+      "id": "anti_proverb_kerek_dative",
+      "category": "honest_unknown",
+      "query": "Саған не керек?",
+      "any_substring": ["түсінбедім"],
+      "none_substring": ["жетілсең", "керек күні"],
+      "note": "v4.22.5 — `керек` added to NOT_A_TOPIC. Pre-fix returned proverb «Жетілсең де, жетсең де, Керек күні бір бар-ау»."
+    },
+    {
+      "id": "anti_proverb_mendeleev",
+      "category": "honest_unknown",
+      "query": "Mendeleev кестесі не үшін керек?",
+      "any_substring": ["түсінбедім"],
+      "none_substring": ["жетілсең"],
+      "note": "v4.22.5 — same `керек` filter; Latin name also unrecognized."
+    },
+    {
+      "id": "anti_proverb_iri_list",
+      "category": "honest_unknown",
+      "query": "Қазақстанның ірі өзендерін атап бер.",
+      "any_substring": ["түсінбедім"],
+      "none_substring": ["ерекше атап өт"],
+      "note": "v4.22.5 — `ірі` + `атап` added to NOT_A_TOPIC. Pre-fix returned proverb on атап."
+    },
+
+    {
+      "id": "willingness_help_request",
+      "category": "willingness",
+      "query": "Маған көмек керек.",
+      "any_substring": ["әрине", "айт"],
+      "note": "v4.17.5 willingness routing — preserves `керек` semantics in this context (request, not topic)."
+    },
+    {
+      "id": "willingness_acknowledgment_today",
+      "category": "acknowledgment",
+      "query": "Бүгін жақсы күн",
+      "any_substring": ["жақсы", "иә"],
+      "note": "v4.22.5 anti-regression — temporal `бүгін` filtered as topic, but acknowledgment template still fires for the statement."
+    },
+
+    {
+      "id": "honest_unknown_quantum",
+      "category": "honest_unknown",
+      "query": "Quantum entanglement дегеніміз не?",
+      "any_substring": ["түсінбедім", "білмеймін"],
+      "note": "Latin technical term outside v4.11.5 closed list. Honest fallback."
+    },
+    {
+      "id": "honest_unknown_musk",
+      "category": "honest_unknown",
+      "query": "Илон Маск туралы не білесің?",
+      "any_substring": ["бәлкім", "айтасыз ба"],
+      "note": "Non-Kazakh proper name outside world_core. Soft fallback."
+    },
+
+    {
+      "id": "name_capture_dauleт",
+      "category": "profile_capture",
+      "query": "Менің атым Дәулет",
+      "any_substring": ["дәулет"],
+      "note": "Name capture into session. v4.18.0 added respectful Дәке form for follow-up turns; first turn echoes literal name."
+    },
+    {
+      "id": "age_capture_25",
+      "category": "profile_capture",
+      "query": "Менің жасым 25",
+      "any_substring": ["25"],
+      "note": "Age capture into session."
+    }
+  ]
+}

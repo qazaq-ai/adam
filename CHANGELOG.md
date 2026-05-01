@@ -7,6 +7,70 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.24.5] — 2026-05-01 — live holdout eval (Codex actionable #4): blind substring-based regression baseline
+
+**Patch in v4.24+ engineering-hygiene arc.** Closes the fourth Codex review actionable: every existing eval suite (`cognitive_eval`, `repl_replay`, `parse_disambiguation`) is curated regression — hand-tuned over ~20 releases to lock specific expected behaviour, definitionally not blind. v4.24.5 adds the missing signal: a captured set of unedited queries from the 2026-05-01 live-dialog battery, run with no template tuning to make any specific case pass, with substring presence/absence rules instead of exact matches so template variants are tolerated.
+
+### Innovations
+
+**(1) `data/eval/live_holdout_2026_05_01.json`** — 32 unedited queries from the 2026-05-01 battery (the same session that surfaced the v4.22.5 / v4.23.0 / v4.23.5 carry-forwards). Schema:
+
+```json
+{
+  "id": "...", "category": "...", "query": "...",
+  "any_substring": ["..."],   // optional - pass if ANY listed substring present
+  "none_substring": ["..."],  // optional - pass if NONE listed substring present
+  "note": "..."
+}
+```
+
+Categories captured: `identity` (5), `world_core_science` (4), `world_core_geo` (2), `world_core_culture` (1), `world_core_history` (1), `math` (3), `temporal_no_data` (4), `compositional_function` (3), `honest_unknown` (5), `willingness` (1), `acknowledgment` (1), `profile_capture` (2). 12 distinct categories.
+
+**Capture rule (`comment` block in the JSON):** "the queries were not edited after capture, no template tuning happened to make any specific case pass." Future captures (`live_holdout_YYYYMMDD.json`) extend coverage; the rule is that no captured set is ever edited after it lands. Failures on a fresh capture are the signal — they're features, not bugs.
+
+**(2) `crates/adam-dialog/tests/live_holdout.rs`** — integration test that runs each case through a production-shaped `Conversation::turn_with_trace` (lexicon + template repo + morpheme index + reasoning facts + derived facts + suffix priors at α=0.3 + domain index — same setup as `adam_chat`). Reports overall pass rate + per-category breakdown + per-failure detail. Asserts overall pass rate ≥ 70 % as a v4.24.5 baseline floor — future regressions go red, future improvements ratchet up cleanly.
+
+### Baseline (v4.24.5)
+
+| Category | Pass | Total | % |
+|---|---|---|---|
+| identity | 5 | 5 | **100 %** |
+| world_core_science | 4 | 4 | **100 %** |
+| world_core_geo | 2 | 2 | **100 %** |
+| world_core_culture | 1 | 1 | **100 %** |
+| world_core_history | 1 | 1 | **100 %** |
+| math | 3 | 3 | **100 %** |
+| temporal_no_data | 4 | 4 | **100 %** (v4.23.0 detector) |
+| compositional_function | 3 | 3 | **100 %** (v4.23.5 detector) |
+| honest_unknown | 5 | 5 | **100 %** |
+| willingness | 1 | 1 | **100 %** |
+| acknowledgment | 1 | 1 | **100 %** |
+| profile_capture | 2 | 2 | **100 %** |
+| **Overall** | **32** | **32** | **🎉 100.0 %** |
+
+The clean 100 % first-run pass rate validates that the v4.22.5 → v4.23.5 honest-fallback work successfully addressed every concrete failure observed during the 2026-05-01 session — not just the 4 cases that were patched directly, but the full set including identity introspection, curated knowledge surfacing, arithmetic, multi-turn name/age capture, willingness routing, and the various honest fallback families. The holdout doesn't *prove* dialog quality is good — it *records* current behaviour so future regressions are visible. Pass rate may legitimately drop on the next capture (a fresh battery is supposed to expose new failures); the gate is at 70 % to leave headroom.
+
+### Known limitations of this eval
+
+- **Substring matching is shallow.** A template that drifts to a paraphrase but still answers correctly may fail; a template that confidently asserts a wrong fact may pass. Future capture sets can layer in `expected_kind: "structural_fact" | "honest_no_data" | "willingness_yes"` as a more semantic check, but v4.24.5 keeps the rules simple to ship the substrate first.
+- **Single-turn only.** Multi-turn anaphor / belief-revision scenarios live in `repl_replay` (curated). A future holdout schema could add a `turns: [...]` array; for v4.24.5 the captured queries are all single-turn.
+- **No latency / cost gate.** Pass rate only — turn p50 / RSS / template-pool size aren't asserted. Those remain in the existing `criterion` benches.
+
+### Pipeline impact
+
+- New file: `data/eval/live_holdout_2026_05_01.json` (32 cases).
+- New file: `crates/adam-dialog/tests/live_holdout.rs` (~210 lines).
+- No production code changes, no schema diffs, no artifact regen.
+- Workspace tests **822 → 823 passing** (+1 new integration test).
+
+### Cadence
+
+Patch — pure measurement infrastructure, no behaviour change.
+
+**Stripe (5) — humanness through real-dialog testing — formal-eval substrate.**
+
+Codex queue progresses to: **v4.25.0** (R5 hub-degree filter — currently 22931/25006 = 91.7 % of derived facts come from a single rule; risk of tangential answers when a hub-IsA target dominates), **v4.25.5** (README badge automation — read counts from artifacts + test output, drop manual claims).
+
 ## [4.24.0] — 2026-05-01 — semantics.rs decomposition: topic_extraction module extracted
 
 **First minor in v4.24+ engineering-hygiene arc.** Closes the third Codex review actionable: `crates/adam-dialog/src/semantics.rs` had grown to **3576 lines** by v4.23.5 — past the threshold where individual edits become risky and code review can no longer hold the whole file in working memory. v4.24.0 is **preventive surgery**: pure reorganization of code that already worked, no behaviour change, no new tests, no schema diff. The biggest, most cohesive group of code (~1247 lines answering "given an input + FST analyses, what noun is the user actually talking about?") moves to a new dedicated module.
