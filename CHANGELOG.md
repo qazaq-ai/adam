@@ -7,6 +7,74 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.25.5] — 2026-05-01 — README badge automation (Codex actionable #6): closes review queue + fixes 3 silent drifts
+
+**Closes the Codex review queue.** Codex's v4.22.5 review listed 6 actionables; v4.23.0 → v4.25.0 worked through the first five. v4.25.5 lands the sixth: a single-file shell script that reads canonical metric values from artifacts and prints them — making the «manual numeric claims in README must stay current» rule (memory `feedback_readme_pre_push_audit`) cheap to satisfy. Running the script *immediately surfaced three silent drifts* that the manual audit had missed.
+
+### Innovations
+
+**(1) `scripts/refresh_readme_badges.sh`** — pure-shell metric reader. Reads:
+- `version` from `Cargo.toml`
+- `lexicon roots` (curated + apertium) from JSON files
+- `world_core` entries / facts / domains from JSONL files
+- `derived_facts` total + R5 share from the artifact
+- Eval-suite sizes (parse-disambig, live-holdout, cognitive-eval, repl-replay) from the dataset JSONs
+- Optional `workspace tests passing` via `cargo test --workspace --release` (slow path, opt-in via `--include-tests`)
+
+Designed to satisfy the existing `rust_only_contracts::shell_scripts_do_not_invoke_foreign_language_runtimes` test — uses only POSIX shell + `grep` + `awk` + `wc` + `find`. No `python3`, no `jq`. The counting tasks are simple enough: each fact has exactly one `"subject":` key (use `grep -o`); each eval-dataset case has exactly one `"id":` key at case level (use `grep -c`).
+
+Read-only by design. Prints values; humans handle README placement. Auto-substitution is brittle when badges share URL patterns and color codes — printing the values is a much smaller surface area for drift.
+
+**(2) `--include-tests` opt-in.** Test-count reading requires running `cargo test --workspace --release`, which takes a few minutes. Default-off so the script is a sub-second pre-push check; opt-in for actual release time.
+
+### Drifts surfaced and fixed
+
+Running the script revealed three values in README badges that didn't match the artifacts:
+
+| Badge | Pre-v4.25.5 (manual) | Canonical | Status |
+|---|---|---|---|
+| `lexicon-25.5%20k%20roots` | **25.5 k** | **16.9 k** (4 947 curated + 11 919 apertium) | **−8.6 k overstated** |
+| `world%20core-1625%20curated%20%2F%201791%20facts` | 1 625 / 1 791 | **1 626 / 1 792** | minor (+1 entry, +1 fact) |
+| (no badge yet) | — | live-holdout 32/32 | **new badge added** |
+
+The lexicon overstatement was the embarrassing one — the v4.4.7 docs had quoted `13606 pure Kazakh + 11919 Apertium imports = 25.5k`, but later releases pruned the curated-Kazakh set down to **4 947** while keeping the older claim in the README. v4.25.5 corrects the badge to **16.9 k roots** matching the actual artifact. (The `foundation_scope.md` doc was already fixed in v4.23.0's drift cleanup; the README badge wasn't.)
+
+The world_core +1/+1 drift is a clean v4.17.5 → v4.22.5 increment that the manual audit hadn't caught.
+
+The new `live%20holdout-32%2F32%20%282026--05--01%29` badge surfaces v4.24.5's eval baseline next to the existing `parse--disambig` and `cognitive%20eval` / `repl%20replay` badges.
+
+### Verification
+
+- **Workspace tests `823 → 823 passing`** — including the `rust_only_contracts::shell_scripts_do_not_invoke_foreign_language_runtimes` test that initially red-flagged my first python3-using draft. The shell-only rewrite passes the contract.
+- **Live holdout `32/32 = 100 %`** — unchanged.
+- **Parse-disambig** still **23/23 = 100 %**.
+
+### Codex queue: CLOSED ✓
+
+| | Codex actionable | Released |
+|---|---|---|
+| 1 | temporal-scope detector | v4.23.0 |
+| 2 | compositional possessive handler | v4.23.5 |
+| 3 | semantics.rs decomposition | v4.24.0 |
+| 4 | live holdout eval (blind) | v4.24.5 |
+| 5 | R5 hub-degree filter | v4.25.0 |
+| 6 | README badge automation | **v4.25.5** |
+
+All six actionables from the 2026-05-01 Codex review are now landed. Future releases either (a) extend the live holdout with a new capture date, (b) layer in domain-aware ranking after R5 reduction (Codex's second-half recommendation, deferred), or (c) start a new arc.
+
+### Pipeline impact
+
+- New file: `scripts/refresh_readme_badges.sh` (~150 lines).
+- README badge updates: lexicon, world_core, +live_holdout.
+- No production code changes, no schema diffs, no artifact regen.
+- Workspace tests **823 → 823 passing**.
+
+### Cadence
+
+Patch — single tooling addition + 3 manual-claim corrections in README.
+
+**Stripe (5) — humanness through real-dialog testing — closes the Codex review queue.** Future Codex review will be against a fresh codebase state.
+
 ## [4.25.0] — 2026-05-01 — R5 degree-based hub filter (Codex actionable #5): −75.5% derived facts, holdout still 100%
 
 **First minor in v4.25+ engineering-hygiene arc.** Closes the fifth Codex review actionable. Pre-fix, **22 931 / 25 006 = 91.7 %** of derived facts came from a single rule — `R5_shared_is_a_target` (`A IsA X ∧ B IsA X ⟹ RelatedTo(A, B)`) — and Codex identified this as the source of tangential-answer risk: even when the answer is formally correct ("the nucleus is part of the cell"), high R5 dominance creates pressure for the planner to surface a `RelatedTo` derivation when a more direct curated fact would have answered better.
