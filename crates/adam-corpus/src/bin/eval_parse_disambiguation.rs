@@ -185,7 +185,7 @@ fn main() -> ExitCode {
     }
 
     // Report.
-    println!("=== Parse-disambiguation eval (v4.21.0) ===");
+    println!("=== Parse-disambiguation eval (v4.21.5) ===");
     println!("Cases with non-empty FST parses: {total_with_parses}");
     println!();
     println!("Per-strategy accuracy:");

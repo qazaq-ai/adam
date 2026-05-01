@@ -7,6 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.21.5] — 2026-05-01 — pronoun paradigm extension (бұл / сол / мен / сен) + 4 new eval cases + сол lexicon entry
+
+**Patch in v4.21+ FST irregularity arc.** v4.21.0 shipped ол's 6 oblique cases as the architectural foundation; v4.21.5 extends the same mechanism to the rest of the demonstrative / personal closed class and adds 4 new eval cases to verify the paradigm matcher scales beyond the single empirical target.
+
+### Innovations
+
+**(1) Paradigm table extended with 15 new entries:**
+- **`бұл` (this)** — 6 oblique cases: бұны / бұның / бұған / бұнда / бұдан / бұнымен. Same `л → н/ғ/д` lateralization pattern as ол.
+- **`сол` (that)** — 6 oblique cases: соны / соның / соған / сонда / содан / сонымен. Same pattern.
+- **`мен` (I)** — only Dative is irregular: маған. The other cases (мені / менің / менде / менен) round-trip through regular synth.
+- **`сен` (you-informal)** — only Dative irregular: саған. Same `сен → са-` alternation.
+
+**Why мен / сен ship only the Dative.** The dative `-ан` triggers the irregular `мен → ма-` / `сен → са-` stem alternation, but accusative -і, genitive -ің, locative -де, ablative -ден all attach to the bare consonant-final root with no alternation; FST's regular `try_noun_analyses` already generates these correctly. The paradigm table is exactly the irregularities, no more.
+
+**(2) `data/tokenizer/segmentation_roots.json` += `pron_sol`.** v4.21.5 uncovered a missing lexicon entry while running the new сол eval cases: `analyse("соған")` returned 24 verb-root «соға» (Reflexive paradigm) parses but no «сол + Dative» — because бare «сол» wasn't in the lexicon at all (despite being a top-tier demonstrative pronoun). Adding `pron_sol` is a 1-line fix that closes the gap. **`pron_ol`, `pron_olar`, `pron_men`, `pron_sen`, `pron_biz`, `pron_siz`** were already present; `сол` was a real-world omission.
+
+**(3) Eval test set extended +4 cases:**
+- **`bunda_anaphoric`** («Менің ойым бар, бұнда шындық бар.») → бұл (Loc).
+- **`sogan_dative`** («Сен соған сенесің бе?») → сол (Dat).
+- **`magan_dative`** («Маған көмек керек.») → мен (Dat).
+- **`sagan_dative`** («Саған не керек?») → сен (Dat).
+
+**(4) Frozen priors artifact regenerated** — with `сол` now in the lexicon and 4 new pronoun paradigm forms in `analyse()`, the closed-class boost applies to 6 of 10 entries (was 5 of 10 at v4.20.5; `сол` newly included). The boosted root scores keep the chain_tiebreak_root strategy correct for all chain-collision cases.
+
+### Results (n = 23 with non-empty FST parses)
+
+| Strategy | Hits | Accuracy |
+|---|---|---|
+| baseline | 18 / 23 | **78.3 %** |
+| unigram | 21 / 23 | **91.3 %** |
+| bigram | 21 / 23 | **91.3 %** |
+| smoothed | 21 / 23 | **91.3 %** |
+| pos_conditioned | 21 / 23 | **91.3 %** |
+| with_context | 21 / 23 | **91.3 %** |
+| chain_plus_root | 22 / 23 | **95.7 %** |
+| **chain_tiebreak_root** | **23 / 23** | **100.0 %** |
+
+**100% holds across the extended 23-case eval.** Both v4.21.0 онда cases continue to resolve correctly, plus all 4 new v4.21.5 cases (бұнда / соған / маған / саған) flip to their gold pronoun roots. The chain-only strategies improve from 89.5 % (v4.21.0 / 19 cases) to 91.3 % (v4.21.5 / 23 cases) — the new cases mostly resolve correctly even without root priors, because the pronoun parses' chains have higher prior scores than the alternative content-word readings.
+
+### Pipeline impact
+
+- `crates/adam-kernel-fst/src/pronoun_paradigm.rs` — paradigm table grew from 6 to 21 entries; +4 unit tests; mini_lex updated to include all 5 closed-class pronouns.
+- `data/tokenizer/segmentation_roots.json` — `pron_sol` entry added.
+- `data/eval/parse_disambiguation_eval.json` — +4 new cases (bunda_anaphoric, sogan_dative, magan_dative, sagan_dative).
+- `data/retrieval/suffix_chain_priors.json` — regenerated with new lexicon + new paradigm.
+- `crates/adam-corpus/src/bin/eval_parse_disambiguation.rs` — printout version v4.21.5.
+- Workspace tests **814 → 818 passing** (+4 new pronoun_paradigm tests).
+
+### Cadence
+
+Patch — same mechanism as v4.21.0, more entries; +4 eval cases verify the mechanism scales.
+
+**Stripe (4) — compositional ML — measurement layer remains CLOSED at 100 % under the extended test set.**
+
+Next: **v4.22.0+** (broader FST irregularity catalog: irregular noun stems, possessive-stem alternations, voicing edge cases — same additive paradigm-matcher pattern, applied to non-pronoun closed classes; eval extends with cases targeting each).
+
 ## [4.21.0] — 2026-05-01 — pronoun stem-alternation paradigm + 100% accuracy on parse-disambiguation eval
 
 **First minor in v4.21+ FST irregularity arc.** v4.20.5's debug pass surfaced the actionable diagnosis: the FST returned no parse with root=`ол` for «онда» because Kazakh's phonological alternation `ол → он-` (with lateralization `л → н` before consonant-initial dental suffixes) wasn't modelled. v4.21.0 ships the irregularity as a small hardcoded paradigm matcher and **closes the entire v4.19.0–v4.20.5 measurement arc with `chain_tiebreak_root` reaching 100% accuracy** on the parse-disambiguation eval.

@@ -26,10 +26,23 @@
 //! cloned from the lexicon and emitted with the documented
 //! features.
 //!
-//! **Scope (v4.21.0).** Only `ол` (he/she/it/that) — the
-//! empirical target. Documented but-not-implemented allomorphs
-//! for `бұл`, `сол`, `мен`, `сен`, `мынау`, `анау` defer to
-//! v4.21.5+.
+//! **Scope.**
+//! - **v4.21.0** — `ол` (he/she/it/that) — the empirical target.
+//! - **v4.21.5** — extends to the rest of the demonstrative /
+//!   personal closed class:
+//!   - `бұл` (this) — 6 oblique cases (бұны / бұның / бұған /
+//!     бұнда / бұдан / бұнымен).
+//!   - `сол` (that) — 6 oblique cases (соны / соның / соған /
+//!     сонда / содан / сонымен).
+//!   - `мен` (I) — only Dative is irregular (маған, due to
+//!     `мен → ма-` stem alternation). The regular cases (мені /
+//!     менің / менде / менен) round-trip through the standard
+//!     synth pipeline.
+//!   - `сен` (you-informal) — only Dative irregular (саған, same
+//!     pattern as мен).
+//! - **v4.22.0+** — broader FST irregularity catalog (мынау /
+//!   анау demonstratives, irregular noun stems, possessive-stem
+//!   alternations, voicing edge cases).
 
 use crate::lexicon::LexiconV1;
 use crate::morphotactics::{Case, NounFeatures, Number};
@@ -54,12 +67,21 @@ struct PronounForm {
     number: Option<Number>,
 }
 
-/// **v4.21.0** — hand-curated table for the pronoun `ол`. Forms
-/// with regular synthesis (e.g. nominative bare `ол`) are not
-/// listed here — they're already handled by the standard
-/// `try_noun_analyses` path. Only the irregular-stem oblique
-/// cases need a dedicated entry.
-const PRONOUN_OL_FORMS: &[PronounForm] = &[
+/// **v4.21.0 / v4.21.5** — hand-curated table for irregular
+/// pronoun forms. Forms with regular synthesis (e.g. nominative
+/// bare `ол` / `бұл` / `сол` / `мен` / `сен`, or regular oblique
+/// cases of мен / сен like мені / менің / менде / менен / сені /
+/// сенің / сенде / сенен) are NOT listed here — they're handled
+/// by the standard `try_noun_analyses` path. Only the irregular-
+/// stem oblique cases need a dedicated entry.
+///
+/// Forms are ordered: pronoun group (ол → бұл → сол → мен →
+/// сен), then within each group by case (Acc / Gen / Dat / Loc /
+/// Abl / Inst). Order is purely cosmetic — the matcher walks the
+/// full table per call and emits matching entries; the aggregate
+/// `analyse()` re-sorts deterministically.
+const PRONOUN_FORMS: &[PronounForm] = &[
+    // ───── ол (he/she/it/that) — v4.21.0 ─────────────────────
     PronounForm {
         surface: "оны",
         root: "ол",
@@ -96,13 +118,98 @@ const PRONOUN_OL_FORMS: &[PronounForm] = &[
         case: Case::Instrumental,
         number: Some(Number::Singular),
     },
+    // ───── бұл (this) — v4.21.5 ──────────────────────────────
+    PronounForm {
+        surface: "бұны",
+        root: "бұл",
+        case: Case::Accusative,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "бұның",
+        root: "бұл",
+        case: Case::Genitive,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "бұған",
+        root: "бұл",
+        case: Case::Dative,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "бұнда",
+        root: "бұл",
+        case: Case::Locative,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "бұдан",
+        root: "бұл",
+        case: Case::Ablative,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "бұнымен",
+        root: "бұл",
+        case: Case::Instrumental,
+        number: Some(Number::Singular),
+    },
+    // ───── сол (that) — v4.21.5 ──────────────────────────────
+    PronounForm {
+        surface: "соны",
+        root: "сол",
+        case: Case::Accusative,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "соның",
+        root: "сол",
+        case: Case::Genitive,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "соған",
+        root: "сол",
+        case: Case::Dative,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "сонда",
+        root: "сол",
+        case: Case::Locative,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "содан",
+        root: "сол",
+        case: Case::Ablative,
+        number: Some(Number::Singular),
+    },
+    PronounForm {
+        surface: "сонымен",
+        root: "сол",
+        case: Case::Instrumental,
+        number: Some(Number::Singular),
+    },
+    // ───── мен (I) — v4.21.5 — only Dative irregular ────────
+    PronounForm {
+        surface: "маған",
+        root: "мен",
+        case: Case::Dative,
+        number: Some(Number::Singular),
+    },
+    // ───── сен (you-informal) — v4.21.5 — only Dative ───────
+    PronounForm {
+        surface: "саған",
+        root: "сен",
+        case: Case::Dative,
+        number: Some(Number::Singular),
+    },
 ];
 
-/// Concatenation of all paradigm tables. v4.21.0 = `ол` only;
-/// future patches extend with `бұл`, `сол`, `мен`, `сен`,
-/// `мынау`, `анау`.
 fn all_forms() -> &'static [PronounForm] {
-    PRONOUN_OL_FORMS
+    PRONOUN_FORMS
 }
 
 /// **v4.21.0** — try matching the surface form against the
@@ -150,21 +257,33 @@ mod tests {
     use std::collections::HashMap;
 
     fn mini_lex() -> LexiconV1 {
-        // Hand-rolled lexicon containing just `ол` so the tests
+        // Hand-rolled lexicon containing the closed-class
+        // pronouns covered by v4.21.0 / v4.21.5 so the tests
         // don't depend on the full curated file.
-        let entry = RootEntry {
-            id: "pron_ol".to_string(),
-            root: "ол".to_string(),
-            part_of_speech: "pronoun".to_string(),
-            vowel_harmony: "back".to_string(),
-            final_sound_class: "voiced_consonant".to_string(),
-        };
+        let entries = [
+            ("pron_ol", "ол", "back"),
+            ("pron_bul", "бұл", "back"),
+            ("pron_sol", "сол", "back"),
+            ("pron_men", "мен", "front"),
+            ("pron_sen", "сен", "front"),
+        ];
         let mut by_surface = HashMap::new();
-        by_surface.insert(entry.root.clone(), entry.clone());
+        let mut entries_ordered = Vec::new();
+        for (id, root, harmony) in entries {
+            let e = RootEntry {
+                id: id.to_string(),
+                root: root.to_string(),
+                part_of_speech: "pronoun".to_string(),
+                vowel_harmony: harmony.to_string(),
+                final_sound_class: "voiced_consonant".to_string(),
+            };
+            by_surface.insert(e.root.clone(), e.clone());
+            entries_ordered.push(e);
+        }
         LexiconV1 {
             by_surface,
-            entries_ordered: vec![entry],
-            curated_count: 1,
+            entries_ordered,
+            curated_count: 5,
             apertium_count: 0,
         }
     }
@@ -233,5 +352,63 @@ mod tests {
         // paradigm match silently degrades instead of panicking.
         let lex = empty_lex();
         assert!(try_pronoun_paradigm("онда", &lex).is_empty());
+    }
+
+    // ───── v4.21.5 — extended paradigm coverage ────────────────
+
+    #[test]
+    fn bunda_resolves_to_bul_locative() {
+        let lex = mini_lex();
+        let analyses = try_pronoun_paradigm("бұнда", &lex);
+        assert_eq!(analyses.len(), 1);
+        match &analyses[0] {
+            Analysis::Noun { root, features } => {
+                assert_eq!(root.root, "бұл");
+                assert_eq!(features.case, Some(Case::Locative));
+            }
+            other => panic!("expected Noun analysis, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn sogan_resolves_to_sol_dative() {
+        let lex = mini_lex();
+        let analyses = try_pronoun_paradigm("соған", &lex);
+        assert_eq!(analyses.len(), 1);
+        match &analyses[0] {
+            Analysis::Noun { root, features } => {
+                assert_eq!(root.root, "сол");
+                assert_eq!(features.case, Some(Case::Dative));
+            }
+            other => panic!("expected Noun analysis, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn magan_resolves_to_men_dative() {
+        let lex = mini_lex();
+        let analyses = try_pronoun_paradigm("маған", &lex);
+        assert_eq!(analyses.len(), 1);
+        match &analyses[0] {
+            Analysis::Noun { root, features } => {
+                assert_eq!(root.root, "мен");
+                assert_eq!(features.case, Some(Case::Dative));
+            }
+            other => panic!("expected Noun analysis, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn sagan_resolves_to_sen_dative() {
+        let lex = mini_lex();
+        let analyses = try_pronoun_paradigm("саған", &lex);
+        assert_eq!(analyses.len(), 1);
+        match &analyses[0] {
+            Analysis::Noun { root, features } => {
+                assert_eq!(root.root, "сен");
+                assert_eq!(features.case, Some(Case::Dative));
+            }
+            other => panic!("expected Noun analysis, got {other:?}"),
+        }
     }
 }

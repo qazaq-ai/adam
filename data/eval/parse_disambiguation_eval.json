@@ -148,6 +148,34 @@
       "token": "көп",
       "gold_root": "көп",
       "note": "Quantifier «көп» (many/much). Closed-class — should never be a topic noun. Already in NOT_A_TOPIC."
+    },
+    {
+      "id": "bunda_anaphoric",
+      "sentence": "Менің ойым бар, бұнда шындық бар.",
+      "token": "бұнда",
+      "gold_root": "бұл",
+      "note": "v4.21.5 paradigm coverage extension. Anaphoric demonstrative «бұл» (this) in Locative case = бұнда («in this»). Mirrors the онда case at v4.21.0: «бұл» is a pronoun root, the Locative form involves stem alternation `бұл → бұн-` before the consonant-initial -да, and without the v4.21.5 paradigm matcher the FST returned no parse with root=бұл. The mid-sentence position gives the chain_tiebreak_root strategy the prev_chain context, but the actual disambiguation comes from the paradigm matcher making the gold parse available."
+    },
+    {
+      "id": "sogan_dative",
+      "sentence": "Сен соған сенесің бе?",
+      "token": "соған",
+      "gold_root": "сол",
+      "note": "v4.21.5 paradigm coverage extension. Dative of demonstrative «сол» (that) = соған («to that»). Stem alternation `сол → соғ-` before the dative -ан suffix. Common in dialog around references / agreements («Сен соған сенесің бе?» = «Do you believe in that?»). Pre-v4.21.5 FST returned no parse with root=сол — the form starts with «соғ», not «сол» as a literal prefix."
+    },
+    {
+      "id": "magan_dative",
+      "sentence": "Маған көмек керек.",
+      "token": "маған",
+      "gold_root": "мен",
+      "note": "v4.21.5 paradigm coverage extension. Dative of personal pronoun «мен» (I) = маған («to me»). Stem alternation `мен → ма-` is the only irregular form in мен's paradigm (other cases — мені/менің/менде/менен — round-trip through regular synth). One of the highest-frequency function words in dialog; «маған көмек керек» = «I need help»."
+    },
+    {
+      "id": "sagan_dative",
+      "sentence": "Саған не керек?",
+      "token": "саған",
+      "gold_root": "сен",
+      "note": "v4.21.5 paradigm coverage extension. Dative of personal pronoun «сен» (you-informal) = саған («to you»). Same `сен → са-` alternation pattern as мен → ма-. Other cases of сен (сені/сенің/сенде/сенен) round-trip through regular synth. «Саған не керек?» = «What do you need?» — common dialog form."
     }
   ]
 }
