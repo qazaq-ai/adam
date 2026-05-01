@@ -1,20 +1,20 @@
 {
-  "version": "4.25.0",
+  "version": "4.26.0",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
   "iterations_completed": 5,
   "counts": {
-    "initial_facts": 1988,
-    "derived_facts": 6137,
+    "initial_facts": 2028,
+    "derived_facts": 6139,
     "by_rule": {
       "R10_in_domain_inheritance": 133,
       "R11_in_domain_shared_target": 3098,
-      "R1_is_a_transitivity": 1156,
+      "R1_is_a_transitivity": 1157,
       "R2_has_inheritance": 292,
       "R3_has_inheritance_via_part_of": 28,
-      "R5_shared_is_a_target": 1158,
+      "R5_shared_is_a_target": 1159,
       "R6_lives_in_via_part_of": 1,
       "R7_goes_to_via_part_of": 6,
       "R8_after_transitivity": 6,
@@ -17324,6 +17324,31 @@
     },
     {
       "subject": {
+        "surface": "generic",
+        "root": "generic",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіл құрылымы",
+        "root": "тіл құрылымы",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_118"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_077"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
         "surface": "ана",
         "root": "ана",
         "pos": "noun"
@@ -20868,6 +20893,31 @@
         {
           "pack": "world_core/programming_rust.jsonl",
           "sample_id": "rust_107"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "send",
+        "root": "send",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "sync",
+        "root": "sync",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_139"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_140"
         }
       ],
       "confidence": "RuleInferred"

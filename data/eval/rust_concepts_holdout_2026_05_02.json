@@ -1,0 +1,223 @@
+{
+  "_comment": "v4.26.0 — Rust-concepts live holdout. Captures the 6 from the 2026-05-01 baseline session (live test that drove this release) plus 24 follow-up questions covering the 40 new alias entries (rust_111…rust_150) added to programming_rust.jsonl. Same blind-eval discipline as live_holdout_2026_05_01.json: queries verbatim from real session, no template tuning to make any specific case pass. Substring presence/absence rules tolerate template variants. Categories: rust_concept (the core Latin concepts); rust_keyword (Rust-та X деген не? phrasing for keyword-class concepts); rust_smart_pointer (Box / Rc / Arc / RefCell / Mutex); rust_error_handling (Result / Option / panic / ?); rust_concurrency (async / Send / Sync). Future captures (rust_concepts_holdout_YYYYMMDD.json) extend coverage; never edit a captured set after it lands.",
+  "version": "v4.26.0",
+  "captured_date": "2026-05-02",
+  "cases": [
+    {
+      "id": "rust_ownership_what",
+      "category": "rust_concept",
+      "query": "Rust-та ownership деген не?",
+      "any_substring": ["жады басқару", "иеленуші", "ownership"],
+      "note": "Core concept. Pre-v4.26.0 returned «Түсінбедім» (Latin extraction failure)."
+    },
+    {
+      "id": "rust_borrow_checker",
+      "category": "rust_concept",
+      "query": "borrow checker не үшін керек?",
+      "any_substring": ["borrow", "сілтеме", "статикалық"],
+      "note": "Pre-v4.26.0 returned «Түсінбедім»."
+    },
+    {
+      "id": "rust_result_option_diff",
+      "category": "rust_concept",
+      "query": "Result пен Option айырмашылығы қандай?",
+      "any_substring": ["result", "ok", "err", "енам"],
+      "note": "Already worked pre-v4.26.0 via existing rust_xxx entries."
+    },
+    {
+      "id": "rust_cargo_toml",
+      "category": "rust_concept",
+      "query": "Cargo.toml не үшін керек?",
+      "any_substring": ["cargo", "құрастыру", "манифест"],
+      "note": "Already worked pre-v4.26.0."
+    },
+    {
+      "id": "rust_match_operator",
+      "category": "rust_concept",
+      "query": "match операторы қалай жұмыс істейді?",
+      "any_substring": ["үлгіге сай", "match"],
+      "none_substring": ["қағазбен жасайтын", "жұмысты тартып"],
+      "note": "Pre-v4.26.0 returned proverb «Олар бізден қағазбен жасайтын барлық жұмысты тартып алды.». Both Latin extension AND оператор NOT_A_TOPIC contribute to the fix."
+    },
+    {
+      "id": "rust_trait_what",
+      "category": "rust_concept",
+      "query": "trait деген не Rust-та?",
+      "any_substring": ["trait", "интерфейс", "әдістер"],
+      "note": "Pre-v4.26.0 returned «Түсінбедім»."
+    },
+
+    {
+      "id": "rust_lifetime_what",
+      "category": "rust_concept",
+      "query": "lifetime деген не?",
+      "any_substring": ["lifetime", "сілтеме мерзімі", "скоп"],
+      "note": "v4.26.0 alias rust_114."
+    },
+    {
+      "id": "rust_impl_block",
+      "category": "rust_concept",
+      "query": "impl блогы қалай жұмыс істейді?",
+      "any_substring": ["impl", "әдістер", "трейт"],
+      "note": "Existing рус_080 covers `impl блогы` via Kazakh form; new rust_116 is Latin alias."
+    },
+    {
+      "id": "rust_closure_what",
+      "category": "rust_concept",
+      "query": "closure деген не Rust-та?",
+      "any_substring": ["closure", "жабу", "анонимді"],
+      "note": "v4.26.0 alias rust_120."
+    },
+    {
+      "id": "rust_iterator_what",
+      "category": "rust_concept",
+      "query": "iterator деген не?",
+      "any_substring": ["iterator", "элемент", "next"],
+      "note": "v4.26.0 alias rust_121."
+    },
+    {
+      "id": "rust_pattern_what",
+      "category": "rust_concept",
+      "query": "pattern деген не Rust-та?",
+      "any_substring": ["pattern", "деструктур", "match"],
+      "note": "v4.26.0 alias rust_122."
+    },
+    {
+      "id": "rust_generic_what",
+      "category": "rust_concept",
+      "query": "generic деген не Rust-та?",
+      "any_substring": ["generic", "тип параметр"],
+      "note": "v4.26.0 alias rust_118."
+    },
+    {
+      "id": "rust_module_what",
+      "category": "rust_concept",
+      "query": "module деген не?",
+      "any_substring": ["module", "модуль"],
+      "note": "v4.26.0 alias rust_124."
+    },
+    {
+      "id": "rust_crate_what",
+      "category": "rust_concept",
+      "query": "crate деген не?",
+      "any_substring": ["crate", "компиляция", "крейт"],
+      "note": "v4.26.0 alias rust_125."
+    },
+    {
+      "id": "rust_struct_what",
+      "category": "rust_concept",
+      "query": "struct деген не?",
+      "any_substring": ["struct", "құрылым", "өріс"],
+      "note": "v4.26.0 alias rust_126."
+    },
+    {
+      "id": "rust_enum_what",
+      "category": "rust_concept",
+      "query": "enum деген не Rust-та?",
+      "any_substring": ["enum", "нұсқа"],
+      "note": "v4.26.0 alias rust_127."
+    },
+    {
+      "id": "rust_function_what",
+      "category": "rust_concept",
+      "query": "function қалай анықталады?",
+      "any_substring": ["function", "fn", "code", "код"],
+      "note": "v4.26.0 alias rust_128."
+    },
+    {
+      "id": "rust_shadowing_what",
+      "category": "rust_concept",
+      "query": "shadowing деген не Rust-та?",
+      "any_substring": ["shadowing", "жабу", "айнымалы"],
+      "note": "v4.26.0 alias rust_130."
+    },
+
+    {
+      "id": "rust_box_what",
+      "category": "rust_smart_pointer",
+      "query": "Box деген не Rust-та?",
+      "any_substring": ["box", "ақылды сілтеме", "үйме"],
+      "note": "v4.26.0 alias rust_133."
+    },
+    {
+      "id": "rust_rc_what",
+      "category": "rust_smart_pointer",
+      "query": "Rc не үшін керек?",
+      "any_substring": ["rc", "санағыш", "ортақ"],
+      "note": "v4.26.0 alias rust_135."
+    },
+    {
+      "id": "rust_arc_what",
+      "category": "rust_smart_pointer",
+      "query": "Arc деген не?",
+      "any_substring": ["arc", "атомдық", "көп ағынды"],
+      "note": "v4.26.0 alias rust_136."
+    },
+    {
+      "id": "rust_refcell_what",
+      "category": "rust_smart_pointer",
+      "query": "RefCell не үшін керек?",
+      "any_substring": ["refcell", "ішкі өзгермелі", "орындалу кезінде"],
+      "note": "v4.26.0 alias rust_137."
+    },
+    {
+      "id": "rust_mutex_what",
+      "category": "rust_smart_pointer",
+      "query": "Mutex деген не?",
+      "any_substring": ["mutex", "синхрондау", "ағын"],
+      "note": "v4.26.0 alias rust_138."
+    },
+    {
+      "id": "rust_smart_pointer_what",
+      "category": "rust_smart_pointer",
+      "query": "smart pointer деген не?",
+      "any_substring": ["сілтеме", "тазарту", "box"],
+      "note": "v4.26.0 alias rust_134."
+    },
+
+    {
+      "id": "rust_error_handling",
+      "category": "rust_error_handling",
+      "query": "error handling қалай жасалады?",
+      "any_substring": ["қателер", "result", "panic"],
+      "note": "v4.26.0 alias rust_142."
+    },
+    {
+      "id": "rust_question_mark",
+      "category": "rust_error_handling",
+      "query": "question mark operator не істейді?",
+      "any_substring": ["question mark", "?", "тарату"],
+      "note": "v4.26.0 alias rust_143."
+    },
+
+    {
+      "id": "rust_async_what",
+      "category": "rust_concurrency",
+      "query": "async деген не Rust-та?",
+      "any_substring": ["async", "асинхронд", "future"],
+      "note": "v4.26.0 alias rust_141."
+    },
+    {
+      "id": "rust_send_trait",
+      "category": "rust_concurrency",
+      "query": "Send трейті не үшін керек?",
+      "any_substring": ["send", "ағын", "автоматты"],
+      "note": "v4.26.0 alias rust_139."
+    },
+    {
+      "id": "rust_sync_trait",
+      "category": "rust_concurrency",
+      "query": "Sync деген не?",
+      "any_substring": ["sync", "ағын", "сілтеме"],
+      "note": "v4.26.0 alias rust_140."
+    },
+
+    {
+      "id": "rust_unsafe_what",
+      "category": "rust_concept",
+      "query": "unsafe не үшін керек?",
+      "any_substring": ["unsafe", "қауіпсіздік", "блок"],
+      "note": "v4.26.0 alias rust_149."
+    }
+  ]
+}

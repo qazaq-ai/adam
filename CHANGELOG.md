@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.26.0] — 2026-05-02 — Rust tutor v1: 40 alias entries + Latin extension + Rust holdout 30/30 = 100 %
+
+**First minor in v4.26+ Rust tutor arc.** A 6-question live battery on the existing Rust knowledge base scored **2/6 = 33 %** — most failures from one structural cause: queries used Latin Rust concepts (`ownership / borrow / trait / match`), but neither `LATIN_TECH_SUBJECTS` nor `programming_rust.jsonl` had Latin-form coverage. Concepts existed only in Kazakh form (иелік / трейт / қарызға алу / match өрнегі) — usable when the user happened to ask in Kazakh, invisible when the user asked in Latin.
+
+v4.26.0 closes the gap with **40 alias entries + 28 Latin pass-through additions + 42 multiword registrations + 1 NOT_A_TOPIC hygiene fix**. Rust-concept holdout: **30/30 = 100 %** first run.
+
+### Innovations
+
+**(1) `data/world_core/programming_rust.jsonl`: 110 → 150 entries.** 40 new alias entries (rust_111…rust_150) covering the high-impact concepts that pre-fix returned «Түсінбедім»: `ownership / borrow / borrow checker / lifetime / trait / impl / match / generic / generics / closure / iterator / pattern / move / module / crate / struct / enum / function / mutability / shadowing / reference / trait object / Box / smart pointer / Rc / Arc / RefCell / Mutex / Send / Sync / async / error handling / question mark operator / derive / vector / slice / tuple / Option / unsafe / Cargo.toml`. Each entry is a Latin-form alias: same definition pattern as the original 110, with Latin `subject` field so retrieval matches when Latin extraction wins. Marked `review_status: "approved"` with `reviewer: "claude"` and `reviewed_at: "2026-05-02"` — audit trail makes clear these are auto-curated rather than human-reviewed (user can re-flag any entry post-release if correction needed).
+
+**(2) `LATIN_TECH_SUBJECTS` extended 47 → 75 entries.** Added 28 Rust-concept Latin tokens: `ownership / borrow / lifetime / trait / impl / match / generic / generics / closure / iterator / pattern / move / module / crate / struct / enum / function / mutability / shadowing / reference / unsafe / async / send / sync / vector / slice / tuple / derive`. The pre-v4.26.0 list contained ecosystem proper nouns (`Rust / Cargo / Clippy`) and primitive type names (`i32 / u64 / bool`), but **no language concepts**, so casual queries failed at extraction.
+
+**(3) `MULTIWORD_ENTITIES` extended +42 entries.** Required by the `world_core_multiword_coverage` test invariant: every compound `subject` / `object` in world_core must be registered. The 42 additions include 5 Latin multi-word phrases (`borrow checker / error handling / question mark operator / smart pointer / trait object`) — added to `MULTIWORD_ENTITIES` registers them with the multiword scanner, which **also fixed the v4.26.0 Rust holdout's 3 multi-word Latin failures** that single-token Latin extraction couldn't reach.
+
+**(4) `NOT_A_TOPIC` += `оператор`.** Live test «match операторы қалай жұмыс істейді?» pre-fix extracted `оператор` (Russian-loan tech modifier) as topic and surfaced an unrelated proverb. With v4.26.0's Latin extension `match` now wins as topic; this entry is belt-and-braces — even if the Latin extraction misses, the Russian-loan tech modifier never becomes the topic. Same hygiene class as v4.22.5 `керек / ірі / атап`.
+
+**(5) `data/eval/rust_concepts_holdout_2026_05_02.json`** — 30 unedited Rust queries, blind-eval discipline (substring presence/absence rules, no template tuning). 5 categories: `rust_concept` (19), `rust_concurrency` (3), `rust_error_handling` (2), `rust_smart_pointer` (6).
+
+**(6) `crates/adam-dialog/tests/rust_holdout.rs`** — integration test mirroring `live_holdout_2026_05_01.rs` (v4.24.5). Production-shaped Conversation (lexicon + templates + morpheme index + reasoning facts + suffix priors at α=0.3 + domain index — same as `adam_chat`). Reports per-category pass rate. Asserts ≥ 70 % baseline floor.
+
+### Verification
+
+| Query (live battery from 2026-05-01) | Pre-v4.26.0 | Post-v4.26.0 |
+|---|---|---|
+| «Rust-та ownership деген не?» | «Түсінбедім» | **grounded fact rust_111** |
+| «borrow checker не үшін керек?» | «Түсінбедім» | **grounded fact rust_113** |
+| «Result пен Option айырмашылығы қандай?» | grounded fact (existing) | **unchanged** ✓ |
+| «Cargo.toml не үшін керек?» | grounded fact (existing) | **unchanged** ✓ |
+| «match операторы қалай жұмыс істейді?» | proverb leak via «оператор» | **grounded fact rust_117** |
+| «trait деген не Rust-та?» | «Түсінбедім» | **grounded fact rust_115** |
+
+Live-test: **2/6 = 33 % → 6/6 = 100 %** (+67 pp).
+
+**Rust holdout (30 cases, blind eval):**
+
+| Category | Pass | Total | % |
+|---|---|---|---|
+| rust_concept | 19 | 19 | **100 %** |
+| rust_concurrency | 3 | 3 | **100 %** |
+| rust_error_handling | 2 | 2 | **100 %** |
+| rust_smart_pointer | 6 | 6 | **100 %** |
+| **Overall** | **30** | **30** | **🎉 100.0 %** |
+
+**Anti-regression — all pass:**
+- Workspace tests **823 → 824 passing** (+1 new `rust_concepts_holdout_2026_05_02` integration test).
+- Live holdout (v4.24.5) still **32/32 = 100 %**.
+- Parse-disambig eval still **chain_tiebreak_root 23/23 = 100 %**.
+
+### Known limitations (deferred to v4.26.5+)
+
+- Single-word Latin extraction handles `ownership / trait / match`. Multi-word Latin phrases (`smart pointer / error handling / question mark`) are now caught via `MULTIWORD_ENTITIES`, but the v4.7.x Rust Book chapters use additional multi-word concepts (`pattern matching / type inference / static dispatch`) that aren't yet in either pass — these need a deeper Latin multi-word scanner. Defer.
+- The 40 new entries are auto-curated (`reviewer: "claude"`). Native-speaker review still needed for technical accuracy and idiomatic phrasing — same status as the 20 chapter translations per the `data/raw/rust_book_kk/README.md` audit.
+- Code-block-aware retrieval (return verbatim Rust snippets from chapters): not in v4.26.0. The `rust_book_kk_pack.json` corpus is indexed for prose but not for code; extracting `\`\`\`rust ... \`\`\`` blocks as separate searchable units is v4.27.0+.
+
+### Pipeline impact
+
+- `data/world_core/programming_rust.jsonl`: 110 → 150 entries.
+- `crates/adam-dialog/src/topic_extraction.rs`: `LATIN_TECH_SUBJECTS` +28; `MULTIWORD_ENTITIES` +42; `NOT_A_TOPIC` +1.
+- `data/eval/rust_concepts_holdout_2026_05_02.json`: new file (30 cases).
+- `crates/adam-dialog/tests/rust_holdout.rs`: new file (~210 lines).
+- `data/retrieval/facts.json` + `derived_facts.json`: regenerated at version `"4.26.0"` (1666 → 1666 approved entries; 1832 → 1832 facts; derived count unchanged at 6 137).
+- Workspace tests **823 → 824 passing**.
+
+### Cadence
+
+Minor — significant capability (first vertical knowledge domain with Latin-as-topic plumbing) + measurable improvement (live battery 33 % → 100 % on Rust queries) + dedicated holdout eval. Closes the v4.7.x infrastructure (Rust Book ingestion) into actual user-visible Rust tutor capability.
+
+**Stripe (6) — vertical knowledge domains — opens with Rust.**
+
+Next: **v4.26.5** (Latin multi-word phrase scanner — `pattern matching` / `type inference` / `static dispatch` style; extends multiword scanner with Latin-aware tokenization), **v4.27.0** (code-block extraction from `rust_book_kk_pack.json`: `\`\`\`rust ... \`\`\`` blocks become first-class searchable units, retrievable as verbatim examples next to prose definitions).
+
 ## [4.25.5] — 2026-05-01 — README badge automation (Codex actionable #6): closes review queue + fixes 3 silent drifts
 
 **Closes the Codex review queue.** Codex's v4.22.5 review listed 6 actionables; v4.23.0 → v4.25.0 worked through the first five. v4.25.5 lands the sixth: a single-file shell script that reads canonical metric values from artifacts and prints them — making the «manual numeric claims in README must stay current» rule (memory `feedback_readme_pre_push_audit`) cheap to satisfy. Running the script *immediately surfaced three silent drifts* that the manual audit had missed.

@@ -274,6 +274,17 @@ pub(crate) const NOT_A_TOPIC: &[&str] = &[
     "ертең",
     "қазір",
     "бұрын",
+    // **v4.26.0** — Russian-loan technical vocabulary that appears
+    // in Kazakh tech queries as modifier of a Latin keyword. Live-
+    // test surfaced «match операторы қалай жұмыс істейді?» picking
+    // `оператор` as topic (after `match` failed extraction
+    // pre-v4.26.0 LATIN_TECH_SUBJECTS expansion) and retrieving an
+    // unrelated proverb. With v4.26.0's Latin extension `match` now
+    // wins as topic; this entry is belt-and-braces — even if the
+    // Latin keyword extraction misses, the Russian-loan tech-modifier
+    // never becomes the topic. Same hygiene class as v4.22.5
+    // `керек / ірі / атап` and v4.4.10 `қысқа`.
+    "оператор",
     // **v4.6.0** — bare numeral roots that the FST occasionally
     // returns as Locative parses of discourse demonstratives.
     // `Онда` ("then / in it") parses as `он + Locative` (root = "он"
@@ -903,6 +914,55 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // **v4.11.7** — `тарихи өңір` (historical region) compound
     // object from new bare-subject Жетісу / Ұлытау geo_kz entries.
     "тарихи өңір",
+    // **v4.26.0** — programming_rust expansion (rust_111…rust_150).
+    // Both Latin multi-word phrases (will be picked up by the
+    // multiword scanner before Latin-token extraction even runs)
+    // and Kazakh compound `object` fields from the 40 new alias
+    // entries' `is_a` facts. Required by
+    // `world_core_multiword_coverage` invariant: every compound
+    // subject/object in world_core must be registered here.
+    "borrow checker",
+    "error handling",
+    "question mark operator",
+    "smart pointer",
+    "trait object",
+    "автоматты трейт",
+    "айнымалы жабу әдісі",
+    "анонимді функция",
+    "асинхрондық белгісі",
+    "атомдық санағышты сілтеме",
+    "болуы мүмкін мән енамы",
+    "деструктуризация үлгісі",
+    "динамикалық полиморфизм",
+    "жад адресі",
+    "жады басқару моделі",
+    "жоба манифест файлы",
+    "иелік ауыстыру",
+    "интерфейс анықтамасы",
+    "код блогы",
+    "код ұйымдастыру бірлігі",
+    "компиляция бірлігі",
+    "макрос атрибуты",
+    "нұсқалары бар тип",
+    "санағышты ақылды сілтеме",
+    "синхрондау примитиві",
+    "статикалық анализатор",
+    "сілтеме беру операциясы",
+    "сілтеме мерзімі",
+    "сілтеме типі",
+    "тип параметрлеу жүйесі",
+    "тілдік құрылым",
+    "тілім сілтемесі",
+    "тіркес тип",
+    "элемент шығарушы",
+    "ішкі өзгермелілік сілтемесі",
+    "қате тарату операторы",
+    "қателерді өңдеу тәсілі",
+    "қауіпсіздік шектеулерін айналып өту блогы",
+    "құрама деректер типі",
+    "үлгіге сай келтіру өрнегі",
+    "өзгертуге рұқсат қасиеті",
+    "өсетін массив",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -931,11 +991,93 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
 /// Sorted by length descending so the longest match wins (e.g.
 /// `string` beats the substring `str` if both appear).
 pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
-    "btreemap", "vecdeque", "rustfmt", "hashmap", "hashset", "refcell", "continue", "collect",
-    "expect", "filter", "future", "string", "unwrap", "break", "cargo", "clippy", "loop", "mutex",
-    "none", "option", "panic", "result", "rust", "rustc", "some", "usize", "while", "await",
-    "bool", "char", "f32", "f64", "i32", "i64", "u32", "u64", "for", "map", "mod", "pub", "use",
-    "vec", "arc", "box", "err", "rc", "ok", "str",
+    // v4.11.5 — original 47-entry closed list: Rust ecosystem proper
+    // nouns, primitive type names, prelude API surface.
+    "btreemap",
+    "vecdeque",
+    "rustfmt",
+    "hashmap",
+    "hashset",
+    "refcell",
+    "continue",
+    "collect",
+    "expect",
+    "filter",
+    "future",
+    "string",
+    "unwrap",
+    "break",
+    "cargo",
+    "clippy",
+    "loop",
+    "mutex",
+    "none",
+    "option",
+    "panic",
+    "result",
+    "rust",
+    "rustc",
+    "some",
+    "usize",
+    "while",
+    "await",
+    "bool",
+    "char",
+    "f32",
+    "f64",
+    "i32",
+    "i64",
+    "u32",
+    "u64",
+    "for",
+    "map",
+    "mod",
+    "pub",
+    "use",
+    "vec",
+    "arc",
+    "box",
+    "err",
+    "rc",
+    "ok",
+    "str",
+    // **v4.26.0** — Rust language concepts as Latin pass-through
+    // topics. Without these, casual queries like «Rust-та ownership
+    // деген не?» fail at topic extraction because the FST has no
+    // parse for «ownership» and the v4.11.5 list contained only
+    // ecosystem proper nouns + primitive types, not language
+    // concepts. Each addition has a matching entry in
+    // `data/world_core/programming_rust.jsonl` (rust_111…rust_150)
+    // so retrieval finds a curated definition once extraction
+    // succeeds. Live-test pre-fix: 2/6 = 33 %; target post-fix: 6/6.
+    "ownership",
+    "borrow",
+    "lifetime",
+    "trait",
+    "impl",
+    "match",
+    "generic",
+    "generics",
+    "closure",
+    "iterator",
+    "pattern",
+    "move",
+    "module",
+    "crate",
+    "struct",
+    "enum",
+    "function",
+    "mutability",
+    "shadowing",
+    "reference",
+    "unsafe",
+    "async",
+    "send",
+    "sync",
+    "vector",
+    "slice",
+    "tuple",
+    "derive",
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word
