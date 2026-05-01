@@ -1,0 +1,1270 @@
+//! Layer 2.5 — topic extraction.
+//!
+//! Closed-class filters (`NOT_A_TOPIC`, `MULTIWORD_ENTITIES`,
+//! `LATIN_TECH_SUBJECTS`) + the noun-hint heuristics they drive
+//! (`best_noun_hint` and friends).
+//!
+//! **Extracted from `semantics.rs` in v4.24.0** as part of the
+//! Codex-review-driven module decomposition. The pre-v4.24.0
+//! `semantics.rs` was 3576 lines — too large to edit safely. This
+//! module pulls out the largest cohesive group: ~1247 lines that
+//! all answer the question "given an input + FST analyses, what
+//! noun is the user actually talking about?". No behaviour change
+//! vs the inline version — same items, same call shapes, same
+//! tests; only file location and visibility (private → `pub(crate)`)
+//! changed.
+//!
+//! Public surface: only [`content_roots`] is `pub` (consumed by
+//! `crate::conversation`). The closed-class lists and intermediate
+//! helpers stay `pub(crate)` — they're internal scaffolding for
+//! the dialog crate.
+
+use adam_kernel_fst::parser::Analysis;
+
+/// Closed-class items the parser often tags as `Noun` but which carry
+/// no topical content for the `unknown.with_noun` template or for
+/// retrieval ranking. Filtered from both `first_noun_root` and
+/// `content_roots`.
+///
+/// **v3.9.5** — kept in sync with `adam_reasoning::patterns::is_closed_class`.
+/// Pre-v3.9.5 this list was narrower, which caused the user-visible bug
+/// where «Неліктен?» («why?» — a vocative interrogative) was parsed as
+/// `Нелік` (noun-root) + ablative suffix, so the dialog replied
+/// «Нелікте тұрасыз ба» («Do you live in Нелік?»). Expansion covers:
+/// interrogative pronouns (неліктен / неге / қашан / қайда / …),
+/// demonstrative qualifiers (мұндай / сондай / …), quantifier-like
+/// forms (кейбір / өз / бірнеше / әрбір / …), and the comparison
+/// particle сияқ (bare root of сияқты).
+pub(crate) const NOT_A_TOPIC: &[&str] = &[
+    // pronouns
+    "мен",
+    "сен",
+    "сіз",
+    "ол",
+    "біз",
+    "сендер",
+    "сіздер",
+    "олар",
+    // demonstratives
+    "бұл",
+    "мына",
+    "сол",
+    "осы",
+    "ана",
+    // postpositions
+    "туралы",
+    "бойынша",
+    "үшін",
+    "кейін",
+    "дейін",
+    "сияқты",
+    "сияқ",
+    "ретінде",
+    "арқылы",
+    // quantifiers / closed-class
+    "көп",
+    "аз",
+    "бәрі",
+    "барлық",
+    // v3.9.5 — interrogatives (mirrors `adam_reasoning::patterns`).
+    // Closes the «Неліктен → Нелікте тұрасыз ба» REPL bug.
+    "қандай",
+    "кім",
+    "не",
+    "қай",
+    "қашан",
+    "қайда",
+    "неліктен",
+    "неге",
+    "қанша",
+    // v4.0.1 — Codex v4.0.0 review caught that the v3.9.5 «Неліктен»
+    // fix was incomplete. FST analysis of "неліктен" returns three
+    // parses; the first is `нелік + Ablative` (stripped stem plus
+    // case), so the dialog still received a `Нелік` noun and routed
+    // it through `StatementOfLocation { city: "Нелік" }`. The v3.9.5
+    // list only contained the full surface form "неліктен". Add the
+    // stripped stem `нелік` so the ablative-scan in
+    // `detect_statement_of_location` also skips it.
+    "нелік",
+    // v3.9.5 — demonstrative qualifiers + quantifier forms.
+    "мұндай",
+    "сондай",
+    "ондай",
+    "мынадай",
+    "сондай-ақ",
+    "кейбір",
+    "өз",
+    "өзі",
+    "бірнеше",
+    "барша",
+    "әрбір",
+    "әр",
+    "бір",
+    "кей",
+    // **v4.3.5** — discourse particles / locative-case
+    // demonstratives. Real-test 2026-04-26 dialog showed `Онда`
+    // ("then") in `Онда маған X туралы айтып беріңізші` was parsed
+    // by FST as `он + Locative` (root `он` = "ten"), so the topic
+    // extractor returned `Он`, the planner's reasoning lookup
+    // surfaced "Он — сан" — completely tangential to the user's
+    // actual question. Same class as the v4.3.2 `интеллект → ел`
+    // substring bug: a closed-class word being mistaken for a
+    // case-marked content noun. Add the demonstrative-locative
+    // and demonstrative-ablative forms so they never reach the
+    // topic-noun candidate stage.
+    "онда",
+    "сонда",
+    "бұнда",
+    "мұнда",
+    "осында",
+    "содан",
+    "одан",
+    "бұдан",
+    "осыдан",
+    "міне",
+    "мынау",
+    // **v4.3.5** — common adjective roots that the FST occasionally
+    // returns as standalone nouns. Real-test 2026-04-26 showed
+    // `Жаңа жасанды интеллект моделін әзірлеу` → topic `Жаңа`
+    // (root of "new"); `әйгілі жазушы Мүсірепов` → topic `әйгіл`
+    // (root of "famous"). Both produced retrieval quotes
+    // tangentially related to "new" / "famous", not to the actual
+    // proper-noun topic. The fix is conservative — only adjective
+    // roots that have unambiguous adjectival usage in modern
+    // Kazakh. `жас` is intentionally NOT in this list because it's
+    // also "age" (a real topic noun in profile turns).
+    "жаңа",
+    "әйгіл",
+    // **v4.4.10** — discourse adverbial particle. Real-REPL
+    // 2026-04-28: `Қысқасы, сен ештеңе білмейсің.` ("In short,
+    // you don't know anything.") — `Қысқасы` is a sentence
+    // adverbial meaning "briefly" / "in short", not a topic. Pre-
+    // v4.4.10 it parsed as `қысқа + 3sg-poss + Nominative`
+    // (root «қысқа» = "short"), the topic extractor returned
+    // `қысқа`, retrieval surfaced an unrelated proverb keyed on
+    // `қысқа`. Same class as v4.3.5 `Онда → он` and `Жаңа → жаңа`:
+    // a closed-class discourse word being mistaken for a content
+    // noun. Stem form added; `қысқасы` (full surface) is its own
+    // entry below if needed (FST returns the stem `қысқа` first).
+    "қысқа",
+    // **v4.13.0** — modal / discourse particles surfaced by the
+    // 2026-05-01 live REPL transcript. «Сіз оны бағдарламалай
+    // аласыз ба, әлі жоқ па?» pre-v4.13.0 fell to `әлі` as topic
+    // because none of these were registered as closed-class. They
+    // are sentence-level discourse markers (yet / or / perhaps /
+    // also), never the topical content noun.
+    "әлі",
+    "әлде",
+    "мүмкін",
+    "тағы",
+    // v4.13.0 — `жоқ` is the existential negator, not a topic noun.
+    // Surfaced by «...әлі жоқ па?» — when `әлі` was added but `жоқ`
+    // was missing, the topic extractor jumped from `әлі` to `жоқ`,
+    // surfacing a poetry quote about absence. Same closed-class
+    // hygiene that catches discourse particles.
+    "жоқ",
+    "иә",
+    // **v4.4.10** — indefinite-quantifier pronoun. Same
+    // 2026-04-28 trace: `сен ештеңе білмейсің` ("you know
+    // nothing") — `ештеңе` ("nothing") is a quantifier pronoun,
+    // not a topic noun. Pre-v4.4.10 (after `қысқа` was muted)
+    // the topic extractor fell through to `ештеңе`, retrieval
+    // matched a tangential proverb. Adding here closes the
+    // misfire from the same trace.
+    "ештеңе",
+    "ешкім",
+    "ешбір",
+    "еш",
+    // **v4.6.0** — additional discourse adverbials surfaced by the
+    // 2026-04-28 real-REPL transcript. `өте` (= "very") and `жалпы`
+    // (= "in general / overall") are intensifier / scope adverbs,
+    // not topic nouns. Pre-v4.6.0 «Бұл өте қызықты, бірақ жалпы не
+    // істей аласыз?» extracted `өте` as the topic and surfaced a
+    // tangential proverb keyed on it. Same misanalysis class as
+    // v4.4.10's `қысқа` / `ештеңе` additions.
+    "өте",
+    "жалпы",
+    // **v4.6.12** — bare case-suffix leaks. Real-REPL 2026-04-29
+    // transcript: «5-ті 7-ге көбейткенде неше болады?» — the
+    // FST analysed `7-ге` as a fragment of `7` + `-ге` (dative
+    // suffix), and the topic extractor picked up the bare
+    // suffix `ге` (from `-Ге` written as a standalone token).
+    // Bare case-suffix forms `ге / ге / ке / бе / пе / да / де
+    // / та / те / мен / нен / нан / тан / тен / нен / ден / тен
+    // / ден` are never legitimate topic nouns; they're
+    // morphological tail fragments. Add the most-leaky ones.
+    "ге",
+    "ке",
+    "де",
+    "те",
+    "да",
+    "та",
+    "бе",
+    "ма",
+    // **v4.11.7** — Kazakh yes/no question particles (`ба` / `ме`,
+    // sister forms of the existing `бе` / `ма`). Real-REPL test
+    // 2026-04-30: «Сіз қазақша сөйлей аласыз ба?» pre-v4.11.7
+    // extracted `ба` as topic and surfaced a poetry quote about
+    // `ұқпасын ба`. The four-form set (`ба / бе / ма / ме`) is the
+    // closed Kazakh interrogative-particle paradigm, never a
+    // standalone topic noun. The lexicon has `ба` registered as a
+    // particle, but FST occasionally emits a Noun reading too.
+    "ба",
+    "ме",
+    // v4.13.0 — `па` / `пе` complete the question-particle paradigm
+    // (post-voiceless-stop allomorphs of `ба` / `бе` per Kazakh
+    // phonotactics). Surfaced by «...әлі жоқ па?» 2026-05-01 — when
+    // `жоқ` was added but `па` was missing, the topic extractor
+    // jumped from `жоқ` to `па`, surfacing «Дос па деген кісіге.»
+    "па",
+    "пе",
+    // v4.17.5 — verb stems that FST occasionally tags as nouns
+    // when their full lemma is missing from the lexicon. Live REPL
+    // 2026-05-01: «А, сені кім тәрбиеледі?» pre-v4.17.5 surfaced
+    // `Бәлкім, тәрбиеле туралы айтасыз ба` because the verb stem
+    // `тәрбиеле` (3rd-person of `тәрбиелеу` = "to raise / educate")
+    // wasn't recognised as a verb, fell through to noun-topic
+    // extraction. The Creator-question detector now catches
+    // «кім тәрбиеледі» directly; this NOT_A_TOPIC entry is the
+    // belt-and-braces fallback so `тәрбиеле` never surfaces as
+    // topic even if the question phrasing isn't caught upstream.
+    "тәрбиеле",
+    "баптал",
+    // **v4.22.5** — verb converb leak. The form «атап» is the
+    // -p converb of «атау» (= "to name"), used in serial verb
+    // constructions like «атап бер» ("name [them] for me",
+    // imperative listing request) or «атап өту» ("to mention").
+    // FST occasionally returns it as a bare noun root because
+    // the lexicon has «атап» as a registered surface form. Live-
+    // dialog test: «Қазақстанның ірі өзендерін атап бер.» pre-
+    // v4.22.5 (and after `ірі` was blocked) extracted `атап` as
+    // topic, retrieval matched the proverb «Ерекше атап өт!».
+    // Same converb-leaks-as-noun class as `тәрбиеле / баптал`.
+    "атап",
+    // **v4.22.5** — closed-class words surfaced by the 2026-05-01
+    // live-dialog battery as wrong topic picks. Each one was
+    // observed in real session output causing the planner to
+    // surface a tangential proverb / fact keyed on the closed-
+    // class word instead of recognising the actual question.
+    //
+    // `керек` — predicate adjective ("is needed / required").
+    // Surfaced in «Маған көмек керек», «Саған не керек?»,
+    // «Mendeleev кестесі не үшін керек?» — every time, retrieval
+    // matched a proverb keyed on `керек` («Жетілсең де, жетсең
+    // де, Керек күні бір бар-ау»). It's structurally the
+    // verbal-need predicate, never the topical content noun.
+    "керек",
+    // `ірі` — comparative-quantitative adjective ("large / big").
+    // Surfaced in «Қазақстанның ірі өзендерін атап бер» where the
+    // user wants a list of large rivers, not a fact about
+    // "largeness". Pre-v4.22.5 retrieval matched «Ерекше атап
+    // өт!» — a proverb on the imperative «атап өту». Adjective
+    // pre-modifier, not a topic.
+    "ірі",
+    // `кеше / бүгін / ертең / қазір / бұрын` — temporal adverbs.
+    // Surfaced in «Кеше ауа райы қандай болды?» where retrieval
+    // matched «Ауа райы туралы оның болжамы ақталды» — a corpus
+    // fragment keyed on `кеше`, dropping the actual question
+    // (yesterday's weather, which adam doesn't have data for).
+    // Temporal adverbs are sentence-level scope markers, never
+    // the noun the question is about. Same hygiene class as
+    // v4.6.0's `өте / жалпы` adverbial additions.
+    "кеше",
+    "бүгін",
+    "ертең",
+    "қазір",
+    "бұрын",
+    // **v4.6.0** — bare numeral roots that the FST occasionally
+    // returns as Locative parses of discourse demonstratives.
+    // `Онда` ("then / in it") parses as `он + Locative` (root = "он"
+    // = number ten). v4.3.5 added the SURFACE forms (`онда / сонда
+    // / осында / мұнда / бұнда`) but `first_noun_root` filters on
+    // the **root**, not the surface — so `он + Locative` still
+    // surfaced `он` as the topic and retrieval matched «Он — сан»
+    // («Ten is a number») unrelated to the user's question. Adding
+    // the bare numeral roots closes the leak; they're rare-enough
+    // standalone topics that the false-negative cost is low. The
+    // proper fix is the discourse-anaphora module below, which
+    // resolves «онда» to the previous turn's topic — but that
+    // module also leans on `first_noun_root` returning None for
+    // these inputs, so this filter is a precondition.
+    "он",
+    "сон",
+];
+
+/// Return the root of the first content-noun Analysis in the parse list.
+/// Skips Kazakh pronouns, demonstratives, and postpositions that the
+/// FST parser may tag as Noun but which aren't informative as a
+/// "topic hint" for the unknown.with_noun template.
+pub(crate) fn first_noun_root(parses: &[Analysis]) -> Option<String> {
+    parses.iter().find_map(|a| match a {
+        Analysis::Noun { root, .. } if !NOT_A_TOPIC.contains(&root.root.as_str()) => {
+            Some(root.root.clone())
+        }
+        _ => None,
+    })
+}
+
+/// v4.0.21 — Multi-word entity catalogue drawn from `data/world_core/*.jsonl`
+/// subjects/objects that contain a space. Kazakh agglutinative morphology
+/// doesn't tokenize these well — «Құс жолы» (Milky Way) tokenizes into
+/// «құс» + «жолы» and the FST picks «құс» as the first noun. This loses
+/// the actual referent (galaxy) and falls back to «құс» (bird).
+///
+/// The list is sorted **longest-first** at compile time so the matcher
+/// below can return on the first hit. Kept in sync with `data/world_core/`
+/// by audit (re-run `world_core_multiword_coverage_test` whenever a new
+/// compound entity enters the world_core set).
+///
+/// Codex v4.0.19 review #2 — direct implementation.
+pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
+    // length 25+ (v4.17.5 — rich Kazakhstan IsA fact)
+    "орталық азиядағы тәуелсіз мемлекет",
+    // length 16+
+    "құйрықты жұлдыз",
+    "қазақ әдебиеті",
+    // length 12–13
+    "тіршілік иесі",
+    "орталық азия",
+    "жүк машинасы",
+    "аспан денесі",
+    "қара сөздер",
+    "тағы жануар",
+    "қозы көрпеш",
+    // length 10–11
+    "қазақ тілі",
+    "су қоймасы",
+    "жер бедері",
+    "күн жүйесі",
+    "туған жер",
+    "көрші елдер",
+    "абай жолы",
+    "темір жол",
+    "қыз жібек",
+    // length 8–9
+    "бас киім",
+    "құс жолы",
+    "аяқ киім",
+    "сары май",
+    "тас жол",
+    // **v4.3.5** — multi-word entities added in the kz_literature
+    // / notable_kazakhstanis expansion. Three Kazakh judges of the
+    // 17th–18th century (`Төле би`, `Қазыбек би`, `Әйтеке би`),
+    // poet `Қадыр Мырза Әли`, and the structural noun
+    // `мемлекет басшысы` ("head of state").
+    "мемлекет басшысы",
+    "мырза әли",
+    "төле би",
+    "қазыбек би",
+    "әйтеке би",
+    // **v4.4.10** — Kazakhstan administrative + physical-geography
+    // expansion. 17 oblast names (compound `<adjective/proper>
+    // облысы`), the structural-bridge nouns `әкімшілік бөлік` /
+    // `су денесі` / `жер бедері` / `елді мекен` /
+    // `табиғи аймақ` / `республикалық маңызы бар қала`, the
+    // mountain-range entity `Жетісу алатауы`, the peak `Хан Тәңірі`,
+    // and the canyon `Шарын каньоны`. Sorted longest-first so
+    // `find_multiword_entity`'s longest-match scan picks the
+    // compound before the simpler substring.
+    "республикалық маңызы бар қала",
+    "солтүстік қазақстан облысы",
+    "батыс қазақстан облысы",
+    "шығыс қазақстан облысы",
+    "маңғыстау облысы",
+    "қарағанды облысы",
+    "қостанай облысы",
+    "қызылорда облысы",
+    "түркістан облысы",
+    "ұлытау облысы",
+    "ақмола облысы",
+    "ақтөбе облысы",
+    "алматы облысы",
+    "атырау облысы",
+    "жамбыл облысы",
+    "жетісу облысы",
+    "павлодар облысы",
+    "абай облысы",
+    "шарын каньоны",
+    "жетісу алатауы",
+    "әкімшілік бөлік",
+    "табиғи аймақ",
+    "елді мекен",
+    "хан тәңірі",
+    "су денесі",
+    // **v4.4.10** — list-summary fact objects (compound nouns
+    // that play the role of `қазақстан related_to <list>`).
+    // Required by `world_core_multiword_coverage` contract test.
+    "облыстар тізімі",
+    "өзендер тізімі",
+    "көлдер тізімі",
+    "таулар тізімі",
+    "шөлдер тізімі",
+    // **v4.6.0** — landmarks list-summary object.
+    "көрікті жерлер тізімі",
+    // **v4.6.15** — mathematics_basic + informatics_basic domains.
+    // Compound objects (and one subject) that appear in `facts` of
+    // the two new world_core domains. Required by
+    // `world_core_multiword_coverage` contract test. Sorted
+    // longest-first within each length bucket so
+    // `find_multiword_entity`'s longest-match scan resolves the
+    // compound before any contained simpler form.
+    "математикалық тәуелділік",
+    "компьютерлер жиынтығы",
+    "қорғаныс бағдарламасы",
+    "математикалық қатынас",
+    "математикалық әрекет",
+    "геометриялық фигура",
+    "математикалық өрнек",
+    "математикалық кесте",
+    "бағдарлама құрылымы",
+    "геометриялық объект",
+    "бағдарламалық шама",
+    "математикалық ұғым",
+    "бағдарламалау тілі",
+    "арифметикалық амал",
+    "электронды құрылғы",
+    "парақтар жиынтығы",
+    "зиянды бағдарлама",
+    "деректер жиынтығы",
+    "математика саласы",
+    "деректер құрылымы",
+    "бағдарлама бөлігі",
+    "таңбалар тізбегі",
+    "енгізу құрылғысы",
+    "шығару құрылғысы",
+    "операциялық жүйе",
+    "қадамдар тізбегі",
+    "сақтау құрылғысы",
+    "деректер базасы",
+    "ақпарат бірлігі",
+    "көбейту кестесі",
+    "ақпарат қоймасы",
+    "нұсқаулар жиыны",
+    "өлшем бірлігі",
+    "формалды тіл",
+    "натурал сан",
+    "бүтін сан",
+    "жұп сан",
+    "тақ сан",
+    "жай сан",
+    // **v4.8.0** — physics_school domain. Compound objects /
+    // subjects from `data/world_core/physics_school.jsonl`. Sorted
+    // longest-first within each length bucket so
+    // `find_multiword_entity`'s longest-match scan resolves the
+    // compound before any contained simpler form.
+    "электромагниттік индукция",
+    "меншікті жылу сыйымдылық",
+    "энергияның сақталу заңы",
+    "электромагниттік толқын",
+    "ньютонның бірінші заңы",
+    "ньютонның екінші заңы",
+    "ньютонның үшінші заңы",
+    "физикалық субстанция",
+    "температуралық шкала",
+    "потенциалдық энергия",
+    "бірқалыпты қозғалыс",
+    "кинетикалық энергия",
+    "радиоактивті сәуле",
+    "ультракүлгін сәуле",
+    "жартылай өткізгіш",
+    "физикалық құбылыс",
+    "физикалық тұрақты",
+    "физикалық процесс",
+    "оптикалық құбылыс",
+    "серпімділік күші",
+    "элементар бөлшек",
+    "физикалық қасиет",
+    "жарық жылдамдығы",
+    "жылу өткізгіштік",
+    "электр құрылғысы",
+    "инфрақызыл сәуле",
+    "дыбыс жылдамдығы",
+    "үдемелі қозғалыс",
+    "жарықтың шағылуы",
+    "шашыратушы линза",
+    "көлденең толқын",
+    "толқын ұзындығы",
+    "материя бөлшегі",
+    "физикалық нысан",
+    "ядролық реакция",
+    "кельвин шкаласы",
+    "оптикалық аспап",
+    "цельсий шкаласы",
+    "физикалық жүйе",
+    "физикалық өріс",
+    "электр тізбегі",
+    "жарықтың сынуы",
+    "ядролық синтез",
+    "физикалық шама",
+    "ядролық ыдырау",
+    "атомдық физика",
+    "тартылыс күші",
+    "гамма сәулесі",
+    "физика саласы",
+    "қозғалыс түрі",
+    "бойлық толқын",
+    "электр заряды",
+    "альфа сәулесі",
+    "өлшеуіш аспап",
+    "жинаушы линза",
+    "үйкеліс күші",
+    "архимед заңы",
+    "магнит өрісі",
+    "ауырлық күші",
+    "бета сәулесі",
+    "электр өрісі",
+    "энергия түрі",
+    "электр тоғы",
+    "толқын түрі",
+    "атом ядросы",
+    "теріс заряд",
+    "физика заңы",
+    "еркін түсу",
+    "қатты дене",
+    "атом түрі",
+    "зат күйі",
+    "оң заряд",
+    "ом заңы",
+    // **v4.9.0** — chemistry_school domain. Compound objects /
+    // subjects from `data/world_core/chemistry_school.jsonl`. Sorted
+    // longest-first within each length bucket so
+    // `find_multiword_entity`'s longest-match scan resolves the
+    // compound before any contained simpler form.
+    "периодтық жүйенің периоды",
+    "тотықсыздану реакциясы",
+    "заттардың сақталу заңы",
+    "бейтараптану реакциясы",
+    "бейорганикалық химия",
+    "ковалентті байланыс",
+    "элемент сипаттамасы",
+    "органикалық қосылыс",
+    "зарядталған бөлшек",
+    "орынбасу реакциясы",
+    "органикалық химия",
+    "металдық байланыс",
+    "натрий гидроксиді",
+    "сутектік байланыс",
+    "сілтілік металдар",
+    "химиялық байланыс",
+    "тотығу реакциясы",
+    "химиялық процесс",
+    "химиялық элемент",
+    "ыдырау реакциясы",
+    "қосылу реакциясы",
+    "көмірқышқыл газы",
+    "химиялық реакция",
+    "алмасу реакциясы",
+    "иондық байланыс",
+    "нуклеин қышқылы",
+    "менделеев заңы",
+    "натрий хлориді",
+    "біртекті қоспа",
+    "молярлық масса",
+    "периодтық жүйе",
+    "бейметалл тобы",
+    "күкірт қышқылы",
+    "карбон қышқылы",
+    "сутектік көрсеткіш",
+    "авогадро саны",
+    "әртекті қоспа",
+    "материя түрі",
+    "химия бірлігі",
+    // **v4.10.0** — biology_school domain. Compound objects /
+    // subjects from `data/world_core/biology_school.jsonl`. Sorted
+    // longest-first within each length bucket so
+    // `find_multiword_entity`'s longest-match scan resolves the
+    // compound before any contained simpler form.
+    "тұқым қуалаушылық бірлігі",
+    "экологиялық қарым-қатынас",
+    "қылқан жапырақты өсімдік",
+    "тағамдық тізбек звеносы",
+    "омыртқасыз жануарлар",
+    "таксономиялық бірлік",
+    "омыртқалы жануарлар",
+    "қан айналымы жүйесі",
+    "бөліп шығару жүйесі",
+    "биологиялық құбылыс",
+    "таксономиялық дүние",
+    "биологиялық процесс",
+    "бауырмен жорғалаушы",
+    "тірек-қимыл жүйесі",
+    "эволюция механизмі",
+    "өрмекші тәрізділер",
+    "экологиялық бірлік",
+    "жасуша мембранасы",
+    "тұқым қуалаушылық",
+    "эндоплазмалық тор",
+    "тіршілік бірлігі",
+    "тіршілік процесі",
+    "генетикалық ұғым",
+    "өсімдік жасушасы",
+    "экологиялық ұғым",
+    "гольджи аппараты",
+    "жасуша қабырғасы",
+    "тыныс алу жүйесі",
+    "эндокриндік жүйе",
+    "жасуша органоиді",
+    "табиғи сұрыпталу",
+    "ас қорыту жүйесі",
+    "биология саласы",
+    "тағамдық тізбек",
+    "биологиялық зат",
+    "тіршілік ортасы",
+    "рецессивті ген",
+    "сезім мүшелері",
+    "жасуша бөлінуі",
+    "доминантты ген",
+    "гүлді өсімдік",
+    "иммундық жүйе",
+    "көбею жүйесі",
+    "жүйке жүйесі",
+    "ағза жүйесі",
+    "адам ағзасы",
+    "қан тамыры",
+    "тірі ағза",
+    "тыныс алу",
+    "ас қазан",
+    // **v4.11.0** — history_kazakhstan domain. Compound objects /
+    // subjects from `data/world_core/history_kazakhstan.jsonl`.
+    // Sorted longest-first within each length bucket so
+    // `find_multiword_entity`'s longest-match scan resolves the
+    // compound before any contained simpler form.
+    "жиырма бесінші маусым 1916 жылғы жарлық",
+    "исатай мен махамбет көтерілісі",
+    "орынбор шекаралық комиссиясы",
+    "қазақ хандығының 550 жылдығы",
+    "қожа ахмет ясауи кесенесі",
+    "беғазы-дәндібай мәдениеті",
+    "археологиялық ескерткіш",
+    "қазақстан президенттігі",
+    "назарбаев президенттігі",
+    "сырым датұлы көтерілісі",
+    "астанаға елорда көшіру",
+    "семей ядролық полигоны",
+    "алматыға елорда көшіру",
+    "археологиялық мәдениет",
+    "невада-семей қозғалысы",
+    "қазақстан республикасы",
+    "1995 жылғы конституция",
+    "дала уалаятының газеті",
+    "қазақстан тәуелсіздігі",
+    "1930 жылдардағы аштық",
+    "ортағасырлық мемлекет",
+    "есім ханның ескі жолы",
+    "байқоңыр ғарыш айлағы",
+    "әдеттегі құқық жинағы",
+    "тамғалы петроглифтері",
+    "желтоқсан көтерілісі",
+    "сталин репрессиялары",
+    "тоқаев президенттігі",
+    "батыс түрік қағанаты",
+    "1916 жылғы көтеріліс",
+    "мемлекеттік институт",
+    "моңғол шапқыншылығы",
+    "мемлекеттік лауазым",
+    "кенесары көтерілісі",
+    "қасымның қасқа жолы",
+    "ехқк астана саммиті",
+    "қазақстан елтаңбасы",
+    "күлтегін ескерткіші",
+    "археологиялық кезең",
+    "андронов мәдениеті",
+    "ұлттық бірлік күні",
+    "сыпайра ескерткіші",
+    "мемлекеттік валюта",
+    "айша бибі кесенесі",
+    "мемлекеттік мереке",
+    "тәуелсіз мемлекет",
+    "ортағасырлық қала",
+    "тарихи сауда жолы",
+    "қазақстан әнұраны",
+    "мемлекеттік құжат",
+    "қарахан мемлекеті",
+    "советтік мемлекет",
+    "мемлекеттік рәміз",
+    "ақтабан шұбырынды",
+    "әбілқайыр хандығы",
+    "тарихи ескерткіш",
+    "халықаралық ұйым",
+    "аңырақай шайқасы",
+    "конституция күні",
+    "тәуелсіздік күні",
+    "қазақстан тарихы",
+    "көне түрік жазуы",
+    "тарихи көтеріліс",
+    "тарихи бірлестік",
+    "қаңтар оқиғалары",
+    "қарлұқ қағанаты",
+    "ресей бодандығы",
+    "ұлы отан соғысы",
+    "түргеш қағанаты",
+    "тарихи мемлекет",
+    "тарихи қозғалыс",
+    "бұланты шайқасы",
+    "кеңестік лагерь",
+    "бесшатыр қорымы",
+    "тарихи мерейтой",
+    "тарихи бөлініс",
+    "қимақ қағанаты",
+    "алаш қозғалысы",
+    "қыпшақ хандығы",
+    "ұлы жібек жолы",
+    "жоңғар хандығы",
+    "тарихи лауазым",
+    "наурыз мейрамы",
+    "түрік қағанаты",
+    "оғыз мемлекеті",
+    "тарихи науқан",
+    "тарихи мекеме",
+    "тарихи үкімет",
+    "алаш партиясы",
+    "қазақстан туы",
+    "тарихи шайқас",
+    "шағатай ұлысы",
+    "әбілқайыр хан",
+    "қазақ хандығы",
+    "тарихи саясат",
+    "тарихи кезең",
+    "тарихи газет",
+    "ежелгі тайпа",
+    "саяси партия",
+    "тарихи оқиға",
+    "тарихи дерек",
+    "тарихи тұлға",
+    "хақназар хан",
+    "тарихи соғыс",
+    "бөкей ордасы",
+    "ежелгі халық",
+    "қазақ газеті",
+    "тарих саласы",
+    "ұлттық рәміз",
+    "тарихи нысан",
+    "алжир лагері",
+    "тарихи аймақ",
+    "тарихи құжат",
+    "кеңес одағы",
+    "жазу жүйесі",
+    "қола дәуірі",
+    "тәуекел хан",
+    "тарихи апат",
+    "орхон жазуы",
+    "жәнібек хан",
+    "алтын орда",
+    "абылай хан",
+    "тарихи топ",
+    "шыңғыс хан",
+    "жәңгір хан",
+    "қазақ асср",
+    "алтын адам",
+    "әмір темір",
+    "қазақ ханы",
+    "експо 2017",
+    "хан кеңесі",
+    "жеңіс күні",
+    "жеті жарғы",
+    "тәуке хан",
+    "қасым хан",
+    "керей хан",
+    "тың игеру",
+    "қазақ сср",
+    "орта жүз",
+    "есім хан",
+    "көк бөрі",
+    "кіші жүз",
+    "ақ орда",
+    "ұлы жүз",
+    "үш би",
+    "сірке қышқылы",
+    "атомдық масса",
+    "реттік нөмір",
+    "азот қышқылы",
+    "химия саласы",
+    "амин қышқылы",
+    "инертті газ",
+    "күрделі зат",
+    "тұз қышқылы",
+    "металл тобы",
+    "химия ұғымы",
+    "химия заңы",
+    "таза зат",
+    "жай зат",
+    // **v4.7.0** — programming_rust domain. Compound objects /
+    // subjects from `data/world_core/programming_rust.jsonl`.
+    // Sorted longest-first so `find_multiword_entity` resolves
+    // the compound before any contained simpler form.
+    "бағдарламалау тілі",
+    "көшіру семантикасы",
+    "бағдарламалық шама",
+    "бағдарлама әрекеті",
+    "байланысты функция",
+    "бағдарлама бөлігі",
+    "бағдарлама құралы",
+    "синхрондау құралы",
+    "компилятор бөлігі",
+    "өзгермелі сілтеме",
+    "орындалу бірлігі",
+    "басқару құрылымы",
+    "иелікті ауыстыру",
+    "тіршілік мерзімі",
+    "қарыз тексергіш",
+    "cargo командасы",
+    "тұрақты сілтеме",
+    "main функциясы",
+    "функция бөлігі",
+    "сандық қоймасы",
+    "ақылды сілтеме",
+    "derive макросы",
+    "бүтін сан түрі",
+    "жалпылама тип",
+    "бірлік структ",
+    "тип параметрі",
+    "async функция",
+    "тіл командасы",
+    "иелік моделі",
+    "баптау файлы",
+    "мәлімет түрі",
+    "қайтару мәні",
+    "unsafe блогы",
+    "тіл құрылымы",
+    "match өрнегі",
+    "енам нұсқасы",
+    "drop трейті",
+    "cargo check",
+    "жад әрекеті",
+    "ұжымдық тип",
+    "қарызға алу",
+    "? операторы",
+    "cargo build",
+    "код бөлігі",
+    "жад аймағы",
+    "cargo test",
+    "код жинағы",
+    "қате өңдеу",
+    "жад моделі",
+    "impl блогы",
+    "жад ұғымы",
+    "if өрнегі",
+    "cargo run",
+    // **v4.11.5** — query-time compounds for school-curriculum
+    // and self-knowledge questions. These are NOT world_core
+    // subjects/objects (so the `world_core_multiword_coverage`
+    // contract test does not require them), but they ARE the
+    // canonical topic phrasing of real user questions like
+    // «Адам, сен мектептің физика бағдарламасын білесің бе?»
+    // or «Мектеп пәндерін білесің бе?». Pre-v4.11.5 these
+    // questions fell through to `first_noun_root` which picked
+    // either a head noun in isolation (`физика`) or — worse —
+    // the vocative addressee (`адам`) as topic. Sorted
+    // longest-first within the bucket so `find_multiword_entity`
+    // resolves the more-specific compound first.
+    "информатика бағдарламасы",
+    "математика бағдарламасы",
+    "биология бағдарламасы",
+    "мектеп бағдарламасы",
+    "физика бағдарламасы",
+    "химия бағдарламасы",
+    "тарих бағдарламасы",
+    "мектеп пәні",
+    // **v4.11.5** — adam_self domain. Compound subjects /
+    // objects from `data/world_core/adam_self.jsonl` (system's
+    // self-identity facts: identity / implementation / knowledge
+    // claims / limitations). Required by
+    // `world_core_multiword_coverage` contract test. Sorted
+    // longest-first within the bucket.
+    "жергілікті бағдарлама",
+    "rust бастапқы коды",
+    "когнитивтік ядро",
+    "жасанды интеллект",
+    "қазақ тілді жүйе",
+    "ретривал жүйесі",
+    "анық архитектура",
+    "география білімі",
+    "информатика білімі",
+    "математика білімі",
+    "биология білімі",
+    "әдебиет білімі",
+    "тілдік модель",
+    "диалог жүйесі",
+    "мектеп пәндері",
+    "физика білімі",
+    "химия білімі",
+    "тарих білімі",
+    "rust білімі",
+    "жалпы білім",
+    "ғылым салалары",
+    // **v4.11.6** — adam_self subject-rich knowledge claim
+    // categories. Compound objects from `adam_self_028..033`
+    // (subject = школьный предмет, IsA = категория ғылым).
+    "жаратылыстану ғылымы",
+    "гуманитарлық ғылым",
+    "қолданбалы ғылым",
+    "табиғат ғылымы",
+    "абстракт ғылым",
+    // **v4.11.7** — `тарихи өңір` (historical region) compound
+    // object from new bare-subject Жетісу / Ұлытау geo_kz entries.
+    "тарихи өңір",
+];
+
+/// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
+/// the first entity found as a substring of the lowercased input.
+/// Substring match handles Kazakh inflection on the last word of the
+/// compound — e.g. «Құс жолының бейнесі» contains «құс жолы» as a prefix
+/// of the inflected compound.
+pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
+    let lowered = input.to_lowercase();
+    for entity in MULTIWORD_ENTITIES {
+        if lowered.contains(entity) {
+            return Some((*entity).to_string());
+        }
+    }
+    None
+}
+
+/// **v4.11.5** — Latin-named technical proper nouns that appear as
+/// subjects in `programming_rust.jsonl`. When the user types one of
+/// these as a Latin word, the topic extractor routes to the
+/// matching per-concept world_core fact instead of falling through
+/// to corpus citation. Closes the v4.7.0 known limitation: queries
+/// like «Rust туралы не білесіз?» pre-v4.11.5 emitted a poetry
+/// quote because the Cyrillic-only FST can't tokenise `Rust`.
+///
+/// Sorted by length descending so the longest match wins (e.g.
+/// `string` beats the substring `str` if both appear).
+pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
+    "btreemap", "vecdeque", "rustfmt", "hashmap", "hashset", "refcell", "continue", "collect",
+    "expect", "filter", "future", "string", "unwrap", "break", "cargo", "clippy", "loop", "mutex",
+    "none", "option", "panic", "result", "rust", "rustc", "some", "usize", "while", "await",
+    "bool", "char", "f32", "f64", "i32", "i64", "u32", "u64", "for", "map", "mod", "pub", "use",
+    "vec", "arc", "box", "err", "rc", "ok", "str",
+];
+
+/// **v4.11.5** — scan input for any whitespace-separated word
+/// matching a known Latin technical subject. Returns the matched
+/// subject in canonical lowercase form (matching world_core
+/// `subject` field). Word boundaries are whitespace + punctuation
+/// + backticks; trailing punctuation in tokens is stripped before
+/// comparison (e.g. `Rust?` → `rust`). Ignores backtick-quoted
+/// spans because those usually mean code identifiers in their
+/// surrounding context, not a topical reference.
+pub(crate) fn latin_subject_hint(input: &str) -> Option<String> {
+    let mut best: Option<&'static str> = None;
+    for raw in input.split(|c: char| {
+        c.is_whitespace()
+            || matches!(
+                c,
+                ',' | '.' | '?' | '!' | ';' | ':' | '`' | '"' | '(' | ')' | '\''
+            )
+    }) {
+        if raw.is_empty() {
+            continue;
+        }
+        // Only consider tokens that are purely ASCII letters /
+        // digits / underscore; anything Cyrillic falls through to
+        // the existing topic-extraction strategies.
+        if !raw.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+            continue;
+        }
+        let lower = raw.to_lowercase();
+        if let Some(&hit) = LATIN_TECH_SUBJECTS.iter().find(|&&s| s == lower.as_str()) {
+            if best.map_or(true, |b| hit.len() > b.len()) {
+                best = Some(hit);
+            }
+        }
+    }
+    best.map(|s| s.to_string())
+}
+
+/// **v4.3.5** — When the input carries an explicit topic marker
+/// (`X туралы` / `X жайында` / `X жөнінде` / `X хақында`), the word
+/// immediately preceding the marker is the topic the user means,
+/// even if it is a proper noun unknown to the FST lexicon.
+///
+/// Pre-v4.3.5 `best_noun_hint` only consulted FST-parsed nouns and
+/// the multiword-entity list, so an utterance like
+/// `Жазушы Мүсірепов туралы не білесіз?` lost the proper noun:
+/// `жазушы` (in lexicon) won over `мүсірепов` (out of lexicon)
+/// because only the former had an FST `Noun` parse to feed
+/// `first_noun_root`. Real-test 2026-04-26 dialog:
+///
+/// > Жазушы Мүсірепов туралы не білесіз?
+/// > → жазушы туралы қысқа жауап: Жазушы — прозалық шығарма жазатын адам.
+///
+/// Adam answered about "what is a writer" instead of about
+/// Mүsirepov.
+///
+/// The marker is a *strong* context signal — when it fires we
+/// should trust it over FST-only parsing. If the preceding word IS
+/// in the FST parses, we still return its lemma (so `қалам туралы`
+/// → `қала`); if it isn't, we return the surface form (so
+/// `Мүсірепов туралы` → `Мүсірепов`).
+pub(crate) fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<String> {
+    const MARKERS: &[&str] = &["туралы", "жайында", "жөнінде", "хақында"];
+    let lower = input.to_lowercase();
+    for marker in MARKERS {
+        let mut search_from = 0usize;
+        while let Some(rel) = lower[search_from..].find(marker) {
+            let pos = search_from + rel;
+            // Word boundary on the left: either start-of-string or whitespace.
+            let preceded_by_boundary = pos == 0
+                || lower[..pos]
+                    .chars()
+                    .last()
+                    .map(|c| c.is_whitespace())
+                    .unwrap_or(false);
+            if !preceded_by_boundary {
+                search_from = pos + marker.len();
+                continue;
+            }
+            let prefix = lower[..pos].trim_end();
+            if let Some(last_word_lower) = prefix.split_whitespace().last() {
+                let cleaned: String = last_word_lower
+                    .chars()
+                    .filter(|c| c.is_alphabetic() || *c == '-')
+                    .collect();
+                if cleaned.is_empty() || NOT_A_TOPIC.contains(&cleaned.as_str()) {
+                    search_from = pos + marker.len();
+                    continue;
+                }
+                // If the cleaned word is itself an FST-recognized
+                // noun lemma, return it as-is (lowercase). This
+                // preserves the existing "жер туралы" → "жер"
+                // behaviour that goal_continuity scenarios depend on.
+                let known_lemma = parses.iter().any(|p| {
+                    matches!(p,
+                        Analysis::Noun { root, .. } if root.root == cleaned
+                            && !NOT_A_TOPIC.contains(&root.root.as_str())
+                    )
+                });
+                if known_lemma {
+                    return Some(cleaned);
+                }
+                // **v4.11.5** — inflected-form fallback. The word
+                // right before `туралы` is frequently inflected
+                // (`тілі` = `тіл + Px3sg`, `қалаға` = `қала + Dat`).
+                // Pre-v4.11.5 the lemma check above failed because
+                // the FST root (`тіл`) does not equal the surface
+                // form (`тілі`), and the function fell through to
+                // `normalize_proper_noun`, which title-cased the
+                // inflected form into a fake proper noun (`Тілі`).
+                // Closes the v4.11.0 transcript bug where
+                // «Rust бағдарламалау тілі туралы не білесіз?»
+                // extracted topic `Тілі` and routed retrieval to a
+                // poetry quote about the body part `тілім`.
+                //
+                // Strategy: walk parses and pick the longest
+                // noun-root that is a prefix of the cleaned form.
+                // Bounded to ≥ 3 char roots to avoid false positives
+                // on tiny stems.
+                let inflected_lemma = parses
+                    .iter()
+                    .filter_map(|p| match p {
+                        Analysis::Noun { root, .. }
+                            if root.root.chars().count() >= 3
+                                && cleaned.starts_with(root.root.as_str())
+                                && !NOT_A_TOPIC.contains(&root.root.as_str()) =>
+                        {
+                            Some(root.root.clone())
+                        }
+                        _ => None,
+                    })
+                    .max_by_key(|s| s.chars().count());
+                if let Some(lemma) = inflected_lemma {
+                    return Some(lemma);
+                }
+                // Otherwise the word is unknown to FST (typically a
+                // proper noun: `Мүсірепов`, `Малқаров`, …). Return
+                // the title-cased form via `normalize_proper_noun`,
+                // matching how `detect_statement_of_location`
+                // normalizes city surface forms.
+                return Some(crate::language_core::normalize_proper_noun(&cleaned));
+            }
+            search_from = pos + marker.len();
+        }
+    }
+    None
+}
+
+/// v4.0.21 — Best noun hint for the `Intent::Unknown` fallback.
+///
+/// **v4.3.5** — checks the topic marker first (`X туралы`), then
+/// falls back to multi-word entity match and finally
+/// `first_noun_root`. The marker hint takes precedence so a proper
+/// noun preceding the marker wins over a generic in-lexicon noun
+/// elsewhere in the sentence.
+pub(crate) fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
+    // **v4.6.20** — adj+noun compound topic ("машиналық оқыту",
+    // "жасанды интеллект", "табиғи тіл"). Pre-v4.6.20 the first-
+    // noun-root strategy returned only the head noun (`оқыту`)
+    // and silently dropped the modifier, so retrieval matched on
+    // a generic concept instead of the compound. The compound
+    // list is closed and audited in `discourse.rs`. Runs first so
+    // the more-specific compound wins over any single-noun fallback.
+    if let Some(c) = crate::discourse::find_adj_noun_compound(input) {
+        return Some(c.to_string());
+    }
+    // **v4.11.5** — Latin-name passthrough for technical proper
+    // nouns. Closes the v4.7.0 known limitation where queries
+    // typed in Latin (`Rust`, `Cargo`, `String`) fall through to
+    // `Intent::Unknown` because Cyrillic-only FST returns no
+    // analysis. The closed list mirrors Latin-named subjects in
+    // `programming_rust.jsonl`. When the user's question contains
+    // any of these as a whole word (case-insensitive), use it as
+    // the topic so SearchGraph can route to the per-Rust-concept
+    // facts (`rust IsA бағдарламалау тілі`, `cargo IsA құрал`,
+    // …). Runs BEFORE multiword/topic_marker so an explicit Latin
+    // proper noun beats any contained Cyrillic compound.
+    if let Some(latin) = latin_subject_hint(input) {
+        return Some(latin);
+    }
+    // **v4.11.5** — `multiword_entity_hint` promoted to run BEFORE
+    // `topic_marker_hint`. Pre-v4.11.5 the marker hint won first,
+    // so questions like «Rust бағдарламалау тілі туралы не
+    // білесіз?» extracted only the word right before `туралы`
+    // (`тілі`/`тіл`) and missed the more specific multiword
+    // compound (`бағдарламалау тілі`). When MULTIWORD_ENTITIES
+    // contains a compound that appears in the input, that compound
+    // is almost always the user's intended topic — more specific
+    // than any single constituent. The reorder lets the world_core
+    // graph lookup land on the compound subject (which world_core
+    // entries explicitly model: `info_007 бағдарламалау тілі IsA
+    // формалды тіл`) instead of falling through to a corpus
+    // citation about an inflected single word.
+    multiword_entity_hint(input)
+        .or_else(|| topic_marker_hint(input, parses))
+        // v4.4.13 — locative-attributive suffix recovery. The
+        // `-дағы / -дегі / -тағы / -тегі` morpheme is a strong
+        // "specifically located in X" topic-narrowing signal,
+        // semantically equivalent to a `туралы` marker for the
+        // word it attaches to. When present, the recovered stem
+        // (e.g. `қазақстан` from `қазақстандағы`) is the most
+        // specific topic in the question and should win over any
+        // generic content noun (e.g. `тау` from `таулар`) found
+        // elsewhere via `first_noun_root`.
+        .or_else(|| locative_attributive_hint(input))
+        .or_else(|| first_noun_root(parses))
+        // **v4.11.6** — accusative-form fallback. Closes the
+        // «биологияны білесің бе?» → "Түсінбедім" gap from the
+        // 2026-04-30 transcript: FST has a lexicon gap on
+        // `биологияны / химияны / тарихты` (loanword roots in
+        // Accusative case) and emits no Noun analysis, so all
+        // upstream strategies yield None. String-level stripper of
+        // the six Accusative allomorphs recovers the bare stem.
+        // Runs LAST as a fallback after FST-driven strategies
+        // have all failed.
+        .or_else(|| accusative_form_hint(input))
+}
+
+/// **v4.4.12** — string-level locative-attributive suffix strip.
+/// Kazakh forms a "located in X" attributive by attaching `-ғы /
+/// -гі / -қы / -кі` to the locative-cased stem, yielding four
+/// surface allomorphs `-дағы / -дегі / -тағы / -тегі`. The current
+/// FST morphotactics does not model this derivation, so words
+/// like «қазақстандағы», «алматыдағы», «мектептегі» return no
+/// analysis and the topic extractor recovers nothing useful.
+///
+/// This fallback is purely string-level: it scans whitespace-
+/// separated tokens, finds those ending in one of the four
+/// allomorphs, and strips the entire 4-char tail to recover the
+/// base noun. The recovered stem must be ≥ 3 codepoints and not
+/// in `NOT_A_TOPIC`. Returns the first qualifying stem.
+///
+/// Conservative by design — does not validate the stem against
+/// the lexicon (the FST gap is precisely that `тау` isn't always
+/// surfaced as a noun even when present in the lexicon). The
+/// 3-codepoint minimum is sufficient against false positives in
+/// practice — any random word ending in `-дағы` that ISN'T the
+/// locative-attributive of a real noun (e.g. as part of a longer
+/// derivation) is rare enough that the dialog layer's downstream
+/// retrieval/refusal handling absorbs the noise. Promote to a
+/// proper FST morphotactics rule when adding the
+/// `Case::LocativeAttributive` variant in a future minor.
+/// **v4.11.6** — string-level accusative-form fallback. Kazakh
+/// Accusative attaches one of six surface allomorphs by vowel
+/// harmony + final-sound class: `-ны / -ні` after vowel, `-ды /
+/// -ді` after voiced consonant, `-ты / -ті` after voiceless
+/// consonant. The current FST has lexicon gaps on inflected
+/// loanword roots (e.g. `биологияны = биология + Acc`,
+/// `химияны = химия + Acc`, `тарихты = тарих + Acc`) and emits no
+/// Noun analysis, so all upstream noun-hint strategies yield None
+/// and the conversation falls to bare `unknown` → "Түсінбедім.".
+///
+/// Conservative: only fires on tokens of ≥ 5 chars (≥ 3 stem +
+/// 2 suffix), recovered stem must be ≥ 3 codepoints, must not
+/// match `NOT_A_TOPIC`. Returns the first qualifying stem.
+pub(crate) fn accusative_form_hint(input: &str) -> Option<String> {
+    const SUFFIXES: &[&str] = &["ны", "ні", "ды", "ді", "ты", "ті"];
+    let lower = input.to_lowercase();
+    for raw_word in lower.split_whitespace() {
+        let word: String = raw_word
+            .chars()
+            .filter(|c| c.is_alphabetic() || *c == '-')
+            .collect();
+        let word_len = word.chars().count();
+        if word_len < 5 {
+            continue;
+        }
+        for suffix in SUFFIXES {
+            if word.ends_with(suffix) {
+                let stem_chars = word_len - suffix.chars().count();
+                let stem: String = word.chars().take(stem_chars).collect();
+                if stem.chars().count() >= 3 && !NOT_A_TOPIC.contains(&stem.as_str()) {
+                    return Some(stem);
+                }
+            }
+        }
+    }
+    None
+}
+
+pub(crate) fn locative_attributive_hint(input: &str) -> Option<String> {
+    const SUFFIXES: &[&str] = &["дағы", "дегі", "тағы", "тегі"];
+    let lower = input.to_lowercase();
+    for raw_word in lower.split_whitespace() {
+        let word: String = raw_word
+            .chars()
+            .filter(|c| c.is_alphabetic() || *c == '-')
+            .collect();
+        let word_len = word.chars().count();
+        if word_len < 7 {
+            // Need ≥ 3 stem chars + 4 suffix chars.
+            continue;
+        }
+        for suffix in SUFFIXES {
+            if word.ends_with(suffix) {
+                let stem_chars = word_len - suffix.chars().count();
+                let stem: String = word.chars().take(stem_chars).collect();
+                if stem.chars().count() >= 3 && !NOT_A_TOPIC.contains(&stem.as_str()) {
+                    return Some(stem);
+                }
+            }
+        }
+    }
+    None
+}
+
+/// v1.7.0: return every distinct content root from the parse list.
+///
+/// This is what the retrieval ranker consumes — more morphemes in means
+/// more signal for the overlap score. Preserves insertion order so the
+/// first hit still wins for equal-score ties after ranking.
+pub fn content_roots(parses: &[Analysis]) -> Vec<String> {
+    let mut seen = std::collections::HashSet::new();
+    let mut out = Vec::new();
+    for a in parses {
+        if let Analysis::Noun { root, .. } = a {
+            let r = root.root.as_str();
+            if NOT_A_TOPIC.contains(&r) {
+                continue;
+            }
+            // Keep POS-wise noun-like only. "adjective" roots are
+            // signal too but widen the net; v1.7.0 sticks to nouns.
+            if root.part_of_speech != "noun" {
+                continue;
+            }
+            if seen.insert(root.root.clone()) {
+                out.push(root.root.clone());
+            }
+        }
+    }
+    out
+}

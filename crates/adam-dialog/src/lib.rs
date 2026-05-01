@@ -46,6 +46,7 @@ pub mod system_identity;
 pub mod task;
 pub mod templates;
 pub mod tool;
+pub mod topic_extraction;
 pub mod uncertainty;
 pub mod verifier;
 
@@ -83,6 +84,12 @@ pub use system_identity::{SystemAspect, SystemIdentity};
 pub use task::{Goal, Subgoal, TaskDigest, TaskState, TaskStatus};
 pub use templates::{TemplateError, TemplateRepository};
 pub use tool::{Tool, ToolCall, ToolContext, ToolEvidence, ToolResult};
+// **v4.24.0** — `content_roots` was extracted from `semantics` into
+// the new `topic_extraction` module as part of the Codex-review-driven
+// decomposition. Re-export it here so external callers
+// (`adam_chat`, `Conversation::turn_with_trace`) keep their existing
+// `adam_dialog::content_roots` imports working.
+pub use topic_extraction::content_roots;
 pub use uncertainty::{EpistemicStatus, UncertaintyPolicy};
 pub use verifier::{VerificationIssue, VerificationReport, Verifier, strip_evidence};
 

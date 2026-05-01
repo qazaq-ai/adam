@@ -31,8 +31,10 @@ use crate::language_core::canonical_geo_entity;
 // (Codex Phase 5 part 2). The v4.0.33 `plan_response_with_session`
 // remains re-exported from the crate for external callers.
 use crate::realiser::realise;
-use crate::semantics::{content_roots, interpret_text_with_lexicon};
+use crate::semantics::interpret_text_with_lexicon;
+// **v4.24.0** — `content_roots` moved to `topic_extraction` module.
 use crate::templates::TemplateRepository;
+use crate::topic_extraction::content_roots;
 
 /// Maximum intent-history length retained across turns. Bounded so a
 /// long-running session doesn't accumulate an unbounded trace.

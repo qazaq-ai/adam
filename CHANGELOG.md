@@ -7,6 +7,56 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.24.0] — 2026-05-01 — semantics.rs decomposition: topic_extraction module extracted
+
+**First minor in v4.24+ engineering-hygiene arc.** Closes the third Codex review actionable: `crates/adam-dialog/src/semantics.rs` had grown to **3576 lines** by v4.23.5 — past the threshold where individual edits become risky and code review can no longer hold the whole file in working memory. v4.24.0 is **preventive surgery**: pure reorganization of code that already worked, no behaviour change, no new tests, no schema diff. The biggest, most cohesive group of code (~1247 lines answering "given an input + FST analyses, what noun is the user actually talking about?") moves to a new dedicated module.
+
+### Innovations
+
+**(1) New module `crates/adam-dialog/src/topic_extraction.rs`** (~1270 lines including header). Houses:
+
+- `NOT_A_TOPIC: &[&str]` — the closed-class filter (~270 entries by v4.22.5: pronouns, demonstratives, postpositions, quantifiers, interrogatives, discourse particles, modal markers, temporal adverbs, verb converbs that leak as nouns, …). Single source of truth for "what is *not* a content noun".
+- `MULTIWORD_ENTITIES: &[&str]` — the curated multiword content-noun list (curriculum subjects, geo descriptors, world_core compounds; ~150 entries).
+- `LATIN_TECH_SUBJECTS: &[&str]` — the v4.11.5 closed list of Latin-script technical subjects (Rust, Python, Cargo, etc.) that bypass Cyrillic-only content filtering.
+- 8 noun-hint functions: `first_noun_root`, `multiword_entity_hint`, `latin_subject_hint`, `topic_marker_hint`, `best_noun_hint`, `accusative_form_hint`, `locative_attributive_hint`, plus the public `content_roots`.
+
+Visibility: closed-class lists + helpers are `pub(crate)`; `content_roots` is `pub` (consumed externally by `Conversation::turn_with_trace`).
+
+**(2) `semantics.rs` slimmed from 3576 → 2329 lines** (35 % reduction). Remaining: `interpret`, `interpret_text`, `interpret_text_with_lexicon` (the orchestrators) + the dialog-act / profile-statement / ask-about-X detector families. Still substantial, but now focused on intent classification rather than the orthogonal noun-hint extraction layer.
+
+**(3) Re-export preserved.** `pub use topic_extraction::content_roots` in `lib.rs` keeps the public API surface byte-identical. External callers (`adam_chat`, integration tests) keep their existing `adam_dialog::content_roots` imports working with no churn.
+
+**(4) Conversation.rs import updated.** The single internal consumer of `content_roots` (`crate::conversation`) was updated from `crate::semantics::content_roots` to `crate::topic_extraction::content_roots`. One-line change.
+
+**(5) Test parity preserved.** 5 tests that exercise topic-extraction items (`multiword_entity_hint_*`, `world_core_multiword_coverage`, `not_a_topic_covers_v3_9_5_additions`) stay in `semantics.rs` for v4.24.0; they import the moved items via `#[cfg(test)] use crate::topic_extraction::{MULTIWORD_ENTITIES, multiword_entity_hint}`. Future patches can move them inline next to their items as a cleanup follow-up.
+
+### Verification
+
+- **Workspace tests `822 → 822 passing`** — every test produces the same result before and after the move. Behaviour is byte-identical.
+- **Live-dialog smoke battery** — 6 representative queries (identity / Қазақстан fact / temporal-scope / compositional-possessive / willingness / honest-fallback) produce the **same response strings** as v4.23.5. Decomposition is invisible at the user surface.
+- **Parse-disambiguation eval** still **chain_tiebreak_root 23/23 = 100 %** — unchanged.
+
+### Pipeline impact
+
+- New file: `crates/adam-dialog/src/topic_extraction.rs` (~1270 lines).
+- `crates/adam-dialog/src/semantics.rs` — 3576 → 2329 lines (-35 %).
+- `crates/adam-dialog/src/lib.rs` — `pub mod topic_extraction;` + `pub use topic_extraction::content_roots`.
+- `crates/adam-dialog/src/conversation.rs` — one-line import update.
+- No schema changes. No artifact diffs. No test list changes.
+- Workspace tests **822 → 822 passing**.
+
+### What this does NOT change
+
+Nothing user-visible. The output of every public function is bit-identical. This is purely a maintainability investment: future feature patches in `semantics.rs` no longer scroll through 1247 lines of closed-class lists to reach the orchestration logic, and topic-extraction changes can be reviewed against a focused 1270-line file.
+
+### Cadence
+
+Minor — significant architectural addition (new module + extracted ~35 % of the largest file in the dialog crate), zero behaviour change.
+
+**Stripe (5) — humanness through real-dialog testing — continues under cleaner scaffolding.**
+
+Codex queue progresses to: **v4.24.5** (live holdout file — 100-200 unedited real queries as separate CI eval), **v4.25.0** (R5 hub-degree filter — 22931/25006 = 91.7 % of derived facts via single rule), **v4.25.5** (README badge automation). Future decomposition follow-ups: split out `system_questions` (`detect_ask_about_system` is ~460 lines, self-contained) and `query_shape_detectors` (temporal_scope + compositional_function + curriculum_content + list-anaphor) when the next round of feature work touches those areas.
+
 ## [4.23.5] — 2026-05-01 — compositional possessive function-question handler
 
 **Patch in v4.23+ honest-fallback arc.** Closes the second carry-forward from the 2026-05-01 live-dialog battery (and Codex review): «Жасушаның ядросы не атқарады?» pre-fix returned «Ядро жасуша құрамына кіреді» — circular, because the only world_core fact about ядро is structural (PartOf) while the user asked about FUNCTION. Same misalignment class as the v4.12.0 causal short-circuit: when the question shape and the available fact shape don't match, hedge honestly instead of surfacing a formally-correct but semantically-wrong answer.
