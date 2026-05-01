@@ -32,6 +32,19 @@
 //! chains *appear at all* in real Kazakh text, not which ones the
 //! existing parser would pick.
 //!
+//! **v4.20.0 — root-level priors via UNAMBIGUOUS-only attribution.**
+//! Closes the chain-collision blind spot surfaced by v4.19.5: when
+//! two parses produce the same suffix chain (e.g. `он + Loc` and
+//! `ол + Loc`), chain-level priors score them identically. Adding
+//! root-level marginals breaks the tie. We *can't* use uniform
+//! attribution for roots — splitting the count between он and ол
+//! on the ambiguous token «онда» would zero the tiebreaker exactly
+//! where we need it. Instead: a token contributes its full count
+//! to a root only when `analyse()` returns parses with a single
+//! distinct root. Bare nominative forms («ол», «олар», «онбес»)
+//! and other unambiguous tokens build up the marginals; ambiguous
+//! tokens are skipped from root counting entirely.
+//!
 //! **CLI.**
 //! ```text
 //! cargo run --release -p adam-corpus --bin train_suffix_priors
@@ -176,6 +189,14 @@ fn main() -> ExitCode {
     // (closed-class word, OOV, etc).
     let mut chain_keys_for: HashMap<String, Vec<String>> =
         HashMap::with_capacity(unique_tokens.len());
+    // **v4.20.0** — also cache the unique-root list per token. We
+    // use this in the second pass to skip ambiguous tokens from
+    // root counting (per the unambiguous-only attribution policy
+    // documented at the module level). When `unique_roots.len() ==
+    // 1`, the single root receives the full token count;
+    // otherwise the token is skipped from root tallies entirely.
+    let mut unique_roots_for: HashMap<String, Vec<String>> =
+        HashMap::with_capacity(unique_tokens.len());
     let unique_total = unique_tokens.len() as u64;
     let mut analysed_forms: u64 = 0;
     for token in unique_tokens.keys() {
@@ -189,12 +210,28 @@ fn main() -> ExitCode {
         let parses = analyse(token, &lex);
         let keys: Vec<String> = parses.iter().map(chain_key_for_analysis).collect();
         chain_keys_for.insert(token.clone(), keys);
+        // Dedupe roots while preserving v3.2.0 deterministic order.
+        let mut seen = std::collections::HashSet::new();
+        let mut roots: Vec<String> = Vec::new();
+        for parse in &parses {
+            let r = match parse {
+                Analysis::Noun { root, .. } | Analysis::Verb { root, .. } => root.root.clone(),
+            };
+            if seen.insert(r.clone()) {
+                roots.push(r);
+            }
+        }
+        unique_roots_for.insert(token.clone(), roots);
     }
 
-    // Second pass: walk samples in order, tally unigrams and
-    // bigrams using the cache.
+    // Second pass: walk samples in order, tally unigrams,
+    // bigrams, and root unigrams using the cache.
     let mut counts_f64: HashMap<String, f64> = HashMap::new();
     let mut bigram_counts_f64: HashMap<(String, String), f64> = HashMap::new();
+    // **v4.20.0** — root counts under unambiguous-only attribution.
+    let mut root_counts: HashMap<String, u64> = HashMap::new();
+    let mut root_unambiguous_tokens: u64 = 0;
+    let mut root_skipped_ambiguous: u64 = 0;
     for sample in &all_samples {
         let mut prev_keys: Option<&Vec<String>> = None;
         for token in sample {
@@ -224,6 +261,20 @@ fn main() -> ExitCode {
                     }
                 }
             }
+            // **v4.20.0** — root contribution: full count to the
+            // single root iff the token is unambiguous; otherwise
+            // skip. This keeps the root prior a true tiebreaker
+            // for chain-collision pairs (the marginal P(root)
+            // builds up from elsewhere in the corpus, where the
+            // surface form pins the root unambiguously).
+            if let Some(roots) = unique_roots_for.get(token) {
+                if roots.len() == 1 {
+                    *root_counts.entry(roots[0].clone()).or_insert(0) += 1;
+                    root_unambiguous_tokens += 1;
+                } else {
+                    root_skipped_ambiguous += 1;
+                }
+            }
             prev_keys = Some(curr_keys);
         }
     }
@@ -235,6 +286,14 @@ fn main() -> ExitCode {
         total_samples,
         counts_f64.len(),
         bigram_counts_f64.len(),
+    );
+    eprintln!(
+        "train_suffix_priors: root counts (unambiguous-only attribution): \
+         {} distinct roots from {} unambiguous-token instances; \
+         {} ambiguous-token instances skipped",
+        root_counts.len(),
+        root_unambiguous_tokens,
+        root_skipped_ambiguous,
     );
 
     // Round float counts to integers for the SuffixPriors API
@@ -256,9 +315,11 @@ fn main() -> ExitCode {
         .filter(|(_, v)| *v >= 2.0)
         .map(|(k, v)| (k, v.round() as u64))
         .collect();
-    let mut priors = SuffixPriors::from_counts_with_bigrams(counts, bigram_counts);
+    let mut priors =
+        SuffixPriors::from_counts_with_bigrams_and_roots(counts, bigram_counts, root_counts);
     // Override `trained_on_tokens` with the true integer count
-    // (from_counts_with_bigrams sums the rounded unigram values).
+    // (from_counts_with_bigrams_and_roots sums the rounded unigram
+    // values).
     priors.trained_on_tokens = total_tokens;
 
     if let Err(err) = write_priors(&priors) {
@@ -266,10 +327,11 @@ fn main() -> ExitCode {
         return ExitCode::FAILURE;
     }
     eprintln!(
-        "train_suffix_priors: wrote {} (schema v{}, {} chains)",
+        "train_suffix_priors: wrote {} (schema v{}, {} chains, {} roots)",
         OUTPUT_PATH,
         SCHEMA_VERSION,
-        priors.len()
+        priors.len(),
+        priors.root_log_prob.len(),
     );
     ExitCode::SUCCESS
 }
@@ -354,7 +416,18 @@ fn write_priors(priors: &SuffixPriors) -> std::io::Result<()> {
         "pos_transition_log_prob",
         &priors.pos_transition_log_prob,
     );
-    json.push_str("\n}\n");
+    json.push_str(",\n");
+    // **v4.20.0** — root_log_prob (root-level marginals).
+    let mut root_sorted: Vec<(&String, &f32)> = priors.root_log_prob.iter().collect();
+    root_sorted.sort_by(|a, b| a.0.cmp(b.0));
+    json.push_str("  \"root_log_prob\": {\n");
+    for (i, (k, v)) in root_sorted.iter().enumerate() {
+        let comma = if i + 1 == root_sorted.len() { "" } else { "," };
+        let escaped = k.replace('\\', "\\\\").replace('"', "\\\"");
+        json.push_str(&format!("    \"{escaped}\": {v}{comma}\n"));
+    }
+    json.push_str("  }\n");
+    json.push_str("}\n");
 
     fs::write(OUTPUT_PATH, json)
 }

@@ -88,6 +88,20 @@ pub struct SuffixPriors {
     /// rejected by `load()`.
     #[serde(default)]
     pub pos_transition_log_prob: HashMap<String, HashMap<String, f32>>,
+    /// **v4.20.0** — root-level marginal prior: `root → log P(root)`.
+    /// Closes the chain-collision blind spot surfaced by v4.19.5:
+    /// when two FST parses produce the SAME suffix chain (e.g.
+    /// `он + Locative` and `ол + Locative` both → `noun:None|Sg|None|Locative|None`),
+    /// chain-level priors score them identically — adding the
+    /// root-level term breaks the tie. Trained from
+    /// **unambiguous-only attribution**: a token contributes its
+    /// count to the root only when `analyse()` returns parses
+    /// with a single distinct root. Ambiguous tokens are skipped
+    /// (uniform 1/N attribution would zero the tiebreaker, which
+    /// is exactly what we want to avoid). Schema bumped from 3 to
+    /// 4; v3 artifacts are explicitly rejected by `load()`.
+    #[serde(default)]
+    pub root_log_prob: HashMap<String, f32>,
 }
 
 impl Default for SuffixPriors {
@@ -107,6 +121,7 @@ impl SuffixPriors {
             chain_log_prob: HashMap::new(),
             transition_log_prob: HashMap::new(),
             pos_transition_log_prob: HashMap::new(),
+            root_log_prob: HashMap::new(),
         }
     }
 
@@ -149,6 +164,7 @@ impl SuffixPriors {
             chain_log_prob,
             transition_log_prob: HashMap::new(),
             pos_transition_log_prob: HashMap::new(),
+            root_log_prob: HashMap::new(),
         }
     }
 
@@ -199,6 +215,66 @@ impl SuffixPriors {
         }
         priors.pos_transition_log_prob = pos_transition_log_prob;
         priors
+    }
+
+    /// **v4.20.0** — extends `from_counts_with_bigrams` with a
+    /// third axis: root unigram counts, used to break the chain-
+    /// collision tie surfaced by v4.19.5 (when two parses produce
+    /// the same suffix chain, root-level marginals decide).
+    ///
+    /// `root_counts` is expected to be built with **unambiguous-
+    /// only attribution**: a token contributes to the root only
+    /// when `analyse()` returns parses with a single distinct
+    /// root. Ambiguous tokens are skipped at the training side,
+    /// which keeps this prior a true tiebreaker — chain-collision
+    /// pairs like (он+Loc, ол+Loc) need this signal to come from
+    /// elsewhere in the corpus (e.g. bare `ол`, `олар`, `онбес`).
+    pub fn from_counts_with_bigrams_and_roots(
+        unigram_counts: HashMap<String, u64>,
+        bigram_counts: HashMap<(String, String), u64>,
+        root_counts: HashMap<String, u64>,
+    ) -> Self {
+        let mut priors = Self::from_counts_with_bigrams(unigram_counts, bigram_counts);
+        // Add-one Laplace smoothing for root unigrams.
+        let root_total: u64 = root_counts.values().sum();
+        let root_vocab = root_counts.len() as u64;
+        let denom = (root_total + root_vocab) as f32;
+        let mut root_log_prob = HashMap::with_capacity(root_counts.len());
+        for (root, count) in root_counts {
+            let smoothed = (count + 1) as f32 / denom;
+            root_log_prob.insert(root, smoothed.ln());
+        }
+        priors.root_log_prob = root_log_prob;
+        priors
+    }
+
+    /// **v4.20.0** — log-probability of a root under the trained
+    /// marginal prior. Returns the unseen-root floor when the
+    /// root isn't in the support — pushes unobserved roots
+    /// strictly below the rarest observed one, mirroring the
+    /// chain-level `unseen_log_prob` policy. Empty `root_log_prob`
+    /// returns `0.0` so callers that combine `score_chain + score_root`
+    /// see an additive identity (the prior contributes nothing
+    /// when no root data is available).
+    pub fn score_root(&self, root: &str) -> f32 {
+        if self.root_log_prob.is_empty() {
+            return 0.0;
+        }
+        if let Some(score) = self.root_log_prob.get(root).copied() {
+            return score;
+        }
+        // Floor: rarest observed minus ln(2), same shape as
+        // `unseen_log_prob`.
+        let min_observed = self
+            .root_log_prob
+            .values()
+            .copied()
+            .fold(f32::INFINITY, f32::min);
+        if min_observed.is_finite() {
+            min_observed - std::f32::consts::LN_2
+        } else {
+            0.0
+        }
     }
 
     /// Number of distinct chains in the support. Diagnostic only.
@@ -396,7 +472,9 @@ impl SuffixPriors {
 ///   bigram scoring.
 /// - v3 (v4.17.0): adds `pos_transition_log_prob` for POS-aggregated
 ///   fallback when full-bigram rows are sparse.
-pub const SCHEMA_VERSION: u32 = 3;
+/// - v4 (v4.20.0): adds `root_log_prob` for root-level marginals
+///   that break the chain-collision tie surfaced by v4.19.5.
+pub const SCHEMA_VERSION: u32 = 4;
 
 /// **v4.17.0** — extract the POS prefix from a chain key.
 /// Chain keys are formatted as `"noun:..."` or `"verb:..."`; we
@@ -593,13 +671,14 @@ mod tests {
     }
 
     #[test]
-    fn schema_version_is_three_at_v4_17_0() {
-        // v4.17.0 bumps SCHEMA_VERSION from 2 to 3 to add
-        // `pos_transition_log_prob` (POS-aggregated bigram
-        // fallback). Any future bump requires regenerating
+    fn schema_version_is_four_at_v4_20_0() {
+        // v4.20.0 bumps SCHEMA_VERSION from 3 to 4 to add
+        // `root_log_prob` (root-level marginal prior — closes
+        // the chain-collision blind spot surfaced by v4.19.5).
+        // Any future bump requires regenerating
         // `data/retrieval/suffix_chain_priors.json` via the
         // training binary.
-        assert_eq!(SCHEMA_VERSION, 3);
+        assert_eq!(SCHEMA_VERSION, 4);
     }
 
     #[test]
@@ -829,6 +908,33 @@ mod tests {
         assert!(
             (s - unigram).abs() < 1e-6,
             "unseen prev should fall back to unigram (got {s}, want {unigram})"
+        );
+    }
+
+    #[test]
+    fn score_root_returns_zero_for_empty_priors() {
+        // Empty `root_log_prob` is the additive identity for
+        // chain+root composition: callers see no contribution.
+        let p = SuffixPriors::empty();
+        assert_eq!(p.score_root("ол"), 0.0);
+        assert_eq!(p.score_root("он"), 0.0);
+    }
+
+    #[test]
+    fn score_root_ranks_observed_above_unseen() {
+        let mut roots: HashMap<String, u64> = HashMap::new();
+        roots.insert("ол".to_string(), 1000);
+        roots.insert("он".to_string(), 100);
+        let unigrams: HashMap<String, u64> = HashMap::new();
+        let bigrams: HashMap<(String, String), u64> = HashMap::new();
+        let p = SuffixPriors::from_counts_with_bigrams_and_roots(unigrams, bigrams, roots);
+        let s_ol = p.score_root("ол");
+        let s_on = p.score_root("он");
+        let s_unseen = p.score_root("xyzunseen");
+        assert!(s_ol > s_on, "more frequent root should score higher");
+        assert!(
+            s_on > s_unseen,
+            "rare observed root should score above unseen floor"
         );
     }
 }

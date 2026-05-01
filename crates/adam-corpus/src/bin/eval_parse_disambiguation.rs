@@ -35,6 +35,21 @@
 //!    the root that won for the target token. This is what the
 //!    runtime *would* see if sentence-level context were plumbed
 //!    into the FST selector at the `analyse()` boundary.
+//! 7. **Chain+root** — v4.20.0. Additive log-prob combination:
+//!    `log P(chain | prev) + log P(root)`. Tests whether root-
+//!    level priors break the chain-collision tie surfaced by
+//!    v4.19.5 (`он+Loc` and `ол+Loc` produce the same chain).
+//!    Empirically REGRESSES on this set — a high-frequency root
+//!    can override a correctly-scored chain.
+//! 8. **Chain-then-root tiebreak** — v4.20.0. Sort by chain DESC;
+//!    among parses tied on chain (within ε), pick the one with
+//!    the highest root score. Strict tiebreaker — the principled
+//!    formulation. Doesn't regress, doesn't lift on this set:
+//!    онда's chain DOES collide on prior, but the root prior
+//!    under unambiguous-only attribution puts он (digit, common
+//!    in dates) above ол (pronoun, mostly appears in inherently-
+//!    ambiguous forms that get filtered out by the attribution
+//!    policy).
 //!
 //! **Test set.** `data/eval/parse_disambiguation_eval.json` —
 //! 20 hand-labeled cases drawn from past live-REPL bugs and
@@ -145,6 +160,8 @@ fn main() -> ExitCode {
         let pos_cond = best_under(&parses, |a| score_pos_conditioned_no_context(a, &priors));
         let with_ctx = pick_with_sentence_context(&case.sentence, &case.token, &lex, &priors, 0.3)
             .unwrap_or_else(|| baseline.clone());
+        let chain_plus_root = best_under(&parses, |a| score_chain_plus_root(a, &priors, 0.3));
+        let chain_tiebreak_root = pick_chain_with_root_tiebreak(&parses, &priors, 0.3);
 
         let strategies = [
             ("baseline", baseline),
@@ -153,6 +170,8 @@ fn main() -> ExitCode {
             ("smoothed", smoothed),
             ("pos_conditioned", pos_cond),
             ("with_context", with_ctx),
+            ("chain_plus_root", chain_plus_root),
+            ("chain_tiebreak_root", chain_tiebreak_root),
         ];
         let mut row: HashMap<&'static str, String> = HashMap::new();
         for (name, picked) in &strategies {
@@ -166,7 +185,7 @@ fn main() -> ExitCode {
     }
 
     // Report.
-    println!("=== Parse-disambiguation eval (v4.19.5) ===");
+    println!("=== Parse-disambiguation eval (v4.20.0) ===");
     println!("Cases with non-empty FST parses: {total_with_parses}");
     println!();
     println!("Per-strategy accuracy:");
@@ -177,6 +196,8 @@ fn main() -> ExitCode {
         "smoothed",
         "pos_conditioned",
         "with_context",
+        "chain_plus_root",
+        "chain_tiebreak_root",
     ] {
         let h = hits.get(name).copied().unwrap_or(0);
         let pct = if total_with_parses == 0 {
@@ -198,13 +219,21 @@ fn main() -> ExitCode {
             .map(String::as_str)
             .unwrap_or("?");
         let ctx = row.get("with_context").map(String::as_str).unwrap_or("?");
+        let cpr = row
+            .get("chain_plus_root")
+            .map(String::as_str)
+            .unwrap_or("?");
+        let ctr = row
+            .get("chain_tiebreak_root")
+            .map(String::as_str)
+            .unwrap_or("?");
         let unique: std::collections::HashSet<&str> =
-            [baseline, unigram, bigram, smoothed, pos, ctx]
+            [baseline, unigram, bigram, smoothed, pos, ctx, cpr, ctr]
                 .into_iter()
                 .collect();
         let marker = if unique.len() == 1 { "  =" } else { "  ⚠" };
         println!(
-            "  {marker} {id:<40} base={baseline} uni={unigram} bi={bigram} sm={smoothed} pos={pos} ctx={ctx}"
+            "  {marker} {id:<40} base={baseline} uni={unigram} bi={bigram} sm={smoothed} pos={pos} ctx={ctx} cpr={cpr} ctr={ctr}"
         );
     }
     ExitCode::SUCCESS
@@ -332,4 +361,65 @@ fn score_smoothed_with_prev(
         Analysis::Noun { features, .. } => priors.score_noun_smoothed(features, prev, alpha),
         Analysis::Verb { features, .. } => priors.score_verb_smoothed(features, prev, alpha),
     }
+}
+
+/// **v4.20.0** — combined chain + root score. The two log-prob
+/// terms add to give a joint score on the probability scale:
+/// `score = log P(chain) + log P(root)`. When two parses share
+/// the same chain (the chain-collision case surfaced by v4.19.5),
+/// the chain term is identical and the root term decides — which
+/// is exactly the tiebreaker the new prior axis is meant to
+/// provide.
+fn score_chain_plus_root(parse: &Analysis, priors: &SuffixPriors, alpha: f32) -> f32 {
+    let chain_score = match parse {
+        Analysis::Noun { features, .. } => priors.score_noun_smoothed(features, None, alpha),
+        Analysis::Verb { features, .. } => priors.score_verb_smoothed(features, None, alpha),
+    };
+    let root = match parse {
+        Analysis::Noun { root, .. } | Analysis::Verb { root, .. } => &root.root,
+    };
+    chain_score + priors.score_root(root)
+}
+
+/// **v4.20.0** — root-as-strict-tiebreaker. Sort parses by chain
+/// score DESC; among parses tied on chain score (within `EPSILON`),
+/// pick the one with the highest root score. Avoids the
+/// `chain_plus_root` regression where a high-frequency root can
+/// override a chain-score difference. This is the principled
+/// formulation: when chains differ, the chain wins (so v4.16.0's
+/// bigram-aware re-rank stays in charge); when chains collide
+/// (v4.19.5's blind spot), the root term decides.
+fn pick_chain_with_root_tiebreak(parses: &[Analysis], priors: &SuffixPriors, alpha: f32) -> String {
+    if parses.is_empty() {
+        return String::new();
+    }
+    const EPSILON: f32 = 1e-4;
+    let mut indexed: Vec<(usize, f32, f32)> = parses
+        .iter()
+        .enumerate()
+        .map(|(i, p)| {
+            let chain_score = match p {
+                Analysis::Noun { features, .. } => {
+                    priors.score_noun_smoothed(features, None, alpha)
+                }
+                Analysis::Verb { features, .. } => {
+                    priors.score_verb_smoothed(features, None, alpha)
+                }
+            };
+            let root = match p {
+                Analysis::Noun { root, .. } | Analysis::Verb { root, .. } => &root.root,
+            };
+            (i, chain_score, priors.score_root(root))
+        })
+        .collect();
+    // Stable sort by chain DESC; ties broken by root DESC.
+    indexed.sort_by(|a, b| {
+        let chain_diff = (a.1 - b.1).abs();
+        if chain_diff < EPSILON {
+            b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal)
+        } else {
+            b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal)
+        }
+    });
+    root_of(&parses[indexed[0].0])
 }

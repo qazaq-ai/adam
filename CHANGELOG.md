@@ -7,6 +7,64 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.20.0] — 2026-05-01 — root-level priors + new prior axis (P(root) marginals via unambiguous-only attribution)
+
+**First minor in v4.20+ root-axis arc.** v4.19.5 surfaced the structural finding that chain-level priors can't disambiguate root identity when both parses share a suffix chain (the «онда» case: `он + Locative` and `ол + Locative` collide on chain). v4.20.0 builds the missing axis: a root-level marginal prior `P(root)` over the corpus, trained via **unambiguous-only attribution**, with two new evaluation strategies that combine it with the chain prior.
+
+**The empirical result is itself the second negative finding in a row** — but the architectural foundation is now in place, the failure mode is precisely diagnosed, and the next steps are sharp.
+
+### Innovations
+
+**(1) Schema bump v3 → v4.** New `SuffixPriors::root_log_prob: HashMap<String, f32>` field (`#[serde(default)]` for forward-compat, but `load()` rejects v3 artifacts). v3 artifacts must regenerate via `train_suffix_priors`.
+
+**(2) New constructor `from_counts_with_bigrams_and_roots`** — extends the v4.16.0 / v4.17.0 chain+bigram+POS constructor with a third axis: root unigram counts with add-one Laplace smoothing.
+
+**(3) New scoring method `score_root(root: &str) -> f32`** — log-probability of a root under the trained marginal. Empty-priors path returns `0.0` (additive identity for callers combining `chain_score + root_score`). Unseen roots fall to the rarest-observed floor minus `ln(2)`, matching the chain-level `unseen_log_prob` policy.
+
+**(4) Training binary updated** — `train_suffix_priors` now tallies root counts using **unambiguous-only attribution**: a token contributes its full count to a root only when `analyse()` returns parses with a single distinct root. Ambiguous tokens are skipped from root counting entirely. Per the v4.19.5 finding, uniform `1/N` attribution would dilute chain-collision pairs (онда would split 0.5 / 0.5 between он and ол) — exactly the cases where the tiebreaker is needed. The unambiguous-only filter keeps the marginal a true tiebreaker.
+
+**(5) Frozen artifact regenerated** at schema v4. Numbers: 1112 chains (unchanged), **9338 distinct roots** from 3,297,498 unambiguous-token instances, 530,565 ambiguous-token instances skipped (~13.9% ambiguity rate in the corpus). 1.5 MB JSON (vs 1.4 MB v3).
+
+**(6) Two new eval strategies:**
+- **`chain_plus_root`** — additive log-prob: `log P(chain | prev) + log P(root)`. Tests whether root marginals break the chain-collision tie.
+- **`chain_tiebreak_root`** — strict tiebreaker: sort by chain DESC; among parses tied on chain (within ε = 1e-4), pick highest root score. The principled formulation.
+
+### Results (n = 19 with non-empty FST parses)
+
+| Strategy | Hits | Accuracy |
+|---|---|---|
+| baseline | 15 / 19 | **78.9 %** |
+| unigram | 17 / 19 | **89.5 %** |
+| bigram | 17 / 19 | **89.5 %** |
+| smoothed | 17 / 19 | **89.5 %** |
+| pos_conditioned | 17 / 19 | **89.5 %** |
+| with_context (v4.19.5) | 17 / 19 | **89.5 %** |
+| **chain_plus_root** | **16 / 19** | **84.2 %** ← REGRESSES |
+| **chain_tiebreak_root** | **17 / 19** | **89.5 %** |
+
+**Two findings.**
+
+1. **Additive `chain + root` regresses (89.5 → 84.2 %).** The case it flips wrong: «неліктен» — a high-frequency root (`нелік`) can override a correctly-scored chain difference. Demonstrates that adding log-probs without weighting is the wrong scheme: the two axes need to be treated asymmetrically (chain primary, root secondary), not equally.
+
+2. **Strict tiebreaker `chain_tiebreak_root` doesn't regress, doesn't lift.** The «онда» case still picks `он`. Reason: the unambiguous-only attribution policy systematically under-counts pronouns. Pronoun `ол` appears mostly in inherently-ambiguous forms (онда, оны, оған, …) which get filtered from root counting; meanwhile digit `он` appears in many unambiguous numeric contexts (dates, ages, quantities). Result: corpus marginal `P(он) > P(ол)`, even though in real Kazakh usage the pronoun `ол` is far more common than the literal digit "ten." The bias is a side effect of the attribution scheme — fixing it requires either:
+   - **A closed-class boost** — hand-curate a small set of structural pronouns (ол, бұл, сол, мен, сен, олар, біз, сіз) with explicit prior boost factors (deferred to v4.20.5+).
+   - **Lexical co-occurrence** `P(root | surrounding tokens)` — full Bayesian context, more data-hungry (deferred to v4.21.0+).
+   - **Anaphor resolution at the dialog layer** — not in the FST at all; the right place but a much bigger architectural lift.
+
+### Pipeline impact
+
+- `crates/adam-kernel-fst/src/suffix_priors.rs` — schema v3 → v4, +1 field, +1 constructor, +1 method, +2 unit tests.
+- `crates/adam-corpus/src/bin/train_suffix_priors.rs` — root-counts pass with unambiguous-only attribution; new diagnostic eprintln; serialiser writes the new field with sorted keys for byte-stable output.
+- `crates/adam-corpus/src/bin/eval_parse_disambiguation.rs` — +2 strategies (`chain_plus_root`, `chain_tiebreak_root`); module docstring updated.
+- `data/retrieval/suffix_chain_priors.json` — regenerated at schema v4 (~1.5 MB).
+- Workspace tests **807 → 809 passing**.
+
+### Cadence
+
+Minor — significant architectural addition (new prior axis + schema bump + constructor + method + frozen-artifact regen + two new eval strategies). The negative empirical finding is itself a contribution: it narrows the design space for v4.20.5+.
+
+**Stripe (4) — compositional ML — root axis layer opens.** Next: v4.20.5 (closed-class structural-pronoun boost — hand-curated set with explicit prior factors), v4.21.0+ (lexical co-occurrence `P(root | surrounding tokens)` if the closed-class boost proves insufficient).
+
 ## [4.19.5] — 2026-05-01 — sentence-context strategy + structural finding on root-vs-chain disambiguation
 
 **Patch in v4.19+ measurement arc.** v4.19.0 surfaced one residual failure («онда» — gold = `ол + Loc` anaphoric, all isolated-token strategies pick `он + Loc` "in ten") and tagged it as needing "FST sentence-context plumbing." v4.19.5 builds that strategy and measures whether it actually helps. **It does not.** This is a publishable negative result — the structural reason gives us a clearer architectural direction than blindly adding more context layers would have.
