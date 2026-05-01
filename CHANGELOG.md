@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.14.0] — 2026-05-01 — DomainIndex foundation + DialogContext.current_domain wiring + curriculum-content honest fallback
+
+**Third minor in the v4.12+ humanness arc.** v4.13.0 introduced `DialogContext` with `current_domain` slot but left it always `None` (no topic→domain mapping). v4.14.0 builds the missing index, wires it through `Conversation`, and adds the third 2026-05-01 transcript failure handler — the curriculum-content honest fallback that v4.13.5 didn't reach.
+
+### Architectural addition: `DomainIndex`
+
+`crates/adam-dialog/src/domain_index.rs` (~150 lines):
+
+- `struct DomainIndex { by_topic: HashMap<String, String> }` — topic root → primary World-Core domain.
+- `DomainIndex::build(entries: &[WorldCoreEntry])` — walks every fact, tallies (root, domain) counts; primary domain = majority winner with alphabetical tie-break for full determinism.
+- `DomainIndex::lookup_domain(topic) -> Option<&str>` — case-insensitive O(1) lookup.
+- `Conversation::with_domain_index(idx)` — builder method.
+
+Built once at `adam_chat` startup from `data/world_core/*.jsonl` (1 644 topics indexed across the current 38 domains). Each turn looks up the resolved noun_hint's primary domain, passes it to `DialogContext::record_turn`, and the existing v4.13.0 majority-vote logic (`recompute_domain` over the last `DOMAIN_WINDOW=4` turns) settles `current_domain` on the currently-discussed subject area.
+
+**Zero ML.** Pure deterministic count over curated facts. TF-IDF would weight domain-uniqueness; with curated facts almost every root maps to a single dominant domain anyway, so simple counts suffice at v4.14.0 scale.
+
+### Innovations bundled
+
+1. **`DomainIndex` module** — 8 unit tests cover empty index, single-topic, case-insensitive lookup, majority winner, alphabetical tie-break, empty-domain skip, unknown-topic returns None, objects-as-roots.
+
+2. **`Conversation::with_domain_index`** builder + per-turn `DialogContext.current_domain` population. Pre-v4.14.0 `current_domain` was hardcoded `None`; now it majority-votes across the last 4 turns of resolved topics. With 1 644 topics indexed in production, almost every turn's noun_hint hits the index.
+
+3. **`adam_chat` startup integration** — loads world_core via `adam_reasoning::world_core::load_world_core_dir`, builds index, attaches via builder. Failure to load world_core (rare) is non-fatal: domain inference no-ops with empty index.
+
+4. **`Intent::AskCurriculumContent`** + detector + new template family `ask_curriculum_content`. Pattern: subject (student-class noun: `оқушы / студент / шәкірт`) + education locus (`мектеп / сабақ / сыныпта / университет / колледж`) + question word `не` + learning verb (`оқиды / үйренеді / оқисың / оқисыз / ...`). Conservative — requires all four signals so generic «оқушы туралы не білесіз?» doesn't accidentally route here. Catches «Оқушылар мектепте физика пәнінен не оқиды?» and «Студенттер университетте не оқиды?». Honest fallback: «Бұл сұрағыңыз оқу бағдарламасының мазмұнына қатысты — менде нақты пәндік дерек жоқ. Мен әр пәннің не екенін, негізгі ұғымдары мен маңызды атауларын айтып бере аламын; нақты тарауларды немесе мектеп бағдарламасының толық мазмұнын өзіңізге айтуға деректерім жетпейді.»
+
+5. **`IntentKind::AskCurriculumContent`** companion variant for session log compatibility.
+
+6. **REPL replay regression** — 2 new dialogs (curriculum-content base + alternative phrasing).
+
+### Pipeline impact
+
+- New module: `crates/adam-dialog/src/domain_index.rs`.
+- New `Conversation.domain_index: DomainIndex` field + `with_domain_index` builder.
+- `adam_chat` now loads world_core at startup and populates the index.
+- New `Intent::AskCurriculumContent` variant + matching `IntentKind` variant.
+- New `detect_curriculum_content_question` function.
+- New template family `ask_curriculum_content`.
+- `DialogContext.current_domain` now actually populated (was always None pre-v4.14.0).
+
+### Live REPL — third transcript failure closed
+
+```
+Q: Оқушылар мектепте физика пәнінен не оқиды?
+Pre-v4.14.0:  Оқушы туралы қысқаша айтсам: Оқушы мектеп құрамына
+              кіреді.
+Post-v4.14.0: Бұл сұрағыңыз оқу бағдарламасының мазмұнына қатысты —
+              менде нақты пәндік дерек жоқ. Мен әр пәннің не
+              екенін, негізгі ұғымдары мен маңызды атауларын айтып
+              бере аламын; нақты тарауларды немесе мектеп
+              бағдарламасының толық мазмұнын өзіңізге айтуға
+              деректерім жетпейді.
+```
+
+### Tests + counters
+
+- New unit tests: **8 domain_index = +8**.
+- New REPL replay dialogs: **+2**.
+- Workspace tests: 777 → **785 passing** (+8).
+- `validate_world_core`: 1 625 / 1 625 / 1 791 facts (unchanged).
+- `cognitive_eval`: 25/25 canonical.
+- DomainIndex coverage: **1 644 topics** indexed across 38 World-Core domains.
+
+### Cadence
+
+**Minor (v4.14.0)** per `feedback_versioning_post_1_0` — substantial architectural addition: new module + new `Conversation` field + new `Intent` variant + new template family. **Stripe (3) — domain awareness — opens.** All three 2026-05-01 transcript failures now closed across v4.13.0/v4.13.5/v4.14.0. Next:
+
+- **v4.14.5** — predicate decomposition wiring (use `sentence_decomp.focus` to override greedy `noun_hint`) + domain-aware retrieval reranker (tie-break by `current_domain` match).
+- **v4.15.0** — first compositional ML layer: `P(suffix_chain)` priors trained offline on the corpus, used as FST-disambiguation tiebreaker. Pure compositional, no embeddings, no inference-time gradient — natural `root + function^n` learning fits a CPU register.
+
 ## [4.13.5] — 2026-05-01 — capability honest fallbacks: generic verb-capability + multi-topic capability detection
 
 **Patch in the v4.12+ humanness arc.** v4.13.0 laid the foundation (sentence_decomp + DialogContext + closed-class hygiene) and intentionally deferred the answer-side work — the v4.13.0 release notes called out "Generic capability detector for arbitrary verbs" and "Multi-topic capability response" as known remaining gaps. v4.13.5 closes both with two new `SystemAspect` variants + honest-fallback templates that preserve the v4.6.0 trust contract: adam doesn't pretend to do things it can't.

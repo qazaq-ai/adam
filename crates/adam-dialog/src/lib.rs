@@ -32,6 +32,7 @@ pub mod belief;
 pub mod conversation;
 pub mod dialog_context;
 pub mod discourse;
+pub mod domain_index;
 pub mod intent;
 pub mod language_core;
 pub mod planner;
@@ -55,6 +56,7 @@ pub use belief::{
 };
 pub use conversation::{ComposeMode, Conversation, IntentKind, TurnTrace};
 pub use dialog_context::{DialogContext, TopicMention};
+pub use domain_index::DomainIndex;
 pub use intent::{GreetingKind, Intent, SubjectPerson};
 pub use language_core::{
     GeoEntity, PersonEntity, canonical_geo_entity, canonical_geo_id, canonical_person_entity,

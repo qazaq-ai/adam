@@ -313,6 +313,22 @@ templates = [
     "{system_generic_capability}",
 ]
 
+# v4.14.0 — Curriculum-content honest fallback. Triggered by the
+# pattern: student-class subject + education locus + question word
+# `не` + learning verb. 2026-05-01 live REPL: «Оқушылар мектепте
+# физика пәнінен не оқиды?» pre-v4.14.0 surfaced a greedy IsA fact
+# about `оқушы` (the first content noun: «Оқушы мектеп құрамына
+# кіреді»). The honest answer: this question asks about
+# curriculum content, which adam doesn't carry at school-program
+# depth. adam offers what it CAN do (subject-level domain
+# summaries) and invites a more specific follow-up.
+[[families]]
+key = "ask_curriculum_content"
+templates = [
+    "Бұл сұрағыңыз оқу бағдарламасының мазмұнына қатысты — менде нақты пәндік дерек жоқ. Мен әр пәннің не екенін, негізгі ұғымдары мен маңызды атауларын айтып бере аламын; нақты тарауларды немесе мектеп бағдарламасының толық мазмұнын өзіңізге айтуға деректерім жетпейді.",
+    "Мектеп бағдарламасының нақты мазмұны менде жоқ — оны оқулық немесе мұғалім дұрысырақ жеткізеді. Оның орнына осы пән жайында жалпы түсінік бере аламын: негізгі ұғымдар мен анықтамалар.",
+]
+
 # v4.13.5 — Multi-topic capability honest fallback. Triggered when
 # the user lists 3+ subjects and asks if adam knows them all
 # («Сіз математика, физика, химия... білесіз бе?»). Acknowledges

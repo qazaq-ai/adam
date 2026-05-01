@@ -693,6 +693,8 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::WellWishes => "well_wishes",
         Intent::Insult => "insult",
         Intent::UserAcknowledgement => "user_acknowledgement",
+        // v4.14.0 — curriculum-content honest fallback.
+        Intent::AskCurriculumContent => "ask_curriculum_content",
         Intent::Unknown {
             raw_tokens,
             noun_hint,

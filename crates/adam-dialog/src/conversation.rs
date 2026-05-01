@@ -164,6 +164,13 @@ pub struct Conversation {
     /// `current_domain`-aware retrieval scoping. See
     /// [`crate::dialog_context::DialogContext`] for the algorithm.
     pub dialog_context: crate::dialog_context::DialogContext,
+    /// **v4.14.0** — topic → World-Core domain index. Built once at
+    /// `with_world_core` time and frozen for the lifetime of the
+    /// Conversation. Used per turn to populate
+    /// `dialog_context.current_domain` from the resolved topic noun.
+    /// Empty by default (no curated facts attached) — domain
+    /// inference no-ops cleanly when the index is empty.
+    pub domain_index: crate::domain_index::DomainIndex,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -264,6 +271,8 @@ pub enum IntentKind {
     WellWishes,
     Insult,
     UserAcknowledgement,
+    /// **v4.14.0** — curriculum-content honest fallback.
+    AskCurriculumContent,
     Unknown,
 }
 
@@ -297,6 +306,7 @@ impl From<&Intent> for IntentKind {
             Intent::WellWishes => Self::WellWishes,
             Intent::Insult => Self::Insult,
             Intent::UserAcknowledgement => Self::UserAcknowledgement,
+            Intent::AskCurriculumContent => Self::AskCurriculumContent,
             Intent::Unknown { .. } => Self::Unknown,
         }
     }
@@ -342,6 +352,18 @@ impl Conversation {
     ) -> Self {
         self.extracted_facts = extracted;
         self.derived_facts = derived;
+        self
+    }
+
+    /// **v4.14.0** — builder: attach a `DomainIndex` so each turn
+    /// can populate `dialog_context.current_domain` from the
+    /// resolved topic. Built by the caller from `WorldCoreEntry`s
+    /// (typically loaded via
+    /// `adam_reasoning::world_core::load_world_core_dir`). Empty by
+    /// default — domain inference no-ops cleanly when the index is
+    /// empty.
+    pub fn with_domain_index(mut self, index: crate::domain_index::DomainIndex) -> Self {
+        self.domain_index = index;
         self
     }
 
@@ -759,18 +781,20 @@ impl Conversation {
         {
             self.session
                 .insert("last_query_topic".into(), topic.clone());
-            // **v4.13.0** — multi-turn topic memory. Also record
-            // the topic in DialogContext so subsequent turns can
-            // resolve anaphora across the entire conversation, not
-            // just the immediately-prior turn. Domain inference
-            // from the curated fact graph is deferred to v4.13.5
-            // (need a topic→domain index built from world_core);
-            // for now we record `None` as the domain hint, which
-            // means `current_domain` stays None until v4.13.5
-            // wires it up. Subject inference from frequency works
-            // even without domain hints.
+            // **v4.13.0** — multi-turn topic memory.
+            // **v4.14.0** — domain inference now populated from
+            // `domain_index`. When a `DomainIndex` is attached
+            // (built from world_core at conversation startup),
+            // each turn looks up the topic's primary domain and
+            // records it. With enough turns the majority-vote in
+            // `DialogContext::recompute_domain` settles on the
+            // currently-discussed subject area; an empty index
+            // (no `with_domain_index` call) leaves
+            // `current_domain` at None, preserving v4.13.0
+            // behaviour bit-for-bit.
+            let domain_hint = self.domain_index.lookup_domain(topic);
             self.dialog_context
-                .record_turn(self.turn_counter, topic, None, false);
+                .record_turn(self.turn_counter, topic, domain_hint, false);
         }
         let trace = TurnTrace {
             parses,

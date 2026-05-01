@@ -150,6 +150,18 @@ pub enum Intent {
     /// reason this variant exists.
     UserAcknowledgement,
 
+    /// **v4.14.0** — curriculum-content question: «Оқушылар не
+    /// оқиды?» / «Оқушылар мектепте физика пәнінен не оқиды?». A
+    /// factual question about *what students learn*, not about
+    /// adam itself. adam doesn't have school-curriculum-level
+    /// content — only domain-summary breadth. The honest answer:
+    /// «Бұл сұрағыңыз оқу бағдарламасының мазмұнына қатысты —
+    /// менде нақты пәндік дерек жоқ».
+    /// Closes the third 2026-05-01 transcript failure pattern that
+    /// v4.13.5 didn't reach (`Оқушылар не оқиды?` surfaced
+    /// `Оқушы мектеп құрамына кіреді` greedy IsA fact).
+    AskCurriculumContent,
+
     /// Nothing matched. Fallback may carry a `noun_hint` extracted from
     /// the input by the FST parser so the response can at least
     /// acknowledge what the user is talking about, rather than blank

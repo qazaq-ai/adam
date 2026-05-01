@@ -708,6 +708,22 @@
       "turns": [
         {"user": "Сіз математика, физика, химия, биология, астрономия және тағы басқа пәндер бойынша мектептегі біліміңізді білесіз бе?", "output_contains_lower_any": ["негізгі түсініктер", "мектеп бағдарламасының толық мазмұны"]}
       ]
+    },
+    {
+      "id": "curriculum_content_honest_fallback_v4_14_0",
+      "category": "knowledge_query",
+      "description": "v4.14.0: «Оқушылар мектепте физика пәнінен не оқиды?» — curriculum-content question (factual: what do students learn?). Pre-v4.14.0 the topic extractor grabbed `оқушы` (first content noun) and surfaced a greedy IsA fact like «Оқушы мектеп құрамына кіреді». v4.14.0 adds Intent::AskCurriculumContent + detector requiring all four signals: subject (student-class) + education locus + question word `не` + learning verb. Routes to dedicated `ask_curriculum_content` template family that says: this is curriculum content, I don't have it; here's what I CAN do. Closes the third 2026-05-01 transcript failure pattern.",
+      "turns": [
+        {"user": "Оқушылар мектепте физика пәнінен не оқиды?", "output_contains_lower_any": ["оқу бағдарламасының мазмұнына", "мектеп бағдарламасының"]}
+      ]
+    },
+    {
+      "id": "curriculum_content_alt_phrasing_v4_14_0",
+      "category": "knowledge_query",
+      "description": "v4.14.0: «Студенттер университетте не оқиды?» — alternative phrasing of the curriculum-content pattern (студент + университет + не + оқиды). Verifies the detector's flexibility across student-class subjects and education-locus tokens, not just the canonical school + student combination.",
+      "turns": [
+        {"user": "Студенттер университетте не оқиды?", "output_contains_lower_any": ["оқу бағдарламасының", "мектеп бағдарламасының"]}
+      ]
     }
   ]
 }

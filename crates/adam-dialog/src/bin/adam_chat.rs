@@ -162,6 +162,33 @@ fn main() -> ExitCode {
         conv = conv.with_reasoning_chains(extracted, derived);
     }
 
+    // **v4.14.0** — load world_core entries and build the
+    // DomainIndex. Each turn's resolved noun_hint will look up its
+    // primary domain via this index, so DialogContext.current_domain
+    // tracks which subject area the conversation is in. Failure to
+    // load world_core (rare — only happens if `data/world_core/`
+    // doesn't exist or is corrupt) is non-fatal: domain inference
+    // simply no-ops with an empty index.
+    let world_core_dir = std::path::Path::new("data/world_core");
+    let domain_idx = match adam_reasoning::world_core::load_world_core_dir(world_core_dir) {
+        Ok(report) => {
+            let entries: Vec<_> = report.entries.into_iter().map(|(e, _)| e).collect();
+            let idx = adam_dialog::DomainIndex::build(&entries);
+            eprintln!(
+                "adam-chat: domain index — {} topics indexed across world_core",
+                idx.len()
+            );
+            idx
+        }
+        Err(err) => {
+            eprintln!(
+                "adam-chat: world_core load failed ({err}); domain index empty (no current_domain inference)"
+            );
+            adam_dialog::DomainIndex::empty()
+        }
+    };
+    conv = conv.with_domain_index(domain_idx);
+
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
             run_turn(&mut conv, input, &lex, &repo, trace, turn_seed(0));

@@ -104,6 +104,21 @@ pub fn interpret_text_with_lexicon(
     if let Some(aspect) = detect_ask_about_system(&tokens, &joined, input) {
         return Intent::AskAboutSystem { aspect };
     }
+    // **v4.14.0** — curriculum-content question detector.
+    // Pattern: subject in {`оқушы`, `студент`, `шәкірт`, `бала`} +
+    // education locus (`мектеп`, `сабақ`, `сыныпта`, `университет`)
+    // + question word `не` + learning verb (`оқу`, `үйрену`,
+    // `өту`). Catches «Оқушылар мектепте физика пәнінен не оқиды?»
+    // — pre-v4.14.0 surfaced a greedy IsA fact about the first
+    // content noun (`оқушы` → `Оқушы мектеп құрамына кіреді`).
+    // The honest fallback says: this is curriculum content, I
+    // don't have it. Distinct from `MultiTopicCapability` (v4.13.5,
+    // about LISTING subjects), `Knowledge` (v4.6.0, about adam's
+    // domain breadth), and `Limitations` (v4.6.0, about what adam
+    // can't do).
+    if detect_curriculum_content_question(&joined) {
+        return Intent::AskCurriculumContent;
+    }
     if detect_ask_name(&joined) {
         return Intent::AskName;
     }
@@ -1597,6 +1612,43 @@ fn detect_ask_how_are_you(joined: &str) -> bool {
 /// path) to preserve the v4.2.5 cognitive scenarios that exercise
 /// the AnswerDirect rendering for stored user names. The
 /// pronoun-led patterns here are unambiguously about adam.
+/// **v4.14.0** — curriculum-content question detector.
+///
+/// Pattern: subject (student-class noun) + education locus +
+/// question word `не` + learning verb. Conservative — requires all
+/// four signals so a generic «оқушылар туралы не білесіз?» (the
+/// IsA-of-students question) doesn't accidentally route here.
+///
+/// Surface anchors:
+/// - subject: `оқушы` / `оқушылар` / `студент` / `шәкірт` / `бала`
+///   (NOT `балалар` if used as "kids" generically — paired with
+///   education locus to disambiguate)
+/// - education locus: `мектеп` / `сабақ` / `сыныпта` / `университет`
+/// - question word: `не` (the WHAT)
+/// - learning verb: `оқу` / `оқиды` / `үйрену` / `үйренеді` / `өту`
+fn detect_curriculum_content_question(joined: &str) -> bool {
+    let has_student =
+        joined.contains("оқушы") || joined.contains("студент") || joined.contains("шәкірт");
+    let has_education_locus = joined.contains("мектеп")
+        || joined.contains("сабақ")
+        || joined.contains("сыныпта")
+        || joined.contains("сыныпқа")
+        || joined.contains("университет")
+        || joined.contains("колледж");
+    let has_what = joined.contains("не ")
+        || joined.contains("не?")
+        || joined.ends_with("не")
+        || joined.contains("нені")
+        || joined.contains("неден");
+    let has_learning_verb = joined.contains("оқиды")
+        || joined.contains("оқимыз")
+        || joined.contains("оқисың")
+        || joined.contains("оқисыз")
+        || joined.contains("үйренеді")
+        || joined.contains("үйрене");
+    has_student && has_education_locus && has_what && has_learning_verb
+}
+
 fn detect_ask_about_system(
     tokens: &[String],
     joined: &str,
