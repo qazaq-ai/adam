@@ -153,6 +153,17 @@ pub struct Conversation {
     /// LLMs). Tests may override individual fields by direct
     /// construction; production callers should leave the default.
     pub system_identity: crate::system_identity::SystemIdentity,
+    /// **v4.13.0** — multi-turn topic / domain / focus memory.
+    /// Pre-v4.13.0 anaphora resolution consulted only
+    /// `session["last_query_topic"]` (one-turn back-reference);
+    /// `dialog_context` widens that window to the full conversation
+    /// while staying cheap (capped Vec, no graph traversal at update
+    /// time). Updated each turn from the resolved Intent's noun_hint
+    /// + (when discoverable) the World-Core domain. Consulted on the
+    /// next turn for `subject_under_discussion`-driven anaphora and
+    /// `current_domain`-aware retrieval scoping. See
+    /// [`crate::dialog_context::DialogContext`] for the algorithm.
+    pub dialog_context: crate::dialog_context::DialogContext,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -435,7 +446,23 @@ impl Conversation {
         // in the user's raw input and continues to influence
         // retrieval ranking via the v4.4.11 input-overlap reranker.
         if crate::discourse::input_contains_discourse_anaphor(input) {
-            if let Some(prev_topic) = self.session.get("last_query_topic").cloned() {
+            // **v4.13.0** — DialogContext-driven anaphora resolution.
+            // Pre-v4.13.0 only `session["last_query_topic"]` was
+            // consulted (one-turn back-reference). DialogContext
+            // widens the window to the full conversation: if a
+            // sticky `subject_under_discussion` exists, it wins over
+            // the immediate `last_topic` (closes the 2026-05-01
+            // transcript pattern where «оны» refers to a topic
+            // established several turns ago). Falls back to the
+            // legacy session entry for full backward compatibility
+            // when DialogContext has no entries (older callers that
+            // never populate it).
+            let resolved = self
+                .dialog_context
+                .resolve_anaphor()
+                .map(|s| s.to_string())
+                .or_else(|| self.session.get("last_query_topic").cloned());
+            if let Some(prev_topic) = resolved {
                 if let Intent::Unknown {
                     ref mut noun_hint, ..
                 } = intent
@@ -732,6 +759,18 @@ impl Conversation {
         {
             self.session
                 .insert("last_query_topic".into(), topic.clone());
+            // **v4.13.0** — multi-turn topic memory. Also record
+            // the topic in DialogContext so subsequent turns can
+            // resolve anaphora across the entire conversation, not
+            // just the immediately-prior turn. Domain inference
+            // from the curated fact graph is deferred to v4.13.5
+            // (need a topic→domain index built from world_core);
+            // for now we record `None` as the domain hint, which
+            // means `current_domain` stays None until v4.13.5
+            // wires it up. Subject inference from frequency works
+            // even without domain hints.
+            self.dialog_context
+                .record_turn(self.turn_counter, topic, None, false);
         }
         let trace = TurnTrace {
             parses,

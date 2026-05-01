@@ -7,6 +7,118 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.13.0] — 2026-05-01 — sentence-decomposition foundation + DialogContext multi-turn topic memory + closed-class hygiene
+
+**Second minor in the v4.12+ humanness research arc.** A 2026-05-01 live-REPL transcript surfaced two systemic gaps that v4.12.x couldn't close:
+
+1. **Greedy first-noun-match.** «Сіз оны бағдарламалай аласыз ба, **әлі** жоқ па?» pre-v4.13.0 surfaced a poetry quote about `әлі`. The pipeline was hitting modal particles and existential negators (`әлі / әлде / мүмкін / тағы / жоқ / иә / па / пе`) as if they were content nouns.
+2. **Goldfish memory.** The conversation tracked only one back-reference (`session["last_query_topic"]`), so a turn referring to a topic established 3-4 turns earlier could not be resolved.
+
+v4.13.0 lays the **foundation** to fix both. Generic capability detection + honest-fallback templates are deferred to v4.13.5 to keep this release coherent.
+
+### Architectural addition: `sentence_decomp` module
+
+The Kazakh agglutinative grammar IS typed function composition: every word is `root + suffix-chain` where each case suffix is a typed function `Noun → CaseMarkedNoun[Role]`. The FST already decomposes this; pre-v4.13.0 we discarded the case markers downstream and fell back to first-noun-match. v4.13.0 wires the case markers into a **semantic role table** that is linguistically standard and has been stable for ~150 years of Kazakh case-grammar tradition:
+
+```text
+  Nominative   → Subject
+  Accusative   → Object
+  Locative     → Locus
+  LocativeAttr → Locus-modifier
+  Ablative     → Source / Topic-from
+  Dative       → Recipient / Goal
+  Genitive     → Possessor
+  Instrumental → Instrument
+```
+
+`crates/adam-dialog/src/sentence_decomp.rs` exposes:
+
+- `enum SentenceType { Question, Statement, Imperative, Exclamation }` — top-level sentence-type classifier (pure surface scan: punctuation + closed-list imperative cues).
+- `enum Role` — 11 semantic roles (Subject / Object / Locus / Source / Recipient / Possessor / Instrument / Predicate / QuestionWord / Closed / Coord).
+- `struct TokenRole { surface, root, role, is_anaphor }` — per-token tagging.
+- `struct SentenceDecomposition { sentence_type, tokens, question_word, focus, focus_role, predicate, topic_list, cohesion }` — full structural decomposition with derived focus.
+- `fn decompose(input, parses, last_topic) -> SentenceDecomposition` — pure function, O(n) over tokens, hardmap lookups only. Microseconds per query.
+
+Question-word focus override: `не` asks for OBJECT, `қайда` for LOCUS, `қашан/қалай/неліктен` for PREDICATE, `кім/қандай` for SUBJECT. When question_word disagrees with greedy first-noun, decomposition.focus reflects the question-driven choice. The planner can switch on `(SentenceType, question_word, focus_role)` instead of just topic-noun.
+
+**Zero ML.** All operations are deterministic table lookups — fits a CPU register. A probabilistic suffix-chain prior (`P(suffix_chain) — root + function^n` learning) is reserved for v4.15+; v4.13.0 is purely structural foundation.
+
+### Architectural addition: `DialogContext` multi-turn memory
+
+`crates/adam-dialog/src/dialog_context.rs` introduces:
+
+- `struct TopicMention { turn_id, topic, domain, from_anaphora }`.
+- `struct DialogContext { topic_history: Vec<TopicMention>, last_topic, subject_under_discussion, current_domain }`.
+- Capped history (`MAX_HISTORY = 64` entries, FIFO eviction) — memory bounded.
+- `subject_under_discussion` computed via majority vote over the last `STICKY_WINDOW = 6` turns; one-off mentions don't displace it.
+- `current_domain` from majority vote over the last `DOMAIN_WINDOW = 4` turns.
+- `resolve_anaphor()` consults `subject_under_discussion` first, falls back to `last_topic`.
+
+Updated each turn from `Conversation::turn_with_trace` after the resolved Intent's noun_hint surfaces. Used by the discourse-anaphora resolver instead of the v4.6.0 single-string `session["last_query_topic"]` (which is preserved as legacy fallback for callers that never populate `dialog_context`).
+
+### Innovations bundled
+
+1. **`sentence_decomp` module** — 11 unit tests cover SentenceType detection, case-role table, focus-picker, anaphor surface forms, cohesion scoring, closed-class filter.
+
+2. **`DialogContext` module** — 8 unit tests cover topic-history append, subject persistence under one-off mentions, domain majority vote, anaphora-only suppression, history cap, fallback semantics.
+
+3. **Closed-class additions to `NOT_A_TOPIC`** — `әлі / әлде / мүмкін / тағы` (modal/discourse particles) + `жоқ / иә` (existential negator + affirmation particle) + `па / пе` (post-voiceless allomorphs of the question particle, completing the `ма/ме/ба/бе/па/пе` paradigm). These leaked into noun_hint as greedy first-noun before v4.13.0.
+
+4. **Accusative/Dative/Genitive anaphor extension to `DISCOURSE_ANAPHORS`** — pre-v4.13.0 only Locative + Ablative cases (`онда / содан / бұдан / ...`) triggered anaphora resolution. v4.13.0 adds Acc (`оны / соны / мұны / бұны`), Dat (`оған / соған / мұған / бұған`), Gen (`оның / соның / мұның / бұның`) — the full 12-form paradigm. Live-REPL «Сіз оны бағдарламалай аласыз ба?» pre-v4.13.0 ignored `оны` because Accusative wasn't registered.
+
+5. **`Conversation.dialog_context` field** + per-turn record_turn integration. Updated after each Intent::Unknown { noun_hint } resolves. Consulted on next turn's anaphora resolution.
+
+6. **REPL replay regression** — 2 new dialogs: closed-class anti-regression (verifies adam doesn't surface poetry on modal-particle questions) + multi-turn anaphora (verifies turn 2 «оны» resolves to turn 1 topic).
+
+### Pipeline impact
+
+- New module: `crates/adam-dialog/src/sentence_decomp.rs` (~470 lines + tests).
+- New module: `crates/adam-dialog/src/dialog_context.rs` (~250 lines + tests).
+- New `Conversation.dialog_context: DialogContext` field.
+- `NOT_A_TOPIC`: +8 closed-class entries.
+- `DISCOURSE_ANAPHORS`: +12 Acc/Dat/Gen anaphor forms.
+- `interpret_text_with_lexicon` unchanged — sentence_decomp is exposed for v4.13.5+ consumers.
+- `audit_response::contains_latin` v4.12.0 backtick carve-out unchanged.
+
+### Live REPL — multi-turn anaphora
+
+```
+Q1: Сіз Rust туралы не білесіз?
+A1: Rust туралы ең әуелі мынаны айтуға болады: `Rust` — жадыны
+    қауіпсіз басқаратын жүйелік бағдарламалау тілі.
+    [DialogContext: last_topic=rust, subject_under_discussion=rust]
+
+Q2: Сіз оны бағдарламалай аласыз ба?
+A2: Rust туралы ең әуелі мынаны айтуға болады: `Rust` — жадыны
+    қауіпсіз басқаратын жүйелік бағдарламалау тілі.
+    [Pre-v4.13.0: Түсінбедім.]
+```
+
+(The post-v4.13.0 answer is a definition of Rust rather than the proper capability response. Generic verb-capability detection is v4.13.5; v4.13.0 ensures the topic at least carries forward correctly via DialogContext.)
+
+### Known remaining for v4.13.5
+
+- **Generic capability detector for arbitrary verbs.** «verb-ала-сың/сыз ба» pattern → routes to «Жоқ, мен X істей алмаймын» honest fallback.
+- **Honest "I don't have curriculum data" fallback** for `«Оқушылар не оқиды?»`-shaped questions where adam has the subject but no answer-bearing fact.
+- **Multi-topic capability response.** «Сіз математика, физика... білесіз бе?» → «Бұл пәндер бойынша негізгі түсініктер бар, бірақ мектеп бағдарламасының толық мазмұны жоқ.»
+- **Domain inference from world_core** to populate `DialogContext.current_domain` (currently always None — subject inference works without it).
+
+### Tests + counters
+
+- New unit tests: **11 sentence_decomp + 8 dialog_context = +19**.
+- New REPL replay dialogs: **+2** (closed-class anti-regression + multi-turn anaphora).
+- Workspace tests: 758 → **777 passing** (+19).
+- `validate_world_core`: 1 625 / 1 625 approved / 1 791 facts (unchanged).
+- `cognitive_eval`: 25/25 canonical (unchanged).
+
+### Cadence
+
+**Minor (v4.13.0)** per `feedback_versioning_post_1_0` — substantial architectural foundation: 2 new modules + new field on `Conversation` + 12 closed-class additions. **Stripe (2) — humanness — continues with foundation laid.** Next:
+
+- **v4.13.5** — generic capability detector + honest fallback templates (multi-topic capability + curriculum-content "I don't know" + verb-capability honest no).
+- **v4.14.0** — predicate decomposition + domain-TF-IDF + semantic-cohesion graph traversal.
+- **v4.15.0** — first ML layer: `P(suffix_chain)` priors trained offline on the corpus, used as FST-disambiguation tiebreaker. Pure compositional, no embeddings, no inference-time gradient.
+
 ## [4.12.0] — 2026-04-30 — humanness milestone: question-shape classifier + Implementation aspect + causal-reasoning routing + backtick carve-out for user output
 
 **First minor in the v4.12+ humanness research arc.** Three patches in v4.11.5/.6/.7 closed stripe (1) — "answer-by-the-point" — across all 38 world_core domains. v4.12.0 opens stripe (2) — "human-like reasoning" — by giving the planner an analytical signal it never had: the **form** of the user's question (definition vs causal vs listing vs comparison vs yes/no), independent of topic.

@@ -336,6 +336,23 @@ const NOT_A_TOPIC: &[&str] = &[
     // noun. Stem form added; `қысқасы` (full surface) is its own
     // entry below if needed (FST returns the stem `қысқа` first).
     "қысқа",
+    // **v4.13.0** — modal / discourse particles surfaced by the
+    // 2026-05-01 live REPL transcript. «Сіз оны бағдарламалай
+    // аласыз ба, әлі жоқ па?» pre-v4.13.0 fell to `әлі` as topic
+    // because none of these were registered as closed-class. They
+    // are sentence-level discourse markers (yet / or / perhaps /
+    // also), never the topical content noun.
+    "әлі",
+    "әлде",
+    "мүмкін",
+    "тағы",
+    // v4.13.0 — `жоқ` is the existential negator, not a topic noun.
+    // Surfaced by «...әлі жоқ па?» — when `әлі` was added but `жоқ`
+    // was missing, the topic extractor jumped from `әлі` to `жоқ`,
+    // surfacing a poetry quote about absence. Same closed-class
+    // hygiene that catches discourse particles.
+    "жоқ",
+    "иә",
     // **v4.4.10** — indefinite-quantifier pronoun. Same
     // 2026-04-28 trace: `сен ештеңе білмейсің` ("you know
     // nothing") — `ештеңе` ("nothing") is a quantifier pronoun,
@@ -383,6 +400,13 @@ const NOT_A_TOPIC: &[&str] = &[
     // particle, but FST occasionally emits a Noun reading too.
     "ба",
     "ме",
+    // v4.13.0 — `па` / `пе` complete the question-particle paradigm
+    // (post-voiceless-stop allomorphs of `ба` / `бе` per Kazakh
+    // phonotactics). Surfaced by «...әлі жоқ па?» 2026-05-01 — when
+    // `жоқ` was added but `па` was missing, the topic extractor
+    // jumped from `жоқ` to `па`, surfacing «Дос па деген кісіге.»
+    "па",
+    "пе",
     // **v4.6.0** — bare numeral roots that the FST occasionally
     // returns as Locative parses of discourse demonstratives.
     // `Онда` ("then / in it") parses as `он + Locative` (root = "он"

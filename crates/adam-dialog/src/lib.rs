@@ -30,6 +30,7 @@
 pub mod action;
 pub mod belief;
 pub mod conversation;
+pub mod dialog_context;
 pub mod discourse;
 pub mod intent;
 pub mod language_core;
@@ -38,6 +39,7 @@ pub mod quality;
 pub mod question_shape;
 pub mod realiser;
 pub mod semantics;
+pub mod sentence_decomp;
 pub mod slot_syntax;
 pub mod system_identity;
 pub mod task;
@@ -52,6 +54,7 @@ pub use belief::{
     EntityMemory, FactStatus, PendingQuestion, Provenance, QuestionNature, USER_SELF_KEY,
 };
 pub use conversation::{ComposeMode, Conversation, IntentKind, TurnTrace};
+pub use dialog_context::{DialogContext, TopicMention};
 pub use intent::{GreetingKind, Intent, SubjectPerson};
 pub use language_core::{
     GeoEntity, PersonEntity, canonical_geo_entity, canonical_geo_id, canonical_person_entity,
@@ -71,6 +74,9 @@ pub use quality::{
 pub use question_shape::{QuestionShape, detect as detect_question_shape};
 pub use realiser::realise;
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
+pub use sentence_decomp::{
+    Role, SentenceDecomposition, SentenceType, TokenRole, decompose as decompose_sentence,
+};
 pub use system_identity::{SystemAspect, SystemIdentity};
 pub use task::{Goal, Subgoal, TaskDigest, TaskState, TaskStatus};
 pub use templates::{TemplateError, TemplateRepository};

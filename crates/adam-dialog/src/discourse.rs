@@ -46,15 +46,37 @@
 /// FST misanalysis side) — these are the FORMS that carry
 /// anaphoric meaning.
 const DISCOURSE_ANAPHORS: &[&str] = &[
+    // Locative-case anaphors (v4.6.0).
     "онда",
     "сонда",
     "осында",
     "мұнда",
     "бұнда",
+    // Ablative-case anaphors (v4.6.0).
     "одан",
     "содан",
     "бұдан",
     "осыдан",
+    // **v4.13.0** — Accusative/Dative/Genitive-case anaphors.
+    // 2026-05-01 live REPL transcript: «Сіз Rust-ты білесіз бе?»
+    // followed by «Сіз оны бағдарламалай аласыз ба?» — `оны` is
+    // the accusative pronoun "it" (Rust as direct object) and
+    // pre-v4.13.0 was not in the anaphor list, so the previous
+    // turn's topic could not be used to resolve the reference.
+    // Adding the four cases (Acc/Dat/Gen + bare) for the three
+    // demonstrative stems (о-/со-/мұ-/бұ-).
+    "оны",
+    "соны",
+    "мұны",
+    "бұны",
+    "оған",
+    "соған",
+    "мұған",
+    "бұған",
+    "оның",
+    "соның",
+    "мұның",
+    "бұның",
 ];
 
 /// Returns `true` if any whitespace-separated lowercase token of

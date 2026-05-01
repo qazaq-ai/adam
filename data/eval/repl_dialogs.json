@@ -675,6 +675,23 @@
       "turns": [
         {"user": "Адам, неліктен су қайнайды?", "output_contains_lower_any": ["себебін", "себептік"]}
       ]
+    },
+    {
+      "id": "closed_class_modal_particles_v4_13_0",
+      "category": "anti_regression",
+      "description": "v4.13.0: «Сіз оны бағдарламалай аласыз ба, әлі жоқ па?» pre-v4.13.0 surfaced confidently-wrong content (`Әлі жайында...поэзия...` / `Тегін ойлап байқасаң...` / `Жасы құрбы...`) because `әлі / әлде / мүмкін / тағы / жоқ / иә / па / пе` were missing from NOT_A_TOPIC. v4.13.0 adds them so these closed-class modal particles never get picked as topical content. Falls through to honest «Түсінбедім» (better than confidently wrong) until v4.13.5 ships generic capability fallback. Pre-v4.13.0 the output never contained «түсінбедім» here — that's the assertion.",
+      "turns": [
+        {"user": "Сіз оны бағдарламалай аласыз ба, әлі жоқ па?", "output_contains_lower_any": ["түсінбедім", "rust"]}
+      ]
+    },
+    {
+      "id": "multi_turn_anaphora_resolves_via_dialog_context_v4_13_0",
+      "category": "multi_turn_context",
+      "description": "v4.13.0: foundational multi-turn anaphora. Turn 1 establishes Rust as topic; turn 2 says «Сіз оны...» — `оны` is the accusative anaphor, pre-v4.13.0 NOT in DISCOURSE_ANAPHORS so the topic could not be carried over. v4.13.0 adds Acc/Dat/Gen anaphor forms AND introduces DialogContext which preserves the subject across the entire conversation (not just one-turn back-reference). Result: turn 2 reuses Rust as the topic via `subject_under_discussion`.",
+      "turns": [
+        {"user": "Сіз Rust туралы не білесіз?", "output_contains_lower_any": ["rust"]},
+        {"user": "Сіз оны бағдарламалай аласыз ба?", "output_contains_lower_any": ["rust"]}
+      ]
     }
   ]
 }
