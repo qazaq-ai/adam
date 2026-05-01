@@ -637,6 +637,7 @@ mod tests {
             reasoning_chain: Some("байланыс бойынша, абай әдебиетке жатады.".into()),
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         };
         assert_eq!(intent_key(&intent), "unknown.with_derived_chain");
     }
@@ -657,6 +658,7 @@ mod tests {
             reasoning_chain: Some("байланыс бойынша, абай әдебиетке жатады.".into()),
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         };
         assert_eq!(intent_key(&intent), "unknown.with_grounded_fact");
     }
@@ -763,6 +765,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             reasoning_chain,
             question_shape,
             temporal_scope,
+            compositional_function,
             ..
         } => {
             // **v4.23.0** — `temporal_scope: true` short-circuits to
@@ -779,6 +782,25 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             // negative than "no causal data".
             if *temporal_scope {
                 return "unknown.temporal_no_data";
+            }
+            // **v4.23.5** — `compositional_function: true` short-
+            // circuits to `unknown.compositional_function.*`.
+            // Pattern: `X-Genitive Y-Possessive + function-asking
+            // phrase`. world_core typically has only structural
+            // (PartOf / IsA) facts about Y; the user is asking
+            // about FUNCTION. Honest hedge: surface the structural
+            // fact when available, but explicitly state we don't
+            // have functional data. Same precedence policy as
+            // temporal_scope — runs BEFORE the v4.12.0 causal
+            // short-circuit.
+            if *compositional_function {
+                if grounded_fact.is_some() {
+                    return "unknown.compositional_function.with_fact";
+                }
+                if noun_hint.is_some() {
+                    return "unknown.compositional_function.bare";
+                }
+                // Fall through to bare unknown when no topic at all.
             }
             // **v4.12.0** — `QuestionShape::Causal` short-circuits the
             // standard unknown routing. Pre-v4.12.0 «Неліктен жасуша

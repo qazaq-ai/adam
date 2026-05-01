@@ -244,6 +244,24 @@ pub enum Intent {
         /// `detect_temporal_scope_question`.
         #[serde(default)]
         temporal_scope: bool,
+        /// **v4.23.5** — `true` iff the input is a compositional
+        /// possessive function question: X-Genitive Y-Possessive
+        /// + a function-asking phrase (`не атқарады / не істейді /
+        /// қандай қызмет / неге қажет / не үшін керек`). Pattern
+        /// surfaced by the 2026-05-01 live-dialog battery on
+        /// «Жасушаның ядросы не атқарады?» — the topic extractor
+        /// correctly picks `ядро`, but the only world_core fact
+        /// available is structural (`Ядро жасуша құрамына кіреді`),
+        /// so the response circular: "the nucleus is part of the
+        /// cell" doesn't answer "what does the nucleus do?"
+        /// Routes the planner to
+        /// `unknown.compositional_function.{with_fact,bare}` which
+        /// explicitly acknowledges that the available fact is
+        /// structural, not functional, and hedges honestly. Detected
+        /// in `interpret_text_with_lexicon` via
+        /// `detect_compositional_function_question`.
+        #[serde(default)]
+        compositional_function: bool,
     },
 }
 

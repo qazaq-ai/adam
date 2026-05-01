@@ -178,6 +178,7 @@ mod tests {
             reasoning_chain: chain.map(|s| s.into()),
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         }
     }
 

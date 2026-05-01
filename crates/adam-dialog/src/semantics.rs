@@ -229,6 +229,13 @@ pub fn interpret_text_with_lexicon(
     // the topic extractor fall through to a tangential general fact
     // about the non-temporal subject.
     let temporal_scope = detect_temporal_scope_question(input);
+    // **v4.23.5** — detect compositional possessive function
+    // questions: `X-Genitive Y-Possessive + (не атқарады / не
+    // істейді / неге қажет / не үшін керек / қандай қызмет ...)`.
+    // Routes to `unknown.compositional_function.*` so the response
+    // can hedge honestly when only structural facts are available
+    // for the owned part Y.
+    let compositional_function = detect_compositional_function_question(input);
     // **v4.14.5** — sentence_decomp fallback. When greedy
     // `best_noun_hint` returns None (FST recovered nothing
     // useful), but `sentence_decomp::decompose` resolved a
@@ -274,6 +281,7 @@ pub fn interpret_text_with_lexicon(
         reasoning_chain: None,
         question_shape,
         temporal_scope,
+        compositional_function,
     }
 }
 
@@ -1576,6 +1584,10 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         // **v4.23.0** — same: temporal-scope detection is surface-
         // level, so the parses-only legacy path can't fire it.
         temporal_scope: false,
+        // **v4.23.5** — same: compositional-function detection is
+        // surface-level, so the parses-only legacy path can't fire
+        // it.
+        compositional_function: false,
     }
 }
 
@@ -1842,6 +1854,101 @@ fn detect_temporal_scope_question(input: &str) -> bool {
         || lower.ends_with("па?")
         || lower.ends_with("пе?");
     has_question_word || has_question_particle
+}
+
+/// **v4.23.5** — compositional possessive function-question
+/// detector. Returns `true` when the input has the structural
+/// shape `X-Genitive Y-Possessive + function-asking phrase`.
+///
+/// Examples it catches:
+/// - «Жасушаның ядросы не атқарады?»
+/// - «Митохондрияның қызметі қандай?»
+/// - «Атомның ядросы неге қажет?»
+/// - «Машинаның мотор не істейді?»
+/// - «Тілдің рөлі не үшін керек?»
+///
+/// Detection is intentionally lightweight — it doesn't require
+/// the FST to confirm Genitive + Possessive case marking on the
+/// nouns, just looks for the surface signal pattern:
+///
+/// 1. SOME token ends in a Genitive suffix (`-ның / -нің / -тың /
+///    -тің / -дың / -дің`).
+/// 2. SOME token ends in a 3sg-Possessive suffix (`-сы / -сі /
+///    -ы / -і / -ысы / -ісі`).
+/// 3. The input contains at least one function-asking phrase from
+///    a small closed list.
+///
+/// All three must be present. Conservative — false positives
+/// would route legitimate questions to a hedge template, but the
+/// hedge is mild (acknowledges the structural fact, says "no
+/// functional data") so the cost of over-firing is low.
+///
+/// Why this matters: post-v4.22.5 the topic extractor correctly
+/// picks `ядро` for «Жасушаның ядросы не атқарады?», but the
+/// available world_core fact is structural (`Ядро жасуша
+/// құрамына кіреді`), and the response template surfaced that
+/// fact verbatim — answering "the nucleus is part of the cell"
+/// instead of "what does the nucleus do". Routes the planner to
+/// `unknown.compositional_function.with_fact` (when grounded_fact
+/// is available — surface it as the structural-only fact we have)
+/// or `unknown.compositional_function.bare` (when no fact at all).
+fn detect_compositional_function_question(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Tokenise on whitespace, strip punctuation tail.
+    let tokens: Vec<String> = lower
+        .split_whitespace()
+        .map(|tok| {
+            tok.chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect::<String>()
+        })
+        .filter(|t| !t.is_empty())
+        .collect();
+    // (1) Genitive suffix — must appear on at least one token,
+    // not at the very end of the sentence (Genitive is always
+    // followed by something).
+    let has_genitive = tokens.iter().any(|t| {
+        t.ends_with("ның")
+            || t.ends_with("нің")
+            || t.ends_with("тың")
+            || t.ends_with("тің")
+            || t.ends_with("дың")
+            || t.ends_with("дің")
+    });
+    if !has_genitive {
+        return false;
+    }
+    // (2) 3sg-Possessive suffix on a different token. Order long
+    // suffixes first so we don't accidentally match `-сы` inside
+    // `-ысы`.
+    let has_possessive = tokens.iter().any(|t| {
+        t.ends_with("ысы")
+            || t.ends_with("ісі")
+            || t.ends_with("сы")
+            || t.ends_with("сі")
+            || (t.ends_with('ы') && t.chars().count() >= 3)
+            || (t.ends_with('і') && t.chars().count() >= 3)
+    });
+    if !has_possessive {
+        return false;
+    }
+    // (3) Function-asking phrase. Closed list — covers the common
+    // ways Kazakh asks "what does Y do / what is Y for / what is
+    // Y's role".
+    let has_function_query = lower.contains("не атқарады")
+        || lower.contains("не атқарад")
+        || lower.contains("не істейді")
+        || lower.contains("не істей")
+        || lower.contains("не үшін керек")
+        || lower.contains("неге қажет")
+        || lower.contains("қандай қызмет")
+        || lower.contains("қандай рөл")
+        || lower.contains("қандай міндет")
+        || lower.contains("қалай жұмыс іс")
+        || lower.contains("рөлі қандай")
+        || lower.contains("қызметі қандай")
+        || lower.contains("міндеті қандай");
+    has_function_query
 }
 
 /// **v4.17.5** — willingness / readiness-to-improve detector.

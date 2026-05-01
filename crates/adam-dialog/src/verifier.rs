@@ -253,6 +253,7 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             noun_hint,
             question_shape,
             temporal_scope,
+            compositional_function,
             ..
         } => Intent::Unknown {
             raw_tokens,
@@ -270,6 +271,9 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             // to the temporal-no-data template family even after
             // verifier rejects injected evidence.
             temporal_scope,
+            // **v4.23.5** — same: compositional_function is an
+            // analytical signal about query structure.
+            compositional_function,
         },
         other => other,
     }
@@ -290,6 +294,7 @@ mod tests {
             reasoning_chain: chain.map(|s| s.into()),
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         }
     }
 

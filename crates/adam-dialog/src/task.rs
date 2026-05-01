@@ -317,6 +317,7 @@ mod tests {
             reasoning_chain: None,
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         }
     }
 
@@ -378,6 +379,7 @@ mod tests {
                 reasoning_chain: None,
                 question_shape: None,
                 temporal_scope: false,
+                compositional_function: false,
             },
         ];
         for intent in social {
@@ -516,6 +518,7 @@ mod tests {
             reasoning_chain: Some("ой-тізбек: жер — аспан денесі".into()),
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         };
         assert!(TaskState::intent_has_evidence(&with_chain));
 
@@ -528,6 +531,7 @@ mod tests {
             reasoning_chain: None,
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         };
         assert!(TaskState::intent_has_evidence(&with_example));
 
@@ -540,6 +544,7 @@ mod tests {
             reasoning_chain: None,
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         };
         assert!(TaskState::intent_has_evidence(&with_grounded));
 
@@ -564,6 +569,7 @@ mod tests {
             reasoning_chain: Some("ой-тізбек: жер — аспан денесі".into()),
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         };
         t.roll_forward(&intent, &belief, 0);
         assert_eq!(t.status, TaskStatus::ReadyToAnswer);
@@ -588,6 +594,7 @@ mod tests {
             reasoning_chain: Some("chain".into()),
             question_shape: None,
             temporal_scope: false,
+            compositional_function: false,
         };
         t.roll_forward(&intent, &belief, 2);
         assert_eq!(t.status, TaskStatus::Blocked);

@@ -7,6 +7,65 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.23.5] — 2026-05-01 — compositional possessive function-question handler
+
+**Patch in v4.23+ honest-fallback arc.** Closes the second carry-forward from the 2026-05-01 live-dialog battery (and Codex review): «Жасушаның ядросы не атқарады?» pre-fix returned «Ядро жасуша құрамына кіреді» — circular, because the only world_core fact about ядро is structural (PartOf) while the user asked about FUNCTION. Same misalignment class as the v4.12.0 causal short-circuit: when the question shape and the available fact shape don't match, hedge honestly instead of surfacing a formally-correct but semantically-wrong answer.
+
+### Innovations
+
+**(1) `Intent::Unknown.compositional_function: bool`** — new field. Set `true` when the input has the structural shape `X-Genitive Y-Possessive + function-asking phrase`. Detected at the same surface-scan stage as `temporal_scope` (v4.23.0) and `question_shape` (v4.12.0).
+
+**(2) `detect_compositional_function_question`** in `semantics.rs` — three-part check:
+- Some token ends in a Genitive suffix (`-ның / -нің / -тың / -тің / -дың / -дің`).
+- Some token ends in a 3sg-Possessive suffix (`-ысы / -ісі / -сы / -сі`, plus bare `-ы / -і` on long words).
+- The input contains at least one function-asking phrase: `не атқарады / не атқарад / не істейді / не істей / не үшін керек / неге қажет / қандай қызмет / қандай рөл / қандай міндет / қалай жұмыс іс / рөлі қандай / қызметі қандай / міндеті қандай`.
+
+All three must be present. Conservative — false positives would route legitimate questions to a hedge template, but the hedge is mild (acknowledges the structural fact, says "no functional data") so the cost of over-firing is low.
+
+**(3) Two new template families** in `v1.toml`:
+- **`unknown.compositional_function.with_fact`** — surfaces the structural `grounded_fact` and explicitly says the functional data isn't available («{noun} жайында мынаны айта аламын: {fact} Бірақ оның нақты атқаратын қызметін ашатын дерек қорымда жоқ.»).
+- **`unknown.compositional_function.bare`** — no fact at all; just the honest "no functional data" hedge.
+
+**(4) Planner short-circuit** — `compositional_function: true` routes to the new family BEFORE the v4.12.0 causal short-circuit. Same precedence policy as v4.23.0 temporal-scope: structural-shape mismatch is a stronger negative signal than missing causal data.
+
+### Verification
+
+| Query | Pre-v4.23.5 | Post-v4.23.5 |
+|---|---|---|
+| «Жасушаның ядросы не атқарады?» | «Ядро жасуша құрамына кіреді» (structural-only, missed function question) | **«Ядро жайында мынаны айта аламын: Ядро жасуша құрамына кіреді. Бірақ оның нақты атқаратын қызметін ашатын дерек қорымда жоқ.»** |
+| «Атомның ядросы неге қажет?» | structural-only | **same hedging template variant** |
+| «Митохондрияның қызметі қандай?» | none | **honest "no functional data" hedge** (bare template, since world_core has no митохондрия fact) |
+
+**Anti-regression — all pass:**
+- «Жасушаның ядросы туралы айт» (no function-asking phrase) → unchanged. Detector correctly skips because the function-asking phrase requirement isn't met.
+- «Ядро не атқарады?» (no Genitive owner) → unchanged. Detector correctly skips because the X-Genitive requirement isn't met. Conservative scope keeps the bare-noun-function-question case on the existing path; can be extended in a future patch if needed.
+- «Жасуша туралы не білесің?» / «Сен кімсің?» / all v4.x canonical queries → unchanged.
+- v4.23.0 temporal-scope queries («Кеше ауа райы қандай болды?») → still route to `unknown.temporal_no_data`.
+- Workspace tests **822 → 822 passing**.
+- Parse-disambig eval **chain_tiebreak_root 23/23 = 100 %** — unchanged.
+
+### Known gap (deferred)
+
+For «Митохондрияның қызметі қандай?», the topic extractor picks the possessed noun «қызмет» (the question word's referent) instead of the owner «митохондрия». The response is honest but doesn't reference the actual subject. A deeper fix in topic-extraction for compositional possessive questions (prefer X-Genitive when the question is about Y's properties) is a separate concern and defers to v4.24.x or beyond.
+
+### Pipeline impact
+
+- `crates/adam-dialog/src/intent.rs` — `Intent::Unknown` += `compositional_function: bool` field with `#[serde(default)]`.
+- `crates/adam-dialog/src/semantics.rs` — `detect_compositional_function_question` (~70 lines); `interpret_text_with_lexicon` populates the field; legacy parses-only path defaults to `false`.
+- `crates/adam-dialog/src/planner.rs` — compositional short-circuit, runs after temporal_scope but before causal.
+- `crates/adam-dialog/src/verifier.rs::strip_evidence` — preserves the field.
+- `crates/adam-dialog/src/{action,planner,task,uncertainty,verifier}.rs` — 14 test sites updated with `compositional_function: false`.
+- `data/dialog/templates/v1.toml` — 2 new template families (5 variants total).
+- Workspace tests **822 → 822 passing**.
+
+### Cadence
+
+Patch — same mechanism as v4.23.0 (new bool flag on Intent::Unknown + detector + planner short-circuit + template family), applied to a different question-shape misalignment.
+
+**Stripe (5) — humanness through real-dialog testing — continues.**
+
+Codex carry-forward queue progresses to: **v4.24.0** (`semantics.rs` decomposition — file is now 3458 lines after v4.23.0 / v4.23.5 detector additions; preventive surgery before unmaintainable), **v4.24.5** (live holdout file), **v4.25.0** (R5 hub-degree filter), **v4.25.5** (README badge automation).
+
 ## [4.23.0] — 2026-05-01 — temporal-scope detector + drift cleanup (Codex review actionables)
 
 **First minor in the v4.23+ honest-fallback arc.** v4.22.5 closed the proverb-leak class for closed-class words but left a deeper failure exposed by the live-dialog battery and confirmed by Codex review: queries about *state at a specific point in time* («Кеше ауа райы қандай болды?», «Ертең күн қандай болады?») had no honest answer because adam doesn't track time-bound state. The post-v4.22.5 path filtered out `кеше` as a topic but fell through to a tangential general fact about the non-temporal subject (`ауа` → «Ауа тыныс себебі болады»). v4.23.0 closes this with a dedicated detector + template family. Bundled with the doc/artifact drift cleanup Codex flagged in the same review.

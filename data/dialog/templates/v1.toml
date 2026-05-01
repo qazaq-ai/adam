@@ -412,6 +412,36 @@ templates = [
     "уақыт бойынша өзгеретін деректерді сақтамаймын, сондықтан кеше / ертең / қазірдегі нақты жағдайды біле бермеймін. Жалпы ұғым туралы білгім келсе айтыңыз — соны айта аламын.",
 ]
 
+# v4.23.5 — compositional possessive function-question
+# fallbacks. Pattern: `X-Genitive Y-Possessive + не атқарады /
+# не істейді / неге қажет / қандай қызмет`. world_core typically
+# stores structural (PartOf / IsA) facts about Y, not functional
+# ones, so the available `grounded_fact` is structural while the
+# user asked about FUNCTION. Honest hedge: acknowledge the
+# structural fact, then explicitly say we don't have functional
+# data. Detected by `detect_compositional_function_question` in
+# `semantics.rs`; routed by `planner.rs` via the v4.23.5 short-
+# circuit BEFORE the v4.12.0 causal one.
+#
+# - `unknown.compositional_function.with_fact` — grounded_fact
+#   present (structural relationship for Y). Surfaces it as the
+#   structural-only data we have.
+# - `unknown.compositional_function.bare` — only noun_hint, no fact.
+[[families]]
+key = "unknown.compositional_function.with_fact"
+templates = [
+    "{noun} жайында мынаны айта аламын: {fact} Бірақ оның нақты атқаратын қызметін ашатын дерек қорымда жоқ.",
+    "{noun} туралы білетінім — құрылымдық байланыс: {fact} Дәл қандай қызмет атқаратынын егжей-тегжейлі айта алмаймын; ол үшін нақты функционалды дерек қажет.",
+    "{noun} жөнінде менде құрылымдық дерек бар: {fact} Атқаратын қызметінің нақты сипаттамасы — менің білім қорымда жоқ.",
+]
+
+[[families]]
+key = "unknown.compositional_function.bare"
+templates = [
+    "{noun} нақты қандай қызмет атқаратынын ашатын дерек менің білім қорымда жоқ. Жалпы анықтамасын немесе байланысын білсем — оны айта аламын.",
+    "{noun} атқаратын қызметі туралы нақты деректерім жоқ — функционалды сипаттамаға қажетті ақпарат менде сақталмаған.",
+]
+
 # v4.6.20 — User-acknowledgement template family. Surfaced by a
 # real-REPL transcript where the user said «Мен сенің әлі
 # бәрін білмейтініңді … түсіндім» (a long, gracious admission
