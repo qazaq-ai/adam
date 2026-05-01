@@ -7,6 +7,90 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.17.0] — 2026-05-01 — POS-conditioned priors P(chain | prev_pos, prev_chain) + 4-tier fallback ladder
+
+**Third minor in the v4.15+ compositional-ML arc.** v4.16.0 added bigram transitions; v4.16.5 added Jelinek-Mercer smoothing. v4.17.0 adds the **POS-aggregated fallback tier** — when a full bigram row is sparse but the previous token's POS is known, fall back to the POS-conditioned distribution before dropping to the unigram. Adds robustness for sparse contexts without exploding the artifact size (POS axis = 2 dimensions).
+
+### Architectural addition: `pos_transition_log_prob`
+
+`crates/adam-kernel-fst/src/suffix_priors.rs` extended:
+
+- New field `pos_transition_log_prob: HashMap<String, HashMap<String, f32>>` keyed by POS string (`"noun"` / `"verb"`) → curr_chain → log_prob.
+- `from_counts_with_bigrams` constructor extended to compute the POS-aggregated rows in parallel with full bigrams.
+- New helper `pos_from_chain_key(chain) -> &str` extracts the prefix (`"noun"` / `"verb"` / `"unknown"`).
+- New helper `smooth_row(row)` — extracted to keep the smoothing recipe consistent across full-bigram and POS-bigram rows.
+- `score_chain_given_prev` extended with the new tier:
+  1. **Tier 1 — full bigram**: `transition_log_prob[prev_chain][curr_chain]` if seen.
+  2. **Tier 2 — POS-bigram**: `pos_transition_log_prob[prev_pos][curr_chain]` if Tier 1 row missing or sparse.
+  3. **Tier 3 — unigram**: `chain_log_prob[curr_chain]`.
+  4. **Tier 4 — floor**: `min_observed - ln(2)` for completely unseen chains.
+
+The POS-aggregated tier is naturally **dense** — only 2 rows (noun, verb) but each carries hundreds of successors, so it always has signal. This makes the fallback ladder genuinely informative for sparse contexts instead of jumping from sparse-bigram-row directly to context-free unigram.
+
+### Innovations bundled
+
+1. **`pos_transition_log_prob` field** + `from_counts_with_bigrams` extension. POS-bigrams are computed by aggregating full-bigram counts by `pos_from_chain_key(prev_chain)`. Same Laplace-smoothing recipe as the full bigrams, applied per POS row.
+
+2. **`pos_from_chain_key` helper** + `smooth_row` extracted helper for code reuse.
+
+3. **Extended `score_chain_given_prev` ladder** — POS-bigram tier inserted between the full bigram and the unigram. Strictly additive: when full bigram is rich, behaviour is identical to v4.16.5; when sparse, the POS row provides a finer signal than pure unigram.
+
+4. **`SCHEMA_VERSION` bumped 2 → 3**. v2 artifacts are explicitly rejected by `load()`; the constants comment documents the schema history.
+
+5. **Training binary updated** — `write_priors` extracts a shared `serialize_nested_map` helper used for both `transition_log_prob` and `pos_transition_log_prob`. Sorted-keys / byte-stable output preserved across runs. Artifact regenerated.
+
+6. **3 new unit tests**: `pos_from_chain_key_extracts_pos_prefix`, `pos_bigrams_populated_alongside_full_bigrams`, `fallback_ladder_uses_pos_bigram_when_full_bigram_row_unseen`. Schema-version assertion bumped to v3.
+
+7. **REPL replay regression** — 1 new dialog `pos_conditioned_priors_anti_regression_v4_17_0` covers canonical multi-token queries, ensuring the new tier doesn't disturb any v4.x behaviour.
+
+### Frozen artifact: `data/retrieval/suffix_chain_priors.json`
+
+Regenerated at schema **v3**:
+
+- **5,765,342 tokens** across 699,035 samples (corpus unchanged).
+- **1,112 distinct chains** (unigrams unchanged).
+- **21,270 full bigrams** across 711 prev-chain rows (v4.16.0 layer unchanged).
+- **846 POS-bigrams** across **2 POS rows** (noun: 423 successors, verb: 423 successors — both densely populated).
+- **1.4 MB** pretty-printed JSON (POS-bigrams add ~16 KB; total artifact size effectively unchanged).
+
+### Pipeline impact
+
+- `SuffixPriors` gains `pos_transition_log_prob` field.
+- `SCHEMA_VERSION` 2 → 3.
+- `from_counts_with_bigrams` now computes POS-aggregated rows in parallel.
+- `score_chain_given_prev` uses 4-tier fallback ladder.
+- `score_chain_smoothed` benefits indirectly through `score_chain_given_prev`.
+- Training binary `write_priors` extracts `serialize_nested_map` helper for code reuse.
+- Frozen artifact regenerated.
+
+### Anti-regression — 11-question battery
+
+All canonical queries answer correctly post-v4.17.0: greeting, definition (Жасуша / Атом / Алматы), system identity, capability, causal, curriculum, name statement. The new tier doesn't disturb any v4.x behaviour — POS-bigrams only fire when full bigrams are sparse, which is rare for canonical queries that walk well-trodden bigram paths.
+
+### Why this is the right next step
+
+Per `project_v4_direction`:
+
+- **Predictable.** POS aggregation is a deterministic sum over existing bigram counts; no new training pass logic, no new hyperparameters.
+- **Cheap.** Training: zero extra cost — POS rows computed in the same pass as full bigrams. Runtime: at most one extra hashmap probe per parse on the fallback path. Artifact: +16 KB out of 1.4 MB total.
+- **Safe.** Strictly additive in the fallback ladder. When full bigrams are rich, behaviour identical to v4.16.5; when sparse, finer signal than unigram. No fabrication path.
+- **Foundation.** The POS axis is the simplest possible context-aggregation. Same `корень + функция^n` view, with a coarser conditioning slot when the fine slot is sparse. Future versions can add lemma-conditioned or domain-conditioned tiers in the same shape.
+
+### Tests + counters
+
+- New unit tests: **+3 suffix_priors** (POS extraction, POS-bigram constructor, fallback ladder). +1 schema-version assertion bumped to v3.
+- New REPL replay dialogs: **+1**.
+- Workspace tests: 799 → **802 passing** (+3).
+- `validate_world_core`: 1 625 / 1 625 / 1 791 facts (unchanged).
+- `cognitive_eval`: 25/25 canonical.
+
+### Cadence
+
+**Minor (v4.17.0)** per `feedback_versioning_post_1_0` — substantial architectural extension: new struct field, new fallback tier, schema bump, training-binary helper extraction. **Stripe (4) — compositional ML — fallback ladder layer.** Next:
+
+- **v4.17.5** — empirical eval: build a tiny held-out test set of FST-ambiguous Kazakh tokens with hand-labelled correct readings; measure how often v4.16.0 / v4.16.5 / v4.17.0 each pick the labelled parse vs raw v3.2.0 lexicographic. Quantifies the actual win from compositional ML.
+- **v4.18.0** — direction TBD: continue the compositional-ML arc (e.g. trigrams, lemma-conditioned priors), or branch back into humanness work (richer dialog memory, multi-turn coreference) once we have empirical data on prior efficacy.
+
 ## [4.16.5] — 2026-05-01 — Jelinek-Mercer interpolation knob α·log_p_unigram + (1-α)·log_p_bigram
 
 **Patch in the v4.15+ compositional-ML arc.** v4.16.0 shipped pure bigram scoring with three-tier fallback. v4.16.5 adds the **smoothing dial**: a tunable interpolation weight between unigram and bigram log-probabilities. Lets the runtime balance the bigram's specificity (good when context is rich) against the unigram's robustness (good when bigram rows are sparse).

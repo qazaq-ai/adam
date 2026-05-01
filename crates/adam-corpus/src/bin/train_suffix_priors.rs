@@ -340,11 +340,37 @@ fn write_priors(priors: &SuffixPriors) -> std::io::Result<()> {
     }
     json.push_str("  },\n");
 
-    // transition_log_prob: outer keys sorted, inner keys sorted.
-    let mut outer_sorted: Vec<(&String, &HashMap<String, f32>)> =
-        priors.transition_log_prob.iter().collect();
+    // transition_log_prob (v4.16.0).
+    serialize_nested_map(
+        &mut json,
+        "transition_log_prob",
+        &priors.transition_log_prob,
+    );
+    json.push_str(",\n");
+    // **v4.17.0** — pos_transition_log_prob serialised the same
+    // way for byte-stable output across runs.
+    serialize_nested_map(
+        &mut json,
+        "pos_transition_log_prob",
+        &priors.pos_transition_log_prob,
+    );
+    json.push_str("\n}\n");
+
+    fs::write(OUTPUT_PATH, json)
+}
+
+/// **v4.17.0** — serialise a nested `HashMap<String,
+/// HashMap<String, f32>>` block with sorted keys at both levels
+/// for byte-stable output. Writes the field as `"name": { ... }`
+/// (no trailing newline / comma).
+fn serialize_nested_map(
+    json: &mut String,
+    field_name: &str,
+    map: &HashMap<String, HashMap<String, f32>>,
+) {
+    let mut outer_sorted: Vec<(&String, &HashMap<String, f32>)> = map.iter().collect();
     outer_sorted.sort_by(|a, b| a.0.cmp(b.0));
-    json.push_str("  \"transition_log_prob\": {\n");
+    json.push_str(&format!("  \"{field_name}\": {{\n"));
     for (oi, (prev_key, row)) in outer_sorted.iter().enumerate() {
         let outer_comma = if oi + 1 == outer_sorted.len() {
             ""
@@ -366,8 +392,5 @@ fn write_priors(priors: &SuffixPriors) -> std::io::Result<()> {
         }
         json.push_str(&format!("    }}{outer_comma}\n"));
     }
-    json.push_str("  }\n");
-    json.push_str("}\n");
-
-    fs::write(OUTPUT_PATH, json)
+    json.push_str("  }");
 }

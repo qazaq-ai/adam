@@ -767,6 +767,15 @@
         {"user": "Атом туралы айт", "output_contains_lower_any": ["атом"]},
         {"user": "Қазақстан туралы не білесіз?", "output_contains_lower_any": ["қазақстан"]}
       ]
+    },
+    {
+      "id": "pos_conditioned_priors_anti_regression_v4_17_0",
+      "category": "anti_regression",
+      "description": "v4.17.0: POS-conditioned priors P(chain | prev_pos, prev_chain) — adds POS-aggregated bigram fallback as the intermediate tier between full bigrams and unigrams. SuffixPriors gains pos_transition_log_prob (HashMap<POS, HashMap<curr_chain, log_prob>>) keyed by 'noun' / 'verb'. Schema bumped 2→3. The fallback ladder is now: full bigram → POS-bigram → unigram → floor. This anti-regression dialog ensures the new tier doesn't disturb canonical answers — the POS-bigram only kicks in when a full-bigram row is sparse; for well-populated rows (the common case) v4.16.0 behaviour is preserved bit-for-bit.",
+      "turns": [
+        {"user": "Жасушаның ядросы туралы айт", "output_contains_lower_any": ["жасуша", "ядро"]},
+        {"user": "Қазақстан туралы не білесіз?", "output_contains_lower_any": ["қазақстан"]}
+      ]
     }
   ]
 }

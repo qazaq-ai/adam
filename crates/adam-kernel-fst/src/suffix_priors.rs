@@ -76,6 +76,18 @@ pub struct SuffixPriors {
     /// callers regenerate the artifact via the training binary.
     #[serde(default)]
     pub transition_log_prob: HashMap<String, HashMap<String, f32>>,
+    /// **v4.17.0** — POS-aggregated bigram fallback:
+    /// `previous_POS → current_chain → log P(curr | prev_pos)`.
+    /// Keyed only by `"noun"` or `"verb"` (the chain-key prefix)
+    /// instead of the full prev chain. Acts as an intermediate
+    /// fallback tier between the full bigram and the unigram —
+    /// when a specific (prev_chain, curr) pair is missing but
+    /// `prev_pos` is known, we still get a context-aware signal
+    /// that's strictly finer-grained than the pure unigram.
+    /// Schema bumped from 2 to 3; v2 artifacts are explicitly
+    /// rejected by `load()`.
+    #[serde(default)]
+    pub pos_transition_log_prob: HashMap<String, HashMap<String, f32>>,
 }
 
 impl Default for SuffixPriors {
@@ -94,6 +106,7 @@ impl SuffixPriors {
             trained_on_tokens: 0,
             chain_log_prob: HashMap::new(),
             transition_log_prob: HashMap::new(),
+            pos_transition_log_prob: HashMap::new(),
         }
     }
 
@@ -135,6 +148,7 @@ impl SuffixPriors {
             trained_on_tokens: total,
             chain_log_prob,
             transition_log_prob: HashMap::new(),
+            pos_transition_log_prob: HashMap::new(),
         }
     }
 
@@ -145,6 +159,11 @@ impl SuffixPriors {
     /// `log P(curr | prev)` with add-one smoothing applied within
     /// the row (so unseen `curr` for a known `prev` gets a small
     /// floor relative to the row's vocabulary).
+    ///
+    /// **v4.17.0** — also computes POS-aggregated bigrams as the
+    /// intermediate fallback tier between the full bigram and the
+    /// unigram. Each prev_chain's POS prefix (`"noun"` /
+    /// `"verb"`) is used as the row key for `pos_transition_log_prob`.
     pub fn from_counts_with_bigrams(
         unigram_counts: HashMap<String, u64>,
         bigram_counts: HashMap<(String, String), u64>,
@@ -153,24 +172,32 @@ impl SuffixPriors {
 
         // Group bigram counts by previous chain.
         let mut by_prev: HashMap<String, HashMap<String, u64>> = HashMap::new();
+        // **v4.17.0** — also aggregate by POS prefix in parallel.
+        let mut by_prev_pos: HashMap<String, HashMap<String, u64>> = HashMap::new();
         for ((prev, curr), count) in bigram_counts {
-            by_prev.entry(prev).or_default().insert(curr, count);
+            // Full bigram row.
+            by_prev
+                .entry(prev.clone())
+                .or_default()
+                .insert(curr.clone(), count);
+            // POS-aggregated row.
+            let pos = pos_from_chain_key(&prev).to_string();
+            *by_prev_pos.entry(pos).or_default().entry(curr).or_insert(0) += count;
         }
 
         let mut transition_log_prob: HashMap<String, HashMap<String, f32>> =
             HashMap::with_capacity(by_prev.len());
         for (prev, row) in by_prev {
-            let row_total: u64 = row.values().sum();
-            let row_vocab = row.len() as u64;
-            let denom = (row_total + row_vocab) as f32;
-            let mut inner = HashMap::with_capacity(row.len());
-            for (curr, count) in row {
-                let smoothed = (count + 1) as f32 / denom;
-                inner.insert(curr, smoothed.ln());
-            }
-            transition_log_prob.insert(prev, inner);
+            transition_log_prob.insert(prev, smooth_row(row));
         }
         priors.transition_log_prob = transition_log_prob;
+
+        let mut pos_transition_log_prob: HashMap<String, HashMap<String, f32>> =
+            HashMap::with_capacity(by_prev_pos.len());
+        for (pos, row) in by_prev_pos {
+            pos_transition_log_prob.insert(pos, smooth_row(row));
+        }
+        priors.pos_transition_log_prob = pos_transition_log_prob;
         priors
     }
 
@@ -219,22 +246,45 @@ impl SuffixPriors {
     ///   floor for the row, falling back to row-unseen if the
     ///   row exists)
     pub fn score_chain_given_prev(&self, current_chain: &str, prev_chain: Option<&str>) -> f32 {
+        // **v4.17.0** — extended fallback ladder:
+        //   1. full bigram (prev_chain → curr_chain)
+        //   2. POS-bigram (prev_pos → curr_chain) — finer than
+        //      unigram, captures noun-vs-verb context distribution
+        //   3. unigram (curr_chain)
+        //   4. floor for completely unseen chains
         if let Some(prev) = prev_chain {
+            // Tier 1: full bigram.
             if let Some(row) = self.transition_log_prob.get(prev) {
                 if let Some(score) = row.get(current_chain).copied() {
                     return score;
                 }
-                // prev is known, curr isn't seen in this row →
-                // floor to the row's rarest observation minus
-                // ln(2). Same shape as unigram unseen handling.
+                // prev_chain is known but (prev, curr) is unseen →
+                // try the row's rarest-observation floor, then
+                // continue to coarser tiers below.
                 let min_in_row = row.values().copied().fold(f32::INFINITY, f32::min);
                 if min_in_row.is_finite() {
+                    // **v4.17.0** — instead of returning the
+                    // bigram-row floor immediately, prefer the
+                    // POS-bigram score when available (it's based
+                    // on more data than a single sparse row).
+                    let pos = pos_from_chain_key(prev);
+                    if let Some(pos_row) = self.pos_transition_log_prob.get(pos) {
+                        if let Some(pos_score) = pos_row.get(current_chain).copied() {
+                            return pos_score;
+                        }
+                    }
                     return min_in_row - std::f32::consts::LN_2;
                 }
             }
+            // Tier 2: POS-bigram (full bigram row absent entirely).
+            let pos = pos_from_chain_key(prev);
+            if let Some(pos_row) = self.pos_transition_log_prob.get(pos) {
+                if let Some(score) = pos_row.get(current_chain).copied() {
+                    return score;
+                }
+            }
         }
-        // No prev context, or prev isn't in transition map →
-        // fall back to unigram.
+        // Tiers 3 + 4: unigram, then unseen-chain floor.
         self.chain_log_prob
             .get(current_chain)
             .copied()
@@ -344,7 +394,37 @@ impl SuffixPriors {
 /// - v1 (v4.15.0): unigram only, `chain_log_prob`.
 /// - v2 (v4.16.0): adds `transition_log_prob` for context-aware
 ///   bigram scoring.
-pub const SCHEMA_VERSION: u32 = 2;
+/// - v3 (v4.17.0): adds `pos_transition_log_prob` for POS-aggregated
+///   fallback when full-bigram rows are sparse.
+pub const SCHEMA_VERSION: u32 = 3;
+
+/// **v4.17.0** — extract the POS prefix from a chain key.
+/// Chain keys are formatted as `"noun:..."` or `"verb:..."`; we
+/// just take the substring up to the first colon. Returns
+/// `"unknown"` when the key has no colon (defensive — shouldn't
+/// happen for keys produced by `noun_chain_key`/`verb_chain_key`).
+pub fn pos_from_chain_key(chain: &str) -> &str {
+    match chain.find(':') {
+        Some(idx) => &chain[..idx],
+        None => "unknown",
+    }
+}
+
+/// **v4.17.0** — turn a row of raw counts into add-one-smoothed
+/// log-probabilities. Extracted helper used by both the full
+/// bigram path and the POS-aggregated path so smoothing stays
+/// consistent across tiers.
+fn smooth_row(row: HashMap<String, u64>) -> HashMap<String, f32> {
+    let row_total: u64 = row.values().sum();
+    let row_vocab = row.len() as u64;
+    let denom = (row_total + row_vocab) as f32;
+    let mut out = HashMap::with_capacity(row.len());
+    for (curr, count) in row {
+        let smoothed = (count + 1) as f32 / denom;
+        out.insert(curr, smoothed.ln());
+    }
+    out
+}
 
 /// Build the chain key for a noun feature bundle. Stable string
 /// format so the JSON artifact is self-describing.
@@ -513,12 +593,101 @@ mod tests {
     }
 
     #[test]
-    fn schema_version_is_two_at_v4_16_0() {
-        // v4.16.0 bumps SCHEMA_VERSION from 1 to 2 to add
-        // `transition_log_prob`. Any future bump requires
-        // regenerating `data/retrieval/suffix_chain_priors.json`
-        // via the training binary.
-        assert_eq!(SCHEMA_VERSION, 2);
+    fn schema_version_is_three_at_v4_17_0() {
+        // v4.17.0 bumps SCHEMA_VERSION from 2 to 3 to add
+        // `pos_transition_log_prob` (POS-aggregated bigram
+        // fallback). Any future bump requires regenerating
+        // `data/retrieval/suffix_chain_priors.json` via the
+        // training binary.
+        assert_eq!(SCHEMA_VERSION, 3);
+    }
+
+    #[test]
+    fn pos_from_chain_key_extracts_pos_prefix() {
+        assert_eq!(
+            pos_from_chain_key("noun:None|None|None|Genitive|None"),
+            "noun"
+        );
+        assert_eq!(
+            pos_from_chain_key("verb:None|false|Some(Present)|None|None|false"),
+            "verb"
+        );
+        assert_eq!(pos_from_chain_key("malformed_no_colon"), "unknown");
+    }
+
+    #[test]
+    fn pos_bigrams_populated_alongside_full_bigrams() {
+        let mut unigrams: HashMap<String, u64> = HashMap::new();
+        unigrams.insert("noun:None|None|None|Genitive|None".to_string(), 50);
+        unigrams.insert("noun:None|None|Some(P3)|None|None".to_string(), 100);
+        unigrams.insert(
+            "verb:None|false|Some(Present)|Some(Third)|None|false".to_string(),
+            200,
+        );
+
+        let mut bigrams: HashMap<(String, String), u64> = HashMap::new();
+        bigrams.insert(
+            (
+                "noun:None|None|None|Genitive|None".to_string(),
+                "noun:None|None|Some(P3)|None|None".to_string(),
+            ),
+            40,
+        );
+        bigrams.insert(
+            (
+                "noun:None|None|None|Genitive|None".to_string(),
+                "verb:None|false|Some(Present)|Some(Third)|None|false".to_string(),
+            ),
+            10,
+        );
+
+        let p = SuffixPriors::from_counts_with_bigrams(unigrams, bigrams);
+        // POS-aggregated row for "noun" should exist and contain
+        // both observed successors.
+        let pos_row = p.pos_transition_log_prob.get("noun").expect("noun pos row");
+        assert!(
+            pos_row.contains_key("noun:None|None|Some(P3)|None|None"),
+            "POS-bigram row should aggregate the noun successor"
+        );
+        assert!(
+            pos_row.contains_key("verb:None|false|Some(Present)|Some(Third)|None|false"),
+            "POS-bigram row should also aggregate the verb successor"
+        );
+    }
+
+    #[test]
+    fn fallback_ladder_uses_pos_bigram_when_full_bigram_row_unseen() {
+        let mut unigrams: HashMap<String, u64> = HashMap::new();
+        unigrams.insert("noun:None|None|None|Genitive|None".to_string(), 50);
+        unigrams.insert("noun:None|None|Some(P3)|None|None".to_string(), 100);
+        let mut bigrams: HashMap<(String, String), u64> = HashMap::new();
+        // Build a POS-bigram entry but for a DIFFERENT prev_chain
+        // than what we'll query — so the full-bigram row for
+        // the queried prev is empty, but the POS row exists.
+        bigrams.insert(
+            (
+                "noun:None|None|None|Genitive|None".to_string(),
+                "noun:None|None|Some(P3)|None|None".to_string(),
+            ),
+            40,
+        );
+        let p = SuffixPriors::from_counts_with_bigrams(unigrams, bigrams);
+
+        // Query with a noun prev_chain that wasn't in the bigram
+        // counts at all. Full bigram absent, POS-bigram present.
+        let unseen_prev = "noun:None|Singular|None|Locative|None";
+        let score =
+            p.score_chain_given_prev("noun:None|None|Some(P3)|None|None", Some(unseen_prev));
+        let unigram = *p
+            .chain_log_prob
+            .get("noun:None|None|Some(P3)|None|None")
+            .unwrap();
+        // The POS-bigram score should differ from the unigram
+        // (otherwise the fallback ladder didn't fire).
+        assert!(
+            (score - unigram).abs() > 1e-5,
+            "POS-bigram tier should kick in when full-bigram row is empty (got {score}, unigram is {unigram})"
+        );
     }
 
     #[test]

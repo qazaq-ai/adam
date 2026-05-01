@@ -174,7 +174,7 @@ pub struct Conversation {
     /// **v4.15.5** — frequency-based prior over FST suffix-chain
     /// signatures, loaded from
     /// `data/retrieval/suffix_chain_priors.json` (trained offline
-    /// in v4.15.0). When `Some`, each turn's `parse_input_public`
+    /// in v4.15.0). When `Some`, each turn's `parse_input_with_priors`
     /// re-ranks candidate analyses by `P(chain)` DESC before
     /// picking the first; when `None`, falls back to the v3.2.0
     /// lexicographic deterministic order. Strictly additive: the

@@ -116,23 +116,16 @@ pub fn respond_with_repo(
     realise(&plan)
 }
 
-/// Crate-public alias so [`Conversation::turn`] can share the same
-/// parser path without duplicating the token-cleaning logic. Not
-/// intended for external callers — use [`respond`] / [`respond_with_repo`]
-/// or the `Conversation` API instead.
-pub(crate) fn parse_input_public(
-    input: &str,
-    lexicon: &adam_kernel_fst::lexicon::LexiconV1,
-) -> Vec<adam_kernel_fst::parser::Analysis> {
-    parse_input_inner(input, lexicon, None, None)
-}
-
-/// **v4.15.5** — priors-aware variant of `parse_input_public`.
-/// Sorts each token's candidate analyses by `P(chain)` DESC before
-/// picking the first. Falls back to v3.2.0 lexicographic order
-/// when `priors` is `None` (caller doesn't have a trained artifact)
-/// or when two parses tie on chain probability — the v3.2.0
-/// determinism contract is preserved exactly in those cases.
+/// **v4.15.5** — priors-aware parse path used by
+/// `Conversation::turn_with_trace`. Sorts each token's candidate
+/// analyses by `P(chain)` DESC before picking the first. Falls
+/// back to v3.2.0 lexicographic order when `priors` is `None`
+/// (caller has no trained artifact) or when two parses tie on
+/// chain probability — the v3.2.0 determinism contract is
+/// preserved exactly in those cases.
+///
+/// Replaced the v4.14.5 `parse_input_public` (removed in v4.17.0
+/// after dead-code analysis confirmed no remaining callers).
 ///
 /// **v4.16.5** — accepts an optional `alpha` interpolation weight
 /// for Jelinek-Mercer smoothing. `None` = pure bigram with unigram
