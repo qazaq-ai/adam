@@ -695,6 +695,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::UserAcknowledgement => "user_acknowledgement",
         // v4.14.0 — curriculum-content honest fallback.
         Intent::AskCurriculumContent => "ask_curriculum_content",
+        Intent::AskWillingness => "ask_willingness",
         Intent::Unknown {
             raw_tokens,
             noun_hint,

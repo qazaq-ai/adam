@@ -150,6 +150,23 @@ pub enum Intent {
     /// reason this variant exists.
     UserAcknowledgement,
 
+    /// **v4.17.5** — willingness / readiness-to-improve question:
+    /// «Сіз жақсаруды үйренуге дайынсыз ба?» / «Жақсырақ болуға
+    /// ашықсыз ба?». Live REPL 2026-05-01 turn 19: the user
+    /// asked whether adam is willing to learn and improve; the
+    /// pre-v4.17.5 pipeline mis-routed to Compliment (because of
+    /// the leading «өте жақсы») then to SelfComparison (because
+    /// of «жақсырақ»). Neither fits — the user is asking about
+    /// adam's stance toward improvement, not asking for a
+    /// compliment-response or a comparison.
+    ///
+    /// The honest answer acknowledges that adam doesn't
+    /// self-improve at runtime (its updates come from the author),
+    /// but the project IS open to refinement based on user
+    /// feedback. Routes to the new `ask_willingness` template
+    /// family.
+    AskWillingness,
+
     /// **v4.14.0** — curriculum-content question: «Оқушылар не
     /// оқиды?» / «Оқушылар мектепте физика пәнінен не оқиды?». A
     /// factual question about *what students learn*, not about

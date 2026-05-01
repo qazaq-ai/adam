@@ -290,6 +290,8 @@ pub enum IntentKind {
     UserAcknowledgement,
     /// **v4.14.0** — curriculum-content honest fallback.
     AskCurriculumContent,
+    /// **v4.17.5** — willingness / readiness-to-improve question.
+    AskWillingness,
     Unknown,
 }
 
@@ -324,6 +326,7 @@ impl From<&Intent> for IntentKind {
             Intent::Insult => Self::Insult,
             Intent::UserAcknowledgement => Self::UserAcknowledgement,
             Intent::AskCurriculumContent => Self::AskCurriculumContent,
+            Intent::AskWillingness => Self::AskWillingness,
             Intent::Unknown { .. } => Self::Unknown,
         }
     }

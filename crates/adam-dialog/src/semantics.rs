@@ -119,6 +119,15 @@ pub fn interpret_text_with_lexicon(
     if detect_curriculum_content_question(&joined) {
         return Intent::AskCurriculumContent;
     }
+    // **v4.17.5** — willingness/readiness question. Detected
+    // BEFORE Compliment / SelfComparison so the v4.17.5
+    // tightening of those detectors doesn't accidentally let
+    // these turns fall through. Surface forms: «дайынсыз ба
+    // үйренуге», «жақсаруға ашықсыз ба», «жақсырақ болуға
+    // дайынсың ба».
+    if detect_ask_willingness(&joined) {
+        return Intent::AskWillingness;
+    }
     if detect_ask_name(&joined) {
         return Intent::AskName;
     }
@@ -458,6 +467,18 @@ const NOT_A_TOPIC: &[&str] = &[
     // jumped from `жоқ` to `па`, surfacing «Дос па деген кісіге.»
     "па",
     "пе",
+    // v4.17.5 — verb stems that FST occasionally tags as nouns
+    // when their full lemma is missing from the lexicon. Live REPL
+    // 2026-05-01: «А, сені кім тәрбиеледі?» pre-v4.17.5 surfaced
+    // `Бәлкім, тәрбиеле туралы айтасыз ба` because the verb stem
+    // `тәрбиеле` (3rd-person of `тәрбиелеу` = "to raise / educate")
+    // wasn't recognised as a verb, fell through to noun-topic
+    // extraction. The Creator-question detector now catches
+    // «кім тәрбиеледі» directly; this NOT_A_TOPIC entry is the
+    // belt-and-braces fallback so `тәрбиеле` never surfaces as
+    // topic even if the question phrasing isn't caught upstream.
+    "тәрбиеле",
+    "баптал",
     // **v4.6.0** — bare numeral roots that the FST occasionally
     // returns as Locative parses of discourse demonstratives.
     // `Онда` ("then / in it") parses as `он + Locative` (root = "он"
@@ -502,6 +523,8 @@ fn first_noun_root(parses: &[Analysis]) -> Option<String> {
 ///
 /// Codex v4.0.19 review #2 — direct implementation.
 const MULTIWORD_ENTITIES: &[&str] = &[
+    // length 25+ (v4.17.5 — rich Kazakhstan IsA fact)
+    "орталық азиядағы тәуелсіз мемлекет",
     // length 16+
     "құйрықты жұлдыз",
     "қазақ әдебиеті",
@@ -1685,6 +1708,57 @@ fn detect_curriculum_content_question(joined: &str) -> bool {
     has_student && has_education_locus && has_what && has_learning_verb
 }
 
+/// **v4.17.5** — willingness / readiness-to-improve detector.
+/// Pattern: `(дайынсыз/дайынсың/ашықсыз/ашықсың) ба + verb-уге`
+/// where the verb expresses growth (`үйрену / жақсару / дамыту /
+/// өсу / жетілдір`). Conservative — requires both the readiness
+/// marker AND a growth-verb so generic «дайын ба» doesn't
+/// accidentally fire.
+fn detect_ask_willingness(joined: &str) -> bool {
+    let has_readiness = joined.contains("дайынсыз ба")
+        || joined.contains("дайынсың ба")
+        || joined.contains("ашықсыз ба")
+        || joined.contains("ашықсың ба");
+    let has_growth_verb = joined.contains("үйренуге")
+        || joined.contains("жақсаруға")
+        || joined.contains("дамуға")
+        || joined.contains("дамытуға")
+        || joined.contains("өсуге")
+        || joined.contains("жетілуге")
+        || joined.contains("жетілдіруге")
+        // Composite forms like «жақсырақ болу + ға»: «жақсырақ
+        // болуға дайынсыз ба» — the user is asking whether you're
+        // open to BECOMING better.
+        || joined.contains("жақсырақ болуға")
+        || joined.contains("ақылды болуға");
+    has_readiness && has_growth_verb
+}
+
+/// **v4.17.5** — list-request with anaphoric subject. Pattern:
+/// `оларды/соларды/мұны + тізімде/атап шық/атаулары + (optional)
+/// аласыз ба`. The user is asking adam to enumerate something
+/// from the previous turn; routing to GenericCapability would
+/// dismiss the request as "I can't do that". Instead detect the
+/// pattern early and let the turn fall through to Intent::Unknown
+/// so the discourse-anaphora resolver substitutes `оларды → last
+/// topic` and SearchGraph surfaces the curated list.
+fn is_list_request_with_anaphor(joined: &str) -> bool {
+    let has_anaphor = joined.contains("оларды")
+        || joined.contains("соларды")
+        || joined.contains("оны")
+        || joined.contains("соны")
+        || joined.contains("мұны")
+        || joined.contains("бұны");
+    let has_list_verb = joined.contains("тізімде")
+        || joined.contains("тізімдей")
+        || joined.contains("тізімдеп")
+        || joined.contains("тізім жаса")
+        || joined.contains("атап шық")
+        || joined.contains("атап өт")
+        || joined.contains("атаулары");
+    has_anaphor && has_list_verb
+}
+
 fn detect_ask_about_system(
     tokens: &[String],
     joined: &str,
@@ -1728,7 +1802,21 @@ fn detect_ask_about_system(
             || joined.contains("қай бағдарламашы")
             || joined.contains("қандай бағдарламашы")
             || joined.contains("бағдарламашы дайындады")
-            || joined.contains("бағдарламашы жасады"))
+            || joined.contains("бағдарламашы жасады")
+            // **v4.17.5** — «кім тәрбиеледі» (who raised/educated
+            // you) and related verbs surfaced by the 2026-05-01
+            // live REPL transcript. Pre-v4.17.5 «А, сені кім
+            // тәрбиеледі?» fell through to greedy retrieval and
+            // surfaced `Бәлкім, тәрбиеле туралы айтасыз ба` —
+            // unparseable verb stem treated as topic noun. Adam
+            // wasn't raised; it was created. Route to Creator so
+            // the canonical creator answer fires.
+            || joined.contains("кім тәрбиеледі")
+            || joined.contains("кім баптады")
+            || joined.contains("кім үйретті")
+            || joined.contains("кім бапкер")
+            || joined.contains("тәрбиешің")
+            || joined.contains("тәрбиешіңіз"))
     {
         return Some(SystemAspect::Creator);
     }
@@ -1745,6 +1833,16 @@ fn detect_ask_about_system(
         || joined.contains("қашан туылдыңыз")
         || joined.contains("туған күнің")
         || joined.contains("туған күніңіз")
+        // **v4.17.5** — «дүниеге кел» fixed expression for "to be
+        // born / to come into being". 2026-05-01 live REPL:
+        // «Ал сіз алғаш қашан дүниеге келдіңіз?» pre-v4.17.5 fell
+        // through to greedy retrieval and surfaced a poetry quote
+        // about `дүние` (world). Adam's `birthdate` is 2026-04-07;
+        // route there.
+        || joined.contains("дүниеге келдің")
+        || joined.contains("дүниеге келдіңіз")
+        || joined.contains("дүниеге келген")
+        || (has_addressee && joined.contains("дүниеге кел"))
         || (has_addressee
             && (joined.contains("қашан жасады")
                 || joined.contains("қашан құрды")
@@ -2005,6 +2103,40 @@ fn detect_ask_about_system(
         || joined.contains("алады ма")
         || joined.contains("алады ме");
     if aux_capability {
+        // **v4.17.5** — list-request gate. Live REPL 2026-05-01:
+        // «Оларды тізімдей аласыз ба?» (after the previous turn
+        // mentioned 17 regions) pre-v4.17.5 surfaced the
+        // GenericCapability honest fallback. The user wasn't
+        // asking adam to perform an action — they were asking it
+        // to enumerate the previous topic. Detect list-verb +
+        // anaphor and DON'T route to GenericCapability; let the
+        // turn fall through to Intent::Unknown so the v4.13.0
+        // discourse-anaphora resolver can replace the anaphor
+        // with the last topic, then SearchGraph surfaces the
+        // curated list-summary fact.
+        let is_list_anaphor = is_list_request_with_anaphor(joined);
+        if !is_list_anaphor {
+            return Some(SystemAspect::GenericCapability);
+        }
+    }
+
+    // **v4.17.5** — combined "how-to-do-X knowledge" question.
+    // Pattern: `<verb-action> керектігін білесіз бе`. Live REPL
+    // 2026-05-01: «Rust бағдарламалау тілінде қалай бағдарламалау
+    // керектігін білесіз бе?» pre-v4.17.5 matched the language-
+    // capability detector via «білесіз бе» but lacked a leading
+    // language adverb (қазақша / орысша / ...), so it fell through
+    // to greedy retrieval and surfaced the IsA fact about Rust.
+    // The user's actual question is a capability check: "do you
+    // know HOW to program in X?". Route to GenericCapability so
+    // the honest «Жоқ, бағдарлама жаза алмаймын» fallback fires.
+    let how_to_capability = (joined.contains("қалай")
+        && (joined.contains("керектігін білесің") || joined.contains("керектігін білесіз")))
+        || joined.contains("істеуді білесің")
+        || joined.contains("істеуді білесіз")
+        || joined.contains("жасауды білесің")
+        || joined.contains("жасауды білесіз");
+    if how_to_capability {
         return Some(SystemAspect::GenericCapability);
     }
 
@@ -2862,6 +2994,27 @@ fn detect_ask_time(joined: &str) -> bool {
 }
 
 fn detect_compliment(tokens: &[String], joined: &str) -> bool {
+    // **v4.17.5** — Compliment detection tightened. Pre-v4.17.5 the
+    // detector fired on `өте жақсы` regardless of context, so live
+    // REPL «Бұл өте жақсы, бірақ ақылды болу жеткіліксіз. Сіз
+    // жақсаруды үйренуге дайынсыз ба?» routed to Compliment (turn
+    // 19, 2026-05-01 transcript) and adam responded with the
+    // «Сіз де жақсы жансыз» template — completely missing the
+    // follow-up question. Now: a `бірақ` + 2nd-person yes/no
+    // question (`дайынсыз ба` etc.) downstream of `өте жақсы`
+    // means this isn't a compliment turn.
+    let has_followup_question =
+        joined.contains("бірақ") && (joined.contains("ма?") || joined.contains("ба?"));
+    if has_followup_question {
+        return false;
+    }
+    // Also defer when the user explicitly asks adam something —
+    // `дайынсыз ба / дайынсың ба` (are you ready?) is an
+    // introspection question, not a compliment, even if the
+    // sentence opens with «өте жақсы».
+    if joined.contains("дайынсыз ба") || joined.contains("дайынсың ба") {
+        return false;
+    }
     tokens.iter().any(|t| {
         matches!(
             t.as_str(),

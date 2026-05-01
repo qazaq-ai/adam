@@ -350,6 +350,31 @@ impl Tool {
                     .query_input
                     .map(|raw| query_content_tokens(raw, subject))
                     .unwrap_or_default();
+                // **v4.17.5** — list-intent boost. When the user's
+                // input contains list-request tokens (`тізім /
+                // тізімде / тізімдей / атаулары / атап шық /
+                // барлық атаулары`), prefer facts whose object
+                // root contains «тізім» (i.e. the curated
+                // list-summary facts like `қазақстан related_to
+                // облыстар тізімі`). Strictly additive: fires
+                // only when the query carries an explicit list
+                // request, otherwise the v4.4.11 cascade is
+                // unchanged. Live REPL 2026-05-01 turn 14-15:
+                // the user asked for the regions list; the
+                // priority cascade preferred `IsA мемлекет` over
+                // `related_to облыстар тізімі`. List-intent
+                // boost flips that.
+                let query_lower = ctx.query_input.unwrap_or("").to_lowercase();
+                let has_list_intent = query_lower.contains("тізім")
+                    || query_lower.contains("атаулары")
+                    || query_lower.contains("атап шық")
+                    || query_lower.contains("атап өт")
+                    || query_lower.contains("барлық атау");
+                // **v4.17.5** — synonym table for list-intent
+                // disambiguation. Hoisted out of the sort closure
+                // so debug code can also reference it.
+                const LIST_TYPE_SYNONYMS: &[(&str, &str)] =
+                    &[("аймақ", "облыс"), ("аумақ", "облыс"), ("гора", "тау")];
                 matches.sort_by(|a, b| {
                     let overlap_a = if query_tokens.is_empty() {
                         0
@@ -385,8 +410,75 @@ impl Tool {
                             _ => 0, // no signal, treat all as equal
                         }
                     };
-                    overlap_b
-                        .cmp(&overlap_a)
+                    // **v4.17.5** — list-intent boost: when the
+                    // query carries an explicit list request,
+                    // facts whose object root contains «тізім»
+                    // (i.e. list-summary facts) win the tier
+                    // BEFORE the v4.0.x predicate-rank cascade.
+                    // Strictly additive — fires only when
+                    // has_list_intent is true.
+                    //
+                    // **Synonym-aware sub-rank**: among list-
+                    // summary candidates, prefer the one whose
+                    // object root overlaps tokens from the
+                    // user's input. Hand-coded synonyms cover
+                    // common Kazakh pairs where the input uses
+                    // one form and the curated fact uses the
+                    // other (e.g. «аймақ» in input, «облыс» in
+                    // the curated regions list).
+                    let list_intent_rank = |fact: &ReasFact| -> i32 {
+                        // 0 = best (list-summary AND overlap),
+                        // 1 = list-summary without overlap,
+                        // 2 = non-list (default).
+                        if !has_list_intent {
+                            return 2;
+                        }
+                        let object_lower = fact.object.root.to_lowercase();
+                        if !object_lower.contains("тізім") {
+                            return 2;
+                        }
+                        // Direct token overlap (input → object root).
+                        // Exclude generic list-marker prefixes (`тізі`,
+                        // `атау`) — they appear in every list-summary
+                        // object and don't disambiguate. Use 4-char
+                        // prefix match like `fact_overlap_score` so
+                        // inflected forms still hit.
+                        let direct_overlap = query_tokens.iter().any(|t| {
+                            let prefix_4: String = t.chars().take(4).collect();
+                            if prefix_4 == "тізі" || prefix_4 == "атау" || prefix_4 == "барл"
+                            {
+                                return false;
+                            }
+                            object_lower.contains(&prefix_4)
+                        });
+                        // Synonym-aware overlap (e.g. аймақ ↔ облыс
+                        // for region queries).
+                        let synonym_overlap =
+                            LIST_TYPE_SYNONYMS.iter().any(|(input_tok, obj_tok)| {
+                                query_lower.contains(input_tok) && object_lower.contains(obj_tok)
+                            });
+                        if direct_overlap || synonym_overlap {
+                            0
+                        } else {
+                            1
+                        }
+                    };
+                    // **v4.17.5** — when has_list_intent fires,
+                    // list_intent_rank takes precedence over the
+                    // v4.4.11 overlap reranker. Reason: spurious
+                    // overlap can pollute the bigram-style match
+                    // (e.g. «атау» 4-char prefix accidentally
+                    // matches «АлАТАУы» in the landmarks fact's
+                    // raw_text). When the user explicitly asks
+                    // for a list, the list-summary fact whose
+                    // OBJECT root matches the list type should
+                    // win regardless of accidental raw-text
+                    // overlap. Outside list-intent mode all facts
+                    // get rank=2 → no effect, overlap dominates
+                    // as before.
+                    list_intent_rank(a)
+                        .cmp(&list_intent_rank(b))
+                        .then_with(|| overlap_b.cmp(&overlap_a))
                         .then_with(|| {
                             user_facing_fact_priority(a).cmp(&user_facing_fact_priority(b))
                         })

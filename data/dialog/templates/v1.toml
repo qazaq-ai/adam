@@ -71,7 +71,7 @@ key = "greeting.intro_proposal"
 templates = [
     "иә, әрине! Менің атым адам. Сіздің атыңыз кім?",
     "танысып алайық. Мен — адам, ал сізді қалай атаймын?",
-    "қуана-қуана. Мен — қазақша сөйлесуге арналған nlm, атым адам. Атыңызды айта аласыз ба?",
+    "қуана-қуана. Мен — қазақша сөйлесуге арналған NLM, атым адам. Атыңызды айта аласыз ба?",
     "әрине, танысайық. Менің атым адам — сізді қалай атаймын?",
 ]
 
@@ -322,6 +322,20 @@ templates = [
 # curriculum content, which adam doesn't carry at school-program
 # depth. adam offers what it CAN do (subject-level domain
 # summaries) and invites a more specific follow-up.
+# v4.17.5 — Willingness / readiness-to-improve honest fallback.
+# 2026-05-01 live REPL: «Сіз жақсаруды үйренуге дайынсыз ба?»
+# pre-v4.17.5 fell through to Compliment («Сіз де жақсы жансыз»)
+# missing the question entirely. The honest answer acknowledges
+# adam doesn't self-improve at runtime — improvements come from
+# the author shipping new versions — but the project itself is
+# open to refinement based on user feedback.
+[[families]]
+key = "ask_willingness"
+templates = [
+    "Ия, әрине. Мен өз бетіммен үйрене алмаймын — менің әрбір жетілуім жасаушым шығаратын жаңа нұсқалар арқылы өтеді. Бірақ жоба ашық: пайдаланушы тарапынан келген кері байланыс әр жаңартудың негізі. Сіздің сұрағыңыз бен сын-ескертулеріңіз — менің дамуымның тікелей көзі.",
+    "Иә, ашықпын. Мен инференция кезінде өзімді өзгерте алмаймын; бірақ менің кодым да, корпусым да, ережелерім де дамиды — әрбір диалог автормен бөлісіледі. Сондықтан сіздің сын-пікіріңіз менің келесі нұсқамды жасап жатыр деп санауыңызға болады.",
+]
+
 [[families]]
 key = "ask_curriculum_content"
 templates = [

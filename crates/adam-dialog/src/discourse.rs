@@ -77,6 +77,24 @@ const DISCOURSE_ANAPHORS: &[&str] = &[
     "соның",
     "мұның",
     "бұның",
+    // **v4.17.5** — plural anaphors. Live REPL 2026-05-01 turn 14:
+    // «Оларды тізімдей аласыз ба?» (after a turn mentioning 17
+    // regions) — `оларды` is the 3rd-plural accusative anaphor
+    // ("them"). v4.13.0 added the singular forms but missed the
+    // plural paradigm. Adding both Acc/Dat/Gen plural forms here
+    // for completeness.
+    "оларды",
+    "соларды",
+    "мұларды",
+    "бұларды",
+    "оларға",
+    "соларға",
+    "мұларға",
+    "бұларға",
+    "олардың",
+    "солардың",
+    "мұлардың",
+    "бұлардың",
 ];
 
 /// Returns `true` if any whitespace-separated lowercase token of
@@ -692,6 +710,19 @@ pub fn input_is_user_acknowledgement(input: &str) -> bool {
 /// Architecture (which v4.3.4 already routes correctly).
 pub fn input_is_self_comparison_question(input: &str) -> bool {
     let lower = input.to_lowercase();
+    // **v4.17.5** — disambiguation: «жақсырақ болу + ...» is a
+    // willingness/improvement question, not a comparison. Live
+    // REPL 2026-05-01 turn 20: «...жақсырақ және ақылды болуды
+    // үйренуге дайынсыз ба?» — pre-v4.17.5 SelfComparison fired
+    // because of `жақсырақ`. Defer to AskWillingness when growth-
+    // verbs are co-present. The Intent dispatcher checks
+    // `AskWillingness` BEFORE this comparison detector so this
+    // guard is the belt-and-braces fallback for cases where the
+    // growth-verb pattern doesn't match exactly but the
+    // comparison-as-improvement reading is clearly wrong.
+    if lower.contains("жақсырақ болу") || lower.contains("ақылды болу") {
+        return false;
+    }
     let has_comparison = lower.contains("артық")
         || lower.contains("жақсырақ")
         || lower.contains("озасың")
@@ -700,7 +731,20 @@ pub fn input_is_self_comparison_question(input: &str) -> bool {
         || lower.contains("несімен бөлек")
         || lower.contains("неге сенемін")
         || lower.contains("несімен ерекше")
-        || lower.contains("неге таңдау керек");
+        || lower.contains("неге таңдау керек")
+        // **v4.17.5** — distinguishing-question phrasings surfaced
+        // by the 2026-05-01 live REPL transcript: «Сізді
+        // қолданыстағы жасанды интеллект модельдерінен
+        // ерекшелендіретін нәрсе.» pre-v4.17.5 fell through to
+        // greedy retrieval and surfaced a poetry quote.
+        || lower.contains("ерекшелендір")
+        || lower.contains("ерекшелейт")
+        || lower.contains("айырмашылығың")
+        || lower.contains("айырмашылығыңыз")
+        || lower.contains("айрықша қылатын")
+        || lower.contains("айырық қылатын")
+        || lower.contains("айырмашылықтарың")
+        || lower.contains("айырмашылықтарыңыз");
     if !has_comparison {
         return false;
     }

@@ -769,6 +769,18 @@
       ]
     },
     {
+      "id": "transcript_2026_05_01_fixes_v4_17_5",
+      "category": "anti_regression",
+      "description": "v4.17.5 transcript-driven patch bundle. The 2026-05-01 live REPL transcript surfaced 11 distinct issues: (1) `тәрбиелеу` verb in Creator-question wasn't recognised; (2) Birthdate detector missed the «дүниеге кел» fixed expression; (3) SelfComparison detector missed «ерекшелендіретін нәрсе»; (4) Capability-on-language combo «X тілінде қалай бағдарламалау керектігін білесіз бе?» mis-routed to definition; (5) `nlm` lowercase in intro; (6) list-request anaphor «оларды тізімдей аласыз ба?» mis-routed to GenericCapability; (7) Compliment over-fired on «өте жақсы» before a follow-up question; (8) «дайынсыз ба үйренуге» (willingness) had no dedicated handler; (9) «жақсырақ болу» (becoming better) mis-routed to SelfComparison; (10) Kazakhstan regions list retrieval picked landmarks; (11) bare «Қазақстан → мемлекет» IsA was too thin. v4.17.5 closes all 11 with detector tightening, NOT_A_TOPIC additions, new Intent::AskWillingness + template family, list-intent reranker with synonym-aware sub-rank (аймақ↔облыс), Acc/Dat/Gen plural anaphor extension, NLM uppercase fix, and a richer geo_kz_115 fact. This dialog locks the canonical post-fix behaviour on 5 representative queries from the transcript.",
+      "turns": [
+        {"user": "Сені кім тәрбиеледі?", "output_contains_lower_any": ["баймурзин"]},
+        {"user": "Сіз қашан дүниеге келдіңіз?", "output_contains_lower_any": ["2026-04-07", "дүниеге келдім"]},
+        {"user": "Сізді басқа модельдерден ерекшелендіретін нәрсе?", "output_contains_lower_any": ["басқашамын", "жасанды интеллект"]},
+        {"user": "Сіз Rust тілінде қалай бағдарламалау керектігін білесіз бе?", "output_contains_lower_any": ["орындай алмаймын", "тілдік модельмін"]},
+        {"user": "Қазақстан аймақтарының барлық атауларын тізімдеңіз", "output_contains_lower_any": ["абай", "ақмола", "облысы"]}
+      ]
+    },
+    {
       "id": "pos_conditioned_priors_anti_regression_v4_17_0",
       "category": "anti_regression",
       "description": "v4.17.0: POS-conditioned priors P(chain | prev_pos, prev_chain) — adds POS-aggregated bigram fallback as the intermediate tier between full bigrams and unigrams. SuffixPriors gains pos_transition_log_prob (HashMap<POS, HashMap<curr_chain, log_prob>>) keyed by 'noun' / 'verb'. Schema bumped 2→3. The fallback ladder is now: full bigram → POS-bigram → unigram → floor. This anti-regression dialog ensures the new tier doesn't disturb canonical answers — the POS-bigram only kicks in when a full-bigram row is sparse; for well-populated rows (the common case) v4.16.0 behaviour is preserved bit-for-bit.",

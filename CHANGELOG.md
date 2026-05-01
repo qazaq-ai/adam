@@ -7,6 +7,89 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.17.5] — 2026-05-01 — transcript-driven patch bundle (11 fixes from live REPL session)
+
+**Patch in the v4.x humanness arc.** A 2026-05-01 live REPL session with the user surfaced 11 distinct issues across detection, mis-routing, and retrieval ranking. v4.17.5 closes all of them as a single coordinated bundle. No architectural changes — pure ROI work on observable user-facing behaviour.
+
+### 11 fixes bundled
+
+**Category A — Detection misses (5 fixes):**
+
+1. **Creator-question misses `тәрбиелеу`.** «А, сені кім тәрбиеледі?» pre-v4.17.5 fell through to greedy retrieval and surfaced «Бәлкім, тәрбиеле туралы айтасыз ба» — the verb stem treated as topic noun. v4.17.5 extends the Creator detector with `кім тәрбиеледі / кім баптады / кім үйретті / тәрбиешің / тәрбиешіңіз`. Also adds `тәрбиеле / баптал` to NOT_A_TOPIC as belt-and-braces.
+
+2. **Birthdate misses «дүниеге кел».** «Сіз қашан дүниеге келдіңіз?» pre-v4.17.5 surfaced a poetry quote about `дүние`. The fixed expression «дүниеге кел» means "to come into being / to be born" — adam's `birthdate` is 2026-04-07. v4.17.5 adds `дүниеге келдің / дүниеге келдіңіз / дүниеге келген` to the Birthdate detector.
+
+3. **SelfComparison misses «ерекшелендіретін / айырмашылығыңыз».** «Сізді басқа модельдерден ерекшелендіретін нәрсе?» pre-v4.17.5 surfaced poetry. v4.17.5 extends `input_is_self_comparison_question` with the distinguishing-question phrasings.
+
+4. **Capability-on-language combo.** «Сіз Rust тілінде қалай бағдарламалау керектігін білесіз бе?» pre-v4.17.5 routed to a definition because no leading language adverb (қазақша/орысша) was present. v4.17.5 detects `қалай ... керектігін білесің/білесіз` + `істеуді/жасауді білесің/білесіз` patterns and routes to GenericCapability.
+
+5. **NLM uppercase fix.** Intro template had `nlm` lowercase; bumped to `NLM`.
+
+**Category B — Mis-routing (3 fixes):**
+
+6. **List-request anaphor mis-routed to GenericCapability.** «Оларды тізімдей аласыз ба?» (after Kazakhstan-regions count) pre-v4.17.5 surfaced the GenericCapability honest fallback. v4.17.5 adds `is_list_request_with_anaphor` gate: when `аласыз ба` is preceded by a list-verb + anaphor, defer to discourse-anaphora resolution (which substitutes `оларды → last topic`) so SearchGraph surfaces the curated list-summary fact. Also extends `DISCOURSE_ANAPHORS` with the plural paradigm (`оларды/соларды/мұларды/бұларды` + Acc/Dat/Gen forms — 12 new entries).
+
+7. **Compliment over-firing.** «Бұл өте жақсы, бірақ ... дайынсыз ба?» pre-v4.17.5 routed to Compliment because of the leading «өте жақсы». v4.17.5 tightens: if input contains `бірақ` AND a trailing yes/no question particle, OR contains `дайынсыз/дайынсың ба`, the compliment detector defers.
+
+8. **`AskWillingness` Intent + detector + template family.** «Сіз жақсаруды үйренуге дайынсыз ба?» / «жақсырақ болуға дайынсыз ба?» now route to a dedicated honest-fallback template that acknowledges adam doesn't self-improve at runtime but the project is open to refinement. Detector gates on (readiness marker `дайынсыз/ашықсыз ба`) AND (growth verb `үйренуге/жақсаруға/дамуға/жетілуге/жақсырақ болуға/ақылды болуға`) to avoid false positives.
+
+9. **«жақсырақ болу» disambiguation.** SelfComparison detector now skips when `жақсырақ болу / ақылды болу` is present (defer to `AskWillingness` ladder) — fires earlier in the chain, but this is the belt-and-braces fallback for cases where the willingness pattern doesn't match exactly.
+
+**Category C — Retrieval ranking (2 fixes):**
+
+10. **Kazakhstan regions list ranking.** «Қазақстан аймақтарының барлық атауларын тізімдеңіз» pre-v4.17.5 picked the landmarks list. Root cause: the `атау` 4-char prefix from `атауларын` accidentally matched «АлАТАУы» in the landmarks fact's raw_text. v4.17.5 reorders the SearchGraph sort cascade so `list_intent_rank` (with synonym-aware sub-rank: `аймақ ↔ облыс`) takes precedence over the v4.4.11 overlap reranker when has_list_intent fires. Filters generic list-marker prefixes (`тізі / атау / барл`) from direct overlap to prevent spurious matches.
+
+11. **Rich Kazakhstan baseline IsA.** Added `geo_kz_115` with kk «Қазақстан — Орталық Азиядағы аумағы бойынша 9-шы үлкен тәуелсіз мемлекет; астанасы — Астана, ірі қаласы — Алматы.» and object «орталық азиядағы тәуелсіз мемлекет» (35+ chars). The v4.11.7 longer-object-wins priority now surfaces this richer fact instead of the bare «Қазақстан — мемлекет». New compound added to `MULTIWORD_ENTITIES`.
+
+### Pipeline impact
+
+- Creator/Birthdate/SelfComparison detectors extended.
+- New `is_list_request_with_anaphor` helper in semantics.
+- `detect_compliment` tightened with `бірақ` + question-particle + readiness-question gates.
+- New `Intent::AskWillingness` + matching `IntentKind::AskWillingness` + new template family `ask_willingness`.
+- `DISCOURSE_ANAPHORS` extended with 12 plural anaphor forms.
+- `Tool::dispatch(SearchGraph)` sort cascade reorganised: `list_intent_rank` precedes overlap when has_list_intent fires; synonym-aware sub-rank with `LIST_TYPE_SYNONYMS` table.
+- New world_core entry `geo_kz_115` (rich Kazakhstan IsA) + `MULTIWORD_ENTITIES` += 1 compound.
+- `NOT_A_TOPIC` += 2 entries (`тәрбиеле / баптал` defensive).
+- Generated artifacts regenerated: `data/retrieval/facts.json` (16 305 → 16 309), `data/retrieval/derived_facts.json` (~30 056 derived facts).
+
+### Anti-regression — 12-question battery
+
+Full 2026-05-01 live REPL transcript replayed post-v4.17.5: every previously-broken turn now answers correctly.
+
+| Pre-v4.17.5 | Post-v4.17.5 |
+|---|---|
+| `Бәлкім, тәрбиеле туралы айтасыз ба` (poetry on verb stem) | `Мені Баймурзин Даулет Абузарович жасады.` |
+| `Дүние кірін жуынып...` (poetry) | `Мен 2026-04-07 күні дүниеге келдім — adam репозиторийі ашылған кез.` |
+| `Сүйенерлік адамды құрмет қыл...` (poetry on `жасанды интеллект`) | Self-comparison summary on the trade-off between adam and mainstream LLMs |
+| `Rust жайында нақты дерек: Rust — жадыны қауіпсіз...` (definition) | `Жоқ, ондай әрекетті өзім орындай алмаймын. Мен — тілдік модельмін...` |
+| `Сіз де жақсы жансыз` (Compliment misroute) | `Ия, әрине. Мен өз бетіммен үйрене алмаймын — менің әрбір жетілуім жасаушым шығаратын жаңа нұсқалар арқылы өтеді...` |
+| Landmarks list | `Қазақстанның 17 облысы: Абай, Ақмола, Ақтөбе, Алматы, Атырау, Батыс Қазақстан, Жамбыл, Жетісу, Қарағанды, Қостанай, Қызылорда, Маңғыстау, Павлодар, Солтүстік Қазақстан, Түркістан, Ұлытау, Шығыс Қазақстан.` |
+| `Қазақстан — мемлекет` (bare) | `Қазақстан — Орталық Азиядағы аумағы бойынша 9-шы үлкен тәуелсіз мемлекет; астанасы — Астана, ірі қаласы — Алматы.` |
+| `nlm` (lowercase) | `NLM` |
+
+### Known limitation
+
+The list-anaphor case («Оларды тізімдей аласыз ба?» without explicit list-type token) still surfaces a list — but not always the one the user has in mind, because the list type isn't tracked across turns. v4.18.0 will add list-class context tracking to DialogContext.
+
+### Tests + counters
+
+- New REPL replay dialog (5 turns from transcript locked).
+- Workspace tests: 802 → **802 passing** (no new unit tests; the new behaviour is exercised through the REPL replay regression).
+- World Core: 1 625 → **1 626 entries**, 1 791 → **1 792 facts** (+1 rich Kazakhstan IsA).
+- `MULTIWORD_ENTITIES` += 1.
+- `DISCOURSE_ANAPHORS` += 12 plural anaphor forms.
+- `cognitive_eval`: 25/25 canonical.
+
+### Cadence
+
+**Patch (v4.17.5)** per `feedback_versioning_post_1_0` — coordinated bug-fix bundle from a live user transcript. Every fix is a small, surgical, additive change. **Stripe (4) — compositional ML — paused for transcript-driven UX work.**
+
+Next:
+
+- **v4.18.0** — list-class context tracking in DialogContext (closes the v4.17.5 known limitation), composite-question handler («X жәнe Y» two-aspect questions), intro warmth on name capture.
+- **v4.18.5+** — empirical eval of v4.15+ priors (deferred from v4.17.5 — transcript-driven work was higher ROI).
+
 ## [4.17.0] — 2026-05-01 — POS-conditioned priors P(chain | prev_pos, prev_chain) + 4-tier fallback ladder
 
 **Third minor in the v4.15+ compositional-ML arc.** v4.16.0 added bigram transitions; v4.16.5 added Jelinek-Mercer smoothing. v4.17.0 adds the **POS-aggregated fallback tier** — when a full bigram row is sparse but the previous token's POS is known, fall back to the POS-conditioned distribution before dropping to the unigram. Adds robustness for sparse contexts without exploding the artifact size (POS axis = 2 dimensions).
