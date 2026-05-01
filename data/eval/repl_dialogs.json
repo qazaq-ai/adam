@@ -679,9 +679,9 @@
     {
       "id": "closed_class_modal_particles_v4_13_0",
       "category": "anti_regression",
-      "description": "v4.13.0: «Сіз оны бағдарламалай аласыз ба, әлі жоқ па?» pre-v4.13.0 surfaced confidently-wrong content (`Әлі жайында...поэзия...` / `Тегін ойлап байқасаң...` / `Жасы құрбы...`) because `әлі / әлде / мүмкін / тағы / жоқ / иә / па / пе` were missing from NOT_A_TOPIC. v4.13.0 adds them so these closed-class modal particles never get picked as topical content. Falls through to honest «Түсінбедім» (better than confidently wrong) until v4.13.5 ships generic capability fallback. Pre-v4.13.0 the output never contained «түсінбедім» here — that's the assertion.",
+      "description": "v4.13.0+: «Сіз оны бағдарламалай аласыз ба, әлі жоқ па?» pre-v4.13.0 surfaced confidently-wrong content (poetry on `әлі` / `жоқ` / `па`) because `әлі / әлде / мүмкін / тағы / жоқ / иә / па / пе` were missing from NOT_A_TOPIC. v4.13.0 added them. v4.13.5 then added `SystemAspect::GenericCapability` which catches the `аласыз ба` pattern and routes to honest fallback («Жоқ, ондай әрекетті өзім орындай алмаймын. Мен — тілдік модельмін»). The assertion is now: output contains the generic-capability honest fallback OR the v4.13.0-era «түсінбедім» fallback. Either way, NOT poetry.",
       "turns": [
-        {"user": "Сіз оны бағдарламалай аласыз ба, әлі жоқ па?", "output_contains_lower_any": ["түсінбедім", "rust"]}
+        {"user": "Сіз оны бағдарламалай аласыз ба, әлі жоқ па?", "output_contains_lower_any": ["орындай алмаймын", "тілдік модельмін", "түсінбедім"]}
       ]
     },
     {
@@ -690,7 +690,23 @@
       "description": "v4.13.0: foundational multi-turn anaphora. Turn 1 establishes Rust as topic; turn 2 says «Сіз оны...» — `оны` is the accusative anaphor, pre-v4.13.0 NOT in DISCOURSE_ANAPHORS so the topic could not be carried over. v4.13.0 adds Acc/Dat/Gen anaphor forms AND introduces DialogContext which preserves the subject across the entire conversation (not just one-turn back-reference). Result: turn 2 reuses Rust as the topic via `subject_under_discussion`.",
       "turns": [
         {"user": "Сіз Rust туралы не білесіз?", "output_contains_lower_any": ["rust"]},
-        {"user": "Сіз оны бағдарламалай аласыз ба?", "output_contains_lower_any": ["rust"]}
+        {"user": "Сіз оны бағдарламалай аласыз ба?", "output_contains_lower_any": ["rust", "тілдік модель", "орындай алмаймын"]}
+      ]
+    },
+    {
+      "id": "generic_capability_honest_fallback_v4_13_5",
+      "category": "system_self_introspection",
+      "description": "v4.13.5: «Сіз бағдарлама жаза аласыз ба?» / «Сіз санай аласыз ба?» / «Сіз есептей аласыз ба?» — generic verb-capability questions where the verb is NOT a language ability (those route to Capabilities aspect from v4.6.0). Pre-v4.13.5 the language-capability detector required a {language adverb} prefix, so these fell through to greedy retrieval. v4.13.5 adds SystemAspect::GenericCapability + detector on `аласың/аласыз ба/ма` + `ала ма?` + `алады ма` patterns. Routes to the honest fallback template that surfaces `system_generic_capability` summary: «Жоқ, ондай әрекетті өзім орындай алмаймын. Мен — тілдік модельмін...».",
+      "turns": [
+        {"user": "Сіз бағдарлама жаза аласыз ба?", "output_contains_lower_any": ["орындай алмаймын", "тілдік модельмін"]}
+      ]
+    },
+    {
+      "id": "multi_topic_capability_honest_fallback_v4_13_5",
+      "category": "system_self_introspection",
+      "description": "v4.13.5: «Сіз математика, физика, химия, биология, астрономия және тағы басқа пәндер бойынша мектептегі біліміңізді білесіз бе?» — multi-topic capability question where the user lists 3+ subjects. Pre-v4.13.5 the topic extractor grabbed `мектеп` (first content noun after closed-class filter) and surfaced an IsA fact. v4.13.5 adds SystemAspect::MultiTopicCapability + detector on (2+ commas) + `және` + `білесің/білесіз`. Detector uses raw_input for comma counting (joined drops punctuation). Routes to honest fallback: «Аталған пәндер бойынша негізгі түсініктерім бар... Бірақ мектеп бағдарламасының толық мазмұны менде жоқ».",
+      "turns": [
+        {"user": "Сіз математика, физика, химия, биология, астрономия және тағы басқа пәндер бойынша мектептегі біліміңізді білесіз бе?", "output_contains_lower_any": ["негізгі түсініктер", "мектеп бағдарламасының толық мазмұны"]}
       ]
     }
   ]

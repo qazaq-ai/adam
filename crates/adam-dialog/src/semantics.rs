@@ -101,7 +101,7 @@ pub fn interpret_text_with_lexicon(
     // aspects). The detector returns the `SystemAspect` it matched
     // so the planner can pick the right `ask_about_system.*`
     // template family. Must be checked BEFORE `detect_ask_name`.
-    if let Some(aspect) = detect_ask_about_system(&tokens, &joined) {
+    if let Some(aspect) = detect_ask_about_system(&tokens, &joined, input) {
         return Intent::AskAboutSystem { aspect };
     }
     if detect_ask_name(&joined) {
@@ -1600,6 +1600,7 @@ fn detect_ask_how_are_you(joined: &str) -> bool {
 fn detect_ask_about_system(
     tokens: &[String],
     joined: &str,
+    raw_input: &str,
 ) -> Option<crate::system_identity::SystemAspect> {
     use crate::system_identity::SystemAspect;
     let pronoun = tokens.iter().any(|t| t == "сен" || t == "сіз");
@@ -1858,6 +1859,65 @@ fn detect_ask_about_system(
     // family that articulates the trade-off honestly.
     if crate::discourse::input_is_self_comparison_question(joined) {
         return Some(SystemAspect::SelfComparison);
+    }
+
+    // **v4.13.5** — Multi-topic capability marker. Pattern: 3+
+    // comma-separated content nouns + `және` (Kazakh "and") + a
+    // capability verb (`білесің / білесіз`). 2026-05-01 live REPL:
+    // «Сіз математика, физика, химия, биология, астрономия және
+    // тағы басқа пәндер бойынша мектептегі біліміңізді білесіз бе?»
+    // pre-v4.13.5 grabbed `мектеп` as topic and surfaced an IsA
+    // fact. The honest answer is: adam has surface-level
+    // understanding of these subjects (knowledge_summary covers
+    // them at the domain level) but no school-curriculum-level
+    // depth. Route to the dedicated `multi_topic_capability`
+    // template family. Detection requires:
+    //   - 2+ commas (signals a list of nouns)
+    //   - `және` (the canonical "and" connector)
+    //   - one of the capability verbs (`білесің / білесіз` —
+    //     other capability verbs like `сөйлей аласыз` are too
+    //     specific to be safe to fire on a random list)
+    // **Important**: `joined` strips punctuation; commas are gone by
+    // the time we reach this detector. Use `raw_input` (lower-cased
+    // for case-insensitive matching) for the comma-count, but
+    // `joined` for the textual markers since the rest of this
+    // function is `joined`-based.
+    let raw_lower = raw_input.to_lowercase();
+    let comma_count = raw_lower.matches(',').count();
+    let multi_topic_capability = comma_count >= 2
+        && raw_lower.contains("және")
+        && (joined.contains("білесің") || joined.contains("білесіз"));
+    if multi_topic_capability {
+        return Some(SystemAspect::MultiTopicCapability);
+    }
+
+    // **v4.13.5** — Generic verb-capability marker. Pattern:
+    // `<verb-converb> ала<person-suffix> <ма/ба/па>?` for any verb
+    // OTHER than the language-capability ones already handled
+    // above. 2026-05-01 live REPL: «Сіз оны бағдарламалай аласыз
+    // ба, әлі жоқ па?» — pre-v4.13.5 the language-capabilities
+    // detector required a {language adverb} prefix, so this fell
+    // through to greedy retrieval and surfaced poetry. v4.13.5
+    // catches the broader pattern: ANY converb + `ала+person` +
+    // question particle = capability question on the verb. The
+    // honest answer: «Жоқ, мен ондай әрекетті орындай алмаймын —
+    // мен тілдік модельмін» (preserves the v4.6.0 trust contract
+    // that adam doesn't pretend to do things it can't).
+    //
+    // Surface forms that signal the "ала + person" auxiliary:
+    //   аласың / аласыз / алады / ала ма / ала ме
+    // Combined with a question particle (бе/ма/ба/па + alternants)
+    // OR a question mark.
+    let aux_capability = joined.contains("аласың ба")
+        || joined.contains("аласыз ба")
+        || joined.contains("аласың ма")
+        || joined.contains("аласыз ма")
+        || joined.contains("ала ма?")
+        || joined.contains("ала ме?")
+        || joined.contains("алады ма")
+        || joined.contains("алады ме");
+    if aux_capability {
+        return Some(SystemAspect::GenericCapability);
     }
 
     // **v4.3.3** — General aspect: pronoun-led identity question.

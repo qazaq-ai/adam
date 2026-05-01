@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.13.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.13.5-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -18,14 +18,14 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/intents-26-2EA44F?style=flat-square" alt="intents">
+  <img src="https://img.shields.io/badge/intents-28-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/surface-Kazakh--only-9CCC65?style=flat-square" alt="Kazakh only">
   <img src="https://img.shields.io/badge/lexicon-25.5%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-745%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-777%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/cognitive%20eval-65%2F65%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
-  <img src="https://img.shields.io/badge/repl%20replay-69%2F69%20canonical-2EA44F?style=flat-square" alt="repl replay">
+  <img src="https://img.shields.io/badge/repl%20replay-85%2F85%20canonical-2EA44F?style=flat-square" alt="repl replay">
   <img src="https://img.shields.io/badge/p50%20turn%20latency-1.07%20ms%20on%20M2-2EA44F?style=flat-square" alt="p50 turn latency">
   <img src="https://img.shields.io/badge/RSS-~76--80%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
@@ -41,6 +41,8 @@
 ## Why adam (v4.4)
 
 adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced. Every layer is **Rust-only** and **graph-first** by repository invariant — both enforced by contract tests.
+
+**v4.13.5 — capability honest fallbacks: generic verb-capability + multi-topic capability detection.** Patch in the v4.12+ humanness arc. v4.13.0 laid the foundation (sentence_decomp + DialogContext + closed-class hygiene) and intentionally deferred the answer-side work; v4.13.5 closes the two known gaps explicitly listed in the v4.13.0 release notes by adding two new `SystemAspect` variants. **(1)** `SystemAspect::GenericCapability` + detector for `<verb-converb> ала<person> <ма/ба/па>?` pattern — surface forms `аласың/аласыз ба/ма`, `ала ма?`, `алады ма`. Distinct from `Capabilities` (v4.6.0 — language-only with closed adverb prefix) and `Limitations` (v4.6.0 — `алмайсың/алмайсыз`). Catches «Сіз бағдарлама жаза аласыз ба?», «Сіз есептей аласыз ба?», «Сіз оны бағдарламалай аласыз ба?» (now resolves `оны → Rust` via v4.13.0 DialogContext, then routes to GenericCapability). **(2)** `SystemAspect::MultiTopicCapability` + detector for 2+ commas (counted on raw input — `joined` strips punctuation) + `және` + `білесің/білесіз`. Catches «Сіз математика, физика, химия... білесіз бе?». Pre-v4.13.5 surfaced `Мектеп — білім беру мекемесі`. **(3)** `detect_ask_about_system` signature extended with `raw_input: &str` so punctuation-sensitive detectors (comma-count) can run. **(4)** Two new fields on `SystemIdentity` (`generic_capability_summary` ~80 words + `multi_topic_capability_summary` ~50 words) + 2 new template families. **All three 2026-05-01 transcript failures now closed.** Pipeline: 2 new SystemAspect variants + 2 new SystemIdentity fields + 2 new template families + 11 new surface-form patterns. Workspace tests: 777 → **777 passing** (+2 REPL replay dialogs). Cadence: patch (v4.13.5). **Stripe (2) — humanness — final patch.** Next: v4.14.0 (predicate decomposition + domain-TF-IDF + semantic-cohesion graph traversal), v4.15.0 (first compositional ML layer: `P(suffix_chain)` priors).
 
 **v4.13.0 — sentence-decomposition foundation + DialogContext multi-turn topic memory + closed-class hygiene.** Second minor in the v4.12+ humanness arc. The 2026-05-01 live-REPL transcript surfaced two systemic gaps: (a) **greedy first-noun-match** — modal particles / negators (`әлі / әлде / мүмкін / тағы / жоқ / иә / па / пе`) leaked into noun_hint as if they were content nouns, surfacing poetry; (b) **goldfish memory** — only one back-reference (`session["last_query_topic"]`) was tracked, so a turn referring to a topic from 3-4 turns earlier could not be resolved. v4.13.0 lays foundation for both. **Architectural addition #1** — new module `crates/adam-dialog/src/sentence_decomp.rs` (~470 lines): the Kazakh agglutinative grammar IS typed function composition (`root + suffix-chain` where each case suffix is `Noun → CaseMarkedNoun[Role]`); FST already decomposes this, downstream code finally USES it. `enum SentenceType { Question, Statement, Imperative, Exclamation }` + `enum Role` (11 variants: Subject/Object/Locus/Source/Recipient/Possessor/Instrument/Predicate/QuestionWord/Closed/Coord) + `struct SentenceDecomposition { sentence_type, tokens, question_word, focus, focus_role, predicate, topic_list, cohesion }` + `fn decompose(input, parses, last_topic)` — pure function, O(n) over tokens, hardmap lookups only, microseconds per query. Question-word focus override: `не` asks for OBJECT, `қайда` LOCUS, `қашан/қалай/неліктен` PREDICATE, `кім/қандай` SUBJECT. **Architectural addition #2** — new module `crates/adam-dialog/src/dialog_context.rs` (~250 lines): `DialogContext { topic_history: Vec<TopicMention>, last_topic, subject_under_discussion, current_domain }` with capped FIFO history (MAX_HISTORY=64), majority-vote subject inference over STICKY_WINDOW=6 turns (one-off mentions don't displace), majority-vote domain over DOMAIN_WINDOW=4 turns. `resolve_anaphor()` consults `subject_under_discussion` first, falls back to `last_topic`. New `Conversation.dialog_context` field, updated each turn after Intent::Unknown.noun_hint resolves. **(1)** Closed-class additions to `NOT_A_TOPIC`: 8 entries (`әлі / әлде / мүмкін / тағы / жоқ / иә / па / пе` — modal/discourse particles + existential negator + post-voiceless allomorphs of question particle, completing the `ма/ме/ба/бе/па/пе` paradigm). **(2)** Acc/Dat/Gen anaphor extension to `DISCOURSE_ANAPHORS`: 12 forms (`оны/соны/мұны/бұны/оған/соған/мұған/бұған/оның/соның/мұның/бұның`) — pre-v4.13.0 only Loc + Abl cases were registered, so «Сіз оны бағдарламалай аласыз ба?» («оны» = "it" Acc) was ignored. **(3)** Multi-turn anaphora live-test: turn 1 «Rust туралы білесіз бе?» establishes Rust as topic; turn 2 «Сіз оны...» now resolves «оны → Rust» via DialogContext. **(4)** 2 new REPL replay regression dialogs. Pipeline: 2 new modules + new `Conversation` field + 12 closed-class entries + 12 anaphor forms; workspace tests **758→777 passing** (+19: 11 sentence_decomp unit tests + 8 dialog_context unit tests). **Zero ML.** Probabilistic suffix-chain prior (`P(suffix_chain)` — natural `root + function^n` learning) reserved for v4.15+. Next: v4.13.5 (generic capability detector + honest fallback templates), v4.14.0 (predicate decomposition + domain-TF-IDF), v4.15.0 (first compositional ML layer).
 
@@ -210,12 +212,12 @@ Live numbers (verified 2026-04-29 against the actual repo): cognitive eval **65 
 | Claim | Verified value | Verification path |
 |---|---|---|
 | Workspace tests | **777 passing, 0 failing, 4 ignored** | `cargo test --workspace` |
-| Cognitive eval canonical | **59 / 59** | `cargo test -p adam-dialog --test cognitive_eval` |
-| REPL replay | **62 / 62 canonical + 0 aspirational** | `cargo test -p adam-dialog --test repl_replay` |
-| World Core entries / facts / domains | **1469 / 1632 / 36** | `find data/world_core -name '*.jsonl' \| xargs cat \| jq -s 'length'` |
-| Extracted runtime facts | **15 642** | `jq '.counts.facts_total' data/retrieval/facts.json` |
-| Derived facts | **23 418** | sum of `data/retrieval/derived_facts.json` `.counts.by_rule` values |
-| Template families | **50** | `grep -c '^\[\[families\]\]' data/dialog/templates/v1.toml` |
+| Cognitive eval canonical | **65 / 65** | `cargo test -p adam-dialog --test cognitive_eval` |
+| REPL replay | **85 / 85 canonical + 0 aspirational** | `cargo test -p adam-dialog --test repl_replay` |
+| World Core entries / facts / domains | **1625 / 1791 / 38** | `find data/world_core -name '*.jsonl' \| xargs cat \| jq -s 'length'` |
+| Extracted runtime facts | **16 317** | `jq '.counts.facts_total' data/retrieval/facts.json` |
+| Derived facts | **30 042** | sum of `data/retrieval/derived_facts.json` `.counts.by_rule` values |
+| Template families | **64** | `grep -c '^\[\[families\]\]' data/dialog/templates/v1.toml` |
 | Tokenizer segmentation eval | **464 / 464 hand-authored** | `data/eval/tokenizer_segmentation_eval_dataset.json` (this is a hand-authored coverage eval, **not** a general "Kazakh tokenizer accuracy" benchmark) |
 | Tiny training validation | **15 / 15 next-token checks on tiny clean prototype** | `data/training/baseline_training_manifest.json` (this is a clean-pipeline prototype check, **not** an ML-model accuracy claim) |
 | `data/eval/benchmark_manifest.json` | **coverage / contract benchmark manifest** with 4 task families + guards + layers | not a single AI-benchmark score; see `docs/foundation_scope.md` for scope |

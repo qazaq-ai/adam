@@ -299,6 +299,31 @@ templates = [
     "{system_implementation}",
 ]
 
+# v4.13.5 — Generic capability honest fallback. Triggered when the
+# user asks adam to perform an arbitrary action («Сіз X істей
+# аласыз ба?» / «X жасай аласың ба?») where X is any verb other
+# than language-related ones (those route to `Capabilities`).
+# 2026-05-01 live REPL: «Сіз оны бағдарламалай аласыз ба, әлі жоқ
+# па?» pre-v4.13.5 surfaced poetry on `әлі`. The honest answer
+# preserves the v4.6.0 trust contract: adam doesn't pretend to do
+# things it can't.
+[[families]]
+key = "ask_about_system.generic_capability"
+templates = [
+    "{system_generic_capability}",
+]
+
+# v4.13.5 — Multi-topic capability honest fallback. Triggered when
+# the user lists 3+ subjects and asks if adam knows them all
+# («Сіз математика, физика, химия... білесіз бе?»). Acknowledges
+# surface-level breadth across subjects but redirects from
+# curriculum-level depth (which adam doesn't have).
+[[families]]
+key = "ask_about_system.multi_topic_capability"
+templates = [
+    "{system_multi_topic_capability}",
+]
+
 # v4.12.0 — Causal-reasoning template family for `QuestionShape::Causal`.
 # Surfaced by «Неліктен X?» / «X неге?» questions where adam has
 # context about X but no Causes-predicate fact. Honest hedging: adam

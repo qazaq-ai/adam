@@ -109,6 +109,22 @@ pub struct SystemIdentity {
     /// user asks «сіз қандай тілде жазылғансыз?» / «не тілінде
     /// жасалғансың?».
     pub implementation_summary: String,
+    /// **v4.13.5** — honest answer for arbitrary verb-capability
+    /// questions («Сіз X істей аласыз ба?» where X is any verb
+    /// adam can't actually do). Mentions adam's nature as a
+    /// language-only system (no actuators, no compute, no internet)
+    /// and what it CAN offer instead (description / explanation /
+    /// retrieval-grounded info). Surfaced via the
+    /// `ask_about_system.generic_capability` template family.
+    pub generic_capability_summary: String,
+    /// **v4.13.5** — honest answer for multi-topic capability
+    /// questions («Сіз математика, физика, химия... білесіз бе?»).
+    /// Acknowledges that adam has surface-level understanding
+    /// across many subjects but does NOT carry curriculum-level
+    /// depth, then redirects to what adam can actually answer at
+    /// the domain level. Surfaced via the
+    /// `ask_about_system.multi_topic_capability` template family.
+    pub multi_topic_capability_summary: String,
 }
 
 impl SystemIdentity {
@@ -180,6 +196,19 @@ impl SystemIdentity {
                 жоқ — әр жауабым нақты дереккөзге сүйенеді. Мен `macOS` пен `Linux` \
                 жүйелерінде жұмыс істеймін, интернетке шықпаймын"
                 .into(),
+            generic_capability_summary: "Жоқ, ондай әрекетті өзім орындай алмаймын. Мен — \
+                тілдік модельмін: тек қазақ тілінде сөйлесе аламын, фактілерді айтып бере \
+                аламын, түсініктер мен анықтамаларды бере аламын. Бағдарлама жазу, есептеу \
+                жүргізу, интернетке шығу немесе кез келген физикалық әрекет менің мүмкіндігімде \
+                жоқ. Бірақ ол әрекеттің мағынасын немесе оған қатысты ұғымдарды түсіндіруге \
+                көмектесе аламын"
+                .into(),
+            multi_topic_capability_summary: "Аталған пәндер бойынша негізгі түсініктерім бар: \
+                әр пәннің не екенін, негізгі ұғымдарын, маңызды атауларын айтып бере аламын. \
+                Бірақ мектеп бағдарламасының толық мазмұны менде жоқ — нақты тарауларды, \
+                есептерді немесе жаттығуларды толық біле бермеймін. Қай пән жайлы білгіңіз \
+                келсе, нақтылап сұрасаңыз көбірек көмектесе аламын"
+                .into(),
             self_comparison_summary: "Мен басқа жасанды интеллект модельдерінен жақсырақ деп \
                 айта алмаймын — басқашамын. Үлкен тілдік модельдер (GPT, Llama және басқалары) \
                 көп тілде, кез келген тақырыпта еркін мәтін жазады, бірақ кейде жоқ нәрсені \
@@ -236,6 +265,18 @@ impl SystemIdentity {
             (
                 "system_self_comparison".into(),
                 self.self_comparison_summary.clone(),
+            ),
+            // v4.13.5 — generic-capability + multi-topic-capability
+            // slots. Honest fallback responses for arbitrary
+            // verb-capability questions and multi-subject knowledge
+            // queries the v4.12.0 specific detectors don't catch.
+            (
+                "system_generic_capability".into(),
+                self.generic_capability_summary.clone(),
+            ),
+            (
+                "system_multi_topic_capability".into(),
+                self.multi_topic_capability_summary.clone(),
             ),
             // v4.12.0 — implementation slot. Renders the
             // `implementation_summary` field for the
@@ -324,6 +365,31 @@ pub enum SystemAspect {
     /// the generic `бағдарламалау тілі IsA формалды тіл` fact instead
     /// of the self-knowledge claim `adam writtenIn rust`.
     Implementation,
+    /// **v4.13.5** — generic verb-capability question: «Сіз X істей
+    /// аласыз ба?» / «X жасай аласың ба?» where X is any verb other
+    /// than language-related ones (those route to `Capabilities`).
+    /// Surface forms: `аласың/аласыз ба/ма`, `ала ма?`, `алады ма`.
+    /// 2026-05-01 live REPL: «Сіз оны бағдарламалай аласыз ба, әлі
+    /// жоқ па?» pre-v4.13.5 surfaced poetry on `әлі`. The honest
+    /// answer: adam is a language model, can't perform actions, only
+    /// describe them. Renders the `generic_capability_summary`
+    /// field. Distinct from `Capabilities` (which lists what adam
+    /// CAN do — Kazakh dialog, slot recall, knowledge queries) —
+    /// `GenericCapability` answers "no, I can't do that" for any
+    /// arbitrary verb that falls outside the closed capability set.
+    GenericCapability,
+    /// **v4.13.5** — multi-topic capability question: «Сіз
+    /// математика, физика, химия... білесіз бе?» where the user
+    /// lists 3+ subjects and asks if adam knows them. Surface
+    /// detection: 2+ commas + `және` + `білесің/білесіз`. The
+    /// honest answer: adam has surface-level understanding across
+    /// these subjects (the `knowledge_summary` covers domain-level
+    /// breadth) but no school-curriculum depth. Renders the
+    /// `multi_topic_capability_summary` field. Distinct from
+    /// `Knowledge` (one-off "what do you know?") — this aspect
+    /// specifically handles list-form questions where the user
+    /// expects per-subject confirmation.
+    MultiTopicCapability,
 }
 
 impl SystemAspect {
@@ -342,6 +408,8 @@ impl SystemAspect {
             SystemAspect::Principles => ".principles",
             SystemAspect::SelfComparison => ".self_comparison",
             SystemAspect::Implementation => ".implementation",
+            SystemAspect::GenericCapability => ".generic_capability",
+            SystemAspect::MultiTopicCapability => ".multi_topic_capability",
         }
     }
 }

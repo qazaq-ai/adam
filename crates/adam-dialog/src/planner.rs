@@ -657,6 +657,14 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             crate::system_identity::SystemAspect::Implementation => {
                 "ask_about_system.implementation"
             }
+            // v4.13.5 — generic verb-capability + multi-topic
+            // capability honest-fallback aspects.
+            crate::system_identity::SystemAspect::GenericCapability => {
+                "ask_about_system.generic_capability"
+            }
+            crate::system_identity::SystemAspect::MultiTopicCapability => {
+                "ask_about_system.multi_topic_capability"
+            }
         },
         Intent::StatementOfName { .. } => "statement_of_name",
         Intent::AskAge => "ask_age",

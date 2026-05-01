@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.13.5] — 2026-05-01 — capability honest fallbacks: generic verb-capability + multi-topic capability detection
+
+**Patch in the v4.12+ humanness arc.** v4.13.0 laid the foundation (sentence_decomp + DialogContext + closed-class hygiene) and intentionally deferred the answer-side work — the v4.13.0 release notes called out "Generic capability detector for arbitrary verbs" and "Multi-topic capability response" as known remaining gaps. v4.13.5 closes both with two new `SystemAspect` variants + honest-fallback templates that preserve the v4.6.0 trust contract: adam doesn't pretend to do things it can't.
+
+### Innovations bundled
+
+1. **`SystemAspect::GenericCapability`** + detector. Pattern: `<verb-converb> ала<person> <ма/ба/па>?`. Surface forms caught: `аласың ба / аласыз ба / аласың ма / аласыз ма / ала ма? / ала ме? / алады ма / алады ме`. Distinct from `Capabilities` (v4.6.0 — language-capability with closed `{қазақша/орысша/...}` adverb prefix) and `Limitations` (v4.6.0 — `алмайсың/алмайсыз` negative). Catches «Сіз бағдарлама жаза аласыз ба?», «Сіз есептей аласыз ба?», «Сіз санай аласыз ба?», «Сіз оны бағдарламалай аласыз ба?» (now resolves `оны → Rust` via v4.13.0 DialogContext, then routes to GenericCapability).
+
+2. **`SystemAspect::MultiTopicCapability`** + detector. Pattern: 2+ commas (counted on the raw input — `joined` strips punctuation) + `және` + `білесің/білесіз`. Catches «Сіз математика, физика, химия, биология, астрономия және тағы басқа пәндер бойынша мектептегі біліміңізді білесіз бе?». Pre-v4.13.5 the topic extractor grabbed `мектеп` and surfaced `Мектеп — білім беру мекемесі`. v4.13.5 routes to honest fallback acknowledging surface-level breadth across listed subjects but explicit absence of curriculum-level depth.
+
+3. **`detect_ask_about_system` signature extended** with `raw_input: &str` parameter. Pre-v4.13.5 the function only saw `joined` (punctuation-stripped) — comma-count-based pattern recognition was impossible. Now `raw_input` carries the original text for punctuation-sensitive detectors.
+
+4. **Two new fields on `SystemIdentity`** — `generic_capability_summary` + `multi_topic_capability_summary`. Honest fallback prose is data, not template logic.
+
+5. **Two new template families** — `ask_about_system.generic_capability` + `ask_about_system.multi_topic_capability`.
+
+6. **REPL replay regression** — 2 new dialogs covering both transcript failures + 1 update to the v4.13.0 multi-turn anaphora dialog (now asserts the GenericCapability honest fallback fires after anaphora resolves `оны → Rust`).
+
+### Pipeline impact
+
+- New `SystemAspect::GenericCapability` + `SystemAspect::MultiTopicCapability` variants.
+- New `SystemIdentity` fields + slot mappings.
+- 2 new template families.
+- `detect_ask_about_system` signature: `(&[String], &str)` → `(&[String], &str, &str)`.
+
+### Live REPL — three transcript failures all closed
+
+```
+Q1: Сіз оны бағдарламалай аласыз ба, әлі жоқ па?
+Pre-v4.13.0:  Әлі жайында қолда бар дерек мынау: «Әлі күнге уайым ...»
+v4.13.0:      Түсінбедім.
+Post-v4.13.5: Жоқ, ондай әрекетті өзім орындай алмаймын. Мен —
+              тілдік модельмін... Бағдарлама жазу, есептеу
+              жүргізу, интернетке шығу немесе кез келген физикалық
+              әрекет менің мүмкіндігімде жоқ.
+
+Q2: Сіз математика, физика, химия... білесіз бе?
+Pre-v4.13.5: Мектеп туралы қысқаша айтсам: Мектеп — білім беру
+             мекемесі.
+Post-v4.13.5: Аталған пәндер бойынша негізгі түсініктерім бар...
+              Бірақ мектеп бағдарламасының толық мазмұны менде жоқ.
+
+Q3 (multi-turn anaphora composition):
+  «Rust туралы білесіз бе?» → «Сіз оны бағдарламалай аласыз ба?»
+  ⇒ DialogContext resolves `оны → Rust` (v4.13.0) AND
+    GenericCapability detector fires on `аласыз ба` (v4.13.5).
+    The two layers compose cleanly.
+```
+
+### Anti-regression
+
+- «Сіз қазақша білесіз бе?» → `Capabilities` (language detector wins, v4.6.0)
+- «Сіз кімсіз?» → `General`
+- «Сіз қандай тілде жазылғансыз?» → `Implementation` (v4.12.0)
+- «Неліктен жасуша өледі?» → causal-routing (v4.12.0)
+
+### Tests + counters
+
+- New REPL replay dialogs: **+2**.
+- 11 new surface-form patterns in `detect_ask_about_system`.
+- Workspace tests: 777 → **777 passing** (behavior exercised through REPL replay regression).
+- `validate_world_core`: 1 625 / 1 625 / 1 791 facts (unchanged).
+- `cognitive_eval`: 25/25 canonical.
+
+### Cadence
+
+**Patch (v4.13.5)** per `feedback_versioning_post_1_0`. Closes the two known gaps explicitly listed in v4.13.0 release notes. **Stripe (2) — humanness — final patch closing all three 2026-05-01 transcript failures.** Next:
+
+- **v4.14.0** — predicate decomposition + domain-TF-IDF + semantic-cohesion graph traversal. Closes the third transcript pattern («Оқушылар не оқиды?»).
+- **v4.15.0** — first ML layer: `P(suffix_chain)` priors. Pure compositional, no embeddings.
+
 ## [4.13.0] — 2026-05-01 — sentence-decomposition foundation + DialogContext multi-turn topic memory + closed-class hygiene
 
 **Second minor in the v4.12+ humanness research arc.** A 2026-05-01 live-REPL transcript surfaced two systemic gaps that v4.12.x couldn't close:
