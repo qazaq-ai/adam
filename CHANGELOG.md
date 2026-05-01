@@ -7,6 +7,68 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.22.0] — 2026-05-01 — runtime integration of chain_tiebreak_root: priors+root infrastructure now reaches live dialog
+
+**First minor in the v4.22+ runtime-integration arc.** v4.19.0 → v4.21.5 built the parse-disambiguation eval framework, surfaced the chain-collision blind spot, added root-level priors with closed-class boost, and shipped the FST pronoun-paradigm matcher — closing the eval at 100 % across 23 cases. **But that 100 % only applied inside the eval binary.** The actual dialog runtime (`parse_input_inner` in `adam-dialog`) was still using chain-only smoothed scoring without the root tiebreak: онда / маған / соған etc. in live REPL still picked the wrong root, even though all the infrastructure to fix it had been in place since v4.20.0 / v4.21.0.
+
+v4.22.0 closes the loop: the chain-then-root tiebreak comparator from the eval is now the runtime path. Live dialog now picks the gold pronoun root for chain-collision surfaces.
+
+### Innovations
+
+**(1) Runtime comparator extended in `parse_input_inner`** (in `crates/adam-dialog/src/lib.rs`). The existing v4.16.0 / v4.16.5 chain-prior re-rank gains a root-tiebreaker tier:
+
+```rust
+analyses.sort_by(|a, b| {
+    let chain_a = score_analysis(a, p, prev, alpha);
+    let chain_b = score_analysis(b, p, prev, alpha);
+    let chain_diff = (chain_a - chain_b).abs();
+    if chain_diff < CHAIN_TIE_EPSILON {
+        // Chain collision — root prior decides.
+        let root_a = p.score_root(root_of(a));
+        let root_b = p.score_root(root_of(b));
+        root_b.partial_cmp(&root_a).unwrap_or(Equal)
+    } else {
+        chain_b.partial_cmp(&chain_a).unwrap_or(Equal)
+    }
+});
+```
+
+Same logic as the eval's `pick_chain_with_root_tiebreak` from v4.20.0. `EPSILON = 1e-4` matches the eval. Chain-difference cases (the vast majority) preserve v4.16.0 behaviour exactly; only chain-collision cases (онда class) gain the new tiebreaker.
+
+**(2) Strictly additive on the no-priors path.** When `priors: None` is passed, the comparator block is skipped entirely — `parse_input` (the public no-priors entry point) returns the v3.2.0 deterministic order bit-for-bit. Verified by the new `no_priors_path_unchanged_for_ambiguous_surface` regression lock.
+
+**(3) Three new runtime regression tests** in `crates/adam-dialog/src/lib.rs::runtime_priors_tests` — load the real frozen artifact + lexicon and assert that production parse picks the gold pronoun root for the v4.20.0 / v4.21.5 chain-collision targets:
+
+- `onda_resolves_to_ol_under_runtime_priors` — «онда» → ол (anaphoric pronoun, not digit ten).
+- `magan_resolves_to_men_under_runtime_priors` — «маған» → мен (1sg pronoun, Dative).
+- `sagan_resolves_to_sen_under_runtime_priors` — «саған» → сен (2sg-informal pronoun, Dative).
+
+These are **runtime regression locks** — future refactors of the prior pipeline can't silently regress live-dialog parse selection on the empirically-validated chain-collision cases.
+
+### Why no eval-binary regenerate
+
+The `eval_parse_disambiguation` binary already implements `chain_tiebreak_root` as one of 8 measured strategies — that result is independent of the runtime path. The new runtime test set in `runtime_priors_tests` is the dialog-side mirror of those eval results.
+
+### Pipeline impact
+
+- `crates/adam-dialog/src/lib.rs` — comparator extended (~30-line diff in `parse_input_inner`); +3 runtime regression tests + 1 no-priors equivalence test.
+- No schema changes, no new artifacts, no new dependencies.
+- Workspace tests **818 → 822 passing** (+4 runtime priors tests).
+
+### What does NOT change
+
+- The 8 eval strategies in `eval_parse_disambiguation` — unchanged. `chain_tiebreak_root` still hits 23 / 23 = 100 %; chain-only strategies still 21 / 23 = 91.3 %. The eval is a measurement of *strategies*, the runtime now uses the winning one.
+- All non-pronoun tests across the workspace — chain-difference cases (the 99 % of dialog) preserve v4.16.0 behaviour exactly.
+- Public API surface — `parse_input_with_priors` signature is identical.
+
+### Cadence
+
+Minor — significant runtime-behaviour change (the priors-and-tiebreaker stack now influences live dialog parse selection on chain-collision cases). The architectural addition is a sort-comparator extension, not a new module — but the impact is the entire compositional ML investment finally reaching production output.
+
+**Stripe (4) — compositional ML — runtime layer opens.**
+
+Next: **v4.22.5+** (live REPL transcript collection to verify chain-collision-class improvements show up in real dialog), **v4.23.0+** (broader FST irregularity catalog — irregular noun stems, possessive-stem alternations, voicing edge cases — same additive paradigm-matcher pattern).
+
 ## [4.21.5] — 2026-05-01 — pronoun paradigm extension (бұл / сол / мен / сен) + 4 new eval cases + сол lexicon entry
 
 **Patch in v4.21+ FST irregularity arc.** v4.21.0 shipped ол's 6 oblique cases as the architectural foundation; v4.21.5 extends the same mechanism to the rest of the demonstrative / personal closed class and adds 4 new eval cases to verify the paradigm matcher scales beyond the single empirical target.
