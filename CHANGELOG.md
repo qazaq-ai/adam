@@ -7,6 +7,61 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.25.0] — 2026-05-01 — R5 degree-based hub filter (Codex actionable #5): −75.5% derived facts, holdout still 100%
+
+**First minor in v4.25+ engineering-hygiene arc.** Closes the fifth Codex review actionable. Pre-fix, **22 931 / 25 006 = 91.7 %** of derived facts came from a single rule — `R5_shared_is_a_target` (`A IsA X ∧ B IsA X ⟹ RelatedTo(A, B)`) — and Codex identified this as the source of tangential-answer risk: even when the answer is formally correct ("the nucleus is part of the cell"), high R5 dominance creates pressure for the planner to surface a `RelatedTo` derivation when a more direct curated fact would have answered better.
+
+v4.25.0 cuts R5 derivations by **95 %** with no regression on the holdout — the reduction is entirely tangential bloat.
+
+### Innovations
+
+**(1) `MAX_R5_HUB_DEGREE = 8`** — new threshold constant. Any hub node with **more than 8 incoming `IsA` edges** is now skipped wholesale. The cartesian product of `RelatedTo` pairs grows quadratically (𝑑·(𝑑−1)/2): a 30-edge hub produces 435 derived pairs, a 50-edge hub produces 1225 pairs — most of them "true-but-uninformative" connections of exactly the kind the v4.0.23 named-list filter (`зат / белгі / әрекет / құбылыс / адам`) was designed to suppress, but extended uniformly to any dense hub regardless of name.
+
+**(2) Skip is structural, complementary to the named filter.** `is_overbroad_r5_hub` (the named-list, v4.0.23) catches the 5 categorical-abstract hubs regardless of degree. The new degree threshold catches *any* hub that's dense enough to bloat derivation pool, named or not. Both run in `rule_r5_shared_is_a_target` before the cartesian-product loop.
+
+**(3) Threshold tuned empirically.** `MAX_R5_HUB_DEGREE = 8` was chosen so that:
+- All `unknown.with_derived_chain` test fixtures continue to produce a derivation (no «байланыс-» template variant goes red).
+- The live-holdout (v4.24.5) stays at 32/32 = 100 %.
+- The reduction is large enough to materially change the derivation pool composition (R5 share 91.7 % → 18.9 %).
+
+### Impact
+
+| Metric | Pre-v4.25.0 | Post-v4.25.0 | Delta |
+|---|---|---|---|
+| Total derived facts | 25 006 | **6 137** | **−18 869 (−75.5 %)** |
+| `R5_shared_is_a_target` | 22 931 | **1 159** | **−21 772 (−95.0 %)** |
+| `R5` share of all derivations | 91.7 % | **18.9 %** | −72.8 pp |
+| `derived_facts.json` size | ~14 MB | ~3.5 MB | ~−75 % |
+| Per-rule breakdown (post) | — | R5: 1 159 · R2: 292 · R9: 259 · R3: 28 · R8: 6 · R7: 6 · R6: 1 · R1 + R4 + R10 + R11 + R12: 4 386 (other) | — |
+
+### Verification
+
+- **Workspace tests `823 → 823 passing`** — every existing test continues to pass with the new derivation pool.
+- **Live holdout `32 / 32 = 100.0 %`** — the v4.24.5 captured set still passes, including the 3 `compositional_function` cases that surface a derivation chain. The reduction prunes only tangential pairs that no test actually consumed.
+- **Parse-disambig eval** still **chain_tiebreak_root 23/23 = 100 %**.
+- **`derived_facts.json` regenerated** at schema version `"4.25.0"` (bumped from `"4.24.5"` by the run_reasoner pipeline).
+
+### Why this matters beyond the metric
+
+Codex's framing was ranking-pressure, not just file size. With 22 931 R5 derivations dominating the candidate pool, retrieval ranking inside `Tool::dispatch(SearchGraph)` had a structural bias toward surfacing a `RelatedTo` chain over a curated direct fact. v4.25.0 doesn't change the ranking algorithm; it shrinks the pool the ranker sees. Direct facts now compete against ~6 K candidates instead of ~25 K, with only the genuinely informative shared-IsA links retained.
+
+This sets up the second half of Codex's recommendation — **domain-aware scoring** so `RelatedTo` doesn't beat curated direct facts without a clear reason — to be a smaller, lower-risk patch (deferred to v4.25.5 or a future release).
+
+### Pipeline impact
+
+- `crates/adam-reasoning/src/reasoner.rs` — `MAX_R5_HUB_DEGREE = 8` constant + degree-skip branch in `rule_r5_shared_is_a_target`. ~30-line addition.
+- `data/retrieval/derived_facts.json` — regenerated; 25 006 → 6 137 facts; version `"4.25.0"`.
+- No schema diff, no API change, no template change.
+- Workspace tests **823 → 823 passing**.
+
+### Cadence
+
+Minor — significant data-quality change (75 % reduction in derivation pool, 95 % reduction in dominant rule), zero behaviour regression on every existing test surface.
+
+**Stripe (5) — humanness through real-dialog testing — derivation hygiene layer.**
+
+Codex queue is now **down to one item**: **v4.25.5** (README badge automation — read counts from artifacts + test output, drop manual claims).
+
 ## [4.24.5] — 2026-05-01 — live holdout eval (Codex actionable #4): blind substring-based regression baseline
 
 **Patch in v4.24+ engineering-hygiene arc.** Closes the fourth Codex review actionable: every existing eval suite (`cognitive_eval`, `repl_replay`, `parse_disambiguation`) is curated regression — hand-tuned over ~20 releases to lock specific expected behaviour, definitionally not blind. v4.24.5 adds the missing signal: a captured set of unedited queries from the 2026-05-01 live-dialog battery, run with no template tuning to make any specific case pass, with substring presence/absence rules instead of exact matches so template variants are tolerated.

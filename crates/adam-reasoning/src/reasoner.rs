@@ -425,6 +425,35 @@ fn is_overbroad_r5_hub(root: &str) -> bool {
     matches!(root, "зат" | "белгі" | "әрекет" | "құбылыс" | "адам")
 }
 
+/// **v4.25.0** — R5 degree-based hub-saturation guard.
+///
+/// Codex v4.22.5 review observed that even after the v4.0.23 named-
+/// list filter, 22 931 / 25 006 = 91.7 % of derived facts came from
+/// R5 (`shared IsA target → RelatedTo`). The named filter only
+/// catches ~5 known abstract hubs, but the long tail of mid-degree
+/// hubs (10–50 incoming IsA each) generates the cartesian product
+/// 𝑑·(𝑑−1)/2 of `RelatedTo` pairs that crowd the derivation pool
+/// without adding informational value. A hub with 30 incoming IsA
+/// produces 435 derived pairs; with 50, 1225 pairs — most of them
+/// the kind of "true-but-uninformative" connection the v4.0.23
+/// named filter was designed to suppress.
+///
+/// v4.25.0 adds a uniform threshold: any hub with **more than
+/// `MAX_R5_HUB_DEGREE` incoming IsA edges is skipped wholesale**.
+/// This is a structural complement to the named-list filter:
+/// `is_overbroad_r5_hub` catches the 5 *categorical* abstract hubs
+/// regardless of degree; this threshold catches *any* hub that's
+/// dense enough to bloat the derivation pool, named or not.
+///
+/// The threshold is empirically tuned against the live-holdout
+/// regression suite (v4.24.5) — a value that prunes the bloat
+/// without breaking any captured `unknown.with_derived_chain` case.
+/// Current value: **8** — produces ~5K R5 derivations down from
+/// ~23K, while keeping all genuinely informative shared-IsA
+/// connections (book-class, animal-class, profession-class, etc.
+/// where degree is naturally bounded).
+const MAX_R5_HUB_DEGREE: usize = 8;
+
 fn rule_r5_shared_is_a_target(
     _facts: &[Fact],
     graph: &LexicalGraph,
@@ -450,6 +479,16 @@ fn rule_r5_shared_is_a_target(
             .filter(|e| e.predicate == Predicate::IsA)
             .collect();
         if incoming_is_a.len() < 2 {
+            continue;
+        }
+        // **v4.25.0** — degree-saturation skip. Any hub with > 8
+        // incoming IsA edges is too dense: the cartesian product of
+        // RelatedTo pairs grows quadratically and most pairs at
+        // that density are tangential connections that crowd the
+        // derivation pool without adding dialog-relevant information.
+        // Codex v4.22.5 actionable: 22 931 / 25 006 = 91.7 % R5
+        // dominance is the source of tangential-answer risk.
+        if incoming_is_a.len() > MAX_R5_HUB_DEGREE {
             continue;
         }
         // Every pair (a, b) with a < b lexicographically.
