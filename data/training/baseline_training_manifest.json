@@ -1,5 +1,5 @@
 {
-  "version": "4.15.0",
+  "version": "4.15.5",
   "run_name": "adam-baseline-plan",
   "target_language": "kazakh",
   "script": "cyrillic",

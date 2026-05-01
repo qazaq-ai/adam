@@ -171,6 +171,16 @@ pub struct Conversation {
     /// Empty by default (no curated facts attached) — domain
     /// inference no-ops cleanly when the index is empty.
     pub domain_index: crate::domain_index::DomainIndex,
+    /// **v4.15.5** — frequency-based prior over FST suffix-chain
+    /// signatures, loaded from
+    /// `data/retrieval/suffix_chain_priors.json` (trained offline
+    /// in v4.15.0). When `Some`, each turn's `parse_input_public`
+    /// re-ranks candidate analyses by `P(chain)` DESC before
+    /// picking the first; when `None`, falls back to the v3.2.0
+    /// lexicographic deterministic order. Strictly additive: the
+    /// stable sort means tied-prior parses preserve v3.2.0 order
+    /// exactly.
+    pub suffix_priors: Option<adam_kernel_fst::suffix_priors::SuffixPriors>,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -367,6 +377,21 @@ impl Conversation {
         self
     }
 
+    /// **v4.15.5** — builder: attach the trained suffix-chain
+    /// prior so each turn's FST parse list is re-ranked by
+    /// `P(chain)` before downstream consumers see the
+    /// `Vec<Analysis>`. Built by the caller via
+    /// `adam_kernel_fst::suffix_priors::SuffixPriors::load(...)`.
+    /// Empty / missing: pre-v4.15.5 lexicographic order
+    /// preserved bit-for-bit.
+    pub fn with_suffix_priors(
+        mut self,
+        priors: adam_kernel_fst::suffix_priors::SuffixPriors,
+    ) -> Self {
+        self.suffix_priors = Some(priors);
+        self
+    }
+
     /// v4.0.3 — builder: enable investor-safe reasoning mode.
     /// When enabled, `inject_reasoning_chain` only cites derivations
     /// whose full `source_chain` comes from `data/world_core/*.jsonl`
@@ -443,7 +468,13 @@ impl Conversation {
         // residual; surface-level checks (Russian/math detection)
         // still operate on the raw input above.
         let stripped = crate::discourse::strip_addressee(crate::discourse::strip_preamble(input));
-        let parses = crate::parse_input_public(stripped, lexicon);
+        // **v4.15.5** — priors-aware parse path. When a trained
+        // `SuffixPriors` artifact is attached, each token's
+        // candidate analyses are re-ranked by `P(chain)` DESC
+        // before downstream consumers see the `Vec<Analysis>`.
+        // `None` falls through to the v3.2.0 deterministic
+        // lexicographic order.
+        let parses = crate::parse_input_with_priors(stripped, lexicon, self.suffix_priors.as_ref());
         let raw_intent = interpret_text_with_lexicon(stripped, &parses, Some(lexicon));
 
         // v1.4.0: follow-up resolution. "ал сіз?" after AskHowAreYou

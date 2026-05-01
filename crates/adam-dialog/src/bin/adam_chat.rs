@@ -189,6 +189,30 @@ fn main() -> ExitCode {
     };
     conv = conv.with_domain_index(domain_idx);
 
+    // **v4.15.5** — load the v4.15.0 trained suffix-chain priors.
+    // Each turn's FST parse list will be re-ranked by P(chain)
+    // before downstream consumers see it. Failure to load (file
+    // missing / schema mismatch) is non-fatal — the v3.2.0
+    // deterministic lexicographic order remains in force.
+    let priors_path = std::path::Path::new("data/retrieval/suffix_chain_priors.json");
+    if priors_path.exists() {
+        match adam_kernel_fst::suffix_priors::SuffixPriors::load(priors_path) {
+            Ok(priors) => {
+                eprintln!(
+                    "adam-chat: suffix priors — {} chains over {} training tokens",
+                    priors.len(),
+                    priors.trained_on_tokens
+                );
+                conv = conv.with_suffix_priors(priors);
+            }
+            Err(err) => {
+                eprintln!(
+                    "adam-chat: suffix priors load failed ({err}); v3.2.0 lexicographic order in force"
+                );
+            }
+        }
+    }
+
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
             run_turn(&mut conv, input, &lex, &repo, trace, turn_seed(0));

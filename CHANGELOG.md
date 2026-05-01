@@ -7,6 +7,52 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.15.5] — 2026-05-01 — SuffixPriors runtime integration: priors-aware FST parse selection
+
+**Patch in the v4.15+ compositional-ML arc.** v4.15.0 shipped the trained `SuffixPriors` artifact + `load`/`score` API but explicitly deferred runtime integration to keep the architectural addition reversible. v4.15.5 wires the prior into the parse pipeline as a re-ranking signal: each turn's FST candidate analyses are now sorted by `P(chain)` DESC before downstream consumers see them. Strictly additive — when no priors are attached, the v3.2.0 deterministic lexicographic order is preserved bit-for-bit.
+
+### Innovations bundled
+
+1. **`parse_input_with_priors`** in `crates/adam-dialog/src/lib.rs` — priors-aware variant of `parse_input_public`. For each token, runs `analyse()` then sorts the candidate list with a **stable** comparator: parses scored higher by `P(chain)` move forward, ties retain the v3.2.0 lexicographic order. Tied-prior parses are bit-identical pre/post-v4.15.5.
+
+2. **`Conversation.suffix_priors: Option<SuffixPriors>`** field + `Conversation::with_suffix_priors(priors)` builder. Default is `None`, in which case the legacy `parse_input_public` path runs unchanged.
+
+3. **`Conversation::turn_with_trace` calls `parse_input_with_priors`** with `self.suffix_priors.as_ref()`, threading the optional prior through the existing parse path. Empty / missing priors short-circuit to the v3.2.0 path; no work is done when there's nothing to re-rank.
+
+4. **`adam_chat` startup loads priors** from `data/retrieval/suffix_chain_priors.json` (the v4.15.0 artifact), validates schema version, attaches via builder. Loading failures are non-fatal — the startup line announces fallback to v3.2.0 order. Production startup now logs all four context layers: morpheme index, reasoning facts, domain index, suffix priors.
+
+5. **`adam-kernel-fst` exports tightened** — `SuffixPriors`, `SuffixPriorsLoadError`, `noun_chain_key`, `verb_chain_key`, `SUFFIX_PRIORS_SCHEMA_VERSION` all reachable through the crate root for `adam-dialog` consumers.
+
+6. **REPL replay regression** — 1 new dialog: `suffix_priors_anti_regression_known_topics_v4_15_5` locks the v4.x baseline behavior on canonical topic queries (`Жасуша туралы не білесіз?`, `Алматы туралы айт`) — both now flow through the priors pipeline since v4.15.5. Failures here mean the prior is changing parse selection in a way that breaks topic extraction.
+
+### Pipeline impact
+
+- `parse_input_inner(input, lex, Option<&SuffixPriors>)` — new internal entry point; `parse_input` and `parse_input_public` both delegate to it with `priors: None`. `parse_input_with_priors` exposes the priors-aware path.
+- `Conversation` gains `suffix_priors: Option<SuffixPriors>` + `with_suffix_priors` builder.
+- `Conversation::turn_with_trace` swaps `crate::parse_input_public(...)` for `crate::parse_input_with_priors(..., self.suffix_priors.as_ref())`.
+- `adam_chat` startup loads priors via `SuffixPriors::load("data/retrieval/suffix_chain_priors.json")` and attaches them when load succeeds.
+
+### Anti-regression — 13-question battery
+
+All canonical queries answer correctly post-v4.15.5: greeting, well-being, definition (`Жасуша / Атом / Алматы`), system identity (`Сіз кімсіз? / Сіз қандай тілде жазылғансыз?`), capability (`Сіз қазақша білесіз бе? / Сіз бағдарлама жаза аласыз ба?`), causal (`Неліктен жасуша өледі?`), curriculum (`Оқушылар не оқиды?`), name statement (`Менің атым Дәулет`). The priors re-rank doesn't disturb any v4.x behaviour.
+
+### Why this is safe
+
+The v4.15.0 artifact has 1 112 chains over 5.77M training tokens. Top chains are the unmarked nominal forms (bare noun, Nominative, Accusative) — exactly the shapes most content nouns take in queries. So when the prior re-ranks, it consistently prefers the more-Kazakh-typical reading. For ambiguous tokens that pre-v4.15.5 matched a closed-class root via lexicographic order (e.g. early-alphabet pronouns), the prior will now downrank them in favour of the actually-common content-noun parse — exactly the kind of disambiguation the prior was trained to capture.
+
+### Tests + counters
+
+- New REPL replay dialogs: **+1** (anti-regression baseline).
+- Workspace tests: 793 → **793 passing** (no new unit tests; behaviour exercised through the workspace + REPL replay).
+- `validate_world_core`: 1 625 / 1 625 / 1 791 facts (unchanged).
+- `cognitive_eval`: 25/25 canonical.
+
+### Cadence
+
+**Patch (v4.15.5)** per `feedback_versioning_post_1_0`. Closes the architectural-wiring gap from v4.15.0 — the trained prior now influences runtime parse selection. **Stripe (4) — compositional ML — first runtime patch.** Next:
+
+- **v4.16.0** — context-aware priors `P(chain | preceding_chain)` capturing local morphological agreement. One Markov step deeper, same compositional view. Same `корень + функция^n` foundation extends to `функция_n | функция_{n-1}` with a transition matrix.
+
 ## [4.15.0] — 2026-05-01 — first compositional ML layer: P(suffix_chain) priors + offline training pass
 
 **First minor in the v4.15+ compositional-ML arc.** The Kazakh agglutinative grammar IS typed function composition (`root + suffix_1 + suffix_2 + ... + suffix_n`). Pre-v4.15.0 the FST analyser returned candidate parses in deterministic lexicographic order (v3.2.0 contract), but had no notion of which suffix-chains are actually *common* in Kazakh usage. v4.15.0 adds the missing distributional signal: a frozen, trained-offline prior over chain signatures, ready to inform downstream tie-breaking from v4.15.5 onward.

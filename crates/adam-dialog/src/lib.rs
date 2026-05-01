@@ -124,16 +124,45 @@ pub(crate) fn parse_input_public(
     input: &str,
     lexicon: &adam_kernel_fst::lexicon::LexiconV1,
 ) -> Vec<adam_kernel_fst::parser::Analysis> {
-    parse_input(input, lexicon)
+    parse_input_inner(input, lexicon, None)
+}
+
+/// **v4.15.5** — priors-aware variant of `parse_input_public`.
+/// Sorts each token's candidate analyses by `P(chain)` DESC before
+/// picking the first. Falls back to v3.2.0 lexicographic order
+/// when `priors` is `None` (caller doesn't have a trained artifact)
+/// or when two parses tie on chain probability — the v3.2.0
+/// determinism contract is preserved exactly in those cases.
+pub(crate) fn parse_input_with_priors(
+    input: &str,
+    lexicon: &adam_kernel_fst::lexicon::LexiconV1,
+    priors: Option<&adam_kernel_fst::suffix_priors::SuffixPriors>,
+) -> Vec<adam_kernel_fst::parser::Analysis> {
+    parse_input_inner(input, lexicon, priors)
 }
 
 /// Layer 1 wrapper: parse each whitespace-separated token, keep only the
-/// first (highest-confidence) analysis of each. Full disambiguation is
-/// a future refinement; for MVP we proceed with the single-best parse.
+/// first (highest-confidence) analysis of each.
+///
+/// **v4.15.5** — when `priors` is `Some`, each token's parse list
+/// is sorted by `P(chain)` DESC before taking the first. The sort
+/// is **stable**: parses with equal scores retain v3.2.0
+/// `(root, id)` order, so empty / no-priors callers see no change.
+/// `respond` / `respond_with_repo` keep calling this with `priors:
+/// None` so their pre-v4.15.5 behaviour is bit-identical.
 fn parse_input(
     input: &str,
     lexicon: &adam_kernel_fst::lexicon::LexiconV1,
 ) -> Vec<adam_kernel_fst::parser::Analysis> {
+    parse_input_inner(input, lexicon, None)
+}
+
+fn parse_input_inner(
+    input: &str,
+    lexicon: &adam_kernel_fst::lexicon::LexiconV1,
+    priors: Option<&adam_kernel_fst::suffix_priors::SuffixPriors>,
+) -> Vec<adam_kernel_fst::parser::Analysis> {
+    use adam_kernel_fst::parser::Analysis;
     let mut out = Vec::new();
     for token in input.split_whitespace() {
         let cleaned: String = token
@@ -144,7 +173,34 @@ fn parse_input(
         if cleaned.is_empty() {
             continue;
         }
-        let analyses = adam_kernel_fst::parser::analyse(&cleaned, lexicon);
+        let mut analyses = adam_kernel_fst::parser::analyse(&cleaned, lexicon);
+        if let Some(p) = priors {
+            // **v4.15.5** — re-rank parses by P(chain) DESC.
+            // `sort_by` is stable: ties preserve the v3.2.0
+            // lexicographic order, so empty / no-priors callers
+            // see no change.
+            analyses.sort_by(|a, b| {
+                let score_a = score_analysis(a, p);
+                let score_b = score_analysis(b, p);
+                // Reverse: higher score wins.
+                score_b
+                    .partial_cmp(&score_a)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
+            // Helper to read a single analysis's chain score.
+            // Defined inline to keep the file's helper inventory
+            // bounded; called only inside this hot path.
+            #[inline]
+            fn score_analysis(
+                a: &Analysis,
+                p: &adam_kernel_fst::suffix_priors::SuffixPriors,
+            ) -> f32 {
+                match a {
+                    Analysis::Noun { features, .. } => p.score_noun(features),
+                    Analysis::Verb { features, .. } => p.score_verb(features),
+                }
+            }
+        }
         if let Some(a) = analyses.into_iter().next() {
             out.push(a);
         }

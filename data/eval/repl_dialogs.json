@@ -740,6 +740,15 @@
       "turns": [
         {"user": "Атом не?", "output_contains_lower_any": ["атом"]}
       ]
+    },
+    {
+      "id": "suffix_priors_anti_regression_known_topics_v4_15_5",
+      "category": "anti_regression",
+      "description": "v4.15.5: SuffixPriors runtime integration must NOT regress canonical topic queries. The priors-driven re-rank uses a stable sort, so equal-prior parses preserve v3.2.0 lexicographic order; queries where the first parse was already correct should land on the same topic. This dialog locks the v4.x baseline behavior on `Жасуша туралы не білесіз?` and `Алматы туралы айт` — both routed through the priors pipeline since v4.15.5. If either regresses, the prior is changing parse selection in a way that breaks topic extraction.",
+      "turns": [
+        {"user": "Жасуша туралы не білесіз?", "output_contains_lower_any": ["жасуша"]},
+        {"user": "Алматы туралы айт", "output_contains_lower_any": ["алматы"]}
+      ]
     }
   ]
 }
