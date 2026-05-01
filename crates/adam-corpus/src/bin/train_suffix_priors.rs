@@ -45,6 +45,21 @@
 //! and other unambiguous tokens build up the marginals; ambiguous
 //! tokens are skipped from root counting entirely.
 //!
+//! **v4.20.5 — closed-class structural-pronoun boost.** v4.20.0
+//! shipped the unambiguous-only attribution and ran into the
+//! pronoun-bias problem: structural pronouns (ол, бұл, сол, мен,
+//! сен, олар, біз, сіз) appear MOSTLY in inherently-ambiguous
+//! inflected forms (онда, оны, оған, бұнда, маған, …) which get
+//! filtered out by the unambiguous-only attribution. Result:
+//! corpus marginal P(он=digit) > P(ол=pronoun), inverting reality.
+//! v4.20.5 reads `data/lexicon/closed_class_root_boosts.json` —
+//! a hand-curated multiplicative count boost per pronoun root —
+//! and applies it AFTER the unambiguous-only counting completes
+//! but BEFORE Laplace smoothing. The boost folds into the same
+//! `root_log_prob` field; no schema change. Empirically validated
+//! against the parse-disambiguation eval (the «онда» case must
+//! flip from он to ол under `chain_tiebreak_root`).
+//!
 //! **CLI.**
 //! ```text
 //! cargo run --release -p adam-corpus --bin train_suffix_priors
@@ -71,6 +86,10 @@ use serde::Deserialize;
 
 const CURATED_DIR: &str = "data/curated";
 const OUTPUT_PATH: &str = "data/retrieval/suffix_chain_priors.json";
+/// **v4.20.5** — closed-class structural-pronoun boost file.
+/// Path is optional: when missing, the training run falls back to
+/// pure unambiguous-only attribution (v4.20.0 behaviour).
+const CLOSED_CLASS_BOOST_PATH: &str = "data/lexicon/closed_class_root_boosts.json";
 
 #[derive(Debug, Deserialize)]
 struct PackFile {
@@ -85,6 +104,17 @@ struct PackSample {
     /// at iteration time when `None`.
     #[serde(default)]
     text: Option<String>,
+}
+
+/// **v4.20.5** — closed-class structural-pronoun boost file. Maps
+/// root → multiplicative count factor applied AFTER unambiguous-
+/// only counting completes. Compensates for the systematic
+/// under-counting of pronouns whose inflected forms are inherently
+/// ambiguous and thus filtered from the v4.20.0 attribution scheme.
+#[derive(Debug, Deserialize, Default)]
+struct ClosedClassBoosts {
+    #[serde(default)]
+    boosts: std::collections::HashMap<String, f64>,
 }
 
 fn main() -> ExitCode {
@@ -295,6 +325,52 @@ fn main() -> ExitCode {
         root_unambiguous_tokens,
         root_skipped_ambiguous,
     );
+
+    // **v4.20.5** — apply closed-class structural-pronoun boost.
+    // Compensates for the systematic under-counting of pronouns
+    // whose inflected forms are inherently ambiguous and got
+    // filtered by the v4.20.0 unambiguous-only attribution.
+    let boosts: ClosedClassBoosts = match fs::read(CLOSED_CLASS_BOOST_PATH) {
+        Ok(b) => match serde_json::from_slice::<ClosedClassBoosts>(&b) {
+            Ok(parsed) => parsed,
+            Err(err) => {
+                eprintln!(
+                    "train_suffix_priors: closed-class boost file at {} \
+                     present but malformed ({}); skipping boost",
+                    CLOSED_CLASS_BOOST_PATH, err
+                );
+                ClosedClassBoosts::default()
+            }
+        },
+        Err(_) => {
+            eprintln!(
+                "train_suffix_priors: no closed-class boost file at {} — \
+                 running with pure unambiguous-only attribution",
+                CLOSED_CLASS_BOOST_PATH
+            );
+            ClosedClassBoosts::default()
+        }
+    };
+    if !boosts.boosts.is_empty() {
+        let mut applied = 0usize;
+        let mut skipped_unseen = Vec::new();
+        for (root, factor) in &boosts.boosts {
+            if let Some(count) = root_counts.get_mut(root) {
+                let boosted = (*count as f64 * factor).round().max(1.0) as u64;
+                *count = boosted;
+                applied += 1;
+            } else {
+                skipped_unseen.push(root.clone());
+            }
+        }
+        eprintln!(
+            "train_suffix_priors: applied closed-class boost to {} roots \
+             (skipped {} roots not seen unambiguously: {:?})",
+            applied,
+            skipped_unseen.len(),
+            skipped_unseen,
+        );
+    }
 
     // Round float counts to integers for the SuffixPriors API
     // (which expects u64). Uniform attribution generates

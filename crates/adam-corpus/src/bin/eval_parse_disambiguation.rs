@@ -185,7 +185,7 @@ fn main() -> ExitCode {
     }
 
     // Report.
-    println!("=== Parse-disambiguation eval (v4.20.0) ===");
+    println!("=== Parse-disambiguation eval (v4.20.5) ===");
     println!("Cases with non-empty FST parses: {total_with_parses}");
     println!();
     println!("Per-strategy accuracy:");
@@ -393,11 +393,19 @@ fn pick_chain_with_root_tiebreak(parses: &[Analysis], priors: &SuffixPriors, alp
     if parses.is_empty() {
         return String::new();
     }
+    // **v4.20.5** — env-var `ADAM_DEBUG_TIEBREAK=1` dumps per-parse
+    // scores. Useful for understanding why a specific ambiguity
+    // isn't resolving as expected.
+    let debug = std::env::var("ADAM_DEBUG_TIEBREAK").as_deref() == Ok("1");
     const EPSILON: f32 = 1e-4;
-    let mut indexed: Vec<(usize, f32, f32)> = parses
+    let mut indexed: Vec<(usize, f32, f32, String, String)> = parses
         .iter()
         .enumerate()
         .map(|(i, p)| {
+            let chain_key = match p {
+                Analysis::Noun { features, .. } => noun_chain_key(features),
+                Analysis::Verb { features, .. } => verb_chain_key(features),
+            };
             let chain_score = match p {
                 Analysis::Noun { features, .. } => {
                     priors.score_noun_smoothed(features, None, alpha)
@@ -407,11 +415,21 @@ fn pick_chain_with_root_tiebreak(parses: &[Analysis], priors: &SuffixPriors, alp
                 }
             };
             let root = match p {
-                Analysis::Noun { root, .. } | Analysis::Verb { root, .. } => &root.root,
+                Analysis::Noun { root, .. } | Analysis::Verb { root, .. } => root.root.clone(),
             };
-            (i, chain_score, priors.score_root(root))
+            let root_score = priors.score_root(&root);
+            (i, chain_score, root_score, root, chain_key)
         })
         .collect();
+    if debug {
+        eprintln!("--- chain_tiebreak_root debug ---");
+        for entry in &indexed {
+            eprintln!(
+                "  parse[{}] root={} chain={} chain_score={:.4} root_score={:.4}",
+                entry.0, entry.3, entry.4, entry.1, entry.2
+            );
+        }
+    }
     // Stable sort by chain DESC; ties broken by root DESC.
     indexed.sort_by(|a, b| {
         let chain_diff = (a.1 - b.1).abs();
@@ -421,5 +439,8 @@ fn pick_chain_with_root_tiebreak(parses: &[Analysis], priors: &SuffixPriors, alp
             b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal)
         }
     });
+    if debug {
+        eprintln!("  picked: parse[{}] root={}", indexed[0].0, indexed[0].3);
+    }
     root_of(&parses[indexed[0].0])
 }

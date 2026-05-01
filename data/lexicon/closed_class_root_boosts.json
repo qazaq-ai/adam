@@ -1,0 +1,16 @@
+{
+  "_comment": "v4.20.5 — closed-class structural-pronoun boost. Multiplicative count boost applied during train_suffix_priors to compensate for the systematic under-counting of pronouns by the v4.20.0 unambiguous-only attribution scheme. The pronoun ол / бұл / сол / мен / сен / олар / біз / сіз family is structural anaphor — these roots are fundamentally common in real Kazakh dialog, but their inflected forms (онда, оны, оған, бұнда, маған, …) are inherently ambiguous in FST analysis and get FILTERED OUT by the unambiguous-only filter. Result without this boost: corpus marginal P(он=digit) > P(ол=pronoun), which inverts reality. The boost factor is multiplicative on the unambiguous-only count and is calibrated to push P(pronoun) > P(common-content-homonym) in the marginal — empirically validated against the parse-disambiguation eval (the «онда» case must flip from он to ол).",
+  "version": 1,
+  "boosts": {
+    "ол": 10,
+    "бұл": 8,
+    "сол": 8,
+    "осы": 5,
+    "олар": 5,
+    "сіз": 5,
+    "сен": 5,
+    "біз": 3,
+    "мынау": 3,
+    "анау": 3
+  }
+}

@@ -7,6 +7,63 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.20.5] — 2026-05-01 — closed-class structural-pronoun boost + diagnostic discovery: онда's gold parse isn't an FST candidate
+
+**Patch in v4.20+ root-axis arc.** Implements the closed-class structural-pronoun boost planned by v4.20.0's writeup, then surfaces the **third (and most actionable) negative finding** in this measurement series: priors-side fixes were targeting the wrong layer the entire time.
+
+### Innovations
+
+**(1) `data/lexicon/closed_class_root_boosts.json`** — hand-curated multiplicative count boosts for structural pronouns (ол / бұл / сол / мен / сен / олар / біз / сіз / осы / мынау / анау). Compensates for the systematic under-counting of pronouns by v4.20.0's unambiguous-only attribution: pronouns appear mostly in inherently-ambiguous inflected forms (онда, оны, оған, бұнда, маған, …) which get filtered, biasing the corpus marginal toward digit-heavy contexts.
+
+**(2) Training binary updated** — `train_suffix_priors` reads the boost file (graceful fallback when missing) and applies the multiplicative factor to the corresponding `root_counts` AFTER unambiguous-only counting and BEFORE Laplace smoothing. The boost folds into the existing `root_log_prob` field — **no schema bump** (still v4). Training-side pre-processing only; runtime API is unchanged.
+
+**(3) Eval binary debug pass.** `pick_chain_with_root_tiebreak` gains an env-gated debug logger (`ADAM_DEBUG_TIEBREAK=1`) that dumps per-parse chain key, chain score, root score, and the picked parse. This is what surfaced the v4.20.5 finding.
+
+### Boost validation
+
+After applying the boost and regenerating the frozen artifact:
+- `ол`: -5.45 → **-3.24** (was below он, now above)
+- `он`: -4.97 → -5.06 (slight shift due to denominator change)
+- `бұл`: -5.09 → -3.10
+- `мен`: -4.42 → -4.51
+- `сен`: -6.96 → -5.44
+- 5 of 10 boosted roots applied (the other 5 — осы, олар, сол, мынау, анау — never appeared unambiguously in the corpus, so the multiplicative boost has nothing to multiply).
+
+The boost mechanism works as designed. The marginal `P(ол) > P(он)` now holds — directionally correct.
+
+### THE CRITICAL FINDING
+
+**Eval results are unchanged from v4.20.0** — `chain_tiebreak_root` still picks `он` for both «онда» cases. The debug logger reveals why:
+
+```
+parse[0] root=он chain=noun:None|None|None|Locative|None chain_score=-4.2171 root_score=-5.0559
+parse[1] root=он chain=noun:None|Singular|None|Locative|None chain_score=-4.2171 root_score=-5.0559
+picked: parse[0] root=он
+```
+
+**The FST returns NO parse with `root=ол` for «онда».** Both candidates have `root=он`. The gold parse isn't even a candidate, so no amount of prior tweaking — boost, tiebreaker, anything — can pick it.
+
+**Root cause.** «онда» starts with «он», not «ол». The FST's `analyse()` does prefix-match on root surface forms; «ол» (2 chars) is not a prefix of «онда» (4 chars), so it never enters the candidate list. Kazakh has a phonological alternation `ол → он-` before consonant-initial suffixes (locative `-да`, accusative `-ны`, dative `-ған`, …) — a regular lateralization pattern. The lexicon stores bare `ол` as a pronoun root, but the FST has no machinery to generate the `он-` allomorph during analysis.
+
+**Implication.** Three releases (v4.19.0 / v4.19.5 / v4.20.0) plus v4.20.5 of priors-side architecture were targeting the **wrong layer**. The bug is in FST stem-alternation, not the prior. The priors infrastructure is still useful — chain priors / root priors / closed-class boost all remain in place for genuine chain-collision cases — but **the «онда» case can only be fixed at the FST/lexicon layer**, not the scoring layer.
+
+This finding actually *unblocks* the project: it eliminates an entire class of priors-tuning that would have continued to fail.
+
+### Pipeline impact
+
+- New file: `data/lexicon/closed_class_root_boosts.json` (10 hand-curated pronouns).
+- `crates/adam-corpus/src/bin/train_suffix_priors.rs` — `ClosedClassBoosts` struct, file load with graceful fallback, post-counting boost application, diagnostic eprintln.
+- `crates/adam-corpus/src/bin/eval_parse_disambiguation.rs` — `ADAM_DEBUG_TIEBREAK=1` debug pass in `pick_chain_with_root_tiebreak`; module + per-case notes updated to flag the FST gap.
+- `data/retrieval/suffix_chain_priors.json` — regenerated with boost applied (still schema v4).
+- `data/eval/parse_disambiguation_eval.json` — `онда` case notes updated to document the FST-layer root cause.
+- Workspace tests **809 → 809 passing**.
+
+### Cadence
+
+Patch — no architectural addition, mechanism implementation, eval discovery.
+
+**Stripe (4) — compositional ML — root axis layer continues, but next step pivots OFF priors.** Next: **v4.20.10** or **v4.21.0** (FST stem-alternation for the pronoun paradigm — add `он-` / `оғ-` / `соған-` / `маған-` allomorphs to the analyser so «онда», «оған», «маған», «бұнда», etc. correctly surface their pronoun root as one of the candidate parses). Once the gold parse is *available*, the existing v4.20.0 root prior + closed-class boost will pick it under `chain_tiebreak_root` — at which point the «онда» case finally flips.
+
 ## [4.20.0] — 2026-05-01 — root-level priors + new prior axis (P(root) marginals via unambiguous-only attribution)
 
 **First minor in v4.20+ root-axis arc.** v4.19.5 surfaced the structural finding that chain-level priors can't disambiguate root identity when both parses share a suffix chain (the «онда» case: `он + Locative` and `ол + Locative` collide on chain). v4.20.0 builds the missing axis: a root-level marginal prior `P(root)` over the corpus, trained via **unambiguous-only attribution**, with two new evaluation strategies that combine it with the chain prior.
