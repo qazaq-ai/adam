@@ -33,6 +33,7 @@ pub mod lexicon;
 pub mod morphotactics;
 pub mod parser;
 pub mod phonology;
+pub mod pronoun_paradigm;
 pub mod suffix_priors;
 
 pub use phonology::{

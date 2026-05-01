@@ -83,6 +83,15 @@ pub fn analyse(surface: &str, lex: &LexiconV1) -> Vec<Analysis> {
             }
         }
     }
+    // **v4.21.0** — pronoun stem-alternation paradigm. Surfaces
+    // like «онда» / «оны» / «оған» / «одан» can't be reached by
+    // the regular `surface_could_contain_root` prefix-match
+    // because the pronoun root «ол» is not a prefix of these
+    // forms (Kazakh phonological alternation `ол → он-/оғ-/од-`
+    // before consonant-initial suffixes). The paradigm matcher
+    // adds the missing analyses without disturbing the regular
+    // candidates.
+    out.extend(crate::pronoun_paradigm::try_pronoun_paradigm(surface, lex));
     out
 }
 

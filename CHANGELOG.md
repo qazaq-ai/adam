@@ -7,6 +7,81 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.21.0] — 2026-05-01 — pronoun stem-alternation paradigm + 100% accuracy on parse-disambiguation eval
+
+**First minor in v4.21+ FST irregularity arc.** v4.20.5's debug pass surfaced the actionable diagnosis: the FST returned no parse with root=`ол` for «онда» because Kazakh's phonological alternation `ол → он-` (with lateralization `л → н` before consonant-initial dental suffixes) wasn't modelled. v4.21.0 ships the irregularity as a small hardcoded paradigm matcher and **closes the entire v4.19.0–v4.20.5 measurement arc with `chain_tiebreak_root` reaching 100% accuracy** on the parse-disambiguation eval.
+
+### Innovations
+
+**(1) New module `crates/adam-kernel-fst/src/pronoun_paradigm.rs`** — irregular-form table for the closed class of Kazakh pronouns whose oblique cases involve stem alternation that the regular `synthesise_noun` pipeline cannot generate. v4.21.0 ships the `ол` paradigm:
+
+| Surface | Bare root | Case |
+|---|---|---|
+| оны | ол | Accusative |
+| оның | ол | Genitive |
+| оған | ол | Dative |
+| **онда** | **ол** | **Locative** ← the empirical target |
+| одан | ол | Ablative |
+| онымен | ол | Instrumental |
+
+`try_pronoun_paradigm(surface, lex) -> Vec<Analysis>` is consulted by `analyse()` after the regular noun / verb passes, **strictly additive** — emits matches without disturbing existing candidates. The bare pronoun root is looked up via `lex.get(...)`; a missing lexicon entry degrades silently to no match (defensive — pure_kazakh_roots.json has `pron_ol`).
+
+**Why a hardcoded table, not a phonology rule.** Adding `л → н` / `л → ғ` / `л → д` allomorph rules to the general engine would over-trigger on common consonant-final nouns (ел → *ен-, бел → *бен-). The linguistic reality is that this is a **closed-class irregularity** of the demonstrative-pronoun paradigm, exactly captured by listing the surface forms.
+
+**(2) `analyse()` integration** — single `out.extend(pronoun_paradigm::try_pronoun_paradigm(surface, lex))` call after the regular per-entry loop. Strictly additive; preserves v3.2.0 deterministic ordering because each appended Analysis still appears at a stable position in the per-call output (table order, after the lexicographic root order from the regular passes).
+
+**(3) `pronoun_paradigm` module exported** from `lib.rs` so downstream callers (eval binary, dialog crate, future paradigm extensions) can reuse the same table or extend it without re-implementing the matcher.
+
+**(4) Frozen priors artifact regenerated** — `онда` tokens now produce 2 distinct roots (он, ол) instead of 1, so they're correctly classified as ambiguous and skipped from root counting (per v4.20.0's policy). The `ол` count + closed-class boost (×10 from v4.20.5) keeps `P(ол) = -3.24 > P(он) = -5.06` directionally correct.
+
+### Results (n = 19 with non-empty FST parses)
+
+| Strategy | Hits | Accuracy |
+|---|---|---|
+| baseline | 15 / 19 | **78.9 %** |
+| unigram | 17 / 19 | **89.5 %** |
+| bigram | 17 / 19 | **89.5 %** |
+| smoothed | 17 / 19 | **89.5 %** |
+| pos_conditioned | 17 / 19 | **89.5 %** |
+| with_context | 17 / 19 | **89.5 %** |
+| chain_plus_root | 18 / 19 | **94.7 %** |
+| **chain_tiebreak_root** | **19 / 19** | **🎉 100.0 %** |
+
+Both «онда» cases (sentence-initial `Онда да менің есімде сақталған.` AND mid-sentence `Менің кітабым бар, онда суреттер көп.`) now correctly resolve to `ол`. The lift from baseline lexicographic order:
+
+- v4.19.0 baseline: 78.9 %
+- v4.21.0 best: **100.0 %** — full closure on the curated test set, **+21.1pp absolute**.
+
+### The end-to-end stack
+
+This release closes a 6-release arc that surfaced and then resolved the chain-collision blind spot:
+
+1. **v4.19.0** — empirical eval framework + 4 prior strategies measured, surfaces residual «онда» failure
+2. **v4.19.5** — `with_context` strategy + structural finding: chain priors can't disambiguate within-chain root identity
+3. **v4.20.0** — root-level prior `P(root)` axis + 2 new combination strategies, finding: simple chain+root regresses; chain_tiebreak_root principled but blocked by attribution bias
+4. **v4.20.5** — closed-class structural-pronoun boost + DIAGNOSTIC DISCOVERY: priors weren't the issue; FST didn't even generate the gold parse
+5. **v4.21.0** — pronoun paradigm matcher closes the FST gap; chain_tiebreak_root hits 100 %
+
+The combined system: **chain priors handle the regular cases; root priors + closed-class boost provide the chain-collision tiebreaker; FST stem-alternation makes the closed-class oblique forms available as candidates**. Each layer has a clear responsibility, each layer's data lives in a clearly-typed artifact, and the eval reports per-strategy contributions transparently.
+
+### Pipeline impact
+
+- New file: `crates/adam-kernel-fst/src/pronoun_paradigm.rs` (~150 lines + 5 unit tests).
+- `crates/adam-kernel-fst/src/lib.rs` — `pub mod pronoun_paradigm;`.
+- `crates/adam-kernel-fst/src/parser.rs` — single `out.extend(...)` call in `analyse()`.
+- `data/retrieval/suffix_chain_priors.json` — regenerated (still schema v4).
+- `data/eval/parse_disambiguation_eval.json` — `онда` case notes updated to RESOLVED status.
+- `crates/adam-corpus/src/bin/eval_parse_disambiguation.rs` — printout version bumped to v4.21.0.
+- Workspace tests **809 → 814 passing** (+5 pronoun_paradigm tests).
+
+### Cadence
+
+Minor — significant architectural addition (new FST module + paradigm-matcher mechanism + 100 % eval closure).
+
+**Stripe (4) — compositional ML — measurement layer CLOSED at 100 %.**
+
+Next: **v4.21.5** (extend pronoun paradigm with `бұл` / `сол` / `мен` / `сен` / `мынау` / `анау` allomorphs — same mechanism, more entries; extends the eval test set with cases like «бұнда» / «соған» / «маған» / «саған» to verify), **v4.22.0+** (broader FST irregularity catalog: irregular noun stems, possessive-stem alternations, voicing edge cases — all as additive paradigm-matcher tables, not rule-engine extensions).
+
 ## [4.20.5] — 2026-05-01 — closed-class structural-pronoun boost + diagnostic discovery: онда's gold parse isn't an FST candidate
 
 **Patch in v4.20+ root-axis arc.** Implements the closed-class structural-pronoun boost planned by v4.20.0's writeup, then surfaces the **third (and most actionable) negative finding** in this measurement series: priors-side fixes were targeting the wrong layer the entire time.

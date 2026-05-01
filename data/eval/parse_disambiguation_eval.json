@@ -28,14 +28,14 @@
       "sentence": "Онда да менің есімде сақталған.",
       "token": "онда",
       "gold_root": "ол",
-      "note": "v4.3.5 regression: gold reading is `ол + Locative` (anaphoric «there» — ол is in the lexicon as part_of_speech=pronoun). v4.20.5 EMPIRICAL DISCOVERY via the eval debug pass: the FST's analyse() returns NO parse with root=ол for онда — only `он + Locative`. The gold parse is not even a candidate. The reason: «онда» starts with «он», not «ол», so the FST's root-prefix matcher never considers ол. Kazakh has a phonological alternation `ол → он-` before consonant-initial suffixes (locative -да); the lexicon has bare ол but no `он-` allomorph wired into the FST. This means v4.19.0 / v4.19.5 / v4.20.0 / v4.20.5 priors-side fixes were all looking in the wrong layer — the bug is in the FST stem-alternation, not the prior. Defers to v4.20.10 / v4.21.0+ (FST pronoun-paradigm allomorphs)."
+      "note": "v4.3.5 regression: gold reading is `ол + Locative` (anaphoric «there» — ол is in the lexicon as part_of_speech=pronoun). v4.20.5 EMPIRICAL DISCOVERY via the eval debug pass: the FST's analyse() returned NO parse with root=ол for онда — only `он + Locative`. v4.21.0 CLOSES THIS by adding the pronoun-paradigm matcher (crates/adam-kernel-fst/src/pronoun_paradigm.rs) — a hardcoded irregular-form table for ол's oblique cases (онда/оны/оның/оған/одан/онымен). With both parses now available, chain_tiebreak_root strategy correctly picks ол via root prior + closed-class boost. RESOLVED at v4.21.0."
     },
     {
       "id": "onda_anaphoric_mid_sentence",
       "sentence": "Менің кітабым бар, онда суреттер көп.",
       "token": "онда",
       "gold_root": "ол",
-      "note": "v4.19.5 companion case to onda_must_not_be_ten_locative. Same ambiguity in principle (он=ten vs ол=anaphoric), but онда appears MID-SENTENCE after a noun-phrase clause. v4.20.5 confirms the same FST gap as the sentence-initial case: analyse() returns no parse with root=ол because «онда» doesn't start with «ол». Sentence position doesn't matter — the gold parse is structurally absent from the candidate list. Defers to v4.20.10 / v4.21.0+ (FST pronoun-paradigm allomorphs)."
+      "note": "v4.19.5 companion case to onda_must_not_be_ten_locative. Same ambiguity in principle (он=ten vs ол=anaphoric), mid-sentence position. v4.21.0 RESOLVES via the new pronoun-paradigm matcher: with the gold parse (ол + Loc) now in the candidate list, chain_tiebreak_root picks ол."
     },
     {
       "id": "qysqasy_must_not_be_qysqa",
