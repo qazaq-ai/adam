@@ -110,11 +110,16 @@ fn main() -> ExitCode {
 
     // **Performance.** FST analyse is O(lexicon_size) per token —
     // expensive when the same surface form appears thousands of
-    // times. We dedupe: count token frequencies first, then run
-    // analyse() once per unique form, multiplying chain
-    // contributions by the form's frequency. Reduces 4.6M token
-    // analyses to ~250K unique-form analyses (~20× faster on M2).
-    let mut token_freq: HashMap<String, u64> = HashMap::new();
+    // times. We dedupe: collect unique tokens first, run analyse()
+    // once per form, cache the resulting chain keys, then walk the
+    // corpus a second time to tally both unigram and bigram counts.
+    //
+    // **v4.16.0** — second pass now also computes bigram counts
+    // `(prev_chain, current_chain) → count` for context-aware
+    // priors. We retain the original sample order (sample
+    // boundaries reset prev_chain to None) so adjacency is
+    // meaningful — a bigram only counts within the same sentence.
+    let mut all_samples: Vec<Vec<String>> = Vec::new();
     let mut total_tokens: u64 = 0;
     let mut total_samples: u64 = 0;
 
@@ -132,10 +137,6 @@ fn main() -> ExitCode {
         let pack: PackFile = match serde_json::from_slice(&bytes) {
             Ok(p) => p,
             Err(err) => {
-                // Not every JSON in `data/curated/` is a sample pack
-                // (manifests / id-pack files have a different
-                // shape). Skip silently when the schema doesn't
-                // match instead of failing the whole training run.
                 eprintln!(
                     "train_suffix_priors: skipping {} (schema mismatch: {err})",
                     path.display()
@@ -148,23 +149,36 @@ fn main() -> ExitCode {
             let Some(text) = sample.text.as_deref() else {
                 continue;
             };
-            for token in tokenize(text) {
-                *token_freq.entry(token).or_insert(0) += 1;
-                total_tokens += 1;
+            let toks: Vec<String> = tokenize(text).collect();
+            total_tokens += toks.len() as u64;
+            if !toks.is_empty() {
+                all_samples.push(toks);
             }
+        }
+    }
+
+    // Build the unique-token → chain-keys cache once.
+    let mut unique_tokens: HashMap<String, ()> = HashMap::new();
+    for sample in &all_samples {
+        for tok in sample {
+            unique_tokens.entry(tok.clone()).or_default();
         }
     }
     eprintln!(
         "train_suffix_priors: {} samples, {} tokens, {} unique forms — analysing each unique form once",
         total_samples,
         total_tokens,
-        token_freq.len()
+        unique_tokens.len()
     );
 
-    let mut counts_f64: HashMap<String, f64> = HashMap::new();
+    // chain_keys_for[token] = list of all chain keys returned by
+    // analyse(token). Empty Vec means analyse returned no parses
+    // (closed-class word, OOV, etc).
+    let mut chain_keys_for: HashMap<String, Vec<String>> =
+        HashMap::with_capacity(unique_tokens.len());
+    let unique_total = unique_tokens.len() as u64;
     let mut analysed_forms: u64 = 0;
-    let unique_total = token_freq.len() as u64;
-    for (token, freq) in &token_freq {
+    for token in unique_tokens.keys() {
         analysed_forms += 1;
         if analysed_forms % 25_000 == 0 {
             eprintln!(
@@ -173,22 +187,54 @@ fn main() -> ExitCode {
             );
         }
         let parses = analyse(token, &lex);
-        if parses.is_empty() {
-            continue;
-        }
-        let weight = (*freq as f64) / parses.len() as f64;
-        for parse in parses {
-            let key = chain_key_for_analysis(&parse);
-            *counts_f64.entry(key).or_insert(0.0) += weight;
+        let keys: Vec<String> = parses.iter().map(chain_key_for_analysis).collect();
+        chain_keys_for.insert(token.clone(), keys);
+    }
+
+    // Second pass: walk samples in order, tally unigrams and
+    // bigrams using the cache.
+    let mut counts_f64: HashMap<String, f64> = HashMap::new();
+    let mut bigram_counts_f64: HashMap<(String, String), f64> = HashMap::new();
+    for sample in &all_samples {
+        let mut prev_keys: Option<&Vec<String>> = None;
+        for token in sample {
+            let Some(curr_keys) = chain_keys_for.get(token) else {
+                prev_keys = None;
+                continue;
+            };
+            if curr_keys.is_empty() {
+                prev_keys = None;
+                continue;
+            }
+            // Unigram contribution: 1/N per parse.
+            let curr_weight = 1.0_f64 / curr_keys.len() as f64;
+            for key in curr_keys {
+                *counts_f64.entry(key.clone()).or_insert(0.0) += curr_weight;
+            }
+            // Bigram contribution: 1/(N_prev * N_curr) per pair.
+            if let Some(prev) = prev_keys {
+                if !prev.is_empty() {
+                    let pair_weight = 1.0_f64 / (prev.len() as f64 * curr_keys.len() as f64);
+                    for p in prev {
+                        for c in curr_keys {
+                            *bigram_counts_f64
+                                .entry((p.clone(), c.clone()))
+                                .or_insert(0.0) += pair_weight;
+                        }
+                    }
+                }
+            }
+            prev_keys = Some(curr_keys);
         }
     }
 
     eprintln!(
         "train_suffix_priors: counted {} tokens across {} samples; \
-         {} distinct chains observed",
+         {} distinct chains, {} distinct chain bigrams observed",
         total_tokens,
         total_samples,
-        counts_f64.len()
+        counts_f64.len(),
+        bigram_counts_f64.len(),
     );
 
     // Round float counts to integers for the SuffixPriors API
@@ -199,9 +245,20 @@ fn main() -> ExitCode {
         .into_iter()
         .map(|(k, v)| (k, v.round().max(1.0) as u64))
         .collect();
-    let mut priors = SuffixPriors::from_counts(counts);
+    // **Bigram pruning.** Drop pairs with raw count < 2.0 — they're
+    // single-occurrence noise that bloats the artifact ~6× without
+    // meaningful signal. Verified empirically: 305K observed
+    // bigrams → 50K-ish after pruning, but we keep all the
+    // statistically informative pairs (the ones the parse-time
+    // re-ranker actually consults).
+    let bigram_counts: HashMap<(String, String), u64> = bigram_counts_f64
+        .into_iter()
+        .filter(|(_, v)| *v >= 2.0)
+        .map(|(k, v)| (k, v.round() as u64))
+        .collect();
+    let mut priors = SuffixPriors::from_counts_with_bigrams(counts, bigram_counts);
     // Override `trained_on_tokens` with the true integer count
-    // (from_counts sums the rounded values).
+    // (from_counts_with_bigrams sums the rounded unigram values).
     priors.trained_on_tokens = total_tokens;
 
     if let Err(err) = write_priors(&priors) {
@@ -260,9 +317,13 @@ fn chain_key_for_analysis(parse: &Analysis) -> String {
 /// Write the priors as pretty-printed JSON. Sort keys for
 /// reproducible byte output (`HashMap` iteration is otherwise
 /// unstable across runs).
+///
+/// **v4.16.0** — also serialises `transition_log_prob` as a
+/// nested map. Outer-key sorted alphabetically; inner rows
+/// sorted alphabetically too — byte-stable across runs.
 fn write_priors(priors: &SuffixPriors) -> std::io::Result<()> {
-    let mut sorted: Vec<(&String, &f32)> = priors.chain_log_prob.iter().collect();
-    sorted.sort_by(|a, b| a.0.cmp(b.0));
+    let mut chain_sorted: Vec<(&String, &f32)> = priors.chain_log_prob.iter().collect();
+    chain_sorted.sort_by(|a, b| a.0.cmp(b.0));
 
     let mut json = String::new();
     json.push_str("{\n");
@@ -272,10 +333,38 @@ fn write_priors(priors: &SuffixPriors) -> std::io::Result<()> {
         priors.trained_on_tokens
     ));
     json.push_str("  \"chain_log_prob\": {\n");
-    for (i, (k, v)) in sorted.iter().enumerate() {
-        let comma = if i + 1 == sorted.len() { "" } else { "," };
+    for (i, (k, v)) in chain_sorted.iter().enumerate() {
+        let comma = if i + 1 == chain_sorted.len() { "" } else { "," };
         let escaped = k.replace('\\', "\\\\").replace('"', "\\\"");
         json.push_str(&format!("    \"{escaped}\": {v}{comma}\n"));
+    }
+    json.push_str("  },\n");
+
+    // transition_log_prob: outer keys sorted, inner keys sorted.
+    let mut outer_sorted: Vec<(&String, &HashMap<String, f32>)> =
+        priors.transition_log_prob.iter().collect();
+    outer_sorted.sort_by(|a, b| a.0.cmp(b.0));
+    json.push_str("  \"transition_log_prob\": {\n");
+    for (oi, (prev_key, row)) in outer_sorted.iter().enumerate() {
+        let outer_comma = if oi + 1 == outer_sorted.len() {
+            ""
+        } else {
+            ","
+        };
+        let prev_escaped = prev_key.replace('\\', "\\\\").replace('"', "\\\"");
+        json.push_str(&format!("    \"{prev_escaped}\": {{\n"));
+        let mut inner_sorted: Vec<(&String, &f32)> = row.iter().collect();
+        inner_sorted.sort_by(|a, b| a.0.cmp(b.0));
+        for (ii, (curr_key, score)) in inner_sorted.iter().enumerate() {
+            let inner_comma = if ii + 1 == inner_sorted.len() {
+                ""
+            } else {
+                ","
+            };
+            let curr_escaped = curr_key.replace('\\', "\\\\").replace('"', "\\\"");
+            json.push_str(&format!("      \"{curr_escaped}\": {score}{inner_comma}\n"));
+        }
+        json.push_str(&format!("    }}{outer_comma}\n"));
     }
     json.push_str("  }\n");
     json.push_str("}\n");

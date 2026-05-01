@@ -749,6 +749,15 @@
         {"user": "Жасуша туралы не білесіз?", "output_contains_lower_any": ["жасуша"]},
         {"user": "Алматы туралы айт", "output_contains_lower_any": ["алматы"]}
       ]
+    },
+    {
+      "id": "context_aware_priors_anti_regression_v4_16_0",
+      "category": "anti_regression",
+      "description": "v4.16.0: bigram-aware FST parse selection (P(chain | preceding_chain)). When prev_chain is known, the re-ranker uses the row of transition_log_prob; falls back to unigram when prev is None or unseen. Locks the canonical baseline on multi-token queries («Қазақстан туралы не білесіз?») where the bigram context has the most signal — `Қазақстан` (Nominative) → `туралы` (postposition) → `не` (question word) — bigram-aware re-rank should still surface the correct Қазақстан-IsA fact.",
+      "turns": [
+        {"user": "Қазақстан туралы не білесіз?", "output_contains_lower_any": ["қазақстан"]},
+        {"user": "Жасушаның ядросы туралы айт", "output_contains_lower_any": ["жасуша", "ядро"]}
+      ]
     }
   ]
 }

@@ -163,7 +163,13 @@ fn parse_input_inner(
     priors: Option<&adam_kernel_fst::suffix_priors::SuffixPriors>,
 ) -> Vec<adam_kernel_fst::parser::Analysis> {
     use adam_kernel_fst::parser::Analysis;
+    use adam_kernel_fst::suffix_priors::{noun_chain_key, verb_chain_key};
+
     let mut out = Vec::new();
+    // **v4.16.0** — track the previous token's selected chain key
+    // for context-aware bigram re-ranking. Reset to `None` when the
+    // FST returns no analyses (sentence boundary in effect).
+    let mut prev_chain: Option<String> = None;
     for token in input.split_whitespace() {
         let cleaned: String = token
             .chars()
@@ -175,32 +181,44 @@ fn parse_input_inner(
         }
         let mut analyses = adam_kernel_fst::parser::analyse(&cleaned, lexicon);
         if let Some(p) = priors {
-            // **v4.15.5** — re-rank parses by P(chain) DESC.
-            // `sort_by` is stable: ties preserve the v3.2.0
-            // lexicographic order, so empty / no-priors callers
-            // see no change.
+            // **v4.15.5 + v4.16.0** — re-rank parses by
+            // P(chain | prev_chain) DESC when bigram context is
+            // available; falls back to unigram when prev_chain is
+            // None or unseen in the transition map. `sort_by` is
+            // stable: ties preserve the v3.2.0 lexicographic
+            // order, so empty / no-priors callers see no change.
+            let prev = prev_chain.as_deref();
             analyses.sort_by(|a, b| {
-                let score_a = score_analysis(a, p);
-                let score_b = score_analysis(b, p);
+                let score_a = score_analysis(a, p, prev);
+                let score_b = score_analysis(b, p, prev);
                 // Reverse: higher score wins.
                 score_b
                     .partial_cmp(&score_a)
                     .unwrap_or(std::cmp::Ordering::Equal)
             });
-            // Helper to read a single analysis's chain score.
-            // Defined inline to keep the file's helper inventory
-            // bounded; called only inside this hot path.
+            // Helper to read a single analysis's chain score
+            // under the (optional) bigram context.
             #[inline]
             fn score_analysis(
                 a: &Analysis,
                 p: &adam_kernel_fst::suffix_priors::SuffixPriors,
+                prev: Option<&str>,
             ) -> f32 {
                 match a {
-                    Analysis::Noun { features, .. } => p.score_noun(features),
-                    Analysis::Verb { features, .. } => p.score_verb(features),
+                    Analysis::Noun { features, .. } => p.score_noun_given_prev(features, prev),
+                    Analysis::Verb { features, .. } => p.score_verb_given_prev(features, prev),
                 }
             }
         }
+        // Update prev_chain to the chain key of the parse we
+        // actually picked (the first one, post-sort). Done before
+        // `out.push` so the closure-borrow-of-analyses dance is
+        // compatible with the `into_iter().next()` consumer below.
+        let chosen_key = analyses.first().map(|a| match a {
+            Analysis::Noun { features, .. } => noun_chain_key(features),
+            Analysis::Verb { features, .. } => verb_chain_key(features),
+        });
+        prev_chain = chosen_key;
         if let Some(a) = analyses.into_iter().next() {
             out.push(a);
         }

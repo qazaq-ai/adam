@@ -45,10 +45,17 @@ use crate::morphotactics::{NounFeatures, VerbFeatures};
 /// Wrapping in a struct lets future versions add fields (e.g.
 /// per-POS marginals, smoothing parameters) without breaking the
 /// JSON contract.
+///
+/// **v4.16.0** — extended with `transition_log_prob` for context-
+/// aware bigram scoring (`P(chain | preceding_chain)`). Schema
+/// version bumped from 1 to 2; v1 artifacts are explicitly
+/// rejected by `load()` so callers fail fast and regenerate via
+/// the training binary.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SuffixPriors {
     /// Format version. Incremented when the on-disk schema changes
-    /// in a backward-incompatible way. v4.15.0 ships with `1`.
+    /// in a backward-incompatible way. v4.15.0 = 1; v4.16.0 = 2
+    /// (added `transition_log_prob`).
     pub version: u32,
     /// Total token count over which the priors were estimated.
     /// Useful as a sanity check + for future smoothing.
@@ -58,6 +65,17 @@ pub struct SuffixPriors {
     /// attribution counting. Empty when no training has been
     /// performed yet (the `empty()` constructor).
     pub chain_log_prob: HashMap<String, f32>,
+    /// **v4.16.0** — bigram transition log-probabilities:
+    /// `previous_chain → current_chain → log P(curr | prev)`.
+    /// Captures local morphological agreement (e.g. Genitive
+    /// followed by 3sg-Possessive — «жасушаның ядросы» — is much
+    /// more probable than Genitive followed by Imperative). Empty
+    /// when running v4.15.0-style unigram-only priors;
+    /// `serde(default)` makes deserialisation tolerate missing
+    /// field, but `load()` enforces `version >= 2` so practical
+    /// callers regenerate the artifact via the training binary.
+    #[serde(default)]
+    pub transition_log_prob: HashMap<String, HashMap<String, f32>>,
 }
 
 impl Default for SuffixPriors {
@@ -75,6 +93,7 @@ impl SuffixPriors {
             version: SCHEMA_VERSION,
             trained_on_tokens: 0,
             chain_log_prob: HashMap::new(),
+            transition_log_prob: HashMap::new(),
         }
     }
 
@@ -115,7 +134,44 @@ impl SuffixPriors {
             version: SCHEMA_VERSION,
             trained_on_tokens: total,
             chain_log_prob,
+            transition_log_prob: HashMap::new(),
         }
+    }
+
+    /// **v4.16.0** — build a prior with both unigram counts AND
+    /// bigram transition counts. The transition map is keyed by
+    /// (`previous_chain`, `current_chain`) — for each previous
+    /// chain, the inner map gives the conditional log-probability
+    /// `log P(curr | prev)` with add-one smoothing applied within
+    /// the row (so unseen `curr` for a known `prev` gets a small
+    /// floor relative to the row's vocabulary).
+    pub fn from_counts_with_bigrams(
+        unigram_counts: HashMap<String, u64>,
+        bigram_counts: HashMap<(String, String), u64>,
+    ) -> Self {
+        let mut priors = Self::from_counts(unigram_counts);
+
+        // Group bigram counts by previous chain.
+        let mut by_prev: HashMap<String, HashMap<String, u64>> = HashMap::new();
+        for ((prev, curr), count) in bigram_counts {
+            by_prev.entry(prev).or_default().insert(curr, count);
+        }
+
+        let mut transition_log_prob: HashMap<String, HashMap<String, f32>> =
+            HashMap::with_capacity(by_prev.len());
+        for (prev, row) in by_prev {
+            let row_total: u64 = row.values().sum();
+            let row_vocab = row.len() as u64;
+            let denom = (row_total + row_vocab) as f32;
+            let mut inner = HashMap::with_capacity(row.len());
+            for (curr, count) in row {
+                let smoothed = (count + 1) as f32 / denom;
+                inner.insert(curr, smoothed.ln());
+            }
+            transition_log_prob.insert(prev, inner);
+        }
+        priors.transition_log_prob = transition_log_prob;
+        priors
     }
 
     /// Number of distinct chains in the support. Diagnostic only.
@@ -150,6 +206,55 @@ impl SuffixPriors {
             .unwrap_or_else(|| self.unseen_log_prob())
     }
 
+    /// **v4.16.0** — context-aware score: log-probability of the
+    /// current chain given the previous token's chain.
+    ///
+    /// When `prev_chain` is `Some`, returns
+    /// `log P(curr | prev) = transition_log_prob[prev][curr]`.
+    /// Falls back to the unigram score when:
+    /// - `prev_chain` is `None` (sentence start / no context)
+    /// - the prev chain isn't in `transition_log_prob` (unseen
+    ///   context — runtime gracefully degrades to unigram)
+    /// - the (prev, curr) pair wasn't observed (Laplace-smoothed
+    ///   floor for the row, falling back to row-unseen if the
+    ///   row exists)
+    pub fn score_chain_given_prev(&self, current_chain: &str, prev_chain: Option<&str>) -> f32 {
+        if let Some(prev) = prev_chain {
+            if let Some(row) = self.transition_log_prob.get(prev) {
+                if let Some(score) = row.get(current_chain).copied() {
+                    return score;
+                }
+                // prev is known, curr isn't seen in this row →
+                // floor to the row's rarest observation minus
+                // ln(2). Same shape as unigram unseen handling.
+                let min_in_row = row.values().copied().fold(f32::INFINITY, f32::min);
+                if min_in_row.is_finite() {
+                    return min_in_row - std::f32::consts::LN_2;
+                }
+            }
+        }
+        // No prev context, or prev isn't in transition map →
+        // fall back to unigram.
+        self.chain_log_prob
+            .get(current_chain)
+            .copied()
+            .unwrap_or_else(|| self.unseen_log_prob())
+    }
+
+    /// **v4.16.0** — convenience: score a NounFeatures bundle in
+    /// the bigram-aware mode.
+    pub fn score_noun_given_prev(&self, features: &NounFeatures, prev_chain: Option<&str>) -> f32 {
+        let chain = noun_chain_key(features);
+        self.score_chain_given_prev(&chain, prev_chain)
+    }
+
+    /// **v4.16.0** — convenience: score a VerbFeatures bundle in
+    /// the bigram-aware mode.
+    pub fn score_verb_given_prev(&self, features: &VerbFeatures, prev_chain: Option<&str>) -> f32 {
+        let chain = verb_chain_key(features);
+        self.score_chain_given_prev(&chain, prev_chain)
+    }
+
     /// Floor for unseen chains. Computed as `min(observed) - ln(2)`
     /// so unseen chains rank strictly below the rarest observed
     /// one. Empty prior returns `f32::NEG_INFINITY` so it's always
@@ -171,7 +276,11 @@ impl SuffixPriors {
 
 /// Current on-disk schema version. Bump when the format changes
 /// in a way that requires regenerating the artifact.
-pub const SCHEMA_VERSION: u32 = 1;
+///
+/// - v1 (v4.15.0): unigram only, `chain_log_prob`.
+/// - v2 (v4.16.0): adds `transition_log_prob` for context-aware
+///   bigram scoring.
+pub const SCHEMA_VERSION: u32 = 2;
 
 /// Build the chain key for a noun feature bundle. Stable string
 /// format so the JSON artifact is self-describing.
@@ -340,10 +449,94 @@ mod tests {
     }
 
     #[test]
-    fn schema_version_is_one_at_v4_15_0() {
-        // v4.15.0 ships SCHEMA_VERSION = 1. Bumping this constant
-        // requires regenerating the artifact and bumping the
-        // `data/retrieval/suffix_chain_priors.json` accordingly.
-        assert_eq!(SCHEMA_VERSION, 1);
+    fn schema_version_is_two_at_v4_16_0() {
+        // v4.16.0 bumps SCHEMA_VERSION from 1 to 2 to add
+        // `transition_log_prob`. Any future bump requires
+        // regenerating `data/retrieval/suffix_chain_priors.json`
+        // via the training binary.
+        assert_eq!(SCHEMA_VERSION, 2);
+    }
+
+    #[test]
+    fn from_counts_with_bigrams_populates_transition_log_prob() {
+        let mut unigrams: HashMap<String, u64> = HashMap::new();
+        unigrams.insert("noun:None|None|None|Genitive|None".to_string(), 50);
+        unigrams.insert("noun:None|None|Some(P3)|None|None".to_string(), 100);
+        unigrams.insert("noun:None|Singular|None|Nominative|None".to_string(), 200);
+
+        let mut bigrams: HashMap<(String, String), u64> = HashMap::new();
+        // «жасушаның ядросы»: Genitive → 3sg-Possessive — common pattern
+        bigrams.insert(
+            (
+                "noun:None|None|None|Genitive|None".to_string(),
+                "noun:None|None|Some(P3)|None|None".to_string(),
+            ),
+            40,
+        );
+        // Genitive → bare Nominative — rare in this dataset
+        bigrams.insert(
+            (
+                "noun:None|None|None|Genitive|None".to_string(),
+                "noun:None|Singular|None|Nominative|None".to_string(),
+            ),
+            5,
+        );
+
+        let p = SuffixPriors::from_counts_with_bigrams(unigrams, bigrams);
+        assert!(!p.transition_log_prob.is_empty());
+
+        let with_3sg = p.score_chain_given_prev(
+            "noun:None|None|Some(P3)|None|None",
+            Some("noun:None|None|None|Genitive|None"),
+        );
+        let with_nom = p.score_chain_given_prev(
+            "noun:None|Singular|None|Nominative|None",
+            Some("noun:None|None|None|Genitive|None"),
+        );
+        assert!(
+            with_3sg > with_nom,
+            "P(3sg-Poss | Genitive) ({with_3sg}) should beat \
+             P(Nominative | Genitive) ({with_nom})"
+        );
+    }
+
+    #[test]
+    fn score_chain_given_prev_falls_back_to_unigram_when_no_context() {
+        let mut unigrams: HashMap<String, u64> = HashMap::new();
+        unigrams.insert("noun:None|Singular|None|Nominative|None".to_string(), 100);
+        let p = SuffixPriors::from_counts(unigrams);
+        // No prev context AND no transition map at all → unigram path.
+        let s = p.score_chain_given_prev("noun:None|Singular|None|Nominative|None", None);
+        let unigram = p
+            .chain_log_prob
+            .get("noun:None|Singular|None|Nominative|None")
+            .copied()
+            .unwrap();
+        assert!(
+            (s - unigram).abs() < 1e-6,
+            "with prev=None, score should equal unigram (got {s}, want {unigram})"
+        );
+    }
+
+    #[test]
+    fn score_chain_given_prev_falls_back_when_prev_unseen() {
+        let mut unigrams: HashMap<String, u64> = HashMap::new();
+        unigrams.insert("noun:None|Singular|None|Nominative|None".to_string(), 100);
+        let bigrams: HashMap<(String, String), u64> = HashMap::new();
+        let p = SuffixPriors::from_counts_with_bigrams(unigrams, bigrams);
+        // prev "x" is unseen in transition map → unigram fallback.
+        let s = p.score_chain_given_prev(
+            "noun:None|Singular|None|Nominative|None",
+            Some("noun:UnseenChain"),
+        );
+        let unigram = p
+            .chain_log_prob
+            .get("noun:None|Singular|None|Nominative|None")
+            .copied()
+            .unwrap();
+        assert!(
+            (s - unigram).abs() < 1e-6,
+            "unseen prev should fall back to unigram (got {s}, want {unigram})"
+        );
     }
 }
