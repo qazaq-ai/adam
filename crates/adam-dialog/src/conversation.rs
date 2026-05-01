@@ -543,6 +543,20 @@ impl Conversation {
             // rerank candidate facts by content-token overlap with
             // the question, not just by predicate centrality.
             query_input: Some(input),
+            // **v4.14.5** — domain-aware retrieval. The
+            // currently-discussed domain (from DialogContext) +
+            // the DomainIndex are passed so SearchGraph reranking
+            // can break ties in favour of facts in the current
+            // subject area. Both are `Some` only when v4.14.0+
+            // domain wiring is attached; older callers pass
+            // through with `None`/empty index, preserving
+            // pre-v4.14.5 behaviour bit-for-bit.
+            current_domain: self.dialog_context.current_domain.as_deref(),
+            domain_index: if self.domain_index.is_empty() {
+                None
+            } else {
+                Some(&self.domain_index)
+            },
         };
         let tool_calls: Vec<crate::tool::ToolResult> = tool_plan
             .into_iter()

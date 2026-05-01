@@ -7,6 +7,47 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.14.5] — 2026-05-01 — predicate decomposition wiring + domain-aware retrieval reranker
+
+**Patch in the v4.12+ humanness arc.** v4.13.0 introduced `sentence_decomp` and v4.14.0 introduced `DomainIndex` + `DialogContext.current_domain`. v4.14.5 wires both into the runtime path so they actually influence behavior — strictly additive, no regression risk.
+
+### Innovations bundled
+
+1. **Domain-aware retrieval tiebreaker.** `Tool::dispatch(SearchGraph)` sort cascade gains a new tier between `user_facing_fact_priority` and `raw_text length`: when both `current_domain` AND `domain_index` are attached, candidates whose subject's primary domain matches the currently-discussed domain win over equal-priority candidates from other domains. Useful for cross-domain ambiguous topics like `тіл` (linguistics OR biology body part), `көз` (biology OR geography spring), `сай` (botany OR geography). Strictly additive — only fires on ties.
+
+2. **`ToolContext` extended** with `current_domain: Option<&'a str>` and `domain_index: Option<&'a DomainIndex>`. Both `Some` only when v4.14.0+ domain wiring is attached; older callers pass `None`/empty index, preserving pre-v4.14.5 behaviour bit-for-bit.
+
+3. **`Conversation::turn_with_trace` wires new fields** — passes `dialog_context.current_domain.as_deref()` and `&self.domain_index` (or `None` if empty). The empty-index short-circuit means the tiebreaker doesn't even run when the index has nothing to say.
+
+4. **`sentence_decomp` focus fallback in `interpret_text_with_lexicon`.** When greedy `best_noun_hint` returns `None`, `sentence_decomp::decompose` runs; if its `focus` is set AND `focus_role ∈ {Subject, Object, Source, Locus}`, it becomes the noun_hint. Strictly additive: turns where greedy already returned a noun are bit-identical pre/post-v4.14.5. Predicate-role focus is excluded so a bare verb root is never promoted as a topic.
+
+5. **NOT_A_TOPIC re-check on the fallback path.** Fixed an early v4.14.5 regression where the sentence_decomp fallback bypassed the v4.4.10 closed-class additions (`қысқа`, `ештеңе`, etc) because `sentence_decomp` keeps its own smaller closed-class list. The re-check on the fallback path applies the full `NOT_A_TOPIC` filter, restoring the `qysqasy_does_not_get_extracted_as_topic` invariant.
+
+6. **REPL replay regression** — 2 new dialogs:
+   - `domain_aware_retrieval_tiebreaker_anti_regression_v4_14_5`: «Жасуша туралы не білесіз?» — verifies the new tiebreaker is strictly additive (doesn't regress the v4.11.7 longer-object-wins fix).
+   - `sentence_decomp_focus_fallback_v4_14_5`: «Атом не?» — smoke-checks the fallback chain.
+
+### Pipeline impact
+
+- `ToolContext` gains 2 new fields.
+- `Tool::dispatch(SearchGraph)` sort cascade: new domain-match tiebreaker between priority and length tiers.
+- `interpret_text_with_lexicon` calls `sentence_decomp::decompose` when greedy noun_hint is None; applies NOT_A_TOPIC re-check before accepting the focus.
+- `Conversation::turn_with_trace` passes dialog_context.current_domain + domain_index to ToolContext.
+- All 4 ToolContext construction sites updated (conversation.rs, action.rs, tool.rs ×3 in tests).
+
+### Tests + counters
+
+- New REPL replay dialogs: **+2**.
+- Workspace tests: 785 → **785 passing** (no new unit tests; behavior tested through REPL replay regression + an existing anti-regression test that v4.14.5 fixed an early regression in).
+- `validate_world_core`: 1 625 / 1 625 / 1 791 facts (unchanged).
+- `cognitive_eval`: 25/25 canonical.
+
+### Cadence
+
+**Patch (v4.14.5)** per `feedback_versioning_post_1_0`. Closes the architectural-wiring gap — both v4.13.0 sentence_decomp and v4.14.0 DomainIndex now actually influence dialog behaviour instead of sitting on the side. **Stripe (3) — domain awareness — final patch.** Next:
+
+- **v4.15.0** — first compositional ML layer: `P(suffix_chain)` priors trained offline on the corpus, used as FST-disambiguation tiebreaker. Pure compositional, no embeddings, no inference-time gradient — natural `root + function^n` learning fits a CPU register, predictable / cheap / safe per the user's directive.
+
 ## [4.14.0] — 2026-05-01 — DomainIndex foundation + DialogContext.current_domain wiring + curriculum-content honest fallback
 
 **Third minor in the v4.12+ humanness arc.** v4.13.0 introduced `DialogContext` with `current_domain` slot but left it always `None` (no topic→domain mapping). v4.14.0 builds the missing index, wires it through `Conversation`, and adds the third 2026-05-01 transcript failure handler — the curriculum-content honest fallback that v4.13.5 didn't reach.

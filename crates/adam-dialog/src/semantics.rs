@@ -209,11 +209,47 @@ pub fn interpret_text_with_lexicon(
     // `example_adapted` (v1.9.5) is also set there.
     // v4.0.21 — prefer multi-word entity match before single-noun fallback
     // so «Құс жолы туралы айтшы» stays intact (not reduced to «құс»).
-    let noun_hint = best_noun_hint(input, parses);
+    let mut noun_hint = best_noun_hint(input, parses);
     // **v4.12.0** — detect question shape at the same point we
     // populate `noun_hint`. Pure surface-level scan; cheap and
     // independent of the FST analyses. `None` for non-questions.
     let question_shape = crate::question_shape::detect(input);
+    // **v4.14.5** — sentence_decomp fallback. When greedy
+    // `best_noun_hint` returns None (FST recovered nothing
+    // useful), but `sentence_decomp::decompose` resolved a
+    // structural focus (Subject / Object / Source / Locus), use
+    // that as fallback. STRICTLY additive: existing turns that
+    // already have a noun_hint are bit-identical pre/post-v4.14.5.
+    // Limited to focus_role ∈ {Subject, Object, Source, Locus} so
+    // we don't promote a bare predicate root as a topic noun.
+    if noun_hint.is_none() {
+        let decomp = crate::sentence_decomp::decompose(input, parses, None);
+        if let Some(focus) = decomp.focus.as_deref() {
+            // Re-apply the same NOT_A_TOPIC filter `first_noun_root`
+            // uses, so the v4.4.10 closed-class additions
+            // (`қысқа` / `ештеңе` / etc) remain effective on this
+            // fallback path too. sentence_decomp keeps its own
+            // smaller closed-class list (it filters tokens during
+            // decomposition); without this re-check the fallback
+            // could promote a discourse particle that semantics.rs
+            // explicitly rejects. Anti-regression:
+            // `qysqasy_does_not_get_extracted_as_topic`.
+            let lower = focus.to_lowercase();
+            let is_closed_class = NOT_A_TOPIC.iter().any(|s| *s == lower);
+            if !focus.is_empty()
+                && !is_closed_class
+                && matches!(
+                    decomp.focus_role,
+                    Some(crate::sentence_decomp::Role::Subject)
+                        | Some(crate::sentence_decomp::Role::Object)
+                        | Some(crate::sentence_decomp::Role::Source)
+                        | Some(crate::sentence_decomp::Role::Locus)
+                )
+            {
+                noun_hint = Some(focus.to_string());
+            }
+        }
+    }
     Intent::Unknown {
         raw_tokens: tokens,
         noun_hint,

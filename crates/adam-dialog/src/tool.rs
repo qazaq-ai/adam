@@ -244,6 +244,24 @@ pub struct ToolContext<'a> {
     /// the tie-breaker when two facts share the same overlap count.
     /// `None` (default) preserves pre-v4.4.11 behaviour bit-for-bit.
     pub query_input: Option<&'a str>,
+    /// **v4.14.5** — the World-Core domain currently being
+    /// discussed (computed by `DialogContext::recompute_domain`
+    /// from the last few turns). When set, `SearchGraph` reranking
+    /// prefers candidates whose subject's primary domain matches —
+    /// useful for cross-domain ambiguous topics like `тіл`
+    /// (linguistics OR biology body part), `көз` (biology OR
+    /// geography spring), `сай` (botany OR geography).
+    /// Strictly additive — runs as a tiebreaker AFTER overlap +
+    /// priority cascades, so existing single-domain queries are
+    /// bit-identical pre/post-v4.14.5. `None` (default) preserves
+    /// pre-v4.14.5 behaviour exactly.
+    pub current_domain: Option<&'a str>,
+    /// **v4.14.5** — companion to `current_domain`: the
+    /// `DomainIndex` used to look up each candidate fact's primary
+    /// domain. The lookup is per-fact via `subject.root`; tying it
+    /// to a per-Conversation index keeps the lookup O(1) without
+    /// re-walking world_core on every retrieval call.
+    pub domain_index: Option<&'a crate::domain_index::DomainIndex>,
 }
 
 /// Pure-function dispatcher. Reads `ToolContext` references, never
@@ -343,11 +361,36 @@ impl Tool {
                     } else {
                         fact_overlap_score(b, &query_tokens)
                     };
+                    // **v4.14.5** — domain-match tiebreaker. After
+                    // overlap + priority cascades, prefer candidates
+                    // whose subject's primary domain matches the
+                    // currently-discussed domain (computed by
+                    // `DialogContext::recompute_domain`). Useful for
+                    // cross-domain ambiguous topics. Strictly
+                    // additive — only fires when both `current_domain`
+                    // AND `domain_index` are attached to the
+                    // ToolContext (i.e. when running inside a
+                    // domain-aware Conversation v4.14.0+). Returns
+                    // 0 for a match, 1 for non-match, so
+                    // `match_score_a.cmp(&match_score_b)` ascending
+                    // puts matches first.
+                    let domain_match = |fact: &ReasFact| -> usize {
+                        match (ctx.current_domain, ctx.domain_index) {
+                            (Some(curr), Some(idx)) => {
+                                match idx.lookup_domain(&fact.subject.root) {
+                                    Some(d) if d == curr => 0,
+                                    _ => 1,
+                                }
+                            }
+                            _ => 0, // no signal, treat all as equal
+                        }
+                    };
                     overlap_b
                         .cmp(&overlap_a)
                         .then_with(|| {
                             user_facing_fact_priority(a).cmp(&user_facing_fact_priority(b))
                         })
+                        .then_with(|| domain_match(a).cmp(&domain_match(b)))
                         // **v4.11.6** — longer fact wins after overlap +
                         // priority tie. Pre-v4.11.6 the tiebreaker was
                         // `length(a) cmp length(b)` (shorter wins),
@@ -797,6 +840,8 @@ mod tests {
             retrieval: None,
             rank_config: None,
             query_input: None,
+            current_domain: None,
+            domain_index: None,
         }
     }
 
@@ -1040,6 +1085,8 @@ mod tests {
             retrieval: None,
             rank_config: None,
             query_input: None,
+            current_domain: None,
+            domain_index: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {
@@ -1095,6 +1142,8 @@ mod tests {
             retrieval: None,
             rank_config: None,
             query_input: None,
+            current_domain: None,
+            domain_index: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {

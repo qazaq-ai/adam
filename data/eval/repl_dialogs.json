@@ -724,6 +724,22 @@
       "turns": [
         {"user": "Студенттер университетте не оқиды?", "output_contains_lower_any": ["оқу бағдарламасының", "мектеп бағдарламасының"]}
       ]
+    },
+    {
+      "id": "domain_aware_retrieval_tiebreaker_anti_regression_v4_14_5",
+      "category": "anti_regression",
+      "description": "v4.14.5: «Жасуша туралы не білесіз?» — single-domain canonical query. Verifies the new domain-aware retrieval tiebreaker is strictly ADDITIVE: pre-existing single-domain queries continue to surface the rich biology_school definition («Жасуша — тірі ағзаның құрылыс және функционалды бірлігі»). The tiebreaker only kicks in when overlap + priority + length cascades have all tied; for ordinary queries it's a no-op. Ensures v4.14.5 doesn't regress the v4.11.7 longer-object-wins fix.",
+      "turns": [
+        {"user": "Жасуша туралы не білесіз?", "output_contains_lower_any": ["тірі ағзаның", "құрылыс"]}
+      ]
+    },
+    {
+      "id": "sentence_decomp_focus_fallback_v4_14_5",
+      "category": "knowledge_query",
+      "description": "v4.14.5: sentence_decomp focus fallback when greedy noun_hint is None. Verifies that questions where best_noun_hint returns None (FST recovered no usable content noun) still find a topic via sentence_decomp.decompose — provided focus_role is in {Subject, Object, Source, Locus}, NOT Predicate. Strictly additive: turns where greedy already returned a noun are bit-identical pre/post-v4.14.5. The smoke check uses a normal query that should succeed; if it returns 'Түсінбедім', the v4.14.5 fallback chain regressed.",
+      "turns": [
+        {"user": "Атом не?", "output_contains_lower_any": ["атом"]}
+      ]
     }
   ]
 }
