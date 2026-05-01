@@ -7,6 +7,63 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.22.5] — 2026-05-01 — closed-class hygiene from 2026-05-01 live-dialog battery (керек / ірі / атап / temporals)
+
+**Patch in v4.22+ runtime-integration arc.** A 2026-05-01 live-dialog battery across 30+ Kazakh queries (identity / science / history / culture / arithmetic / multi-turn / unknown-handling) surfaced ~5 cases where the topic-extraction heuristic picked a closed-class word and the planner surfaced a tangential proverb keyed on it. Each one is the same misanalysis class as v4.3.5's `Онда → он` and v4.4.10's `қысқасы → қысқа`: a sentence-level discourse / predicate / temporal word being mistaken for a content noun. v4.22.5 closes all of them with NOT_A_TOPIC entries.
+
+### Innovations
+
+**(1) `керек`** — predicate adjective ("is needed / required"). Surfaced in:
+- «Маған көмек керек» — pre-fix matched proverb «Жетілсең де, жетсең де, Керек күні бір бар-ау».
+- «Саған не керек?» — same proverb.
+- «Mendeleev кестесі не үшін керек?» — same proverb.
+
+Structurally the verbal-need predicate, never the topical content noun.
+
+**(2) `ірі`** — comparative-quantitative adjective ("large / big"). Surfaced in «Қазақстанның ірі өзендерін атап бер.» where the user wants a list of large rivers, not a fact about "largeness". Pre-fix retrieval matched proverb «Ерекше атап өт!».
+
+**(3) `атап`** — verbal converb of «атау» ("to name"), used in serial verb constructions like «атап бер» (imperative listing request) or «атап өту» ("to mention"). FST occasionally returns it as a bare noun root because the lexicon has «атап» as a registered surface form. Once `ірі` was blocked in the same query, the topic extractor fell through to `атап` and matched the same proverb. Same converb-leaks-as-noun class as v4.17.5's `тәрбиеле / баптал`.
+
+**(4) `кеше / бүгін / ертең / қазір / бұрын`** — temporal adverbs. Surfaced in «Кеше ауа райы қандай болды?» where retrieval matched a corpus fragment keyed on `кеше` ("yesterday"), dropping the actual question (yesterday's weather, which adam doesn't have data for). Temporal adverbs are sentence-level scope markers, never the noun the question is about. Same hygiene class as v4.6.0's `өте / жалпы` adverbial additions.
+
+### Verification
+
+Re-ran the live-dialog battery after the fix:
+
+| Query | Pre-v4.22.5 | Post-v4.22.5 |
+|---|---|---|
+| «Саған не керек?» | proverb on керек | **«Түсінбедім»** (honest fallback) |
+| «Mendeleev кестесі не үшін керек?» | proverb on керек | **«Түсінбедім»** |
+| «Қазақстанның ірі өзендерін атап бер.» | proverb on атап | **«Түсінбедім»** |
+| «Кеше ауа райы қандай болды?» | proverb on кеше | partial — falls to `ауа` and surfaces an OK fact about air; deeper temporal-scope detection deferred |
+
+**Anti-regression battery — all pass:**
+- «Маған көмек керек» → «Әрине, айтыңыз» (willingness routing — still works because keep-detector triggers BEFORE topic extraction).
+- «Бүгін жақсы күн» → «Жақсы екен» (acknowledgment — temporal `бүгін` no longer becomes a content topic, so the acknowledgement template fires correctly).
+- «Сен кімсің?», «Қазақстан қандай ел?», all v4.x identity / science / history canonical queries — unchanged.
+- Workspace tests **822 → 822 passing**.
+- Parse-disambiguation eval **chain_tiebreak_root 23/23 = 100 %** — unchanged.
+
+### What this does NOT fix
+
+- «Кеше ауа райы қандай болды?» now falls to `ауа` instead of `кеше`, surfacing an air-related fact rather than a yesterday-related proverb. Better, but the question is about *yesterday's weather*, which adam has no time-series data for. Proper handling needs a temporal-scope detector that catches «кеше / бүгін / ертең + ауа райы» as a known-empty data class. Defers to v4.23.0+.
+- «Жасушаның ядросы не атқарады?» (compositional possessive question) still doesn't decompose properly. Defers.
+- Latin technical names outside the v4.11.5 closed list (Mendeleev, Илон Маск, quantum entanglement) still fail. Defers.
+
+### Pipeline impact
+
+- `crates/adam-dialog/src/semantics.rs::NOT_A_TOPIC` += 8 entries (керек, ірі, атап, кеше, бүгін, ертең, қазір, бұрын) with detailed inline rationale per entry.
+- No new modules, no schema changes, no artifact regen.
+- Workspace tests **822 → 822 passing**.
+
+### Cadence
+
+Patch — closed-class hygiene from real live-dialog observation, single-file edit, 8 entries.
+
+**Stripe (5) — humanness through real-dialog testing — opens.**
+
+Next: **v4.23.0+** (temporal-scope detector + compositional possessive question handler — both surfaced as carry-forwards by the same 2026-05-01 battery).
+
 ## [4.22.0] — 2026-05-01 — runtime integration of chain_tiebreak_root: priors+root infrastructure now reaches live dialog
 
 **First minor in the v4.22+ runtime-integration arc.** v4.19.0 → v4.21.5 built the parse-disambiguation eval framework, surfaced the chain-collision blind spot, added root-level priors with closed-class boost, and shipped the FST pronoun-paradigm matcher — closing the eval at 100 % across 23 cases. **But that 100 % only applied inside the eval binary.** The actual dialog runtime (`parse_input_inner` in `adam-dialog`) was still using chain-only smoothed scoring without the root tiebreak: онда / маған / соған etc. in live REPL still picked the wrong root, even though all the infrastructure to fix it had been in place since v4.20.0 / v4.21.0.

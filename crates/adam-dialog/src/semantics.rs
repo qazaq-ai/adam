@@ -479,6 +479,50 @@ const NOT_A_TOPIC: &[&str] = &[
     // topic even if the question phrasing isn't caught upstream.
     "тәрбиеле",
     "баптал",
+    // **v4.22.5** — verb converb leak. The form «атап» is the
+    // -p converb of «атау» (= "to name"), used in serial verb
+    // constructions like «атап бер» ("name [them] for me",
+    // imperative listing request) or «атап өту» ("to mention").
+    // FST occasionally returns it as a bare noun root because
+    // the lexicon has «атап» as a registered surface form. Live-
+    // dialog test: «Қазақстанның ірі өзендерін атап бер.» pre-
+    // v4.22.5 (and after `ірі` was blocked) extracted `атап` as
+    // topic, retrieval matched the proverb «Ерекше атап өт!».
+    // Same converb-leaks-as-noun class as `тәрбиеле / баптал`.
+    "атап",
+    // **v4.22.5** — closed-class words surfaced by the 2026-05-01
+    // live-dialog battery as wrong topic picks. Each one was
+    // observed in real session output causing the planner to
+    // surface a tangential proverb / fact keyed on the closed-
+    // class word instead of recognising the actual question.
+    //
+    // `керек` — predicate adjective ("is needed / required").
+    // Surfaced in «Маған көмек керек», «Саған не керек?»,
+    // «Mendeleev кестесі не үшін керек?» — every time, retrieval
+    // matched a proverb keyed on `керек` («Жетілсең де, жетсең
+    // де, Керек күні бір бар-ау»). It's structurally the
+    // verbal-need predicate, never the topical content noun.
+    "керек",
+    // `ірі` — comparative-quantitative adjective ("large / big").
+    // Surfaced in «Қазақстанның ірі өзендерін атап бер» where the
+    // user wants a list of large rivers, not a fact about
+    // "largeness". Pre-v4.22.5 retrieval matched «Ерекше атап
+    // өт!» — a proverb on the imperative «атап өту». Adjective
+    // pre-modifier, not a topic.
+    "ірі",
+    // `кеше / бүгін / ертең / қазір / бұрын` — temporal adverbs.
+    // Surfaced in «Кеше ауа райы қандай болды?» where retrieval
+    // matched «Ауа райы туралы оның болжамы ақталды» — a corpus
+    // fragment keyed on `кеше`, dropping the actual question
+    // (yesterday's weather, which adam doesn't have data for).
+    // Temporal adverbs are sentence-level scope markers, never
+    // the noun the question is about. Same hygiene class as
+    // v4.6.0's `өте / жалпы` adverbial additions.
+    "кеше",
+    "бүгін",
+    "ертең",
+    "қазір",
+    "бұрын",
     // **v4.6.0** — bare numeral roots that the FST occasionally
     // returns as Locative parses of discourse demonstratives.
     // `Онда` ("then / in it") parses as `он + Locative` (root = "он"
