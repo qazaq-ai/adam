@@ -7,6 +7,48 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.19.5] — 2026-05-01 — sentence-context strategy + structural finding on root-vs-chain disambiguation
+
+**Patch in v4.19+ measurement arc.** v4.19.0 surfaced one residual failure («онда» — gold = `ол + Loc` anaphoric, all isolated-token strategies pick `он + Loc` "in ten") and tagged it as needing "FST sentence-context plumbing." v4.19.5 builds that strategy and measures whether it actually helps. **It does not.** This is a publishable negative result — the structural reason gives us a clearer architectural direction than blindly adding more context layers would have.
+
+### Innovations
+
+**(1) `with_context` strategy** — 6th tier in `eval_parse_disambiguation`. Walks the full eval `sentence` left-to-right, greedily picking each token's parse under bigram-aware Jelinek-Mercer smoothed scoring (mirrors `parse_input_inner` in `adam-dialog`). Tracks `prev_chain` across tokens. When the target token is reached, returns the root that won. Pure inline implementation in the eval binary — no new public API, no production code change.
+
+**(2) New eval case `onda_anaphoric_mid_sentence`** — companion to `onda_must_not_be_ten_locative`. Same ambiguity (`он` ten vs `ол` anaphoric), but онда appears MID-SENTENCE («Менің кітабым бар, онда суреттер көп.»). Tests whether sentence-level bigram context (prev_chain available) helps — distinguishes "context unavailable" from "context available but unhelpful."
+
+### Results (n = 19 with non-empty FST parses)
+
+| Strategy | Hits | Accuracy |
+|---|---|---|
+| baseline | 15 / 19 | **78.9 %** |
+| unigram | 17 / 19 | **89.5 %** |
+| bigram | 17 / 19 | **89.5 %** |
+| smoothed | 17 / 19 | **89.5 %** |
+| pos_conditioned | 17 / 19 | **89.5 %** |
+| **with_context** | **17 / 19** | **89.5 %** |
+
+`with_context` matches the isolated-token strategies — **no additional lift.** Both `онда` cases (sentence-initial AND mid-sentence) still pick `он`. The mid-sentence variant rules out "context unavailable" as the cause.
+
+### Why context plumbing doesn't help here — structural finding
+
+Inspecting the `онда` parses: **both `он + Locative` and `ол + Locative` produce the same suffix chain** (`noun:None|Singular|None|Locative|None`). Chain-level priors — unigram `P(chain)`, bigram `P(chain | prev_chain)`, smoothed, POS-conditioned — score these two analyses **identically**. Whatever score one gets, the other gets, and stable lexicographic order picks `он`.
+
+The runtime layer doing context-aware re-ranking can't fix this. **The signal needs to come from a different axis** — root-level priors `P(root | context)`, or lexical co-occurrence (`есім / сақтау / кітап → ол` more than `→ он`), or genuine anaphor resolution at the dialog layer. This reshapes the v4.20+ direction: the next compositional ML layer isn't about deeper context plumbing in the FST, it's about adding root-identity to the prior axis.
+
+### Pipeline impact
+
+- `crates/adam-corpus/src/bin/eval_parse_disambiguation.rs` — extended with `pick_with_sentence_context` + `score_smoothed_with_prev` helpers (~50 lines). Module docstring updated.
+- `data/eval/parse_disambiguation_eval.json` — +1 case (`onda_anaphoric_mid_sentence`), updated note on existing `onda_must_not_be_ten_locative` to flag sentence-initial limitation.
+- **No production code changes** — pure measurement / infrastructure.
+- Workspace tests **807 → 807 passing**.
+
+### Cadence
+
+Patch (no architectural addition; one new eval strategy + one new test case + a clearer view of *why* one specific case fails).
+
+**Stripe (4) — compositional ML — measurement layer.** Next: v4.20.0+ (root-level priors `P(root | suffix_chain)` to break the chain-collision tie), v4.20.5+ (corpus expansion + retraining over larger token base).
+
 ## [4.19.0] — 2026-05-01 — empirical eval of v4.15+ priors
 
 **First quantitative evidence that priors actually pick the right parse.** v4.15.0 → v4.17.0 shipped four prior strategies (unigram → bigram → smoothed → POS-conditioned) with anecdotal REPL evidence but no measured accuracy. v4.19.0 closes that loop: a hand-curated test set of 20 ambiguous Kazakh surface forms + an eval binary that runs all four strategies side-by-side against the v3.2.0 lexicographic baseline.
