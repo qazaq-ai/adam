@@ -758,6 +758,15 @@
         {"user": "Қазақстан туралы не білесіз?", "output_contains_lower_any": ["қазақстан"]},
         {"user": "Жасушаның ядросы туралы айт", "output_contains_lower_any": ["жасуша", "ядро"]}
       ]
+    },
+    {
+      "id": "smoothed_priors_anti_regression_v4_16_5",
+      "category": "anti_regression",
+      "description": "v4.16.5: Jelinek-Mercer smoothed parse selection. SuffixPriors gains score_chain_smoothed(curr, prev, alpha) which interpolates α·log_p_unigram + (1-α)·log_p_bigram. Conversation gains with_priors_alpha builder. adam_chat defaults to α=0.3 (bigram-dominant with unigram smoothing). The smoothing layer must NOT regress canonical queries — α=0.3 preserves the v4.16.0 bigram dominance while letting unigram counts smooth out sparse rows. This anti-regression dialog covers a single-noun query («Атом туралы айт») where bigram context is minimal AND a multi-token query («Қазақстан туралы не білесіз?») where bigram dominates — both must answer correctly under the smoothing.",
+      "turns": [
+        {"user": "Атом туралы айт", "output_contains_lower_any": ["атом"]},
+        {"user": "Қазақстан туралы не білесіз?", "output_contains_lower_any": ["қазақстан"]}
+      ]
     }
   ]
 }

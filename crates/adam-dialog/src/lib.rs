@@ -124,7 +124,7 @@ pub(crate) fn parse_input_public(
     input: &str,
     lexicon: &adam_kernel_fst::lexicon::LexiconV1,
 ) -> Vec<adam_kernel_fst::parser::Analysis> {
-    parse_input_inner(input, lexicon, None)
+    parse_input_inner(input, lexicon, None, None)
 }
 
 /// **v4.15.5** — priors-aware variant of `parse_input_public`.
@@ -133,12 +133,18 @@ pub(crate) fn parse_input_public(
 /// when `priors` is `None` (caller doesn't have a trained artifact)
 /// or when two parses tie on chain probability — the v3.2.0
 /// determinism contract is preserved exactly in those cases.
+///
+/// **v4.16.5** — accepts an optional `alpha` interpolation weight
+/// for Jelinek-Mercer smoothing. `None` = pure bigram with unigram
+/// fallback (v4.16.0 behaviour); `Some(α)` interpolates
+/// `α·log P(curr) + (1-α)·log P(curr|prev)`.
 pub(crate) fn parse_input_with_priors(
     input: &str,
     lexicon: &adam_kernel_fst::lexicon::LexiconV1,
     priors: Option<&adam_kernel_fst::suffix_priors::SuffixPriors>,
+    alpha: Option<f32>,
 ) -> Vec<adam_kernel_fst::parser::Analysis> {
-    parse_input_inner(input, lexicon, priors)
+    parse_input_inner(input, lexicon, priors, alpha)
 }
 
 /// Layer 1 wrapper: parse each whitespace-separated token, keep only the
@@ -154,13 +160,14 @@ fn parse_input(
     input: &str,
     lexicon: &adam_kernel_fst::lexicon::LexiconV1,
 ) -> Vec<adam_kernel_fst::parser::Analysis> {
-    parse_input_inner(input, lexicon, None)
+    parse_input_inner(input, lexicon, None, None)
 }
 
 fn parse_input_inner(
     input: &str,
     lexicon: &adam_kernel_fst::lexicon::LexiconV1,
     priors: Option<&adam_kernel_fst::suffix_priors::SuffixPriors>,
+    alpha: Option<f32>,
 ) -> Vec<adam_kernel_fst::parser::Analysis> {
     use adam_kernel_fst::parser::Analysis;
     use adam_kernel_fst::suffix_priors::{noun_chain_key, verb_chain_key};
@@ -189,8 +196,8 @@ fn parse_input_inner(
             // order, so empty / no-priors callers see no change.
             let prev = prev_chain.as_deref();
             analyses.sort_by(|a, b| {
-                let score_a = score_analysis(a, p, prev);
-                let score_b = score_analysis(b, p, prev);
+                let score_a = score_analysis(a, p, prev, alpha);
+                let score_b = score_analysis(b, p, prev, alpha);
                 // Reverse: higher score wins.
                 score_b
                     .partial_cmp(&score_a)
@@ -198,15 +205,31 @@ fn parse_input_inner(
             });
             // Helper to read a single analysis's chain score
             // under the (optional) bigram context.
+            //
+            // **v4.16.5** — when `alpha` is `Some`, uses
+            // Jelinek-Mercer smoothed scoring; `None` falls
+            // through to the v4.16.0 pure-bigram-with-fallback
+            // path.
             #[inline]
             fn score_analysis(
                 a: &Analysis,
                 p: &adam_kernel_fst::suffix_priors::SuffixPriors,
                 prev: Option<&str>,
+                alpha: Option<f32>,
             ) -> f32 {
-                match a {
-                    Analysis::Noun { features, .. } => p.score_noun_given_prev(features, prev),
-                    Analysis::Verb { features, .. } => p.score_verb_given_prev(features, prev),
+                match (a, alpha) {
+                    (Analysis::Noun { features, .. }, Some(a)) => {
+                        p.score_noun_smoothed(features, prev, a)
+                    }
+                    (Analysis::Verb { features, .. }, Some(a)) => {
+                        p.score_verb_smoothed(features, prev, a)
+                    }
+                    (Analysis::Noun { features, .. }, None) => {
+                        p.score_noun_given_prev(features, prev)
+                    }
+                    (Analysis::Verb { features, .. }, None) => {
+                        p.score_verb_given_prev(features, prev)
+                    }
                 }
             }
         }

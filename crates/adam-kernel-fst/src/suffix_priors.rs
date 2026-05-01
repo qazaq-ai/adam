@@ -255,6 +255,70 @@ impl SuffixPriors {
         self.score_chain_given_prev(&chain, prev_chain)
     }
 
+    /// **v4.16.5** — Jelinek-Mercer interpolation between unigram
+    /// and bigram log-probabilities.
+    ///
+    /// Returns `α · log P(curr) + (1-α) · log P(curr | prev)`.
+    /// Equivalent to `P(curr)^α · P(curr|prev)^(1-α)` on the
+    /// probability scale — a classic smoothing recipe that lets
+    /// callers tune how aggressively bigrams influence parse
+    /// selection:
+    ///
+    /// - `α = 0.0` — pure bigram (same as `score_chain_given_prev`).
+    /// - `α = 1.0` — pure unigram (same as `score_chain`).
+    /// - `α ≈ 0.3` — bigram dominates but unigram smooths out
+    ///    sparse rows; the recommended default.
+    ///
+    /// `α` is clamped to `[0.0, 1.0]`; out-of-range values are
+    /// silently bounded so callers can't accidentally negate the
+    /// interpolation.
+    pub fn score_chain_smoothed(
+        &self,
+        current_chain: &str,
+        prev_chain: Option<&str>,
+        alpha: f32,
+    ) -> f32 {
+        let alpha = alpha.clamp(0.0, 1.0);
+        let unigram = self
+            .chain_log_prob
+            .get(current_chain)
+            .copied()
+            .unwrap_or_else(|| self.unseen_log_prob());
+        // Skip the bigram lookup when α is fully unigram — saves
+        // one hashmap probe per parse on the hot path.
+        if alpha >= 0.999_99 {
+            return unigram;
+        }
+        let bigram = self.score_chain_given_prev(current_chain, prev_chain);
+        // Symmetric early-out for α≈0 (pure bigram path).
+        if alpha <= 1e-5 {
+            return bigram;
+        }
+        alpha * unigram + (1.0 - alpha) * bigram
+    }
+
+    /// **v4.16.5** — convenience: smoothed score for a noun bundle.
+    pub fn score_noun_smoothed(
+        &self,
+        features: &NounFeatures,
+        prev_chain: Option<&str>,
+        alpha: f32,
+    ) -> f32 {
+        let chain = noun_chain_key(features);
+        self.score_chain_smoothed(&chain, prev_chain, alpha)
+    }
+
+    /// **v4.16.5** — convenience: smoothed score for a verb bundle.
+    pub fn score_verb_smoothed(
+        &self,
+        features: &VerbFeatures,
+        prev_chain: Option<&str>,
+        alpha: f32,
+    ) -> f32 {
+        let chain = verb_chain_key(features);
+        self.score_chain_smoothed(&chain, prev_chain, alpha)
+    }
+
     /// Floor for unseen chains. Computed as `min(observed) - ln(2)`
     /// so unseen chains rank strictly below the rarest observed
     /// one. Empty prior returns `f32::NEG_INFINITY` so it's always
@@ -516,6 +580,65 @@ mod tests {
             (s - unigram).abs() < 1e-6,
             "with prev=None, score should equal unigram (got {s}, want {unigram})"
         );
+    }
+
+    #[test]
+    fn score_chain_smoothed_alpha_zero_equals_bigram() {
+        let mut unigrams: HashMap<String, u64> = HashMap::new();
+        unigrams.insert("noun:None|None|None|Genitive|None".to_string(), 50);
+        unigrams.insert("noun:None|None|Some(P3)|None|None".to_string(), 100);
+        let mut bigrams: HashMap<(String, String), u64> = HashMap::new();
+        bigrams.insert(
+            (
+                "noun:None|None|None|Genitive|None".to_string(),
+                "noun:None|None|Some(P3)|None|None".to_string(),
+            ),
+            40,
+        );
+        let p = SuffixPriors::from_counts_with_bigrams(unigrams, bigrams);
+        let pure_bigram = p.score_chain_given_prev(
+            "noun:None|None|Some(P3)|None|None",
+            Some("noun:None|None|None|Genitive|None"),
+        );
+        let alpha_zero = p.score_chain_smoothed(
+            "noun:None|None|Some(P3)|None|None",
+            Some("noun:None|None|None|Genitive|None"),
+            0.0,
+        );
+        assert!(
+            (pure_bigram - alpha_zero).abs() < 1e-5,
+            "α=0 must equal pure bigram (got {alpha_zero}, want {pure_bigram})"
+        );
+    }
+
+    #[test]
+    fn score_chain_smoothed_alpha_one_equals_unigram() {
+        let mut unigrams: HashMap<String, u64> = HashMap::new();
+        unigrams.insert("noun:None|Singular|None|Nominative|None".to_string(), 100);
+        let p = SuffixPriors::from_counts(unigrams);
+        let pure_unigram = *p
+            .chain_log_prob
+            .get("noun:None|Singular|None|Nominative|None")
+            .unwrap();
+        let alpha_one =
+            p.score_chain_smoothed("noun:None|Singular|None|Nominative|None", None, 1.0);
+        assert!(
+            (pure_unigram - alpha_one).abs() < 1e-5,
+            "α=1 must equal pure unigram (got {alpha_one}, want {pure_unigram})"
+        );
+    }
+
+    #[test]
+    fn score_chain_smoothed_clamps_alpha_to_unit_interval() {
+        let mut unigrams: HashMap<String, u64> = HashMap::new();
+        unigrams.insert("noun:None|Singular|None|Nominative|None".to_string(), 100);
+        let p = SuffixPriors::from_counts(unigrams);
+        let neg = p.score_chain_smoothed("noun:None|Singular|None|Nominative|None", None, -0.5);
+        let zero = p.score_chain_smoothed("noun:None|Singular|None|Nominative|None", None, 0.0);
+        let plus_two = p.score_chain_smoothed("noun:None|Singular|None|Nominative|None", None, 2.0);
+        let one = p.score_chain_smoothed("noun:None|Singular|None|Nominative|None", None, 1.0);
+        assert!((neg - zero).abs() < 1e-5, "α<0 must clamp to 0");
+        assert!((plus_two - one).abs() < 1e-5, "α>1 must clamp to 1");
     }
 
     #[test]

@@ -181,6 +181,13 @@ pub struct Conversation {
     /// stable sort means tied-prior parses preserve v3.2.0 order
     /// exactly.
     pub suffix_priors: Option<adam_kernel_fst::suffix_priors::SuffixPriors>,
+    /// **v4.16.5** — Jelinek-Mercer interpolation weight between
+    /// unigram and bigram log-probabilities when scoring FST
+    /// parses. `α · unigram + (1-α) · bigram`. `None` means
+    /// "use pure bigram-with-unigram-fallback (v4.16.0
+    /// behaviour)". Recommended default for tuning is `Some(0.3)`
+    /// — bigram dominates but unigram smooths sparse rows.
+    pub priors_alpha: Option<f32>,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -392,6 +399,17 @@ impl Conversation {
         self
     }
 
+    /// **v4.16.5** — builder: set the unigram-vs-bigram
+    /// interpolation weight for FST parse re-ranking. `α=0.0` =
+    /// pure bigram (v4.16.0); `α=1.0` = pure unigram (v4.15.5);
+    /// `α≈0.3` = bigram dominates with unigram smoothing.
+    /// Without this builder, parse selection uses the v4.16.0
+    /// pure-bigram-with-fallback path.
+    pub fn with_priors_alpha(mut self, alpha: f32) -> Self {
+        self.priors_alpha = Some(alpha);
+        self
+    }
+
     /// v4.0.3 — builder: enable investor-safe reasoning mode.
     /// When enabled, `inject_reasoning_chain` only cites derivations
     /// whose full `source_chain` comes from `data/world_core/*.jsonl`
@@ -468,13 +486,19 @@ impl Conversation {
         // residual; surface-level checks (Russian/math detection)
         // still operate on the raw input above.
         let stripped = crate::discourse::strip_addressee(crate::discourse::strip_preamble(input));
-        // **v4.15.5** — priors-aware parse path. When a trained
-        // `SuffixPriors` artifact is attached, each token's
-        // candidate analyses are re-ranked by `P(chain)` DESC
-        // before downstream consumers see the `Vec<Analysis>`.
-        // `None` falls through to the v3.2.0 deterministic
-        // lexicographic order.
-        let parses = crate::parse_input_with_priors(stripped, lexicon, self.suffix_priors.as_ref());
+        // **v4.15.5 + v4.16.5** — priors-aware parse path. When a
+        // trained `SuffixPriors` artifact is attached, each
+        // token's candidate analyses are re-ranked by `P(chain)`
+        // DESC before downstream consumers see the
+        // `Vec<Analysis>`. `priors_alpha` selects the scoring
+        // mode: `Some(α)` uses Jelinek-Mercer interpolation,
+        // `None` uses pure-bigram-with-unigram-fallback (v4.16.0).
+        let parses = crate::parse_input_with_priors(
+            stripped,
+            lexicon,
+            self.suffix_priors.as_ref(),
+            self.priors_alpha,
+        );
         let raw_intent = interpret_text_with_lexicon(stripped, &parses, Some(lexicon));
 
         // v1.4.0: follow-up resolution. "ал сіз?" after AskHowAreYou

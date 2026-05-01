@@ -198,12 +198,29 @@ fn main() -> ExitCode {
     if priors_path.exists() {
         match adam_kernel_fst::suffix_priors::SuffixPriors::load(priors_path) {
             Ok(priors) => {
+                let n_chains = priors.len();
+                let n_bigrams: usize = priors
+                    .transition_log_prob
+                    .values()
+                    .map(|row| row.len())
+                    .sum();
+                let n_tokens = priors.trained_on_tokens;
                 eprintln!(
-                    "adam-chat: suffix priors — {} chains over {} training tokens",
-                    priors.len(),
-                    priors.trained_on_tokens
+                    "adam-chat: suffix priors — {n_chains} chains, {n_bigrams} bigrams over {n_tokens} training tokens"
                 );
                 conv = conv.with_suffix_priors(priors);
+                // **v4.16.5** — Jelinek-Mercer interpolation
+                // weight α=0.3 (bigram-dominant with unigram
+                // smoothing). Tunable via env-override —
+                // `ADAM_PRIORS_ALPHA=0.5` etc — for experimentation
+                // without recompilation. Out-of-range values get
+                // silently clamped inside SuffixPriors.
+                let alpha = std::env::var("ADAM_PRIORS_ALPHA")
+                    .ok()
+                    .and_then(|s| s.parse::<f32>().ok())
+                    .unwrap_or(0.3);
+                eprintln!("adam-chat: priors alpha = {alpha} (Jelinek-Mercer)");
+                conv = conv.with_priors_alpha(alpha);
             }
             Err(err) => {
                 eprintln!(

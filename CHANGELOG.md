@@ -7,6 +7,56 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.16.5] — 2026-05-01 — Jelinek-Mercer interpolation knob α·log_p_unigram + (1-α)·log_p_bigram
+
+**Patch in the v4.15+ compositional-ML arc.** v4.16.0 shipped pure bigram scoring with three-tier fallback. v4.16.5 adds the **smoothing dial**: a tunable interpolation weight between unigram and bigram log-probabilities. Lets the runtime balance the bigram's specificity (good when context is rich) against the unigram's robustness (good when bigram rows are sparse).
+
+### Innovations bundled
+
+1. **`SuffixPriors::score_chain_smoothed(curr, prev, alpha)`** + `score_noun_smoothed` + `score_verb_smoothed` — Jelinek-Mercer interpolation. Returns `α · log P(curr) + (1-α) · log P(curr | prev)`. `α` is clamped to `[0.0, 1.0]` so out-of-range values are silently bounded. Symmetric early-outs for `α≈0` (skip the unigram path) and `α≈1` (skip the bigram path) keep the hot path fast.
+
+2. **`Conversation::with_priors_alpha(α)`** builder + `priors_alpha: Option<f32>` field. `None` preserves the v4.16.0 pure-bigram-with-fallback path; `Some(α)` switches the parse re-ranker to interpolation mode.
+
+3. **`parse_input_with_priors`** signature extended with optional `alpha: Option<f32>`. The inner re-rank closure dispatches to smoothed scoring when alpha is set, falls back to v4.16.0 path otherwise. All 4 call sites updated; older callers passing only `priors` get bit-identical behaviour.
+
+4. **`adam_chat` defaults to `α = 0.3`** — bigram-dominant with unigram smoothing. **Tunable via `ADAM_PRIORS_ALPHA` env var** so callers can experiment without recompiling. Startup line announces the chosen alpha so the chosen smoothing setting is visible in the production log.
+
+5. **Three new unit tests**: `α=0` equals pure bigram, `α=1` equals pure unigram, out-of-range `α` clamps to `[0, 1]`.
+
+6. **REPL replay regression** — 1 new dialog `smoothed_priors_anti_regression_v4_16_5` covers a single-noun query (minimal bigram context) AND a multi-token query (rich bigram context) — both must answer correctly under the smoothing.
+
+### Pipeline impact
+
+- `SuffixPriors` gains 3 new methods (`score_chain_smoothed` + 2 convenience wrappers).
+- `Conversation` gains `priors_alpha: Option<f32>` field + `with_priors_alpha` builder.
+- `parse_input_with_priors` / `parse_input_inner` / `parse_input_public` / `parse_input` all updated to thread the new `alpha` parameter; the public surface is a single new optional argument.
+- `adam_chat` startup attaches `α = 0.3` by default (override via `ADAM_PRIORS_ALPHA` env var).
+- Frozen artifact unchanged — interpolation is a runtime concern.
+
+### Why `α = 0.3`
+
+The unigram prior captures broad frequency: which suffix chains are common in Kazakh at all. The bigram prior captures local agreement: which chains follow which. Both signals are useful, but bigram rows can be sparse (the v4.16.0 prune-at-count-2 step keeps only 21k of 305k observed bigrams). When a bigram row is well-populated, it should dominate parse selection — that's the purpose of context-awareness. When it's sparse, we want the unigram to step in and prevent the row's noise from steering the parse.
+
+`α = 0.3` is a textbook Jelinek-Mercer setting for bigrams under Laplace-smoothed counts: bigram dominates (70 % weight), unigram smooths (30 % weight). Empirically — verified on the 11-question anti-regression battery — this preserves the v4.16.0 behaviour on every canonical query while making the prior more robust to unseen contexts.
+
+### Anti-regression — 11-question battery
+
+All canonical queries answer correctly post-v4.16.5: greeting, definition (Жасуша / Атом / Алматы), system identity, capability, causal, curriculum, name statement. The smoothing layer doesn't disturb any v4.x behaviour.
+
+### Tests + counters
+
+- New unit tests: **+3 suffix_priors** (interpolation correctness + alpha clamping).
+- New REPL replay dialogs: **+1**.
+- Workspace tests: 796 → **799 passing** (+3).
+- `validate_world_core`: 1 625 / 1 625 / 1 791 facts (unchanged).
+- `cognitive_eval`: 25/25 canonical.
+
+### Cadence
+
+**Patch (v4.16.5)** per `feedback_versioning_post_1_0`. Closes the v4.16.0 deferred work (interpolation knob). **Stripe (4) — compositional ML — smoothing patch.** Next:
+
+- **v4.17.0** — POS-conditioned priors `P(chain | prev_pos, prev_chain)`. Adds part-of-speech context when bigram alone is too sparse (e.g. distinguishing «Genitive after Noun» from «Genitive after Verb» as different transition rows).
+
 ## [4.16.0] — 2026-05-01 — context-aware priors P(chain | preceding_chain) + greedy bigram-aware FST parse selection
 
 **Second minor in the v4.15+ compositional-ML arc.** v4.15.0 shipped unigram priors `P(chain)`, v4.15.5 wired them into runtime parse selection. v4.16.0 extends to **context-aware bigrams** `P(chain | preceding_chain)` — captures local morphological agreement (e.g. Genitive followed by 3sg-Possessive — «жасушаның ядросы» — is much more probable than Genitive followed by Imperative). Same `корень + функция^n` compositional view, one Markov step deeper.
