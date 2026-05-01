@@ -129,6 +129,76 @@ pub fn canonical_person_id(token: &str) -> Option<String> {
 /// Does not look up any registry — it just checks orthographic
 /// shape. The actual canonical resolution happens in
 /// [`canonical_person_entity`].
+/// **v4.18.0** — respectful Kazakh address form.
+///
+/// Builds the diminutive-respectful version of a personal name by
+/// taking the first consonant and appending «әке» (etymologically
+/// "father / elder"). This is the warm, respectful way for a younger
+/// or junior speaker to address an older or honoured person in
+/// Kazakh tradition. Since adam is a young system addressing the
+/// human user, every post-introduction turn should use this form
+/// instead of the literal name.
+///
+/// **Pattern.** Take the first consonant of the name, append `әке`
+/// (preserving the case of the input's first letter):
+///
+/// - `Дәулет → Дәке` (Д + әке)
+/// - `Марат → Мәке` (М + әке)
+/// - `Серік → Сәке`
+/// - `Нұрлан → Нәке`
+/// - `Жанболат → Жәке`
+///
+/// **Vowel-initial names** (Абай, Алия, Айгүл, Аман) return `None`
+/// — the «<consonant>әке» pattern doesn't fit, and the alternative
+/// «<vowel>+әке» would collide with adam's own name (`Адам → Әке`,
+/// where `әке` literally means "father" — confusing). Callers
+/// should fall back to the literal name in those cases.
+///
+/// **Returns.** `Some("Дәке")` for consonant-initial names, `None`
+/// otherwise.
+pub fn kazakh_respectful_address(name: &str) -> Option<String> {
+    let trimmed = name.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    let first = trimmed.chars().next()?;
+    if !first.is_alphabetic() {
+        return None;
+    }
+    if is_kazakh_vowel(first) {
+        return None;
+    }
+    // Preserve the case of the first letter so titles render
+    // naturally in templates («Дәке, …» not «дәке, …»).
+    let first_uppercase = first.to_uppercase().next().unwrap_or(first);
+    Some(format!("{first_uppercase}әке"))
+}
+
+/// **v4.18.0** — Kazakh vowel set (both Cyrillic native vowels and
+/// vowel-mark variants). Used by `kazakh_respectful_address` to
+/// decide whether a name is consonant- or vowel-initial.
+fn is_kazakh_vowel(c: char) -> bool {
+    let lower = c.to_lowercase().next().unwrap_or(c);
+    matches!(
+        lower,
+        'а' | 'ә'
+            | 'е'
+            | 'ё'
+            | 'и'
+            | 'й'
+            | 'о'
+            | 'ө'
+            | 'у'
+            | 'ұ'
+            | 'ү'
+            | 'ы'
+            | 'і'
+            | 'э'
+            | 'ю'
+            | 'я'
+    )
+}
+
 pub fn looks_like_person_name(token: &str) -> bool {
     let trimmed = token.trim();
     if trimmed.chars().count() < 2 {
@@ -426,6 +496,51 @@ fn curated_geo_aliases() -> &'static [(&'static str, &'static str)] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn respectful_address_consonant_initial_names() {
+        // Canonical pattern: first consonant + әке, preserving case.
+        assert_eq!(kazakh_respectful_address("Дәулет").as_deref(), Some("Дәке"));
+        assert_eq!(kazakh_respectful_address("Марат").as_deref(), Some("Мәке"));
+        assert_eq!(kazakh_respectful_address("Серік").as_deref(), Some("Сәке"));
+        assert_eq!(kazakh_respectful_address("Нұрлан").as_deref(), Some("Нәке"));
+        assert_eq!(
+            kazakh_respectful_address("Жанболат").as_deref(),
+            Some("Жәке")
+        );
+    }
+
+    #[test]
+    fn respectful_address_lowercase_input_uppercased() {
+        // Even if the input is lowercase, the rendered respectful
+        // form uses the title-cased first letter so it reads well
+        // in templates («Дәке, ...» not «дәке, ...»).
+        assert_eq!(kazakh_respectful_address("дәулет").as_deref(), Some("Дәке"));
+    }
+
+    #[test]
+    fn respectful_address_vowel_initial_returns_none() {
+        // Vowel-initial names fall back to literal-name rendering;
+        // the «<vowel>+әке» pattern would collide with adam's own
+        // name (Адам → Әке = "father" literal).
+        assert!(kazakh_respectful_address("Абай").is_none());
+        assert!(kazakh_respectful_address("Алия").is_none());
+        assert!(kazakh_respectful_address("Айгүл").is_none());
+        assert!(kazakh_respectful_address("Аман").is_none());
+        assert!(kazakh_respectful_address("Әлем").is_none());
+        assert!(kazakh_respectful_address("Ермек").is_none());
+        assert!(kazakh_respectful_address("Ысқақ").is_none());
+        assert!(kazakh_respectful_address("Олжас").is_none());
+        assert!(kazakh_respectful_address("Үсен").is_none());
+    }
+
+    #[test]
+    fn respectful_address_empty_or_invalid_returns_none() {
+        assert!(kazakh_respectful_address("").is_none());
+        assert!(kazakh_respectful_address("   ").is_none());
+        // Non-alphabetic first character.
+        assert!(kazakh_respectful_address("123").is_none());
+    }
 
     #[test]
     fn normalize_proper_noun_fixes_case_and_script() {

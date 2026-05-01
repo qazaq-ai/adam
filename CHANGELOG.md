@@ -7,6 +7,92 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.18.0] — 2026-05-01 — respectful Kazakh address (Дәке/Мәке/Сәке) + list-class DialogContext tracking
+
+**First minor in v4.18+.** Two architectural additions explicitly directed by the user during the v4.17.5 review:
+
+1. **Respectful Kazakh address.** Per Kazakh tradition a junior speaker addresses an older / honored person by «<first-consonant>әке» (Дәулет → Дәке, Марат → Мәке). Adam is a young system addressing the human user; previously every post-introduction turn used the literal name «Дәулет, ...» which felt cold. v4.18.0 ships the diminutive form throughout.
+
+2. **List-class DialogContext tracking.** v4.17.5 known limitation: «Оларды тізімдей аласыз ба?» after a turn that mentioned regions surfaced rivers because no context carried the «облыс» class forward. v4.18.0 stashes the previous turn's grounded fact in session and the SearchGraph list-intent reranker now reads it as fallback context.
+
+### Architectural addition #1: respectful address
+
+`crates/adam-dialog/src/language_core.rs`:
+
+- New function **`kazakh_respectful_address(name) -> Option<String>`** — takes the first consonant of the name and appends «әке» (preserving case). Vowel-initial names (Абай, Алия, Айгүл, Аман) return `None` because the «<vowel>+әке» pattern would collide with adam's own name (Адам → Әке = "father" literal); callers fall back to the literal name in that case.
+- New helper `is_kazakh_vowel(c)` — covers all native Cyrillic Kazakh vowels (а ә е ё и й о ө у ұ ү ы і э ю я).
+- 4 new unit tests cover the consonant-initial rule, lowercase→uppercase normalisation, vowel-initial fallback, empty/invalid inputs.
+
+`crates/adam-dialog/src/conversation.rs`:
+
+- `Conversation::turn_with_trace` writes BOTH `name` (literal) and `name_respect` (diminutive) to session when `StatementOfName` is captured. Falls back to literal when the name has no respectful form.
+
+`crates/adam-dialog/src/planner.rs`:
+
+- New helper `ensure_name_respect_slot` mirrors the v0.9.0 `ensure_geo_kind_slot` pattern. Auto-derives `name_respect` from `name` whenever the planner builds slots — covers direct-session-insert callers (tests, replay harnesses) that bypass the `StatementOfName` flow. Three call sites in `plan_response_with_session` and `plan_response_with_epistemic` updated.
+- `extract_slots(Intent::StatementOfName { name })` also writes both `name` and `name_respect`.
+
+`data/dialog/templates/v1.toml`:
+
+- Mass migration: 28 templates updated to use `{name_respect}` instead of `{name}`. Five literal-name templates kept (`statement_of_name` first ack `сәлем, {name}` for warmth-on-first-turn; `ask_name.with_known_user` recall queries to echo the literal stored name; `{name}, танысқаныма қуаныштымын` and `{name} деген атыңызды есте сақтаймын` for the warm intro). The split: first turn uses literal so the user sees they were heard; subsequent turns use respect.
+
+### Architectural addition #2: list-class DialogContext tracking
+
+`crates/adam-dialog/src/conversation.rs`:
+
+- After each turn renders, `Conversation::turn_with_trace` stashes the rendered `grounded_fact` text in `session["last_grounded_fact"]` (cleared on turns with no grounded fact, so stale context doesn't leak).
+
+`crates/adam-dialog/src/tool.rs`:
+
+- `ToolContext` gains `previous_grounded_fact: Option<&'a str>` field.
+- `Tool::dispatch(SearchGraph)` `list_intent_rank` extended with a 4th-tier fallback: when the current query has no list-class token AND no synonym hit, scan the previous_grounded_fact for class tokens (`облыс / өзен / көл / тау / шөл / көрікті жер`) and prefer candidates whose object root matches.
+
+### Live REPL — three behaviour changes
+
+```
+Q1: «Менің атым Дәулет»
+A1 (random across pool): «Сәлем, Дәулет.» / «Дәулет, танысқаныма қуаныштымын.» / «Дәулет деген атыңызды есте сақтаймын.»
+   (literal — first ack uses {name})
+
+Q2: «Қазақстан туралы не білесіз?»
+A2: «Дәке, қазақстан туралы қысқа жауап: ...» (when name-bearing template is picked)
+    OR «Қазақстан туралы қысқаша айтсам: ...» (when name-less variant is picked)
+    Both forms are valid; the seed-based picker rotates among them.
+
+Q1: «Қазақстанда қанша облыс бар?»
+A1: «Қазақстанның аймақтары — 17 облыс пен 3 республикалық маңызы бар қала.»
+
+Q2: «Оларды тізімдей аласыз ба?»
+Pre-v4.18.0:  rivers list
+Post-v4.18.0: «Қазақстанның 17 облысы: Абай, Ақмола, Ақтөбе, Алматы, ...»
+              (regions list — context carried forward via previous_grounded_fact)
+```
+
+### Pipeline impact
+
+- `kazakh_respectful_address` + `is_kazakh_vowel` exposed via `adam_dialog::*`.
+- `Conversation::turn_with_trace` writes `last_grounded_fact` to session and clears on no-grounded-fact turns.
+- `ToolContext` gains `previous_grounded_fact: Option<&'a str>`. All 4 construction sites updated.
+- `list_intent_rank` 4-tier fallback ladder: synonym query→object → synonym prev-fact→object → direct prev-fact-class→object → unmatched.
+- `extract_slots` and 3 planner slot-build sites auto-populate `name_respect`.
+- 28 templates migrated to `{name_respect}` (kept 5 literal-name for warmth + recall semantics).
+
+### Tests + counters
+
+- New unit tests: **+4 language_core::respectful_address**.
+- New REPL replay dialogs: **+2** (respectful address + list-class context).
+- Existing dialog assertions broadened to accept either literal name or respectful form (3 dialogs, 5 end_to_end test sites).
+- Workspace tests: 802 → **806 passing** (+4).
+- World Core: unchanged.
+
+### Cadence
+
+**Minor (v4.18.0)** per `feedback_versioning_post_1_0` — substantial architectural addition: new public function, new session field, new ToolContext field, mass template migration. **Stripe (5) — humanness through cultural fit — opens.**
+
+Next:
+- **v4.18.5** — composite-question handler («X жәнe Y» two-aspect splitter) + intro warmth on name capture (combine literal + respect: «Танысқаныма қуаныштымын, {name}! Сізді {name_respect} деп атаймын — қазақ дәстүрі бойынша.»).
+- **v4.19.0+** — empirical eval of v4.15+ priors.
+
 ## [4.17.5] — 2026-05-01 — transcript-driven patch bundle (11 fixes from live REPL session)
 
 **Patch in the v4.x humanness arc.** A 2026-05-01 live REPL session with the user surfaced 11 distinct issues across detection, mis-routing, and retrieval ranking. v4.17.5 closes all of them as a single coordinated bundle. No architectural changes — pure ROI work on observable user-facing behaviour.

@@ -1011,13 +1011,13 @@ fn conversation_remembers_name_across_turns() {
         let out = conv.turn("сәлем", &lex, &repo, seed);
         assert!(!out.contains("{name}"), "unfilled slot leaked: {out:?}");
         // v4.6.5 — replies surface sentence-cased + period (≥10 chars).
-        if out == "Сәлем, Дәулет." {
+        if out == "Сәлем, Дәулет." || out == "Сәлем, Дәке." {
             saw_personalised = true;
         }
     }
     assert!(
         saw_personalised,
-        "expected at least one seed in 0..16 to pick \"Сәлем, Дәулет.\""
+        "expected at least one seed in 0..16 to pick \"Сәлем, Дәулет.\" or \"Сәлем, Дәке.\""
     );
 }
 
@@ -1568,7 +1568,7 @@ fn cross_slot_how_are_you_uses_remembered_name() {
     for seed in 0..32u64 {
         let out = conv.turn("қалайсыз", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
-        if out.contains("Дәулет") {
+        if out.contains("Дәулет") || out.contains("Дәке") {
             saw_personalised = true;
         }
     }
@@ -1589,7 +1589,7 @@ fn cross_slot_age_mentions_remembered_name() {
     for seed in 0..32u64 {
         let out = conv.turn("менің жасым отыз", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
-        if out.contains("Дәулет") && out.contains("30") {
+        if (out.contains("Дәулет") || out.contains("Дәке")) && out.contains("30") {
             saw_cross = true;
         }
     }
@@ -1612,7 +1612,9 @@ fn cross_slot_occupation_in_city_fires_with_all_three() {
         let out = conv.turn("мен мұғаліммін", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
         // Triple-slot: Дәулет + Алматыда (locative) + мұғалім.
-        if out.contains("Дәулет") && out.contains("Алматыда") && out.contains("мұғалім")
+        if (out.contains("Дәулет") || out.contains("Дәке"))
+            && out.contains("Алматыда")
+            && out.contains("мұғалім")
         {
             saw_triple = true;
         }
@@ -1638,7 +1640,9 @@ fn cross_slot_greeting_fires_when_both_name_and_city_known() {
         let out = conv.turn("сәлем", &lex, &repo, seed);
         assert!(!out.contains("{"), "unfilled slot leaked: {out:?}");
         // v4.6.5 — sentence-cased + period.
-        if out == "Сәлем, Дәулет, Алматыдан бәрі жақсы ма." {
+        if out == "Сәлем, Дәулет, Алматыдан бәрі жақсы ма."
+            || out == "Сәлем, Дәке, Алматыдан бәрі жақсы ма."
+        {
             saw_cross = true;
         }
     }
@@ -3100,7 +3104,7 @@ fn unknown_with_session_and_evidence_personalises_frame() {
         );
         // Guillemets confirm the evidence path fired (not the noun-echo
         // path); name presence confirms the frame was personalised.
-        if out.contains("Дәулет") && out.contains("«") {
+        if (out.contains("Дәулет") || out.contains("Дәке")) && out.contains("«") {
             saw_personalised = true;
         }
     }
@@ -3428,7 +3432,10 @@ fn unknown_with_session_name_and_city_can_use_combined_frame() {
             !out.contains("{"),
             "unfilled slot leaked at seed={seed}: {out:?}"
         );
-        if out.contains("Дәулет") && out.contains("Алматы") && out.contains("«") {
+        if (out.contains("Дәулет") || out.contains("Дәке"))
+            && out.contains("Алматы")
+            && out.contains("«")
+        {
             saw_name_and_city = true;
         }
     }

@@ -5,9 +5,9 @@
     {
       "id": "name_introduction_acknowledged",
       "category": "profile_building",
-      "description": "User introduces self by name; the reply must surface the name back so the user sees they were heard.",
+      "description": "User introduces self by name; the reply must surface a recognisable form of the name so the user sees they were heard. v4.18.0: assertion broadened to accept either the literal name (`дәулет` — used by the explicit name-recall templates and the warm-intro template) OR the respectful Kazakh address form (`дәке` — used by the post-introduction address templates). Either form is correct evidence that the name was captured.",
       "turns": [
-        {"user": "менің атым Дәулет", "output_contains_lower_any": ["дәулет"]}
+        {"user": "менің атым Дәулет", "output_contains_lower_any": ["дәулет", "дәке"]}
       ]
     },
     {
@@ -37,9 +37,9 @@
     {
       "id": "name_recall_after_introduction",
       "category": "profile_recall",
-      "description": "v4.4.9-tightened: after introducing a name, asking `менің атым кім?` must return the stored name AND must NOT echo the question word `кім` as if it were a name (the latter half locks v4.4.9's interrogative-pronoun guard in place — pre-v4.4.9 the reply contained both `Дәулет` and `Кім` as a phantom-contradiction clarifying question, so the dialog passed the substring check by accident).",
+      "description": "v4.4.9-tightened: after introducing a name, asking `менің атым кім?` must return the stored name AND must NOT echo the question word `кім` as if it were a name (the latter half locks v4.4.9's interrogative-pronoun guard in place — pre-v4.4.9 the reply contained both `Дәулет` and `Кім` as a phantom-contradiction clarifying question, so the dialog passed the substring check by accident). v4.18.0: turn 0 broadened to accept the respectful address form (Дәке) since the first acknowledgement template family now picks among literal-name AND respectful-form variants. Turn 1 (the explicit name-recall query) keeps the strict literal-name assertion — the AskName.with_known_user templates use `{name}` literally because they recall the stored name verbatim.",
       "turns": [
-        {"user": "менің атым Дәулет", "output_contains_lower_any": ["дәулет"]},
+        {"user": "менің атым Дәулет", "output_contains_lower_any": ["дәулет", "дәке"]},
         {"user": "менің атым кім?", "output_contains_lower_any": ["дәулет"], "output_not_contains_lower": ["кім"]}
       ]
     },
@@ -198,9 +198,9 @@
     {
       "id": "edge_case_mixed_script_name_normalised",
       "category": "edge_case",
-      "description": "v4.3.1 person canonicalisation: lowercase / mixed-case name forms collapse to canonical title-cased form when echoed back.",
+      "description": "v4.3.1 person canonicalisation: lowercase / mixed-case name forms collapse to canonical title-cased form when echoed back. v4.18.0: assertion broadened to accept either the literal name OR the respectful address form (Дәке) — both prove the name was captured and canonicalised.",
       "turns": [
-        {"user": "менің атым дәулет", "output_contains_lower_any": ["дәулет"]}
+        {"user": "менің атым дәулет", "output_contains_lower_any": ["дәулет", "дәке"]}
       ]
     },
     {
@@ -766,6 +766,23 @@
       "turns": [
         {"user": "Атом туралы айт", "output_contains_lower_any": ["атом"]},
         {"user": "Қазақстан туралы не білесіз?", "output_contains_lower_any": ["қазақстан"]}
+      ]
+    },
+    {
+      "id": "respectful_kazakh_address_v4_18_0",
+      "category": "humanness",
+      "description": "v4.18.0: respectful Kazakh address form per the user's directive. Adam is a young system; per Kazakh tradition it addresses honored speakers as «<first-consonant>әке» (Дәулет → Дәке, Марат → Мәке, Серік → Сәке). Vowel-initial names fall back to literal name. After name capture, the session stores both `name` (literal) AND `name_respect` (diminutive); ALL post-introduction templates that address the user use `{name_respect}`. The first ack family picks among literal-name AND respectful-form variants. This dialog asserts the captured-and-acknowledged invariant by accepting either form.",
+      "turns": [
+        {"user": "Менің атым Дәулет", "output_contains_lower_any": ["дәулет", "дәке"]}
+      ]
+    },
+    {
+      "id": "list_class_context_anaphor_v4_18_0",
+      "category": "multi_turn_context",
+      "description": "v4.18.0: list-class DialogContext tracking. Pre-v4.18.0 «Оларды тізімдей аласыз ба?» (after a turn surfacing Kazakhstan regions count) picked the rivers list because nothing carried the «облыс» class forward. v4.18.0 stashes the previous turn's grounded_fact text in session and the SearchGraph list_intent_rank reads it as fallback context — when the current query has no list-class token (just `оларды + тізімдей + аласыз ба`), the prior fact's «облыс» word triggers the regions-list synonym match. Locks the cross-turn list-class inference: turn 2 must surface the regions list (containing «Абай / Ақмола / Ақтөбе» and «облыс» class).",
+      "turns": [
+        {"user": "Қазақстанда қанша облыс бар?", "output_contains_lower_any": ["17", "облыс"]},
+        {"user": "Оларды тізімдей аласыз ба?", "output_contains_lower_any": ["абай", "ақмола"]}
       ]
     },
     {

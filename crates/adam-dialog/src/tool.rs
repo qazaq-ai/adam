@@ -262,6 +262,14 @@ pub struct ToolContext<'a> {
     /// to a per-Conversation index keeps the lookup O(1) without
     /// re-walking world_core on every retrieval call.
     pub domain_index: Option<&'a crate::domain_index::DomainIndex>,
+    /// **v4.18.0** — previous turn's rendered grounded_fact text,
+    /// when one was surfaced. Used by `list_intent_rank` as a
+    /// fallback context when the current query has no list-class
+    /// token. Lets «Оларды тізімдей аласыз ба?» (after a turn
+    /// surfacing the regions count) infer that «облыс» is the
+    /// implied list class. `None` when the previous turn produced
+    /// no grounded fact, or when this is the first turn.
+    pub previous_grounded_fact: Option<&'a str>,
 }
 
 /// Pure-function dispatcher. Reads `ToolContext` references, never
@@ -453,11 +461,40 @@ impl Tool {
                         });
                         // Synonym-aware overlap (e.g. аймақ ↔ облыс
                         // for region queries).
+                        // **v4.18.0** — also scan the previous
+                        // grounded fact's text for list-class
+                        // hints. When the current query has no
+                        // explicit list-class but the prior turn
+                        // surfaced «Қазақстанның аймақтары — 17
+                        // облыс ...», the «облыс» token in that
+                        // fact tells us the implicit referent is
+                        // regions, not landmarks. Strictly
+                        // additive — fires only when
+                        // previous_grounded_fact is attached.
+                        let prev_fact_lower = ctx
+                            .previous_grounded_fact
+                            .map(|s| s.to_lowercase())
+                            .unwrap_or_default();
                         let synonym_overlap =
                             LIST_TYPE_SYNONYMS.iter().any(|(input_tok, obj_tok)| {
-                                query_lower.contains(input_tok) && object_lower.contains(obj_tok)
+                                (query_lower.contains(input_tok)
+                                    || prev_fact_lower.contains(input_tok))
+                                    && object_lower.contains(obj_tok)
                             });
-                        if direct_overlap || synonym_overlap {
+                        // Direct prior-fact list-class match: if
+                        // the previous fact mentions a list-class
+                        // word that's also in this candidate's
+                        // object root, prefer this candidate.
+                        let prev_class_match = if prev_fact_lower.is_empty() {
+                            false
+                        } else {
+                            const CLASS_TOKENS: &[&str] =
+                                &["облыс", "өзен", "көл", "тау", "шөл", "көрікті жер"];
+                            CLASS_TOKENS.iter().any(|class| {
+                                prev_fact_lower.contains(class) && object_lower.contains(class)
+                            })
+                        };
+                        if direct_overlap || synonym_overlap || prev_class_match {
                             0
                         } else {
                             1
@@ -934,6 +971,7 @@ mod tests {
             query_input: None,
             current_domain: None,
             domain_index: None,
+            previous_grounded_fact: None,
         }
     }
 
@@ -1179,6 +1217,7 @@ mod tests {
             query_input: None,
             current_domain: None,
             domain_index: None,
+            previous_grounded_fact: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {
@@ -1236,6 +1275,7 @@ mod tests {
             query_input: None,
             current_domain: None,
             domain_index: None,
+            previous_grounded_fact: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {

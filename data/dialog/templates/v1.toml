@@ -22,8 +22,8 @@ key = "greeting.casual"
 templates = [
     "сәлем",
     "сәлем достым",
-    "сәлем, {name}",
-    "сәлем, {name}, {city|ablative} бәрі жақсы ма",
+    "сәлем, {name_respect}",
+    "сәлем, {name_respect}, {city|ablative} бәрі жақсы ма",
 ]
 
 [[families]]
@@ -31,8 +31,8 @@ key = "greeting.polite"
 templates = [
     "сәлеметсіз бе",
     "армысыз",
-    "сәлеметсіз бе, {name}",
-    "сәлеметсіз бе, {name}, {city|ablative} бәрі аман ба",
+    "сәлеметсіз бе, {name_respect}",
+    "сәлеметсіз бе, {name_respect}, {city|ablative} бәрі аман ба",
 ]
 
 [[families]]
@@ -40,21 +40,21 @@ key = "greeting.morning"
 templates = [
     "қайырлы таң",
     "қайырлы таң болсын",
-    "қайырлы таң {name}",
+    "қайырлы таң {name_respect}",
 ]
 
 [[families]]
 key = "greeting.day"
 templates = [
     "қайырлы күн",
-    "қайырлы күн {name}",
+    "қайырлы күн {name_respect}",
 ]
 
 [[families]]
 key = "greeting.evening"
 templates = [
     "қайырлы кеш",
-    "қайырлы кеш {name}",
+    "қайырлы кеш {name_respect}",
 ]
 
 # v4.4.10 / v4.6.12 — Introduction proposal opener: user said
@@ -131,8 +131,8 @@ templates = [
     "жақсымын, рахмет",
     "жаман емеспін",
     "жақсы, ал сіз қалайсыз",
-    "жақсымын {name}, ал сіз қалайсыз",
-    "жақсымын, рахмет {name}",
+    "жақсымын {name_respect}, ал сіз қалайсыз",
+    "жақсымын, рахмет {name_respect}",
 ]
 
 # User said a wellbeing statement → acknowledge + mirror
@@ -395,7 +395,7 @@ templates = [
     "рахмет, түсінгеніңізге қуаныштымын. Мен әлі дамып келемін, әр сөйлесуден жақсаруға тырысамын",
     "түсінгеніңіз үшін рақмет — иә, шектеулерім бар, бірақ оларды ашық айтуға ұмтыламын",
     "осы жанашырлығыңызға рахмет; әлі үйренуім керек, әр сұхбат — менің ілгері жылжуыма көмек",
-    "рахмет {name}, түсінгеніңіз маған жігер береді — қазақ тілінде сенімді сөйлесуге барымды салып келемін",
+    "рахмет {name_respect}, түсінгеніңіз маған жігер береді — қазақ тілінде сенімді сөйлесуге барымды салып келемін",
 ]
 
 # v4.6.12 — Non-Kazakh input refusal. Surfaced by a 2026-04-29
@@ -479,13 +479,19 @@ templates = [
 
 # ---------- Social topics (v0.8.0 new) ----------
 
-# User introduced self by name. `{name}` is substituted by the realiser
+# User introduced self by name. `{name_respect}` is substituted by the realiser
 # with the extracted PersonName entity. `{name|instrumental}` uses the
 # FST to produce the grammatically correct "with X" form: Дәулет →
 # Дәулетпен, Ерлан → Ерланмен.
 [[families]]
 key = "statement_of_name"
 templates = [
+    # **v4.18.0** — first acknowledgement uses literal `{name}` so
+    # the user sees adam captured exactly what they said. Every
+    # downstream address template uses `{name_respect}` (Дәке /
+    # Мәке / Сәке) per Kazakh tradition. The split lets the user
+    # confirm they were heard correctly AND see adam shift to the
+    # respectful diminutive on subsequent turns.
     "сәлем, {name}",
     "{name}, танысқаныма қуаныштымын",
     "{name|instrumental} танысқаныма қуаныштымын",
@@ -523,8 +529,8 @@ templates = [
     "{age} — қуатты кезеңіңіз",
     "{age} жас — тамаша кезең",
     "жасыңыз {age} екен",
-    "{name}, {age} жастасыз, тамаша",
-    "{name}, {age} жас — керемет кезең",
+    "{name_respect}, {age} жастасыз, тамаша",
+    "{name_respect}, {age} жас — керемет кезең",
 ]
 
 [[families]]
@@ -615,8 +621,8 @@ templates = [
     "{occupation|plural} еңбегі маңызды",
     "{occupation|plural} қоғамға қажет",
     "{occupation|dative} табыс тілеймін",
-    "{name}, {occupation} екеніңіз қуантады",
-    "{name}, сіз {city|locative} {occupation} болып еңбек етіп жүрсіз",
+    "{name_respect}, {occupation} екеніңіз қуантады",
+    "{name_respect}, сіз {city|locative} {occupation} болып еңбек етіп жүрсіз",
 ]
 
 [[families]]
@@ -665,8 +671,8 @@ templates = [
     "рахмет",
     "жылы сөзіңізге рақмет",
     "сіз де жақсы жансыз",
-    "рахмет {name}",
-    "рахмет {name}, жылы пікіріңізге қуандым",
+    "рахмет {name_respect}",
+    "рахмет {name_respect}, жылы пікіріңізге қуандым",
 ]
 
 [[families]]
@@ -727,12 +733,12 @@ templates = [
     "{noun} туралы ойланып көрейін",
     # v1.8.0 — session-aware variants. planner's template_is_fillable
     # auto-activates these ONLY when the required session slot exists.
-    "{name}, {noun} жайында не ойлайсыз",
-    "{name}, {noun} деген сіз үшін жаңа тақырып па",
+    "{name_respect}, {noun} жайында не ойлайсыз",
+    "{name_respect}, {noun} деген сіз үшін жаңа тақырып па",
     "{age} жасында {noun} жайында ойлану әрі қызық",
     # v1.8.5 — FST-aware city inflection via synthesise_noun.
     "{city|locative} {noun} туралы қалай қарайды екен",
-    "{name}, {city|locative} отырып {noun} жайында ойланамыз ба",
+    "{name_respect}, {city|locative} отырып {noun} жайында ойланамыз ба",
 ]
 
 # v1.6.5: Unknown with retrieval evidence — the morpheme index had a
@@ -756,8 +762,8 @@ templates = [
     "{noun} туралы нақты бір мысал: «{example}»",
     "мен {noun} жайында мынадай дерек таптым: «{example}»",
     # v1.8.0 — session-aware variants (literal slot interpolation)
-    "{name}, {noun} туралы мынаны айта аламын: «{example}»",
-    "{name}, {noun} жайында сізге мына дерек қызық болуы мүмкін: «{example}»",
+    "{name_respect}, {noun} туралы мынаны айта аламын: «{example}»",
+    "{name_respect}, {noun} жайында сізге мына дерек қызық болуы мүмкін: «{example}»",
     "{age} жаста болсаңыз да, {noun} туралы жақсы сұрақ қойдыңыз. Дерек: «{example}»",
     "{occupation} ретінде сізге {noun} туралы мына дерек жақын болуы мүмкін: «{example}»",
     # v1.8.5 — FST-aware slot variants. `{city|locative}` renders via
@@ -766,7 +772,7 @@ templates = [
     # previous `{city}-да` literal is both ugly (dangling hyphen) and
     # ignores vowel harmony for front/back stems.
     "{city|locative} тұратын сізге {noun} туралы мынадай дерек: «{example}»",
-    "{name}, {city|locative} отырып {noun} жайында мына деректі ұсына аламын: «{example}»",
+    "{name_respect}, {city|locative} отырып {noun} жайында мына деректі ұсына аламын: «{example}»",
 ]
 
 [[families]]
@@ -775,7 +781,7 @@ templates = [
     "{noun} туралы қысқаша айтсам: {fact}",
     "{noun} жайында негізгі дерек мынау: {fact}",
     "{noun} туралы ең әуелі мынаны айтуға болады: {fact}",
-    "{name}, {noun} туралы қысқа жауап: {fact}",
+    "{name_respect}, {noun} туралы қысқа жауап: {fact}",
     "{noun} жайында нақты дерек: {fact}",
 ]
 
@@ -799,8 +805,8 @@ templates = [
     "{noun} туралы корпустағы бір жолды сіздің қалаңызға бейімдеп көрдім: «{example}»",
     "Бұл бейімделген нұсқа (түпнұсқада басқа қала аталған): «{example}»",
     # Name-aware — when the session also has a name.
-    "{name}, мен {noun} туралы бір жолды сіздің {city|locative} болуыңызға сай бейімдедім: «{example}»",
-    "{name}, бейімделген мысал (түпнұсқадан өзгертілген): «{example}»",
+    "{name_respect}, мен {noun} туралы бір жолды сіздің {city|locative} болуыңызға сай бейімдедім: «{example}»",
+    "{name_respect}, бейімделген мысал (түпнұсқадан өзгертілген): «{example}»",
 ]
 
 # v2.7 — Unknown with rule-derived reasoning chain. When the reasoner
@@ -816,7 +822,7 @@ templates = [
     "{noun} туралы мынадай байланыс анықтадым: {chain}.",
     "Айтуыңыз бойынша, мынадай қисынды байланыс бар: {chain}.",
     "Қолда бар деректерден байланыс құрастырдым: {chain}.",
-    "{name}, {noun} жайында мен мынадай байланысты таптым: {chain}.",
+    "{name_respect}, {noun} жайында мен мынадай байланысты таптым: {chain}.",
 ]
 
 

@@ -615,6 +615,9 @@ impl Conversation {
             } else {
                 Some(&self.domain_index)
             },
+            // **v4.18.0** — previous turn's grounded_fact text,
+            // for list-class context tracking.
+            previous_grounded_fact: self.session.get("last_grounded_fact").map(String::as_str),
         };
         let tool_calls: Vec<crate::tool::ToolResult> = tool_plan
             .into_iter()
@@ -853,6 +856,24 @@ impl Conversation {
         {
             self.session
                 .insert("last_query_topic".into(), topic.clone());
+            // **v4.18.0** — list-class context for cross-turn
+            // anaphor list-requests. Stash the prior grounded
+            // fact's text so the next turn's SearchGraph
+            // tiebreaker can scan it for list-class tokens
+            // (облыс/өзен/тау/etc) when the current query has
+            // no explicit list-class token. Cleared on turns
+            // with no grounded_fact so stale context doesn't
+            // leak.
+            if let Intent::Unknown {
+                grounded_fact: Some(text),
+                ..
+            } = &intent_for_render
+            {
+                self.session
+                    .insert("last_grounded_fact".into(), text.clone());
+            } else {
+                self.session.remove("last_grounded_fact");
+            }
             // **v4.13.0** — multi-turn topic memory.
             // **v4.14.0** — domain inference now populated from
             // `domain_index`. When a `DomainIndex` is attached
@@ -1278,6 +1299,16 @@ impl Conversation {
                 if let Some(person) = crate::language_core::canonical_person_entity(name) {
                     self.session.insert("name".into(), person.canonical.clone());
                     self.session.insert("name_id".into(), person.id.clone());
+                    // **v4.18.0** — also store the respectful
+                    // address form. Adam uses `{name_respect}` in
+                    // most templates so every post-introduction
+                    // turn addresses the user as «Дәке / Мәке /
+                    // Сәке» per Kazakh tradition. Vowel-initial
+                    // names fall back to the literal name.
+                    let respect =
+                        crate::language_core::kazakh_respectful_address(&person.canonical)
+                            .unwrap_or_else(|| person.canonical.clone());
+                    self.session.insert("name_respect".into(), respect);
                     self.belief.touch_entity(
                         USER_SELF_KEY,
                         EntityKind::User,
@@ -1291,6 +1322,12 @@ impl Conversation {
                 } else {
                     self.session.insert("name".into(), name.clone());
                     self.session.remove("name_id");
+                    // **v4.18.0** — same respectful form for non-
+                    // canonical-registry names (covers any
+                    // person-name shape the FST recovered).
+                    let respect = crate::language_core::kazakh_respectful_address(name)
+                        .unwrap_or_else(|| name.clone());
+                    self.session.insert("name_respect".into(), respect);
                     self.belief.touch_entity(
                         USER_SELF_KEY,
                         EntityKind::User,

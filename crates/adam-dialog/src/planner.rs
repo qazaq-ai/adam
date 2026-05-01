@@ -81,6 +81,7 @@ pub fn plan_response_with_session(
         slots.insert(k, v);
     }
     ensure_geo_kind_slot(&mut slots);
+    ensure_name_respect_slot(&mut slots);
     if !slots.is_empty() {
         trace.push(format!("planner: slots={slots:?}"));
     }
@@ -401,6 +402,7 @@ pub fn plan_response_with_epistemic(
         slots.insert(k.clone(), v.clone());
     }
     ensure_geo_kind_slot(&mut slots);
+    ensure_name_respect_slot(&mut slots);
     if !slots.is_empty() {
         trace.push(format!("planner: slots={slots:?}"));
     }
@@ -441,6 +443,23 @@ fn ensure_geo_kind_slot(slots: &mut HashMap<String, String>) {
         if let Some(kind) = geo_entity_kind(&city) {
             slots.insert("geo_kind".into(), kind);
         }
+    }
+}
+
+/// **v4.18.0** — auto-derive `name_respect` from `name` when the
+/// session has the latter but not the former. Direct
+/// `session.insert("name", ...)` callers (tests, replay harnesses)
+/// don't go through the `StatementOfName` path that also writes
+/// `name_respect`, so we paper over that here. No-op when
+/// `name_respect` is already present.
+fn ensure_name_respect_slot(slots: &mut HashMap<String, String>) {
+    if slots.contains_key("name_respect") {
+        return;
+    }
+    if let Some(name) = slots.get("name").cloned() {
+        let respect =
+            crate::language_core::kazakh_respectful_address(&name).unwrap_or_else(|| name.clone());
+        slots.insert("name_respect".into(), respect);
     }
 }
 
@@ -488,6 +507,19 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
     match intent {
         Intent::StatementOfName { name } => {
             slots.insert("name".into(), name.clone());
+            // **v4.18.0** — respectful Kazakh address form. Adam
+            // is a young system; per Kazakh tradition it addresses
+            // older / honoured speakers as «<first-consonant>әке»
+            // (Дәулет → Дәке, Марат → Мәке) instead of by full
+            // name. Vowel-initial names (Абай, Алия) fall back to
+            // the literal name. Templates use `{name_respect}`
+            // when set, otherwise `{name}` — see
+            // `kazakh_respectful_address` for the rule.
+            if let Some(respect) = crate::language_core::kazakh_respectful_address(name) {
+                slots.insert("name_respect".into(), respect);
+            } else {
+                slots.insert("name_respect".into(), name.clone());
+            }
         }
         Intent::StatementOfAge { years: Some(years) } => {
             slots.insert("age".into(), years.to_string());

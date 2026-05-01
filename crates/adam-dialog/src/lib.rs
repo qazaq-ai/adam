@@ -60,8 +60,8 @@ pub use domain_index::DomainIndex;
 pub use intent::{GreetingKind, Intent, SubjectPerson};
 pub use language_core::{
     GeoEntity, PersonEntity, canonical_geo_entity, canonical_geo_id, canonical_person_entity,
-    canonical_person_id, geo_entity_kind, looks_like_named_place_candidate, looks_like_person_name,
-    normalize_proper_noun,
+    canonical_person_id, geo_entity_kind, kazakh_respectful_address,
+    looks_like_named_place_candidate, looks_like_person_name, normalize_proper_noun,
 };
 pub use planner::{
     ResponsePlan, intent_key, plan_response, plan_response_with_epistemic, plan_response_with_repo,
