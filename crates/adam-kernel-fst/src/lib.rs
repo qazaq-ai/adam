@@ -33,7 +33,12 @@ pub mod lexicon;
 pub mod morphotactics;
 pub mod parser;
 pub mod phonology;
+pub mod suffix_priors;
 
 pub use phonology::{
     Archiphoneme, ConsonantClass, PhonologicalContext, VowelClass, realise_archiphoneme,
+};
+pub use suffix_priors::{
+    SCHEMA_VERSION as SUFFIX_PRIORS_SCHEMA_VERSION, SuffixPriors, SuffixPriorsLoadError,
+    noun_chain_key, verb_chain_key,
 };
