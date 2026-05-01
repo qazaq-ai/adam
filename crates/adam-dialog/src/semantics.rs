@@ -1768,6 +1768,33 @@ fn detect_ask_about_system(
     let pronoun = tokens.iter().any(|t| t == "сен" || t == "сіз");
     let has_addressee = pronoun || joined.contains("сені") || joined.contains("сізді");
 
+    // **v4.18.5** — composite (identity + capabilities) question.
+    // Pre-v4.18.5 detectors picked one aspect per turn. The 2026-
+    // 05-01 live REPL turn 4 — «Өзіңіз туралы, кім екеніңіз және
+    // не істей алатыныңыз туралы аздап айтып беріңізші» — asks
+    // both who you are AND what you can do; adam answered only
+    // the first half.
+    //
+    // Detect the composite pattern BEFORE individual-aspect
+    // detectors so the combined template fires:
+    // - identity marker: «кім екен» / «өзіңіз туралы» / «өзің
+    //   туралы» / «не екен» / `сіз кімсіз`
+    // - connector: «және» (or no connector but multiple markers)
+    // - capabilities marker: «не істей ала» / «мүмкіндіктері»
+    let identity_marker = joined.contains("кім екен")
+        || joined.contains("кім ексің")
+        || joined.contains("сіз кімсіз")
+        || joined.contains("сен кімсің")
+        || joined.contains("өзіңіз туралы")
+        || joined.contains("өзің туралы")
+        || joined.contains("не екен");
+    let capabilities_marker_short = joined.contains("не істей ала")
+        || joined.contains("мүмкіндіктер")
+        || joined.contains("қандай қызмет");
+    if identity_marker && capabilities_marker_short && joined.contains("және") {
+        return Some(SystemAspect::IntroAndCapabilities);
+    }
+
     // **v4.3.4** — Creator aspect: "who made you" / "who built you".
     // Triggered by addressee-marker (сені/сізді/сен/сіз) plus
     // creator-question keyword. Checked first so multi-question

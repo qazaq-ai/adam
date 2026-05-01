@@ -453,13 +453,27 @@ fn ensure_geo_kind_slot(slots: &mut HashMap<String, String>) {
 /// `name_respect`, so we paper over that here. No-op when
 /// `name_respect` is already present.
 fn ensure_name_respect_slot(slots: &mut HashMap<String, String>) {
-    if slots.contains_key("name_respect") {
-        return;
+    if !slots.contains_key("name_respect") {
+        if let Some(name) = slots.get("name").cloned() {
+            let respect = crate::language_core::kazakh_respectful_address(&name)
+                .unwrap_or_else(|| name.clone());
+            slots.insert("name_respect".into(), respect);
+        }
     }
-    if let Some(name) = slots.get("name").cloned() {
-        let respect =
-            crate::language_core::kazakh_respectful_address(&name).unwrap_or_else(|| name.clone());
-        slots.insert("name_respect".into(), respect);
+    // **v4.18.5** — distinct slot present ONLY when the respect
+    // form genuinely differs from the literal name. Templates
+    // that warmly introduce both forms («Сізді {name_respect_distinct}
+    // деп атаймын — қазақ дәстүрі бойынша») gate on this slot
+    // so they're auto-filtered for vowel-initial names where
+    // respect == literal (Абай → name_respect = Абай → no
+    // distinct form, no awkward «Сізді Абай деп атаймын»
+    // rendering).
+    if !slots.contains_key("name_respect_distinct") {
+        if let (Some(name), Some(respect)) = (slots.get("name"), slots.get("name_respect")) {
+            if name != respect {
+                slots.insert("name_respect_distinct".into(), respect.clone());
+            }
+        }
     }
 }
 
@@ -516,9 +530,15 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
             // when set, otherwise `{name}` — see
             // `kazakh_respectful_address` for the rule.
             if let Some(respect) = crate::language_core::kazakh_respectful_address(name) {
-                slots.insert("name_respect".into(), respect);
+                slots.insert("name_respect".into(), respect.clone());
+                // **v4.18.5** — distinct slot only set when respect
+                // form differs from literal. Used by warmth templates
+                // that introduce both forms.
+                slots.insert("name_respect_distinct".into(), respect);
             } else {
                 slots.insert("name_respect".into(), name.clone());
+                // No distinct slot for vowel-initial names — warmth
+                // templates won't fire (template_is_fillable filters).
             }
         }
         Intent::StatementOfAge { years: Some(years) } => {
@@ -696,6 +716,10 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             }
             crate::system_identity::SystemAspect::MultiTopicCapability => {
                 "ask_about_system.multi_topic_capability"
+            }
+            // v4.18.5 — composite identity + capabilities aspect.
+            crate::system_identity::SystemAspect::IntroAndCapabilities => {
+                "ask_about_system.intro_and_capabilities"
             }
         },
         Intent::StatementOfName { .. } => "statement_of_name",

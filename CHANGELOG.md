@@ -7,6 +7,83 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.18.5] — 2026-05-01 — composite-question handler + intro warmth template
+
+**Patch in v4.18+ humanness arc.** Closes the two follow-up items deferred from v4.18.0:
+
+1. **Composite question handler.** 2026-05-01 transcript turn 4: «Өзіңіз туралы, кім екеніңіз және не істей алатыныңыз туралы аздап айтып беріңізші» asks both who you are AND what you can do. Pre-v4.18.5 detectors picked one aspect and dropped the other.
+
+2. **Intro warmth template.** Add a variant of `statement_of_name` that introduces both the literal name AND the respectful Kazakh address form with an explicit cultural note: «Танысқаныма қуаныштымын, Дәулет! Сізді Дәке деп атаймын — қазақ дәстүрі бойынша.»
+
+### Innovations
+
+**(1) `SystemAspect::IntroAndCapabilities`** + composite detector + template family. The detector requires identity-marker + «және» + capabilities-marker, fires BEFORE individual-aspect detectors. Surface anchors:
+- identity: «кім екен» / «сіз кімсіз» / «сен кімсің» / «өзіңіз туралы» / «өзің туралы» / «не екен»
+- connector: «және»
+- capabilities: «не істей ала» / «мүмкіндіктер» / «қандай қызмет»
+
+New template family `ask_about_system.intro_and_capabilities` with 2 variants that surface both `system_kind` AND `system_capabilities` slots in sequence:
+```
+"Менің атым {system_name}, толық атауым {system_full_name} ({system_abbreviation}). Мен — {system_kind}. Менің мүмкіндіктерім: {system_capabilities}"
+```
+
+**(2) `name_respect_distinct` slot.** Set ONLY when the respect form genuinely differs from the literal name (i.e. consonant-initial names). Auto-derived in `ensure_name_respect_slot` and `extract_slots(StatementOfName)`. Templates that use this slot are auto-filtered for vowel-initial names (Абай → name_respect = Абай → no distinct form, no awkward «Сізді Абай деп атаймын»). `Conversation::turn_with_trace` writes/clears the slot in session symmetrically with `name_respect`.
+
+**(3) Warm-intro template variant** in `statement_of_name`:
+```
+"Танысқаныма қуаныштымын, {name}! Сізді {name_respect_distinct} деп атаймын — қазақ дәстүрі бойынша"
+```
+Gated on `{name_respect_distinct}` so it only fires for consonant-initial names (Дәулет → Дәке, Марат → Мәке). Vowel-initial names (Абай, Алия) automatically fall back to the simpler 4 ack templates.
+
+### Pipeline impact
+
+- New `SystemAspect::IntroAndCapabilities` variant.
+- `detect_ask_about_system` extended with composite-question check (before individual aspects).
+- New template family `ask_about_system.intro_and_capabilities` (2 variants).
+- New `name_respect_distinct` slot derivation in `ensure_name_respect_slot` + `extract_slots`.
+- `Conversation::turn_with_trace` writes/clears `name_respect_distinct` in session.
+- New 5th template in `statement_of_name` family.
+
+### Live REPL
+
+```
+Q: Өзіңіз туралы, кім екеніңіз және не істей алатыныңыз туралы аздап айтып беріңізші
+Pre-v4.18.5: Мені адам деп атайды, мен қазақша сөйлесуге арналған тілдік модельмін.
+            (only the first half — capabilities ignored)
+Post-v4.18.5: Менің атым адам, толық атауым Nano Language Model (NLM). Мен — тілдік модель.
+              Менің мүмкіндіктерім: Қазақ тілінде сөйлесе аламын; есіміңізді, жасыңызды,
+              қалаңызды және мамандығыңызды есте сақтап... [full capabilities].
+
+Q: Менің атым Дәулет
+A (one of 5 variants): «Танысқаныма қуаныштымын, Дәулет! Сізді Дәке деп атаймын —
+                       қазақ дәстүрі бойынша.» (when warmth template is picked)
+                       (4 simpler variants also rotate)
+
+Q: Менің атым Абай  (vowel-initial)
+A: «Сәлем, Абай.» / «Абай, танысқаныма қуаныштымын.» / etc.
+   (warmth template auto-filtered — `name_respect_distinct` not set)
+```
+
+### Anti-regression
+
+- v4.17.5 transcript turns: all 12 still answer correctly.
+- v4.18.0 respectful address: works for Дәулет/Марат, falls back to literal for Абай.
+- v4.18.0 list-class context: «Оларды тізімдей аласыз ба?» still surfaces regions list.
+
+### Tests + counters
+
+- New REPL replay dialogs: **+1** (composite question).
+- 1 e2e test extended (`response_statement_of_name_substitutes_slot` accepts new warmth variant).
+- Workspace tests: 806 → **806 passing** (no new unit tests; behavior exercised through REPL replay + e2e templates).
+
+### Cadence
+
+**Patch (v4.18.5)** per `feedback_versioning_post_1_0`. Closes the v4.18.0 deferred composite handler + intro warmth. **Stripe (5) — humanness through cultural fit — final patch.**
+
+Next:
+- **v4.19.0+** — empirical eval of v4.15+ priors (long-deferred from v4.17.5).
+- **v4.19.5** — direction TBD per next live REPL transcript.
+
 ## [4.18.0] — 2026-05-01 — respectful Kazakh address (Дәке/Мәке/Сәке) + list-class DialogContext tracking
 
 **First minor in v4.18+.** Two architectural additions explicitly directed by the user during the v4.17.5 review:

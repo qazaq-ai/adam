@@ -354,6 +354,19 @@ templates = [
     "{system_multi_topic_capability}",
 ]
 
+# v4.18.5 — Composite identity + capabilities aspect. Triggered by
+# the pattern «кім екеніңіз және не істей алатыныңыз туралы
+# айтыңыз» — user asks both aspects in one turn. Pre-v4.18.5 the
+# detector picked one and dropped the other. The combined template
+# surfaces self-introduction (name + kind + abbreviation) AND the
+# capabilities summary in sequence.
+[[families]]
+key = "ask_about_system.intro_and_capabilities"
+templates = [
+    "Менің атым {system_name}, толық атауым {system_full_name} ({system_abbreviation}). Мен — {system_kind}. Менің мүмкіндіктерім: {system_capabilities}",
+    "Мені {system_name} деп атайды; мен — {system_kind}. Не істей алатыным жайында айтсам: {system_capabilities}",
+]
+
 # v4.12.0 — Causal-reasoning template family for `QuestionShape::Causal`.
 # Surfaced by «Неліктен X?» / «X неге?» questions where adam has
 # context about X but no Causes-predicate fact. Honest hedging: adam
@@ -496,6 +509,18 @@ templates = [
     "{name}, танысқаныма қуаныштымын",
     "{name|instrumental} танысқаныма қуаныштымын",
     "{name} деген атыңызды есте сақтаймын",
+    # **v4.18.5** — warm-intro variant that introduces both the
+    # literal name AND the respectful Kazakh address form, with
+    # an explicit cultural note. Gated on `{name_respect_distinct}`
+    # which is present ONLY when the respect form differs from
+    # the literal — so this template auto-filters for vowel-
+    # initial names (Абай, Алия) where the diminutive collapses
+    # to the literal and the «Сізді X деп атаймын» phrasing would
+    # be redundant. For consonant-initial names the user sees
+    # they were heard verbatim AND learns adam's address style:
+    # «Танысқаныма қуаныштымын, Дәулет! Сізді Дәке деп атаймын —
+    # қазақ дәстүрі бойынша.»
+    "Танысқаныма қуаныштымын, {name}! Сізді {name_respect_distinct} деп атаймын — қазақ дәстүрі бойынша",
 ]
 
 [[families]]

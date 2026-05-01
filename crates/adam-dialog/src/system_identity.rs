@@ -390,6 +390,19 @@ pub enum SystemAspect {
     /// specifically handles list-form questions where the user
     /// expects per-subject confirmation.
     MultiTopicCapability,
+    /// **v4.18.5** — composite identity + capabilities question.
+    /// Pattern: «кім екеніңіз және не істей алатыныңыз туралы
+    /// айтыңыз» — user asks two aspects in one turn (who you are
+    /// AND what you can do). Pre-v4.18.5 the detector would pick
+    /// one aspect (whichever fired first) and miss the other.
+    /// 2026-05-01 live REPL turn 4 surfaced this exact pattern;
+    /// adam answered only the first half.
+    ///
+    /// The composite template renders both `system_kind` and
+    /// `system_capabilities` in sequence. Routed via a dedicated
+    /// detector that fires BEFORE individual-aspect detectors so
+    /// the composite check has priority.
+    IntroAndCapabilities,
 }
 
 impl SystemAspect {
@@ -410,6 +423,7 @@ impl SystemAspect {
             SystemAspect::Implementation => ".implementation",
             SystemAspect::GenericCapability => ".generic_capability",
             SystemAspect::MultiTopicCapability => ".multi_topic_capability",
+            SystemAspect::IntroAndCapabilities => ".intro_and_capabilities",
         }
     }
 }

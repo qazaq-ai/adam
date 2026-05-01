@@ -1305,10 +1305,23 @@ impl Conversation {
                     // turn addresses the user as «Дәке / Мәке /
                     // Сәке» per Kazakh tradition. Vowel-initial
                     // names fall back to the literal name.
-                    let respect =
-                        crate::language_core::kazakh_respectful_address(&person.canonical)
-                            .unwrap_or_else(|| person.canonical.clone());
+                    let respect_opt =
+                        crate::language_core::kazakh_respectful_address(&person.canonical);
+                    let respect = respect_opt
+                        .clone()
+                        .unwrap_or_else(|| person.canonical.clone());
                     self.session.insert("name_respect".into(), respect);
+                    // **v4.18.5** — distinct slot only set when
+                    // respect form differs from literal. Drives
+                    // the warm-intro template that introduces
+                    // both forms; vowel-initial names omit it
+                    // and fall back to the simpler ack templates.
+                    if let Some(distinct) = respect_opt {
+                        self.session
+                            .insert("name_respect_distinct".into(), distinct);
+                    } else {
+                        self.session.remove("name_respect_distinct");
+                    }
                     self.belief.touch_entity(
                         USER_SELF_KEY,
                         EntityKind::User,
@@ -1325,9 +1338,15 @@ impl Conversation {
                     // **v4.18.0** — same respectful form for non-
                     // canonical-registry names (covers any
                     // person-name shape the FST recovered).
-                    let respect = crate::language_core::kazakh_respectful_address(name)
-                        .unwrap_or_else(|| name.clone());
+                    let respect_opt = crate::language_core::kazakh_respectful_address(name);
+                    let respect = respect_opt.clone().unwrap_or_else(|| name.clone());
                     self.session.insert("name_respect".into(), respect);
+                    if let Some(distinct) = respect_opt {
+                        self.session
+                            .insert("name_respect_distinct".into(), distinct);
+                    } else {
+                        self.session.remove("name_respect_distinct");
+                    }
                     self.belief.touch_entity(
                         USER_SELF_KEY,
                         EntityKind::User,

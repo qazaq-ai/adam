@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.18.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.18.5-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -25,7 +25,7 @@
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
   <img src="https://img.shields.io/badge/tests-806%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/cognitive%20eval-65%2F65%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
-  <img src="https://img.shields.io/badge/repl%20replay-96%2F96%20canonical-2EA44F?style=flat-square" alt="repl replay">
+  <img src="https://img.shields.io/badge/repl%20replay-97%2F97%20canonical-2EA44F?style=flat-square" alt="repl replay">
   <img src="https://img.shields.io/badge/p50%20turn%20latency-1.07%20ms%20on%20M2-2EA44F?style=flat-square" alt="p50 turn latency">
   <img src="https://img.shields.io/badge/RSS-~76--80%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
@@ -41,6 +41,8 @@
 ## Why adam (v4.4)
 
 adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced. Every layer is **Rust-only** and **graph-first** by repository invariant — both enforced by contract tests.
+
+**v4.18.5 — composite-question handler + intro warmth template.** Patch in v4.18+ humanness arc closing two follow-up items deferred from v4.18.0. **(1)** New `SystemAspect::IntroAndCapabilities` + composite detector: requires identity-marker (`кім екен / сіз кімсіз / өзіңіз туралы`) + «және» + capabilities-marker (`не істей ала / мүмкіндіктер`), fires BEFORE individual aspect detectors. New template family `ask_about_system.intro_and_capabilities` surfaces both `system_kind` AND `system_capabilities` in sequence. Closes 2026-05-01 transcript turn 4 «Өзіңіз туралы, кім екеніңіз және не істей алатыныңыз туралы айтыңыз» where adam previously answered only the first half. **(2)** New `name_respect_distinct` slot — set ONLY when respect form differs from literal name (consonant-initial only). Auto-derived in `ensure_name_respect_slot` + `extract_slots(StatementOfName)`. New warm-intro template variant: «Танысқаныма қуаныштымын, {name}! Сізді {name_respect_distinct} деп атаймын — қазақ дәстүрі бойынша». Gated on `{name_respect_distinct}` so it auto-filters for vowel-initial names (Абай → name_respect = literal → no distinct form, no awkward «Сізді Абай деп атаймын»). For consonant-initial names (Дәулет/Марат/Серік) the user sees they were heard verbatim AND learns adam's address style with explicit cultural note. Pipeline: 1 new SystemAspect variant + 1 new template family + 1 new slot + 1 new template variant + composite detector. Workspace tests **806→806 passing** (+1 REPL replay regression dialog + 1 e2e test extended). Cadence: patch. **Stripe (5) — humanness through cultural fit — final patch.** Next: v4.19.0+ (empirical eval of v4.15+ priors, long-deferred from v4.17.5).
 
 **v4.18.0 — respectful Kazakh address (Дәке/Мәке/Сәке) + list-class DialogContext tracking.** First minor in v4.18+. Two architectural additions explicitly directed by the user during v4.17.5 review. **(1) Respectful Kazakh address** — per Kazakh tradition a junior speaker addresses an older / honored person by «<first-consonant>әке» (Дәулет → Дәке, Марат → Мәке, Серік → Сәке). Adam is a young system addressing the human user — every post-introduction turn now uses the diminutive form. New `kazakh_respectful_address(name) -> Option<String>` helper in language_core (vowel-initial names like Абай return None, fall back to literal). New `is_kazakh_vowel(c)` covers all native Kazakh vowels. After `StatementOfName`, session stores BOTH `name` (literal) AND `name_respect` (diminutive). New `ensure_name_respect_slot` planner helper auto-derives respect form from name for direct-session-insert callers (tests/replay). 28 templates migrated to `{name_respect}`; 5 literal-name templates kept (first-ack warmth + `ask_name.with_known_user` recall). The split: first turn uses literal so user sees they were heard verbatim, subsequent turns use respect for warmth. **(2) List-class DialogContext tracking** — closes v4.17.5 known limitation. After each turn renders, `Conversation::turn_with_trace` stashes the rendered grounded_fact in session (cleared on no-grounded turns). `ToolContext` gains `previous_grounded_fact: Option<&'a str>`. `Tool::dispatch(SearchGraph)` `list_intent_rank` extends with 4-tier fallback ladder: synonym query→object → synonym prev-fact→object → direct prev-fact-class→object → unmatched. Closes the «Оларды тізімдей аласыз ба?» case where adam previously surfaced rivers; now correctly surfaces the regions list because previous turn mentioned «облыс». 4 unit tests + 2 REPL replay regression dialogs. Pipeline: 1 new pub function + 2 new helpers (`is_kazakh_vowel`, `ensure_name_respect_slot`) + ToolContext +1 field + 28 template migrations + 5 end_to_end tests broadened to accept either form. Workspace tests **802→806 passing**. **Stripe (5) — humanness through cultural fit — opens.** Next: v4.18.5 (composite-question handler «X жәнe Y» two-aspect splitter + intro warmth combining literal + respect: «Танысқаныма қуаныштымын, {name}! Сізді {name_respect} деп атаймын — қазақ дәстүрі бойынша.»), v4.19.0+ (empirical eval of v4.15+ priors).
 
@@ -231,7 +233,7 @@ Live numbers (verified 2026-04-29 against the actual repo): cognitive eval **65 
 |---|---|---|
 | Workspace tests | **806 passing, 0 failing, 4 ignored** | `cargo test --workspace` |
 | Cognitive eval canonical | **65 / 65** | `cargo test -p adam-dialog --test cognitive_eval` |
-| REPL replay | **96 / 96 canonical + 0 aspirational** | `cargo test -p adam-dialog --test repl_replay` |
+| REPL replay | **97 / 97 canonical + 0 aspirational** | `cargo test -p adam-dialog --test repl_replay` |
 | World Core entries / facts / domains | **1626 / 1792 / 38** | `find data/world_core -name '*.jsonl' \| xargs cat \| jq -s 'length'` |
 | Extracted runtime facts | **16 317** | `jq '.counts.facts_total' data/retrieval/facts.json` |
 | Derived facts | **30 042** | sum of `data/retrieval/derived_facts.json` `.counts.by_rule` values |

@@ -543,6 +543,9 @@ fn intent_statement_of_name_lowercase_is_capitalised() {
 #[test]
 fn response_statement_of_name_substitutes_slot() {
     // Plain and FST-backed instrumental variants.
+    // **v4.18.5** — also includes the warm-intro variant that
+    // introduces both literal + respectful Kazakh address with
+    // an explicit cultural note.
     assert_response_with_toml(
         "менің атым Дәулет",
         &[
@@ -550,6 +553,7 @@ fn response_statement_of_name_substitutes_slot() {
             "Дәулет, танысқаныма қуаныштымын",
             "Дәулетпен танысқаныма қуаныштымын",
             "Дәулет деген атыңызды есте сақтаймын",
+            "Танысқаныма қуаныштымын, Дәулет! Сізді Дәке деп атаймын — қазақ дәстүрі бойынша",
         ],
     );
 }

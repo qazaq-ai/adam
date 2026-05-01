@@ -769,6 +769,14 @@
       ]
     },
     {
+      "id": "intro_and_capabilities_composite_v4_18_5",
+      "category": "system_self_introspection",
+      "description": "v4.18.5: composite identity + capabilities question. Pre-v4.18.5 detectors picked one aspect per turn. The 2026-05-01 live REPL turn 4 — «Өзіңіз туралы, кім екеніңіз және не істей алатыныңыз туралы аздап айтып беріңізші» — asks both who you are AND what you can do; adam answered only the first half. v4.18.5 adds SystemAspect::IntroAndCapabilities with a detector that requires identity-marker + «және» + capabilities-marker, fires BEFORE individual-aspect detectors. Routes to dedicated template family that surfaces both system_kind and system_capabilities in sequence.",
+      "turns": [
+        {"user": "Өзіңіз туралы, кім екеніңіз және не істей алатыныңыз туралы аздап айтып беріңізші", "output_contains_lower_any": ["мүмкіндіктерім", "не істей алатыным"]}
+      ]
+    },
+    {
       "id": "respectful_kazakh_address_v4_18_0",
       "category": "humanness",
       "description": "v4.18.0: respectful Kazakh address form per the user's directive. Adam is a young system; per Kazakh tradition it addresses honored speakers as «<first-consonant>әке» (Дәулет → Дәке, Марат → Мәке, Серік → Сәке). Vowel-initial names fall back to literal name. After name capture, the session stores both `name` (literal) AND `name_respect` (diminutive); ALL post-introduction templates that address the user use `{name_respect}`. The first ack family picks among literal-name AND respectful-form variants. This dialog asserts the captured-and-acknowledged invariant by accepting either form.",
