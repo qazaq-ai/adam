@@ -230,6 +230,20 @@ pub enum Intent {
         /// existing v4.11.x template selection.
         #[serde(default)]
         question_shape: Option<crate::question_shape::QuestionShape>,
+        /// **v4.23.0** — `true` iff the input is a temporal-scope
+        /// query that adam has no time-series data for: temporal
+        /// adverb (`кеше / бүгін / ертең / қазір / бұрын / былтыр /
+        /// келесі`) co-occurring with a question word or particle
+        /// asking about state-at-a-time. Routes the planner to
+        /// `unknown.temporal_no_data` for an honest "I don't track
+        /// time-bound state" answer instead of letting the topic
+        /// extractor fall through to a general fact about the
+        /// non-temporal subject (the post-v4.22.5 «Кеше ауа райы»
+        /// → «Ауа тыныс себебі болады» behaviour). Detected in
+        /// `interpret_text_with_lexicon` via
+        /// `detect_temporal_scope_question`.
+        #[serde(default)]
+        temporal_scope: bool,
     },
 }
 

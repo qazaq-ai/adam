@@ -7,6 +7,72 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.23.0] — 2026-05-01 — temporal-scope detector + drift cleanup (Codex review actionables)
+
+**First minor in the v4.23+ honest-fallback arc.** v4.22.5 closed the proverb-leak class for closed-class words but left a deeper failure exposed by the live-dialog battery and confirmed by Codex review: queries about *state at a specific point in time* («Кеше ауа райы қандай болды?», «Ертең күн қандай болады?») had no honest answer because adam doesn't track time-bound state. The post-v4.22.5 path filtered out `кеше` as a topic but fell through to a tangential general fact about the non-temporal subject (`ауа` → «Ауа тыныс себебі болады»). v4.23.0 closes this with a dedicated detector + template family. Bundled with the doc/artifact drift cleanup Codex flagged in the same review.
+
+### Innovations
+
+**(1) `Intent::Unknown.temporal_scope: bool`** — new field. Set `true` when the input contains a temporal adverb (`кеше / бүгін / ертең / қазір / бұрын / былтыр / келесі`) co-occurring with a question marker (interrogative word `қандай / не / қашан / қалай / неше / қанша / неліктен / неге` OR yes/no particle `ма / ме / ба / бе / па / пе`). Detected at the same point as `question_shape` in `interpret_text_with_lexicon` — pure surface-level scan, cheap, independent of FST analyses.
+
+**(2) `detect_temporal_scope_question` in `semantics.rs`** — implements the detection. Whole-token match on the temporal adverb (each word stripped to alphabetic + `-`); permissive question-marker matching (substring for question words, sentence-end / pre-`?` anchor for particles). Correctly excludes:
+- Statements without a question marker («Бүгін жақсы күн» — no question particle, returns false; existing acknowledgment template still fires).
+- Clock-time queries («Қазір сағат қанша?») — those route to the existing specialised clock-time handler, which fires before the `temporal_scope` short-circuit and produces «Уақытты білмеймін».
+
+**(3) `unknown.temporal_no_data` template family in `v1.toml`** — three honest-fallback variants offering "no time-series data" with an invitation to ask about the general topic instead. Slots-free; works for any temporal scope.
+
+**(4) Planner short-circuit** — `temporal_scope: true` routes to `unknown.temporal_no_data` BEFORE the v4.12.0 causal short-circuit. A temporal-causal composite («Неліктен кеше Х?») routes here on the principle that "no time data" is a stronger negative than "no causal data".
+
+**(5) Drift cleanup (Codex review actionables):**
+- `docs/foundation_scope.md` — version header `v1.0.0 → v4.4.7 delivered` → `v1.0.0 → v4.22.5 delivered`; template-families count `49 at v4.4.7` → `67 at v4.22.5` (with v4.18.0 / v4.18.5 additions called out); test-count claim `681 workspace tests` → `822 workspace tests` (with v4.19 → v4.22 capability summary); World Core line refreshed to current `1626 / 1792 / 38 domains`.
+- `crates/adam-dialog/src/tool.rs` — top-of-file docstring updated. Pre-fix said «v4.0.37 scope — substrate only» + «Conversation::turn_with_trace doesn't yet auto-dispatch». Both stale: all four tools have been live since v4.0.38+ and `turn_with_trace` does auto-dispatch. New docstring documents the substrate → fully-wired transition + subsequent v4.13 / v4.14.5 / v4.17.5 / v4.18.0 list-rank / domain-aware-tiebreaker / list-anaphor extensions.
+- `data/retrieval/facts.json` + `data/retrieval/derived_facts.json` — version field `"4.17.0"` → `"4.23.0"`. The artifacts themselves haven't changed (the rule pipeline output is byte-stable since v4.17.0 last invalidated it), but the version-skew between workspace `4.22.5` and artifact `4.17.0` was a credibility hit for a project whose thesis is version-locked traceability.
+
+### Verification
+
+| Query | Pre-v4.23.0 | Post-v4.23.0 |
+|---|---|---|
+| «Кеше ауа райы қандай болды?» | tangential «Ауа тыныс себебі болады» | **honest «уақытқа байланысты сұрақтарға деректерім жоқ…»** |
+| «Бүгін не болды?» | greedy noun-hint surfaced unrelated fact | **honest temporal-no-data** |
+| «Ертең күн қандай болады?» | greedy noun-hint surfaced unrelated fact | **honest temporal-no-data** |
+| «Былтыр Қазақстанда не болды?» | greedy noun-hint surfaced unrelated fact | **honest temporal-no-data** |
+
+**Anti-regression — all pass:**
+- «Бүгін жақсы күн» (statement, no question) → still acknowledgment «Жақсы екен» (temporal_scope returns false, existing path).
+- «Қазір сағат қанша?» (clock-time) → still «Уақытты білмеймін» (clock handler fires before temporal_scope).
+- All v4.x canonical identity / science / history queries → unchanged.
+- Workspace tests **822 → 822 passing**.
+- Parse-disambiguation eval **chain_tiebreak_root 23/23 = 100%** — unchanged.
+
+### Codex review carry-forwards (deferred)
+
+- **v4.23.5** — compositional possessive («Жасушаның ядросы не атқарады?» → decompose).
+- **v4.24.0** — `semantics.rs` decomposition (3377 lines → ~6 modules). Preventive surgery before the file becomes unmaintainable.
+- **v4.24.5** — live holdout file (100-200 unedited real queries) as a separate CI-blind eval next to the curated 23/23 regression.
+- **v4.25.0** — R5 hub-degree filter + domain-aware scoring (currently 22931/25006 = 91.7 % of derived facts come from a single rule; this is the source of tangential-answer risk).
+- **v4.25.5** — README badge automation (read counts from artifacts + test output, drop manual claims).
+
+### Pipeline impact
+
+- `crates/adam-dialog/src/intent.rs` — `Intent::Unknown` += `temporal_scope: bool` field with `#[serde(default)]`.
+- `crates/adam-dialog/src/semantics.rs` — `detect_temporal_scope_question` (~30 lines); `interpret_text_with_lexicon` populates the field; legacy parses-only path defaults to `false`.
+- `crates/adam-dialog/src/planner.rs` — temporal short-circuit before the v4.12.0 causal one.
+- `crates/adam-dialog/src/verifier.rs::strip_evidence` — preserves `temporal_scope` (analytical signal, not evidence).
+- `crates/adam-dialog/src/{action,planner,task,uncertainty,verifier}.rs` — 14 test sites updated with `temporal_scope: false`.
+- `data/dialog/templates/v1.toml` — new `unknown.temporal_no_data` family (3 variants).
+- `docs/foundation_scope.md` — version + counts refreshed.
+- `crates/adam-dialog/src/tool.rs` — top docstring rewritten.
+- `data/retrieval/facts.json`, `data/retrieval/derived_facts.json` — version field synced to 4.23.0.
+- Workspace tests **822 → 822 passing**.
+
+### Cadence
+
+Minor — single substantive new capability (temporal-scope detector + template family) bundled with multi-file drift cleanup that was actively misleading external reviewers about the project state.
+
+**Stripe (5) — humanness through real-dialog testing — continues.**
+
+Next: **v4.23.5** (compositional possessive question handler), **v4.24.0** (semantics.rs decomposition).
+
 ## [4.22.5] — 2026-05-01 — closed-class hygiene from 2026-05-01 live-dialog battery (керек / ірі / атап / temporals)
 
 **Patch in v4.22+ runtime-integration arc.** A 2026-05-01 live-dialog battery across 30+ Kazakh queries (identity / science / history / culture / arithmetic / multi-turn / unknown-handling) surfaced ~5 cases where the topic-extraction heuristic picked a closed-class word and the planner surfaced a tangential proverb keyed on it. Each one is the same misanalysis class as v4.3.5's `Онда → он` and v4.4.10's `қысқасы → қысқа`: a sentence-level discourse / predicate / temporal word being mistaken for a content noun. v4.22.5 closes all of them with NOT_A_TOPIC entries.

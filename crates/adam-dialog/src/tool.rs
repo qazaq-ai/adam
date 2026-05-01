@@ -17,19 +17,24 @@
 //! 3. New tools (calculator, calendar, external API, future learned
 //!    rerankers) plug in without touching every consumer.
 //!
-//! **v4.0.37 scope** — substrate **only**. Defines types + a pure
-//! dispatcher with **two** tools fully implemented (`SearchBelief`,
-//! `SearchGraph`); `SearchRetrieval` and `RunLocalReasoner` are
-//! reserved variants with stubs that return `success=false` so the
-//! dispatcher never panics. Conversation::turn_with_trace doesn't
-//! yet auto-dispatch — `tool_calls: Vec<ToolResult>` on `TurnTrace`
-//! stays empty unless a caller explicitly calls `Tool::dispatch`.
-//! v4.0.38 (Phase 6 part 2) will wire `ActionPlanner` so the
-//! existing `inject_*` helpers go through the tool layer.
+//! **Substrate (v4.0.37) → fully wired (v4.0.38+).** Phase 6 was
+//! split across two releases following the same pattern as Phases
+//! 1 / 2 / 5: substrate first, behavior second, each Codex-
+//! reviewable independently. As of v4.0.38+ all four tools are
+//! live and `Conversation::turn_with_trace` **does** auto-dispatch
+//! the planned tool sequence — `tool_calls: Vec<ToolResult>` on
+//! `TurnTrace` carries every executed call. `SearchBelief`,
+//! `SearchGraph`, `SearchRetrieval`, and `RunLocalReasoner` all
+//! return real results; the v4.0.37 stub paths have been removed.
 //!
-//! Splits Phase 6 across two releases following the same pattern as
-//! Phase 1 / 2 / 5: substrate first, behavior second, each
-//! Codex-reviewable independently.
+//! **Subsequent expansions:** v4.13.0 added DialogContext-aware
+//! list-class ranking inside `Tool::dispatch(SearchGraph)`;
+//! v4.14.5 added a domain-aware tiebreaker that consults
+//! `current_domain` + `DomainIndex` when both are attached;
+//! v4.17.5 reordered `list_intent_rank` before overlap so
+//! synonym-aware queries (`аймақ ↔ облыс`) match correctly;
+//! v4.18.0 added `previous_grounded_fact` to `ToolContext` for
+//! list-anaphor cross-turn tracking.
 
 use crate::belief::{BeliefState, FactStatus};
 use adam_reasoning::ontology::{

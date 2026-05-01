@@ -495,6 +495,7 @@ mod tests {
             example_adapted: false,
             reasoning_chain: chain.map(|s| s.into()),
             question_shape: None,
+            temporal_scope: false,
         }
     }
 
@@ -584,6 +585,7 @@ mod tests {
             example_adapted: false,
             reasoning_chain: None,
             question_shape: None,
+            temporal_scope: false,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RetrieveEvidence);
@@ -606,6 +608,7 @@ mod tests {
             example_adapted: false,
             reasoning_chain: Some("байланыс бойынша, жер аспан денесіне жатады.".into()),
             question_shape: None,
+            temporal_scope: false,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RunReasoner);

@@ -636,6 +636,7 @@ mod tests {
             example_adapted: false,
             reasoning_chain: Some("байланыс бойынша, абай әдебиетке жатады.".into()),
             question_shape: None,
+            temporal_scope: false,
         };
         assert_eq!(intent_key(&intent), "unknown.with_derived_chain");
     }
@@ -655,6 +656,7 @@ mod tests {
             example_adapted: false,
             reasoning_chain: Some("байланыс бойынша, абай әдебиетке жатады.".into()),
             question_shape: None,
+            temporal_scope: false,
         };
         assert_eq!(intent_key(&intent), "unknown.with_grounded_fact");
     }
@@ -760,8 +762,24 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             example_adapted,
             reasoning_chain,
             question_shape,
+            temporal_scope,
             ..
         } => {
+            // **v4.23.0** — `temporal_scope: true` short-circuits to
+            // `unknown.temporal_no_data`. Pattern: temporal adverb
+            // (кеше / бүгін / ертең / қазір / бұрын / былтыр /
+            // келесі) co-occurring with a question marker — adam
+            // has no time-series data for state-at-a-time queries.
+            // Honest fallback says so explicitly instead of letting
+            // topic extraction fall through to a tangential general
+            // fact about the non-temporal subject. Routes BEFORE
+            // the v4.12.0 causal short-circuit so a temporal-causal
+            // composite («Неліктен кеше...») still routes here, on
+            // the principle that "no time data" is a stronger
+            // negative than "no causal data".
+            if *temporal_scope {
+                return "unknown.temporal_no_data";
+            }
             // **v4.12.0** — `QuestionShape::Causal` short-circuits the
             // standard unknown routing. Pre-v4.12.0 «Неліктен жасуша
             // өледі?» surfaced a generic IsA fact about жасуша, which

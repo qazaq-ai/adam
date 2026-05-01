@@ -252,6 +252,7 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             raw_tokens,
             noun_hint,
             question_shape,
+            temporal_scope,
             ..
         } => Intent::Unknown {
             raw_tokens,
@@ -263,6 +264,12 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             // **v4.12.0** — preserve question_shape across the
             // strip; it's an analytical signal, not evidence.
             question_shape,
+            // **v4.23.0** — same: temporal_scope is an analytical
+            // signal about query structure, not evidence; preserve
+            // it through strip_evidence so the planner still routes
+            // to the temporal-no-data template family even after
+            // verifier rejects injected evidence.
+            temporal_scope,
         },
         other => other,
     }
@@ -282,6 +289,7 @@ mod tests {
             example_adapted: false,
             reasoning_chain: chain.map(|s| s.into()),
             question_shape: None,
+            temporal_scope: false,
         }
     }
 

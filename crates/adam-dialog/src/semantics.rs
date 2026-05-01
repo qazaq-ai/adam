@@ -223,6 +223,12 @@ pub fn interpret_text_with_lexicon(
     // populate `noun_hint`. Pure surface-level scan; cheap and
     // independent of the FST analyses. `None` for non-questions.
     let question_shape = crate::question_shape::detect(input);
+    // **v4.23.0** — detect temporal-scope queries (kese / büginnen
+    // / etc. + question marker). Routes to `unknown.temporal_no_data`
+    // for an honest "no time-series data" answer instead of letting
+    // the topic extractor fall through to a tangential general fact
+    // about the non-temporal subject.
+    let temporal_scope = detect_temporal_scope_question(input);
     // **v4.14.5** — sentence_decomp fallback. When greedy
     // `best_noun_hint` returns None (FST recovered nothing
     // useful), but `sentence_decomp::decompose` resolved a
@@ -267,6 +273,7 @@ pub fn interpret_text_with_lexicon(
         example_adapted: false,
         reasoning_chain: None,
         question_shape,
+        temporal_scope,
     }
 }
 
@@ -1566,6 +1573,9 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         // shape cannot be detected (the detector is surface-level).
         // Always None on this code path.
         question_shape: None,
+        // **v4.23.0** — same: temporal-scope detection is surface-
+        // level, so the parses-only legacy path can't fire it.
+        temporal_scope: false,
     }
 }
 
@@ -1750,6 +1760,88 @@ fn detect_curriculum_content_question(joined: &str) -> bool {
         || joined.contains("үйренеді")
         || joined.contains("үйрене");
     has_student && has_education_locus && has_what && has_learning_verb
+}
+
+/// **v4.23.0** — temporal-scope question detector. Returns `true`
+/// when the input contains a temporal adverb (`кеше / бүгін /
+/// ертең / қазір / бұрын / былтыр / келесі`) co-occurring with a
+/// question marker (question word `қандай / не / қашан / қалай /
+/// неше / қанша` or yes/no particle `ма/ме/ба/бе/па/пе`). The
+/// pattern flags queries about *state at a specific point in
+/// time* — e.g. «Кеше ауа райы қандай болды?» («What was the
+/// weather yesterday?») — which adam has no time-series data for.
+///
+/// Routes to `unknown.temporal_no_data` for an honest "I don't
+/// track time-bound state" answer instead of letting the topic
+/// extractor fall through to a tangential general fact about the
+/// non-temporal subject (the post-v4.22.5 behaviour where кеше
+/// was filtered out and the response collapsed to a fact about
+/// `ауа` — accurate about air in general, but missed the actual
+/// "what was yesterday's weather" question).
+///
+/// **What this does NOT catch:** temporal markers without a
+/// question (e.g. statement «Кеше ауа райы жақсы болды.» —
+/// detector returns false because no question marker is present;
+/// the existing path handles it as a statement). Also excluded:
+/// clock-time questions like «Қазір сағат қанша?» where adam
+/// could in principle integrate a clock — those would route to
+/// a different specialised handler when added.
+fn detect_temporal_scope_question(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Temporal adverb anchors. Each must appear as a whole token —
+    // we check `surrounded by spaces or string boundaries` via the
+    // simple `.contains` after padding the input. A bare substring
+    // test is acceptable here because all the listed forms are
+    // distinct enough not to appear inside content nouns (e.g.
+    // «бүгін» doesn't substring any common Kazakh content noun).
+    let has_temporal = [
+        "кеше",
+        "бүгін",
+        "ертең",
+        "қазір",
+        "бұрын",
+        "былтыр",
+        "келесі",
+    ]
+    .iter()
+    .any(|adv| {
+        lower.split_whitespace().any(|tok| {
+            // Strip trailing punctuation / case-suffix garbage.
+            let cleaned: String = tok
+                .chars()
+                .filter(|c| c.is_alphabetic() || *c == '-')
+                .collect();
+            cleaned == *adv
+        })
+    });
+    if !has_temporal {
+        return false;
+    }
+    // Question marker: question word OR question particle. Mirrors
+    // the same set the v4.12.0 question_shape detector uses.
+    let has_question_word = lower.contains("қандай")
+        || lower.contains("қашан")
+        || lower.contains("қалай")
+        || lower.contains("неше")
+        || lower.contains("қанша")
+        || lower.contains("неліктен")
+        || lower.contains("неге")
+        // «не» as a standalone question word — must be a separate
+        // token, not a fragment of a longer word.
+        || lower.split_whitespace().any(|t| t == "не" || t == "не?");
+    let has_question_particle = lower.contains(" ма?")
+        || lower.contains(" ме?")
+        || lower.contains(" ба?")
+        || lower.contains(" бе?")
+        || lower.contains(" па?")
+        || lower.contains(" пе?")
+        || lower.ends_with("ма?")
+        || lower.ends_with("ме?")
+        || lower.ends_with("ба?")
+        || lower.ends_with("бе?")
+        || lower.ends_with("па?")
+        || lower.ends_with("пе?");
+    has_question_word || has_question_particle
 }
 
 /// **v4.17.5** — willingness / readiness-to-improve detector.

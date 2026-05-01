@@ -395,6 +395,23 @@ templates = [
     "{noun} неге болатынын дәл біле бермеймін; нақты себептік дерек қорымда жоқ.",
 ]
 
+# v4.23.0 — temporal-scope query fallback. Pattern: temporal
+# adverb (кеше / бүгін / ертең / қазір / бұрын / былтыр /
+# келесі) + question marker. Adam doesn't track time-bound
+# state, so honest fallback says so instead of letting the topic
+# extractor surface a tangential general fact about the non-
+# temporal subject. Detected by `detect_temporal_scope_question`
+# in `semantics.rs`; routed by `planner.rs` BEFORE the v4.12.0
+# causal short-circuit so a temporal-causal composite still
+# routes here.
+[[families]]
+key = "unknown.temporal_no_data"
+templates = [
+    "уақытқа байланысты сұрақтарға жауап беруге деректерім жоқ — менде нақты күн бойынша өзгеретін мәліметтер сақталмайды. Жалпы тақырып туралы білетінімді сұрасаңыз, көмектесе аламын.",
+    "кешіріңіз, нақты уақыттағы (кеше / бүгін / ертең) жағдай туралы деректерім жоқ — менде уақыт өрісі бойынша өзгеретін мағлұмат жинағы жоқ. Бірақ тақырыптың өзі туралы білетінімді сұрасаңыз, айтып бере аламын.",
+    "уақыт бойынша өзгеретін деректерді сақтамаймын, сондықтан кеше / ертең / қазірдегі нақты жағдайды біле бермеймін. Жалпы ұғым туралы білгім келсе айтыңыз — соны айта аламын.",
+]
+
 # v4.6.20 — User-acknowledgement template family. Surfaced by a
 # real-REPL transcript where the user said «Мен сенің әлі
 # бәрін білмейтініңді … түсіндім» (a long, gracious admission

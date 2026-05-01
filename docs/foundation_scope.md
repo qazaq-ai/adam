@@ -4,7 +4,7 @@
 
 Deliver a **predictable, auditable Kazakh reasoning engine** built entirely in Rust and runnable on a MacBook Air M2 8 GB. Every layer's decision must be traceable. No probabilistic free generation in the recognised-intent path. **Not** an LLM clone — intentionally narrower, intentionally cheaper, intentionally provenance-first.
 
-## In scope (v1.0.0 → v4.4.7 delivered)
+## In scope (v1.0.0 → v4.22.5 delivered)
 
 ### Morphology + Lexicon
 - Pure Kazakh **Lexicon** (~25.5 k roots: 13 606 pure Kazakh + 11 919 Apertium imports; v2.2 purged intervocalic-voicing-duplicate pollutions; v3.2.0 dual-storage for deterministic iteration).
@@ -14,7 +14,7 @@ Deliver a **predictable, auditable Kazakh reasoning engine** built entirely in R
 ### Dialog layer
 - **26-intent dialog pipeline** with multi-turn session state + follow-up resolution (v1.4.0).
 - **FST-backed slot expansion** (`{slot|features}` — case × number × derivation × possessive × predicate-person).
-- Template repository as external TOML data (**49 families** at v4.4.7; v4.0.34 added Tentative / Conflicted families for epistemic banding; v4.3.4 added four `ask_about_system.*` aspect families; v4.4.0 added `dismiss_contradiction`; v4.4.5 added `check_contradiction`).
+- Template repository as external TOML data (**67 families** at v4.22.5; v4.0.34 added Tentative / Conflicted families for epistemic banding; v4.3.4 added four `ask_about_system.*` aspect families; v4.4.0 added `dismiss_contradiction`; v4.4.5 added `check_contradiction`; v4.18.0+ added respectful Kazakh address `{name_respect}`; v4.18.5 added composite-question `intro_and_capabilities`).
 - **Session-aware composition** (v1.8.0+): frame around retrieved quote personalises when session has name/city/age/occupation.
 - **Opt-in city swap** (v1.9.0+): `ComposeMode::InSampleCitySwap` rewrites city mentions via FST feature-preserving synthesis, year-guarded; adapted responses carry the «бейімд-» marker (v1.9.5).
 - **Dialog `NOT_A_TOPIC` synced with reasoning closed-class** (v3.9.5) — one source of truth for "what is a content noun" across layers.
@@ -87,7 +87,7 @@ Deliver a **predictable, auditable Kazakh reasoning engine** built entirely in R
 - **79.48 % morpheme coverage** of the committed pool (v1.5.5 audit baseline).
 
 ### Quality gates
-- **Full regression test suite — 681 workspace tests passing as of v4.4.7, 0 failing, 4 ignored**.
+- **Full regression test suite — 822 workspace tests passing as of v4.22.5, 0 failing, 4 ignored**. (v4.19.0 → v4.21.5 added the parse-disambiguation eval framework + pronoun stem-alternation paradigm + closed-class root-prior boost; v4.22.0 wired chain_tiebreak_root into the runtime; v4.22.5 added 8 NOT_A_TOPIC entries from the 2026-05-01 live-dialog battery.)
 - `scripts/validate_foundation.sh` — foundation CI (lex / FST / corpus / world_core / reasoner end-to-end).
 - `scripts/verify_release_version.sh` — manifest-consistency gate (every committed JSON pinned to current crate version).
 - `scripts/run_slow_roundtrip.sh` (v4.1.6+) — runs the four `#[ignore]`d FST synthesis-analysis roundtrip tests on demand.
@@ -135,7 +135,7 @@ Nothing else can leave the system. No free-text generator, no learned probabilit
 
 ## v4.x targets — committed
 
-- ✅ World Core to 500–1 000 entries across 10+ domains (delivered: **874 / 995 / 30 domains** at v4.4.7).
+- ✅ World Core to 500–1 000 entries across 10+ domains (delivered: **874 / 995 / 30 domains** at v4.4.7; expanded to **1626 / 1792 / 38 domains** by v4.17.5 — added physics_school / chemistry_school / biology_school / history_kazakhstan + adam_self).
 - ✅ Belief layer with `BeliefState` lifecycle + contradiction logging (v4.0.27).
 - ✅ Single-active-fact invariant (v4.0.28).
 - ✅ Action planning + verifier + epistemic-status banding (v4.0.31 → v4.0.34).
