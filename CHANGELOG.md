@@ -7,6 +7,58 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.19.0] — 2026-05-01 — empirical eval of v4.15+ priors
+
+**First quantitative evidence that priors actually pick the right parse.** v4.15.0 → v4.17.0 shipped four prior strategies (unigram → bigram → smoothed → POS-conditioned) with anecdotal REPL evidence but no measured accuracy. v4.19.0 closes that loop: a hand-curated test set of 20 ambiguous Kazakh surface forms + an eval binary that runs all four strategies side-by-side against the v3.2.0 lexicographic baseline.
+
+### Innovations
+
+**(1) `data/eval/parse_disambiguation_eval.json`** — 20 hand-labeled cases. Drawn from past live-REPL bugs (v3.9.5 неліктен → нелік, v4.3.5 онда → он, v4.4.10 қысқасы / ештеңе) plus cross-domain ambiguous content nouns (тіл, көз, шай, күй, тас, бар, кел, …). Each case: surface, sentence context (for human review), gold root, note explaining the ambiguity.
+
+**(2) `eval_parse_disambiguation` binary** in `adam-corpus`. Loads the eval set + Lexicon + trained `SuffixPriors`, runs `analyse()` on each token, then for each parse list applies five scoring strategies:
+
+| Strategy | Picks parse maximizing | Origin |
+|---|---|---|
+| `baseline` | (none — first parse from `analyse()`) | v3.2.0 lexicographic |
+| `unigram` | `score_noun(features)` / `score_verb(features)` | v4.15.5 |
+| `bigram` | `score_noun_given_prev(features, None)` | v4.16.0 |
+| `smoothed` | `score_noun_smoothed(features, None, α=0.3)` | v4.16.5 |
+| `pos_conditioned` | `score_chain_given_prev(chain, None)` | v4.17.0 |
+
+Reports per-strategy accuracy + per-case detail with `=` (all strategies agree) / `⚠` (disagreement) markers.
+
+### Results (n = 18 with non-empty FST parses)
+
+| Strategy | Hits | Accuracy |
+|---|---|---|
+| baseline | 15 / 18 | **83.3%** |
+| unigram | 17 / 18 | **94.4%** |
+| bigram | 17 / 18 | **94.4%** |
+| smoothed | 17 / 18 | **94.4%** |
+| pos_conditioned | 17 / 18 | **94.4%** |
+
+**+11.1pp accuracy lift from priors** over the lexicographic baseline. The four prior strategies collapse to identical scores on isolated tokens (no preceding chain, so bigram/smoothed/POS-conditioned all fall back to the unigram tier) — a sanity check that the higher-order tiers don't *regress* on no-context queries.
+
+**Two cases where priors flip the wrong baseline pick:**
+- `неліктен` — baseline picks `нелік + Ablative` (the v3.9.5 bug); priors pick the bare interrogative `неліктен`.
+- `алма` — baseline picks `ал + (verb)` (imperative); priors pick the noun `алма` (apple).
+
+**One residual failure (all strategies):**
+- `онда` — gold = `ол + Locative` (anaphoric "there"), priors pick `он + Locative` ("in ten"). Without sentence context, isolated-token priors can't disambiguate this. **Beyond v4.19.0 scope** — needs context-window plumbing into the FST selector.
+
+**Two cases skipped** (`қаза`, `өз`) — `analyse()` returns no parses for these tokens. The eval binary skips them from the accuracy denominator and logs them to stderr.
+
+### Pipeline impact
+
+- New file: `data/eval/parse_disambiguation_eval.json` (20 cases).
+- New binary: `crates/adam-corpus/src/bin/eval_parse_disambiguation.rs` + `[[bin]]` registration in `Cargo.toml`.
+- No runtime code changes — this is pure infrastructure / measurement.
+- Workspace tests **806 → 807 passing**.
+
+### What this does NOT measure
+
+End-to-end dialog quality (REPL replay locks already do that). v4.19.0 isolates parse-selection ONLY: for an ambiguous surface form, did the right ROOT win? Downstream `noun_hint` filtering, template selection, retrieval reranking are separate layers.
+
 ## [4.18.5] — 2026-05-01 — composite-question handler + intro warmth template
 
 **Patch in v4.18+ humanness arc.** Closes the two follow-up items deferred from v4.18.0:

@@ -42,3 +42,7 @@ path = "src/bin/process_common_voice_kk.rs"
 [[bin]]
 name = "train_suffix_priors"
 path = "src/bin/train_suffix_priors.rs"
+
+[[bin]]
+name = "eval_parse_disambiguation"
+path = "src/bin/eval_parse_disambiguation.rs"

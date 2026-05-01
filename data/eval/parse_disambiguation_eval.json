@@ -1,0 +1,146 @@
+{
+  "_comment": "v4.19.0 parse-disambiguation test set. Each case is an ambiguous Kazakh token where the FST returns 2+ parses; the gold-correct root is the one that fits the surrounding sentence context. Used by `eval_parse_disambiguation` binary to measure how often each prior strategy (lexicographic baseline / unigram / bigram / smoothed / POS-conditioned) picks the gold parse. Hand-labeled by author; bias the cases toward the actually-troublesome surface forms surfaced by past live-REPL transcripts (v3.9.5 неліктен → нелік bug, v4.3.5 онда → он, v4.3.5 жаңа, v4.4.10 қысқасы, v4.4.10 ештеңе) plus cross-domain ambiguous content nouns (тіл, көз, сай).",
+  "version": "v4.19.0",
+  "cases": [
+    {
+      "id": "tongue_as_body_part",
+      "sentence": "Тіл — адамның дене мүшесі.",
+      "token": "тіл",
+      "gold_root": "тіл",
+      "note": "Native nominative noun; body-part reading. Should be unambiguous on this token; included as anti-regression baseline."
+    },
+    {
+      "id": "tongue_as_language",
+      "sentence": "Қазақ тілі — түркі тілдер тобына жатады.",
+      "token": "тіл",
+      "gold_root": "тіл",
+      "note": "Same root as body-part case, but linguistic-domain context. Both readings collapse to the same root in the lexicon — case included to confirm priors don't fragment the parse for linguistic contexts."
+    },
+    {
+      "id": "neliktyen_must_not_be_nelik",
+      "sentence": "Неліктен жасуша өледі?",
+      "token": "неліктен",
+      "gold_root": "неліктен",
+      "note": "v3.9.5 regression: FST returns 3 parses including `нелік + Ablative` (root «нелік»). Pre-fix the lexicographic order picked нелік, dialog replied about location. Test: priors should rank the bare interrogative reading higher because `нелік + Abl` is a vanishingly rare chain."
+    },
+    {
+      "id": "onda_must_not_be_ten_locative",
+      "sentence": "Онда да менің есімде сақталған.",
+      "token": "онда",
+      "gold_root": "ол",
+      "note": "v4.3.5 regression: FST returns `он + Locative` (root «он» = ten) AND the demonstrative-locative `ол + Locative` (root «ол» = he/she/it). Lexicographic order picked он. The discourse-context here is anaphoric; `ол + Loc` is the right reading."
+    },
+    {
+      "id": "qysqasy_must_not_be_qysqa",
+      "sentence": "Қысқасы, сен білмейсің.",
+      "token": "қысқасы",
+      "gold_root": "қысқа",
+      "note": "v4.4.10 regression: FST returns `қысқа + 3sg-Possessive + Nominative` (root «қысқа» = short). The discourse-particle reading «in short» also produces this root via possessive; the ROOT is correct here (қысқа), but the question is whether the PARSE choice is the discourse-particle reading. Gold = `қысқа` (the only root) — included to verify no regression."
+    },
+    {
+      "id": "esheteñe_must_not_be_topic",
+      "sentence": "Сен ештеңе білмейсің.",
+      "token": "ештеңе",
+      "gold_root": "ештеңе",
+      "note": "v4.4.10: indefinite-quantifier pronoun `ештеңе`. FST returns it as a noun root. Multiple parses possible if FST tries derivational stems. Gold = `ештеңе`."
+    },
+    {
+      "id": "alma_as_apple",
+      "sentence": "Алма — жеміс.",
+      "token": "алма",
+      "gold_root": "алма",
+      "note": "Native noun «alma» (apple). Could conflict with imperative «алма» («don't take», from `ал` verb stem + negative). Sentence context is definitional, so noun reading wins. Tests verb/noun ambiguity."
+    },
+    {
+      "id": "bar_as_have",
+      "sentence": "Менде кітап бар.",
+      "token": "бар",
+      "gold_root": "бар",
+      "note": "Existential `бар` (= have/exist). Conflicts with verb `бар` (= go) imperative. Existential reading is the canonical noun-like form; verb interpretation produces a different chain."
+    },
+    {
+      "id": "kel_as_come",
+      "sentence": "Үйге кел.",
+      "token": "кел",
+      "gold_root": "кел",
+      "note": "Verb `кел` (come) imperative. Could conflict with noun `кел` (= raisin). Imperative + locative-goal context favours verb."
+    },
+    {
+      "id": "joq_as_negation",
+      "sentence": "Менде ешбір кітап жоқ.",
+      "token": "жоқ",
+      "gold_root": "жоқ",
+      "note": "Existential negator `жоқ`. FST may parse as noun root. Pre-v4.13.0 `жоқ` was missing from NOT_A_TOPIC; now closed-class. Gold root is `жоқ`."
+    },
+    {
+      "id": "tau_as_mountain",
+      "sentence": "Тянь-Шань — биік тау.",
+      "token": "тау",
+      "gold_root": "тау",
+      "note": "Noun «тау» (mountain). FST has homonym `тау` as verb root («tighten / contract»). Definitional sentence context favours noun."
+    },
+    {
+      "id": "qaza_as_grief",
+      "sentence": "Үлкен қаза болды.",
+      "token": "қаза",
+      "gold_root": "қаза",
+      "note": "Noun «қаза» (grief / death). Could conflict with `Қазақстан` short form (case-marked). Definitional context favours common noun."
+    },
+    {
+      "id": "öz_must_not_be_topic",
+      "sentence": "Өз елімді сүйемін.",
+      "token": "өз",
+      "gold_root": "өз",
+      "note": "Reflexive determiner `өз`. Already in NOT_A_TOPIC at v3.9.5. Verifying lexicographic + priors agree on the closed-class reading."
+    },
+    {
+      "id": "şay_as_tea_not_river",
+      "sentence": "Маған шай беріңіз.",
+      "token": "шай",
+      "gold_root": "шай",
+      "note": "Common noun «шай» (tea). FST may parse as noun or verb stem (шаю = to wash). Imperative context with «беріңіз» (give) favours object-noun reading."
+    },
+    {
+      "id": "kuy_as_state",
+      "sentence": "Көңіл-күйім жақсы.",
+      "token": "күй",
+      "gold_root": "күй",
+      "note": "Noun «күй» (state/mood). Conflicts with verb `күй` (burn). Compound «көңіл-күй» (mood) signals noun reading."
+    },
+    {
+      "id": "shöl_as_desert",
+      "sentence": "Бетпақдала — үлкен шөл.",
+      "token": "шөл",
+      "gold_root": "шөл",
+      "note": "Noun «шөл» (desert/thirst). Multiple senses but same root. Gold = `шөл`."
+    },
+    {
+      "id": "el_as_country",
+      "sentence": "Қазақстан — менің елім.",
+      "token": "ел",
+      "gold_root": "ел",
+      "note": "Noun «ел» (country/people). v4.3.2 had `интеллект → ел` substring bug; the standalone token should always parse as the bare noun."
+    },
+    {
+      "id": "kun_as_day",
+      "sentence": "Бүгін — жақсы күн.",
+      "token": "күн",
+      "gold_root": "күн",
+      "note": "Noun «күн» (day/sun). Definitional context."
+    },
+    {
+      "id": "tas_as_stone",
+      "sentence": "Жолда үлкен тас жатыр.",
+      "token": "тас",
+      "gold_root": "тас",
+      "note": "Noun «тас» (stone). Could conflict with verb `тас` (overflow). Subject of intransitive «жатыр» favours noun."
+    },
+    {
+      "id": "köp_as_quantifier",
+      "sentence": "Көп адам жиналды.",
+      "token": "көп",
+      "gold_root": "көп",
+      "note": "Quantifier «көп» (many/much). Closed-class — should never be a topic noun. Already in NOT_A_TOPIC."
+    }
+  ]
+}
