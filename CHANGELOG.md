@@ -7,6 +7,91 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.31.0] — 2026-05-02 — Morphemic-logical IR (SemFrame) substrate
+
+**First minor in v4.31+ semantic-IR arc.** The architectural step the 2026-05-02 Codex consultation correctly identified as next: convert agglutination from a tokenizer-improvement into the **internal logic of the system** by introducing a single typed semantic frame that carries a word's full morphological + logical features through the entire pipeline downstream of FST analysis.
+
+v4.31.0 ships **substrate only** — type + lossless conversion from `Analysis` + comprehensive unit tests. No consumers wired yet; that's v4.31.5 onwards. Deliberately follows the v4.0.37 → v4.0.38 "substrate first, behaviour second" pattern: ship the architectural primitive in one reviewable patch, then migrate consumers one at a time so each migration is independently testable.
+
+### Innovations
+
+**(1) New module `crates/adam-kernel-fst/src/sem_frame.rs`** (~520 lines + 8 unit tests). Defines:
+
+- `SemFrame { root, pos, case, number, possessive, predicate, derivation, tense, person, voice, polarity, polite, modality, evidence, relation }` — the unified morphemic-logical frame.
+- `PosTag` (Noun / Adjective / Pronoun / Numeral / Verb / Function) — closed-set projection of the lexicon's freeform `part_of_speech` field.
+- `Polarity` (Affirmative / Negated) — unified across nouns and verbs. Default Affirmative. For verbs auto-derived from `VerbFeatures.negation`.
+- `Modality` (Ability / Necessity / Possibility) — placeholder for v4.32+ periphrastic-construction extraction; always `None` in v4.31.0.
+- `EvidenceKind` (Direct / Hearsay / Inferred) — auto-derived from `Tense::PastEvidential` → `Hearsay`. Other tenses leave `evidence` `None` (no explicit evidential distinction).
+- `RelationKind` (IsA / LivesIn / GoesTo / Has / HasQuantity / PartOf / RelatedTo / Causes / DoesTo / InDomain / After) — placeholder for v4.32+ pattern-matcher migration; always `None` in v4.31.0.
+
+**(2) `SemFrame::from_analysis(&Analysis) -> SemFrame`** + `impl From<&Analysis> for SemFrame`. Lossless conversion: every existing `NounFeatures` / `VerbFeatures` field flows through to the corresponding `SemFrame` field. Auto-derives:
+- `polarity = Negated` when `VerbFeatures.negation == true`, else `Affirmative`.
+- `evidence = Some(Hearsay)` when `Tense::PastEvidential`, else `None`.
+
+**(3) Re-exports in `adam-kernel-fst/src/lib.rs`:** `SemFrame`, `PosTag`, `Polarity`, `Modality`, `EvidenceKind`, `RelationKind`. Single import for downstream crates.
+
+### What's lossless from Analysis
+
+Every existing morphological feature flows through:
+
+| Analysis field | SemFrame field |
+|---|---|
+| `root.root` | `root` (String) |
+| `root.part_of_speech` | `pos` (PosTag) |
+| `NounFeatures.{case,number,possessive,predicate,derivation}` | same names |
+| `VerbFeatures.{tense,person,number,voice,polite}` | same names |
+| `VerbFeatures.negation` | `polarity` (Affirmative / Negated) |
+
+### What's NEW in SemFrame
+
+- Unified `polarity` across POS classes (verbs derive it from `negation`; nouns default Affirmative pending sentence-level `X емес` detection in v4.32+).
+- `modality: Option<Modality>` — placeholder slot for v4.32+ periphrastic-construction extraction.
+- `evidence: Option<EvidenceKind>` — auto-populated from `PastEvidential` tense.
+- `relation: Option<RelationKind>` — placeholder slot for v4.32+ pattern-matcher migration.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **831 → 839 passing** (+8 new SemFrame tests) |
+| New unit tests | `noun_roundtrip_preserves_all_fields`, `verb_roundtrip_preserves_all_fields`, `verb_negation_maps_to_polarity_negated`, `past_evidential_tense_maps_to_evidence_hearsay`, `pos_projection_covers_known_classes`, `polite_verb_form_preserved`, `trait_impl_matches_inherent_method`, `from_analysis_is_deterministic` |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Ranking ladder / runtime behaviour
+
+**Zero changes.** v4.31.0 adds the type but wires zero consumers. Runtime ranking, retrieval, reasoning, dialog — all bit-for-bit identical to v4.30.5. The 1.07 ms / correct-answer KPI stays at 1.07 ms.
+
+### Determinism
+
+`SemFrame::from_analysis` is a pure function — no randomness, no side effects, allocation only for the cloned root String. The `from_analysis_is_deterministic` test asserts three calls on the same input produce bit-identical frames.
+
+### What this is NOT
+
+- Not a runtime behaviour change. v4.31.0 is substrate; consumer migration starts in v4.31.5.
+- Not a deletion of `Analysis`. SemFrame is a higher-level wrapping. FST keeps emitting `Analysis`.
+- Not a neural component. v4.31.0 stays purely deterministic. Per `project_v4_direction` and `project_humanlike_dialog_directive`: no neural runtime in v4.x.
+- Not a fix for the bigger precision risk at 10k+-fact extraction scale. Independent track.
+
+### Pipeline impact
+
+- 1 new module file (~520 lines + 8 tests) — `crates/adam-kernel-fst/src/sem_frame.rs`.
+- 1 mod registration + 6 re-exports in `crates/adam-kernel-fst/src/lib.rs`.
+- 0 consumer changes.
+- facts/derived_facts version sync to 4.31.0.
+
+Cadence: minor — first release of a new architectural primitive that will flow through every downstream consumer over the v4.31.x arc. Substrate ships clean; consumer migration each in its own release for independent reviewability.
+
+### Next
+
+**v4.31.5** — first consumer migration. Most likely candidate: extend `Conversation::turn_with_trace` so `--trace` output emits the full `SemFrame` per parsed token (zero-risk demonstration that the type flows through the pipeline cleanly). Alternative candidate: migrate one extract_facts pattern matcher (e.g. `copula_is_a`) to consume `&[SemFrame]` instead of `&[Analysis]`.
+
+**v4.32.0** — populate `modality` from periphrastic-construction matchers («-а ал-» / «-у керек» / «-у мүмкін»); populate `relation` when extract_facts patterns produce typed arcs.
+
+**v4.33.0+** — sentence-level negation detection («X емес») for noun polarity; full migration of all extract_facts patterns to SemFrame input; SemFrame as the canonical input to SearchGraph (richer than current root-only string lookup).
+
 ## [4.30.5] — 2026-05-02 — Precision sweep: DoesTo extraction disabled; +engineering thesis in README; +unified KPI
 
 **Patch in v4.30+ dialog-coherence arc.** A 2026-05-02 strategic consultation with Codex flagged three corrections to the project trajectory: (1) drop any «казахский язык как протоязык» philosophical framing in favour of an engineering claim; (2) the main precision risk is automatic fact extraction, not the curated graph; (3) latency and pass-rate should fold into one combined KPI. v4.30.5 acts on all three without changing the runtime architecture.
