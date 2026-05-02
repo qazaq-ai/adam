@@ -1,4 +1,27 @@
-# Performance — adam v4.4.7
+# Performance — adam v4.30.5
+
+## Headline KPI: cost per correct answer
+
+**`latency_ms_per_correct_answer = p50_turn_latency_ms / holdout_pass_rate`**
+
+This is the unified efficiency metric. Latency and pass-rate moving in opposite directions across a release would otherwise force eyeball judgements about whether a trade was worth it; folding them into one number makes the trade explicit.
+
+| Release | p50 turn latency (M2) | Holdout pass-rate | **ms / correct answer** |
+|---|---|---|---|
+| v4.30.5 | 1.07 ms | 831 / 831 = 100.0 % | **1.07 ms** |
+| v4.30.0 | 1.07 ms | 831 / 831 = 100.0 % | **1.07 ms** |
+| v4.29.5 | 1.07 ms | 830 / 830 = 100.0 % | **1.07 ms** |
+
+The pass-rate denominator is the **full workspace test count** (unit + integration + holdouts). When a release ships with sub-100 % holdouts (acceptable for known-issue-tracked carry-forwards), the ratio rises proportionally — so a release that adds 50 tests but drops one to failing has a measurably worse cost per correct answer even at unchanged latency. The metric punishes hidden regressions.
+
+**Energy variant** (laptop deploy claims): `µJ_per_correct_answer = p50_turn_energy_µJ / pass_rate`. Currently un-instrumented — adding `powermetrics`-based per-turn energy capture is on the v4.31+ roadmap. Until then, the ms-based metric serves as the comparable proxy (single-thread M2 power is roughly constant across turns).
+
+**What this metric is NOT for:**
+- Cross-hardware comparisons (M2 vs server vs phone) — only valid within one hardware target.
+- Single-shot regressions (one-line bug fix) — the metric is for release-to-release framing.
+- Comparisons against LLMs — LLMs don't have a holdout pass-rate in the same sense (they don't pass/fail discrete cases against a fixed set).
+
+---
 
 Measured per-turn latency, cold-start cost, and steady-state memory
 footprint for the dialog runtime, with a frank comparison against

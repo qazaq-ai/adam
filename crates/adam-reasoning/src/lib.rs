@@ -244,7 +244,22 @@ pub fn extract_facts(
     patterns::copula_causes(text, parses, lexicon, source, &mut out);
     patterns::temporal_after(text, parses, lexicon, source, &mut out);
     patterns::quantity_count(text, parses, lexicon, source, &mut out);
-    patterns::agent_verb(text, parses, lexicon, source, &mut out);
+    // **v4.30.5** — `agent_verb` (DoesTo extractor) DISABLED in the
+    // pipeline. Audit of the 196 Grammar-extracted facts at v4.30.0
+    // showed 125 / 196 = 64 % of corpus-extracted relations came from
+    // this single matcher, and qualitative review confirmed the
+    // (subject, object) pairs are surface verbal-phrase co-occurrences,
+    // not stable real-world relations: «жаңбыр does_to жер»,
+    // «ксро does_to байланыс», «рет does_to ел». The pattern
+    // `X Y-ні V-лайды` matches transitive verb constructions
+    // mechanically, but the extracted DoesTo edge has no clear
+    // semantic content — multiplication into the derivation graph
+    // would propagate noise without adding precision. Keeping the
+    // function (and its 4 unit tests) for future correctness work,
+    // just removing it from the production extraction pipeline.
+    // Re-enable when the matcher gains semantic-class filters that
+    // restrict (agent, patient) pairs to meaningful relations.
+    // patterns::agent_verb(text, parses, lexicon, source, &mut out);
     patterns::nominal_conjunction(text, parses, lexicon, source, &mut out);
     patterns::domain_membership(text, parses, lexicon, source, &mut out);
     // v3.5.5: structural partitive — first PartOf extractor. Feeds

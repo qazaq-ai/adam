@@ -7,6 +7,48 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.30.5] — 2026-05-02 — Precision sweep: DoesTo extraction disabled; +engineering thesis in README; +unified KPI
+
+**Patch in v4.30+ dialog-coherence arc.** A 2026-05-02 strategic consultation with Codex flagged three corrections to the project trajectory: (1) drop any «казахский язык как протоязык» philosophical framing in favour of an engineering claim; (2) the main precision risk is automatic fact extraction, not the curated graph; (3) latency and pass-rate should fold into one combined KPI. v4.30.5 acts on all three without changing the runtime architecture.
+
+### Innovations
+
+**(1) DoesTo extraction disabled in the production pipeline.** Audit of the v4.30.0 graph showed 196 Grammar-extracted facts, of which **125 (64 %)** came from a single matcher: `patterns::agent_verb` (pattern `X Y-ні V-лайды` → DoesTo). Qualitative review confirmed the (subject, object) pairs were surface verbal-phrase co-occurrences with no stable semantic content: «жаңбыр does_to жер», «ксро does_to байланыс», «рет does_to ел». The matcher is mechanically correct (it does match transitive constructions) but produces no useful relations — and would multiply noise into derivations as the graph grows. `lib.rs` extraction-pipeline call commented out with explanatory rationale; the function and its 4 unit tests are preserved for future correctness work (re-enable when the matcher gains semantic-class filters that restrict pairs to meaningful relations). **Result:** 196 → 71 Grammar facts (-64 %); HumanApproved share rises 90.5 % → **96.3 %** of the committed graph.
+
+**(2) Engineering thesis in README.** New "Engineering thesis" subsection in the "Why adam" block makes the project's actual claim explicit and provable: agglutinative morphology gives a clean algebra of meaning (root + typed suffixes as known grammatical operators), composition is rule-bound, and that's what we build the runtime on (FST + suffix priors + root-pair PMI as deterministic prior layers, world_core as curated typed graph, templates as the only fact-to-text path). The same engineering style would apply to other agglutinative-typology languages (Turkish, Kyrgyz, Tatar, Uzbek) without claims of universal grammar or historical primacy. Closes the framing risk Codex flagged: building roadmaps on philosophical hypotheses creates strategic fragility — building on engineering claims is robust independent of any historical thesis.
+
+**(3) Unified KPI in performance.md: `latency_ms_per_correct_answer = p50_turn_latency_ms / holdout_pass_rate`.** Folds the two axes (speed + correctness) into one comparable number. Pass-rate denominator is full workspace test count (unit + integration + holdouts), so a release that adds 50 tests but drops one to failing has a measurably worse cost per correct answer even at unchanged latency — the metric punishes hidden regressions. v4.30.5 baseline: **1.07 ms / correct answer** (1.07 ms p50 × 100.0 % pass-rate). Energy variant (`µJ_per_correct_answer`) un-instrumented; powermetrics-based per-turn energy capture is on the v4.31+ roadmap.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **831 passing** unchanged (agent_verb's own unit tests still pass since the function is preserved) |
+| facts.json | 2059 → 1934 (-125 = exact DoesTo drop) |
+| derived_facts.json | 6153 → 6151 (-2 derived; minor downstream effect — DoesTo wasn't load-bearing for any rule) |
+| HumanApproved share | 90.5 % → **96.3 %** of committed graph |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### What this is NOT
+
+- Not a fix for the bigger precision risk (auto-extraction at 10k+-fact scale). That's still a v4.31+ topic if/when we ramp up auto-ingest. v4.30.5 just trims the one matcher that was demonstrably noisy at current 196-fact volume.
+- Not a deletion of the agent_verb function — kept for future semantic-class-filtered re-enable.
+- Not the morphemic-logical IR (SemFrame) work — that's v4.31.0, the next minor.
+
+### Pipeline impact
+
+- 1 line commented in `crates/adam-reasoning/src/lib.rs` + extensive rationale comment.
+- 1 new subsection in README ("Engineering thesis").
+- 1 new headline section in `docs/performance.md` (unified KPI table + rationale).
+- facts/derived_facts regenerated.
+
+Cadence: patch — gigienic correction without architectural change.
+
+**Stripe (8) — multi-turn coherence layer continues.** Next: **v4.31.0** — morphemic-logical IR (SemFrame), the architectural step Codex correctly identified as next.
+
 ## [4.30.0] — 2026-05-02 — Coreference layer + Rust extraction patches: live REPL 2026-05-02 regressions closed
 
 **First minor in v4.30+ dialog-coherence arc.** A 2026-05-02 live REPL session surfaced three failures that no benchmark caught: (1) «Rust бағдарламалау тілі туралы не білесіз?» extracted topic «тіл» (generic head of qualifier) instead of «Rust»; (2) «Раст» (Cyrillic transliteration) had no alias coverage; (3) follow-up «Бұл тілдегі кілт сөздер?» couldn't resolve `бұл тіл` to the Rust topic established a turn earlier — system has v4.13.0 bare-pronoun anaphor handling but adnominal demonstratives (`бұл/осы/сол + generic head`) were unrecognised. v4.30.0 closes all three.
