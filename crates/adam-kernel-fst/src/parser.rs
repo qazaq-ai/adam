@@ -342,6 +342,23 @@ fn try_verb_analyses(surface: &str, entry: &RootEntry, out: &mut Vec<Analysis>) 
         Some(Tense::PastDefinite),
         Some(Tense::PastEvidential),
         Some(Tense::Present),
+        // **v4.32.5** — `ConverbImperfect` (`-{A}` "while V-ing")
+        // added to the enumeration so the parser can recover converb
+        // forms like «жаза» (converb of жаз) and «сөйлей» (converb of
+        // сөйле). Pre-v4.32.5 these forms didn't parse at all because
+        // — although `morphotactics::synthesise_verb` supports them —
+        // the parser's generate-and-test loop only enumerated 4 of
+        // the 13 defined tenses. The gap blocked `populate_ability_modality`
+        // (which needs the converb signal on the lexical predicate to
+        // disambiguate periphrastic ability «жаза алам» from a literal
+        // "X took Y" sentence). Adding ConverbImperfect alone keeps
+        // the search-space cost bounded (5 tenses instead of 4 → ~25 %
+        // more parse time per token); other missing forms (ConverbPerfect,
+        // 3 participles, FutureIntentional, FuturePossible, Conditional,
+        // Imperative) are deferred to releases that genuinely need them
+        // — adding all at once would double the search space and likely
+        // surface unrelated regression noise.
+        Some(Tense::ConverbImperfect),
     ];
     let persons = [
         None,

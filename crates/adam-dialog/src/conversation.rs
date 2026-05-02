@@ -949,10 +949,18 @@ impl Conversation {
         // SemFrame sequence and sets `modality` on the lexical
         // predicate when a modal auxiliary («керек» / «тиіс» /
         // «мүмкін») follows it. Idempotent; doesn't overwrite a
-        // non-None modality. Ability `-а ал-` is deferred to v4.32.5+
-        // because the auxiliary `ал` is also a transitive verb and
-        // naive detection would mis-mark genuine "X took Y" sentences.
+        // non-None modality.
         adam_kernel_fst::populate_periphrastic_modality(&mut sem_frames);
+        // **v4.32.5** — ability `-а ал-` detection. Dual-signal check:
+        // current frame is `ал` (Verb) AND preceding frame has
+        // `tense=ConverbImperfect`. Both signals together
+        // unambiguously identify the periphrastic ability
+        // construction, distinguishing it from a literal "X took Y"
+        // sentence where `ал` is just the lexical verb.
+        // Runs AFTER populate_periphrastic_modality; first-detection-
+        // wins, so если керек/тиіс/мүмкін уже задал modality —
+        // ability detector её не перезапишет.
+        adam_kernel_fst::populate_ability_modality(&mut sem_frames);
         let trace = TurnTrace {
             parses,
             sem_frames,

@@ -42,7 +42,7 @@ pub use phonology::{
     Archiphoneme, ConsonantClass, PhonologicalContext, VowelClass, realise_archiphoneme,
 };
 pub use sem_frame::{
-    EvidenceKind, Modality, Polarity, PosTag, RelationKind, SemFrame,
+    EvidenceKind, Modality, Polarity, PosTag, RelationKind, SemFrame, populate_ability_modality,
     populate_periphrastic_modality,
 };
 pub use suffix_priors::{

@@ -7,6 +7,119 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.32.5] — 2026-05-02 — Ability `-а ал-` detection + parser tense expansion (ConverbImperfect)
+
+**Patch in v4.32+ semantic-feature population arc.** Closes the third member of the Kazakh modality triad (after Necessity and Possibility shipped in v4.32.0). The honest scope-creep here: ability detection turned out to require a **prerequisite parser fix** — the FST's verb analyser only enumerated 4 of 13 defined tenses, leaving converb forms like «жаза» unparseable. Fixing both together in this patch is the matched architectural pair.
+
+### What was broken pre-v4.32.5
+
+Probing FST coverage:
+```
+$ adam_chat --trace --once "Жаза аламын"
+├─ sem_frames:
+│   [0] ал/Verb tense=Present person=First
+                      ↑ only ONE frame — «жаза» dropped entirely
+```
+
+`parser::try_verb_analyses` enumerated only `[None, PastDefinite, PastEvidential, Present]` for the `tenses` axis. The 9 other tenses defined in `morphotactics::Tense` (3 converbs, 3 participles, FutureIntentional, FuturePossible, Conditional, Imperative) were unreachable through the parser's generate-and-test loop. Even though `morphotactics::synthesise_verb` supports them (the comment at line 1856 explicitly says «жаз + ConverbImperfect = жаза»), the parser never tried that combination.
+
+This blocked any downstream consumer that needed converb-form information — including ability detection.
+
+### Innovations
+
+**(1) Parser tense expansion: `ConverbImperfect` added to `try_verb_analyses` enumeration.** Cost: ~25 % more parse time per verb token (5 tenses instead of 4). Conservative scope — only the one tense ability detection needs. Other 8 missing tenses (ConverbPerfect, 3 participles, FutureIntentional, FuturePossible, Conditional, Imperative) deferred to releases that genuinely need them; adding all at once would double the search space and likely surface unrelated regression noise.
+
+Post-fix probe:
+```
+$ adam_chat --trace --once "Жаза аламын"
+├─ sem_frames:
+│   [0] жаз/Verb tense=ConverbImperfect mod=Ability
+│   [1] ал/Verb tense=Present person=First
+```
+
+Both frames now present, and ability detector fires.
+
+**(2) `populate_ability_modality(&mut [SemFrame])`** in `crates/adam-kernel-fst/src/sem_frame.rs`. **Dual-signal check:**
+- Signal (a): current frame's `root == "ал"` AND `pos == Verb`
+- Signal (b): preceding frame's `tense == Some(ConverbImperfect)`
+
+Both required. This is what distinguishes periphrastic ability from a literal "X took Y" sentence where `ал` is just the regular transitive verb. With only signal (a), «Кітапты алдым» ("I took the book") would mis-mark as ability-modal; the converb-form requirement (b) eliminates this false positive.
+
+**(3) Wired into `Conversation::turn_with_trace`** AFTER `populate_periphrastic_modality`:
+```rust
+populate_periphrastic_modality(&mut sem_frames);
+populate_ability_modality(&mut sem_frames);
+```
+First-detection-wins, so when both detectors might match (rare edge case with stacked modals), the periphrastic detector's match takes precedence.
+
+### Live verification (4 cases probed in `--trace`)
+
+| Query | Frame 0 | Frame 1 | ✓ |
+|---|---|---|---|
+| Жаза аламын | `жаз/Verb tense=ConverbImperfect **mod=Ability**` | `ал/Verb tense=Present person=First` | ✓ |
+| Сөйлей аласыз ба? | `сөйле/Verb tense=ConverbImperfect **mod=Ability**` | `ал/Verb tense=Present person=Second polite` | ✓ |
+| Жаза алмаймын | `жаз/Verb tense=ConverbImperfect **mod=Ability**` | `ал/Verb tense=Present person=First **polarity=Negated**` | ✓ |
+| **Кітапты алдым** | `кітап/Noun case=Accusative number=Singular` | `ал/Verb tense=PastDefinite person=First` | ✓ no false positive |
+
+### Real-world battery (v4.32.5)
+
+22 queries (extends v4.32.0's 20 with 2 ability cases):
+
+| Aggregate | v4.32.5 | Δ vs v4.32.0 |
+|---|---|---|
+| Mean latency | **325.4 ms** | +1.9 ms (parser cost: +1 tense in enum loop) |
+| Mean max RSS | **176.2 MB** | +0.3 MB (noise) |
+| Coherent responses | **21 / 22 = 95.5 %** | one honest fallback |
+| Modal-detection rate | **4 / 4 = 100 %** | new (necessity + possibility + ability ×2) |
+
+The +1.9 ms latency increase is within noise but tracks the parser tense expansion. Full battery details:
+
+| # | Category | Query | Latency | Max RSS | ✓ |
+|---|---|---|---|---|---|
+| 19 | modal_necessity | Кітап оқу керек. | 320 ms | 176.4 MB | ✓ trace mod=Necessity |
+| 20 | modal_possibility | Бұл болу мүмкін бе? | 330 ms | 177.1 MB | ✓ trace mod=Possibility |
+| 21 | modal_ability | Жаза аламын | 320 ms | 177.0 MB | ⚠ trace mod=Ability ✓; response "Түсінбедім" — no template for declarative "user can do X" |
+| 22 | modal_ability | Сөйлей аласыз ба? | 320 ms | 176.2 MB | ✓ trace mod=Ability + intent=AskAboutSystem GenericCapability + honest "Жоқ, ондай әрекетті өзім орындай алмаймын" |
+
+Cases 1-18 unchanged from v4.32.0. Case 21's "Түсінбедім" is the one non-coherent case — honest fallback (system has no template for "user declares they can do X" — that's a v4.x intent gap, not a regression). Case 22 is interesting: ability modality detected on `сөйле`, AND the question form correctly routed to `AskAboutSystem(GenericCapability)`, AND the response honestly refuses the capability — three layers working together.
+
+### Honest framing
+
+`Modality::Ability` is now populated but, like Necessity and Possibility, **not consumed** by the response generator. Case 22's smart answer comes from the AskAboutSystem intent path, not from the modality field. Template branching on Modality (e.g. `unknown.modal_ability` family responding "иә, X-ті V-у мүмкіндігім бар") is v4.33+ work.
+
+The Kazakh modality triad (Necessity / Possibility / Ability) is now **fully populated in SemFrame** as auto-derivations on the lexical predicate. Any v4.33+ consumer (template branching, fact-extractor migration, response planner) can read these fields without re-deriving them.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **847 → 854 passing** (+7 ability tests) |
+| New ability tests | `ability_modality_detects_canonical_periphrastic_able`, `…_fires_when_auxiliary_negated`, `…_no_false_positive_on_literal_take`, `…_no_false_positive_on_finite_chain`, `…_single_frame_noop`, `…_preserves_preset_modality`, `…_is_idempotent` |
+| Real-world 22-query battery | **21/22 = 95.5 % coherent** (1 honest "Түсінбедім" on declarative ability, not a regression) |
+| Modal-detection rate | **4 / 4 = 100 %** in `--trace` |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Pipeline impact
+
+- 1 line added to `parser::try_verb_analyses` `tenses` array (`ConverbImperfect`)
+- 1 new function `populate_ability_modality` in sem_frame.rs (~30 lines)
+- 1 re-export in lib.rs
+- 1 line wiring in `Conversation::turn_with_trace`
+- 7 new unit tests (all passing)
+- Real-world battery extended 20 → 22 queries
+- facts/derived_facts version sync to 4.32.5
+
+Cadence: patch — small parser fix + small detector function. The parser tense expansion is the deepest change but bounded to one new enumeration value.
+
+### Carry-forwards
+
+- **v4.33.0** — sentence-level negation «X емес» on prior noun frame; **template branching on Modality** (response generator finally consumes the populated modality fields); SemFrame as canonical SearchGraph query input.
+- **v4.34.0** — first behavioural migration of one extract_facts pattern matcher (e.g. `copula_is_a`) to consume `&[SemFrame]` instead of `&[Analysis]` — the originally-planned v4.32.5 scope, deferred because parser+ability work was the genuinely-blocking architectural prerequisite.
+- **v4.35+** — remaining 8 missing tenses in parser enumeration (ConverbPerfect, 3 participles, FutureIntentional, FuturePossible, Conditional, Imperative) — added one at a time as downstream needs surface.
+
 ## [4.32.0] — 2026-05-02 — Modality population from periphrastic auxiliaries (керек / тиіс / мүмкін)
 
 **First minor in v4.32+ semantic-feature population arc.** Second SemFrame consumer migration (after v4.31.5's TurnTrace integration). Where v4.31.0 introduced the `Modality` enum as a placeholder slot, v4.32.0 starts populating it — auto-detecting periphrastic-modality constructions in the SemFrame stream and marking the lexical predicate with the corresponding modal.

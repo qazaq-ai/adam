@@ -363,6 +363,73 @@ impl From<&Analysis> for SemFrame {
     }
 }
 
+/// **v4.32.5** — ability `-а ал-` detection.
+///
+/// Kazakh expresses ability/possibility periphrastically: a lexical
+/// verb in **converb-imperfect** form (`-а / -е / -й` ending,
+/// `Tense::ConverbImperfect` in the FST analysis) followed by the
+/// auxiliary `ал` ("can / be able to") in some person/tense:
+///
+/// ```text
+///   жаза алам         — "I can write"
+///   жаза аламын       — "I can write" (longer 1sg form)
+///   жаза алмаймын     — "I cannot write" (negated auxiliary)
+///   оқи аласыз ба?    — "Can you read?"
+///   сөйлей алады      — "(s)he can speak"
+/// ```
+///
+/// **Why a dual-signal check.** The auxiliary `ал` is also a real
+/// transitive verb meaning "to take/get". Naive surface detection
+/// — "if `ал` follows another word, mark Ability" — would mis-mark
+/// genuine sentences like «Кітапты алдым» ("I took the book") as
+/// ability-modal. We require BOTH:
+///   (a) the auxiliary's root is `ал` AND its POS is Verb, AND
+///   (b) the immediately-preceding frame is a verb in
+///       `ConverbImperfect` tense (the `-а / -е / -й` form).
+/// Both signals together unambiguously identify the periphrastic
+/// ability construction.
+///
+/// **Pre-v4.32.5 the dual-signal check was impossible.** The FST
+/// parser's `tenses` enumeration didn't include `ConverbImperfect`
+/// (only None / PastDefinite / PastEvidential / Present), so converb
+/// forms like «жаза» didn't parse at all. v4.32.5 extends the
+/// parser enumeration AND ships this detector together — the
+/// matched architectural pair.
+///
+/// **Polarity note.** When the auxiliary is negated («алмаймын» —
+/// "cannot"), the COMBINED meaning is "cannot V". In the SemFrame
+/// stream this is recorded as:
+///   - lexical predicate: modality=Ability, polarity=Affirmative
+///   - auxiliary `ал`:    polarity=Negated (own negation flag)
+/// Sentence-level negation aggregation across modal constructions
+/// (collapsing the auxiliary's polarity onto the lexical predicate's
+/// effective meaning) is v4.33+ work.
+///
+/// **First-detection-wins.** Doesn't overwrite modality already set
+/// by `populate_periphrastic_modality` (which runs first in the
+/// pipeline). Keeps the two detectors independent and safely
+/// composable.
+pub fn populate_ability_modality(frames: &mut [SemFrame]) {
+    if frames.len() < 2 {
+        return;
+    }
+    for i in 1..frames.len() {
+        // Signal (a): current frame is the `ал` auxiliary as Verb.
+        if frames[i].root != "ал" || frames[i].pos != PosTag::Verb {
+            continue;
+        }
+        // Signal (b): preceding frame is a verb in ConverbImperfect tense.
+        if frames[i - 1].tense != Some(Tense::ConverbImperfect) {
+            continue;
+        }
+        // Both signals fired — this is the periphrastic ability
+        // construction. Mark the lexical predicate (frame i-1).
+        if frames[i - 1].modality.is_none() {
+            frames[i - 1].modality = Some(Modality::Ability);
+        }
+    }
+}
+
 /// **v4.32.0** — periphrastic-modality detection.
 ///
 /// Kazakh expresses modality NOT as a single inflectional suffix on
@@ -773,5 +840,161 @@ mod tests {
         populate_periphrastic_modality(&mut frames);
         // First detection wins — Ability not overwritten by Necessity.
         assert_eq!(frames[0].modality, Some(Modality::Ability));
+    }
+
+    /// **v4.32.5** — helper to build an ability-detection test:
+    /// lexical verb in ConverbImperfect tense + auxiliary `ал` as Verb.
+    fn converb_verb_frame(root: &str) -> SemFrame {
+        SemFrame::from_analysis(&Analysis::Verb {
+            root: verb_root(root),
+            features: VerbFeatures {
+                voice: None,
+                negation: false,
+                tense: Some(Tense::ConverbImperfect),
+                person: None,
+                number: None,
+                polite: false,
+            },
+        })
+    }
+
+    fn finite_al_frame() -> SemFrame {
+        SemFrame::from_analysis(&Analysis::Verb {
+            root: verb_root("ал"),
+            features: VerbFeatures {
+                voice: None,
+                negation: false,
+                tense: Some(Tense::Present),
+                person: Some(Person::First),
+                number: Some(Number::Singular),
+                polite: false,
+            },
+        })
+    }
+
+    /// **v4.32.5** — canonical ability case: «жаза алам».
+    /// Lexical verb in ConverbImperfect + auxiliary `ал` (Verb) →
+    /// Modality::Ability on the lexical verb's frame.
+    #[test]
+    fn ability_modality_detects_canonical_periphrastic_able() {
+        let mut frames = vec![converb_verb_frame("жаз"), finite_al_frame()];
+        populate_ability_modality(&mut frames);
+        assert_eq!(frames[0].modality, Some(Modality::Ability));
+        // Auxiliary itself untouched.
+        assert_eq!(frames[1].modality, None);
+    }
+
+    /// Negated auxiliary («алмаймын» — "cannot") is still ability.
+    /// Polarity is recorded on the auxiliary's own frame (not on the
+    /// lexical predicate); sentence-level polarity aggregation is
+    /// v4.33+ work.
+    #[test]
+    fn ability_modality_fires_when_auxiliary_negated() {
+        let mut frames = vec![
+            converb_verb_frame("жаз"),
+            SemFrame::from_analysis(&Analysis::Verb {
+                root: verb_root("ал"),
+                features: VerbFeatures {
+                    voice: None,
+                    negation: true,
+                    tense: Some(Tense::Present),
+                    person: Some(Person::First),
+                    number: Some(Number::Singular),
+                    polite: false,
+                },
+            }),
+        ];
+        populate_ability_modality(&mut frames);
+        assert_eq!(frames[0].modality, Some(Modality::Ability));
+        // Auxiliary's own polarity reflects the negation.
+        assert_eq!(frames[1].polarity, Polarity::Negated);
+    }
+
+    /// **No false positive on literal "X took Y".** When the
+    /// preceding frame is a noun (not a converb-imperfect verb),
+    /// `ал` is just the regular transitive verb meaning "take/get"
+    /// and ability detection must NOT fire.
+    #[test]
+    fn ability_modality_no_false_positive_on_literal_take() {
+        // «Кітапты алдым» — "I took the book". Frame 0 is the noun
+        // кітап (in accusative), frame 1 would be «ал» as a regular
+        // verb. No converb signal — detection must skip.
+        let mut frames = vec![
+            SemFrame::from_analysis(&Analysis::Noun {
+                root: noun_root("кітап"),
+                features: NounFeatures {
+                    derivation: None,
+                    number: None,
+                    possessive: None,
+                    case: Some(Case::Accusative),
+                    predicate: None,
+                },
+            }),
+            finite_al_frame(),
+        ];
+        populate_ability_modality(&mut frames);
+        // Noun frames have no `tense` — and the contract says a verb
+        // in ConverbImperfect must precede `ал`. So no Ability set.
+        assert_eq!(frames[0].modality, None);
+        assert_eq!(frames[1].modality, None);
+    }
+
+    /// **No false positive when preceding verb is finite.** «Келдім
+    /// алдым» (hypothetical sequence) — frame 0 is `кел` in
+    /// PastDefinite, frame 1 is `ал` finite. Not a converb chain.
+    #[test]
+    fn ability_modality_no_false_positive_on_finite_chain() {
+        let mut frames = vec![
+            SemFrame::from_analysis(&Analysis::Verb {
+                root: verb_root("кел"),
+                features: VerbFeatures {
+                    voice: None,
+                    negation: false,
+                    tense: Some(Tense::PastDefinite),
+                    person: Some(Person::First),
+                    number: Some(Number::Singular),
+                    polite: false,
+                },
+            }),
+            finite_al_frame(),
+        ];
+        populate_ability_modality(&mut frames);
+        assert_eq!(frames[0].modality, None);
+        assert_eq!(frames[1].modality, None);
+    }
+
+    /// Single-frame input is a degenerate case (no preceding
+    /// predicate to attach Ability to). Function must early-exit
+    /// without panicking.
+    #[test]
+    fn ability_modality_single_frame_noop() {
+        let mut frames = vec![finite_al_frame()];
+        populate_ability_modality(&mut frames);
+        assert_eq!(frames[0].modality, None);
+    }
+
+    /// First-detection-wins: when periphrastic detector has already
+    /// set Necessity (e.g. ability auxiliary is itself part of a
+    /// nested «жаза ала керек» — hypothetical edge case), the
+    /// pre-existing modality is preserved.
+    #[test]
+    fn ability_modality_preserves_preset_modality() {
+        let mut frames = vec![converb_verb_frame("жаз"), finite_al_frame()];
+        // Simulate periphrastic detector having marked Necessity first.
+        frames[0].modality = Some(Modality::Necessity);
+        populate_ability_modality(&mut frames);
+        // First detection wins — Necessity not overwritten by Ability.
+        assert_eq!(frames[0].modality, Some(Modality::Necessity));
+    }
+
+    /// Idempotence: running the ability detector twice produces the
+    /// same result.
+    #[test]
+    fn ability_modality_is_idempotent() {
+        let mut frames = vec![converb_verb_frame("жаз"), finite_al_frame()];
+        populate_ability_modality(&mut frames);
+        let after_first = frames.clone();
+        populate_ability_modality(&mut frames);
+        assert_eq!(frames, after_first);
     }
 }
