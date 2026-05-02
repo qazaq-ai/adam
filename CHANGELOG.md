@@ -7,6 +7,83 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.26.5] — 2026-05-02 — Rust tutor v2: language-qualifier defer + 7 keyword aliases + verb-stem hygiene; comprehensive 40-question battery 40/40 = 100 %
+
+**Patch in v4.26+ Rust tutor arc.** v4.26.0 brought the Rust holdout to 30/30 = 100 % on the curated set. A live REPL session immediately surfaced a deeper class of failures: queries that begin with a language-qualifier prefix («Rust тілінде / Rust-та / Rust бағдарламасында»). On those, the v4.11.5 `latin_subject_hint` (which runs early in `best_noun_hint`) hijacked topic extraction to «Rust» itself, so the user got a generic Rust intro instead of a fact about the actual concept they asked about.
+
+A 40-question comprehensive battery covering all 20 Rust Book chapters scored **32/40 = 80 %** on the v4.26.0 build. v4.26.5 closes 8 specific gaps and reaches **40/40 = 100 %**.
+
+### Innovations
+
+**(1) `has_language_qualifier_prefix` defer in `latin_subject_hint`.** When the Latin subject is at sentence start followed by a Kazakh language-qualifier pattern (`<LATIN> тілінде / тіліндегі / тілдерінде / тілінен / бағдарламасында / бағдарламасынан / кодында`), or by a dash-attached case suffix (`-та / -те / -тың / -тің / -тан / -тен`), the function returns `None` instead of returning the Latin word as topic. Downstream extractors (`multiword_entity_hint` / `topic_marker_hint` / `first_noun_root`) then see the original input unchanged and pick the actual Kazakh content noun later in the sentence.
+
+Example: «Rust тілінде айнымалы дегеніміз не?»
+- Pre-v4.26.5: latin_subject_hint returns «rust» → grounded fact about Rust language (wrong topic).
+- Post-v4.26.5: latin_subject_hint defers (qualifier detected) → topic_marker_hint extracts «айнымалы» (preceded by «дегеніміз») → grounded fact rust_021 about variables.
+
+**(2) `topic_marker_hint` MARKERS extended.** Pre-fix the marker list was `["туралы", "жайында", "жөнінде", "хақында"]`. Added: `"жайлы"`, `"дегеніміз"`, `"деген"`. Now «X дегеніміз не?» / «X деген не?» («what is X?» — the most natural Kazakh definitional pattern) extracts X as topic, regardless of whether X is FST-recognized.
+
+**(3) Verb-stem leaks in `NOT_A_TOPIC`** — added 5 passive-form verb stems surfaced by the battery: `анықтала / жазыла / құрыла / қолданыла / қолдан`. Pattern: «X қалай <passive verb>?» (e.g. «fn қалай анықталады?»). When Latin extraction of `fn` fails, the FST falls through to «анықтала» (passive of «анықтау» = "to define"). Same converb-leaks-as-noun class as v4.17.5 `тәрбиеле / баптал` and v4.22.5 `атап`.
+
+**(4) `LATIN_TECH_SUBJECTS += 6 keywords**: `let / mut / fn / references / thread / macro`. The v4.26.0 list covered concepts (ownership / trait / closure) but missed bare-keyword queries («let деген не?», «mut деген не?»). `references` is the plural form of `reference` (already present); kept both for case-form tolerance. `hello` deliberately NOT added — `Hello World` is registered as a multiword instead so the more-specific compound wins.
+
+**(5) `programming_rust.jsonl` 150 → 160 entries** (rust_151…rust_160):
+- `rust_151` — `қарыз алу` Kazakh form variant (without dative -ға) of canonical `қарызға алу` (rust_012)
+- `rust_152` — `жад тазарту` (memory cleanup via Drop trait + scope-based RAII)
+- `rust_153` — `let` keyword
+- `rust_154` — `mut` modifier
+- `rust_155` — `fn` keyword (function declaration)
+- `rust_156` — `references` (plural alias)
+- `rust_157` — `thread` (parallel execution unit)
+- `rust_158` — `macro` (declarative + procedural)
+- `rust_159` — `Hello World` (the canonical first program)
+- `rust_160` — `тест` (unit + integration tests)
+
+**(6) `MULTIWORD_ENTITIES` += 11**: `қарыз алу`, `жад тазарту`, `hello world` plus 8 compound `object` fields from new entries (e.g. `автоматты тексеру функциясы`, `айнымалы жариялау кілт сөзі`, `параллель орындалу бірлігі`).
+
+**(7) Rust holdout extended +11 cases** (rust_concepts_holdout_2026_05_02.json now 41 cases). New categories: `rust_lang_prefix` (4 cases verifying language-qualifier defer), `rust_keyword` (5 cases for let/mut/fn/thread/macro), `rust_basics` (Hello World + tests).
+
+### Comprehensive 40-question battery results
+
+20 Rust Book chapters covered, varied phrasings (with/without «Rust» prefix, with/without «тілінде» qualifier, asking-by-concept, asking-by-keyword):
+
+| Phase | Pass | Total | % |
+|---|---|---|---|
+| Pre-v4.26.5 | 32 | 40 | 80 % |
+| Post-v4.26.5 | **40** | **40** | **100 %** |
+
+Failures fixed: `Hello World` / `let` / `mut` / `fn` / `references` / `thread` / `macro` / тест — all returning «Бәлкім, X туралы айтасыз ба» (recognized topic, no world_core entry) or hitting verb-stem leaks pre-fix; all returning grounded facts post-fix.
+
+### Holdout impact
+
+- **Rust holdout: 41 / 41 = 100 %** (was 30/30; +11 new cases all pass).
+  - rust_concept 19/19, rust_concurrency 3/3, rust_error_handling 2/2, rust_smart_pointer 6/6, **rust_lang_prefix 4/4 (new)**, **rust_keyword 5/5 (new)**, **rust_basics 2/2 (new)**.
+- **Live holdout: 32 / 32 = 100 %** (one test note tightened: «Quantum entanglement дегеніміз не?» now extracts «entanglement» as topic via the new `дегеніміз` marker, surfacing «Бәлкім, Entanglement туралы айтасыз ба» — more informative than a blanket «Түсінбедім»; both responses are honest no-data fallbacks; the test was updated to accept either).
+- **Parse-disambig** still **23/23 = 100 %**.
+
+### Known v4.27.0+ carry-forwards
+
+- **Surface-form mismatch in compound multiword scanner.** Query «Rust бағдарламасында пайдаланылған жад қалай тазартылады?» — multiword `жад тазарту` doesn't appear verbatim in the input («жад қалай тазартылады»), so the substring scanner misses. Even with the language-qualifier defer, FST then parses «бағдарламасында» → «бағдарлама» wins as topic. Needs deeper Kazakh-form-variant matching at the multiword level (e.g. морфологически-устойчивый scan that matches «жад тазарту» surface against «жад ... тазарту/тазарт-ы-ла-ды» variants). The `rust_lang_qualifier_memory` holdout case verifies the underlying rust_152 entry IS reachable via «Жад тазарту туралы айт» phrasing.
+- **Latin multi-word extraction** (`pattern matching / type inference / static dispatch`). Currently caught only when explicitly registered in `MULTIWORD_ENTITIES`. Generic Latin multi-word scanner deferred.
+- **Native-speaker review** of all 50 auto-curated entries (rust_111…rust_160). Audit trail honest about it (`reviewer: "claude"`).
+
+### Pipeline impact
+
+- `crates/adam-dialog/src/topic_extraction.rs` — `latin_subject_hint` defer + `has_language_qualifier_prefix` helper; `topic_marker_hint` MARKERS extended (4 → 7); `LATIN_TECH_SUBJECTS` 75 → 81; `MULTIWORD_ENTITIES` +11; `NOT_A_TOPIC` += 5 verb-stem leaks.
+- `data/world_core/programming_rust.jsonl` — 150 → 160 entries.
+- `data/eval/rust_concepts_holdout_2026_05_02.json` — 30 → 41 cases.
+- `data/eval/live_holdout_2026_05_01.json` — `honest_unknown_quantum` test note updated.
+- `data/retrieval/facts.json` + `derived_facts.json` — regenerated at version `"4.26.5"`.
+- Workspace tests **824 → 824 passing** (rust_holdout case count grew internally; no test count change).
+
+### Cadence
+
+Patch — same mechanism as v4.26.0 (data-side expansion + topic-extraction tuning), iterating on real-session failure modes rather than introducing new architecture.
+
+**Stripe (6) — vertical knowledge domains — Rust track continues.**
+
+Next: **v4.27.0** (Kazakh form-variant matching for compound multiword scanner — needed to close the «жад тазарту» / «бағдарламасында» surface gap), or **v4.27.5+** (native-speaker review pass on rust_111…rust_160).
+
 ## [4.26.0] — 2026-05-02 — Rust tutor v1: 40 alias entries + Latin extension + Rust holdout 30/30 = 100 %
 
 **First minor in v4.26+ Rust tutor arc.** A 6-question live battery on the existing Rust knowledge base scored **2/6 = 33 %** — most failures from one structural cause: queries used Latin Rust concepts (`ownership / borrow / trait / match`), but neither `LATIN_TECH_SUBJECTS` nor `programming_rust.jsonl` had Latin-form coverage. Concepts existed only in Kazakh form (иелік / трейт / қарызға алу / match өрнегі) — usable when the user happened to ask in Kazakh, invisible when the user asked in Latin.

@@ -218,6 +218,86 @@
       "query": "unsafe не үшін керек?",
       "any_substring": ["unsafe", "қауіпсіздік", "блок"],
       "note": "v4.26.0 alias rust_149."
+    },
+
+    {
+      "id": "rust_lang_qualifier_aynymaly",
+      "category": "rust_lang_prefix",
+      "query": "Rust тілінде айнымалы дегеніміз не?",
+      "any_substring": ["айнымалы", "let", "атаулы мән"],
+      "note": "v4.26.5 — language-qualifier prefix strip. Pre-fix latin_subject_hint hijacked to «Rust»; post-fix айнымалы wins via topic_marker_hint (extended with «дегеніміз»)."
+    },
+    {
+      "id": "rust_lang_qualifier_turaqty",
+      "category": "rust_lang_prefix",
+      "query": "Rust тілінде тұрақты дегеніміз не?",
+      "any_substring": ["тұрақты", "const", "өзгермейтін"],
+      "note": "v4.26.5 — same prefix-strip pattern."
+    },
+    {
+      "id": "rust_lang_qualifier_borrow",
+      "category": "rust_lang_prefix",
+      "query": "Rust-та қарыз алу қалай түсініледі?",
+      "any_substring": ["қарыз алу", "сілтеме", "көшірмей"],
+      "note": "v4.26.5 — `Rust-та` dash form prefix-strip; «қарыз алу» registered as MULTIWORD_ENTITY + alias rust_151."
+    },
+    {
+      "id": "rust_lang_qualifier_memory",
+      "category": "rust_lang_prefix",
+      "query": "Жад тазарту туралы айт",
+      "any_substring": ["жад тазарту", "drop", "иеліктің скоптан"],
+      "note": "v4.26.5 — `жад тазарту` registered as MULTIWORD_ENTITY + alias rust_152. Note: the original phrasing «Rust бағдарламасында пайдаланылған жад қалай тазартылады?» surfaces «бағдарлама» as topic via FST parse of «бағдарламасында» — that's a deeper Kazakh-form-variant gap deferred to v4.27+. The `туралы айт` form here verifies the underlying entry is reachable."
+    },
+
+    {
+      "id": "rust_keyword_let",
+      "category": "rust_keyword",
+      "query": "let деген не Rust-та?",
+      "any_substring": ["let", "айнымалы жариялау", "кілт сөз"],
+      "note": "v4.26.5 — Latin keyword `let` added to LATIN_TECH_SUBJECTS + alias rust_153."
+    },
+    {
+      "id": "rust_keyword_mut",
+      "category": "rust_keyword",
+      "query": "mut деген не?",
+      "any_substring": ["mut", "өзгермелі", "модификатор"],
+      "note": "v4.26.5 — `mut` alias rust_154."
+    },
+    {
+      "id": "rust_keyword_fn",
+      "category": "rust_keyword",
+      "query": "fn қалай анықталады?",
+      "any_substring": ["fn", "функция", "main"],
+      "note": "v4.26.5 — `fn` alias rust_155 + verb-stem leak `анықтала` filtered."
+    },
+    {
+      "id": "rust_keyword_thread",
+      "category": "rust_keyword",
+      "query": "thread қалай құрылады?",
+      "any_substring": ["thread", "ағын", "spawn"],
+      "note": "v4.26.5 — `thread` alias rust_157 + verb-stem leak `құрыла` filtered."
+    },
+    {
+      "id": "rust_keyword_macro",
+      "category": "rust_keyword",
+      "query": "macro қалай анықталады?",
+      "any_substring": ["macro", "макрос", "println"],
+      "note": "v4.26.5 — `macro` alias rust_158."
+    },
+
+    {
+      "id": "rust_hello_world",
+      "category": "rust_basics",
+      "query": "Hello World қалай жазылады?",
+      "any_substring": ["hello world", "fn main", "println"],
+      "note": "v4.26.5 — `Hello World` registered as MULTIWORD_ENTITY + alias rust_159; verb-stem leak `жазыла` filtered."
+    },
+    {
+      "id": "rust_test_writing",
+      "category": "rust_basics",
+      "query": "тест қалай жазылады Rust-та?",
+      "any_substring": ["тест", "#[test]", "cargo test"],
+      "note": "v4.26.5 — `тест` alias rust_160."
     }
   ]
 }

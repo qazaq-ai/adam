@@ -1,5 +1,5 @@
 {
-  "version": "4.26.0",
+  "version": "4.26.5",
   "status": "completed",
   "elapsed_s": 53,
   "packs_completed": 9,
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 195,
-    "facts_total": 2028,
+    "facts_total": 2038,
     "by_predicate": {
       "after": 7,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 59,
       "has_quantity": 29,
       "in_domain": 24,
-      "is_a": 1442,
+      "is_a": 1452,
       "lives_in": 8,
       "part_of": 228,
       "related_to": 64
@@ -72,7 +72,7 @@
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/professions.jsonl": 40,
-      "world_core/programming_rust.jsonl": 150,
+      "world_core/programming_rust.jsonl": 160,
       "world_core/proverbs.jsonl": 43,
       "world_core/society.jsonl": 44,
       "world_core/sports.jsonl": 18,
@@ -36042,6 +36042,206 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "`Cargo.toml` — `Rust` жобасының манифест файлы: жоба атауын, нұсқасын, тәуелділіктерін, түзеткіш профильдерін және басқа метадеректерді сақтайды."
+    },
+    {
+      "subject": {
+        "surface": "қарыз алу",
+        "root": "қарыз алу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сілтеме беру операциясы",
+        "root": "сілтеме беру операциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_151"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`қарыз алу` — `Rust`-та мәнді көшірмей сілтеме арқылы пайдалануға беру: `&value` оқу үшін, `&mut value` өзгерту үшін. Иеленушіні ауыстырмай, тек уақытша қол жеткізу."
+    },
+    {
+      "subject": {
+        "surface": "жад тазарту",
+        "root": "жад тазарту",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "иелік әрекеті",
+        "root": "иелік әрекеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_152"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rust`-та жад тазарту иеліктің скоптан шығуы кезінде автоматты түрде орындалады: `Drop` трейті іске қосылып, мән жадтан босатылады. Бұл үшін `garbage collector` те, қолмен `free()` те қажет емес."
+    },
+    {
+      "subject": {
+        "surface": "let",
+        "root": "let",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "айнымалы жариялау кілт сөзі",
+        "root": "айнымалы жариялау кілт сөзі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_153"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`let` — `Rust`-та айнымалыны жариялайтын кілт сөз: `let x = 5;`. Үнсіз тұрақты — `mut` модификаторы өзгермеліге мүмкіндік береді."
+    },
+    {
+      "subject": {
+        "surface": "mut",
+        "root": "mut",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өзгерілуі рұқсат модификаторы",
+        "root": "өзгерілуі рұқсат модификаторы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_154"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`mut` — `Rust`-та айнымалының өзгертілуіне рұқсат беретін модификатор: `let mut x = 5;` болса, кейін `x = 10;` рұқсат етіледі. Үнсіз `let x` тұрақты."
+    },
+    {
+      "subject": {
+        "surface": "fn",
+        "root": "fn",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "функция жариялау кілт сөзі",
+        "root": "функция жариялау кілт сөзі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_155"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`fn` — `Rust`-та функцияны жариялайтын кілт сөз: `fn name(params) -> ReturnType { body }`. Бағдарлама `main` функциясынан басталады."
+    },
+    {
+      "subject": {
+        "surface": "references",
+        "root": "references",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жад адресі",
+        "root": "жад адресі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_156"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`references` — `Rust`-та сілтемелердің жинақты атауы: `&T` тұрақты сілтеме, `&mut T` өзгермелі сілтеме. Қарызға алу ережелеріне бағынады."
+    },
+    {
+      "subject": {
+        "surface": "thread",
+        "root": "thread",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "параллель орындалу бірлігі",
+        "root": "параллель орындалу бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_157"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`thread` — `Rust`-та параллель орындалу бірлігі: `std::thread::spawn(|| { ... })` арқылы құрылады. Деректер ағындар арасында `Send` трейті арқылы тасымалданады."
+    },
+    {
+      "subject": {
+        "surface": "macro",
+        "root": "macro",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "код генерациялау құрылымы",
+        "root": "код генерациялау құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_158"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`macro` — `Rust`-та компиляция кезінде кодты генерациялайтын құрылым: `println!`, `vec!`, `format!` сияқты декларативті макростар; `derive`, `attribute`, `function-like` процедуралық макростар."
+    },
+    {
+      "subject": {
+        "surface": "hello world",
+        "root": "hello world",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қарапайым бағдарлама үлгісі",
+        "root": "қарапайым бағдарлама үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_159"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Hello World` — `Rust`-та ең қарапайым бағдарлама: `fn main() { println!(\"Hello, world!\"); }`. `cargo new` арқылы жоба құрылғанда автоматты түрде осы код жасалады."
+    },
+    {
+      "subject": {
+        "surface": "тест",
+        "root": "тест",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "автоматты тексеру функциясы",
+        "root": "автоматты тексеру функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_160"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`тест` — `Rust`-та автоматты тексеру функциясы: `#[test]` атрибутымен белгіленеді, `cargo test` командасымен орындалады. Бірлік тесттер `#[cfg(test)]` модулінде, интеграциялық тесттер `tests/` каталогында."
     },
     {
       "subject": {

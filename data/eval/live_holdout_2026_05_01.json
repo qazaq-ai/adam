@@ -213,8 +213,8 @@
       "id": "honest_unknown_quantum",
       "category": "honest_unknown",
       "query": "Quantum entanglement дегеніміз не?",
-      "any_substring": ["түсінбедім", "білмеймін"],
-      "note": "Latin technical term outside v4.11.5 closed list. Honest fallback."
+      "any_substring": ["түсінбедім", "білмеймін", "бәлкім"],
+      "note": "Latin technical term outside v4.11.5 closed list. Honest fallback. v4.26.5 added «дегеніміз» as topic-marker keyword, which makes the extractor pick «entanglement» as topic; since it's not in world_core, the fallback is now «Бәлкім, Entanglement туралы айтасыз ба» rather than blanket «Түсінбедім» — both are honest-no-data responses; updated to accept either."
     },
     {
       "id": "honest_unknown_musk",

@@ -241,6 +241,19 @@ pub(crate) const NOT_A_TOPIC: &[&str] = &[
     // topic, retrieval matched the proverb «Ерекше атап өт!».
     // Same converb-leaks-as-noun class as `тәрбиеле / баптал`.
     "атап",
+    // **v4.26.5** — passive-form verb stems surfaced as topics by
+    // the 2026-05-02 Rust battery. Pattern: «X қалай <verb>?»
+    // where the verb is a passive form (-ыла / -іле suffix).
+    // Examples: «fn қалай анықталады?» («fn` is the actual topic
+    // → captured by Latin extension), but if `fn` extraction
+    // fails the FST falls through to «анықтала» (passive stem
+    // of «анықтау» = "to define"). Same converb-leaks-as-noun
+    // class as v4.17.5 `тәрбиеле / баптал` + v4.22.5 `атап`.
+    "анықтала",
+    "жазыла",
+    "құрыла",
+    "қолданыла",
+    "қолдан",
     // **v4.22.5** — closed-class words surfaced by the 2026-05-01
     // live-dialog battery as wrong topic picks. Each one was
     // observed in real session output causing the planner to
@@ -963,6 +976,32 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "үлгіге сай келтіру өрнегі",
     "өзгертуге рұқсат қасиеті",
     "өсетін массив",
+    // **v4.26.5** — Kazakh form variants surfaced by the
+    // 2026-05-02 live battery on Rust queries.
+    //
+    // `қарыз алу` is the user-typed Kazakh form (without dative
+    // -ға); world_core's canonical `қарызға алу` (rust_012) is
+    // grammatically correct but the bare-stem form is what most
+    // users naturally produce. New rust_151 alias entry points
+    // both surfaces to the same definition.
+    //
+    // `жад тазарту` is the natural Kazakh way to ask about
+    // memory management. New rust_152 entry routes the question
+    // to a curated answer about Drop trait + scope-based RAII
+    // (vs Rust intro that pre-fix surfaced).
+    "қарыз алу",
+    "жад тазарту",
+    "hello world",
+    // **v4.26.5 follow-up** — `object` compounds from new
+    // rust_153…rust_160 entries.
+    "автоматты тексеру функциясы",
+    "айнымалы жариялау кілт сөзі",
+    "иелік әрекеті",
+    "код генерациялау құрылымы",
+    "параллель орындалу бірлігі",
+    "функция жариялау кілт сөзі",
+    "қарапайым бағдарлама үлгісі",
+    "өзгерілуі рұқсат модификаторы",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -1078,6 +1117,19 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     "slice",
     "tuple",
     "derive",
+    // **v4.26.5** — additional Rust keywords surfaced by the
+    // 2026-05-02 comprehensive 40-question battery. Each has a
+    // matching alias entry in programming_rust.jsonl
+    // (rust_153…rust_160). Note: `hello` deliberately not added
+    // here — `Hello World` is registered as a MULTIWORD_ENTITY
+    // (rust_159) instead, so the more-specific compound wins
+    // over the bare token.
+    "let",
+    "mut",
+    "fn",
+    "references",
+    "thread",
+    "macro",
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word
@@ -1089,6 +1141,31 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
 /// spans because those usually mean code identifiers in their
 /// surrounding context, not a topical reference.
 pub(crate) fn latin_subject_hint(input: &str) -> Option<String> {
+    // **v4.26.5** — language-qualifier check. When the Latin
+    // subject is at sentence start followed by a Kazakh language-
+    // qualifier pattern (`Rust тілінде / Rust-та / Rust-тың /
+    // Rust бағдарламасында / …`), the user is asking about a
+    // *concept within that language*, not about the language
+    // itself. The actual topic is a Kazakh content noun later in
+    // the sentence (e.g. «Rust тілінде айнымалы дегеніміз не?» —
+    // topic should be «айнымалы», not «Rust»).
+    //
+    // Pre-v4.26.5 `latin_subject_hint` ran early in
+    // `best_noun_hint` and unconditionally returned the Latin
+    // language name, hijacking topic extraction. Live battery
+    // 2026-05-02 confirmed: 5 of 6 «Rust тілінде X» queries
+    // returned generic Rust intro instead of the X concept.
+    //
+    // v4.26.5 detects the qualifier pattern; when present, returns
+    // None so downstream extractors (`topic_marker_hint` /
+    // `first_noun_root`) see the original input and pick the
+    // Kazakh content noun. The Latin language word still appears
+    // in the rendered response (templates use `{noun}` interp,
+    // grounded fact about the X concept usually mentions Rust
+    // anyway).
+    if has_language_qualifier_prefix(input) {
+        return None;
+    }
     let mut best: Option<&'static str> = None;
     for raw in input.split(|c: char| {
         c.is_whitespace()
@@ -1116,6 +1193,53 @@ pub(crate) fn latin_subject_hint(input: &str) -> Option<String> {
     best.map(|s| s.to_string())
 }
 
+/// **v4.26.5** — checks if the input opens with a language-
+/// qualifier pattern: `<LATIN_TECH_SUBJECT>` at sentence start
+/// followed by either a Kazakh case-marked dash form (`-та / -те
+/// / -тың / -тің / -тан / -тен`) or a free-standing locative
+/// qualifier (`тілінде / тіліндегі / тілдерінде /
+/// бағдарламасында / бағдарламасынан`).
+///
+/// Used by `latin_subject_hint` to defer when the Latin word is
+/// scoping context, not the topic. Conservative — only fires at
+/// sentence start so that mid-sentence Latin mentions
+/// («Cargo.toml не үшін керек?») still extract correctly.
+fn has_language_qualifier_prefix(input: &str) -> bool {
+    let trimmed = input.trim_start();
+    let lower = trimmed.to_lowercase();
+    // Free-standing locative qualifiers (preceded by space).
+    const SPACE_QUALIFIERS: &[&str] = &[
+        "тілінде",
+        "тіліндегі",
+        "тілдерінде",
+        "тілінен",
+        "бағдарламасында",
+        "бағдарламасынан",
+        "кодында",
+    ];
+    // Dash-attached case suffixes.
+    const DASH_QUALIFIERS: &[&str] = &[
+        "-та", "-те", "-тың", "-тің", "-тан", "-тен", "-та,", "-те,", "-тың,", "-тің,",
+    ];
+    for &lang in LATIN_TECH_SUBJECTS {
+        // Free-standing form: "rust тілінде …"
+        for &qual in SPACE_QUALIFIERS {
+            let prefix = format!("{lang} {qual}");
+            if lower.starts_with(&prefix) {
+                return true;
+            }
+        }
+        // Dash form: "rust-та …"
+        for &qual in DASH_QUALIFIERS {
+            let prefix = format!("{lang}{qual}");
+            if lower.starts_with(&prefix) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
 /// **v4.3.5** — When the input carries an explicit topic marker
 /// (`X туралы` / `X жайында` / `X жөнінде` / `X хақында`), the word
 /// immediately preceding the marker is the topic the user means,
@@ -1140,7 +1264,24 @@ pub(crate) fn latin_subject_hint(input: &str) -> Option<String> {
 /// → `қала`); if it isn't, we return the surface form (so
 /// `Мүсірепов туралы` → `Мүсірепов`).
 pub(crate) fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<String> {
-    const MARKERS: &[&str] = &["туралы", "жайында", "жөнінде", "хақында"];
+    // **v4.26.5** — extended marker list. Added `дегеніміз` /
+    // `деген` for the «X дегеніміз не?» / «X деген не?» pattern
+    // (asking for a definition). Live battery on Rust knowledge
+    // surfaced this gap: «Айнымалы дегеніміз не?» pre-fix
+    // returned «Түсінбедім» because no marker matched, even
+    // though `айнымалы` is a known world_core entry. With
+    // `дегеніміз` registered, the word *before* the marker —
+    // here `айнымалы` — is correctly extracted as topic. Same
+    // structural logic as `туралы` / `жайында` / etc.
+    const MARKERS: &[&str] = &[
+        "туралы",
+        "жайында",
+        "жайлы",
+        "жөнінде",
+        "хақында",
+        "дегеніміз",
+        "деген",
+    ];
     let lower = input.to_lowercase();
     for marker in MARKERS {
         let mut search_from = 0usize;
