@@ -7,6 +7,87 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.29.0] — 2026-05-02 — Track A discourse-level prior: RootAffinity (PMI matrix) — 834k pairs across 10 523 roots
+
+**First minor in v4.29+ Track A discourse-level statistical layer.** v4.15 → v4.20 built `SuffixPriors` for chain-level morphology disambiguation. v4.28.5 expanded the corpus from 5.77M to 8.85M tokens. v4.29.0 ships the **first cross-word semantic signal**: a sparse pointwise-mutual-information (PMI) matrix over root pairs that co-occur in the same sample.
+
+This release ships **Phase 1 — the artifact + the type + the training binary**. Runtime integration into retrieval reranking is **deferred to v4.29.5** to keep the architectural addition reversible.
+
+### Innovations
+
+**(1) New module `crates/adam-kernel-fst/src/root_affinity.rs`** (~250 lines + 5 unit tests). Defines `RootAffinity { version, trained_on_samples, min_pair_count, root_log_prob, pair_pmi }` — a frozen sparse map indexed `outer_root → inner_root → PMI` with lex-smaller-first key normalization. API:
+
+- `RootAffinity::empty()` — additive-identity no-op (returns 0.0 from `score`).
+- `RootAffinity::load(path)` — schema-versioned JSON loader; rejects v != 1.
+- `RootAffinity::from_counts(N, single_counts, pair_counts, min_pair_count)` — computes PMI per pair, filters below threshold + below 0 (negative-PMI pairs add storage cost without ranking value).
+- `score(root_a, root_b) -> f32` — order-insensitive lookup; returns 0.0 for unknown pairs.
+- `root_log_p(root) -> f32` — marginal log-probability.
+
+**(2) Why PMI not raw count.** Raw co-occurrence is dominated by ubiquitous roots (`мен / ол / бір`) — they appear with everything and produce no signal. PMI normalizes by marginals: `log(P(a, b) / (P(a) · P(b)))`. High PMI = pair co-occurs much more than chance. Filter by `MIN_PAIR_COUNT = 5` to suppress small-sample noise (PMI on 1-2 observations is unreliable).
+
+**(3) New training binary `crates/adam-corpus/src/bin/train_root_affinity.rs`.** Three-pass algorithm:
+1. Walk all curated packs (incl. v4.28.5 filtered shards), collect samples + tally unique tokens.
+2. FST-analyse each unique token once, cache deduped root list.
+3. Walk samples, accumulate single + pair counts (lex-sorted-smaller first), pass to `RootAffinity::from_counts`.
+
+Output: `data/retrieval/root_affinity.json` with byte-stable sorted keys.
+
+### Trained on v4.28.5 corpus
+
+| Metric | Value |
+|---|---|
+| Samples scanned | **1,076,271** |
+| Distinct tokens | 343,320 |
+| Distinct roots collected | 10,523 |
+| Distinct pairs (pre-filter) | 3,389,957 |
+| **Pairs (post-filter, ≥5 count + positive PMI)** | **834,053** (24.6 % survival) |
+| Outer roots in matrix | 6,662 |
+| Artifact size | 26 MB JSON |
+| Training time | ~1.5 minutes on M2 |
+
+### Sample affinities (sanity check)
+
+| Pair | PMI | Interpretation |
+|---|---|---|
+| жасуша ↔ ядро | **4.286** | strong biology co-occurrence (cell + nucleus) |
+| атом ↔ ядро | **4.278** | strong physics co-occurrence (atom + nucleus) |
+| бала ↔ ана | 2.108 | family contexts (child + mother) |
+| тау ↔ көл | 2.094 | geography (mountain + lake) |
+| кітап ↔ ілім | 1.027 | knowledge contexts (book + science) |
+| жер ↔ күн | 0.495 | weak (both common, modest co-occurrence) |
+| rust ↔ cargo | 0.000 | Latin tokens not in Kazakh lexicon → no FST parse → no roots collected (handled separately by Latin extraction) |
+
+### Verification
+
+- **Workspace tests `824 → 829 passing`** (+5 new `root_affinity` unit tests).
+- **rust_holdout `41 / 41 = 100 %`** — unchanged.
+- **live_holdout `32 / 32 = 100 %`** — unchanged.
+- **Parse-disambig** still **23 / 23 = 100 %**.
+- **80-question Rust battery** still **79 / 80 = 98.75 %** (zero behavior change since Phase 1 only).
+
+### What this enables (Phase 2 = v4.29.5)
+
+The artifact sits ready for runtime integration. v4.29.5 will:
+- Load `RootAffinity` at `Conversation::with_root_affinity(...)` builder, mirroring `with_suffix_priors`.
+- Add `current_topic_root` field to `ToolContext` (already partly present via `current_domain`).
+- Insert affinity tiebreaker in `Tool::dispatch(SearchGraph)` ranking ladder between `domain_match` and `length` — when chain priority and domain match tie, prefer the candidate whose subject root has higher PMI to the user's recent topic.
+
+### Pipeline impact
+
+- New module `crates/adam-kernel-fst/src/root_affinity.rs` + 5 unit tests + `pub mod` registration in `lib.rs`.
+- New binary `crates/adam-corpus/src/bin/train_root_affinity.rs` + Cargo registration.
+- New artifact `data/retrieval/root_affinity.json` (26 MB, gitignored if it crosses the 50 MB threshold per memory; currently committed as it's under threshold).
+- `data/retrieval/facts.json` + `derived_facts.json` — version field synced to `"4.29.0"`.
+- Workspace tests **824 → 829 passing**.
+
+### Cadence
+
+Minor — first artifact in a new statistical-prior axis (chain → root pair). Architectural addition (new module, new training binary, new artifact, new schema) but zero runtime behavior change — the artifact exists for v4.29.5 to wire in.
+
+**Stripe (7) — Track A corpus expansion → discourse-prior layer.**
+
+Next: **v4.29.5** (runtime integration of `RootAffinity` into `Tool::dispatch(SearchGraph)` reranking).
+
 ## [4.28.5] — 2026-05-02 — Track A corpus expansion: 27 filtered shards ingested, 5.77M → 8.85M tokens (+53 %)
 
 **First patch in v4.28+ Track A corpus-expansion arc.** Per the user-approved 2026-05-02 strategic direction, Track A is the path toward eventual statistical learning layers (root co-occurrence affinity, domain-specific suffix priors, eventually a tiny typed-suffix encoder). Track A's first prerequisite is **more corpus**: 5.77M tokens at v4.28.0 was enough for chain-level priors (v4.15-v4.20) but undersized for root-level affinity matrices.

@@ -46,3 +46,7 @@ path = "src/bin/train_suffix_priors.rs"
 [[bin]]
 name = "eval_parse_disambiguation"
 path = "src/bin/eval_parse_disambiguation.rs"
+
+[[bin]]
+name = "train_root_affinity"
+path = "src/bin/train_root_affinity.rs"
