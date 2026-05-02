@@ -72,7 +72,39 @@ pub fn analyse(surface: &str, lex: &LexiconV1) -> Vec<Analysis> {
             "verb" => {
                 try_verb_analyses(surface, entry, &mut out);
             }
-            // adverbs, postpositions, conjunctions, particles: bare only.
+            // **v4.34.0** — particle-copula inflection for «емес».
+            // Pre-v4.34.0 «particle» POS fell through to the catch-all
+            // bare-only branch, so inflected predicate-copula forms
+            // («емеспін / емессің / емеспіз / емессіз») didn't parse
+            // at all. v4.33.5 wired sentence-level negation
+            // («Бұл шындық емес») end-to-end through SemFrame; the
+            // inflected pattern «Мен X емеспін» was blocked here at
+            // the FST layer. Fix: dispatch «емес» specifically through
+            // try_noun_analyses, which enumerates the Predicate
+            // copulas (P1Sg / P2SgInformal / P2SgPolite / P1Pl /
+            // P2PlInformal / P2PlPolite). Other particles (ба / бе /
+            // ма / ме / па / пе question particles, да / де connector,
+            // еді / екен copulas) keep bare-only behaviour — surgical
+            // scope keeps blast radius minimal.
+            "particle" if entry.root == "емес" => {
+                try_noun_analyses(surface, entry, &mut out);
+                // Also keep bare «емес» path: try_noun_analyses with
+                // `predicate: None` covers it, but we add an explicit
+                // bare emit too in case the noun-feature enumeration
+                // changes upstream and stops covering bare-form.
+                if entry.root == surface
+                    && !out.iter().any(|a| {
+                        matches!(a, Analysis::Noun { root, features }
+                            if root == entry && *features == NounFeatures::default())
+                    })
+                {
+                    out.push(Analysis::Noun {
+                        root: entry.clone(),
+                        features: NounFeatures::default(),
+                    });
+                }
+            }
+            // adverbs, postpositions, conjunctions, other particles: bare only.
             _ => {
                 if entry.root == surface {
                     out.push(Analysis::Noun {

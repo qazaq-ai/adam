@@ -7,6 +7,108 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.34.0] — 2026-05-02 — Parser particle-copula extension + epistemic-override polarity bypass (battery edge case 18 closed)
+
+**First minor in v4.34+ semantic-IR arc.** Closes the FST coverage gap that blocked inflected «емес» forms from parsing, and the planner-routing gap that let `EpistemicStatus::Tentative` override v4.33.5's polarity-aware routing. Together these two fixes finally give battery edge case 18 («Сен бағдарламашы емессің бе?») the response it deserves — respectful acknowledgment instead of a generic "Бәлкім, X туралы айтасыз ба" fallback that's been stuck since the 2026-05-02 live REPL session was first captured.
+
+### What was broken pre-v4.34.0
+
+Two distinct issues stacked:
+
+**(a) FST coverage:** «емеспін / емессің / емеспіз / емессіз» (the predicate-copula inflected forms of «емес») didn't parse at all. `parser::analyse` dispatched `particle` POS through the catch-all branch which only emits an analysis when `entry.root == surface` — bare «емес» worked, inflected forms fell off entirely. So «Мен X емеспін» lost the «емеспін» token and v4.33.0's `populate_sentential_negation` had nothing to fire on.
+
+**(b) Planner override:** even when bare «емес» fired (case 23 «Бұл шындық емес» worked since v4.33.5), an inflected case like «Сен бағдарламашы емессің бе?» — once issue (a) was fixed — would STILL fall to the `unknown.tentative` template family. The reason: `EpistemicStatus::Tentative` triggers an override (`base_key` ignored, `unknown.tentative` returned) when the Intent has a noun_hint but no grounded_fact / example / reasoning_chain. v4.33.5's `unknown.with_negated_topic` routing happened in `plan_response_with_session::base_key` — but the override block in `plan_response_with_epistemic` ran AFTER and unconditionally won.
+
+### Innovations
+
+**(1) Parser particle-copula extension** (`crates/adam-kernel-fst/src/parser.rs`). New surgical branch:
+```rust
+"particle" if entry.root == "емес" => {
+    try_noun_analyses(surface, entry, &mut out);
+    // bare-form preservation guard
+}
+```
+
+Dispatches «емес» through `try_noun_analyses`, which already enumerates the Predicate copulas (P1Sg / P2SgInformal / P2SgPolite / P1Pl / P2PlInformal / P2PlPolite). Other particles (ба / бе / ма / ме / па / пе question particles, да / де connectors, еді / екен copulas) keep bare-only behavior — surgical scope keeps blast radius minimal. Bare-form path explicitly preserved by a guard insert.
+
+Post-fix:
+```
+> Мен бағдарламашы емеспін
+├─ sem_frames:
+│   [0] мен/Pronoun
+│   [1] бағдарламашы/Noun polarity=Negated
+│   [2] емес/Function pred=P1Sg
+```
+
+**(2) Epistemic-override polarity bypass** (`crates/adam-dialog/src/planner.rs`). New first match arm in the override block:
+```rust
+(Intent::Unknown {
+    noun_hint: Some(_),
+    noun_hint_polarity: Polarity::Negated,
+    ..
+}, _) => None,  // bypass override entirely
+```
+
+When polarity is `Negated`, the base_key (computed by `plan_response_with_session` as `unknown.with_negated_topic`) wins regardless of epistemic status. Reason: the user is denying X's predicate role, not asking for evidence; a "tentative" template like "Бәлкім, X туралы айтасыз ба" would force the user back into asserting X — exactly what they just denied.
+
+### Live verification — battery edge case 18 closed
+
+| Query | v4.33.5 | v4.34.0 |
+|---|---|---|
+| **Сен бағдарламашы емессің бе?** | "Бәлкім, бағдарламашы туралы айтасыз ба." (tentative) | "**Бағдарламашы емес деп айтасыз — пікіріңізді сыйлаймын.**" (acknowledgment) |
+| Мен бағдарламашы емеспін | (didn't parse «емеспін») | "**Бағдарламашы емес деп айтасыз — пікіріңізді сыйлаймын.**" |
+| Біз бағдарламашы емеспіз | (didn't parse «емеспіз») | "**Бағдарламашы емес деп айтасыз — пікіріңізді сыйлаймын.**" |
+
+Battery edge case 18 — surfaced in the 2026-05-02 live REPL session and tracked through every release since v4.30.0 — is finally closed.
+
+### Real-world battery (v4.34.0)
+
+26 queries (extends v4.33.5's 24 with 2 inflected-negation cases):
+
+| Aggregate | v4.34.0 | Δ vs v4.33.5 |
+|---|---|---|
+| Mean latency | **323.4 ms** | +0.9 ms (parser cost: one new dispatch branch + emes-specific noun-analysis enumeration) |
+| Mean max RSS | **175.9 MB** | +0.8 MB (noise) |
+| Coherent responses | **26/26 = 100 %** | matched |
+| **Neg-consumed rate** | **5/5 = 100 %** | **+3 over v4.33.5's 2/5** (cases 18, 25, 26 now route correctly) |
+
+Five negation cases (cases 18, 23, 24, 25, 26) all route through `unknown.with_negated_topic`. Modal-detect 4/4 unchanged.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **860 passing** unchanged |
+| Real-world 26-query battery | **26/26 = 100 % coherent** |
+| Neg-consumed rate | **5/5 = 100 %** (up from 2/5; +3 inflected forms now consumed) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Honest framing
+
+This release closes a 5-version-old carry-forward (battery edge case 18 surfaced in the original 2026-05-02 live REPL session that drove v4.30.0). The fix is a matched architectural pair: parser coverage + planner-override-priority. Either alone wouldn't close the gap; both together do.
+
+Other particles (ба / бе / ма / ме / па / пе question particles, да / де connectors) keep their bare-only catch-all dispatch — extending them would surface unrelated regressions. If real REPL transcripts later reveal a need for inflected forms of those particles, the same surgical branch pattern can be added per particle.
+
+The pattern matcher migration originally promised for this release was deferred to v4.34.5. Reason: closing edge case 18 was higher visibility (it's been stuck since v4.30.0) and a matcher migration would have made this release harder to review. Each release stays focused.
+
+### Pipeline impact
+
+- 1 new branch in `parser::analyse` dispatching emes through try_noun_analyses
+- 1 new bypass arm in planner epistemic-override match (places before existing arms)
+- Real-world battery extended 24 → 26 queries
+- facts/derived_facts version sync to 4.34.0
+
+Cadence: minor — closes a long-standing battery edge case via a matched FST + planner change.
+
+### Carry-forwards
+
+- **v4.34.5** — first behavioural migration of one extract_facts pattern matcher (e.g. `copula_is_a`) to consume `&[SemFrame]` instead of `&[Analysis]`. Originally promised for v4.32.5, then v4.34.0; re-promised for v4.34.5 (substrate work has accumulated; this is the next architectural step that genuinely needs SemFrame as input).
+- **v4.34.7** — first **Modality consumption** in templates: `unknown.with_modal_acknowledge` family responding to «X оқу керек» with "иә, X-ті V-у пайдалы" instead of asserting a generic fact about X.
+- **v4.35+** — remaining 8 missing parser tenses (ConverbPerfect, 3 participles, FutureIntentional, FuturePossible, Conditional, Imperative); other particle-copula extensions if real REPL surfaces a need.
+
 ## [4.33.5] — 2026-05-02 — First SemFrame consumption: Polarity::Negated routes Unknown to respectful negation acknowledgment
 
 **Patch in v4.33+ semantic-IR arc — landmark release.** First time a populated SemFrame field **influences user-facing answer text**. v4.31.0 → v4.33.0 all populated SemFrame fields without consumption (the substrate-then-consume discipline). v4.33.5 starts consumption: when the user negates a topic with «X емес», the response generator no longer asserts a definition that contradicts the user's claim — instead it respectfully acknowledges the negation.

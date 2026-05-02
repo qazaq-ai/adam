@@ -339,6 +339,24 @@ pub fn plan_response_with_epistemic(
         }
     }
     let override_key = match (intent, epistemic) {
+        // **v4.34.0** — when the user negates the topic («X емес»),
+        // the `unknown.with_negated_topic` family from v4.33.5 takes
+        // precedence over Conflicted/Tentative epistemic overrides.
+        // Reason: the user is denying X's predicate role, not asking
+        // for evidence about X. A "tentative" template that says
+        // "Бәлкім, X туралы айтасыз ба" would force the user back
+        // into asserting X — exactly what they just denied. Bypass
+        // the override block entirely when polarity is Negated; the
+        // base_key computed by plan_response_with_session
+        // (`unknown.with_negated_topic`) wins.
+        (
+            Intent::Unknown {
+                noun_hint: Some(_),
+                noun_hint_polarity: adam_kernel_fst::Polarity::Negated,
+                ..
+            },
+            _,
+        ) => None,
         (
             Intent::Unknown {
                 noun_hint: Some(_), ..
