@@ -1,7 +1,7 @@
 {
-  "version": "4.26.5",
+  "version": "4.27.0",
   "status": "completed",
-  "elapsed_s": 53,
+  "elapsed_s": 26,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 195,
-    "facts_total": 2038,
+    "facts_total": 2056,
     "by_predicate": {
       "after": 7,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 59,
       "has_quantity": 29,
       "in_domain": 24,
-      "is_a": 1452,
+      "is_a": 1470,
       "lives_in": 8,
       "part_of": 228,
       "related_to": 64
@@ -72,7 +72,7 @@
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/professions.jsonl": 40,
-      "world_core/programming_rust.jsonl": 160,
+      "world_core/programming_rust.jsonl": 178,
       "world_core/proverbs.jsonl": 43,
       "world_core/society.jsonl": 44,
       "world_core/sports.jsonl": 18,
@@ -36242,6 +36242,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "`тест` — `Rust`-та автоматты тексеру функциясы: `#[test]` атрибутымен белгіленеді, `cargo test` командасымен орындалады. Бірлік тесттер `#[cfg(test)]` модулінде, интеграциялық тесттер `tests/` каталогында."
+    },
+    {
+      "subject": {
+        "surface": "expression",
+        "root": "expression",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мән қайтаратын құрылым",
+        "root": "мән қайтаратын құрылым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_161"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`expression` — `Rust`-та мән қайтаратын құрылым: арифметикалық операция, функция шақыру, блок (`{ ... }`), `match` өрнегі. `Rust` өрнекке негізделген тіл."
+    },
+    {
+      "subject": {
+        "surface": "statement",
+        "root": "statement",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "нұсқау құрылымы",
+        "root": "нұсқау құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_162"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`statement` — `Rust`-та мән қайтармайтын нұсқау: `let x = 5;` жариялау, нүктелі үтірмен аяқталатын өрнек. `Statement` мән береді, бірақ оны қолдануға болмайды."
+    },
+    {
+      "subject": {
+        "surface": "deref coercion",
+        "root": "deref coercion",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "автоматты түрлендіру",
+        "root": "автоматты түрлендіру",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_163"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`deref coercion` — `Rust`-та компилятордың `&T`-ны `&U` сілтемесіне автоматты түрлендіруі, егер `T` `Deref<Target=U>` трейтін жүзеге асырса. Мысалы: `&String` сілтемесі `&str`-ге, `&Box<T>` сілтемесі `&T`-ге айналады."
+    },
+    {
+      "subject": {
+        "surface": "type alias",
+        "root": "type alias",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тип балама атауы",
+        "root": "тип балама атауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_164"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`type alias` — `Rust`-та типке балама атау беру: `type Kilometers = i32;`. Жаңа тип жасамайды, тек оқудың жеңілдігі үшін, ұзын типтерді қысқартуға қызмет етеді."
+    },
+    {
+      "subject": {
+        "surface": "where clause",
+        "root": "where clause",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шектеу синтаксисі",
+        "root": "шектеу синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_165"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`where clause` — `Rust`-та жалпылама шектеулерді жариялаудың кеңейтілген синтаксисі: `fn name<T>() where T: Trait { ... }`. Қарапайым `<T: Bound>` синтаксисіне қарағанда күрделі шектеулерді оқылымды жазуға мүмкіндік береді."
+    },
+    {
+      "subject": {
+        "surface": "dynamic dispatch",
+        "root": "dynamic dispatch",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "орындалу-кезіндегі полиморфизм",
+        "root": "орындалу-кезіндегі полиморфизм",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_166"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`dynamic dispatch` — `Rust`-та орындалу кезінде шешілетін `trait object` полиморфизмі: `dyn Trait` арқылы. `vtable` арқылы жанама шақыру; икемді бірақ аздап шығынды."
+    },
+    {
+      "subject": {
+        "surface": "static dispatch",
+        "root": "static dispatch",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "компиляция-кезіндегі полиморфизм",
+        "root": "компиляция-кезіндегі полиморфизм",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_167"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`static dispatch` — `Rust`-та компиляция кезінде шешілетін жалпылама полиморфизм: `<T: Trait>` арқылы. Әр пайдаланылған тип үшін мономорфизация жасалады; шығынсыз жоғары өнімділік."
+    },
+    {
+      "subject": {
+        "surface": "zero-cost abstraction",
+        "root": "zero-cost abstraction",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіл принципі",
+        "root": "тіл принципі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_168"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`zero-cost abstraction` — `Rust`-тың негізгі принципі: жоғары деңгейлі абстракциялар (итератор, `generic`, `trait`) қолмен жазылған төмен деңгейлі кодтан баяу болмайды. Компилятор оларды толық оптимизациялайды."
+    },
+    {
+      "subject": {
+        "surface": "raii",
+        "root": "raii",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ресурс басқару тәсілі",
+        "root": "ресурс басқару тәсілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_169"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`RAII` (`Resource Acquisition Is Initialization`) — ресурс басқару тәсілі: ресурс объектіні құру кезінде алынады, объекті скоптан шыққанда `Drop` арқылы автоматты түрде босатылады. `Rust`-тың жад басқаруының іргетасы."
+    },
+    {
+      "subject": {
+        "surface": "pin",
+        "root": "pin",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жад жылжытпау кепілдемесі",
+        "root": "жад жылжытпау кепілдемесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_170"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Pin` — `Rust`-та мәнді жадтан жылжытпауға кепілдік беретін типтік қаптама: `Pin<P>`. `async`, `await` және өзіне сілтемелі құрылымдарға қажет."
+    },
+    {
+      "subject": {
+        "surface": "rust design",
+        "root": "rust design",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілдік дизайн принциптері",
+        "root": "тілдік дизайн принциптері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_171"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rust` дизайны үш негізгі мақсатқа бағытталған: жад қауіпсіздігі (`borrow checker` арқылы), қауіпсіз қатарластық (`Send` мен `Sync` арқылы), нөлдік құнды абстракциялар. Жинақтаушы тіл, манипуляция жоқ — әр шешім ашық және компиляция кезінде тексеріледі."
+    },
+    {
+      "subject": {
+        "surface": "future",
+        "root": "future",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асинхронды операция трейті",
+        "root": "асинхронды операция трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_172"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Future` — `Rust`-та асинхронды операцияны білдіретін трейт: уақытпен өзгеретін мәнді сипаттайды. `poll` әдісі арқылы орындалады; `await` синтаксисі `Future`-ды күтеді."
+    },
+    {
+      "subject": {
+        "surface": "дизайн",
+        "root": "дизайн",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілдік дизайн принциптері",
+        "root": "тілдік дизайн принциптері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_173"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rust` дизайны үш мақсатқа бағытталған: жад қауіпсіздігі (`borrow checker` арқылы), қауіпсіз қатарластық (`Send` мен `Sync` арқылы), нөлдік құнды абстракциялар. Жинақтаушы тіл, манипуляция жоқ — әр шешім ашық және компиляция кезінде тексеріледі."
+    },
+    {
+      "subject": {
+        "surface": "implicit type",
+        "root": "implicit type",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тип шығару тәсілі",
+        "root": "тип шығару тәсілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_174"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`implicit type` пен `explicit type` — `Rust`-та тип жариялаудың екі тәсілі: айқын — `let x: i32 = 5;`, ал имплициттік — `let x = 5;` (компилятор контекстен шығарады). `Rust` көп жағдайда типті автоматты түрде анықтай алады."
+    },
+    {
+      "subject": {
+        "surface": "type inference",
+        "root": "type inference",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "автоматты тип анықтау",
+        "root": "автоматты тип анықтау",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_175"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`type inference` — `Rust`-тың контексттен айнымалы типін автоматты анықтау қабілеті: `let x = 5;` болса, компилятор `x` типін `i32` (үнсіз) деп анықтайды. Қажет болғанда жеке белгілеуге болады."
+    },
+    {
+      "subject": {
+        "surface": "дизай",
+        "root": "дизай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілдік дизайн принциптері",
+        "root": "тілдік дизайн принциптері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_176"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rust` дизайны үш мақсатқа бағытталған: жад қауіпсіздігі (`borrow checker` арқылы), қауіпсіз қатарластық (`Send` мен `Sync` арқылы), нөлдік құнды абстракциялар."
+    },
+    {
+      "subject": {
+        "surface": "implicit",
+        "root": "implicit",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тип шығару тәсілі",
+        "root": "тип шығару тәсілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_177"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`implicit` — `Rust`-та ашық белгіленбейтін тип немесе түрлендіру: `let x = 5;` болғанда компилятор `x` типін контекстен шығарады. Қарама-қарсысы `explicit` — типті бағдарламашы өзі белгілейді."
+    },
+    {
+      "subject": {
+        "surface": "explicit",
+        "root": "explicit",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тип шығару тәсілі",
+        "root": "тип шығару тәсілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_178"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`explicit` — `Rust`-та ашық белгіленген тип немесе түрлендіру: `let x: i32 = 5;`, `value as u32`. Қарама-қарсысы `implicit` — компилятор автоматты түрде шығарады."
     },
     {
       "subject": {

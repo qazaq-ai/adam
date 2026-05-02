@@ -7,6 +7,74 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.27.0] — 2026-05-02 — Rust tutor v3: 80-question battery 79/80 = 98.75 %; +18 entries covering advanced concepts
+
+**First minor in v4.27+ Rust tutor depth-of-coverage arc.** v4.26.5 brought the 40-question comprehensive battery to 40/40. To stress the system on advanced topics, v4.27.0 doubles the battery to **80 questions** covering all 20 Rust Book chapters at greater depth: comparative queries («Box пен Rc айырмашылығы?»), advanced features (`deref coercion / type alias / where clause / dynamic dispatch / static dispatch / zero-cost abstraction / RAII / Pin / Future`), language design questions («Rust қандай артықшылықтары бар?»), and edge-case phrasings (Accusative with dash, truncated stems, multi-word comparisons).
+
+Pre-v4.27.0 expanded battery: **68/80 = 85 %**. Post-v4.27.0: **79/80 = 98.75 %** (only the `Result-ты` Accusative-with-dash tokenization edge case unfixed; see carry-forward).
+
+### Innovations
+
+**(1) `programming_rust.jsonl` 160 → 178 entries** (rust_161…rust_178). 18 new advanced-concept aliases:
+- rust_161: `expression` (Rust as expression-based language)
+- rust_162: `statement` (vs expression)
+- rust_163: `deref coercion` (auto `&T → &U` via `Deref`)
+- rust_164: `type alias` (`type Kilometers = i32;`)
+- rust_165: `where clause` (extended generic bounds)
+- rust_166: `dynamic dispatch` (`dyn Trait` + vtable)
+- rust_167: `static dispatch` (monomorphization at compile time)
+- rust_168: `zero-cost abstraction` (Rust core principle)
+- rust_169: `RAII` (Resource Acquisition Is Initialization)
+- rust_170: `Pin` (no-move guarantee for self-referential / async)
+- rust_171: `rust design` (Latin alias)
+- rust_172: `Future` (async operation trait)
+- rust_173: `дизайн` (Kazakh form for Rust design)
+- rust_174: `implicit type` (compound)
+- rust_175: `type inference` (compound + Latin alias)
+- rust_176: `дизай` (truncated-stem alias for FST stem `дизай`)
+- rust_177: `implicit` (bare alias)
+- rust_178: `explicit` (bare alias)
+
+**(2) `LATIN_TECH_SUBJECTS` 81 → 88 entries.** Added 7 advanced concept tokens: `expression / statement / future / pin / raii / implicit / explicit`. Multi-word compounds (`type alias / where clause / deref coercion / dynamic dispatch / static dispatch / zero-cost abstraction / type inference / implicit type`) are registered in `MULTIWORD_ENTITIES` instead.
+
+**(3) `MULTIWORD_ENTITIES += 23` entries.** 8 Latin / mixed compounds + 15 Kazakh compound `object` fields from new world_core entries. Required by the `world_core_multiword_coverage` invariant (every compound subject/object in world_core must register here for retrieval matching).
+
+**(4) `NOT_A_TOPIC += жасала`** — passive form of «жасау» (to make/do). Pattern «X қалай жасалады?». Same hygiene class as v4.26.5 `анықтала / жазыла / құрыла / қолданыла / қолдан`.
+
+### Verification
+
+| Battery | Pre-v4.27.0 | Post-v4.27.0 |
+|---|---|---|
+| Original 40-question | 40 / 40 | 40 / 40 |
+| **Expanded 80-question** | 68 / 80 = 85 % | **79 / 80 = 98.75 %** (+13.75 pp) |
+
+| Holdouts | Pass | Total | % |
+|---|---|---|---|
+| rust_holdout | 41 | 41 | **100 %** |
+| live_holdout | 32 | 32 | **100 %** |
+| parse-disambig | 23 | 23 | **100 %** |
+
+Workspace tests **824 → 824 passing**.
+
+### The 1 remaining failure (carry-forward to v4.27.5+)
+
+«Result-ты қалай қолданады?» — the Accusative case suffix `-ты` attached via `-` produces token `Result-ты`. Some normalizer in the topic-extraction pipeline strips `-ты` and leaves `result-` (with trailing dash), which doesn't match the bare `result` subject in world_core. The query phrasing without the Accusative-dash («Result қалай қолданылады?» or «Result не үшін керек?») works correctly. Fixing the dash-Accusative tokenizer requires a small change in the token-cleanup code path; deferred to keep v4.27.0 patch-sized.
+
+### Pipeline impact
+
+- `data/world_core/programming_rust.jsonl` — 160 → 178 entries.
+- `crates/adam-dialog/src/topic_extraction.rs` — `LATIN_TECH_SUBJECTS` 81 → 88; `MULTIWORD_ENTITIES` += 23; `NOT_A_TOPIC` += 1.
+- `data/retrieval/facts.json` + `derived_facts.json` — regenerated at version `"4.27.0"`.
+- Workspace tests **824 → 824 passing**.
+
+### Cadence
+
+Minor — significant data-side coverage expansion (concept count 110 → 178 across the v4.26-4.27 arc, +62 % of programming_rust corpus) + measurable advancement in real-question coverage (85 % → 98.75 % on expanded battery).
+
+**Stripe (6) — vertical knowledge domains — Rust track depth-of-coverage layer.**
+
+Next: **v4.27.5** (token-cleanup fix for Accusative-with-dash + extended Rust holdout to ~50 cases including the v4.27.0 advanced-concept additions), **v4.28.0** (native-speaker review pass on rust_111…rust_178 entries — currently auto-curated), **v4.29.0+** (code-block extraction from rust_book_kk_pack — verbatim Rust snippets as first-class searchable units).
+
 ## [4.26.5] — 2026-05-02 — Rust tutor v2: language-qualifier defer + 7 keyword aliases + verb-stem hygiene; comprehensive 40-question battery 40/40 = 100 %
 
 **Patch in v4.26+ Rust tutor arc.** v4.26.0 brought the Rust holdout to 30/30 = 100 % on the curated set. A live REPL session immediately surfaced a deeper class of failures: queries that begin with a language-qualifier prefix («Rust тілінде / Rust-та / Rust бағдарламасында»). On those, the v4.11.5 `latin_subject_hint` (which runs early in `best_noun_hint`) hijacked topic extraction to «Rust» itself, so the user got a generic Rust intro instead of a fact about the actual concept they asked about.

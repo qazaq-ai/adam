@@ -1,20 +1,20 @@
 {
-  "version": "4.26.5",
+  "version": "4.27.0",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
   "iterations_completed": 5,
   "counts": {
-    "initial_facts": 2038,
-    "derived_facts": 6141,
+    "initial_facts": 2056,
+    "derived_facts": 6147,
     "by_rule": {
       "R10_in_domain_inheritance": 133,
       "R11_in_domain_shared_target": 3098,
       "R1_is_a_transitivity": 1157,
       "R2_has_inheritance": 292,
       "R3_has_inheritance_via_part_of": 28,
-      "R5_shared_is_a_target": 1161,
+      "R5_shared_is_a_target": 1167,
       "R6_lives_in_via_part_of": 1,
       "R7_goes_to_via_part_of": 6,
       "R8_after_transitivity": 6,
@@ -38174,6 +38174,81 @@
     },
     {
       "subject": {
+        "surface": "explicit",
+        "root": "explicit",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "implicit",
+        "root": "implicit",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_178"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_177"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "explicit",
+        "root": "explicit",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "implicit type",
+        "root": "implicit type",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_178"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_174"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "implicit",
+        "root": "implicit",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "implicit type",
+        "root": "implicit type",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_177"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_174"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
         "surface": "бойлық толқын",
         "root": "бойлық толқын",
         "pos": "noun"
@@ -38393,6 +38468,81 @@
         {
           "pack": "world_core/programming_rust.jsonl",
           "sample_id": "rust_071"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "rust design",
+        "root": "rust design",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "дизай",
+        "root": "дизай",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_171"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_176"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "rust design",
+        "root": "rust design",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "дизайн",
+        "root": "дизайн",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_171"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_173"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "дизай",
+        "root": "дизай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "дизайн",
+        "root": "дизайн",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_176"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_173"
         }
       ],
       "confidence": "RuleInferred"

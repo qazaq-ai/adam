@@ -254,6 +254,10 @@ pub(crate) const NOT_A_TOPIC: &[&str] = &[
     "құрыла",
     "қолданыла",
     "қолдан",
+    // **v4.27.0** — additional verb-stem leaks surfaced by the
+    // 80-question expanded battery. «жасала» = passive of «жасау»
+    // (to make/do); pattern «X қалай жасалады?» («how is X made?»).
+    "жасала",
     // **v4.22.5** — closed-class words surfaced by the 2026-05-01
     // live-dialog battery as wrong topic picks. Each one was
     // observed in real session output causing the planner to
@@ -1002,6 +1006,32 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "функция жариялау кілт сөзі",
     "қарапайым бағдарлама үлгісі",
     "өзгерілуі рұқсат модификаторы",
+    // **v4.27.0** — multi-word concepts from rust_161…rust_172 +
+    // their `object` compounds.
+    "deref coercion",
+    "type alias",
+    "where clause",
+    "dynamic dispatch",
+    "static dispatch",
+    "zero-cost abstraction",
+    "rust design",
+    "автоматты түрлендіру",
+    "тип балама атауы",
+    "шектеу синтаксисі",
+    "орындалу-кезіндегі полиморфизм",
+    "компиляция-кезіндегі полиморфизм",
+    "тіл принципі",
+    "мән қайтаратын құрылым",
+    "нұсқау құрылымы",
+    "ресурс басқару тәсілі",
+    "жад жылжытпау кепілдемесі",
+    "асинхронды операция трейті",
+    "тілдік дизайн принциптері",
+    "implicit type",
+    "explicit type",
+    "type inference",
+    "тип шығару тәсілі",
+    "автоматты тип анықтау",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -1130,6 +1160,20 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     "references",
     "thread",
     "macro",
+    // **v4.27.0** — additional concepts surfaced by the 80-question
+    // expanded battery. Single-word Latin tokens; multi-word
+    // compounds (`type alias`, `where clause`, `deref coercion`,
+    // `dynamic dispatch`, `static dispatch`, `zero-cost abstraction`,
+    // `expression vs statement`) are registered in MULTIWORD_ENTITIES
+    // instead.
+    "expression",
+    "statement",
+    "future",
+    "pin",
+    "raii",
+    // **v4.27.0 follow-up** — additional aliases (rust_173…rust_175).
+    "implicit",
+    "explicit",
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word
