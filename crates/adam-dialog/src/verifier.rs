@@ -256,6 +256,7 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             compositional_function,
             noun_hint_polarity,
             input_modality,
+            input_evidence,
             ..
         } => Intent::Unknown {
             raw_tokens,
@@ -268,9 +269,10 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             temporal_scope,
             compositional_function,
             noun_hint_polarity,
-            // **v4.34.7** — preserve input_modality across strip;
-            // analytical signal about modal claim type, not evidence.
             input_modality,
+            // **v4.36.0** — preserve input_evidence across strip;
+            // analytical signal about evidentiality kind, not evidence.
+            input_evidence,
         },
         other => other,
     }
@@ -294,6 +296,7 @@ mod tests {
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
+            input_evidence: None,
         }
     }
 

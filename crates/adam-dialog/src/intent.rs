@@ -296,6 +296,21 @@ pub enum Intent {
         /// емес»).
         #[serde(default)]
         input_modality: Option<adam_kernel_fst::Modality>,
+        /// **v4.36.0** — third SemFrame field consumed by the
+        /// response generator. When the input carries a verb in
+        /// `Tense::PastEvidential` (the «-{Y}п(ты)» reportative
+        /// form: «X-ті естідім» / «X болыпты»), the verb's SemFrame
+        /// has `evidence: Some(EvidenceKind::Hearsay)`.
+        /// `Conversation::turn` walks the frame stream and copies
+        /// the first non-None evidence here; the planner routes
+        /// Hearsay-marked Unknowns to `unknown.with_hearsay_hedge`
+        /// — a family that hedges the response: "сізге айтылған ба,
+        /// нақты білмеймін". Asserting a definition of the topic
+        /// noun would either ignore the hearsay framing OR appear
+        /// to confirm a story adam can't verify. Default `None`
+        /// preserves all pre-v4.36.0 routing exactly.
+        #[serde(default)]
+        input_evidence: Option<adam_kernel_fst::EvidenceKind>,
     },
 }
 

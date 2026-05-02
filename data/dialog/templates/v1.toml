@@ -924,6 +924,31 @@ templates = [
     "Сіздің ойыңыз орынды — бұл мүмкін.",
 ]
 
+# v4.36.0 — third SemFrame-driven response family. When the input
+# carried past-evidential tense («-{Y}п(ты)» / болыпты / деген екен),
+# `SemFrame::from_analysis` auto-derives `evidence: Some(Hearsay)`
+# from `Tense::PastEvidential`; `Conversation::turn` copies onto
+# `Intent::Unknown.input_evidence`; planner routes here.
+#
+# The user is REPORTING hearsay, not asserting first-hand knowledge.
+# Surfacing a flat grounded fact would either ignore the evidential
+# framing or appear to confirm a story adam can't verify. Templates
+# echo the user's hedging back («сізге айтылған ба, нақты білмеймін»)
+# and offer a curated fact only if available, marked as adam's own
+# (not a confirmation of the user's hearsay).
+[[families]]
+key = "unknown.with_hearsay_hedge"
+templates = [
+    "Сізге айтылған сияқты екен — нақты дерегім жоқ.",
+    "Сондай дерек естідіңіз бе, иә? Менде нақты ақпарат жоқ.",
+    "{noun} жайлы сізге айтылған пікір болуы мүмкін, дегенмен мен растай алмаймын.",
+    "Иә, сондай әңгіме бар екен — нақты дерегім жоқ.",
+    "Сіз естіген сөз болса керек, бірақ мен тексере алмаймын.",
+    # No-noun variants
+    "Иә, сондай дерек естіген екенсіз — мен нақты білмеймін.",
+    "Сізге айтылған әңгіме болуы мүмкін.",
+]
+
 # Ability («-а ал-») — user claims (or asks about) capability to do something.
 # v4.35.5 — added no-{noun} variants for verb-only ability claims like
 # «Жаза аламын» (battery case 21 — pre-v4.35.5 fell to "Түсінбедім").

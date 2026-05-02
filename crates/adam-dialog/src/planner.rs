@@ -370,6 +370,19 @@ pub fn plan_response_with_epistemic(
             },
             _,
         ) => None,
+        // **v4.36.0** — same bypass for hearsay evidentiality.
+        // When the user reports hearsay («-{Y}п(ты)» evidential
+        // tense), `unknown.with_hearsay_hedge` takes precedence
+        // over Conflicted/Tentative overrides — a tentative
+        // template would dilute the hedging adam wants to do
+        // anyway.
+        (
+            Intent::Unknown {
+                input_evidence: Some(adam_kernel_fst::EvidenceKind::Hearsay),
+                ..
+            },
+            _,
+        ) => None,
         (
             Intent::Unknown {
                 noun_hint: Some(_), ..
@@ -671,6 +684,7 @@ mod tests {
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
+            input_evidence: None,
         };
         assert_eq!(intent_key(&intent), "unknown.with_derived_chain");
     }
@@ -694,6 +708,7 @@ mod tests {
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
+            input_evidence: None,
         };
         assert_eq!(intent_key(&intent), "unknown.with_grounded_fact");
     }
@@ -803,6 +818,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             compositional_function,
             noun_hint_polarity,
             input_modality,
+            input_evidence,
             ..
         } => {
             // **v4.33.5** — sentence-level negation routing. When
@@ -850,6 +866,24 @@ pub fn intent_key(intent: &Intent) -> &'static str {
                     adam_kernel_fst::Modality::Possibility => "unknown.with_modal_possibility",
                     adam_kernel_fst::Modality::Ability => "unknown.with_modal_ability",
                 };
+            }
+            // **v4.36.0** — evidentiality routing. When the user
+            // uses past-evidential tense («-{Y}п(ты)» / болыпты /
+            // деген екен), `populate_*` chain marks the verb frame
+            // with `evidence: Some(EvidenceKind::Hearsay)`. The
+            // user is reporting hearsay, not asserting first-hand
+            // knowledge — adam should hedge in response, marking
+            // its uncertainty about whether the reported claim is
+            // grounded. Routes BEFORE evidence-shaped families
+            // (with_grounded_fact, with_evidence) because Hearsay
+            // marking dominates: even if adam has a grounded fact
+            // about the topic, surfacing it as a flat assertion
+            // misses the user's evidential framing. Runs AFTER
+            // polarity + modality checks (those have higher
+            // priority — when both fire, the more salient signal
+            // wins).
+            if matches!(input_evidence, Some(adam_kernel_fst::EvidenceKind::Hearsay)) {
+                return "unknown.with_hearsay_hedge";
             }
             // **v4.23.0** — `temporal_scope: true` short-circuits to
             // `unknown.temporal_no_data`. Pattern: temporal adverb

@@ -245,7 +245,7 @@ pub fn extract_facts(
     let sem_frames = build_sem_frames(text, lexicon);
     // v2.x baseline matchers.
     patterns::copula_is_a(text, parses, &sem_frames, lexicon, source, &mut out);
-    patterns::locative_lives_in(text, parses, lexicon, source, &mut out);
+    patterns::locative_lives_in(text, parses, &sem_frames, lexicon, source, &mut out);
     patterns::possessive_has(text, parses, lexicon, source, &mut out);
     patterns::dative_goes_to(text, parses, lexicon, source, &mut out);
     // v3.5.0 breadth expansion — 6 new matchers bring predicate

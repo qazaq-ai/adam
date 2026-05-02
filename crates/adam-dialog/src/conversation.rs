@@ -580,6 +580,7 @@ impl Conversation {
             noun_hint,
             noun_hint_polarity,
             input_modality,
+            input_evidence,
             ..
         } = &mut intent
         {
@@ -606,6 +607,15 @@ impl Conversation {
             // inside the noun_hint check and silently skipped.
             if input_modality.is_none() {
                 *input_modality = sem_frames.iter().find_map(|f| f.modality);
+            }
+            // **v4.36.0** — third SemFrame field consumption.
+            // EvidenceKind is on the verb frame (set when
+            // Tense::PastEvidential triggers the auto-derivation in
+            // SemFrame::from_analysis). Walk the frame stream for
+            // the first non-None evidence and copy onto Intent.
+            // Independent of noun_hint — like modality.
+            if input_evidence.is_none() {
+                *input_evidence = sem_frames.iter().find_map(|f| f.evidence);
             }
         }
 

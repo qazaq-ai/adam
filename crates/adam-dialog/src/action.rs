@@ -500,6 +500,7 @@ mod tests {
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
+            input_evidence: None,
         }
     }
 
@@ -593,6 +594,7 @@ mod tests {
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
+            input_evidence: None,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RetrieveEvidence);
@@ -619,6 +621,7 @@ mod tests {
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
+            input_evidence: None,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RunReasoner);

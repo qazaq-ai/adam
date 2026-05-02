@@ -181,6 +181,7 @@ mod tests {
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
+            input_evidence: None,
         }
     }
 

@@ -303,6 +303,7 @@ pub fn interpret_text_with_lexicon(
         // v4.33.5 routing exactly.
         noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         input_modality: None,
+        input_evidence: None,
     }
 }
 
@@ -367,6 +368,7 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         // from the rich FST analyses.
         noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         input_modality: None,
+        input_evidence: None,
     }
 }
 

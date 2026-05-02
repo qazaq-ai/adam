@@ -7,6 +7,95 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.36.0] — 2026-05-02 — Third matcher migration + first EvidenceKind consumption (Hearsay hedging)
+
+**First minor in v4.36+ semantic-IR arc.** Two architectural completions in one release:
+1. Third extract_facts matcher migration — `locative_lives_in` joins `copula_is_a` (v4.34.5) and `nominal_conjunction` (v4.35.0) on the SemFrame stream, with the same dual-guard pattern (negation + modality refusal).
+2. **First EvidenceKind consumption** — Hearsay-marked utterances now route to a respectful hedging template family instead of asserting flat facts about the topic. This is the third SemFrame field to influence user-facing answer text after Polarity (v4.33.5) and Modality (v4.34.7).
+
+### Innovations
+
+**(1) `locative_lives_in` signature migration**: `+ sem_frames: &[SemFrame]`. Mirrors v4.34.5's `copula_is_a` and v4.35.0's `nominal_conjunction`. Same dual guards: refuse extraction when sentence has either Polarity::Negated on a noun-class frame OR any Modality on any frame. For LivesIn this protects against modal claims like «X Y-да тұру керек» ("X needs to live in Y") being mistakenly extracted as factual residency.
+
+**(2) `Intent::Unknown.input_evidence: Option<EvidenceKind>` field.** Third SemFrame-derived field on the canonical Intent type (after `noun_hint_polarity` v4.33.5 and `input_modality` v4.34.7). Default `None` preserves all pre-v4.36.0 routing exactly. Propagated through `semantics`, `verifier`, and 8 test sites.
+
+**(3) `Conversation::turn` populates `input_evidence`** by walking the SemFrame stream for any non-None evidence — independent of noun_hint, like modality. Auto-derivation flows: FST `Tense::PastEvidential` → `SemFrame.evidence: Some(EvidenceKind::Hearsay)` → `Intent.input_evidence: Some(Hearsay)`.
+
+**(4) Planner Hearsay routing.** New short-circuit AFTER polarity and modality checks (those have higher priority — when they fire on the same input, the more salient signal wins):
+```rust
+if matches!(input_evidence, Some(EvidenceKind::Hearsay)) {
+    return "unknown.with_hearsay_hedge";
+}
+```
+
+**(5) Epistemic-override bypass for Hearsay.** Mirrors v4.34.0's polarity bypass and v4.34.7's modality bypass. Hearsay-marked Unknowns skip `unknown.tentative` override — the hedging template family is already a tentative-shape response.
+
+**(6) New template family `unknown.with_hearsay_hedge`** in `v1.toml` — 7 templates that hedge the response by echoing the user's evidential framing back:
+- "Сізге айтылған сияқты екен — нақты дерегім жоқ."
+- "{noun} жайлы сізге айтылған пікір болуы мүмкін, дегенмен мен растай алмаймын."
+- "Сіз естіген сөз болса керек, бірақ мен тексере алмаймын."
+
+Templates use «сізге айтылған / естідіңіз / айтылған әңгіме» to mark the source as the user's hearsay, not adam's first-hand knowledge.
+
+### Live verification
+
+| Query | sem_frame trace | Response |
+|---|---|---|
+| **Жазғанмын** | `жаз/Verb tense=PastEvidential evid=Hearsay` | "Сізге айтылған сияқты екен — нақты дерегім жоқ." ✓ |
+| **Абай жазған** | `[1] жаз/Verb tense=PastEvidential evid=Hearsay` | "Сізге айтылған сияқты екен — нақты дерегім жоқ." ✓ |
+| **Ол жазған екен** | `[2] жаз/Verb tense=PastEvidential evid=Hearsay` | "Сізге айтылған сияқты екен — нақты дерегім жоқ." ✓ |
+| Абай жазды (control, PastDefinite) | `жаз/Verb tense=PastDefinite` (no evid) | unchanged grounded fact ✓ |
+| Абай кім? (control, no verb) | no evidence | unchanged ✓ |
+
+Note: «-{Y}п(ты)» reportative forms like «жазыпты» / «болыпты» do NOT currently parse — the FST treats `Tense::PastEvidential` as the `жазғанмын`-style construction. Closing the «-ыпты» path is **v4.36.5+** FST coverage work.
+
+### Substrate-then-consume cycle status (3 of 4 fields with closed cycles)
+
+| Field | Population | Consumption (dialog) | Consumption (extraction) |
+|---|---|---|---|
+| **Polarity** | v4.33.0 | v4.33.5 | v4.34.5 |
+| **Modality** | v4.32.0 / v4.32.5 | v4.34.7 | v4.35.0 |
+| **Evidence** | v4.31.0 (PastEvidential→Hearsay) | **v4.36.0** | not yet |
+| Relation | placeholder | n/a | n/a |
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **865 passing** unchanged (8 test-site Intent::Unknown patches added `input_evidence: None`) |
+| Real-world 26-query battery | **26/26 = 100 % coherent** unchanged |
+| Mean latency | **321.9 ms** (+1.6 ms vs v4.35.5, within noise) |
+| Mean RSS | **175.8 MB** (-0.1 MB, within noise) |
+| facts.json | 1935 → **1935** unchanged (locative_lives_in didn't reject any current LivesIn facts) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Pipeline impact
+
+- 1 signature change to `locative_lives_in` (+ `sem_frames` parameter)
+- 2 guards (negation + modality) added to `locative_lives_in` (~30 lines)
+- 1 dispatch update in `extract_facts`
+- 4 test-site call updates for `locative_lives_in`
+- 1 new field on `Intent::Unknown` (`input_evidence`)
+- 1 propagation in `semantics::interpret_text_with_lexicon`
+- 1 propagation in `verifier::strip_evidence`
+- 8 test-site Intent::Unknown patches
+- 1 wiring in `Conversation::turn` (find_map for evidence)
+- 1 short-circuit in planner Unknown-branch routing
+- 1 epistemic-override bypass for Hearsay
+- 1 new template family with 7 templates in v1.toml
+- facts/derived_facts version sync to 4.36.0
+
+Cadence: minor — third matcher migration + first EvidenceKind consumption + closes 3rd substrate-then-consume cycle.
+
+### Carry-forwards
+
+- **v4.36.5** — FST coverage: «-{Y}п(ты)» reportative path («жазыпты» / «болыпты»); short-form 1sg «алам» variant + back-vowel converb «оқи».
+- **v4.36.7** — EvidenceKind consumption on extraction side (refuse extraction when sentence has Hearsay evidential — adam shouldn't promote hearsay to graph facts).
+- **v4.37.0** — fourth extract_facts matcher migration (likely `dative_goes_to` or `possessive_has`); remaining 8 missing parser tenses; battery edge case for «X емес пе?» question form.
+
 ## [4.35.5] — 2026-05-02 — Modal-without-noun: battery case 21 «Жаза аламын» closes
 
 **Patch in v4.35+ semantic-IR arc.** Closes battery case 21 — declarative ability claim «Жаза аламын» ("I can write") that has been falling to "Түсінбедім" since v4.32.5 because no `noun_hint` was extracted (verb-only sentence) and v4.34.7's modality routing required both modality AND noun_hint. v4.35.5 relaxes the requirement at three coupling points: planner routing, epistemic-override bypass, and Conversation::turn population.

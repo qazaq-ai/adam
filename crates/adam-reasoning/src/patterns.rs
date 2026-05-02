@@ -257,10 +257,41 @@ fn strip_parens(s: &str) -> String {
 pub fn locative_lives_in(
     text: &str,
     _parses: &[Analysis],
+    sem_frames: &[adam_kernel_fst::SemFrame],
     lexicon: &LexiconV1,
     source: &FactSource,
     out: &mut Vec<Fact>,
 ) {
+    // **v4.36.0** — third matcher migration to consume the SemFrame
+    // stream (after copula_is_a in v4.34.5 + nominal_conjunction in
+    // v4.35.0). Same dual-guard pattern: refuse extraction when the
+    // sentence carries either sentence-level negation
+    // (Polarity::Negated on noun-class frame) or periphrastic
+    // modality (Modality::Necessity / Possibility / Ability).
+    //
+    // For LivesIn this protects against:
+    //   (a) «X Y-да тұру керек» — modal claim ("X needs to live in Y"),
+    //       not factual residency assertion
+    //   (b) «X Y-да тұрмайды дегі pattern with Polarity::Negated noun
+    //       earlier — sentence has negation, refuse to assert
+    //       residence relation
+    let any_negated_noun = sem_frames.iter().any(|f| {
+        f.polarity == adam_kernel_fst::Polarity::Negated
+            && matches!(
+                f.pos,
+                adam_kernel_fst::PosTag::Noun
+                    | adam_kernel_fst::PosTag::Adjective
+                    | adam_kernel_fst::PosTag::Pronoun
+                    | adam_kernel_fst::PosTag::Numeral
+            )
+    });
+    if any_negated_noun {
+        return;
+    }
+    let any_modal = sem_frames.iter().any(|f| f.modality.is_some());
+    if any_modal {
+        return;
+    }
     // Tokenise + per-token parse. Build a parallel vector of
     // (surface, first_analysis) entries — deterministic since
     // `analyse` returns in insertion order.
@@ -2193,7 +2224,7 @@ mod tests {
         let Some(lex) = load_lex() else { return };
         let text = "Бақытжан Алматыда тұрады";
         let mut out = Vec::new();
-        locative_lives_in(text, &[], &lex, &src(), &mut out);
+        locative_lives_in(text, &[], &[], &lex, &src(), &mut out);
         if out.is_empty() {
             eprintln!("note: «Бақытжан» may not be in Lexicon; skipping");
             return;
@@ -2208,7 +2239,7 @@ mod tests {
     fn locative_rejects_without_turu_verb() {
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        locative_lives_in("бала Алматыда жүр", &[], &lex, &src(), &mut out);
+        locative_lives_in("бала Алматыда жүр", &[], &[], &lex, &src(), &mut out);
         assert!(out.is_empty(), "no тұру verb → no lives_in fact");
     }
 
@@ -2216,7 +2247,7 @@ mod tests {
     fn locative_rejects_pronoun_subject() {
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        locative_lives_in("мен Алматыда тұрамын", &[], &lex, &src(), &mut out);
+        locative_lives_in("мен Алматыда тұрамын", &[], &[], &lex, &src(), &mut out);
         assert!(
             out.is_empty(),
             "pronoun subject rejected (no knowledge value)"
@@ -2730,7 +2761,14 @@ mod tests {
         // location-root filter refuses Қазақстан as a LivesIn subject.
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        locative_lives_in("Қазақстан өз аумағында тұрады", &[], &lex, &src(), &mut out);
+        locative_lives_in(
+            "Қазақстан өз аумағында тұрады",
+            &[],
+            &[],
+            &lex,
+            &src(),
+            &mut out,
+        );
         assert!(
             out.is_empty(),
             "country subject must be refused for LivesIn (got {out:?})"
