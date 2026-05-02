@@ -278,6 +278,24 @@ pub enum Intent {
         /// consumption. Consumption discipline starts here.
         #[serde(default)]
         noun_hint_polarity: adam_kernel_fst::Polarity,
+        /// **v4.34.7** — second SemFrame field consumed by the
+        /// response generator. When the input carries a periphrastic-
+        /// modality construction («X керек / тиіс / мүмкін» or «-а
+        /// ал-» ability), the SemFrame for the lexical predicate
+        /// carries `Modality::{Necessity, Possibility, Ability}`.
+        /// `Conversation::turn` walks the frame stream looking for
+        /// any non-None modality and copies it here; the planner
+        /// then routes the turn to `unknown.with_modal_acknowledge`
+        /// instead of asserting a generic fact about the noun_hint
+        /// (which is typically a different word from the modal-bearer
+        /// — e.g. «Кітап оқу керек» has noun_hint=кітап but
+        /// modality=Necessity on оқу). Default `None` preserves all
+        /// pre-v4.34.7 routing exactly. Polarity-aware routing
+        /// (v4.33.5) takes precedence when both fields are set —
+        /// negation overrides modality (rare edge case «X V керек
+        /// емес»).
+        #[serde(default)]
+        input_modality: Option<adam_kernel_fst::Modality>,
     },
 }
 

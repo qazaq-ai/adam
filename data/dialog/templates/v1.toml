@@ -879,6 +879,53 @@ templates = [
     "Түсіндім: {noun} емес деген пікір. Бұл туралы өзімде нақты дерек жоқ.",
 ]
 
+# v4.34.7 — second SemFrame-driven response triad. When the input
+# carries a periphrastic-modality construction («X V керек / тиіс /
+# мүмкін» or «-а ал-» ability), `populate_periphrastic_modality` /
+# `populate_ability_modality` mark the lexical-verb frame with the
+# corresponding Modality; `Conversation::turn` copies that onto
+# `Intent::Unknown.input_modality`; planner routes to one of three
+# per-modality families below.
+#
+# Pattern across all three: acknowledge the modal claim without
+# asserting evidence about it. adam doesn't have curated facts about
+# "what's necessary / possible / within ability" — those are the
+# user's claims, and the right response is respectful agreement or
+# acknowledgement, not a definition of the topic noun.
+
+# Necessity («керек / тиіс») — user claims X-V is needed/required.
+[[families]]
+key = "unknown.with_modal_necessity"
+templates = [
+    "Иә, маңызды мәселе екен.",
+    "{noun} жайында пікіріңізді түсіндім — бұл шынымен керек.",
+    "{noun} туралы ойыңыз орынды деп ойлаймын.",
+    "Сіздің пікіріңізді сыйлаймын — иә, бұл қажет нәрсе.",
+    "Иә, {noun} мәселесінде сіздің ойыңыз дұрыс.",
+]
+
+# Possibility («мүмкін») — user asks/claims X-V is possible.
+[[families]]
+key = "unknown.with_modal_possibility"
+templates = [
+    "Мүмкін екен, иә.",
+    "{noun} жайында бұл мүмкіндік туралы нақты дерегім жоқ.",
+    "Сіздің ойыңыз мүмкін болуы — қызық мәселе.",
+    "Иә, мұндай мүмкіндік бар деп ойлауыңыз орынды.",
+    "{noun} туралы пікіріңізді бағалаймын — мүмкін екеніне дау жоқ.",
+]
+
+# Ability («-а ал-») — user claims (or asks about) capability to do something.
+[[families]]
+key = "unknown.with_modal_ability"
+templates = [
+    "Жақсы екен, сіздің мүмкіндігіңізді түсіндім.",
+    "{noun} жайында ондай қабілет болуы — пайдалы.",
+    "Иә, сіз ондай нәрсе істей аласыз ба — бұл өзіңізге тән.",
+    "Сіздің мүмкіндігіңізді сыйлаймын.",
+    "Ондай нәрсе істей алу — жақсы қасиет.",
+]
+
 # v1.9.5: Unknown with *adapted* retrieval evidence — the retrieved
 # quote was rewritten by `compose_with_city` (ComposeMode::InSampleCitySwap)
 # so at least one city mention was swapped to the user's session city.

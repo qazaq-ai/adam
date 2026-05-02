@@ -7,6 +7,120 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.34.7] — 2026-05-02 — First Modality consumption: per-modality template families (Necessity / Possibility / Ability)
+
+**Patch in v4.34+ semantic-IR arc.** Closes the substrate-then-consume cycle for the **second** SemFrame field — `Modality`. Modality has been populated since v4.32.0 (Necessity / Possibility) and v4.32.5 (Ability), but the response generator ignored it. v4.34.7 wires three per-modality template families that engage with the user's modal claim instead of asserting a generic fact about the noun_hint.
+
+### What was broken pre-v4.34.7
+
+```
+> Кітап оқу керек.
+Кітап туралы қысқаша айтсам: Кітап — әдебиет көзі.
+                          ↑ ignores user's necessity claim about reading
+
+> Бұл болу мүмкін бе?
+Болу туралы мынаны айта аламын: «Жоғары білім сапасы...»
+                          ↑ ignores user's possibility question
+```
+
+Modality was correctly detected at SemFrame layer (`mod=Necessity`, `mod=Possibility` in `--trace`) but no consumer read the field, so routing fell through to standard `unknown.with_grounded_fact`/`with_evidence`.
+
+### Innovations
+
+**(1) `Intent::Unknown.input_modality: Option<Modality>` field.** Second SemFrame-derived field on the canonical Intent type (after v4.33.5's `noun_hint_polarity`). Default `None` preserves all pre-v4.34.7 routing exactly. Propagated through `semantics::interpret_text_with_lexicon`, `verifier::strip_evidence`, and 5 test-site Intent::Unknown constructors.
+
+**(2) `Conversation::turn` populates from any sem_frame with modality.** Unlike polarity (which is on the same frame as `noun_hint`), modality is on the **lexical verb** frame — a different word from the noun_hint. So we walk the entire sem_frames stream and pick the first non-None modality:
+```rust
+*input_modality = sem_frames.iter().find_map(|f| f.modality);
+```
+
+**(3) Per-modality planner routing.** New planner short-circuit BEFORE the standard Unknown routing chain, AFTER the polarity short-circuit (negation has higher priority — when both fire on rare «X V керек емес», negation wins):
+```rust
+if noun_hint.is_some() {
+    if let Some(modality) = input_modality {
+        return match modality {
+            Modality::Necessity => "unknown.with_modal_necessity",
+            Modality::Possibility => "unknown.with_modal_possibility",
+            Modality::Ability => "unknown.with_modal_ability",
+        };
+    }
+}
+```
+
+**(4) Epistemic-override bypass for modality.** Same pattern as v4.34.0's polarity bypass: when `input_modality.is_some()`, return None from override block so base_key wins. Otherwise EpistemicStatus::Tentative would force `unknown.tentative` over the modal-aware family.
+
+**(5) Three new template families** in `v1.toml`, 5 templates each:
+- `unknown.with_modal_necessity` — acknowledges the necessity claim ("Иә, маңызды мәселе екен", "Бұл шынымен керек", "Иә, бұл қажет нәрсе")
+- `unknown.with_modal_possibility` — acknowledges the possibility ("Мүмкін екен, иә", "Мұндай мүмкіндік бар деп ойлауыңыз орынды")
+- `unknown.with_modal_ability` — acknowledges the ability claim ("Жақсы екен, сіздің мүмкіндігіңізді түсіндім", "Ондай нәрсе істей алу — жақсы қасиет")
+
+### Live verification — visible behavior change
+
+| Query | v4.34.5 | v4.34.7 |
+|---|---|---|
+| **Кітап оқу керек** | "Кітап — әдебиет көзі." (definition) | "**Иә, маңызды мәселе екен.**" (necessity-aware) |
+| **Бұл болу мүмкін бе?** | "Болу туралы: «Жоғары білім...»" (corpus quote) | "**Мүмкін екен, иә.**" (possibility-aware) |
+| **Бұл шындық емес** (control) | "Шындық емес деп айтасыз — пікіріңізді сыйлаймын." | unchanged (polarity has higher priority) ✓ |
+| **Қазақстан туралы айт** (control) | grounded fact about Kazakhstan | unchanged (no modality) ✓ |
+
+### Real-world battery (v4.34.7)
+
+26 queries (same set as v4.34.5):
+
+| Aggregate | v4.34.7 | Δ vs v4.34.5 |
+|---|---|---|
+| Mean latency | **321.5 ms** | -2.7 ms (within noise) |
+| Mean max RSS | **176.0 MB** | -0.9 MB (within noise) |
+| Coherent responses | **26/26 = 100 %** | matched |
+| Neg-consumed rate | **5/5** | matched |
+| **Mod-consumed rate** | **2/4** (cases 19, 20 visibly modal-aware) | **NEW** |
+
+Cases 19 («Кітап оқу керек») and 20 («Бұл болу мүмкін бе?») moved from "asserting an unrelated definition" → "acknowledging the modal claim". Cases 21 («Жаза аламын») and 22 («Сөйлей аласыз ба?») unchanged:
+- Case 21: no `noun_hint` extracted (just verb+aux, no content noun) — modality routing requires both modality AND noun_hint. Falls to "Түсінбедім" as before. v4.35+ work to handle noun-less modal claims.
+- Case 22: routes through `Intent::AskAboutSystem(GenericCapability)` BEFORE reaching Unknown branch — gets the existing smart "Жоқ, ондай әрекетті..." answer. Modality is detected but doesn't influence (different intent path). No regression.
+
+### Substrate-then-consume cycle status
+
+Two of three SemFrame fields now have closed cycles:
+
+| Field | Population | Consumption (dialog) | Consumption (extraction) |
+|---|---|---|---|
+| **Polarity** | v4.33.0 | **v4.33.5** | **v4.34.5** |
+| **Modality** | v4.32.0 (N/P) + v4.32.5 (Ability) | **v4.34.7** | not yet |
+| Evidence | v4.31.0 (PastEvidential→Hearsay) | not yet | not yet |
+| Relation | not yet (placeholder) | n/a | n/a |
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **862 passing** unchanged (5 test-site Intent::Unknown patches added `input_modality: None`) |
+| Real-world 26-query battery | **26/26 = 100 %** coherent; mod-consumed 2/4 (cases 21, 22 correctly unchanged) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Pipeline impact
+
+- 1 new field on `Intent::Unknown` (`input_modality`)
+- 1 propagation in `semantics::interpret_text_with_lexicon`
+- 1 propagation in `verifier::strip_evidence`
+- 5 test-site Intent::Unknown patches
+- 1 wiring in `Conversation::turn` (find_map over sem_frames for modality)
+- 1 per-modality match in planner Unknown-branch routing
+- 1 epistemic-override bypass for modality
+- 3 new template families with 15 templates total in v1.toml
+- facts/derived_facts version sync to 4.34.7
+
+Cadence: patch — closes second substrate-then-consume cycle (Modality), the second SemFrame field to influence user-facing answer text.
+
+### Carry-forwards
+
+- **v4.35.0** — second extract_facts matcher migration (likely `nominal_conjunction` for RelatedTo, since it benefits from sem_frame negation check the same way `copula_is_a` does); modality consumption on the extraction side (refuse extraction when modality is set — modal claims aren't assertions).
+- **v4.35.5** — handle modal claims without `noun_hint` (case 21 «Жаза аламын» — verb-only modal); EvidenceKind consumption (Hearsay-marked claims should hedge evidentiality).
+- **v4.36+** — remaining 8 missing parser tenses; battery edge case for «X емес пе?» question form requiring polarity-aware AND new intent classification.
+
 ## [4.34.5] — 2026-05-02 — First extract_facts pattern matcher migration: copula_is_a consumes &[SemFrame], refuses negated extraction
 
 **Patch in v4.34+ semantic-IR arc.** Closes a long-standing carry-forward (originally promised v4.32.5, then v4.34.0). First time a corpus-extraction pattern matcher reads from the `&[SemFrame]` stream — substrate-then-consume cycle now closed for the **extraction side** of the pipeline (it was already closed for the **dialog side** at v4.33.5). Negation-aware extraction guards against future corpus sentences where «X — Y емес» would otherwise mis-extract as «X IsA Y».

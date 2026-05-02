@@ -579,6 +579,7 @@ impl Conversation {
         if let Intent::Unknown {
             noun_hint: Some(hint),
             noun_hint_polarity,
+            input_modality,
             ..
         } = &mut intent
         {
@@ -588,6 +589,16 @@ impl Conversation {
                 .find(|f| f.root.to_lowercase() == hint_lower)
             {
                 *noun_hint_polarity = frame.polarity;
+            }
+            // **v4.34.7** — second SemFrame field consumption.
+            // Modality is set on the LEXICAL VERB frame (not on the
+            // noun_hint frame) by `populate_periphrastic_modality`
+            // and `populate_ability_modality`. So we walk the entire
+            // sem_frames stream and pick the first non-None modality.
+            // Pattern: «{noun} {verb}-у керек» — noun_hint=кітап,
+            // modality=Necessity on оқу.
+            if input_modality.is_none() {
+                *input_modality = sem_frames.iter().find_map(|f| f.modality);
             }
         }
 

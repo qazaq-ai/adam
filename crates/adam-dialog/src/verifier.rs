@@ -255,6 +255,7 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             temporal_scope,
             compositional_function,
             noun_hint_polarity,
+            input_modality,
             ..
         } => Intent::Unknown {
             raw_tokens,
@@ -263,23 +264,13 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             grounded_fact: None,
             example_adapted: false,
             reasoning_chain: None,
-            // **v4.12.0** — preserve question_shape across the
-            // strip; it's an analytical signal, not evidence.
             question_shape,
-            // **v4.23.0** — same: temporal_scope is an analytical
-            // signal about query structure, not evidence; preserve
-            // it through strip_evidence so the planner still routes
-            // to the temporal-no-data template family even after
-            // verifier rejects injected evidence.
             temporal_scope,
-            // **v4.23.5** — same: compositional_function is an
-            // analytical signal about query structure.
             compositional_function,
-            // **v4.33.5** — same: noun_hint_polarity is an
-            // analytical signal about input polarity, not evidence.
-            // Preserve it so verbatim/derived evidence stripping
-            // doesn't lose the negation marker.
             noun_hint_polarity,
+            // **v4.34.7** — preserve input_modality across strip;
+            // analytical signal about modal claim type, not evidence.
+            input_modality,
         },
         other => other,
     }
@@ -302,6 +293,7 @@ mod tests {
             temporal_scope: false,
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+            input_modality: None,
         }
     }
 

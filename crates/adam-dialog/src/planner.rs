@@ -357,6 +357,22 @@ pub fn plan_response_with_epistemic(
             },
             _,
         ) => None,
+        // **v4.34.7** — same bypass for modality. When the user
+        // makes a periphrastic-modality claim, the modal-aware
+        // template families (`unknown.with_modal_necessity / _possibility
+        // / _ability`) take precedence over Conflicted/Tentative
+        // overrides. Reason: a tentative "Бәлкім X туралы айтасыз ба"
+        // doesn't acknowledge the user's modal claim about doing /
+        // being / capable-of-doing something. The base_key from
+        // plan_response_with_session wins.
+        (
+            Intent::Unknown {
+                noun_hint: Some(_),
+                input_modality: Some(_),
+                ..
+            },
+            _,
+        ) => None,
         (
             Intent::Unknown {
                 noun_hint: Some(_), ..
@@ -657,6 +673,7 @@ mod tests {
             temporal_scope: false,
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+            input_modality: None,
         };
         assert_eq!(intent_key(&intent), "unknown.with_derived_chain");
     }
@@ -679,6 +696,7 @@ mod tests {
             temporal_scope: false,
             compositional_function: false,
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+            input_modality: None,
         };
         assert_eq!(intent_key(&intent), "unknown.with_grounded_fact");
     }
@@ -787,6 +805,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             temporal_scope,
             compositional_function,
             noun_hint_polarity,
+            input_modality,
             ..
         } => {
             // **v4.33.5** — sentence-level negation routing. When
@@ -804,6 +823,28 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             // Negated.
             if *noun_hint_polarity == adam_kernel_fst::Polarity::Negated && noun_hint.is_some() {
                 return "unknown.with_negated_topic";
+            }
+            // **v4.34.7** — modality routing. When the user makes a
+            // periphrastic-modality claim («X V керек / тиіс /
+            // мүмкін» or «-а ал-» ability), `Conversation::turn`
+            // copies the Modality from the lexical-verb SemFrame
+            // onto the Intent. Asserting a generic fact about
+            // noun_hint doesn't engage with the user's modal claim.
+            // Route to per-modality template families so the response
+            // can acknowledge the specific modal kind appropriately:
+            // Necessity → "иә, V-у пайдалы"; Possibility → "мүмкін
+            // екен"; Ability → "жақсы екен, сіздің мүмкіндігіңізді
+            // түсіндім". Runs AFTER polarity check (negation has
+            // higher priority — when both fire on rare edge case
+            // «X V керек емес», negation is the more salient signal).
+            if noun_hint.is_some() {
+                if let Some(modality) = input_modality {
+                    return match modality {
+                        adam_kernel_fst::Modality::Necessity => "unknown.with_modal_necessity",
+                        adam_kernel_fst::Modality::Possibility => "unknown.with_modal_possibility",
+                        adam_kernel_fst::Modality::Ability => "unknown.with_modal_ability",
+                    };
+                }
             }
             // **v4.23.0** — `temporal_scope: true` short-circuits to
             // `unknown.temporal_no_data`. Pattern: temporal adverb

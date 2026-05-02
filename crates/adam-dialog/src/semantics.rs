@@ -302,6 +302,7 @@ pub fn interpret_text_with_lexicon(
         // analyses here). Default Affirmative preserves all pre-
         // v4.33.5 routing exactly.
         noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+        input_modality: None,
     }
 }
 
@@ -365,6 +366,7 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         // detection requires sem_frames built in Conversation::turn
         // from the rich FST analyses.
         noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+        input_modality: None,
     }
 }
 
