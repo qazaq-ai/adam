@@ -136,7 +136,7 @@ Validator checks:
 - `measurements.jsonl` — 10 entries / 10 facts  *(new in v4.0.19)*
 - `mathematics_basic.jsonl` — 37 entries / 37 facts  *(new in v4.6.15)*
 - `informatics_basic.jsonl` — 40 entries / 40 facts  *(new in v4.6.15)*
-- `programming_rust.jsonl` — 110 entries / 110 facts  *(new in v4.7.0)*
+- `programming_rust.jsonl` — 179 entries / 179 facts  *(110 baseline in v4.7.0; +40 Latin-alias entries in v4.26.0; +10 keyword/concept aliases in v4.26.5; +18 advanced concepts in v4.27.0; +1 in v4.27.5. rust_111…rust_179 are auto-curated `reviewer: "claude"` — pending native-speaker review per `docs/rust_glossary_review_v4.28.md`. Approve via `bash scripts/approve_rust_entry.sh <id>` after review)*
 - `physics_school.jsonl` — 102 entries / 102 facts  *(new in v4.8.0)*
 - `chemistry_school.jsonl` — 105 entries / 105 facts  *(new in v4.9.0)*
 - `biology_school.jsonl` — 120 entries / 120 facts  *(new in v4.10.0)*

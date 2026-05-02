@@ -7,6 +7,58 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.28.0] — 2026-05-02 — Native-speaker review substrate: rust_glossary_review_v4.28.md + approve_rust_entry.sh
+
+**First minor in v4.28+ review-pipeline arc.** v4.26.0 → v4.27.5 added 69 entries to `programming_rust.jsonl` (rust_111…rust_179), all auto-curated by Claude with honest `reviewer: "claude"` audit trail. Per the v4.7.0 directive in `data/raw/rust_book_kk/README.md` («native-speaker review is needed for technical accuracy and idiomatic phrasing»), these entries need a human pass before being marked `reviewer: "shaman"`. v4.28.0 ships the **review substrate** — tooling and documentation that make the offline review process cheap, rather than the review itself (which requires the user as native speaker).
+
+This release contains zero behavior changes. It's pure infrastructure for the next phase of work.
+
+### Innovations
+
+**(1) `docs/rust_glossary_review_v4.28.md`** (~100 lines) — Markdown review document. Lists all 69 auto-curated entries with `id`, `subject`, `object` (IsA target), and verbatim `kk` text in a single markdown table for offline reading. Front-matter explains the review workflow (approve / approve-with-edit / reject) and how each choice flows into runtime via the existing extract_facts → run_reasoner pipeline.
+
+**(2) `scripts/approve_rust_entry.sh`** (~60 lines) — Pure-shell approval helper. After reviewing an entry, run `bash scripts/approve_rust_entry.sh rust_111` to flip `reviewer: "claude"` → `reviewer: "shaman"` for that specific entry. Supports batch mode (`bash scripts/approve_rust_entry.sh rust_111 rust_112 rust_113`) and `--all` for full-batch acceptance. Uses awk + sed only — passes the existing `rust_only_contracts::shell_scripts_do_not_invoke_foreign_language_runtimes` test.
+
+**(3) Self-review pass.** Before generating the review document, ran a heuristic check on all 69 entries:
+- Russian-loan filter: which words in `kk` text could be replaced with Kazakh equivalents
+- Backtick-quoted-Latin check: every Latin code-identifier must be `\`code\``-wrapped per v4.7.0 corpus-purity rule
+- Subject-in-text check: the `subject` field must appear (case-insensitive) in the rendered `kk` text
+
+Result: **only 1 false-positive** flagged (rust_171: subject `rust design` is the Latin retrieval-key but kk text uses Kazakh prose «`Rust` дизайны…» — by design). Entries are syntactically clean. The remaining review concern is **idiomatic Kazakh + technical accuracy**, which requires a human native speaker.
+
+**(4) `data/world_core/README.md` updated.** `programming_rust.jsonl` line refreshed: 110 → 179 entries, with provenance trail (which release added how many) and pointer to the review document and approve script.
+
+### Verification
+
+- **Workspace tests `824 → 824 passing`** — zero behavior change, every test produces the same result.
+- **rust_holdout `41 / 41 = 100 %`** — unchanged.
+- **live_holdout `32 / 32 = 100 %`** — unchanged.
+- **Parse-disambig** still **23/23 = 100 %**.
+- **`validate_world_core`** OK at 1695 / 1695 approved / 1861 facts.
+
+### Honest framing
+
+This is **substrate, not review.** Adam-as-Claude is not a native Kazakh speaker; the actual review must be done by the user. v4.28.0 makes that work cheap to do (one entry at a time, with a shell helper to flip the audit trail) rather than blocking on review before further releases.
+
+The 69 entries continue to function correctly in production (they're `review_status: "approved"`, just with `reviewer: "claude"` to flag their auto-curated status). User can review and flip them at their own pace.
+
+### Pipeline impact
+
+- New file: `docs/rust_glossary_review_v4.28.md` (~100 lines).
+- New file: `scripts/approve_rust_entry.sh` (~60 lines).
+- `data/world_core/README.md` — programming_rust line refreshed.
+- `data/retrieval/facts.json` + `derived_facts.json` — version field synced to `"4.28.0"`.
+- No code changes, no test count changes, no behavior changes.
+- Workspace tests **824 → 824 passing**.
+
+### Cadence
+
+Minor — review-pipeline substrate. Substantive enough for a minor (ships a workflow that closes a 4-release accumulation of `reviewer: "claude"` entries), but architecturally light (no production code changes).
+
+**Stripe (6) — vertical knowledge domains — Rust track review-pipeline layer.** This concludes the immediate Rust tutor work; subsequent v4.28.5+ patches will be opportunistic (act on user's review feedback, fix issues found during review).
+
+Next per the user-approved 2026-05-02 strategic direction: **Track A corpus expansion** (root co-occurrence affinity matrix; needs corpus growth to ~50M tokens before useful — defer concrete release until corpus is bigger).
+
 ## [4.27.5] — 2026-05-02 — Rust tutor v4: 5 live-session fixes — Hello World hijack + bağdarlamalau-tilinde qualifier + айнымалы lexicon entry
 
 **Patch in v4.27+ Rust tutor depth-of-coverage arc.** A live REPL session immediately after v4.27.0 ship surfaced 5 new failure patterns, all of them topic-extraction architectural issues, not data gaps:
