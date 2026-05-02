@@ -7,6 +7,101 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.33.0] — 2026-05-02 — Sentence-level negation: «X емес» → Polarity::Negated on prior noun
+
+**First minor in v4.33+ semantic-feature population arc.** Closes the noun-polarity gap left by v4.31.0. v4.31.0 introduced `Polarity` as a unified type but only auto-derived from `VerbFeatures.negation` — noun frames defaulted to `Affirmative`. v4.33.0 adds sentence-level detection: when a noun-class frame is followed by the «емес» («not») particle, the noun's polarity flips to `Negated`. The Kazakh polarity story is now complete for the canonical patterns: verbs auto-derive from suffix-level negation, nouns auto-derive from sentence-level «емес».
+
+### Innovations
+
+**(1) `populate_sentential_negation(&mut [SemFrame])`** in `crates/adam-kernel-fst/src/sem_frame.rs`. Single linear scan:
+
+```
+for i in 1..frames.len():
+    if frames[i].root == "емес" and frames[i-1].pos in {Noun, Adj, Pronoun, Numeral}:
+        set frames[i-1].polarity = Negated
+```
+
+Noun-like POS gating prevents false positives — verb frames are skipped because their negation comes from `VerbFeatures.negation` (set at FST analysis time), not from sentential «емес».
+
+**(2) Wired into `Conversation::turn_with_trace`** AFTER `populate_periphrastic_modality` and `populate_ability_modality`. First-detection-wins applies: detectors don't fight each other.
+
+Live `--trace`:
+```
+> Бұл шындық емес
+├─ sem_frames:
+│   [0] бұл/Pronoun
+│   [1] шындық/Noun polarity=Negated
+│   [2] емес/Function
+
+> Ол ұзын емес
+├─ sem_frames:
+│   [0] ол/Pronoun
+│   [1] ұзын/Adjective polarity=Negated
+│   [2] емес/Function
+```
+
+The negation flag attaches to the immediate predecessor (the actual content head), not to the leading pronoun.
+
+### Known FST gap (carry-forward)
+
+The predicate-copula inflected forms «емеспін / емессің / емеспіз / емессіз / емеспіс» do **not** parse currently. `parser::analyse` dispatches `particle` POS through the catch-all branch which only emits an analysis when `entry.root == surface` — bare «емес» works, inflected forms fall off. So «Мен X емеспін» loses the «емеспін» token entirely; the negation can't be detected.
+
+Detection works for the bare-particle pattern («Бұл X емес») which is the canonical declarative form. Inflected detection requires extending parser's particle dispatch to enumerate predicate copulas (mirror of how nouns are handled). Documented as **v4.34+** prerequisite — same release where the first extract_facts pattern matcher migration also wants better particle handling.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **854 → 860 passing** (+6 negation tests) |
+| New negation tests | `sentential_negation_sets_negated_on_prior_noun`, `…_attaches_to_immediate_predecessor`, `…_skips_verb_frame`, `…_no_match_leaves_all_affirmative`, `…_emes_at_position_zero_skipped`, `…_is_idempotent` |
+| Real-world 24-query battery | **23/24 = 95.8 % coherent** (1 honest "Түсінбедім" on case 21 declarative ability — no regression vs v4.32.5) |
+| Modal-detect rate | **4/4 = 100 %** (Necessity + Possibility + Ability ×2) |
+| **Neg-detect rate** | **2/2 = 100 %** (new) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Real-world battery (v4.33.0)
+
+24 queries, extending v4.32.5's 22 with 2 negation cases:
+
+| # | Category | Query | Latency | RSS | ✓ |
+|---|---|---|---|---|---|
+| 23 | negation | Бұл шындық емес | 320 ms | 177.2 MB | ✓ trace polarity=Negated |
+| 24 | negation | Ол ұзын емес | 320 ms | 177.2 MB | ✓ trace polarity=Negated |
+
+**Aggregate:** mean **322.5 ms** / mean **177.0 MB** RSS · worst 330 / 177.9 · **23/24 = 95.8 % coherent**.
+
+vs v4.32.5: -2.9 ms latency (within noise), +0.8 MB RSS (within noise). Negation detection adds zero measurable cost.
+
+### Honest framing
+
+`Polarity::Negated` is now populated on noun frames in the canonical pattern. **Not yet consumed** by the response generator — for «Бұл шындық емес» the response is the same general fact about шындық you'd get without negation. Polarity-aware response generation is **v4.33.5+** work (template branching: `unknown.negated_noun` family responding "Шындық емес деп ойлауыңызға құрметпен қараймын" / "Кешіріңіз, мен бұл туралы дау айта алмаймын").
+
+The Kazakh polarity story is now architecturally complete:
+- **Verbs**: `VerbFeatures.negation` (FST-level) → `Polarity::Negated`
+- **Nouns / Adjs / Pronouns / Numerals**: sentential «емес» → `Polarity::Negated` (this release)
+
+Inflected «емеспін / емессің» forms remain a coverage gap, deferred to v4.34+.
+
+### Pipeline impact
+
+- 1 new function `populate_sentential_negation` in sem_frame.rs (~40 lines)
+- 1 re-export in lib.rs
+- 1 line wiring in `Conversation::turn_with_trace`
+- 6 new unit tests (all passing)
+- Real-world battery extended 22 → 24 queries
+- facts/derived_facts version sync to 4.33.0
+
+Cadence: minor — closes a meaningful gap (noun polarity detection) that v4.31.0 deliberately left for a future release. Architecturally completes the polarity coverage for non-inflected patterns.
+
+### Carry-forwards
+
+- **v4.33.5** — first **consumption** of populated SemFrame fields by the response generator: template branching on `Polarity::Negated` (acknowledge the user's negation gracefully); template branching on Modality (acknowledge necessity / possibility / ability claims appropriately).
+- **v4.34.0** — parser particle-copula extension (so «емеспін / емессің / емеспіз / емессіз» parse and feed the negation detector); first behavioural migration of one extract_facts pattern matcher to consume `&[SemFrame]`.
+- **v4.35+** — remaining 8 missing parser tenses; battery edge case 18 (structural answer to «X емес пе?» question form, requires both polarity-aware response AND new intent classification).
+
 ## [4.32.5] — 2026-05-02 — Ability `-а ал-` detection + parser tense expansion (ConverbImperfect)
 
 **Patch in v4.32+ semantic-feature population arc.** Closes the third member of the Kazakh modality triad (after Necessity and Possibility shipped in v4.32.0). The honest scope-creep here: ability detection turned out to require a **prerequisite parser fix** — the FST's verb analyser only enumerated 4 of 13 defined tenses, leaving converb forms like «жаза» unparseable. Fixing both together in this patch is the matched architectural pair.

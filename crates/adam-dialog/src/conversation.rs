@@ -961,6 +961,14 @@ impl Conversation {
         // wins, so если керек/тиіс/мүмкін уже задал modality —
         // ability detector её не перезапишет.
         adam_kernel_fst::populate_ability_modality(&mut sem_frames);
+        // **v4.33.0** — sentence-level negation via «емес» particle.
+        // When a noun-class frame is followed by `емес`, set its
+        // polarity to Negated. Closes the v4.31.0 noun-polarity gap
+        // for the canonical predicate-negation pattern «X емес».
+        // Inflected forms «емеспін / емессің / емеспіз» don't parse
+        // currently (parser particle dispatch is bare-only) — that's
+        // a v4.34+ FST coverage fix.
+        adam_kernel_fst::populate_sentential_negation(&mut sem_frames);
         let trace = TurnTrace {
             parses,
             sem_frames,

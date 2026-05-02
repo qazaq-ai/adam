@@ -43,7 +43,7 @@ pub use phonology::{
 };
 pub use sem_frame::{
     EvidenceKind, Modality, Polarity, PosTag, RelationKind, SemFrame, populate_ability_modality,
-    populate_periphrastic_modality,
+    populate_periphrastic_modality, populate_sentential_negation,
 };
 pub use suffix_priors::{
     SCHEMA_VERSION as SUFFIX_PRIORS_SCHEMA_VERSION, SuffixPriors, SuffixPriorsLoadError,

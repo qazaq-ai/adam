@@ -363,6 +363,68 @@ impl From<&Analysis> for SemFrame {
     }
 }
 
+/// **v4.33.0** — sentence-level negation detection via «емес» particle.
+///
+/// In Kazakh, a noun, adjective, or pronoun is negated by following
+/// it with the particle «емес» («not / is not»):
+///
+/// ```text
+///   Бұл шындық емес       — "This is not the truth"
+///   Ол ұзын емес          — "He/she is not tall"
+///   Бұл мен емес          — "This is not me"
+/// ```
+///
+/// When v4.31.0 introduced `Polarity` it was unified across nouns
+/// and verbs but only auto-derived from `VerbFeatures.negation` —
+/// noun frames defaulted to `Affirmative`. v4.33.0 closes the gap
+/// for the canonical sentence-level pattern: a noun-class frame
+/// followed by «емес» as its own SemFrame.
+///
+/// Detection — single linear scan:
+///   for i in 1..frames.len():
+///     if frames[i].root == "емес" and frames[i-1].pos is noun-like:
+///       set frames[i-1].polarity = Negated
+///
+/// Noun-like POS includes `Noun`, `Adjective`, `Pronoun`, `Numeral`
+/// — the four classes that take predicate-style negation.
+///
+/// **Known FST gap (v4.34+ work):** the predicate-copula inflected
+/// forms «емеспін / емессің / емеспіз / емессіз» are NOT in the
+/// SemFrame stream because `parser::analyse` dispatches `particle`
+/// POS through the catch-all branch, which only emits an analysis
+/// when `entry.root == surface`. The inflected forms simply don't
+/// parse and get dropped by `parse_input_inner`. Detection here
+/// works for bare «емес» («Бұл X емес»); inflected forms («Мен X
+/// емеспін») are blocked until parser's particle dispatch is
+/// extended to enumerate predicate copulas (mirror of how nouns
+/// are handled). Documented as carry-forward.
+///
+/// First-detection-wins. Idempotent.
+pub fn populate_sentential_negation(frames: &mut [SemFrame]) {
+    if frames.len() < 2 {
+        return;
+    }
+    for i in 1..frames.len() {
+        if frames[i].root != "емес" {
+            continue;
+        }
+        // Only mark noun-class frames. Skip verb / function /
+        // preceding modal — negation by «емес» is a predicate
+        // negator that attaches to noun-headed predicates.
+        let prev_is_noun_like = matches!(
+            frames[i - 1].pos,
+            PosTag::Noun | PosTag::Adjective | PosTag::Pronoun | PosTag::Numeral
+        );
+        if !prev_is_noun_like {
+            continue;
+        }
+        // First-detection-wins.
+        if frames[i - 1].polarity == Polarity::Affirmative {
+            frames[i - 1].polarity = Polarity::Negated;
+        }
+    }
+}
+
 /// **v4.32.5** — ability `-а ал-` detection.
 ///
 /// Kazakh expresses ability/possibility periphrastically: a lexical
@@ -995,6 +1057,117 @@ mod tests {
         populate_ability_modality(&mut frames);
         let after_first = frames.clone();
         populate_ability_modality(&mut frames);
+        assert_eq!(frames, after_first);
+    }
+
+    /// **v4.33.0** — sentence-level negation: noun frame followed by
+    /// «емес» particle should be marked Negated.
+    fn emes_particle_frame() -> SemFrame {
+        SemFrame::from_analysis(&Analysis::Noun {
+            // particle POS projects to PosTag::Function via from_lexicon_str.
+            root: RootEntry {
+                id: "test_part_emes".into(),
+                root: "емес".into(),
+                part_of_speech: "particle".into(),
+                vowel_harmony: "front".into(),
+                final_sound_class: "voiceless_consonant".into(),
+            },
+            features: NounFeatures::default(),
+        })
+    }
+
+    #[test]
+    fn sentential_negation_sets_negated_on_prior_noun() {
+        let mut frames = vec![bare_noun_frame("шындық"), emes_particle_frame()];
+        populate_sentential_negation(&mut frames);
+        assert_eq!(frames[0].polarity, Polarity::Negated);
+        // The «емес» particle's own polarity is untouched
+        // (it's the negator, not the thing-being-negated).
+        assert_eq!(frames[1].polarity, Polarity::Affirmative);
+    }
+
+    /// «Бұл X емес» — leading pronoun + content noun + emes.
+    /// Negation must attach to the immediately-preceding noun
+    /// (frame[1]=шындық), not to the pronoun (frame[0]=бұл).
+    #[test]
+    fn sentential_negation_attaches_to_immediate_predecessor() {
+        let mut frames = vec![
+            // бұл — pronoun
+            SemFrame::from_analysis(&Analysis::Noun {
+                root: RootEntry {
+                    id: "test_pron_bul".into(),
+                    root: "бұл".into(),
+                    part_of_speech: "pronoun".into(),
+                    vowel_harmony: "front".into(),
+                    final_sound_class: "voiceless_consonant".into(),
+                },
+                features: NounFeatures::default(),
+            }),
+            bare_noun_frame("шындық"),
+            emes_particle_frame(),
+        ];
+        populate_sentential_negation(&mut frames);
+        // Pronoun «бұл» stays Affirmative.
+        assert_eq!(frames[0].polarity, Polarity::Affirmative);
+        // Noun «шындық» (immediate predecessor) is Negated.
+        assert_eq!(frames[1].polarity, Polarity::Negated);
+    }
+
+    /// Verb frame preceding «емес» is NOT marked. Verb negation goes
+    /// through `VerbFeatures.negation` → `polarity` on the verb
+    /// frame itself; sentential «емес» applies only to noun-class
+    /// predicates. Avoids stomping on auto-derived verb polarity.
+    #[test]
+    fn sentential_negation_skips_verb_frame() {
+        let mut frames = vec![
+            SemFrame::from_analysis(&Analysis::Verb {
+                root: verb_root("жаз"),
+                features: VerbFeatures {
+                    voice: None,
+                    negation: false,
+                    tense: Some(Tense::PastDefinite),
+                    person: Some(Person::Third),
+                    number: Some(Number::Singular),
+                    polite: false,
+                },
+            }),
+            emes_particle_frame(),
+        ];
+        populate_sentential_negation(&mut frames);
+        // Verb frame stays Affirmative.
+        assert_eq!(frames[0].polarity, Polarity::Affirmative);
+    }
+
+    /// No false positive when there's no «емес» in the stream.
+    #[test]
+    fn sentential_negation_no_match_leaves_all_affirmative() {
+        let mut frames = vec![
+            bare_noun_frame("қазақстан"),
+            bare_noun_frame("туралы"),
+            bare_noun_frame("айт"),
+        ];
+        populate_sentential_negation(&mut frames);
+        for frame in &frames {
+            assert_eq!(frame.polarity, Polarity::Affirmative);
+        }
+    }
+
+    /// Single «емес» frame at index 0 — no preceding noun to negate.
+    /// Function must early-exit gracefully.
+    #[test]
+    fn sentential_negation_emes_at_position_zero_skipped() {
+        let mut frames = vec![emes_particle_frame()];
+        populate_sentential_negation(&mut frames);
+        assert_eq!(frames[0].polarity, Polarity::Affirmative);
+    }
+
+    /// Idempotence: running twice produces the same result.
+    #[test]
+    fn sentential_negation_is_idempotent() {
+        let mut frames = vec![bare_noun_frame("шындық"), emes_particle_frame()];
+        populate_sentential_negation(&mut frames);
+        let after_first = frames.clone();
+        populate_sentential_negation(&mut frames);
         assert_eq!(frames, after_first);
     }
 }
