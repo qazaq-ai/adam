@@ -216,6 +216,15 @@ pub struct Conversation {
 pub struct TurnTrace {
     /// FST parses for each token in the raw input.
     pub parses: Vec<adam_kernel_fst::parser::Analysis>,
+    /// **v4.31.5** — first SemFrame consumer migration. One frame
+    /// per parse, in the same order as `parses`. Built via
+    /// `SemFrame::from_analysis(&analysis)` at trace-capture time.
+    /// Lets `--trace` render the unified morphemic-logical IR per
+    /// token. v4.31.0 introduced the type; v4.31.5 wires it into
+    /// the canonical trace path so every downstream consumer sees
+    /// the same frame-per-parse mapping. Substrate for v4.32+
+    /// pattern-matcher migration to SemFrame inputs.
+    pub sem_frames: Vec<adam_kernel_fst::SemFrame>,
     /// Intent after follow-up resolution AND retrieval/reasoning
     /// injection — this is the shape the planner actually saw.
     pub intent_after_injection: Intent,
@@ -925,8 +934,20 @@ impl Conversation {
             self.dialog_context
                 .record_turn(self.turn_counter, topic, domain_hint, false);
         }
+        // **v4.31.5** — populate SemFrame view of every parse before
+        // moving `parses` into the trace. One-to-one correspondence
+        // with `parses`; uses `From<&Analysis>` (lossless on every
+        // morphological feature, auto-derives polarity from negation
+        // and evidence from PastEvidential tense). Allocation cost:
+        // one SemFrame per parse (~200 bytes), proportional to input
+        // length. No new pipeline behaviour — just the canonical
+        // SemFrame view exposed at the trace boundary so v4.32+
+        // consumers can migrate one at a time.
+        let sem_frames: Vec<adam_kernel_fst::SemFrame> =
+            parses.iter().map(adam_kernel_fst::SemFrame::from).collect();
         let trace = TurnTrace {
             parses,
+            sem_frames,
             intent_after_injection: intent,
             intent_after_verification: intent_for_render,
             session_snapshot: self.session.clone(),

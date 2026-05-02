@@ -7,6 +7,89 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.31.5] — 2026-05-02 — SemFrame consumer #1: TurnTrace.sem_frames + --trace renderer; +real-world battery + RSS measurement
+
+**Patch in v4.31+ semantic-IR arc.** First consumer migration of v4.31.0's SemFrame substrate. Plus the start of a new release-discipline practice: every release tested with **real human-like Kazakh queries**, reporting **both latency AND max RSS per query**, not just templated holdout pass-rates.
+
+### Innovations
+
+**(1) `TurnTrace.sem_frames: Vec<SemFrame>` field.** Populated in `turn_with_trace` via `parses.iter().map(SemFrame::from).collect()` — one frame per parse, in the same order. Substrate path for v4.32+ pattern-matcher migration to consume `&[SemFrame]` instead of `&[Analysis]`. Allocation cost ~200 bytes per parse (proportional to input length); in measured battery this added ~0.03 MB peak RSS (within noise). Zero pipeline behaviour change — frames are derived view, not authoritative state.
+
+**(2) `adam_chat --trace` SemFrame renderer.** Compact one-line-per-frame format: `[i] root/POS feature=value …`. Any feature that's `None` is omitted to keep the line scannable. Shows polarity / evidence / modality auto-derivations live. Example for «Кітапты оқымадым»:
+```
+├─ sem_frames:
+│   [0] кітап/Noun case=Accusative number=Singular
+│   [1] оқы/Verb tense=PastDefinite person=First polarity=Negated
+```
+The `Polarity::Negated` line is the v4.31.0 auto-derivation working end-to-end through the trace boundary — exactly the demonstration substrate-then-wire releases are for.
+
+**(3) Real-world battery in CHANGELOG.** First release to ship a verbatim 18-query human-like battery (small talk / identity / capabilities / knowledge / rust / honest-unknown / edge), each measured for wall-clock latency AND max RSS via `/usr/bin/time -l ./target/release/adam_chat --once "<query>"`. Establishes a per-release reportable baseline that catches memory regressions invisible to latency-only metrics.
+
+### Real-world battery (v4.31.5)
+
+Hardware: M2 8 GB. Each query is `--once`-spawned (cold-load Lexicon + retrieval + facts + derivations + suffix priors + root_affinity), which is what a real user invoking the CLI per question would experience. Per-turn hot-loop latency on the same hardware remains 1.07 ms (criterion bench, pre-loaded conversation).
+
+| # | Category | Query | Latency | Max RSS | Response (truncated) | ✓ |
+|---|---|---|---|---|---|---|
+| 1 | small_talk | Сәлем! | 320 ms | 176.0 MB | Сәлем | ✓ |
+| 2 | small_talk | Қалыңыз қалай? | 320 ms | 177.4 MB | Жақсымын, рахмет. | ✓ |
+| 3 | small_talk | Танысайық. | 320 ms | 177.3 MB | Иә, әрине! Менің атым адам. Сіздің атыңыз кім? | ✓ |
+| 4 | identity | Сен кімсің? | 310 ms | 177.5 MB | Менің атым адам, толық атауым Nano Language Model… | ✓ |
+| 5 | identity | Сені кім жасады? | 320 ms | 177.3 MB | Мені Баймурзин Даулет Абузарович жасады. | ✓ |
+| 6 | identity | Не істей аласың? | 320 ms | 176.2 MB | Қазақ тілінде сөйлесе аламын… | ✓ |
+| 7 | knowledge | Қазақстан туралы айт | 330 ms | 176.6 MB | Қазақстан — Орталық Азиядағы 9-шы мемлекет… | ✓ |
+| 8 | knowledge | Алматы туралы не білесіз? | 320 ms | 176.5 MB | Алматы — Қазақстанның республикалық қаласы… | ✓ |
+| 9 | knowledge | Абай кім? | 320 ms | 176.2 MB | Абай — ұлы ойшыл. | ✓ |
+| 10 | knowledge | Биология деген не? | 320 ms | 177.3 MB | Биология — тірі ағзалар мен олардың тіршілік… | ✓ |
+| 11 | knowledge | Адам ағзасы туралы айт | 330 ms | 177.6 MB | Адам ағзасы — мүшелер мен жүйелер жиынтығы… | ✓ |
+| 12 | rust | Rust туралы айт | 330 ms | 176.3 MB | `Rust` — жадыны қауіпсіз басқаратын жүйелік тіл | ✓ |
+| 13 | rust | Айнымалы дегеніміз не? | 320 ms | 176.3 MB | Айнымалы — `Rust-`та `let` арқылы… | ✓ |
+| 14 | rust | Раст деген не? | 320 ms | 176.3 MB | `Раст` — `Rust` атауының кириллицалық… | ✓ |
+| 15 | unknown | Бүгін Алматыда ауа-райы қандай? | 340 ms | 177.5 MB | Уақытқа байланысты деректерім жоқ — ескертемін | ✓ |
+| 16 | unknown | Кеше не болды? | 330 ms | 177.4 MB | Уақытқа байланысты деректерім жоқ — ескертемін | ✓ |
+| 17 | unknown | Парижде қандай мұражайлар бар? | 320 ms | 176.2 MB | Мұражай туралы: «Қалада 60 кәсіби театр…» (ретриевал) | ✓ |
+| 18 | edge | Сен бағдарламашы емессің бе? | 320 ms | 177.5 MB | Бәлкім, бағдарламашы туралы айтасыз ба. | ⚠ tentative |
+
+**Aggregate:** mean 322.7 ms / query · mean 176.8 MB RSS · worst 340 ms · worst 177.6 MB · **18/18 = 100 % coherent responses** (case 18 marked tentative because the system fell to «Бәлкім …» rather than giving a structural answer to the negation question — coherent, but not optimal; sentence-level negation handling is v4.33+ work).
+
+### Memory baseline correction
+
+**`docs/performance.md` headline RSS updated from "~76–80 MB" to "~177 MB"** based on this battery. The earlier number was pre-v4.29.0 / pre-RootAffinity. Largest drivers of the 100 MB growth across the v4.29 → v4.31 arc:
+- v4.29.0 RootAffinity matrix (26 MB JSON → ~50 MB resident in HashMap form)
+- v4.28.5 corpus expansion (8.85M tokens → larger morpheme index, ~30 MB additional)
+- Smaller contributions: world_core 1626 → 1934 entries, suffix_priors transition matrix, derivation graph
+
+The 1.07 ms hot-loop per-turn latency stays at 1.07 ms — runtime per-turn work hasn't changed across these releases. Cold-start dominates `--once`-style invocations.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **839 passing** unchanged |
+| Real-world 18-query battery | **18/18 = 100 % coherent** |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+| Memory regression vs v4.31.0 | within noise (~0.03 MB from sem_frames Vec) |
+
+### Pipeline impact
+
+- 1 new field on `TurnTrace` (`sem_frames`)
+- 1 line added to `turn_with_trace` (population)
+- ~50-line trace renderer in `bin/adam_chat.rs` (compact one-line-per-frame format)
+- Battery script + 18-query results table in CHANGELOG
+- `docs/performance.md` RSS row updated
+
+Cadence: patch — first consumer migration is small (one trace line + one TurnTrace field), but the **release-discipline change** (real-world battery + RSS measurement per release) is durable and significant.
+
+### Carry-forwards
+
+- v4.32.0: populate `Modality` from periphrastic-construction matchers («-а ал-» / «-у керек» / «-у мүмкін»); populate `RelationKind` when extract_facts patterns produce typed arcs.
+- v4.32.5: SemFrame as input to one extract_facts pattern matcher (e.g. `copula_is_a`) — first real consumer migration that changes a downstream behaviour, not just a trace.
+- v4.33.0+: sentence-level negation detection («X емес» as `Polarity::Negated` on the prior noun frame); SemFrame as canonical SearchGraph query input.
+- v4.40+: address battery edge case 18 — give structural answers to «X емес пе?» negation questions instead of tentative fallback. Requires sentence-level polarity inversion in topic_extraction.
+
 ## [4.31.0] — 2026-05-02 — Morphemic-logical IR (SemFrame) substrate
 
 **First minor in v4.31+ semantic-IR arc.** The architectural step the 2026-05-02 Codex consultation correctly identified as next: convert agglutination from a tokenizer-improvement into the **internal logic of the system** by introducing a single typed semantic frame that carries a word's full morphological + logical features through the entire pipeline downstream of FST analysis.

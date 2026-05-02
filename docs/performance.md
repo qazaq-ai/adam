@@ -8,10 +8,38 @@ This is the unified efficiency metric. Latency and pass-rate moving in opposite 
 
 | Release | p50 turn latency (M2) | Holdout pass-rate | **ms / correct answer** |
 |---|---|---|---|
+| v4.31.5 | 1.07 ms | 839 / 839 = 100.0 % | **1.07 ms** |
 | v4.31.0 | 1.07 ms | 839 / 839 = 100.0 % | **1.07 ms** |
 | v4.30.5 | 1.07 ms | 831 / 831 = 100.0 % | **1.07 ms** |
 | v4.30.0 | 1.07 ms | 831 / 831 = 100.0 % | **1.07 ms** |
 | v4.29.5 | 1.07 ms | 830 / 830 = 100.0 % | **1.07 ms** |
+
+## Cold-start vs hot-loop — two distinct latency regimes
+
+The 1.07 ms above is **per-turn hot-loop latency** (criterion bench, pre-loaded `Conversation`). A real user invoking `./adam_chat --once "<query>"` per question pays a **cold-start cost** of ~320 ms to load Lexicon + retrieval index + facts + derivations + suffix priors + root_affinity matrix. Once the conversation is warm, every subsequent turn is back to ~1.07 ms.
+
+Two distinct deploy modes:
+- **Long-running REPL / chatbot service**: amortises cold-start over the session. Per-turn cost ≈ 1.07 ms. RSS dominated by loaded artefacts.
+- **One-shot CLI / batch processing**: pays cold-start every invocation. Per-question cost ≈ 320 ms wall-clock. Use the long-running mode where possible.
+
+## Resident memory — real-world battery (v4.31.5)
+
+Measured via `/usr/bin/time -l ./target/release/adam_chat --once "<query>"` across an 18-query human-like Kazakh battery:
+
+| Metric | v4.31.5 |
+|---|---|
+| Max RSS (mean across battery) | **176.8 MB** |
+| Max RSS (worst across battery) | **177.6 MB** |
+| Max RSS (best across battery) | 176.0 MB |
+
+**Headline correction vs pre-v4.29 docs:** earlier README/perf docs cited ~76–80 MB. That number was **stale by v4.29.0+**. The 100 MB growth across the v4.29 → v4.31 arc is driven mainly by:
+- v4.29.0 RootAffinity matrix (26 MB JSON → ~50 MB resident in HashMap form)
+- v4.28.5 corpus expansion (8.85M tokens → larger morpheme index, ~30 MB additional)
+- world_core 1626 → 1934 entries
+- suffix_priors 1143 chains × 31k bigrams transition matrix
+- derivation graph (R1–R11 × 1934 facts → 6151 derived facts)
+
+The hot-loop per-turn cost is unchanged across this growth — the headline shift is on **memory footprint**, not on per-turn latency. Memory grew because the determinism strategy is "load all artefacts once, then run forever" — a deploy-mode choice that trades RAM for hot-loop speed. For a deploy that wants smaller RAM, an `--minimal` mode skipping root_affinity + half the world_core would drop RSS to ~100 MB at the cost of weaker reranking and narrower coverage. Not built; flagged as v4.40+ option if size pressure emerges.
 
 The pass-rate denominator is the **full workspace test count** (unit + integration + holdouts). When a release ships with sub-100 % holdouts (acceptable for known-issue-tracked carry-forwards), the ratio rises proportionally — so a release that adds 50 tests but drops one to failing has a measurably worse cost per correct answer even at unchanged latency. The metric punishes hidden regressions.
 

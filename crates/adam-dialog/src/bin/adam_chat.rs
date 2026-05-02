@@ -336,6 +336,67 @@ fn run_turn(
         let (out, trace) = conv.turn_with_trace(input, lex, repo, seed);
         println!("┌─ input:    {input}");
         println!("├─ parses:   {:#?}", trace.parses);
+        // **v4.31.5** — first SemFrame consumer migration. Render
+        // the unified morphemic-logical IR per parse. Compact one-
+        // line-per-frame format: `{root}/{pos} case={case?}
+        // tense={tense?} polarity={polarity:?} evidence={ev?}`. Any
+        // feature that's `None` is omitted to keep the line scannable
+        // — most frames have only 2-3 non-None features. The full
+        // `Debug` form is reachable via `trace.sem_frames` from a
+        // calling Rust consumer; this is the human-readable variant.
+        if trace.sem_frames.is_empty() {
+            println!("├─ sem_frames: (none)");
+        } else {
+            println!("├─ sem_frames:");
+            for (i, frame) in trace.sem_frames.iter().enumerate() {
+                let mut features = Vec::new();
+                if let Some(c) = frame.case {
+                    features.push(format!("case={c:?}"));
+                }
+                if let Some(n) = frame.number {
+                    features.push(format!("number={n:?}"));
+                }
+                if let Some(p) = frame.possessive {
+                    features.push(format!("poss={p:?}"));
+                }
+                if let Some(p) = frame.predicate {
+                    features.push(format!("pred={p:?}"));
+                }
+                if let Some(d) = frame.derivation {
+                    features.push(format!("deriv={d:?}"));
+                }
+                if let Some(t) = frame.tense {
+                    features.push(format!("tense={t:?}"));
+                }
+                if let Some(p) = frame.person {
+                    features.push(format!("person={p:?}"));
+                }
+                if let Some(v) = frame.voice {
+                    features.push(format!("voice={v:?}"));
+                }
+                if frame.polarity != adam_kernel_fst::Polarity::Affirmative {
+                    features.push(format!("polarity={:?}", frame.polarity));
+                }
+                if frame.polite {
+                    features.push("polite".into());
+                }
+                if let Some(m) = frame.modality {
+                    features.push(format!("mod={m:?}"));
+                }
+                if let Some(e) = frame.evidence {
+                    features.push(format!("evid={e:?}"));
+                }
+                if let Some(r) = frame.relation {
+                    features.push(format!("rel={r:?}"));
+                }
+                let suffix = if features.is_empty() {
+                    String::new()
+                } else {
+                    format!(" {}", features.join(" "))
+                };
+                println!("│   [{i}] {}/{:?}{suffix}", frame.root, frame.pos);
+            }
+        }
         println!("├─ intent:   {:?}", trace.intent_after_injection);
         println!("├─ session:  {:?}", trace.session_snapshot);
         // v4.0.27 — belief snapshot (Codex v4.0.26 roadmap Phase 1).
