@@ -1,20 +1,20 @@
 {
-  "version": "4.29.5",
+  "version": "4.30.0",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
   "iterations_completed": 5,
   "counts": {
-    "initial_facts": 2057,
-    "derived_facts": 6150,
+    "initial_facts": 2059,
+    "derived_facts": 6153,
     "by_rule": {
       "R10_in_domain_inheritance": 133,
       "R11_in_domain_shared_target": 3098,
-      "R1_is_a_transitivity": 1157,
+      "R1_is_a_transitivity": 1158,
       "R2_has_inheritance": 292,
       "R3_has_inheritance_via_part_of": 28,
-      "R5_shared_is_a_target": 1170,
+      "R5_shared_is_a_target": 1172,
       "R6_lives_in_via_part_of": 1,
       "R7_goes_to_via_part_of": 6,
       "R8_after_transitivity": 6,
@@ -17349,6 +17349,31 @@
     },
     {
       "subject": {
+        "surface": "раст",
+        "root": "раст",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "формалды тіл",
+        "root": "формалды тіл",
+        "pos": "noun"
+      },
+      "rule_id": "R1_is_a_transitivity",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_180"
+        },
+        {
+          "pack": "world_core/informatics_basic.jsonl",
+          "sample_id": "info_007"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
         "surface": "ана",
         "root": "ана",
         "pos": "noun"
@@ -22918,6 +22943,31 @@
         {
           "pack": "world_core/programming_rust.jsonl",
           "sample_id": "rust_079"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "rust",
+        "root": "rust",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "раст",
+        "root": "раст",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_001"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_180"
         }
       ],
       "confidence": "RuleInferred"
@@ -71793,6 +71843,31 @@
         {
           "pack": "world_core/informatics_basic.jsonl",
           "sample_id": "info_007"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "бағдарламалау тілі",
+        "root": "бағдарламалау тілі",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "раст",
+        "root": "раст",
+        "pos": "noun"
+      },
+      "rule_id": "R5_shared_is_a_target",
+      "source_chain": [
+        {
+          "pack": "world_core/informatics_basic.jsonl",
+          "sample_id": "info_007"
+        },
+        {
+          "pack": "world_core/programming_rust.jsonl",
+          "sample_id": "rust_180"
         }
       ],
       "confidence": "RuleInferred"

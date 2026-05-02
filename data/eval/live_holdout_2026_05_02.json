@@ -1,0 +1,46 @@
+{
+  "_comment": "v4.30.0 — live holdout: unedited Kazakh queries from the 2026-05-02 live REPL session that drove the v4.30.0 patches. Each case asserts substring presence (any-of-list passes) and/or absence (none-of-list passes). Captures: Rust extraction with бағдарламалау-тілі-туралы qualifier (was returning тіл туралы), Раст Cyrillic-alias coverage, adnominal-demonstrative coreference (бұл тілдегі after Rust topic). Blind-eval discipline: queries verbatim from session, no template tuning to make any specific case pass.",
+  "version": "v4.30.0",
+  "captured_date": "2026-05-02",
+  "cases": [
+    {
+      "id": "rust_qualifier_turali",
+      "category": "rust_extraction",
+      "query": "Rust бағдарламалау тілі туралы не білесіз?",
+      "any_substring": ["rust", "жадыны қауіпсіз"],
+      "none_substring": ["тіл — қарым-қатынас"],
+      "note": "v4.30.0 fix: latin_with_generic_head_marker recognises «{LATIN} (бағдарламалау)? тілі туралы». Pre-fix multiword scanner picked «бағдарламалау тілі» and topic resolved to qualifier itself."
+    },
+    {
+      "id": "rust_qualifier_short",
+      "category": "rust_extraction",
+      "query": "Rust тілі туралы не білесіз?",
+      "any_substring": ["rust", "жадыны қауіпсіз"],
+      "none_substring": ["тіл — қарым-қатынас"],
+      "note": "v4.30.0 short-form variant of the qualifier pattern."
+    },
+    {
+      "id": "rast_cyrillic_alias",
+      "category": "rust_extraction",
+      "query": "Раст туралы айтшы",
+      "any_substring": ["раст", "rust", "кириллицалық"],
+      "note": "v4.30.0 fix: rust_180 entry maps Cyrillic Раст to Rust description. Pre-fix returned Түсінбедім / generic fallback."
+    },
+    {
+      "id": "rast_cyrillic_definitional",
+      "category": "rust_extraction",
+      "query": "Раст деген не?",
+      "any_substring": ["раст", "rust", "кириллицалық", "бағдарламалау"],
+      "note": "v4.30.0: same alias under definitional «деген не» pattern."
+    },
+    {
+      "id": "demonstrative_coreference_after_rust",
+      "category": "coreference",
+      "query": "Бұл тілдегі кілт сөздер қандай?",
+      "context_turns": ["Rust бағдарламалау тілі туралы не білесіз?"],
+      "any_substring": ["rust"],
+      "none_substring": ["тіл — қарым-қатынас"],
+      "note": "v4.30.0 fix: input_contains_adnominal_demonstrative recognises «бұл + generic head» as anaphor; resolves to last_topic (Rust). Pre-fix returned generic «Тіл — қарым-қатынас құралы»."
+    }
+  ]
+}

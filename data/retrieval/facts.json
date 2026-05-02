@@ -1,7 +1,7 @@
 {
-  "version": "4.29.5",
+  "version": "4.30.0",
   "status": "completed",
-  "elapsed_s": 24,
+  "elapsed_s": 56,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 195,
-    "facts_total": 2057,
+    "facts_total": 2059,
     "by_predicate": {
       "after": 7,
       "causes": 23,
@@ -27,10 +27,10 @@
       "has": 59,
       "has_quantity": 29,
       "in_domain": 24,
-      "is_a": 1471,
+      "is_a": 1472,
       "lives_in": 8,
       "part_of": 228,
-      "related_to": 64
+      "related_to": 65
     },
     "by_pack": {
       "abai_wikisource_pack.json": 10,
@@ -72,7 +72,7 @@
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/professions.jsonl": 40,
-      "world_core/programming_rust.jsonl": 179,
+      "world_core/programming_rust.jsonl": 181,
       "world_core/proverbs.jsonl": 43,
       "world_core/society.jsonl": 44,
       "world_core/sports.jsonl": 18,
@@ -36622,6 +36622,46 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "`explicit type` — `Rust`-та ашық белгіленген тип: `let x: i32 = 5;`. Бағдарламашы типті өзі көрсетеді. Қарама-қарсысы `implicit type` — компилятор контекстен шығарады."
+    },
+    {
+      "subject": {
+        "surface": "раст",
+        "root": "раст",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау тілі",
+        "root": "бағдарламалау тілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_180"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Раст` — `Rust` атауының кириллицалық жазылуы; жадыны қауіпсіз басқаратын жүйелік бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "бағдарламалау тілі",
+        "root": "бағдарламалау тілі",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "rust тізімі",
+        "root": "rust тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_181"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Адам білетін бағдарламалау тілдері: `Rust`. Басқа тілдер бойынша курирленген дерек әлі жоқ."
     },
     {
       "subject": {

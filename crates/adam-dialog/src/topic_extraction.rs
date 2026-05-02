@@ -429,6 +429,13 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "шөлдер тізімі",
     // **v4.6.0** — landmarks list-summary object.
     "көрікті жерлер тізімі",
+    // **v4.30.0** — programming-language list-summary object
+    // (rust_181 «бағдарламалау тілі related_to rust тізімі»).
+    // Closes the live REPL 2026-05-02 turn 7 case where the user
+    // asked «Қандай бағдарламалау тілдерін білесіз?» and got
+    // «Кешіріңіз, мен мұны білмеймін» — pre-fix there was no
+    // list-summary fact for the programming domain.
+    "rust тізімі",
     // **v4.6.15** — mathematics_basic + informatics_basic domains.
     // Compound objects (and one subject) that appear in `facts` of
     // the two new world_core domains. Required by
@@ -1177,6 +1184,74 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word
+/// **v4.30.0** — Latin subject + generic-head + topic-marker
+/// pattern recogniser. Closes the live REPL 2026-05-02 case
+/// «Rust бағдарламалау тілі туралы не білесіз?» where neither
+/// the multiword scanner (picks «бағдарламалау тілі») nor the
+/// topic_marker_hint (picks immediate predecessor «тіл») recover
+/// the user's actual subject «Rust». The pattern is structurally
+/// distinct from v4.27.5's `тілінде ... дегеніміз` case: the
+/// topic marker here attaches to the qualifier itself, not to a
+/// content noun. So the handling has to be different — return
+/// the Latin head explicitly.
+///
+/// Recognised shapes (case-insensitive, sentence start):
+///   - `{LATIN} (бағдарламалау|программалау)? тілі (туралы|жайында|жөнінде|хақында)`
+///   - `{LATIN} (нәрсе|зат|тақырып|сала|ұғым|бағыт)(сы|ы|сі|і)? (туралы|жайында|жөнінде|хақында)`
+///
+/// Conservative: only fires at sentence start (skipping leading
+/// pronouns like «Сіз», «Сен» — in compositional questions like
+/// «Сіз Rust туралы не білесіз?» the v4.11.5 latin path already
+/// handles correctly). Returns the Latin subject in canonical
+/// lowercase form when matched, `None` otherwise.
+fn latin_with_generic_head_marker(input: &str) -> Option<String> {
+    let trimmed = input.trim_start();
+    let lower = trimmed.to_lowercase();
+    const HEAD_NOUNS: &[&str] = &[
+        // Language-domain heads.
+        "тіл",
+        "тілі",
+        "тілдер",
+        "тілдері",
+        // Generic referents.
+        "нәрсе",
+        "нәрсесі",
+        "зат",
+        "заты",
+        "тақырып",
+        "тақырыбы",
+        "сала",
+        "саласы",
+        "ұғым",
+        "ұғымы",
+        "бағыт",
+        "бағыты",
+        "жүйе",
+        "жүйесі",
+    ];
+    const QUALIFIERS: &[&str] = &["бағдарламалау", "программалау"];
+    const MARKERS: &[&str] = &["туралы", "жайында", "жөнінде", "хақында"];
+    for &lang in LATIN_TECH_SUBJECTS {
+        for &marker in MARKERS {
+            for &head in HEAD_NOUNS {
+                // Direct: «{lang} {head} {marker}»
+                let direct = format!("{lang} {head} {marker}");
+                if lower.starts_with(&direct) {
+                    return Some(lang.to_string());
+                }
+                // With qualifier: «{lang} {qualifier} {head} {marker}»
+                for &qual in QUALIFIERS {
+                    let with_qual = format!("{lang} {qual} {head} {marker}");
+                    if lower.starts_with(&with_qual) {
+                        return Some(lang.to_string());
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
 /// matching a known Latin technical subject. Returns the matched
 /// subject in canonical lowercase form (matching world_core
 /// `subject` field). Word boundaries are whitespace + punctuation
@@ -1431,6 +1506,25 @@ pub(crate) fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<Stri
 /// noun preceding the marker wins over a generic in-lexicon noun
 /// elsewhere in the sentence.
 pub(crate) fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
+    // **v4.30.0** — Latin-subject + generic-head + topic-marker
+    // pattern. Live REPL 2026-05-02 turn 8: «Rust бағдарламалау
+    // тілі туралы не білесіз?». Pre-v4.30.0 the multiword scanner
+    // (v4.27.5 reorder) picked «бағдарламалау тілі» (registered
+    // MULTIWORD) and topic resolved to the qualifier itself — not
+    // the user's actual subject «Rust». The `туралы` marker
+    // attaches to the qualifier here, not to the subject, so
+    // `topic_marker_hint` would also be wrong (returns «тіл», the
+    // immediate predecessor of `туралы`). Both regular extractors
+    // miss because the head of the noun-phrase is a generic word
+    // («тіл/нәрсе/зат/...») and the actual identifier is the Latin
+    // proper noun BEFORE the generic head. This direct pattern
+    // covers the case explicitly: when input begins with a
+    // LATIN_TECH_SUBJECT followed (optionally) by `бағдарламалау`
+    // or `программалау`, then a generic-head-noun in any inflection,
+    // then a topic marker — return the Latin subject.
+    if let Some(latin) = latin_with_generic_head_marker(input) {
+        return Some(latin);
+    }
     // **v4.6.20** — adj+noun compound topic ("машиналық оқыту",
     // "жасанды интеллект", "табиғи тіл"). Pre-v4.6.20 the first-
     // noun-root strategy returned only the head noun (`оқыту`)

@@ -104,9 +104,77 @@ const DISCOURSE_ANAPHORS: &[&str] = &[
 /// what `NOT_A_TOPIC` suppresses.
 pub fn input_contains_discourse_anaphor(input: &str) -> bool {
     let lower = input.to_lowercase();
-    lower
+    if lower
         .split(|c: char| !c.is_alphabetic())
         .any(|word| DISCOURSE_ANAPHORS.contains(&word))
+    {
+        return true;
+    }
+    // **v4.30.0** — adnominal-demonstrative coreference. Live REPL
+    // 2026-05-02 turn 11: «Бұл тілдегі кілт сөздер қандай?» — the
+    // intended referent is the language being discussed in prior
+    // turns (Rust). The bare-pronoun anaphor list (v4.13.0) doesn't
+    // catch this because «бұл» here is a determiner modifying a
+    // generic head noun («тіл / тілдегі») — not a standalone Acc/
+    // Loc/Dat pronoun. The pattern is a strong coreference signal:
+    // demonstrative determiner («бұл / осы / сол») + generic head
+    // («тіл / нәрсе / зат / тақырып / сала / ұғым / бағыт / жүйе»)
+    // means "the X we just discussed". Routes to the same
+    // `dialog_context.resolve_anaphor()` substitution path as the
+    // bare-pronoun anaphors.
+    input_contains_adnominal_demonstrative(input)
+}
+
+/// **v4.30.0** — Detects the adnominal-demonstrative coreference
+/// pattern: a demonstrative determiner («бұл / осы / сол / о /
+/// мұ») followed (with up to 1 token gap for an adjective like
+/// «жаңа / ескі») by a generic head noun in any inflection.
+///
+/// Generic heads cover the lemmas that — in adnominal-anaphora
+/// position — almost always mean "the topic we are discussing":
+/// `тіл / нәрсе / зат / тақырып / сала / ұғым / бағыт / жүйе`.
+///
+/// Returns `true` when the input contains such a phrase, telling
+/// the caller to substitute `dialog_context.resolve_anaphor()`
+/// for the topic. Conservative on false positives: the head must
+/// match a fixed list of generic referent nouns; mentions like
+/// «бұл кітап» (this book — likely a NEW topic, not anaphoric)
+/// don't trigger.
+pub fn input_contains_adnominal_demonstrative(input: &str) -> bool {
+    const DETERMINERS: &[&str] = &["бұл", "осы", "сол"];
+    // Generic-head prefixes — anything that starts with one of
+    // these in lowercase is treated as the head. Covers all case
+    // inflections (Loc, Acc, Dat, Gen, Abl, P3): тіл / тілі /
+    // тілдегі / тілді / тілге / тілдің / тілден / тілдер ...
+    const HEAD_PREFIXES: &[&str] = &[
+        "тіл",
+        "нәрсе",
+        "зат",
+        "тақырып",
+        "сала",
+        "ұғым",
+        "бағыт",
+        "жүйе",
+    ];
+    // Optional intervening adjective stems (allow 1 token between
+    // determiner and head). Empty by default — keep as bare match
+    // for now; widening to allow «бұл жаңа тілде» can come later
+    // with evidence from real REPL.
+    let lower = input.to_lowercase();
+    let tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|t| !t.is_empty())
+        .collect();
+    for window in tokens.windows(2) {
+        if !DETERMINERS.contains(&window[0]) {
+            continue;
+        }
+        let head = window[1];
+        if HEAD_PREFIXES.iter().any(|p| head.starts_with(p)) {
+            return true;
+        }
+    }
+    false
 }
 
 /// Russian function-word markers — common high-frequency Russian

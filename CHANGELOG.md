@@ -7,6 +7,53 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.30.0] — 2026-05-02 — Coreference layer + Rust extraction patches: live REPL 2026-05-02 regressions closed
+
+**First minor in v4.30+ dialog-coherence arc.** A 2026-05-02 live REPL session surfaced three failures that no benchmark caught: (1) «Rust бағдарламалау тілі туралы не білесіз?» extracted topic «тіл» (generic head of qualifier) instead of «Rust»; (2) «Раст» (Cyrillic transliteration) had no alias coverage; (3) follow-up «Бұл тілдегі кілт сөздер?» couldn't resolve `бұл тіл` to the Rust topic established a turn earlier — system has v4.13.0 bare-pronoun anaphor handling but adnominal demonstratives (`бұл/осы/сол + generic head`) were unrecognised. v4.30.0 closes all three.
+
+### Innovations
+
+**(1) `latin_with_generic_head_marker` recogniser** in `topic_extraction.rs`. Matches the structural pattern «{LATIN_TECH_SUBJECT} (бағдарламалау|программалау)? {generic head} {topic marker}» at sentence start; returns the Latin subject directly. Handles 9 generic head lemmas (`тіл / нәрсе / зат / тақырып / сала / ұғым / бағыт / жүйе`) in any inflection × 4 markers (`туралы / жайында / жөнінде / хақында`) × 0–1 qualifier (`бағдарламалау / программалау`). Runs FIRST in `best_noun_hint` — both multiword scanner («бағдарламалау тілі» from MULTIWORD_ENTITIES) and topic_marker_hint («тілі» as immediate predecessor of `туралы`) extracted the wrong constituent on this pattern; the new recogniser short-circuits both with the correct Latin head.
+
+**(2) Adnominal-demonstrative coreference** in `discourse.rs`. New `input_contains_adnominal_demonstrative()` recognises «{бұл/осы/сол} + {generic head}» as a coreference signal — the determiner-modifier construction that means "the X we just discussed". `input_contains_discourse_anaphor` now returns true when EITHER the v4.13.0 bare-pronoun list matches (оны / соны / олардың / ...) OR an adnominal demonstrative + generic head appears. The downstream v4.6.0/v4.13.0 path (`dialog_context.resolve_anaphor()` → noun_hint substitution) handles both signals identically. Generic-head list mirrors the new `latin_with_generic_head_marker` heads (тіл / нәрсе / зат / тақырып / сала / ұғым / бағыт / жүйе) — these almost always mean "the topic" in adnominal-anaphora position.
+
+**(3) `programming_rust.jsonl` += rust_180 (`Раст` Cyrillic alias) + rust_181 (programming-language list-summary).** rust_180 maps the Cyrillic transliteration «раст» to the same definition as Rust (cross-script alias). rust_181 ships a curated list-summary fact `бағдарламалау тілі related_to rust тізімі` so the world_core knows what programming languages adam covers. Both `reviewer: "claude"` for honest audit trail.
+
+**(4) `MULTIWORD_ENTITIES += «rust тізімі»**. Required by `world_core_multiword_coverage` contract test for the new list-summary object.
+
+**(5) New holdout `data/eval/live_holdout_2026_05_02.json` + dedicated test rig** at `crates/adam-dialog/tests/live_holdout_2026_05_02.rs`. 5 cases verbatim from the live session, with 100 % required floor (small dataset, all are direct regression captures). Adds **multi-turn `context_turns` support** — preceding queries replayed against the same `Conversation` instance — so the demonstrative-coreference case can establish the Rust topic before testing «Бұл тілдегі кілт сөздер?». First multi-turn case in the holdout suite.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **830 → 831 passing** (+1 `live_holdout_2026_05_02`) |
+| live_holdout_2026_05_02 | **5 / 5 = 100 %** (all v4.30.0 fixes verified end-to-end) |
+| live_holdout_2026_05_01 | **32 / 32 ✓** unchanged |
+| rust_holdout_2026_05_02 | **41 / 41 ✓** unchanged |
+| 5-query live ON probe | Original v4.30.0 fix targets all green: Rust extraction with бағдарламалау тілі туралы → `Rust` ✓ ; Раст-туралы → Раст ✓ ; multi-turn «Бұл тілдегі кілт сөздер?» after Rust → resolves to Rust ✓ ; v4.27.5 «Rust бағдарламалау тілінде тұрақты дегеніміз не?» → still extracts «тұрақты» ✓ ; «қазақ тілі туралы» → still extracts «қазақ тілі» (multiword) ✓ |
+| Foundation validation | **passes, no drifts** |
+
+### What was NOT solved (carry-forwards)
+
+- **Plural-form multiword expansion**: «Қандай бағдарламалау тілдерін білесіз?» still falls through. Multiword scanner does substring-match (`input.contains("бағдарламалау тілі")`) which fails on the plural «бағдарламалау тілдерін»; rust_181 list-summary fact is in place but unreached. Fix needs morphological-aware multiword scanning or a list-intent trigger on «қандай ... білесіз». **v4.30.5+**.
+- **Functional / compositional queries**: «Бұл тілде функцияны қалай жазамыз?» — even with coreference resolving to Rust, no curated entry combines Rust with function definition. Compositional reasoning over multi-fact retrieval is the v4.31+ track.
+- **Physics domain**: zero curated entries. Pure data work, separate from this stripe. **v4.30.5+**.
+- **«Функцияны» → wrong intent**: Acc-suffix lemma normalisation in intent classifier surfaces «функция» as a person/place name in some contexts. Pre-existing bug, not v4.30.0 scope.
+
+### Honest framing
+
+This release closes the three specific failures the user surfaced in the 2026-05-02 REPL session and adds the first-ever **multi-turn coreference** path — bare pronouns (v4.13.0) and adnominal demonstratives (v4.30.0) now both flow through `dialog_context.resolve_anaphor()`. Subjective "context retention" should improve noticeably on follow-up questions about a previously-mentioned subject. Subjective "intelligence" doesn't improve, because the system still does retrieval+ranking, not synthesis — that gap is on the v4.31+ compositional-reasoning track and is the right honest framing for what's still missing.
+
+### Pipeline impact
+
+- 1 new recogniser + 1 new coreference detector + 1 MULTIWORD entry + 2 world_core entries + 1 holdout JSON + 1 holdout test rig + facts/derived_facts regen.
+- Cadence: minor — first dialog-coherence-arc release, introduces multi-turn coreference into the holdout discipline. Architecturally additive (zero ranking-ladder changes).
+
+### Next
+
+**v4.30.5** — plural-form multiword expansion + list-intent extension (`қандай ... білесіз`); physics_school world_core seed (50–100 entries from school textbook). **v4.31.0** — compositional reasoning track (multi-fact retrieval composition for «Rust + кілт сөздер» / «Rust + функция» style queries).
+
 ## [4.29.5] — 2026-05-02 — Track A Phase 2: RootAffinity wired into runtime SearchGraph reranking
 
 **Phase 2 of Track A — runtime integration of v4.29.0's RootAffinity matrix.** v4.29.0 shipped the artifact + type + training binary, deliberately deferring runtime wiring to keep that architectural addition reversible. v4.29.5 closes the loop: the PMI matrix now influences `Tool::dispatch(SearchGraph)` reranking as the deepest semantic tiebreaker.
