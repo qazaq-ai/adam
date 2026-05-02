@@ -357,17 +357,14 @@ pub fn plan_response_with_epistemic(
             },
             _,
         ) => None,
-        // **v4.34.7** — same bypass for modality. When the user
-        // makes a periphrastic-modality claim, the modal-aware
-        // template families (`unknown.with_modal_necessity / _possibility
-        // / _ability`) take precedence over Conflicted/Tentative
-        // overrides. Reason: a tentative "Бәлкім X туралы айтасыз ба"
-        // doesn't acknowledge the user's modal claim about doing /
-        // being / capable-of-doing something. The base_key from
-        // plan_response_with_session wins.
+        // **v4.34.7 + v4.35.5** — same bypass for modality. When the
+        // user makes a periphrastic-modality claim, the modal-aware
+        // template families take precedence over Conflicted/Tentative
+        // overrides. v4.35.5 dropped the `noun_hint: Some(_)`
+        // requirement to support verb-only modal claims like «Жаза
+        // аламын» (battery case 21).
         (
             Intent::Unknown {
-                noun_hint: Some(_),
                 input_modality: Some(_),
                 ..
             },
@@ -837,14 +834,22 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             // түсіндім". Runs AFTER polarity check (negation has
             // higher priority — when both fire on rare edge case
             // «X V керек емес», negation is the more salient signal).
-            if noun_hint.is_some() {
-                if let Some(modality) = input_modality {
-                    return match modality {
-                        adam_kernel_fst::Modality::Necessity => "unknown.with_modal_necessity",
-                        adam_kernel_fst::Modality::Possibility => "unknown.with_modal_possibility",
-                        adam_kernel_fst::Modality::Ability => "unknown.with_modal_ability",
-                    };
-                }
+            // **v4.35.5** — relaxed `noun_hint.is_some()` requirement.
+            // Pre-v4.35.5 the routing required BOTH modality AND
+            // noun_hint, so verb-only modal claims like «Жаза аламын»
+            // (battery case 21) fell to "Түсінбедім" because no
+            // content noun was extracted. With the requirement
+            // dropped, modality alone is enough to route. Templates
+            // in each family include both noun-bearing AND no-noun
+            // variants; `template_is_fillable` filters to the
+            // applicable subset based on whether `{noun}` slot has
+            // a value.
+            if let Some(modality) = input_modality {
+                return match modality {
+                    adam_kernel_fst::Modality::Necessity => "unknown.with_modal_necessity",
+                    adam_kernel_fst::Modality::Possibility => "unknown.with_modal_possibility",
+                    adam_kernel_fst::Modality::Ability => "unknown.with_modal_ability",
+                };
             }
             // **v4.23.0** — `temporal_scope: true` short-circuits to
             // `unknown.temporal_no_data`. Pattern: temporal adverb

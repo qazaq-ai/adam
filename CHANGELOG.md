@@ -7,6 +7,98 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.35.5] — 2026-05-02 — Modal-without-noun: battery case 21 «Жаза аламын» closes
+
+**Patch in v4.35+ semantic-IR arc.** Closes battery case 21 — declarative ability claim «Жаза аламын» ("I can write") that has been falling to "Түсінбедім" since v4.32.5 because no `noun_hint` was extracted (verb-only sentence) and v4.34.7's modality routing required both modality AND noun_hint. v4.35.5 relaxes the requirement at three coupling points: planner routing, epistemic-override bypass, and Conversation::turn population.
+
+### What was broken pre-v4.35.5
+
+```
+> Жаза аламын
+Түсінбедім.
+                  ^ no noun_hint → modality routing skipped → tentative fallback
+```
+
+Modality was correctly detected at SemFrame layer (`жаз/Verb tense=ConverbImperfect mod=Ability` in `--trace`), but three coupling points blocked end-to-end consumption:
+1. `Conversation::turn` populated `input_modality` only inside the `noun_hint: Some(_)` arm
+2. Planner routing required `input_modality.is_some() && noun_hint.is_some()`
+3. Epistemic-override bypass required `noun_hint: Some(_), input_modality: Some(_)`
+
+### Innovations
+
+**(1) `Conversation::turn` modality population moved out of `noun_hint`-Some guard.** Polarity is per-noun (no noun → no polarity to copy), but modality is on the lexical verb frame and independent of `noun_hint`. The pre-v4.35.5 nesting silently skipped population for verb-only modal claims.
+
+**(2) Planner modality routing relaxed.** Drop the `noun_hint.is_some()` requirement; modality alone routes to the appropriate `unknown.with_modal_*` family.
+
+**(3) Epistemic-override bypass relaxed.** Same relaxation in the override block — when `input_modality: Some(_)`, base_key wins regardless of `noun_hint`.
+
+**(4) +3 no-noun template variants per modal family** (9 templates total added). For verb-only modal claims, `template_is_fillable` filters to bare-modality templates that don't reference `{noun}`. Examples:
+- Necessity bare: «Иә, шынымен қажет нәрсе екен.», «Сіздің ойыңыз орынды — бұл маңызды.»
+- Possibility bare: «Иә, мұндай мүмкіндік болуы ықтимал.»
+- Ability bare: «Жақсы екен, ондай қабілетіңіз бар.», «Иә, сізде ондай мүмкіндік бар екен.»
+
+### Live verification — case 21 closes
+
+| Query | v4.35.0 | v4.35.5 |
+|---|---|---|
+| **Жаза аламын** | "Түсінбедім." | "**Жақсы екен, сіздің мүмкіндігіңізді түсіндім.**" |
+| Кітап оқу керек (control, with noun) | "Иә, маңызды мәселе екен." | unchanged ✓ |
+| Бұл шындық емес (control, polarity precedence) | "Шындық емес деп айтасыз — пікіріңізді сыйлаймын." | unchanged ✓ |
+| Қазақстан туралы айт (control, no modality) | grounded fact | unchanged ✓ |
+
+### Known FST gaps still present (carry-forward)
+
+Two ability variants do NOT close in v4.35.5:
+- «Сөйлей алам» — `сөйле` parses as ConverbImperfect ✓, but `алам` (short 1sg form without -ын) doesn't parse → only one frame in stream → ability detector can't fire (needs both lexical-verb + ал frames).
+- «Оқи аламын» — `оқи` (converb of back-vowel verb «оқы») doesn't parse → same.
+
+These are FST coverage gaps in the v4.32.5 ConverbImperfect enumeration — short-form-1sg «алам» variant isn't enumerated, and back-vowel verb converb «оқи» isn't synthesised correctly. Documented as **v4.36+ FST coverage** alongside the remaining 8 missing parser tenses.
+
+### Real-world battery (v4.35.5)
+
+Same 26-query battery; case 21 row moved to PASS:
+
+| # | Query | v4.35.0 | v4.35.5 |
+|---|---|---|---|
+| 21 | Жаза аламын | "Түсінбедім." | "Жақсы екен, сіздің мүмкіндігіңізді түсіндім." ✓ |
+
+| Aggregate | v4.35.5 | Δ vs v4.35.0 |
+|---|---|---|
+| Mean latency | **320.3 ms** | matched |
+| Mean max RSS | **175.9 MB** | -0.9 MB (within noise) |
+| Coherent responses | **26/26 = 100 %** | matched |
+| Mod-consumed (visible) | **3/4** (cases 19, 20, **21**) | **+1** vs v4.35.0's 2/4 |
+| Neg-consumed | **5/5** | matched |
+
+Case 22 still uses AskAboutSystem path (not modality-routing) and gives the existing smart honest refusal — no regression.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **865 passing** unchanged |
+| Real-world battery | **26/26 = 100 %**; mod-consumed **3/4** (up from 2/4) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Pipeline impact
+
+- 1 indent change in `Conversation::turn` (moved modality population out of noun_hint-guard)
+- 1 simpler conditional in planner modality routing
+- 1 simpler match arm in epistemic-override bypass
+- 8 new template variants across 3 modal families
+- facts/derived_facts version sync to 4.35.5
+
+Cadence: patch — single targeted improvement, closes a battery case that's been stuck since v4.32.5.
+
+### Carry-forwards
+
+- **v4.36.0** — third extract_facts matcher migration (likely `locative_lives_in` or `dative_goes_to`); first **EvidenceKind consumption** in templates (Hearsay-marked claims should hedge evidentiality in response).
+- **v4.36.5** — FST coverage: short-form 1sg «алам» variant + back-vowel converb «оқи» synthesis fix (closes «Сөйлей алам», «Оқи аламын»).
+- **v4.37+** — remaining 8 missing parser tenses (ConverbPerfect, 3 participles, FutureIntentional, FuturePossible, Conditional, Imperative); battery edge case for «X емес пе?» question form.
+
 ## [4.35.0] — 2026-05-02 — Second extract_facts matcher migration + modality guard on extraction side
 
 **First minor in v4.35+ semantic-IR arc.** Closes the substrate-then-consume cycle for **Modality on the extraction side** (mirroring v4.34.7's dialog-side consumption). Migrates `nominal_conjunction` to consume `&[SemFrame]` (second matcher to do so after `copula_is_a` in v4.34.5). Retroactively adds a modality guard to `copula_is_a` for symmetry. Both matchers now refuse extraction when the sentence carries either sentence-level negation (Polarity::Negated) OR periphrastic modality (Modality::Necessity / Possibility / Ability). The principle: modal claims are normative or epistemic, not factual assertions; extracting them as graph facts loses their modal nature.

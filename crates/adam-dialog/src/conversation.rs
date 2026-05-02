@@ -577,26 +577,33 @@ impl Conversation {
         // that influences the answer text — v4.31.0–v4.33.0 all
         // populated fields without consumption.
         if let Intent::Unknown {
-            noun_hint: Some(hint),
+            noun_hint,
             noun_hint_polarity,
             input_modality,
             ..
         } = &mut intent
         {
-            let hint_lower = hint.to_lowercase();
-            if let Some(frame) = sem_frames
-                .iter()
-                .find(|f| f.root.to_lowercase() == hint_lower)
-            {
-                *noun_hint_polarity = frame.polarity;
+            // **v4.33.5** — populate noun_hint_polarity from the
+            // matching SemFrame. Only meaningful when noun_hint is
+            // Some — polarity is per-noun, no noun → no polarity to
+            // copy.
+            if let Some(hint) = noun_hint.as_deref() {
+                let hint_lower = hint.to_lowercase();
+                if let Some(frame) = sem_frames
+                    .iter()
+                    .find(|f| f.root.to_lowercase() == hint_lower)
+                {
+                    *noun_hint_polarity = frame.polarity;
+                }
             }
-            // **v4.34.7** — second SemFrame field consumption.
-            // Modality is set on the LEXICAL VERB frame (not on the
-            // noun_hint frame) by `populate_periphrastic_modality`
-            // and `populate_ability_modality`. So we walk the entire
-            // sem_frames stream and pick the first non-None modality.
-            // Pattern: «{noun} {verb}-у керек» — noun_hint=кітап,
-            // modality=Necessity on оқу.
+            // **v4.34.7 + v4.35.5** — populate input_modality from
+            // any frame in the stream with modality set. Modality is
+            // on the LEXICAL VERB frame (not on noun_hint), so the
+            // walk is independent of noun_hint. v4.35.5 moved this
+            // out of the noun_hint-Some guard so verb-only modal
+            // claims like «Жаза аламын» (battery case 21) populate
+            // the field — pre-v4.35.5 the population was nested
+            // inside the noun_hint check and silently skipped.
             if input_modality.is_none() {
                 *input_modality = sem_frames.iter().find_map(|f| f.modality);
             }

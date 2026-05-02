@@ -894,6 +894,7 @@ templates = [
 # acknowledgement, not a definition of the topic noun.
 
 # Necessity («керек / тиіс») — user claims X-V is needed/required.
+# v4.35.5 — added no-{noun} variants for verb-only modal claims.
 [[families]]
 key = "unknown.with_modal_necessity"
 templates = [
@@ -902,9 +903,14 @@ templates = [
     "{noun} туралы ойыңыз орынды деп ойлаймын.",
     "Сіздің пікіріңізді сыйлаймын — иә, бұл қажет нәрсе.",
     "Иә, {noun} мәселесінде сіздің ойыңыз дұрыс.",
+    # v4.35.5 no-noun variants
+    "Иә, шынымен қажет нәрсе екен.",
+    "Сіздің ойыңыз орынды — бұл маңызды.",
+    "Иә, бұл шынымен керек деп ойлаймын.",
 ]
 
 # Possibility («мүмкін») — user asks/claims X-V is possible.
+# v4.35.5 — added no-{noun} variants.
 [[families]]
 key = "unknown.with_modal_possibility"
 templates = [
@@ -913,9 +919,14 @@ templates = [
     "Сіздің ойыңыз мүмкін болуы — қызық мәселе.",
     "Иә, мұндай мүмкіндік бар деп ойлауыңыз орынды.",
     "{noun} туралы пікіріңізді бағалаймын — мүмкін екеніне дау жоқ.",
+    # v4.35.5 no-noun variants
+    "Иә, мұндай мүмкіндік болуы ықтимал.",
+    "Сіздің ойыңыз орынды — бұл мүмкін.",
 ]
 
 # Ability («-а ал-») — user claims (or asks about) capability to do something.
+# v4.35.5 — added no-{noun} variants for verb-only ability claims like
+# «Жаза аламын» (battery case 21 — pre-v4.35.5 fell to "Түсінбедім").
 [[families]]
 key = "unknown.with_modal_ability"
 templates = [
@@ -924,6 +935,11 @@ templates = [
     "Иә, сіз ондай нәрсе істей аласыз ба — бұл өзіңізге тән.",
     "Сіздің мүмкіндігіңізді сыйлаймын.",
     "Ондай нәрсе істей алу — жақсы қасиет.",
+    # v4.35.5 no-noun variants — for verb-only ability claims
+    # «Жаза аламын» / «Сөйлей алам» / «Оқи аламын».
+    "Жақсы екен, ондай қабілетіңіз бар.",
+    "Иә, сізде ондай мүмкіндік бар екен.",
+    "Жарайсыз — ондай нәрсе істей алу — жақсы қасиет.",
 ]
 
 # v1.9.5: Unknown with *adapted* retrieval evidence — the retrieved
