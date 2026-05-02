@@ -7,6 +7,78 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.35.0] — 2026-05-02 — Second extract_facts matcher migration + modality guard on extraction side
+
+**First minor in v4.35+ semantic-IR arc.** Closes the substrate-then-consume cycle for **Modality on the extraction side** (mirroring v4.34.7's dialog-side consumption). Migrates `nominal_conjunction` to consume `&[SemFrame]` (second matcher to do so after `copula_is_a` in v4.34.5). Retroactively adds a modality guard to `copula_is_a` for symmetry. Both matchers now refuse extraction when the sentence carries either sentence-level negation (Polarity::Negated) OR periphrastic modality (Modality::Necessity / Possibility / Ability). The principle: modal claims are normative or epistemic, not factual assertions; extracting them as graph facts loses their modal nature.
+
+### Innovations
+
+**(1) `nominal_conjunction` signature migration**: `+ sem_frames: &[SemFrame]`. Mirrors v4.34.5's `copula_is_a` migration. Wired through `extract_facts` dispatch.
+
+**(2) Dual guards on `nominal_conjunction`**:
+- **Negation guard**: refuse RelatedTo extraction when any noun-class frame has `polarity == Negated`.
+- **Modality guard**: refuse extraction when any frame has `modality.is_some()`.
+
+Both guards skip the whole matcher when ANY frame in the stream carries the signal — conservative, mirrors `copula_is_a` behavior.
+
+**(3) Retroactive modality guard on `copula_is_a`** for symmetry. Pre-v4.35.0, `copula_is_a` had only the negation guard (v4.34.5). v4.35.0 adds the same modality check, completing the dual-guard pattern across both matchers.
+
+**(4) `Modality` consumption on extraction side closes the second substrate-then-consume cycle:**
+
+| Field | Population | Consumption (dialog) | Consumption (extraction) |
+|---|---|---|---|
+| **Polarity** | v4.33.0 | v4.33.5 | v4.34.5 |
+| **Modality** | v4.32.0 (N/P) + v4.32.5 (Ability) | v4.34.7 | **v4.35.0** |
+| Evidence | v4.31.0 | not yet | not yet |
+| Relation | placeholder | n/a | n/a |
+
+### Corpus impact
+
+Re-running `extract_facts` after both guards:
+
+| Predicate | v4.34.7 | v4.35.0 | Δ |
+|---|---|---|---|
+| IsA (Grammar) | 1472 | 1472 | unchanged (copula_is_a guards rejected zero IsA — modality / negation didn't appear in IsA-shaped sentences) |
+| RelatedTo (Grammar) | 65 | **63** | **-2** (nominal_conjunction guards rejected 2 sentences with negation, e.g. «Онша ауқымды емес жерлерде темекі мен шай өсіріледі») |
+| Other predicates | unchanged | unchanged | — |
+
+The 2 rejected RelatedTo facts came from sentences where «емес» appeared as part of an adjective modifier earlier in the sentence (not directly negating the related-to pair). Conservative refusal is the safe move — extracting in this case would imply the source sentence asserts the relation, but the negation context muddies that.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **862 → 865 passing** (+3 new tests: copula_refuses_when_sem_frame_has_modality, nominal_conjunction_refuses_when_sem_frame_has_negated_noun, nominal_conjunction_refuses_when_sem_frame_has_modality) |
+| facts.json | 1937 → **1935** (-2 RelatedTo from new nominal_conjunction guards; IsA 1472 unchanged) |
+| derived_facts.json | regenerated cleanly |
+| Real-world 26-query battery | **26/26 = 100 % coherent** unchanged |
+| Mean latency | **320.3 ms** (-1.2 ms vs v4.34.7, within noise) |
+| Mean RSS | **176.8 MB** (+0.8 MB, within noise) |
+| Neg-consumed rate | **5/5 = 100 %** unchanged |
+| Mod-consumed rate | **2/4** unchanged (cases 19, 20 visibly modal-aware) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Pipeline impact
+
+- 1 modality guard added to `copula_is_a` (~12 lines)
+- 1 signature change to `nominal_conjunction` (+ `sem_frames` parameter)
+- 2 guards (negation + modality) added to `nominal_conjunction` (~30 lines)
+- 1 dispatch update in `extract_facts`
+- 3 test-site call updates for `nominal_conjunction` (mechanical: insert `&[]`)
+- 3 new unit tests
+- facts/derived_facts regeneration (-2 RelatedTo facts)
+
+Cadence: minor — closes second substrate-then-consume cycle, completing Modality coverage across both pipeline directions. Two of three SemFrame fields now have fully-closed cycles (Polarity, Modality).
+
+### Carry-forwards
+
+- **v4.35.5** — handle modal claims without `noun_hint` (battery case 21 «Жаза аламын» — verb-only modal); EvidenceKind consumption (Hearsay-marked claims should hedge evidentiality in response).
+- **v4.36.0** — third extract_facts matcher migration (likely `locative_lives_in` or `dative_goes_to`); gradual fleet-wide migration.
+- **v4.37+** — remaining 8 missing parser tenses (ConverbPerfect, 3 participles, FutureIntentional, FuturePossible, Conditional, Imperative); battery edge case for «X емес пе?» question form.
+
 ## [4.34.7] — 2026-05-02 — First Modality consumption: per-modality template families (Necessity / Possibility / Ability)
 
 **Patch in v4.34+ semantic-IR arc.** Closes the substrate-then-consume cycle for the **second** SemFrame field — `Modality`. Modality has been populated since v4.32.0 (Necessity / Possibility) and v4.32.5 (Ability), but the response generator ignored it. v4.34.7 wires three per-modality template families that engage with the user's modal claim instead of asserting a generic fact about the noun_hint.

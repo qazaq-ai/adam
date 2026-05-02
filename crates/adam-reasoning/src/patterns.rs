@@ -85,6 +85,20 @@ pub fn copula_is_a(
     if any_negated_noun {
         return;
     }
+    // **v4.35.0** — modality guard. When the input carries a
+    // periphrastic-modality construction («X V керек / тиіс /
+    // мүмкін» or `-а ал-` ability), the sentence is a NORMATIVE or
+    // EPISTEMIC claim, not a factual assertion. «Кітап оқу керек»
+    // means "books should be read" — that's a normative claim about
+    // the action, not a definition of «кітап». Pattern: even with
+    // dash «X — Y керек» appearing, the matcher would extract «X IsA
+    // Y» which loses the modal nature entirely. Refuse extraction.
+    // Same conservative scope as the negation guard: skip whole
+    // matcher when ANY frame in the stream has modality set.
+    let any_modal = sem_frames.iter().any(|f| f.modality.is_some());
+    if any_modal {
+        return;
+    }
 
     // LHS must be a single bare nominative noun. Multi-word LHS means
     // the subject is a possessive / adjective-noun construction where
@@ -1070,6 +1084,7 @@ pub fn agent_verb(
 pub fn nominal_conjunction(
     text: &str,
     _parses: &[Analysis],
+    sem_frames: &[adam_kernel_fst::SemFrame],
     lexicon: &LexiconV1,
     source: &FactSource,
     out: &mut Vec<Fact>,
@@ -1079,6 +1094,40 @@ pub fn nominal_conjunction(
         || text_lower.contains(" мен ")
         || text_lower.contains(" бен ");
     if !has_conj {
+        return;
+    }
+    // **v4.35.0** — second extract_facts matcher to consume the
+    // SemFrame stream (after copula_is_a in v4.34.5). Same dual
+    // guards as copula_is_a:
+    //
+    //   (a) Negation: when the sentence has «X пен Y емес» or any
+    //       sentence-level negation, RelatedTo extraction would be
+    //       wrong — the user is denying the relation, not asserting
+    //       it.
+    //   (b) Modality: «X пен Y керек» / «X пен Y болуы мүмкін» are
+    //       normative / epistemic claims, not factual assertions
+    //       about a relation between X and Y.
+    //
+    // Both guards skip the whole matcher when ANY frame carries the
+    // signal — conservative, mirrors copula_is_a behavior. Audit of
+    // v4.34.7 committed graph: zero RelatedTo Grammar facts had
+    // «емес» or modal auxiliaries in source — guards are
+    // forward-looking safety nets.
+    let any_negated_noun = sem_frames.iter().any(|f| {
+        f.polarity == adam_kernel_fst::Polarity::Negated
+            && matches!(
+                f.pos,
+                adam_kernel_fst::PosTag::Noun
+                    | adam_kernel_fst::PosTag::Adjective
+                    | adam_kernel_fst::PosTag::Pronoun
+                    | adam_kernel_fst::PosTag::Numeral
+            )
+    });
+    if any_negated_noun {
+        return;
+    }
+    let any_modal = sem_frames.iter().any(|f| f.modality.is_some());
+    if any_modal {
         return;
     }
     let tokens: Vec<(String, Option<Analysis>)> = text
@@ -2016,6 +2065,115 @@ mod tests {
         assert_eq!(out[0].object.root, "ғылым");
     }
 
+    /// **v4.35.0** — modality guard for copula_is_a (retroactive,
+    /// symmetric with negation guard from v4.34.5). Modal claims
+    /// «X V керек» are normative, not factual — refuse extraction.
+    #[test]
+    fn copula_refuses_when_sem_frame_has_modality() {
+        use adam_kernel_fst::sem_frame::SemFrame;
+        let Some(lex) = load_lex() else { return };
+        let frames = vec![SemFrame {
+            root: "оқу".into(),
+            pos: adam_kernel_fst::PosTag::Noun,
+            case: None,
+            number: None,
+            possessive: None,
+            predicate: None,
+            derivation: None,
+            tense: None,
+            person: None,
+            voice: None,
+            polarity: adam_kernel_fst::Polarity::Affirmative,
+            polite: false,
+            modality: Some(adam_kernel_fst::Modality::Necessity),
+            evidence: None,
+            relation: None,
+        }];
+        let mut out = Vec::new();
+        copula_is_a("кітап — оқу керек", &[], &frames, &lex, &src(), &mut out);
+        assert!(
+            out.is_empty(),
+            "Modal frame must refuse copula_is_a IsA extraction, got {out:?}"
+        );
+    }
+
+    /// **v4.35.0** — `nominal_conjunction` refuses RelatedTo when
+    /// the sentence has sentence-level negation on a noun-class
+    /// predicate.
+    #[test]
+    fn nominal_conjunction_refuses_when_sem_frame_has_negated_noun() {
+        use adam_kernel_fst::sem_frame::SemFrame;
+        let Some(lex) = load_lex() else { return };
+        let frames = vec![SemFrame {
+            root: "ауқым".into(),
+            pos: adam_kernel_fst::PosTag::Adjective,
+            case: None,
+            number: None,
+            possessive: None,
+            predicate: None,
+            derivation: None,
+            tense: None,
+            person: None,
+            voice: None,
+            polarity: adam_kernel_fst::Polarity::Negated,
+            polite: false,
+            modality: None,
+            evidence: None,
+            relation: None,
+        }];
+        let mut out = Vec::new();
+        nominal_conjunction(
+            "ауқымды емес жерлерде темекі мен шай өсіріледі",
+            &[],
+            &frames,
+            &lex,
+            &src(),
+            &mut out,
+        );
+        assert!(
+            out.is_empty(),
+            "Negated noun frame must refuse nominal_conjunction RelatedTo, got {out:?}"
+        );
+    }
+
+    /// **v4.35.0** — `nominal_conjunction` refuses RelatedTo when
+    /// sentence has any modality (Necessity / Possibility / Ability).
+    #[test]
+    fn nominal_conjunction_refuses_when_sem_frame_has_modality() {
+        use adam_kernel_fst::sem_frame::SemFrame;
+        let Some(lex) = load_lex() else { return };
+        let frames = vec![SemFrame {
+            root: "болу".into(),
+            pos: adam_kernel_fst::PosTag::Noun,
+            case: None,
+            number: None,
+            possessive: None,
+            predicate: None,
+            derivation: None,
+            tense: None,
+            person: None,
+            voice: None,
+            polarity: adam_kernel_fst::Polarity::Affirmative,
+            polite: false,
+            modality: Some(adam_kernel_fst::Modality::Possibility),
+            evidence: None,
+            relation: None,
+        }];
+        let mut out = Vec::new();
+        nominal_conjunction(
+            "кітап пен ілім болуы мүмкін",
+            &[],
+            &frames,
+            &lex,
+            &src(),
+            &mut out,
+        );
+        assert!(
+            out.is_empty(),
+            "Modal frame must refuse nominal_conjunction RelatedTo, got {out:?}"
+        );
+    }
+
     #[test]
     fn exactly_one_token_rejects_two_words() {
         assert!(exactly_one_alphabetic_token("бала жанашыры").is_none());
@@ -2313,7 +2471,7 @@ mod tests {
     fn nominal_conjunction_extracts_book_and_science() {
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        nominal_conjunction("кітап пен ілім", &[], &lex, &src(), &mut out);
+        nominal_conjunction("кітап пен ілім", &[], &[], &lex, &src(), &mut out);
         if out.is_empty() {
             eprintln!("note: кітап/ілім may not analyse; skipping");
             return;
@@ -2326,7 +2484,7 @@ mod tests {
     fn nominal_conjunction_rejects_without_conjunction() {
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        nominal_conjunction("кітап ілім", &[], &lex, &src(), &mut out);
+        nominal_conjunction("кітап ілім", &[], &[], &lex, &src(), &mut out);
         assert!(out.is_empty());
     }
 
@@ -2334,7 +2492,7 @@ mod tests {
     fn nominal_conjunction_rejects_pronoun_side() {
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        nominal_conjunction("мен пен сен", &[], &lex, &src(), &mut out);
+        nominal_conjunction("мен пен сен", &[], &[], &lex, &src(), &mut out);
         assert!(out.is_empty(), "pronouns refused on either side");
     }
 

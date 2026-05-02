@@ -1,7 +1,7 @@
 {
-  "version": "4.34.7",
+  "version": "4.35.0",
   "status": "completed",
-  "elapsed_s": 57,
+  "elapsed_s": 52,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -17,8 +17,8 @@
   ],
   "counts": {
     "samples_scanned": 3691,
-    "samples_with_facts": 73,
-    "facts_total": 1937,
+    "samples_with_facts": 71,
+    "facts_total": 1935,
     "by_predicate": {
       "after": 7,
       "causes": 23,
@@ -30,17 +30,17 @@
       "is_a": 1472,
       "lives_in": 9,
       "part_of": 228,
-      "related_to": 65
+      "related_to": 63
     },
     "by_pack": {
       "abai_wikisource_pack.json": 2,
-      "cc100_kk_pack.json": 20,
+      "cc100_kk_pack.json": 19,
       "common_voice_kk_pack.json": 3,
       "kazakh_classics_pack.json": 3,
       "kazakh_proverbs_pack.json": 13,
       "kazakh_textbooks_pack.json": 14,
       "tatoeba_kazakh_pack.json": 2,
-      "wikipedia_kz_pack.json": 17,
+      "wikipedia_kz_pack.json": 16,
       "world_core/adam_self.jsonl": 33,
       "world_core/animals.jsonl": 42,
       "world_core/astronomy.jsonl": 41,
@@ -444,26 +444,6 @@
     },
     {
       "subject": {
-        "surface": "темекі",
-        "root": "темекі",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
-        "surface": "шай",
-        "root": "шай",
-        "pos": "noun"
-      },
-      "pattern": "X пен Y",
-      "source": {
-        "pack": "wikipedia_kz_pack.json",
-        "sample_id": "wiki_kz_0000483"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Онша ауқымды емес жерлерде темекі мен шай өсіріледі."
-    },
-    {
-      "subject": {
         "surface": "Ілім",
         "root": "ілім",
         "pos": "noun"
@@ -521,26 +501,6 @@
       },
       "confidence": "Grammar",
       "raw_text": "Айлакерлік — әлсіздіктің ісі."
-    },
-    {
-      "subject": {
-        "surface": "ұлдар",
-        "root": "ұл",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
-        "surface": "қыздар",
-        "root": "қыздар",
-        "pos": "noun"
-      },
-      "pattern": "X пен Y",
-      "source": {
-        "pack": "cc100_kk_pack.json",
-        "sample_id": "cc100_kk_0000044"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Жарысқа 2 жастық дәрежедегі ұлдар мен қыздар қатыса алады:"
     },
     {
       "subject": {

@@ -272,7 +272,7 @@ pub fn extract_facts(
     // Re-enable when the matcher gains semantic-class filters that
     // restrict (agent, patient) pairs to meaningful relations.
     // patterns::agent_verb(text, parses, lexicon, source, &mut out);
-    patterns::nominal_conjunction(text, parses, lexicon, source, &mut out);
+    patterns::nominal_conjunction(text, parses, &sem_frames, lexicon, source, &mut out);
     patterns::domain_membership(text, parses, lexicon, source, &mut out);
     // v3.5.5: structural partitive — first PartOf extractor. Feeds
     // the R3_has_inheritance_via_part_of rule (Has + PartOf → Has).
