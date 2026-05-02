@@ -275,6 +275,18 @@ pub struct ToolContext<'a> {
     /// implied list class. `None` when the previous turn produced
     /// no grounded fact, or when this is the first turn.
     pub previous_grounded_fact: Option<&'a str>,
+    /// **v4.29.5** — Track A discourse-level prior. PMI matrix
+    /// over root pairs that co-occurred in the same corpus
+    /// sample (trained offline by `train_root_affinity` over the
+    /// v4.28.5 8.85M-token corpus). When set, `SearchGraph`
+    /// reranking gains a discourse tiebreaker tier between
+    /// `domain_match` and `length`: among candidates with equal
+    /// chain priority + equal overlap + equal domain match,
+    /// prefer the one whose `object.root` has higher PMI to the
+    /// SearchGraph subject (the user's topic anchor for this
+    /// turn). Strictly additive — `None` (default) preserves
+    /// the v4.29.0 ranking order bit-for-bit.
+    pub root_affinity: Option<&'a adam_kernel_fst::root_affinity::RootAffinity>,
 }
 
 /// Pure-function dispatcher. Reads `ToolContext` references, never
@@ -423,6 +435,26 @@ impl Tool {
                             _ => 0, // no signal, treat all as equal
                         }
                     };
+                    // **v4.29.5** — Track A discourse tiebreaker.
+                    // After overlap + priority + domain_match, when
+                    // a `RootAffinity` PMI matrix is attached, prefer
+                    // candidates whose `object.root` has higher
+                    // co-occurrence PMI with the SearchGraph subject
+                    // (the user's topic anchor for this turn). All
+                    // candidates filtered through this branch share
+                    // the same `subject.root`, so the discriminator
+                    // lives on the object side. `None` matrix → all
+                    // candidates score 0.0, the tier collapses to
+                    // a no-op and the v4.14.5 ladder is preserved
+                    // bit-for-bit.
+                    let affinity_score = |fact: &ReasFact| -> f32 {
+                        match ctx.root_affinity {
+                            Some(aff) => {
+                                aff.score(&subject_lower, &fact.object.root.to_lowercase())
+                            }
+                            None => 0.0,
+                        }
+                    };
                     // **v4.17.5** — list-intent boost: when the
                     // query carries an explicit list request,
                     // facts whose object root contains «тізім»
@@ -539,6 +571,40 @@ impl Tool {
                         // wants the school-curriculum definition
                         // over the one-word `X — ғылым.` stub.
                         .then_with(|| b.raw_text.chars().count().cmp(&a.raw_text.chars().count()))
+                        // **v4.29.5** — Track A discourse tiebreaker.
+                        // After overlap + priority + domain_match +
+                        // length, when a `RootAffinity` PMI matrix is
+                        // attached, prefer candidates whose
+                        // `object.root` has higher co-occurrence PMI
+                        // with the SearchGraph subject (the user's
+                        // topic anchor for this turn). Placed at this
+                        // depth — the last semantic tier before
+                        // lexicographic — for two reasons:
+                        //  (a) length is a strong "informativeness"
+                        //      signal (richer facts are usually more
+                        //      useful answers — the live_holdout
+                        //      world_core_water case shows that
+                        //      rich chemistry facts beat short
+                        //      «Су — сусын» despite higher PMI of
+                        //      сусын↔су in food contexts);
+                        //  (b) when length is also tied, two facts
+                        //      are genuinely equivalent in obvious
+                        //      signals; PMI then picks the one with
+                        //      tighter discourse cohesion to the
+                        //      anchor topic — exactly the use case
+                        //      RootAffinity was trained for.
+                        // Higher affinity wins, so we compare `b vs a`.
+                        // Falls back to `Equal` on NaN so sort
+                        // stability is preserved. `None` matrix → all
+                        // candidates score 0.0 → tier collapses, the
+                        // v4.29.0 ladder is preserved bit-for-bit.
+                        .then_with(|| {
+                            let aff_a = affinity_score(a);
+                            let aff_b = affinity_score(b);
+                            aff_b
+                                .partial_cmp(&aff_a)
+                                .unwrap_or(std::cmp::Ordering::Equal)
+                        })
                         .then_with(|| a.raw_text.cmp(&b.raw_text))
                 });
                 let total_matches = matches.len();
@@ -977,6 +1043,7 @@ mod tests {
             current_domain: None,
             domain_index: None,
             previous_grounded_fact: None,
+            root_affinity: None,
         }
     }
 
@@ -1124,6 +1191,94 @@ mod tests {
         assert_eq!(r.findings, vec!["Қазақстан — мемлекет.".to_string()]);
     }
 
+    /// **v4.29.5** — root-affinity tiebreaker fires when length +
+    /// priority + overlap + domain_match are all tied. Two
+    /// candidate facts of identical predicate and identical
+    /// raw_text length differ only by object root; the higher-PMI
+    /// pair wins. Without this tier the lexicographic fallback
+    /// would pick the alphabetically-earlier object.
+    #[test]
+    fn search_graph_root_affinity_breaks_length_tie() {
+        use std::collections::HashMap;
+        // Two facts: «қазақстан — астана» vs «қазақстан — алматы».
+        // Same predicate (IsA), same length, same domain, no
+        // overlap. Lex order: «алматы» < «астана» so the
+        // pre-affinity ladder picks алматы. We construct an
+        // affinity matrix with stronger PMI for (қазақстан,
+        // астана) so the tier flips it.
+        let mut a = fact("қазақстан", Predicate::IsA, "астана");
+        a.confidence = ConfidenceKind::HumanApproved;
+        a.raw_text = "Қазақстан — астана".into();
+        let mut b = fact("қазақстан", Predicate::IsA, "алматы");
+        b.confidence = ConfidenceKind::HumanApproved;
+        b.raw_text = "Қазақстан — алматы".into();
+        let extracted = vec![a, b];
+        let belief = BeliefState::new();
+
+        // Synthetic counts: 100 samples, all three roots seen 50
+        // times each. Pair (қазақстан, астана) co-occurs 40×;
+        // (қазақстан, алматы) co-occurs 6×. Both pass MIN=5,
+        // both have positive PMI, but астана's PMI is much
+        // higher (40 / (50·50/100) = 1.6 vs 6 / (50·50/100) = 0.24).
+        let mut singles: HashMap<String, u64> = HashMap::new();
+        singles.insert("қазақстан".into(), 50);
+        singles.insert("астана".into(), 50);
+        singles.insert("алматы".into(), 50);
+        let mut pairs: HashMap<(String, String), u64> = HashMap::new();
+        // Lex-sorted-smaller-first key order.
+        pairs.insert(("астана".into(), "қазақстан".into()), 40);
+        pairs.insert(("алматы".into(), "қазақстан".into()), 6);
+        let affinity =
+            adam_kernel_fst::root_affinity::RootAffinity::from_counts(100, singles, pairs, 5);
+        // Sanity check: the matrix scores астана > алматы.
+        assert!(affinity.score("қазақстан", "астана") > affinity.score("қазақстан", "алматы"));
+
+        // Dispatch WITH affinity: астана must rank first despite
+        // alphabetically losing to алматы.
+        let ctx_with = ToolContext {
+            belief: &belief,
+            extracted: &extracted,
+            derived: &[],
+            retrieval: None,
+            rank_config: None,
+            query_input: None,
+            current_domain: None,
+            domain_index: None,
+            previous_grounded_fact: None,
+            root_affinity: Some(&affinity),
+        };
+        let r_with = Tool::dispatch(
+            ToolCall::SearchGraph {
+                subject: "қазақстан".into(),
+                predicate: None,
+            },
+            &ctx_with,
+        );
+        assert!(r_with.success);
+        assert!(
+            r_with.findings[0].contains("астана"),
+            "with affinity, астана must rank first, got {:?}",
+            r_with.findings
+        );
+
+        // Dispatch WITHOUT affinity: lexicographic fallback wins,
+        // so алматы ranks first. Confirms the tier is what flips
+        // the order, not some other accidental signal.
+        let r_without = Tool::dispatch(
+            ToolCall::SearchGraph {
+                subject: "қазақстан".into(),
+                predicate: None,
+            },
+            &ctx(&belief, &extracted),
+        );
+        assert!(r_without.success);
+        assert!(
+            r_without.findings[0].contains("алматы"),
+            "without affinity, lex order must put алматы first, got {:?}",
+            r_without.findings
+        );
+    }
+
     #[test]
     fn search_graph_filters_out_ontology_invalid_facts() {
         let mut invalid = fact("адам", Predicate::LivesIn, "ақын");
@@ -1223,6 +1378,7 @@ mod tests {
             current_domain: None,
             domain_index: None,
             previous_grounded_fact: None,
+            root_affinity: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {
@@ -1281,6 +1437,7 @@ mod tests {
             current_domain: None,
             domain_index: None,
             previous_grounded_fact: None,
+            root_affinity: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {

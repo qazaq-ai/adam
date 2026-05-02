@@ -230,6 +230,33 @@ fn main() -> ExitCode {
         }
     }
 
+    // **v4.29.5** — load the Track A root-affinity PMI matrix
+    // trained offline by `train_root_affinity` over the v4.28.5
+    // 8.85M-token corpus. When attached, `Tool::dispatch(SearchGraph)`
+    // gains a discourse tiebreaker tier between domain_match and
+    // length: among candidates with equal chain priority + equal
+    // overlap + equal domain match, the candidate whose object
+    // root has higher PMI to the SearchGraph subject wins. Missing
+    // file or schema mismatch is non-fatal — the v4.29.0 ladder
+    // remains in force bit-for-bit.
+    let affinity_path = std::path::Path::new("data/retrieval/root_affinity.json");
+    if affinity_path.exists() {
+        match adam_kernel_fst::root_affinity::RootAffinity::load(affinity_path) {
+            Ok(affinity) => {
+                let n_roots = affinity.root_log_prob.len();
+                let n_pairs: usize = affinity.pair_pmi.values().map(|row| row.len()).sum();
+                let n_samples = affinity.trained_on_samples;
+                eprintln!(
+                    "adam-chat: root affinity — {n_roots} roots, {n_pairs} pairs over {n_samples} training samples"
+                );
+                conv = conv.with_root_affinity(affinity);
+            }
+            Err(err) => {
+                eprintln!("adam-chat: root affinity load failed ({err}); v4.29.0 ladder in force");
+            }
+        }
+    }
+
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
             run_turn(&mut conv, input, &lex, &repo, trace, turn_seed(0));

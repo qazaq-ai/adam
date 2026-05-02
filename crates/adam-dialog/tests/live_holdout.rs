@@ -38,6 +38,7 @@ use std::path::Path;
 
 use adam_dialog::{Conversation, DomainIndex, TemplateRepository};
 use adam_kernel_fst::lexicon::LexiconV1;
+use adam_kernel_fst::root_affinity::RootAffinity;
 use adam_kernel_fst::suffix_priors::SuffixPriors;
 use adam_reasoning::Fact as ReasFact;
 use adam_reasoning::reasoner::DerivedFact;
@@ -49,6 +50,7 @@ const MORPHEME_INDEX_PATH: &str = "../../data/retrieval/morpheme_index.json";
 const FACTS_PATH: &str = "../../data/retrieval/facts.json";
 const DERIVED_FACTS_PATH: &str = "../../data/retrieval/derived_facts.json";
 const PRIORS_PATH: &str = "../../data/retrieval/suffix_chain_priors.json";
+const AFFINITY_PATH: &str = "../../data/retrieval/root_affinity.json";
 
 #[derive(Debug, Deserialize)]
 struct Dataset {
@@ -83,7 +85,13 @@ fn load_lexicon() -> LexiconV1 {
     LexiconV1::load(curated, apertium).expect("live_holdout: lexicon load failed")
 }
 
-fn load_runtime() -> Option<(MorphemeIndex, Vec<ReasFact>, Vec<DerivedFact>, SuffixPriors)> {
+fn load_runtime() -> Option<(
+    MorphemeIndex,
+    Vec<ReasFact>,
+    Vec<DerivedFact>,
+    SuffixPriors,
+    Option<RootAffinity>,
+)> {
     if !Path::new(MORPHEME_INDEX_PATH).exists()
         || !Path::new(FACTS_PATH).exists()
         || !Path::new(DERIVED_FACTS_PATH).exists()
@@ -112,8 +120,16 @@ fn load_runtime() -> Option<(MorphemeIndex, Vec<ReasFact>, Vec<DerivedFact>, Suf
             .ok()?
             .derived;
     let priors = SuffixPriors::load(PRIORS_PATH).ok()?;
+    // **v4.29.5** — root-affinity matrix is optional. Holdouts
+    // run with ON when the file is present so we observe its
+    // discourse tier in production-shape configuration.
+    let affinity = if Path::new(AFFINITY_PATH).exists() {
+        RootAffinity::load(AFFINITY_PATH).ok()
+    } else {
+        None
+    };
 
-    Some((index, extracted, derived, priors))
+    Some((index, extracted, derived, priors, affinity))
 }
 
 fn build_domain_index() -> DomainIndex {
@@ -134,11 +150,17 @@ fn run_case(
     case: &Case,
     lex: &LexiconV1,
     repo: &TemplateRepository,
-    runtime: Option<&(MorphemeIndex, Vec<ReasFact>, Vec<DerivedFact>, SuffixPriors)>,
+    runtime: Option<&(
+        MorphemeIndex,
+        Vec<ReasFact>,
+        Vec<DerivedFact>,
+        SuffixPriors,
+        Option<RootAffinity>,
+    )>,
     domain_idx: Option<&DomainIndex>,
 ) -> Result<String, String> {
     let mut conv = Conversation::new();
-    if let Some((index, extracted, derived, priors)) = runtime {
+    if let Some((index, extracted, derived, priors, affinity)) = runtime {
         conv = conv
             .with_morpheme_index(index.clone())
             .with_reasoning_chains(extracted.clone(), derived.clone())
@@ -146,6 +168,9 @@ fn run_case(
             .with_priors_alpha(0.3);
         if let Some(idx) = domain_idx {
             conv = conv.with_domain_index(idx.clone());
+        }
+        if let Some(aff) = affinity {
+            conv = conv.with_root_affinity(aff.clone());
         }
     }
 

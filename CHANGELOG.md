@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.29.5] — 2026-05-02 — Track A Phase 2: RootAffinity wired into runtime SearchGraph reranking
+
+**Phase 2 of Track A — runtime integration of v4.29.0's RootAffinity matrix.** v4.29.0 shipped the artifact + type + training binary, deliberately deferring runtime wiring to keep that architectural addition reversible. v4.29.5 closes the loop: the PMI matrix now influences `Tool::dispatch(SearchGraph)` reranking as the deepest semantic tiebreaker.
+
+### Innovations
+
+**(1) `Conversation::with_root_affinity(affinity)` builder.** Mirrors the v4.15.5 `with_suffix_priors` pattern. Optional — when not attached, ranking is bit-for-bit identical to v4.29.0.
+
+**(2) `ToolContext.root_affinity: Option<&RootAffinity>` field.** Threaded through `Conversation::turn` so every `SearchGraph` dispatch in a domain-aware Conversation sees the matrix.
+
+**(3) Affinity tier inserted at the deepest semantic depth — after `length`, before lexicographic.** Initial draft placed the tier between `domain_match` and `length`, but a holdout regression (`world_core_water`) revealed that PMI cultural co-occurrence (`су ↔ сусын` in food-context corpus) can outrank the length signal that distinguishes a rich chemistry definition from a stub. Length is a strong "informativeness" signal and protecting it is correct. The deepest placement preserves all v4.29.0 ranking outcomes while still firing on truly equivalent candidates — exactly the use case PMI was trained for.
+
+**(4) Live `adam_chat` startup wiring.** Loads `data/retrieval/root_affinity.json` if present; logs `"adam-chat: root affinity — {n_roots} roots, {n_pairs} pairs over {n_samples} training samples"`. Missing file or schema mismatch is non-fatal — the v4.29.0 ranking ladder remains in force unchanged.
+
+**(5) Holdout test rigs (`live_holdout`, `rust_holdout`) load the matrix when present** — so the regression suite runs in production-shape configuration, with the discourse tier active.
+
+### Verification
+
+- **Workspace tests `829 → 830 passing`** (+1 new `search_graph_root_affinity_breaks_length_tie` test that constructs synthetic counts and proves the tier flips an alphabetically-losing candidate when PMI is decisive).
+- **live_holdout `32 / 32 = 100 %`** — unchanged with affinity ON.
+- **rust_holdout `41 / 41 = 100 %`** — unchanged with affinity ON.
+- **9-query live ON-vs-OFF probe** (Қазақстан / Биология / Алматы / Абай / су / тау / өзен / уақыт / тіл / көк / көз / тас / ас / ат) — **all bit-identical** between affinity ON and OFF. The tier is placed conservatively enough that on the current world_core (where length usually disambiguates) it acts as a pure safety net. As future versions add more equally-rich candidates per subject, the discourse signal will start firing.
+
+### Why "deepest semantic tier" is the right placement for v4.29.5
+
+The principle: **affinity should refine ranking, not override stronger signals.** Length is a strong proxy for "richness of the answer," and the chemistry-vs-food su example confirms PMI on a corpus dominated by general/news/textbook contexts can mislead when domain-rich content is short. Placing affinity at the deepest semantic depth means:
+
+- All v4.29.0 ranking outcomes preserved exactly when length, priority, overlap, or domain differ.
+- Affinity fires only when those tiers are truly equivalent — exactly when "more discourse cohesion to the topic anchor" is the correct discriminator.
+- Future versions can promote the tier earlier as PMI training data widens (cross-domain pairs, larger corpora).
+
+### Ranking ladder (post-v4.29.5)
+
+```
+list_intent_rank (v4.17.5)
+    → overlap (v4.4.11)
+    → predicate_priority (v4.0.x)
+    → domain_match (v4.14.5)
+    → length DESC (v4.11.6)
+    → root_affinity DESC (v4.29.5)   ← NEW
+    → lexicographic ASC (stable)
+```
+
+### Pipeline impact
+
+- `crates/adam-dialog/src/conversation.rs` — `root_affinity` field, `with_root_affinity` builder, ToolContext threading.
+- `crates/adam-dialog/src/tool.rs` — `ToolContext.root_affinity` field, `affinity_score` closure in SearchGraph dispatch, ranking tier insertion, +1 unit test.
+- `crates/adam-dialog/src/bin/adam_chat.rs` — load + log + attach.
+- `crates/adam-dialog/tests/live_holdout.rs` + `tests/rust_holdout.rs` — load + attach when present.
+- `data/retrieval/facts.json` + `derived_facts.json` — version field synced to `"4.29.5"`.
+
+### Carry-forward to v4.30.0+
+
+- **Promote affinity earlier in the ladder** as evidence accumulates that the discourse signal can outweigh length on specific domains.
+- **Per-domain PMI matrices** — the current matrix mixes contexts; a chemistry-specific PMI would correctly score `су ↔ оттек` higher than `су ↔ сусын` in chemistry-domain queries.
+- **Cross-turn topic carry**: derive the anchor root from `previous_grounded_fact` so multi-turn discourse cohesion uses prior grounding, not just the current SearchGraph subject.
+- **Result-ты Accusative-with-dash tokenizer fix** (v4.27+ carry-forward).
+
+### Honest limitations
+
+- The current affinity tier is conservative — on the present world_core / live_holdout / rust_holdout coverage, no behaviour visibly differs ON vs OFF. The tier is in place and provably fires on synthetic ties (verified by unit test); production benefits will accumulate as the curated knowledge graph grows facts that tie on length.
+- The matrix was trained over a corpus dominated by general/news/textbook contexts. Specialty-domain PMI (chemistry, medicine, programming) is sparse — bridging this is on the v4.30+ roadmap.
+
 ## [4.29.0] — 2026-05-02 — Track A discourse-level prior: RootAffinity (PMI matrix) — 834k pairs across 10 523 roots
 
 **First minor in v4.29+ Track A discourse-level statistical layer.** v4.15 → v4.20 built `SuffixPriors` for chain-level morphology disambiguation. v4.28.5 expanded the corpus from 5.77M to 8.85M tokens. v4.29.0 ships the **first cross-word semantic signal**: a sparse pointwise-mutual-information (PMI) matrix over root pairs that co-occur in the same sample.

@@ -190,6 +190,18 @@ pub struct Conversation {
     /// behaviour)". Recommended default for tuning is `Some(0.3)`
     /// — bigram dominates but unigram smooths sparse rows.
     pub priors_alpha: Option<f32>,
+    /// **v4.29.5** — Track A discourse-level prior. Sparse PMI
+    /// matrix over root pairs that co-occur in same corpus
+    /// sample. When attached, `Tool::dispatch(SearchGraph)`
+    /// reranking gains a tiebreaker tier: among candidates with
+    /// equal chain priority + equal overlap + equal domain match,
+    /// the one whose subject root has higher affinity to the
+    /// user's recent topic wins. When `None`, the ranking ladder
+    /// preserves v4.29.0 behaviour bit-for-bit. Trained offline
+    /// by `train_root_affinity` over the v4.28.5 8.85M-token
+    /// corpus; loaded from `data/retrieval/root_affinity.json`
+    /// at conversation startup.
+    pub root_affinity: Option<adam_kernel_fst::root_affinity::RootAffinity>,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -415,6 +427,23 @@ impl Conversation {
         self
     }
 
+    /// **v4.29.5** — builder: attach the trained root-affinity
+    /// PMI matrix so `Tool::dispatch(SearchGraph)` reranking
+    /// gains a discourse-level tiebreaker. Among candidates
+    /// with equal chain priority + equal overlap + equal domain
+    /// match, the one whose subject root has higher PMI to the
+    /// turn's primary topic root wins. Built by the caller via
+    /// `adam_kernel_fst::root_affinity::RootAffinity::load(...)`
+    /// from `data/retrieval/root_affinity.json`. When `None`,
+    /// the ranking ladder preserves v4.29.0 order bit-for-bit.
+    pub fn with_root_affinity(
+        mut self,
+        affinity: adam_kernel_fst::root_affinity::RootAffinity,
+    ) -> Self {
+        self.root_affinity = Some(affinity);
+        self
+    }
+
     /// v4.0.3 — builder: enable investor-safe reasoning mode.
     /// When enabled, `inject_reasoning_chain` only cites derivations
     /// whose full `source_chain` comes from `data/world_core/*.jsonl`
@@ -620,6 +649,11 @@ impl Conversation {
             // **v4.18.0** — previous turn's grounded_fact text,
             // for list-class context tracking.
             previous_grounded_fact: self.session.get("last_grounded_fact").map(String::as_str),
+            // **v4.29.5** — Track A discourse-level prior. Sparse
+            // PMI matrix over root pairs, used as a tiebreaker in
+            // SearchGraph reranking. `None` (no PMI matrix
+            // attached) preserves v4.29.0 behaviour bit-for-bit.
+            root_affinity: self.root_affinity.as_ref(),
         };
         let tool_calls: Vec<crate::tool::ToolResult> = tool_plan
             .into_iter()

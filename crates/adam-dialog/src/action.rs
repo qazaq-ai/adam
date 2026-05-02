@@ -440,6 +440,7 @@ impl ActionPlanner {
             current_domain: None,
             domain_index: None,
             previous_grounded_fact: None,
+            root_affinity: None,
         };
         let result = crate::tool::Tool::dispatch(
             crate::tool::ToolCall::SearchBelief {
