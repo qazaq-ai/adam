@@ -231,8 +231,20 @@ pub fn extract_facts(
     source: &FactSource,
 ) -> Vec<Fact> {
     let mut out = Vec::new();
+    // **v4.34.5** — first pattern matcher migration to consume
+    // SemFrame stream. Internal sem_frames computation: tokenize the
+    // text, FST-analyse each token, project to SemFrames, run
+    // detector chain (sentential negation; modality not needed by
+    // copula_is_a). External callers (`bench`, `extract_facts` bin)
+    // pass `parses: &[]` — the per-token re-analysis here is the
+    // existing behavior of every matcher (they all do inline
+    // `analyse()` calls), just collected into a single sem_frames
+    // pass instead of duplicated across each matcher. Cost: one
+    // additional pass over tokens per sample; downstream matchers
+    // that migrate next will share this work instead of re-analysing.
+    let sem_frames = build_sem_frames(text, lexicon);
     // v2.x baseline matchers.
-    patterns::copula_is_a(text, parses, lexicon, source, &mut out);
+    patterns::copula_is_a(text, parses, &sem_frames, lexicon, source, &mut out);
     patterns::locative_lives_in(text, parses, lexicon, source, &mut out);
     patterns::possessive_has(text, parses, lexicon, source, &mut out);
     patterns::dative_goes_to(text, parses, lexicon, source, &mut out);
@@ -276,6 +288,51 @@ pub fn extract_facts(
     // unconditionally at the pipeline boundary.
     out.retain(|f| !is_fragment_root(&f.subject.root) && !is_fragment_root(&f.object.root));
     out
+}
+
+/// **v4.34.5** — build the SemFrame stream for a sentence, ready
+/// for migrated pattern matchers to consume. Mirrors the
+/// `Conversation::turn` build sequence used by the dialog runtime
+/// since v4.33.5: tokenize whitespace-stripped text, FST-analyse
+/// each token, project to SemFrame, run the populated-feature
+/// detector chain (sentential negation; modality not strictly
+/// needed for current matchers but cheap to include).
+///
+/// Designed to be the single source of truth for SemFrame views
+/// inside `extract_facts`: as more matchers migrate to consume
+/// `&[SemFrame]`, they share this single computed stream instead
+/// of re-analysing the same tokens individually.
+fn build_sem_frames(text: &str, lexicon: &LexiconV1) -> Vec<adam_kernel_fst::SemFrame> {
+    let mut analyses: Vec<Analysis> = Vec::new();
+    for token in text.split_whitespace() {
+        let cleaned: String = token
+            .chars()
+            .filter(|c| c.is_alphabetic() || *c == '-')
+            .collect::<String>()
+            .to_lowercase();
+        if cleaned.is_empty() {
+            continue;
+        }
+        // Take the first analysis per token, mirroring
+        // `parse_input_with_priors` in adam-dialog. Ranking via
+        // suffix priors isn't applied here — extract_facts is
+        // deterministic-pipeline territory and using priors would
+        // couple corpus extraction to runtime priors.
+        if let Some(first) = adam_kernel_fst::parser::analyse(&cleaned, lexicon)
+            .into_iter()
+            .next()
+        {
+            analyses.push(first);
+        }
+    }
+    let mut frames: Vec<adam_kernel_fst::SemFrame> = analyses
+        .iter()
+        .map(adam_kernel_fst::SemFrame::from)
+        .collect();
+    adam_kernel_fst::populate_periphrastic_modality(&mut frames);
+    adam_kernel_fst::populate_ability_modality(&mut frames);
+    adam_kernel_fst::populate_sentential_negation(&mut frames);
+    frames
 }
 
 /// v3.9.0 — filter for dash-prefixed fragment roots. Returns `true`

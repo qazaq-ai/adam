@@ -42,6 +42,7 @@ use crate::{ConfidenceKind, Fact, FactSource, Predicate, SlotRef};
 pub fn copula_is_a(
     text: &str,
     _parses: &[Analysis],
+    sem_frames: &[adam_kernel_fst::SemFrame],
     lexicon: &LexiconV1,
     source: &FactSource,
     out: &mut Vec<Fact>,
@@ -55,6 +56,35 @@ pub fn copula_is_a(
         Some(parts) => parts,
         None => return,
     };
+    // **v4.34.5** — first SemFrame consumption inside extract_facts.
+    // Refuse to extract «X IsA Y» when the sentence carries
+    // sentence-level negation on a noun-class predicate. The pattern
+    // «X — Y емес» (e.g. «биология — ғылым емес» — "biology is not
+    // a science") would otherwise extract a wrong fact: the dash
+    // pattern fires, the RHS head extraction picks `ғылым`, and the
+    // matcher emits «биология IsA ғылым» — exactly what the source
+    // sentence DENIED. v4.33.0's `populate_sentential_negation`
+    // already marks the noun preceding «емес» as `Polarity::Negated`;
+    // here we simply refuse extraction whenever any noun-class frame
+    // in the sentence stream carries that polarity. Conservative —
+    // skips the whole IsA extraction even when the negation is on a
+    // different clause / sub-phrase. Audit of the v4.34.0 committed
+    // graph showed zero IsA Grammar facts whose source text contains
+    // «емес», so this guard is a forward-looking safety net rather
+    // than a fix for an existing wrong fact.
+    let any_negated_noun = sem_frames.iter().any(|f| {
+        f.polarity == adam_kernel_fst::Polarity::Negated
+            && matches!(
+                f.pos,
+                adam_kernel_fst::PosTag::Noun
+                    | adam_kernel_fst::PosTag::Adjective
+                    | adam_kernel_fst::PosTag::Pronoun
+                    | adam_kernel_fst::PosTag::Numeral
+            )
+    });
+    if any_negated_noun {
+        return;
+    }
 
     // LHS must be a single bare nominative noun. Multi-word LHS means
     // the subject is a possessive / adjective-noun construction where
@@ -1787,7 +1817,7 @@ mod tests {
         let Some(lex) = load_lex() else { return };
         let text = "Абай — ақын";
         let mut out = Vec::new();
-        copula_is_a(text, &[], &lex, &src(), &mut out);
+        copula_is_a(text, &[], &[], &lex, &src(), &mut out);
         assert_eq!(out.len(), 1, "expected exactly one fact for «Абай — ақын»");
         let f = &out[0];
         assert_eq!(f.subject.root, "абай");
@@ -1801,7 +1831,7 @@ mod tests {
     fn copula_rejects_no_dash() {
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        copula_is_a("Абай ақын еді", &[], &lex, &src(), &mut out);
+        copula_is_a("Абай ақын еді", &[], &[], &lex, &src(), &mut out);
         assert!(out.is_empty(), "no dash → no fact, got {out:?}");
     }
 
@@ -1811,6 +1841,7 @@ mod tests {
         let mut out = Vec::new();
         copula_is_a(
             "Абай — қазақ ақыны — дара тұлға",
+            &[],
             &[],
             &lex,
             &src(),
@@ -1827,7 +1858,7 @@ mod tests {
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
         // «Абайдың» is genitive; not a bare nominative.
-        copula_is_a("Абайдың — ақын", &[], &lex, &src(), &mut out);
+        copula_is_a("Абайдың — ақын", &[], &[], &lex, &src(), &mut out);
         assert!(out.is_empty(), "inflected subject → refuse");
     }
 
@@ -1835,7 +1866,7 @@ mod tests {
     fn copula_rejects_self_tautology() {
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        copula_is_a("адам — адам", &[], &lex, &src(), &mut out);
+        copula_is_a("адам — адам", &[], &[], &lex, &src(), &mut out);
         assert!(out.is_empty(), "X — X tautology → refuse");
     }
 
@@ -1846,7 +1877,7 @@ mod tests {
         // v2.1 precision: refuse any multi-token side.
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        copula_is_a("Адалдық түбі — кеніш", &[], &lex, &src(), &mut out);
+        copula_is_a("Адалдық түбі — кеніш", &[], &[], &lex, &src(), &mut out);
         assert!(out.is_empty(), "multi-token LHS → refuse");
     }
 
@@ -1856,7 +1887,7 @@ mod tests {
         // v2.1 head extraction: RHS head = бұлағы (possessed) → бұлақ.
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        copula_is_a("Кітап — білім бұлағы", &[], &lex, &src(), &mut out);
+        copula_is_a("Кітап — білім бұлағы", &[], &[], &lex, &src(), &mut out);
         if out.is_empty() {
             eprintln!("note: «кітап» or «бұлақ» may not be in Lexicon; skipping");
             return;
@@ -1877,6 +1908,7 @@ mod tests {
         copula_is_a(
             "Шекара — Қазақстан мен Ресей шекарасы және ұзын",
             &[],
+            &[],
             &lex,
             &src(),
             &mut out,
@@ -1893,6 +1925,7 @@ mod tests {
         copula_is_a(
             "Шекара — шекарасы (7591 шақырым)",
             &[],
+            &[],
             &lex,
             &src(),
             &mut out,
@@ -1908,12 +1941,79 @@ mod tests {
         // "Ілім — бұлақ." — one token each side, trailing period OK.
         let Some(lex) = load_lex() else { return };
         let mut out = Vec::new();
-        copula_is_a("Ілім — бұлақ.", &[], &lex, &src(), &mut out);
+        copula_is_a("Ілім — бұлақ.", &[], &[], &lex, &src(), &mut out);
         if out.is_empty() {
             eprintln!("note: «ілім» or «бұлақ» may not be in Lexicon; skipping");
             return;
         }
         assert_eq!(out.len(), 1);
+    }
+
+    /// **v4.34.5** — first SemFrame consumption inside extract_facts.
+    /// When the sentence carries sentence-level negation on a noun-
+    /// class predicate (any frame in the stream has
+    /// `polarity=Negated` AND `pos in {Noun,Adj,Pronoun,Numeral}`),
+    /// `copula_is_a` refuses to extract an IsA fact even when the
+    /// dash pattern fires.
+    #[test]
+    fn copula_refuses_when_sem_frame_has_negated_noun() {
+        use adam_kernel_fst::sem_frame::SemFrame;
+        let Some(lex) = load_lex() else { return };
+        // Construct a synthetic SemFrame stream with a Negated noun.
+        // Using the same builder the extract_facts pipeline uses.
+        // For this synthetic test we just inject a Negated frame
+        // directly — the sem_frames argument represents the post-
+        // detector output, not the pre-detector input.
+        let mut frames: Vec<SemFrame> = Vec::new();
+        // Mimic «X — Y емес» — the noun "Y" has been marked Negated
+        // by populate_sentential_negation upstream.
+        frames.push(SemFrame {
+            root: "ғылым".into(),
+            pos: adam_kernel_fst::PosTag::Noun,
+            case: None,
+            number: None,
+            possessive: None,
+            predicate: None,
+            derivation: None,
+            tense: None,
+            person: None,
+            voice: None,
+            polarity: adam_kernel_fst::Polarity::Negated,
+            polite: false,
+            modality: None,
+            evidence: None,
+            relation: None,
+        });
+        let mut out = Vec::new();
+        copula_is_a(
+            "биология — ғылым емес",
+            &[],
+            &frames,
+            &lex,
+            &src(),
+            &mut out,
+        );
+        assert!(
+            out.is_empty(),
+            "Negated noun frame must refuse copula_is_a IsA extraction, got {out:?}"
+        );
+    }
+
+    /// Control: same sentence WITHOUT a Negated frame in the stream
+    /// → matcher fires as usual. Confirms the guard fires only on
+    /// the Polarity::Negated signal, not on the dash pattern itself.
+    #[test]
+    fn copula_fires_when_no_negation_in_sem_frames() {
+        let Some(lex) = load_lex() else { return };
+        let mut out = Vec::new();
+        copula_is_a("биология — ғылым", &[], &[], &lex, &src(), &mut out);
+        if out.is_empty() {
+            eprintln!("note: «биология» or «ғылым» may not be in Lexicon; skipping");
+            return;
+        }
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].subject.root, "биология");
+        assert_eq!(out[0].object.root, "ғылым");
     }
 
     #[test]
@@ -2446,7 +2546,7 @@ mod tests {
         ];
         for text in cases {
             let mut out = Vec::new();
-            copula_is_a(text, &[], &lexicon, &source, &mut out);
+            copula_is_a(text, &[], &[], &lexicon, &source, &mut out);
             assert!(
                 out.is_empty(),
                 "copula_is_a should refuse time-noun subject for «{text}», got {out:?}"

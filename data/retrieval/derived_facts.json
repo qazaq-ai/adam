@@ -1,13 +1,13 @@
 {
-  "version": "4.34.0",
+  "version": "4.34.5",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
   "iterations_completed": 5,
   "counts": {
-    "initial_facts": 1934,
-    "derived_facts": 6153,
+    "initial_facts": 1937,
+    "derived_facts": 6154,
     "by_rule": {
       "R10_in_domain_inheritance": 133,
       "R11_in_domain_shared_target": 3098,
@@ -16,7 +16,7 @@
       "R3_has_inheritance_via_part_of": 28,
       "R5_shared_is_a_target": 1172,
       "R6_lives_in_via_part_of": 1,
-      "R7_goes_to_via_part_of": 6,
+      "R7_goes_to_via_part_of": 7,
       "R8_after_transitivity": 6,
       "R9_part_of_transitivity": 259
     }
@@ -45718,6 +45718,31 @@
         {
           "pack": "world_core/time.jsonl",
           "sample_id": "time_005"
+        }
+      ],
+      "confidence": "RuleInferred"
+    },
+    {
+      "subject": {
+        "surface": "өңірін",
+        "root": "өңірін",
+        "pos": "noun"
+      },
+      "predicate": "GoesTo",
+      "object": {
+        "surface": "периодтық жүйе",
+        "root": "периодтық жүйе",
+        "pos": "noun"
+      },
+      "rule_id": "R7_goes_to_via_part_of",
+      "source_chain": [
+        {
+          "pack": "kazakh_textbooks_pack.json",
+          "sample_id": "kz_textbook_kz_lang_11_emn_p0007_s15"
+        },
+        {
+          "pack": "world_core/chemistry_school.jsonl",
+          "sample_id": "chem_015"
         }
       ],
       "confidence": "RuleInferred"

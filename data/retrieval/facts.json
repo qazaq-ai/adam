@@ -1,7 +1,7 @@
 {
-  "version": "4.34.0",
+  "version": "4.34.5",
   "status": "completed",
-  "elapsed_s": 36,
+  "elapsed_s": 57,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -17,28 +17,28 @@
   ],
   "counts": {
     "samples_scanned": 3691,
-    "samples_with_facts": 70,
-    "facts_total": 1934,
+    "samples_with_facts": 73,
+    "facts_total": 1937,
     "by_predicate": {
       "after": 7,
       "causes": 23,
       "does_to": 1,
-      "goes_to": 18,
+      "goes_to": 20,
       "has": 59,
       "has_quantity": 29,
       "in_domain": 24,
       "is_a": 1472,
-      "lives_in": 8,
+      "lives_in": 9,
       "part_of": 228,
       "related_to": 65
     },
     "by_pack": {
-      "abai_wikisource_pack.json": 1,
-      "cc100_kk_pack.json": 19,
+      "abai_wikisource_pack.json": 2,
+      "cc100_kk_pack.json": 20,
       "common_voice_kk_pack.json": 3,
       "kazakh_classics_pack.json": 3,
       "kazakh_proverbs_pack.json": 13,
-      "kazakh_textbooks_pack.json": 13,
+      "kazakh_textbooks_pack.json": 14,
       "tatoeba_kazakh_pack.json": 2,
       "wikipedia_kz_pack.json": 17,
       "world_core/adam_self.jsonl": 33,
@@ -744,6 +744,26 @@
     },
     {
       "subject": {
+        "surface": "клуб",
+        "root": "клуб",
+        "pos": "noun"
+      },
+      "predicate": "GoesTo",
+      "object": {
+        "surface": "ұпайға",
+        "root": "ұпай",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ке барады",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000225"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Осы нәтижеден кейін астаналық клуб екінші орында келе жатқан алматылық \"Қайраттан\" бес ұпайға озып кетті. \"Қайрат\" 29 қазанда өтетін соңғы турда өз алаңында \"Оқжетпес\" командасымен ойнайды. \"Қайрат\" бұл матчта жеңіске жетсе де \"Астанаға\" ұпай саны бойынша жете алмайды."
+    },
+    {
+      "subject": {
         "surface": "түскен",
         "root": "түскен",
         "pos": "noun"
@@ -901,6 +921,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "10. М. Жұмабаев дүниеге келген көлдің атауы:"
+    },
+    {
+      "subject": {
+        "surface": "бала",
+        "root": "бала",
+        "pos": "noun"
+      },
+      "predicate": "LivesIn",
+      "object": {
+        "surface": "қалыпта",
+        "root": "қалып",
+        "pos": "noun"
+      },
+      "pattern": "X Y-да тұрады",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00037"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Кеше бала ең, келдің ғой талай жасқа, Көз жетті бір қалыпта тұра алмасқа."
     },
     {
       "subject": {
@@ -1341,6 +1381,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Бұдан кейін Дешті Қыпшақтағы билік Жә- нібек хан мен Керей ханның қолына өтеді"
+    },
+    {
+      "subject": {
+        "surface": "өңірін",
+        "root": "өңірін",
+        "pos": "noun"
+      },
+      "predicate": "GoesTo",
+      "object": {
+        "surface": "топқа",
+        "root": "топ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ке барады",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0007_s15"
+      },
+      "confidence": "Grammar",
+      "raw_text": "ХУ ғасырдың орта шенінде ежелден “Жетісу өңірін мекендеген түркі тай- палары бір этникалық топқа біріге келе, қазақ халқын құра- ды"
     },
     {
       "subject": {

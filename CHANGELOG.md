@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.34.5] — 2026-05-02 — First extract_facts pattern matcher migration: copula_is_a consumes &[SemFrame], refuses negated extraction
+
+**Patch in v4.34+ semantic-IR arc.** Closes a long-standing carry-forward (originally promised v4.32.5, then v4.34.0). First time a corpus-extraction pattern matcher reads from the `&[SemFrame]` stream — substrate-then-consume cycle now closed for the **extraction side** of the pipeline (it was already closed for the **dialog side** at v4.33.5). Negation-aware extraction guards against future corpus sentences where «X — Y емес» would otherwise mis-extract as «X IsA Y».
+
+### Innovations
+
+**(1) New `build_sem_frames(text, lexicon)` helper** in `crates/adam-reasoning/src/lib.rs`. Mirrors the `Conversation::turn` build sequence used by the dialog runtime since v4.33.5: tokenize whitespace-stripped text → FST-analyse each token → project to SemFrame → run detector chain (sentential negation; periphrastic + ability modality also included for cheap symmetry). Designed to be the **single source of truth** for SemFrame views inside `extract_facts`: as more matchers migrate, they share this single computed stream instead of re-analysing the same tokens individually.
+
+**(2) `copula_is_a` signature migration: `+ sem_frames: &[SemFrame]`.** Old `_parses: &[Analysis]` parameter preserved (still unused by this matcher; kept for sibling-matcher compatibility — they all share the same vestigial parameter). New `sem_frames` parameter is the actual SemFrame stream from `build_sem_frames`. First extract_facts matcher to consume this stream.
+
+**(3) Negation guard inside `copula_is_a`:**
+```rust
+let any_negated_noun = sem_frames.iter().any(|f| {
+    f.polarity == Polarity::Negated
+        && matches!(f.pos, PosTag::Noun | PosTag::Adjective | PosTag::Pronoun | PosTag::Numeral)
+});
+if any_negated_noun { return; }
+```
+
+When the sentence carries sentence-level negation on a noun-class predicate, refuse IsA extraction entirely. Conservative — skips the whole matcher even when negation is on a different clause / sub-phrase. Audit of the v4.34.0 committed graph showed **zero** IsA Grammar facts whose source text contains «емес», so this guard is a forward-looking safety net rather than a fix for an existing wrong fact. Synthetic test «биология — ғылым емес» confirms: pre-v4.34.5 would extract «биология IsA ғылым» (wrong); v4.34.5 refuses.
+
+### Substrate-then-consume cycle now closed for extraction
+
+For the polarity feature, both directions of the pipeline now consume the SemFrame field:
+
+| Side | Population | Consumption |
+|---|---|---|
+| **Dialog** (response generation) | v4.33.0 (sentential negation detector) | **v4.33.5** (`unknown.with_negated_topic` template family) |
+| **Extraction** (corpus → facts) | v4.33.0 (same detector, run inside `build_sem_frames`) | **v4.34.5** (negation guard in `copula_is_a`) |
+
+Same architectural pattern queued for `Modality` (Necessity / Possibility / Ability — already populated in v4.32.0–v4.32.5; consumption v4.34.7+).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **860 → 862 passing** (+2 copula negation tests: `copula_refuses_when_sem_frame_has_negated_noun`, `copula_fires_when_no_negation_in_sem_frames`) |
+| facts.json | 1934 → **1937** (+3 from other matchers benefiting from v4.32.5 ConverbImperfect; **IsA count 1472 unchanged** confirming negation guard didn't reject any current fact, as audit predicted) |
+| derived_facts.json | 6151 → 6153 |
+| Real-world 26-query battery | **26/26 = 100 % coherent** unchanged |
+| Neg-consumed rate | **5/5 = 100 %** unchanged |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+| Mean latency | **324.2 ms** (+0.8 ms vs v4.34.0; build_sem_frames overhead per sample, within noise) |
+| Mean RSS | **176.9 MB** (+1.0 MB, within noise) |
+
+### What's NOT in v4.34.5
+
+- **Other matchers (`locative_lives_in`, `dative_goes_to`, `possessive_has`, `nominal_conjunction`, `domain_membership`, `structural_part_of`)** still take `_parses: &[Analysis]` (unused) and don't consume sem_frames. Migration is per-matcher; each will get its own release as concrete sem_frame consumption value emerges.
+- **Modality consumption in templates** — still v4.34.7 work.
+
+### Pipeline impact
+
+- 1 new helper `build_sem_frames` in lib.rs (~25 lines)
+- 1 line added in `extract_facts` to compute sem_frames
+- 1 signature change to `copula_is_a` (+`sem_frames` parameter)
+- 1 negation-guard block in `copula_is_a` (~12 lines)
+- 12 test-site call updates (mechanical: insert `&[]` for new parameter)
+- 2 new unit tests
+- facts/derived_facts regeneration
+
+Cadence: patch — small migration of one matcher; the architectural pattern (single `build_sem_frames` + per-matcher consumption) is the durable payload, not the line count.
+
+### Carry-forwards
+
+- **v4.34.7** — first **Modality consumption** in templates: when input has `Modality::Necessity` on lexical predicate (e.g. «X оқу керек»), route to `unknown.with_modal_acknowledge` family responding "иә, X-ті V-у пайдалы" instead of asserting a generic fact about X.
+- **v4.35.0** — second extract_facts matcher migration (likely `nominal_conjunction` for RelatedTo extraction, since it benefits from sem_frame negation check the same way `copula_is_a` does).
+- **v4.36+** — remaining 8 missing parser tenses (ConverbPerfect, 3 participles, FutureIntentional, FuturePossible, Conditional, Imperative); other particle-copula extensions if real REPL surfaces a need.
+
 ## [4.34.0] — 2026-05-02 — Parser particle-copula extension + epistemic-override polarity bypass (battery edge case 18 closed)
 
 **First minor in v4.34+ semantic-IR arc.** Closes the FST coverage gap that blocked inflected «емес» forms from parsing, and the planner-routing gap that let `EpistemicStatus::Tentative` override v4.33.5's polarity-aware routing. Together these two fixes finally give battery edge case 18 («Сен бағдарламашы емессің бе?») the response it deserves — respectful acknowledgment instead of a generic "Бәлкім, X туралы айтасыз ба" fallback that's been stuck since the 2026-05-02 live REPL session was first captured.
