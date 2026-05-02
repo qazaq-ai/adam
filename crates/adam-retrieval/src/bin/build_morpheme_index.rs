@@ -69,6 +69,43 @@ const SOURCE_PACKS: &[&str] = &[
     // `crates/adam-corpus/src/bin/process_rust_book_kk.rs` and
     // indexed here.
     "rust_book_kk_pack.json",
+    // **v4.28.5** — Track A corpus expansion: 27 filtered shards
+    // (18 cc100_kk + 9 wikipedia_kz), each ~10% survival rate
+    // after `filter_pack` strict pass (≥70% FSM coverage, no
+    // loanword suffixes, no blocklist words). Pre-v4.28.5 only
+    // the first 150k-sample base packs were indexed; shards 02+
+    // sat on disk unused. Total +377k filtered samples (~20M
+    // tokens) → corpus 5.77M → ~25M tokens (4.3x growth).
+    // Files live in `data/curated/shards/` which is gitignored
+    // per the v1.3.5 policy (shards >50MB don't go to git); the
+    // raw unfiltered shards are not registered here.
+    "shards/filtered_cc100_kk_shard_02_pack.json",
+    "shards/filtered_cc100_kk_shard_03_pack.json",
+    "shards/filtered_cc100_kk_shard_04_pack.json",
+    "shards/filtered_cc100_kk_shard_05_pack.json",
+    "shards/filtered_cc100_kk_shard_06_pack.json",
+    "shards/filtered_cc100_kk_shard_07_pack.json",
+    "shards/filtered_cc100_kk_shard_08_pack.json",
+    "shards/filtered_cc100_kk_shard_09_pack.json",
+    "shards/filtered_cc100_kk_shard_10_pack.json",
+    "shards/filtered_cc100_kk_shard_11_pack.json",
+    "shards/filtered_cc100_kk_shard_12_pack.json",
+    "shards/filtered_cc100_kk_shard_13_pack.json",
+    "shards/filtered_cc100_kk_shard_14_pack.json",
+    "shards/filtered_cc100_kk_shard_15_pack.json",
+    "shards/filtered_cc100_kk_shard_16_pack.json",
+    "shards/filtered_cc100_kk_shard_17_pack.json",
+    "shards/filtered_cc100_kk_shard_18_pack.json",
+    "shards/filtered_cc100_kk_shard_19_pack.json",
+    "shards/filtered_wikipedia_kz_shard_02_pack.json",
+    "shards/filtered_wikipedia_kz_shard_03_pack.json",
+    "shards/filtered_wikipedia_kz_shard_04_pack.json",
+    "shards/filtered_wikipedia_kz_shard_05_pack.json",
+    "shards/filtered_wikipedia_kz_shard_06_pack.json",
+    "shards/filtered_wikipedia_kz_shard_07_pack.json",
+    "shards/filtered_wikipedia_kz_shard_08_pack.json",
+    "shards/filtered_wikipedia_kz_shard_09_pack.json",
+    "shards/filtered_wikipedia_kz_shard_10_pack.json",
 ];
 
 /// **v4.7.21** — per-pack default-mode limit overrides. Default

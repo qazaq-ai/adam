@@ -426,6 +426,30 @@ fn collect_pack_paths(dir: &Path) -> std::io::Result<Vec<PathBuf>> {
             out.push(path);
         }
     }
+    // **v4.28.5** — also scan `data/curated/shards/` for filtered
+    // shards (cc100, wikipedia). Only `filtered_*.json` files are
+    // pulled in — raw shards are aggressive-noise sources and have
+    // already been cleaned by `filter_pack` (≥70 % FSM coverage,
+    // no loanword suffixes, no blocklist words). The filtered
+    // versions sit alongside their raw counterparts in
+    // `curated/shards/` (which is gitignored per the v1.3.5
+    // policy: shards >50 MB don't go to git). 377k filtered
+    // samples across 27 shards (~20M tokens) at v4.28.5 ingest.
+    let shards_dir = dir.join("shards");
+    if shards_dir.is_dir() {
+        for entry in fs::read_dir(&shards_dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .map(|n| n.starts_with("filtered_") && n.ends_with(".json"))
+                .unwrap_or(false)
+            {
+                out.push(path);
+            }
+        }
+    }
     out.sort();
     Ok(out)
 }

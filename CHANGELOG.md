@@ -7,6 +7,86 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.28.5] — 2026-05-02 — Track A corpus expansion: 27 filtered shards ingested, 5.77M → 8.85M tokens (+53 %)
+
+**First patch in v4.28+ Track A corpus-expansion arc.** Per the user-approved 2026-05-02 strategic direction, Track A is the path toward eventual statistical learning layers (root co-occurrence affinity, domain-specific suffix priors, eventually a tiny typed-suffix encoder). Track A's first prerequisite is **more corpus**: 5.77M tokens at v4.28.0 was enough for chain-level priors (v4.15-v4.20) but undersized for root-level affinity matrices.
+
+This release ingests 27 shards that were already on disk but not registered with the indexing pipelines, giving a **+53 % token boost** with strict noise filtering.
+
+### What was already on disk (unused)
+
+`data/curated/shards/` (gitignored per v1.3.5 — shards >50 MB don't go to git):
+- 18 cc100_kk shards × 150k samples = 2.7M raw samples
+- 9 wikipedia_kz shards × ~150k samples = ~1.3M raw samples
+- Total: ~3.9M unfiltered samples
+
+Pre-v4.28.5 only the *first* 150k-sample base packs (`wikipedia_kz_pack.json`, `cc100_kk_pack.json`) were registered in `SOURCE_PACKS`; shards 02+ sat unused.
+
+### What ingestion looked like
+
+**Stage 1 — strict per-shard filtering** (`filter_pack` binary, existing). Each raw shard → `filtered_*.json` with:
+- ≥ 4 words / sample
+- ≥ 70 % FSM coverage (curated lexicon must segment ≥ 70 % of the words)
+- No loanword-suffix patterns (`-ция / -изм / -логия / -графия / -тика / -ивный / -ильный / -альный / -ональный` and case-form variants)
+- No blocklist words
+
+**Survival rate per shard: 8–10 %.** Wikipedia: 12.2k of 150k (8.1 %). CC100: 14.9k of 150k (9.9 %). Aggressive filter — the surviving 377k samples are pure-Kazakh, morphologically dense, ready for FST training.
+
+**Stage 2 — pipeline registration:**
+- `crates/adam-corpus/src/bin/train_suffix_priors.rs` — `collect_pack_paths` extended to also scan `data/curated/shards/` for `filtered_*.json` files. ~10 lines added.
+- `crates/adam-retrieval/src/bin/build_morpheme_index.rs` — `SOURCE_PACKS` += 27 explicit `shards/filtered_*.json` paths.
+
+**Stage 3 — artifact regeneration:**
+- `train_suffix_priors` re-run: 5.77M → 8.85M tokens, 1112 → 1143 chains, 305k → 353k bigrams, 9338 → 9602 root types.
+- `build_morpheme_index` re-run (committed mode, 500-cap per pack): +13.5k samples added to the index.
+- `extract_facts` + `run_reasoner` re-run: derived_facts artifact synced to v4.28.5.
+
+### Impact
+
+| Metric | Pre-v4.28.5 | Post-v4.28.5 | Δ |
+|---|---|---|---|
+| `train_suffix_priors` tokens | 5,765,342 | **8,846,707** | **+53.4 %** |
+| `train_suffix_priors` samples | 699,035 | **1,076,271** | +377,236 |
+| Distinct chain signatures | 1,112 | 1,143 | +31 |
+| Distinct chain bigrams | 305,856 | **353,227** | +47k |
+| Distinct root types | 9,338 | 9,602 | +264 |
+| Closed-class boost coverage | 5/10 | 6/10 | +1 (one previously-zero-count root reached the unambiguous bucket) |
+
+### Verification
+
+- **Workspace tests `824 → 824 passing`** — every existing test produces the same result with the bigger corpus.
+- **rust_holdout `41 / 41 = 100 %`** — unchanged.
+- **live_holdout `32 / 32 = 100 %`** — unchanged.
+- **Parse-disambig eval** still **chain_tiebreak_root 23/23 = 100 %**.
+- **80-question Rust battery** still **79 / 80 = 98.75 %** (the `Result-ты` Accusative-with-dash edge case persists, as expected — corpus growth doesn't fix tokenizer issues).
+
+### What this enables (next releases)
+
+The bigger token base is the prerequisite for **Track A v4.29.0+ work**:
+- **Root co-occurrence affinity**: with 9602 distinct roots and 8.85M tokens, the root-pair co-occurrence matrix has enough samples per cell to be statistically useful (was thin at 5.77M).
+- **Domain-specific suffix priors**: separate `SuffixPriors` per programming_rust / physics_school / etc. requires per-domain token volume — now achievable with 8.85M total.
+- **Discourse-level transition priors**: across-sentence root-cluster transitions need wider coverage.
+
+8.85M is still 17000× smaller than what serious neural pretraining requires (100B+), but **3-10× more than enough for statistical reranking layers** that stay deterministic.
+
+### Pipeline impact
+
+- `crates/adam-corpus/src/bin/train_suffix_priors.rs` — `collect_pack_paths` extended to scan `shards/filtered_*.json`.
+- `crates/adam-retrieval/src/bin/build_morpheme_index.rs` — `SOURCE_PACKS` += 27 shard entries.
+- `data/curated/shards/filtered_*.json` — 27 new files (gitignored, total ~ 1.3 GB local-only).
+- `data/retrieval/suffix_chain_priors.json` — regenerated at v4.28.5 (still schema v4).
+- `data/retrieval/morpheme_index.json` — regenerated.
+- `data/retrieval/facts.json` + `derived_facts.json` — version field synced to `"4.28.5"`.
+- Workspace tests **824 → 824 passing**.
+
+### Cadence
+
+Patch — pure data-side expansion via existing filter pipeline + 2 small SOURCE_PACKS edits. Architecturally light; behavior-wise invisible (all holdouts unchanged); statistically meaningful (+53 % token base).
+
+**Stripe (7) — Track A corpus expansion — opens.**
+
+Next: **v4.29.0** (root co-occurrence affinity matrix design + `data/retrieval/root_affinity.json` artifact + reranking integration). 1-day train pass on the new 8.85M-token corpus; static hashmap lookup at runtime.
+
 ## [4.28.0] — 2026-05-02 — Native-speaker review substrate: rust_glossary_review_v4.28.md + approve_rust_entry.sh
 
 **First minor in v4.28+ review-pipeline arc.** v4.26.0 → v4.27.5 added 69 entries to `programming_rust.jsonl` (rust_111…rust_179), all auto-curated by Claude with honest `reviewer: "claude"` audit trail. Per the v4.7.0 directive in `data/raw/rust_book_kk/README.md` («native-speaker review is needed for technical accuracy and idiomatic phrasing»), these entries need a human pass before being marked `reviewer: "shaman"`. v4.28.0 ships the **review substrate** — tooling and documentation that make the offline review process cheap, rather than the review itself (which requires the user as native speaker).
