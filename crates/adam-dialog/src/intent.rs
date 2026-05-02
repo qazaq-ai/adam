@@ -262,6 +262,22 @@ pub enum Intent {
         /// `detect_compositional_function_question`.
         #[serde(default)]
         compositional_function: bool,
+        /// **v4.33.5** — first consumption of a populated SemFrame
+        /// field by the response generator. When the input contains
+        /// a sentence-level negation pattern («X емес»), the SemFrame
+        /// for the noun-headed predicate carries
+        /// `Polarity::Negated`. `Conversation::turn` looks up the
+        /// frame whose root matches `noun_hint` and copies that
+        /// polarity here; the planner then routes the turn to
+        /// `unknown.with_negated_topic` instead of asserting a
+        /// definition that contradicts the user's claim. Default
+        /// `Affirmative` preserves all pre-v4.33.5 routing exactly.
+        ///
+        /// This is the first SemFrame field that influences the
+        /// answer text; v4.31.0–v4.33.0 all populated fields without
+        /// consumption. Consumption discipline starts here.
+        #[serde(default)]
+        noun_hint_polarity: adam_kernel_fst::Polarity,
     },
 }
 

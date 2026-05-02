@@ -542,6 +542,20 @@ impl Conversation {
             self.suffix_priors.as_ref(),
             self.priors_alpha,
         );
+        // **v4.33.5** — build SemFrames immediately after parses so
+        // they're available BEFORE intent finalisation. v4.31.5 built
+        // them at the END of the turn (trace-assembly time); v4.33.5
+        // moves the build forward so populated fields (polarity,
+        // modality, evidence) can influence Intent / planner routing.
+        // The detector chain (periphrastic modality / ability /
+        // sentential negation) runs once here; the result flows into
+        // both `intent.noun_hint_polarity` (v4.33.5 consumer) and
+        // `TurnTrace.sem_frames` (v4.31.5 trace consumer).
+        let mut sem_frames: Vec<adam_kernel_fst::SemFrame> =
+            parses.iter().map(adam_kernel_fst::SemFrame::from).collect();
+        adam_kernel_fst::populate_periphrastic_modality(&mut sem_frames);
+        adam_kernel_fst::populate_ability_modality(&mut sem_frames);
+        adam_kernel_fst::populate_sentential_negation(&mut sem_frames);
         let raw_intent = interpret_text_with_lexicon(stripped, &parses, Some(lexicon));
 
         // v1.4.0: follow-up resolution. "ал сіз?" after AskHowAreYou
@@ -549,6 +563,33 @@ impl Conversation {
         // thing back", which is still AskHowAreYou for planning
         // purposes (planner picks a response without asking back).
         let mut intent = resolve_follow_up(raw_intent, input, self.active_intent);
+
+        // **v4.33.5** — first consumption of SemFrame fields by
+        // intent: copy `Polarity::Negated` onto Intent::Unknown
+        // when the noun_hint frame carries it. Looks up the SemFrame
+        // whose root matches noun_hint (case-insensitive) and reads
+        // its polarity. When v4.33.0's `populate_sentential_negation`
+        // detected «X емес» on the noun, polarity is Negated and the
+        // planner will route this turn to `unknown.with_negated_topic`
+        // instead of asserting a definition that contradicts the
+        // user's claim. Default Affirmative path preserves all pre-
+        // v4.33.5 routing exactly. This is the FIRST SemFrame field
+        // that influences the answer text — v4.31.0–v4.33.0 all
+        // populated fields without consumption.
+        if let Intent::Unknown {
+            noun_hint: Some(hint),
+            noun_hint_polarity,
+            ..
+        } = &mut intent
+        {
+            let hint_lower = hint.to_lowercase();
+            if let Some(frame) = sem_frames
+                .iter()
+                .find(|f| f.root.to_lowercase() == hint_lower)
+            {
+                *noun_hint_polarity = frame.polarity;
+            }
+        }
 
         // **v4.6.0** — discourse-anaphora resolution. When the user's
         // input contains a discourse anaphor («онда / сонда / осында
@@ -934,41 +975,11 @@ impl Conversation {
             self.dialog_context
                 .record_turn(self.turn_counter, topic, domain_hint, false);
         }
-        // **v4.31.5** — populate SemFrame view of every parse before
-        // moving `parses` into the trace. One-to-one correspondence
-        // with `parses`; uses `From<&Analysis>` (lossless on every
-        // morphological feature, auto-derives polarity from negation
-        // and evidence from PastEvidential tense). Allocation cost:
-        // one SemFrame per parse (~200 bytes), proportional to input
-        // length. No new pipeline behaviour — just the canonical
-        // SemFrame view exposed at the trace boundary so v4.32+
-        // consumers can migrate one at a time.
-        let mut sem_frames: Vec<adam_kernel_fst::SemFrame> =
-            parses.iter().map(adam_kernel_fst::SemFrame::from).collect();
-        // **v4.32.0** — periphrastic-modality detection. Walks the
-        // SemFrame sequence and sets `modality` on the lexical
-        // predicate when a modal auxiliary («керек» / «тиіс» /
-        // «мүмкін») follows it. Idempotent; doesn't overwrite a
-        // non-None modality.
-        adam_kernel_fst::populate_periphrastic_modality(&mut sem_frames);
-        // **v4.32.5** — ability `-а ал-` detection. Dual-signal check:
-        // current frame is `ал` (Verb) AND preceding frame has
-        // `tense=ConverbImperfect`. Both signals together
-        // unambiguously identify the periphrastic ability
-        // construction, distinguishing it from a literal "X took Y"
-        // sentence where `ал` is just the lexical verb.
-        // Runs AFTER populate_periphrastic_modality; first-detection-
-        // wins, so если керек/тиіс/мүмкін уже задал modality —
-        // ability detector её не перезапишет.
-        adam_kernel_fst::populate_ability_modality(&mut sem_frames);
-        // **v4.33.0** — sentence-level negation via «емес» particle.
-        // When a noun-class frame is followed by `емес`, set its
-        // polarity to Negated. Closes the v4.31.0 noun-polarity gap
-        // for the canonical predicate-negation pattern «X емес».
-        // Inflected forms «емеспін / емессің / емеспіз» don't parse
-        // currently (parser particle dispatch is bare-only) — that's
-        // a v4.34+ FST coverage fix.
-        adam_kernel_fst::populate_sentential_negation(&mut sem_frames);
+        // **v4.33.5** — sem_frames are now built earlier (right after
+        // `parses`, before intent finalisation) so populated fields
+        // can influence Intent / planner routing. The build below is
+        // moved up; this block is preserved as a sentinel for the
+        // historical pipeline location.
         let trace = TurnTrace {
             parses,
             sem_frames,

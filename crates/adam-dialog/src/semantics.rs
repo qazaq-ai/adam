@@ -297,6 +297,11 @@ pub fn interpret_text_with_lexicon(
         question_shape,
         temporal_scope,
         compositional_function,
+        // v4.33.5 — populated downstream in Conversation::turn after
+        // sem_frames is built (semantics.rs has no access to FST
+        // analyses here). Default Affirmative preserves all pre-
+        // v4.33.5 routing exactly.
+        noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
     }
 }
 
@@ -355,6 +360,11 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         // surface-level, so the parses-only legacy path can't fire
         // it.
         compositional_function: false,
+        // **v4.33.5** — same: noun_hint_polarity defaults to
+        // Affirmative on the legacy parses-only path. Real polarity
+        // detection requires sem_frames built in Conversation::turn
+        // from the rich FST analyses.
+        noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
     }
 }
 

@@ -318,6 +318,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         }
     }
 
@@ -380,6 +381,7 @@ mod tests {
                 question_shape: None,
                 temporal_scope: false,
                 compositional_function: false,
+                noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             },
         ];
         for intent in social {
@@ -519,6 +521,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         };
         assert!(TaskState::intent_has_evidence(&with_chain));
 
@@ -532,6 +535,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         };
         assert!(TaskState::intent_has_evidence(&with_example));
 
@@ -545,6 +549,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         };
         assert!(TaskState::intent_has_evidence(&with_grounded));
 
@@ -570,6 +575,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         };
         t.roll_forward(&intent, &belief, 0);
         assert_eq!(t.status, TaskStatus::ReadyToAnswer);
@@ -595,6 +601,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         };
         t.roll_forward(&intent, &belief, 2);
         assert_eq!(t.status, TaskStatus::Blocked);

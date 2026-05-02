@@ -179,6 +179,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         }
     }
 

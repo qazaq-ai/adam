@@ -254,6 +254,7 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             question_shape,
             temporal_scope,
             compositional_function,
+            noun_hint_polarity,
             ..
         } => Intent::Unknown {
             raw_tokens,
@@ -274,6 +275,11 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             // **v4.23.5** — same: compositional_function is an
             // analytical signal about query structure.
             compositional_function,
+            // **v4.33.5** — same: noun_hint_polarity is an
+            // analytical signal about input polarity, not evidence.
+            // Preserve it so verbatim/derived evidence stripping
+            // doesn't lose the negation marker.
+            noun_hint_polarity,
         },
         other => other,
     }
@@ -295,6 +301,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         }
     }
 

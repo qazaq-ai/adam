@@ -8,6 +8,7 @@ This is the unified efficiency metric. Latency and pass-rate moving in opposite 
 
 | Release | p50 turn latency (M2) | Holdout pass-rate | **ms / correct answer** |
 |---|---|---|---|
+| v4.33.5 | 1.07 ms | 860 / 860 = 100.0 % | **1.07 ms** |
 | v4.33.0 | 1.07 ms | 860 / 860 = 100.0 % | **1.07 ms** |
 | v4.32.5 | 1.07 ms | 854 / 854 = 100.0 % | **1.07 ms** |
 | v4.32.0 | 1.07 ms | 847 / 847 = 100.0 % | **1.07 ms** |

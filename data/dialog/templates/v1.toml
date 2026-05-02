@@ -857,6 +857,28 @@ templates = [
     "{noun} жайында нақты дерек: {fact}",
 ]
 
+# v4.33.5 — first SemFrame-driven response family. When the input
+# carried sentence-level negation («X емес»), `populate_sentential_negation`
+# marks the noun frame Negated; `Conversation::turn` copies that onto
+# `Intent::Unknown.noun_hint_polarity`; planner routes here.
+#
+# Asserting a definition («X — Y») would contradict the user's claim.
+# The templates here acknowledge the negation respectfully without
+# making any positive claim about X — adam doesn't have access to the
+# user's mental model and can't verify the negation. The wording uses
+# «емес» echoed back so the user sees their own negation reflected,
+# and «пікіріңіз / ойыңыз» («your view / opinion») to mark the
+# epistemic status as user-asserted rather than adam-asserted.
+[[families]]
+key = "unknown.with_negated_topic"
+templates = [
+    "{noun} емес деп айтасыз — пікіріңізді сыйлаймын.",
+    "{noun} емес туралы пікіріңізді түсіндім.",
+    "{noun} жайында дау айтуға деректерім жетпейді — сіздің ойыңызды сыйлаймын.",
+    "{noun} емес деп ойлайсыз; мен бұл туралы дау айтуға бара алмаймын.",
+    "Түсіндім: {noun} емес деген пікір. Бұл туралы өзімде нақты дерек жоқ.",
+]
+
 # v1.9.5: Unknown with *adapted* retrieval evidence — the retrieved
 # quote was rewritten by `compose_with_city` (ComposeMode::InSampleCitySwap)
 # so at least one city mention was swapped to the user's session city.

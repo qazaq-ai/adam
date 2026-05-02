@@ -7,6 +7,115 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.33.5] — 2026-05-02 — First SemFrame consumption: Polarity::Negated routes Unknown to respectful negation acknowledgment
+
+**Patch in v4.33+ semantic-IR arc — landmark release.** First time a populated SemFrame field **influences user-facing answer text**. v4.31.0 → v4.33.0 all populated SemFrame fields without consumption (the substrate-then-consume discipline). v4.33.5 starts consumption: when the user negates a topic with «X емес», the response generator no longer asserts a definition that contradicts the user's claim — instead it respectfully acknowledges the negation.
+
+### What was broken pre-v4.33.5
+
+Case 23 of the v4.33.0 battery:
+```
+> Бұл шындық емес
+Шындық туралы қысқаша айтсам: Шындық — ең күшті қару.
+```
+The user said "this is not the truth"; the system replied with a definition of truth. The negation was detected at the SemFrame layer (`шындық polarity=Negated` in `--trace`), but no consumer read the field, so routing fell through to the standard `unknown.with_grounded_fact` family.
+
+### Innovations
+
+**(1) `Intent::Unknown.noun_hint_polarity: Polarity` field.** First SemFrame-derived field on the canonical Intent type. Default `Affirmative` preserves all pre-v4.33.5 routing exactly. Propagated through `semantics::interpret_text_with_lexicon` (default Affirmative — semantics has no FST analyses), `verifier::strip_evidence` (preserved as analytical signal, not evidence), and `task` test sites (default).
+
+**(2) `Conversation::turn` populates the polarity** by walking `sem_frames` for the frame whose `root` (case-insensitive) matches `noun_hint`, then copying that frame's polarity onto the Intent. Wired RIGHT AFTER follow-up resolution and BEFORE planner routing — gives the planner first dibs on the populated polarity.
+
+**(3) SemFrame build moved earlier in the turn pipeline.** Pre-v4.33.5, `sem_frames` was built at trace-assembly time (very late, after planner). v4.33.5 builds it RIGHT after `parses` so populated fields can influence routing. Detector chain (`populate_periphrastic_modality` → `populate_ability_modality` → `populate_sentential_negation`) runs once at this earlier point; the result flows into both the consumer (Intent.noun_hint_polarity) and the trace (TurnTrace.sem_frames).
+
+**(4) Planner routing on `Polarity::Negated`.** New short-circuit at the top of the `Intent::Unknown` branch:
+```rust
+if *noun_hint_polarity == Polarity::Negated && noun_hint.is_some() {
+    return "unknown.with_negated_topic";
+}
+```
+Highest priority among Unknown-routing — overrides every "I have evidence about X" path because the user is *denying* X's predicate role, not asking about it.
+
+**(5) New template family `unknown.with_negated_topic` in `v1.toml`** — 5 templates that echo the user's negation back («{noun} емес деп айтасыз...») and frame the response as respectful acknowledgment without making any positive claim:
+```toml
+"{noun} емес деп айтасыз — пікіріңізді сыйлаймын.",
+"{noun} емес туралы пікіріңізді түсіндім.",
+"{noun} жайында дау айтуға деректерім жетпейді — сіздің ойыңызды сыйлаймын.",
+"{noun} емес деп ойлайсыз; мен бұл туралы дау айтуға бара алмаймын.",
+"Түсіндім: {noun} емес деген пікір. Бұл туралы өзімде нақты дерек жоқ.",
+```
+
+The templates use `пікіріңіз / ойыңыз` («your view / opinion») to mark the epistemic status as **user-asserted** rather than **adam-asserted** — adam doesn't have access to the user's mental model and can't verify the negation.
+
+### Live verification
+
+Before vs after on the two negation cases from v4.33.0 battery:
+
+| Query | v4.33.0 (definition) | v4.33.5 (acknowledgment) |
+|---|---|---|
+| Бұл шындық емес | "Шындық — ең күшті қару." | "Шындық емес деп айтасыз — пікіріңізді сыйлаймын." |
+| Ол ұзын емес | "Ұзын қара бешпент..." | "Ұзын емес деп айтасыз — пікіріңізді сыйлаймын." |
+
+Control: «Бұл шындық» (no negation) → unchanged definition response. Affirmative path is bit-for-bit identical to pre-v4.33.5.
+
+### Real-world battery (v4.33.5)
+
+24 queries (same as v4.33.0):
+
+| Aggregate | v4.33.5 | Δ vs v4.33.0 |
+|---|---|---|
+| Mean latency | **322.5 ms** | matched |
+| Mean max RSS | **175.1 MB** | -1.9 MB (slight improvement, within noise) |
+| Coherent responses | **24/24 = 100 %** | **+1 case fixed** (cases 23, 24 now contextually correct) |
+| Modal-detect rate | **4/4** | matched |
+| Neg-detect rate | **2/2** | matched |
+| **Neg-consumed rate** | **2/2 = 100 %** | **NEW** — first SemFrame consumption metric |
+
+The 24/24 vs v4.33.0's 23/24 is a real visible improvement — case 23 «Бұл шындық емес» moved from "asserting a definition that contradicts the user" to "respectfully acknowledging the negation". Case 18 «Сен бағдарламашы емессің бе?» STILL falls to the tentative fallback because `емессің` (inflected) doesn't parse and polarity isn't detected; that's v4.34+ FST particle-copula work.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **860 passing** unchanged (Intent::Unknown construction patched at 14 test sites in action.rs / planner.rs / task.rs / uncertainty.rs / verifier.rs to add `noun_hint_polarity: Polarity::Affirmative`) |
+| Real-world 24-query battery | **24/24 = 100 % coherent** (up from 23/24) |
+| Neg-consumed rate | **2/2 = 100 %** — first SemFrame field consumption metric |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Substrate-then-consume discipline closed
+
+For the polarity feature, the architectural cycle is now complete:
+- **v4.31.0**: SemFrame type with `polarity` field (placeholder)
+- **v4.31.5**: TurnTrace.sem_frames + --trace renderer (visibility)
+- **v4.33.0**: `populate_sentential_negation` populates the field
+- **v4.33.5**: Intent + planner + template **consume** the field (visible behavior change)
+
+Each step independently reviewable. Same pattern will apply to Modality (populate v4.32.0 / v4.32.5; consume v4.34+) and `RelationKind` (populate v4.34+; consume later).
+
+### Pipeline impact
+
+- 1 new field on `Intent::Unknown` (`noun_hint_polarity`)
+- 1 propagation in `semantics::interpret_text_with_lexicon` + 1 in legacy `interpret`
+- 1 propagation in `verifier::strip_evidence`
+- 14 Intent::Unknown test-site patches (mechanical default-Affirmative)
+- 1 wiring block in `Conversation::turn` populating polarity from sem_frames
+- 1 line-move: sem_frames build moved earlier in the turn pipeline
+- 1 short-circuit at top of planner Unknown-routing
+- 1 new template family in v1.toml (5 templates)
+- Real-world battery measurement updated
+- facts/derived_facts version sync to 4.33.5
+
+Cadence: patch — small, focused first consumption. The release-discipline change (SemFrame field influences user-facing text) is the durable payload; the line count is small.
+
+### Carry-forwards
+
+- **v4.34.0** — parser particle-copula extension so «емеспін / емессің / емеспіз / емессіз» parse, enabling negation detection on the «Мен X емеспін» pattern (currently blocked at FST layer); first behavioural migration of one extract_facts pattern matcher to consume `&[SemFrame]`.
+- **v4.34.5** — first **Modality consumption** in templates: when input has `Modality::Necessity` on lexical predicate (e.g. «X оқу керек»), route to a `unknown.with_modal_acknowledge` family that says "иә, X-ті V-у пайдалы" rather than asserting a generic fact about X.
+- **v4.35+** — battery edge case 18 («X емес пе?» question form requiring polarity-aware AND new intent classification).
+
 ## [4.33.0] — 2026-05-02 — Sentence-level negation: «X емес» → Polarity::Negated on prior noun
 
 **First minor in v4.33+ semantic-feature population arc.** Closes the noun-polarity gap left by v4.31.0. v4.31.0 introduced `Polarity` as a unified type but only auto-derived from `VerbFeatures.negation` — noun frames defaulted to `Affirmative`. v4.33.0 adds sentence-level detection: when a noun-class frame is followed by the «емес» («not») particle, the noun's polarity flips to `Negated`. The Kazakh polarity story is now complete for the canonical patterns: verbs auto-derive from suffix-level negation, nouns auto-derive from sentence-level «емес».

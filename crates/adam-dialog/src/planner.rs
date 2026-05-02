@@ -638,6 +638,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         };
         assert_eq!(intent_key(&intent), "unknown.with_derived_chain");
     }
@@ -659,6 +660,7 @@ mod tests {
             question_shape: None,
             temporal_scope: false,
             compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         };
         assert_eq!(intent_key(&intent), "unknown.with_grounded_fact");
     }
@@ -766,8 +768,25 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             question_shape,
             temporal_scope,
             compositional_function,
+            noun_hint_polarity,
             ..
         } => {
+            // **v4.33.5** — sentence-level negation routing. When
+            // the user said «X емес» («X is not the case»),
+            // `Conversation::turn` copies `Polarity::Negated` from
+            // the matching SemFrame onto the Intent. Asserting a
+            // definition of X («X — Y») would contradict the user's
+            // claim, so we route to a respectful acknowledgement
+            // family that doesn't assert anything new. Highest
+            // priority among Unknown-routing because it overrides
+            // every other "I have evidence about X" path — the
+            // user is denying X's predicate role, not asking about
+            // it. Default Affirmative path is unchanged: pre-v4.33.5
+            // routing preserved bit-for-bit when polarity is not
+            // Negated.
+            if *noun_hint_polarity == adam_kernel_fst::Polarity::Negated && noun_hint.is_some() {
+                return "unknown.with_negated_topic";
+            }
             // **v4.23.0** — `temporal_scope: true` short-circuits to
             // `unknown.temporal_no_data`. Pattern: temporal adverb
             // (кеше / бүгін / ертең / қазір / бұрын / былтыр /
