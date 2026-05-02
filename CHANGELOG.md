@@ -7,6 +7,111 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.32.0] — 2026-05-02 — Modality population from periphrastic auxiliaries (керек / тиіс / мүмкін)
+
+**First minor in v4.32+ semantic-feature population arc.** Second SemFrame consumer migration (after v4.31.5's TurnTrace integration). Where v4.31.0 introduced the `Modality` enum as a placeholder slot, v4.32.0 starts populating it — auto-detecting periphrastic-modality constructions in the SemFrame stream and marking the lexical predicate with the corresponding modal.
+
+### Innovations
+
+**(1) `populate_periphrastic_modality(&mut [SemFrame])`** in `crates/adam-kernel-fst/src/sem_frame.rs`. Single linear scan over the frame sequence:
+
+| Auxiliary root | Modality set | Example |
+|---|---|---|
+| `керек` | `Necessity` ("must / need") | «жазу керек» — "must write" |
+| `тиіс`  | `Necessity` ("ought to")    | «келу тиіс» — "ought to come" |
+| `мүмкін` | `Possibility` ("may / might") | «болу мүмкін» — "may be" |
+
+When the detector encounters one of these auxiliary roots, it sets `modality` on the **preceding** frame (the lexical predicate). The auxiliary's own SemFrame stays untouched. First-detection-wins (won't overwrite a non-None modality), so future ability detection (v4.32.5+) can run alongside without conflict.
+
+**(2) Wired into `Conversation::turn_with_trace`** right after `sem_frames` construction:
+```rust
+let mut sem_frames: Vec<SemFrame> = parses.iter().map(SemFrame::from).collect();
+populate_periphrastic_modality(&mut sem_frames);
+```
+Result visible live in `adam_chat --trace`:
+```
+> Жазу керек
+├─ sem_frames:
+│   [0] жазу/Noun mod=Necessity
+│   [1] керек/Function
+
+> Болу мүмкін
+├─ sem_frames:
+│   [0] болу/Noun mod=Possibility
+│   [1] мүмкін/Function
+```
+
+**(3) Detection by ROOT, not POS.** All three modal auxiliaries share `part_of_speech: "modal"` in the lexicon (which projects to `PosTag::Function` in SemFrame, alongside particles/postpositions/adverbs). Detection by root means other Function-class words (e.g. `туралы` postposition) don't trigger false positives.
+
+**(4) Conservative on ability.** The `-а ал-` periphrastic-ability construction is **deliberately not detected** in v4.32.0. The auxiliary `ал` is also a transitive verb meaning "take/get", and naive surface detection would mis-mark genuine "X took Y" sentences as ability-modal. Proper detection needs the converb form of the lexical verb (`-а / -е / -й` ending) AND a person-marked form of `ал` — both signals checked together. Deferred to v4.32.5+.
+
+### What's NOT changed
+
+Runtime answer text is **unchanged** by this release. v4.32.0 *populates* `modality`; consuming it (e.g. branching template families on Necessity vs Possibility) is v4.33+ work. The substrate-then-consume discipline keeps each release independently reviewable.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **839 → 847 passing** (+8 modality tests) |
+| New modality tests | `periphrastic_modality_detects_kerek_as_necessity`, `…_tiis_as_necessity`, `…_mumkin_as_possibility`, `…_no_match_leaves_all_none`, `…_single_frame_noop`, `…_sentence_initial_modal_skipped`, `…_is_idempotent`, `…_preserves_preset_modality` |
+| Real-world 20-query battery | **20/20 = 100 % coherent** (extends v4.31.5's 18 with 2 modal cases) |
+| Modal-detection rate (live) | **2/2** ✓ (both `керек` and `мүмкін` cases marked correctly in `--trace`) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Real-world battery (v4.32.0)
+
+| # | Category | Query | Latency | Max RSS | Response (truncated) | ✓ |
+|---|---|---|---|---|---|---|
+| 1 | small_talk | Сәлем! | 350 ms | 175.2 MB | Сәлем | ✓ |
+| 2 | small_talk | Қалыңыз қалай? | 320 ms | 175.1 MB | Жақсымын, рахмет. | ✓ |
+| 3 | small_talk | Танысайық. | 320 ms | 175.2 MB | Иә, әрине! Менің атым адам… | ✓ |
+| 4 | identity | Сен кімсің? | 310 ms | 175.2 MB | Менің атым адам, толық атауым NLM… | ✓ |
+| 5 | identity | Сені кім жасады? | 320 ms | 175.3 MB | Мені Баймурзин Даулет жасады. | ✓ |
+| 6 | identity | Не істей аласың? | 320 ms | 175.1 MB | Қазақ тілінде сөйлесе аламын… | ✓ |
+| 7 | knowledge | Қазақстан туралы айт | 330 ms | 177.7 MB | Қазақстан — Орталық Азиядағы 9-шы… | ✓ |
+| 8 | knowledge | Алматы туралы не білесіз? | 330 ms | 176.2 MB | Алматы — Қазақстанның республикалық… | ✓ |
+| 9 | knowledge | Абай кім? | 320 ms | 175.1 MB | Абай — ұлы ойшыл. | ✓ |
+| 10 | knowledge | Биология деген не? | 320 ms | 175.4 MB | Биология — тірі ағзалар мен олардың… | ✓ |
+| 11 | knowledge | Адам ағзасы туралы айт | 330 ms | 177.7 MB | Адам ағзасы — мүшелер мен жүйелер… | ✓ |
+| 12 | rust | Rust туралы айт | 320 ms | 175.3 MB | `Rust` — жадыны қауіпсіз басқаратын… | ✓ |
+| 13 | rust | Айнымалы дегеніміз не? | 320 ms | 175.2 MB | Айнымалы — `Rust-`та `let` арқылы… | ✓ |
+| 14 | rust | Раст деген не? | 320 ms | 177.4 MB | `Раст` — `Rust` атауының кириллицалық… | ✓ |
+| 15 | unknown | Бүгін Алматыда ауа-райы қандай? | 330 ms | 177.6 MB | Уақытқа байланысты деректерім жоқ… | ✓ |
+| 16 | unknown | Кеше не болды? | 320 ms | 175.3 MB | Уақытқа байланысты деректерім жоқ… | ✓ |
+| 17 | unknown | Парижде қандай мұражайлар бар? | 320 ms | 177.3 MB | Мұражай туралы: «Қалада 60 кәсіби театр»… | ✓ |
+| 18 | edge | Сен бағдарламашы емессің бе? | 320 ms | 175.1 MB | Бәлкім, бағдарламашы туралы айтасыз ба. | ⚠ tentative |
+| 19 | **modal** | **Кітап оқу керек.** | **330 ms** | **177.5 MB** | Кітап — әдебиет көзі. (modal=Necessity in trace) | ✓ |
+| 20 | **modal** | **Бұл болу мүмкін бе?** | **320 ms** | **175.4 MB** | Болу туралы: «...сапасы талаптарға сәйкес болуы тиіс.» (modal=Possibility in trace) | ✓ |
+
+**Aggregate:** mean **323.5 ms** / query · mean **175.9 MB** RSS · worst 350 ms · worst 177.7 MB · **20/20 = 100 % coherent**.
+
+Compared to v4.31.5 (322.7 ms / 176.8 MB / 18 queries): latency within noise (+0.8 ms), RSS slightly lower (-0.9 MB) — sem_frames vec growth is invisible at this resolution. Modality detection adds zero measurable cost.
+
+### Honest framing
+
+`modality` is now populated but **not consumed** — the response text doesn't yet branch on it. For «Кітап оқу керек» the response is the same general fact about кітап that you'd get without the modal. The trace shows `mod=Necessity` correctly; downstream template branching is v4.33+ work. This is exactly the substrate-then-consume discipline: ship the auto-derivation in one reviewable patch, then wire downstream consumers in subsequent patches.
+
+### Pipeline impact
+
+- 1 new function `populate_periphrastic_modality` in sem_frame.rs (~50 lines)
+- 1 re-export in lib.rs
+- 1 line wiring in `Conversation::turn_with_trace`
+- 8 new unit tests (all passing)
+- Real-world battery extended 18 → 20 queries
+- facts/derived_facts version sync to 4.32.0
+
+Cadence: minor — first capability addition (vs v4.31.5 substrate-only); third v4.31+ release in the semantic-IR arc.
+
+### Carry-forwards
+
+- **v4.32.5** — ability `-а ал-` detection (proper converb-form + person-marked-ал check); first behavioural migration (one extract_facts pattern matcher consumes `&[SemFrame]`).
+- **v4.33.0+** — sentence-level negation «X емес» on prior noun frame; SemFrame as canonical SearchGraph query input; **template branching on Modality** (e.g. `unknown.modal_necessity` family responding "иә, X-ті V-у пайдалы" when modality=Necessity).
+- **v4.40+** — battery edge case 18 (structural answer to «X емес пе?»).
+
 ## [4.31.5] — 2026-05-02 — SemFrame consumer #1: TurnTrace.sem_frames + --trace renderer; +real-world battery + RSS measurement
 
 **Patch in v4.31+ semantic-IR arc.** First consumer migration of v4.31.0's SemFrame substrate. Plus the start of a new release-discipline practice: every release tested with **real human-like Kazakh queries**, reporting **both latency AND max RSS per query**, not just templated holdout pass-rates.

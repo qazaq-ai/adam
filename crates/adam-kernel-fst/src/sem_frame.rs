@@ -363,6 +363,67 @@ impl From<&Analysis> for SemFrame {
     }
 }
 
+/// **v4.32.0** — periphrastic-modality detection.
+///
+/// Kazakh expresses modality NOT as a single inflectional suffix on
+/// the main verb, but periphrastically — through dedicated modal
+/// auxiliary words placed AFTER the lexical predicate:
+///
+/// | Auxiliary | Modality | Example |
+/// |---|---|---|
+/// | `керек` | Necessity ("must / need") | «жазу керек» — "must write" |
+/// | `тиіс`  | Necessity ("ought to")    | «келу тиіс» — "ought to come" |
+/// | `мүмкін` | Possibility ("may")      | «болу мүмкін» — "may be" |
+///
+/// All three modals share `part_of_speech: "modal"` in the lexicon
+/// and parse as bare `Analysis::Noun` (the FST's catch-all branch
+/// for non-noun-non-verb POS). They surface as `SemFrame.pos =
+/// PosTag::Function`. We detect them by ROOT match (not POS) so
+/// other Function-class words (postpositions like `туралы`,
+/// particles) don't interfere.
+///
+/// Algorithm — single linear scan:
+///   for i in 0..frames.len():
+///     if frames[i].root in MODAL_AUXILIARIES and i > 0:
+///       set frames[i-1].modality = corresponding Modality
+///
+/// The modality is recorded on the **lexical predicate** (frame
+/// `i-1`), not on the auxiliary itself — that's the modal-bearer
+/// in the canonical analysis. The auxiliary's own SemFrame is left
+/// untouched (its `relation/modality/etc` stay `None`); future
+/// passes may want to mark it as "consumed by the lexical
+/// predicate's modal frame", but that's not required for v4.32.0.
+///
+/// Conservative: ability `-а ал-` is NOT detected here. The auxiliary
+/// `ал` is also a transitive verb meaning "take/get", and naive
+/// surface-form detection would mis-mark genuine "X took Y" sentences
+/// as ability-modal. Proper ability detection needs the converb form
+/// of the lexical verb (`-а / -е / -й`) AND a person-marked form of
+/// `ал` — both signals checked together. Deferred to v4.32.5+.
+///
+/// Idempotent: running twice produces the same result. Safe to call
+/// even on frames that already have modality set (won't overwrite
+/// non-None modality — first detection wins).
+pub fn populate_periphrastic_modality(frames: &mut [SemFrame]) {
+    if frames.len() < 2 {
+        return;
+    }
+    for i in 1..frames.len() {
+        let modal = match frames[i].root.as_str() {
+            "керек" | "тиіс" => Some(Modality::Necessity),
+            "мүмкін" => Some(Modality::Possibility),
+            _ => None,
+        };
+        let Some(m) = modal else { continue };
+        // First detection wins — don't overwrite a previously-set
+        // modality. Useful when a future pass adds ability detection
+        // and we want the first match to take effect.
+        if frames[i - 1].modality.is_none() {
+            frames[i - 1].modality = Some(m);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -594,5 +655,123 @@ mod tests {
         let f3 = SemFrame::from_analysis(&analysis);
         assert_eq!(f1, f2);
         assert_eq!(f2, f3);
+    }
+
+    /// **v4.32.0** — periphrastic-modality detection sets
+    /// `Modality::Necessity` on the lexical predicate when followed
+    /// by «керек» auxiliary.
+    ///
+    /// Pattern: «жазу керек» — "must write".
+    /// frames[0] = жазу (lexical predicate, verbal noun form).
+    /// frames[1] = керек (modal auxiliary, POS=modal → Function tag).
+    /// Expectation: frames[0].modality = Some(Necessity); frames[1]
+    /// untouched.
+    fn modal_root_function(root: &str) -> RootEntry {
+        RootEntry {
+            id: format!("test_modal_{root}"),
+            root: root.to_string(),
+            part_of_speech: "modal".to_string(),
+            vowel_harmony: "front".to_string(),
+            final_sound_class: "consonant".to_string(),
+        }
+    }
+
+    fn bare_noun_frame(root: &str) -> SemFrame {
+        SemFrame::from_analysis(&Analysis::Noun {
+            root: noun_root(root),
+            features: NounFeatures::default(),
+        })
+    }
+
+    fn bare_modal_frame(root: &str) -> SemFrame {
+        SemFrame::from_analysis(&Analysis::Noun {
+            root: modal_root_function(root),
+            features: NounFeatures::default(),
+        })
+    }
+
+    #[test]
+    fn periphrastic_modality_detects_kerek_as_necessity() {
+        let mut frames = vec![bare_noun_frame("жазу"), bare_modal_frame("керек")];
+        populate_periphrastic_modality(&mut frames);
+        assert_eq!(frames[0].modality, Some(Modality::Necessity));
+        // Modal auxiliary itself is left untouched.
+        assert_eq!(frames[1].modality, None);
+    }
+
+    #[test]
+    fn periphrastic_modality_detects_tiis_as_necessity() {
+        let mut frames = vec![bare_noun_frame("келу"), bare_modal_frame("тиіс")];
+        populate_periphrastic_modality(&mut frames);
+        assert_eq!(frames[0].modality, Some(Modality::Necessity));
+    }
+
+    #[test]
+    fn periphrastic_modality_detects_mumkin_as_possibility() {
+        let mut frames = vec![bare_noun_frame("болу"), bare_modal_frame("мүмкін")];
+        populate_periphrastic_modality(&mut frames);
+        assert_eq!(frames[0].modality, Some(Modality::Possibility));
+    }
+
+    /// Without a modal auxiliary, all frames retain `modality: None`.
+    /// Closes the no-false-positive contract: only specific roots
+    /// (not POS) trigger detection.
+    #[test]
+    fn periphrastic_modality_no_match_leaves_all_none() {
+        let mut frames = vec![
+            bare_noun_frame("қазақстан"),
+            bare_noun_frame("туралы"),
+            bare_noun_frame("айт"),
+        ];
+        populate_periphrastic_modality(&mut frames);
+        for frame in &frames {
+            assert_eq!(frame.modality, None);
+        }
+    }
+
+    /// Single-frame input is a degenerate case (no preceding
+    /// predicate to attach modality to). Function must early-exit
+    /// without panicking and without touching the lone frame.
+    #[test]
+    fn periphrastic_modality_single_frame_noop() {
+        let mut frames = vec![bare_modal_frame("керек")];
+        populate_periphrastic_modality(&mut frames);
+        assert_eq!(frames[0].modality, None);
+    }
+
+    /// Sentence-initial modal — no preceding frame to receive
+    /// the modality. Function must skip gracefully (modal at index 0
+    /// has no `i-1`).
+    #[test]
+    fn periphrastic_modality_sentence_initial_modal_skipped() {
+        let mut frames = vec![bare_modal_frame("керек"), bare_noun_frame("деген")];
+        populate_periphrastic_modality(&mut frames);
+        assert_eq!(frames[0].modality, None);
+        assert_eq!(frames[1].modality, None);
+    }
+
+    /// Idempotence: running the detector twice produces the same
+    /// output. Important for trace-replay scenarios where the same
+    /// frames Vec might pass through the detector multiple times.
+    #[test]
+    fn periphrastic_modality_is_idempotent() {
+        let mut frames = vec![bare_noun_frame("жазу"), bare_modal_frame("керек")];
+        populate_periphrastic_modality(&mut frames);
+        let after_first = frames.clone();
+        populate_periphrastic_modality(&mut frames);
+        assert_eq!(frames, after_first);
+    }
+
+    /// First-detection-wins: if a frame already has `modality` set
+    /// (e.g. from a future ability detector running first), the
+    /// periphrastic pass must not overwrite it.
+    #[test]
+    fn periphrastic_modality_preserves_preset_modality() {
+        let mut frames = vec![bare_noun_frame("жазу"), bare_modal_frame("керек")];
+        // Simulate a future ability detector having run first.
+        frames[0].modality = Some(Modality::Ability);
+        populate_periphrastic_modality(&mut frames);
+        // First detection wins — Ability not overwritten by Necessity.
+        assert_eq!(frames[0].modality, Some(Modality::Ability));
     }
 }

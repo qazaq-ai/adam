@@ -943,8 +943,16 @@ impl Conversation {
         // length. No new pipeline behaviour — just the canonical
         // SemFrame view exposed at the trace boundary so v4.32+
         // consumers can migrate one at a time.
-        let sem_frames: Vec<adam_kernel_fst::SemFrame> =
+        let mut sem_frames: Vec<adam_kernel_fst::SemFrame> =
             parses.iter().map(adam_kernel_fst::SemFrame::from).collect();
+        // **v4.32.0** — periphrastic-modality detection. Walks the
+        // SemFrame sequence and sets `modality` on the lexical
+        // predicate when a modal auxiliary («керек» / «тиіс» /
+        // «мүмкін») follows it. Idempotent; doesn't overwrite a
+        // non-None modality. Ability `-а ал-` is deferred to v4.32.5+
+        // because the auxiliary `ал` is also a transitive verb and
+        // naive detection would mis-mark genuine "X took Y" sentences.
+        adam_kernel_fst::populate_periphrastic_modality(&mut sem_frames);
         let trace = TurnTrace {
             parses,
             sem_frames,
