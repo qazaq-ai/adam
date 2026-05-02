@@ -7,6 +7,71 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.27.5] — 2026-05-02 — Rust tutor v4: 5 live-session fixes — Hello World hijack + bağdarlamalau-tilinde qualifier + айнымалы lexicon entry
+
+**Patch in v4.27+ Rust tutor depth-of-coverage arc.** A live REPL session immediately after v4.27.0 ship surfaced 5 new failure patterns, all of them topic-extraction architectural issues, not data gaps:
+
+1. «Маған Hello World көрсететін Rust кодын» → topic = «Rust» (latin won over compound)
+2. «Маған \"Hello World\" көрсететін Rust кодын» → same as above
+3. «Rast айнымалысы дегеніміз не?» → topic = «Айнымалысы» (FST stem unresolved)
+4. «Rust бағдарламалау тілінде тұрақты дегеніміз не?» → topic = «Rust» (multi-word qualifier «бағдарламалау тілінде» not in pattern list)
+5. «Rust бағдарламалау тілінде функция дегеніміз не?» → same as #4
+
+All 5 fixed in v4.27.5 with 3 architectural changes + 1 lexicon addition + 2 data entries. None required template changes.
+
+### Innovations
+
+**(1) Multiword scanner reordered BEFORE Latin in `best_noun_hint`.** Pre-fix order was: adj+noun → latin → multiword → topic_marker → first_noun. With Latin running before multiword, «Hello World» (registered as MULTIWORD) lost to bare Latin «Rust» when both appeared in the input. Post-fix: multiword runs after adj+noun but before Latin. Multi-word entities are inherently more specific than bare Latin tokens — when both match, the compound should win. Risk-bounded: in queries like «Rust туралы не білесіз?» (where no compound matches), multiword returns None and Latin extraction proceeds normally. Original v4.11.5 ordering rationale (Latin first) is preserved for the no-multiword path.
+
+**(2) `topic_marker_hint` PROMOTED before multiword when language-qualifier prefix detected.** Without this, «Rust бағдарламалау тілінде тұрақты дегеніміз не?» extracted «бағдарламалау тілі» (registered MULTIWORD) — which is a substring of the qualifier «бағдарламалау тілінде» itself, NOT the user's actual subject. Pattern: when `has_language_qualifier_prefix` returns true, run topic_marker_hint first; if it finds a word before «дегеніміз / туралы / etc.», use it. The multi-word qualifier inside the prefix never wins. Falls through to normal order if no marker found.
+
+**(3) `has_language_qualifier_prefix` SPACE_QUALIFIERS extended +5 patterns:** `бағдарламалау тілінде / бағдарламалау тіліндегі / программалау тілінде / программалау тіліндегі / кодын`. The v4.26.5 list covered the simple forms (`тілінде / бағдарламасында`); v4.27.5 adds the multi-word variants common in formal Kazakh tech writing.
+
+**(4) Lexicon: `айнымалы` added to `data/tokenizer/segmentation_roots.json`.** Pre-fix the FST returned no parse for «айнымалы» / «айнымалысы» / «айнымалылар» — the bare word wasn't in the curated lexicon (only in world_core as a Russian-loan technical term subject). Without an FST parse, the inflected_lemma fallback in `topic_marker_hint` couldn't normalize «айнымалысы» (3sg-Possessive) to «айнымалы». Adding the noun root closes this gap for ALL inflected forms — Locative, Accusative, Genitive, Plural, etc.
+
+**(5) `programming_rust.jsonl` += 1 entry** (rust_179): `explicit type` Latin alias mirroring rust_174's `implicit type`. Required because the v4.27.0 multiword scanner registered both compounds but only added a world_core entry for one.
+
+### Verification
+
+| Live session 5 failures | Pre-v4.27.5 | Post-v4.27.5 |
+|---|---|---|
+| «Маған Hello World көрсететін Rust кодын» | Rust intro (wrong topic) | **Hello World fact** ✓ |
+| «Маған \"Hello World\" көрсететін Rust кодын» | Rust intro | **Hello World fact** ✓ |
+| «Rast айнымалысы дегеніміз не?» | «Бәлкім, Айнымалысы туралы…» | **Айнымалы fact** (FST stem) ✓ |
+| «Rust бағдарламалау тілінде тұрақты дегеніміз не?» | Rust intro | **Тұрақты fact** ✓ |
+| «Rust бағдарламалау тілінде функция дегеніміз не?» | Rust intro | **Функция fact** ✓ |
+
+| Battery / holdout | Pre | Post |
+|---|---|---|
+| 40-question original | 40 / 40 | 40 / 40 ✓ |
+| 80-question expanded | 79 / 80 = 98.75 % | **79 / 80 = 98.75 %** (one regress recovered: explicit-type entry added; one preserved: Result-ты edge case) |
+| rust_holdout (41 cases) | 41 / 41 | 41 / 41 ✓ |
+| live_holdout (32 cases) | 32 / 32 | 32 / 32 ✓ |
+| parse-disambig | 23 / 23 | 23 / 23 ✓ |
+
+Workspace tests **824 → 824 passing**.
+
+### What this does NOT change
+
+- The «Result-ты» Accusative-with-dash edge case is still unfixed (the `-ты` strip leaves trailing `result-` which doesn't match world_core). Phrasing «Result қалай қолданылады?» works.
+- Code-block extraction from rust_book_kk_pack (verbatim Rust snippets) — still v4.29.0+ work.
+
+### Pipeline impact
+
+- `crates/adam-dialog/src/topic_extraction.rs` — `best_noun_hint` reorder + `topic_marker` promotion under qualifier; `has_language_qualifier_prefix` SPACE_QUALIFIERS += 5 patterns.
+- `data/tokenizer/segmentation_roots.json` += `noun_aynymaly_v4275` entry.
+- `data/world_core/programming_rust.jsonl` += rust_179 (`explicit type`).
+- `data/retrieval/facts.json` + `derived_facts.json` — regenerated at version `"4.27.5"`.
+- Workspace tests **824 → 824 passing**.
+
+### Cadence
+
+Patch — pure topic-extraction tuning + 1 lexicon entry + 1 world_core alias. No new architecture; iterating on real-session failure modes.
+
+**Stripe (6) — Rust track depth-of-coverage layer continues.**
+
+Next: **v4.28.0** (native-speaker review pass on rust_111…rust_179 — currently auto-curated), **v4.29.0+** (code-block extraction), **v4.30.0+** (token-cleanup fix for the lingering Accusative-with-dash edge case).
+
 ## [4.27.0] — 2026-05-02 — Rust tutor v3: 80-question battery 79/80 = 98.75 %; +18 entries covering advanced concepts
 
 **First minor in v4.27+ Rust tutor depth-of-coverage arc.** v4.26.5 brought the 40-question comprehensive battery to 40/40. To stress the system on advanced topics, v4.27.0 doubles the battery to **80 questions** covering all 20 Rust Book chapters at greater depth: comparative queries («Box пен Rc айырмашылығы?»), advanced features (`deref coercion / type alias / where clause / dynamic dispatch / static dispatch / zero-cost abstraction / RAII / Pin / Future`), language design questions («Rust қандай артықшылықтары бар?»), and edge-case phrasings (Accusative with dash, truncated stems, multi-word comparisons).

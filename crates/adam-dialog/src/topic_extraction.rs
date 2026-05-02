@@ -1252,6 +1252,13 @@ fn has_language_qualifier_prefix(input: &str) -> bool {
     let trimmed = input.trim_start();
     let lower = trimmed.to_lowercase();
     // Free-standing locative qualifiers (preceded by space).
+    // **v4.27.5** — added compound qualifiers «бағдарламалау
+    // тілінде» / «программалау тілінде» / «кодын» to handle live-
+    // session pattern «Rust бағдарламалау тілінде <X> дегеніміз
+    // не?» and «Маған Hello World көрсететін Rust кодын». The
+    // existing `тілінде` / `бағдарламасында` covers the simpler
+    // forms; the multi-word variants are common in formal Kazakh
+    // tech writing.
     const SPACE_QUALIFIERS: &[&str] = &[
         "тілінде",
         "тіліндегі",
@@ -1259,7 +1266,12 @@ fn has_language_qualifier_prefix(input: &str) -> bool {
         "тілінен",
         "бағдарламасында",
         "бағдарламасынан",
+        "бағдарламалау тілінде",
+        "бағдарламалау тіліндегі",
+        "программалау тілінде",
+        "программалау тіліндегі",
         "кодында",
+        "кодын",
     ];
     // Dash-attached case suffixes.
     const DASH_QUALIFIERS: &[&str] = &[
@@ -1429,6 +1441,34 @@ pub(crate) fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String>
     if let Some(c) = crate::discourse::find_adj_noun_compound(input) {
         return Some(c.to_string());
     }
+    // **v4.27.5** — when a language-qualifier prefix is detected
+    // (`Rust бағдарламалау тілінде <X> дегеніміз не?`), prefer the
+    // topic_marker_hint extraction over both multiword and latin.
+    // Otherwise multiword scanner finds compound substrings INSIDE
+    // the qualifier itself («бағдарламалау тілі» is contained in
+    // «бағдарламалау тілінде»), hijacking topic extraction. Live-
+    // test 2026-05-02 confirmed: with this guard, «Rust
+    // бағдарламалау тілінде тұрақты дегеніміз не?» correctly
+    // extracts «тұрақты» (preceded by «дегеніміз»).
+    if has_language_qualifier_prefix(input) {
+        if let Some(tm) = topic_marker_hint(input, parses) {
+            return Some(tm);
+        }
+    }
+    // **v4.27.5** — multiword scanner promoted BEFORE
+    // latin_subject_hint. Live-test 2026-05-02: «Маған Hello
+    // World көрсететін Rust кодын» extracted «Rust» (latin won)
+    // when the user clearly meant the «Hello World» compound.
+    // Multi-word entities are more specific than bare Latin
+    // tokens — when both match, the compound should win. The
+    // v4.11.5 ordering (latin first) was correct for queries
+    // like «Rust туралы не білесіз?» where no multiword could
+    // possibly match — that case still works fine because the
+    // multiword scanner returns None when no compound is
+    // present, and falls through to latin.
+    if let Some(mw) = multiword_entity_hint(input) {
+        return Some(mw);
+    }
     // **v4.11.5** — Latin-name passthrough for technical proper
     // nouns. Closes the v4.7.0 known limitation where queries
     // typed in Latin (`Rust`, `Cargo`, `String`) fall through to
@@ -1438,8 +1478,10 @@ pub(crate) fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String>
     // any of these as a whole word (case-insensitive), use it as
     // the topic so SearchGraph can route to the per-Rust-concept
     // facts (`rust IsA бағдарламалау тілі`, `cargo IsA құрал`,
-    // …). Runs BEFORE multiword/topic_marker so an explicit Latin
-    // proper noun beats any contained Cyrillic compound.
+    // …). Runs AFTER multiword (v4.27.5 reorder) so a more-
+    // specific compound beats a bare Latin token, but before
+    // topic_marker_hint so an explicit Latin proper noun still
+    // beats any contained Cyrillic word-before-marker.
     if let Some(latin) = latin_subject_hint(input) {
         return Some(latin);
     }

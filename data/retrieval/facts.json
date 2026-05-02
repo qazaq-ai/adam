@@ -1,7 +1,7 @@
 {
-  "version": "4.27.0",
+  "version": "4.27.5",
   "status": "completed",
-  "elapsed_s": 26,
+  "elapsed_s": 25,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 195,
-    "facts_total": 2056,
+    "facts_total": 2057,
     "by_predicate": {
       "after": 7,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 59,
       "has_quantity": 29,
       "in_domain": 24,
-      "is_a": 1470,
+      "is_a": 1471,
       "lives_in": 8,
       "part_of": 228,
       "related_to": 64
@@ -72,7 +72,7 @@
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/professions.jsonl": 40,
-      "world_core/programming_rust.jsonl": 178,
+      "world_core/programming_rust.jsonl": 179,
       "world_core/proverbs.jsonl": 43,
       "world_core/society.jsonl": 44,
       "world_core/sports.jsonl": 18,
@@ -36602,6 +36602,26 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "`explicit` — `Rust`-та ашық белгіленген тип немесе түрлендіру: `let x: i32 = 5;`, `value as u32`. Қарама-қарсысы `implicit` — компилятор автоматты түрде шығарады."
+    },
+    {
+      "subject": {
+        "surface": "explicit type",
+        "root": "explicit type",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тип шығару тәсілі",
+        "root": "тип шығару тәсілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_179"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`explicit type` — `Rust`-та ашық белгіленген тип: `let x: i32 = 5;`. Бағдарламашы типті өзі көрсетеді. Қарама-қарсысы `implicit type` — компилятор контекстен шығарады."
     },
     {
       "subject": {

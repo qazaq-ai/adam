@@ -1,5 +1,5 @@
 {
-  "version": "4.27.0",
+  "version": "4.27.5",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -30579,6 +30579,13 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_aynymaly_v4275",
+      "root": "айнымалы",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
     },
     {
       "id": "verb_uughyn",
