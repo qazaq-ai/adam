@@ -502,6 +502,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         }
     }
 
@@ -597,6 +598,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RetrieveEvidence);
@@ -625,6 +627,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RunReasoner);

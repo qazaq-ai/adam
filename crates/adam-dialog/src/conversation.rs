@@ -675,10 +675,26 @@ impl Conversation {
                 .or_else(|| self.session.get("last_query_topic").cloned());
             if let Some(prev_topic) = resolved {
                 if let Intent::Unknown {
-                    ref mut noun_hint, ..
+                    ref mut noun_hint,
+                    ref mut noun_hint_confidence,
+                    ..
                 } = intent
                 {
                     *noun_hint = Some(prev_topic);
+                    // **v4.37.5** — discourse-anaphora resolution is a
+                    // structural recovery of the topic from the
+                    // dialog context. The current turn's confidence
+                    // band reflects the surface-form pick (often Low
+                    // when the only token left is a pronoun like
+                    // `олар`); promoting to High here lets the
+                    // resolved topic continue to drive the standard
+                    // confident path instead of being intercepted by
+                    // the `clarify_low_confidence` fork. Without this
+                    // promotion, multi-turn anaphor cases like
+                    // «Оларды тізімдей аласыз ба?» following an
+                    // established list-class topic would clarify
+                    // instead of listing.
+                    *noun_hint_confidence = crate::topic_extraction::TopicConfidence::High;
                 }
             }
         }

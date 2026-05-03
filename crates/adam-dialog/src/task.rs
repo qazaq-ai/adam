@@ -322,6 +322,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         }
     }
 
@@ -388,6 +389,7 @@ mod tests {
                 input_modality: None,
                 input_evidence: None,
                 input_is_inversion_question: false,
+                noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
             },
         ];
         for intent in social {
@@ -531,6 +533,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         };
         assert!(TaskState::intent_has_evidence(&with_chain));
 
@@ -548,6 +551,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         };
         assert!(TaskState::intent_has_evidence(&with_example));
 
@@ -565,6 +569,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         };
         assert!(TaskState::intent_has_evidence(&with_grounded));
 
@@ -594,6 +599,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         };
         t.roll_forward(&intent, &belief, 0);
         assert_eq!(t.status, TaskStatus::ReadyToAnswer);
@@ -623,6 +629,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         };
         t.roll_forward(&intent, &belief, 2);
         assert_eq!(t.status, TaskStatus::Blocked);

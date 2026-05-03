@@ -7,6 +7,63 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.37.5] — 2026-05-03 — Human-like clarification on low-confidence topic extraction — «Сіз X туралы сұрап тұрсыз ғой?»
+
+**First behavioural release in v4.37+ arc.** Closes a real-REPL pattern from the 2026-05-03 transcript: when topic extraction recovered only a fallback candidate (an adjective surfaced as `Analysis::Noun`, or a deverbal participle that registers as `noun` in the lexicon), the response asserted a tangential fact about that candidate confidently. Pre-v4.37.5 the system either echoed the wrong word («Атақты — ...») or cited a corpus quote about a modifier the user clearly meant as a qualifier of a deeper noun. v4.37.5 introduces a `TopicConfidence` band on `Intent::Unknown` and routes `Low` confidence to a hedged clarification family that surfaces the inferred subject and INVITES the user to correct it — instead of pretending the modifier was the topic.
+
+### Real-REPL bugs closed (2026-05-03 transcript)
+
+| Query | v4.37.0 | v4.37.5 |
+|---|---|---|
+| **Қазақстаннан шыққан танымал тұлғаларды білесіз?** | "Шыққан туралы нақты бір мысал: «Білімдіден шыққан сөз...»" (deverbal participle hijacked topic) | "**Тұлға туралы нақты бір мысал: ...**" (deeper noun wins) |
+| **Қазақстанның атақты жазушыларын атаңыз** | "Атақты — атақ-атолу аффиксі..." (confident definition of an adjective) | "**Сіз атақты жайында сұрап отырсыз деп ұқтым. Дұрыс түсіндім бе? Толығырақ айтсаңыз болады.**" (clarify) |
+| абвгд / жжжж (gibberish) | "Түсінбедім." | "**Менің түсінуімше сұрағыңыз бар, бірақ нақты тақырыпты ажырата алмадым. Қайталап, басқаша тұжырымдап көріңізші.**" |
+| Қазақстан туралы не білесіз? (control, High confidence) | confident grounded fact | unchanged ✓ |
+| Сәлем! / Сенің атың кім? (controls) | unchanged | unchanged ✓ |
+
+### Innovations
+
+**(1) `TopicConfidence` enum on `Intent::Unknown.noun_hint_confidence`.** Fifth analytical signal on the canonical Intent type (after polarity, modality, evidence, inversion-question). Two bands: `High` — multiword / Latin / topic_marker / locative_attributive / adj+noun-compound / sentence_decomp focus / `first_noun_root` returning a root with lexicon `part_of_speech == "noun"` AND not a deverbal participle. `Low` — `first_noun_root` fell back to `adjective` / `pronoun` / `numeral`, OR returned a deverbal participle (`-ған/-ген/-қан/-кен`), OR `accusative_form_hint` stripped a suffix without lexicon validation. Default `High` preserves all pre-v4.37.5 routing exactly.
+
+**(2) Two-pass `first_noun_root_with_confidence`** prefers true content nouns over modifiers and demotes deverbal participles even when the lexicon registers them as `noun` (e.g. «шыққан», «келген», «өткен»). Closes the 2026-05-03 case where «шыққан» beat «тұлға» purely on parse-stream order.
+
+**(3) Confidence-aware `best_noun_hint_with_confidence`** threads the band through every extraction strategy — structural strategies (multiword / latin / topic_marker / locative_attributive) report `High`, fallback strategies (`first_noun_root_with_confidence`'s second pass, `accusative_form_hint`) report `Low`.
+
+**(4) Discourse-anaphora promotes confidence to `High`** after substituting a prior topic. Without this, multi-turn anaphor cases like «Оларды тізімдей аласыз ба?» (where the only token left is a pronoun) would clarify instead of listing the previously-established class. Anti-regression: `list_class_context_anaphor_v4_18_0`.
+
+**(5) Planner clarification fork.** `Low` confidence ALWAYS routes to `unknown.clarify_low_confidence`, even when retrieval/curated-graph paths produced "evidence". A corpus citation about an adjective or deverbal participle the user meant as a modifier is noise, not signal — surfacing it confidently misleads. `noun_hint == None` AND no evidence routes to `unknown.clarify_no_topic` (replaces bare «Түсінбедім»).
+
+**(6) Two new template families** in `v1.toml` — `unknown.clarify_low_confidence` (5 templates) and `unknown.clarify_no_topic` (5 templates). Phrasing intentionally avoids asserting any new fact: their work is purely meta-conversational — surface the inferred subject (or absence thereof) and hand the next turn back to the user.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **865 passing** unchanged |
+| Live REPL — bug 2 «шыққан → тұлға» | ✓ deverbal-participle demotion picks deeper noun |
+| Live REPL — bug 3 «атақты» | ✓ Low confidence → clarify_low_confidence |
+| Live REPL — gibberish «абвгд» / «жжжж» | ✓ no_topic + no_evidence → clarify_no_topic |
+| Anti-regression: greetings, name, confident facts | unchanged ✓ |
+| Anti-regression: anaphor list-class continuation | ✓ promoted to High after resolution |
+| `cargo fmt --all --check` | clean |
+
+### Latency / RSS (release-mode probes)
+
+| Query | Latency | Max RSS |
+|---|---|---|
+| Қазақстаннан шыққан танымал тұлғалар... | 0.34 s | 176 MB |
+| Қазақстанның атақты жазушыларын атаңыз | 0.33 s | 175 MB |
+| Қазақстан туралы не білесіз? (control) | 0.33 s | 176 MB |
+
+Within noise of v4.37.0 baseline (mean 195 ms, RSS 176 MB).
+
+### Deferred to v4.38.0
+
+- Bug 1 (HasQuantity overranks RelatedTo on «Қазақстанда қанша өзен бар?» — wrong fact about cities surfaced).
+- Bug 4 (subject synonym «аймақ» ↔ «облыс» for list queries — neither populated as fact in current SearchGraph).
+- RelationKind population (when extract_facts patterns emit SemFrame outputs).
+- Remaining 6 missing parser tenses (ParticiplePast / ParticipleHabitual / ParticipleFuture / FutureIntentional / FuturePossible / Conditional / Imperative).
+
 ## [4.37.0] — 2026-05-02 — «X емес пе?» inversion-question routing — confirmation-seeking shape recognized
 
 **First minor in v4.37+ semantic-IR arc.** Closes the v4.36.7 carry-forward. The «X емес пе?» pattern — a tag-question form like «Бұл дұрыс емес пе?» («isn't this correct?») — is **not** a denial; it's a confirmation-seeking inversion where the speaker EXPECTS X to be true. Pre-v4.37.0 the v4.33.5 negation routing misread these as denials and gave «{noun} емес деп айтасыз — пікіріңізді сыйлаймын» (denial acknowledgment). v4.37.0 detects the inversion via «емес» + question-particle co-occurrence and routes to a dedicated family that engages with the confirmation-seeking shape.

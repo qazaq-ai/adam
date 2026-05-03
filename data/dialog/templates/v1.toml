@@ -987,6 +987,39 @@ templates = [
     "Жарайсыз — ондай нәрсе істей алу — жақсы қасиет.",
 ]
 
+# v4.37.5 — human-like clarification families. When topic extraction
+# returned a candidate but the lexicon-aware band is `Low` (the only
+# extraction available was a fallback: an adjective / pronoun / numeral
+# tagged as `Analysis::Noun`, or `accusative_form_hint` stripping a
+# suffix without lexicon validation), confidently citing a tangential
+# fact about that candidate misreads the user's question. Instead,
+# offer the candidate interpretation and INVITE the user to correct
+# it. Same idea when noun_hint is None entirely — invite clarification
+# instead of bare «Түсінбедім».
+#
+# Templates intentionally avoid asserting any new fact; their work is
+# purely meta-conversational: surface the inferred subject (or absence
+# thereof) and hand the next turn back to the user.
+[[families]]
+key = "unknown.clarify_low_confidence"
+templates = [
+    "Менің түсінуімше, сіз {noun} туралы сұрап тұрсыз ғой? Егер басқа нәрсе мегзеп тұрсаңыз, нақтырақ айтып жіберіңізші.",
+    "Сұрағыңыз {noun} жайында ма? Дәл солай болса айтыңыз, басқаша болса нақтылап жіберсеңіз.",
+    "Мен {noun} деген сөзге назар аудардым — сіздің сұрағыңыз дәл осы туралы ма? Егер басқаша болса, тағы бір рет тұжырымдап жіберіңіз.",
+    "Сіз {noun} жайында сұрап отырсыз деп ұқтым. Дұрыс түсіндім бе? Толығырақ айтсаңыз болады.",
+    "Мүмкін сіз {noun} туралы сұрап отырған шығарсыз. Нақтыласаңыз — нақтырақ жауап беруге тырысамын.",
+]
+
+[[families]]
+key = "unknown.clarify_no_topic"
+templates = [
+    "Сұрағыңызды толық түсінбедім. Қандай тақырып туралы сұрап отырсыз? Аздап нақтылап жіберіңізші.",
+    "Кешіріңіз, сұрағыңыздың мәнін дәл аңғара алмадым. Қандай нәрсе жайында сөз болып тұр?",
+    "Сұрағыңыз жайында кеңірек айтып жіберсеңіз — қандай тақырыпқа қатысты екенін түсінсем, көмек етуге тырысамын.",
+    "Менің түсінуімше сұрағыңыз бар, бірақ нақты тақырыпты ажырата алмадым. Қайталап, басқаша тұжырымдап көріңізші.",
+    "Сізді дұрыс түсіну үшін сұрағыңызды нақтылай түсіңізші — қандай тақырып туралы сұрап тұрсыз?",
+]
+
 # v1.9.5: Unknown with *adapted* retrieval evidence — the retrieved
 # quote was rewritten by `compose_with_city` (ComposeMode::InSampleCitySwap)
 # so at least one city mention was swapped to the user's session city.

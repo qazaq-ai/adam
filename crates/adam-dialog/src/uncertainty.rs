@@ -183,6 +183,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         }
     }
 

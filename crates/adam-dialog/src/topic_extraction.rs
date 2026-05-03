@@ -20,6 +20,33 @@
 //! the dialog crate.
 
 use adam_kernel_fst::parser::Analysis;
+use serde::{Deserialize, Serialize};
+
+/// **v4.37.5** — confidence band on the extracted topic noun.
+///
+/// Drives a human-like clarification fork in the planner: when the
+/// topic was recovered through a strong structural signal (multiword
+/// entity, Latin proper noun, `туралы` marker, locative-attributive
+/// suffix, adj+noun compound, sentence_decomp focus, or
+/// `first_noun_root` returning a root whose lexicon `part_of_speech`
+/// is actually `"noun"`), confidence is `High` and the planner
+/// proceeds to its standard fact-asserting path. When the topic was
+/// recovered as a fallback (`first_noun_root` picked a root tagged
+/// `adjective` / `pronoun` / `numeral`, or `accusative_form_hint`
+/// stripped a suffix without lexicon validation), confidence is
+/// `Low` and the planner routes to `unknown.clarify_low_confidence`,
+/// offering the candidate interpretation and inviting the user to
+/// correct it instead of confidently citing a tangential fact.
+///
+/// `Default::default()` is `High`, so every pre-v4.37.5 construction
+/// site that doesn't set the field continues to route through the
+/// standard confident path bit-for-bit.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum TopicConfidence {
+    #[default]
+    High,
+    Low,
+}
 
 /// Closed-class items the parser often tags as `Noun` but which carry
 /// no topical content for the `unknown.with_noun` template or for
@@ -325,12 +352,86 @@ pub(crate) const NOT_A_TOPIC: &[&str] = &[
 /// FST parser may tag as Noun but which aren't informative as a
 /// "topic hint" for the unknown.with_noun template.
 pub(crate) fn first_noun_root(parses: &[Analysis]) -> Option<String> {
-    parses.iter().find_map(|a| match a {
-        Analysis::Noun { root, .. } if !NOT_A_TOPIC.contains(&root.root.as_str()) => {
+    first_noun_root_with_confidence(parses).map(|(root, _)| root)
+}
+
+/// **v4.37.5** — confidence-aware variant of [`first_noun_root`].
+///
+/// Two-pass walk:
+/// 1. **First pass** — return the first parse whose `RootEntry`
+///    has `part_of_speech == "noun"` (and isn't filtered by
+///    `NOT_A_TOPIC`). These are *true* nouns; confidence `High`.
+/// 2. **Second pass** — fall back to any noun-class root
+///    (`adjective` / `pronoun` / `numeral` — the FST routes those
+///    through `try_noun_analyses` so they all surface as
+///    `Analysis::Noun`). Confidence `Low` — the planner will hedge
+///    and invite clarification rather than asserting a definitive
+///    fact about a modifier the user almost certainly intended as a
+///    qualifier of a deeper noun.
+///
+/// Pre-v4.37.5 behaviour was the second pass alone, which surfaced
+/// surprises like:
+///   - «Қазақстанның **атақты** жазушыларын атаңыз» — `атақты`
+///     (POS=adjective) won over `жазушы` because it preceded it in
+///     the parse stream.
+///   - «Кітап **қызық** болады» — `қызық` (POS=adjective) eclipsed
+///     `кітап`.
+///
+/// The first-pass / second-pass split keeps every existing
+/// noun-driven case bit-identical (because real nouns are now
+/// strictly preferred) while letting the planner downgrade routing
+/// for the residual cases where only an adjective/pronoun/numeral
+/// candidate exists.
+pub(crate) fn first_noun_root_with_confidence(
+    parses: &[Analysis],
+) -> Option<(String, TopicConfidence)> {
+    // First pass — *true* content nouns: lexicon `part_of_speech ==
+    // "noun"` AND root is not a deverbal participle ending in
+    // perfect-participle suffix («-ған / -ген / -қан / -кен»).
+    // Some deverbal participles are registered as `noun` in the
+    // lexicon (e.g. «шыққан», «келген») because they nominalise in
+    // common usage, but in a sentence they almost always function
+    // as a participle modifier on a following content noun rather
+    // than as the topic themselves. Demoting them lets a deeper
+    // *true* noun win the first pass.
+    if let Some(root) = parses.iter().find_map(|a| match a {
+        Analysis::Noun { root, .. }
+            if root.part_of_speech == "noun"
+                && !is_deverbal_participle_root(&root.root)
+                && !NOT_A_TOPIC.contains(&root.root.as_str()) =>
+        {
             Some(root.root.clone())
         }
         _ => None,
+    }) {
+        return Some((root, TopicConfidence::High));
+    }
+    parses.iter().find_map(|a| match a {
+        Analysis::Noun { root, .. } if !NOT_A_TOPIC.contains(&root.root.as_str()) => {
+            Some((root.root.clone(), TopicConfidence::Low))
+        }
+        _ => None,
     })
+}
+
+/// **v4.37.5** — heuristic: does this root surface end in one of
+/// the four perfect-participle allomorphs («-ған / -ген / -қан /
+/// -кен»)? Used by [`first_noun_root_with_confidence`] to demote
+/// deverbal participles registered as `noun` in the lexicon (e.g.
+/// «шыққан», «келген», «өткен») when a *true* content noun is
+/// also available in the parse stream.
+///
+/// False-positive risk: a tiny set of bare nouns that happen to
+/// end in these letter sequences (e.g. «қаған» — khan). The cost
+/// is bounded — when no other content noun is available, the
+/// demoted root still surfaces as `Low` confidence, and the
+/// planner asks the user to confirm rather than asserting a fact.
+/// That hedged response is acceptable on the rare false positive,
+/// and the routine fix on the dominant case (deverbal participles
+/// hijacking topic extraction in real REPL turns) is the primary
+/// goal.
+fn is_deverbal_participle_root(root: &str) -> bool {
+    root.ends_with("ған") || root.ends_with("ген") || root.ends_with("қан") || root.ends_with("кен")
 }
 
 /// v4.0.21 — Multi-word entity catalogue drawn from `data/world_core/*.jsonl`
@@ -1505,116 +1606,62 @@ pub(crate) fn topic_marker_hint(input: &str, parses: &[Analysis]) -> Option<Stri
 /// `first_noun_root`. The marker hint takes precedence so a proper
 /// noun preceding the marker wins over a generic in-lexicon noun
 /// elsewhere in the sentence.
-pub(crate) fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
-    // **v4.30.0** — Latin-subject + generic-head + topic-marker
-    // pattern. Live REPL 2026-05-02 turn 8: «Rust бағдарламалау
-    // тілі туралы не білесіз?». Pre-v4.30.0 the multiword scanner
-    // (v4.27.5 reorder) picked «бағдарламалау тілі» (registered
-    // MULTIWORD) and topic resolved to the qualifier itself — not
-    // the user's actual subject «Rust». The `туралы` marker
-    // attaches to the qualifier here, not to the subject, so
-    // `topic_marker_hint` would also be wrong (returns «тіл», the
-    // immediate predecessor of `туралы`). Both regular extractors
-    // miss because the head of the noun-phrase is a generic word
-    // («тіл/нәрсе/зат/...») and the actual identifier is the Latin
-    // proper noun BEFORE the generic head. This direct pattern
-    // covers the case explicitly: when input begins with a
-    // LATIN_TECH_SUBJECT followed (optionally) by `бағдарламалау`
-    // or `программалау`, then a generic-head-noun in any inflection,
-    // then a topic marker — return the Latin subject.
+/// **v4.37.5** — confidence-aware variant of [`best_noun_hint`].
+///
+/// Same strategy chain as the legacy entry point, but every branch
+/// now returns a `TopicConfidence` band so the planner can route
+/// uncertain extractions to the clarification family
+/// (`unknown.clarify_low_confidence`). All structural strategies
+/// (multiword, latin, topic_marker, locative_attributive,
+/// adj_noun_compound, language_qualifier_prefix) report `High` —
+/// they encode strong syntactic signals from the user's surface
+/// form. `first_noun_root_with_confidence` reports its own band.
+/// `accusative_form_hint` reports `Low` because it strips a suffix
+/// without lexicon validation (string-level fallback for FST gaps).
+pub(crate) fn best_noun_hint_with_confidence(
+    input: &str,
+    parses: &[Analysis],
+) -> Option<(String, TopicConfidence)> {
     if let Some(latin) = latin_with_generic_head_marker(input) {
-        return Some(latin);
+        return Some((latin, TopicConfidence::High));
     }
-    // **v4.6.20** — adj+noun compound topic ("машиналық оқыту",
-    // "жасанды интеллект", "табиғи тіл"). Pre-v4.6.20 the first-
-    // noun-root strategy returned only the head noun (`оқыту`)
-    // and silently dropped the modifier, so retrieval matched on
-    // a generic concept instead of the compound. The compound
-    // list is closed and audited in `discourse.rs`. Runs first so
-    // the more-specific compound wins over any single-noun fallback.
     if let Some(c) = crate::discourse::find_adj_noun_compound(input) {
-        return Some(c.to_string());
+        return Some((c.to_string(), TopicConfidence::High));
     }
-    // **v4.27.5** — when a language-qualifier prefix is detected
-    // (`Rust бағдарламалау тілінде <X> дегеніміз не?`), prefer the
-    // topic_marker_hint extraction over both multiword and latin.
-    // Otherwise multiword scanner finds compound substrings INSIDE
-    // the qualifier itself («бағдарламалау тілі» is contained in
-    // «бағдарламалау тілінде»), hijacking topic extraction. Live-
-    // test 2026-05-02 confirmed: with this guard, «Rust
-    // бағдарламалау тілінде тұрақты дегеніміз не?» correctly
-    // extracts «тұрақты» (preceded by «дегеніміз»).
     if has_language_qualifier_prefix(input) {
         if let Some(tm) = topic_marker_hint(input, parses) {
-            return Some(tm);
+            return Some((tm, TopicConfidence::High));
         }
     }
-    // **v4.27.5** — multiword scanner promoted BEFORE
-    // latin_subject_hint. Live-test 2026-05-02: «Маған Hello
-    // World көрсететін Rust кодын» extracted «Rust» (latin won)
-    // when the user clearly meant the «Hello World» compound.
-    // Multi-word entities are more specific than bare Latin
-    // tokens — when both match, the compound should win. The
-    // v4.11.5 ordering (latin first) was correct for queries
-    // like «Rust туралы не білесіз?» where no multiword could
-    // possibly match — that case still works fine because the
-    // multiword scanner returns None when no compound is
-    // present, and falls through to latin.
     if let Some(mw) = multiword_entity_hint(input) {
-        return Some(mw);
+        return Some((mw, TopicConfidence::High));
     }
-    // **v4.11.5** — Latin-name passthrough for technical proper
-    // nouns. Closes the v4.7.0 known limitation where queries
-    // typed in Latin (`Rust`, `Cargo`, `String`) fall through to
-    // `Intent::Unknown` because Cyrillic-only FST returns no
-    // analysis. The closed list mirrors Latin-named subjects in
-    // `programming_rust.jsonl`. When the user's question contains
-    // any of these as a whole word (case-insensitive), use it as
-    // the topic so SearchGraph can route to the per-Rust-concept
-    // facts (`rust IsA бағдарламалау тілі`, `cargo IsA құрал`,
-    // …). Runs AFTER multiword (v4.27.5 reorder) so a more-
-    // specific compound beats a bare Latin token, but before
-    // topic_marker_hint so an explicit Latin proper noun still
-    // beats any contained Cyrillic word-before-marker.
     if let Some(latin) = latin_subject_hint(input) {
-        return Some(latin);
+        return Some((latin, TopicConfidence::High));
     }
-    // **v4.11.5** — `multiword_entity_hint` promoted to run BEFORE
-    // `topic_marker_hint`. Pre-v4.11.5 the marker hint won first,
-    // so questions like «Rust бағдарламалау тілі туралы не
-    // білесіз?» extracted only the word right before `туралы`
-    // (`тілі`/`тіл`) and missed the more specific multiword
-    // compound (`бағдарламалау тілі`). When MULTIWORD_ENTITIES
-    // contains a compound that appears in the input, that compound
-    // is almost always the user's intended topic — more specific
-    // than any single constituent. The reorder lets the world_core
-    // graph lookup land on the compound subject (which world_core
-    // entries explicitly model: `info_007 бағдарламалау тілі IsA
-    // формалды тіл`) instead of falling through to a corpus
-    // citation about an inflected single word.
-    multiword_entity_hint(input)
-        .or_else(|| topic_marker_hint(input, parses))
-        // v4.4.13 — locative-attributive suffix recovery. The
-        // `-дағы / -дегі / -тағы / -тегі` morpheme is a strong
-        // "specifically located in X" topic-narrowing signal,
-        // semantically equivalent to a `туралы` marker for the
-        // word it attaches to. When present, the recovered stem
-        // (e.g. `қазақстан` from `қазақстандағы`) is the most
-        // specific topic in the question and should win over any
-        // generic content noun (e.g. `тау` from `таулар`) found
-        // elsewhere via `first_noun_root`.
-        .or_else(|| locative_attributive_hint(input))
-        .or_else(|| first_noun_root(parses))
-        // **v4.11.6** — accusative-form fallback. Closes the
-        // «биологияны білесің бе?» → "Түсінбедім" gap from the
-        // 2026-04-30 transcript: FST has a lexicon gap on
-        // `биологияны / химияны / тарихты` (loanword roots in
-        // Accusative case) and emits no Noun analysis, so all
-        // upstream strategies yield None. String-level stripper of
-        // the six Accusative allomorphs recovers the bare stem.
-        // Runs LAST as a fallback after FST-driven strategies
-        // have all failed.
-        .or_else(|| accusative_form_hint(input))
+    if let Some(mw) = multiword_entity_hint(input) {
+        return Some((mw, TopicConfidence::High));
+    }
+    if let Some(tm) = topic_marker_hint(input, parses) {
+        return Some((tm, TopicConfidence::High));
+    }
+    if let Some(la) = locative_attributive_hint(input) {
+        return Some((la, TopicConfidence::High));
+    }
+    if let Some(pair) = first_noun_root_with_confidence(parses) {
+        return Some(pair);
+    }
+    accusative_form_hint(input).map(|s| (s, TopicConfidence::Low))
+}
+
+/// **v4.37.5** — confidence-stripping wrapper over
+/// [`best_noun_hint_with_confidence`]. Preserved as the legacy entry
+/// point for any caller that doesn't need the confidence band; new
+/// callers should use the confidence-aware variant directly so the
+/// planner can route to the clarification fork.
+#[allow(dead_code)]
+pub(crate) fn best_noun_hint(input: &str, parses: &[Analysis]) -> Option<String> {
+    best_noun_hint_with_confidence(input, parses).map(|(s, _)| s)
 }
 
 /// **v4.4.12** — string-level locative-attributive suffix strip.

@@ -258,6 +258,7 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             input_modality,
             input_evidence,
             input_is_inversion_question,
+            noun_hint_confidence,
             ..
         } => Intent::Unknown {
             raw_tokens,
@@ -276,6 +277,12 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             // across strip; analytical signal about question shape,
             // not evidence.
             input_is_inversion_question,
+            // **v4.37.5** — preserve confidence band across strip;
+            // it's an analytical signal about the topic-extraction
+            // certainty, not evidence content. After stripping, the
+            // planner uses it to choose between the clarification
+            // fork and `unknown.with_noun` as before.
+            noun_hint_confidence,
         },
         other => other,
     }
@@ -301,6 +308,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         }
     }
 

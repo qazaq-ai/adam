@@ -326,6 +326,35 @@ pub enum Intent {
         /// preserves all pre-v4.36.0 routing exactly.
         #[serde(default)]
         input_evidence: Option<adam_kernel_fst::EvidenceKind>,
+        /// **v4.37.5** — human-like clarification fork. When the topic
+        /// noun was extracted via a strong structural signal
+        /// (multiword / Latin / topic_marker / locative_attributive /
+        /// adj+noun compound, or a `first_noun_root` result whose
+        /// lexicon `part_of_speech` is actually `"noun"`), this is
+        /// `High` and the planner takes the standard fact-asserting
+        /// path. When the only extraction available was a fallback
+        /// (an adjective / pronoun / numeral surfaced as
+        /// `Analysis::Noun`, or `accusative_form_hint` stripped a
+        /// suffix without lexicon validation), this is `Low` and the
+        /// planner routes to `unknown.clarify_low_confidence` —
+        /// surfacing the candidate interpretation and inviting the
+        /// user to correct it instead of confidently asserting a
+        /// tangential fact about a likely-modifier.
+        ///
+        /// Default `High` preserves all pre-v4.37.5 routing exactly:
+        /// every existing test-site construction that doesn't set
+        /// the field continues to take the confident path.
+        ///
+        /// Surfaced by the 2026-05-03 live REPL transcript: «...
+        /// **атақты** жазушыларын ...» picked the adjective `атақты`
+        /// over the actual content noun `жазушы`. The fix is
+        /// twofold — `first_noun_root` now prefers POS=`"noun"`
+        /// (resolves the bug when both candidates exist), AND when
+        /// only a non-noun-POS candidate survives, the response
+        /// hedges with a clarification template instead of pretending
+        /// the modifier was the topic.
+        #[serde(default)]
+        noun_hint_confidence: crate::topic_extraction::TopicConfidence,
     },
 }
 

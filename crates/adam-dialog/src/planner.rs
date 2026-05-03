@@ -699,6 +699,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         };
         assert_eq!(intent_key(&intent), "unknown.with_derived_chain");
     }
@@ -724,6 +725,7 @@ mod tests {
             input_modality: None,
             input_evidence: None,
             input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
         };
         assert_eq!(intent_key(&intent), "unknown.with_grounded_fact");
     }
@@ -835,6 +837,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             input_modality,
             input_evidence,
             input_is_inversion_question,
+            noun_hint_confidence,
             ..
         } => {
             // **v4.37.0** — inversion-question routing. «X емес пе?»
@@ -966,6 +969,50 @@ pub fn intent_key(intent: &Intent) -> &'static str {
                     return "unknown.causal.bare";
                 }
                 // Fall through to bare unknown when no topic at all.
+            }
+
+            // **v4.37.5** — human-like clarification fork. Runs AFTER
+            // every user-intent special route (negation / modality /
+            // evidence / temporal / compositional / causal) but
+            // BEFORE the standard fact-asserting paths.
+            //
+            // Routing rules:
+            //   1. `Low` confidence → ALWAYS clarify, even when the
+            //      retrieval/curated-graph paths produced "evidence".
+            //      A corpus citation about an adjective or deverbal
+            //      participle the user clearly meant as a *modifier*
+            //      (e.g. «атақты» / «шыққан») is noise, not signal —
+            //      surfacing it confidently misleads. Better to echo
+            //      the candidate interpretation and ASK the user.
+            //   2. `noun_hint == None` AND no evidence → clarify
+            //      entirely (replaces bare «Түсінбедім»).
+            //   3. Otherwise — fall through to the standard path
+            //      (every pre-v4.37.5 route preserved bit-for-bit
+            //      because confidence defaults to High when no field
+            //      is set).
+            //
+            // Surfaced by the 2026-05-03 live REPL transcript:
+            //   «Қазақстанның **атақты** жазушыларын атаңыз»
+            //     pre-v4.37.5:  unknown.with_evidence (corpus quote
+            //                   about Astana — tangential)
+            //     post-v4.37.5: confidence=Low → clarify_low_confidence,
+            //                   echoes the candidate, asks the user.
+            //   «Қазақстаннан **шыққан** танымал тұлғалар…»
+            //     pre-v4.37.5:  noun_hint=шыққан, confident citation
+            //     post-v4.37.5: deverbal-participle demotion → Low →
+            //                   clarify, echoes «тұлға» (deeper noun
+            //                   from the parse stream as fallback) or
+            //                   «шыққан» if тұлға wasn't reached.
+            if matches!(
+                noun_hint_confidence,
+                crate::topic_extraction::TopicConfidence::Low
+            ) {
+                return "unknown.clarify_low_confidence";
+            }
+            let no_evidence =
+                example.is_none() && grounded_fact.is_none() && reasoning_chain.is_none();
+            if no_evidence && noun_hint.is_none() {
+                return "unknown.clarify_no_topic";
             }
 
             // User-facing chat prefers grounded evidence over a

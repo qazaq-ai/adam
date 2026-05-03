@@ -22,7 +22,9 @@ use crate::language_core::{
 // topic-marker / accusative / locative-attributive) are called
 // transitively through `best_noun_hint` and don't need a direct
 // import in this file.
-use crate::topic_extraction::{NOT_A_TOPIC, best_noun_hint, first_noun_root};
+use crate::topic_extraction::{
+    NOT_A_TOPIC, TopicConfidence, best_noun_hint_with_confidence, first_noun_root,
+};
 // `MULTIWORD_ENTITIES` and `multiword_entity_hint` are
 // referenced by the in-file
 // `world_core_multiword_coverage` /
@@ -233,7 +235,15 @@ pub fn interpret_text_with_lexicon(
     // `example_adapted` (v1.9.5) is also set there.
     // v4.0.21 — prefer multi-word entity match before single-noun fallback
     // so «Құс жолы туралы айтшы» stays intact (not reduced to «құс»).
-    let mut noun_hint = best_noun_hint(input, parses);
+    // **v4.37.5** — best_noun_hint_with_confidence threads a
+    // TopicConfidence band through every extraction strategy so the
+    // planner can route low-confidence picks to the
+    // `unknown.clarify_low_confidence` family.
+    let (mut noun_hint, mut noun_hint_confidence): (Option<String>, TopicConfidence) =
+        match best_noun_hint_with_confidence(input, parses) {
+            Some((root, conf)) => (Some(root), conf),
+            None => (None, TopicConfidence::High),
+        };
     // **v4.12.0** — detect question shape at the same point we
     // populate `noun_hint`. Pure surface-level scan; cheap and
     // independent of the FST analyses. `None` for non-questions.
@@ -284,6 +294,10 @@ pub fn interpret_text_with_lexicon(
                 )
             {
                 noun_hint = Some(focus.to_string());
+                // v4.37.5 — sentence_decomp identifies a *structural*
+                // role (Subject/Object/Source/Locus), which is a
+                // strong topical signal — confidence stays High.
+                noun_hint_confidence = TopicConfidence::High;
             }
         }
     }
@@ -305,6 +319,7 @@ pub fn interpret_text_with_lexicon(
         input_modality: None,
         input_evidence: None,
         input_is_inversion_question: false,
+        noun_hint_confidence,
     }
 }
 
@@ -345,6 +360,8 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
     // Legacy path has no raw input, so multi-word matching is skipped —
     // callers using raw-text-aware `interpret_text_with_lexicon` get the
     // full v4.0.21 multiword treatment.
+    // v4.37.5 — legacy parses-only path defaults confidence to High
+    // (preserves bit-identical pre-v4.37.5 routing on this path).
     Intent::Unknown {
         raw_tokens: tokens,
         noun_hint: first_noun_root(parses),
@@ -371,6 +388,7 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         input_modality: None,
         input_evidence: None,
         input_is_inversion_question: false,
+        noun_hint_confidence: TopicConfidence::High,
     }
 }
 
