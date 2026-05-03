@@ -486,6 +486,19 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "төле би",
     "қазыбек би",
     "әйтеке би",
+    // **v4.38.0** — role-bridges expansion (8 new compound bridge
+    // objects from `data/world_core/role_bridges.jsonl`). These are
+    // structural multi-word categories used as IsA targets by the
+    // bridge-fact ladder (Абай → ақын → шығармашылық тұлға → ...).
+    // Required by the `world_core_multiword_coverage` invariant test.
+    "шығармашылық тұлға",
+    "әкімшілік бөлініс",
+    "қоғамдық тұлға",
+    "өнер тұлғасы",
+    "спорт тұлғасы",
+    "ұлттық саябақ",
+    "еңбек саласы",
+    "тау жүйесі",
     // **v4.4.10** — Kazakhstan administrative + physical-geography
     // expansion. 17 oblast names (compound `<adjective/proper>
     // облысы`), the structural-bridge nouns `әкімшілік бөлік` /

@@ -1,7 +1,7 @@
 {
-  "version": "4.37.0",
+  "version": "4.37.5",
   "status": "completed",
-  "elapsed_s": 40,
+  "elapsed_s": 67,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,16 +18,16 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 63,
-    "facts_total": 1927,
+    "facts_total": 1980,
     "by_predicate": {
       "after": 7,
       "causes": 23,
       "does_to": 1,
       "goes_to": 21,
       "has": 59,
-      "has_quantity": 29,
+      "has_quantity": 34,
       "in_domain": 24,
-      "is_a": 1472,
+      "is_a": 1520,
       "lives_in": 7,
       "part_of": 228,
       "related_to": 56
@@ -73,6 +73,7 @@
       "world_core/professions.jsonl": 40,
       "world_core/programming_rust.jsonl": 181,
       "world_core/proverbs.jsonl": 43,
+      "world_core/role_bridges.jsonl": 53,
       "world_core/society.jsonl": 44,
       "world_core/sports.jsonl": 18,
       "world_core/time.jsonl": 38,
@@ -34881,6 +34882,1066 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Жақсы ат — мыңға, жаман ат — бірге."
+    },
+    {
+      "subject": {
+        "surface": "ақын",
+        "root": "ақын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ақын — адам."
+    },
+    {
+      "subject": {
+        "surface": "ақын",
+        "root": "ақын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шығармашылық тұлға",
+        "root": "шығармашылық тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ақын — өлең шығаратын шығармашылық тұлға."
+    },
+    {
+      "subject": {
+        "surface": "ақын",
+        "root": "ақын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ақын — өнер саласындағы маман."
+    },
+    {
+      "subject": {
+        "surface": "ақындық",
+        "root": "ақындық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ақындық — әдеби кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "жазушы",
+        "root": "жазушы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жазушы — адам."
+    },
+    {
+      "subject": {
+        "surface": "жазушы",
+        "root": "жазушы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шығармашылық тұлға",
+        "root": "шығармашылық тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жазушы — әдебиет саласындағы шығармашылық тұлға."
+    },
+    {
+      "subject": {
+        "surface": "жазушы",
+        "root": "жазушы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жазушы — өнер маманы."
+    },
+    {
+      "subject": {
+        "surface": "жазушылық",
+        "root": "жазушылық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жазушылық — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "ғалым",
+        "root": "ғалым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ғалым — адам."
+    },
+    {
+      "subject": {
+        "surface": "ғалым",
+        "root": "ғалым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "зерттеуші",
+        "root": "зерттеуші",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ғалым — ғылыми зерттеуші."
+    },
+    {
+      "subject": {
+        "surface": "ғалым",
+        "root": "ғалым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ғалым — ғылым саласындағы маман."
+    },
+    {
+      "subject": {
+        "surface": "ғалымдық",
+        "root": "ғалымдық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ғалымдық — кәсіп."
+    },
+    {
+      "subject": {
+        "surface": "спортшы",
+        "root": "спортшы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Спортшы — адам."
+    },
+    {
+      "subject": {
+        "surface": "спортшы",
+        "root": "спортшы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Спортшы — спорт саласындағы маман."
+    },
+    {
+      "subject": {
+        "surface": "спортшы",
+        "root": "спортшы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "спорт тұлғасы",
+        "root": "спорт тұлғасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Спортшы — спорт тұлғасы."
+    },
+    {
+      "subject": {
+        "surface": "композитор",
+        "root": "композитор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Композитор — адам."
+    },
+    {
+      "subject": {
+        "surface": "композитор",
+        "root": "композитор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шығармашылық тұлға",
+        "root": "шығармашылық тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Композитор — музыка саласындағы шығармашылық тұлға."
+    },
+    {
+      "subject": {
+        "surface": "композитор",
+        "root": "композитор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Композитор — өнер маманы."
+    },
+    {
+      "subject": {
+        "surface": "әнші",
+        "root": "әнші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әнші — адам."
+    },
+    {
+      "subject": {
+        "surface": "әнші",
+        "root": "әнші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өнер тұлғасы",
+        "root": "өнер тұлғасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әнші — өнер тұлғасы."
+    },
+    {
+      "subject": {
+        "surface": "әнші",
+        "root": "әнші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әнші — музыка маманы."
+    },
+    {
+      "subject": {
+        "surface": "суретші",
+        "root": "суретші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Суретші — адам."
+    },
+    {
+      "subject": {
+        "surface": "суретші",
+        "root": "суретші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шығармашылық тұлға",
+        "root": "шығармашылық тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Суретші — бейнелеу өнерінің шығармашылық тұлғасы."
+    },
+    {
+      "subject": {
+        "surface": "суретші",
+        "root": "суретші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Суретші — өнер маманы."
+    },
+    {
+      "subject": {
+        "surface": "мұғалім",
+        "root": "мұғалім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мұғалім — адам."
+    },
+    {
+      "subject": {
+        "surface": "мұғалім",
+        "root": "мұғалім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мұғалім — білім саласындағы маман."
+    },
+    {
+      "subject": {
+        "surface": "мұғалім",
+        "root": "мұғалім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұстаз",
+        "root": "ұстаз",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мұғалім — ұстаз."
+    },
+    {
+      "subject": {
+        "surface": "дәрігер",
+        "root": "дәрігер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дәрігер — адам."
+    },
+    {
+      "subject": {
+        "surface": "дәрігер",
+        "root": "дәрігер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дәрігер — медицина маманы."
+    },
+    {
+      "subject": {
+        "surface": "инженер",
+        "root": "инженер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Инженер — адам."
+    },
+    {
+      "subject": {
+        "surface": "инженер",
+        "root": "инженер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Инженер — техника саласындағы маман."
+    },
+    {
+      "subject": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Маман — адам."
+    },
+    {
+      "subject": {
+        "surface": "тұлға",
+        "root": "тұлға",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұлға — адам."
+    },
+    {
+      "subject": {
+        "surface": "тарихи тұлға",
+        "root": "тарихи тұлға",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тұлға",
+        "root": "тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тарихи тұлға — өткен дәуірдің көрнекті өкілі."
+    },
+    {
+      "subject": {
+        "surface": "қоғамдық тұлға",
+        "root": "қоғамдық тұлға",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тұлға",
+        "root": "тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қоғамдық тұлға — қоғамға ықпал ететін адам."
+    },
+    {
+      "subject": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіршілік иесі",
+        "root": "тіршілік иесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_036"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Адам — тіршілік иесі."
+    },
+    {
+      "subject": {
+        "surface": "шығармашылық тұлға",
+        "root": "шығармашылық тұлға",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_037"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шығармашылық тұлға — өнер немесе ғылым саласындағы адам."
+    },
+    {
+      "subject": {
+        "surface": "өнер тұлғасы",
+        "root": "өнер тұлғасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шығармашылық тұлға",
+        "root": "шығармашылық тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өнер тұлғасы — өнер саласындағы адам."
+    },
+    {
+      "subject": {
+        "surface": "зерттеуші",
+        "root": "зерттеуші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Зерттеуші — ғылыммен айналысатын адам."
+    },
+    {
+      "subject": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "еңбек саласы",
+        "root": "еңбек саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кәсіп — адамның еңбек ету саласы."
+    },
+    {
+      "subject": {
+        "surface": "көл",
+        "root": "көл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "су денесі",
+        "root": "су денесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көл — су денесі."
+    },
+    {
+      "subject": {
+        "surface": "тау",
+        "root": "тау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жер бедері",
+        "root": "жер бедері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тау — жер бедері."
+    },
+    {
+      "subject": {
+        "surface": "шөл",
+        "root": "шөл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жер бедері",
+        "root": "жер бедері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шөл — жер бедері."
+    },
+    {
+      "subject": {
+        "surface": "дала",
+        "root": "дала",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жер бедері",
+        "root": "жер бедері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дала — жер бедері."
+    },
+    {
+      "subject": {
+        "surface": "қала",
+        "root": "қала",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "елді мекен",
+        "root": "елді мекен",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қала — елді мекен."
+    },
+    {
+      "subject": {
+        "surface": "ауыл",
+        "root": "ауыл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "елді мекен",
+        "root": "елді мекен",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ауыл — елді мекен."
+    },
+    {
+      "subject": {
+        "surface": "облыс",
+        "root": "облыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әкімшілік бөлініс",
+        "root": "әкімшілік бөлініс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_047"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Облыс — әкімшілік бөлініс."
+    },
+    {
+      "subject": {
+        "surface": "аймақ",
+        "root": "аймақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "аумақ",
+        "root": "аумақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аймақ — аумақ."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "өзен",
+        "root": "өзен",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанда жеті мыңнан астам өзен бар."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "көл",
+        "root": "көл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанда қырық сегіз мыңнан астам көл бар."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "тау жүйесі",
+        "root": "тау жүйесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_051"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанда үш ірі тау жүйесі бар."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "ұлттық саябақ",
+        "root": "ұлттық саябақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_052"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанда он төрт мемлекеттік ұлттық табиғи саябақ бар."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "ауыл",
+        "root": "ауыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_053"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанда жеті мыңнан астам ауыл бар."
     },
     {
       "subject": {

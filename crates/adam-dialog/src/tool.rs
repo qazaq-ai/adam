@@ -350,6 +350,35 @@ impl Tool {
                 // existed. Closes the live-REPL gap on Ұлытау /
                 // Жетісу-style bare proper-noun queries.
                 let subject_lower = subject.to_lowercase();
+                // **v4.38.0** — subject-synonym fallback. When direct
+                // subject lookup returns no matches AND the query
+                // subject is one half of a known synonym pair, also
+                // try the other half. Fires *only* when direct
+                // lookup is empty (defensive — preserves the
+                // pre-v4.38.0 unique-subject path bit-for-bit when
+                // direct facts exist). Initial pair list is
+                // intentionally tiny: only equivalences that hold in
+                // factoid contexts without register / connotation
+                // shifts. Expand cautiously — a too-eager synonym
+                // pair leaks irrelevant facts into queries about
+                // closely-related-but-distinct concepts (e.g.
+                // ауыл↔қала would be wrong: villages and cities are
+                // both settlements but quantitative facts differ).
+                //
+                // Why this is needed even after v4.17.5
+                // `LIST_TYPE_SYNONYMS`: that table re-ranks
+                // candidates the SearchGraph lookup ALREADY found.
+                // If the lookup itself returns nothing because the
+                // subject string doesn't match any fact's
+                // `subject.root`, no amount of re-ranking helps.
+                // This lookup-time synonym fallback closes that
+                // gap.
+                const SUBJECT_SYNONYMS: &[(&str, &str)] = &[
+                    ("аймақ", "облыс"), // region ↔ oblast
+                    ("кісі", "адам"),   // person (formal ↔ neutral)
+                    ("тұлға", "адам"),  // figure ↔ person (in factoid contexts)
+                    ("ел", "мемлекет"), // country ↔ state
+                ];
                 let mut matches: Vec<&ReasFact> = ctx
                     .extracted
                     .iter()
@@ -360,6 +389,33 @@ impl Tool {
                     })
                     .filter(|f| f.confidence == ConfidenceKind::HumanApproved)
                     .collect();
+                if matches.is_empty() {
+                    let synonyms: Vec<&str> = SUBJECT_SYNONYMS
+                        .iter()
+                        .filter_map(|(a, b)| {
+                            if subject_lower == *a {
+                                Some(*b)
+                            } else if subject_lower == *b {
+                                Some(*a)
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
+                    matches = ctx
+                        .extracted
+                        .iter()
+                        .filter(|f| {
+                            let root_lower = f.subject.root.to_lowercase();
+                            synonyms.iter().any(|syn| root_lower == *syn)
+                        })
+                        .filter(|f| match predicate {
+                            Some(p) => predicate_name_matches(f.predicate, p),
+                            None => true,
+                        })
+                        .filter(|f| f.confidence == ConfidenceKind::HumanApproved)
+                        .collect();
+                }
                 // v4.4.11 — input-overlap reranker. When `ctx.query_input`
                 // is set, score each fact by how many content tokens
                 // from the user's question appear as substrings of
@@ -395,11 +451,46 @@ impl Tool {
                     || query_lower.contains("атап шық")
                     || query_lower.contains("атап өт")
                     || query_lower.contains("барлық атау");
+                // **v4.38.0** — quantity-question detection. When the
+                // user's input contains «қанша / неше» (quantity
+                // markers — "how many / how much"), the answer
+                // should come from a HasQuantity fact whose
+                // **object root** matches what the user is counting,
+                // not whichever HasQuantity fact happens to share
+                // raw-text tokens with the query subject. Pre-v4.38.0
+                // «Қазақстанда қанша өзен бар?» surfaced
+                // «Қазақстанда 3 республикалық маңызы бар қала бар:
+                // ...» because both `қазақстан-has_quantity-облыс`
+                // and `қазақстан-has_quantity-республикалық маңызы
+                // бар қала` matched the query subject in raw_text;
+                // length tier picked the city fact regardless of the
+                // user actually asking about rivers. The
+                // `quantity_object_match_rank` tier below boosts
+                // candidates whose `object.root` prefix-matches a
+                // query token, so the «өзен» fact (when present)
+                // wins over «қала» / «облыс» when the user asks
+                // about өзен. Strictly additive — fires only when
+                // `has_quantity_intent` is true.
+                let has_quantity_intent =
+                    query_lower.contains("қанша") || query_lower.contains("неше");
                 // **v4.17.5** — synonym table for list-intent
                 // disambiguation. Hoisted out of the sort closure
-                // so debug code can also reference it.
-                const LIST_TYPE_SYNONYMS: &[(&str, &str)] =
-                    &[("аймақ", "облыс"), ("аумақ", "облыс"), ("гора", "тау")];
+                // so debug code can also reference it. **v4.38.0**
+                // expanded with бала↔ұл / қала↔мегаполис / ел↔мемлекет /
+                // елді мекен↔ауыл / адам↔тұлға / адам↔кісі pairs
+                // — all conservative semantic synonyms used
+                // interchangeably in factoid contexts.
+                const LIST_TYPE_SYNONYMS: &[(&str, &str)] = &[
+                    ("аймақ", "облыс"),
+                    ("аумақ", "облыс"),
+                    ("гора", "тау"),
+                    ("бала", "ұл"),
+                    ("қала", "мегаполис"),
+                    ("ел", "мемлекет"),
+                    ("ауыл", "елді мекен"),
+                    ("кісі", "адам"),
+                    ("тұлға", "адам"),
+                ];
                 matches.sort_by(|a, b| {
                     let overlap_a = if query_tokens.is_empty() {
                         0
@@ -537,6 +628,106 @@ impl Tool {
                             1
                         }
                     };
+                    // **v4.38.0** — quantity-object match rank.
+                    // Mirrors `list_intent_rank`: when the user's
+                    // input has a quantity marker («қанша / неше»),
+                    // candidates whose `object.root` prefix-matches
+                    // a content token from the query win the tier.
+                    // This decouples WHAT the user is counting
+                    // (object root) from raw-text overlap with the
+                    // SUBJECT of the fact. Pre-v4.38.0
+                    // «Қазақстанда қанша өзен бар?» surfaced a city
+                    // fact because both share «Қазақстанда» / «бар»
+                    // in raw_text but neither has «өзен» as object.
+                    // Now: if any HasQuantity fact about Kazakhstan
+                    // has object «өзен», it wins the rank=0 slot;
+                    // others fall to rank=1 (no object match) or
+                    // rank=2 (no quantity intent → tier collapses).
+                    // **v4.38.0** — separate token extraction with
+                    // a 3-char floor (vs the 4-char floor in
+                    // `query_content_tokens`). The 4-char filter is
+                    // tuned for `fact_overlap_score`, where short
+                    // tokens cause spurious bigram-style matches.
+                    // Here we want to recognise short content nouns
+                    // like «көл» (lake), «тау» (mountain), «ел»
+                    // (country), «ауыл» (village) that the user
+                    // commonly asks about — exactly the most-
+                    // -frequent-but-shortest words in Kazakh
+                    // geography. Trade-off: 3-char floor admits
+                    // very common function tokens (e.g. «бір»,
+                    // «үш»), but those are then matched against
+                    // a HasQuantity fact's object root, where
+                    // they're unlikely to coincide with the
+                    // counted-class noun.
+                    let quantity_query_tokens: Vec<String> = if has_quantity_intent {
+                        query_lower
+                            .split(|c: char| !c.is_alphanumeric())
+                            .filter_map(|w| {
+                                let t = w.trim();
+                                if t.is_empty() || t.chars().count() < 3 {
+                                    return None;
+                                }
+                                if t == "қанша" || t == "неше" || t == "бар" || t == subject_lower
+                                {
+                                    return None;
+                                }
+                                Some(t.to_string())
+                            })
+                            .collect()
+                    } else {
+                        Vec::new()
+                    };
+                    let quantity_object_match_rank = |fact: &ReasFact| -> i32 {
+                        if has_quantity_intent {
+                            // Only HasQuantity facts compete for
+                            // the top slot — other predicates are
+                            // not the appropriate answer shape for
+                            // a quantity question.
+                            if !matches!(fact.predicate, ReasPredicate::HasQuantity) {
+                                return 1;
+                            }
+                            let object_lower = fact.object.root.to_lowercase();
+                            // Match the candidate's object root
+                            // against any of the user's content
+                            // tokens. Both directions: object
+                            // substring of token (handles «көл»
+                            // query → «көл» object) and token
+                            // substring of object (handles «көлдер»
+                            // query → «көл» object).
+                            let object_match = quantity_query_tokens.iter().any(|t| {
+                                object_lower.contains(t.as_str())
+                                    || t.contains(object_lower.as_str())
+                            });
+                            if object_match { 0 } else { 1 }
+                        } else {
+                            // **v4.38.0** — guard against the
+                            // inverse failure: a HasQuantity fact
+                            // hijacking a non-quantity query just
+                            // because it shares the subject and
+                            // object-class tokens with the query
+                            // input. Surfaced when v4.38.0 added
+                            // «Қазақстанда жеті мыңнан астам өзен
+                            // бар» — for the question «Қазақстандағы
+                            // өзендер қандай?» (no quantity marker)
+                            // that fact tied on overlap with the
+                            // existing «Қазақстандағы ірі өзендер:
+                            // Ертіс, ...» list fact, then won the
+                            // predicate-rank tier (HasQuantity
+                            // ranks 2, RelatedTo ranks 6 in the
+                            // ASC priority sort). Demoting HasQuantity
+                            // to rank 3 here pushes it below the
+                            // default 2 for non-HasQuantity
+                            // candidates, so list / definition
+                            // queries surface their natural
+                            // partners (RelatedTo lists, IsA
+                            // descriptions) instead of bare counts.
+                            if matches!(fact.predicate, ReasPredicate::HasQuantity) {
+                                3
+                            } else {
+                                2
+                            }
+                        }
+                    };
                     // **v4.17.5** — when has_list_intent fires,
                     // list_intent_rank takes precedence over the
                     // v4.4.11 overlap reranker. Reason: spurious
@@ -550,8 +741,24 @@ impl Tool {
                     // overlap. Outside list-intent mode all facts
                     // get rank=2 → no effect, overlap dominates
                     // as before.
+                    //
+                    // **v4.38.0** — `quantity_object_match_rank`
+                    // sits at the same precedence level as
+                    // `list_intent_rank` (both are content-shape
+                    // signals stronger than raw-text overlap).
+                    // The two are mutually exclusive in normal
+                    // questions: list-intent is a directive
+                    // («тізімдеңіз»), quantity-intent is an
+                    // interrogative («қанша»); a query rarely
+                    // carries both. If both happen to fire, list
+                    // wins by being checked first (deliberate —
+                    // listing presupposes an enumerable set, which
+                    // already implies counting).
                     list_intent_rank(a)
                         .cmp(&list_intent_rank(b))
+                        .then_with(|| {
+                            quantity_object_match_rank(a).cmp(&quantity_object_match_rank(b))
+                        })
                         .then_with(|| overlap_b.cmp(&overlap_a))
                         .then_with(|| {
                             user_facing_fact_priority(a).cmp(&user_facing_fact_priority(b))

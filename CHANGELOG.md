@@ -7,6 +7,65 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.38.0] — 2026-05-03 — Quantity-aware ranker + subject-synonym fallback + 53 role-bridge facts
+
+**First minor in v4.38+ arc.** Closes the v4.37.5 deferred bug 1 (HasQuantity ranking) and lays infrastructure groundwork (subject-synonym fallback in SearchGraph, role-bridge fact ladder) for the v4.38.5 lexicon-cleanup arc that will close bug 4.
+
+### Real-REPL bugs closed (2026-05-03 transcript)
+
+| Query | v4.37.5 | v4.38.0 |
+|---|---|---|
+| Қазақстанда қанша өзен бар? | "Қазақстанда 3 республикалық маңызы бар қала бар: Астана, Алматы, Шымкент." (cities — wrong) | "**Қазақстанда жеті мыңнан астам өзен бар.**" |
+| Қазақстанда қанша көл бар? | (same cities fact) | "**Қазақстанда қырық сегіз мыңнан астам көл бар.**" |
+| Қазақстанда қанша тау бар? | (same cities fact) | "**Қазақстанда үш ірі тау жүйесі бар.**" |
+| Қазақстанда қанша ұлттық саябақ бар? | (same cities fact) | "**Қазақстанда он төрт мемлекеттік ұлттық табиғи саябақ бар.**" |
+| Қазақстаннан шыққан танымал тұлғаларды білесіз? | proverb citation | "**Тұлға — адам.**" (bridge fact, more relevant) |
+| Жазушы дегеніміз кім? | (no fact) | "**Жазушы — әдебиет саласындағы шығармашылық тұлға.**" |
+| Ғалым дегеніміз кім? | (no fact) | "**Ғалым — ғылыми зерттеуші.**" |
+| Қазақстандағы өзендер қандай? (control) | "Қазақстандағы ірі өзендер: Ертіс, Сырдария, ..." | unchanged (RelatedTo list still wins; reverse-guard prevents new HasQuantity facts hijacking type-list queries) ✓ |
+| Сәлем / Қазақстан туралы / confident-fact controls | unchanged | unchanged ✓ |
+
+### Innovations
+
+**(1) `quantity_object_match_rank` in SearchGraph sort cascade.** New rank tier between `list_intent_rank` and `overlap`. When the user's query contains «қанша / неше», a HasQuantity fact whose `object.root` matches a content token from the query wins the tier — closes the «өзен» case where four HasQuantity facts about Kazakhstan (облыс / қала / халық / новые өзен/көл/...) all matched on subject + raw_text overlap, but only one had the relevant *counted class* in its object root. 3-char floor on token extraction (vs the 4-char floor in `query_content_tokens`) admits short content nouns like «көл» (lake), «тау» (mountain), «ел» (country), «ауыл» (village).
+
+**(2) Reverse-guard for HasQuantity facts.** When `has_quantity_intent` is false (the user is asking «what kind / which» — definition or list-style enquiry), HasQuantity facts get demoted to rank 3 (worse than the default 2 for non-HasQuantity candidates). This prevents new quantity facts from hijacking type-list queries that previously surfaced RelatedTo `<X> тізімі` facts. Closes the would-be regression on «Қазақстандағы өзендер қандай?» from leaking the bare count into a list query.
+
+**(3) `SUBJECT_SYNONYMS` lookup fallback in SearchGraph.** New 4-pair synonym table — аймақ↔облыс, кісі↔адам, тұлға↔адам, ел↔мемлекет. When direct subject lookup returns no matches AND the queried subject is one half of a synonym pair, retry the lookup against the other half. Strictly defensive (preserves all pre-v4.38.0 unique-subject behavior bit-for-bit). Note: this alone doesn't yet close bug 4 (lexicon registers «аймақтарын / аймақтары / аймақтар» as separate noun roots, so topic extraction never hands SearchGraph a clean «аймақ» subject) — full closure deferred to v4.38.5 lexicon cleanup.
+
+**(4) 53 new world_core facts in `role_bridges.jsonl`** — high-leverage bridges per `project_bridge_fact_leverage` (+47-67 derivations / fact). Coverage: 7 profession→person bridges (ақын/жазушы/ғалым/спортшы/композитор/әнші/суретші/мұғалім/дәрігер/инженер IsA адам); 4 profession→creative-figure bridges (ақын/жазушы/композитор/суретші IsA шығармашылық тұлға); class→category bridges (көл/тау/шөл/дала IsA жер бедері; қала/ауыл IsA елді мекен; облыс IsA әкімшілік бөлініс; адам IsA тіршілік иесі); 5 HasQuantity facts on natural geography (өзен / көл / тау жүйесі / ұлттық саябақ / ауыл).
+
+**(5) `MULTIWORD_ENTITIES` extended** with 8 new compound bridge objects (шығармашылық тұлға, әкімшілік бөлініс, қоғамдық тұлға, өнер тұлғасы, спорт тұлғасы, ұлттық саябақ, еңбек саласы, тау жүйесі) — keeps the `world_core_multiword_coverage` invariant test passing.
+
+**(6) `LIST_TYPE_SYNONYMS` expanded** with бала↔ұл, қала↔мегаполис, ел↔мемлекет, ауыл↔елді мекен, кісі↔адам, тұлға↔адам — covers more interchangeable pairs in factoid contexts. Conservative; pairs with register / connotation shifts (ауыл↔қала etc.) intentionally NOT added.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **865 passing** unchanged |
+| Live REPL — bug 1 (qty queries) | ✓ all 7 quantity classes route correctly |
+| Anti-regression — type-list queries | ✓ «өзендер қандай?» still surfaces RelatedTo list |
+| Anti-regression — confident-fact controls | unchanged ✓ |
+| `cargo fmt --all --check` | clean |
+| Foundation validation | 1750 entries / 1916 facts / 0 issues |
+| Reasoner derivations | 25 435 (was ~24 000 — bridge facts amplify R1 transitivity) |
+
+### Latency / RSS (release-mode probes)
+
+| Query | Latency | Max RSS |
+|---|---|---|
+| Қазақстанда қанша өзен бар? | 0.84 s | 190 MB |
+| Қазақстандағы өзендер қандай? (control) | 0.33 s | 175 MB |
+
+Cold-start overhead from larger fact graph (1916 vs 1860 facts + 25 435 vs 24 000 derivations); steady-state turn latency unchanged.
+
+### Deferred to v4.38.5
+
+- **Bug 4 (lexicon pollution):** «аймақтарын», «аймақтары», «аймақтар» registered as separate noun roots in both `pure_kazakh_roots.json` and `apertium_imported_roots.json`. FST picks the longest match → topic extraction never normalises to bare «аймақ». Requires a focused lexicon cleanup pass — separate release for clear scope.
+- Subject-synonym table is in place but won't fire on bug 4 cases until lexicon is clean.
+- Lexicon function-word completion (деп / осы / оның / деген / пен) — v4.39.0 milestone.
+
 ## [4.37.5] — 2026-05-03 — Human-like clarification on low-confidence topic extraction — «Сіз X туралы сұрап тұрсыз ғой?»
 
 **First behavioural release in v4.37+ arc.** Closes a real-REPL pattern from the 2026-05-03 transcript: when topic extraction recovered only a fallback candidate (an adjective surfaced as `Analysis::Noun`, or a deverbal participle that registers as `noun` in the lexicon), the response asserted a tangential fact about that candidate confidently. Pre-v4.37.5 the system either echoed the wrong word («Атақты — ...») or cited a corpus quote about a modifier the user clearly meant as a qualifier of a deeper noun. v4.37.5 introduces a `TopicConfidence` band on `Intent::Unknown` and routes `Low` confidence to a hedged clarification family that surfaces the inferred subject and INVITES the user to correct it — instead of pretending the modifier was the topic.
