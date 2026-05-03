@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.41.7] — 2026-05-03 — Dialog precision pass + Rust knowledge expansion — 7-innovation bundle from real-REPL transcript
+
+**Driven by 2026-05-03 user dialog test (second round).** Closes 6 distinct dialog gaps from a real session AND expands Rust knowledge per user's explicit ask about adam learning programming. Word-form math now handles digit-prefix forms («30-ды»); the `пен` conjunction has context-aware merge/split semantics; math turns no longer pollute discourse anaphora; the misleading «Rust only» fact is replaced; the modal-ability gate exempts explain/teach verbs; 35 advanced Rust facts cover ownership / borrowing / lifetimes / traits / generics / Vec / HashMap / iterators / closures / async / cargo / etc.
+
+### Real-REPL gap closures
+
+| Query | Pre-v4.41.7 | Post-v4.41.7 |
+|---|---|---|
+| Бес санын үшке көбейтіп, 30-ды азайтыңыз | refusal (digit «30» dropped by splitter) | "**Есептедім: -15**" |
+| Маған Rust бағдарламалауын үйрете аласыз ба? | "Жоқ, ондай әрекетті өзім орындай алмаймын..." (capability refusal) | "**Rust — компиляцияланатын жүйелік және қауіпсіз жадтармен жұмыс жасайтын бағдарламалау тілі.**" (engages with topic) |
+| Меншік деген не? | (no fact) | "**Меншік (ownership) — Rust жадтарын автоматты түрде басқару моделі.**" |
+| Қарызға алу туралы? | (no fact) | "**Қарызға алу (borrowing) — мәнді көшірмей сілтеме арқылы қолдану.**" |
+| Trait / Lifetime / Generic / Closure / Iterator queries | partial | curated explanations |
+| Басқа қандай бағдарламалау тілдері бар? | "Адам білетін бағдарламалау тілдері: Rust" (misleading) | full list (Rust терең + Python / JS / TS / Java / Kotlin / C / C++ / C# / Go / Swift / Ruby / PHP / SQL / HTML / CSS) |
+| «Содан кейін Rust...» after math turns (anaphora) | resolved to «сан» (math-meta-word polluted last_query_topic) | last_query_topic skipped on math turns; anaphor resolves correctly |
+| Single-clause math / qty queries / bug 4 / greetings (controls) | unchanged | unchanged ✓ |
+
+### Innovations (7)
+
+**(1) Digit-prefix numerals in word-math** — pre-v4.41.7 the splitter `!c.is_alphabetic()` dropped digits entirely (chars '3' and '0' aren't alphabetic, splitter cut between them, leaving "30" as empty strings). Changed predicate to `!c.is_alphanumeric() && c != '-'` keeping «30-ды» as one token. New digit-prefix branch in `parse_kazakh_number_token`: bare digits like «30» → `(30, false)`; digits + dash + suffix like «30-ды» / «100-ге» → `(N, true)` (case-marked).
+
+**(2) `пен / мен / бен` context-aware merge/split** in `extract_kazakh_number_operands`. Pre-scan counts case-marked numbers in the clause:
+- 1 case-marked → conjunction SPLITS into separate operands («Қырық пен бесті қосып» → [40, 5] → Add → 45).
+- 2+ case-marked → conjunction MERGES into compound number («Қырық пен бесті екіге көбейтіп» → [45, 2] → Mul → 90).
+
+The single-/multi-case distinction disambiguates "add A and B" from "(A+B) op C" without needing speculative parses.
+
+**(3) `last_query_topic` skip on math turns.** Real-REPL: «Бес санын үшке көбейтіп, 30-ды азайтыңыз» (math turn) set last_query_topic = «сан»; subsequent «Содан кейін Rust туралы» fired anaphor → reused «сан» → surfaced "Сан — есептеу мен өлшеуге арналған математикалық ұғым" instead of Rust info. Math turns are not knowledge turns; they no longer update the anaphor-resolution slot. Conversation.rs gated by `extra_slots.contains_key("__math_answer__") || "__math_input__"`.
+
+**(4) Updated misleading «Rust only» fact** in `programming_rust.jsonl` (rust_181). Pre-v4.41.7 surfaced "Адам білетін бағдарламалау тілдері: `Rust`. Басқа тілдер бойынша курирленген дерек әлі жоқ." — outdated since v4.41.5 added programming_languages.jsonl with 13 languages. Replaced with full list ("Rust (терең), Python, JavaScript, TypeScript, Java, Kotlin, C, C++, C#, Go, Swift, Ruby, PHP, SQL, HTML, CSS").
+
+**(5) Modal-ability gate exempts explain/teach verbs.** Two-place fix:
+- `semantics.rs` aux_capability gate: when input contains «түсіндір», «үйрет», «айтып бер», «баянда» — DON'T route to GenericCapability. These verbs ask for content, not action.
+- `planner.rs` modality override: when explain/teach verb + grounded_fact present, skip the `unknown.with_modal_ability` template and let `unknown.with_grounded_fact` fire — surface the curated topic explanation instead of «иә, мүмкіндік бар екен» hedging.
+
+**(6) `programming_rust_advanced.jsonl` — new world_core domain (35 entries).** Curated facts on Rust depth concepts in Kazakh: ownership / borrowing / references / lifetimes / traits / generics / Result / Option / enum / struct / Vec / HashMap / String / slice / iterator / closure / match / cargo / crate / module / macro / async / await / Box / Rc / Arc / Mutex / trait object / pattern matching / borrow checker / move semantics / Copy / Drop / unsafe.
+
+**(7) MULTIWORD_ENTITIES sync** with 24 new compound objects from programming_rust_advanced + 1 from updated rust_181 fact. Required by `world_core_multiword_coverage` invariant.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **877 passing** unchanged |
+| Multi-clause math 2-step | ✓ «(7+5)-2 = 10», «(40+5)×2 = 90», «5×3-30 = -15» |
+| Multi-clause math with digit-prefix | ✓ «30-ды» recognised as 30+Acc |
+| Rust depth queries | ✓ ownership / borrowing / lifetimes / traits / generics surface |
+| Modal-ability for explain/teach | ✓ «үйрете аласыз ба?» surfaces topic content |
+| Modal-ability for normal capability | ✓ «сөйлей аласыз ба?» preserved |
+| Anti-regression — bug 4 / qty / greetings / Абай | unchanged ✓ |
+| Foundation: 1819 entries / 1985 facts / 41 domains / 25 633 derivations | ✓ |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.7` reflects 7 substantive innovations bundled. Programming-Rust-advanced is a new world_core domain (patch-tier per v4.4.10). Math extensions (digit + пен-context-aware) are evaluator refinements within existing function. Modal-ability gate is a 2-place planner+semantics tweak. Combined: solid `.7` patch.
+
+### Deferred (per user direction)
+
+- Rust syntax parsing / code analysis — defer to v5.x; needs separate Rust-parser layer.
+- Rust code generation — never; LLM territory, violates `project_retrieval_not_neural_v2`.
+- More transliterations (сишарп / котлин) — added on REPL demand.
+
 ## [4.41.5] — 2026-05-03 — Multi-clause math + IT knowledge expansion + Cyrillic Rust — 6-innovation bundle from real-REPL transcript
 
 **Driven by 2026-05-03 user dialog test.** Three concrete gaps surfaced in real session: chained-operation Kazakh math («Беске жетіні қоссақ, екіге көбейтеміз, үшке бөлеміз және бесті азайтамыз»), absent classification of programming languages beyond Rust (Python / Java / C / etc., compiled vs interpreted), and Cyrillic-spelled tech proper nouns («Руст» not matching Latin «Rust» fact base). All closed.

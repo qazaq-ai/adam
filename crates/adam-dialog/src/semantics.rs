@@ -1186,7 +1186,21 @@ fn detect_ask_about_system(
         // with the last topic, then SearchGraph surfaces the
         // curated list-summary fact.
         let is_list_anaphor = is_list_request_with_anaphor(joined);
-        if !is_list_anaphor {
+        // **v4.41.7** — explain/teach gate. Live REPL 2026-05-03:
+        // «Маған Rust бағдарламалауын үйрете аласыз ба?» /
+        // «Оның қалай жұмыс істейтінін түсіндіріп бере аласыз
+        // ба?» pre-v4.41.7 routed to GenericCapability ("can't do
+        // physical action"), missing that "explain / teach via
+        // facts" IS adam's main capability. The verbs «түсіндір»
+        // / «үйрет» / «айтып бер» are about *describing concepts*,
+        // not executing actions — they should fall through to
+        // topic-extraction so SearchGraph surfaces the relevant
+        // facts about the topic.
+        let is_explain_teach = joined.contains("түсіндір")
+            || joined.contains("үйрет")
+            || joined.contains("айтып бер")
+            || joined.contains("баянда");
+        if !is_list_anaphor && !is_explain_teach {
             return Some(SystemAspect::GenericCapability);
         }
     }

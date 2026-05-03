@@ -1018,13 +1018,30 @@ impl Conversation {
         // turns leave the previous value intact (so a follow-up
         // anaphor still resolves to whatever was actually being
         // discussed).
+        //
+        // **v4.41.7** — skip update on math turns (math_input
+        // OR math_answer set in extra_slots). Real-REPL transcript
+        // 2026-05-03: «Бес санын үшке көбейтіп, 30-ды азайтыңыз»
+        // (math turn) set last_query_topic to «сан» (the meta-
+        // word "number" surfaced as topic before math detection
+        // kicked in); the next turn «Содан кейін маған Rust
+        // бағдарламалау тілі туралы айтып беріңізші?» fired
+        // discourse-anaphora on «Содан» and reused «сан» as the
+        // topic — surfacing «Сан — есептеу мен өлшеуге арналған
+        // математикалық ұғым» instead of Rust info. Math turns
+        // are not knowledge turns; they should not pollute the
+        // anaphora-resolution context.
+        let is_math_turn = extra_slots.contains_key("__math_answer__")
+            || extra_slots.contains_key("__math_input__");
         if let Intent::Unknown {
             noun_hint: Some(topic),
             ..
         } = &intent_for_render
         {
-            self.session
-                .insert("last_query_topic".into(), topic.clone());
+            if !is_math_turn {
+                self.session
+                    .insert("last_query_topic".into(), topic.clone());
+            }
             // **v4.18.0** — list-class context for cross-turn
             // anaphor list-requests. Stash the prior grounded
             // fact's text so the next turn's SearchGraph

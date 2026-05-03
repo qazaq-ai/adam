@@ -515,6 +515,7 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // compounds + style/markup-language compounds.
     "интерпретацияланатын тілдер тізімі",
     "компиляцияланатын тілдер тізімі",
+    "білетін бағдарламалау тілдер тізімі",
     "интерпретацияланатын тіл",
     "компиляцияланатын тіл",
     "бағдарламалау тілдер тізімі",
@@ -525,6 +526,32 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "белгілеу тілі",
     "типтеу жүйесі",
     "стиль тілі",
+    // **v4.41.7** — programming_rust_advanced compound objects.
+    // Required by `world_core_multiword_coverage` invariant test.
+    "Rust ұғымы",
+    "move семантикасы",
+    "pattern matching",
+    "арнайы блок",
+    "асинхронды операция",
+    "басқару құралы",
+    "бір ие ережесі",
+    "динамикалық сілтеме",
+    "жад басқару моделі",
+    "жинақ бірлігі",
+    "ие сілтеме",
+    "меншік ережесі",
+    "меншік моделінің бөлігі",
+    "мән көрінісі",
+    "мән түрі",
+    "мәтін типі",
+    "параллельдік құралы",
+    "параметрлік тип",
+    "синхрондау механизмі",
+    "сілтеме санағыш",
+    "тип құрылымы",
+    "тіл механизмі",
+    "функция түрі",
+    "өмір сүру мерзімі",
     // **v4.38.0** — role-bridges expansion (8 new compound bridge
     // objects from `data/world_core/role_bridges.jsonl`). These are
     // structural multi-word categories used as IsA targets by the

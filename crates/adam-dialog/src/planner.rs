@@ -904,11 +904,42 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             // applicable subset based on whether `{noun}` slot has
             // a value.
             if let Some(modality) = input_modality {
-                return match modality {
-                    adam_kernel_fst::Modality::Necessity => "unknown.with_modal_necessity",
-                    adam_kernel_fst::Modality::Possibility => "unknown.with_modal_possibility",
-                    adam_kernel_fst::Modality::Ability => "unknown.with_modal_ability",
-                };
+                // **v4.41.7** — explain/teach skip. When the user
+                // asks «can you teach/explain X?» («Маған Rust-ты
+                // үйрете аласыз ба?» / «Оның жұмысын түсіндіріп
+                // бере аласыз ба?»), the Ability modality fires on
+                // the auxiliary («аласыз») but the question shape
+                // is asking for *content*, not asking adam whether
+                // it has a capability in the abstract. The
+                // GenericCapability path already exempts these
+                // verbs (semantics.rs aux_capability gate); modal-
+                // ability template would hedge with «иә, мүмкіндік
+                // бар екен» (treating the user as having the
+                // ability), which is the wrong direction. Skip the
+                // override when an explain/teach verb is in the
+                // raw input AND a noun_hint with grounded fact
+                // exists — let the response surface the curated
+                // fact about the topic instead.
+                let has_explain_teach = raw_tokens.iter().any(|t| {
+                    let lower = t.to_lowercase();
+                    lower.starts_with("түсіндір")
+                        || lower.starts_with("үйрет")
+                        || lower.starts_with("баянда")
+                });
+                let has_grounded_fact = matches!(
+                    intent,
+                    Intent::Unknown {
+                        grounded_fact: Some(_),
+                        ..
+                    }
+                );
+                if !(has_explain_teach && has_grounded_fact) {
+                    return match modality {
+                        adam_kernel_fst::Modality::Necessity => "unknown.with_modal_necessity",
+                        adam_kernel_fst::Modality::Possibility => "unknown.with_modal_possibility",
+                        adam_kernel_fst::Modality::Ability => "unknown.with_modal_ability",
+                    };
+                }
             }
             // **v4.36.0** — evidentiality routing. When the user
             // uses past-evidential tense («-{Y}п(ты)» / болыпты /

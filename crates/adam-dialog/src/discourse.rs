@@ -663,11 +663,25 @@ fn clause_has_math_verb(clause: &str) -> bool {
     })
 }
 
-fn single_clause_kazakh_math(clause: &str) -> Option<i64> {
-    let raw_tokens: Vec<&str> = clause
-        .split(|c: char| !c.is_alphabetic())
+fn split_kazakh_math_clause(clause: &str) -> Vec<&str> {
+    // **v4.41.7** — split on whitespace + non-alphanumeric chars
+    // EXCEPT '-'. Pre-v4.41.7 the predicate was `!c.is_alphabetic()`
+    // which dropped digits entirely (chars '3' and '0' aren't
+    // alphabetic, so the splitter cut between them, leaving "30"
+    // as a sequence of empty strings). Real-REPL transcript
+    // 2026-05-03 typed «30-ды азайтыңыз» (digit form with Kazakh
+    // case suffix); pre-v4.41.7 the «30» was lost entirely and the
+    // chunk had no operand. Keeping `'-'` as part of tokens lets
+    // «30-ды» survive as one token, parsed by
+    // `parse_kazakh_number_token`'s digit-prefix branch.
+    clause
+        .split(|c: char| !c.is_alphanumeric() && c != '-')
         .filter(|t| !t.is_empty())
-        .collect();
+        .collect()
+}
+
+fn single_clause_kazakh_math(clause: &str) -> Option<i64> {
+    let raw_tokens = split_kazakh_math_clause(clause);
     if raw_tokens.len() < 3 {
         return None;
     }
@@ -680,10 +694,7 @@ fn single_clause_kazakh_math(clause: &str) -> Option<i64> {
 }
 
 fn sequel_clause_kazakh_math(clause: &str, accumulator: i64) -> Option<i64> {
-    let raw_tokens: Vec<&str> = clause
-        .split(|c: char| !c.is_alphabetic())
-        .filter(|t| !t.is_empty())
-        .collect();
+    let raw_tokens = split_kazakh_math_clause(clause);
     let op = detect_kazakh_math_op(&raw_tokens)?;
     let operands = extract_kazakh_number_operands(&raw_tokens);
     // Sequel clauses provide exactly ONE additional operand —
@@ -802,6 +813,27 @@ fn extract_kazakh_number_operands(tokens: &[&str]) -> Vec<i64> {
     // compose normally (so «жиырма бес есепте» means «count up to
     // 25» — single operand 25). The case suffix is the
     // disambiguator between «25» and «20-and-5-as-separate-args».
+    // **v4.41.7** — pre-scan: count case-marked numbers in this
+    // clause. Determines whether `пен/мен/бен` between numbers
+    // should MERGE additively into a single chunk (count ≥ 2) or
+    // SPLIT into separate operands (count == 1).
+    //
+    // Reasoning:
+    // - «Қырық пен бесті қосып» (count = 1, only `бесті`) →
+    //   user means "add 40 AND 5" → operands [40, 5], op=Add → 45.
+    //   The single case-marked operand signals a binary operation
+    //   on the two pen-conjoined numbers.
+    // - «Қырық пен бесті екіге көбейтіп» (count = 2, `бесті` and
+    //   `екіге`) → user means "(40+5) × 2" → operands [45, 2],
+    //   op=Mul → 90. The two case-marked positions ARE the
+    //   binary operands; пен-conjoined numbers are a compound
+    //   first operand.
+    let case_marked_count = tokens
+        .iter()
+        .filter(|t| parse_kazakh_number_token(t).map_or(false, |(_, has_case)| has_case))
+        .count();
+    let pen_merges = case_marked_count >= 2;
+
     let mut operands = Vec::new();
     let mut chunk_total: i64 = 0;
     let mut chunk_inflight = false;
@@ -811,14 +843,15 @@ fn extract_kazakh_number_operands(tokens: &[&str]) -> Vec<i64> {
             chunk_total = compose_number_in_chunk(chunk_total, value);
             chunk_inflight = true;
             if has_case {
-                // Case suffix closes the chunk — this number is a
-                // complete syntactic operand.
                 operands.push(chunk_total);
                 chunk_total = 0;
                 chunk_inflight = false;
             }
+        } else if pen_merges && matches!(*t, "пен" | "мен" | "бен") && chunk_inflight {
+            // Pen-conjoined merge — chunk stays open, next number
+            // adds to chunk_total. Active only when 2+ case-marked
+            // operands are present in the clause.
         } else if chunk_inflight {
-            // Non-number token closes any open chunk.
             operands.push(chunk_total);
             chunk_total = 0;
             chunk_inflight = false;
@@ -857,6 +890,30 @@ fn parse_kazakh_number_token(token: &str) -> Option<(i64, bool)> {
     // First try the bare token (no case).
     if let Some(v) = bare_kazakh_number(token) {
         return Some((v, false));
+    }
+    // **v4.41.7** — digit form: «30», «100», «5» bare digits AND
+    // digit + Kazakh case suffix («30-ды», «100-ге», «5-ке»).
+    // Real-REPL transcript «Бес санын үшке көбейтіп, 30-ды
+    // азайтыңыз» typed digit «30» with Acc «-ды»; pre-v4.41.7
+    // the splitter dropped the digits entirely. Now both bare
+    // digits and digit + dash + suffix forms are recognised.
+    if token.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+        let digits: String = token.chars().take_while(|c| c.is_ascii_digit()).collect();
+        if let Ok(v) = digits.parse::<i64>() {
+            let rest = &token[digits.len()..];
+            // Strip optional leading '-' (Kazakh writes «30-ды»).
+            let rest = rest.strip_prefix('-').unwrap_or(rest);
+            if rest.is_empty() {
+                return Some((v, false));
+            }
+            // Trailing chars present → treat as case-marked
+            // operand. Conservative: any non-empty suffix on a
+            // digit-prefix is read as case morphology even if
+            // the suffix isn't a known Kazakh case form (covers
+            // dialectal / colloquial inflections without an
+            // exhaustive whitelist).
+            return Some((v, true));
+        }
     }
     // Try each case-suffix, longest first, and check that the
     // remaining stem IS a recognised bare number.

@@ -1,7 +1,7 @@
 {
-  "version": "4.41.0",
+  "version": "4.41.5",
   "status": "completed",
-  "elapsed_s": 64,
+  "elapsed_s": 66,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,16 +18,16 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2029,
+    "facts_total": 2064,
     "by_predicate": {
       "after": 8,
       "causes": 23,
       "does_to": 1,
       "goes_to": 26,
-      "has": 62,
+      "has": 63,
       "has_quantity": 34,
       "in_domain": 24,
-      "is_a": 1546,
+      "is_a": 1580,
       "lives_in": 8,
       "part_of": 230,
       "related_to": 67
@@ -73,6 +73,7 @@
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 30,
       "world_core/programming_rust.jsonl": 181,
+      "world_core/programming_rust_advanced.jsonl": 35,
       "world_core/proverbs.jsonl": 43,
       "world_core/role_bridges.jsonl": 53,
       "world_core/society.jsonl": 44,
@@ -34992,8 +34993,8 @@
       },
       "predicate": "RelatedTo",
       "object": {
-        "surface": "rust тізімі",
-        "root": "rust тізімі",
+        "surface": "білетін бағдарламалау тілдер тізімі",
+        "root": "білетін бағдарламалау тілдер тізімі",
         "pos": "noun"
       },
       "pattern": "world_core/programming_rust",
@@ -35002,7 +35003,707 @@
         "sample_id": "rust_181"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Адам білетін бағдарламалау тілдері: `Rust`. Басқа тілдер бойынша курирленген дерек әлі жоқ."
+      "raw_text": "Адам білетін бағдарламалау тілдері: Rust (терең), Python, JavaScript, TypeScript, Java, Kotlin, C, C++, C#, Go, Swift, Ruby, PHP, SQL, HTML, CSS. Rust бойынша терең дерек, басқа тілдер туралы базалық анықтама бар."
+    },
+    {
+      "subject": {
+        "surface": "меншік",
+        "root": "меншік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жад басқару моделі",
+        "root": "жад басқару моделі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Меншік (ownership) — Rust жадтарын автоматты түрде басқару моделі."
+    },
+    {
+      "subject": {
+        "surface": "меншік",
+        "root": "меншік",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "бір ие ережесі",
+        "root": "бір ие ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әр мәннің Rust-та бір ғана иесі болады."
+    },
+    {
+      "subject": {
+        "surface": "қарызға алу",
+        "root": "қарызға алу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "меншік моделінің бөлігі",
+        "root": "меншік моделінің бөлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарызға алу (borrowing) — мәнді көшірмей сілтеме арқылы қолдану."
+    },
+    {
+      "subject": {
+        "surface": "сілтеме",
+        "root": "сілтеме",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мән түрі",
+        "root": "мән түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сілтеме (reference) — мәннің орналасу адресіне нұсқайтын мән."
+    },
+    {
+      "subject": {
+        "surface": "өмір сүру мерзімі",
+        "root": "өмір сүру мерзімі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "Rust ұғымы",
+        "root": "Rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өмір сүру мерзімі (lifetime) — сілтеменің жарамды болатын кезеңі."
+    },
+    {
+      "subject": {
+        "surface": "трейт",
+        "root": "трейт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "интерфейс",
+        "root": "интерфейс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Трейт (trait) — типтердің ортақ мінез-құлқын анықтайтын интерфейс."
+    },
+    {
+      "subject": {
+        "surface": "generic",
+        "root": "generic",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "параметрлік тип",
+        "root": "параметрлік тип",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Generic — типке тәуелсіз кодты жазуға арналған параметрлік тип."
+    },
+    {
+      "subject": {
+        "surface": "result",
+        "root": "result",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "енумерация",
+        "root": "енумерация",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Result — операцияның сәтті немесе сәтсіз нәтижесін көрсететін енумерация."
+    },
+    {
+      "subject": {
+        "surface": "option",
+        "root": "option",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "енумерация",
+        "root": "енумерация",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Option — мәннің бар-жоғын білдіретін енумерация."
+    },
+    {
+      "subject": {
+        "surface": "енумерация",
+        "root": "енумерация",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тип құрылымы",
+        "root": "тип құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Enum — бірнеше нұсқаның бірі болатын типті анықтайтын құрылым."
+    },
+    {
+      "subject": {
+        "surface": "структура",
+        "root": "структура",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тип құрылымы",
+        "root": "тип құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Struct — өрістерден тұратын құрама тип."
+    },
+    {
+      "subject": {
+        "surface": "vec",
+        "root": "vec",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "коллекция",
+        "root": "коллекция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Vec — өзгермелі ұзындықтағы бір типті элементтердің жиымы."
+    },
+    {
+      "subject": {
+        "surface": "hashmap",
+        "root": "hashmap",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "коллекция",
+        "root": "коллекция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "HashMap — кілт-мән жұптарын сақтайтын ассоциативті коллекция."
+    },
+    {
+      "subject": {
+        "surface": "string",
+        "root": "string",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мәтін типі",
+        "root": "мәтін типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "String — динамикалық ұзындықтағы UTF-8 мәтін типі."
+    },
+    {
+      "subject": {
+        "surface": "slice",
+        "root": "slice",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мән көрінісі",
+        "root": "мән көрінісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Slice — массивтің немесе вектордың үздіксіз бөлігіне сілтейтін көрініс."
+    },
+    {
+      "subject": {
+        "surface": "итератор",
+        "root": "итератор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "трейт",
+        "root": "трейт",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Iterator — элементтер тізбегін бір-бірлеп өңдеу мүмкіндігі."
+    },
+    {
+      "subject": {
+        "surface": "closure",
+        "root": "closure",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "функция түрі",
+        "root": "функция түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Closure — өз ортасынан мәндерді ұстай алатын анонимдік функция."
+    },
+    {
+      "subject": {
+        "surface": "match",
+        "root": "match",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "басқару құрылымы",
+        "root": "басқару құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Match — енумерация нұсқаларын тексеретін үлгі сәйкестендіру өрнегі."
+    },
+    {
+      "subject": {
+        "surface": "cargo",
+        "root": "cargo",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "басқару құралы",
+        "root": "басқару құралы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Cargo — Rust бағдарламалары мен тәуелділіктерін басқаратын құрал."
+    },
+    {
+      "subject": {
+        "surface": "crate",
+        "root": "crate",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жинақ бірлігі",
+        "root": "жинақ бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Crate — Rust бағдарламасының жинақталу бірлігі."
+    },
+    {
+      "subject": {
+        "surface": "модуль",
+        "root": "модуль",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кеңістік",
+        "root": "кеңістік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Module — кодты функционалды топтарға бөлуге арналған кеңістік."
+    },
+    {
+      "subject": {
+        "surface": "макрос",
+        "root": "макрос",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мета-құрылым",
+        "root": "мета-құрылым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Macro — компиляция кезінде кодты генерациялайтын мета-құрылым."
+    },
+    {
+      "subject": {
+        "surface": "async",
+        "root": "async",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "параллельдік құралы",
+        "root": "параллельдік құралы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Async — функциялардың параллель орындалуын мүмкін ететін кілтсөз."
+    },
+    {
+      "subject": {
+        "surface": "await",
+        "root": "await",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асинхронды операция",
+        "root": "асинхронды операция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Await — асинхронды мәннің дайын болуын күтетін операция."
+    },
+    {
+      "subject": {
+        "surface": "box",
+        "root": "box",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ие сілтеме",
+        "root": "ие сілтеме",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Box — мәнді heap-те сақтайтын ие сілтеме."
+    },
+    {
+      "subject": {
+        "surface": "rc",
+        "root": "rc",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сілтеме санағыш",
+        "root": "сілтеме санағыш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Rc — бір мәнді бірнеше иемен бөлісуге арналған сілтеме санағыш."
+    },
+    {
+      "subject": {
+        "surface": "arc",
+        "root": "arc",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сілтеме санағыш",
+        "root": "сілтеме санағыш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Arc — ағындар арасында қауіпсіз бөлінетін атомдық сілтеме санағыш."
+    },
+    {
+      "subject": {
+        "surface": "mutex",
+        "root": "mutex",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "синхрондау механизмі",
+        "root": "синхрондау механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Mutex — деректерді ағындар арасында өзара алып тастап қорғайтын механизм."
+    },
+    {
+      "subject": {
+        "surface": "trait object",
+        "root": "trait object",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "динамикалық сілтеме",
+        "root": "динамикалық сілтеме",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Trait object — трейтті орындайтын типтердің бір сілтеме арқылы пайдаланылуы."
+    },
+    {
+      "subject": {
+        "surface": "pattern matching",
+        "root": "pattern matching",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіл механизмі",
+        "root": "тіл механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Pattern matching — мәннің құрылымын тексеру және бөлшектеу үшін қолданылатын Rust техникасы."
+    },
+    {
+      "subject": {
+        "surface": "borrow checker",
+        "root": "borrow checker",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "компилятор бөлігі",
+        "root": "компилятор бөлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Borrow checker — Rust компиляторының қарызға алу ережелерін тексеретін бөлігі."
+    },
+    {
+      "subject": {
+        "surface": "move семантикасы",
+        "root": "move семантикасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "меншік ережесі",
+        "root": "меншік ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Move семантикасы — Rust-та мәнді бір айнымалыдан екіншісіне меншікпен бірге беру."
+    },
+    {
+      "subject": {
+        "surface": "copy",
+        "root": "copy",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "трейт",
+        "root": "трейт",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Copy трейті — мәнді көшіруге рұқсат беретін Rust трейті."
+    },
+    {
+      "subject": {
+        "surface": "drop",
+        "root": "drop",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "трейт",
+        "root": "трейт",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Drop трейті — айнымалы өмір сүру кезеңі аяқталғанда орындалатын тазалау функциясы."
+    },
+    {
+      "subject": {
+        "surface": "unsafe",
+        "root": "unsafe",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "арнайы блок",
+        "root": "арнайы блок",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust_advanced",
+      "source": {
+        "pack": "world_core/programming_rust_advanced.jsonl",
+        "sample_id": "rustadv_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Unsafe — Rust қауіпсіздік кепілдіктерін айналып өтуге арналған блок."
     },
     {
       "subject": {
