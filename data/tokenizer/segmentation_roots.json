@@ -978,6 +978,41 @@
       "final_sound_class": "vowel"
     },
     {
+      "id": "noun_v4_42_0_rust_cyr",
+      "root": "руст",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_42_0_python_cyr",
+      "root": "питон",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_v4_42_0_java_cyr",
+      "root": "джава",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_42_0_kompilyator",
+      "root": "компилятор",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_42_0_interpretator",
+      "root": "интерпретатор",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
       "id": "verb_v4_41_0_jatyr",
       "root": "жатыр",
       "part_of_speech": "verb",

@@ -378,6 +378,16 @@ impl Tool {
                     ("кісі", "адам"),   // person (formal ↔ neutral)
                     ("тұлға", "адам"),  // figure ↔ person (in factoid contexts)
                     ("ел", "мемлекет"), // country ↔ state
+                    // **v4.42.0** — Cyrillic transliterations of
+                    // common programming-language proper nouns.
+                    // Lets «Руст туралы не білесіз?» (Cyrillic)
+                    // hit the curated `programming_rust` /
+                    // `programming_languages` facts indexed under
+                    // the Latin spelling. Conservative — only the
+                    // top-3 most likely typed in Cyrillic.
+                    ("руст", "rust"),
+                    ("питон", "python"),
+                    ("джава", "java"),
                 ];
                 let mut matches: Vec<&ReasFact> = ctx
                     .extracted

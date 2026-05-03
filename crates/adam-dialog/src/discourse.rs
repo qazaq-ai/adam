@@ -343,7 +343,10 @@ pub fn input_is_math_expression(input: &str) -> bool {
     // stem-prefix is short but preceded by the `has_numeral_word`
     // gate so an incidental noun starting with «көб»/«бөл»/«қос»
     // can't trigger math-mode by itself.
-    const MATH_VERB_STEMS: &[&str] = &["көбейт", "бөл", "қос", "есепте"];
+    // **v4.42.0** — added `азайт*` (decrease / subtract) as a
+    // fifth math-verb stem; pairs with the new sequel-clause
+    // multi-step evaluator.
+    const MATH_VERB_STEMS: &[&str] = &["көбейт", "бөл", "қос", "есепте", "азайт"];
     // `ал` (subtract / take) is too short to use as a prefix —
     // checked below as a closed set of inflected forms.
     // **v4.41.0** — closed set of `ал` (subtract / take) inflected
@@ -587,8 +590,81 @@ enum ArithToken {
 /// number words AND verb stems with Kazakh case morphology. Sharing
 /// internals would mix two unrelated parse strategies.
 pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
+    // **v4.42.0** — multi-clause support. Split input by commas /
+    // sequencing connectives («және» — "and", «содан кейін» — "then",
+    // «соңында» — "at the end") so chained operations like
+    // «Беске жетіні қоссақ, екіге көбейтеміз, үшке бөлеміз және
+    // бесті азайтамыз» — ((5+7)*2)/3-5 = 3 — evaluate left-to-right
+    // with the running accumulator carried between clauses.
+    //
+    // Pipeline:
+    //   - First clause: must provide BOTH operands (2 numbers with
+    //     explicit case morphology) and one math verb. Result is
+    //     the seed accumulator.
+    //   - Each subsequent clause: one operand + one verb; the
+    //     accumulator becomes the left operand, the new operand
+    //     the right.
+    //   - Any clause failing to satisfy this shape → return None
+    //     and let the planner pick math_refusal.
     let lower = input.to_lowercase();
-    let raw_tokens: Vec<&str> = lower
+    let normalized: String = lower
+        .replace(',', " __CLAUSE_SEP__ ")
+        .replace(" және ", " __CLAUSE_SEP__ ")
+        .replace(" содан кейін ", " __CLAUSE_SEP__ ")
+        .replace(" соңында ", " __CLAUSE_SEP__ ");
+    let clauses: Vec<&str> = normalized
+        .split("__CLAUSE_SEP__")
+        .map(str::trim)
+        .filter(|c| !c.is_empty())
+        .collect();
+    if clauses.is_empty() {
+        return None;
+    }
+    let mut iter = clauses.iter();
+    // First clause — bootstrap with two operands.
+    let first = iter.next()?;
+    let mut accumulator = single_clause_kazakh_math(first)?;
+    // Subsequent clauses — apply one op against running accumulator.
+    // Trailing non-math clauses («нәтижесі қандай болады») are
+    // skipped (return None from sequel parser → treat as appendage,
+    // not failure).
+    for clause in iter {
+        if let Some(next) = sequel_clause_kazakh_math(clause, accumulator) {
+            accumulator = next;
+        } else if clause_has_math_verb(clause) {
+            // Math verb present but couldn't parse → real failure.
+            return None;
+        }
+        // No math verb → trailing rhetorical appendage; ignore.
+    }
+    Some(accumulator)
+}
+
+fn clause_has_math_verb(clause: &str) -> bool {
+    let lowered = clause.to_lowercase();
+    lowered.split(|c: char| !c.is_alphabetic()).any(|w| {
+        !w.is_empty()
+            && (w.starts_with("көбейт")
+                || w.starts_with("бөл")
+                || w.starts_with("қос")
+                || w.starts_with("есепте")
+                || w.starts_with("азайт")
+                || matches!(
+                    w,
+                    "алу"
+                        | "алса"
+                        | "алсам"
+                        | "алсаң"
+                        | "алсаңыз"
+                        | "алыңыз"
+                        | "алғанда"
+                        | "алып"
+                ))
+    })
+}
+
+fn single_clause_kazakh_math(clause: &str) -> Option<i64> {
+    let raw_tokens: Vec<&str> = clause
         .split(|c: char| !c.is_alphabetic())
         .filter(|t| !t.is_empty())
         .collect();
@@ -600,7 +676,26 @@ pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
     if operands.len() != 2 {
         return None;
     }
-    let (a, b) = (operands[0], operands[1]);
+    apply_kazakh_math_op(op, operands[0], operands[1])
+}
+
+fn sequel_clause_kazakh_math(clause: &str, accumulator: i64) -> Option<i64> {
+    let raw_tokens: Vec<&str> = clause
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let op = detect_kazakh_math_op(&raw_tokens)?;
+    let operands = extract_kazakh_number_operands(&raw_tokens);
+    // Sequel clauses provide exactly ONE additional operand —
+    // the accumulator from previous clauses serves as the left
+    // operand. «Екіге көбейтеміз» = «running × 2».
+    if operands.len() != 1 {
+        return None;
+    }
+    apply_kazakh_math_op(op, accumulator, operands[0])
+}
+
+fn apply_kazakh_math_op(op: KazakhMathOp, a: i64, b: i64) -> Option<i64> {
     match op {
         KazakhMathOp::Add => a.checked_add(b),
         KazakhMathOp::Sub => a.checked_sub(b),
@@ -639,6 +734,11 @@ fn detect_kazakh_math_op(tokens: &[&str]) -> Option<KazakhMathOp> {
         }
         if t.starts_with("қос") {
             return Some(KazakhMathOp::Add);
+        }
+        // **v4.42.0** — `азайт*` (decrease / subtract) — alternate
+        // verb stem for subtraction. «Бесті азайт» = «subtract 5».
+        if t.starts_with("азайт") {
+            return Some(KazakhMathOp::Sub);
         }
     }
     // `ал` separately because of its short length — accept only when

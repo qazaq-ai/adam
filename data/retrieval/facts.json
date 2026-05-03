@@ -1,7 +1,7 @@
 {
-  "version": "4.40.5",
+  "version": "4.41.0",
   "status": "completed",
-  "elapsed_s": 73,
+  "elapsed_s": 64,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 1999,
+    "facts_total": 2029,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,10 +27,10 @@
       "has": 62,
       "has_quantity": 34,
       "in_domain": 24,
-      "is_a": 1520,
+      "is_a": 1546,
       "lives_in": 8,
       "part_of": 230,
-      "related_to": 63
+      "related_to": 67
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -71,6 +71,7 @@
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/professions.jsonl": 40,
+      "world_core/programming_languages.jsonl": 30,
       "world_core/programming_rust.jsonl": 181,
       "world_core/proverbs.jsonl": 43,
       "world_core/role_bridges.jsonl": 53,
@@ -30782,6 +30783,606 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Жаттықтырушы — маман."
+    },
+    {
+      "subject": {
+        "surface": "бағдарламалау тілі",
+        "root": "бағдарламалау тілі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "формалды тіл",
+        "root": "формалды тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бағдарламалау тілі — формалды тіл."
+    },
+    {
+      "subject": {
+        "surface": "компиляцияланатын тіл",
+        "root": "компиляцияланатын тіл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау тілі",
+        "root": "бағдарламалау тілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Компиляцияланатын тіл — машиналық кодқа алдын ала аударылатын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "интерпретацияланатын тіл",
+        "root": "интерпретацияланатын тіл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау тілі",
+        "root": "бағдарламалау тілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Интерпретацияланатын тіл — орындалу барысында жолма-жол өңделетін бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "гибридтік тіл",
+        "root": "гибридтік тіл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау тілі",
+        "root": "бағдарламалау тілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гибридтік тіл — алдымен байт-кодқа компиляцияланатын, кейін виртуалды машинада интерпретацияланатын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "компиляция",
+        "root": "компиляция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "процесс",
+        "root": "процесс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Компиляция — бастапқы кодты машиналық кодқа аудару процесі."
+    },
+    {
+      "subject": {
+        "surface": "интерпретация",
+        "root": "интерпретация",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "процесс",
+        "root": "процесс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Интерпретация — бастапқы кодты тікелей орындау процесі."
+    },
+    {
+      "subject": {
+        "surface": "компилятор",
+        "root": "компилятор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарлама",
+        "root": "бағдарлама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Компилятор — бастапқы кодты машиналық кодқа аударатын бағдарлама."
+    },
+    {
+      "subject": {
+        "surface": "интерпретатор",
+        "root": "интерпретатор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарлама",
+        "root": "бағдарлама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Интерпретатор — кодты жолма-жол орындайтын бағдарлама."
+    },
+    {
+      "subject": {
+        "surface": "статикалық типтеу",
+        "root": "статикалық типтеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "типтеу жүйесі",
+        "root": "типтеу жүйесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Статикалық типтеу — айнымалылардың типтері компиляция кезінде тексерілетін жүйе."
+    },
+    {
+      "subject": {
+        "surface": "динамикалық типтеу",
+        "root": "динамикалық типтеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "типтеу жүйесі",
+        "root": "типтеу жүйесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Динамикалық типтеу — айнымалылардың типтері орындалу барысында анықталатын жүйе."
+    },
+    {
+      "subject": {
+        "surface": "c",
+        "root": "c",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "компиляцияланатын тіл",
+        "root": "компиляцияланатын тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "C — компиляцияланатын жүйелік бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "c++",
+        "root": "c++",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "компиляцияланатын тіл",
+        "root": "компиляцияланатын тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "C++ — компиляцияланатын объектіге бағытталған бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "rust",
+        "root": "rust",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "компиляцияланатын тіл",
+        "root": "компиляцияланатын тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Rust — компиляцияланатын жүйелік және қауіпсіз жадтармен жұмыс жасайтын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "go",
+        "root": "go",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "компиляцияланатын тіл",
+        "root": "компиляцияланатын тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Go — Google әзірлеген компиляцияланатын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "swift",
+        "root": "swift",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "компиляцияланатын тіл",
+        "root": "компиляцияланатын тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Swift — Apple әзірлеген компиляцияланатын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "java",
+        "root": "java",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "гибридтік тіл",
+        "root": "гибридтік тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Java — байт-кодқа компиляцияланып, JVM-де орындалатын гибридтік бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "kotlin",
+        "root": "kotlin",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "гибридтік тіл",
+        "root": "гибридтік тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Kotlin — JVM-ге арналған, Java-мен үйлесімді гибридтік бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "c#",
+        "root": "c#",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "гибридтік тіл",
+        "root": "гибридтік тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "C# — Microsoft әзірлеген, .NET ортасында орындалатын гибридтік бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "python",
+        "root": "python",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "интерпретацияланатын тіл",
+        "root": "интерпретацияланатын тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Python — кең таралған, оқуға қарапайым интерпретацияланатын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "javascript",
+        "root": "javascript",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "интерпретацияланатын тіл",
+        "root": "интерпретацияланатын тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "JavaScript — веб-парақтарда орындалатын интерпретацияланатын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "typescript",
+        "root": "typescript",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау тілі",
+        "root": "бағдарламалау тілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "TypeScript — статикалық типтеуі бар, JavaScript-ке транспиляцияланатын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "ruby",
+        "root": "ruby",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "интерпретацияланатын тіл",
+        "root": "интерпретацияланатын тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ruby — динамикалық типтеуі бар интерпретацияланатын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "php",
+        "root": "php",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "интерпретацияланатын тіл",
+        "root": "интерпретацияланатын тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "PHP — веб-серверде орындалатын интерпретацияланатын бағдарламалау тілі."
+    },
+    {
+      "subject": {
+        "surface": "sql",
+        "root": "sql",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау тілі",
+        "root": "бағдарламалау тілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "SQL — деректер базасына сұраныс жасауға арналған декларативтік тіл."
+    },
+    {
+      "subject": {
+        "surface": "html",
+        "root": "html",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "белгілеу тілі",
+        "root": "белгілеу тілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "HTML — веб-парақ құрылымын белгілейтін белгілеу тілі."
+    },
+    {
+      "subject": {
+        "surface": "css",
+        "root": "css",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "стиль тілі",
+        "root": "стиль тілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "CSS — веб-парақ безендіруіне арналған стиль тілі."
+    },
+    {
+      "subject": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "бағдарламалау тілдер тізімі",
+        "root": "бағдарламалау тілдер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Адамға белгілі бағдарламалау тілдері: Rust, C, C++, Go, Swift, Java, Kotlin, C#, Python, JavaScript, TypeScript, Ruby, PHP, SQL, HTML, CSS."
+    },
+    {
+      "subject": {
+        "surface": "компиляцияланатын тіл",
+        "root": "компиляцияланатын тіл",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "компиляцияланатын тілдер тізімі",
+        "root": "компиляцияланатын тілдер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Танымал компиляцияланатын тілдер: C, C++, Rust, Go, Swift."
+    },
+    {
+      "subject": {
+        "surface": "интерпретацияланатын тіл",
+        "root": "интерпретацияланатын тіл",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "интерпретацияланатын тілдер тізімі",
+        "root": "интерпретацияланатын тілдер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Танымал интерпретацияланатын тілдер: Python, JavaScript, Ruby, PHP."
+    },
+    {
+      "subject": {
+        "surface": "гибридтік тіл",
+        "root": "гибридтік тіл",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "гибридтік тілдер тізімі",
+        "root": "гибридтік тілдер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Танымал гибридтік тілдер: Java, Kotlin, C#."
     },
     {
       "subject": {

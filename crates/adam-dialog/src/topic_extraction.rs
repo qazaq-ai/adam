@@ -509,6 +509,22 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ақын-жазушылар тізімі",
     "ғалымдар тізімі",
     "спортшылар тізімі",
+    // **v4.42.0** — programming-languages compound objects from
+    // `data/world_core/programming_languages.jsonl`. List-summary
+    // forms + classification forms + structural type-system
+    // compounds + style/markup-language compounds.
+    "интерпретацияланатын тілдер тізімі",
+    "компиляцияланатын тілдер тізімі",
+    "интерпретацияланатын тіл",
+    "компиляцияланатын тіл",
+    "бағдарламалау тілдер тізімі",
+    "гибридтік тілдер тізімі",
+    "динамикалық типтеу",
+    "статикалық типтеу",
+    "гибридтік тіл",
+    "белгілеу тілі",
+    "типтеу жүйесі",
+    "стиль тілі",
     // **v4.38.0** — role-bridges expansion (8 new compound bridge
     // objects from `data/world_core/role_bridges.jsonl`). These are
     // structural multi-word categories used as IsA targets by the

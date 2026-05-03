@@ -1,10 +1,10 @@
 {
-  "version": "4.40.5",
-  "lexicon_roots": 14584,
+  "version": "4.41.0",
+  "lexicon_roots": 14588,
   "min_root_len": 3,
   "total_words": 3866812,
-  "covered_words": 3333455,
-  "overall_coverage": 0.86206806,
+  "covered_words": 3333500,
+  "overall_coverage": 0.8620797,
   "packs": [
     {
       "pack": "tatoeba_kazakh_pack.json",
@@ -100,9 +100,9 @@
       "pack": "wikipedia_kz_pack.json",
       "total_words": 1683182,
       "unique_words": 173857,
-      "covered_words": 1422646,
-      "coverage_ratio": 0.8452122,
-      "uncovered_unique": 260536,
+      "covered_words": 1422670,
+      "coverage_ratio": 0.84522647,
+      "uncovered_unique": 260512,
       "top_uncovered": [
         {
           "word": "оның",
@@ -280,9 +280,9 @@
       "pack": "cc100_kk_pack.json",
       "total_words": 1684920,
       "unique_words": 141243,
-      "covered_words": 1431825,
-      "coverage_ratio": 0.8497881,
-      "uncovered_unique": 253095,
+      "covered_words": 1431845,
+      "coverage_ratio": 0.8498,
+      "uncovered_unique": 253075,
       "top_uncovered": [
         {
           "word": "оның",
@@ -730,9 +730,9 @@
       "pack": "rust_book_kk_pack.json",
       "total_words": 22608,
       "unique_words": 5327,
-      "covered_words": 17712,
-      "coverage_ratio": 0.7834395,
-      "uncovered_unique": 4896,
+      "covered_words": 17713,
+      "coverage_ratio": 0.78348374,
+      "uncovered_unique": 4895,
       "top_uncovered": [
         {
           "word": "rust",

@@ -7,6 +7,60 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.41.5] — 2026-05-03 — Multi-clause math + IT knowledge expansion + Cyrillic Rust — 6-innovation bundle from real-REPL transcript
+
+**Driven by 2026-05-03 user dialog test.** Three concrete gaps surfaced in real session: chained-operation Kazakh math («Беске жетіні қоссақ, екіге көбейтеміз, үшке бөлеміз және бесті азайтамыз»), absent classification of programming languages beyond Rust (Python / Java / C / etc., compiled vs interpreted), and Cyrillic-spelled tech proper nouns («Руст» not matching Latin «Rust» fact base). All closed.
+
+### Real-REPL gap closures
+
+| Query | Pre-v4.41.5 | Post-v4.41.5 |
+|---|---|---|
+| Беске жетіні қоссақ, екіге көбейтеміз, үшке бөлеміз және бесті азайтамыз | refusal (single-clause-only evaluator) | "**Есептедім: 3 (үш)**" — ((5+7)×2)/3-5 |
+| Жетіге бесті қосып, екіні азайтсақ, нәтижесі қандай болады | refusal | "**Есептедім: 10 (он)**" — (7+5)-2 |
+| Қандай компиляцияланатын тілдер бар? | "Тіл — қарым-қатынас құралы" (head-noun fallback) | "**Танымал компиляцияланатын тілдер: C, C++, Rust, Go, Swift.**" |
+| Қандай интерпретацияланатын тілдер бар? | (no fact) | "**Танымал интерпретацияланатын тілдер: Python, JavaScript, Ruby, PHP.**" |
+| Гибридтік тілдер қандай? | (no fact) | "**Танымал гибридтік тілдер: Java, Kotlin, C#.**" |
+| Руст туралы не білесіз? | "Руст жайында анық емес" (no Cyrillic→Latin synonym) | "**Rust — компиляцияланатын жүйелік және қауіпсіз жадтармен жұмыс жасайтын бағдарламалау тілі.**" |
+| Питон туралы не білесіз? | (Python not registered) | "**Python — кең таралған, оқуға қарапайым интерпретацияланатын бағдарламалау тілі.**" |
+| Single-clause math («Бесті отызға көбейтсем») / qty queries / bug 4 / greetings | unchanged | unchanged ✓ |
+
+### Innovations (6)
+
+**(1) Multi-clause math evaluator** in `try_evaluate_kazakh_word_math`. Splits input by clause boundaries (`,` / «және» / «содан кейін» / «соңында»). First clause provides BOTH operands (seed accumulator); each subsequent clause provides ONE operand and one math verb (running accumulator becomes left operand). Trailing rhetorical clauses without a math verb («нәтижесі қандай болады») are skipped — only clauses with a real math verb count for parse failures. Closes the v4.41.0 single-clause-only limitation.
+
+**(2) `азайт*` as fifth math-verb stem.** Sub variant alongside `ал*` — modern Kazakh uses both for "subtract / decrease". «Бесті азайт» = "subtract 5".
+
+**(3) `programming_languages.jsonl` — new world_core domain (30 entries).** Curated facts on Kazakh CS terminology: 4 type bridges (бағдарламалау тілі / компиляцияланатын / интерпретацияланатын / гибридтік тіл), 4 process bridges (компиляция / интерпретация / компилятор / интерпретатор), 2 typing-system definitions (статикалық / динамикалық), 13 specific languages (C / C++ / Rust / Go / Swift / Java / Kotlin / C# / Python / JavaScript / TypeScript / Ruby / PHP / SQL / HTML / CSS) with classification, 4 list-summary facts (full list / compiled / interpreted / hybrid).
+
+**(4) 5 new lexicon entries** in `segmentation_roots.json` — three Cyrillic transliterations of programming-language proper nouns (руст / питон / джава) + tooling terms (компилятор / интерпретатор). Lets Cyrillic-typed queries match Latin-spelled fact subjects.
+
+**(5) `SUBJECT_SYNONYMS` extension** with 3 Cyrillic→Latin pairs (руст→rust / питон→python / джава→java). Closes the «Руст туралы» query failing to find Rust facts.
+
+**(6) `MULTIWORD_ENTITIES` sync** — 12 new compound bridge objects (компиляцияланатын тіл / интерпретацияланатын тіл / гибридтік тіл / типтеу жүйесі / стиль тілі / белгілеу тілі + 4 list-summary objects + 2 typing-system compounds). Required by the `world_core_multiword_coverage` invariant test.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **877 passing** unchanged |
+| Multi-clause math (4 ops chain) | ✓ ((5+7)×2)/3-5 = 3 |
+| Multi-clause with rhetorical tail | ✓ (7+5)-2 = 10, ignoring «нәтижесі қандай болады» |
+| Programming-language list queries (compiled / interpreted / hybrid) | ✓ all surface curated lists |
+| Cyrillic Rust / Python | ✓ surface Latin-indexed facts via SUBJECT_SYNONYMS |
+| Anti-regression — single-clause math / qty / Абай / bug 4 / greetings | ✓ unchanged |
+| Foundation: 1784 entries / 1950 facts / 40 domains / 25 567 derivations | ✓ |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.5` reflects 6 substantive innovations bundled (per `feedback_versioning_post_1_0` v4.39.0 reaffirmation). Multi-clause math is a meaningful capability extension but doesn't add a new module / public API surface — it's a richer parser inside the existing `try_evaluate_kazakh_word_math`. Programming-languages new domain is patch-tier per v4.4.10 rule («new world_core domain file with N entries is patch-tier regardless of fact count»). Together: solid `.5` patch, not a minor.
+
+### Deferred
+
+- More transliterations (сишарп / котлин / тайпскрипт) — added on REPL demand.
+- Multi-clause math with non-trivial precedence («Беске жетіні қоссақ, оған екіні көбейтсек» where «оған» refers to the prior result) — current version uses left-to-right sequential semantics only.
+- Curated examples for non-Rust languages — Python / JS code samples in corpus.
+
 ## [4.41.0] — 2026-05-03 — Word-form math (Kazakh-language arithmetic) — 7-innovation bundle; coverage 85.28 % → 86.21 %
 
 **First minor in v4.41+ arc.** New kernel-signature capability: adam now understands and computes Kazakh-language arithmetic phrasings («Бесті отызға көбейтсем», «Жүзді онға бөл», «Бес пен үш қос»), returning both digit and word-form results («Есептедім: 150 (жүз елу)»). User-driven feature: 2026-05-03 dialog test surfaced math expressed in natural Kazakh without operators; previously refused via the `math_refusal` template («Санақ-есептеу әлі қазақша сөйлемдер арқылы менің мүмкіндігімде жоқ»).
