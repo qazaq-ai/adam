@@ -17785,13 +17785,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_apt_duerbihler",
-      "root": "дүрбілер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "verb_apt_duerdit",
       "root": "дүрдит",
       "part_of_speech": "verb",
@@ -22172,13 +22165,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_apt_jangghaqtar",
-      "root": "жаңғақтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_apt_jangghalaq",
@@ -37770,13 +37756,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_apt_qaymaqtar",
-      "root": "қаймақтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "verb_apt_qaymyq",
       "root": "қаймық",
       "part_of_speech": "verb",
@@ -40925,13 +40904,6 @@
       "part_of_speech": "verb",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_apt_qaryzdar",
-      "root": "қарыздар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "adjective_apt_qaryzdyq",
@@ -74798,13 +74770,6 @@
       "part_of_speech": "adjective",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_apt_uegihndihler",
-      "root": "үгінділер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_apt_uegihndih",

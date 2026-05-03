@@ -834,7 +834,28 @@ pub fn synthesise_noun(root: &str, features: NounFeatures) -> String {
             Case::Nominative => {}
             Case::Genitive => acc.apply(GENITIVE),
             Case::Dative => acc.apply(DATIVE),
-            Case::Accusative => acc.apply(ACCUSATIVE),
+            // **v4.38.5** — for P3 + Accusative, the pronominal-н
+            // buffer injected above IS itself the accusative marker
+            // (Kazakh grammar: «N + P3 + Acc» surfaces as «N-ы + н»,
+            // not «N-ы + н + ды»). Skipping the regular ACCUSATIVE
+            // template here aligns synthesis with the actual form.
+            // Closes the FST gap exposed by the v4.38.5 lexicon
+            // pollution purge: «аймақтарын» / «тұлғаларын» /
+            // «жазушыларын» now derive correctly from bare roots
+            // (аймақ / тұлға / жазушы) + Pl + P3 + Acc, instead of
+            // requiring pre-inflected lexicon entries. The reverse
+            // (analyse) direction inherits the fix because
+            // analyse() runs synthesise() over candidate features
+            // and matches against the input surface.
+            //
+            // For other cases (Dative / Locative / Ablative) the
+            // pronominal-н is a true buffer between the P3 vowel
+            // and the case suffix, so those templates still apply.
+            Case::Accusative => {
+                if !needs_pronominal_n {
+                    acc.apply(ACCUSATIVE);
+                }
+            }
             Case::Locative => acc.apply(LOCATIVE),
             Case::Ablative => acc.apply(ABLATIVE),
             Case::Instrumental => acc.apply(INSTRUMENTAL),

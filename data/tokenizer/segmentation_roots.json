@@ -684,27 +684,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_aymaqtar",
-      "root": "аймақтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_aymaqtary",
-      "root": "аймақтары",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_aymaqtaryn",
-      "root": "аймақтарын",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "nasal"
-    },
-    {
       "id": "noun_aymaqtagh",
       "root": "аймақтағ",
       "part_of_speech": "noun",
@@ -896,13 +875,6 @@
     {
       "id": "noun_aktih",
       "root": "акті",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_aktihlerih",
-      "root": "актілері",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
@@ -1599,13 +1571,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_aspektihler",
-      "root": "аспектілер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_assa",
@@ -2845,13 +2810,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_aqyndar",
-      "root": "ақындар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_aqyndyq",
@@ -4569,13 +4527,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_boekterlerihn",
-      "root": "бөктерлерін",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "nasal"
-    },
-    {
       "id": "noun_boekterihn",
       "root": "бөктерін",
       "part_of_speech": "noun",
@@ -4653,32 +4604,11 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_boelihkter",
-      "root": "бөліктер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_boelihkterih",
-      "root": "бөліктері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_boelihm",
       "root": "бөлім",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_boelihmder",
-      "root": "бөлімдер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_boelihmshe",
@@ -5465,13 +5395,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_v1_0011_n",
-      "root": "деректер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_djaz",
       "root": "джаз",
       "part_of_speech": "noun",
@@ -5519,13 +5442,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_dialektihler",
-      "root": "диалектілер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_dialogtihk",
@@ -6599,20 +6515,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_erekshelihkter",
-      "root": "ерекшеліктер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_erekshelihkterih",
-      "root": "ерекшеліктері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_eren",
       "root": "ерен",
       "part_of_speech": "noun",
@@ -6814,13 +6716,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_eskertkihshter",
-      "root": "ескерткіштер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_eskerihl",
@@ -7199,27 +7094,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_engbekter",
-      "root": "еңбектер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_engbekterih",
-      "root": "еңбектері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_engbekterihn",
-      "root": "еңбектерін",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "nasal"
     },
     {
       "id": "verb_engkey",
@@ -7887,13 +7761,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_jauyngerlerih",
-      "root": "жауынгерлері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_jauyngerlihk",
       "root": "жауынгерлік",
       "part_of_speech": "noun",
@@ -7950,13 +7817,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_jaghalaularyn",
-      "root": "жағалауларын",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "nasal"
-    },
-    {
       "id": "noun_jaghalauy",
       "root": "жағалауы",
       "part_of_speech": "noun",
@@ -7994,13 +7854,6 @@
     {
       "id": "noun_jaghday",
       "root": "жағдай",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_jaghdaylar",
-      "root": "жағдайлар",
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiced_consonant"
@@ -8491,13 +8344,6 @@
     {
       "id": "noun_jengihmpaz",
       "root": "жеңімпаз",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_jengihmpazdar",
-      "root": "жеңімпаздар",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiced_consonant"
@@ -9350,20 +9196,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_juumystar",
-      "root": "жұмыстар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_juumystary",
-      "root": "жұмыстары",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_juumyssh",
       "root": "жұмысш",
       "part_of_speech": "noun",
@@ -9411,13 +9243,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_juurnaqtar",
-      "root": "жұрнақтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_juurt",
@@ -10699,13 +10524,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_kezengder",
-      "root": "кезеңдер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_kezengih",
@@ -12155,20 +11973,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_kaesihporyndar",
-      "root": "кәсіпорындар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_kaesihporyndary",
-      "root": "кәсіпорындары",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "vowel"
     },
     {
       "id": "noun_kaesihptihk",
@@ -13760,20 +13564,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_muesheler",
-      "root": "мүшелер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_mueshelerih",
-      "root": "мүшелері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_mueshelihgih",
       "root": "мүшелігі",
       "part_of_speech": "noun",
@@ -14166,13 +13956,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_maelihmetter",
-      "root": "мәліметтер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_maelihmetihnshe",
       "root": "мәліметінше",
       "part_of_speech": "noun",
@@ -14273,20 +14056,6 @@
     {
       "id": "noun_maesele",
       "root": "мәселе",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_maeseleler",
-      "root": "мәселелер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_maeselelerih",
-      "root": "мәселелері",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
@@ -14724,13 +14493,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_negihzder",
-      "root": "негіздер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_negihzdeush",
@@ -16623,13 +16385,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_raemihzder",
-      "root": "рәміздер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_raesihm",
       "root": "рәсім",
       "part_of_speech": "noun",
@@ -17188,13 +16943,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_saqshylar",
-      "root": "сақшылар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_sangyrauquulaq",
@@ -17932,13 +17680,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_studentterih",
-      "root": "студенттері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_studenttihk",
       "root": "студенттік",
       "part_of_speech": "noun",
@@ -17976,13 +17717,6 @@
     {
       "id": "noun_subektih",
       "root": "субъекті",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_subektihlerih",
-      "root": "субъектілері",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
@@ -18247,13 +17981,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_syngarlary",
-      "root": "сыңарлары",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_ses",
       "root": "сэс",
       "part_of_speech": "noun",
@@ -18301,20 +18028,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_sihlemder",
-      "root": "сілемдер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_sihlemderih",
-      "root": "сілемдері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
     },
     {
       "id": "noun_sihleusihn",
@@ -18630,13 +18343,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_suuraqtar",
-      "root": "сұрақтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_suukhbat",
@@ -19071,13 +18777,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_talshyqtar",
-      "root": "талшықтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_talgham",
@@ -19806,13 +19505,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_tetihkter",
-      "root": "тетіктер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_teu",
@@ -21852,13 +21544,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_taesihlder",
-      "root": "тәсілдер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_taet",
       "root": "тәт",
       "part_of_speech": "noun",
@@ -22377,13 +22062,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_universitetterih",
-      "root": "университеттері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_universitetih",
       "root": "университеті",
       "part_of_speech": "noun",
@@ -22564,13 +22242,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_faktihler",
-      "root": "фактілер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_fakultetih",
@@ -24155,13 +23826,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_shyghanaqtar",
-      "root": "шығанақтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "modal_shyghar",
       "root": "шығар",
       "part_of_speech": "modal",
@@ -24531,13 +24195,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_shoegihndihler",
-      "root": "шөгінділер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_shoek",
@@ -25191,13 +24848,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_ihzbasarlar",
-      "root": "ізбасарлар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_ihzgihlihk",
       "root": "ізгілік",
       "part_of_speech": "noun",
@@ -25597,13 +25247,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_ghalymdar",
-      "root": "ғалымдар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_ghan",
       "root": "ған",
       "part_of_speech": "noun",
@@ -25716,20 +25359,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_ghylymdar",
-      "root": "ғылымдар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_ghylymdary",
-      "root": "ғылымдары",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_ghylymi",
       "root": "ғылыми",
       "part_of_speech": "noun",
@@ -25826,13 +25455,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_qabattary",
-      "root": "қабаттары",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "vowel"
     },
     {
       "id": "noun_qabaty",
@@ -26248,13 +25870,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_qayratkerler",
-      "root": "қайраткерлер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_qayraq",
       "root": "қайрақ",
       "part_of_speech": "noun",
@@ -26458,13 +26073,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_qaldyqtar",
-      "root": "қалдықтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_qali",
       "root": "қали",
       "part_of_speech": "noun",
@@ -26603,13 +26211,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_qalghandar",
-      "root": "қалғандар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_qalq",
@@ -27158,20 +26759,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_qasietter",
-      "root": "қасиеттер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_qasietterih",
-      "root": "қасиеттері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_qasietih",
       "root": "қасиеті",
       "part_of_speech": "noun",
@@ -27310,13 +26897,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_qatynastar",
-      "root": "қатынастар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_qatys",
@@ -27471,13 +27051,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_qaghidalar",
-      "root": "қағидалар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_qaq",
@@ -28824,13 +28397,6 @@
       "final_sound_class": "vowel"
     },
     {
-      "id": "noun_qystaular",
-      "root": "қыстаулар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_qystaq",
       "root": "қыстақ",
       "part_of_speech": "noun",
@@ -29258,13 +28824,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_quuqyqtar",
-      "root": "құқықтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_quuqyqtyq",
       "root": "құқықтық",
       "part_of_speech": "noun",
@@ -29484,13 +29043,6 @@
     {
       "id": "noun_uekihl",
       "root": "үкіл",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_uekihmder",
-      "root": "үкімдер",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiced_consonant"
@@ -29979,20 +29531,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_uuyymdar",
-      "root": "ұйымдар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_uuyymdary",
-      "root": "ұйымдары",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "verb_uuyymdas",
       "root": "ұйымдас",
       "part_of_speech": "verb",
@@ -30278,13 +29816,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "voiceless_consonant"
-    },
-    {
-      "id": "noun_uurpaqtar",
-      "root": "ұрпақтар",
-      "part_of_speech": "noun",
-      "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "verb_uurys",
@@ -30882,13 +30413,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_aedihster",
-      "root": "әдістер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
       "id": "noun_aedihsih",
       "root": "әдісі",
       "part_of_speech": "noun",
@@ -31076,13 +30600,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_aekihmder",
-      "root": "әкімдер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_aekihmdihgih",
@@ -31477,13 +30994,6 @@
       "final_sound_class": "voiceless_consonant"
     },
     {
-      "id": "noun_aereketterih",
-      "root": "әрекеттері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_aereketih",
       "root": "әрекеті",
       "part_of_speech": "noun",
@@ -31626,20 +31136,6 @@
     {
       "id": "noun_aeskeri",
       "root": "әскери",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
-      "id": "noun_aeskerler",
-      "root": "әскерлер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_aeskerlerih",
-      "root": "әскерлері",
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "vowel"
@@ -32002,20 +31498,6 @@
       "final_sound_class": "nasal"
     },
     {
-      "id": "noun_oezender",
-      "root": "өзендер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_oezenderih",
-      "root": "өзендері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_oezenih",
       "root": "өзені",
       "part_of_speech": "noun",
@@ -32114,20 +31596,6 @@
       "final_sound_class": "voiced_consonant"
     },
     {
-      "id": "noun_oekihlder",
-      "root": "өкілдер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_oekihlderih",
-      "root": "өкілдері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
-    },
-    {
       "id": "noun_oekihlet",
       "root": "өкілет",
       "part_of_speech": "noun",
@@ -32196,13 +31664,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_oelengder",
-      "root": "өлеңдер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
     },
     {
       "id": "noun_oelengihn",
@@ -32490,20 +31951,6 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "nasal"
-    },
-    {
-      "id": "noun_oenihmder",
-      "root": "өнімдер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_oenihmderih",
-      "root": "өнімдері",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
-      "final_sound_class": "vowel"
     },
     {
       "id": "noun_oenihmih",
@@ -34204,13 +33651,6 @@
       "root": "ғұндар",
       "part_of_speech": "noun",
       "vowel_harmony": "back",
-      "final_sound_class": "voiced_consonant"
-    },
-    {
-      "id": "noun_v4_11_0_үйсіндер",
-      "root": "үйсіндер",
-      "part_of_speech": "noun",
-      "vowel_harmony": "front",
       "final_sound_class": "voiced_consonant"
     },
     {
