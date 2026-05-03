@@ -99,6 +99,23 @@ pub fn copula_is_a(
     if any_modal {
         return;
     }
+    // **v4.36.7** — evidentiality guard. When the source sentence
+    // has past-evidential / reportative tense (PastEvidential or
+    // PastReportative — both auto-mark `evidence: Some(Hearsay)`),
+    // the speaker is reporting hearsay, not asserting first-hand
+    // knowledge. Promoting «X — Y болыпты» («apparently X is Y, they
+    // say») to the graph as `(X, IsA, Y)` would lose the
+    // evidentiality and recompose hearsay as confirmed knowledge.
+    // Refuse extraction. Same conservative pattern as the negation
+    // and modality guards. Audit at v4.36.6: zero current IsA
+    // Grammar facts have Hearsay-marked source — guard is forward-
+    // looking safety net, not a fix for an existing wrong fact.
+    let any_hearsay = sem_frames
+        .iter()
+        .any(|f| matches!(f.evidence, Some(adam_kernel_fst::EvidenceKind::Hearsay)));
+    if any_hearsay {
+        return;
+    }
 
     // LHS must be a single bare nominative noun. Multi-word LHS means
     // the subject is a possessive / adjective-noun construction where
@@ -290,6 +307,16 @@ pub fn locative_lives_in(
     }
     let any_modal = sem_frames.iter().any(|f| f.modality.is_some());
     if any_modal {
+        return;
+    }
+    // **v4.36.7** — evidentiality guard (matches copula_is_a pattern).
+    // Refuse LivesIn extraction when source sentence has past-
+    // evidential / reportative tense — speaker is reporting hearsay
+    // about residence, not asserting first-hand knowledge.
+    let any_hearsay = sem_frames
+        .iter()
+        .any(|f| matches!(f.evidence, Some(adam_kernel_fst::EvidenceKind::Hearsay)));
+    if any_hearsay {
         return;
     }
     // Tokenise + per-token parse. Build a parallel vector of
@@ -1159,6 +1186,16 @@ pub fn nominal_conjunction(
     }
     let any_modal = sem_frames.iter().any(|f| f.modality.is_some());
     if any_modal {
+        return;
+    }
+    // **v4.36.7** — evidentiality guard for nominal_conjunction.
+    // Refuse RelatedTo when source sentence has past-evidential /
+    // reportative tense — speaker is reporting hearsay, not
+    // asserting a relation between X and Y.
+    let any_hearsay = sem_frames
+        .iter()
+        .any(|f| matches!(f.evidence, Some(adam_kernel_fst::EvidenceKind::Hearsay)));
+    if any_hearsay {
         return;
     }
     let tokens: Vec<(String, Option<Analysis>)> = text

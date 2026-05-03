@@ -1,7 +1,7 @@
 {
-  "version": "4.36.6",
+  "version": "4.36.7",
   "status": "completed",
-  "elapsed_s": 33,
+  "elapsed_s": 40,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -17,8 +17,8 @@
   ],
   "counts": {
     "samples_scanned": 3691,
-    "samples_with_facts": 72,
-    "facts_total": 1936,
+    "samples_with_facts": 63,
+    "facts_total": 1927,
     "by_predicate": {
       "after": 7,
       "causes": 23,
@@ -28,19 +28,19 @@
       "has_quantity": 29,
       "in_domain": 24,
       "is_a": 1472,
-      "lives_in": 10,
+      "lives_in": 7,
       "part_of": 228,
-      "related_to": 62
+      "related_to": 56
     },
     "by_pack": {
-      "abai_wikisource_pack.json": 3,
-      "cc100_kk_pack.json": 19,
+      "abai_wikisource_pack.json": 2,
+      "cc100_kk_pack.json": 18,
       "common_voice_kk_pack.json": 3,
       "kazakh_classics_pack.json": 3,
       "kazakh_proverbs_pack.json": 13,
-      "kazakh_textbooks_pack.json": 15,
+      "kazakh_textbooks_pack.json": 11,
       "tatoeba_kazakh_pack.json": 2,
-      "wikipedia_kz_pack.json": 15,
+      "wikipedia_kz_pack.json": 12,
       "world_core/adam_self.jsonl": 33,
       "world_core/animals.jsonl": 42,
       "world_core/astronomy.jsonl": 41,
@@ -124,26 +124,6 @@
     },
     {
       "subject": {
-        "surface": "Керей",
-        "root": "керей",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
-        "surface": "Жәнібек",
-        "root": "жәнібек",
-        "pos": "noun"
-      },
-      "pattern": "X пен Y",
-      "source": {
-        "pack": "wikipedia_kz_pack.json",
-        "sample_id": "wiki_kz_0000075"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Керей мен Жәнібек құрған бұл мемлекеттің билеушілері де Жошы хан ұрпағы Төре әулетінен тараған болатын."
-    },
-    {
-      "subject": {
         "surface": "сыртқы",
         "root": "сыртқ",
         "pos": "noun"
@@ -201,26 +181,6 @@
       },
       "confidence": "Grammar",
       "raw_text": "Әлемдегі ең ұзын құрлықтық шекара — Қазақстан мен Ресей шекарасы (7591 шақырым)."
-    },
-    {
-      "subject": {
-        "surface": "Оңтүстік",
-        "root": "оңтүстік",
-        "pos": "noun"
-      },
-      "predicate": "LivesIn",
-      "object": {
-        "surface": "қалада",
-        "root": "қала",
-        "pos": "noun"
-      },
-      "pattern": "X Y-да тұрады",
-      "source": {
-        "pack": "wikipedia_kz_pack.json",
-        "sample_id": "wiki_kz_0000190"
-      },
-      "confidence": "Grammar",
-      "raw_text": "2018 жылғы 19 маусымға дейін Оңтүстік Қазақстан облысының орталығы болған, бұл қалада қазір 1 028 673 адам тұрады (2019)."
     },
     {
       "subject": {
@@ -301,26 +261,6 @@
       },
       "confidence": "Grammar",
       "raw_text": "Мұндай агроклиматтық жағдайда бидай, қарабидай, арпа, бұршақ, зығыр, қарақұмық, картоп, кейбір көкөніс түрлерін, малазықтық дақылдарды өсіруге мүмкіндік бар."
-    },
-    {
-      "subject": {
-        "surface": "қойнаулар",
-        "root": "қойнау",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
-        "surface": "жағалаулар",
-        "root": "жағалау",
-        "pos": "noun"
-      },
-      "pattern": "X пен Y",
-      "source": {
-        "pack": "wikipedia_kz_pack.json",
-        "sample_id": "wiki_kz_0000378"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Табиғи-рекреациялық ресурстардан қолайлы қойнаулар мен жағалаулар (теңіз, өзен, көл), таулар мен ормандар, минералды сулар, табиғат ескерткіштері, табиғи саябақтар өте көп таралған."
     },
     {
       "subject": {
@@ -624,26 +564,6 @@
     },
     {
       "subject": {
-        "surface": "ШҚО",
-        "root": "шқо",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
-        "surface": "Түркістан",
-        "root": "түркістан",
-        "pos": "noun"
-      },
-      "pattern": "X пен Y",
-      "source": {
-        "pack": "cc100_kk_pack.json",
-        "sample_id": "cc100_kk_0000148"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Осы категория бойынша: « Әдептілік нормаларын бұзған мемлекеттік қызметшілер ШҚО мен Түркістан облысынан болды Жұлдыздай жарқ еткен Денис Тенді дүние жүзі жоқтап қалды »"
-    },
-    {
-      "subject": {
         "surface": "елдің",
         "root": "ел",
         "pos": "noun"
@@ -901,26 +821,6 @@
       },
       "confidence": "Grammar",
       "raw_text": "Ет пен қымыз сықылды ас жоқ дейді, Ол немене жоқтықтың әсері емей?"
-    },
-    {
-      "subject": {
-        "surface": "хан",
-        "root": "хан",
-        "pos": "noun"
-      },
-      "predicate": "LivesIn",
-      "object": {
-        "surface": "қолында",
-        "root": "қолын",
-        "pos": "noun"
-      },
-      "pattern": "X Y-да тұрады",
-      "source": {
-        "pack": "abai_wikisource_pack.json",
-        "sample_id": "abai_00387"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Бір сұлу қыз тұрыпты хан қолында, Хан да жанын қыяды қыз жолында."
     },
     {
       "subject": {
@@ -1244,46 +1144,6 @@
     },
     {
       "subject": {
-        "surface": "тіл",
-        "root": "тіл",
-        "pos": "noun"
-      },
-      "predicate": "LivesIn",
-      "object": {
-        "surface": "қатарында",
-        "root": "қатарын",
-        "pos": "noun"
-      },
-      "pattern": "X Y-да тұрады",
-      "source": {
-        "pack": "kazakh_textbooks_pack.json",
-        "sample_id": "kz_textbook_kz_lang_11_emn_p0004_s02"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Сондай-ақ ол дүниежүзіндегі ауызша және жазбаша тіл мәдениеті қалыптасқан алты жүз тілдің және мемлекеттік мәрте- беге ие екі жүз тілдің қатарында тұр"
-    },
-    {
-      "subject": {
-        "surface": "хан",
-        "root": "хан",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
-        "surface": "Жәнібек",
-        "root": "жәнібек",
-        "pos": "noun"
-      },
-      "pattern": "X пен Y",
-      "source": {
-        "pack": "kazakh_textbooks_pack.json",
-        "sample_id": "kz_textbook_kz_lang_11_emn_p0007_s00"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Ғылыми мәліметтер бойынша, Керей хан мен (Жәнібек хан қол астындағы ру-тайпалармен 1457 жылдың күзінде Шу өңі- ріне көшіп келген"
-    },
-    {
-      "subject": {
         "surface": "хандығы",
         "root": "хандығы",
         "pos": "noun"
@@ -1401,46 +1261,6 @@
       },
       "confidence": "Grammar",
       "raw_text": "Өздерің біле- тін адамдардың ішінде шешен сөйлейтіндер бар ма"
-    },
-    {
-      "subject": {
-        "surface": "жұт",
-        "root": "жұт",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
-        "surface": "жұрт",
-        "root": "жұрт",
-        "pos": "noun"
-      },
-      "pattern": "X пен Y",
-      "source": {
-        "pack": "kazakh_textbooks_pack.json",
-        "sample_id": "kz_textbook_kz_lang_11_emn_p0011_s02"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Жер аздырған жұт пен жұрт тоздырған шапқыншылық қазақ елі- нің хал-ахуалын мүлде ойсыратып жіберді"
-    },
-    {
-      "subject": {
-        "surface": "ет",
-        "root": "ет",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
-        "surface": "сүт",
-        "root": "сүт",
-        "pos": "noun"
-      },
-      "pattern": "X пен Y",
-      "source": {
-        "pack": "kazakh_textbooks_pack.json",
-        "sample_id": "kz_textbook_kz_lang_11_emn_p0011_s08"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Негізгі асы ет пен сүт болған босқын қазақтар қайыңның қабығын тіліп, шырынын ішуге, алғыр (ашы өсім- діктің тамыры), қозықұйрық (саңырауқұлақтың түрі)сияқты жеуге жарамды шөптесін өсімдіктерді талғажау етуге мәжбүр болды"
     },
     {
       "subject": {

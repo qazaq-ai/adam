@@ -7,6 +7,86 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.36.7] — 2026-05-02 — EvidenceKind consumption on extraction side (Hearsay refuse) — Evidence cycle closed both sides
+
+**Patch in v4.36+ semantic-IR arc.** Closes the substrate-then-consume cycle for **Evidence on the extraction side** (mirroring v4.36.0's dialog-side consumption). Adds the third guard — Hearsay refusal — to all three migrated extract_facts matchers, completing the **triple-guard pattern**: negation + modality + evidentiality.
+
+### Principle
+
+The user's evidential framing matters for graph integrity. If the source sentence reports hearsay («Абай ақын болыпты» — "apparently Abai was a poet, they say"), promoting it to the graph as `(абай, IsA, ақын)` would lose the evidential context and recompose hearsay as confirmed knowledge. Adam shouldn't fabricate certainty from reportative source. Refuse extraction.
+
+### Innovations
+
+**(1) Triple-guard pattern in `copula_is_a`, `nominal_conjunction`, `locative_lives_in`.** Each matcher now has three sequential guards before extraction:
+```rust
+let any_negated_noun = sem_frames.iter().any(...);     // v4.34.5/v4.35.0/v4.36.0
+if any_negated_noun { return; }
+let any_modal = sem_frames.iter().any(...);            // v4.35.0/v4.35.0/v4.36.0
+if any_modal { return; }
+let any_hearsay = sem_frames.iter().any(...);          // v4.36.7 NEW
+if any_hearsay { return; }
+```
+
+All three guards conservative — skip whole matcher when ANY frame in the stream carries the signal. Zero cross-coupling between guards.
+
+**(2) Substrate-then-consume cycle for Evidence now closed both sides:**
+
+| Field | Population | Consumption (dialog) | Consumption (extraction) |
+|---|---|---|---|
+| **Polarity** | v4.33.0 | v4.33.5 | v4.34.5 |
+| **Modality** | v4.32.0 / v4.32.5 | v4.34.7 | v4.35.0 |
+| **Evidence** | v4.31.0 + v4.36.5 | v4.36.0 | **v4.36.7** |
+| Relation | placeholder | n/a | n/a |
+
+Three of four SemFrame fields now have **fully closed cycles** (population + dialog consumption + extraction consumption). RelationKind remains placeholder — populated by future pattern-matcher migration when matchers start emitting SemFrame outputs (v4.37+).
+
+### Corpus impact
+
+| Predicate | v4.36.6 | v4.36.7 | Δ |
+|---|---|---|---|
+| IsA (Grammar) | 1472 | 1472 | unchanged (no IsA Grammar facts had Hearsay-marked source) |
+| RelatedTo (Grammar) | 62 | **56** | **-6** (nominal_conjunction Hearsay guard rejected 6 sentences with PastEvidential / PastReportative tense in source) |
+| LivesIn (Grammar) | 8 | 8 | unchanged |
+| Other predicates | unchanged | unchanged | — |
+
+The 6 rejected RelatedTo facts came from sentences where the speaker reports hearsay about the relation between two nouns. Conservative refusal is the safe move — extracting these would imply adam asserts the relation while the source explicitly framed it as reported hearsay.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **865 passing** unchanged |
+| Real-world 26-query battery | **26/26 = 100 % coherent** |
+| facts.json | 1934 → **1928** (-6 RelatedTo from Hearsay guards; IsA 1472 unchanged) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+| Mean latency | **191.5 ms** (-25 ms vs v4.36.6 — likely OS file-cache warmth, the additional guard adds minor cost on the hot path) |
+| Mean RSS | **176.1 MB** (-1.0 MB, within noise) |
+
+### v4.36.x arc fully complete
+
+Five releases (v4.36.0 → v4.36.5 → v4.36.6 → v4.36.7) closed:
+- v4.36.0: third matcher migration + first EvidenceKind dialog consumption (Hearsay hedging)
+- v4.36.5: PastReportative tense + ConverbPerfect parser enumeration
+- v4.36.6: vowel-alternation for «оқи», short-form 1sg for «алам»
+- **v4.36.7**: Evidence guard on extraction (triple-guard pattern in all migrated matchers)
+
+The Evidence story is now architecturally complete: detection (v4.31.0/v4.36.5), dialog consumption (v4.36.0), extraction refusal (v4.36.7).
+
+### Pipeline impact
+
+- 3 new guard blocks (~10 lines each) added to `copula_is_a`, `nominal_conjunction`, `locative_lives_in` — same-shape guard mirroring negation/modality patterns
+- facts/derived_facts regeneration
+
+Cadence: patch — closes Evidence extraction-side cycle; small uniform change across three matchers.
+
+### Carry-forwards
+
+- **v4.37.0** — fourth extract_facts matcher migration (likely `dative_goes_to` or `possessive_has`); remaining 6 missing parser tenses (ParticiplePast, ParticipleHabitual, ParticipleFuture, FutureIntentional, FuturePossible, Conditional, Imperative); battery edge case for «X емес пе?» question form.
+- **v4.38+** — RelationKind population (when extract_facts patterns start emitting SemFrame outputs); consumption (when downstream consumers read the `relation` field).
+
 ## [4.36.6] — 2026-05-02 — FST coverage: «алам» short-form 1sg + «оқи» back-vowel converb (final v4.36.x FST gaps closed)
 
 **Patch in v4.36+ semantic-IR arc.** Closes the two FST coverage gaps re-scoped from v4.36.5 to v4.36.6+. Both required separate FST architecture work:
