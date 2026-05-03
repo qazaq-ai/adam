@@ -1652,7 +1652,7 @@ pub(crate) fn best_noun_hint_with_confidence(
     // outside list queries the genitive subject often is NOT the
     // topic (e.g. «адамның мақсаты — өз ісін табу» where head
     // «мақсат» is the topic), so this strategy fires narrowly.
-    if let Some(g) = genitive_topic_hint_for_list(input) {
+    if let Some(g) = genitive_topic_hint_for_list(input, parses) {
         return Some((g, TopicConfidence::High));
     }
     if has_language_qualifier_prefix(input) {
@@ -1774,7 +1774,7 @@ pub(crate) fn accusative_form_hint(input: &str) -> Option<String> {
 /// pre-v4.39.0 noun_hint = «аймақ» (head noun) → bridge fact «Аймақ —
 /// аумақ»; post-v4.39.0 noun_hint = «қазақстан» → SearchGraph
 /// returns the curated «облыстар тізімі» list-summary fact.
-pub(crate) fn genitive_topic_hint_for_list(input: &str) -> Option<String> {
+pub(crate) fn genitive_topic_hint_for_list(input: &str, parses: &[Analysis]) -> Option<String> {
     let lower = input.to_lowercase();
     let has_list_intent = lower.contains("тізім")
         || lower.contains("атаулары")
@@ -1792,46 +1792,32 @@ pub(crate) fn genitive_topic_hint_for_list(input: &str) -> Option<String> {
     if !has_list_intent && !has_qty_intent {
         return None;
     }
-    const GENITIVE_SUFFIXES: &[&str] = &["ның", "нің", "тың", "тің", "дың", "дің"];
-    // **v4.39.0** — fire only when the FIRST content token is itself
-    // a genitive. The pattern this strategy handles is «X-ның Y-тарын
-    // тізімдеңіз / қанша?» — the genitive subject leads the clause.
-    // Inputs like «X Y-ның Z-тарын тізімдеңіз» (bare X first, then
-    // genitive Y) have X as the discourse topic, not Y; firing on the
-    // deeper genitive would mis-identify the topic. Existing test
-    // cases «Қазақстан аймақтарының барлық атауларын тізімдеңіз»
-    // depend on this gate: pre-gate v4.39.0 picked «аймақтары» (the
-    // deeper genitive stem) over «қазақстан» (the bare leading
-    // noun), regressing topic extraction; post-gate the strategy
-    // declines and the legacy chain (first_noun_root) picks
-    // «қазақстан» correctly.
-    let first_token: Option<String> = lower.split_whitespace().next().map(|raw| {
-        raw.chars()
-            .filter(|c| c.is_alphabetic() || *c == '-')
-            .collect()
-    });
-    let first_is_genitive = first_token
-        .as_deref()
-        .map(|t| GENITIVE_SUFFIXES.iter().any(|s| t.ends_with(s)))
-        .unwrap_or(false);
-    if !first_is_genitive {
-        return None;
-    }
-    let word = first_token.unwrap();
-    let word_len = word.chars().count();
-    if word_len < 6 {
-        return None;
-    }
-    for suffix in GENITIVE_SUFFIXES {
-        if word.ends_with(suffix) {
-            let stem_chars = word_len - suffix.chars().count();
-            let stem: String = word.chars().take(stem_chars).collect();
-            if stem.chars().count() >= 3 && !NOT_A_TOPIC.contains(&stem.as_str()) {
-                return Some(stem);
-            }
+    // **v4.39.5** — parse-stream version (was string-level in
+    // v4.39.0). The string-level workaround was needed because the
+    // FST didn't derive Genitive on nasal/vowel-final stems
+    // («Қазақстанның» → []); v4.39.5 closed that gap via the new
+    // {DN} archiphoneme, so `parses` now contains a `Case::Genitive`
+    // analysis for those forms with the bare root attached. Reading
+    // from parses gives us the lexically-validated root for free.
+    //
+    // First-parse gate: only fire if the FIRST parse is a Genitive
+    // noun. Mirrors the v4.39.0 first-token-genitive gate semantics
+    // — for inputs like «Қазақстан аймақтарының X-тарын
+    // тізімдеңіз» (bare leading noun, then deeper genitive), the
+    // first parse is bare «қазақстан» (no Case), so this strategy
+    // declines and the legacy chain picks the leading bare noun.
+    let first = parses.first()?;
+    match first {
+        Analysis::Noun { root, features }
+            if matches!(
+                features.case,
+                Some(adam_kernel_fst::morphotactics::Case::Genitive)
+            ) && !NOT_A_TOPIC.contains(&root.root.as_str()) =>
+        {
+            Some(root.root.clone())
         }
+        _ => None,
     }
-    None
 }
 
 pub(crate) fn locative_attributive_hint(input: &str) -> Option<String> {

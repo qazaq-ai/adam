@@ -313,6 +313,27 @@ pub fn deterministic_segment_parse(
     candidates
         .dedup_by(|left, right| left.segments == right.segments && left.labels == right.labels);
 
+    // **v4.39.5** — prefer the fewest-segment parse when multiple
+    // candidates remain. Pre-v4.39.5 the segmenter rejected
+    // ambiguity outright, which forced lexicon authors to omit any
+    // root that creates a parse-path collision with another
+    // lexicalized form. Concrete case: adding «бас» (head, noun)
+    // alongside «басқа» (postposition) made segmentation fail on
+    // «басқа» because both `[басқа]` (bare postposition) and
+    // `[бас, қа]` (бас + Dative) became valid candidates.
+    // Real-Kazakh lexicon coverage demands both entries;
+    // disambiguating by «fewest segments» picks the lexicalized
+    // (idiomatic) form over the morphologically-decomposable form,
+    // matching the dataset expectation that frozen postpositions
+    // (`басқа`, `бастап`, `сөздік`) surface as a single segment
+    // while truly compositional forms (`қолдан + а + ды`) still
+    // segment normally (no shorter alternative exists).
+    if candidates.is_empty() {
+        return None;
+    }
+    candidates.sort_by_key(|c| c.segments.len());
+    let min_len = candidates[0].segments.len();
+    candidates.retain(|c| c.segments.len() == min_len);
     if candidates.len() == 1 {
         candidates.pop()
     } else {

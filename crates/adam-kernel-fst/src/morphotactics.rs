@@ -228,9 +228,19 @@ const DATIVE: SuffixTemplate = &[
     SuffixAtom::Arch(Archiphoneme::A),
 ];
 
-/// Ablative suffix: `-{D}{A}n`.
+/// Ablative suffix: `-{DA}{A}н`.
+///
+/// **v4.39.5** — uses `{DA}` (Ablative-specific D archiphoneme) so the
+/// suffix surfaces as `-нан/-нен` after nasal-final stems (адам →
+/// адамнан, not *адамдан, closing the pre-v4.39.5 analyse gap on
+/// forms like Адамнан / Қазақстаннан) and `-дан/-ден` after vowel-
+/// final stems (бала → баладан, preserving the pre-v4.39.5 surface
+/// confirmed by the existing `noun_ablative_бала_after_vowel` test).
+/// The asymmetry against Gen on vowel-final stems (which DOES
+/// nasalize: баланың) is real modern-Kazakh phonology — see
+/// [`realise_da`] vs [`realise_dn`].
 const ABLATIVE: SuffixTemplate = &[
-    SuffixAtom::Arch(Archiphoneme::D),
+    SuffixAtom::Arch(Archiphoneme::DA),
     SuffixAtom::Arch(Archiphoneme::A),
     SuffixAtom::Literal('н'),
 ];
@@ -264,16 +274,32 @@ const LOCATIVE_ATTRIBUTIVE: SuffixTemplate = &[
     SuffixAtom::Arch(Archiphoneme::I),
 ];
 
-/// Accusative suffix: `-{D}{I}` (simplified — real rule also picks `н`
-/// variant for certain contexts, covered later).
+/// Accusative suffix: `-{N}{I}`.
+///
+/// **v4.39.5** — uses `{N}` archiphoneme (vowel-final → н; voiceless →
+/// т; otherwise → д). Pre-v4.39.5 used `{D}`, which produced
+/// `*баланы → баладі` style errors on vowel-final stems (real form
+/// `баланы`, with `н` after the vowel — that's what `{N}` already
+/// encodes). The asymmetry against Gen/Abl is structural: Acc has
+/// no nasal in its right context, so the catalogue's
+/// «:Nasals _ :Vow :Nasal» rule doesn't fire after nasal stems
+/// (адам+Acc = адамды, not *адамны), but the vowel-final case still
+/// needs `н` — which `{N}` provides via its «vowel → н» branch.
 const ACCUSATIVE: SuffixTemplate = &[
-    SuffixAtom::Arch(Archiphoneme::D),
+    SuffixAtom::Arch(Archiphoneme::N),
     SuffixAtom::Arch(Archiphoneme::I),
 ];
 
-/// Genitive suffix: `-{D}{I}ң`.
+/// Genitive suffix: `-{DN}{I}ң`.
+///
+/// **v4.39.5** — uses `{DN}` (right-context-nasal D) so the suffix
+/// surfaces as `-ның/-нің` after nasal-final stems (адам → адамның,
+/// not *адамдың) and after vowel-final stems (бала → баланың).
+/// Pre-v4.39.5 used vanilla `{D}`, which produced `*адамдың`,
+/// `*ананың` (sic — wrong), `*Қазақстандың`, etc., and broke
+/// analyse on these surface forms.
 const GENITIVE: SuffixTemplate = &[
-    SuffixAtom::Arch(Archiphoneme::D),
+    SuffixAtom::Arch(Archiphoneme::DN),
     SuffixAtom::Arch(Archiphoneme::I),
     SuffixAtom::Literal('ң'),
 ];
@@ -1199,6 +1225,103 @@ mod tests {
     // Additional integration tests — each exercises a specific rule
     // interaction. These lock in the week-1 FST behaviour against future
     // phonology refactoring.
+
+    // -----------------------------------------------------------------
+    // **v4.39.5** — Genitive / Accusative / Ablative case tests across
+    // stem types. Locks in the {DN} / {N} / {DA} archiphoneme split
+    // that closes the pre-v4.39.5 analyse gap on nasal/vowel-final
+    // case forms. Each combination encodes a non-trivial rule
+    // interaction and would silently regress under a careless
+    // archiphoneme rename.
+    // -----------------------------------------------------------------
+
+    #[test]
+    fn noun_genitive_адам_nasal_v4_39_5() {
+        let out = synthesise_noun(
+            "адам",
+            NounFeatures {
+                case: Some(Case::Genitive),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "адамның");
+    }
+
+    #[test]
+    fn noun_genitive_бала_vowel_v4_39_5() {
+        let out = synthesise_noun(
+            "бала",
+            NounFeatures {
+                case: Some(Case::Genitive),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "баланың");
+    }
+
+    #[test]
+    fn noun_genitive_тіл_liquid_v4_39_5() {
+        let out = synthesise_noun(
+            "тіл",
+            NounFeatures {
+                case: Some(Case::Genitive),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "тілдің");
+    }
+
+    #[test]
+    fn noun_genitive_мектеп_voiceless_v4_39_5() {
+        let out = synthesise_noun(
+            "мектеп",
+            NounFeatures {
+                case: Some(Case::Genitive),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "мектептің");
+    }
+
+    #[test]
+    fn noun_accusative_адам_nasal_v4_39_5() {
+        // адам + Acc = адамды ({N}=д after nasal). Distinct from Gen
+        // (адамның) — Acc has no right-context nasal, so the
+        // catalogue's «nasal-D-нasalization» rule doesn't fire.
+        let out = synthesise_noun(
+            "адам",
+            NounFeatures {
+                case: Some(Case::Accusative),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "адамды");
+    }
+
+    #[test]
+    fn noun_accusative_бала_vowel_v4_39_5() {
+        let out = synthesise_noun(
+            "бала",
+            NounFeatures {
+                case: Some(Case::Accusative),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "баланы");
+    }
+
+    #[test]
+    fn noun_ablative_адам_nasal_v4_39_5() {
+        // адам + Abl = адамнан ({DA}=н after nasal).
+        let out = synthesise_noun(
+            "адам",
+            NounFeatures {
+                case: Some(Case::Ablative),
+                ..Default::default()
+            },
+        );
+        assert_eq!(out, "адамнан");
+    }
 
     #[test]
     fn noun_ablative_бала_after_vowel() {

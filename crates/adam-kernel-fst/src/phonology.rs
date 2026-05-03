@@ -51,6 +51,19 @@ pub enum Archiphoneme {
     /// Buffer `{n}` — pronominal-н that appears between 3rd-person possessive
     /// and some cases; deletes in other contexts per rules 39–45.
     NBuf,
+    /// **v4.39.5** — Abstract `DN` (Genitive D): nasal/vowel-stem →
+    /// `н`, voiceless → `т`, otherwise → `д`. Used by GENITIVE
+    /// (`-{DN}{I}ң`). Surface: адамның (nasal), баланың (vowel),
+    /// тілдің (liquid), мектептің (voiceless).
+    DN,
+    /// **v4.39.5** — Abstract `DA` (Ablative D): nasal-stem →
+    /// `н`, voiceless → `т`, otherwise → `д` (including vowel,
+    /// liquid, sonorant). Used by ABLATIVE (`-{DA}{A}н`). Surface:
+    /// адамнан (nasal), баладан (vowel — distinct from Gen!),
+    /// тілден (liquid), мектептен (voiceless). The asymmetry with
+    /// {DN} is real — modern-standard Kazakh uses different surface
+    /// patterns for Gen vs Abl on vowel-final stems.
+    DA,
 }
 
 /// Vowel harmony class — the single most important phonological feature of a
@@ -116,6 +129,8 @@ pub fn realise_archiphoneme(arch: Archiphoneme, ctx: PhonologicalContext) -> Opt
         Archiphoneme::S => realise_s_buffer(ctx),
         Archiphoneme::Y => realise_y_buffer(ctx),
         Archiphoneme::NBuf => realise_n_buffer(ctx),
+        Archiphoneme::DN => Some(realise_dn(ctx)),
+        Archiphoneme::DA => Some(realise_da(ctx)),
     }
 }
 
@@ -158,17 +173,64 @@ pub fn realise_i(ctx: PhonologicalContext) -> char {
 // ---------------------------------------------------------------------------
 
 /// Archiphoneme `{D}` — catalogue rules 4, 5, 7.
+///
+/// Used by suffixes WITHOUT a literal nasal in the right context:
+/// Locative (`-{D}{A}`) and Locative-attributive (`-{D}{A}{G}{I}`).
+/// Realises as `т` after voiceless, `д` otherwise. This is correct for
+/// Loc / LocAttr because the Apertium «D-nasalization» rule
+/// (`:Nasals|Vow _ :Vow :Nasal`) requires a nasal in the right context,
+/// which neither suffix provides.
+///
+/// **v4.39.5** — the Genitive and Ablative cases (right-context nasal)
+/// previously also routed through `{D}`, producing wrong forms like
+/// `*қазақстандың` for `қазақстан + Gen`. They've been migrated to
+/// the new `{DN}` archiphoneme (see [`realise_dn`]). `{D}` itself
+/// keeps the simple voicing rule.
 pub fn realise_d(ctx: PhonologicalContext) -> char {
-    // Rule 4 (D nasal harmony) full condition is `:Nasals _ :Vow :Nasals` —
-    // the abstract {D} becomes н only when flanked on the LEFT by a nasal
-    // AND on the RIGHT by Vow+Nasal. Since we walk atoms left-to-right we
-    // don't have forward lookahead yet; in the vast majority of real cases
-    // the left-only "nasal→нn" heuristic produces the wrong output (e.g.
-    // адам+LOC → *адамна, should be адамда). Disable it for now and revisit
-    // when we implement two-pass FST with lookahead (week 2 target).
-    // Rule 5 (forward voicing): after voiceless → т.
     if matches!(ctx.preceding, ConsonantClass::Voiceless) {
         return 'т';
+    }
+    'д'
+}
+
+/// **v4.39.5** — Archiphoneme `{DN}` — Genitive variant of `{D}`.
+/// Used by GENITIVE (`-{DN}{I}ң`).
+///
+/// Realisation:
+/// - Voiceless → `т` (мектеп + Gen → мектептің)
+/// - Nasal-final → `н` (адам + Gen → адамның)
+/// - Vowel-final → `н` (бала + Gen → баланың)
+/// - Otherwise (voiced obstruent, liquid, high sonorant) → `д`
+///   (тіл + Gen → тілдің; үй + Gen → үйдің; газ + Gen → газдың)
+pub fn realise_dn(ctx: PhonologicalContext) -> char {
+    if matches!(ctx.preceding, ConsonantClass::Voiceless) {
+        return 'т';
+    }
+    if matches!(
+        ctx.preceding,
+        ConsonantClass::Nasal | ConsonantClass::VowelPreceding
+    ) {
+        return 'н';
+    }
+    'д'
+}
+
+/// **v4.39.5** — Archiphoneme `{DA}` — Ablative variant of `{D}`.
+/// Used by ABLATIVE (`-{DA}{A}н`). Differs from `{DN}` on
+/// vowel-final stems: standard Kazakh Abl after vowel is `-дан/-ден`
+/// (баладан, not *бананан), so vowel-final maps to `д` here.
+///
+/// Realisation:
+/// - Voiceless → `т` (мектеп + Abl → мектептен)
+/// - Nasal-final → `н` (адам + Abl → адамнан)
+/// - Otherwise (vowel, voiced obstruent, liquid, sonorant) → `д`
+///   (бала + Abl → баладан; тіл + Abl → тілден; газ + Abl → газдан)
+pub fn realise_da(ctx: PhonologicalContext) -> char {
+    if matches!(ctx.preceding, ConsonantClass::Voiceless) {
+        return 'т';
+    }
+    if matches!(ctx.preceding, ConsonantClass::Nasal) {
+        return 'н';
     }
     'д'
 }

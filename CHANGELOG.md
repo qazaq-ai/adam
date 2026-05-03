@@ -7,6 +7,52 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.39.7] — 2026-05-03 — FST archiphoneme split + lexicon batch + segmenter disambiguation — 7-innovation patch bundle; coverage 83.27 % → 85.28 %
+
+**Largest patch bundle since v4.6.5.** Closes the v4.39.0 architecture-note carry-forward (FST `realise_d` gap on nasal/vowel-final case suffixes) AND lifts morpheme coverage by another 2.01 pp via a high-frequency lexicon batch. Bundle size justifies `.7` per the patch-bundling rule (`feedback_versioning_post_1_0` v4.39.0 reaffirmation).
+
+### Innovations (7)
+
+**(1) FST `{DN}` / `{DA}` archiphoneme split + ACCUSATIVE migration.** The Apertium catalogue's «D-nasalization fires in `:Nasals|Vow _ :Vow :Nasal` context» rule needs forward lookahead — which the forward-walking FST can't provide. Pre-v4.39.7 was a single `{D}` archiphoneme with a stem-only rule, producing wrong forms for Gen / Acc / Abl on nasal/vowel-final stems («Қазақстанның» didn't parse because synth produced `*Қазақстандың`). Migrated:
+- New `{DN}` (Genitive D): nasal/vowel→н, voiceless→т, default→д. Surface: адамның / баланың / тілдің / мектептің. Used by `GENITIVE = -{DN}{I}ң`.
+- New `{DA}` (Ablative D): nasal→н, voiceless→т, default→д (incl. vowel→д). Surface: адамнан / баладан / тілден / мектептен. Used by `ABLATIVE = -{DA}{A}н`. Distinct from `{DN}` because Abl on vowel stems is `-дан/-ден`, not `-нан/-нен` (баладан, not *бананан).
+- ACCUSATIVE migrated to `{N}` archiphoneme (which already had the right rule: voiceless→т, all-consonants→д, vowel→н). Surface: мектепті / адамды / баланы.
+- Vanilla `{D}` (no right-context nasal) preserved for LOCATIVE / LOCATIVE_ATTRIBUTIVE.
+
+**(2) 7 new synthesis-direction case tests** for the new archiphonemes — `noun_genitive_адам_nasal_v4_39_5`, `noun_genitive_бала_vowel_v4_39_5`, `noun_genitive_тіл_liquid_v4_39_5`, `noun_genitive_мектеп_voiceless_v4_39_5`, `noun_accusative_адам_nasal_v4_39_5`, `noun_accusative_бала_vowel_v4_39_5`, `noun_ablative_адам_nasal_v4_39_5`. Pin the asymmetry between Gen and Abl on vowel-final stems (Gen → н, Abl → д) so a future careless archiphoneme rename gets caught immediately.
+
+**(3) `genitive_topic_hint_for_list` — parse-stream version.** Pre-v4.39.7 was string-level (post-hoc suffix-strip on the input string) because the FST didn't derive Genitive on nasal/vowel-final stems. Now that v4.39.7 closes the FST gap, the parses themselves carry `Case::Genitive` directly. The function reads `parses.first()` and checks for a Genitive noun, replacing the v4.39.0 string-level workaround with a lexically-validated parse-stream extraction. Same first-token-genitive gate semantics; same anti-regression on bare-leading + deeper-genitive shapes.
+
+**(4) 11 high-frequency lexicon entries** in `segmentation_roots.json` — closes top-uncovered words from morpheme-coverage report. Nouns: `бас` (head), `бет` (page/face), `мал` (cattle), `орта` (middle), `орыс` (Russian), `пайда` (use/profit), `қол` (hand), `сөз` (word). Verbs: `баста` (begin), `отыр` (sit), `орналас` (be located). Each entry is a top-15-frequency uncovered token; combined coverage delta **+2.01 pp**.
+
+**(5) `deterministic_segment_parse` — fewest-segment preference.** Pre-v4.39.7 the segmenter rejected ambiguity outright (returned `None` on >1 candidate parse), forcing lexicon authors to omit any root that creates a parse-path collision with another lexicalized form (e.g. adding `бас` (head) alongside `басқа` (postposition) made segmentation fail on «басқа»). Real-Kazakh lexicon coverage demands both entries; disambiguating by «fewest segments» picks the lexicalized (idiomatic) form over the morphologically-decomposable form. Frozen postpositions (`басқа`, `бастап`, `сөздік`) win against compositional alternates; truly compositional forms (`қолдан + а + ды`) still segment normally.
+
+**(6) Morpheme coverage milestone:** 83.27 % → **85.28 %** (+2.01 pp over 3.87M committed words). Cumulative from v1.5.5 baseline: 79.48 % → 85.28 % (+5.80 pp across v4.39.0 + v4.39.7).
+
+**(7) Bonus discovery: improved query precision on previously-mis-segmented inputs.** «Адамның мақсаты не?» pre-v4.39.7 picked topic «мақса» (truncated «мақсат» via accusative_form_hint, because «Адамның» didn't parse). Post-v4.39.7 the FST resolves «Адамның» → «адам» + Genitive directly, so `first_noun_root` picks «адам» as topic and the bridge fact «Адам — тіршілік иесі» surfaces. «Сөз туралы / Бас деген не?» queries now answer with bridge facts via the new lexicon entries.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **872 passing** (was 865; +7 new case-suffix tests) |
+| FST roundtrip — Gen/Acc/Abl/Loc on all stem-classes | ✓ all 13 probed forms parse correctly |
+| Bug 4 — list-of-regions | ✓ preserved (now via FST parse-stream, not string-level) |
+| Anti-regression — quantity queries / confident facts / greetings | ✓ unchanged |
+| Tokenizer segmentation eval | ✓ 464/464 exact match (was 463/464 mid-bundle, restored by segmenter fix) |
+| Morpheme coverage | **+2.01 pp** (83.27 % → 85.28 %) |
+| `cargo fmt --all --check` | clean |
+
+### Latency / RSS
+
+Unchanged from v4.39.0 (within noise; new archiphoneme dispatch adds 1 enum-match per case suffix, ~ns-level cost).
+
+### Deferred (reasonable scope; not blocking)
+
+- 14 short-base lexicon clusters (көл / жер / көз / гүл) from v4.38.5 review — segmenter fewest-segment-preference makes their addition safer now; revisit in next bundle.
+- `realise_n` / `realise_l` audit for parallel gaps — current archiphonemes serve the major use cases; widen audit if real-REPL exposes new failures.
+- «Отырмын» (отыр + 1sg without aorist) and «Орталық» (орта + лық derivational) — verb-conjugation / derivation gaps for individual entries.
+
 ## [4.39.0] — 2026-05-03 — Function-word completion + genitive-topic priority — 79.48 % → 83.27 % morpheme coverage; bug 4 fully closed
 
 **Second minor in v4.38+ arc.** Closes the v4.38.5 deferred bug 4 carry-forward (full list-of-regions answer) AND closes the long-standing morpheme coverage plateau by adding 4 high-frequency function words to the lexicon. Two changes ship together because they're complementary: function-word coverage unlocks parse breadth on real Kazakh text; genitive-topic priority unlocks the discourse-subject side of list / quantity queries.
