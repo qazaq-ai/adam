@@ -257,6 +257,7 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             noun_hint_polarity,
             input_modality,
             input_evidence,
+            input_is_inversion_question,
             ..
         } => Intent::Unknown {
             raw_tokens,
@@ -270,9 +271,11 @@ pub fn strip_evidence(intent: Intent) -> Intent {
             compositional_function,
             noun_hint_polarity,
             input_modality,
-            // **v4.36.0** — preserve input_evidence across strip;
-            // analytical signal about evidentiality kind, not evidence.
             input_evidence,
+            // **v4.37.0** — preserve inversion-question marker
+            // across strip; analytical signal about question shape,
+            // not evidence.
+            input_is_inversion_question,
         },
         other => other,
     }
@@ -297,6 +300,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         }
     }
 

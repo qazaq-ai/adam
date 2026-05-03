@@ -321,6 +321,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         }
     }
 
@@ -386,6 +387,7 @@ mod tests {
                 noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
                 input_modality: None,
                 input_evidence: None,
+                input_is_inversion_question: false,
             },
         ];
         for intent in social {
@@ -528,6 +530,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         };
         assert!(TaskState::intent_has_evidence(&with_chain));
 
@@ -544,6 +547,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         };
         assert!(TaskState::intent_has_evidence(&with_example));
 
@@ -560,6 +564,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         };
         assert!(TaskState::intent_has_evidence(&with_grounded));
 
@@ -588,6 +593,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         };
         t.roll_forward(&intent, &belief, 0);
         assert_eq!(t.status, TaskStatus::ReadyToAnswer);
@@ -616,6 +622,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         };
         t.roll_forward(&intent, &belief, 2);
         assert_eq!(t.status, TaskStatus::Blocked);

@@ -304,6 +304,7 @@ pub fn interpret_text_with_lexicon(
         noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         input_modality: None,
         input_evidence: None,
+        input_is_inversion_question: false,
     }
 }
 
@@ -369,6 +370,7 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
         noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
         input_modality: None,
         input_evidence: None,
+        input_is_inversion_question: false,
     }
 }
 

@@ -869,6 +869,26 @@ templates = [
 # «емес» echoed back so the user sees their own negation reflected,
 # and «пікіріңіз / ойыңыз» («your view / opinion») to mark the
 # epistemic status as user-asserted rather than adam-asserted.
+# v4.37.0 — inversion-question family. When the input is «X емес пе?»
+# (confirmation-seeking inversion: "isn't X the case?"), the speaker
+# EXPECTS X to be true and is asking adam to confirm or hedge. NOT a
+# denial. Templates engage with the confirmation-seeking shape:
+# acknowledge the question, hedge honestly (no flat assertion), and
+# avoid the negation-acknowledgment phrasing that would misread the
+# speaker's intent.
+[[families]]
+key = "unknown.with_inversion_question"
+templates = [
+    "Иә, мүмкін солай шығар — нақты дерегім жоқ.",
+    "{noun} жайында пікіріңіз орынды деп ойлаймын.",
+    "Иә, мен де солай ойлаймын — бірақ нақтысын білмеймін.",
+    "Сіздің ойыңыз дұрыс шығар, бірақ растай алмаймын.",
+    "{noun} туралы пікіріңізді бағалаймын — бұл ықтимал.",
+    # No-noun variants (when noun_hint is None)
+    "Иә, бұл мүмкін болуы — нақтысын білмеймін.",
+    "Сіздің ойыңыз орынды деп ойлаймын.",
+]
+
 [[families]]
 key = "unknown.with_negated_topic"
 templates = [

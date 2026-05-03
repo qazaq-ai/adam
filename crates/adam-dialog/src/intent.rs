@@ -296,6 +296,21 @@ pub enum Intent {
         /// емес»).
         #[serde(default)]
         input_modality: Option<adam_kernel_fst::Modality>,
+        /// **v4.37.0** — inversion-question marker. Set `true` when
+        /// the input contains BOTH «емес» (or its predicate-copula
+        /// inflections) AND a tag-question particle («бе / ма / ме /
+        /// па / пе») in the same sentence — i.e. the «X емес пе?»
+        /// pattern. Linguistically this is NOT a denial; it's a
+        /// confirmation-seeking inversion ("isn't X the case?")
+        /// where the speaker EXPECTS X to be true. Routing this
+        /// through the v4.33.5 negation-acknowledgment family
+        /// («X емес деп айтасыз — пікіріңізді сыйлаймын») would
+        /// misread the speaker's intent. v4.37.0 routes it instead
+        /// to a dedicated `unknown.with_inversion_question` family
+        /// that engages with the confirmation-seeking shape.
+        /// Default `false` preserves all pre-v4.37.0 routing.
+        #[serde(default)]
+        input_is_inversion_question: bool,
         /// **v4.36.0** — third SemFrame field consumed by the
         /// response generator. When the input carries a verb in
         /// `Tense::PastEvidential` (the «-{Y}п(ты)» reportative

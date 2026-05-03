@@ -339,6 +339,19 @@ pub fn plan_response_with_epistemic(
         }
     }
     let override_key = match (intent, epistemic) {
+        // **v4.37.0** — same bypass for inversion-question. When the
+        // user asks «X емес пе?», `unknown.with_inversion_question`
+        // takes precedence over Conflicted/Tentative overrides — a
+        // tentative template would dilute the engagement adam wants
+        // to do.
+        (
+            Intent::Unknown {
+                noun_hint: Some(_),
+                input_is_inversion_question: true,
+                ..
+            },
+            _,
+        ) => None,
         // **v4.34.0** — when the user negates the topic («X емес»),
         // the `unknown.with_negated_topic` family from v4.33.5 takes
         // precedence over Conflicted/Tentative epistemic overrides.
@@ -685,6 +698,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         };
         assert_eq!(intent_key(&intent), "unknown.with_derived_chain");
     }
@@ -709,6 +723,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         };
         assert_eq!(intent_key(&intent), "unknown.with_grounded_fact");
     }
@@ -819,8 +834,21 @@ pub fn intent_key(intent: &Intent) -> &'static str {
             noun_hint_polarity,
             input_modality,
             input_evidence,
+            input_is_inversion_question,
             ..
         } => {
+            // **v4.37.0** — inversion-question routing. «X емес пе?»
+            // is confirmation-seeking ("isn't X the case?"), NOT a
+            // denial. Routing through `unknown.with_negated_topic`
+            // (the v4.33.5 denial-acknowledgment family) would
+            // misread the speaker's intent. Highest priority among
+            // Unknown-routing because the question shape needs
+            // engagement, not refusal. Fires only when both `емес`
+            // AND a tag-question particle co-occur in the stream
+            // (set by `Conversation::turn`).
+            if *input_is_inversion_question && noun_hint.is_some() {
+                return "unknown.with_inversion_question";
+            }
             // **v4.33.5** — sentence-level negation routing. When
             // the user said «X емес» («X is not the case»),
             // `Conversation::turn` copies `Polarity::Negated` from

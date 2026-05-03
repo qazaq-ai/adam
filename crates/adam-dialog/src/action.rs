@@ -501,6 +501,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         }
     }
 
@@ -595,6 +596,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RetrieveEvidence);
@@ -622,6 +624,7 @@ mod tests {
             noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
             input_modality: None,
             input_evidence: None,
+            input_is_inversion_question: false,
         };
         let plan = ActionPlanner::plan(&intent, &belief, &task);
         assert_eq!(plan.action, Action::RunReasoner);

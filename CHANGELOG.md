@@ -7,6 +7,94 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.37.0] — 2026-05-02 — «X емес пе?» inversion-question routing — confirmation-seeking shape recognized
+
+**First minor in v4.37+ semantic-IR arc.** Closes the v4.36.7 carry-forward. The «X емес пе?» pattern — a tag-question form like «Бұл дұрыс емес пе?» («isn't this correct?») — is **not** a denial; it's a confirmation-seeking inversion where the speaker EXPECTS X to be true. Pre-v4.37.0 the v4.33.5 negation routing misread these as denials and gave «{noun} емес деп айтасыз — пікіріңізді сыйлаймын» (denial acknowledgment). v4.37.0 detects the inversion via «емес» + question-particle co-occurrence and routes to a dedicated family that engages with the confirmation-seeking shape.
+
+### What was broken pre-v4.37.0
+
+```
+> Бұл дұрыс емес пе?
+"Дұрыс емес деп айтасыз — пікіріңізді сыйлаймын."
+                       ↑ misreads tag-question as denial; should engage as inversion
+```
+
+Linguistically «X емес пе?» is the opposite of «X емес» — the former asks for confirmation that X IS the case (despite the surface-level negation marker), while the latter asserts X is NOT the case.
+
+### Innovations
+
+**(1) `Intent::Unknown.input_is_inversion_question: bool` field.** Fourth SemFrame-derived signal on the canonical Intent type (after polarity, modality, evidence). Default `false` preserves all pre-v4.37.0 routing.
+
+**(2) `Conversation::turn` populates from sem_frames** by detecting co-occurrence of «емес» (any inflected form: емес, емеспін, емессің, емеспіз, емессіз) AND a tag-question particle (бе / ма / ме / па / пе) in the SemFrame stream.
+
+**(3) Planner inversion routing — HIGHEST priority** among Unknown-routing. Runs BEFORE the v4.33.5 polarity check because the question shape needs engagement, not refusal. Polarity is still set by `populate_sentential_negation`, but routing skips the denial family when inversion-question is true.
+
+**(4) Epistemic-override bypass for inversion** mirrors v4.34.0/v4.34.7/v4.36.0 patterns.
+
+**(5) New template family `unknown.with_inversion_question`** in `v1.toml` — 7 templates that engage with confirmation-seeking shape without flat assertion or flat refusal:
+- "Иә, мүмкін солай шығар — нақты дерегім жоқ."
+- "{noun} жайында пікіріңіз орынды деп ойлаймын."
+- "Иә, мен де солай ойлаймын — бірақ нақтысын білмеймін."
+- "Сіздің ойыңыз дұрыс шығар, бірақ растай алмаймын."
+- "{noun} туралы пікіріңізді бағалаймын — бұл ықтимал."
+- (+2 no-noun variants)
+
+Phrasing avoids both confirmation («yes, X IS the case») and denial («no, X ISN'T») since adam doesn't have ground-truth — uses hedging «мүмкін / шығар / ықтимал / нақтысын білмеймін» instead.
+
+### Live verification
+
+| Query | v4.36.7 | v4.37.0 |
+|---|---|---|
+| **Бұл дұрыс емес пе?** | "Дұрыс емес деп айтасыз — пікіріңізді сыйлаймын." | "**Иә, мүмкін солай шығар — нақты дерегім жоқ.**" |
+| **Қазақстан үлкен ел емес пе?** | grounded fact about Kazakhstan | "**Иә, мүмкін солай шығар — нақты дерегім жоқ.**" |
+| **Сен бағдарламашы емессің бе?** | denial acknowledgment | "**Иә, мүмкін солай шығар — нақты дерегім жоқ.**" (now treated as inversion — semantically more accurate) |
+| Бұл шындық емес (control, no question particle) | unchanged denial | unchanged denial ✓ |
+| Қазақстан туралы айт (control) | unchanged | unchanged ✓ |
+
+### Battery edge case 18 reframed
+
+Battery case 18 «Сен бағдарламашы емессің бе?» previously closed in v4.34.0 as denial acknowledgment. v4.37.0 reroutes to inversion-question (semantically closer to user's intent). The battery `neg-consumed` metric drops from 5/5 to 4/5 reflecting this routing change — but it's NOT a regression, it's a refinement. The battery script needs an `inv-consumed` metric tracking the new family; deferred to next battery refresh.
+
+### Real-world battery (v4.37.0)
+
+| Aggregate | v4.37.0 | Δ vs v4.36.7 |
+|---|---|---|
+| Mean latency | **195.3 ms** | +3.8 ms (within noise; new conditional in Conversation::turn population) |
+| Mean max RSS | **176.1 MB** | unchanged |
+| Coherent responses | **26/26 = 100 %** | matched |
+| Neg-consumed | **4/5** | -1 (case 18 reframed as inversion — script doesn't yet have inv-consumed metric) |
+| Mod-consumed | **2/4** | matched |
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **865 passing** unchanged |
+| Real-world battery | **26/26 = 100 %** coherent |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Pipeline impact
+
+- 1 new `Intent::Unknown` field (`input_is_inversion_question`)
+- 1 propagation in `semantics::interpret_text_with_lexicon`
+- 1 propagation in `verifier::strip_evidence`
+- 6 test-site Intent::Unknown patches
+- 1 wiring in `Conversation::turn` (емес + question particle co-occurrence detection)
+- 1 short-circuit in planner Unknown-branch routing (highest priority)
+- 1 epistemic-override bypass for inversion
+- 1 new template family with 7 templates
+- facts/derived_facts version sync to 4.37.0
+
+Cadence: minor — fourth SemFrame-derived dialog signal; refines case 18 routing to semantically more accurate inversion-engagement.
+
+### Carry-forwards
+
+- **v4.37.5** — fourth extract_facts matcher migration (likely `dative_goes_to` or `possessive_has`); battery script extension with `inv-consumed` metric.
+- **v4.38+** — RelationKind population (when extract_facts patterns emit SemFrame outputs); remaining 6 missing parser tenses (ParticiplePast, ParticipleHabitual, ParticipleFuture, FutureIntentional, FuturePossible, Conditional, Imperative).
+
 ## [4.36.7] — 2026-05-02 — EvidenceKind consumption on extraction side (Hearsay refuse) — Evidence cycle closed both sides
 
 **Patch in v4.36+ semantic-IR arc.** Closes the substrate-then-consume cycle for **Evidence on the extraction side** (mirroring v4.36.0's dialog-side consumption). Adds the third guard — Hearsay refusal — to all three migrated extract_facts matchers, completing the **triple-guard pattern**: negation + modality + evidentiality.

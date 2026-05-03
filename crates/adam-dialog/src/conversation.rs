@@ -581,6 +581,7 @@ impl Conversation {
             noun_hint_polarity,
             input_modality,
             input_evidence,
+            input_is_inversion_question,
             ..
         } = &mut intent
         {
@@ -616,6 +617,27 @@ impl Conversation {
             // Independent of noun_hint — like modality.
             if input_evidence.is_none() {
                 *input_evidence = sem_frames.iter().find_map(|f| f.evidence);
+            }
+            // **v4.37.0** — inversion-question detection. When the
+            // sentence has BOTH «емес» (any inflection) AND a tag-
+            // question particle («бе / ма / ме / па / пе») in the
+            // SemFrame stream, it's a confirmation-seeking
+            // inversion («Бұл дұрыс емес пе?» — "isn't this
+            // correct?"), NOT a denial. The polarity-from-emes
+            // detector still fires, but the planner will route
+            // through the inversion-question family (which
+            // engages with the confirmation-seeking shape) instead
+            // of the v4.33.5 negation-acknowledgment family
+            // (which would misread the speaker's intent as
+            // denial).
+            if !*input_is_inversion_question {
+                let has_emes = sem_frames.iter().any(|f| f.root == "емес");
+                let has_qparticle = sem_frames
+                    .iter()
+                    .any(|f| matches!(f.root.as_str(), "бе" | "ма" | "ме" | "па" | "пе"));
+                if has_emes && has_qparticle {
+                    *input_is_inversion_question = true;
+                }
             }
         }
 
