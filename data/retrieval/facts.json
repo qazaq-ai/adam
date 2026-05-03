@@ -1,7 +1,7 @@
 {
-  "version": "4.39.7",
+  "version": "4.40.5",
   "status": "completed",
-  "elapsed_s": 66,
+  "elapsed_s": 73,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -765,8 +765,8 @@
     },
     {
       "subject": {
-        "surface": "түскен",
-        "root": "түскен",
+        "surface": "республика",
+        "root": "республика",
         "pos": "noun"
       },
       "predicate": "LivesIn",

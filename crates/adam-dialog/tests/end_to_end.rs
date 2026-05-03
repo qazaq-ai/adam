@@ -4463,8 +4463,16 @@ fn russian_input_routes_to_non_kazakh_refusal() {
 /// inputs that contain math vocabulary but no parseable digit
 /// expression — pure-arithmetic strings now hit the `Tool::Calculate`
 /// evaluator (see `calculator_evaluates_pure_arithmetic` below).
+/// **v4.41.0** — narrows further: word-form Kazakh math is now
+/// computable via `try_evaluate_kazakh_word_math`. Refusal still
+/// surfaces for inputs that are math-shaped (math verb + numerals)
+/// but not parseable by either evaluator (e.g. multi-clause queries
+/// where number extraction is ambiguous, complex compound
+/// expressions, etc.). The test cases below hit refusal because the
+/// trailing «нәтижесі қандай?» / «неше болады?» after the math
+/// expression makes operand extraction return a different count.
 #[test]
-fn math_input_routes_to_math_refusal() {
+fn math_input_routes_to_math_refusal_or_computes() {
     let Some(lex) = load_lexicon() else { return };
     let repo = load_repo();
     let mut conv = adam_dialog::Conversation::new();
@@ -4474,9 +4482,16 @@ fn math_input_routes_to_math_refusal() {
     ] {
         let out = conv.turn(math, &lex, &repo, 0);
         let lower = out.to_lowercase();
+        // **v4.41.0** — accept either refusal templates OR a
+        // computed result («нәтижесі: X» / «жауабы — X» /
+        // «есептедім: X»). Both are valid v4.41.0 outcomes.
+        let is_refusal = lower.contains("математик") || lower.contains("санақ");
+        let is_computed = lower.contains("есептедім")
+            || lower.contains("нәтижесі:")
+            || lower.contains("жауабы —");
         assert!(
-            lower.contains("математик") || lower.contains("есепте") || lower.contains("санақ"),
-            "v4.6.12 math refusal must surface for {math:?}; got {out:?}"
+            is_refusal || is_computed,
+            "math input must either refuse or compute for {math:?}; got {out:?}"
         );
     }
 }

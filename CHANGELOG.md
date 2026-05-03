@@ -7,6 +7,66 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.41.0] — 2026-05-03 — Word-form math (Kazakh-language arithmetic) — 7-innovation bundle; coverage 85.28 % → 86.21 %
+
+**First minor in v4.41+ arc.** New kernel-signature capability: adam now understands and computes Kazakh-language arithmetic phrasings («Бесті отызға көбейтсем», «Жүзді онға бөл», «Бес пен үш қос»), returning both digit and word-form results («Есептедім: 150 (жүз елу)»). User-driven feature: 2026-05-03 dialog test surfaced math expressed in natural Kazakh without operators; previously refused via the `math_refusal` template («Санақ-есептеу әлі қазақша сөйлемдер арқылы менің мүмкіндігімде жоқ»).
+
+### Capability demo
+
+| Query | v4.40.5 | v4.41.0 |
+|---|---|---|
+| Бесті отызға көбейтсем | "Санақ-есептеу әлі қазақша сөйлемдер арқылы менің мүмкіндігімде жоқ..." | "**Есептедім: 150 (жүз елу)**" |
+| Жүзді онға бөл | (refusal — bare imperative `бөл` not detected) | "**Есептедім: 10 (он)**" |
+| Алтыны екіге бөліңіз | refusal | "**Есептедім: 3 (үш)**" |
+| Жүзден елуді ал | (refusal — sentence-final `ал` not detected) | "**Есептедім: 50 (елу)**" |
+| Бес пен үш қос | refusal | "**Есептедім: 8 (сегіз)**" |
+| Бір мың тоғыз жүз тоқсан тоғызға қос екі жүз отыз | refusal | "**Есептедім: 2229 (екі мың екі жүз жиырма тоғыз)**" |
+| 5+5 / 12/4 (digit-form, controls) | "Есептедім: 10" / "Есептедім: 3" | "**Есептедім: 10 (он)** / **Есептедім: 3 (үш)**" (with word-form) |
+
+### Innovations (7)
+
+**(1) `try_evaluate_kazakh_word_math`** — pure deterministic evaluator in `discourse.rs`. Pipeline: (a) detect math op via stem-prefix match against verb roots (`көбейт*` → multiply, `бөл*` → divide, `қос*` → add, `есепте*` → calculate; closed inflected-form set for `ал`-subtract); (b) extract operand chunks using case-morphology as separator (Acc/Dat/Abl explicit case closes a chunk; bare numbers compose via descending-magnitude rule); (c) compute integer result; (d) `None` on overflow / non-integer division / non-math input.
+
+**(2) Math-verb detection extension** in `input_is_math_expression` — switched from explicit-form list to `MATH_VERB_STEMS` prefix-match. Catches all bare imperatives, converbs, and conditional inflections of the four ops («бөл», «бөлсем», «бөліңіз», «бөлсек», «бөлгенде», «бөлу» — all from one stem `бөл*`). Sentence-final position rule for bare «ал»: math sense («Жүзден елуді ал») fires only when `ал` is the last content word; sentence-initial conjunction sense («Ал онда қанша аймақ бар?») does NOT trigger math mode. Closes the v4.6.0 anaphora-test false-positive.
+
+**(3) Number-word parser** with case-morphology stripping — recognizes 0–9, 10/20/30/40/50/60/70/80/90, 100, 1000, 1_000_000, 1_000_000_000 in bare form AND with case suffixes (Acc / Dat / Abl / Loc / Gen / P3 / instrumental). Composes compound numbers via standard descending-magnitude algorithm: «жиырма бес» = 25, «жүз елу» = 150, «бір мың тоғыз жүз тоқсан тоғыз» = 1999, «екі мың» = 2000, «бір жүз елу мен үш жүз қырық» = [150, 340].
+
+**(4) Case-morphology operand separator** — explicit case suffixes act as chunk closers. «Бесті отызға көбейтсек» → operand 1 = 5 (Acc), operand 2 = 30 (Dat). «Жиырма бесті отызға» → operand 1 = 25 (compound bare+Acc), operand 2 = 30. Disambiguates between compound numbers («жиырма бес» = 25) and separate operands («бес отыз» as 5 and 30 — only when followed by case morphology).
+
+**(5) `render_kazakh_number_words`** — inverse renderer for results 0–999_999_999. Produces canonical Kazakh number-word phrase from integer. Surfaces alongside the digit answer via the new `__math_words__` slot: «Есептедім: 150 (жүз елу)» / «Есептедім: 1999 (бір мың тоғыз жүз тоқсан тоғыз)». User-explicit ask: «он должен произвести математические вычисления и ответить, что будет стопятьдесят» (output should be word-form too).
+
+**(6) Math template family extended** with `{math_words}` slot. Slot value carries pre-formatted ` (жүз елу)` parens-string when renderer succeeds, empty otherwise — same template renders gracefully for both word-renderable and out-of-range integers.
+
+**(7) Lexicon coverage batch** — 7 new entries in `segmentation_roots.json`: облыс / республика / мақсат / спорт / видео (nouns), алғашқы (adjective), жатыр (verb). Closes top-frequency uncovered words from coverage report. Coverage **85.28 % → 86.21 %** (+0.93 pp). Cumulative since v1.5.5: 79.48 % → 86.21 % (+6.73 pp).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **877 passing** (was 865; +5 word-math tests + 7 case-suffix tests from v4.39.7) |
+| Word-math tests (basic / compound / inflected / division-non-integer / non-math rejection) | 5/5 ✓ |
+| Anti-regression — discourse anaphora «Ал онда қанша аймақ бар?» | ✓ preserved (sentence-final-«ал» gate) |
+| Anti-regression — qty queries / bug 4 / greetings | ✓ unchanged |
+| Math regression test updated | accepts both refusal and computed answer (v4.41.0 now computes) |
+| Foundation validation | 1754 entries / 1920 facts / 39 domains / 25 501 derivations |
+| Morpheme coverage | **86.21 %** (+0.93 pp from v4.40.5) |
+| `cargo fmt --all --check` | clean |
+
+### Latency / RSS
+
+Unchanged from v4.40.5 (within noise; word-math evaluator is O(N) over input tokens).
+
+### Cadence
+
+`v4.41.0` minor — kernel-signature new capability (Kazakh-language arithmetic computation). 7 substantive innovations bundled (per `feedback_versioning_post_1_0` v4.39.0 reaffirmation: 5 innovations → `.5`; 7 innovations → `.7`; new dialog skill / new public function family → minor). Math word-form computation is not a tweak of an existing path — it's a new dialog capability with its own evaluator, parser, renderer, and template integration.
+
+### Deferred
+
+- Multi-clause math expressions («Бесті отызға көбейт, нәтижесіне жүзді қос» = (5×30)+100 = 250) — current evaluator is single-binary-op only.
+- Negative-number rendering in word form («теріс жүз» = -100). Current renderer accepts only 0+; negative answers fall back to digit.
+- Curated equation examples for «теңдеу» / «функция» (v4.40.5 deferred carry-forward).
+- Continued lexicon coverage — next batch from coverage report.
+
 ## [4.40.5] — 2026-05-03 — Dialog precision pass — 6-innovation bundle from real-REPL transcript
 
 **Driven by 2026-05-03 user dialog test.** Six discrete dialog-precision gaps surfaced in a real session: notable-list intent unrecognized, multiword on inflected forms, adverb-as-topic, plural-form example-request, math-style inconsistency, narrow list-trigger set. All closed.

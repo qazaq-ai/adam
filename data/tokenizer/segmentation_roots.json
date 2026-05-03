@@ -936,6 +936,55 @@
       "final_sound_class": "vowel"
     },
     {
+      "id": "noun_v4_41_0_oblys",
+      "root": "облыс",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_41_0_respublika",
+      "root": "республика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_41_0_maqsat",
+      "root": "мақсат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_41_0_sport",
+      "root": "спорт",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_41_0_video",
+      "root": "видео",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_v4_41_0_alghashqy",
+      "root": "алғашқы",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "verb_v4_41_0_jatyr",
+      "root": "жатыр",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
       "id": "noun_v4_39_5_orys",
       "root": "орыс",
       "part_of_speech": "noun",

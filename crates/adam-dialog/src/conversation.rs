@@ -977,8 +977,25 @@ impl Conversation {
         // returns None — Kazakh-language phrasings, complex
         // expressions, division-by-zero, etc.
         if math_input {
-            if let Some(value) = crate::discourse::try_evaluate_arithmetic(input) {
+            // **v4.41.0** — word-form math fallback. The digit-only
+            // `try_evaluate_arithmetic` returns None for Kazakh
+            // phrasings like «бесті отызға көбейту» (5×30); pre-
+            // -v4.41.0 these fell through to `__math_input__` →
+            // refusal family. Now the `try_evaluate_kazakh_word_math`
+            // path catches them. When either evaluator succeeds,
+            // we ALSO compute the Kazakh-word rendering of the
+            // result and surface both — the template
+            // `"{math_value} ({math_words})"` shows e.g.
+            // «150 (жүз елу)», matching the user's expectation
+            // («стопятьдесят») while keeping the digit for
+            // copy-pasting / readability on large numbers.
+            let computed = crate::discourse::try_evaluate_arithmetic(input)
+                .or_else(|| crate::discourse::try_evaluate_kazakh_word_math(input));
+            if let Some(value) = computed {
                 extra_slots.insert("__math_answer__".into(), value.to_string());
+                if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
+                    extra_slots.insert("__math_words__".into(), words);
+                }
             } else {
                 extra_slots.insert("__math_input__".into(), "1".into());
             }

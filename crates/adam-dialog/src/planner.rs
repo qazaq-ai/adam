@@ -270,6 +270,18 @@ pub fn plan_response_with_epistemic(
                 }
             }
             slots.insert("math_value".into(), value.clone());
+            // **v4.41.0** — surface Kazakh number-words alongside
+            // the digit when the renderer produced output. The
+            // slot value INCLUDES the leading space and parens
+            // when populated (« (жүз елу)») and is empty otherwise,
+            // so the same template `"{math_value}{math_words}"`
+            // renders «150 (жүз елу)» for word-renderable results
+            // and «1234567890» (bare) for out-of-range integers.
+            let math_words_slot = extra_slots
+                .get("__math_words__")
+                .map(|w| format!(" ({w})"))
+                .unwrap_or_default();
+            slots.insert("math_words".into(), math_words_slot);
             return ResponsePlan {
                 literal: chosen,
                 slots,

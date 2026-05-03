@@ -496,15 +496,20 @@ templates = [
 [[families]]
 key = "math_answer"
 # **v4.40.5** — removed the bare `{math_value}` template so every
-# math answer has a verbal prefix. Pre-v4.40.5 alternation between
-# bare («12/6 → 2») and prefixed («2*43 → Жауабы — 86») in the same
-# session looked inconsistent in the 2026-05-03 transcript. Three
-# prefix variants stay for seed-driven variety; choice is still
-# deterministic per (seed, intent).
+# math answer has a verbal prefix. **v4.41.0** — added a Kazakh
+# word-form rendering of the result via `{math_words}`. The
+# rendering is computed by `discourse::render_kazakh_number_words`
+# and surfaced by the planner alongside `{math_value}`. Templates
+# that include `{math_words}` produce e.g. «Нәтижесі: 150 (жүз
+# елу)» when the renderer succeeded, matching the user's
+# expectation when the question was asked in word form. For
+# results > 999_999_999 the renderer returns None and the
+# planner inserts an empty string; templates fall through to a
+# plain digit form via the alternates that don't use the slot.
 templates = [
-    "нәтижесі: {math_value}",
-    "жауабы — {math_value}",
-    "есептедім: {math_value}",
+    "нәтижесі: {math_value}{math_words}",
+    "жауабы — {math_value}{math_words}",
+    "есептедім: {math_value}{math_words}",
 ]
 
 # v4.4.0 — User opted out of resolving a pending contradiction

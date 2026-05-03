@@ -335,30 +335,35 @@ pub fn input_is_math_expression(input: &str) -> bool {
     }
     // Signal 2: math verb/noun + presence of numeric tokens
     // (digit-only or Kazakh numeral words).
-    const MATH_VERBS: &[&str] = &[
-        "көбейту",
-        "көбейтсем",
-        "көбейтсеңіз",
-        "көбейткенде",
-        "көбейтіңіз",
-        "бөлу",
-        "бөлсем",
-        "бөлсеңіз",
-        "бөліңіз",
-        "бөлгенде",
-        "қосу",
-        "қоссам",
-        "қоссаңыз",
-        "қосыңыз",
-        "қосқанда",
+    // **v4.41.0** — match by stem-prefix («көбейт*», «бөл*»,
+    // «қос*») so naked imperative («бөл», «қос», «көбейт») and
+    // converb forms («көбейтсек», «бөлсе») fire too. Pre-v4.41.0
+    // the explicit form list missed «Жүзді онға бөл» (bare
+    // imperative) — fell through to clarify path. The
+    // stem-prefix is short but preceded by the `has_numeral_word`
+    // gate so an incidental noun starting with «көб»/«бөл»/«қос»
+    // can't trigger math-mode by itself.
+    const MATH_VERB_STEMS: &[&str] = &["көбейт", "бөл", "қос", "есепте"];
+    // `ал` (subtract / take) is too short to use as a prefix —
+    // checked below as a closed set of inflected forms.
+    // **v4.41.0** — closed set of `ал` (subtract / take) inflected
+    // forms recognised as math-verb. Bare imperative «ал» is
+    // intentionally OMITTED — it doubles as the Kazakh sentence-
+    // initial conjunction "and / but" («Ал онда қанша аймақ
+    // бар?» — pre-cognitive_eval bare «ал» in SUB_FORMS triggered
+    // math mode here on the «он» numeral prefix in «онда»,
+    // breaking the v4.6.0 anaphora test). For subtraction prefer
+    // the explicit imperative «алыңыз» / verbal noun «алу» /
+    // converb «алып» / conditional «алсам / алсаң / алсаңыз».
+    const SUB_FORMS: &[&str] = &[
         "алу",
+        "алса",
         "алсам",
+        "алсаң",
         "алсаңыз",
         "алыңыз",
         "алғанда",
-        "есепте",
-        "есептеңіз",
-        "есептесеңіз",
+        "алып",
     ];
     const KAZAKH_NUMERALS: &[&str] = &[
         "бір",
@@ -383,10 +388,21 @@ pub fn input_is_math_expression(input: &str) -> bool {
         "мың",
     ];
     let words: Vec<&str> = lower.split(|c: char| !c.is_alphabetic()).collect();
-    let has_math_verb = words
-        .iter()
-        .any(|w| MATH_VERBS.iter().any(|v| !w.is_empty() && w.starts_with(v)));
-    if !has_math_verb {
+    let non_empty_words: Vec<&&str> = words.iter().filter(|w| !w.is_empty()).collect();
+    let has_math_verb = words.iter().any(|w| {
+        if w.is_empty() {
+            return false;
+        }
+        MATH_VERB_STEMS.iter().any(|stem| w.starts_with(stem)) || SUB_FORMS.contains(w)
+    });
+    // **v4.41.0** — bare imperative «ал» is the standalone form of
+    // «to subtract» but doubles as the sentence-initial Kazakh
+    // conjunction "and / but". Position disambiguates: math-«ал»
+    // is sentence-final («Жүзден елуді ал»); conjunction-«ал» is
+    // sentence-initial («Ал онда қанша аймақ бар?»). Accept ONLY
+    // the sentence-final position.
+    let has_bare_al_imperative = non_empty_words.last().map(|w| **w == "ал").unwrap_or(false);
+    if !has_math_verb && !has_bare_al_imperative {
         return false;
     }
     let has_digit = input.chars().any(|c| c.is_ascii_digit());
@@ -543,6 +559,392 @@ pub fn try_evaluate_arithmetic(input: &str) -> Option<i64> {
 enum ArithToken {
     Num(i64),
     Op(char),
+}
+
+/// **v4.41.0** — Kazakh word-form math evaluator. Returns
+/// `Some(value)` for parseable Kazakh-language arithmetic input
+/// (e.g. «бесті отызға көбейту» = 5×30 = 150; «жүз пен елуді
+/// қосу» = 100+50 = 150; «жүзді онға бөл» = 100/10 = 10).
+/// Returns `None` when the input doesn't have the
+/// `<num-word> <num-word> <math-verb>` shape, when number parsing
+/// fails, or when computation overflows / divides non-evenly.
+///
+/// Pipeline:
+/// 1. Strip case suffixes from each token (бесті → бес, отызға → отыз).
+/// 2. Detect math operation by stem-prefix match against verb roots
+///    (қос / көбейт / бөл / ал) — handles inflected forms like
+///    «көбейтіңіз», «көбейткенде», «көбейтсек», «қоссаңыз», etc.
+/// 3. Group consecutive number-word tokens into operands using
+///    additive composition («жиырма бес» → 20+5 = 25) and
+///    multiplicative composition with `жүз / мың / миллион` («екі
+///    мың» → 2×1000 = 2000; «бір жүз елу» → 100+50 = 150).
+/// 4. Apply the operation; return integer result. Non-integer
+///    division falls back to `None` (planner picks math_refusal).
+///
+/// Why a separate evaluator from `try_evaluate_arithmetic`:
+/// the digit-form version normalises whitespace and walks ASCII
+/// arithmetic; the word-form version needs lexical recognition of
+/// number words AND verb stems with Kazakh case morphology. Sharing
+/// internals would mix two unrelated parse strategies.
+pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
+    let lower = input.to_lowercase();
+    let raw_tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|t| !t.is_empty())
+        .collect();
+    if raw_tokens.len() < 3 {
+        return None;
+    }
+    let op = detect_kazakh_math_op(&raw_tokens)?;
+    let operands = extract_kazakh_number_operands(&raw_tokens);
+    if operands.len() != 2 {
+        return None;
+    }
+    let (a, b) = (operands[0], operands[1]);
+    match op {
+        KazakhMathOp::Add => a.checked_add(b),
+        KazakhMathOp::Sub => a.checked_sub(b),
+        KazakhMathOp::Mul => a.checked_mul(b),
+        KazakhMathOp::Div => {
+            if b == 0 || a % b != 0 {
+                None
+            } else {
+                Some(a / b)
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum KazakhMathOp {
+    Add,
+    Sub,
+    Mul,
+    Div,
+}
+
+fn detect_kazakh_math_op(tokens: &[&str]) -> Option<KazakhMathOp> {
+    // Stem-prefix match against verb roots. Order matters: longer
+    // / more-specific stems first so «көбейту» wins over a
+    // hypothetical «көб» (shorter prefix). All four ops covered;
+    // `ал` (subtract / take) is intentionally checked LAST because
+    // it's the shortest stem and would otherwise eat plenty of
+    // unrelated tokens.
+    for t in tokens {
+        if t.starts_with("көбейт") {
+            return Some(KazakhMathOp::Mul);
+        }
+        if t.starts_with("бөл") {
+            return Some(KazakhMathOp::Div);
+        }
+        if t.starts_with("қос") {
+            return Some(KazakhMathOp::Add);
+        }
+    }
+    // `ал` separately because of its short length — accept only when
+    // the stem is exactly one of the known math-verb forms (not a
+    // prefix of unrelated nouns like `алма` "apple" / `алмас` "won't
+    // take" / `алыс` "far"). Conservative whitelist.
+    // **v4.41.0** — closed set of `ал` (subtract / take) inflected
+    // forms recognised as math-verb. Bare imperative «ал» is
+    // intentionally OMITTED — it doubles as the Kazakh sentence-
+    // initial conjunction "and / but" («Ал онда қанша аймақ
+    // бар?» — pre-cognitive_eval bare «ал» in SUB_FORMS triggered
+    // math mode here on the «он» numeral prefix in «онда»,
+    // breaking the v4.6.0 anaphora test). For subtraction prefer
+    // the explicit imperative «алыңыз» / verbal noun «алу» /
+    // converb «алып» / conditional «алсам / алсаң / алсаңыз».
+    const SUB_FORMS: &[&str] = &[
+        "алу",
+        "алса",
+        "алсам",
+        "алсаң",
+        "алсаңыз",
+        "алыңыз",
+        "алғанда",
+        "алып",
+    ];
+    for t in tokens {
+        if SUB_FORMS.contains(t) {
+            return Some(KazakhMathOp::Sub);
+        }
+    }
+    // **v4.41.0** — bare imperative «ал» accepted ONLY when
+    // sentence-final (canonical imperative position; sentence-
+    // initial «ал» is the conjunction "and / but" — closes the
+    // false-positive on «Ал онда қанша аймақ бар?»).
+    if tokens.last().is_some_and(|t| *t == "ал") {
+        return Some(KazakhMathOp::Sub);
+    }
+    None
+}
+
+fn extract_kazakh_number_operands(tokens: &[&str]) -> Vec<i64> {
+    // **v4.41.0** — case-morphology-aware operand extraction.
+    //
+    // Algorithm: a "number chunk" accumulates consecutive number-
+    // word tokens via standard number-composition (additive for
+    // descending magnitude — «жиырма бес» = 20+5 = 25;
+    // multiplicative for `жүз`/`мың`/`миллион` — «бір мың
+    // тоғыз жүз» = 1*1000 + 9*100 = 1900). A chunk CLOSES when:
+    //  - the token has an explicit case suffix («бесті» Acc /
+    //    «отызға» Dat / «жүзден» Abl) — the case marker is the
+    //    user's signal that this number is a complete operand
+    //    serving a syntactic role;
+    //  - OR a non-number token (verb / separator) appears.
+    //
+    // This handles the canonical Kazakh math phrasings:
+    //   «Бесті отызға көбейту»          → [5, 30] × → 150
+    //   «Жиырма бесті отызға көбейту»   → [25, 30] × → 750
+    //   «Жүз елуді бір мыңға қос»       → [150, 1000] + → 1150
+    //
+    // Without case morphology, two consecutive number words
+    // compose normally (so «жиырма бес есепте» means «count up to
+    // 25» — single operand 25). The case suffix is the
+    // disambiguator between «25» and «20-and-5-as-separate-args».
+    let mut operands = Vec::new();
+    let mut chunk_total: i64 = 0;
+    let mut chunk_inflight = false;
+    for t in tokens {
+        if let Some((value, has_case)) = parse_kazakh_number_token(t) {
+            // Compose into the current chunk.
+            chunk_total = compose_number_in_chunk(chunk_total, value);
+            chunk_inflight = true;
+            if has_case {
+                // Case suffix closes the chunk — this number is a
+                // complete syntactic operand.
+                operands.push(chunk_total);
+                chunk_total = 0;
+                chunk_inflight = false;
+            }
+        } else if chunk_inflight {
+            // Non-number token closes any open chunk.
+            operands.push(chunk_total);
+            chunk_total = 0;
+            chunk_inflight = false;
+        }
+    }
+    if chunk_inflight {
+        operands.push(chunk_total);
+    }
+    operands
+}
+
+fn compose_number_in_chunk(current: i64, next: i64) -> i64 {
+    // Standard cardinal-number composition for descending-magnitude
+    // languages.
+    //   - `жүз` (100) multiplies the < 1000 remainder of `current`
+    //     (or 1 if remainder is 0); preserves any thousands
+    //     accumulated already. «бес жүз» = 5*100 = 500;
+    //     «бір мың тоғыз жүз» = 1000 + 9*100 = 1900.
+    //   - `мың` / `миллион` multiply the entire accumulator (or 1).
+    //   - Other digits add.
+    if next == 100 {
+        let thousands = current / 1000 * 1000;
+        let units = current % 1000;
+        let multiplier = if units == 0 { 1 } else { units };
+        thousands + multiplier * 100
+    } else if next == 1000 || next == 1_000_000 {
+        let multiplier = if current == 0 { 1 } else { current };
+        multiplier * next
+    } else {
+        current + next
+    }
+}
+
+fn parse_kazakh_number_token(token: &str) -> Option<(i64, bool)> {
+    // Returns (value, has_explicit_case_suffix).
+    // First try the bare token (no case).
+    if let Some(v) = bare_kazakh_number(token) {
+        return Some((v, false));
+    }
+    // Try each case-suffix, longest first, and check that the
+    // remaining stem IS a recognised bare number.
+    for suff in CASE_SUFFIXES {
+        if let Some(stem_len) = token.len().checked_sub(suff.len()) {
+            if token.ends_with(suff) {
+                let stem = &token[..stem_len];
+                if let Some(v) = bare_kazakh_number(stem) {
+                    return Some((v, true));
+                }
+            }
+        }
+    }
+    None
+}
+
+const CASE_SUFFIXES: &[&str] = &[
+    // Ordered longest-first so longest-match wins.
+    "тардың",
+    "тердің",
+    "лардың",
+    "лердің",
+    "дардың",
+    "дердің",
+    "ынан",
+    "інен",
+    "ының",
+    "інің",
+    "ында",
+    "інде",
+    "тың",
+    "тің",
+    "дың",
+    "дің",
+    "ның",
+    "нің",
+    "пен",
+    "бен",
+    "ден",
+    "тен",
+    "нен",
+    "дан",
+    "тан",
+    "нан",
+    "ге",
+    "ке",
+    "ға",
+    "қа",
+    "не",
+    "на",
+    "ты",
+    "ті",
+    "ды",
+    "ді",
+    "ны",
+    "ні",
+    "де",
+    "те",
+    "да",
+    "та",
+];
+
+/// **v4.41.0** — Kazakh number-to-words renderer. The inverse of
+/// [`bare_kazakh_number`]: given an integer, produces its
+/// canonical Kazakh number-word phrase. Used by the math-answer
+/// pipeline to optionally emit «жүз елу» alongside `150` so the
+/// user gets the answer in the same modality they asked
+/// («Бесті отызға көбейтсем» → «Нәтижесі: 150 (жүз елу)»).
+///
+/// Supported range: 0 to 999_999_999 (up to «тоғыз жүз тоқсан
+/// тоғыз миллион тоғыз жүз тоқсан тоғыз мың тоғыз жүз тоқсан
+/// тоғыз»). Returns `None` for negative or larger numbers
+/// — those continue to render as bare digits via the
+/// `{math_value}` slot. Negative not implemented because Kazakh
+/// math vocabulary («теріс» negation marker) is rare in
+/// arithmetic-result contexts; user can read the digit directly.
+pub fn render_kazakh_number_words(value: i64) -> Option<String> {
+    if !(0..=999_999_999).contains(&value) {
+        return None;
+    }
+    if value == 0 {
+        return Some("нөл".to_string());
+    }
+    let mut parts: Vec<String> = Vec::new();
+    let mut n = value;
+    let millions = n / 1_000_000;
+    n %= 1_000_000;
+    if millions > 0 {
+        if millions > 1 {
+            parts.push(render_under_thousand(millions));
+        } else {
+            parts.push("бір".to_string());
+        }
+        parts.push("миллион".to_string());
+    }
+    let thousands = n / 1000;
+    n %= 1000;
+    if thousands > 0 {
+        if thousands > 1 {
+            parts.push(render_under_thousand(thousands));
+        } else {
+            parts.push("бір".to_string());
+        }
+        parts.push("мың".to_string());
+    }
+    if n > 0 {
+        parts.push(render_under_thousand(n));
+    }
+    Some(parts.join(" "))
+}
+
+fn render_under_thousand(n: i64) -> String {
+    let mut parts: Vec<String> = Vec::new();
+    let hundreds = n / 100;
+    if hundreds > 0 {
+        if hundreds > 1 {
+            parts.push(digit_word(hundreds).to_string());
+        }
+        parts.push("жүз".to_string());
+    }
+    let tens_value = (n % 100) / 10 * 10;
+    if tens_value > 0 {
+        parts.push(tens_word(tens_value).to_string());
+    }
+    let units = n % 10;
+    if units > 0 {
+        parts.push(digit_word(units).to_string());
+    }
+    parts.join(" ")
+}
+
+fn digit_word(d: i64) -> &'static str {
+    match d {
+        1 => "бір",
+        2 => "екі",
+        3 => "үш",
+        4 => "төрт",
+        5 => "бес",
+        6 => "алты",
+        7 => "жеті",
+        8 => "сегіз",
+        9 => "тоғыз",
+        _ => "",
+    }
+}
+
+fn tens_word(t: i64) -> &'static str {
+    match t {
+        10 => "он",
+        20 => "жиырма",
+        30 => "отыз",
+        40 => "қырық",
+        50 => "елу",
+        60 => "алпыс",
+        70 => "жетпіс",
+        80 => "сексен",
+        90 => "тоқсан",
+        _ => "",
+    }
+}
+
+fn bare_kazakh_number(stem: &str) -> Option<i64> {
+    match stem {
+        "нөл" => Some(0),
+        "бір" => Some(1),
+        "екі" => Some(2),
+        "үш" => Some(3),
+        "төрт" => Some(4),
+        "бес" => Some(5),
+        "алты" => Some(6),
+        "жеті" => Some(7),
+        "сегіз" => Some(8),
+        "тоғыз" => Some(9),
+        "он" => Some(10),
+        "жиырма" => Some(20),
+        "отыз" => Some(30),
+        "қырық" => Some(40),
+        "елу" => Some(50),
+        "алпыс" => Some(60),
+        "жетпіс" => Some(70),
+        "сексен" => Some(80),
+        "тоқсан" => Some(90),
+        "жүз" => Some(100),
+        "мың" => Some(1000),
+        "миллион" => Some(1_000_000),
+        "миллиард" => Some(1_000_000_000),
+        _ => None,
+    }
 }
 
 /// **v4.6.20** — discourse preambles. Surface forms a Kazakh
@@ -952,6 +1354,79 @@ mod math_tests {
         assert!(!input_is_math_expression("Қазақстанда 17 облыс бар."));
         assert!(!input_is_math_expression("Менің жасым 30"));
         assert!(!input_is_math_expression("Алты қаласы Қазақстанда"));
+    }
+
+    /// **v4.41.0** — word-form math evaluator tests.
+    use super::try_evaluate_kazakh_word_math;
+
+    #[test]
+    fn word_math_basic_ops() {
+        // 5 × 30 = 150
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Бесті отызға көбейтсем"),
+            Some(150)
+        );
+        // 100 / 10 = 10
+        assert_eq!(try_evaluate_kazakh_word_math("Жүзді онға бөл"), Some(10));
+        // 6 / 2 = 3
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Алтыны екіге бөліңіз"),
+            Some(3)
+        );
+        // 100 - 50 = 50
+        assert_eq!(try_evaluate_kazakh_word_math("Жүзден елуді ал"), Some(50));
+        // 5 + 3 = 8
+        assert_eq!(try_evaluate_kazakh_word_math("Бес пен үш қос"), Some(8));
+    }
+
+    #[test]
+    fn word_math_compound_numbers() {
+        // 25 × 5 = 125 (compound «жиырма бес»)
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Жиырма бесті бес көбейтсек"),
+            Some(125)
+        );
+        // 100 + 50 = 150 (compound «жүз елу»)
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Жүз елуді бір мыңға қос"),
+            Some(1150)
+        );
+        // 1999 + 230 = 2229 (compound «бір мың тоғыз жүз тоқсан тоғыз»)
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Бір мың тоғыз жүз тоқсан тоғызға қос екі жүз отыз"),
+            Some(2229)
+        );
+    }
+
+    #[test]
+    fn word_math_inflected_imperatives() {
+        // Imperative-form variants
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Бесті отызға көбейтіңіз"),
+            Some(150)
+        );
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Жүзді бесті бөлсем"),
+            Some(20)
+        );
+    }
+
+    #[test]
+    fn word_math_rejects_non_math() {
+        // No math verb
+        assert_eq!(try_evaluate_kazakh_word_math("Бес отыз қанша"), None);
+        // Single operand only
+        assert_eq!(try_evaluate_kazakh_word_math("Бесті көбейтсек"), None);
+        // Take-imperative without numerals doesn't trigger
+        assert_eq!(try_evaluate_kazakh_word_math("Кітапты ал"), None);
+    }
+
+    #[test]
+    fn word_math_division_non_integer_returns_none() {
+        // 7 / 2 has remainder → None (math_refusal fallback)
+        assert_eq!(try_evaluate_kazakh_word_math("Жетіні екіге бөл"), None);
+        // 5 / 0 → None
+        assert_eq!(try_evaluate_kazakh_word_math("Бесті нөлге бөл"), None);
     }
 }
 
