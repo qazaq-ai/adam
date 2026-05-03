@@ -211,6 +211,21 @@ pub(crate) const NOT_A_TOPIC: &[&str] = &[
     // v4.4.10's `қысқа` / `ештеңе` additions.
     "өте",
     "жалпы",
+    // **v4.40.5** — temporal/manner adverbs surfaced by the
+    // 2026-05-03 dialog transcript. «Кейде сенің қателесіп
+    // жүргеніңді көремін» — `кейде` ("sometimes") is a sentential
+    // adverb, never a topic noun. Pre-v4.40.5 the topic extractor
+    // returned `кейде` and the planner surfaced the unknown-with-
+    // -noun template "Мүмкін сіз кейде туралы сұрап отырған
+    // шығарсыз" — clearly nonsensical. Same misanalysis class as
+    // v4.6.0's `өте` / `жалпы` additions.
+    "кейде",
+    "кей-кейде",
+    "әрдайым",
+    "ылғи",
+    "үнемі",
+    "бірден",
+    "дереу",
     // **v4.6.12** — bare case-suffix leaks. Real-REPL 2026-04-29
     // transcript: «5-ті 7-ге көбейткенде неше болады?» — the
     // FST analysed `7-ге` as a fragment of `7` + `-ге` (dative
@@ -486,6 +501,14 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "төле би",
     "қазыбек би",
     "әйтеке би",
+    // **v4.40.5** — notable-people list-summary objects from
+    // `data/world_core/notable_kazakhstanis.jsonl` (notable_031
+    // through notable_034). Required by the
+    // `world_core_multiword_coverage` invariant test.
+    "танымал қазақстандықтар тізімі",
+    "ақын-жазушылар тізімі",
+    "ғалымдар тізімі",
+    "спортшылар тізімі",
     // **v4.38.0** — role-bridges expansion (8 new compound bridge
     // objects from `data/world_core/role_bridges.jsonl`). These are
     // structural multi-word categories used as IsA targets by the
@@ -1162,9 +1185,42 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
 /// of the inflected compound.
 pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
     let lowered = input.to_lowercase();
+    // First pass: exact substring (preserves all pre-v4.40.5
+    // matches bit-for-bit when the input surface contains the
+    // multiword in canonical bare form).
     for entity in MULTIWORD_ENTITIES {
         if lowered.contains(entity) {
             return Some((*entity).to_string());
+        }
+    }
+    // **v4.40.5** — second pass: inflected-second-word match. For
+    // 2-word entities `X Y`, accept input containing the consecutive
+    // token pair `X T` where T starts with `Y`'s first 3 chars.
+    // Closes the gap on inflected forms like «бағдарламалау
+    // тілдерін» (Plural+P3+Acc of `тіл`) which doesn't substring-
+    // contain «бағдарламалау тілі»; surfaced by the 2026-05-03
+    // dialog transcript «Қандай бағдарламалау тілдерін білесіз?»
+    // returning a tangential «Тіл — қарым-қатынас құралы» fact
+    // instead of routing to programming_rust topic. Conservative
+    // — fires only when the FIRST word matches exactly (longer
+    // first words give stronger discriminative signal); 3+ -word
+    // entities still rely on the first-pass substring match
+    // because multi-token inflection patterns are too varied for
+    // a uniform stem-prefix heuristic.
+    let tokens: Vec<&str> = lowered.split_whitespace().collect();
+    for entity in MULTIWORD_ENTITIES {
+        let parts: Vec<&str> = entity.split_whitespace().collect();
+        if parts.len() != 2 {
+            continue;
+        }
+        let stem_2: String = parts[1].chars().take(3).collect();
+        if stem_2.chars().count() < 3 {
+            continue;
+        }
+        for window in tokens.windows(2) {
+            if window[0] == parts[0] && window[1].starts_with(stem_2.as_str()) {
+                return Some((*entity).to_string());
+            }
         }
     }
     None
@@ -1780,7 +1836,21 @@ pub(crate) fn genitive_topic_hint_for_list(input: &str, parses: &[Analysis]) -> 
         || lower.contains("атаулары")
         || lower.contains("атап шық")
         || lower.contains("атап өт")
-        || lower.contains("барлық");
+        || lower.contains("барлық")
+        // **v4.40.5** — extended triggers (mirror `tool.rs`
+        // v4.40.5 list-intent extension): «айтып бер / келтір /
+        // атаңыз / көрсет / тізіп бер» phrasings ask for items
+        // of a class even without an explicit «тізім» token.
+        // Surfaced by 2026-05-03 transcript test where
+        // «Қазақстанның танымал тұлғалары туралы айтып
+        // беріңізші» picked head-noun «тұлға» instead of
+        // genitive subject «қазақстан» because the trigger set
+        // was too narrow.
+        || lower.contains("айтып бер")
+        || lower.contains("келтір")
+        || lower.contains("атаңыз")
+        || lower.contains("көрсет")
+        || lower.contains("тізіп бер");
     // **v4.39.0** — also fire on quantity questions with a
     // possessive-genitive shape («Қазақстанның халқы шамамен
     // қанша?»). The genitive subject is the *holder* of the

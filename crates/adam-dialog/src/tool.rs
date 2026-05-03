@@ -446,11 +446,33 @@ impl Tool {
                 // `related_to облыстар тізімі`. List-intent
                 // boost flips that.
                 let query_lower = ctx.query_input.unwrap_or("").to_lowercase();
+                // **v4.40.5** — extended list-intent trigger list.
+                // Original v4.17.5 set was «тізім / атаулары / атап
+                // шық / атап өт / барлық атау». Real-REPL transcript
+                // 2026-05-03 («Қазақстанның танымал тұлғалары туралы
+                // айтып беріңізші?», «Теңдеулерге мысалдар
+                // келтіріңіз», «...атын атаңыз») showed three more
+                // common list-request phrasings that didn't fire:
+                //   - «айтып бер» — "tell me about [the list]"
+                //   - «келтір» — "cite/give [examples / items]"
+                //   - «атаңыз / атап» — bare "name [items]" imperative
+                //   - «көрсет» — "show [the items]"
+                //   - «тізіп бер» — "list out [items]"
+                // All five share the discourse-shape «X-тарын / X
+                // туралы + verb-imperative» that asks for items of
+                // a class. Added as triggers; downstream
+                // list-intent ranking + genitive-topic priority
+                // pick the right subject.
                 let has_list_intent = query_lower.contains("тізім")
                     || query_lower.contains("атаулары")
                     || query_lower.contains("атап шық")
                     || query_lower.contains("атап өт")
-                    || query_lower.contains("барлық атау");
+                    || query_lower.contains("барлық атау")
+                    || query_lower.contains("айтып бер")
+                    || query_lower.contains("келтір")
+                    || query_lower.contains("атаңыз")
+                    || query_lower.contains("көрсет")
+                    || query_lower.contains("тізіп бер");
                 // **v4.38.0** — quantity-question detection. When the
                 // user's input contains «қанша / неше» (quantity
                 // markers — "how many / how much"), the answer
@@ -490,6 +512,18 @@ impl Tool {
                     ("ауыл", "елді мекен"),
                     ("кісі", "адам"),
                     ("тұлға", "адам"),
+                    // **v4.40.5** — notable-people list bridges.
+                    // «Қазақстанның танымал тұлғалары» query
+                    // tokenises as «танымал тұлға» (head: тұлға);
+                    // the curated list-summary fact has object
+                    // «танымал қазақстандықтар тізімі». These
+                    // pairs let list_intent_rank's synonym
+                    // overlap promote the right list.
+                    ("тұлға", "қазақстандық"),
+                    ("ақын", "ақын-жазушы"),
+                    ("жазушы", "ақын-жазушы"),
+                    ("ғалым", "ғалым"),
+                    ("спортшы", "спортшы"),
                 ];
                 matches.sort_by(|a, b| {
                     let overlap_a = if query_tokens.is_empty() {

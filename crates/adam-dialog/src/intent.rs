@@ -402,11 +402,20 @@ pub enum Politeness {
 }
 
 pub fn unknown_answer_mode(raw_tokens: &[String]) -> UnknownAnswerMode {
+    // **v4.40.5** — extended example-request detection.
+    // Pre-v4.40.5 only matched exact tokens «мысал / мысалы /
+    // дәйек / дәйексөз / үзінді». Real-REPL transcript
+    // 2026-05-03 «Теңдеулерге мысалдар келтіріңіз» (plural form
+    // «мысалдар» of «мысал») asked for examples but the
+    // detector missed because of the plural ending. Extend with
+    // a `starts_with("мысал")` prefix check + the verb «келтір»
+    // (literally "cite/produce", strongly implies example-
+    // -request when paired with a topic).
     if raw_tokens.iter().any(|t| {
-        matches!(
-            t.as_str(),
-            "мысал" | "мысалы" | "дәйек" | "дәйексөз" | "үзінді"
-        )
+        let s = t.as_str();
+        s.starts_with("мысал")
+            || s.starts_with("келтір")
+            || matches!(s, "дәйек" | "дәйексөз" | "үзінді")
     }) {
         return UnknownAnswerMode::Example;
     }

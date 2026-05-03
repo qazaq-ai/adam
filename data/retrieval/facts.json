@@ -1,7 +1,7 @@
 {
-  "version": "4.37.5",
+  "version": "4.39.7",
   "status": "completed",
-  "elapsed_s": 67,
+  "elapsed_s": 66,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -17,30 +17,30 @@
   ],
   "counts": {
     "samples_scanned": 3691,
-    "samples_with_facts": 63,
-    "facts_total": 1980,
+    "samples_with_facts": 77,
+    "facts_total": 1999,
     "by_predicate": {
-      "after": 7,
+      "after": 8,
       "causes": 23,
       "does_to": 1,
-      "goes_to": 21,
-      "has": 59,
+      "goes_to": 26,
+      "has": 62,
       "has_quantity": 34,
       "in_domain": 24,
       "is_a": 1520,
-      "lives_in": 7,
-      "part_of": 228,
-      "related_to": 56
+      "lives_in": 8,
+      "part_of": 230,
+      "related_to": 63
     },
     "by_pack": {
-      "abai_wikisource_pack.json": 2,
-      "cc100_kk_pack.json": 18,
+      "abai_wikisource_pack.json": 6,
+      "cc100_kk_pack.json": 20,
       "common_voice_kk_pack.json": 3,
       "kazakh_classics_pack.json": 3,
       "kazakh_proverbs_pack.json": 13,
-      "kazakh_textbooks_pack.json": 11,
-      "tatoeba_kazakh_pack.json": 2,
-      "wikipedia_kz_pack.json": 12,
+      "kazakh_textbooks_pack.json": 14,
+      "tatoeba_kazakh_pack.json": 3,
+      "wikipedia_kz_pack.json": 17,
       "world_core/adam_self.jsonl": 33,
       "world_core/animals.jsonl": 42,
       "world_core/astronomy.jsonl": 41,
@@ -66,7 +66,7 @@
       "world_core/mathematics_basic.jsonl": 37,
       "world_core/measurements.jsonl": 10,
       "world_core/music_kz.jsonl": 16,
-      "world_core/notable_kazakhstanis.jsonl": 47,
+      "world_core/notable_kazakhstanis.jsonl": 51,
       "world_core/numbers.jsonl": 54,
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
@@ -105,6 +105,26 @@
     },
     {
       "subject": {
+        "surface": "Батыс",
+        "root": "батыс",
+        "pos": "noun"
+      },
+      "predicate": "LivesIn",
+      "object": {
+        "surface": "Еуропада",
+        "root": "еуропа",
+        "pos": "noun"
+      },
+      "pattern": "X Y-да тұрады",
+      "source": {
+        "pack": "tatoeba_kazakh_pack.json",
+        "sample_id": "tatoeba_kz_00127"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Франция Батыс Еуропада орналасады."
+    },
+    {
+      "subject": {
         "surface": "Сазсырнай",
         "root": "сазсырнай",
         "pos": "noun"
@@ -125,6 +145,26 @@
     },
     {
       "subject": {
+        "surface": "Қауым",
+        "root": "қау",
+        "pos": "noun"
+      },
+      "predicate": "GoesTo",
+      "object": {
+        "surface": "басқа",
+        "root": "бас",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ке барады",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000032"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Басты бетті және Қауым порталын безендіріп шығаруының уақыты келген болар, басқа жобалардан ұят болды."
+    },
+    {
+      "subject": {
         "surface": "сыртқы",
         "root": "сыртқ",
         "pos": "noun"
@@ -142,6 +182,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Қазақстанның сыртқы сауда айналымы жылдан жылға өсіп келеді: 1995 жылы $9 млрд болатын болса 2008 жылы $109 млрд болды."
+    },
+    {
+      "subject": {
+        "surface": "Қазақстанның",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "сыртқы",
+        "root": "сыртқ",
+        "pos": "noun"
+      },
+      "pattern": "X-тың Y-сы бар",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000130"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Осыған қарамастан Қазақстанның сыртқы экономикалық саласын болашақта дамытуына орасан зор шамасы бар."
     },
     {
       "subject": {
@@ -182,6 +242,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Әлемдегі ең ұзын құрлықтық шекара — Қазақстан мен Ресей шекарасы (7591 шақырым)."
+    },
+    {
+      "subject": {
+        "surface": "Қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "бағытының",
+        "root": "бағыт",
+        "pos": "noun"
+      },
+      "pattern": "X Y-нің құрамында",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000210"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Қазақстан мен Орталық Азияның Ресейге қосылуы аяқталған соң, Шымкент Жаңақоқан бағытының құрамында болып, соңынан Түркістан уезінің, ал 1867 жылдан Түркістан генерал-губернаторлығына қарасты Сырдария облысының уездік қаласы болды."
     },
     {
       "subject": {
@@ -305,8 +385,8 @@
     },
     {
       "subject": {
-        "surface": "аумағының",
-        "root": "аумағын",
+        "surface": "бөлігін",
+        "root": "бөлігін",
         "pos": "noun"
       },
       "predicate": "LivesIn",
@@ -342,6 +422,46 @@
       },
       "confidence": "Grammar",
       "raw_text": "Еуропалық бөліктің солтүстігінен басқа аумағын және азиялық бөліктегі Транссібір теміржолы бойындағы аудандарды қамтитын жолақта Ресей халқының 93%-ы тұрады."
+    },
+    {
+      "subject": {
+        "surface": "пайда",
+        "root": "пайда",
+        "pos": "noun"
+      },
+      "predicate": "GoesTo",
+      "object": {
+        "surface": "басқа",
+        "root": "бас",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ке барады",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000438"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ұлттық топырақта пайда болып, өзіндік бет- бейнесімен ерекшеленсе де, мәдени өркендеудің жалпы арнасына келіп құйылатын Ресей мәдениеті, оның ішінде ұлттық бұлақтан нәр алған ежелгі Русь мәдениеті, византиялық көркем жүйемен және тағы да басқа мәдениеттермен тығыз алмасып жатады."
+    },
+    {
+      "subject": {
+        "surface": "қала",
+        "root": "қала",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "халқының",
+        "root": "халқ",
+        "pos": "noun"
+      },
+      "pattern": "X Y-нің бөлігі",
+      "source": {
+        "pack": "wikipedia_kz_pack.json",
+        "sample_id": "wiki_kz_0000444"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Миллионер қалаларда елдегі барлық қала халқының 1/4 бөлігі шоғырланған."
     },
     {
       "subject": {
@@ -522,6 +642,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Соңғы сұрақтар мен жауаптар Халықтық емдеу"
+    },
+    {
+      "subject": {
+        "surface": "пәнінің",
+        "root": "пән",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ұстаздары",
+        "root": "ұстаз",
+        "pos": "noun"
+      },
+      "pattern": "X-тың Y-сы бар",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000132"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Тарих пәнінің ұстаздары мен жас мамандарға ашық сабақ, күнделікті сабақ өткізу кезінде қолдануға болады. Сабақ құрылымында мәтінмен жұмыс, түрлі әдіс-тәсілдермен жұмыс түрлері бар."
     },
     {
       "subject": {
@@ -745,6 +885,26 @@
     },
     {
       "subject": {
+        "surface": "өтінімі",
+        "root": "өтінім",
+        "pos": "noun"
+      },
+      "predicate": "After",
+      "object": {
+        "surface": "түскеннен",
+        "root": "түскен",
+        "pos": "noun"
+      },
+      "pattern": "X Y-дан кейін",
+      "source": {
+        "pack": "cc100_kk_pack.json",
+        "sample_id": "cc100_kk_0000429"
+      },
+      "confidence": "Grammar",
+      "raw_text": "15. Облыс басқармасы ауыл шаруашылығы тауарын өндірушінің өтінімі түскеннен кейін екі жұмыс күні ішінде қазынашылықтың аумақтық бөліміне ауыл шаруашылығы тауарын өндірушілердің және (немесе) тыңайтқыштарды өндірушілердің шотына тиесілі субсидияларды аудару үшін ақы төлеуге төлем құжаттарын береді."
+    },
+    {
+      "subject": {
         "surface": "Есек",
         "root": "есек",
         "pos": "noun"
@@ -805,6 +965,26 @@
     },
     {
       "subject": {
+        "surface": "мал",
+        "root": "мал",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "бас",
+        "root": "бас",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00053"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Айттым сәлем, Қаламқас, Саған құрбан мал мен бас."
+    },
+    {
+      "subject": {
         "surface": "Ет",
         "root": "ет",
         "pos": "noun"
@@ -822,6 +1002,66 @@
       },
       "confidence": "Grammar",
       "raw_text": "Ет пен қымыз сықылды ас жоқ дейді, Ол немене жоқтықтың әсері емей?"
+    },
+    {
+      "subject": {
+        "surface": "мал",
+        "root": "мал",
+        "pos": "noun"
+      },
+      "predicate": "GoesTo",
+      "object": {
+        "surface": "Қолға",
+        "root": "қол",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ке барады",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00180"
+      },
+      "confidence": "Grammar",
+      "raw_text": "н жусаң да, мал тауып кел, Қолға жұқпас, еш адам кеміте алмас."
+    },
+    {
+      "subject": {
+        "surface": "Бас",
+        "root": "бас",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "аяқ",
+        "root": "аяқ",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00209"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Жөнді, жөнсіз, Сөз теңеусіз, Бас пен аяқ бір қысап."
+    },
+    {
+      "subject": {
+        "surface": "өлең",
+        "root": "өлең",
+        "pos": "noun"
+      },
+      "predicate": "GoesTo",
+      "object": {
+        "surface": "қолға",
+        "root": "қол",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ке барады",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00371"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Бар ойы - өлең айтып, ән салалық, Біреуді қалжың қылып қолға алалық."
     },
     {
       "subject": {
@@ -1011,8 +1251,8 @@
       },
       "predicate": "IsA",
       "object": {
-        "surface": "достықтың",
-        "root": "достық",
+        "surface": "нышаны",
+        "root": "ныша",
         "pos": "noun"
       },
       "pattern": "X — Y",
@@ -1071,8 +1311,8 @@
       },
       "predicate": "IsA",
       "object": {
-        "surface": "байлықтың",
-        "root": "байлық",
+        "surface": "басы",
+        "root": "бас",
         "pos": "noun"
       },
       "pattern": "X — Y",
@@ -1205,8 +1445,8 @@
     },
     {
       "subject": {
-        "surface": "өңірін",
-        "root": "өңірін",
+        "surface": "орта",
+        "root": "орта",
         "pos": "noun"
       },
       "predicate": "GoesTo",
@@ -1265,6 +1505,46 @@
     },
     {
       "subject": {
+        "surface": "терминдер",
+        "root": "термин",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "сөз",
+        "root": "сөз",
+        "pos": "noun"
+      },
+      "pattern": "X пен Y",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0009_s14"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ғылыми стильге сай тілдік құралдарды (тарихи терминдер мен сөз оралымдарын) орынды қолданып, оқылым мәтіндерінің тезисін жазыңдар"
+    },
+    {
+      "subject": {
+        "surface": "Орта",
+        "root": "орта",
+        "pos": "noun"
+      },
+      "predicate": "GoesTo",
+      "object": {
+        "surface": "қырғынға",
+        "root": "қырғын",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ке барады",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0011_s07"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Ұлы жүз, Орта жүз қазақтарының Қаратау асып, Сыр- дан өтіп, Алқакөлде қырғынға ұшыраған жері - «Алқакөл сұлама»; Кіші жүз қазақтарының Қаратаудан Түркістанға келіп, одан Сауранды айналып, Бұхараға бет түзеген шұбы- рынды көші - «Сауран айналған», ал Орта жүздің бір бөлігі- нің Қаратаудан солтүстікке қарай ауған шұбырынды жолы «қайың сауғанда, ел ауғанда» деп келетін фразеологизмдерде көрініс тапты"
+    },
+    {
+      "subject": {
         "surface": "тырнақша",
         "root": "тырнақша",
         "pos": "noun"
@@ -1282,6 +1562,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "тырнақша Мысалдар Шешендік өнер Шешендік өнер қай қоғамда болса да, халыққа, қалың көпшілікке әсер ететін, оның санасын, сезімін баурап, жігерін тасытатын қуатты құрал болып келген және күні бүгінге дейін сол күшін, қасиетін жойған жоқ"
+    },
+    {
+      "subject": {
+        "surface": "сөздің",
+        "root": "сөз",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "түбі",
+        "root": "түб",
+        "pos": "noun"
+      },
+      "pattern": "X-тың Y-сы бар",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0016_s19"
+      },
+      "confidence": "Grammar",
+      "raw_text": "«Түгел сөздің түбі бір, түп атасы - Майқы би» дейтін де сөз бар"
     },
     {
       "subject": {
@@ -25782,6 +26082,86 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Әйтеке би — қазақтың үш биінің бірі."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "танымал қазақстандықтар тізімі",
+        "root": "танымал қазақстандықтар тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/notable_kazakhstanis",
+      "source": {
+        "pack": "world_core/notable_kazakhstanis.jsonl",
+        "sample_id": "notable_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның танымал тұлғалары: Абай, Шәкәрім, Махамбет, Мағжан, Мұхтар Әуезов, Сәкен Сейфуллин, Назарбаев, Тоқаев, Сәтбаев, Уәлиханов, Марғұлан, Бөкейхан, Абылай хан, Кенесары хан, Молдағұлова, Момышұлы, Головкин, Ильин, Сапиев, Төле би, Қазыбек би, Әйтеке би."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ақын-жазушылар тізімі",
+        "root": "ақын-жазушылар тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/notable_kazakhstanis",
+      "source": {
+        "pack": "world_core/notable_kazakhstanis.jsonl",
+        "sample_id": "notable_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақтың танымал ақын-жазушылары: Абай, Шәкәрім, Махамбет, Мағжан Жұмабаев, Сәкен Сейфуллин, Бейімбет Майлин, Мұхтар Әуезов, Ғабит Мүсірепов, Ғабиден Мұстафин, Олжас Сүлейменов, Мұқағали Мақатаев."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ғалымдар тізімі",
+        "root": "ғалымдар тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/notable_kazakhstanis",
+      "source": {
+        "pack": "world_core/notable_kazakhstanis.jsonl",
+        "sample_id": "notable_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның танымал ғалымдары: Қаныш Сәтбаев, Шоқан Уәлиханов, Әлкей Марғұлан."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "спортшылар тізімі",
+        "root": "спортшылар тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/notable_kazakhstanis",
+      "source": {
+        "pack": "world_core/notable_kazakhstanis.jsonl",
+        "sample_id": "notable_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның танымал спортшылары: Геннадий Головкин, Илья Ильин, Серік Сапиев, Дмитрий Баландин."
     },
     {
       "subject": {

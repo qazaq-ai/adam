@@ -495,10 +495,16 @@ templates = [
 # no novel-text generation, no fabrication risk.
 [[families]]
 key = "math_answer"
+# **v4.40.5** — removed the bare `{math_value}` template so every
+# math answer has a verbal prefix. Pre-v4.40.5 alternation between
+# bare («12/6 → 2») and prefixed («2*43 → Жауабы — 86») in the same
+# session looked inconsistent in the 2026-05-03 transcript. Three
+# prefix variants stay for seed-driven variety; choice is still
+# deterministic per (seed, intent).
 templates = [
-    "{math_value}",
     "нәтижесі: {math_value}",
     "жауабы — {math_value}",
+    "есептедім: {math_value}",
 ]
 
 # v4.4.0 — User opted out of resolving a pending contradiction
