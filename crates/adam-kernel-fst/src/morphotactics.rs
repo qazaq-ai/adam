@@ -177,6 +177,17 @@ pub enum Tense {
     /// Imperfect converb `-{A}` ("while V-ing"). Same shape as aorist but
     /// non-finite.
     ConverbImperfect,
+    /// **v4.36.5** — Reportative past `-{Y}п(ты)` ("they say X V-ed
+    /// / apparently X V-ed"). Distinct from `PastEvidential` (the
+    /// `-ған/-ген` participle-based reportative): uses the perfect-
+    /// converb base `-{Y}п` plus the indeclinable particle `-ты`.
+    /// Both forms encode hearsay/reportative semantics, but the
+    /// «-ыпты» surface form is the one most commonly produced in
+    /// natural Kazakh dialog reporting hearsay (battery probe
+    /// 2026-05-02 turn 23 «жазғанмын» works; user-style «жазыпты»
+    /// previously didn't parse). Maps to `EvidenceKind::Hearsay` in
+    /// `SemFrame::from_analysis` alongside `PastEvidential`.
+    PastReportative,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -409,6 +420,23 @@ const VERB_PART_FUTURE: SuffixTemplate =
 /// After vowel-final stems the buffer {Y} drops: оқы + п = оқып.
 const VERB_CONV_PERFECT: SuffixTemplate =
     &[SuffixAtom::Arch(Archiphoneme::Y), SuffixAtom::Literal('п')];
+
+/// **v4.36.5** — Reportative past: `-{Y}п(ты)`. Same `-{Y}п` base as
+/// the perfect converb, plus the indeclinable particle `-ты`
+/// marking reportative / "they say" evidentiality. Surface forms:
+///   жаз + ыпты  = жазыпты ("apparently wrote / they say wrote"),
+///   бер + іпті  = беріпті  ("apparently gave"),
+///   бол + ыпты  = болыпты ("apparently was"),
+///   оқы +  пты  = оқыпты  (vowel-final: {Y} drops, then «-ты»).
+///
+/// The «-ты» suffix is invariant — it's the literal particle, not a
+/// person-ending. So no Person/Number slot follows in synthesis.
+const VERB_REPORTATIVE_PAST: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::Y),
+    SuffixAtom::Literal('п'),
+    SuffixAtom::Literal('т'),
+    SuffixAtom::Literal('ы'),
+];
 
 // Imperfect converb `-{A}` is NOT given its own const — the dispatch
 // at the tense match site routes `Tense::ConverbImperfect` through
@@ -915,6 +943,12 @@ pub fn synthesise_verb(root: &str, features: VerbFeatures) -> String {
         Some(Tense::ParticipleHabitual) => acc.apply(VERB_PART_HABITUAL),
         Some(Tense::ParticipleFuture) => acc.apply(VERB_PART_FUTURE),
         Some(Tense::ConverbPerfect) => acc.apply(VERB_CONV_PERFECT),
+        // **v4.36.5** — reportative past «-{Y}п(ты)». No personal-
+        // ending slot follows; the particle «-ты» is invariant.
+        // Fall through to the personal-ending match below, which
+        // skips for tenses outside the past-definite / present-style
+        // sets (early-return-equivalent without explicit code).
+        Some(Tense::PastReportative) => acc.apply(VERB_REPORTATIVE_PAST),
         _ => {}
     }
 

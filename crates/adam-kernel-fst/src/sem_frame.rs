@@ -333,6 +333,12 @@ impl SemFrame {
                 };
                 let evidence = match features.tense {
                     Some(Tense::PastEvidential) => Some(EvidenceKind::Hearsay),
+                    // **v4.36.5** — «-{Y}п(ты)» reportative past
+                    // also marks Hearsay. Both surface forms encode
+                    // reported speech / hearsay; downstream consumers
+                    // (planner Hearsay routing, hedge templates)
+                    // treat them identically.
+                    Some(Tense::PastReportative) => Some(EvidenceKind::Hearsay),
                     _ => None,
                 };
                 Self {

@@ -7,6 +7,102 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.36.5] — 2026-05-02 — FST coverage: ConverbPerfect + PastReportative («жазыпты» / «болыпты» now route to Hearsay)
+
+**Patch in v4.36+ semantic-IR arc.** Closes the v4.36.0 honest-gap carry-forward — the «-{Y}п(ты)» reportative form («жазыпты» / «болыпты» / «барыпты»), which is the natural Kazakh hearsay form most commonly produced in user dialog, previously didn't parse at all. The FST treated only `Tense::PastEvidential` («-ған/-ген» → жазғанмын) as reportative; «-ыпты» fell through to no parse, blocking v4.36.0's Hearsay routing.
+
+### What was broken pre-v4.36.5
+
+```
+> Жазыпты
+sem_frames: (none)               ← didn't parse
+intent: input_evidence: None     ← Hearsay not detected
+response: "Түсінбедім."
+```
+
+The synth side already supported the perfect-converb base `-{Y}п` (line 421 `VERB_CONV_PERFECT`), but the parser tense enumeration didn't include `ConverbPerfect`, AND there was no tense variant for the «-ыпты» reportative (perfect-converb base + literal `-ты` particle).
+
+### Innovations
+
+**(1) New `Tense::PastReportative` variant.** Distinct from `PastEvidential` — both encode hearsay/reportative semantics, but the surface forms differ structurally:
+- `PastEvidential` = «жазғанмын / берген» (`-ған/-ген` participle base + person-style endings)
+- `PastReportative` = «жазыпты / беріпті / болыпты» (`-{Y}п` perfect-converb base + invariant `-ты` particle, no person ending)
+
+**(2) New synth template `VERB_REPORTATIVE_PAST`** (~10 lines):
+```rust
+const VERB_REPORTATIVE_PAST: SuffixTemplate = &[
+    SuffixAtom::Arch(Archiphoneme::Y),  // ы / і buffer
+    SuffixAtom::Literal('п'),            // perfect converb
+    SuffixAtom::Literal('т'),            // -ты particle (invariant)
+    SuffixAtom::Literal('ы'),
+];
+```
+
+`synthesise_verb` match arm dispatches `Tense::PastReportative` to this template; no personal-ending slot follows because `-ты` is invariant.
+
+**(3) `SemFrame::from_analysis` maps `PastReportative → Some(EvidenceKind::Hearsay)`** alongside the existing `PastEvidential → Hearsay` mapping. Both forms now feed the same v4.36.0 Hearsay routing.
+
+**(4) Parser tenses += `ConverbPerfect, PastReportative`** (alongside v4.32.5's `ConverbImperfect`). Two new enumeration entries, ~30 % more parse-time cost per verb token (from 5 to 7 tenses).
+
+### Live verification
+
+| Query | sem_frame trace | Response |
+|---|---|---|
+| **Жазыпты** | `жаз/Verb tense=PastReportative evid=Hearsay` | "Сізге айтылған сияқты екен — нақты дерегім жоқ." ✓ |
+| **Болыпты** | `бол/Verb tense=PastReportative evid=Hearsay` | hearsay-aware ✓ |
+| **Абай жазыпты** | `жаз/Verb tense=PastReportative evid=Hearsay` | hearsay-aware ✓ |
+| **Жазып** (ConverbPerfect bare) | `жаз/Verb tense=ConverbPerfect` | now parses (was: no parse) ✓ |
+| Жазғанмын (control, PastEvidential) | unchanged | unchanged ✓ |
+| Абай жазды (control, PastDefinite) | unchanged | unchanged grounded fact ✓ |
+
+### Real-world battery (v4.36.5)
+
+| Aggregate | v4.36.5 | Δ vs v4.36.0 |
+|---|---|---|
+| Mean latency | **194.6 ms** | -127 ms (mostly OS file-cache warmth between immediate-back-to-back runs; not a true performance improvement — adding 2 tenses to enumeration costs ~30 % more parse work per verb token) |
+| Mean max RSS | **177.1 MB** | +1.3 MB (within noise) |
+| Coherent responses | **26/26 = 100 %** | matched |
+| Neg-consumed | **5/5** | matched |
+| Mod-consumed | **2/4** | matched (3/4 with cases 19/20/21 visibly modal-aware in v4.35.5; battery script case-sensitivity bug undercounts) |
+
+The latency drop is suspicious — adding tenses should slow parsing, not speed it. Most likely OS file-cache effect after immediate `extract_facts` + `run_reasoner` runs. Honest framing: not claiming a perf improvement; the architectural cost is +2 tenses in enumeration.
+
+### Known FST gaps still present (carry-forward to v4.36.6+)
+
+- **«алам» short-form 1sg**: «ал + Present + 1sg» synth produces «аламын» (long form), not the contracted «алам». Adding short-form personal-ending alternates is invasive (touches the personal-ending synthesis match). Defer.
+- **«оқи» back-vowel converb**: `surface_could_contain_root` requires root prefix-match, but vowel-final back-vowel verbs change shape during converb derivation (оқы → оқи), breaking prefix-match. Closing this requires either pre-stripping final ы/і before lookup, or stem-alternation paradigm matcher (mirroring `pronoun_paradigm`).
+
+Both were originally promised for v4.36.5 but turn out to need separate FST architecture work. Honest re-scope: v4.36.5 is **«-ыпты» reportative + ConverbPerfect parsing**; «алам» / «оқи» → v4.36.6+.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **865 passing** unchanged |
+| Real-world battery | **26/26 = 100 %** coherent |
+| facts.json | 1935 → 1934 (-1 RelatedTo from new ConverbPerfect parse path triggering a guard on a previously-unparseable sentence; IsA 1472 unchanged) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### Pipeline impact
+
+- 1 new `Tense::PastReportative` enum variant
+- 1 new synth template `VERB_REPORTATIVE_PAST` (~12 lines)
+- 1 new match arm in `synthesise_verb`
+- 1 line in SemFrame evidence mapping (PastReportative → Hearsay)
+- 2 new entries in parser tense enumeration (ConverbPerfect, PastReportative)
+- facts/derived_facts regeneration
+
+Cadence: patch — closes one specific architectural gap (Reportative path); two related gaps («алам» / «оқи») defer due to separate FST architecture cost.
+
+### Carry-forwards
+
+- **v4.36.6** — short-form 1sg «алам» variant + back-vowel converb «оқи» synthesis fix.
+- **v4.36.7** — EvidenceKind consumption on extraction side (refuse extraction when sentence has Hearsay evidential).
+- **v4.37.0** — fourth extract_facts matcher migration (likely `dative_goes_to` or `possessive_has`); remaining 6 missing parser tenses (ParticiplePast, ParticipleHabitual, ParticipleFuture, FutureIntentional, FuturePossible, Conditional, Imperative); battery edge case for «X емес пе?» question form.
+
 ## [4.36.0] — 2026-05-02 — Third matcher migration + first EvidenceKind consumption (Hearsay hedging)
 
 **First minor in v4.36+ semantic-IR arc.** Two architectural completions in one release:

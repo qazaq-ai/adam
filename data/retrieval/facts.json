@@ -1,7 +1,7 @@
 {
-  "version": "4.36.0",
+  "version": "4.36.5",
   "status": "completed",
-  "elapsed_s": 56,
+  "elapsed_s": 32,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -17,30 +17,30 @@
   ],
   "counts": {
     "samples_scanned": 3691,
-    "samples_with_facts": 71,
-    "facts_total": 1935,
+    "samples_with_facts": 72,
+    "facts_total": 1936,
     "by_predicate": {
       "after": 7,
       "causes": 23,
       "does_to": 1,
-      "goes_to": 20,
+      "goes_to": 21,
       "has": 59,
       "has_quantity": 29,
       "in_domain": 24,
       "is_a": 1472,
-      "lives_in": 9,
+      "lives_in": 10,
       "part_of": 228,
-      "related_to": 63
+      "related_to": 62
     },
     "by_pack": {
-      "abai_wikisource_pack.json": 2,
+      "abai_wikisource_pack.json": 3,
       "cc100_kk_pack.json": 19,
       "common_voice_kk_pack.json": 3,
       "kazakh_classics_pack.json": 3,
       "kazakh_proverbs_pack.json": 13,
-      "kazakh_textbooks_pack.json": 14,
+      "kazakh_textbooks_pack.json": 15,
       "tatoeba_kazakh_pack.json": 2,
-      "wikipedia_kz_pack.json": 16,
+      "wikipedia_kz_pack.json": 15,
       "world_core/adam_self.jsonl": 33,
       "world_core/animals.jsonl": 42,
       "world_core/astronomy.jsonl": 41,
@@ -321,26 +321,6 @@
       },
       "confidence": "Grammar",
       "raw_text": "Табиғи-рекреациялық ресурстардан қолайлы қойнаулар мен жағалаулар (теңіз, өзен, көл), таулар мен ормандар, минералды сулар, табиғат ескерткіштері, табиғи саябақтар өте көп таралған."
-    },
-    {
-      "subject": {
-        "surface": "өнеркәсіп",
-        "root": "өнеркәсіп",
-        "pos": "noun"
-      },
-      "predicate": "RelatedTo",
-      "object": {
-        "surface": "ауыл",
-        "root": "ауыл",
-        "pos": "noun"
-      },
-      "pattern": "X пен Y",
-      "source": {
-        "pack": "wikipedia_kz_pack.json",
-        "sample_id": "wiki_kz_0000398"
-      },
-      "confidence": "Grammar",
-      "raw_text": "Елдегі жұмыспен қамтылғандардың басым бөлігі өндірістік емес салада (57%), қалғандары өнеркәсіп пен ауыл шаруашылығы салаларында еңбек етеді."
     },
     {
       "subject": {
@@ -921,6 +901,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Ет пен қымыз сықылды ас жоқ дейді, Ол немене жоқтықтың әсері емей?"
+    },
+    {
+      "subject": {
+        "surface": "хан",
+        "root": "хан",
+        "pos": "noun"
+      },
+      "predicate": "LivesIn",
+      "object": {
+        "surface": "қолында",
+        "root": "қолын",
+        "pos": "noun"
+      },
+      "pattern": "X Y-да тұрады",
+      "source": {
+        "pack": "abai_wikisource_pack.json",
+        "sample_id": "abai_00387"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Бір сұлу қыз тұрыпты хан қолында, Хан да жанын қыяды қыз жолында."
     },
     {
       "subject": {
@@ -1521,6 +1521,26 @@
       },
       "confidence": "Grammar",
       "raw_text": "Анадай жерде, қонақ үйдің сыртында, қасында екі-үш үлкен кісі бар әкесі Құнан- бай тұр екен"
+    },
+    {
+      "subject": {
+        "surface": "Дүние",
+        "root": "дүние",
+        "pos": "noun"
+      },
+      "predicate": "GoesTo",
+      "object": {
+        "surface": "үмітке",
+        "root": "үміт",
+        "pos": "noun"
+      },
+      "pattern": "X Y-ке барады",
+      "source": {
+        "pack": "kazakh_textbooks_pack.json",
+        "sample_id": "kz_textbook_kz_lang_11_emn_p0032_s06"
+      },
+      "confidence": "Grammar",
+      "raw_text": "Дүние үмітке сүйенеді Бірде Жанқұтты шешен Құнанбайдың үйінде отырғанда, Абай келіп сәлем береді"
     },
     {
       "subject": {

@@ -1,12 +1,12 @@
 {
-  "version": "4.36.0",
+  "version": "4.36.5",
   "status": "completed",
   "elapsed_s": 0,
   "built_from": "data/retrieval/facts.json",
   "built_from_status": "completed",
   "iterations_completed": 5,
   "counts": {
-    "initial_facts": 1935,
+    "initial_facts": 1936,
     "derived_facts": 6154,
     "by_rule": {
       "R10_in_domain_inheritance": 133,

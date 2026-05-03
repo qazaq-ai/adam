@@ -391,6 +391,18 @@ fn try_verb_analyses(surface: &str, entry: &RootEntry, out: &mut Vec<Analysis>) 
         // — adding all at once would double the search space and likely
         // surface unrelated regression noise.
         Some(Tense::ConverbImperfect),
+        // **v4.36.5** — `ConverbPerfect` («-{Y}п» — "having V-ed")
+        // and `PastReportative` («-{Y}п(ты)» — "they say X V-ed")
+        // added to enumeration. ConverbPerfect closes a v4.32.5
+        // carry-forward (bare «жазып / беріп / оқып» previously
+        // didn't parse). PastReportative is the v4.36.5 path that
+        // unblocks user-style hearsay forms «жазыпты / болыпты /
+        // барыпты» — these were the natural Kazakh hearsay form
+        // that v4.36.0's Hearsay routing couldn't see because the
+        // FST treated only `-ған/-ген` (PastEvidential) as
+        // reportative.
+        Some(Tense::ConverbPerfect),
+        Some(Tense::PastReportative),
     ];
     let persons = [
         None,
