@@ -278,19 +278,39 @@ fn surface_could_contain_root(surface: &str, root: &str) -> bool {
     if surface.starts_with(root) {
         return true;
     }
-    // Only care about roots that end in a voiceless obstruent whose voiced
-    // counterpart might have surfaced instead.
     let last = root.chars().last();
-    let voiced = match last {
-        Some('п') => 'б',
-        Some('к') => 'г',
-        Some('қ') => 'ғ',
-        _ => return false,
-    };
-    // Rebuild the root with the voiced final consonant.
-    let mut voiced_root: String = root.chars().take(root.chars().count() - 1).collect();
-    voiced_root.push(voiced);
-    surface.starts_with(&voiced_root)
+    // Intervocalic voicing — voiceless final → voiced.
+    if let Some(voiced) = match last {
+        Some('п') => Some('б'),
+        Some('к') => Some('г'),
+        Some('қ') => Some('ғ'),
+        _ => None,
+    } {
+        let mut voiced_root: String = root.chars().take(root.chars().count() - 1).collect();
+        voiced_root.push(voiced);
+        if surface.starts_with(&voiced_root) {
+            return true;
+        }
+    }
+    // **v4.36.6** — vowel-final stem alternation. Aorist / converb-
+    // imperfect derivation replaces final ы/і with и («оқы + а» →
+    // «оқи»). Pre-v4.36.6, surfaces beginning with the alternate
+    // stem («оқи*», «жасы*», «таны*») couldn't be analysed because
+    // the original root «оқы» / «жасы» / «таны» wasn't a prefix
+    // match. Mirrors the intervocalic-voicing branch above:
+    // synth produces «оқи»; parser must accept it as a candidate
+    // for the «оқы» root.
+    if let Some(alt) = match last {
+        Some('ы') | Some('і') => Some('и'),
+        _ => None,
+    } {
+        let mut alt_root: String = root.chars().take(root.chars().count() - 1).collect();
+        alt_root.push(alt);
+        if surface.starts_with(&alt_root) {
+            return true;
+        }
+    }
+    false
 }
 
 fn try_noun_analyses(surface: &str, entry: &RootEntry, out: &mut Vec<Analysis>) {
@@ -425,7 +445,8 @@ fn try_verb_analyses(surface: &str, entry: &RootEntry, out: &mut Vec<Analysis>) 
                                 number,
                                 polite,
                             };
-                            if synthesise_verb(&entry.root, features) == surface {
+                            let long = synthesise_verb(&entry.root, features);
+                            if long == surface {
                                 // Deduplicate against earlier analyses that
                                 // differ only by unused fields (e.g. active
                                 // vs None voice produce the same output).
@@ -435,6 +456,45 @@ fn try_verb_analyses(surface: &str, entry: &RootEntry, out: &mut Vec<Analysis>) 
                                 };
                                 if !out.contains(&analysis) {
                                     out.push(analysis);
+                                }
+                            }
+                            // **v4.36.6** — short-form 1sg colloquial
+                            // contraction («алам» from «аламын»,
+                            // «барам» from «барамын», «оқим» from
+                            // «оқимын»). Long present-style 1sg
+                            // ending is `-мын/-мін` (VERB_PRES_1SG);
+                            // colloquial drops the final `-ын/-ін`,
+                            // leaving just `-м`. Both forms are
+                            // standard Kazakh — long is formal,
+                            // short is colloquial. Pre-v4.36.6
+                            // parser only enumerated long-form synth,
+                            // so user-typed «алам / барам / оқим»
+                            // didn't parse and modality detection
+                            // couldn't fire on verb-only ability
+                            // claims like «Жаза алам». Limited to
+                            // (Present|PastEvidential) + First +
+                            // (Sg|None) + polite=false — the exact
+                            // feature combo that produces -мын/-мін.
+                            // Other persons (-сың, -сыз, -міз, etc.)
+                            // don't have a similar short-form
+                            // contraction in standard Kazakh.
+                            let short_eligible =
+                                matches!(tense, Some(Tense::Present) | Some(Tense::PastEvidential))
+                                    && matches!(person, Some(Person::First))
+                                    && matches!(number, Some(Number::Singular) | None)
+                                    && !polite;
+                            if short_eligible && (long.ends_with("мын") || long.ends_with("мін"))
+                            {
+                                let short: String =
+                                    long.chars().take(long.chars().count() - 2).collect();
+                                if short != long && short == surface {
+                                    let analysis = Analysis::Verb {
+                                        root: entry.clone(),
+                                        features,
+                                    };
+                                    if !out.contains(&analysis) {
+                                        out.push(analysis);
+                                    }
                                 }
                             }
                         }

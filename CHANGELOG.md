@@ -7,6 +7,91 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.36.6] — 2026-05-02 — FST coverage: «алам» short-form 1sg + «оқи» back-vowel converb (final v4.36.x FST gaps closed)
+
+**Patch in v4.36+ semantic-IR arc.** Closes the two FST coverage gaps re-scoped from v4.36.5 to v4.36.6+. Both required separate FST architecture work:
+
+1. **«оқи» back-vowel converb** — vowel-final back-vowel verbs change shape during converb derivation (оқы → оқи), breaking the prefix-match in `surface_could_contain_root`. Pre-v4.36.6, surfaces beginning with «оқи*» / «жасы*» / «таны*» couldn't be analysed.
+2. **«алам» short-form 1sg** — colloquial Kazakh 1sg present-style verbs drop the `-ын/-ін` tail of the personal ending (-мын/-мін → -м). The synth path produced only the long form, so user-typed «алам / барам / оқим» didn't parse.
+
+### What was broken pre-v4.36.6
+
+```
+> Оқи
+sem_frames: (none)               ← оқы→оқи vowel alternation broke prefix-match
+
+> Алам
+sem_frames: (none)               ← short-form 1sg not enumerated by synth
+
+> Жаза алам
+sem_frames: (none)               ← combined: ConverbImperfect short-form ability
+response: "Түсінбедім."
+```
+
+### Innovations
+
+**(1) `surface_could_contain_root` extended with ы/і → и vowel alternation.** Mirrors the existing intervocalic-voicing branch (п↔б, к↔г, қ↔ғ): when root ends in ы/і, also accept `<root[..-1]>и` as prefix candidate. Synth side already produces «оқи» from `synthesise_verb(оқы, ConverbImperfect)` via `apply_aorist_after_vowel`; the gap was purely on the parser-prefix-match side.
+
+**(2) Short-form 1sg synth path in `try_verb_analyses`.** New conditional inside the existing nested loop: when feature combo is (Present|PastEvidential) + First + (Sg|None) + polite=false, ALSO try the short-form variant. Implementation strips the trailing `-ын/-ін` from the long-form synth output. If short matches surface, emit Analysis with same features. Limited to 1sg because other persons (`-сың`, `-сыз`, `-міз`, etc.) don't have a similar contraction in standard Kazakh.
+
+### Live verification
+
+| Query | sem_frame trace | Response |
+|---|---|---|
+| **Оқи** | `оқы/Verb tense=ConverbImperfect` | parses ✓ (was: no parse) |
+| **Оқиды** | `оқы/Verb tense=Present` | parses ✓ |
+| **Алам** | `ал/Verb tense=Present person=First` | parses ✓ (was: no parse) |
+| **Барам** | `бар/Verb tense=Present person=First` | parses ✓ |
+| **Жаза алам** | full ability detection | "Жақсы екен, сіздің мүмкіндігіңізді түсіндім." ✓ |
+| Жаза аламын (control, long form) | unchanged | "Жақсы екен, сіздің мүмкіндігіңізді түсіндім." ✓ |
+| Аламын (control) | unchanged | unchanged |
+
+### Real-world battery (v4.36.6)
+
+| Aggregate | v4.36.6 | Δ vs v4.36.5 |
+|---|---|---|
+| Mean latency | **216.1 ms** | +21 ms (real cost: vowel-alternation prefix-match check + short-form 1sg synth+compare per matching feature combo) |
+| Mean max RSS | **177.1 MB** | unchanged |
+| Coherent responses | **26/26 = 100 %** | matched |
+| Neg-consumed | **5/5** | matched |
+| Mod-consumed | **2/4** | matched |
+
+The +21 ms is honest perf cost from the new code paths. Acceptable trade for closing two architectural gaps. The substrate-then-consume cycle for Modality (Ability sub-flavor) now reaches all standard surface forms — long «аламын», short «алам», back-vowel «оқи аламын».
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **865 passing** unchanged |
+| Real-world 26-query battery | **26/26 = 100 %** coherent |
+| facts.json | 1934 → 1934 (unchanged — vowel-alternation didn't open new IsA/RelatedTo extractions in current corpus; IsA 1472 unchanged) |
+| live_holdout_2026_05_02 | **5/5 ✓** unchanged |
+| live_holdout_2026_05_01 | **32/32 ✓** unchanged |
+| rust_holdout | **41/41 ✓** unchanged |
+| Foundation validation | **passes, no drifts** |
+
+### v4.36.x arc complete
+
+Three releases (v4.36.0 → v4.36.5 → v4.36.6) closed all v4.36+ FST coverage and consumption work:
+- v4.36.0: third matcher migration + first EvidenceKind consumption (Hearsay hedging)
+- v4.36.5: PastReportative «-{Y}п(ты)» + ConverbPerfect parse
+- v4.36.6: vowel-alternation for «оқи», short-form 1sg for «алам»
+
+The Hearsay-detection chain is now end-to-end functional on natural Kazakh forms across all relevant tense/person variants.
+
+### Pipeline impact
+
+- 1 extension to `surface_could_contain_root` (~10 lines, mirrors existing voicing branch)
+- 1 new conditional in `try_verb_analyses` short-form path (~20 lines)
+- facts/derived_facts version sync to 4.36.6
+
+Cadence: patch — closes two specific FST gaps deferred from v4.36.5; honest performance trade-off (+21 ms).
+
+### Carry-forwards
+
+- **v4.36.7** — EvidenceKind consumption on extraction side (refuse extraction when sentence has Hearsay evidential — adam shouldn't promote hearsay to graph facts).
+- **v4.37.0** — fourth extract_facts matcher migration (likely `dative_goes_to` or `possessive_has`); remaining 6 missing parser tenses (ParticiplePast, ParticipleHabitual, ParticipleFuture, FutureIntentional, FuturePossible, Conditional, Imperative); battery edge case for «X емес пе?» question form.
+
 ## [4.36.5] — 2026-05-02 — FST coverage: ConverbPerfect + PastReportative («жазыпты» / «болыпты» now route to Hearsay)
 
 **Patch in v4.36+ semantic-IR arc.** Closes the v4.36.0 honest-gap carry-forward — the «-{Y}п(ты)» reportative form («жазыпты» / «болыпты» / «барыпты»), which is the natural Kazakh hearsay form most commonly produced in user dialog, previously didn't parse at all. The FST treated only `Tense::PastEvidential` («-ған/-ген» → жазғанмын) as reportative; «-ыпты» fell through to no parse, blocking v4.36.0's Hearsay routing.
