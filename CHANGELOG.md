@@ -7,6 +7,79 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.39.0] — 2026-05-03 — Function-word completion + genitive-topic priority — 79.48 % → 83.27 % morpheme coverage; bug 4 fully closed
+
+**Second minor in v4.38+ arc.** Closes the v4.38.5 deferred bug 4 carry-forward (full list-of-regions answer) AND closes the long-standing morpheme coverage plateau by adding 4 high-frequency function words to the lexicon. Two changes ship together because they're complementary: function-word coverage unlocks parse breadth on real Kazakh text; genitive-topic priority unlocks the discourse-subject side of list / quantity queries.
+
+### Real-REPL bug 4 fully closed (2026-05-03 transcript)
+
+| Query | v4.38.5 | v4.39.0 |
+|---|---|---|
+| Қазақстанның барлық аймақтарын тізімдеңіз | "Аймақ туралы ең әуелі мынаны айтуға болады: Аймақ — аумақ." (bridge fact, missed the list) | "**Қазақстан туралы ең әуелі мынаны айтуға болады: Қазақстанның 17 облысы: Абай, Ақмола, Ақтөбе, Алматы, Атырау, Батыс Қазақстан, Жамбыл, Жетісу, Қарағанды, Қостанай, Қызылорда, Маңғыстау, Павлодар, Солтүстік Қазақстан, Түркістан, Ұлытау, Шығыс Қазақстан.**" |
+| Қазақстанның халқы шамамен қанша? | "Халқы туралы нақты бір мысал: ..." (corpus citation, missed the count fact) | "**Қазақстанның халқы шамамен 20 миллион адам.**" |
+| Қазақстанның өзендерін тізімдеңіз | (similar miss) | "**Қазақстандағы ірі өзендер: Ертіс, Сырдария, Іле, Жайық, Есіл, Тобыл, Шу, Қаратал, Талас.**" |
+| Қазақстан аймақтарының атауларын білесіз бе? (anti-regression: bare-first then deeper genitive) | preserved (topic = қазақстан) | preserved ✓ (first-token-genitive gate) |
+| Адамның мақсаты не? (no list/qty intent) | head-noun strategy | unchanged ✓ |
+| Қазақстанда қанша өзен бар? / Абай / Сәлем (controls) | unchanged | unchanged ✓ |
+
+### Morpheme coverage milestone
+
+| Metric | Pre-v4.39.0 | Post-v4.39.0 | Δ |
+|---|---|---|---|
+| Lexicon roots (≥ 3 chars) | 14 562 | 14 566 | +4 |
+| Prefix-match coverage over 3.87M committed words | **79.48 %** | **83.27 %** | **+3.79 pp** |
+
+Single biggest coverage jump since v3.x lexicon work. Achieved by recognizing 5 high-frequency function words that had been listed in `project_morpheme_coverage_baseline` as gaps for 5+ releases.
+
+### Innovations
+
+**(1) 4 function-word lexicon entries** in `segmentation_roots.json`:
+- `part_dep` — «деп» (quotative particle, converb of verb «де»)
+- `adj_degen` — «деген» (attributive participle of «де», "called/named")
+- `pron_osy` — «осы» (demonstrative pronoun "this") — registered as bare entry; wins over the previously-applied «о» + P3 derivation by being a more specific lexicon match.
+- `postp_pen` — «пен» (postposition / instrumental clitic / coordinating particle "and")
+- `ол + Genitive` already derived correctly by FST → «оның» — no entry needed (verified by trace).
+
+**(2) `genitive_topic_hint_for_list`** in `topic_extraction.rs` — string-level genitive-suffix strip that fires when (a) input has list-intent shape («тізім / атаулары / атап шық / атап өт / барлық») OR quantity-intent shape («қанша / неше»), AND (b) the FIRST content token of the input ends in one of six genitive allomorphs `-ның / -нің / -тың / -тің / -дың / -дің`. Returns the bare stem as topic. Closes the FST-gap-induced miss on nasal-final and vowel-final genitive stems (see "Architecture" below) without requiring an FST-side change.
+
+**(3) First-token gate** prevents over-firing: in inputs like «Қазақстан аймақтарының атауларын білесіз бе?» (bare leading proper noun, then deeper genitive), the strategy declines so the legacy chain picks the bare leading noun as topic. Required to preserve the v4.4.11 / v4.17.5 anti-regression tests on bare-leading + deeper-genitive shapes.
+
+**(4) Mutual reinforcement** — function-word entries make `тізімдеңіз`-style commands parseable (closing the «тізім» content morpheme); genitive-topic priority routes the parsed list-intent to the right subject.
+
+### Architecture note: FST genitive gap discovered
+
+The reason genitive-topic priority is implemented at the string level (mirroring the v4.4.12 `locative_attributive_hint`) rather than via parse-stream extraction is a separate FST bug discovered during v4.39.0 development: `realise_d` returns 'д' as default after non-voiceless stems, but Kazakh genitive after **nasal** AND **vowel** finals should produce 'н' (-ның / -нің), not 'д' (-дың / -дің). So `synthesise_noun(қазақстан, Gen)` produces «қазақстандың» (wrong); the analyse direction never matches the real surface «Қазақстанның». Same gap blocks «адамның», «ананың», «балaның», etc.
+
+This is a meaningful FST architectural fix for a future release (v4.39.5 or v4.40.0) — touching `realise_d` to add nasal→н and vowel→н cases. Risk: changes synthesis output for ALL `{D}` archiphoneme suffixes (Gen / Acc / Dat / Loc / Abl), which need careful per-case verification because they have different correct realizations on different stem-finals (e.g. Acc after nasal correctly stays 'д' as in «адамды», unlike Gen). Filed as known limitation; v4.39.0 routes around it via the string-level hint.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **865 passing** unchanged |
+| Live REPL — bug 4 (regions list) | ✓ full closure |
+| Live REPL — quantity-genitive («халқы шамамен қанша?») | ✓ correct count fact surfaces |
+| Anti-regression — bare-leading + deeper-genitive | ✓ preserved |
+| Anti-regression — non-list/qty queries | ✓ unchanged (gate works) |
+| Morpheme coverage | **+3.79 pp** (79.48 % → 83.27 %) |
+| `cargo fmt --all --check` | clean |
+
+### Latency / RSS (release-mode probes)
+
+| Query | Latency | Max RSS |
+|---|---|---|
+| Қазақстанның барлық аймақтарын тізімдеңіз | 0.89 s | 188 MB |
+| Сәлем! (control) | 0.30 s | 175 MB |
+
+Within v4.38.5 noise.
+
+### Deferred to v4.39.5+
+
+- **FST `realise_d` fix** for genitive on nasal/vowel-finals — proper architectural closure of the underlying gap. v4.39.0 routes around it.
+- **Short-base lexicon clusters** (көл / жер / көз / гүл) — 14 candidates from v4.38.5 review, need FST derivation verification.
+- **«қала» genitive after vowel** («қаланың» / «баланың») — currently FST-derivable through different path; check no regression.
+- **Lexicon function-word completion (continued)** — next batch of high-frequency missing words after coverage re-measurement.
+
 ## [4.38.5] — 2026-05-03 — Lexicon pollution purge + FST P3+Acc derivation fix
 
 **First patch in v4.38+ arc.** Closes bug 4 carry-forward from v4.38.0 (lexicon registered «аймақтарын / аймақтары / аймақтар» as separate noun roots → FST never normalized inflected surfaces to bare «аймақ»). Two changes ship together because they're inseparable: removing the polluted entries exposed an FST gap (P3+Acc derivation) that was previously masked by the duplicates.

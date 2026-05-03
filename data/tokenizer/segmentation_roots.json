@@ -5367,6 +5367,20 @@
       "final_sound_class": "vowel"
     },
     {
+      "id": "part_dep",
+      "root": "деп",
+      "part_of_speech": "particle",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "adj_degen",
+      "root": "деген",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
+    },
+    {
       "id": "postp_deyin",
       "root": "дейін",
       "part_of_speech": "postposition",
@@ -15032,6 +15046,20 @@
       "part_of_speech": "pronoun",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
+    },
+    {
+      "id": "pron_osy",
+      "root": "осы",
+      "part_of_speech": "pronoun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "postp_pen",
+      "root": "пен",
+      "part_of_speech": "postposition",
+      "vowel_harmony": "front",
+      "final_sound_class": "nasal"
     },
     {
       "id": "noun_v4020_ожау",

@@ -1641,6 +1641,20 @@ pub(crate) fn best_noun_hint_with_confidence(
     if let Some(c) = crate::discourse::find_adj_noun_compound(input) {
         return Some((c.to_string(), TopicConfidence::High));
     }
+    // **v4.39.0** — genitive-topic priority for list queries. Place
+    // BEFORE multiword / topic-marker / first-noun strategies because
+    // a genitive subject in a list query («Қазақстанның X-тарын
+    // тізімдеңіз») is the discourse topic, while the head noun is
+    // the predicate of the question. Pre-v4.39.0 the head-noun
+    // strategies won, surfacing definition-style facts about the
+    // class instead of the curated list owned by the genitive
+    // subject. Conditional on `has_list_intent` inside the helper —
+    // outside list queries the genitive subject often is NOT the
+    // topic (e.g. «адамның мақсаты — өз ісін табу» where head
+    // «мақсат» is the topic), so this strategy fires narrowly.
+    if let Some(g) = genitive_topic_hint_for_list(input) {
+        return Some((g, TopicConfidence::High));
+    }
     if has_language_qualifier_prefix(input) {
         if let Some(tm) = topic_marker_hint(input, parses) {
             return Some((tm, TopicConfidence::High));
@@ -1733,6 +1747,87 @@ pub(crate) fn accusative_form_hint(input: &str) -> Option<String> {
                 if stem.chars().count() >= 3 && !NOT_A_TOPIC.contains(&stem.as_str()) {
                     return Some(stem);
                 }
+            }
+        }
+    }
+    None
+}
+
+/// **v4.39.0** — string-level genitive-suffix strip for list queries.
+/// Mirrors [`locative_attributive_hint`] in shape: closes a known FST
+/// gap by recovering the genitive stem at the string level when the
+/// FST fails to derive `noun + Genitive` for nasal-final / vowel-final
+/// stems (the `realise_d` archiphoneme rule currently produces
+/// `адамдың` instead of `адамның`, so analyse(«адамның») returns
+/// nothing — same gap blocks «Қазақстанның», «ананың», etc.).
+///
+/// Strategy: when the input has list-intent shape («тізім / атаулары
+/// / атап шық / атап өт / барлық атау»), scan tokens ending in one of
+/// the six genitive allomorphs `-ның / -нің / -тың / -тің / -дың /
+/// -дің` and return the bare stem. The list-intent gate is critical —
+/// without it, every adjective-genitive in normal speech (e.g.
+/// «адамның» in «адамның мақсаты — ...» = "human's goal") would be
+/// promoted over the more-specific head noun, which is the wrong
+/// topic for definition-style queries.
+///
+/// Closes bug 4 («Қазақстанның барлық аймақтарын тізімдеңіз»):
+/// pre-v4.39.0 noun_hint = «аймақ» (head noun) → bridge fact «Аймақ —
+/// аумақ»; post-v4.39.0 noun_hint = «қазақстан» → SearchGraph
+/// returns the curated «облыстар тізімі» list-summary fact.
+pub(crate) fn genitive_topic_hint_for_list(input: &str) -> Option<String> {
+    let lower = input.to_lowercase();
+    let has_list_intent = lower.contains("тізім")
+        || lower.contains("атаулары")
+        || lower.contains("атап шық")
+        || lower.contains("атап өт")
+        || lower.contains("барлық");
+    // **v4.39.0** — also fire on quantity questions with a
+    // possessive-genitive shape («Қазақстанның халқы шамамен
+    // қанша?»). The genitive subject is the *holder* of the
+    // counted property; without this gate, head-noun strategies
+    // pick «халқы» as topic and SearchGraph misses the
+    // `қазақстан-has_quantity-халық` fact stored under the
+    // genitive subject.
+    let has_qty_intent = lower.contains("қанша") || lower.contains("неше");
+    if !has_list_intent && !has_qty_intent {
+        return None;
+    }
+    const GENITIVE_SUFFIXES: &[&str] = &["ның", "нің", "тың", "тің", "дың", "дің"];
+    // **v4.39.0** — fire only when the FIRST content token is itself
+    // a genitive. The pattern this strategy handles is «X-ның Y-тарын
+    // тізімдеңіз / қанша?» — the genitive subject leads the clause.
+    // Inputs like «X Y-ның Z-тарын тізімдеңіз» (bare X first, then
+    // genitive Y) have X as the discourse topic, not Y; firing on the
+    // deeper genitive would mis-identify the topic. Existing test
+    // cases «Қазақстан аймақтарының барлық атауларын тізімдеңіз»
+    // depend on this gate: pre-gate v4.39.0 picked «аймақтары» (the
+    // deeper genitive stem) over «қазақстан» (the bare leading
+    // noun), regressing topic extraction; post-gate the strategy
+    // declines and the legacy chain (first_noun_root) picks
+    // «қазақстан» correctly.
+    let first_token: Option<String> = lower.split_whitespace().next().map(|raw| {
+        raw.chars()
+            .filter(|c| c.is_alphabetic() || *c == '-')
+            .collect()
+    });
+    let first_is_genitive = first_token
+        .as_deref()
+        .map(|t| GENITIVE_SUFFIXES.iter().any(|s| t.ends_with(s)))
+        .unwrap_or(false);
+    if !first_is_genitive {
+        return None;
+    }
+    let word = first_token.unwrap();
+    let word_len = word.chars().count();
+    if word_len < 6 {
+        return None;
+    }
+    for suffix in GENITIVE_SUFFIXES {
+        if word.ends_with(suffix) {
+            let stem_chars = word_len - suffix.chars().count();
+            let stem: String = word.chars().take(stem_chars).collect();
+            if stem.chars().count() >= 3 && !NOT_A_TOPIC.contains(&stem.as_str()) {
+                return Some(stem);
             }
         }
     }
