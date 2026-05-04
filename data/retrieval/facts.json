@@ -1,7 +1,7 @@
 {
-  "version": "4.43.7",
+  "version": "4.43.9",
   "status": "completed",
-  "elapsed_s": 62,
+  "elapsed_s": 69,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,19 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2283,
+    "facts_total": 2300,
     "by_predicate": {
       "after": 8,
       "causes": 23,
       "does_to": 1,
       "goes_to": 26,
-      "has": 65,
-      "has_quantity": 34,
+      "has": 67,
+      "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1756,
+      "is_a": 1761,
       "lives_in": 8,
       "part_of": 236,
-      "related_to": 102
+      "related_to": 111
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -41,7 +41,7 @@
       "kazakh_textbooks_pack.json": 14,
       "tatoeba_kazakh_pack.json": 3,
       "wikipedia_kz_pack.json": 17,
-      "world_core/adam_self.jsonl": 33,
+      "world_core/adam_self.jsonl": 39,
       "world_core/animals.jsonl": 42,
       "world_core/astronomy.jsonl": 56,
       "world_core/biology_basic.jsonl": 40,
@@ -57,12 +57,12 @@
       "world_core/emotions.jsonl": 30,
       "world_core/food.jsonl": 50,
       "world_core/geography_kz.jsonl": 178,
-      "world_core/government_kazakhstan.jsonl": 29,
+      "world_core/government_kazakhstan.jsonl": 32,
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
       "world_core/informatics_basic.jsonl": 40,
       "world_core/kinship_extended.jsonl": 20,
-      "world_core/kz_literature.jsonl": 94,
+      "world_core/kz_literature.jsonl": 96,
       "world_core/language_features.jsonl": 33,
       "world_core/materials.jsonl": 14,
       "world_core/mathematics_basic.jsonl": 52,
@@ -82,7 +82,7 @@
       "world_core/role_bridges.jsonl": 53,
       "world_core/society.jsonl": 57,
       "world_core/sports.jsonl": 18,
-      "world_core/time.jsonl": 38,
+      "world_core/time.jsonl": 44,
       "world_core/tools_household.jsonl": 30,
       "world_core/transport.jsonl": 42,
       "world_core/weather_phenomena.jsonl": 26
@@ -2328,6 +2328,126 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Информатика — ақпаратты жинау, сақтау, өңдеу мен жеткізу туралы ғылым; мен оны мектеп бағдарламасы деңгейінде білемін: алгоритм, бағдарлама, дерек, желі, файл, бит."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллект кемшіліктері",
+        "root": "жасанды интеллект кемшіліктері",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "кемшіліктер тізімі",
+        "root": "кемшіліктер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қолданыстағы үлкен тілдік модельдердің кемшіліктері: жоқ деректі ойдан шығару (галлюцинация), мол есеп ресурстары мен энергия шығыны, шешімінің ашықтығы мен дереккөзін көрсету мүмкіндігінің жоқтығы, бір сұраққа әр түрлі жауап беру (детерминирленбеуі), оқу деректері — интернеттен жиналған бөгде материалдар."
+    },
+    {
+      "subject": {
+        "surface": "галлюцинация",
+        "root": "галлюцинация",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілдік модель кемшілігі",
+        "root": "тілдік модель кемшілігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлкен тілдік модельдер галлюцинацияға бейім — нақты дереккөзі жоқ ойдан шығарылған мәліметтерді сенімді жауап ретінде ұсынады."
+    },
+    {
+      "subject": {
+        "surface": "тілдік модель ресурс шығыны",
+        "root": "тілдік модель ресурс шығыны",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілдік модель кемшілігі",
+        "root": "тілдік модель кемшілігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_036"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлкен тілдік модельдер мол есеп ресурсын талап етеді: GPU кластерлері, мегаваттарға жететін энергия, миллиардтаған параметрлер."
+    },
+    {
+      "subject": {
+        "surface": "тілдік модель ашық еместігі",
+        "root": "тілдік модель ашық еместігі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілдік модель кемшілігі",
+        "root": "тілдік модель кемшілігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_037"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлкен тілдік модельдердің шешімі ашық емес — қарапайым пайдаланушы немесе тіпті әзірлеушінің өзі неліктен дәл осы жауап берілгенін айтып бере алмайды."
+    },
+    {
+      "subject": {
+        "surface": "тілдік модель детерминирленбеуі",
+        "root": "тілдік модель детерминирленбеуі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілдік модель кемшілігі",
+        "root": "тілдік модель кемшілігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлкен тілдік модельдер бір сұрауға әр түрлі жауап бере алады — статистикалық сэмплингке негізделген генерация детерминирленбеген."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллект",
+        "root": "жасанды интеллект",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "кемшіліктер тізімі",
+        "root": "кемшіліктер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазіргі жасанды интеллект модельдерінің кемшіліктері: галлюцинация (ойдан шығару), мол есеп ресурсы мен энергия шығыны, шешімінің ашықсыздығы, бір сұрауға әр түрлі жауап (детерминирленбеуі), оқу деректерінің сапасыздығы."
     },
     {
       "subject": {
@@ -18991,6 +19111,66 @@
     },
     {
       "subject": {
+        "surface": "қазақстан республикасының президенті",
+        "root": "қазақстан республикасының президенті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қасым-жомарт тоқаев",
+        "root": "қасым-жомарт тоқаев",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасының Президенті — Қасым-Жомарт Тоқаев."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан республикасының премьер-министрі",
+        "root": "қазақстан республикасының премьер-министрі",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "олжас бектенов",
+        "root": "олжас бектенов",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасының Премьер-Министрі — Олжас Бектенов."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан республикасы",
+        "root": "қазақстан республикасы",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "көрші елдер",
+        "root": "көрші елдер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан Республикасы Ресеймен, Қытаймен, Қырғызстанмен, Өзбекстанмен және Түрікменстанмен шектеседі."
+    },
+    {
+      "subject": {
         "surface": "қазақстан тарихы",
         "root": "қазақстан тарихы",
         "pos": "noun"
@@ -24968,6 +25148,46 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Мырза Әли — қазақ ақыны."
+    },
+    {
+      "subject": {
+        "surface": "қазақ жазушылары",
+        "root": "қазақ жазушылары",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жазушылар тізімі",
+        "root": "жазушылар тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_078"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақ жазушылары: Абай Құнанбайұлы, Мұхтар Әуезов, Сәкен Сейфуллин, Мағжан Жұмабаев, Ілияс Жансүгіров, Бейімбет Майлин, Жұбан Молдағалиев, Мұқағали Мақатаев, Шәкәрім Құдайбердіұлы, Ілияс Есенберлин, Әбіш Кекілбаев, Тахауи Ахтанов, Бауыржан Момышұлы."
+    },
+    {
+      "subject": {
+        "surface": "қазақ ақындары",
+        "root": "қазақ ақындары",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ақындар тізімі",
+        "root": "ақындар тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_079"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақ ақындары: Абай, Шәкәрім, Махамбет Өтемісұлы, Мағжан Жұмабаев, Сәкен Сейфуллин, Қасым Аманжолов, Мұқағали Мақатаев, Олжас Сүлейменов, Қадыр Мырза Әли."
     },
     {
       "subject": {
@@ -43788,6 +44008,126 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Уақыт тоқтамайды."
+    },
+    {
+      "subject": {
+        "surface": "жыл мезгілдері",
+        "root": "жыл мезгілдері",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "мезгілдер тізімі",
+        "root": "мезгілдер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/time",
+      "source": {
+        "pack": "world_core/time.jsonl",
+        "sample_id": "time_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жыл төрт мезгілден тұрады: көктем, жаз, күз, қыс."
+    },
+    {
+      "subject": {
+        "surface": "тоқсан",
+        "root": "тоқсан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "уақыт кезеңі",
+        "root": "уақыт кезеңі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/time",
+      "source": {
+        "pack": "world_core/time.jsonl",
+        "sample_id": "time_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тоқсан — жылдың төрттен бір бөлігі, үш айға тең кезең."
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "тоқсан",
+        "root": "тоқсан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/time",
+      "source": {
+        "pack": "world_core/time.jsonl",
+        "sample_id": "time_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бір жылда төрт тоқсан болады."
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "мезгіл",
+        "root": "мезгіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/time",
+      "source": {
+        "pack": "world_core/time.jsonl",
+        "sample_id": "time_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жыл — он екі айдан, төрт мезгілден және төрт тоқсаннан тұрады."
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "тоқсан",
+        "root": "тоқсан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/time",
+      "source": {
+        "pack": "world_core/time.jsonl",
+        "sample_id": "time_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жыл — он екі айдан, төрт мезгілден және төрт тоқсаннан тұрады."
+    },
+    {
+      "subject": {
+        "surface": "жыл",
+        "root": "жыл",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "мезгілдер тізімі",
+        "root": "мезгілдер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/time",
+      "source": {
+        "pack": "world_core/time.jsonl",
+        "sample_id": "time_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жыл төрт мезгілге бөлінеді: көктем, жаз, күз, қыс."
     },
     {
       "subject": {

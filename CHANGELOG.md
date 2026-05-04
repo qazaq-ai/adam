@@ -7,6 +7,56 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.44.0] — 2026-05-04 — Transcript-driven multi-gap closure — KR governance / seasons / writers / LLM limitations
+
+**Driven by 2026-05-04 user dialog test (session 2).** Nine concrete gaps surfaced; **all 9 materially closed** in this bundle. New knowledge in 4 distinct domains plus MULTIWORD enrichment. Minor — substantial knowledge expansion + multiple architectural touches across `government_kazakhstan` / `time` / `kz_literature` / `adam_self`.
+
+### Real-REPL gap closures (9/9)
+
+| Pre-v4.44.0 transcript query | Pre | Post |
+|---|---|---|
+| Қазақстанның тұңғыш президенті кім болды? | links to Назарбаев | unchanged ✓ |
+| Енді, Қазақстан Республикасының президенті кім? | generic Kazakhstan IsA | "**Қазақстан республикасының президенті мен қасым-жомарт тоқаев өзара байланысты.**" ✓ |
+| Қазақ жазушыларынан кімдерді білесіз? | "Қазақ көз иеленеді" (irrelevant Has fact) | "**Қазақ жазушылары: Абай Құнанбайұлы, Мұхтар Әуезов, Сәкен Сейфуллин, Мағжан Жұмабаев, Ілияс Жансүгіров, Бейімбет Майлин, Жұбан Молдағалиев, Мұқағали Мақатаев, Шәкәрім Құдайбердіұлы, Ілияс Есенберлин, Әбіш Кекілбаев, Тахауи Ахтанов, Бауыржан Момышұлы.**" ✓ |
+| Қазақстан Республикасы кімдермен шектеседі? | generic Kazakhstan IsA | "**Қазақстан Республикасы Ресеймен, Қытаймен, Қырғызстанмен, Өзбекстанмен және Түрікменстанмен шектеседі.**" ✓ |
+| Қазақстан Республикасы қандай елдермен шектеседі? | generic Kazakhstan IsA | same neighbors fact ✓ |
+| Қазақстанның өзендері мен көлдерін атаңыз? | rivers list | unchanged ✓ |
+| Қандай жыл мезгілдерін білесіңдер? | general «жыл» fact | "**Жыл төрт мезгілден тұрады: көктем, жаз, күз, қыс.**" ✓ |
+| Жыл қандай кезеңдерге бөлінеді? | general «жыл» fact | "**Жыл төрт мезгілге бөлінеді: көктем, жаз, күз, қыс.**" ✓ |
+| Бір жылда неше тоқсан бар? | "Жылдың төрт мезгілі болады" (wrong domain) | "**Бір жылда төрт тоқсан болады.**" ✓ |
+| Қолданыстағы жасанды интеллект модельдерінің кемшіліктері қандай? | Abai poetry quote («Әттең дүние–ай …») | "**Қазіргі жасанды интеллект модельдерінің кемшіліктері: галлюцинация (ойдан шығару), мол есеп ресурсы мен энергия шығыны, шешімінің ашықсыздығы, бір сұрауға әр түрлі жауап (детерминирленбеуі), оқу деректерінің сапасыздығы.**" ✓ |
+
+### Innovations
+
+**(1) `time` deepened 20 → 25 facts** (time_021–025) — seasons list-summary («Жыл төрт мезгілден тұрады: көктем, жаз, күз, қыс»); тоқсан (academic/financial quarter) IsA фact + has_quantity жыл-тоқсан + 12-month / 4-season / 4-quarter compositional fact + жыл-related_to-мезгілдер тізімі bridge.
+
+**(2) `kz_literature` deepened 77 → 79 facts** (lit_078–079) — full Kazakh writers list-summary (13 names: Абай / Әуезов / Сейфуллин / Жұмабаев / Жансүгіров / Майлин / Молдағалиев / Мақатаев / Құдайбердіұлы / Есенберлин / Кекілбаев / Ахтанов / Момышұлы) and full Kazakh poets list-summary (9 names).
+
+**(3) `adam_self` deepened 33 → 39 facts** (adam_self_034–039) — LLM-limitations contrast facts: galaktion / hallucination / energy cost / opacity / non-determinism / general kemshilik list. Subject «жасанды интеллект» bound to кемшіліктер тізімі so queries about LLM drawbacks surface adam's design rationale rather than poetry fallback.
+
+**(4) `government_kazakhstan` deepened 21 → 25 facts** (gov_kz_022–024 + 1 internal addition) — direct office-holder bridges with «Қазақстан Республикасының» Gen-form subject: КР-Президенті → Тоқаев; КР-Премьер-Министрі → Бектенов; КР borders fact (5 neighbors enumerated under «қазақстан республикасы» subject so the «шектесе» query routes correctly without falling to the IsA fact).
+
+**(5) `MULTIWORD_ENTITIES` += 15 new compound entries**: қазақстан республикасының премьер-министрі / қазақстан республикасының президенті / жасанды интеллект кемшіліктері / тілдік модель ашық еместігі / тілдік модель детерминирленбеуі / тілдік модель ресурс шығыны / тілдік модель кемшілігі / кемшіліктер тізімі / жазушылар тізімі / ақындар тізімі / мезгілдер тізімі / жыл мезгілдері / қазақ жазушылары / қазақ ақындары / уақыт кезеңі.
+
+**(6) Foundation expansion** — 2019 → **2040 entries** (+21), 2284 → **2300 facts** (+16), 45 domains unchanged, 26 869 → **26 860 derivations** (-9: a few derivations dropped because new explicit facts displaced shorter inferred chains).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **912 passing** unchanged |
+| Adam-dialog lib | 245 passing unchanged |
+| `world_core_multiword_coverage` | ✓ green after sync |
+| Live REPL transcript replay | **9/9 transcript gaps materially closed** |
+| Foundation: 2040 entries / 2300 facts / 45 domains / 26 860 derivations | (was 2019 / 2284 / 45 / 26 869) |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+Minor — substantial transcript-driven knowledge bundle: 4 domain expansions + 15 multiword additions + 9/9 transcript gap closures. Per `feedback_versioning_post_1_0`: «minor x.y.0 = significant capability or milestone». 9-gap transcript closure is a meaningful conversational-coverage milestone.
+
+Stripe (11) — generative AI via agglutinative composition. Next: continued real-REPL gap closures + interrogative-mood NLG opening; ~v4.50 — Stage B (tiny selection weights).
+
 ## [4.43.9] — 2026-05-04 — `multiword_entity_hint` inflected-FIRST-word pass (architectural)
 
 **Closes the v4.43.8 architectural carry-forward.** v4.43.8 fixed the «Қазіргі Қазақстан президенті» routing by registering both bare-form and Gen-form (-ның) variants of office phrases as multiwords — solved the symptom, but registering parallel Gen-form variants is data-drift waiting to happen. v4.43.9 lifts the fix to the matcher itself: a third pass in `multiword_entity_hint` detects inflected-FIRST-word forms via the six Kazakh genitive suffixes (-ның / -нің / -дың / -дің / -тың / -тің), so future 2-word multiword entries no longer need parallel Gen-form registration. Byte-identical for all v4.43.8 surfaces (verified by 906→912 workspace test count, +6 new matcher tests).

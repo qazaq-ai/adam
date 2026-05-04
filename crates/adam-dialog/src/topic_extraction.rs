@@ -536,6 +536,26 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // premier, parliament, ministries, courts). Required by
     // `world_core_multiword_coverage`. Driven by 2026-05-04 user
     // dialog test transcript.
+    // **v4.44.0** — transcript-driven gap closure (2026-05-04
+    // session 2). Compound subjects from `government_kazakhstan`
+    // (КР-form office bridges), `time` (seasons/quarters lists),
+    // `kz_literature` (writers/poets lists), and `adam_self`
+    // (LLM-limitations facts).
+    "қазақстан республикасының премьер-министрі",
+    "қазақстан республикасының президенті",
+    "жасанды интеллект кемшіліктері",
+    "тілдік модель ашық еместігі",
+    "тілдік модель детерминирленбеуі",
+    "тілдік модель ресурс шығыны",
+    "тілдік модель кемшілігі",
+    "кемшіліктер тізімі",
+    "жазушылар тізімі",
+    "ақындар тізімі",
+    "мезгілдер тізімі",
+    "жыл мезгілдері",
+    "қазақ жазушылары",
+    "қазақ ақындары",
+    "уақыт кезеңі",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of
