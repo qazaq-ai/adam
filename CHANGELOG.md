@@ -7,6 +7,71 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.42.0] — 2026-05-04 — Stage A opens — rule-based NLG over typed semantic frames (foundation)
+
+**First minor in v4.42+ arc.** Opens **Stage A** of the project's refined thesis (`project_retrieval_not_neural_v2.md`, refined 2026-05-03): adam as a NEW class of generative AI that uses the agglutinative paradigm — typed primitives + rule-based composition + tiny selection weights — to be safe / cheap / predictable while reaching LLM-comparable abilities. Templates were the rough draft of this; rule-based NLG over typed `SentenceFrame`s is the proper architecture.
+
+This release lays the foundation: a new `nlg/` module with `SentenceFrame`, `NlgRule` trait, and 5 starter rules covering the most-frequent factoid response patterns. NLG runs as a **parallel path** in v4.42.0 — the existing template-based realiser is unchanged. Subsequent v4.42+ releases will progressively replace template families with rules and add Stage B (selection weights).
+
+### Layered stack
+
+```
+1. FST morphology              (already)
+2. Typed SemFrame IR           (already, partial)
+3. world_core knowledge        (already)
+4. Reasoner                    (already)
+5. Rule-based sentence NLG     ← NEW IN v4.42.0
+6. Selection weights           (Stage B, future)
+7. Realiser (FST forward)      (already)
+```
+
+### Innovations
+
+**(1) New `crates/adam-dialog/src/nlg/` module.** Public API: `render_sentence(frame)` → `Option<String>`. Iterates rules in priority order; first matching rule's render output wins. Returns `None` when no rule applies (caller falls through to existing template realiser).
+
+**(2) `SentenceFrame` typed wrapper** — `{fact, mood, introducer}`. The "fact" is the agglutinative root (what is said); `mood` and `introducer` are the operators that compose into the surface form. `SentenceMood::{Declarative, Interrogative, Imperative}` (only Declarative wired in v4.42.0). `Introducer::{Direct, AboutTopicFirst, OnTheSubjectMain, BrieflyAbout}` mirrors the existing `unknown.with_grounded_fact` template variants.
+
+**(3) `NlgRule` trait.** Pluggable rule shape — `matches(&self, frame) -> bool` + `render(&self, frame) -> Option<String>` + `name(&self) -> &'static str`. Trait-object polymorphism so future rules / community contributions slot in cleanly.
+
+**(4) 5 starter rules** covering the most-frequent factoid response patterns:
+- `IsACopulaDeclarative` — «X — Y» (definitional copula; most common factoid shape).
+- `PartOfDeclarative` — «X Y құрамына кіреді».
+- `HasQuantityDeclarative` — reuses `raw_text` (curated quantity phrasings encode count morphology).
+- `RelatedToListDeclarative` — list-summary form (object root contains «тізім»); reuses curated comma list.
+- `LivesInDeclarative` — «X мекені — Y».
+
+**(5) 7 unit tests** in `nlg/tests` — Direct / introducer variants / each rule path / unknown-predicate fallthrough.
+
+**(6) Regression fix from in-flight test:** «Қазақстанның барлық аймақтарын тізімдеңіз» was incorrectly returning the notable-people list (added v4.40.5) instead of the облыстар list. Cause: the 4-char query-token prefix `қаза` from «Қазақстанның» false-positively matched the «танымал қазақстандықтар тізімі» object root (which contains the derivative «қазақстандықтар»), giving direct_overlap rank 0 alongside the synonym_overlap rank 0 from `(аймақ, облыс)` for the облыстар list — tie-breaker by length picked the longer notable-list raw_text. Skip-list extended with `қаза` to suppress the false positive; синоним path correctly identifies облыстар.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **884 passing** (+7 NLG tests; was 877) |
+| 5 NLG rules | unit-tested ✓ |
+| Bug 4 regression fix | ✓ «барлық аймақтарын тізімдеңіз» → 17-облыс list |
+| Anti-regression — Абай / Қазақстан / qty / Меншік / Сәлем / notable / writers / scientists | unchanged ✓ |
+| Foundation: 1819 entries / 1985 facts / 41 domains / 25 633 derivations | unchanged ✓ |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`v4.42.0` minor — new module + new public API surface (`render_sentence`) + new trait (`NlgRule`) + opens a multi-release architectural arc (Stage A). Per `feedback_versioning_post_1_0`: «New module / enum variant / API surface / multi-release-milestone closure → next minor». Stage A opening is precisely that.
+
+### Stage A roadmap
+
+- **v4.42.x** — incrementally widen rule set (interrogative mood, imperative mood, more predicate combinations). Migrate template families to rules where the typed-frame path is strictly equal-or-better.
+- **~v4.50.x** — Stage B: selection weights over rule-generated candidates, trained on the 3.87M-word committed corpus.
+- **v5.x parallel track** — Rust code-generation in the same paradigm.
+
+### Deferred (per Stage A scope)
+
+- Verb-frame rules (only nominal-predicate facts in v4.42.0).
+- Interrogative / Imperative moods.
+- Rule integration into the dialog pipeline replacing templates (NLG runs as parallel CHECK in v4.42.0).
+- Selection weights (Stage B).
+
 ## [4.41.7] — 2026-05-03 — Dialog precision pass + Rust knowledge expansion — 7-innovation bundle from real-REPL transcript
 
 **Driven by 2026-05-03 user dialog test (second round).** Closes 6 distinct dialog gaps from a real session AND expands Rust knowledge per user's explicit ask about adam learning programming. Word-form math now handles digit-prefix forms («30-ды»); the `пен` conjunction has context-aware merge/split semantics; math turns no longer pollute discourse anaphora; the misleading «Rust only» fact is replaced; the modal-ability gate exempts explain/teach verbs; 35 advanced Rust facts cover ownership / borrowing / lifetimes / traits / generics / Vec / HashMap / iterators / closures / async / cargo / etc.

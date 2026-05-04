@@ -625,7 +625,25 @@ impl Tool {
                         // inflected forms still hit.
                         let direct_overlap = query_tokens.iter().any(|t| {
                             let prefix_4: String = t.chars().take(4).collect();
-                            if prefix_4 == "тізі" || prefix_4 == "атау" || prefix_4 == "барл"
+                            // **v4.42.0** — skip-list extended with
+                            // `қаза` / `қаза` and `адам` / `тұлғ`. The
+                            // 4-char prefix `қаза` from a query token
+                            // `қазақстанның` accidentally matches
+                            // `танымал қазақстандықтар тізімі`'s
+                            // object root (which contains the
+                            // derivative `қазақстандықтар`), giving a
+                            // false-positive direct overlap that
+                            // promoted the notable-people list above
+                            // the correct `облыстар тізімі` for
+                            // queries like «Қазақстанның барлық
+                            // аймақтарын тізімдеңіз». Filtering
+                            // `қаза` removes that false-positive —
+                            // the synonym_overlap branch below picks
+                            // up the right (аймақ, облыс) match.
+                            if prefix_4 == "тізі"
+                                || prefix_4 == "атау"
+                                || prefix_4 == "барл"
+                                || prefix_4 == "қаза"
                             {
                                 return false;
                             }

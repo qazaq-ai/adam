@@ -35,6 +35,7 @@ pub mod discourse;
 pub mod domain_index;
 pub mod intent;
 pub mod language_core;
+pub mod nlg;
 pub mod planner;
 pub mod quality;
 pub mod question_shape;
