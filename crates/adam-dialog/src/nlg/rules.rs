@@ -14,25 +14,17 @@
 //! skeleton.
 
 use super::{
-    Introducer, NlgRule, SentenceFrame, SentenceMood, capitalize_first, preferred_surface,
+    Introducer, NlgRule, SentenceFrame, SentenceMood, capitalize_first, compose_introducer,
+    preferred_surface,
 };
 use adam_reasoning::Predicate as ReasPredicate;
 
-/// Wrap `body` in the introducer's preamble.
+/// Wrap `body` in the introducer's preamble. **v4.43.0** —
+/// delegates to the public [`super::compose_introducer`] so the
+/// rules path and the planner path produce byte-identical output
+/// for any given `(introducer, topic, name_respect, body)`.
 fn wrap_introducer(introducer: Introducer, topic: &str, body: &str) -> String {
-    let topic_cap = capitalize_first(topic);
-    match introducer {
-        Introducer::Direct => body.to_string(),
-        Introducer::AboutTopicFirst => {
-            format!("{topic_cap} туралы ең әуелі мынаны айтуға болады: {body}")
-        }
-        Introducer::OnTheSubjectMain => {
-            format!("{topic_cap} жайында негізгі дерек мынау: {body}")
-        }
-        Introducer::BrieflyAbout => {
-            format!("{topic_cap} туралы қысқаша айтсам: {body}")
-        }
-    }
+    compose_introducer(introducer, topic, None, body)
 }
 
 /// Ensure the body ends with a period.

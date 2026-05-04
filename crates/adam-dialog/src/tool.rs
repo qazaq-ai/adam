@@ -1183,6 +1183,7 @@ fn render_grounded_fact(fact: &ReasFact) -> Option<String> {
         fact,
         mood: crate::nlg::SentenceMood::Declarative,
         introducer: crate::nlg::Introducer::Direct,
+        name_respect: None,
     };
     crate::nlg::render_sentence(&frame).or_else(|| {
         let text = fact.raw_text.trim();

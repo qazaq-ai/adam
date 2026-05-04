@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.43.0] — 2026-05-04 — Stage A bundle 3 — Introducer migration into NLG production path
+
+**Stage A architectural milestone.** Closes the deferred carry-forward from v4.42.6 memory note. The five-variant introducer rotation that lived in template-string text (`unknown.with_grounded_fact` family in `data/dialog/templates/v1.toml`) is now first-class enum + composer in the NLG module. Templates simplify to a single `{fact}` slot whose value is a full preamble+body sentence produced by `nlg::compose_introducer`; the planner picks the introducer via `nlg::pick_introducer` mirroring the v4.42.x seed-mod rotation byte-for-byte. **Output is byte-identical to v4.42.x for any `(seed, has_name_respect, fact)` triple** — verified via existing 890-test workspace + live REPL anti-regression probe.
+
+### Architectural before/after
+
+**Pre-v4.43.0** — introducer phrasings live in templates:
+```toml
+[[families]]
+key = "unknown.with_grounded_fact"
+templates = [
+    "{noun} туралы қысқаша айтсам: {fact}",          # idx 0
+    "{noun} жайында негізгі дерек мынау: {fact}",    # idx 1
+    "{noun} туралы ең әуелі мынаны айтуға болады: {fact}",  # idx 2
+    "{name_respect}, {noun} туралы қысқа жауап: {fact}",     # idx 3
+    "{noun} жайында нақты дерек: {fact}",            # idx 4
+]
+```
+Slot `{fact}` filled with body-only sentence; template wraps with preamble.
+
+**Post-v4.43.0** — introducer is code-side enum + composer:
+```toml
+[[families]]
+key = "unknown.with_grounded_fact"
+templates = ["{fact}"]
+```
+Slot `{fact}` filled with `compose_introducer(introducer, topic, name_respect, body)`; planner picks introducer via `pick_introducer(seed, has_name_respect)` whose pool order matches the original template-array order, preserving the v4.42.x rotation bit-for-bit.
+
+### Innovations
+
+**(1) `Introducer` enum extended to 5 user-facing variants** — added `NameRespectAnswer` (template idx 3: «{name_respect}, {topic} туралы қысқа жауап:») and `ExactFact` (template idx 4: «{topic} жайында нақты дерек:»). Pre-v4.43.0 only had 3 user-facing variants + Direct; the 2 new variants close the surface-coverage gap with the templates.
+
+**(2) `SentenceFrame` extended with `name_respect: Option<&'a str>`** — required by `NameRespectAnswer` rendering. Defaults `None` for all other introducer variants and for callers without a session name; when `Some`, expected to be the respectful surface form already (e.g. «Дәулет мырза»).
+
+**(3) `pub fn pick_introducer(seed, has_name_respect) -> Introducer`** — deterministic introducer pick mirroring the v4.42.x template-rotation algorithm. Pool of 5 when `has_name_respect`, 4 when not (filtering out `NameRespectAnswer`); pool order matches template-array order so `seed % pool.len()` produces the same surface text as before.
+
+**(4) `pub fn compose_introducer(introducer, topic, name_respect, body) -> String`** — public composer that wraps a body sentence in the chosen preamble. Threads topic capitalisation and (for `NameRespectAnswer`) the respectful name form. Defensive fallback: if `NameRespectAnswer` called with `name_respect = None`, falls back to `BrieflyAbout` surface to prevent crashes.
+
+**(5) Planner integration via `apply_introducer_migration` helper** — called from both `plan_response_with_session` and `plan_response_with_epistemic` after template selection. For key == "unknown.with_grounded_fact", reads `{noun}` + `{fact}` + `{name_respect}` slots from the planner state, calls `pick_introducer` with `rng_seed` + name-respect availability, calls `compose_introducer` with the picked variant, rewrites the `{fact}` slot to the wrapped sentence. No-op for all other template families. Trace records the picked introducer variant for `--trace` mode debugging.
+
+**(6) Template family `unknown.with_grounded_fact` simplified to `["{fact}"]`** — single template; the introducer wrap moved from data to code. Other template families using `{fact}` (`unknown.with_grounded_fact.no_causal` / `.no_function`) keep their semantic-hedge wrapping; only the pure-introducer family was migrated.
+
+**(7) 10 new NLG unit tests** verify each `(Introducer × topic × name_respect × body)` combination renders the exact pre-migration surface, and that `pick_introducer` is deterministic + cycle-correct for both 5-variant (with name_respect) and 4-variant (without name_respect) pools.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **890 passing** unchanged (`cargo test --workspace --release`) |
+| Adam-dialog lib | **233 passing** (was 223; +10 NLG migration tests) |
+| `world_core_multiword_coverage` | ✓ green |
+| Live REPL byte-identical probe | ✓ 6/6 outputs match v4.42.x line-for-line (Алгоритм / Рекурсия / Сызықтық функция / Итерация / Квадраттық теңдеу / Статистика) |
+| Foundation: 1931 entries / 2182 facts / 43 domains / 26 251 derivations | unchanged ✓ |
+| `cargo fmt --all --check` | clean |
+| `cargo check --all-targets` | clean |
+
+### Cadence
+
+Minor — Stage A architectural milestone. Per `feedback_versioning_post_1_0`: «never under-version a kernel-signature feature». The introducer migration:
+- Moves a 5-way phrasing rotation from data (templates) to code (NLG enum + composer)
+- Extends the `Introducer` enum with 2 new variants + `SentenceFrame` with a new field — public API surface change
+- Adds 2 new public NLG functions (`pick_introducer`, `compose_introducer`)
+- Closes the deferred Stage A bundle 3 carry-forward from v4.42.6
+
+This is a kernel-signature architectural step. Bundle complete:
+1. Foundation (v4.42.0)
+2. Production migration (v4.42.5)
+3. **Introducer migration (v4.43.0)** ← shipped
+
+Stripe (11) — generative AI via agglutinative composition continues. Next: ~v4.50 Stage B (tiny selection weights). Interrogative-mood NLG rules deferred to a future v4.43.x.
+
 ## [4.42.9] — 2026-05-04 — Knowledge depth bundle 2 — Psychology + Emotions/Society enrichment
 
 **Continuation of v4.42.8 knowledge expansion arc.** New `psychology_basic` domain (22 facts) covers cognition / personality / mental processes — concepts adam previously lacked entirely. `emotions` deepens 18 → 30 facts with complex emotions (envy / boredom / despair / longing / pleasure) plus a hub-defining `сезім is_a психикалық күй` link bridging emotions into the new psychology hub. `society` deepens 36 → 49 facts with civic/political concepts (democracy / republic / elections / rights / freedom / justice / market / civil society / taxes). All facts compose through Stage A `IsACopulaDeclarative` NLG rule.

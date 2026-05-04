@@ -874,14 +874,17 @@ templates = [
     "{name_respect}, {city|locative} отырып {noun} жайында мына деректі ұсына аламын: «{example}»",
 ]
 
+# **v4.43.0** — Stage A bundle 3: introducer migration.
+# Pre-v4.43.0 this family had 5 templates each embedding an introducer
+# preamble in the literal text. v4.43.0 lifted introducer choice into
+# the planner via `crate::nlg::pick_introducer` + `compose_introducer`
+# (see `apply_introducer_migration` in planner.rs); the templates here
+# now display the planner-pre-wrapped `{fact}` slot. Output is
+# byte-identical to v4.42.x for any `(seed, has_name_respect, fact)`.
 [[families]]
 key = "unknown.with_grounded_fact"
 templates = [
-    "{noun} туралы қысқаша айтсам: {fact}",
-    "{noun} жайында негізгі дерек мынау: {fact}",
-    "{noun} туралы ең әуелі мынаны айтуға болады: {fact}",
-    "{name_respect}, {noun} туралы қысқа жауап: {fact}",
-    "{noun} жайында нақты дерек: {fact}",
+    "{fact}",
 ]
 
 # v4.33.5 — first SemFrame-driven response family. When the input

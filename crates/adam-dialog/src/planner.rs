@@ -107,6 +107,8 @@ pub fn plan_response_with_session(
         chosen,
     ));
 
+    apply_introducer_migration(key, rng_seed, &mut slots, &mut trace);
+
     ResponsePlan {
         literal: chosen,
         slots,
@@ -497,6 +499,8 @@ pub fn plan_response_with_epistemic(
         chosen,
     ));
 
+    apply_introducer_migration(key, rng_seed, &mut slots, &mut trace);
+
     ResponsePlan {
         literal: chosen,
         slots,
@@ -647,6 +651,38 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
         _ => {}
     }
     slots
+}
+
+/// **v4.43.0** — Stage A bundle 3: introducer migration. Rewrites
+/// the `{fact}` slot for the `unknown.with_grounded_fact` family
+/// from a body-only sentence to a full preamble+body sentence
+/// produced via [`crate::nlg::compose_introducer`]. The introducer
+/// pick mirrors the v4.42.x template-rotation algorithm bit-for-bit
+/// via [`crate::nlg::pick_introducer`], so output is byte-identical
+/// to pre-migration for any `(seed, has_name_respect, fact)`. No-op
+/// for other template families.
+fn apply_introducer_migration(
+    key: &str,
+    rng_seed: u64,
+    slots: &mut HashMap<String, String>,
+    trace: &mut Vec<String>,
+) {
+    if key != "unknown.with_grounded_fact" {
+        return;
+    }
+    let Some(noun) = slots.get("noun").cloned() else {
+        return;
+    };
+    let Some(body) = slots.get("fact").cloned() else {
+        return;
+    };
+    let name_respect = slots.get("name_respect").cloned();
+    let introducer = crate::nlg::pick_introducer(rng_seed, name_respect.is_some());
+    let wrapped = crate::nlg::compose_introducer(introducer, &noun, name_respect.as_deref(), &body);
+    trace.push(format!(
+        "planner: introducer={introducer:?} (v4.43.0 NLG migration)",
+    ));
+    slots.insert("fact".into(), wrapped);
 }
 
 fn uses_geo_feature_location_family(kind: &str) -> bool {

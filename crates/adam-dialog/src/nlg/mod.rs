@@ -79,19 +79,36 @@ pub enum SentenceMood {
     Imperative,
 }
 
-/// Optional preamble framing the answer. Mirrors the existing
-/// template family `unknown.with_grounded_fact` which has three
-/// introducer variants («X туралы ең әуелі мынаны айтуға болады»,
-/// «X жайында негізгі дерек мынау», none / direct).
+/// Optional preamble framing the answer. **v4.43.0** — Stage A
+/// bundle 3 completed the introducer migration: the existing
+/// template family `unknown.with_grounded_fact` had 5 phrasings;
+/// all 5 are now first-class `Introducer` enum variants. The
+/// templates simplify to a single `{fact}` slot whose value is a
+/// full preamble+body sentence produced by [`compose_introducer`].
+///
+/// Order of variants matches template-array order (idx 0..=4) in
+/// `data/dialog/templates/v1.toml::unknown.with_grounded_fact`
+/// so that [`pick_introducer`] reproduces the v4.42.x seed-mod
+/// rotation byte-for-byte.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Introducer {
-    /// «{topic} туралы ең әуелі мынаны айтуға болады: {body}»
-    AboutTopicFirst,
-    /// «{topic} жайында негізгі дерек мынау: {body}»
-    OnTheSubjectMain,
-    /// «{topic} туралы қысқаша айтсам: {body}»
+    /// «{topic} туралы қысқаша айтсам: {body}» (template idx 0)
     BrieflyAbout,
-    /// Direct: just the body, no preamble.
+    /// «{topic} жайында негізгі дерек мынау: {body}» (template idx 1)
+    OnTheSubjectMain,
+    /// «{topic} туралы ең әуелі мынаны айтуға болады: {body}»
+    /// (template idx 2)
+    AboutTopicFirst,
+    /// «{name_respect}, {topic} туралы қысқа жауап: {body}»
+    /// (template idx 3) — added in v4.43.0. Requires
+    /// [`SentenceFrame::name_respect`] to be `Some`; otherwise
+    /// the variant is filtered out by [`pick_introducer`].
+    NameRespectAnswer,
+    /// «{topic} жайында нақты дерек: {body}» (template idx 4) —
+    /// added in v4.43.0.
+    ExactFact,
+    /// Direct: just the body, no preamble. Used by internal
+    /// evidence rendering; not in the user-facing pick pool.
     Direct,
 }
 
@@ -107,6 +124,12 @@ pub struct SentenceFrame<'a> {
     pub mood: SentenceMood,
     /// Optional preamble framing.
     pub introducer: Introducer,
+    /// **v4.43.0** — respectful name form for
+    /// [`Introducer::NameRespectAnswer`]. `None` for all other
+    /// introducer variants (and for callers that don't have a
+    /// session name). When `Some`, expected to already be in the
+    /// respectful surface form (e.g. «Дәулет мырза»).
+    pub name_respect: Option<&'a str>,
 }
 
 /// A rule that knows how to render some `(predicate × mood)`
@@ -174,6 +197,76 @@ pub fn render_sentence(frame: &SentenceFrame) -> Option<String> {
     None
 }
 
+/// **v4.43.0** — Stage A bundle 3. Deterministic introducer pick
+/// for the migrated `unknown.with_grounded_fact` family.
+///
+/// Mirrors the v4.42.x template-rotation algorithm bit-for-bit:
+/// the candidate pool has 5 introducers when the session has a
+/// respectful-form name (matching the 5 fillable templates), and
+/// 4 when it doesn't (matching the post-fillability-filter pool
+/// when the `{name_respect}` template was filtered out). Order
+/// inside the pool matches the original template-array order,
+/// so `seed % pool.len()` produces the same surface text after
+/// the migration as before.
+pub fn pick_introducer(seed: u64, has_name_respect: bool) -> Introducer {
+    let pool: &[Introducer] = if has_name_respect {
+        &[
+            Introducer::BrieflyAbout,      // template idx 0
+            Introducer::OnTheSubjectMain,  // template idx 1
+            Introducer::AboutTopicFirst,   // template idx 2
+            Introducer::NameRespectAnswer, // template idx 3
+            Introducer::ExactFact,         // template idx 4
+        ]
+    } else {
+        &[
+            Introducer::BrieflyAbout,     // template idx 0
+            Introducer::OnTheSubjectMain, // template idx 1
+            Introducer::AboutTopicFirst,  // template idx 2
+            Introducer::ExactFact,        // template idx 4 (filtered: idx 3 needs name_respect)
+        ]
+    };
+    pool[(seed as usize) % pool.len()]
+}
+
+/// **v4.43.0** — Stage A bundle 3. Public composer that wraps a
+/// body sentence in the chosen introducer's preamble, threading
+/// the topic anchor and (for `NameRespectAnswer`) the respectful
+/// name form. Used by the planner to fill the `{fact}` slot of
+/// the simplified `unknown.with_grounded_fact` template family.
+///
+/// For `Direct`, returns the body unchanged. For
+/// `NameRespectAnswer` with `name_respect == None`, falls back to
+/// `BrieflyAbout` (the variant should have been filtered out by
+/// `pick_introducer` in normal flow; this fallback prevents a
+/// crash if a caller composes manually without checking).
+pub fn compose_introducer(
+    introducer: Introducer,
+    topic: &str,
+    name_respect: Option<&str>,
+    body: &str,
+) -> String {
+    let topic_cap = capitalize_first(topic);
+    match introducer {
+        Introducer::Direct => body.to_string(),
+        Introducer::BrieflyAbout => {
+            format!("{topic_cap} туралы қысқаша айтсам: {body}")
+        }
+        Introducer::OnTheSubjectMain => {
+            format!("{topic_cap} жайында негізгі дерек мынау: {body}")
+        }
+        Introducer::AboutTopicFirst => {
+            format!("{topic_cap} туралы ең әуелі мынаны айтуға болады: {body}")
+        }
+        Introducer::NameRespectAnswer => match name_respect {
+            Some(name) => format!("{name}, {topic_cap} туралы қысқа жауап: {body}"),
+            None => format!("{topic_cap} туралы қысқаша айтсам: {body}"),
+        },
+        Introducer::ExactFact => {
+            format!("{topic_cap} жайында нақты дерек: {body}")
+        }
+    }
+}
+
 /// Capitalise the first character (Kazakh-aware — uppercase
 /// preserves Cyrillic semantics).
 fn capitalize_first(s: &str) -> String {
@@ -235,6 +328,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("rule should match");
         assert_eq!(out, "Қазақстан — мемлекет.");
@@ -252,6 +346,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::AboutTopicFirst,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("rule should match");
         assert_eq!(
@@ -272,6 +367,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("rule should match");
         assert_eq!(out, "Астана қазақстан құрамына кіреді.");
@@ -293,6 +389,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("rule should match");
         assert_eq!(out, "Қазақстанда 17 облыс бар.");
@@ -310,6 +407,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("rule should match");
         assert_eq!(out, "Абай мекені — семей.");
@@ -327,6 +425,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("rule should match");
         // List-summary facts surface as their raw_text — preserves
@@ -344,6 +443,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         assert_eq!(render_sentence(&frame), None);
     }
@@ -360,6 +460,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("Causes rule should match");
         assert_eq!(out, "Жаңбыр сел себебі болады.");
@@ -372,6 +473,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("Has rule should match");
         assert_eq!(out, "Ел тіл иеленеді.");
@@ -393,6 +495,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("rule should match");
         assert_eq!(out, "Қазақстан — Орталық Азиядағы ел.");
@@ -412,6 +515,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("шектес rule should match");
         assert_eq!(out, "Қазақстан Ресеймен шектес.");
@@ -424,6 +528,7 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("general RelatedTo should match");
         assert_eq!(out, "Кітап мен ілім өзара байланысты.");
@@ -436,8 +541,122 @@ mod tests {
             fact: &fact,
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
+            name_respect: None,
         };
         let out = render_sentence(&frame).expect("InDomain rule should match");
         assert_eq!(out, "Атом физика саласына жатады.");
+    }
+
+    // ========================================================================
+    // **v4.43.0** — Stage A bundle 3: introducer migration tests.
+    // ========================================================================
+
+    #[test]
+    fn compose_introducer_briefly_about() {
+        let out = compose_introducer(
+            Introducer::BrieflyAbout,
+            "алгоритм",
+            None,
+            "Алгоритм — ереже.",
+        );
+        assert_eq!(out, "Алгоритм туралы қысқаша айтсам: Алгоритм — ереже.");
+    }
+
+    #[test]
+    fn compose_introducer_on_the_subject_main() {
+        let out = compose_introducer(
+            Introducer::OnTheSubjectMain,
+            "алгоритм",
+            None,
+            "Алгоритм — ереже.",
+        );
+        assert_eq!(
+            out,
+            "Алгоритм жайында негізгі дерек мынау: Алгоритм — ереже."
+        );
+    }
+
+    #[test]
+    fn compose_introducer_about_topic_first() {
+        let out = compose_introducer(
+            Introducer::AboutTopicFirst,
+            "алгоритм",
+            None,
+            "Алгоритм — ереже.",
+        );
+        assert_eq!(
+            out,
+            "Алгоритм туралы ең әуелі мынаны айтуға болады: Алгоритм — ереже."
+        );
+    }
+
+    #[test]
+    fn compose_introducer_name_respect_answer() {
+        let out = compose_introducer(
+            Introducer::NameRespectAnswer,
+            "алгоритм",
+            Some("Дәулет мырза"),
+            "Алгоритм — ереже.",
+        );
+        assert_eq!(
+            out,
+            "Дәулет мырза, Алгоритм туралы қысқа жауап: Алгоритм — ереже."
+        );
+    }
+
+    #[test]
+    fn compose_introducer_exact_fact() {
+        let out = compose_introducer(Introducer::ExactFact, "алгоритм", None, "Алгоритм — ереже.");
+        assert_eq!(out, "Алгоритм жайында нақты дерек: Алгоритм — ереже.");
+    }
+
+    #[test]
+    fn compose_introducer_direct_returns_body_unchanged() {
+        let out = compose_introducer(Introducer::Direct, "алгоритм", None, "Алгоритм — ереже.");
+        assert_eq!(out, "Алгоритм — ереже.");
+    }
+
+    #[test]
+    fn compose_introducer_name_respect_answer_falls_back_when_name_missing() {
+        // Defensive fallback: if a caller forgets to supply
+        // name_respect for NameRespectAnswer, use BrieflyAbout
+        // surface (template idx 0) rather than crash.
+        let out = compose_introducer(
+            Introducer::NameRespectAnswer,
+            "алгоритм",
+            None,
+            "Алгоритм — ереже.",
+        );
+        assert_eq!(out, "Алгоритм туралы қысқаша айтсам: Алгоритм — ереже.");
+    }
+
+    #[test]
+    fn pick_introducer_with_name_respect_rotates_5_variants() {
+        // Pool order matches v4.42.x template-array order (idx 0..=4).
+        assert_eq!(pick_introducer(0, true), Introducer::BrieflyAbout);
+        assert_eq!(pick_introducer(1, true), Introducer::OnTheSubjectMain);
+        assert_eq!(pick_introducer(2, true), Introducer::AboutTopicFirst);
+        assert_eq!(pick_introducer(3, true), Introducer::NameRespectAnswer);
+        assert_eq!(pick_introducer(4, true), Introducer::ExactFact);
+        assert_eq!(pick_introducer(5, true), Introducer::BrieflyAbout); // wraps
+    }
+
+    #[test]
+    fn pick_introducer_without_name_respect_rotates_4_variants() {
+        // NameRespectAnswer filtered out; pool shrinks to 4.
+        assert_eq!(pick_introducer(0, false), Introducer::BrieflyAbout);
+        assert_eq!(pick_introducer(1, false), Introducer::OnTheSubjectMain);
+        assert_eq!(pick_introducer(2, false), Introducer::AboutTopicFirst);
+        assert_eq!(pick_introducer(3, false), Introducer::ExactFact);
+        assert_eq!(pick_introducer(4, false), Introducer::BrieflyAbout); // wraps
+    }
+
+    #[test]
+    fn pick_introducer_is_deterministic() {
+        // Same seed + same has_name_respect always picks the same variant.
+        for seed in [0u64, 7, 42, 1024, u64::MAX] {
+            assert_eq!(pick_introducer(seed, true), pick_introducer(seed, true));
+            assert_eq!(pick_introducer(seed, false), pick_introducer(seed, false));
+        }
     }
 }
