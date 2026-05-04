@@ -7,6 +7,76 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.46.0] — 2026-05-04 — Stage B bundle 3 — canonical gold pairs + audit substrate
+
+**Stage B bundle 3.** Two architectural primitives that close the gap between the v4.45.5 training algorithm and the future v4.46.5+ production wiring:
+
+1. **`canonical_training_pairs_v0()`** — 15 hand-curated `(positive, negative)` gold pairs covering every dimension of the v0 feature set + the disambiguation scenarios that the v4.38.0 SearchGraph ranker tiers handle today. Pure deterministic constant. Train `default_v0()` on this set with `train_perceptron` and the resulting weights *by construction* satisfy every canonical scenario.
+
+2. **`AuditResult` + `audit_compare()`** — pure-function side-by-side comparison of "what the heuristic ranker picked" vs "what the trained selector would pick" given the same candidate list. Returns the disagreement boolean + score gap so future trace logs can surface mismatches without changing live behavior.
+
+**No production wiring in v4.46.0** — the audit substrate is pure infrastructure for v4.46.5+ trace integration. Live REPL byte-identical to v4.45.5.
+
+### Innovations
+
+**(1) `canonical_training_pairs_v0() -> Vec<TrainingPair>`** — 15 gold pairs covering 5 dimensions:
+- **Confidence axis** (3 pairs): HumanApproved beats Grammar / RuleInferred; CuratedQuote beats Grammar.
+- **Subject-overlap axis** (3 pairs): the dominant v4.38.0 ranker tier.
+- **Object-overlap axis** (1 pair): secondary tier.
+- **Recency axis** (2 pairs): tiebreaker; doesn't override confidence.
+- **Richness axis** (1 pair): soft tier.
+- **Multi-signal interactions** (5 pairs): HumanApproved + matching subject beats Grammar + non-matching; curated rich text + recency dominates; subject + object overlap beats neither; etc.
+
+Each pair documents inline the rationale and which v4.38.0 ranker tier it mirrors.
+
+**(2) `AuditResult` struct** — `{ heuristic_top_idx, selector_top_idx, disagreement: bool, score_gap: f32 }`. `score_gap` is `score(selector_top) − score(heuristic_top)`, useful for trace logs to quantify how strongly the selector disagrees.
+
+**(3) `audit_compare(candidates, heuristic_top_idx, weights, query_tokens, last_topic) -> Option<AuditResult>`** — pure function that runs the selector, identifies its top-1, and reports disagreement vs the heuristic. Returns `None` for empty candidates or out-of-bounds index. Stable-tie-break matches `select_top` semantics (first index wins on ties).
+
+**(4) Re-exports** in `lib.rs`: `AuditResult`, `audit_compare`, `canonical_training_pairs_v0` available as top-level public API.
+
+**(5) 10 new unit tests** verify:
+- `canonical_pairs_v0_is_non_empty_and_deterministic` — at least 15 pairs, deterministic, every pair's positive ≠ negative.
+- `canonical_pairs_v0_each_pair_well_formed` — every feature value in `[0, 1]`.
+- `training_on_canonical_pairs_v0_converges` — perceptron converges within budget on the canonical set; trained weights have positive confidence + subject_overlap.
+- `trained_weights_satisfy_every_canonical_pair` — post-training, every pair satisfies `score(positive) ≥ score(negative) + margin`.
+- `audit_compare_reports_agreement_when_heuristic_matches_selector` — agreement case.
+- `audit_compare_reports_disagreement_with_score_gap` — disagreement case with positive score gap.
+- `audit_compare_empty_candidates_returns_none` — degenerate input.
+- `audit_compare_out_of_bounds_idx_returns_none` — invalid heuristic index.
+- `audit_compare_single_candidate_always_agrees` — trivial case.
+- `audit_compare_ties_resolve_by_first_index` — stable-tie-break edge case.
+
+**(6) NOT YET in v4.46.0** (Stage B carry-forwards):
+- Production trace-wiring — wire `audit_compare` into `tool::search_graph` result path so disagreements appear in `--trace` output.
+- Real REPL-transcript-derived gold pairs — extract pairs from `live_holdout_2026_05_01.json` / `live_holdout_2026_05_02.json` etc.
+- Production ranker replacement — replace `apply_graph_result`'s heuristic top-1 with `selection::select_top`.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **946 passing** (was 936; +10 new audit tests) |
+| Adam-dialog lib | **279 passing** (was 269; +10) |
+| Selection module | 34/34 tests pass (13 v4.45.0 + 11 v4.45.5 + 10 v4.46.0) |
+| Canonical training pairs converge under `train_perceptron` | ✓ verified |
+| Live REPL | byte-identical to v4.45.5 (no production wiring yet) |
+| Foundation: 2086 / 2346 / 46 / 27 163 | unchanged |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+Minor — Stage B bundle 3. Per `feedback_versioning_post_1_0`: Stage B is the kernel-signature architectural arc; bundle 3 introduces the first concrete training data + audit infrastructure (v4.45.0 was substrate; v4.45.5 was algorithm; v4.46.0 connects them with gold data + comparison primitive). Bundles 1–3 form the substrate for bundle 4 (production routing) and bundle 5 (heuristic-ranker replacement).
+
+Stage B status:
+- v4.45.0 — bundle 1 — selection weights foundation ✓
+- v4.45.5 — bundle 2 — training pipeline ✓
+- **v4.46.0 — bundle 3 — canonical gold pairs + audit substrate** ← shipped
+- v4.46.5+ — bundle 4: production trace-wiring + real REPL-derived pairs
+- v4.50.0 (target) — bundle 5: trained weights replace heuristic ranker
+
+Stripe (11) — generative AI via agglutinative composition continues.
+
 ## [4.45.5] — 2026-05-04 — Stage B bundle 2 — pairwise margin-perceptron training pipeline
 
 **Stage B continues.** v4.45.0 shipped the foundation (`SelectionWeights` + `extract_features` + `score` + `select_top`). v4.45.5 ships the training algorithm: pairwise margin perceptron that takes a list of gold `(positive, negative)` candidate pairs and tunes a `SelectionWeights` table until every pair satisfies `score(positive) ≥ score(negative) + margin` (or `max_epochs` elapse). Pure function, deterministic per `(initial, pairs, config)`. 11 new unit tests verify convergence, determinism, edge cases, and stats reporting.

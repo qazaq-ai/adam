@@ -846,3 +846,370 @@ mod training_tests {
         assert_eq!(stats.final_violations, 0);
     }
 }
+
+// ---------------------------------------------------------------------------
+// **v4.46.0** — Stage B bundle 3: canonical training pairs + audit
+// substrate.
+//
+// `canonical_training_pairs_v0` returns a hand-curated set of gold
+// `(positive, negative)` pairs covering the disambiguation scenarios
+// the v4.38.0 SearchGraph ranker tiers handle today. Training on this
+// set with `train_perceptron` produces a model that — by construction
+// — agrees with the existing heuristic on every canonical scenario.
+// This is the v0 training substrate; v4.46.5+ will wire it into the
+// production trace path so disagreements with the heuristic ranker
+// become visible.
+//
+// `AuditResult` + `audit_compare` form the pure-function audit
+// substrate. Given a list of candidates and the heuristic ranker's
+// top choice, audit_compare computes the selector's top choice and
+// reports both indices + a `disagreement` boolean. NOT YET wired
+// into production in v4.46.0.
+
+/// **v4.46.0** — Hand-curated canonical training pairs covering the
+/// disambiguation scenarios that the v4.38.0 SearchGraph ranker
+/// tiers handle today. Each pair is a single-axis test of one
+/// feature dimension; the training loop must learn that the named
+/// feature outweighs noise on the other dimensions.
+///
+/// Sources: synthetic mirror of v4.38.0 ranker tier tests +
+/// generalizations of the v4.42.x–v4.44.0 transcript-driven gap
+/// closures. No external dependencies; pure deterministic constant.
+pub fn canonical_training_pairs_v0() -> Vec<TrainingPair> {
+    fn p(pos: CandidateFeatures, neg: CandidateFeatures) -> TrainingPair {
+        TrainingPair {
+            positive: pos,
+            negative: neg,
+        }
+    }
+    fn f(c: f32, r: f32, s: f32, o: f32, recency: f32) -> CandidateFeatures {
+        CandidateFeatures {
+            confidence: c,
+            raw_text_richness: r,
+            subject_overlap: s,
+            object_overlap: o,
+            recency_match: recency,
+        }
+    }
+    vec![
+        // ---- Confidence axis (HumanApproved beats lower kinds) ----
+        // (1) HumanApproved (1.0) beats Grammar (0.0) at equal everything else.
+        p(f(1.0, 0.5, 0.5, 0.5, 0.0), f(0.0, 0.5, 0.5, 0.5, 0.0)),
+        // (2) HumanApproved (1.0) beats RuleInferred (0.5).
+        p(f(1.0, 0.5, 0.5, 0.5, 0.0), f(0.5, 0.5, 0.5, 0.5, 0.0)),
+        // (3) CuratedQuote (0.8) beats Grammar (0.0).
+        p(f(0.8, 0.0, 0.5, 0.5, 0.0), f(0.0, 0.0, 0.5, 0.5, 0.0)),
+        // ---- Subject-overlap axis (the dominant tier in v4.38.0) ----
+        // (4) Subject overlap 1.0 beats 0.0 at equal confidence.
+        p(f(0.5, 0.0, 1.0, 0.0, 0.0), f(0.5, 0.0, 0.0, 0.0, 0.0)),
+        // (5) Subject overlap with curated raw_text dominates.
+        p(f(1.0, 0.5, 1.0, 0.0, 0.0), f(1.0, 0.5, 0.0, 0.0, 0.0)),
+        // (6) Subject overlap dominates over richness alone.
+        p(f(0.5, 0.0, 1.0, 0.0, 0.0), f(0.5, 1.0, 0.0, 0.0, 0.0)),
+        // ---- Object-overlap axis (secondary tier) ----
+        // (7) Object overlap 1.0 beats 0.0 at equal subject.
+        p(f(0.5, 0.0, 0.5, 1.0, 0.0), f(0.5, 0.0, 0.5, 0.0, 0.0)),
+        // ---- Recency axis (tiebreaker) ----
+        // (8) Recency match wins when other features are equal.
+        p(f(0.5, 0.5, 0.5, 0.5, 1.0), f(0.5, 0.5, 0.5, 0.5, 0.0)),
+        // (9) Recency match doesn't override confidence gap.
+        // (Negative test: HumanApproved with no recency beats Grammar with recency.)
+        p(f(1.0, 0.5, 0.5, 0.5, 0.0), f(0.0, 0.5, 0.5, 0.5, 1.0)),
+        // ---- Richness axis (soft tier) ----
+        // (10) Richness 1.0 beats 0.0 at equal everything else.
+        p(f(0.5, 1.0, 0.5, 0.5, 0.0), f(0.5, 0.0, 0.5, 0.5, 0.0)),
+        // ---- Multi-signal interactions ----
+        // (11) HumanApproved + matching subject beats Grammar + non-matching.
+        p(f(1.0, 0.0, 1.0, 0.0, 0.0), f(0.0, 0.0, 0.0, 0.0, 0.0)),
+        // (12) Curated rich raw_text + recency beats grammar with no signal.
+        p(f(1.0, 1.0, 0.5, 0.5, 1.0), f(0.0, 0.0, 0.0, 0.0, 0.0)),
+        // (13) Subject overlap + recency beats subject overlap alone.
+        p(f(0.5, 0.0, 1.0, 0.0, 1.0), f(0.5, 0.0, 1.0, 0.0, 0.0)),
+        // (14) Confidence dominates over recency tiebreaker.
+        p(f(1.0, 0.0, 0.0, 0.0, 0.0), f(0.5, 0.0, 0.0, 0.0, 1.0)),
+        // (15) Subject + object overlap beats neither.
+        p(f(0.5, 0.0, 1.0, 1.0, 0.0), f(0.5, 0.0, 0.0, 0.0, 0.0)),
+    ]
+}
+
+/// **v4.46.0** — Audit substrate. Given a list of candidate facts,
+/// the heuristic ranker's choice (by index in the list), and the
+/// trained selector weights, return a side-by-side comparison: which
+/// candidate the selector would pick, whether that disagrees with
+/// the heuristic, and the score gap between selector top-1 and the
+/// heuristic's choice.
+///
+/// Pure function. NOT YET wired into production in v4.46.0 —
+/// v4.46.5+ will route trace logs through this so disagreements
+/// with the heuristic ranker become visible.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct AuditResult {
+    /// Index of the heuristic ranker's top choice in the candidate
+    /// list. Echoed back from the input — useful for trace logs.
+    pub heuristic_top_idx: usize,
+    /// Index of the selector's top choice (by `score`). Stable-tie-
+    /// break by first index, matching `select_top`.
+    pub selector_top_idx: usize,
+    /// `true` when `heuristic_top_idx != selector_top_idx`.
+    pub disagreement: bool,
+    /// `score(selector_top) - score(heuristic_top)`. Always `>= 0`
+    /// when there's disagreement (selector picked something with a
+    /// strictly higher score). Zero when there's agreement; can be
+    /// zero with disagreement only when scores tie and the stable-
+    /// tie-break diverges from the heuristic — which `select_top`'s
+    /// "first index wins" policy makes impossible by construction
+    /// when `heuristic_top_idx == 0`.
+    pub score_gap: f32,
+}
+
+/// Compute the audit comparison. Returns `None` if `candidates` is
+/// empty or `heuristic_top_idx` is out of bounds.
+pub fn audit_compare(
+    candidates: &[&ReasFact],
+    heuristic_top_idx: usize,
+    weights: &SelectionWeights,
+    query_tokens: &[&str],
+    last_topic: Option<&str>,
+) -> Option<AuditResult> {
+    if candidates.is_empty() || heuristic_top_idx >= candidates.len() {
+        return None;
+    }
+    let mut best_idx = 0usize;
+    let mut best_score = f32::NEG_INFINITY;
+    let mut heuristic_score = f32::NEG_INFINITY;
+    for (i, fact) in candidates.iter().enumerate() {
+        let f = extract_features(fact, query_tokens, last_topic);
+        let s = score(&f, weights);
+        if i == heuristic_top_idx {
+            heuristic_score = s;
+        }
+        if s > best_score {
+            best_score = s;
+            best_idx = i;
+        }
+    }
+    Some(AuditResult {
+        heuristic_top_idx,
+        selector_top_idx: best_idx,
+        disagreement: best_idx != heuristic_top_idx,
+        score_gap: best_score - heuristic_score,
+    })
+}
+
+#[cfg(test)]
+mod audit_tests {
+    use super::*;
+    use adam_reasoning::{FactSource, Predicate, SlotRef};
+
+    fn make_fact(
+        subject: &str,
+        predicate: Predicate,
+        object: &str,
+        raw: &str,
+        confidence: ConfidenceKind,
+    ) -> ReasFact {
+        ReasFact {
+            subject: SlotRef {
+                surface: subject.to_string(),
+                root: subject.to_string(),
+                pos: "noun".to_string(),
+            },
+            predicate,
+            object: SlotRef {
+                surface: object.to_string(),
+                root: object.to_string(),
+                pos: "noun".to_string(),
+            },
+            pattern: "test".to_string(),
+            source: FactSource {
+                pack: "test".to_string(),
+                sample_id: "test".to_string(),
+            },
+            confidence,
+            raw_text: raw.to_string(),
+        }
+    }
+
+    #[test]
+    fn canonical_pairs_v0_is_non_empty_and_deterministic() {
+        let a = canonical_training_pairs_v0();
+        let b = canonical_training_pairs_v0();
+        assert!(!a.is_empty());
+        assert!(a.len() >= 15);
+        assert_eq!(a.len(), b.len());
+        // Each pair's positive must differ from negative on at least one feature.
+        for pair in &a {
+            assert!(
+                pair.positive != pair.negative,
+                "pair has identical positive and negative",
+            );
+        }
+    }
+
+    #[test]
+    fn canonical_pairs_v0_each_pair_well_formed() {
+        let pairs = canonical_training_pairs_v0();
+        // Each feature value should be in [0, 1] (the v0 normalization range).
+        for pair in &pairs {
+            for f in [&pair.positive, &pair.negative] {
+                assert!((0.0..=1.0).contains(&f.confidence));
+                assert!((0.0..=1.0).contains(&f.raw_text_richness));
+                assert!((0.0..=1.0).contains(&f.subject_overlap));
+                assert!((0.0..=1.0).contains(&f.object_overlap));
+                assert!((0.0..=1.0).contains(&f.recency_match));
+            }
+        }
+    }
+
+    #[test]
+    fn training_on_canonical_pairs_v0_converges() {
+        let pairs = canonical_training_pairs_v0();
+        let initial = SelectionWeights::default_v0();
+        let cfg = TrainingConfig::default_v0();
+        let (trained, stats) = train_perceptron(initial, &pairs, cfg);
+        assert!(
+            stats.converged,
+            "v0 training must converge on canonical pairs (epochs={}, violations={})",
+            stats.epochs_run, stats.final_violations,
+        );
+        // Post-training: confidence and subject_overlap weights must
+        // be positive (the dominant ranking signals).
+        assert!(trained.w_confidence > 0.0);
+        assert!(trained.w_subject_overlap > 0.0);
+    }
+
+    #[test]
+    fn trained_weights_satisfy_every_canonical_pair() {
+        let pairs = canonical_training_pairs_v0();
+        let initial = SelectionWeights::default_v0();
+        let cfg = TrainingConfig::default_v0();
+        let (trained, _stats) = train_perceptron(initial, &pairs, cfg);
+        for (i, pair) in pairs.iter().enumerate() {
+            let s_pos = score(&pair.positive, &trained);
+            let s_neg = score(&pair.negative, &trained);
+            assert!(
+                s_pos >= s_neg + cfg.margin,
+                "pair {i}: positive score {s_pos} did not exceed negative {s_neg} by margin {}",
+                cfg.margin,
+            );
+        }
+    }
+
+    #[test]
+    fn audit_compare_reports_agreement_when_heuristic_matches_selector() {
+        let curated = make_fact(
+            "қазақстан",
+            Predicate::IsA,
+            "мемлекет",
+            "Қазақстан — Орталық Азиядағы тәуелсіз ел.",
+            ConfidenceKind::HumanApproved,
+        );
+        let grammar = make_fact(
+            "қазақстан",
+            Predicate::IsA,
+            "адам",
+            "",
+            ConfidenceKind::Grammar,
+        );
+        let candidates = [&curated, &grammar];
+        let weights = SelectionWeights::default_v0();
+        let result =
+            audit_compare(&candidates, 0, &weights, &["қазақстан"], None).expect("non-empty");
+        // Heuristic picked index 0 (curated); selector also picks 0.
+        assert_eq!(result.heuristic_top_idx, 0);
+        assert_eq!(result.selector_top_idx, 0);
+        assert!(!result.disagreement);
+        assert_eq!(result.score_gap, 0.0);
+    }
+
+    #[test]
+    fn audit_compare_reports_disagreement_with_score_gap() {
+        // Heuristic supposedly picked the Grammar fact (index 1),
+        // but the default-v0 selector should prefer the curated one.
+        let curated = make_fact(
+            "қазақстан",
+            Predicate::IsA,
+            "мемлекет",
+            "Қазақстан — Орталық Азиядағы тәуелсіз ел.",
+            ConfidenceKind::HumanApproved,
+        );
+        let grammar = make_fact(
+            "қазақстан",
+            Predicate::IsA,
+            "адам",
+            "",
+            ConfidenceKind::Grammar,
+        );
+        let candidates = [&curated, &grammar];
+        let weights = SelectionWeights::default_v0();
+        let result =
+            audit_compare(&candidates, 1, &weights, &["қазақстан"], None).expect("non-empty");
+        assert_eq!(result.heuristic_top_idx, 1);
+        assert_eq!(result.selector_top_idx, 0);
+        assert!(result.disagreement);
+        // score_gap = score(curated) - score(grammar) > 0.
+        assert!(result.score_gap > 0.0);
+    }
+
+    #[test]
+    fn audit_compare_empty_candidates_returns_none() {
+        let weights = SelectionWeights::default_v0();
+        let candidates: [&ReasFact; 0] = [];
+        assert!(audit_compare(&candidates, 0, &weights, &[], None).is_none());
+    }
+
+    #[test]
+    fn audit_compare_out_of_bounds_idx_returns_none() {
+        let fact = make_fact("x", Predicate::IsA, "y", "", ConfidenceKind::HumanApproved);
+        let candidates = [&fact];
+        let weights = SelectionWeights::default_v0();
+        // heuristic_top_idx = 5 with 1 candidate → out of bounds.
+        assert!(audit_compare(&candidates, 5, &weights, &[], None).is_none());
+    }
+
+    #[test]
+    fn audit_compare_single_candidate_always_agrees() {
+        let fact = make_fact(
+            "x",
+            Predicate::IsA,
+            "y",
+            "Some raw text.",
+            ConfidenceKind::HumanApproved,
+        );
+        let candidates = [&fact];
+        let weights = SelectionWeights::default_v0();
+        let result = audit_compare(&candidates, 0, &weights, &[], None).expect("non-empty");
+        assert_eq!(result.heuristic_top_idx, 0);
+        assert_eq!(result.selector_top_idx, 0);
+        assert!(!result.disagreement);
+        assert_eq!(result.score_gap, 0.0);
+    }
+
+    #[test]
+    fn audit_compare_ties_resolve_by_first_index() {
+        // Two identical-feature facts: heuristic picked index 1; the
+        // selector's stable-tie-break picks index 0. So selector
+        // disagrees in this edge case.
+        let a = make_fact(
+            "x",
+            Predicate::IsA,
+            "y1",
+            "Same length raw.",
+            ConfidenceKind::HumanApproved,
+        );
+        let b = make_fact(
+            "x",
+            Predicate::IsA,
+            "y2",
+            "Same length raw.",
+            ConfidenceKind::HumanApproved,
+        );
+        let candidates = [&a, &b];
+        let weights = SelectionWeights::default_v0();
+        let result = audit_compare(&candidates, 1, &weights, &[], None).expect("non-empty");
+        assert_eq!(result.selector_top_idx, 0);
+        assert!(result.disagreement);
+        // Identical features → score gap is exactly zero.
+        assert!(result.score_gap.abs() < 1e-6);
+    }
+}
