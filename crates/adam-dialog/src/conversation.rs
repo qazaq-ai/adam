@@ -773,6 +773,12 @@ impl Conversation {
             // SearchGraph reranking. `None` (no PMI matrix
             // attached) preserves v4.29.0 behaviour bit-for-bit.
             root_affinity: self.root_affinity.as_ref(),
+            // **v4.47.0** — Stage B bundle 5: previous turn's topic
+            // root, threaded through to `selection::audit_compare`
+            // so the recency-match feature fires on real session
+            // data. `None` on the first turn or when no topic was
+            // resolved.
+            last_topic: self.session.get("last_query_topic").map(String::as_str),
         };
         let tool_calls: Vec<crate::tool::ToolResult> = tool_plan
             .into_iter()

@@ -287,6 +287,15 @@ pub struct ToolContext<'a> {
     /// turn). Strictly additive — `None` (default) preserves
     /// the v4.29.0 ranking order bit-for-bit.
     pub root_affinity: Option<&'a adam_kernel_fst::root_affinity::RootAffinity>,
+    /// **v4.47.0** — Stage B bundle 5: previous turn's topic root
+    /// (the subject the user asked about in the prior turn). Read
+    /// from `Conversation::session["last_query_topic"]` (populated
+    /// by `Conversation::turn` when a grounded fact was surfaced).
+    /// Threaded through to `selection::audit_compare` so the
+    /// recency-match feature fires with real session data instead
+    /// of always scoring 0. `None` on the first turn or when the
+    /// previous turn had no resolvable topic.
+    pub last_topic: Option<&'a str>,
 }
 
 /// Pure-function dispatcher. Reads `ToolContext` references, never
@@ -907,9 +916,13 @@ impl Tool {
                     if admissible_refs.len() >= 2 {
                         let sw = crate::selection::SelectionWeights::default_v0();
                         let qt: Vec<&str> = query_tokens.iter().map(|s| s.as_str()).collect();
-                        if let Some(audit) =
-                            crate::selection::audit_compare(&admissible_refs, 0, &sw, &qt, None)
-                            && audit.disagreement
+                        if let Some(audit) = crate::selection::audit_compare(
+                            &admissible_refs,
+                            0,
+                            &sw,
+                            &qt,
+                            ctx.last_topic,
+                        ) && audit.disagreement
                         {
                             trace.push(format!(
                                 "selection_audit: disagreement heuristic_top=0 selector_top={} score_gap={:.4}",
@@ -1324,6 +1337,7 @@ mod tests {
             domain_index: None,
             previous_grounded_fact: None,
             root_affinity: None,
+            last_topic: None,
         }
     }
 
@@ -1526,6 +1540,7 @@ mod tests {
             domain_index: None,
             previous_grounded_fact: None,
             root_affinity: Some(&affinity),
+            last_topic: None,
         };
         let r_with = Tool::dispatch(
             ToolCall::SearchGraph {
@@ -1659,6 +1674,7 @@ mod tests {
             domain_index: None,
             previous_grounded_fact: None,
             root_affinity: None,
+            last_topic: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {
@@ -1718,6 +1734,7 @@ mod tests {
             domain_index: None,
             previous_grounded_fact: None,
             root_affinity: None,
+            last_topic: None,
         };
         let r = Tool::dispatch(
             ToolCall::RunLocalReasoner {

@@ -7,6 +7,52 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.47.0] — 2026-05-04 — Stage B bundle 5 — `ToolContext.last_topic` threading
+
+**Closes the v4.46.5 carry-forward.** The audit-only wiring shipped in v4.46.5 had a known limitation: it passed `last_topic = None` to `audit_compare`, so the recency-match feature always scored 0 for both heuristic and selector. v4.47.0 threads `Conversation::session["last_query_topic"]` through `ToolContext` to `selection::audit_compare` so the recency feature now contributes signal on real session data. Real disagreement-case collection (running offline evals through the audit-trace pipeline) remains carry-forward to v4.47.5+.
+
+### Innovations
+
+**(1) `ToolContext.last_topic: Option<&'a str>` field** — added at the bottom of the struct alongside `previous_grounded_fact` and `root_affinity`. `None` on the first turn or when no topic was resolved; `Some(&str)` to the prior turn's topic root otherwise. Documented as «threaded through to `selection::audit_compare` so the recency-match feature fires with real session data instead of always scoring 0».
+
+**(2) `Conversation::turn` populates** `tool_ctx.last_topic` from `self.session.get("last_query_topic")` (the slot already maintained by v4.13.0+ `DialogContext` / `Conversation` after every grounded turn). Strictly additive — `None` when the slot isn't set, preserving v4.46.5 behavior bit-for-bit.
+
+**(3) `audit_compare` call site** in `tool::search_graph` updated from hard-coded `None` to `ctx.last_topic`. The recency-match feature now contributes `1.0` × `w_recency` (= 0.5 with `default_v0()`) when the candidate fact's subject matches the prior turn's topic, and `0.0` otherwise. This is the first feature that produces session-conditional audit signal.
+
+**(4) ToolContext construction sites updated** — 5 sites: 1 in `conversation.rs` (production), 1 in `action.rs` (capability lookup), 3 in `tool.rs` test fixtures. All non-production sites pass `last_topic: None` (no recency context in test fixtures by default; existing tests don't depend on it).
+
+**(5) NOT YET in v4.47.0** (Stage B carry-forwards):
+- Real disagreement-case collection — run `live_holdout_*.json`, `rust_holdout.json`, etc. through the production pipeline with audit-trace enabled; parse trace for `selection_audit: disagreement` lines; hand-curate found cases as new `TrainingPair` entries. v4.47.5 target.
+- Trained-weights export — once v4.47.5 produces real gold pairs, train a `SelectionWeights::trained_v0()` constant via `train_perceptron` and ship as the new audit baseline.
+- Production ranker replacement — replace `apply_graph_result`'s heuristic top-1 with `selection::select_top` once trained weights match or beat heuristic on canonical evals.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **946 passing** unchanged |
+| Adam-dialog lib | 279 passing unchanged |
+| Selection module | 34/34 (no new tests — substrate already covered) |
+| Live REPL | byte-identical to v4.46.5 (recency feature now scores 1.0 in matching cases, but the audit is trace-only — no behavioral change) |
+| Foundation: 2086 / 2346 / 46 / 27 163 | unchanged |
+| `cargo fmt --all --check` | clean |
+| `cargo check --all-targets` | clean |
+
+### Cadence
+
+`.0` minor — Stage B architectural threading of session-conditional feature signal. Per `feedback_versioning_post_1_0`: Stage B is the kernel-signature architectural arc; this bundle adds a new public field on `ToolContext` (a public API surface change) and meaningfully changes the audit signal that future bundles will use to extract gold pairs and train weights.
+
+Stage B status:
+- v4.45.0 — bundle 1 — selection weights foundation ✓
+- v4.45.5 — bundle 2 — training pipeline ✓
+- v4.46.0 — bundle 3 — canonical gold pairs + audit substrate ✓
+- v4.46.5 — bundle 4 — production trace-wiring (audit-only) ✓
+- **v4.47.0 — bundle 5 — `ToolContext.last_topic` threading** ← shipped
+- v4.47.5+ — bundle 6: real disagreement-case collection from offline evals + first trained `SelectionWeights::trained_v0` constant
+- v4.50.0 (target) — bundle 7: trained weights replace heuristic ranker top-1
+
+Stripe (11) — generative AI via agglutinative composition continues.
+
 ## [4.46.5] — 2026-05-04 — Stage B bundle 4 — production trace-wiring (audit-only)
 
 **First production touch in the Stage B arc.** v4.45.0–v4.46.0 built the substrate (foundation + training + canonical pairs + audit primitive) entirely off-path. v4.46.5 wires the audit primitive into the live `tool::search_graph` dispatch — when there are 2+ admissible candidates, run `selection::audit_compare` against the heuristic top-1 and push a trace line if the trained selector disagrees. **No behavioral change** — the heuristic still wins; the trace is read by `--trace` consumers (`adam_chat --trace`, the regression bank) to surface where the selector would diverge.
