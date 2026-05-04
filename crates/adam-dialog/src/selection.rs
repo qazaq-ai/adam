@@ -1663,3 +1663,210 @@ mod harvest_tests {
         assert_eq!(report.disagreement_count, 1);
     }
 }
+
+// ---------------------------------------------------------------------------
+// **v4.50.0** — Stage B completion: REPL-derived training pairs +
+// trained weights constant + audit baseline shift.
+//
+// `repl_derived_training_pairs_v0()` is a hand-curated set of close-call
+// scenarios mirroring the patterns surfaced by the v4.48.5 first-run
+// harvest (2 disagreements with score_gap ≈ 0.05 — confidence /
+// subject-overlap close calls). Combined with `canonical_training_pairs_v0`
+// they form the training corpus for `SelectionWeights::trained_v0`.
+//
+// `trained_v0()` lazy-caches the result of training `default_v0()` on
+// `canonical + repl_derived` via the `train_perceptron` margin loop.
+// Once computed, the same weight values are returned on every call
+// (`OnceLock`). Trained model still occupies the same ~28 bytes as the
+// hand-set defaults — the thesis-stated "tiny inspectable weights"
+// promise holds after training.
+//
+// The v4.46.5 audit-wiring in `tool::search_graph` now calls `trained_v0`
+// instead of `default_v0`, so audit lines reflect the trained-vs-heuristic
+// disagreement (the meaningful Stage B signal). Live REPL byte-identical
+// (audit is trace-only — heuristic still wins findings[0]). Production
+// ranker replacement deferred to v4.50.5+ once trained weights demonstrate
+// match-or-beat heuristic on the full eval suite.
+
+/// **v4.50.0** — Hand-curated training pairs derived from the v4.48.5
+/// first-run harvest patterns. The two disagreements observed in
+/// `live_holdout_2026_05_01` had small score gaps (0.06 / 0.04),
+/// indicating close-call multi-candidate scenarios. These pairs span
+/// that pattern across multiple feature dimensions so the trained
+/// weights internalize "small differences matter" without losing the
+/// canonical broad-stroke ordering.
+pub fn repl_derived_training_pairs_v0() -> Vec<TrainingPair> {
+    fn p(pos: CandidateFeatures, neg: CandidateFeatures) -> TrainingPair {
+        TrainingPair {
+            positive: pos,
+            negative: neg,
+        }
+    }
+    fn f(c: f32, r: f32, s: f32, o: f32, recency: f32) -> CandidateFeatures {
+        CandidateFeatures {
+            confidence: c,
+            raw_text_richness: r,
+            subject_overlap: s,
+            object_overlap: o,
+            recency_match: recency,
+        }
+    }
+    vec![
+        // Close-call: HumanApproved with slightly less subject overlap
+        // beats RuleInferred with slightly more — confidence wins close
+        // calls on overlap. Small gap (matches v4.48.5 patterns).
+        p(f(1.0, 0.5, 0.4, 0.3, 0.0), f(0.5, 0.3, 0.5, 0.3, 0.0)),
+        // Close-call: HumanApproved + recency beats CuratedQuote without
+        // recency at equal overlap. Probes the recency-tier weight.
+        p(f(1.0, 0.4, 0.5, 0.3, 1.0), f(0.8, 0.4, 0.5, 0.3, 0.0)),
+        // Close-call: subject overlap + slight richness beats slightly
+        // higher object overlap. Subject is the stronger discriminator.
+        p(f(0.8, 0.5, 0.6, 0.2, 0.0), f(0.8, 0.3, 0.4, 0.5, 0.0)),
+        // Close-call: rich raw_text + matching subject (both strong
+        // tier-1 signals) beats grammar with everything else.
+        p(f(1.0, 0.9, 0.8, 0.0, 0.0), f(0.0, 0.0, 0.0, 0.5, 0.5)),
+        // Close-call: small recency advantage decisive when other
+        // features tied. The 0.5 recency weight in default_v0 was hand-
+        // set; this pair confirms it should remain positive after
+        // training.
+        p(f(0.8, 0.5, 0.5, 0.3, 1.0), f(0.8, 0.5, 0.5, 0.3, 0.0)),
+        // Close-call: object overlap matters when subject is tied.
+        // Probes the secondary-overlap tier.
+        p(f(0.8, 0.5, 0.5, 0.7, 0.0), f(0.8, 0.5, 0.5, 0.2, 0.0)),
+        // Close-call: HumanApproved with mid signals beats high-richness
+        // grammar — confidence outranks bare text length.
+        p(f(1.0, 0.3, 0.4, 0.3, 0.0), f(0.0, 1.0, 0.4, 0.3, 0.0)),
+        // Close-call: combined subject+object overlap with HumanApproved
+        // beats raw confidence alone. Multi-signal interaction.
+        p(f(1.0, 0.4, 0.6, 0.5, 0.0), f(1.0, 0.0, 0.0, 0.0, 0.0)),
+    ]
+}
+
+/// **v4.50.0** — Lazily-trained `SelectionWeights` constant. Trains
+/// `default_v0()` on `canonical_training_pairs_v0()` +
+/// `repl_derived_training_pairs_v0()` via `train_perceptron` with
+/// `TrainingConfig::default_v0()`. Result is cached in a `OnceLock`
+/// so subsequent calls return the same weights without re-training.
+///
+/// Size unchanged: still ~28 bytes (6 floats + bias), readable as
+/// numbers in a table. Deterministic per (initial, pairs, config) —
+/// any two runs with the same v4.50.0 binary produce the same
+/// trained weights.
+pub fn trained_v0() -> SelectionWeights {
+    use std::sync::OnceLock;
+    static CACHED: OnceLock<SelectionWeights> = OnceLock::new();
+    *CACHED.get_or_init(|| {
+        let mut all_pairs = canonical_training_pairs_v0();
+        all_pairs.extend(repl_derived_training_pairs_v0());
+        let (trained, _stats) = train_perceptron(
+            SelectionWeights::default_v0(),
+            &all_pairs,
+            TrainingConfig::default_v0(),
+        );
+        trained
+    })
+}
+
+#[cfg(test)]
+mod trained_tests {
+    use super::*;
+
+    #[test]
+    fn repl_derived_pairs_non_empty_and_well_formed() {
+        let pairs = repl_derived_training_pairs_v0();
+        assert!(!pairs.is_empty());
+        assert!(pairs.len() >= 6);
+        for pair in &pairs {
+            for f in [&pair.positive, &pair.negative] {
+                assert!((0.0..=1.0).contains(&f.confidence));
+                assert!((0.0..=1.0).contains(&f.raw_text_richness));
+                assert!((0.0..=1.0).contains(&f.subject_overlap));
+                assert!((0.0..=1.0).contains(&f.object_overlap));
+                assert!((0.0..=1.0).contains(&f.recency_match));
+            }
+            assert!(pair.positive != pair.negative);
+        }
+    }
+
+    #[test]
+    fn repl_derived_pairs_deterministic() {
+        let a = repl_derived_training_pairs_v0();
+        let b = repl_derived_training_pairs_v0();
+        assert_eq!(a.len(), b.len());
+        for (x, y) in a.iter().zip(b.iter()) {
+            assert_eq!(x.positive, y.positive);
+            assert_eq!(x.negative, y.negative);
+        }
+    }
+
+    #[test]
+    fn trained_v0_is_deterministic() {
+        let a = trained_v0();
+        let b = trained_v0();
+        let c = trained_v0();
+        assert_eq!(a, b);
+        assert_eq!(b, c);
+    }
+
+    #[test]
+    fn trained_v0_satisfies_canonical_pairs() {
+        let trained = trained_v0();
+        let pairs = canonical_training_pairs_v0();
+        let agg = evaluate_weights_on_pairs(&trained, &pairs);
+        assert_eq!(
+            agg.disagreements, 0,
+            "trained_v0 disagrees on {} canonical pairs (expected 0)",
+            agg.disagreements,
+        );
+    }
+
+    #[test]
+    fn trained_v0_satisfies_repl_derived_pairs() {
+        let trained = trained_v0();
+        let pairs = repl_derived_training_pairs_v0();
+        let agg = evaluate_weights_on_pairs(&trained, &pairs);
+        assert_eq!(
+            agg.disagreements, 0,
+            "trained_v0 disagrees on {} REPL-derived pairs (expected 0)",
+            agg.disagreements,
+        );
+    }
+
+    #[test]
+    fn trained_v0_satisfies_combined_pairs() {
+        let trained = trained_v0();
+        let mut all_pairs = canonical_training_pairs_v0();
+        all_pairs.extend(repl_derived_training_pairs_v0());
+        let agg = evaluate_weights_on_pairs(&trained, &all_pairs);
+        assert_eq!(agg.disagreements, 0);
+        assert_eq!(agg.agreement_rate(), 1.0);
+    }
+
+    #[test]
+    fn trained_v0_weights_remain_inspectable() {
+        // Stage B thesis: trained weights stay tiny and readable.
+        // 24 bytes (6 f32: bias + 5 feature weights), no allocation,
+        // no opaque structure.
+        let trained = trained_v0();
+        assert_eq!(std::mem::size_of_val(&trained), 6 * 4);
+        assert!(trained.bias.is_finite());
+        assert!(trained.w_confidence.is_finite());
+        assert!(trained.w_richness.is_finite());
+        assert!(trained.w_subject_overlap.is_finite());
+        assert!(trained.w_object_overlap.is_finite());
+        assert!(trained.w_recency.is_finite());
+    }
+
+    #[test]
+    fn trained_v0_differs_from_default_v0() {
+        // After absorbing 23 training pairs (15 canonical + 8 REPL-
+        // derived), at least one weight component should have shifted
+        // from the hand-set defaults.
+        let trained = trained_v0();
+        let default = SelectionWeights::default_v0();
+        assert!(
+            trained != default,
+            "trained_v0 must differ from default_v0 after training",
+        );
+    }
+}

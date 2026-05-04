@@ -7,6 +7,97 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.50.0] — 2026-05-04 — Stage B completion — REPL-derived pairs + trained_v0 + audit baseline shift
+
+**Stage B completion milestone** — three carry-forward bundles consolidated into one minor:
+- **Bundle 9**: REPL-derived training pairs hand-curated from v4.48.5 first-run patterns.
+- **Bundle 10**: First trained `SelectionWeights::trained_v0()` constant via `OnceLock`-cached `train_perceptron`.
+- **Bundle 11**: Audit baseline shift — `tool::search_graph` now calls `trained_v0()` instead of `default_v0()` so audit lines reflect the trained-vs-heuristic divergence, the meaningful Stage B signal.
+
+Live REPL byte-identical (audit is trace-only — heuristic still wins `findings[0]`). Production ranker replacement (actually using `select_top` for `findings[0]`) deferred to v4.50.5+ once trained weights demonstrate match-or-beat heuristic on the full eval suite.
+
+### Harvest-test signal change
+
+Pre-v4.50.0 (`default_v0` audit baseline):
+```
+disagreement_traces:
+  [0] selection_audit: disagreement heuristic_top=0 selector_top=2 score_gap=0.0600
+  [1] selection_audit: disagreement heuristic_top=0 selector_top=3 score_gap=0.0420
+```
+
+Post-v4.50.0 (`trained_v0` audit baseline):
+```
+disagreement_traces:
+  [0] selection_audit: disagreement heuristic_top=0 selector_top=2 score_gap=0.2600
+  [1] selection_audit: disagreement heuristic_top=0 selector_top=3 score_gap=0.1820
+```
+
+**Same 2 disagreement cases, ~4× larger score gaps.** The trained selector is more confident the heuristic is wrong on these cases — exactly the signal v4.50.5+ production replacement will act on.
+
+### Innovations
+
+**(1) `repl_derived_training_pairs_v0() -> Vec<TrainingPair>`** — 8 hand-curated close-call pairs mirroring the v4.48.5 first-run patterns (small score gaps where confidence / subject-overlap close calls matter):
+- HumanApproved with slightly less subject overlap beats RuleInferred with slightly more.
+- HumanApproved + recency beats CuratedQuote without recency at equal overlap.
+- Subject overlap + slight richness beats slightly higher object overlap.
+- Rich raw_text + matching subject beats grammar with everything else.
+- Small recency advantage decisive when other features tied.
+- Object overlap matters when subject is tied (secondary tier).
+- HumanApproved with mid signals beats high-richness grammar.
+- Combined subject+object overlap with HumanApproved beats raw confidence alone (multi-signal).
+
+**(2) `SelectionWeights::trained_v0()` constant** via `OnceLock`-cached `train_perceptron`. Trains `default_v0()` on `canonical_training_pairs_v0() + repl_derived_training_pairs_v0()` (15 + 8 = 23 pairs total) with `TrainingConfig::default_v0()`. Result cached so subsequent calls are O(1). Trained model still occupies the same 24 bytes as the hand-set defaults — the thesis-stated "tiny inspectable weights" promise holds after training.
+
+**(3) Audit baseline shift in `tool::search_graph`** — `crate::selection::default_v0()` → `crate::selection::trained_v0()` at the audit-compare call site. Live REPL byte-identical (audit is trace-only). The `selection_audit:` lines now reflect trained-vs-heuristic divergence — the meaningful Stage B signal that future production-replacement bundles will act on.
+
+**(4) Re-exports** in `lib.rs`: `repl_derived_training_pairs_v0`, `trained_v0` available as top-level public API.
+
+**(5) 8 new unit tests** verify:
+- `repl_derived_pairs_non_empty_and_well_formed` — at least 6 pairs, every feature ∈ [0, 1], positives differ from negatives.
+- `repl_derived_pairs_deterministic` — same call returns same pairs.
+- `trained_v0_is_deterministic` — `OnceLock` caching contract.
+- `trained_v0_satisfies_canonical_pairs` — zero disagreements on canonical set.
+- `trained_v0_satisfies_repl_derived_pairs` — zero disagreements on REPL set.
+- `trained_v0_satisfies_combined_pairs` — zero disagreements on full 23-pair training corpus.
+- `trained_v0_weights_remain_inspectable` — 24 bytes (6 f32), all finite.
+- `trained_v0_differs_from_default_v0` — training actually shifted weights.
+
+**(6) NOT YET in v4.50.0** (Stage B carry-forwards):
+- Production ranker replacement — wire `selection::select_top(matches, trained_v0(), ...)` to override `findings[0]` in `tool::search_graph`. Risk: not all heuristic tiers are captured by the v0 features (predicate-rank cascade, list-intent boost, etc.); needs careful eval-suite validation before flipping. v4.50.5+ target.
+- Hand-curation of the 2 specific harvested disagreements into named TrainingPair entries (requires inspecting which queries produced them; deferred for tighter scope here).
+- Harvest from `live_holdout_2026_05_02.json` and `rust_holdout.json` integration tests.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **969 passing** (was 961; +8 new trained tests) |
+| Adam-dialog lib | **301 passing** (was 293; +8) |
+| Selection module | **56/56** tests pass (13 v4.45.0 + 11 v4.45.5 + 10 v4.46.0 + 7 v4.47.5 + 7 v4.48.0 + 8 v4.50.0) |
+| Selection_audit_harvest | 1/1 pass with new baseline; same 2 disagreements but ~4× larger score gaps |
+| Live REPL | byte-identical to v4.48.5 (audit is trace-only — heuristic still wins findings[0]) |
+| Foundation: 2086 / 2346 / 46 / 27 163 | unchanged |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.0` minor — Stage B completion milestone consolidating bundles 9, 10, 11. The substrate-side of Stage B is now fully closed: every primitive from "raw REPL traces" → "trained, deployable weight table" → "audit baseline visible in production trace" exists as typed public API. The remaining carry-forward (production ranker replacement) is risk-managed: eval-suite validation must confirm trained weights match-or-beat heuristic on the full canonical regression bank before flipping.
+
+### Stage B status (final after v4.50.0)
+
+- v4.45.0 — bundle 1 — selection weights foundation ✓
+- v4.45.5 — bundle 2 — training pipeline ✓
+- v4.46.0 — bundle 3 — canonical gold pairs + audit substrate ✓
+- v4.46.5 — bundle 4 — production trace-wiring (audit-only) ✓
+- v4.47.0 — bundle 5 — `ToolContext.last_topic` threading ✓
+- v4.47.5 — bundle 6 — disagreement-case collection harness ✓
+- v4.48.0 — bundle 7 — REPL-trace harvest substrate ✓
+- v4.48.5 — bundle 8 — test-harness integration ✓
+- **v4.50.0 — Stage B completion (bundles 9-11): REPL-derived pairs + trained_v0 + audit baseline shift** ← shipped
+- v4.50.5+ — production ranker replacement (deferred — needs eval validation)
+
+Stripe (11) — generative AI via agglutinative composition. **Stage B substrate complete. The training-loop (foundation → algorithm → gold data → audit wiring → harvest → trained constant → audit baseline) is closed.** Production replacement is the last carry-forward and is gated on eval validation.
+
 ## [4.48.5] — 2026-05-04 — Stage B bundle 8 — test-harness integration: first real disagreements harvested
 
 **First time the Stage B substrate runs against real eval data.** New `tests/selection_audit_harvest.rs` runs every query in `data/eval/live_holdout_2026_05_01.json` (32 cases) through a production-shaped `Conversation::turn_with_trace`, collects every `ToolResult.trace` line emitted across all turns, flattens into `Vec<Vec<String>>`, and feeds it to `harvest_audit_traces` (v4.48.0). The resulting `HarvestReport` is printed to stderr for offline operators.

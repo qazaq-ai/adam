@@ -914,7 +914,17 @@ impl Tool {
                         .copied()
                         .collect();
                     if admissible_refs.len() >= 2 {
-                        let sw = crate::selection::SelectionWeights::default_v0();
+                        // **v4.50.0** — Stage B completion: audit
+                        // baseline shifted from the hand-set
+                        // `default_v0()` to the trained `trained_v0()`
+                        // (canonical_training_pairs_v0 + repl_derived
+                        // pairs trained via `train_perceptron`). Live
+                        // REPL stays byte-identical (audit is trace-
+                        // only — heuristic still wins findings[0]).
+                        // Disagreements now reflect trained-vs-
+                        // heuristic divergence, the meaningful signal
+                        // for v4.50.5+ production-ranker replacement.
+                        let sw = crate::selection::trained_v0();
                         let qt: Vec<&str> = query_tokens.iter().map(|s| s.as_str()).collect();
                         if let Some(audit) = crate::selection::audit_compare(
                             &admissible_refs,
