@@ -1,7 +1,7 @@
 {
-  "version": "4.43.9",
+  "version": "4.44.0",
   "status": "completed",
-  "elapsed_s": 69,
+  "elapsed_s": 65,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2300,
+    "facts_total": 2346,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1761,
+      "is_a": 1807,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -52,8 +52,9 @@
       "world_core/colors.jsonl": 38,
       "world_core/computer_science_basics.jsonl": 30,
       "world_core/constellations_kz.jsonl": 6,
-      "world_core/cooking_methods.jsonl": 10,
+      "world_core/cooking_methods.jsonl": 18,
       "world_core/directions.jsonl": 9,
+      "world_core/economics_basic.jsonl": 22,
       "world_core/emotions.jsonl": 30,
       "world_core/food.jsonl": 50,
       "world_core/geography_kz.jsonl": 178,
@@ -64,10 +65,10 @@
       "world_core/kinship_extended.jsonl": 20,
       "world_core/kz_literature.jsonl": 96,
       "world_core/language_features.jsonl": 33,
-      "world_core/materials.jsonl": 14,
+      "world_core/materials.jsonl": 22,
       "world_core/mathematics_basic.jsonl": 52,
       "world_core/measurements.jsonl": 18,
-      "world_core/music_kz.jsonl": 16,
+      "world_core/music_kz.jsonl": 24,
       "world_core/notable_kazakhstanis.jsonl": 51,
       "world_core/numbers.jsonl": 54,
       "world_core/philosophy_basic.jsonl": 23,
@@ -13191,6 +13192,166 @@
     },
     {
       "subject": {
+        "surface": "қайнату",
+        "root": "қайнату",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асүй әрекеті",
+        "root": "асүй әрекеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/cooking_methods",
+      "source": {
+        "pack": "world_core/cooking_methods.jsonl",
+        "sample_id": "cook_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қайнату — сұйықтықты жоғары температураға дейін қыздыру әрекеті."
+    },
+    {
+      "subject": {
+        "surface": "қуыру",
+        "root": "қуыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асүй әрекеті",
+        "root": "асүй әрекеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/cooking_methods",
+      "source": {
+        "pack": "world_core/cooking_methods.jsonl",
+        "sample_id": "cook_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қуыру — азықты майға салып қыздыру әрекеті."
+    },
+    {
+      "subject": {
+        "surface": "бұқтыру",
+        "root": "бұқтыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асүй әрекеті",
+        "root": "асүй әрекеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/cooking_methods",
+      "source": {
+        "pack": "world_core/cooking_methods.jsonl",
+        "sample_id": "cook_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бұқтыру — азықты буға салып баяу пісіру әрекеті."
+    },
+    {
+      "subject": {
+        "surface": "күйдіру",
+        "root": "күйдіру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асүй әрекеті",
+        "root": "асүй әрекеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/cooking_methods",
+      "source": {
+        "pack": "world_core/cooking_methods.jsonl",
+        "sample_id": "cook_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күйдіру — азықты пешке салып, құрғақ ыстықпен пісіру."
+    },
+    {
+      "subject": {
+        "surface": "бұршылдату",
+        "root": "бұршылдату",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асүй әрекеті",
+        "root": "асүй әрекеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/cooking_methods",
+      "source": {
+        "pack": "world_core/cooking_methods.jsonl",
+        "sample_id": "cook_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бұршылдату — азықты қыздырылған шарбақта тікелей отта пісіру."
+    },
+    {
+      "subject": {
+        "surface": "турау",
+        "root": "турау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асүй әрекеті",
+        "root": "асүй әрекеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/cooking_methods",
+      "source": {
+        "pack": "world_core/cooking_methods.jsonl",
+        "sample_id": "cook_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Турау — азықты ұсақ бөліктерге кесу әрекеті."
+    },
+    {
+      "subject": {
+        "surface": "тұздау",
+        "root": "тұздау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асүй әрекеті",
+        "root": "асүй әрекеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/cooking_methods",
+      "source": {
+        "pack": "world_core/cooking_methods.jsonl",
+        "sample_id": "cook_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұздау — азықты тұзбен консервілеу әрекеті."
+    },
+    {
+      "subject": {
+        "surface": "қақтау",
+        "root": "қақтау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асүй әрекеті",
+        "root": "асүй әрекеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/cooking_methods",
+      "source": {
+        "pack": "world_core/cooking_methods.jsonl",
+        "sample_id": "cook_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қақтау — етті желмен немесе түтінмен кептіру арқылы консервілеу."
+    },
+    {
+      "subject": {
         "surface": "бағыт",
         "root": "бағыт",
         "pos": "noun"
@@ -13368,6 +13529,446 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Сол — сол жақтағы бағыт."
+    },
+    {
+      "subject": {
+        "surface": "экономика",
+        "root": "экономика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғылым",
+        "root": "ғылым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Экономика — қоғамның тауарлар мен қызметтерді өндіру, бөлу, айырбастау мен тұтыну тәртібін зерттейтін ғылым."
+    },
+    {
+      "subject": {
+        "surface": "тауар",
+        "root": "тауар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық игілік",
+        "root": "экономикалық игілік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тауар — нарықта сатылатын материалды зат немесе игілік."
+    },
+    {
+      "subject": {
+        "surface": "қызмет",
+        "root": "қызмет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық игілік",
+        "root": "экономикалық игілік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қызмет — нарықта ұсынылатын материалсыз нәтижесі бар әрекет."
+    },
+    {
+      "subject": {
+        "surface": "сұраныс",
+        "root": "сұраныс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық категория",
+        "root": "экономикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сұраныс — белгілі тауарға тұтынушылардың қаншалықты мұқтаж екенін көрсететін экономикалық категория."
+    },
+    {
+      "subject": {
+        "surface": "ұсыныс",
+        "root": "ұсыныс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық категория",
+        "root": "экономикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ұсыныс — өндірушілер нарыққа шығаратын тауар мөлшерін көрсететін экономикалық категория."
+    },
+    {
+      "subject": {
+        "surface": "баға",
+        "root": "баға",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық шама",
+        "root": "экономикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Баға — тауар немесе қызметтің ақшамен өрнектелген құны."
+    },
+    {
+      "subject": {
+        "surface": "инфляция",
+        "root": "инфляция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық құбылыс",
+        "root": "экономикалық құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Инфляция — ақшаның құнсыздануы салдарынан баға деңгейінің көтерілуі."
+    },
+    {
+      "subject": {
+        "surface": "дефляция",
+        "root": "дефляция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық құбылыс",
+        "root": "экономикалық құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дефляция — ақша құнының өсуі салдарынан баға деңгейінің төмендеуі."
+    },
+    {
+      "subject": {
+        "surface": "тұтынушы",
+        "root": "тұтынушы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық субъект",
+        "root": "экономикалық субъект",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұтынушы — тауар немесе қызметті сатып алатын тұлға."
+    },
+    {
+      "subject": {
+        "surface": "өндіруші",
+        "root": "өндіруші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық субъект",
+        "root": "экономикалық субъект",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өндіруші — тауар мен қызмет жасап нарыққа шығаратын тұлға."
+    },
+    {
+      "subject": {
+        "surface": "капитал",
+        "root": "капитал",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық ресурс",
+        "root": "экономикалық ресурс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Капитал — өндіріске жұмсалатын ақшалай немесе материалды қаражат."
+    },
+    {
+      "subject": {
+        "surface": "еңбек",
+        "root": "еңбек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық ресурс",
+        "root": "экономикалық ресурс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Еңбек — өндіріс үшін адамдар жұмсайтын күш-жігер мен дағды."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық ресурс",
+        "root": "экономикалық ресурс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер — өндіріске қатысатын табиғи ресурс."
+    },
+    {
+      "subject": {
+        "surface": "бюджет",
+        "root": "бюджет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қаржы құжаты",
+        "root": "қаржы құжаты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бюджет — кіріс пен шығынның жоспарлы тізбесі."
+    },
+    {
+      "subject": {
+        "surface": "кіріс",
+        "root": "кіріс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қаржы шамасы",
+        "root": "қаржы шамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кіріс — белгілі кезеңде алынған ақша немесе игілік ағыны."
+    },
+    {
+      "subject": {
+        "surface": "шығын",
+        "root": "шығын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қаржы шамасы",
+        "root": "қаржы шамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шығын — белгілі кезеңде жұмсалатын ақша немесе игілік ағыны."
+    },
+    {
+      "subject": {
+        "surface": "пайда",
+        "root": "пайда",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қаржы шамасы",
+        "root": "қаржы шамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Пайда — кіріс пен шығын арасындағы оң айырма."
+    },
+    {
+      "subject": {
+        "surface": "шығын-кіріс",
+        "root": "шығын-кіріс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қаржы шамасы",
+        "root": "қаржы шамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шығын-кіріс — кірістен шығынды шегергендегі теріс айырма."
+    },
+    {
+      "subject": {
+        "surface": "банк",
+        "root": "банк",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қаржы мекемесі",
+        "root": "қаржы мекемесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Банк — ақша операцияларын жүргізетін қаржы мекемесі."
+    },
+    {
+      "subject": {
+        "surface": "несие",
+        "root": "несие",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қаржы құралы",
+        "root": "қаржы құралы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Несие — белгілі мерзімге, пайызбен берілетін ақшалай қарыз."
+    },
+    {
+      "subject": {
+        "surface": "пайыз",
+        "root": "пайыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қаржы шамасы",
+        "root": "қаржы шамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Пайыз — несие немесе салымның қосымша ақша түрінде есептелетін бөлігі."
+    },
+    {
+      "subject": {
+        "surface": "эконом",
+        "root": "эконом",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/economics_basic",
+      "source": {
+        "pack": "world_core/economics_basic.jsonl",
+        "sample_id": "econ_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Эконом — экономика саласындағы маман."
     },
     {
       "subject": {
@@ -26131,6 +26732,166 @@
     },
     {
       "subject": {
+        "surface": "темір",
+        "root": "темір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "металл",
+        "root": "металл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/materials",
+      "source": {
+        "pack": "world_core/materials.jsonl",
+        "sample_id": "mat_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Темір — қара металдан жасалған берік материал."
+    },
+    {
+      "subject": {
+        "surface": "алтын",
+        "root": "алтын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асыл металл",
+        "root": "асыл металл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/materials",
+      "source": {
+        "pack": "world_core/materials.jsonl",
+        "sample_id": "mat_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Алтын — асыл сары түсті жұмсақ металл."
+    },
+    {
+      "subject": {
+        "surface": "күміс",
+        "root": "күміс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "асыл металл",
+        "root": "асыл металл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/materials",
+      "source": {
+        "pack": "world_core/materials.jsonl",
+        "sample_id": "mat_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күміс — асыл ақшыл металл."
+    },
+    {
+      "subject": {
+        "surface": "мыс",
+        "root": "мыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "металл",
+        "root": "металл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/materials",
+      "source": {
+        "pack": "world_core/materials.jsonl",
+        "sample_id": "mat_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мыс — қызыл-қоңыр түсті электр өткізгіш металл."
+    },
+    {
+      "subject": {
+        "surface": "болат",
+        "root": "болат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қорытпа",
+        "root": "қорытпа",
+        "pos": "noun"
+      },
+      "pattern": "world_core/materials",
+      "source": {
+        "pack": "world_core/materials.jsonl",
+        "sample_id": "mat_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Болат — темір мен көміртектің берік қорытпасы."
+    },
+    {
+      "subject": {
+        "surface": "шыны",
+        "root": "шыны",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "материал",
+        "root": "материал",
+        "pos": "noun"
+      },
+      "pattern": "world_core/materials",
+      "source": {
+        "pack": "world_core/materials.jsonl",
+        "sample_id": "mat_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шыны — мөлдір қатты материал, көбіне құмнан қыздырып жасалады."
+    },
+    {
+      "subject": {
+        "surface": "пластмасса",
+        "root": "пластмасса",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "материал",
+        "root": "материал",
+        "pos": "noun"
+      },
+      "pattern": "world_core/materials",
+      "source": {
+        "pack": "world_core/materials.jsonl",
+        "sample_id": "mat_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Пластмасса — синтетикалық полимерден жасалған иілгіш материал."
+    },
+    {
+      "subject": {
+        "surface": "қағаз",
+        "root": "қағаз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "материал",
+        "root": "материал",
+        "pos": "noun"
+      },
+      "pattern": "world_core/materials",
+      "source": {
+        "pack": "world_core/materials.jsonl",
+        "sample_id": "mat_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қағаз — ағаш талшықтарынан жасалған жұқа материал."
+    },
+    {
+      "subject": {
         "surface": "математика",
         "root": "математика",
         "pos": "noun"
@@ -27848,6 +28609,166 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Той — халықтық жиын."
+    },
+    {
+      "subject": {
+        "surface": "жетіген",
+        "root": "жетіген",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халық аспабы",
+        "root": "халық аспабы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/music_kz",
+      "source": {
+        "pack": "world_core/music_kz.jsonl",
+        "sample_id": "music_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жетіген — жеті ішекті қазақ халық музыка аспабы."
+    },
+    {
+      "subject": {
+        "surface": "шертер",
+        "root": "шертер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халық аспабы",
+        "root": "халық аспабы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/music_kz",
+      "source": {
+        "pack": "world_core/music_kz.jsonl",
+        "sample_id": "music_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шертер — қыл ысқышымен ойналатын қазақтың ішекті аспабы."
+    },
+    {
+      "subject": {
+        "surface": "сазсырнай",
+        "root": "сазсырнай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халық аспабы",
+        "root": "халық аспабы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/music_kz",
+      "source": {
+        "pack": "world_core/music_kz.jsonl",
+        "sample_id": "music_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сазсырнай — қыштан жасалған қазақ үрмелі аспабы."
+    },
+    {
+      "subject": {
+        "surface": "шаңқобыз",
+        "root": "шаңқобыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халық аспабы",
+        "root": "халық аспабы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/music_kz",
+      "source": {
+        "pack": "world_core/music_kz.jsonl",
+        "sample_id": "music_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шаңқобыз — ауызға салып ойналатын қазақтың кішкентай металл аспабы."
+    },
+    {
+      "subject": {
+        "surface": "күй",
+        "root": "күй",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "музыка жанры",
+        "root": "музыка жанры",
+        "pos": "noun"
+      },
+      "pattern": "world_core/music_kz",
+      "source": {
+        "pack": "world_core/music_kz.jsonl",
+        "sample_id": "music_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күй — қазақтың аспаптық музыкалық шығармасы."
+    },
+    {
+      "subject": {
+        "surface": "толғау",
+        "root": "толғау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "музыка жанры",
+        "root": "музыка жанры",
+        "pos": "noun"
+      },
+      "pattern": "world_core/music_kz",
+      "source": {
+        "pack": "world_core/music_kz.jsonl",
+        "sample_id": "music_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Толғау — ой-толғаныс білдіретін қазақтың дәстүрлі поэтикалық жанры."
+    },
+    {
+      "subject": {
+        "surface": "жыр",
+        "root": "жыр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "музыка жанры",
+        "root": "музыка жанры",
+        "pos": "noun"
+      },
+      "pattern": "world_core/music_kz",
+      "source": {
+        "pack": "world_core/music_kz.jsonl",
+        "sample_id": "music_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жыр — батырлар мен оқиғалар туралы ұзақ эпикалық шығарма."
+    },
+    {
+      "subject": {
+        "surface": "терме",
+        "root": "терме",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "музыка жанры",
+        "root": "музыка жанры",
+        "pos": "noun"
+      },
+      "pattern": "world_core/music_kz",
+      "source": {
+        "pack": "world_core/music_kz.jsonl",
+        "sample_id": "music_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Терме — өсиет, тәлім беретін қазақтың дидактикалық музыкалық жанры."
     },
     {
       "subject": {

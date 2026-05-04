@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.44.5] — 2026-05-04 — Knowledge breadth — Economics + Materials/Cooking/Music depth (last bundle before Stage B)
+
+**Final knowledge bundle before Stage B opens at v4.45.0+.** New `economics_basic` domain (22 facts on tauar / sūranıs / ūsynıs / inflation / capital / labour / market / banks / credit) + thin-domain enrichment: materials 14 → 22 (metals, alloys, glass, plastic), cooking_methods 10 → 18 (qaynatu / quyru / būqtıru + 5 more), music_kz 16 → 24 (Kazakh folk instruments: жетіген / шертер / сазсырнай / шаңқобыз + folk genres: күй / толғау / жыр / терме). MULTIWORD +14.
+
+### Real-REPL probe
+
+| Query | Response |
+|---|---|
+| Экономика деген не? | "Экономика — қоғамның тауарлар мен қызметтерді өндіру, бөлу, айырбастау мен тұтыну тәртібін зерттейтін ғылым." |
+| Сұраныс деген не? | "Сұраныс — белгілі тауарға тұтынушылардың қаншалықты мұқтаж екенін көрсететін экономикалық категория." |
+| Инфляция деген не? | "Инфляция — ақшаның құнсыздануы салдарынан баға деңгейінің көтерілуі." |
+| Жетіген деген не? | "Жетіген — жеті ішекті қазақ халық музыка аспабы." |
+| Күй деген не? | "Күй — қазақтың аспаптық музыкалық шығармасы." |
+| Қайнату деген не? | "Қайнату — сұйықтықты жоғары температураға дейін қыздыру әрекеті." |
+| Алтын деген не? | "Алтын — асыл сары түсті жұмсақ металл." |
+
+### Innovations
+
+**(1) New `economics_basic.jsonl` domain — 22 facts** covering economic vocabulary: экономика / тауар / қызмет / сұраныс / ұсыныс / баға / инфляция / дефляция / тұтынушы / өндіруші / капитал / еңбек / жер / бюджет / кіріс / шығын / пайда / банк / несие / пайыз / эконом.
+
+**(2) `materials` deepened 14 → 22 facts** (mat_015–022) — metals (темір / алтын / күміс / мыс / болат), glass / pластмасса / қағаз. Adds the «асыл металл» (precious metal) sub-hub.
+
+**(3) `cooking_methods` deepened 10 → 18 facts** (cook_011–018) — qaynatu / qauıru / būqtıru / küidiru / būrshyldatu / turau / tūzdau / qaqtau (boil / fry / steam / bake / grill / chop / salt / smoke-cure). New `асүй әрекеті` (kitchen action) hub.
+
+**(4) `music_kz` deepened 16 → 24 facts** (music_017–024) — Kazakh folk instruments (жетіген / шертер / сазсырнай / шаңқобыз) and folk music genres (күй / толғау / жыр / терме). New `халық аспабы` and `музыка жанры` hubs.
+
+**(5) `MULTIWORD_ENTITIES` += 14 new compound entries** required by `world_core_multiword_coverage`.
+
+**(6) Foundation expansion** — 2040 → **2086 entries** (+46), 2300 → **2346 facts** (+46), 45 → **46 domains** (+1: economics_basic), 26 860 → **27 163 derivations** (+303 from R1/R5/R10/R11 chains over the new IsA hubs).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **912 passing** unchanged |
+| Adam-dialog lib | 245 passing unchanged |
+| `world_core_multiword_coverage` | ✓ green |
+| Live REPL probe (7 queries on new facts) | ✓ all 7 surface correct fact via NLG |
+| Foundation: 2086 entries / 2346 facts / 46 domains / 27 163 derivations | (was 2040 / 2300 / 45 / 26 860) |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.5` reflects: (1) new `economics_basic` domain + (2) materials +8 + (3) cooking_methods +8 + (4) music_kz +8 + (5) MULTIWORD sync +14 + (6) foundation expansion → 6 distinct innovations.
+
+### Roadmap note — Stage A → Stage B transition
+
+Stage A complete (v4.42.0 foundation → v4.43.6 11/11 predicate coverage → v4.43.9 matcher cleanup). Knowledge breadth bundles (v4.42.8 / v4.42.9 / v4.43.5 / v4.44.0 / **v4.44.5**) accumulated 46 domains and 2346 curated facts. **Next milestone: v4.45.0 opens Stage B** — selection weights over rule-generated candidates, the project's stated path to LLM-comparable abilities without LLM costs. Stripe (11) — generative AI via agglutinative composition continues.
+
 ## [4.44.0] — 2026-05-04 — Transcript-driven multi-gap closure — KR governance / seasons / writers / LLM limitations
 
 **Driven by 2026-05-04 user dialog test (session 2).** Nine concrete gaps surfaced; **all 9 materially closed** in this bundle. New knowledge in 4 distinct domains plus MULTIWORD enrichment. Minor — substantial knowledge expansion + multiple architectural touches across `government_kazakhstan` / `time` / `kz_literature` / `adam_self`.

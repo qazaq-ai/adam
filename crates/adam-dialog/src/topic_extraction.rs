@@ -532,6 +532,22 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     ".net саласы",
     "меншік моделі",
     "қоқыс жинаушы",
+    // **v4.44.5** — economics_basic + materials/cooking/music depth.
+    // Required by `world_core_multiword_coverage`.
+    "экономикалық категория",
+    "экономикалық құбылыс",
+    "экономикалық субъект",
+    "экономикалық игілік",
+    "экономикалық ресурс",
+    "экономикалық шама",
+    "қаржы мекемесі",
+    "қаржы құжаты",
+    "қаржы құралы",
+    "қаржы шамасы",
+    "асүй әрекеті",
+    "халық аспабы",
+    "музыка жанры",
+    "асыл металл",
     // **v4.43.7** — government_kazakhstan domain (presidents,
     // premier, parliament, ministries, courts). Required by
     // `world_core_multiword_coverage`. Driven by 2026-05-04 user
