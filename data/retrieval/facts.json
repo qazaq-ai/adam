@@ -1,7 +1,7 @@
 {
-  "version": "4.42.7",
+  "version": "4.42.8",
   "status": "completed",
-  "elapsed_s": 65,
+  "elapsed_s": 67,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2135,
+    "facts_total": 2182,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 65,
       "has_quantity": 34,
       "in_domain": 24,
-      "is_a": 1626,
+      "is_a": 1673,
       "lives_in": 8,
       "part_of": 230,
       "related_to": 90
@@ -54,7 +54,7 @@
       "world_core/constellations_kz.jsonl": 6,
       "world_core/cooking_methods.jsonl": 10,
       "world_core/directions.jsonl": 9,
-      "world_core/emotions.jsonl": 18,
+      "world_core/emotions.jsonl": 30,
       "world_core/food.jsonl": 50,
       "world_core/geography_kz.jsonl": 178,
       "world_core/history_kazakhstan.jsonl": 125,
@@ -76,8 +76,9 @@
       "world_core/programming_rust.jsonl": 181,
       "world_core/programming_rust_advanced.jsonl": 35,
       "world_core/proverbs.jsonl": 43,
+      "world_core/psychology_basic.jsonl": 22,
       "world_core/role_bridges.jsonl": 53,
-      "world_core/society.jsonl": 44,
+      "world_core/society.jsonl": 57,
       "world_core/sports.jsonl": 18,
       "world_core/time.jsonl": 38,
       "world_core/tools_household.jsonl": 30,
@@ -13305,6 +13306,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Бақыт — терең қуаныш сезімі."
+    },
+    {
+      "subject": {
+        "surface": "қызғаныш",
+        "root": "қызғаныш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қызғаныш — басқаға меншікті немесе сүйікті адамды қимау сезімі."
+    },
+    {
+      "subject": {
+        "surface": "күншілдік",
+        "root": "күншілдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күншілдік — басқаның жетістігіне қарай туатын жағымсыз сезім."
+    },
+    {
+      "subject": {
+        "surface": "зерігу",
+        "root": "зерігу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Зерігу — қызықсыздықтан туатын ауыр көңіл-күй."
+    },
+    {
+      "subject": {
+        "surface": "күйзеліс",
+        "root": "күйзеліс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күйзеліс — ұзаққа созылған стресстен туатын ауыр психикалық күй."
+    },
+    {
+      "subject": {
+        "surface": "уайым",
+        "root": "уайым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Уайым — ертеңгі күн жайында мазасыздану сезімі."
+    },
+    {
+      "subject": {
+        "surface": "мұң",
+        "root": "мұң",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мұң — жалғыздықтан немесе жоғалтудан туатын баяу қайғы сезімі."
+    },
+    {
+      "subject": {
+        "surface": "шаттық",
+        "root": "шаттық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шаттық — жайдары қуаныш сезімі."
+    },
+    {
+      "subject": {
+        "surface": "торығу",
+        "root": "торығу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Торығу — үмітсіздікке ұшырау сезімі."
+    },
+    {
+      "subject": {
+        "surface": "қапалану",
+        "root": "қапалану",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қапалану — ренжіп көңілсіздену сезімі."
+    },
+    {
+      "subject": {
+        "surface": "ләззат",
+        "root": "ләззат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ләззат — жан тоятын жағымды сезім."
+    },
+    {
+      "subject": {
+        "surface": "жабырқау",
+        "root": "жабырқау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жабырқау — көңілдің төмен түсу сезімі."
+    },
+    {
+      "subject": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық күй",
+        "root": "психикалық күй",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "em_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сезім — сыртқы әсерге адам жанының жауабы."
     },
     {
       "subject": {
@@ -37988,6 +38229,446 @@
     },
     {
       "subject": {
+        "surface": "психология",
+        "root": "психология",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғылым",
+        "root": "ғылым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Психология — адамның сана-сезімі мен мінез-құлқын зерттейтін ғылым."
+    },
+    {
+      "subject": {
+        "surface": "сана",
+        "root": "сана",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық қызмет",
+        "root": "психикалық қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сана — адамның өз ойы мен әрекетін бағдарлайтын психикалық қызметі."
+    },
+    {
+      "subject": {
+        "surface": "ой",
+        "root": "ой",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық қызмет",
+        "root": "психикалық қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ой — мида туындайтын идея, пікір немесе тұжырым."
+    },
+    {
+      "subject": {
+        "surface": "ес",
+        "root": "ес",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық қызмет",
+        "root": "психикалық қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ес — алынған мәліметті сақтап, кейін қайта шығаратын психикалық қызмет."
+    },
+    {
+      "subject": {
+        "surface": "қабылдау",
+        "root": "қабылдау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық үрдіс",
+        "root": "психикалық үрдіс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қабылдау — сезім мүшелері арқылы келген ақпаратты тану үрдісі."
+    },
+    {
+      "subject": {
+        "surface": "зейін",
+        "root": "зейін",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық үрдіс",
+        "root": "психикалық үрдіс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Зейін — әрекеттің белгілі бір нысанға бағытталуы."
+    },
+    {
+      "subject": {
+        "surface": "қиял",
+        "root": "қиял",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық үрдіс",
+        "root": "психикалық үрдіс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қиял — нақты түрде қабылданбаған бейнелерді ой арқылы құру."
+    },
+    {
+      "subject": {
+        "surface": "тұлға",
+        "root": "тұлға",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұлға — өзіне тән мінез-құлық, құндылық пен әрекет жиынтығы бар адам."
+    },
+    {
+      "subject": {
+        "surface": "мінез",
+        "root": "мінез",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тұлғалық қасиет",
+        "root": "тұлғалық қасиет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мінез — адамның тұрақты мінез-құлық белгілерінің жиынтығы."
+    },
+    {
+      "subject": {
+        "surface": "темперамент",
+        "root": "темперамент",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тұлғалық қасиет",
+        "root": "тұлғалық қасиет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Темперамент — адамның жүйке жүйесінің табиғи ерекшелігі."
+    },
+    {
+      "subject": {
+        "surface": "қабілет",
+        "root": "қабілет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тұлғалық қасиет",
+        "root": "тұлғалық қасиет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қабілет — белгілі бір әрекетті жақсы орындауға мүмкіндік беретін психикалық қасиет."
+    },
+    {
+      "subject": {
+        "surface": "интеллект",
+        "root": "интеллект",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қабілет",
+        "root": "қабілет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Интеллект — танымдық міндеттерді шешу қабілеті."
+    },
+    {
+      "subject": {
+        "surface": "мотивация",
+        "root": "мотивация",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық күш",
+        "root": "психикалық күш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мотивация — адамды әрекетке итермелейтін ішкі күш."
+    },
+    {
+      "subject": {
+        "surface": "қажеттілік",
+        "root": "қажеттілік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық күй",
+        "root": "психикалық күй",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қажеттілік — адамға қажет нәрсенің жетіспеуінен туған сезім."
+    },
+    {
+      "subject": {
+        "surface": "стресс",
+        "root": "стресс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық күй",
+        "root": "психикалық күй",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Стресс — қиын жағдайға жауап ретінде туындайтын психикалық кернеу."
+    },
+    {
+      "subject": {
+        "surface": "эмоция",
+        "root": "эмоция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық күй",
+        "root": "психикалық күй",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Эмоция — қоршаған әлемге қысқа мерзімді көңіл-күй жауабы."
+    },
+    {
+      "subject": {
+        "surface": "көңіл-күй",
+        "root": "көңіл-күй",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық күй",
+        "root": "психикалық күй",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көңіл-күй — біршама ұзаққа созылатын эмоциялық күй."
+    },
+    {
+      "subject": {
+        "surface": "мінез-құлық",
+        "root": "мінез-құлық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әрекет түрі",
+        "root": "әрекет түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мінез-құлық — адамның сыртқы әлемге көрсететін әрекеттер жиынтығы."
+    },
+    {
+      "subject": {
+        "surface": "әдет",
+        "root": "әдет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мінез-құлық үлгісі",
+        "root": "мінез-құлық үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әдет — қайталану нәтижесінде қалыптасқан мінез-құлық үлгісі."
+    },
+    {
+      "subject": {
+        "surface": "психолог",
+        "root": "психолог",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Психолог — психология саласындағы маман."
+    },
+    {
+      "subject": {
+        "surface": "психика",
+        "root": "психика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "психикалық қызмет",
+        "root": "психикалық қызмет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Психика — мидың сыртқы әлемді бейнелеу қызметі."
+    },
+    {
+      "subject": {
+        "surface": "рефлекс",
+        "root": "рефлекс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реакция",
+        "root": "реакция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/psychology_basic",
+      "source": {
+        "pack": "world_core/psychology_basic.jsonl",
+        "sample_id": "psy_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Рефлекс — сыртқы тітіркендіргішке туа біткен немесе үйренілген жауап реакция."
+    },
+    {
+      "subject": {
         "surface": "ақын",
         "root": "ақын",
         "pos": "noun"
@@ -39925,6 +40606,266 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Халық — ортақ тіл мен мәдениеті бар адамдар."
+    },
+    {
+      "subject": {
+        "surface": "демократия",
+        "root": "демократия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "басқару түрі",
+        "root": "басқару түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Демократия — халық билігіне негізделген басқару түрі."
+    },
+    {
+      "subject": {
+        "surface": "республика",
+        "root": "республика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекет түрі",
+        "root": "мемлекет түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Республика — халықтың сайлайтын өкілдері басқаратын мемлекет түрі."
+    },
+    {
+      "subject": {
+        "surface": "сайлау",
+        "root": "сайлау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "саяси процесс",
+        "root": "саяси процесс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сайлау — азаматтардың билікке өкіл таңдау процесі."
+    },
+    {
+      "subject": {
+        "surface": "құқық",
+        "root": "құқық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мүдде",
+        "root": "мүдде",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Құқық — заңмен қорғалатын мүдде."
+    },
+    {
+      "subject": {
+        "surface": "бостандық",
+        "root": "бостандық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құқық",
+        "root": "құқық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бостандық — адамның өз қалауынша әрекет ете алуы."
+    },
+    {
+      "subject": {
+        "surface": "әділдік",
+        "root": "әділдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қоғамдық принцип",
+        "root": "қоғамдық принцип",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әділдік — әркімге өз үлесін беретін қоғамдық принцип."
+    },
+    {
+      "subject": {
+        "surface": "бейбітшілік",
+        "root": "бейбітшілік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қоғамдық жағдай",
+        "root": "қоғамдық жағдай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_047"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бейбітшілік — соғыссыз тыныш қоғамдық жағдай."
+    },
+    {
+      "subject": {
+        "surface": "салық",
+        "root": "салық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "міндетті ақы",
+        "root": "міндетті ақы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Салық — азаматтар мемлекетке төлейтін міндетті ақы."
+    },
+    {
+      "subject": {
+        "surface": "нарық",
+        "root": "нарық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "экономикалық кеңістік",
+        "root": "экономикалық кеңістік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Нарық — сатушы мен сатып алушы кездесетін экономикалық кеңістік."
+    },
+    {
+      "subject": {
+        "surface": "кәсіпорын",
+        "root": "кәсіпорын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұйым",
+        "root": "ұйым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кәсіпорын — өндіріс немесе қызмет көрсетумен айналысатын ұйым."
+    },
+    {
+      "subject": {
+        "surface": "кәсіпкер",
+        "root": "кәсіпкер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_051"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кәсіпкер — өз ісімен айналысып, табыс табатын адам."
+    },
+    {
+      "subject": {
+        "surface": "азаматтық қоғам",
+        "root": "азаматтық қоғам",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қоғамдық бірлестік",
+        "root": "қоғамдық бірлестік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_052"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Азаматтық қоғам — мемлекеттен дербес әрекет ететін қоғамдық бірлестіктер жиыны."
+    },
+    {
+      "subject": {
+        "surface": "конституция",
+        "root": "конституция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "заң түрі",
+        "root": "заң түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_053"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Конституция — заң түрі ретінде ең жоғары күші бар құжат."
     },
     {
       "subject": {

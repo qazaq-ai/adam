@@ -7,6 +7,52 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.42.9] — 2026-05-04 — Knowledge depth bundle 2 — Psychology + Emotions/Society enrichment
+
+**Continuation of v4.42.8 knowledge expansion arc.** New `psychology_basic` domain (22 facts) covers cognition / personality / mental processes — concepts adam previously lacked entirely. `emotions` deepens 18 → 30 facts with complex emotions (envy / boredom / despair / longing / pleasure) plus a hub-defining `сезім is_a психикалық күй` link bridging emotions into the new psychology hub. `society` deepens 36 → 49 facts with civic/political concepts (democracy / republic / elections / rights / freedom / justice / market / civil society / taxes). All facts compose through Stage A `IsACopulaDeclarative` NLG rule.
+
+### Real-REPL probe (live `adam-chat`)
+
+| Query | Response |
+|---|---|
+| Психология деген не? | "Психология — адамның сана-сезімі мен мінез-құлқын зерттейтін ғылым." |
+| Тұлға деген не? | "Тұлға — өзіне тән мінез-құлық, құндылық пен әрекет жиынтығы бар адам." |
+| Қызғаныш деген не? | "Қызғаныш — басқаға меншікті немесе сүйікті адамды қимау сезімі." |
+| Демократия деген не? | "Демократия — халық билігіне негізделген басқару түрі." |
+| Стресс деген не? | "Стресс — қиын жағдайға жауап ретінде туындайтын психикалық кернеу." |
+| Зерігу деген не? | "Зерігу — қызықсыздықтан туатын ауыр көңіл-күй." |
+
+### Innovations
+
+**(1) New `psychology_basic.jsonl` domain — 22 facts** covering: психология / сана / ой / ес / қабылдау / зейін / қиял / тұлға / мінез / темперамент / қабілет / интеллект / мотивация / қажеттілік / стресс / эмоция / көңіл-күй / мінез-құлық / әдет / психолог / психика / рефлекс. Each uses `is_a` for clean NLG composition.
+
+**(2) `emotions` deepened 18 → 30 facts** (em_019–030) — complex emotions: қызғаныш, күншілдік, зерігу, күйзеліс, уайым, мұң, шаттық, торығу, қапалану, ләззат, жабырқау + hub bridge `сезім is_a психикалық күй` linking emotions into the psychology hub.
+
+**(3) `society` deepened 36 → 49 facts** (soc_041–053) — political/civic concepts: демократия, республика, сайлау, құқық, бостандық, әділдік, бейбітшілік, салық, нарық, кәсіпорын, кәсіпкер, азаматтық қоғам + an explicit `конституция is_a заң түрі` IsA-hub bridge.
+
+**(4) `MULTIWORD_ENTITIES` += 17 new compound entries** required by `world_core_multiword_coverage`: психикалық қызмет / психикалық үрдіс / психикалық күш / психикалық күй / тұлғалық қасиет / мінез-құлық үлгісі / әрекет түрі / басқару түрі / мемлекет түрі / заң түрі / саяси процесс / қоғамдық принцип / қоғамдық жағдай / қоғамдық бірлестік / экономикалық кеңістік / міндетті ақы / азаматтық қоғам.
+
+**(5) NLG composition path verified end-to-end on 47 new facts** — every new psychology/emotions/society fact routes through Stage A `IsACopulaDeclarative` rule; no per-fact templates needed. Live REPL 6/6 on probes spanning all three domains.
+
+**(6) Foundation expansion** — 1884 → **1931 entries** (+47), 2135 → **2182 facts** (+47), 42 → **43 domains** (+1: psychology_basic), 25 755 → **26 251 derivations** (+496 from R1/R5/R10/R11 chains over the new IsA parents and the `сезім is_a психикалық күй` bridge).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **890 passing** unchanged (`cargo test --workspace --release`) |
+| `world_core_multiword_coverage` | ✓ green after sync |
+| Adam-dialog lib tests | **223 passing** unchanged |
+| Live REPL probe (6 queries on new facts) | ✓ all 6 surface correct fact via NLG |
+| Foundation: 1931 entries / 2182 facts / 43 domains / 26 251 derivations | (was 1884 / 2135 / 42 / 25 755) |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.9` reflects: (1) new psychology_basic domain + 22 facts + (2) emotions +12 with hub bridge + (3) society +13 with political/civic concepts + (4) MULTIWORD sync +17 + (5) NLG end-to-end probe verification + (6) foundation expansion → 6 distinct innovations, second knowledge bundle in the v4.42.x arc. Per `feedback_versioning_post_1_0`: 6 innovations + new domain warrants `.9`.
+
+Stage A continues. Next: introducer migration (deferred to v4.43.0 minor — heavier architectural cleanup; byte-identical output contract requires careful seed-rotation preservation). Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.42.8] — 2026-05-04 — Knowledge expansion bundle — Computer Science fundamentals + Mathematics depth
 
 **Two-domain knowledge expansion driven by adam's growing CS / math conversational reach.** A new `computer_science_basics` domain (30 facts) covers the universal CS vocabulary (algorithms / data structures / complexity / OOP / FP / debugging / API / parallelism). The existing `mathematics_basic` domain extends from 37 → 52 facts with **function types** (linear / quadratic), **equation types** (linear / quadratic), **progressions** (arithmetic / geometric), **statistics** (mean / median / variance / probability), **set theory + calculus basics** (derivative / integral). All facts compose through the Stage A NLG `IsACopulaDeclarative` rule — typed-frame composition, no per-fact templates.

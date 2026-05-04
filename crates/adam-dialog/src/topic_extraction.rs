@@ -532,6 +532,25 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     ".net саласы",
     "меншік моделі",
     "қоқыс жинаушы",
+    // **v4.42.9** — psychology_basic + emotions/society depth.
+    // Required by `world_core_multiword_coverage`.
+    "экономикалық кеңістік",
+    "қоғамдық бірлестік",
+    "психикалық қызмет",
+    "психикалық үрдіс",
+    "мінез-құлық үлгісі",
+    "тұлғалық қасиет",
+    "қоғамдық принцип",
+    "қоғамдық жағдай",
+    "психикалық күш",
+    "психикалық күй",
+    "азаматтық қоғам",
+    "саяси процесс",
+    "мемлекет түрі",
+    "міндетті ақы",
+    "басқару түрі",
+    "әрекет түрі",
+    "заң түрі",
     // **v4.42.8** — computer_science_basics + mathematics_basic
     // (functions / equations / progressions / statistics) compound
     // objects/subjects. Required by `world_core_multiword_coverage`.
