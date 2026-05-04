@@ -7,6 +7,60 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.45.0] — 2026-05-04 — Stage B opens — selection weights foundation
+
+**Stage B architectural milestone — first patch.** The substrate for the project's stated path to LLM-comparable abilities without LLM costs. New `crates/adam-dialog/src/selection.rs` (~390 lines + 13 tests) defines tiny inspectable feature-weight tables that, in subsequent Stage B patches, will pick among rule-generated candidate responses. Foundation only in v4.45.0 — module + types + scoring + tests, no production wiring yet (mirrors the v4.42.0 NLG-foundation pattern).
+
+### Architectural significance
+
+Per the project thesis (`project_retrieval_not_neural_v2.md`): adam aims to be a NEW class of generative AI that combines typed primitives + rule-based composition + **tiny selection weights** to achieve LLM-comparable abilities while remaining safe / cheap / predictable. **Stage A** (v4.42.0–v4.44.5) built typed primitives, NLG, and 46 domains of curated facts. **Stage B starts here:** selection weights over candidates. Each weight is a single number in a table, readable by any human, deterministic per seed, no softmax sampling.
+
+### Innovations
+
+**(1) New `crates/adam-dialog/src/selection.rs` module** with public API:
+- `CandidateFeatures` — five hand-extracted features per candidate fact: `confidence`, `raw_text_richness`, `subject_overlap`, `object_overlap`, `recency_match`. Each normalized to roughly `[0, 1]` so weight magnitudes are comparable.
+- `SelectionWeights` — six numbers + bias = `~28 bytes` for the v0 model. `default_v0()` hand-set to approximate the v4.38.0 SearchGraph ranker tiers (subject_overlap weight = 2.0, confidence = 1.0, object_overlap = 1.0, recency = 0.5, richness = 0.3, bias = 0.0).
+- `extract_features(fact, query_tokens, last_topic) -> CandidateFeatures` — pure feature extractor.
+- `score(features, weights) -> f32` — dot-product + bias.
+- `select_top(candidates, weights, query_tokens, last_topic) -> Option<&Fact>` — picks highest-scoring candidate; stable-tie-break by first index for byte-identical regression on canonical evals.
+
+**(2) Confidence mapping** — covers all 5 `ConfidenceKind` variants: `HumanApproved → 1.0`, `CuratedQuote → 0.8`, `RuleInferred → 0.5`, `RepeatedPattern → 0.3`, `Grammar → 0.0`. Reflects the "trust ladder" already implicit in SearchGraph's tier system.
+
+**(3) Token overlap** — counts how many query tokens (≥ 3 chars, casefold) match the slot root, normalized by query token count. Mirrors the v4.38.0 list-aware ranker's "subject contains query token" tier.
+
+**(4) 13 new unit tests** verify deterministic feature extraction, weight construction, scoring math, top-1 selection, stable-tie-break, empty-list handling, token-overlap noise filtering.
+
+**(5) Re-exports** in `lib.rs`: `CandidateFeatures` / `SelectionWeights` / `extract_features` / `selection_score` / `select_top` available as top-level public API.
+
+**(6) NOT YET in v4.45.0** (Stage B carry-forwards):
+- Training pipeline — replace hand-set weights with weights learned from the committed 3.87M-word corpus + accumulated REPL transcripts.
+- Production wiring — route SearchGraph's top-N through the selector; v4.45.0 ships parallel/optional, no behavioral change.
+- Per-domain weight specialization (different weights per query domain).
+- Categorical predicate-kind one-hot encoding (currently dropped from v0 features as low-leverage).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **925 passing** (was 912; +13 new selection tests) |
+| Adam-dialog lib | **258 passing** (was 245; +13) |
+| Selection module | 13/13 tests pass (deterministic + correct feature math + stable selection) |
+| Live REPL | byte-identical to v4.44.5 (no production wiring yet) |
+| Foundation: 2086 entries / 2346 facts / 46 domains / 27 163 derivations | unchanged |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+Minor — Stage B opens (architectural arc that the project was started for). Per `feedback_versioning_post_1_0`: «never under-version a kernel-signature feature». Selection weights are THE kernel-signature Stage B feature; v4.45.0 mirrors v4.42.0's pattern (foundation-only minor + carry-forward bundle 2 in next patches).
+
+Stage B status:
+- **v4.45.0 — bundle 1 — selection weights foundation** ← shipped
+- v4.45.5+ — bundle 2: training pipeline + first audit-only wiring
+- v4.46.0+ — bundle 3: production routing for multi-candidate scenarios
+- v4.50.0 — bundle 4 (target): trained weights replace heuristic ranker
+
+Stripe (11) — generative AI via agglutinative composition continues. v5.x parallel track (Rust code-gen in same paradigm) reserved for after Stage B converges.
+
 ## [4.44.5] — 2026-05-04 — Knowledge breadth — Economics + Materials/Cooking/Music depth (last bundle before Stage B)
 
 **Final knowledge bundle before Stage B opens at v4.45.0+.** New `economics_basic` domain (22 facts on tauar / sūranıs / ūsynıs / inflation / capital / labour / market / banks / credit) + thin-domain enrichment: materials 14 → 22 (metals, alloys, glass, plastic), cooking_methods 10 → 18 (qaynatu / quyru / būqtıru + 5 more), music_kz 16 → 24 (Kazakh folk instruments: жетіген / шертер / сазсырнай / шаңқобыз + folk genres: күй / толғау / жыр / терме). MULTIWORD +14.

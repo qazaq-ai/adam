@@ -40,6 +40,7 @@ pub mod planner;
 pub mod quality;
 pub mod question_shape;
 pub mod realiser;
+pub mod selection;
 pub mod semantics;
 pub mod sentence_decomp;
 pub mod slot_syntax;
@@ -77,6 +78,9 @@ pub use quality::{
 };
 pub use question_shape::{QuestionShape, detect as detect_question_shape};
 pub use realiser::realise;
+pub use selection::{
+    CandidateFeatures, SelectionWeights, extract_features, score as selection_score, select_top,
+};
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
 pub use sentence_decomp::{
     Role, SentenceDecomposition, SentenceType, TokenRole, decompose as decompose_sentence,
