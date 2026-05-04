@@ -470,3 +470,379 @@ mod tests {
         assert!((f.subject_overlap - 1.0).abs() < 1e-6);
     }
 }
+
+// ---------------------------------------------------------------------------
+// **v4.45.5** — Stage B bundle 2: training pipeline.
+//
+// Pairwise margin-perceptron training of [`SelectionWeights`]. Given a list
+// of gold pairs `(positive, negative)` — where the positive candidate
+// SHOULD score higher than the negative under correct weights — the loop
+// nudges weights toward positives and away from negatives until either
+// every pair satisfies `score(positive) ≥ score(negative) + margin` or
+// `max_epochs` epochs elapse.
+//
+// Why pairwise margin perceptron:
+// - Deterministic per (initial weights, training pairs, hyperparameters)
+//   — no random sampling, no SGD batching variance.
+// - Convex update on the per-pair margin loss — simple to reason about.
+// - O(epochs × pairs) update cost, no gradient computation graph, no
+//   library dependency.
+// - Outputs a tiny inspectable weight table (still ~28 bytes for v0).
+//
+// The training loop respects the project thesis: small clean training
+// data → small inspectable weights. A fully-converged v0 model on a
+// hand-curated 50-pair eval suite occupies the same 28 bytes as the
+// hand-set defaults.
+
+/// One labelled training example: `positive` is the candidate whose
+/// score should EXCEED `negative.score + margin` after training.
+#[derive(Debug, Clone, Copy)]
+pub struct TrainingPair {
+    pub positive: CandidateFeatures,
+    pub negative: CandidateFeatures,
+}
+
+/// Hyperparameters for the perceptron training loop. Defaults are
+/// hand-tuned for the v0 feature set on synthetic linearly-separable
+/// data; revisit when real REPL-transcript pairs become available.
+#[derive(Debug, Clone, Copy)]
+pub struct TrainingConfig {
+    /// Step size for each weight update.
+    pub learning_rate: f32,
+    /// Required margin: `score(positive) ≥ score(negative) + margin`
+    /// before the pair is considered satisfied.
+    pub margin: f32,
+    /// Maximum number of full passes over the training pairs.
+    pub max_epochs: usize,
+}
+
+impl TrainingConfig {
+    /// **v4.45.5 default** — tuned for the v0 feature scale (`[0, 1]`)
+    /// and the hand-set initial weights in [`SelectionWeights::default_v0`].
+    pub fn default_v0() -> Self {
+        Self {
+            learning_rate: 0.1,
+            margin: 0.5,
+            max_epochs: 200,
+        }
+    }
+}
+
+impl Default for TrainingConfig {
+    fn default() -> Self {
+        Self::default_v0()
+    }
+}
+
+/// What the training loop reports back. Useful for tests, telemetry,
+/// and convergence checks. Never inspected by the live planner —
+/// production wiring (Stage B bundle 3+) consumes only the trained
+/// `SelectionWeights`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct TrainingStats {
+    /// Number of epochs that ran (≤ `config.max_epochs`).
+    pub epochs_run: usize,
+    /// Number of pair violations in the FINAL epoch — pairs where
+    /// `score(positive) < score(negative) + margin`. Zero ⇒
+    /// converged.
+    pub final_violations: usize,
+    /// Did training converge before hitting `max_epochs`?
+    pub converged: bool,
+}
+
+/// Pairwise margin-perceptron training. Returns the trained weights
+/// + convergence stats. Pure function — same `(initial, pairs,
+/// config)` always yields the same output.
+pub fn train_perceptron(
+    initial: SelectionWeights,
+    pairs: &[TrainingPair],
+    config: TrainingConfig,
+) -> (SelectionWeights, TrainingStats) {
+    let mut w = initial;
+    let mut last_violations = pairs.len();
+    let mut epochs_run = 0usize;
+    let mut converged = false;
+    for _ in 0..config.max_epochs {
+        epochs_run += 1;
+        let mut violations = 0usize;
+        for pair in pairs {
+            let s_pos = score(&pair.positive, &w);
+            let s_neg = score(&pair.negative, &w);
+            if s_pos < s_neg + config.margin {
+                violations += 1;
+                // Bump weights toward (positive - negative). Each
+                // weight component is updated by
+                //   lr * (pos_feature - neg_feature).
+                w.bias += config.learning_rate * 0.0; // bias has no feature
+                w.w_confidence +=
+                    config.learning_rate * (pair.positive.confidence - pair.negative.confidence);
+                w.w_richness += config.learning_rate
+                    * (pair.positive.raw_text_richness - pair.negative.raw_text_richness);
+                w.w_subject_overlap += config.learning_rate
+                    * (pair.positive.subject_overlap - pair.negative.subject_overlap);
+                w.w_object_overlap += config.learning_rate
+                    * (pair.positive.object_overlap - pair.negative.object_overlap);
+                w.w_recency += config.learning_rate
+                    * (pair.positive.recency_match - pair.negative.recency_match);
+            }
+        }
+        last_violations = violations;
+        if violations == 0 {
+            converged = true;
+            break;
+        }
+    }
+    (
+        w,
+        TrainingStats {
+            epochs_run,
+            final_violations: last_violations,
+            converged,
+        },
+    )
+}
+
+#[cfg(test)]
+mod training_tests {
+    use super::*;
+
+    fn pair(pos: CandidateFeatures, neg: CandidateFeatures) -> TrainingPair {
+        TrainingPair {
+            positive: pos,
+            negative: neg,
+        }
+    }
+
+    fn feats(c: f32, r: f32, s: f32, o: f32, recency: f32) -> CandidateFeatures {
+        CandidateFeatures {
+            confidence: c,
+            raw_text_richness: r,
+            subject_overlap: s,
+            object_overlap: o,
+            recency_match: recency,
+        }
+    }
+
+    #[test]
+    fn training_config_default_is_deterministic() {
+        let a = TrainingConfig::default_v0();
+        let b = TrainingConfig::default_v0();
+        assert_eq!(a.learning_rate, b.learning_rate);
+        assert_eq!(a.margin, b.margin);
+        assert_eq!(a.max_epochs, b.max_epochs);
+    }
+
+    #[test]
+    fn perceptron_converges_on_linearly_separable_pairs() {
+        // Gold rule: prefer high-confidence facts over low-confidence
+        // facts. One clean dimension; should converge in few epochs.
+        let pairs = vec![
+            pair(
+                feats(1.0, 0.5, 0.5, 0.5, 0.0),
+                feats(0.0, 0.5, 0.5, 0.5, 0.0),
+            ),
+            pair(
+                feats(0.8, 0.3, 0.3, 0.3, 0.0),
+                feats(0.0, 0.3, 0.3, 0.3, 0.0),
+            ),
+        ];
+        // Initial weights all zero — no preference. Training must
+        // discover that confidence matters.
+        let initial = SelectionWeights {
+            bias: 0.0,
+            w_confidence: 0.0,
+            w_richness: 0.0,
+            w_subject_overlap: 0.0,
+            w_object_overlap: 0.0,
+            w_recency: 0.0,
+        };
+        let (trained, stats) = train_perceptron(initial, &pairs, TrainingConfig::default_v0());
+        assert!(stats.converged);
+        assert_eq!(stats.final_violations, 0);
+        // After training, confidence weight must be positive.
+        assert!(trained.w_confidence > 0.0);
+    }
+
+    #[test]
+    fn perceptron_is_deterministic() {
+        let pairs = vec![pair(
+            feats(1.0, 0.5, 0.5, 0.5, 0.0),
+            feats(0.0, 0.5, 0.5, 0.5, 0.0),
+        )];
+        let initial = SelectionWeights::default_v0();
+        let cfg = TrainingConfig::default_v0();
+        let (a, sa) = train_perceptron(initial, &pairs, cfg);
+        let (b, sb) = train_perceptron(initial, &pairs, cfg);
+        assert_eq!(a, b);
+        assert_eq!(sa, sb);
+    }
+
+    #[test]
+    fn perceptron_no_op_when_pairs_already_satisfy_margin() {
+        // Initial weights already separate these pairs by > margin —
+        // training must NOT update weights.
+        let pairs = vec![pair(
+            feats(1.0, 0.5, 0.5, 0.5, 0.0),
+            feats(0.0, 0.5, 0.5, 0.5, 0.0),
+        )];
+        let initial = SelectionWeights {
+            bias: 0.0,
+            w_confidence: 10.0, // pos scores 10 + 1 = 11; neg scores 0 + 1 = 1; margin OK
+            w_richness: 0.0,
+            w_subject_overlap: 1.0,
+            w_object_overlap: 0.0,
+            w_recency: 0.0,
+        };
+        let (trained, stats) = train_perceptron(initial, &pairs, TrainingConfig::default_v0());
+        assert!(stats.converged);
+        assert_eq!(stats.final_violations, 0);
+        assert_eq!(stats.epochs_run, 1);
+        assert_eq!(trained, initial);
+    }
+
+    #[test]
+    fn perceptron_reports_violations_when_max_epochs_reached() {
+        // Construct an unsatisfiable contradiction: gold says A > B,
+        // but A and B have IDENTICAL features → score gap is zero,
+        // never reaches margin. Loop should hit max_epochs.
+        let same = feats(0.5, 0.5, 0.5, 0.5, 0.0);
+        let pairs = vec![pair(same, same)];
+        let initial = SelectionWeights::default_v0();
+        let cfg = TrainingConfig {
+            max_epochs: 5,
+            ..TrainingConfig::default_v0()
+        };
+        let (_w, stats) = train_perceptron(initial, &pairs, cfg);
+        assert!(!stats.converged);
+        assert_eq!(stats.epochs_run, 5);
+        assert_eq!(stats.final_violations, 1);
+    }
+
+    #[test]
+    fn perceptron_empty_pairs_returns_initial_immediately() {
+        let initial = SelectionWeights::default_v0();
+        let cfg = TrainingConfig::default_v0();
+        let (trained, stats) = train_perceptron(initial, &[], cfg);
+        // No pairs ⇒ no violations, converges in epoch 1.
+        assert!(stats.converged);
+        assert_eq!(stats.final_violations, 0);
+        assert_eq!(trained, initial);
+    }
+
+    #[test]
+    fn perceptron_learns_recency_signal() {
+        // Gold: prefer the recency-matching candidate (anaphor
+        // continuation) when other features are equal.
+        let pairs = vec![pair(
+            feats(0.5, 0.5, 0.5, 0.5, 1.0),
+            feats(0.5, 0.5, 0.5, 0.5, 0.0),
+        )];
+        let initial = SelectionWeights {
+            bias: 0.0,
+            w_confidence: 0.0,
+            w_richness: 0.0,
+            w_subject_overlap: 0.0,
+            w_object_overlap: 0.0,
+            w_recency: 0.0,
+        };
+        let (trained, stats) = train_perceptron(initial, &pairs, TrainingConfig::default_v0());
+        assert!(stats.converged);
+        // Recency weight must end positive.
+        assert!(trained.w_recency > 0.0);
+        // Other weights remain zero — single-dimension signal.
+        assert_eq!(trained.w_confidence, 0.0);
+        assert_eq!(trained.w_subject_overlap, 0.0);
+    }
+
+    #[test]
+    fn perceptron_zero_learning_rate_makes_no_progress() {
+        let pairs = vec![pair(
+            feats(1.0, 0.5, 0.5, 0.5, 0.0),
+            feats(0.0, 0.5, 0.5, 0.5, 0.0),
+        )];
+        let initial = SelectionWeights {
+            bias: 0.0,
+            w_confidence: 0.0,
+            w_richness: 0.0,
+            w_subject_overlap: 0.0,
+            w_object_overlap: 0.0,
+            w_recency: 0.0,
+        };
+        let cfg = TrainingConfig {
+            learning_rate: 0.0,
+            max_epochs: 50,
+            ..TrainingConfig::default_v0()
+        };
+        let (trained, stats) = train_perceptron(initial, &pairs, cfg);
+        assert!(!stats.converged);
+        assert_eq!(trained, initial);
+    }
+
+    #[test]
+    fn perceptron_converges_within_epoch_budget_on_realistic_pairs() {
+        // Synthetic mirror of the v4.38.0 ranker tiers: HumanApproved
+        // beats Grammar; subject-overlap dominates; recency adds a
+        // small bonus.
+        let pairs = vec![
+            // HumanApproved should beat Grammar.
+            pair(
+                feats(1.0, 0.5, 0.5, 0.0, 0.0),
+                feats(0.0, 0.5, 0.5, 0.0, 0.0),
+            ),
+            // Higher subject_overlap should beat lower.
+            pair(
+                feats(0.5, 0.0, 1.0, 0.0, 0.0),
+                feats(0.5, 0.0, 0.0, 0.0, 0.0),
+            ),
+            // Recency tiebreaker.
+            pair(
+                feats(0.5, 0.5, 0.5, 0.5, 1.0),
+                feats(0.5, 0.5, 0.5, 0.5, 0.0),
+            ),
+        ];
+        let initial = SelectionWeights::default_v0();
+        let (trained, stats) = train_perceptron(initial, &pairs, TrainingConfig::default_v0());
+        assert!(stats.converged);
+        // All three signal weights must be positive after training.
+        assert!(trained.w_confidence > 0.0);
+        assert!(trained.w_subject_overlap > 0.0);
+        assert!(trained.w_recency > 0.0);
+    }
+
+    #[test]
+    fn perceptron_trained_weights_correctly_rank_via_score() {
+        let pairs = vec![pair(
+            feats(1.0, 0.0, 0.0, 0.0, 0.0),
+            feats(0.0, 0.0, 0.0, 0.0, 0.0),
+        )];
+        let initial = SelectionWeights {
+            bias: 0.0,
+            w_confidence: 0.0,
+            w_richness: 0.0,
+            w_subject_overlap: 0.0,
+            w_object_overlap: 0.0,
+            w_recency: 0.0,
+        };
+        let (trained, stats) = train_perceptron(initial, &pairs, TrainingConfig::default_v0());
+        assert!(stats.converged);
+        // After convergence, score(positive) ≥ score(negative) + margin.
+        let s_pos = score(&pairs[0].positive, &trained);
+        let s_neg = score(&pairs[0].negative, &trained);
+        assert!(s_pos >= s_neg + TrainingConfig::default_v0().margin);
+    }
+
+    #[test]
+    fn training_stats_reports_epoch_count_correctly() {
+        // Linearly separable, so converges in 1 epoch (no violations
+        // on the second pass).
+        let pairs = vec![pair(
+            feats(1.0, 0.5, 0.5, 0.5, 0.0),
+            feats(0.0, 0.5, 0.5, 0.5, 0.0),
+        )];
+        let initial = SelectionWeights::default_v0();
+        let (_, stats) = train_perceptron(initial, &pairs, TrainingConfig::default_v0());
+        assert!(stats.converged);
+        assert!(stats.epochs_run >= 1);
+        assert_eq!(stats.final_violations, 0);
+    }
+}

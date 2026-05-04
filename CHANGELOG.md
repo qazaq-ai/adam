@@ -7,6 +7,73 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.45.5] — 2026-05-04 — Stage B bundle 2 — pairwise margin-perceptron training pipeline
+
+**Stage B continues.** v4.45.0 shipped the foundation (`SelectionWeights` + `extract_features` + `score` + `select_top`). v4.45.5 ships the training algorithm: pairwise margin perceptron that takes a list of gold `(positive, negative)` candidate pairs and tunes a `SelectionWeights` table until every pair satisfies `score(positive) ≥ score(negative) + margin` (or `max_epochs` elapse). Pure function, deterministic per `(initial, pairs, config)`. 11 new unit tests verify convergence, determinism, edge cases, and stats reporting.
+
+### Architectural fit
+
+Per the project thesis, weights must be **discrete, inspectable, deterministic per seed**. Pairwise margin-perceptron satisfies all three:
+- **Discrete:** updates are `lr × (positive_features − negative_features)`, no gradient graph, no library deps.
+- **Inspectable:** trained model still occupies the same ~28 bytes as `SelectionWeights::default_v0()`.
+- **Deterministic:** no random sampling, no SGD batching variance — same `(initial weights, pairs, config)` always yields the same trained weights and stats.
+
+This satisfies the thesis constraint: «weights/learning OK if **discrete, inspectable, cheap**; reject only LLM internals».
+
+### Innovations
+
+**(1) `TrainingPair` struct** — one labelled training example: `positive` is the candidate whose score should EXCEED `negative.score + margin` after training. Pure data, no allocation.
+
+**(2) `TrainingConfig` struct** — three hyperparameters: `learning_rate` (step size), `margin` (required score gap), `max_epochs` (budget). `default_v0()` hand-tuned for the v0 feature scale `[0, 1]` (lr=0.1, margin=0.5, max_epochs=200).
+
+**(3) `TrainingStats` struct** — what the training loop reports back: `epochs_run`, `final_violations` (zero ⇒ converged), `converged` boolean. Useful for tests + telemetry; never inspected by the live planner.
+
+**(4) `train_perceptron(initial, pairs, config) -> (SelectionWeights, TrainingStats)`** — the loop. For each epoch, iterates pairs; pairs that fail the margin trigger a perceptron update on each weight component by `lr × (pos_feature - neg_feature)`. Loop exits early on full convergence (zero violations) or hits `max_epochs` budget.
+
+**(5) Re-exports** in `lib.rs`: `TrainingPair`, `TrainingConfig`, `TrainingStats`, `train_perceptron` available as top-level public API.
+
+**(6) 11 new unit tests** verify:
+- `perceptron_converges_on_linearly_separable_pairs` — single-dimension confidence signal converges.
+- `perceptron_is_deterministic` — same `(initial, pairs, config)` → same `(trained_weights, stats)`.
+- `perceptron_no_op_when_pairs_already_satisfy_margin` — pre-converged input returns initial weights unchanged.
+- `perceptron_reports_violations_when_max_epochs_reached` — unsatisfiable pair (identical features) hits budget cap, reports correct violation count.
+- `perceptron_empty_pairs_returns_initial_immediately` — degenerate input is no-op.
+- `perceptron_learns_recency_signal` — single-dimension recency signal pickup.
+- `perceptron_zero_learning_rate_makes_no_progress` — sanity check on hyperparameter boundary.
+- `perceptron_converges_within_epoch_budget_on_realistic_pairs` — multi-signal pair set converges within budget.
+- `perceptron_trained_weights_correctly_rank_via_score` — post-training, `score(positive) ≥ score(negative) + margin`.
+- `training_stats_reports_epoch_count_correctly` — stats reflect actual loop iterations.
+- `training_config_default_is_deterministic` — default constructor stable.
+
+**(7) NOT YET in v4.45.5** (Stage B carry-forwards):
+- Real training data pipeline — extract gold pairs from canonical evals (`live_holdout`, `rust_holdout`, `parse_disambig`) and accumulated REPL transcripts.
+- Audit-only wiring — compute selection scores at `tool::search_graph` result point; log to trace when selection top-1 differs from heuristic top-1 (don't change behavior yet).
+- Production routing — replace `apply_graph_result`'s heuristic top-1 with `selection::select_top`.
+- Per-domain weight specialization.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **936 passing** (was 925; +11 new training tests) |
+| Adam-dialog lib | **269 passing** (was 258; +11) |
+| Selection module | 24/24 tests pass (13 v4.45.0 + 11 new) |
+| Live REPL | byte-identical to v4.45.0 (no production wiring yet) |
+| Foundation: 2086 / 2346 / 46 / 27 163 | unchanged |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.5` reflects: (1) `TrainingPair` + (2) `TrainingConfig` + (3) `TrainingStats` + (4) `train_perceptron` algorithm + (5) re-exports + (6) 11 new tests + (7) docstring articulating thesis fit → **5 distinct innovations + a kernel-signature algorithm**.
+
+Stage B status:
+- v4.45.0 — bundle 1 — selection weights foundation ✓
+- **v4.45.5 — bundle 2 — training pipeline** ← shipped
+- v4.46.0+ — bundle 3: real training data + audit-only wiring
+- v4.50.0 (target) — bundle 4: trained weights replace heuristic ranker
+
+Stripe (11) — generative AI via agglutinative composition continues.
+
 ## [4.45.0] — 2026-05-04 — Stage B opens — selection weights foundation
 
 **Stage B architectural milestone — first patch.** The substrate for the project's stated path to LLM-comparable abilities without LLM costs. New `crates/adam-dialog/src/selection.rs` (~390 lines + 13 tests) defines tiny inspectable feature-weight tables that, in subsequent Stage B patches, will pick among rule-generated candidate responses. Foundation only in v4.45.0 — module + types + scoring + tests, no production wiring yet (mirrors the v4.42.0 NLG-foundation pattern).

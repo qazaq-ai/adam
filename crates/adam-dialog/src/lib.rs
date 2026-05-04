@@ -79,7 +79,8 @@ pub use quality::{
 pub use question_shape::{QuestionShape, detect as detect_question_shape};
 pub use realiser::realise;
 pub use selection::{
-    CandidateFeatures, SelectionWeights, extract_features, score as selection_score, select_top,
+    CandidateFeatures, SelectionWeights, TrainingConfig, TrainingPair, TrainingStats,
+    extract_features, score as selection_score, select_top, train_perceptron,
 };
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
 pub use sentence_decomp::{
