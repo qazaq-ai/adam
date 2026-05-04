@@ -884,6 +884,40 @@ impl Tool {
                             .is_err()
                     })
                     .count();
+                // **v4.46.5** — Stage B bundle 4: audit-only trace
+                // wiring. After heuristic sort, run the trained-
+                // selector audit on the same candidate list and log
+                // any disagreement to the trace. **No behavioral
+                // change** — the heuristic top-1 still wins.
+                // `--trace` consumers (e.g. `adam_chat --trace`) see
+                // a `selection_audit:` line per multi-candidate
+                // SearchGraph turn, surfacing where the trained
+                // selector would pick differently. Substrate for
+                // v4.50.0 (target) bundle 5 — replacing the
+                // heuristic ranker with the trained selector.
+                if matches.len() >= 2 {
+                    let admissible_refs: Vec<&adam_reasoning::Fact> = matches
+                        .iter()
+                        .filter(|fact| {
+                            validate_fact(&fact.subject.root, fact.predicate, &fact.object.root)
+                                .is_ok()
+                        })
+                        .copied()
+                        .collect();
+                    if admissible_refs.len() >= 2 {
+                        let sw = crate::selection::SelectionWeights::default_v0();
+                        let qt: Vec<&str> = query_tokens.iter().map(|s| s.as_str()).collect();
+                        if let Some(audit) =
+                            crate::selection::audit_compare(&admissible_refs, 0, &sw, &qt, None)
+                            && audit.disagreement
+                        {
+                            trace.push(format!(
+                                "selection_audit: disagreement heuristic_top=0 selector_top={} score_gap={:.4}",
+                                audit.selector_top_idx, audit.score_gap,
+                            ));
+                        }
+                    }
+                }
                 let surfaced: Vec<(String, ToolEvidence)> = matches
                     .into_iter()
                     .filter(|fact| {

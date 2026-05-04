@@ -7,6 +7,50 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.46.5] — 2026-05-04 — Stage B bundle 4 — production trace-wiring (audit-only)
+
+**First production touch in the Stage B arc.** v4.45.0–v4.46.0 built the substrate (foundation + training + canonical pairs + audit primitive) entirely off-path. v4.46.5 wires the audit primitive into the live `tool::search_graph` dispatch — when there are 2+ admissible candidates, run `selection::audit_compare` against the heuristic top-1 and push a trace line if the trained selector disagrees. **No behavioral change** — the heuristic still wins; the trace is read by `--trace` consumers (`adam_chat --trace`, the regression bank) to surface where the selector would diverge.
+
+### Architectural significance
+
+This is the first time selection-weights infrastructure runs in production on real corpus facts. With `default_v0()` weights — hand-set to approximate the v4.38.0 ranker tiers — disagreement should be rare. Each disagreement that DOES surface is a candidate for the v4.46.5+ training corpus: cases where heuristic and selector diverge are exactly where labelled gold pairs would teach the selector to match (or beat) the heuristic.
+
+### Innovations
+
+**(1) Audit-only wiring in `tool::search_graph`** — after the heuristic `matches.sort_by(...)` settles, when admissible candidates count is ≥ 2, build a `Vec<&Fact>` of admissibles, call `audit_compare(refs, 0, default_v0(), &query_tokens, None)`, and push `"selection_audit: disagreement heuristic_top=0 selector_top={N} score_gap={X}"` to the trace if disagreement. Agreement case is silent (no noise on the common path).
+
+**(2) Trace-only — no behavioral change** — the heuristic-ranker top-1 still becomes `findings[0]`; the audit only writes into `trace`. The whole audit block is inside an `if matches.len() >= 2` guard so single-candidate queries (the common case for narrow factoids) skip the work entirely. Live REPL byte-identical to v4.46.0.
+
+**(3) `query_tokens` propagation** — feature extraction needs the query's lowered tokens for `subject_overlap` / `object_overlap`. The SearchGraph dispatch already builds `query_tokens` for the v4.38.0 list-aware ranker; we reuse that vec for the audit (no new infrastructure).
+
+**(4) `last_topic` deferred to None** — recency-match feature requires session's `last_query_topic` which lives in `Conversation::session`, not `ToolContext`. Threading it through is a v4.47.0+ refinement; v4.46.5 ships with `last_topic = None` (recency feature scores 0 for both candidates → tier collapses to a no-op).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **946 passing** unchanged |
+| Adam-dialog lib | 279 passing unchanged |
+| Selection module | 34/34 tests pass (no new tests in v4.46.5; audit substrate already covered in v4.46.0) |
+| Live REPL | byte-identical to v4.46.0 (audit lines are trace-only) |
+| Foundation: 2086 / 2346 / 46 / 27 163 | unchanged |
+| `cargo fmt --all --check` | clean |
+| `cargo check --all-targets` | clean |
+
+### Cadence
+
+`.5` reflects: (1) production wiring of audit primitive into live SearchGraph dispatch + (2) trace-only architectural pattern (mirrors the v4.42.0 NLG parallel-path pattern) + (3) admissible-candidate guard for performance + (4) deferred `last_topic` plumbing → **3 distinct innovations + first Stage B production-side touch**.
+
+Stage B status:
+- v4.45.0 — bundle 1 — selection weights foundation ✓
+- v4.45.5 — bundle 2 — training pipeline ✓
+- v4.46.0 — bundle 3 — canonical gold pairs + audit substrate ✓
+- **v4.46.5 — bundle 4 — production trace-wiring (audit-only)** ← shipped
+- v4.47.0+ — bundle 5: real REPL-derived gold pairs from accumulated transcripts; thread `last_topic` through ToolContext
+- v4.50.0 (target) — bundle 6: trained weights replace heuristic ranker top-1
+
+Stripe (11) — generative AI via agglutinative composition continues.
+
 ## [4.46.0] — 2026-05-04 — Stage B bundle 3 — canonical gold pairs + audit substrate
 
 **Stage B bundle 3.** Two architectural primitives that close the gap between the v4.45.5 training algorithm and the future v4.46.5+ production wiring:
