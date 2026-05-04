@@ -1,7 +1,7 @@
 {
-  "version": "4.43.6",
+  "version": "4.43.7",
   "status": "completed",
-  "elapsed_s": 59,
+  "elapsed_s": 62,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2277,
+    "facts_total": 2283,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -30,7 +30,7 @@
       "is_a": 1756,
       "lives_in": 8,
       "part_of": 236,
-      "related_to": 96
+      "related_to": 102
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -57,7 +57,7 @@
       "world_core/emotions.jsonl": 30,
       "world_core/food.jsonl": 50,
       "world_core/geography_kz.jsonl": 178,
-      "world_core/government_kazakhstan.jsonl": 23,
+      "world_core/government_kazakhstan.jsonl": 29,
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
       "world_core/informatics_basic.jsonl": 40,
@@ -18868,6 +18868,126 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Жоғарғы сот — Қазақстанның сот жүйесінің ең жоғарғы инстанциясы."
+    },
+    {
+      "subject": {
+        "surface": "қазіргі қазақстан президенті",
+        "root": "қазіргі қазақстан президенті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қасым-жомарт тоқаев",
+        "root": "қасым-жомарт тоқаев",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазіргі Қазақстан президенті — Қасым-Жомарт Тоқаев."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан президенті",
+        "root": "қазақстан президенті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қасым-жомарт тоқаев",
+        "root": "қасым-жомарт тоқаев",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан президенті — қазір Қасым-Жомарт Тоқаев қызмет атқарады."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан премьер-министрі",
+        "root": "қазақстан премьер-министрі",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "олжас бектенов",
+        "root": "олжас бектенов",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның Премьер-Министрі — Олжас Бектенов, 2024 жылдан бастап."
+    },
+    {
+      "subject": {
+        "surface": "премьер-министр",
+        "root": "премьер-министр",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "олжас бектенов",
+        "root": "олжас бектенов",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Премьер-министр — қазір Олжас Бектенов лауазымын атқарады."
+    },
+    {
+      "subject": {
+        "surface": "қазақстанның президенті",
+        "root": "қазақстанның президенті",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қасым-жомарт тоқаев",
+        "root": "қасым-жомарт тоқаев",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның Президенті — Қасым-Жомарт Тоқаев."
+    },
+    {
+      "subject": {
+        "surface": "қазақстанның премьер-министрі",
+        "root": "қазақстанның премьер-министрі",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "олжас бектенов",
+        "root": "олжас бектенов",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның Премьер-Министрі — Олжас Бектенов."
     },
     {
       "subject": {

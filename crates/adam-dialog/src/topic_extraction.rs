@@ -536,6 +536,20 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // premier, parliament, ministries, courts). Required by
     // `world_core_multiword_coverage`. Driven by 2026-05-04 user
     // dialog test transcript.
+    // **v4.43.8** — direct office-holder bridges (closes carry-
+    // forward where «Қазіргі Қазақстан президенті кім?» fell to
+    // the abstract «Қазақстан президенттігі» fact instead of
+    // surfacing Тоқаев). Sorted longest-first. Both bare-form and
+    // genitive-form (with «-ның» suffix) are registered so the
+    // first-pass substring match in `multiword_entity_hint` fires
+    // regardless of whether the user writes the genitive or the
+    // bare-form possessor (the v4.40.5 inflected-second-word pass
+    // only handles inflection on the SECOND word, not the first).
+    "қазақстанның премьер-министрі",
+    "қазіргі қазақстан президенті",
+    "қазақстанның президенті",
+    "қазақстан премьер-министрі",
+    "қазақстан президенті",
     "конституциялық сот",
     "министрліктер тізімі",
     "қасым-жомарт тоқаев",

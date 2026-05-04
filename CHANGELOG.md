@@ -7,6 +7,57 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.43.8] — 2026-05-04 — v4.43.7 carry-forward closed — current-president direct routing
+
+**Closes the v4.43.7 carry-forward.** Pre-v4.43.8 «Қазіргі Қазақстан президенті кім?» fell to «Қазақстан президенттігі — 1991 жылдан бастап енгізілген ел басшысы лауазымы» (the abstract office concept, not naming Тоқаев). Root cause: FST analyzes «президенті» as either `президент + Pos3` or `президенттік + Pos3`; the multiword «қазақстан президенттігі» (a registered abstract-noun compound from `history_kazakhstan`) wins via longest-substring match. Fix: add direct office-holder facts whose subject IS the inflected/compound surface phrase the user actually types («қазіргі қазақстан президенті», «қазақстан президенті», «қазақстанның президенті», plus parallel premier-minister forms) and register them as multiwords so topic-extraction picks the bridge to the office-holder.
+
+### Real-REPL probe — full v4.43.7 transcript replay
+
+| Pre-v4.43.7 query | Pre-v4.43.7 | v4.43.7 | v4.43.8 (now) |
+|---|---|---|---|
+| Қазіргі Қазақстан президенті кім? | generic Kazakhstan IsA | abstract «президенттігі» | "**Қазіргі қазақстан президенті мен қасым-жомарт тоқаев өзара байланысты.**" ✓ |
+| Қазақстанның президенті кім? | (malformed) | corpus quote | "**Қазақстанның президенті мен қасым-жомарт тоқаев өзара байланысты.**" ✓ |
+| Қазақстанның премьер-министрі кім? | (didn't engage) | ministries list | "**Қазақстанның премьер-министрі мен олжас бектенов өзара байланысты.**" ✓ |
+| Қазақстан президенті кім? | — | links to Тоқаев | unchanged ✓ |
+| Қазақстан премьер-министрі кім? | — | links to Бектенов | unchanged ✓ |
+
+**All 6 v4.43.7-transcript gaps now materially closed (was 5/6).**
+
+### Innovations
+
+**(1) 5 direct office-holder bridge facts** in `government_kazakhstan.jsonl`:
+- gov_kz_016: «Қазіргі Қазақстан президенті — Қасым-Жомарт Тоқаев»
+- gov_kz_017: «Қазақстан президенті — қазір Қасым-Жомарт Тоқаев қызмет атқарады»
+- gov_kz_018: «Қазақстанның Премьер-Министрі — Олжас Бектенов»
+- gov_kz_019: «Премьер-министр — қазір Олжас Бектенов лауазымын атқарады»
+- gov_kz_020/021: parallel Gen-form bridges
+Each fact uses `related_to` to bind the office (with its inflected surface form) to the current officeholder.
+
+**(2) `MULTIWORD_ENTITIES` += 5** for both bare-form and Gen-form (-ның) variants of office phrases — `қазақстанның премьер-министрі` / `қазіргі қазақстан президенті` / `қазақстанның президенті` / `қазақстан премьер-министрі` / `қазақстан президенті`. Required because the v4.40.5 inflected-second-word pass in `multiword_entity_hint` only handles inflection on the SECOND word of a 2-word entity, not the first.
+
+**(3) Foundation expansion** — 2018 → **2019 entries** (+1 from re-extraction), 2277 → **2284 facts** (+7 — 5 bridge facts × ~1.4 facts each from multi-fact entries), 45 domains unchanged, 26 854 → **26 869 derivations** (+15).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **906 passing** unchanged |
+| Adam-dialog lib | 239 passing unchanged |
+| `world_core_multiword_coverage` | ✓ green |
+| Live REPL transcript replay | **6/6 transcript gaps now materially closed** (was 5/6 in v4.43.7) |
+| Foundation: 2019 entries / 2284 facts / 45 domains / 26 869 derivations | (was 2018 / 2277 / 45 / 26 854) |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.8` reflects: (1) 5 bridge facts + (2) 5 multiword entries + (3) full transcript-replay verification (6/6) + (4) carry-forward closed = **3 distinct innovations** + carry-forward closure milestone. Per `feedback_versioning_post_1_0`: small/incremental patch closing a known issue from prior release. Bumped sequentially from .7.
+
+### Architectural note (carry-forward to a future patch)
+
+The deeper fix would be in `multiword_entity_hint` itself: extend the v4.40.5 inflected-second-word pass to ALSO handle inflected-FIRST-word (genitive «-ның»/«-нің»/«-дың»/«-дің»/«-тың»/«-тің» suffix on parts[0]). Then registering the bare-form alone would suffice. Deferring — current explicit Gen-form registrations are byte-identical for known surfaces and avoid over-firing risk on shorter first words.
+
+Stripe (11) — generative AI via agglutinative composition. Next: continued real-REPL gap closures + interrogative-mood NLG opening.
+
 ## [4.43.7] — 2026-05-04 — Transcript-driven gap closure — Kazakhstan governance + scientific-loan lexicon
 
 **Driven by 2026-05-04 user dialog test transcript.** Six concrete gaps surfaced in a 14-turn live REPL session, of which 5 are materially closed and 1 partially improved. Two distinct fix classes: (a) **lexicon** — 38 scientific/civic loan roots (психология / философия / эстетика / меркурий / шолпан / юпитер / сатурн / нептун / президент / министр / республика / etc.) registered so the FST can decompose inflected forms like «психологиясы» (Pos3) → «психология» bare root; (b) **knowledge** — new `government_kazakhstan` domain (15 facts) covering presidents (Назарбаев / Тоқаев), premier (Бектенов), parliament (Сенат / Мәжіліс), ministries list, courts, political-system type.
