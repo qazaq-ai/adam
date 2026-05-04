@@ -1,7 +1,7 @@
 {
-  "version": "4.42.5",
+  "version": "4.42.6",
   "status": "completed",
-  "elapsed_s": 31,
+  "elapsed_s": 67,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,19 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2064,
+    "facts_total": 2090,
     "by_predicate": {
       "after": 8,
       "causes": 23,
       "does_to": 1,
       "goes_to": 26,
-      "has": 63,
+      "has": 65,
       "has_quantity": 34,
       "in_domain": 24,
-      "is_a": 1580,
+      "is_a": 1581,
       "lives_in": 8,
       "part_of": 230,
-      "related_to": 67
+      "related_to": 90
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -71,7 +71,7 @@
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/professions.jsonl": 40,
-      "world_core/programming_languages.jsonl": 30,
+      "world_core/programming_languages.jsonl": 56,
       "world_core/programming_rust.jsonl": 181,
       "world_core/programming_rust_advanced.jsonl": 35,
       "world_core/proverbs.jsonl": 43,
@@ -31384,6 +31384,526 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Танымал гибридтік тілдер: Java, Kotlin, C#."
+    },
+    {
+      "subject": {
+        "surface": "python",
+        "root": "python",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "деректер ғылымы саласы",
+        "root": "деректер ғылымы саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Python — деректер ғылымы, машина оқыту, веб-серверлер, скриптинг және білім беру салаларында кең қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "python",
+        "root": "python",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "машина оқыту саласы",
+        "root": "машина оқыту саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Python — деректер ғылымы, машина оқыту, веб-серверлер, скриптинг және білім беру салаларында кең қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "python",
+        "root": "python",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқуға қарапайым тіл",
+        "root": "оқуға қарапайым тіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Python — оқуға қарапайым, синтаксисі айқын тіл; жаңадан бастаушыларға таптырмас."
+    },
+    {
+      "subject": {
+        "surface": "javascript",
+        "root": "javascript",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "веб-фронтенд саласы",
+        "root": "веб-фронтенд саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "JavaScript — веб-парақтардың интерактивтілігін қамтамасыз ететін негізгі тіл; браузерде орындалады."
+    },
+    {
+      "subject": {
+        "surface": "javascript",
+        "root": "javascript",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "веб-бэкэнд саласы",
+        "root": "веб-бэкэнд саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Node.js арқылы JavaScript серверлік қосымшаларды да жазуға мүмкіндік береді."
+    },
+    {
+      "subject": {
+        "surface": "typescript",
+        "root": "typescript",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "веб-фронтенд саласы",
+        "root": "веб-фронтенд саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "TypeScript — JavaScript-ке статикалық типтеу қосатын тіл; үлкен веб-қосымшалар үшін қолайлы."
+    },
+    {
+      "subject": {
+        "surface": "typescript",
+        "root": "typescript",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "javascript",
+        "root": "javascript",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "TypeScript — JavaScript-ке статикалық типтеу қосатын тіл; үлкен веб-қосымшалар үшін қолайлы."
+    },
+    {
+      "subject": {
+        "surface": "rust",
+        "root": "rust",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жүйелік бағдарламалау саласы",
+        "root": "жүйелік бағдарламалау саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_036"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Rust — операциялық жүйелер, ендірілген жүйелер, желілік қызметтер және WebAssembly үшін қолданылатын жүйелік тіл."
+    },
+    {
+      "subject": {
+        "surface": "rust",
+        "root": "rust",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "меншік моделі",
+        "root": "меншік моделі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_037"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Rust-тың басты ерекшелігі — компилятор арқылы жадтар қауіпсіздігін кепілдік ететін иелік (ownership) моделі."
+    },
+    {
+      "subject": {
+        "surface": "c",
+        "root": "c",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жүйелік бағдарламалау саласы",
+        "root": "жүйелік бағдарламалау саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "C — операциялық жүйелер, ендірілген жүйелер және жүйелік құралдар жасауға арналған негізгі төменгі деңгейлі тіл."
+    },
+    {
+      "subject": {
+        "surface": "c++",
+        "root": "c++",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "жоғары өнімді жүйелер саласы",
+        "root": "жоғары өнімді жүйелер саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "C++ — жоғары өнімді жүйелер, ойындар, графика, қаржы жүйелері және ғылыми есептеулер үшін қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "c++",
+        "root": "c++",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ойын саласы",
+        "root": "ойын саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "C++ — жоғары өнімді жүйелер, ойындар, графика, қаржы жүйелері және ғылыми есептеулер үшін қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "java",
+        "root": "java",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "корпоративтік бағдарламалау саласы",
+        "root": "корпоративтік бағдарламалау саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Java — корпоративтік қосымшалар, Android мобильдік қосымшалар және серверлік жүйелер үшін кең қолданылатын тіл."
+    },
+    {
+      "subject": {
+        "surface": "java",
+        "root": "java",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "android саласы",
+        "root": "android саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Java — корпоративтік қосымшалар, Android мобильдік қосымшалар және серверлік жүйелер үшін кең қолданылатын тіл."
+    },
+    {
+      "subject": {
+        "surface": "java",
+        "root": "java",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "қоқыс жинаушы",
+        "root": "қоқыс жинаушы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Java қоқыс жинаушысы (garbage collector) бар — жадтарды бағдарламашы қолымен басқарудың қажеті жоқ."
+    },
+    {
+      "subject": {
+        "surface": "kotlin",
+        "root": "kotlin",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "android саласы",
+        "root": "android саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Kotlin — Android платформасының заманауи негізгі тілі; Java-мен толық үйлесімді."
+    },
+    {
+      "subject": {
+        "surface": "c#",
+        "root": "c#",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": ".net саласы",
+        "root": ".net саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "C# — Microsoft .NET платформасында қолданылады; Windows қосымшалары, Unity ойындары және веб-сервистер үшін негізгі тіл."
+    },
+    {
+      "subject": {
+        "surface": "c#",
+        "root": "c#",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "unity ойын саласы",
+        "root": "unity ойын саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "C# — Microsoft .NET платформасында қолданылады; Windows қосымшалары, Unity ойындары және веб-сервистер үшін негізгі тіл."
+    },
+    {
+      "subject": {
+        "surface": "go",
+        "root": "go",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "бұлттық инфрақұрылым саласы",
+        "root": "бұлттық инфрақұрылым саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Go — Google әзірлеген тіл; бұлттық инфрақұрылым, микросервистер және желілік құралдар үшін кең қолданылады. Kubernetes, Docker сияқты жобалар Go-да жазылған."
+    },
+    {
+      "subject": {
+        "surface": "swift",
+        "root": "swift",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ios саласы",
+        "root": "ios саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Swift — Apple-дің iOS, macOS, watchOS және tvOS қосымшалары үшін негізгі тілі."
+    },
+    {
+      "subject": {
+        "surface": "swift",
+        "root": "swift",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "macos саласы",
+        "root": "macos саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Swift — Apple-дің iOS, macOS, watchOS және tvOS қосымшалары үшін негізгі тілі."
+    },
+    {
+      "subject": {
+        "surface": "ruby",
+        "root": "ruby",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "веб-бэкэнд саласы",
+        "root": "веб-бэкэнд саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ruby — Ruby on Rails веб-фреймворкымен танымал; стартаптар мен жылдам прототиптер үшін қолайлы."
+    },
+    {
+      "subject": {
+        "surface": "php",
+        "root": "php",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "веб-бэкэнд саласы",
+        "root": "веб-бэкэнд саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_047"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "PHP — веб-серверлік бағдарламалау тілі; WordPress, Drupal сияқты жүйелердің негізі."
+    },
+    {
+      "subject": {
+        "surface": "sql",
+        "root": "sql",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "деректер базасы саласы",
+        "root": "деректер базасы саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "SQL — реляциялық деректер базасынан ақпаратты сұрауға және өзгертуге арналған декларативтік тіл; алгоритм жазбайды."
+    },
+    {
+      "subject": {
+        "surface": "html",
+        "root": "html",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "веб-фронтенд саласы",
+        "root": "веб-фронтенд саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "HTML — веб-парақтың құрылымын белгілеуге арналған тіл; не қандай элемент екенін көрсетеді."
+    },
+    {
+      "subject": {
+        "surface": "css",
+        "root": "css",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "веб-фронтенд саласы",
+        "root": "веб-фронтенд саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_languages",
+      "source": {
+        "pack": "world_core/programming_languages.jsonl",
+        "sample_id": "plang_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "CSS — HTML-парақтың безендіруіне арналған стиль тілі; түс, шрифт, орналасуды басқарады."
     },
     {
       "subject": {

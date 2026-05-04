@@ -509,6 +509,29 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ақын-жазушылар тізімі",
     "ғалымдар тізімі",
     "спортшылар тізімі",
+    // **v4.42.7** — per-language purpose / domain compounds from
+    // `data/world_core/programming_languages.jsonl` plang_031-050.
+    // Each language now has 1-3 facts about WHAT FOR it's used —
+    // these compound «{domain} саласы» objects are required by
+    // the `world_core_multiword_coverage` invariant test.
+    "корпоративтік бағдарламалау саласы",
+    "бұлттық инфрақұрылым саласы",
+    "жүйелік бағдарламалау саласы",
+    "жоғары өнімді жүйелер саласы",
+    "деректер базасы саласы",
+    "деректер ғылымы саласы",
+    "машина оқыту саласы",
+    "оқуға қарапайым тіл",
+    "веб-фронтенд саласы",
+    "веб-бэкэнд саласы",
+    "unity ойын саласы",
+    "android саласы",
+    "macos саласы",
+    "ойын саласы",
+    "ios саласы",
+    ".net саласы",
+    "меншік моделі",
+    "қоқыс жинаушы",
     // **v4.42.0** — programming-languages compound objects from
     // `data/world_core/programming_languages.jsonl`. List-summary
     // forms + classification forms + structural type-system
@@ -1306,6 +1329,24 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     "result",
     "rust",
     "rustc",
+    // **v4.42.7** — programming languages registered in
+    // `programming_languages.jsonl` (plang_011-026 + plang_031-050
+    // purpose facts). Listing them here lets `latin_subject_hint`
+    // and `latin_with_generic_head_marker` recognise them as the
+    // discourse subject of queries like «Python қандай тіл?» /
+    // «Java қандай салада қолданылады?» / «Kotlin не үшін қажет?».
+    "python",
+    "java",
+    "kotlin",
+    "javascript",
+    "typescript",
+    "ruby",
+    "php",
+    "swift",
+    "go",
+    "sql",
+    "html",
+    "css",
     "some",
     "usize",
     "while",
@@ -1459,6 +1500,43 @@ fn latin_with_generic_head_marker(input: &str) -> Option<String> {
                         return Some(lang.to_string());
                     }
                 }
+            }
+            // **v4.42.7** — definitional / categorisation patterns
+            // where `marker` is omitted: «{lang} — {head}» («Python
+            // — қандай тіл?», «Rust — какой язык?») and «{lang}
+            // {qualifier-adjective} {head}» («Python қандай тіл?»).
+            // These ask "what kind of X is {lang}?" — the topic is
+            // {lang}, not the generic head. Pre-v4.42.7 the
+            // first_noun_root strategy returned the head noun
+            // («тіл» / «сала»), surfacing tangential definitions
+            // instead of the language-specific facts.
+            for &head in HEAD_NOUNS {
+                let dash_pattern = format!("{lang} — {head}");
+                if lower.starts_with(&dash_pattern) {
+                    return Some(lang.to_string());
+                }
+                let dash_pattern2 = format!("{lang} - {head}");
+                if lower.starts_with(&dash_pattern2) {
+                    return Some(lang.to_string());
+                }
+                let qandai_pattern = format!("{lang} қандай {head}");
+                if lower.starts_with(&qandai_pattern) {
+                    return Some(lang.to_string());
+                }
+                let qai_salada = format!("{lang} қандай {head}да");
+                if lower.starts_with(&qai_salada) {
+                    return Some(lang.to_string());
+                }
+                let qai_salada2 = format!("{lang} қандай {head}де");
+                if lower.starts_with(&qai_salada2) {
+                    return Some(lang.to_string());
+                }
+            }
+            // **v4.42.7** — purpose pattern «{lang} не үшін қажет?»
+            // («Kotlin не үшін қажет?»). Topic is {lang}.
+            let purpose_pattern = format!("{lang} не үшін");
+            if lower.starts_with(&purpose_pattern) {
+                return Some(lang.to_string());
             }
         }
     }
