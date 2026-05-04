@@ -289,6 +289,8 @@ pub enum IntentKind {
     Negation,
     Thanks,
     Apology,
+    /// **v4.42.7** — companion to `Intent::UserDisagrees`.
+    UserDisagrees,
     AskHowAreYou,
     StatementOfWellbeing,
     AskName,
@@ -327,6 +329,7 @@ impl From<&Intent> for IntentKind {
             Intent::Negation => Self::Negation,
             Intent::Thanks => Self::Thanks,
             Intent::Apology => Self::Apology,
+            Intent::UserDisagrees => Self::UserDisagrees,
             Intent::AskHowAreYou => Self::AskHowAreYou,
             Intent::StatementOfWellbeing => Self::StatementOfWellbeing,
             Intent::AskName => Self::AskName,

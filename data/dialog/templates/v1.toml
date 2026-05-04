@@ -124,6 +124,22 @@ templates = [
     "түк етпейді",
 ]
 
+# **v4.42.7** — User pushed back with «қателесесіз» / «дұрыс емес» /
+# «олай емес». Acknowledge the correction without re-asserting the
+# disputed fact. Pre-v4.42.7 the topic-extraction path surfaced the
+# same fact verbatim, which felt obtuse on real-REPL test (2026-05-04).
+# Adam doesn't yet model the correction's content — proper extraction
+# is deferred. The honest move is to ack, invite specifics, and back
+# off the disputed assertion.
+[[families]]
+key = "disagreement_ack"
+templates = [
+    "Ескертуіңіз үшін рахмет, тағы бір қарап шығамын. Қандай нақтылықты қосайын?",
+    "Дұрыс — қателескен болуым мүмкін. Нақты қандай тұста дұрыс емес екенін айтсаңыз, түсіндіруді жөндеуге тырысамын.",
+    "Түсіндім, қателесіп тұрған шығармын. Дәлірек айтсаңыз, ескерткіш ретінде есте сақтап, келесі жауапта түзеуге тырысамын.",
+    "Сіздің ескертуіңіз орынды. Қай бөлігі дәл емес — соны нақтыласаңыз, толығырақ жауап берейін.",
+]
+
 # User asked "қалайсың" / "қалайсыз" (how are you) → respond about self
 [[families]]
 key = "ask_how_are_you"

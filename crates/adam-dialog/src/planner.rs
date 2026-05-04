@@ -769,6 +769,7 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::Negation => "negation",
         Intent::Thanks => "thanks",
         Intent::Apology => "apology",
+        Intent::UserDisagrees => "disagreement_ack",
         Intent::AskHowAreYou => "ask_how_are_you",
         Intent::StatementOfWellbeing => "statement_of_wellbeing",
         Intent::AskName => "ask_name",

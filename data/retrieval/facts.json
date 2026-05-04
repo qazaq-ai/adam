@@ -1,7 +1,7 @@
 {
-  "version": "4.41.5",
+  "version": "4.42.5",
   "status": "completed",
-  "elapsed_s": 66,
+  "elapsed_s": 31,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -31323,7 +31323,7 @@
         "sample_id": "plang_027"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Адамға белгілі бағдарламалау тілдері: Rust, C, C++, Go, Swift, Java, Kotlin, C#, Python, JavaScript, TypeScript, Ruby, PHP, SQL, HTML, CSS."
+      "raw_text": "Бағдарламалау тілдері: Rust, C, C++, Go, Swift, Java, Kotlin, C#, Python, JavaScript, TypeScript, Ruby, PHP. SQL — деректер базасына арналған сұраныс тілі; HTML — белгілеу тілі; CSS — стиль тілі (олар алгоритм жазбайды, сондықтан таза мағынада бағдарламалау тілдері емес)."
     },
     {
       "subject": {
@@ -35003,7 +35003,7 @@
         "sample_id": "rust_181"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Адам білетін бағдарламалау тілдері: Rust (терең), Python, JavaScript, TypeScript, Java, Kotlin, C, C++, C#, Go, Swift, Ruby, PHP, SQL, HTML, CSS. Rust бойынша терең дерек, басқа тілдер туралы базалық анықтама бар."
+      "raw_text": "Адам білетін бағдарламалау тілдері: Rust (терең), Python, JavaScript, TypeScript, Java, Kotlin, C, C++, C#, Go, Swift, Ruby, PHP. Сонымен қатар деректер тілдерінен SQL (сұраныс тілі), HTML (белгілеу тілі), CSS (стиль тілі) туралы білемін — олар алгоритм жазбайды, сондықтан таза мағынада бағдарламалау тілдері емес."
     },
     {
       "subject": {

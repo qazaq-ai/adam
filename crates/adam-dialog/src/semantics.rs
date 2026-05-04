@@ -112,6 +112,13 @@ pub fn interpret_text_with_lexicon(
     if detect_apology(&tokens, &joined) {
         return Intent::Apology;
     }
+    // **v4.42.7** — disagreement / correction detection. User is
+    // pushing back on adam's previous answer. Don't engage the
+    // topic-extraction path (which surfaces the same disputed fact
+    // again). Route to dedicated ack template family.
+    if detect_user_disagreement(&joined) {
+        return Intent::UserDisagrees;
+    }
     // **v4.3.3 / v4.3.4** — `сен кімсің` / `сені кім жасады` /
     // `қашан пайда болдың` / `ерекшелігің не` ask about adam's
     // identity (general / creator / birthdate / architecture
@@ -341,6 +348,13 @@ pub fn interpret(parses: &[Analysis]) -> Intent {
     if detect_apology(&tokens, &joined) {
         return Intent::Apology;
     }
+    // **v4.42.7** — disagreement / correction detection. User is
+    // pushing back on adam's previous answer. Don't engage the
+    // topic-extraction path (which surfaces the same disputed fact
+    // again). Route to dedicated ack template family.
+    if detect_user_disagreement(&joined) {
+        return Intent::UserDisagrees;
+    }
     if detect_ask_how_are_you(&joined) {
         return Intent::AskHowAreYou;
     }
@@ -498,6 +512,39 @@ fn detect_apology(tokens: &[String], joined: &str) -> bool {
         .any(|t| matches!(t.as_str(), "кешіріңіз" | "кешір" | "ғафу"))
         || joined.contains("кешір")
         || joined.contains("ғафу ет")
+}
+
+/// **v4.42.7** — Detect a disagreement / correction signal from the
+/// user. Triggers `Intent::UserDisagrees` so the planner picks the
+/// `disagreement_ack` template family instead of re-surfacing the
+/// disputed fact.
+///
+/// Markers:
+///   - «қателесесің» / «қателесесіз» — "you are wrong" (2sg
+///     informal / polite).
+///   - «дұрыс емес» / «дұрыс емессіз» — "[that is] not right".
+///   - «олай емес» / «бұлай емес» — "not so" / "not like that".
+///   - «теріс» — "wrong / incorrect" (when paired with адам / сіз
+///     — to avoid false-positive on geography facts about reverse
+///     direction).
+///   - «бұл қате» / «қателесіп тұрсыз» — explicit "this is a
+///     mistake" / "you are mistaking".
+///
+/// Light detector — does NOT extract WHAT was incorrect or model
+/// the correction's content. Future bundles may add proper
+/// correction-content extraction (filed in
+/// `project_retrieval_not_neural_v2.md` Stage A roadmap).
+fn detect_user_disagreement(joined: &str) -> bool {
+    joined.contains("қателесесің")
+        || joined.contains("қателесесіз")
+        || joined.contains("қателесіп тұр")
+        || joined.contains("қателесіп")
+        || joined.contains("дұрыс емес")
+        || joined.contains("олай емес")
+        || joined.contains("бұлай емес")
+        || joined.contains("бұл қате")
+        || joined.contains("сіз қате")
+        || joined.contains("сен қате")
 }
 
 fn detect_ask_how_are_you(joined: &str) -> bool {

@@ -40,6 +40,20 @@ pub enum Intent {
     /// Sorry / excuse me: кешіріңіз, ғафу етіңіз.
     Apology,
 
+    /// **v4.42.7** — User signals disagreement / correction with a
+    /// previous adam answer. Lexical markers: «қателесесің» /
+    /// «қателесесіз» (you are wrong), «дұрыс емес» (not correct),
+    /// «олай емес» (not so), «қате», «бұл қате» (this is a
+    /// mistake), «теріс» (wrong). The intent does NOT carry the
+    /// content of the correction (proper correction-content
+    /// extraction is harder NLP — deferred). The planner routes
+    /// this intent to a dedicated `disagreement_ack` template
+    /// family that acknowledges the correction without re-asserting
+    /// the same fact (the v4.42.5 transcript showed adam replying
+    /// to «Сіз қателесесіз, X емес» with a verbatim repeat of the
+    /// disputed fact, which felt obtuse).
+    UserDisagrees,
+
     /// "How are you?": қалайсың, қалайсыз, жағдайыңыз қалай.
     AskHowAreYou,
 

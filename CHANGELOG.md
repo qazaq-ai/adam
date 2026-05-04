@@ -7,6 +7,49 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.42.6] — 2026-05-04 — Disagreement-detection + language-classification refinement + Stage A roadmap notes
+
+**Driven by 2026-05-04 user dialog test.** Two distinct gaps closed: (a) when the user pushes back on adam's answer («Сіз қателесесіз, X — Y емес»), pre-v4.42.6 the topic-extraction path simply re-surfaced the disputed fact verbatim — felt obtuse; (b) the programming-languages list-summary lumped SQL / HTML / CSS as «бағдарламалау тілдері» without distinguishing query / markup / style languages. Both addressed. Plus memory roadmap captures three deferred carry-forward items (per-language purpose enrichment, advanced disagreement handling, introducer migration into NLG production path).
+
+### Real-REPL gap closures
+
+| Query | Pre-v4.42.6 | Post-v4.42.6 |
+|---|---|---|
+| Сіз қателесесіз, SQL — программалау тілі емес | re-surfaces disputed fact (obtuse) | "**Түсіндім, қателесіп тұрған шығармын. Дәлірек айтсаңыз, ескерткіш ретінде есте сақтап, келесі жауапта түзеуге тырысамын.**" |
+| Бұл дұрыс емес. | re-surfaces previous fact | acknowledgment + invite specifics |
+| Сен қателесіп тұрсың | re-surfaces previous fact | acknowledgment |
+| Әлемде қандай бағдарламалау тілдері бар? | "Адам білетін бағдарламалау тілдері: Rust (терең), Python, ... SQL, HTML, CSS." (lumped) | "Адам білетін бағдарламалау тілдері: Rust (терең), Python, JavaScript, TypeScript, Java, Kotlin, C, C++, C#, Go, Swift, Ruby, PHP. **Сонымен қатар деректер тілдерінен SQL (сұраныс тілі), HTML (белгілеу тілі), CSS (стиль тілі) туралы білемін — олар алгоритм жазбайды, сондықтан таза мағынада бағдарламалау тілдері емес.**" |
+
+### Innovations
+
+**(1) New `Intent::UserDisagrees`** + companion `IntentKind::UserDisagrees`. Triggered by 9 lexical markers: «қателесесің / қателесесіз / қателесіп тұр / қателесіп / дұрыс емес / олай емес / бұлай емес / бұл қате / сіз қате / сен қате». Light detector — does NOT extract correction's content (deferred to advanced disagreement handling per memory note).
+
+**(2) `disagreement_ack` template family** — 4 variants thanking the user for the correction, inviting specifics, backing off the disputed assertion. Phrasing intentionally avoids re-asserting the disputed fact OR pretending to update belief without doing so («ескерткіш ретінде есте сақтап, келесі жауапта түзеуге тырысамын» = "I'll keep this in mind as a note and try to fix it next time").
+
+**(3) Programming-languages list-summary refinement** — `rust_181` and `plang_027` updated to clearly separate true programming languages (Rust / C / C++ / Go / Swift / Java / Kotlin / C# / Python / JavaScript / TypeScript / Ruby / PHP) from data languages (SQL — query language, HTML — markup, CSS — style). The text explicitly notes «олар алгоритм жазбайды, сондықтан таза мағынада бағдарламалау тілдері емес» (they don't write algorithms, so they're not programming languages in the strict sense).
+
+**(4) Memory roadmap notes for three deferred carry-forwards** in `project_retrieval_not_neural_v2.md`:
+- **Per-language purpose enrichment** — describe WHAT FOR each language is used (Python for data science / web; Rust for systems / safety; SQL for database queries; etc.). User-noted gap.
+- **Advanced disagreement / correction handling** — extract correction content + apply belief revision + confidence-aware response. Beyond v4.42.6 light detector.
+- **Introducer migration into NLG production path** — move introducer-variant choice from templates into planner code; templates simplify to `{fact}`. Architectural cleanup; byte-identical output.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **890 passing** unchanged |
+| Disagreement-marker probe | ✓ all 3 variants («қателесесіз» / «дұрыс емес» / «қателесіп тұрсың») route to ack |
+| Languages list refinement | ✓ surfaces refined classification |
+| Anti-regression on all controls (Қазақстан / math / Сәлем / Меншік / etc.) | unchanged ✓ |
+| Foundation: 1819 entries / 1985 facts / 41 domains / 25 633 derivations | unchanged ✓ |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.6` reflects 3 substantive innovations + memory roadmap refresh. Per `feedback_versioning_post_1_0`: «3 innovations → `.3`», but the disagreement detection is a NEW intent (architectural addition with new template family + companion IntentKind variant) and the memory roadmap captures 3 deferred Stage A bundles — combined this is meaningful enough for `.6`.
+
+Stage A continues. Bundle 3 (introducer migration) deferred per memory note — bigger surgery than this bundle scope, planned for a future v4.42.x.
+
 ## [4.42.5] — 2026-05-04 — Stage A bundle 2 — NLG production migration + 5 new rules
 
 **Stage A progresses.** v4.42.0 laid the foundation (NLG module + 5 rules + parallel-only operation). v4.42.5 takes the first **production migration**: `tool::render_grounded_fact` — the function that produces every grounded-fact response in adam — now flows through `nlg::render_sentence`. Byte-identical output preserved (verified by workspace tests + live probes); architecturally, every grounded-fact surface now goes through the typed-frame rule engine. Five new rules expand predicate coverage to all 10 declarative-mood predicates currently emitted by the reasoner.
