@@ -417,6 +417,47 @@ impl NlgRule for GoesToDeclarative {
 
 // ---------------------------------------------------------------------------
 
+/// **v4.43.6** — DoesTo declarative: «X Y-ге Z жасайды»,
+/// raw_text-prefer. Closes Stage A NLG predicate coverage from
+/// 10/11 → **11/11** (full reasoner-emitted predicate coverage).
+/// Mirrors the [`GoesToDeclarative`] / [`AfterDeclarative`] pattern.
+/// Defers mechanical-fallback to a generic «X Y-ге әсер етеді»
+/// since the agent-verb shape («әрекет етеді») requires a verb
+/// slot the typed graph doesn't currently carry.
+pub struct DoesToDeclarative;
+
+impl NlgRule for DoesToDeclarative {
+    fn matches(&self, frame: &SentenceFrame) -> bool {
+        matches!(frame.fact.predicate, ReasPredicate::DoesTo)
+            && matches!(frame.mood, SentenceMood::Declarative)
+    }
+
+    fn render(&self, frame: &SentenceFrame) -> Option<String> {
+        let raw = frame.fact.raw_text.trim();
+        let body = if !raw.is_empty() {
+            ensure_period(raw.to_string())
+        } else {
+            let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
+            ensure_period(format!(
+                "{} {}-ге әсер етеді",
+                subject_cap,
+                preferred_surface(&frame.fact.object)
+            ))
+        };
+        Some(wrap_introducer(
+            frame.introducer,
+            &frame.fact.subject.root,
+            &body,
+        ))
+    }
+
+    fn name(&self) -> &'static str {
+        "DoesToDeclarative"
+    }
+}
+
+// ---------------------------------------------------------------------------
+
 /// **v4.43.5** — After declarative: «X-тен кейін Y болады»,
 /// raw_text-prefer. Mirrors the [`GoesToDeclarative`] pattern.
 pub struct AfterDeclarative;

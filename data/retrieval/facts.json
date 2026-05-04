@@ -1,7 +1,7 @@
 {
-  "version": "4.43.0",
+  "version": "4.43.5",
   "status": "completed",
-  "elapsed_s": 62,
+  "elapsed_s": 60,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2239,
+    "facts_total": 2254,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 65,
       "has_quantity": 34,
       "in_domain": 24,
-      "is_a": 1730,
+      "is_a": 1745,
       "lives_in": 8,
       "part_of": 230,
       "related_to": 90
@@ -62,7 +62,7 @@
       "world_core/informatics_basic.jsonl": 40,
       "world_core/kinship_extended.jsonl": 20,
       "world_core/kz_literature.jsonl": 94,
-      "world_core/language_features.jsonl": 18,
+      "world_core/language_features.jsonl": 33,
       "world_core/materials.jsonl": 14,
       "world_core/mathematics_basic.jsonl": 52,
       "world_core/measurements.jsonl": 18,
@@ -24747,6 +24747,306 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Сөйлем — белгі."
+    },
+    {
+      "subject": {
+        "surface": "морфема",
+        "root": "морфема",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілдік бірлік",
+        "root": "тілдік бірлік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Морфема — мағынасы бар тілдің ең кіші бөлігі."
+    },
+    {
+      "subject": {
+        "surface": "түбір",
+        "root": "түбір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "морфема",
+        "root": "морфема",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Түбір — сөздің мағынасын беретін негізгі морфема."
+    },
+    {
+      "subject": {
+        "surface": "жұрнақ",
+        "root": "жұрнақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "морфема",
+        "root": "морфема",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жұрнақ — түбірге жалғанатын мағына туғызушы морфема."
+    },
+    {
+      "subject": {
+        "surface": "жалғау",
+        "root": "жалғау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "морфема",
+        "root": "морфема",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жалғау — түбірге жалғанатын грамматикалық қызметті атқаратын морфема."
+    },
+    {
+      "subject": {
+        "surface": "септік",
+        "root": "септік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Септік — зат есімнің сөйлемдегі қызметін көрсететін грамматикалық категория."
+    },
+    {
+      "subject": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шақ — етістіктің әрекет уақытын білдіретін грамматикалық категория."
+    },
+    {
+      "subject": {
+        "surface": "жақ",
+        "root": "жақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жақ — әрекет иесін көрсететін грамматикалық категория."
+    },
+    {
+      "subject": {
+        "surface": "зат есім",
+        "root": "зат есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Зат есім — зат пен құбылысты атайтын сөз табы."
+    },
+    {
+      "subject": {
+        "surface": "етістік",
+        "root": "етістік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Етістік — әрекет немесе күй білдіретін сөз табы."
+    },
+    {
+      "subject": {
+        "surface": "сын есім",
+        "root": "сын есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сын есім — заттың сапасын білдіретін сөз табы."
+    },
+    {
+      "subject": {
+        "surface": "сан есім",
+        "root": "сан есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сан есім — мөлшерді білдіретін сөз табы."
+    },
+    {
+      "subject": {
+        "surface": "есімдік",
+        "root": "есімдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Есімдік — затты, белгіні немесе мөлшерді нұсқайтын сөз табы."
+    },
+    {
+      "subject": {
+        "surface": "үстеу",
+        "root": "үстеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үстеу — әрекеттің белгісін немесе мөлшерін білдіретін сөз табы."
+    },
+    {
+      "subject": {
+        "surface": "агглютинация",
+        "root": "агглютинация",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тілдік құбылыс",
+        "root": "тілдік құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Агглютинация — түбірге біртіндеп жалғанатын жұрнақ-жалғаулар арқылы сөз тудыру тәсілі."
+    },
+    {
+      "subject": {
+        "surface": "үндестік заңы",
+        "root": "үндестік заңы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "фонетикалық заң",
+        "root": "фонетикалық заң",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "lang_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үндестік заңы — қазақ тіліндегі дауысты дыбыстардың бір-бірімен үйлесімін белгілейтін фонетикалық заң."
     },
     {
       "subject": {

@@ -162,7 +162,7 @@ mod rules;
 ///   order matching the existing `tool::render_grounded_fact`
 ///   behavior preserved bit-for-bit at the v4.42.5 NLG migration
 ///   point.
-fn all_rules() -> [&'static dyn NlgRule; 12] {
+fn all_rules() -> [&'static dyn NlgRule; 13] {
     [
         // Curated-raw-text rules first (special cases).
         &rules::HasQuantityDeclarative,
@@ -176,11 +176,11 @@ fn all_rules() -> [&'static dyn NlgRule; 12] {
         &rules::CausesDeclarative,
         &rules::InDomainDeclarative,
         // **v4.43.5** — added GoesTo + After (raw_text-prefer);
-        // closes Stage A declarative coverage to 11/11 reasoner-
-        // emitted predicates (DoesTo deferred — only 1 fact in
-        // current corpus, low-leverage).
+        // **v4.43.6** — added DoesTo, closing Stage A declarative
+        // coverage to **11/11** reasoner-emitted predicates.
         &rules::GoesToDeclarative,
         &rules::AfterDeclarative,
+        &rules::DoesToDeclarative,
         // General RelatedTo last (catches everything not caught
         // by шектес / list-summary specialisations above).
         &rules::RelatedToOzaraDeclarative,
@@ -440,10 +440,41 @@ mod tests {
     }
 
     #[test]
-    fn unknown_predicate_returns_none() {
-        // **v4.43.5** — predicates without an NLG rule fall through.
-        // Of the 11 reasoner-emitted predicates only DoesTo lacks a
-        // rule (GoesTo + After got rules in v4.43.5).
+    fn all_eleven_predicates_have_a_rule() {
+        // **v4.43.6** — Stage A declarative NLG covers all 11
+        // reasoner-emitted predicates (full coverage). This test
+        // pins the contract so a future predicate addition without
+        // a corresponding rule trips a red CI.
+        let predicates = [
+            ReasPredicate::IsA,
+            ReasPredicate::HasQuantity,
+            ReasPredicate::RelatedTo,
+            ReasPredicate::PartOf,
+            ReasPredicate::LivesIn,
+            ReasPredicate::Has,
+            ReasPredicate::Causes,
+            ReasPredicate::InDomain,
+            ReasPredicate::GoesTo,
+            ReasPredicate::After,
+            ReasPredicate::DoesTo,
+        ];
+        for p in predicates {
+            let fact = make_fact("адам", p, "зат", "Адам затпен әрекет етеді.");
+            let frame = SentenceFrame {
+                fact: &fact,
+                mood: SentenceMood::Declarative,
+                introducer: Introducer::Direct,
+                name_respect: None,
+            };
+            assert!(
+                render_sentence(&frame).is_some(),
+                "predicate {p:?} has no NLG rule",
+            );
+        }
+    }
+
+    #[test]
+    fn does_to_declarative_uses_raw_text_when_present() {
         let fact = make_fact("адам", ReasPredicate::DoesTo, "үй", "Адам үйді тазалайды.");
         let frame = SentenceFrame {
             fact: &fact,
@@ -451,7 +482,21 @@ mod tests {
             introducer: Introducer::Direct,
             name_respect: None,
         };
-        assert_eq!(render_sentence(&frame), None);
+        let out = render_sentence(&frame).expect("DoesTo rule should match");
+        assert_eq!(out, "Адам үйді тазалайды.");
+    }
+
+    #[test]
+    fn does_to_declarative_falls_back_to_dative_when_raw_empty() {
+        let fact = make_fact("жаңбыр", ReasPredicate::DoesTo, "жер", "");
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+            name_respect: None,
+        };
+        let out = render_sentence(&frame).expect("DoesTo rule should match");
+        assert_eq!(out, "Жаңбыр жер-ге әсер етеді.");
     }
 
     #[test]

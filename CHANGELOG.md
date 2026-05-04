@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.43.6] — 2026-05-04 — Stage A NLG predicate-coverage **complete (11/11)** + Kazakh morphology vocabulary
+
+**Stage A milestone: NLG declarative coverage now closes all 11 reasoner-emitted predicates.** v4.43.5 brought GoesTo + After (10/11). This release adds `DoesToDeclarative` (11/11) and pins the contract via a new `all_eleven_predicates_have_a_rule` test that iterates every `Predicate` variant and asserts NLG produces some output. Plus `language_features` deepened 18 → 33 with Kazakh morphology vocabulary (морфема / түбір / жұрнақ / жалғау / септік / шақ / жақ / зат есім / етістік / сын есім / сан есім / есімдік / үстеу / агглютинация / үндестік заңы) — directly relevant to the project's agglutinative-algebra core engineering thesis.
+
+### Real-REPL probe
+
+| Query | Response |
+|---|---|
+| Морфема деген не? | "Морфема — мағынасы бар тілдің ең кіші бөлігі." |
+| Етістік деген не? | "Етістік — әрекет немесе күй білдіретін сөз табы." |
+| Агглютинация деген не? | "Агглютинация — түбірге біртіндеп жалғанатын жұрнақ-жалғаулар арқылы сөз тудыру тәсілі." |
+| Үндестік заңы деген не? | "Үндестік заңы — қазақ тіліндегі дауысты дыбыстардың бір-бірімен үйлесімін белгілейтін фонетикалық заң." |
+
+### Innovations
+
+**(1) `DoesToDeclarative` NLG rule** — raw_text-prefer (mirroring GoesTo / After patterns); mechanical fallback `«X Y-ге әсер етеді»` when raw_text empty. Closes Stage A NLG declarative coverage from 10/11 → **11/11** reasoner-emitted predicates. NLG `all_rules()` extended 12 → 13.
+
+**(2) `all_eleven_predicates_have_a_rule` contract test** — iterates every `Predicate` enum variant, asserts `render_sentence` returns `Some` for each. Replaces the old `unknown_predicate_returns_none` test (the predicate it was testing got a rule). Future predicate additions without an NLG rule trip a red CI.
+
+**(3) `language_features` deepened 18 → 33 facts** (lang_019–033) — Kazakh morphology vocabulary anchored in the project's engineering thesis: морфема / түбір / жұрнақ / жалғау (Kazakh morphology primitives matching FST kernel); септік / шақ / жақ as `грамматикалық категория`; зат есім / етістік / сын есім / сан есім / есімдік / үстеу as `сөз табы`; агглютинация as `тілдік құбылыс`; үндестік заңы as `фонетикалық заң`.
+
+**(4) `MULTIWORD_ENTITIES` += 9 new compound entries** required by `world_core_multiword_coverage`: грамматикалық категория / тілдік құбылыс / тілдік бірлік / фонетикалық заң / үндестік заңы / сөз табы / зат есім / сын есім / сан есім.
+
+**(5) Foundation expansion** — 1988 → **2003 entries** (+15), 2239 → **2254 facts** (+15), domains unchanged at 44, 26 779 → **26 806 derivations** (+27).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **906 passing** (was 904; +2 new DoesTo tests; -1 old `unknown_predicate_returns_none` superseded; +1 contract test) |
+| Adam-dialog lib | **239 passing** (was 237; +2 net) |
+| `all_eleven_predicates_have_a_rule` | ✓ green — 11/11 reasoner-emitted predicates have an NLG rule |
+| `world_core_multiword_coverage` | ✓ green |
+| Live REPL probe (4 queries on language vocabulary) | ✓ all 4 surface correct fact via NLG |
+| Foundation: 2003 entries / 2254 facts / 44 domains / 26 806 derivations | (was 1988 / 2239 / 44 / 26 779) |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.6` reflects: (1) DoesTo rule completing Stage A 11/11 coverage + (2) all-11-predicates contract test + (3) language_features +15 facts (project-thesis-relevant Kazakh morphology) + (4) MULTIWORD sync +9 + (5) foundation expansion → 5 distinct innovations. **Stage A declarative NLG predicate coverage is now COMPLETE.**
+
+Stage A status:
+- Bundle 1 (v4.42.0) — NLG foundation
+- Bundle 2 (v4.42.5) — production migration + 5 rules
+- Bundle 3 (v4.43.0) — introducer migration
+- Bundle 4 (v4.43.5–v4.43.6) — predicate completion (12 → **13 rules, 11/11 predicates**)
+
+Stripe (11) — generative AI via agglutinative composition. Next: continued knowledge breadth + interrogative-mood NLG opening; ~v4.50 Stage B (tiny selection weights).
+
 ## [4.43.5] — 2026-05-04 — Knowledge depth bundle 3 + NLG predicate-coverage completion (10 → 12 rules)
 
 **Mixed bundle** continuing both knowledge expansion (4 domain expansions) and Stage A NLG completeness (2 new declarative rules covering the last reasoner-emitted predicate gaps). New `philosophy_basic` domain (23 facts on existence / ethics / epistemology); `astronomy` 30 → 45 (planets / galaxies / black holes / telescopes); `weather_phenomena` 15 → 26 (storm types / atmospheric measurements); `measurements` 10 → 18 (SI units of length / mass / volume / time). NLG `all_rules()` extended from 10 → 12 with `GoesToDeclarative` + `AfterDeclarative` (raw_text-prefer pattern, mirroring `IsACopulaDeclarative`); only `DoesTo` predicate remains unmatched (1 fact in current corpus, low-leverage).

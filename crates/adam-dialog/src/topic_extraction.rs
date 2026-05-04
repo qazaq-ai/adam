@@ -532,6 +532,17 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     ".net саласы",
     "меншік моделі",
     "қоқыс жинаушы",
+    // **v4.43.6** — language_features depth (Kazakh morphology
+    // vocabulary). Required by `world_core_multiword_coverage`.
+    "грамматикалық категория",
+    "тілдік құбылыс",
+    "фонетикалық заң",
+    "үндестік заңы",
+    "тілдік бірлік",
+    "сөз табы",
+    "зат есім",
+    "сын есім",
+    "сан есім",
     // **v4.43.5** — philosophy_basic + astronomy/weather/measurements
     // depth. Required by `world_core_multiword_coverage`.
     "метеорологиялық шама",
