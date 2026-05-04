@@ -162,7 +162,7 @@ mod rules;
 ///   order matching the existing `tool::render_grounded_fact`
 ///   behavior preserved bit-for-bit at the v4.42.5 NLG migration
 ///   point.
-fn all_rules() -> [&'static dyn NlgRule; 10] {
+fn all_rules() -> [&'static dyn NlgRule; 12] {
     [
         // Curated-raw-text rules first (special cases).
         &rules::HasQuantityDeclarative,
@@ -175,6 +175,12 @@ fn all_rules() -> [&'static dyn NlgRule; 10] {
         &rules::HasDeclarative,
         &rules::CausesDeclarative,
         &rules::InDomainDeclarative,
+        // **v4.43.5** — added GoesTo + After (raw_text-prefer);
+        // closes Stage A declarative coverage to 11/11 reasoner-
+        // emitted predicates (DoesTo deferred — only 1 fact in
+        // current corpus, low-leverage).
+        &rules::GoesToDeclarative,
+        &rules::AfterDeclarative,
         // General RelatedTo last (catches everything not caught
         // by шектес / list-summary specialisations above).
         &rules::RelatedToOzaraDeclarative,
@@ -435,10 +441,10 @@ mod tests {
 
     #[test]
     fn unknown_predicate_returns_none() {
-        // **v4.42.5** — predicates without an NLG rule fall through.
-        // Causes was added in this bundle, so use one that's still
-        // unmatched (GoesTo / After / DoesTo).
-        let fact = make_fact("адам", ReasPredicate::GoesTo, "үй", "Адам үйге барады.");
+        // **v4.43.5** — predicates without an NLG rule fall through.
+        // Of the 11 reasoner-emitted predicates only DoesTo lacks a
+        // rule (GoesTo + After got rules in v4.43.5).
+        let fact = make_fact("адам", ReasPredicate::DoesTo, "үй", "Адам үйді тазалайды.");
         let frame = SentenceFrame {
             fact: &fact,
             mood: SentenceMood::Declarative,
@@ -649,6 +655,72 @@ mod tests {
         assert_eq!(pick_introducer(2, false), Introducer::AboutTopicFirst);
         assert_eq!(pick_introducer(3, false), Introducer::ExactFact);
         assert_eq!(pick_introducer(4, false), Introducer::BrieflyAbout); // wraps
+    }
+
+    // ========================================================================
+    // **v4.43.5** — GoesTo + After NLG rule tests.
+    // ========================================================================
+
+    #[test]
+    fn goes_to_declarative_uses_raw_text_when_present() {
+        let fact = make_fact(
+            "адам",
+            ReasPredicate::GoesTo,
+            "үй",
+            "Адам үйге жолын жасайды.",
+        );
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+            name_respect: None,
+        };
+        let out = render_sentence(&frame).expect("GoesTo rule should match");
+        assert_eq!(out, "Адам үйге жолын жасайды.");
+    }
+
+    #[test]
+    fn goes_to_declarative_falls_back_to_dative_when_raw_empty() {
+        let fact = make_fact("адам", ReasPredicate::GoesTo, "үй", "");
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+            name_respect: None,
+        };
+        let out = render_sentence(&frame).expect("GoesTo rule should match");
+        assert_eq!(out, "Адам үй-ге барады.");
+    }
+
+    #[test]
+    fn after_declarative_uses_raw_text_when_present() {
+        let fact = make_fact(
+            "көктем",
+            ReasPredicate::After,
+            "жаз",
+            "Көктемнен кейін жаз келеді.",
+        );
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+            name_respect: None,
+        };
+        let out = render_sentence(&frame).expect("After rule should match");
+        assert_eq!(out, "Көктемнен кейін жаз келеді.");
+    }
+
+    #[test]
+    fn after_declarative_falls_back_to_ablative_when_raw_empty() {
+        let fact = make_fact("көктем", ReasPredicate::After, "жаз", "");
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+            name_respect: None,
+        };
+        let out = render_sentence(&frame).expect("After rule should match");
+        assert_eq!(out, "Көктем-тен кейін жаз болады.");
     }
 
     #[test]

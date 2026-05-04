@@ -1,7 +1,7 @@
 {
-  "version": "4.42.8",
+  "version": "4.43.0",
   "status": "completed",
-  "elapsed_s": 67,
+  "elapsed_s": 62,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2182,
+    "facts_total": 2239,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 65,
       "has_quantity": 34,
       "in_domain": 24,
-      "is_a": 1673,
+      "is_a": 1730,
       "lives_in": 8,
       "part_of": 230,
       "related_to": 90
@@ -43,7 +43,7 @@
       "wikipedia_kz_pack.json": 17,
       "world_core/adam_self.jsonl": 33,
       "world_core/animals.jsonl": 42,
-      "world_core/astronomy.jsonl": 41,
+      "world_core/astronomy.jsonl": 56,
       "world_core/biology_basic.jsonl": 40,
       "world_core/biology_school.jsonl": 120,
       "world_core/body_parts.jsonl": 55,
@@ -65,10 +65,11 @@
       "world_core/language_features.jsonl": 18,
       "world_core/materials.jsonl": 14,
       "world_core/mathematics_basic.jsonl": 52,
-      "world_core/measurements.jsonl": 10,
+      "world_core/measurements.jsonl": 18,
       "world_core/music_kz.jsonl": 16,
       "world_core/notable_kazakhstanis.jsonl": 51,
       "world_core/numbers.jsonl": 54,
+      "world_core/philosophy_basic.jsonl": 23,
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/professions.jsonl": 40,
@@ -83,7 +84,7 @@
       "world_core/time.jsonl": 38,
       "world_core/tools_household.jsonl": 30,
       "world_core/transport.jsonl": 42,
-      "world_core/weather_phenomena.jsonl": 15
+      "world_core/weather_phenomena.jsonl": 26
     }
   },
   "facts": [
@@ -3986,6 +3987,306 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Метеор — аспаннан түсетін тас."
+    },
+    {
+      "subject": {
+        "surface": "меркурий",
+        "root": "меркурий",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғаламшар",
+        "root": "ғаламшар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Меркурий — Күн жүйесінің Күнге ең жақын ғаламшары."
+    },
+    {
+      "subject": {
+        "surface": "шолпан",
+        "root": "шолпан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғаламшар",
+        "root": "ғаламшар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шолпан — Күн жүйесіндегі екінші ғаламшар, Венера деп те аталады."
+    },
+    {
+      "subject": {
+        "surface": "юпитер",
+        "root": "юпитер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғаламшар",
+        "root": "ғаламшар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Юпитер — Күн жүйесінің ең үлкен газ ғаламшары."
+    },
+    {
+      "subject": {
+        "surface": "сатурн",
+        "root": "сатурн",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғаламшар",
+        "root": "ғаламшар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сатурн — сақинасы бар алып газ ғаламшар."
+    },
+    {
+      "subject": {
+        "surface": "уран",
+        "root": "уран",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғаламшар",
+        "root": "ғаламшар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Уран — Күн жүйесіндегі жетінші, мұзды газ ғаламшар."
+    },
+    {
+      "subject": {
+        "surface": "нептун",
+        "root": "нептун",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғаламшар",
+        "root": "ғаламшар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_036"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Нептун — Күн жүйесінің сегізінші, ең алыс ғаламшары."
+    },
+    {
+      "subject": {
+        "surface": "галактика",
+        "root": "галактика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жұлдыздар жиыны",
+        "root": "жұлдыздар жиыны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_037"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Галактика — миллиардтаған жұлдыздар жиыны."
+    },
+    {
+      "subject": {
+        "surface": "құс жолы",
+        "root": "құс жолы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "галактика",
+        "root": "галактика",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Құс жолы — Жер мен Күн жүйесі орналасқан галактика."
+    },
+    {
+      "subject": {
+        "surface": "қара құрдым",
+        "root": "қара құрдым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғарыштық нысан",
+        "root": "ғарыштық нысан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қара құрдым — өте күшті тартылыс күші бар, тіпті жарықты да жұтатын ғарыштық нысан."
+    },
+    {
+      "subject": {
+        "surface": "тұманды",
+        "root": "тұманды",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғарыштық нысан",
+        "root": "ғарыштық нысан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұманды — газ бен тозаңнан тұратын ғарыштық бұлт."
+    },
+    {
+      "subject": {
+        "surface": "астероид",
+        "root": "астероид",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғарыш денесі",
+        "root": "ғарыш денесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Астероид — Күн жүйесіндегі шағын тас тәріздес ғарыш денесі."
+    },
+    {
+      "subject": {
+        "surface": "телескоп",
+        "root": "телескоп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оптикалық аспап",
+        "root": "оптикалық аспап",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Телескоп — алыс ғарыш нысандарын бақылауға арналған оптикалық аспап."
+    },
+    {
+      "subject": {
+        "surface": "орбита",
+        "root": "орбита",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қозғалыс жолы",
+        "root": "қозғалыс жолы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орбита — ғарыш нысанының басқа нысан төңірегінде қозғалатын жолы."
+    },
+    {
+      "subject": {
+        "surface": "космонавтика",
+        "root": "космонавтика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "техникалық сала",
+        "root": "техникалық сала",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Космонавтика — ғарышты зерттейтін техникалық сала."
+    },
+    {
+      "subject": {
+        "surface": "ғарышкер",
+        "root": "ғарышкер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ғарышкер — ғарыш кеңістігінде ұшу үшін дайындалған адам."
     },
     {
       "subject": {
@@ -25969,6 +26270,166 @@
     },
     {
       "subject": {
+        "surface": "метр",
+        "root": "метр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұзындық бірлігі",
+        "root": "ұзындық бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/measurements",
+      "source": {
+        "pack": "world_core/measurements.jsonl",
+        "sample_id": "mea_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Метр — халықаралық жүйедегі ұзындықтың негізгі бірлігі."
+    },
+    {
+      "subject": {
+        "surface": "километр",
+        "root": "километр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұзындық бірлігі",
+        "root": "ұзындық бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/measurements",
+      "source": {
+        "pack": "world_core/measurements.jsonl",
+        "sample_id": "mea_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Километр — мың метрге тең ұзындық бірлігі."
+    },
+    {
+      "subject": {
+        "surface": "сантиметр",
+        "root": "сантиметр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұзындық бірлігі",
+        "root": "ұзындық бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/measurements",
+      "source": {
+        "pack": "world_core/measurements.jsonl",
+        "sample_id": "mea_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сантиметр — метрдің жүзден бір бөлігі."
+    },
+    {
+      "subject": {
+        "surface": "грамм",
+        "root": "грамм",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "масса бірлігі",
+        "root": "масса бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/measurements",
+      "source": {
+        "pack": "world_core/measurements.jsonl",
+        "sample_id": "mea_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Грамм — масса бірлігі, килограммның мыңнан бір бөлігі."
+    },
+    {
+      "subject": {
+        "surface": "килограмм",
+        "root": "килограмм",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "масса бірлігі",
+        "root": "масса бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/measurements",
+      "source": {
+        "pack": "world_core/measurements.jsonl",
+        "sample_id": "mea_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Килограмм — халықаралық жүйедегі масса бірлігінің негізгісі."
+    },
+    {
+      "subject": {
+        "surface": "тонна",
+        "root": "тонна",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "масса бірлігі",
+        "root": "масса бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/measurements",
+      "source": {
+        "pack": "world_core/measurements.jsonl",
+        "sample_id": "mea_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тонна — мың килограммға тең масса бірлігі."
+    },
+    {
+      "subject": {
+        "surface": "литр",
+        "root": "литр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "көлем бірлігі",
+        "root": "көлем бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/measurements",
+      "source": {
+        "pack": "world_core/measurements.jsonl",
+        "sample_id": "mea_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Литр — сұйықтық пен газдың көлем бірлігі."
+    },
+    {
+      "subject": {
+        "surface": "секунд",
+        "root": "секунд",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "уақыт бірлігі",
+        "root": "уақыт бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/measurements",
+      "source": {
+        "pack": "world_core/measurements.jsonl",
+        "sample_id": "mea_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Секунд — халықаралық жүйедегі уақыттың негізгі бірлігі."
+    },
+    {
+      "subject": {
         "surface": "аспап",
         "root": "аспап",
         "pos": "noun"
@@ -28386,6 +28847,466 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Көбейту мен бөлу — қарама-қарсы амалдар."
+    },
+    {
+      "subject": {
+        "surface": "философия",
+        "root": "философия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғылым",
+        "root": "ғылым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Философия — болмыс, таным мен өмір мәні туралы жалпы сұрақтарды зерттейтін ғылым."
+    },
+    {
+      "subject": {
+        "surface": "болмыс",
+        "root": "болмыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ұғым",
+        "root": "философиялық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Болмыс — бар нәрсенің жалпы атауы, философияның негізгі ұғымы."
+    },
+    {
+      "subject": {
+        "surface": "таным",
+        "root": "таным",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ұғым",
+        "root": "философиялық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Таным — адамның әлем туралы білім жинау процесі."
+    },
+    {
+      "subject": {
+        "surface": "шындық",
+        "root": "шындық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ұғым",
+        "root": "философиялық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шындық — пікір немесе тұжырымның болмысқа сәйкестік қасиеті."
+    },
+    {
+      "subject": {
+        "surface": "логика",
+        "root": "логика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философия саласы",
+        "root": "философия саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Логика — дұрыс пайымдау заңдарын зерттейтін философия саласы."
+    },
+    {
+      "subject": {
+        "surface": "этика",
+        "root": "этика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философия саласы",
+        "root": "философия саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Этика — адамгершілік мінез-құлық пен құндылықтарды зерттейтін философия саласы."
+    },
+    {
+      "subject": {
+        "surface": "эстетика",
+        "root": "эстетика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философия саласы",
+        "root": "философия саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Эстетика — әсемдік пен өнерді зерттейтін философия саласы."
+    },
+    {
+      "subject": {
+        "surface": "метафизика",
+        "root": "метафизика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философия саласы",
+        "root": "философия саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Метафизика — болмыстың түпкі негіздерін зерттейтін философия саласы."
+    },
+    {
+      "subject": {
+        "surface": "гносеология",
+        "root": "гносеология",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философия саласы",
+        "root": "философия саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гносеология — танымның көздері мен шектерін зерттейтін философия саласы."
+    },
+    {
+      "subject": {
+        "surface": "идеализм",
+        "root": "идеализм",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ағым",
+        "root": "философиялық ағым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Идеализм — рух пен идеяны болмыстың негізі деп санайтын философиялық ағым."
+    },
+    {
+      "subject": {
+        "surface": "материализм",
+        "root": "материализм",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ағым",
+        "root": "философиялық ағым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Материализм — материяны болмыстың негізі деп санайтын философиялық ағым."
+    },
+    {
+      "subject": {
+        "surface": "скептицизм",
+        "root": "скептицизм",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ағым",
+        "root": "философиялық ағым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Скептицизм — кез келген білімге күмәнмен қарайтын философиялық ұстаным."
+    },
+    {
+      "subject": {
+        "surface": "адамгершілік",
+        "root": "адамгершілік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тұлғалық қасиет",
+        "root": "тұлғалық қасиет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Адамгершілік — жақсылық пен жамандықты ажырата білуге негізделген тұлғалық қасиет."
+    },
+    {
+      "subject": {
+        "surface": "парасат",
+        "root": "парасат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ақыл түрі",
+        "root": "ақыл түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Парасат — ақыл мен ой жетіктігі."
+    },
+    {
+      "subject": {
+        "surface": "жақсылық",
+        "root": "жақсылық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "моральдық құндылық",
+        "root": "моральдық құндылық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жақсылық — этикадағы оң, моральдық бағалы құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "жамандық",
+        "root": "жамандық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "моральдық құндылық",
+        "root": "моральдық құндылық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жамандық — этикадағы теріс, моральдық сын болатын құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "еркіндік",
+        "root": "еркіндік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ұғым",
+        "root": "философиялық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Еркіндік — өз қалауымен әрекет ете алу мүмкіндігі."
+    },
+    {
+      "subject": {
+        "surface": "жауапкершілік",
+        "root": "жауапкершілік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "моральдық қасиет",
+        "root": "моральдық қасиет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жауапкершілік — өз әрекеттерінің салдарын мойындау қабілеті."
+    },
+    {
+      "subject": {
+        "surface": "уақыт",
+        "root": "уақыт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ұғым",
+        "root": "философиялық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Уақыт — оқиғалардың бір-бірінен айырмашылығын білдіретін философиялық ұғым."
+    },
+    {
+      "subject": {
+        "surface": "кеңістік",
+        "root": "кеңістік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ұғым",
+        "root": "философиялық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кеңістік — заттардың орналасуын білдіретін философиялық ұғым."
+    },
+    {
+      "subject": {
+        "surface": "себеп",
+        "root": "себеп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ұғым",
+        "root": "философиялық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Себеп — белгілі құбылысты тудыратын фактор."
+    },
+    {
+      "subject": {
+        "surface": "салдар",
+        "root": "салдар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "философиялық ұғым",
+        "root": "философиялық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Салдар — белгілі себептен туындайтын құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "философ",
+        "root": "философ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ойшыл",
+        "root": "ойшыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/philosophy_basic",
+      "source": {
+        "pack": "world_core/philosophy_basic.jsonl",
+        "sample_id": "phil_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Философ — философиялық сұрақтармен айналысатын ойшыл."
     },
     {
       "subject": {
@@ -43726,6 +44647,226 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Бұлт — ауадағы су буларының шоғыры."
+    },
+    {
+      "subject": {
+        "surface": "дауыл",
+        "root": "дауыл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құбылыс",
+        "root": "құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дауыл — қатты желді ауа райы құбылысы."
+    },
+    {
+      "subject": {
+        "surface": "боран",
+        "root": "боран",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құбылыс",
+        "root": "құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Боран — қарлы дауыл, төмен көрінушілікпен жүреді."
+    },
+    {
+      "subject": {
+        "surface": "найзағай",
+        "root": "найзағай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құбылыс",
+        "root": "құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Найзағай — атмосферадағы электр разряды."
+    },
+    {
+      "subject": {
+        "surface": "күн күркіреу",
+        "root": "күн күркіреу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құбылыс",
+        "root": "құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күн күркіреу — найзағай тудыратын дыбыстық құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "тұман",
+        "root": "тұман",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құбылыс",
+        "root": "құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұман — жер бетіндегі су буларының қалың шоғыры."
+    },
+    {
+      "subject": {
+        "surface": "шық",
+        "root": "шық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құбылыс",
+        "root": "құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шық — таңертеңгі салқында пайда болатын су тамшылары."
+    },
+    {
+      "subject": {
+        "surface": "бұршақ",
+        "root": "бұршақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құбылыс",
+        "root": "құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бұршақ — қаттық мұз тамшы түрінде жауатын жауын-шашын."
+    },
+    {
+      "subject": {
+        "surface": "климат",
+        "root": "климат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ауа райы күйі",
+        "root": "ауа райы күйі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Климат — белгілі аумақта ұзақ уақыт бойы байқалатын ауа райы күйі."
+    },
+    {
+      "subject": {
+        "surface": "ауа райы",
+        "root": "ауа райы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "атмосфералық жағдай",
+        "root": "атмосфералық жағдай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ауа райы — белгілі бір сәттегі атмосфералық жағдай."
+    },
+    {
+      "subject": {
+        "surface": "ылғалдылық",
+        "root": "ылғалдылық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "метеорологиялық шама",
+        "root": "метеорологиялық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ылғалдылық — ауадағы су буы мөлшерін көрсететін шама."
+    },
+    {
+      "subject": {
+        "surface": "атмосфералық қысым",
+        "root": "атмосфералық қысым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "метеорологиялық шама",
+        "root": "метеорологиялық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/weather_phenomena",
+      "source": {
+        "pack": "world_core/weather_phenomena.jsonl",
+        "sample_id": "w_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Атмосфералық қысым — ауаның жер бетіне түсіретін салмағы."
     }
   ]
 }

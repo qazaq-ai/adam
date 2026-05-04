@@ -372,3 +372,81 @@ impl NlgRule for RelatedToOzaraDeclarative {
         "RelatedToOzaraDeclarative"
     }
 }
+
+// ---------------------------------------------------------------------------
+
+/// **v4.43.5** — GoesTo declarative: «X Y-ге барады», raw_text-prefer.
+///
+/// Most extracted GoesTo facts come from corpus pattern matching on
+/// long source sentences whose raw_text is richer than mechanical
+/// «X Y-ге барады» composition. The rule prefers raw_text when
+/// non-empty (mirroring the IsACopulaDeclarative pattern), falling
+/// back to the bare dative-motion shape when raw_text is empty
+/// (curated facts that elect not to ship a long form).
+pub struct GoesToDeclarative;
+
+impl NlgRule for GoesToDeclarative {
+    fn matches(&self, frame: &SentenceFrame) -> bool {
+        matches!(frame.fact.predicate, ReasPredicate::GoesTo)
+            && matches!(frame.mood, SentenceMood::Declarative)
+    }
+
+    fn render(&self, frame: &SentenceFrame) -> Option<String> {
+        let raw = frame.fact.raw_text.trim();
+        let body = if !raw.is_empty() {
+            ensure_period(raw.to_string())
+        } else {
+            let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
+            ensure_period(format!(
+                "{} {}-ге барады",
+                subject_cap,
+                preferred_surface(&frame.fact.object)
+            ))
+        };
+        Some(wrap_introducer(
+            frame.introducer,
+            &frame.fact.subject.root,
+            &body,
+        ))
+    }
+
+    fn name(&self) -> &'static str {
+        "GoesToDeclarative"
+    }
+}
+
+// ---------------------------------------------------------------------------
+
+/// **v4.43.5** — After declarative: «X-тен кейін Y болады»,
+/// raw_text-prefer. Mirrors the [`GoesToDeclarative`] pattern.
+pub struct AfterDeclarative;
+
+impl NlgRule for AfterDeclarative {
+    fn matches(&self, frame: &SentenceFrame) -> bool {
+        matches!(frame.fact.predicate, ReasPredicate::After)
+            && matches!(frame.mood, SentenceMood::Declarative)
+    }
+
+    fn render(&self, frame: &SentenceFrame) -> Option<String> {
+        let raw = frame.fact.raw_text.trim();
+        let body = if !raw.is_empty() {
+            ensure_period(raw.to_string())
+        } else {
+            let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
+            ensure_period(format!(
+                "{}-тен кейін {} болады",
+                subject_cap,
+                preferred_surface(&frame.fact.object)
+            ))
+        };
+        Some(wrap_introducer(
+            frame.introducer,
+            &frame.fact.subject.root,
+            &body,
+        ))
+    }
+
+    fn name(&self) -> &'static str {
+        "AfterDeclarative"
+    }
+}

@@ -7,6 +7,57 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.43.5] — 2026-05-04 — Knowledge depth bundle 3 + NLG predicate-coverage completion (10 → 12 rules)
+
+**Mixed bundle** continuing both knowledge expansion (4 domain expansions) and Stage A NLG completeness (2 new declarative rules covering the last reasoner-emitted predicate gaps). New `philosophy_basic` domain (23 facts on existence / ethics / epistemology); `astronomy` 30 → 45 (planets / galaxies / black holes / telescopes); `weather_phenomena` 15 → 26 (storm types / atmospheric measurements); `measurements` 10 → 18 (SI units of length / mass / volume / time). NLG `all_rules()` extended from 10 → 12 with `GoesToDeclarative` + `AfterDeclarative` (raw_text-prefer pattern, mirroring `IsACopulaDeclarative`); only `DoesTo` predicate remains unmatched (1 fact in current corpus, low-leverage).
+
+### Real-REPL probe (live `adam-chat`)
+
+| Query | Response |
+|---|---|
+| Философия деген не? | "Философия — болмыс, таным мен өмір мәні туралы жалпы сұрақтарды зерттейтін ғылым." |
+| Этика деген не? | "Этика — адамгершілік мінез-құлық пен құндылықтарды зерттейтін философия саласы." |
+| Юпитер деген не? | "Юпитер — Күн жүйесінің ең үлкен газ ғаламшары." |
+| Галактика деген не? | "Галактика — миллиардтаған жұлдыздар жиыны." |
+| Климат деген не? | "Климат — белгілі аумақта ұзақ уақыт бойы байқалатын ауа райы күйі." |
+| Килограмм деген не? | "Килограмм — халықаралық жүйедегі масса бірлігінің негізгісі." |
+
+### Innovations
+
+**(1) New `philosophy_basic.jsonl` domain — 23 facts** covering existence / cognition / ethics / aesthetics / metaphysics / epistemology vocabulary: философия / болмыс / таным / шындық / логика / этика / эстетика / метафизика / гносеология / идеализм / материализм / скептицизм / адамгершілік / парасат / жақсылық / жамандық / еркіндік / жауапкершілік / уақыт / кеңістік / себеп / салдар / философ.
+
+**(2) `astronomy` deepened 30 → 45 facts** (astro_031–045) — Меркурий / Шолпан / Юпитер / Сатурн / Уран / Нептун (the 6 planets not yet curated), Құс жолы galaxy, қара құрдым (black hole), тұманды (nebula), астероид, телескоп, орбита, космонавтика, ғарышкер.
+
+**(3) `weather_phenomena` deepened 15 → 26 facts** (w_016–026) — дауыл / боран / найзағай / күн күркіреу / тұман / шық / бұршақ / климат / ауа райы / ылғалдылық / атмосфералық қысым.
+
+**(4) `measurements` deepened 10 → 18 facts** (mea_011–018) — SI base + derived units: метр / километр / сантиметр / грамм / килограмм / тонна / литр / секунд with proper IsA hubs (`ұзындық бірлігі` / `масса бірлігі` / `көлем бірлігі` / `уақыт бірлігі`).
+
+**(5) `GoesToDeclarative` + `AfterDeclarative` NLG rules** with raw_text-prefer pattern. Mirrors `IsACopulaDeclarative` design: when `raw_text` is non-empty (true for ~all corpus-extracted GoesTo / After facts), prefer it; otherwise mechanical compose via dative («X Y-ге барады») / ablative («X-тен кейін Y болады»). Closes Stage A declarative coverage from 10 → 12 active rules covering 10/11 reasoner-emitted predicates (DoesTo deferred — only 1 fact, low-leverage).
+
+**(6) `MULTIWORD_ENTITIES` += 22 new compound entries** required by `world_core_multiword_coverage`: ауа райы / ауа райы күйі / атмосфералық жағдай / атмосфералық қысым / метеорологиялық шама / философиялық ұғым / философиялық ағым / философия саласы / моральдық құндылық / моральдық қасиет / жұлдыздар жиыны / ғарыштық нысан / ғарыш денесі / қозғалыс жолы / техникалық сала / ұзындық бірлігі / көлем бірлігі / масса бірлігі / уақыт бірлігі / қара құрдым / күн күркіреу / ақыл түрі.
+
+**(7) 4 new NLG unit tests** verify GoesTo + After both raw_text-prefer (`uses_raw_text_when_present`) and mechanical-fallback (`falls_back_to_dative_when_raw_empty` / `falls_back_to_ablative_when_raw_empty`) paths. Plus `unknown_predicate_returns_none` repointed from `GoesTo` to `DoesTo` (the last unmatched predicate).
+
+**(8) Foundation expansion** — 1931 → **1988 entries** (+57), 2182 → **2239 facts** (+57), 43 → **44 domains** (+1: philosophy_basic), 26 251 → **26 779 derivations** (+528 from R1/R5/R10/R11 chains over the new IsA parents).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **904 passing** (was 890; +14 new — 4 GoesTo/After NLG + 10 introducer migration tests carried forward from v4.43.0) |
+| Adam-dialog lib | **237 passing** (was 233; +4 new GoesTo/After tests) |
+| `world_core_multiword_coverage` | ✓ green after sync |
+| Live REPL probe (6 queries on new facts) | ✓ all 6 surface correct fact via NLG |
+| Foundation: 1988 entries / 2239 facts / 44 domains / 26 779 derivations | (was 1931 / 2182 / 43 / 26 251) |
+| `cargo fmt --all --check` | clean |
+| `cargo check --all-targets` | clean |
+
+### Cadence
+
+`.5` reflects: (1) new philosophy_basic domain + 23 facts + (2) astronomy +15 + (3) weather_phenomena +11 + (4) measurements +8 + (5) NLG 10 → 12 rules + (6) MULTIWORD sync +22 + (7) 4 new NLG unit tests + (8) foundation expansion → 8 distinct innovations. Per `feedback_versioning_post_1_0`: substantial knowledge bundle + NLG predicate completion + new domain warrants `.5` patch tier.
+
+Stage A continues. NLG declarative coverage now at 10/11 reasoner-emitted predicates (DoesTo deferred). Stripe (11) — generative AI via agglutinative composition. Next: continued knowledge expansion + interrogative-mood NLG opening; ~v4.50 — Stage B (tiny selection weights).
+
 ## [4.43.0] — 2026-05-04 — Stage A bundle 3 — Introducer migration into NLG production path
 
 **Stage A architectural milestone.** Closes the deferred carry-forward from v4.42.6 memory note. The five-variant introducer rotation that lived in template-string text (`unknown.with_grounded_fact` family in `data/dialog/templates/v1.toml`) is now first-class enum + composer in the NLG module. Templates simplify to a single `{fact}` slot whose value is a full preamble+body sentence produced by `nlg::compose_introducer`; the planner picks the introducer via `nlg::pick_introducer` mirroring the v4.42.x seed-mod rotation byte-for-byte. **Output is byte-identical to v4.42.x for any `(seed, has_name_respect, fact)` triple** — verified via existing 890-test workspace + live REPL anti-regression probe.
