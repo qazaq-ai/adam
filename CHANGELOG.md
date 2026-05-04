@@ -7,6 +7,61 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.47.5] — 2026-05-04 — Stage B bundle 6 — disagreement-case collection harness
+
+**Pure-function aggregate substrate.** `AuditAggregate` accumulates audit results across many gold pairs; `evaluate_weights_on_pairs(weights, pairs) -> AuditAggregate` runs the audit comparison for each pair and reports overall agreement / disagreement statistics + worst-case score gap. Together they answer: «given this `SelectionWeights` table and this gold-pair set, how many pairs does the selector get wrong, and how badly?» This is the substrate for the v4.50.0 (target) decision: trained weights replace the heuristic ranker only when `evaluate_weights_on_pairs(trained, canonical_training_pairs_v0()).disagreements == 0` AND the trained weights match or beat the heuristic on live REPL holdouts.
+
+### Innovations
+
+**(1) `AuditAggregate` struct** — `{ total_pairs, agreements, disagreements, max_neg_score_advantage }`. `agreements` counts pairs where `score(positive) > score(negative)`; `disagreements` counts pairs where `score(positive) <= score(negative)` (ties count as disagreement — gold label requires strict ordering). `max_neg_score_advantage` tracks the worst-case "how badly the selector got it wrong" — useful for deciding how aggressive a re-training step needs to be.
+
+**(2) `AuditAggregate::agreement_rate()`** — fraction of total pairs that agreed. Vacuous truth: empty aggregate returns `1.0`.
+
+**(3) `evaluate_weights_on_pairs(weights, pairs) -> AuditAggregate`** — pure function. For each `TrainingPair`, computes `score(positive, weights)` and `score(negative, weights)`, records strict-ordering agreement, accumulates max gap on disagreements.
+
+**(4) Re-exports** in `lib.rs`: `AuditAggregate`, `evaluate_weights_on_pairs` available as top-level public API.
+
+**(5) 7 new unit tests** verify:
+- `aggregate_default_is_empty` — zero-init + vacuous-truth `agreement_rate()`.
+- `evaluate_default_v0_on_canonical_pairs_high_agreement` — `default_v0` weights handle ≥ 80 % of canonical pairs without training (baseline regression pin).
+- `evaluate_trained_weights_on_canonical_pairs_zero_disagreements` — trained weights satisfy every canonical pair (training contract from v4.45.5 holds).
+- `evaluate_zero_weights_produces_disagreements` — all-zero weights tie everywhere → disagreement on every pair.
+- `evaluate_negative_weights_inverts_ranking` — inverted weights flip every canonical pair.
+- `evaluate_records_max_neg_score_advantage_correctly` — aggregate tracks max worst-case gap.
+- `evaluate_empty_pairs_returns_empty_aggregate` — degenerate input.
+
+**(6) NOT YET in v4.47.5** (Stage B carry-forwards):
+- Real REPL-trace parsing harness — run `live_holdout_*.json` / `rust_holdout.json` through audit-trace pipeline → parse `selection_audit:` lines → hand-curate disagreement cases as new `TrainingPair`s. Different infrastructure (binary + log-parser + JSON output); deferred to v4.48.0+.
+- First trained `SelectionWeights::trained_v0()` constant — once a real disagreement-case set exists, train and ship as new audit baseline.
+- Production ranker replacement — replace `apply_graph_result`'s heuristic top-1 with `selection::select_top` once trained weights match or beat heuristic.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **953 passing** (was 946; +7 new aggregate tests) |
+| Adam-dialog lib | **286 passing** (was 279; +7) |
+| Selection module | 41/41 tests pass (13 v4.45.0 + 11 v4.45.5 + 10 v4.46.0 + 7 v4.47.5) |
+| Live REPL | byte-identical to v4.47.0 (no production wiring change) |
+| Foundation: 2086 / 2346 / 46 / 27 163 | unchanged |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.5` reflects: (1) `AuditAggregate` struct + (2) `agreement_rate()` accessor + (3) `evaluate_weights_on_pairs` algorithm + (4) re-exports + (5) 7 new tests + (6) substrate-only design — **5 distinct innovations + Stage B substrate completion**.
+
+Stage B status:
+- v4.45.0 — bundle 1 — selection weights foundation ✓
+- v4.45.5 — bundle 2 — training pipeline ✓
+- v4.46.0 — bundle 3 — canonical gold pairs + audit substrate ✓
+- v4.46.5 — bundle 4 — production trace-wiring (audit-only) ✓
+- v4.47.0 — bundle 5 — `ToolContext.last_topic` threading ✓
+- **v4.47.5 — bundle 6 — disagreement-case collection harness (substrate)** ← shipped
+- v4.48.0+ — bundle 7: real REPL-trace parsing tool + first trained `trained_v0` constant
+- v4.50.0 (target) — bundle 8: trained weights replace heuristic ranker
+
+Stripe (11) — generative AI via agglutinative composition continues. Stage B substrate is now complete: foundation (1) + algorithm (2) + gold data (3) + production wiring (4) + session signal (5) + evaluation (6). Bundle 7+ produces real training data and the first trained model.
+
 ## [4.47.0] — 2026-05-04 — Stage B bundle 5 — `ToolContext.last_topic` threading
 
 **Closes the v4.46.5 carry-forward.** The audit-only wiring shipped in v4.46.5 had a known limitation: it passed `last_topic = None` to `audit_compare`, so the recency-match feature always scored 0 for both heuristic and selector. v4.47.0 threads `Conversation::session["last_query_topic"]` through `ToolContext` to `selection::audit_compare` so the recency feature now contributes signal on real session data. Real disagreement-case collection (running offline evals through the audit-trace pipeline) remains carry-forward to v4.47.5+.

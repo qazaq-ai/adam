@@ -1213,3 +1213,227 @@ mod audit_tests {
         assert!(result.score_gap.abs() < 1e-6);
     }
 }
+
+// ---------------------------------------------------------------------------
+// **v4.47.5** — Stage B bundle 6: disagreement-case collection harness.
+//
+// `AuditAggregate` accumulates audit results across many gold pairs;
+// `evaluate_weights_on_pairs` runs the audit comparison for each pair
+// and reports overall agreement/disagreement statistics. Together they
+// answer: "given this `SelectionWeights` table and this gold-pair set,
+// how many pairs does the selector get wrong, and how badly?"
+//
+// This is the substrate for the v4.50.0 (target) decision: trained
+// weights replace the heuristic ranker only when `evaluate_weights_on_pairs(
+// trained, canonical_training_pairs_v0()).disagreements == 0` AND the
+// trained weights match or beat the heuristic on the live REPL holdouts.
+//
+// Pure-function aggregate; no binaries, no I/O.
+
+/// Accumulated audit statistics across many gold pairs. `agreements`
+/// counts pairs where `score(positive) > score(negative)` (selector
+/// agrees with the gold label); `disagreements` counts pairs where
+/// `score(positive) <= score(negative)` (selector picked negative or
+/// tied — strictly, ties count as disagreement since the gold label
+/// requires strict ordering).
+///
+/// `max_neg_score_advantage` tracks the worst-case "how badly the
+/// selector got it wrong": for disagreement cases, this is
+/// `score(negative) - score(positive)`; the larger this value, the
+/// more aggressive a re-training step would need to be. For
+/// agreement cases this contributes 0.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct AuditAggregate {
+    pub total_pairs: usize,
+    pub agreements: usize,
+    pub disagreements: usize,
+    pub max_neg_score_advantage: f32,
+}
+
+impl AuditAggregate {
+    /// Convenience: agreement rate as a fraction of total pairs.
+    /// Returns 1.0 for the empty-aggregate case (vacuous truth).
+    pub fn agreement_rate(&self) -> f32 {
+        if self.total_pairs == 0 {
+            return 1.0;
+        }
+        self.agreements as f32 / self.total_pairs as f32
+    }
+}
+
+/// **v4.47.5** — evaluate a `SelectionWeights` table against a list
+/// of gold pairs. For each `TrainingPair`, computes
+/// `score(positive, weights)` and `score(negative, weights)` and
+/// records whether the selector agrees with the gold ordering.
+/// Strict ordering is required: ties count as disagreement.
+///
+/// Substrate for v4.50.0 trained-weights vs heuristic comparison.
+pub fn evaluate_weights_on_pairs(
+    weights: &SelectionWeights,
+    pairs: &[TrainingPair],
+) -> AuditAggregate {
+    let mut agg = AuditAggregate {
+        total_pairs: pairs.len(),
+        ..Default::default()
+    };
+    for pair in pairs {
+        let s_pos = score(&pair.positive, weights);
+        let s_neg = score(&pair.negative, weights);
+        if s_pos > s_neg {
+            agg.agreements += 1;
+        } else {
+            agg.disagreements += 1;
+            let gap = s_neg - s_pos;
+            if gap > agg.max_neg_score_advantage {
+                agg.max_neg_score_advantage = gap;
+            }
+        }
+    }
+    agg
+}
+
+#[cfg(test)]
+mod aggregate_tests {
+    use super::*;
+
+    fn pair(pos: CandidateFeatures, neg: CandidateFeatures) -> TrainingPair {
+        TrainingPair {
+            positive: pos,
+            negative: neg,
+        }
+    }
+
+    fn feats(c: f32, r: f32, s: f32, o: f32, recency: f32) -> CandidateFeatures {
+        CandidateFeatures {
+            confidence: c,
+            raw_text_richness: r,
+            subject_overlap: s,
+            object_overlap: o,
+            recency_match: recency,
+        }
+    }
+
+    #[test]
+    fn aggregate_default_is_empty() {
+        let agg = AuditAggregate::default();
+        assert_eq!(agg.total_pairs, 0);
+        assert_eq!(agg.agreements, 0);
+        assert_eq!(agg.disagreements, 0);
+        assert_eq!(agg.max_neg_score_advantage, 0.0);
+        // Empty aggregate has agreement_rate = 1.0 (vacuous truth).
+        assert_eq!(agg.agreement_rate(), 1.0);
+    }
+
+    #[test]
+    fn evaluate_default_v0_on_canonical_pairs_high_agreement() {
+        // The hand-set default_v0 weights mirror the v4.38.0 ranker
+        // tiers. They should already handle most canonical pairs
+        // without training. Document that agreement rate is high
+        // (this test pins the baseline for future regressions).
+        let weights = SelectionWeights::default_v0();
+        let pairs = canonical_training_pairs_v0();
+        let agg = evaluate_weights_on_pairs(&weights, &pairs);
+        assert_eq!(agg.total_pairs, pairs.len());
+        // default_v0 must agree on at least 80 % of canonical pairs.
+        // Tighter than 80 % is fine; looser would mean default weights
+        // are mis-calibrated relative to the canonical scenarios they
+        // were designed to mirror.
+        assert!(
+            agg.agreement_rate() >= 0.8,
+            "default_v0 agreement rate {} below 0.8 baseline",
+            agg.agreement_rate(),
+        );
+    }
+
+    #[test]
+    fn evaluate_trained_weights_on_canonical_pairs_zero_disagreements() {
+        // After training default_v0 on canonical_pairs_v0, the trained
+        // weights MUST satisfy every canonical pair (this is the
+        // training contract from v4.45.5).
+        let pairs = canonical_training_pairs_v0();
+        let initial = SelectionWeights::default_v0();
+        let cfg = TrainingConfig::default_v0();
+        let (trained, stats) = train_perceptron(initial, &pairs, cfg);
+        assert!(stats.converged);
+        let agg = evaluate_weights_on_pairs(&trained, &pairs);
+        assert_eq!(
+            agg.disagreements, 0,
+            "trained weights still disagree on {} pairs",
+            agg.disagreements,
+        );
+        assert_eq!(agg.agreement_rate(), 1.0);
+        // Trained weights satisfy strict margin → max_neg_score_advantage = 0.
+        assert_eq!(agg.max_neg_score_advantage, 0.0);
+    }
+
+    #[test]
+    fn evaluate_zero_weights_produces_disagreements() {
+        // All-zero weights make every fact score 0 → ties everywhere
+        // → every pair disagrees by the strict-ordering contract.
+        let zero = SelectionWeights {
+            bias: 0.0,
+            w_confidence: 0.0,
+            w_richness: 0.0,
+            w_subject_overlap: 0.0,
+            w_object_overlap: 0.0,
+            w_recency: 0.0,
+        };
+        let pairs = canonical_training_pairs_v0();
+        let agg = evaluate_weights_on_pairs(&zero, &pairs);
+        assert_eq!(agg.disagreements, pairs.len());
+        assert_eq!(agg.agreements, 0);
+        // Tied scores → max_neg_score_advantage = 0 (no NEGATIVE
+        // advantage; just no positive ordering).
+        assert_eq!(agg.max_neg_score_advantage, 0.0);
+    }
+
+    #[test]
+    fn evaluate_negative_weights_inverts_ranking() {
+        // Inverted weights (negative confidence) should flip the
+        // canonical pairs — every disagreement, max_neg_score_advantage
+        // strictly positive.
+        let inverted = SelectionWeights {
+            bias: 0.0,
+            w_confidence: -1.0,
+            w_richness: -0.3,
+            w_subject_overlap: -2.0,
+            w_object_overlap: -1.0,
+            w_recency: -0.5,
+        };
+        let pairs = canonical_training_pairs_v0();
+        let agg = evaluate_weights_on_pairs(&inverted, &pairs);
+        assert!(agg.disagreements > 0);
+        assert!(agg.max_neg_score_advantage > 0.0);
+    }
+
+    #[test]
+    fn evaluate_records_max_neg_score_advantage_correctly() {
+        // Two pairs: one mild disagreement, one strong disagreement.
+        // Aggregate must record the maximum gap.
+        let mild_pos = feats(1.0, 0.0, 0.0, 0.0, 0.0);
+        let mild_neg = feats(1.1, 0.0, 0.0, 0.0, 0.0); // negative wins by 0.1*confidence
+        let strong_pos = feats(1.0, 0.0, 0.0, 0.0, 0.0);
+        let strong_neg = feats(5.0, 0.0, 0.0, 0.0, 0.0); // negative wins by 4.0*confidence
+        let pairs = [pair(mild_pos, mild_neg), pair(strong_pos, strong_neg)];
+        let weights = SelectionWeights {
+            bias: 0.0,
+            w_confidence: 1.0,
+            w_richness: 0.0,
+            w_subject_overlap: 0.0,
+            w_object_overlap: 0.0,
+            w_recency: 0.0,
+        };
+        let agg = evaluate_weights_on_pairs(&weights, &pairs);
+        assert_eq!(agg.disagreements, 2);
+        // Strong disagreement: gap = 5.0*1.0 - 1.0*1.0 = 4.0.
+        assert!((agg.max_neg_score_advantage - 4.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn evaluate_empty_pairs_returns_empty_aggregate() {
+        let agg = evaluate_weights_on_pairs(&SelectionWeights::default_v0(), &[]);
+        assert_eq!(agg, AuditAggregate::default());
+        // Empty has agreement_rate = 1.0 (vacuous truth).
+        assert_eq!(agg.agreement_rate(), 1.0);
+    }
+}
