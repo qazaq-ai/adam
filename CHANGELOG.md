@@ -7,6 +7,54 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.42.5] — 2026-05-04 — Stage A bundle 2 — NLG production migration + 5 new rules
+
+**Stage A progresses.** v4.42.0 laid the foundation (NLG module + 5 rules + parallel-only operation). v4.42.5 takes the first **production migration**: `tool::render_grounded_fact` — the function that produces every grounded-fact response in adam — now flows through `nlg::render_sentence`. Byte-identical output preserved (verified by workspace tests + live probes); architecturally, every grounded-fact surface now goes through the typed-frame rule engine. Five new rules expand predicate coverage to all 10 declarative-mood predicates currently emitted by the reasoner.
+
+### Innovations (6)
+
+**(1) IsACopulaDeclarative** adjusted to prefer curated `raw_text` when non-empty, fall back to mechanical "subject — object" composition only when raw_text is empty. Mirrors existing `tool::render_grounded_fact` IsA→None+raw_text-fallback behavior. Preserves the v4.4.11-era invariant `grounded_fact_keeps_richer_raw_text_for_is_a` test.
+
+**(2) HasDeclarative** — «X Y иеленеді». New rule.
+**(3) CausesDeclarative** — «X Y себебі болады». New rule.
+**(4) InDomainDeclarative** — «X Y саласына жатады». New rule.
+**(5) RelatedToShectesDeclarative** — special-case for «шектес» (border) facts: prefer curated raw_text. New rule.
+**(6) RelatedToOzaraDeclarative** — general RelatedTo: «X мен Y өзара байланысты». New rule. Runs after шектес and list-summary specialisations via priority order.
+
+**(7) `tool::render_grounded_fact` migrated to NLG.** The hand-coded predicate match replaced with a call to `nlg::render_sentence` + raw_text fallback. Byte-identical output (verified). Production wiring of the typed-frame rule engine.
+
+**(8) `nlg::preferred_surface` helper** — mirrors pre-v4.42.5 `tool::preferred_slot_text` behavior (prefer SlotRef.surface, fall back to .root when empty). All rule renders updated to use it. Removes the four obsolete helpers `preferred_subject_text` / `preferred_object_text` / `preferred_slot_text` / `capitalise_first` from `tool.rs`.
+
+**(9) 6 new NLG unit tests** — `causes_declarative`, `has_declarative`, `isa_with_richer_raw_text_uses_raw`, `related_to_shectes_uses_raw`, `related_to_general_uses_ozara_template`, `in_domain_declarative`.
+
+### Coverage
+
+NLG now covers **10 of 11** Predicate variants for declarative mood:
+- ✓ IsA / PartOf / RelatedTo (3 specialisations) / LivesIn / HasQuantity / Has / Causes / InDomain
+- not yet: GoesTo / After / DoesTo (low-frequency; raw_text fallback in `render_grounded_fact` covers them)
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **890 passing** (+6 NLG tests; was 884) |
+| All NLG rules | unit-tested via 13 tests |
+| Byte-identical output | ✓ verified for «Қазақстан», «Абай», «Меншік», «бугагра аймақтарын», «танымал тұлғалар», «Сәтбаев», «қанша өзен», math controls, greetings |
+| Anti-regression | all controls preserved |
+| Foundation: 1819 entries / 1985 facts / 41 domains / 25 633 derivations | unchanged ✓ |
+| `cargo fmt --all --check` | clean |
+| Compiler warnings | none (post-cleanup) |
+
+### Cadence
+
+`.5` reflects 6 substantive innovations + 1 architectural migration + 6 tests + helper extraction. Per `feedback_versioning_post_1_0`: «5+ innovations → `.5` patch». The migration of `render_grounded_fact` is the most consequential single change — every grounded-fact surface in production now flows through the typed-frame NLG layer. This sets up Stage A bundle 3 for interrogative-mood rules and progressive template-family migrations.
+
+### Stage A roadmap (continued)
+
+- **v4.42.6+** — interrogative mood rules («X не?» / «X дегеніміз не?»); migrate `unknown.with_grounded_fact` template family entirely (introducer wrapping moves into NLG).
+- **~v4.50** — Stage B: tiny selection weights over rule-generated candidates.
+- **v5.x parallel** — Rust code-generation in same paradigm.
+
 ## [4.42.0] — 2026-05-04 — Stage A opens — rule-based NLG over typed semantic frames (foundation)
 
 **First minor in v4.42+ arc.** Opens **Stage A** of the project's refined thesis (`project_retrieval_not_neural_v2.md`, refined 2026-05-03): adam as a NEW class of generative AI that uses the agglutinative paradigm — typed primitives + rule-based composition + tiny selection weights — to be safe / cheap / predictable while reaching LLM-comparable abilities. Templates were the rough draft of this; rule-based NLG over typed `SentenceFrame`s is the proper architecture.

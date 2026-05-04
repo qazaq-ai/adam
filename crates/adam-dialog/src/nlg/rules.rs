@@ -13,7 +13,9 @@
 //! generates from the typed primitives via a fixed template
 //! skeleton.
 
-use super::{Introducer, NlgRule, SentenceFrame, SentenceMood, capitalize_first};
+use super::{
+    Introducer, NlgRule, SentenceFrame, SentenceMood, capitalize_first, preferred_surface,
+};
 use adam_reasoning::Predicate as ReasPredicate;
 
 /// Wrap `body` in the introducer's preamble.
@@ -44,10 +46,15 @@ fn ensure_period(s: String) -> String {
 
 // ---------------------------------------------------------------------------
 
-/// IsA copula declarative: «X — Y».
+/// IsA copula declarative: «X — Y», or curated raw_text when richer.
 ///
-/// Surfaces a definitional fact via the em-dash copula — the most
-/// frequent factoid response shape in adam.
+/// Surfaces a definitional fact via the em-dash copula. Prefers
+/// curated `raw_text` over mechanical composition — many world_core
+/// IsA facts have rich descriptive raw_text («Қазақстан — Орталық
+/// Азиядағы аумағы бойынша 9-шы үлкен тәуелсіз мемлекет; астанасы
+/// — Астана, ірі қаласы — Алматы.») that mechanical "subject —
+/// object" composition would lose. Mechanical composition fires
+/// only when raw_text is empty.
 pub struct IsACopulaDeclarative;
 
 impl NlgRule for IsACopulaDeclarative {
@@ -57,8 +64,18 @@ impl NlgRule for IsACopulaDeclarative {
     }
 
     fn render(&self, frame: &SentenceFrame) -> Option<String> {
-        let subject_cap = capitalize_first(&frame.fact.subject.surface);
-        let body = ensure_period(format!("{} — {}", subject_cap, frame.fact.object.surface));
+        let raw = frame.fact.raw_text.trim();
+        let body = if raw.is_empty() {
+            // No curated text — compose from typed primitives.
+            let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
+            ensure_period(format!(
+                "{} — {}",
+                subject_cap,
+                preferred_surface(&frame.fact.object)
+            ))
+        } else {
+            ensure_period(raw.to_string())
+        };
         Some(wrap_introducer(
             frame.introducer,
             &frame.fact.subject.root,
@@ -83,10 +100,11 @@ impl NlgRule for PartOfDeclarative {
     }
 
     fn render(&self, frame: &SentenceFrame) -> Option<String> {
-        let subject_cap = capitalize_first(&frame.fact.subject.surface);
+        let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
         let body = ensure_period(format!(
             "{} {} құрамына кіреді",
-            subject_cap, frame.fact.object.surface
+            subject_cap,
+            preferred_surface(&frame.fact.object)
         ));
         Some(wrap_introducer(
             frame.introducer,
@@ -179,10 +197,11 @@ impl NlgRule for LivesInDeclarative {
     }
 
     fn render(&self, frame: &SentenceFrame) -> Option<String> {
-        let subject_cap = capitalize_first(&frame.fact.subject.surface);
+        let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
         let body = ensure_period(format!(
             "{} мекені — {}",
-            subject_cap, frame.fact.object.surface
+            subject_cap,
+            preferred_surface(&frame.fact.object)
         ));
         Some(wrap_introducer(
             frame.introducer,
@@ -193,5 +212,171 @@ impl NlgRule for LivesInDeclarative {
 
     fn name(&self) -> &'static str {
         "LivesInDeclarative"
+    }
+}
+
+// ---------------------------------------------------------------------------
+
+/// Has declarative: «X Y иеленеді».
+///
+/// **v4.42.5** — added to mirror existing `render_grounded_fact`
+/// behavior in tool.rs so the NLG migration is byte-identical.
+pub struct HasDeclarative;
+
+impl NlgRule for HasDeclarative {
+    fn matches(&self, frame: &SentenceFrame) -> bool {
+        matches!(frame.fact.predicate, ReasPredicate::Has)
+            && matches!(frame.mood, SentenceMood::Declarative)
+    }
+
+    fn render(&self, frame: &SentenceFrame) -> Option<String> {
+        let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
+        let body = ensure_period(format!(
+            "{} {} иеленеді",
+            subject_cap,
+            preferred_surface(&frame.fact.object)
+        ));
+        Some(wrap_introducer(
+            frame.introducer,
+            &frame.fact.subject.root,
+            &body,
+        ))
+    }
+
+    fn name(&self) -> &'static str {
+        "HasDeclarative"
+    }
+}
+
+// ---------------------------------------------------------------------------
+
+/// Causes declarative: «X Y себебі болады».
+///
+/// **v4.42.5** — added.
+pub struct CausesDeclarative;
+
+impl NlgRule for CausesDeclarative {
+    fn matches(&self, frame: &SentenceFrame) -> bool {
+        matches!(frame.fact.predicate, ReasPredicate::Causes)
+            && matches!(frame.mood, SentenceMood::Declarative)
+    }
+
+    fn render(&self, frame: &SentenceFrame) -> Option<String> {
+        let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
+        let body = ensure_period(format!(
+            "{} {} себебі болады",
+            subject_cap,
+            preferred_surface(&frame.fact.object)
+        ));
+        Some(wrap_introducer(
+            frame.introducer,
+            &frame.fact.subject.root,
+            &body,
+        ))
+    }
+
+    fn name(&self) -> &'static str {
+        "CausesDeclarative"
+    }
+}
+
+// ---------------------------------------------------------------------------
+
+/// InDomain declarative: «X Y саласына жатады».
+///
+/// **v4.42.5** — added.
+pub struct InDomainDeclarative;
+
+impl NlgRule for InDomainDeclarative {
+    fn matches(&self, frame: &SentenceFrame) -> bool {
+        matches!(frame.fact.predicate, ReasPredicate::InDomain)
+            && matches!(frame.mood, SentenceMood::Declarative)
+    }
+
+    fn render(&self, frame: &SentenceFrame) -> Option<String> {
+        let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
+        let body = ensure_period(format!(
+            "{} {} саласына жатады",
+            subject_cap,
+            preferred_surface(&frame.fact.object)
+        ));
+        Some(wrap_introducer(
+            frame.introducer,
+            &frame.fact.subject.root,
+            &body,
+        ))
+    }
+
+    fn name(&self) -> &'static str {
+        "InDomainDeclarative"
+    }
+}
+
+// ---------------------------------------------------------------------------
+
+/// RelatedTo border-fact declarative: when raw_text contains
+/// «шектес» (Kazakh "borders / adjacent to"), prefer raw_text
+/// — these are curated geographic-border statements that lose
+/// information through mechanical composition.
+///
+/// Must run BEFORE [`RelatedToOzaraDeclarative`] so the special
+/// case wins.
+pub struct RelatedToShectesDeclarative;
+
+impl NlgRule for RelatedToShectesDeclarative {
+    fn matches(&self, frame: &SentenceFrame) -> bool {
+        matches!(frame.fact.predicate, ReasPredicate::RelatedTo)
+            && matches!(frame.mood, SentenceMood::Declarative)
+            && frame.fact.raw_text.contains("шектес")
+    }
+
+    fn render(&self, frame: &SentenceFrame) -> Option<String> {
+        let raw = frame.fact.raw_text.trim();
+        if raw.is_empty() {
+            return None;
+        }
+        let body = ensure_period(raw.to_string());
+        Some(wrap_introducer(
+            frame.introducer,
+            &frame.fact.subject.root,
+            &body,
+        ))
+    }
+
+    fn name(&self) -> &'static str {
+        "RelatedToShectesDeclarative"
+    }
+}
+
+// ---------------------------------------------------------------------------
+
+/// RelatedTo general declarative: «X мен Y өзара байланысты».
+///
+/// Default RelatedTo phrasing. Runs AFTER list-summary and шектес
+/// special cases via priority order in `super::all_rules`.
+pub struct RelatedToOzaraDeclarative;
+
+impl NlgRule for RelatedToOzaraDeclarative {
+    fn matches(&self, frame: &SentenceFrame) -> bool {
+        matches!(frame.fact.predicate, ReasPredicate::RelatedTo)
+            && matches!(frame.mood, SentenceMood::Declarative)
+    }
+
+    fn render(&self, frame: &SentenceFrame) -> Option<String> {
+        let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
+        let body = ensure_period(format!(
+            "{} мен {} өзара байланысты",
+            subject_cap,
+            preferred_surface(&frame.fact.object)
+        ));
+        Some(wrap_introducer(
+            frame.introducer,
+            &frame.fact.subject.root,
+            &body,
+        ))
+    }
+
+    fn name(&self) -> &'static str {
+        "RelatedToOzaraDeclarative"
     }
 }

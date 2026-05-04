@@ -61,7 +61,7 @@
 //!   NLG runs as a parallel CHECK, not a replacement, in v4.42.0).
 //! - Verb-frame rules (only nominal-predicate facts covered).
 
-use adam_reasoning::{Fact as ReasFact, Predicate as ReasPredicate};
+use adam_reasoning::Fact as ReasFact;
 
 /// Sentence-shape operators carried alongside the propositional
 /// content. Mirrors the agglutinative pattern: a "root" (the fact)
@@ -125,14 +125,36 @@ pub trait NlgRule: Sync {
 
 mod rules;
 
-/// All starter rules in priority order. First matching rule wins.
-fn all_rules() -> [&'static dyn NlgRule; 5] {
+/// All rules in priority order. First matching rule wins.
+///
+/// Order rationale:
+/// - Special-case RelatedTo rules (`шектес`, list-summary) run
+///   BEFORE the general RelatedTo rule so curated raw_text wins
+///   over mechanical composition where the curated text is richer.
+/// - HasQuantity uses raw_text and runs early — count phrasings
+///   («Қазақстанда 17 облыс бар») are richer than mechanical
+///   templating could produce.
+/// - The remaining declarative rules (IsA / PartOf / LivesIn /
+///   Has / Causes / InDomain) compose from typed primitives in
+///   order matching the existing `tool::render_grounded_fact`
+///   behavior preserved bit-for-bit at the v4.42.5 NLG migration
+///   point.
+fn all_rules() -> [&'static dyn NlgRule; 10] {
     [
+        // Curated-raw-text rules first (special cases).
+        &rules::HasQuantityDeclarative,
+        &rules::RelatedToShectesDeclarative,
+        &rules::RelatedToListDeclarative,
+        // Composed rules (typed-primitives → surface).
         &rules::IsACopulaDeclarative,
         &rules::PartOfDeclarative,
-        &rules::HasQuantityDeclarative,
-        &rules::RelatedToListDeclarative,
         &rules::LivesInDeclarative,
+        &rules::HasDeclarative,
+        &rules::CausesDeclarative,
+        &rules::InDomainDeclarative,
+        // General RelatedTo last (catches everything not caught
+        // by шектес / list-summary specialisations above).
+        &rules::RelatedToOzaraDeclarative,
     ]
 }
 
@@ -162,10 +184,21 @@ fn capitalize_first(s: &str) -> String {
     }
 }
 
+/// Pick the best surface form from a SlotRef — prefer the curated
+/// surface, fall back to the canonical root when surface is empty.
+/// Mirrors the pre-v4.42.5 `tool::preferred_slot_text` behavior.
+fn preferred_surface(slot: &adam_reasoning::SlotRef) -> &str {
+    if slot.surface.trim().is_empty() {
+        slot.root.trim()
+    } else {
+        slot.surface.trim()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use adam_reasoning::{ConfidenceKind, FactSource, SlotRef};
+    use adam_reasoning::{ConfidenceKind, FactSource, Predicate as ReasPredicate, SlotRef};
 
     fn make_fact(subject: &str, predicate: ReasPredicate, object: &str, raw: &str) -> ReasFact {
         ReasFact {
@@ -303,9 +336,20 @@ mod tests {
 
     #[test]
     fn unknown_predicate_returns_none() {
-        // Rule set covers IsA / PartOf / HasQuantity / RelatedTo /
-        // LivesIn. Other predicates (Causes, GoesTo, …) fall
-        // through to None — caller falls back to templates.
+        // **v4.42.5** — predicates without an NLG rule fall through.
+        // Causes was added in this bundle, so use one that's still
+        // unmatched (GoesTo / After / DoesTo).
+        let fact = make_fact("адам", ReasPredicate::GoesTo, "үй", "Адам үйге барады.");
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+        };
+        assert_eq!(render_sentence(&frame), None);
+    }
+
+    #[test]
+    fn causes_declarative() {
         let fact = make_fact(
             "жаңбыр",
             ReasPredicate::Causes,
@@ -317,6 +361,83 @@ mod tests {
             mood: SentenceMood::Declarative,
             introducer: Introducer::Direct,
         };
-        assert_eq!(render_sentence(&frame), None);
+        let out = render_sentence(&frame).expect("Causes rule should match");
+        assert_eq!(out, "Жаңбыр сел себебі болады.");
+    }
+
+    #[test]
+    fn has_declarative() {
+        let fact = make_fact("ел", ReasPredicate::Has, "тіл", "Елдің тілі бар.");
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+        };
+        let out = render_sentence(&frame).expect("Has rule should match");
+        assert_eq!(out, "Ел тіл иеленеді.");
+    }
+
+    #[test]
+    fn isa_with_richer_raw_text_uses_raw() {
+        // Mirrors the existing tool.rs test
+        // `grounded_fact_keeps_richer_raw_text_for_is_a` — IsA rule
+        // prefers curated raw_text over mechanical "subj — obj"
+        // composition.
+        let fact = make_fact(
+            "қазақстан",
+            ReasPredicate::IsA,
+            "ел",
+            "Қазақстан — Орталық Азиядағы ел",
+        );
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+        };
+        let out = render_sentence(&frame).expect("rule should match");
+        assert_eq!(out, "Қазақстан — Орталық Азиядағы ел.");
+    }
+
+    #[test]
+    fn related_to_shectes_uses_raw() {
+        // Border-relation special case — raw_text wins over the
+        // generic «X мен Y өзара байланысты» phrasing.
+        let fact = make_fact(
+            "қазақстан",
+            ReasPredicate::RelatedTo,
+            "ресей",
+            "Қазақстан Ресеймен шектес.",
+        );
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+        };
+        let out = render_sentence(&frame).expect("шектес rule should match");
+        assert_eq!(out, "Қазақстан Ресеймен шектес.");
+    }
+
+    #[test]
+    fn related_to_general_uses_ozara_template() {
+        let fact = make_fact("кітап", ReasPredicate::RelatedTo, "ілім", "");
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+        };
+        let out = render_sentence(&frame).expect("general RelatedTo should match");
+        assert_eq!(out, "Кітап мен ілім өзара байланысты.");
+    }
+
+    #[test]
+    fn in_domain_declarative() {
+        let fact = make_fact("атом", ReasPredicate::InDomain, "физика", "");
+        let frame = SentenceFrame {
+            fact: &fact,
+            mood: SentenceMood::Declarative,
+            introducer: Introducer::Direct,
+        };
+        let out = render_sentence(&frame).expect("InDomain rule should match");
+        assert_eq!(out, "Атом физика саласына жатады.");
     }
 }

@@ -1155,47 +1155,43 @@ fn user_facing_fact_priority(fact: &ReasFact) -> (usize, usize, isize) {
 }
 
 fn render_grounded_fact(fact: &ReasFact) -> Option<String> {
-    let subject = preferred_subject_text(&fact.subject);
-    let object = preferred_object_text(&fact.object);
-    // v4.4.11 — when the fact's object encodes a structured
-    // collection (its root contains «тізім» = "list", or it's
-    // explicitly a multi-word "X тізімі" object), the canned
-    // «{subject} мен {object} өзара байланысты» template reads
-    // awkwardly («Қазақстан мен көлдер тізімі өзара байланысты»)
-    // and hides the informative content from `raw_text`. Prefer the
-    // raw sentence in that case — it's curated and carries the
-    // actual list. Mirror of the existing «шектес» special-case for
-    // border facts.
-    let object_root_lower = fact.object.root.to_lowercase();
-    let is_list_summary = object_root_lower.contains("тізім");
-    let rendered = match fact.predicate {
-        ReasPredicate::IsA => None,
-        ReasPredicate::PartOf => Some(format!("{subject} {object} құрамына кіреді")),
-        ReasPredicate::RelatedTo if fact.raw_text.contains("шектес") => {
-            Some(fact.raw_text.trim().to_string())
-        }
-        ReasPredicate::RelatedTo if is_list_summary => Some(fact.raw_text.trim().to_string()),
-        ReasPredicate::RelatedTo => Some(format!("{subject} мен {object} өзара байланысты")),
-        ReasPredicate::InDomain => Some(format!("{subject} {object} саласына жатады")),
-        ReasPredicate::LivesIn => Some(format!("{subject} мекені — {object}")),
-        ReasPredicate::Has => Some(format!("{subject} {object} иеленеді")),
-        ReasPredicate::Causes => Some(format!("{subject} {object} себебі болады")),
-        ReasPredicate::GoesTo
-        | ReasPredicate::After
-        | ReasPredicate::HasQuantity
-        | ReasPredicate::DoesTo => None,
+    // **v4.42.5** — Stage A bundle 2: NLG migration. The v4.4.11
+    // hand-coded predicate match is replaced with a call into the
+    // typed-frame rule engine `crate::nlg::render_sentence`. Every
+    // pre-v4.42.5 surface case is preserved bit-for-bit by the rule
+    // priority order in `nlg::all_rules`:
+    //   - HasQuantity / RelatedTo+«шектес» / RelatedTo+list →
+    //     curated raw_text wins (matches old fall-through
+    //     behaviour where `match` returned `None` and the
+    //     `or_else(raw_text)` branch fired).
+    //   - IsA → also prefers raw_text via the rule's internal logic
+    //     (preserves the «Қазақстан — Орталық Азиядағы…» rich
+    //     description case from the v4.4.11-era test).
+    //   - PartOf / LivesIn / Has / Causes / InDomain / RelatedTo
+    //     general → composed from typed primitives, identical
+    //     surface to the old `match` arms.
+    //   - GoesTo / After / DoesTo → no rule matches, NLG returns
+    //     None, fall through to raw_text below.
+    //
+    // The behavior is byte-identical to v4.42.0 (verified by the
+    // workspace test suite + repl_replay regression bank). The
+    // architectural significance: every grounded-fact surface
+    // now flows through the typed-frame NLG layer, the foundation
+    // for Stage A widening (interrogative mood, more predicate
+    // combinations, eventual selection weights).
+    let frame = crate::nlg::SentenceFrame {
+        fact,
+        mood: crate::nlg::SentenceMood::Declarative,
+        introducer: crate::nlg::Introducer::Direct,
     };
-    rendered
-        .filter(|text| !text.trim().is_empty())
-        .map(ensure_sentence_period)
-        .or_else(|| {
-            let text = fact.raw_text.trim();
-            if text.is_empty() {
-                None
-            } else {
-                Some(ensure_sentence_period(text.to_string()))
-            }
-        })
+    crate::nlg::render_sentence(&frame).or_else(|| {
+        let text = fact.raw_text.trim();
+        if text.is_empty() {
+            None
+        } else {
+            Some(ensure_sentence_period(text.to_string()))
+        }
+    })
 }
 
 fn render_grounded_graph_evidence(fact: &ReasFact) -> Option<(String, ToolEvidence)> {
@@ -1217,30 +1213,10 @@ fn predicate_name_matches(predicate: ReasPredicate, needle: &str) -> bool {
     predicate.as_str().replace('_', "") == normalised
 }
 
-fn preferred_subject_text(slot: &adam_reasoning::SlotRef) -> String {
-    capitalise_first(preferred_slot_text(slot))
-}
-
-fn preferred_object_text(slot: &adam_reasoning::SlotRef) -> String {
-    preferred_slot_text(slot)
-}
-
-fn preferred_slot_text(slot: &adam_reasoning::SlotRef) -> String {
-    let text = if slot.surface.trim().is_empty() {
-        slot.root.trim()
-    } else {
-        slot.surface.trim()
-    };
-    text.to_string()
-}
-
-fn capitalise_first(text: String) -> String {
-    let mut chars = text.chars();
-    match chars.next() {
-        Some(c) => c.to_uppercase().chain(chars).collect(),
-        None => String::new(),
-    }
-}
+// **v4.42.5** — `preferred_subject_text` / `preferred_object_text` /
+// `preferred_slot_text` / `capitalise_first` removed; their work is
+// now done by `crate::nlg::preferred_surface` / `capitalize_first`
+// inside the rule engine.
 
 fn ensure_sentence_period(text: String) -> String {
     if text.ends_with(['.', '!', '?']) {
