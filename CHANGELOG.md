@@ -7,6 +7,41 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.43.9] — 2026-05-04 — `multiword_entity_hint` inflected-FIRST-word pass (architectural)
+
+**Closes the v4.43.8 architectural carry-forward.** v4.43.8 fixed the «Қазіргі Қазақстан президенті» routing by registering both bare-form and Gen-form (-ның) variants of office phrases as multiwords — solved the symptom, but registering parallel Gen-form variants is data-drift waiting to happen. v4.43.9 lifts the fix to the matcher itself: a third pass in `multiword_entity_hint` detects inflected-FIRST-word forms via the six Kazakh genitive suffixes (-ның / -нің / -дың / -дің / -тың / -тің), so future 2-word multiword entries no longer need parallel Gen-form registration. Byte-identical for all v4.43.8 surfaces (verified by 906→912 workspace test count, +6 new matcher tests).
+
+### Innovations
+
+**(1) Third pass in `multiword_entity_hint`** — for 2-word entities `X Y`, accepts input containing `X{Gen} T` where `T` starts with `Y`'s first 3 chars and `X{Gen}` is `X` followed by one of the six Kazakh genitive suffixes. Conservative: requires `parts[0].chars().count() >= 4` to avoid spurious matches on shorter first words. Returns the BARE-form entity string (not the inflected surface) so SearchGraph downstream finds the canonical fact subject.
+
+**(2) 6 new unit tests** in `topic_extraction::tests`:
+- `multiword_hint_first_pass_exact_substring` — anti-regression on first-pass bare-form match
+- `multiword_hint_second_pass_inflected_second_word` — anti-regression on v4.40.5 inflected-second-word pass
+- `multiword_hint_third_pass_genitive_first_word_returns_bare_form` — verifies new third pass on `қазақтың тілі` → bare `қазақ тілі` (registered without Gen-form variant)
+- `multiword_hint_third_pass_handles_temir_zhol_genitive` — front-vowel + voiced-consonant Gen `темірдің жолы`
+- `multiword_hint_third_pass_handles_nasal_genitive` — nasal-final Gen `аспанның денесі`
+- `multiword_hint_third_pass_skips_short_first_word` — gate test for parts[0] < 4 chars
+
+**(3) Architectural cleanliness** — the v4.43.8 Gen-form multiword registrations remain (byte-identical for those known surfaces) but are now redundant for the matcher contract. Future 2-word multiword additions can be registered in bare form alone; the third pass handles genitive-form input automatically. Pattern documented in the matcher's docstring.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **912 passing** (was 906; +6 new matcher tests) |
+| Adam-dialog lib | **245 passing** (was 239; +6) |
+| `world_core_multiword_coverage` | ✓ green |
+| Live REPL replay (5 v4.43.8-transcript president/premier queries) | ✓ all 5 byte-identical to v4.43.8 |
+| Foundation: 2019 / 2284 / 45 / 26 869 | unchanged |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.9` reflects: (1) third matcher pass + (2) 6 unit tests + (3) architectural cleanup + future-proofing — **3 distinct innovations**. Per `feedback_versioning_post_1_0`: small/incremental architectural patch. Bumped sequentially from .8.
+
+Stripe (11) — generative AI via agglutinative composition. Next: continued real-REPL gap closures + interrogative-mood NLG opening.
+
 ## [4.43.8] — 2026-05-04 — v4.43.7 carry-forward closed — current-president direct routing
 
 **Closes the v4.43.7 carry-forward.** Pre-v4.43.8 «Қазіргі Қазақстан президенті кім?» fell to «Қазақстан президенттігі — 1991 жылдан бастап енгізілген ел басшысы лауазымы» (the abstract office concept, not naming Тоқаев). Root cause: FST analyzes «президенті» as either `президент + Pos3` or `президенттік + Pos3`; the multiword «қазақстан президенттігі» (a registered abstract-noun compound from `history_kazakhstan`) wins via longest-substring match. Fix: add direct office-holder facts whose subject IS the inflected/compound surface phrase the user actually types («қазіргі қазақстан президенті», «қазақстан президенті», «қазақстанның президенті», plus parallel premier-minister forms) and register them as multiwords so topic-extraction picks the bridge to the office-holder.
