@@ -34268,6 +34268,258 @@
       "part_of_speech": "noun",
       "vowel_harmony": "back",
       "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_психология",
+      "root": "психология",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_философия",
+      "root": "философия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_эстетика",
+      "root": "эстетика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_метафизика",
+      "root": "метафизика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_гносеология",
+      "root": "гносеология",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_галактика",
+      "root": "галактика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_меркурий",
+      "root": "меркурий",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_шолпан",
+      "root": "шолпан",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_v4_43_7_юпитер",
+      "root": "юпитер",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_сатурн",
+      "root": "сатурн",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_v4_43_7_нептун",
+      "root": "нептун",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "noun_v4_43_7_астероид",
+      "root": "астероид",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_телескоп",
+      "root": "телескоп",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_орбита",
+      "root": "орбита",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_космонавтика",
+      "root": "космонавтика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_атмосфера",
+      "root": "атмосфера",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_статистика",
+      "root": "статистика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_дисперсия",
+      "root": "дисперсия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_медиана",
+      "root": "медиана",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_прогрессия",
+      "root": "прогрессия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_алгебра",
+      "root": "алгебра",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_геометрия",
+      "root": "геометрия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_тригонометрия",
+      "root": "тригонометрия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_президент",
+      "root": "президент",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_премьер",
+      "root": "премьер",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_министр",
+      "root": "министр",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_министрлік",
+      "root": "министрлік",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_парламент",
+      "root": "парламент",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_мәжіліс",
+      "root": "мәжіліс",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_сенат",
+      "root": "сенат",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_республика",
+      "root": "республика",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_конституция",
+      "root": "конституция",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_демократия",
+      "root": "демократия",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "noun_v4_43_7_назарбаев",
+      "root": "назарбаев",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_тоқаев",
+      "root": "тоқаев",
+      "part_of_speech": "noun",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "noun_v4_43_7_бектенов",
+      "root": "бектенов",
+      "part_of_speech": "noun",
+      "vowel_harmony": "front",
+      "final_sound_class": "voiced_consonant"
     }
   ]
 }

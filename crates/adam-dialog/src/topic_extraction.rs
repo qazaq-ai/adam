@@ -532,6 +532,20 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     ".net саласы",
     "меншік моделі",
     "қоқыс жинаушы",
+    // **v4.43.7** — government_kazakhstan domain (presidents,
+    // premier, parliament, ministries, courts). Required by
+    // `world_core_multiword_coverage`. Driven by 2026-05-04 user
+    // dialog test transcript.
+    "конституциялық сот",
+    "министрліктер тізімі",
+    "қасым-жомарт тоқаев",
+    "нұрсұлтан назарбаев",
+    "мемлекеттік орган",
+    "тұңғыш президент",
+    "қазіргі президент",
+    "олжас бектенов",
+    "республика түрі",
+    "жоғарғы сот",
     // **v4.43.6** — language_features depth (Kazakh morphology
     // vocabulary). Required by `world_core_multiword_coverage`.
     "грамматикалық категория",

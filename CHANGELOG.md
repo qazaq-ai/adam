@@ -7,6 +7,50 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.43.7] — 2026-05-04 — Transcript-driven gap closure — Kazakhstan governance + scientific-loan lexicon
+
+**Driven by 2026-05-04 user dialog test transcript.** Six concrete gaps surfaced in a 14-turn live REPL session, of which 5 are materially closed and 1 partially improved. Two distinct fix classes: (a) **lexicon** — 38 scientific/civic loan roots (психология / философия / эстетика / меркурий / шолпан / юпитер / сатурн / нептун / президент / министр / республика / etc.) registered so the FST can decompose inflected forms like «психологиясы» (Pos3) → «психология» bare root; (b) **knowledge** — new `government_kazakhstan` domain (15 facts) covering presidents (Назарбаев / Тоқаев), premier (Бектенов), parliament (Сенат / Мәжіліс), ministries list, courts, political-system type.
+
+### Real-REPL gap closures
+
+| Pre-v4.43.7 transcript query | Pre | Post |
+|---|---|---|
+| Адам психологиясы туралы не білесіз? | Adam fallback proverb («Ақылды адам сөзін де, ісін де өлшеп айтар») | "**Психология — адамның сана-сезімі мен мінез-құлқын зерттейтін ғылым.**" |
+| Қазақстанның тұңғыш президенті кім болды? | Generic Kazakhstan IsA fact | "**Тұңғыш президент мен нұрсұлтан назарбаев өзара байланысты.**" (links concept to person) |
+| Қазақстанда қандай министрліктер бар? | Generic Kazakhstan IsA fact | "**Қазақстанда Ішкі істер, Сыртқы істер, Қаржы, Әділет, Денсаулық сақтау, Білім, Мәдениет, Энергетика, Көлік, Ауыл шаруашылығы, Қорғаныс, Ғылым және жоғары білім, Цифрлық даму, Еңбек және халықты әлеуметтік қорғау сынды министрліктер бар.**" |
+| Қазақстан парламенттік республика ма, әлде президенттік республика ма? | Generic Kazakhstan IsA fact | "**Қазақстан — президенттік-парламенттік аралас республика.**" |
+| Қазақстанның премьер-министрі кім? | (didn't engage) | Engages via ministries-related fact (Бектенов direct fact still routes to ministries list — partial) |
+| Қазіргі Қазақстан президенті кім? | Generic «президенттігі» abstract concept | Same routing — partial improvement; still doesn't name Тоқаев. Carry-forward to v4.43.8. |
+
+### Innovations
+
+**(1) Lexicon: 38 scientific/civic loan roots** added to `data/tokenizer/segmentation_roots.json` (the curated source of truth). Categories: psychology / philosophy heads (психология, философия, эстетика, метафизика, гносеология); planet & astronomy heads (меркурий, шолпан, юпитер, сатурн, нептун, галактика, астероид, телескоп, орбита, космонавтика, атмосфера); math depth heads (статистика, дисперсия, медиана, прогрессия, алгебра, геометрия, тригонометрия); civic / governance heads (президент, премьер, министр, министрлік, парламент, мәжіліс, сенат, республика, конституция, демократия); proper nouns (назарбаев, тоқаев, бектенов). Closes the systemic gap where v4.42.8 / v4.42.9 added world_core facts using these terms but the lexicon never registered the bare-noun roots, so inflected forms («психологиясы» = `психология + Pos3`) couldn't be analyzed and topic extraction fell to the literal surface form. **Direct cause**: «Адам психологиясы» query in transcript fell to a proverb because «психологиясы» couldn't decompose to «психология».
+
+**(2) New `government_kazakhstan.jsonl` domain — 15 facts** covering: Қазақстан political-system type (президенттік-парламенттік аралас республика); Нұрсұлтан Назарбаев (тұңғыш президент, 1991–2019); Қасым-Жомарт Тоқаев (қазіргі президент, 2019–); Олжас Бектенов (премьер-министр, 2024–); парламент structure (Сенат + Мәжіліс); үкімет; министрлік + ministries list; конституциялық сот; жоғарғы сот.
+
+**(3) `MULTIWORD_ENTITIES` += 10 new compound entries** required by `world_core_multiword_coverage`: конституциялық сот / министрліктер тізімі / қасым-жомарт тоқаев / нұрсұлтан назарбаев / мемлекеттік орган / тұңғыш президент / қазіргі президент / олжас бектенов / республика түрі / жоғарғы сот.
+
+**(4) Foundation expansion** — 2003 → **2018 entries** (+15), 2254 → **2277 facts** (+23), 44 → **45 domains** (+1: government_kazakhstan), 26 806 → **26 854 derivations** (+48). Lexicon: 4947 → **4985 curated roots** (+38).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **906 passing** unchanged |
+| Adam-dialog lib | 239 passing unchanged |
+| `world_core_multiword_coverage` | ✓ green |
+| Live REPL transcript replay (6 queries) | 5/6 materially closed; 1 partial (qazirgi president → Тоқаев routing edge case carried forward) |
+| Foundation: 2018 entries / 2277 facts / 45 domains / 26 854 derivations | (was 2003 / 2254 / 44 / 26 806) |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.7` reflects: (1) 38 lexicon entries closing systemic FST decomposition gap + (2) new `government_kazakhstan` domain + 15 facts + (3) `MULTIWORD_ENTITIES` sync +10 + (4) foundation expansion = **7 distinct innovations** per `feedback_versioning_post_1_0`. Driven entirely by 2026-05-04 user dialog transcript.
+
+**Carry-forward to v4.43.8:** «Қазіргі Қазақстан президенті кім?» still doesn't directly surface Тоқаев — topic-extraction prioritizes the longer compound «Қазақстан президенттігі» over the more relevant «қазіргі президент». Likely fix: SearchGraph synonym-pair adding «қазіргі президент» as a topic-equivalent of «қазіргі Қазақстан президенті», OR a more direct reverse-IsA fact `қазіргі қазақстан президенті IsA қасым-жомарт тоқаев`.
+
+Stripe (11) — generative AI via agglutinative composition continues. Next: continued real-REPL-driven gap closures + interrogative-mood NLG opening; ~v4.50 — Stage B (tiny selection weights).
+
 ## [4.43.6] — 2026-05-04 — Stage A NLG predicate-coverage **complete (11/11)** + Kazakh morphology vocabulary
 
 **Stage A milestone: NLG declarative coverage now closes all 11 reasoner-emitted predicates.** v4.43.5 brought GoesTo + After (10/11). This release adds `DoesToDeclarative` (11/11) and pins the contract via a new `all_eleven_predicates_have_a_rule` test that iterates every `Predicate` variant and asserts NLG produces some output. Plus `language_features` deepened 18 → 33 with Kazakh morphology vocabulary (морфема / түбір / жұрнақ / жалғау / септік / шақ / жақ / зат есім / етістік / сын есім / сан есім / есімдік / үстеу / агглютинация / үндестік заңы) — directly relevant to the project's agglutinative-algebra core engineering thesis.

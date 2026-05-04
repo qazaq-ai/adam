@@ -1,7 +1,7 @@
 {
-  "version": "4.43.5",
+  "version": "4.43.6",
   "status": "completed",
-  "elapsed_s": 60,
+  "elapsed_s": 59,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2254,
+    "facts_total": 2277,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,10 +27,10 @@
       "has": 65,
       "has_quantity": 34,
       "in_domain": 24,
-      "is_a": 1745,
+      "is_a": 1756,
       "lives_in": 8,
-      "part_of": 230,
-      "related_to": 90
+      "part_of": 236,
+      "related_to": 96
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -57,6 +57,7 @@
       "world_core/emotions.jsonl": 30,
       "world_core/food.jsonl": 50,
       "world_core/geography_kz.jsonl": 178,
+      "world_core/government_kazakhstan.jsonl": 23,
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
       "world_core/informatics_basic.jsonl": 40,
@@ -18407,6 +18408,466 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақстан — Орталық Азиядағы аумағы бойынша 9-шы үлкен тәуелсіз мемлекет; астанасы — Астана, ірі қаласы — Алматы."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "республика түрі",
+        "root": "республика түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан — президенттік-парламенттік аралас республика."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекет",
+        "root": "мемлекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстан — президенттік-парламенттік аралас республика."
+    },
+    {
+      "subject": {
+        "surface": "нұрсұлтан назарбаев",
+        "root": "нұрсұлтан назарбаев",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "президент",
+        "root": "президент",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Нұрсұлтан Назарбаев — Қазақстанның тұңғыш Президенті, 1991 жылдан 2019 жылға дейін қызмет атқарған."
+    },
+    {
+      "subject": {
+        "surface": "нұрсұлтан назарбаев",
+        "root": "нұрсұлтан назарбаев",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Нұрсұлтан Назарбаев — Қазақстанның тұңғыш Президенті, 1991 жылдан 2019 жылға дейін қызмет атқарған."
+    },
+    {
+      "subject": {
+        "surface": "қасым-жомарт тоқаев",
+        "root": "қасым-жомарт тоқаев",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "президент",
+        "root": "президент",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қасым-Жомарт Тоқаев — Қазақстанның қазіргі Президенті, 2019 жылдан бері мемлекет басшысы."
+    },
+    {
+      "subject": {
+        "surface": "қасым-жомарт тоқаев",
+        "root": "қасым-жомарт тоқаев",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қасым-Жомарт Тоқаев — Қазақстанның қазіргі Президенті, 2019 жылдан бері мемлекет басшысы."
+    },
+    {
+      "subject": {
+        "surface": "олжас бектенов",
+        "root": "олжас бектенов",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "премьер-министр",
+        "root": "премьер-министр",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Олжас Бектенов — Қазақстан Республикасының Премьер-Министрі, 2024 жылдан бері қызмет атқарады."
+    },
+    {
+      "subject": {
+        "surface": "олжас бектенов",
+        "root": "олжас бектенов",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Олжас Бектенов — Қазақстан Республикасының Премьер-Министрі, 2024 жылдан бері қызмет атқарады."
+    },
+    {
+      "subject": {
+        "surface": "тұңғыш президент",
+        "root": "тұңғыш президент",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "нұрсұлтан назарбаев",
+        "root": "нұрсұлтан назарбаев",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанның тұңғыш президенті — Нұрсұлтан Назарбаев."
+    },
+    {
+      "subject": {
+        "surface": "қазіргі президент",
+        "root": "қазіргі президент",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қасым-жомарт тоқаев",
+        "root": "қасым-жомарт тоқаев",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазіргі Қазақстан президенті — Қасым-Жомарт Тоқаев."
+    },
+    {
+      "subject": {
+        "surface": "парламент",
+        "root": "парламент",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік орган",
+        "root": "мемлекеттік орган",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Парламент — Қазақстанның жоғары заң шығарушы органы, екі палатадан тұрады: Сенат пен Мәжіліс."
+    },
+    {
+      "subject": {
+        "surface": "парламент",
+        "root": "парламент",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Парламент — Қазақстанның жоғары заң шығарушы органы, екі палатадан тұрады: Сенат пен Мәжіліс."
+    },
+    {
+      "subject": {
+        "surface": "сенат",
+        "root": "сенат",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "парламент",
+        "root": "парламент",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сенат — Қазақстан парламентінің жоғарғы палатасы."
+    },
+    {
+      "subject": {
+        "surface": "мәжіліс",
+        "root": "мәжіліс",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "парламент",
+        "root": "парламент",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мәжіліс — Қазақстан парламентінің төменгі палатасы."
+    },
+    {
+      "subject": {
+        "surface": "үкімет",
+        "root": "үкімет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік орган",
+        "root": "мемлекеттік орган",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үкімет — Қазақстанның атқарушы билік органы, министрліктерден тұрады."
+    },
+    {
+      "subject": {
+        "surface": "үкімет",
+        "root": "үкімет",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үкімет — Қазақстанның атқарушы билік органы, министрліктерден тұрады."
+    },
+    {
+      "subject": {
+        "surface": "министрлік",
+        "root": "министрлік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік орган",
+        "root": "мемлекеттік орган",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Министрлік — мемлекеттік басқарудың белгілі бір саласына жауапты атқарушы орган."
+    },
+    {
+      "subject": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "министрліктер тізімі",
+        "root": "министрліктер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақстанда Ішкі істер, Сыртқы істер, Қаржы, Әділет, Денсаулық сақтау, Білім, Мәдениет, Энергетика, Көлік, Ауыл шаруашылығы, Қорғаныс, Ғылым және жоғары білім, Цифрлық даму, Еңбек және халықты әлеуметтік қорғау сынды министрліктер бар."
+    },
+    {
+      "subject": {
+        "surface": "премьер-министр",
+        "root": "премьер-министр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "басшы",
+        "root": "басшы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Премьер-министр — үкімет басшысы, президент тағайындайды, парламент бекітеді."
+    },
+    {
+      "subject": {
+        "surface": "конституциялық сот",
+        "root": "конституциялық сот",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік орган",
+        "root": "мемлекеттік орган",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Конституциялық сот — Қазақстанның жоғары құқықтық қадағалау органы."
+    },
+    {
+      "subject": {
+        "surface": "конституциялық сот",
+        "root": "конституциялық сот",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Конституциялық сот — Қазақстанның жоғары құқықтық қадағалау органы."
+    },
+    {
+      "subject": {
+        "surface": "жоғарғы сот",
+        "root": "жоғарғы сот",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекеттік орган",
+        "root": "мемлекеттік орган",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жоғарғы сот — Қазақстанның сот жүйесінің ең жоғарғы инстанциясы."
+    },
+    {
+      "subject": {
+        "surface": "жоғарғы сот",
+        "root": "жоғарғы сот",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "қазақстан",
+        "root": "қазақстан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/government_kazakhstan",
+      "source": {
+        "pack": "world_core/government_kazakhstan.jsonl",
+        "sample_id": "gov_kz_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жоғарғы сот — Қазақстанның сот жүйесінің ең жоғарғы инстанциясы."
     },
     {
       "subject": {
