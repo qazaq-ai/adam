@@ -7,6 +7,71 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.48.5] — 2026-05-04 — Stage B bundle 8 — test-harness integration: first real disagreements harvested
+
+**First time the Stage B substrate runs against real eval data.** New `tests/selection_audit_harvest.rs` runs every query in `data/eval/live_holdout_2026_05_01.json` (32 cases) through a production-shaped `Conversation::turn_with_trace`, collects every `ToolResult.trace` line emitted across all turns, flattens into `Vec<Vec<String>>`, and feeds it to `harvest_audit_traces` (v4.48.0). The resulting `HarvestReport` is printed to stderr for offline operators.
+
+### First-run results (live_holdout_2026_05_01)
+
+```
+total_turns:           32
+multi_candidate_turns: 2 (6.2% of total)
+audit_lines_found:     2
+disagreement_count:    2
+disagreement_rate:     1.0000
+disagreement_traces:
+  [0] selection_audit: disagreement heuristic_top=0 selector_top=2 score_gap=0.0600
+  [1] selection_audit: disagreement heuristic_top=0 selector_top=3 score_gap=0.0420
+```
+
+**Two real disagreements surfaced** — both with small score gaps (0.06 / 0.04), confirming v0 weights mostly agree with the heuristic ranker but flagging two candidate gold pairs for hand-curation. These are the first concrete training data points harvested from the audit pipeline.
+
+### Innovations
+
+**(1) New `tests/selection_audit_harvest.rs` integration test** — production-shaped harness:
+- Loads `live_holdout_2026_05_01.json` (32 cases).
+- For each case, builds a `Conversation` with full runtime (lexicon, morpheme index, extracted+derived facts, suffix priors, root affinity, domain index).
+- Calls `turn_with_trace` per case; flattens `tool_calls[*].trace + plan_trace` into a per-case `Vec<String>`.
+- Feeds the batch to `harvest_audit_traces`.
+- Prints `HarvestReport` via `eprintln!` (CI logs).
+- Asserts only internal consistency (`total_turns == cases.len()`, `disagreement_count <= audit_lines_found`, `multi_candidate_turns <= total_turns`).
+
+**(2) Diagnostic-not-gating** — no assertion on disagreement count or rate. The v4.46.5 wiring with `default_v0()` weights is calibrated to match the v4.38.0 heuristic ranker, so disagreements should be rare. This test surfaces what the audit sees and reports it; future patches that re-train the weights will start reporting different disagreement counts that operators can act on.
+
+**(3) Skip semantics** — when runtime artifacts (`facts.json`, `morpheme_index.json`, etc.) are absent (trimmed CI checkouts, external crate consumers), the test skips silently rather than panic. Same convention as `tests/live_holdout.rs`.
+
+**(4) First concrete disagreement data points** — the two disagreements with `score_gap=0.0600` and `score_gap=0.0420` are now visible in CI logs for every release. v4.48.6+ patches can hand-curate them into `TrainingPair` entries by inspecting which queries emitted them and which candidates the selector preferred.
+
+**(5) NOT YET in v4.48.5** (Stage B carry-forwards):
+- Harvest from `live_holdout_2026_05_02.json` and `rust_holdout.json` (similar test scaffold; deferred for tighter scope).
+- Hand-curation of the 2 found disagreements into `TrainingPair` entries — requires inspecting the specific queries + candidate facts behind each line, which is operator work.
+- First trained `SelectionWeights::trained_v0()` constant — once curated pairs exist.
+- Production ranker replacement.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **961 passing** (was 960; +1 new harvest integration test) |
+| Adam-dialog integration test | `selection_audit_harvest_live_holdout_2026_05_01`: 1/1 pass |
+| Disagreement cases harvested | **2 real disagreements found** in live_holdout_2026_05_01 (6.2 % of 32 turns) |
+| Live REPL | byte-identical to v4.48.0 (audit is trace-only) |
+| Foundation: 2086 / 2346 / 46 / 27 163 | unchanged |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.5` reflects: (1) integration test scaffold + (2) report printing + (3) diagnostic-not-gating policy + (4) skip-semantics for trimmed checkouts + (5) **first real disagreement data points harvested** = 4 distinct innovations + Stage B's first end-to-end pipeline run on real data.
+
+Stage B status:
+- v4.45.0–v4.48.0 — substrate complete ✓
+- **v4.48.5 — bundle 8 — test-harness integration: 2 real disagreements harvested** ← shipped
+- v4.48.6+ — bundle 9: hand-curate the 2 disagreements into TrainingPair entries; harvest live_holdout_2026_05_02 + rust_holdout for more
+- v4.49.0+ — bundle 10: first trained `SelectionWeights::trained_v0()` constant
+- v4.50.0 (target) — bundle 11: trained weights replace heuristic ranker
+
+Stripe (11) — generative AI via agglutinative composition. **First concrete signal from real corpus data is now in CI logs.**
+
 ## [4.48.0] — 2026-05-04 — Stage B bundle 7 — REPL-trace harvest substrate
 
 **Pure-function trace-line parser.** `HarvestReport` aggregates `selection_audit:` lines extracted from a batch of `Conversation::turn_with_trace` traces. `harvest_audit_traces(&[Vec<String>]) -> HarvestReport` is the parser that walks each trace and counts how many turns produced audit lines, how many of those were disagreements, and keeps the raw disagreement lines for hand-curation into new `TrainingPair` entries.
