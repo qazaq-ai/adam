@@ -532,6 +532,35 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     ".net саласы",
     "меншік моделі",
     "қоқыс жинаушы",
+    // **v4.42.8** — computer_science_basics + mathematics_basic
+    // (functions / equations / progressions / statistics) compound
+    // objects/subjects. Required by `world_core_multiword_coverage`.
+    "объектіге бағытталған бағдарламалау",
+    "функционалдық бағдарламалау",
+    "бағдарламалау парадигмасы",
+    "арифметикалық прогрессия",
+    "геометриялық прогрессия",
+    "логарифмдік күрделілік",
+    "бағдарламалау құрылымы",
+    "бағдарламалау бірлігі",
+    "бағдарламалау тәсілі",
+    "жадтар күрделілігі",
+    "уақыт күрделілігі",
+    "квадраттық функция",
+    "квадраттық теңдеу",
+    "статистикалық шама",
+    "алгоритмдік тәсіл",
+    "ұйымдастыру тәсілі",
+    "сызықтық функция",
+    "сызықтық теңдеу",
+    "күрделілік белгісі",
+    "математикалық шама",
+    "сандар тізбегі",
+    "математикалық топ",
+    "күрделілік түрі",
+    "жадтар түрі",
+    "орташа мән",
+    "қате жөндеу",
     // **v4.42.0** — programming-languages compound objects from
     // `data/world_core/programming_languages.jsonl`. List-summary
     // forms + classification forms + structural type-system

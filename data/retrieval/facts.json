@@ -1,7 +1,7 @@
 {
-  "version": "4.42.6",
+  "version": "4.42.7",
   "status": "completed",
-  "elapsed_s": 67,
+  "elapsed_s": 65,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2090,
+    "facts_total": 2135,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 65,
       "has_quantity": 34,
       "in_domain": 24,
-      "is_a": 1581,
+      "is_a": 1626,
       "lives_in": 8,
       "part_of": 230,
       "related_to": 90
@@ -50,6 +50,7 @@
       "world_core/chemistry_school.jsonl": 105,
       "world_core/clothing.jsonl": 35,
       "world_core/colors.jsonl": 38,
+      "world_core/computer_science_basics.jsonl": 30,
       "world_core/constellations_kz.jsonl": 6,
       "world_core/cooking_methods.jsonl": 10,
       "world_core/directions.jsonl": 9,
@@ -63,7 +64,7 @@
       "world_core/kz_literature.jsonl": 94,
       "world_core/language_features.jsonl": 18,
       "world_core/materials.jsonl": 14,
-      "world_core/mathematics_basic.jsonl": 37,
+      "world_core/mathematics_basic.jsonl": 52,
       "world_core/measurements.jsonl": 10,
       "world_core/music_kz.jsonl": 16,
       "world_core/notable_kazakhstanis.jsonl": 51,
@@ -11844,6 +11845,606 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Түс — көз арқылы қабылданады."
+    },
+    {
+      "subject": {
+        "surface": "алгоритм",
+        "root": "алгоритм",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қадамдар тізбегі",
+        "root": "қадамдар тізбегі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Алгоритм — есепті шешу үшін орындалатын анық қадамдар тізбегі."
+    },
+    {
+      "subject": {
+        "surface": "деректер құрылымы",
+        "root": "деректер құрылымы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұйымдастыру тәсілі",
+        "root": "ұйымдастыру тәсілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дерек құрылымы — деректерді ұйымдастыру мен сақтаудың тәсілі."
+    },
+    {
+      "subject": {
+        "surface": "жиым",
+        "root": "жиым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "деректер құрылымы",
+        "root": "деректер құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жиым (массив) — реттелген тізбекте сақталатын бір типті элементтер жиынтығы."
+    },
+    {
+      "subject": {
+        "surface": "тізім",
+        "root": "тізім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "деректер құрылымы",
+        "root": "деректер құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тізім — элементтері бір-біріне сілтемелер арқылы байланысқан деректер құрылымы."
+    },
+    {
+      "subject": {
+        "surface": "стек",
+        "root": "стек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "деректер құрылымы",
+        "root": "деректер құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Стек — соңғы кірген элемент бірінші шығатын (LIFO) деректер құрылымы."
+    },
+    {
+      "subject": {
+        "surface": "кезек",
+        "root": "кезек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "деректер құрылымы",
+        "root": "деректер құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кезек — алғаш кірген элемент бірінші шығатын (FIFO) деректер құрылымы."
+    },
+    {
+      "subject": {
+        "surface": "ағаш",
+        "root": "ағаш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "деректер құрылымы",
+        "root": "деректер құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ағаш — әр түйіні балалар түйіндерге бөлінетін иерархиялық деректер құрылымы."
+    },
+    {
+      "subject": {
+        "surface": "граф",
+        "root": "граф",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "деректер құрылымы",
+        "root": "деректер құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Граф — түйіндер мен оларды байланыстыратын қырлардан құралған деректер құрылымы."
+    },
+    {
+      "subject": {
+        "surface": "хеш-кесте",
+        "root": "хеш-кесте",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "деректер құрылымы",
+        "root": "деректер құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Хеш-кесте — кілттер бойынша мәндерді жылдам іздеуге арналған деректер құрылымы."
+    },
+    {
+      "subject": {
+        "surface": "сұрыптау",
+        "root": "сұрыптау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "алгоритм",
+        "root": "алгоритм",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сұрыптау — элементтерді белгілі бір тәртіппен реттейтін алгоритм."
+    },
+    {
+      "subject": {
+        "surface": "іздеу",
+        "root": "іздеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "алгоритм",
+        "root": "алгоритм",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Іздеу — жиыннан қажетті элементті табатын алгоритм."
+    },
+    {
+      "subject": {
+        "surface": "рекурсия",
+        "root": "рекурсия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "алгоритмдік тәсіл",
+        "root": "алгоритмдік тәсіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Рекурсия — функцияның өзіне-өзі сілтейтін алгоритмдік тәсіл."
+    },
+    {
+      "subject": {
+        "surface": "итерация",
+        "root": "итерация",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "алгоритмдік тәсіл",
+        "root": "алгоритмдік тәсіл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Итерация — қадамдарды бірнеше рет қайталау арқылы есеп шығару тәсілі."
+    },
+    {
+      "subject": {
+        "surface": "күрделілік",
+        "root": "күрделілік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшем",
+        "root": "өлшем",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күрделілік — алгоритмнің орындалуына қанша уақыт пен жадтар қажет екенін көрсететін өлшем."
+    },
+    {
+      "subject": {
+        "surface": "уақыт күрделілігі",
+        "root": "уақыт күрделілігі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күрделілік түрі",
+        "root": "күрделілік түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Уақыт күрделілігі — алгоритмнің орындалуына қанша қадам қажет екенін кіріс мөлшеріне қатысты белгілейтін өлшем."
+    },
+    {
+      "subject": {
+        "surface": "жадтар күрделілігі",
+        "root": "жадтар күрделілігі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күрделілік түрі",
+        "root": "күрделілік түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жадтар күрделілігі — алгоритмнің орындалуына қанша жадтар қажет екенін көрсететін өлшем."
+    },
+    {
+      "subject": {
+        "surface": "o-n",
+        "root": "o-n",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күрделілік белгісі",
+        "root": "күрделілік белгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "O(n) белгісі — алгоритмнің күрделілігі кіріс мөлшеріне сызықты түрде өсетінін көрсетеді."
+    },
+    {
+      "subject": {
+        "surface": "логарифмдік күрделілік",
+        "root": "логарифмдік күрделілік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күрделілік түрі",
+        "root": "күрделілік түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Логарифмдік күрделілік O(log n) — әр қадамда мәселенің көлемі екі есе кемитін алгоритмдер үшін тән."
+    },
+    {
+      "subject": {
+        "surface": "айнымалы",
+        "root": "айнымалы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалық шама",
+        "root": "бағдарламалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Айнымалы — мәні өзгеретін бағдарламалық шама."
+    },
+    {
+      "subject": {
+        "surface": "тұрақты",
+        "root": "тұрақты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалық шама",
+        "root": "бағдарламалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұрақты — мәні өзгермейтін бағдарламалық шама."
+    },
+    {
+      "subject": {
+        "surface": "функция",
+        "root": "функция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарлама бөлігі",
+        "root": "бағдарлама бөлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Функция — белгілі есепті шешетін, қайта пайдалануға арналған бағдарлама бөлігі."
+    },
+    {
+      "subject": {
+        "surface": "класс",
+        "root": "класс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау құрылымы",
+        "root": "бағдарламалау құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Класс — деректер мен олармен жұмыс істейтін әдістерді біріктіретін объектіге бағытталған бағдарламалаудың құрылымы."
+    },
+    {
+      "subject": {
+        "surface": "объект",
+        "root": "объект",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау бірлігі",
+        "root": "бағдарламалау бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Объект — кластың нақты данасы, деректер мен мінез-құлыққа ие бағдарламалық бірлік."
+    },
+    {
+      "subject": {
+        "surface": "объектіге бағытталған бағдарламалау",
+        "root": "объектіге бағытталған бағдарламалау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау парадигмасы",
+        "root": "бағдарламалау парадигмасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Объектіге бағытталған бағдарламалау — программаны өзара әрекеттесетін объектілер жиынтығы ретінде құрылымдау тәсілі."
+    },
+    {
+      "subject": {
+        "surface": "функционалдық бағдарламалау",
+        "root": "функционалдық бағдарламалау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау парадигмасы",
+        "root": "бағдарламалау парадигмасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Функционалдық бағдарламалау — программаны таза функциялар арқылы құрылымдайтын бағдарламалау парадигмасы; күй өзгерту мен қосалқы әсерлерден аулақ болады."
+    },
+    {
+      "subject": {
+        "surface": "тестілеу",
+        "root": "тестілеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "процесс",
+        "root": "процесс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тестілеу — бағдарламаның дұрыс жұмыс істеуін тексеру процесі."
+    },
+    {
+      "subject": {
+        "surface": "қате жөндеу",
+        "root": "қате жөндеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "процесс",
+        "root": "процесс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қате жөндеу (debug) — бағдарламадағы қателерді табу мен түзету процесі."
+    },
+    {
+      "subject": {
+        "surface": "кэш",
+        "root": "кэш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жадтар түрі",
+        "root": "жадтар түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кэш — жиі қолданылатын деректерді жылдам қол жеткізу үшін уақытша сақтайтын жадтар."
+    },
+    {
+      "subject": {
+        "surface": "api",
+        "root": "api",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "интерфейс",
+        "root": "интерфейс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_029"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "API — бағдарламалардың бір-бірімен өзара әрекеттесуіне арналған интерфейс."
+    },
+    {
+      "subject": {
+        "surface": "параллелдік",
+        "root": "параллелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бағдарламалау тәсілі",
+        "root": "бағдарламалау тәсілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/computer_science_basics",
+      "source": {
+        "pack": "world_core/computer_science_basics.jsonl",
+        "sample_id": "cs_030"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Параллелдік — бірнеше есеп бір уақытта орындалатын бағдарламалау тәсілі."
     },
     {
       "subject": {
@@ -24624,6 +25225,306 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Функция — әр кіріс мәніне тек бір шығыс мән сәйкестендіретін математикалық тәуелділік."
+    },
+    {
+      "subject": {
+        "surface": "сызықтық функция",
+        "root": "сызықтық функция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "функция",
+        "root": "функция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сызықтық функция — y = kx + b түріндегі бірінші дәрежелі функция."
+    },
+    {
+      "subject": {
+        "surface": "квадраттық функция",
+        "root": "квадраттық функция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "функция",
+        "root": "функция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Квадраттық функция — y = ax² + bx + c түріндегі екінші дәрежелі функция."
+    },
+    {
+      "subject": {
+        "surface": "сызықтық теңдеу",
+        "root": "сызықтық теңдеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "теңдеу",
+        "root": "теңдеу",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сызықтық теңдеу — белгісізі тек бірінші дәрежеде кездесетін теңдеу."
+    },
+    {
+      "subject": {
+        "surface": "квадраттық теңдеу",
+        "root": "квадраттық теңдеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "теңдеу",
+        "root": "теңдеу",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Квадраттық теңдеу — белгісізі екінші дәрежеде кездесетін теңдеу."
+    },
+    {
+      "subject": {
+        "surface": "прогрессия",
+        "root": "прогрессия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сандар тізбегі",
+        "root": "сандар тізбегі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Прогрессия — белгілі ережемен құрылған сандар тізбегі."
+    },
+    {
+      "subject": {
+        "surface": "арифметикалық прогрессия",
+        "root": "арифметикалық прогрессия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "прогрессия",
+        "root": "прогрессия",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Арифметикалық прогрессия — әр келесі мүшесі алдыңғы мүшеге тұрақты сан қосу арқылы алынатын прогрессия."
+    },
+    {
+      "subject": {
+        "surface": "геометриялық прогрессия",
+        "root": "геометриялық прогрессия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "прогрессия",
+        "root": "прогрессия",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Геометриялық прогрессия — әр келесі мүшесі алдыңғы мүшені тұрақты санға көбейту арқылы алынатын прогрессия."
+    },
+    {
+      "subject": {
+        "surface": "орташа мән",
+        "root": "орташа мән",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "статистикалық шама",
+        "root": "статистикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орташа мән — сандар жиынының қосындысын олардың санына бөлу арқылы алынатын статистикалық шама."
+    },
+    {
+      "subject": {
+        "surface": "медиана",
+        "root": "медиана",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "статистикалық шама",
+        "root": "статистикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Медиана — сандар жиынын реттеген кезде дәл ортасында тұрған мән."
+    },
+    {
+      "subject": {
+        "surface": "дисперсия",
+        "root": "дисперсия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "статистикалық шама",
+        "root": "статистикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_047"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дисперсия — сандардың орташа мәннен ауытқу шамасын көрсететін статистикалық шама."
+    },
+    {
+      "subject": {
+        "surface": "статистика",
+        "root": "статистика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математика саласы",
+        "root": "математика саласы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Статистика — деректерді жинау, талдау мен түсіндірумен айналысатын математика саласы."
+    },
+    {
+      "subject": {
+        "surface": "ықтималдық",
+        "root": "ықтималдық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық шама",
+        "root": "математикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ықтималдық — оқиғаның болу мүмкіндігін 0-ден 1-ге дейінгі санмен өрнектейтін математикалық шама."
+    },
+    {
+      "subject": {
+        "surface": "жиын",
+        "root": "жиын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық топ",
+        "root": "математикалық топ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жиын — белгілі бір қасиеті бар нысандардың математикалық тобы."
+    },
+    {
+      "subject": {
+        "surface": "туынды",
+        "root": "туынды",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық ұғым",
+        "root": "математикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_051"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Туынды — функцияның өзгеру жылдамдығын көрсететін математикалық ұғым."
+    },
+    {
+      "subject": {
+        "surface": "интеграл",
+        "root": "интеграл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық ұғым",
+        "root": "математикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_052"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Интеграл — функцияның қисығы мен ось арасындағы ауданды есептейтін математикалық ұғым."
     },
     {
       "subject": {

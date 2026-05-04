@@ -7,6 +7,53 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.42.8] — 2026-05-04 — Knowledge expansion bundle — Computer Science fundamentals + Mathematics depth
+
+**Two-domain knowledge expansion driven by adam's growing CS / math conversational reach.** A new `computer_science_basics` domain (30 facts) covers the universal CS vocabulary (algorithms / data structures / complexity / OOP / FP / debugging / API / parallelism). The existing `mathematics_basic` domain extends from 37 → 52 facts with **function types** (linear / quadratic), **equation types** (linear / quadratic), **progressions** (arithmetic / geometric), **statistics** (mean / median / variance / probability), **set theory + calculus basics** (derivative / integral). All facts compose through the Stage A NLG `IsACopulaDeclarative` rule — typed-frame composition, no per-fact templates.
+
+### Real-REPL probe (live `adam-chat`)
+
+| Query | Response |
+|---|---|
+| Алгоритм деген не? | "Алгоритм — есепті шешу үшін орындалатын анық қадамдар тізбегі." |
+| Рекурсия деген не? | "Рекурсия — функцияның өзіне-өзі сілтейтін алгоритмдік тәсіл." |
+| Итерация деген не? | "Итерация — қадамдарды бірнеше рет қайталау арқылы есеп шығару тәсілі." |
+| Сызықтық функция деген не? | "Сызықтық функция — y = kx + b түріндегі бірінші дәрежелі функция." |
+| Квадраттық теңдеу деген не? | "Квадраттық теңдеу — белгісізі екінші дәрежеде кездесетін теңдеу." |
+| Статистика деген не? | "Статистика — деректерді жинау, талдау мен түсіндірумен айналысатын математика саласы." |
+
+### Innovations
+
+**(1) New `computer_science_basics.jsonl` domain — 30 facts** covering the foundational CS vocabulary: алгоритм, деректер құрылымы, жиым, тізім, стек, кезек, ағаш, граф, хеш-кесте, сұрыптау, іздеу, рекурсия, итерация, күрделілік (уақыт / жадтар / O(n) / O(log n)), айнымалы / тұрақты, функция, класс, объект, ОБП / ФП, тестілеу, қате жөндеу, кэш, API, параллелдік. Each fact uses `is_a` for clean NLG composition.
+
+**(2) Mathematics depth — 15 new facts** in `mathematics_basic.jsonl` (math_038–052): linear / quadratic functions, linear / quadratic equations, arithmetic / geometric progressions, statistical measures (mean / median / variance), statistics + probability + sets as fields, calculus primitives (derivative / integral). Closes the previous gap where `mathematics_basic` only had 37 facts focused on arithmetic + geometry without algebra-of-functions, statistics, or calculus.
+
+**(3) IsA-hub consolidation** — aligned `cs_basics` to use `деректер құрылымы` (matching the existing `informatics_basic` form) rather than fragmenting the IsA hub with the singular `дерек құрылымы`. жиым / тізім / стек / кезек / ағаш / граф / хеш-кесте all attach to the same hub used by `info_021..info_028`.
+
+**(4) `MULTIWORD_ENTITIES` sync — 26 new compound entries** required by the `world_core_multiword_coverage` invariant: объектіге бағытталған бағдарламалау, функционалдық бағдарламалау, бағдарламалау парадигмасы, арифметикалық прогрессия, геометриялық прогрессия, логарифмдік күрделілік, бағдарламалау құрылымы, бағдарламалау бірлігі, бағдарламалау тәсілі, жадтар күрделілігі, уақыт күрделілігі, квадраттық функция, квадраттық теңдеу, статистикалық шама, алгоритмдік тәсіл, ұйымдастыру тәсілі, сызықтық функция, сызықтық теңдеу, күрделілік белгісі, математикалық шама, сандар тізбегі, математикалық топ, күрделілік түрі, жадтар түрі, орташа мән, қате жөндеу.
+
+**(5) NLG composition path verified end-to-end** — every new fact (45 curated additions across two domains) routes through Stage A `IsACopulaDeclarative` rule and surfaces with proper introducer + dash form. Live REPL probe confirms 6/6 queries land on the new facts (cs_001 / cs_012 / cs_013 / math_038 / math_041 / math_048).
+
+**(6) Foundation expansion** — 1849 → 1884 world_core entries, 2026 → 2135 curated facts (+45 from the two-domain expansion plus secondary effects), 25 633 → 25 755 derivations (+122 from R1 / R5 / R10 / R11 chains over the new `is_a` parents).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **890 passing** unchanged (`cargo test --workspace --release`) |
+| `world_core_multiword_coverage` | ✓ green after sync |
+| Adam-dialog lib tests | **223 passing** unchanged |
+| Live REPL probe (6 queries on new facts) | ✓ all 6 surface correct fact via NLG |
+| Foundation: 1884 entries / 2135 facts / 42 domains / 25 755 derivations | (was 1849 / 2026 / 41 / 25 633) |
+| `cargo fmt --all --check` | clean |
+| `cargo check --all-targets` | clean |
+
+### Cadence
+
+`.8` reflects: (1) new domain `computer_science_basics` + 30 facts + (2) mathematics depth +15 facts + (3) IsA-hub consolidation + (4) MULTIWORD_ENTITIES sync +26 + (5) NLG end-to-end probe verification + (6) foundation expansion → 6 distinct innovations. Per `feedback_versioning_post_1_0`: 6 innovations + new domain warrants `.8`.
+
+Stage A continues — Stage B (tiny selection weights) opens ~v4.50. Knowledge breadth complementing Stage A composition machinery: the more typed facts feed `IsACopulaDeclarative` / `RelatedToOzaraDeclarative` / `HasQuantityDeclarative` rules, the broader adam's reach in deterministic NLG without any per-fact template.
+
 ## [4.42.7] — 2026-05-04 — Per-language purpose enrichment + Latin-tech topic-extraction fix
 
 **Closes user note from v4.42.6 transcript** («он должен знать для чего предназначен каждый язык»). Adds 20 new facts about WHAT FOR each major programming language is used (Python for data science / ML / scripting; Rust for systems / safety; Go for cloud infrastructure; etc.), AND fixes the Latin-tech topic-extraction gap that prevented these facts from being reachable through natural Kazakh phrasings («Python қандай тіл?» / «Java қандай салада қолданылады?» / «Kotlin не үшін қажет?»).
