@@ -7,6 +7,71 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.48.0] — 2026-05-04 — Stage B bundle 7 — REPL-trace harvest substrate
+
+**Pure-function trace-line parser.** `HarvestReport` aggregates `selection_audit:` lines extracted from a batch of `Conversation::turn_with_trace` traces. `harvest_audit_traces(&[Vec<String>]) -> HarvestReport` is the parser that walks each trace and counts how many turns produced audit lines, how many of those were disagreements, and keeps the raw disagreement lines for hand-curation into new `TrainingPair` entries.
+
+### Pipeline (offline, periodic — operator workflow)
+
+1. Run a Conversation programmatically on each query in `live_holdout_*.json` / `rust_holdout.json`, capturing the `TurnTrace` per turn.
+2. Pass `&[Vec<String>]` (one Vec per trace) to `harvest_audit_traces`.
+3. Inspect the resulting `HarvestReport.disagreement_traces`; every line is a candidate for a new gold pair.
+4. Hand-curate the most-leveraged disagreements into TrainingPairs → re-train via `train_perceptron` → ship as the new `SelectionWeights::trained_v0` constant.
+
+The integration with real Conversation runs is left to per-eval test harnesses (`tests/live_holdout.rs` etc.) which already wire the runtime; v4.48.0 ships the parser only.
+
+### Innovations
+
+**(1) `HarvestReport` struct** — `{ total_turns, multi_candidate_turns, audit_lines_found, disagreement_count, disagreement_traces: Vec<String> }`. `disagreement_traces` preserves raw disagreement lines verbatim so the offline curator can read score gaps and pick gold pairs without re-running the pipeline.
+
+**(2) `HarvestReport::disagreement_rate()` accessor** — fraction of multi-candidate turns where the trained selector disagreed with the heuristic. `0.0` when no audit ever ran (no multi-candidate turns); useful as an "audit divergence" KPI per release.
+
+**(3) `harvest_audit_traces(traces) -> HarvestReport`** — pure function. Walks each trace; for each line, prefix-matches `"selection_audit:"`; counts agreement-vs-disagreement via substring `"disagreement"` presence; preserves raw disagreement lines; counts multi-candidate turns (turns with at least one audit line) separately from total audit lines (one turn can in principle emit multiple).
+
+**(4) Re-exports** in `lib.rs`: `HarvestReport`, `harvest_audit_traces` available as top-level public API.
+
+**(5) 7 new unit tests** verify:
+- `harvest_empty_input_returns_zero_report` — degenerate input + vacuous-truth `disagreement_rate()`.
+- `harvest_traces_without_audit_lines_only_count_total_turns` — non-audit lines ignored.
+- `harvest_disagreement_line_recorded_with_full_text` — disagreement line preserved verbatim with score gap.
+- `harvest_agreement_line_counted_but_not_recorded_as_disagreement` — agreement variant handled (for future-proofing, since v4.46.5 wiring is silent on agreement).
+- `harvest_many_turns_aggregate_correctly` — `multi_candidate_turns` counts turns (not lines); `disagreement_count` counts disagreement lines specifically; mixed input verified.
+- `harvest_multiple_audit_lines_in_one_turn_count_separately` — edge case (current wiring emits at most 1, parser is shape-agnostic).
+- `harvest_ignores_lines_that_dont_start_with_selection_audit` — prefix-match (not substring); robust against false positives.
+
+**(6) NOT YET in v4.48.0** (Stage B carry-forwards):
+- Test-harness integration — extend `tests/live_holdout.rs` etc. to capture `Conversation::turn_with_trace` results and call `harvest_audit_traces` for offline disagreement collection. v4.48.5 target.
+- First trained `SelectionWeights::trained_v0()` constant — train on hand-curated disagreement-derived gold pairs once they're harvested.
+- Production ranker replacement — replace `apply_graph_result`'s heuristic top-1 with `selection::select_top` once trained weights match or beat heuristic.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **960 passing** (was 953; +7 new harvest tests) |
+| Adam-dialog lib | **293 passing** (was 286; +7) |
+| Selection module | 48/48 tests pass (13 v4.45.0 + 11 v4.45.5 + 10 v4.46.0 + 7 v4.47.5 + 7 v4.48.0) |
+| Live REPL | byte-identical to v4.47.5 (no production wiring change) |
+| Foundation: 2086 / 2346 / 46 / 27 163 | unchanged |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.0` minor — Stage B substrate now covers the full offline disagreement-harvest pipeline. The remaining work is operator-workflow (run, harvest, curate, train, ship) — each step has substrate; the `.5` patches will exercise it on real data and produce the first trained `trained_v0` constant.
+
+Stage B status:
+- v4.45.0 — bundle 1 — selection weights foundation ✓
+- v4.45.5 — bundle 2 — training pipeline ✓
+- v4.46.0 — bundle 3 — canonical gold pairs + audit substrate ✓
+- v4.46.5 — bundle 4 — production trace-wiring (audit-only) ✓
+- v4.47.0 — bundle 5 — `ToolContext.last_topic` threading ✓
+- v4.47.5 — bundle 6 — disagreement-case collection harness (aggregate substrate) ✓
+- **v4.48.0 — bundle 7 — REPL-trace harvest substrate (parser)** ← shipped
+- v4.48.5+ — bundle 8: test-harness integration + first hand-curated gold pairs from real disagreements
+- v4.50.0 (target) — bundle 9: trained weights replace heuristic ranker
+
+Stripe (11) — generative AI via agglutinative composition continues. With v4.48.0, the substrate-side of Stage B is complete: every primitive needed to go from "raw REPL traces" to "trained, deployable weight table" exists as a typed public API. v4.48.5+ runs that pipeline on real data.
+
 ## [4.47.5] — 2026-05-04 — Stage B bundle 6 — disagreement-case collection harness
 
 **Pure-function aggregate substrate.** `AuditAggregate` accumulates audit results across many gold pairs; `evaluate_weights_on_pairs(weights, pairs) -> AuditAggregate` runs the audit comparison for each pair and reports overall agreement / disagreement statistics + worst-case score gap. Together they answer: «given this `SelectionWeights` table and this gold-pair set, how many pairs does the selector get wrong, and how badly?» This is the substrate for the v4.50.0 (target) decision: trained weights replace the heuristic ranker only when `evaluate_weights_on_pairs(trained, canonical_training_pairs_v0()).disagreements == 0` AND the trained weights match or beat the heuristic on live REPL holdouts.

@@ -1437,3 +1437,229 @@ mod aggregate_tests {
         assert_eq!(agg.agreement_rate(), 1.0);
     }
 }
+
+// ---------------------------------------------------------------------------
+// **v4.48.0** — Stage B bundle 7: REPL-trace harvest substrate.
+//
+// `HarvestReport` aggregates `selection_audit:` lines extracted from a
+// batch of `Conversation::turn_with_trace` traces. `harvest_audit_traces`
+// is the pure-function parser that walks each trace and counts how many
+// turns produced audit lines, how many of those were disagreements, and
+// keeps the raw disagreement lines for hand-curation into new
+// `TrainingPair` entries.
+//
+// Pipeline (offline, periodic):
+//   1. Run a Conversation programmatically on each query in
+//      `live_holdout_*.json` / `rust_holdout.json`, capturing the
+//      `TurnTrace` per turn.
+//   2. Pass `&[Vec<String>]` (one Vec per trace) to `harvest_audit_traces`.
+//   3. Inspect the resulting `HarvestReport.disagreement_traces`; every
+//      line is a candidate for a new gold pair.
+//   4. Hand-curate the most-leveraged disagreements into TrainingPairs
+//      → re-train via `train_perceptron` → ship as the new
+//      `SelectionWeights::trained_v0` constant.
+//
+// The integration with real Conversation runs is left to per-eval test
+// harnesses (`tests/live_holdout.rs` etc.) which already wire the
+// runtime; v4.48.0 ships the parser only.
+
+/// Aggregated harvest of `selection_audit:` trace lines across many
+/// turns. Intended for offline analysis: feed the report into a
+/// hand-curation step that promotes the most-frequent disagreements
+/// into new `TrainingPair` entries.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct HarvestReport {
+    /// Total number of traces examined (one per `Conversation::turn`).
+    pub total_turns: usize,
+    /// Number of traces that contained at least one
+    /// `selection_audit:` line — i.e., turns where SearchGraph found
+    /// 2+ admissible candidates and the audit ran.
+    pub multi_candidate_turns: usize,
+    /// Total `selection_audit:` lines across all traces (sum, not
+    /// distinct turns — a single turn can in principle emit multiple).
+    pub audit_lines_found: usize,
+    /// Number of audit lines that contained the literal
+    /// `disagreement` token. The remainder were agreements.
+    pub disagreement_count: usize,
+    /// Raw disagreement lines — preserved verbatim so the offline
+    /// curator can read score gaps and pick gold pairs without
+    /// re-running the pipeline.
+    pub disagreement_traces: Vec<String>,
+}
+
+impl HarvestReport {
+    /// Convenience: fraction of multi-candidate turns where the
+    /// trained selector disagreed with the heuristic. `0.0` when
+    /// no audit ever ran (no multi-candidate turns); useful as an
+    /// "audit divergence" KPI per release.
+    pub fn disagreement_rate(&self) -> f32 {
+        if self.multi_candidate_turns == 0 {
+            return 0.0;
+        }
+        self.disagreement_count as f32 / self.multi_candidate_turns as f32
+    }
+}
+
+/// **v4.48.0** — pure-function parser. Walk each trace, count
+/// `selection_audit:` lines, accumulate stats, preserve raw
+/// disagreement lines for offline hand-curation.
+///
+/// Every audit line emitted by `tool::search_graph` (per the v4.46.5
+/// production wiring) starts with the literal prefix
+/// `"selection_audit:"`. Disagreement lines additionally contain the
+/// literal substring `"disagreement"`. Agreement lines contain the
+/// literal substring `"agreement"` — but v4.46.5's wiring is silent
+/// on agreement to avoid noise on the common path, so in practice
+/// every audit line in a real trace is a disagreement.
+pub fn harvest_audit_traces(traces: &[Vec<String>]) -> HarvestReport {
+    let mut report = HarvestReport {
+        total_turns: traces.len(),
+        ..Default::default()
+    };
+    for trace in traces {
+        let mut turn_has_audit = false;
+        for line in trace {
+            if !line.starts_with("selection_audit:") {
+                continue;
+            }
+            turn_has_audit = true;
+            report.audit_lines_found += 1;
+            if line.contains("disagreement") {
+                report.disagreement_count += 1;
+                report.disagreement_traces.push(line.clone());
+            }
+        }
+        if turn_has_audit {
+            report.multi_candidate_turns += 1;
+        }
+    }
+    report
+}
+
+#[cfg(test)]
+mod harvest_tests {
+    use super::*;
+
+    #[test]
+    fn harvest_empty_input_returns_zero_report() {
+        let report = harvest_audit_traces(&[]);
+        assert_eq!(report.total_turns, 0);
+        assert_eq!(report.multi_candidate_turns, 0);
+        assert_eq!(report.audit_lines_found, 0);
+        assert_eq!(report.disagreement_count, 0);
+        assert!(report.disagreement_traces.is_empty());
+        // Empty has disagreement_rate = 0.0 (no audits ran).
+        assert_eq!(report.disagreement_rate(), 0.0);
+    }
+
+    #[test]
+    fn harvest_traces_without_audit_lines_only_count_total_turns() {
+        // Three turns, none with selection_audit lines.
+        let traces = vec![
+            vec!["planner: seed=0".to_string()],
+            vec![
+                "tool: dispatch SearchGraph".to_string(),
+                "search_graph: subject=qazaqstan".to_string(),
+            ],
+            vec!["tool: dispatch SearchBelief".to_string()],
+        ];
+        let report = harvest_audit_traces(&traces);
+        assert_eq!(report.total_turns, 3);
+        assert_eq!(report.multi_candidate_turns, 0);
+        assert_eq!(report.audit_lines_found, 0);
+        assert_eq!(report.disagreement_count, 0);
+        assert_eq!(report.disagreement_rate(), 0.0);
+    }
+
+    #[test]
+    fn harvest_disagreement_line_recorded_with_full_text() {
+        // Single turn with one disagreement line.
+        let traces = vec![vec![
+            "tool: dispatch SearchGraph".to_string(),
+            "selection_audit: disagreement heuristic_top=0 selector_top=2 score_gap=0.4500"
+                .to_string(),
+        ]];
+        let report = harvest_audit_traces(&traces);
+        assert_eq!(report.total_turns, 1);
+        assert_eq!(report.multi_candidate_turns, 1);
+        assert_eq!(report.audit_lines_found, 1);
+        assert_eq!(report.disagreement_count, 1);
+        assert_eq!(report.disagreement_traces.len(), 1);
+        assert!(
+            report.disagreement_traces[0].contains("score_gap=0.4500"),
+            "disagreement line preserved verbatim",
+        );
+        // 1 disagreement / 1 multi-candidate turn = 1.0.
+        assert!((report.disagreement_rate() - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn harvest_agreement_line_counted_but_not_recorded_as_disagreement() {
+        // Hypothetical agreement variant (the v4.46.5 wiring is silent
+        // on agreement, but the parser handles both shapes for future-
+        // proofing).
+        let traces = vec![vec![
+            "selection_audit: agreement heuristic_top=0 selector_top=0 score_gap=0.0000"
+                .to_string(),
+        ]];
+        let report = harvest_audit_traces(&traces);
+        assert_eq!(report.audit_lines_found, 1);
+        assert_eq!(report.disagreement_count, 0);
+        assert!(report.disagreement_traces.is_empty());
+        assert_eq!(report.disagreement_rate(), 0.0);
+    }
+
+    #[test]
+    fn harvest_many_turns_aggregate_correctly() {
+        // 5 turns: 2 with disagreement, 1 with agreement, 2 without
+        // any audit. Verifies multi_candidate_turns counts turns
+        // (not lines) and disagreement_count counts disagreement
+        // lines specifically.
+        let traces = vec![
+            vec!["selection_audit: disagreement ... score_gap=0.1".to_string()],
+            vec!["selection_audit: disagreement ... score_gap=0.2".to_string()],
+            vec!["selection_audit: agreement ... score_gap=0.0".to_string()],
+            vec!["planner: seed=0".to_string()],
+            vec!["tool: dispatch ...".to_string()],
+        ];
+        let report = harvest_audit_traces(&traces);
+        assert_eq!(report.total_turns, 5);
+        assert_eq!(report.multi_candidate_turns, 3);
+        assert_eq!(report.audit_lines_found, 3);
+        assert_eq!(report.disagreement_count, 2);
+        assert_eq!(report.disagreement_traces.len(), 2);
+        // 2 disagreements / 3 multi-candidate turns ≈ 0.667.
+        assert!((report.disagreement_rate() - 2.0 / 3.0).abs() < 1e-3);
+    }
+
+    #[test]
+    fn harvest_multiple_audit_lines_in_one_turn_count_separately() {
+        // Single turn that somehow emits 2 audit lines (edge case;
+        // current wiring emits at most 1 per turn but parser is
+        // shape-agnostic).
+        let traces = vec![vec![
+            "selection_audit: disagreement ... score_gap=0.1".to_string(),
+            "selection_audit: disagreement ... score_gap=0.2".to_string(),
+        ]];
+        let report = harvest_audit_traces(&traces);
+        assert_eq!(report.total_turns, 1);
+        // multi_candidate_turns counts turns with at least one audit line.
+        assert_eq!(report.multi_candidate_turns, 1);
+        // audit_lines_found counts all audit lines.
+        assert_eq!(report.audit_lines_found, 2);
+        assert_eq!(report.disagreement_count, 2);
+    }
+
+    #[test]
+    fn harvest_ignores_lines_that_dont_start_with_selection_audit() {
+        // A line containing "selection_audit" mid-string should NOT
+        // be counted (parser uses prefix match for robustness).
+        let traces = vec![vec![
+            "some other tool: see selection_audit: in passing".to_string(),
+            "selection_audit: disagreement real one".to_string(),
+        ]];
+        let report = harvest_audit_traces(&traces);
+        assert_eq!(report.audit_lines_found, 1);
+        assert_eq!(report.disagreement_count, 1);
+    }
+}

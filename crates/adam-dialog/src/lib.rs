@@ -79,9 +79,10 @@ pub use quality::{
 pub use question_shape::{QuestionShape, detect as detect_question_shape};
 pub use realiser::realise;
 pub use selection::{
-    AuditAggregate, AuditResult, CandidateFeatures, SelectionWeights, TrainingConfig, TrainingPair,
-    TrainingStats, audit_compare, canonical_training_pairs_v0, evaluate_weights_on_pairs,
-    extract_features, score as selection_score, select_top, train_perceptron,
+    AuditAggregate, AuditResult, CandidateFeatures, HarvestReport, SelectionWeights,
+    TrainingConfig, TrainingPair, TrainingStats, audit_compare, canonical_training_pairs_v0,
+    evaluate_weights_on_pairs, extract_features, harvest_audit_traces, score as selection_score,
+    select_top, train_perceptron,
 };
 pub use semantics::{interpret, interpret_text, interpret_text_with_lexicon};
 pub use sentence_decomp::{
