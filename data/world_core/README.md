@@ -105,7 +105,7 @@ Validator checks:
 
 ## Current scale (v4.52.5)
 
-**Live totals: 2102 entries / 2362 facts across 46 domains**, all `approved`
+**Live totals: 2113 entries / 2373 facts across 47 domains**, all `approved`
 by `shaman`. Re-run `bash scripts/validate_foundation.sh` to refresh.
 Per-domain counts in the listing below are a **historical v4.11.7 snapshot**
 preserved for change-tracking; verify current counts via

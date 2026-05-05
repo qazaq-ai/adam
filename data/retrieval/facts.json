@@ -1,7 +1,7 @@
 {
-  "version": "4.55.0",
+  "version": "4.55.5",
   "status": "completed",
-  "elapsed_s": 61,
+  "elapsed_s": 66,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2362,
+    "facts_total": 2373,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1823,
+      "is_a": 1834,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -74,6 +74,7 @@
       "world_core/philosophy_basic.jsonl": 23,
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
+      "world_core/preschool_alphabet.jsonl": 11,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
       "world_core/programming_rust.jsonl": 181,
@@ -34189,6 +34190,226 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Гүлзар — гүлдерге толы орын."
+    },
+    {
+      "subject": {
+        "surface": "а",
+        "root": "а",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "А — қазақ әліпбиінің бірінші әрпі. Артқы тіл дауыстысы. Мысал: алма, ана, ат."
+    },
+    {
+      "subject": {
+        "surface": "ә",
+        "root": "ә",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ә — қазақ әліпбиінің екінші әрпі, тек қазақ тіліне тән дыбыс. Алдыңғы тіл дауыстысы. Мысал: әке, әже, әуе."
+    },
+    {
+      "subject": {
+        "surface": "б",
+        "root": "б",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Б — қазақ әліпбиінің үшінші әрпі. Қос ерінді қатаң дауыссыз. Мысал: бала, бауыр, бұлақ."
+    },
+    {
+      "subject": {
+        "surface": "в",
+        "root": "в",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "В — қазақ әліпбиінің төртінші әрпі. Орыс тілінен енген сөздерде кездеседі. Мысал: вагон, вокзал."
+    },
+    {
+      "subject": {
+        "surface": "г",
+        "root": "г",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Г — қазақ әліпбиінің бесінші әрпі. Тіл арты ұяң дауыссыз, жұмсақ дыбыс. Мысал: гүл, газет, генерал."
+    },
+    {
+      "subject": {
+        "surface": "ғ",
+        "root": "ғ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ғ — қазақ әліпбиінің алтыншы әрпі, тек қазақ тіліне тән дыбыс. Тіл арты ұяң, қатты дыбыс. Мысал: ғылым, ғарыш, ағаш."
+    },
+    {
+      "subject": {
+        "surface": "д",
+        "root": "д",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Д — қазақ әліпбиінің жетінші әрпі. Тіл ұшы ұяң дауыссыз. Мысал: дала, домбыра, дос."
+    },
+    {
+      "subject": {
+        "surface": "е",
+        "root": "е",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Е — қазақ әліпбиінің сегізінші әрпі. Алдыңғы тіл дауыстысы. Сөз басында «йе» дыбыстарын береді. Мысал: ел, ене, есік."
+    },
+    {
+      "subject": {
+        "surface": "ё",
+        "root": "ё",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ё — қазақ әліпбиінің тоғызыншы әрпі. Орыс тілінен енген сөздерде ғана кездеседі. Мысал: ёлка."
+    },
+    {
+      "subject": {
+        "surface": "ж",
+        "root": "ж",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ж — қазақ әліпбиінің оныншы әрпі. Тіл ортасы ұяң дауыссыз. Мысал: жан, жаз, жұлдыз."
+    },
+    {
+      "subject": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әріп — жазудың ең кіші бірлігі, белгілі бір дыбысты белгілейді."
     },
     {
       "subject": {

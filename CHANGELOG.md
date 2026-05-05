@@ -7,6 +7,41 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.56.0] — 2026-05-06 — Educational portal Day 1 #1 — Pre-school alphabet letters 1-10
+
+**Day 1 of educational program** (`docs/educational_program_2026-W19+1.md`). Strategic priority: adam = #1 қазақ тілді білім порталы РК. v4.56.0 lays the first floor: pre-school Kazakh alphabet, letters А through Ж (10 letters of 42).
+
+### Innovations
+
+**(1) New `data/world_core/preschool_alphabet.jsonl`** (47th domain) — 11 entries:
+- 10 letters: а / ә / б / в / г / ғ / д / е / ё / ж — each entry includes letter ordinal in alphabet, phonetic class (front/back vowel, voiced/voiceless consonant), and ≥2 example Kazakh words starting with the letter
+- 1 bridge fact: `әріп IsA ұғым` — establishes the letter-as-concept hub for downstream R1/R5 cascading
+
+**(2) Curriculum-aligned content** — entries written for pre-school comprehension level. Phonetic descriptors use established Kazakh linguistic terminology («алдыңғы тіл дауыстысы», «тіл арты ұяң дауыссыз»). Special letters (ә, ғ) flagged as «тек қазақ тіліне тән» (Kazakh-specific). Loanword letters (в, ё) flagged as «орыс тілінен енген сөздерде кездеседі» — honest about scope.
+
+**(3) New domain `preschool_alphabet`** registered in world_core domain index.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2102 | **2113** (+11) |
+| world_core facts | 2362 | **2373** (+11) |
+| world_core domains | 46 | **47** (+1) |
+| Derived facts | 28112 | **28135** (+23) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.56.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The +23 derivations from +11 facts (2.1× per fact) reflects the «әріп IsA ұғым» bridge cascading R1 transitivity: each letter `IsA әріп` × bridge → letter `IsA ұғым` derivations.
+
+### Cadence
+
+`.0` minor — first release of the 7-day educational program; new domain + 11 entries + 1 bridge fact. Per `feedback_versioning_post_1_0`: «minor x.y.0 = significant capability or milestone». Establishes the pattern for the next 9 Day 1 releases.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.55.5] — 2026-05-05 — Architecture rename: NLM → ARK (Agglutinative Reasoning Kernel)
 
 **Driven by user decision (2026-05-05):** the architecture name «NLM» (Nano Language Model) was buckets adam with the LLM family. **ARK** = Agglutinative Reasoning Kernel names what adam actually is — agglutinative morphology + curated knowledge graph + forward-chaining reasoner + tiny trained selection weights, packaged as a system-runtime not a probabilistic estimator.
