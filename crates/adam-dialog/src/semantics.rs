@@ -2066,10 +2066,17 @@ fn detect_ask_activity(joined: &str) -> bool {
         || joined.contains("не жасап")
         || joined.contains("немен айналыс"))
         && !joined.contains("кәсіб");
-    // 1sg self-recall: «менің ісім», «менің не істейтінім»
+    // 1sg self-recall: «менің ісім», «менің не істейтінім»,
+    // «не істейтінімді» (Acc-marked embedded clause).
+    // **v4.51.5** — also catches «не істейтінімді» / «не
+    // істейтінін» (Acc on the embedded participle), used in
+    // recall queries like «Менің атымды және не істейтінімді
+    // есіңізде ме?».
     let self_recall = (joined.contains("менің")
-        && (joined.contains("ісім") || joined.contains("істейтін")))
-        || joined.contains("не істеймін");
+        && (joined.contains("ісім") || joined.contains("істейтін") || joined.contains("не істе")))
+        || joined.contains("не істеймін")
+        || joined.contains("не істейтінімді")
+        || joined.contains("не істейтінім");
     second_person || self_recall
 }
 
@@ -2091,12 +2098,25 @@ fn detect_ask_activity(joined: &str) -> bool {
 /// Multi-word phrases like «жасанды интеллект» are kept whole.
 fn detect_statement_of_activity(tokens: &[String], joined: &str) -> Option<Option<String>> {
     const ACTIVITY_VERBS: &[&str] = &[
+        // v4.51.0 — finite 1sg present-future forms.
         "әзірлеймін",
         "жасаймын",
         "жазамын",
         "зерттеймін",
         "айналысамын",
         "құрастырамын",
+        // **v4.51.5** — participle-form (Aorist Participle, -йтін /
+        // -етін / -атын / -йтын) used in compound clauses like
+        // «жасанды интеллект моделімді әзірлейтін бағдарламашымын» —
+        // "(I am) a programmer who develops AI models". The
+        // participle modifies an occupation noun; the activity is
+        // the noun phrase preceding the participle.
+        "әзірлейтін",
+        "жасайтын",
+        "жазатын",
+        "зерттейтін",
+        "айналысатын",
+        "құрастыратын",
     ];
     // Find the activity verb position in tokens (verb at end of clause).
     let mut verb_idx: Option<usize> = None;
@@ -2117,7 +2137,21 @@ fn detect_statement_of_activity(tokens: &[String], joined: &str) -> Option<Optio
         // Stop on clause boundary tokens.
         if matches!(
             t,
-            "және" | "ал" | "содан" | "бірақ" | "сондықтан" | "мен" | "менің"
+            "және"
+                | "ал"
+                | "содан"
+                | "бірақ"
+                | "сондықтан"
+                | "мен"
+                | "менің"
+                // **v4.51.5** — reflexive-genitive boundary («of myself»)
+                // for compound participle clauses like «мен өзімнің
+                // X-ді әзірлейтін бағдарламашымын» — without this
+                // boundary the noun phrase walk would include «өзімнің»
+                // which is meta-grammatical, not part of the activity.
+                | "өзімнің"
+                | "өзіңнің"
+                | "өзіміздің"
         ) {
             break;
         }
@@ -2159,18 +2193,33 @@ fn detect_statement_of_activity(tokens: &[String], joined: &str) -> Option<Optio
 /// occupation. Returns the same `Option<Option<String>>` shape as
 /// `detect_statement_of_activity`.
 pub(crate) fn detect_activity_in_compound(input: &str) -> Option<Option<String>> {
-    if !input.contains("және") {
-        return None;
-    }
-    // Tokenize the post-«және» clause and run the activity detector
-    // on it. Tokenization mirrors the main pipeline (whitespace +
-    // lowercase).
     let lower = input.to_lowercase();
-    let after = lower.split("және").nth(1)?.trim();
-    if after.is_empty() {
-        return None;
+    // **v4.51.0 path** — explicit «және» split.
+    if lower.contains("және") {
+        let after = lower.split("және").nth(1)?.trim();
+        if !after.is_empty() {
+            let after_tokens: Vec<String> = after
+                .split_whitespace()
+                .map(|t| {
+                    t.trim_matches(|c: char| c == '.' || c == '!' || c == '?' || c == ',')
+                        .to_string()
+                })
+                .filter(|t| !t.is_empty())
+                .collect();
+            if !after_tokens.is_empty()
+                && let Some(activity) = detect_statement_of_activity(&after_tokens, after)
+            {
+                return Some(activity);
+            }
+        }
     }
-    let tokens: Vec<String> = after
+    // **v4.51.5 path** — participle-modifier same-clause. The
+    // input has no «және» but contains a participle-form activity
+    // verb («әзірлейтін» / «жасайтын» / etc.) modifying an
+    // occupation noun («әзірлейтін бағдарламашымын»). Run activity
+    // detector on the full input — it picks up the participle and
+    // walks back to extract the noun phrase.
+    let tokens: Vec<String> = lower
         .split_whitespace()
         .map(|t| {
             t.trim_matches(|c: char| c == '.' || c == '!' || c == '?' || c == ',')
@@ -2181,7 +2230,7 @@ pub(crate) fn detect_activity_in_compound(input: &str) -> Option<Option<String>>
     if tokens.is_empty() {
         return None;
     }
-    detect_statement_of_activity(&tokens, after)
+    detect_statement_of_activity(&tokens, &lower)
 }
 
 /// Strip Accusative («-ды/-ді/-ны/-ні/-ты/-ті»), Comitative («-мен»),
@@ -2189,15 +2238,31 @@ pub(crate) fn detect_activity_in_compound(input: &str) -> Option<Option<String>>
 /// root string. Conservative — only strips when the token is long
 /// enough that the residue is at least 3 chars.
 fn strip_object_case_suffix(token: &str) -> String {
+    // **v4.51.5** — handles compound P1Sg+Acc forms like «моделімді»
+    // («модель» + P1Sg «-ім» + Acc «-ді»). Strip Acc first; if
+    // residue ends in P1Sg «-ім»/«-ім», strip that too.
     const ACC_SUFFIXES: &[&str] = &["ды", "ді", "ны", "ні", "ты", "ті", "мен", "пен", "бен"];
+    const POS_SUFFIXES: &[&str] = &["ім", "ім", "ым", "м", "сі", "сы", "і", "ы"];
+    let mut current = token.to_string();
+    // Pass 1: strip Acc/Comitative.
     for suf in ACC_SUFFIXES {
-        if let Some(stripped) = token.strip_suffix(suf) {
+        if let Some(stripped) = current.strip_suffix(suf) {
             if stripped.chars().count() >= 3 {
-                return stripped.to_string();
+                current = stripped.to_string();
+                break;
             }
         }
     }
-    token.to_string()
+    // Pass 2: strip Possessive (P1Sg / P3) if residue still ≥ 3 chars.
+    for suf in POS_SUFFIXES {
+        if let Some(stripped) = current.strip_suffix(suf) {
+            if stripped.chars().count() >= 3 {
+                current = stripped.to_string();
+                break;
+            }
+        }
+    }
+    current
 }
 
 /// For every token ending in a Kazakh 1sg-copula suffix, strip the

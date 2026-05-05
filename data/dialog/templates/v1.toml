@@ -587,16 +587,17 @@ templates = [
     "Танысқаныма қуаныштымын, {name}! Сізді {name_respect_distinct} деп атаймын — қазақ дәстүрі бойынша",
     "{name_respect_distinct}, танысқаныма қуаныштымын",
     "{name} деген атыңызды есте сақтап, сізді {name_respect_distinct} деп атаймын — қазақша",
-    # **v4.18.0** vowel-initial fallback. Always fillable when name
-    # is set; gets picked by the planner for vowel-initial names
-    # where the three name_respect_distinct templates above are
-    # unfillable. Note: still in the fillable pool for consonant-
-    # initial names too — the seed-mod cycles through all four,
-    # giving a ~25 % chance the literal-instrumental form surfaces
-    # vs ~75 % chance the respect form does. Acceptable since the
-    # instrumental form («Дәулетпен танысқаныма…») is also
-    # culturally polite (formal-acquaintance register).
+    # **v4.51.5** — instrumental fallback retained ONLY as the
+    # vowel-no-consonant safety case (e.g. single-vowel names that
+    # have no extractable diminutive). All real Kazakh names —
+    # consonant-initial AND vowel-initial — now produce a
+    # `name_respect_distinct` value (see
+    # `language_core::kazakh_respectful_address` v4.51.5 vowel-rule
+    # extension), so the three respect-form variants above cover
+    # the full pool. The instrumental fallback below is a safety
+    # net for unusual inputs (single-letter / non-Cyrillic names).
     "{name|instrumental} танысқаныма қуаныштымын",
+    "Сізді {name_respect_distinct} деп атаймын, қош келдіңіз",
 ]
 
 [[families]]

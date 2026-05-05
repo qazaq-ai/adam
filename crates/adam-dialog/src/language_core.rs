@@ -161,17 +161,35 @@ pub fn kazakh_respectful_address(name: &str) -> Option<String> {
     if trimmed.is_empty() {
         return None;
     }
-    let first = trimmed.chars().next()?;
+    let chars: Vec<char> = trimmed.chars().collect();
+    if chars.len() < 3 {
+        return None;
+    }
+    let first = chars[0];
     if !first.is_alphabetic() {
         return None;
     }
-    if is_kazakh_vowel(first) {
+    let first_uppercase = first.to_uppercase().next().unwrap_or(first);
+    if !is_kazakh_vowel(first) {
+        // **v4.18.0** — consonant-initial: first consonant + «әке».
+        // Дәулет → Дәке, Мұрат → Мәке, Сергей → Сәке.
+        return Some(format!("{first_uppercase}әке"));
+    }
+    // **v4.51.5** — vowel-initial: take first 2 characters of the
+    // name + «әке». Per Kazakh address tradition: Арман → Арәке,
+    // Алия → Аләке, Абай → Абәке, Айгүл → Айәке (where «й» is
+    // treated as part of the first syllable). Simpler than tracking
+    // vowel/consonant categories — the first two characters reliably
+    // form the diminutive prefix.
+    let second = chars[1];
+    if !second.is_alphabetic() {
         return None;
     }
-    // Preserve the case of the first letter so titles render
-    // naturally in templates («Дәке, …» not «дәке, …»).
-    let first_uppercase = first.to_uppercase().next().unwrap_or(first);
-    Some(format!("{first_uppercase}әке"))
+    Some(format!(
+        "{}{}әке",
+        first_uppercase,
+        second.to_lowercase().next().unwrap_or(second)
+    ))
 }
 
 /// **v4.18.0** — Kazakh vowel set (both Cyrillic native vowels and
@@ -519,19 +537,19 @@ mod tests {
     }
 
     #[test]
-    fn respectful_address_vowel_initial_returns_none() {
-        // Vowel-initial names fall back to literal-name rendering;
-        // the «<vowel>+әке» pattern would collide with adam's own
-        // name (Адам → Әке = "father" literal).
-        assert!(kazakh_respectful_address("Абай").is_none());
-        assert!(kazakh_respectful_address("Алия").is_none());
-        assert!(kazakh_respectful_address("Айгүл").is_none());
-        assert!(kazakh_respectful_address("Аман").is_none());
-        assert!(kazakh_respectful_address("Әлем").is_none());
-        assert!(kazakh_respectful_address("Ермек").is_none());
-        assert!(kazakh_respectful_address("Ысқақ").is_none());
-        assert!(kazakh_respectful_address("Олжас").is_none());
-        assert!(kazakh_respectful_address("Үсен").is_none());
+    fn respectful_address_vowel_initial_uses_two_letter_prefix() {
+        // **v4.51.5** — vowel-initial: first vowel + first consonant
+        // after the vowel + «әке». Per Kazakh tradition: Арман →
+        // Арәке, Алия → Аләке, Абай → Абәке.
+        assert_eq!(kazakh_respectful_address("Абай").as_deref(), Some("Абәке"));
+        assert_eq!(kazakh_respectful_address("Алия").as_deref(), Some("Аләке"));
+        assert_eq!(kazakh_respectful_address("Айгүл").as_deref(), Some("Айәке"));
+        assert_eq!(kazakh_respectful_address("Аман").as_deref(), Some("Амәке"));
+        assert_eq!(kazakh_respectful_address("Әлем").as_deref(), Some("Әләке"));
+        assert_eq!(kazakh_respectful_address("Ермек").as_deref(), Some("Ерәке"));
+        assert_eq!(kazakh_respectful_address("Ысқақ").as_deref(), Some("Ысәке"));
+        assert_eq!(kazakh_respectful_address("Олжас").as_deref(), Some("Оләке"));
+        assert_eq!(kazakh_respectful_address("Үсен").as_deref(), Some("Үсәке"));
     }
 
     #[test]

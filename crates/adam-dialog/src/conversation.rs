@@ -1025,13 +1025,66 @@ impl Conversation {
             // «150 (жүз елу)», matching the user's expectation
             // («стопятьдесят») while keeping the digit for
             // copy-pasting / readability on large numbers.
-            let computed = crate::discourse::try_evaluate_arithmetic(input)
-                .or_else(|| crate::discourse::try_evaluate_kazakh_word_math(input));
+            // **v4.51.5** — math anaphora: when input refers to the
+            // previous result («алдыңғы есептеу нәтижесі», «оны»,
+            // «соны», «алдыңғы нәтиже»), substitute the stored
+            // `last_math_result` slot value into the input before
+            // evaluation. Lets follow-up turns like «алдыңғы есептеу
+            // нәтижесін екіге көбейтіңіз» (multiply previous result
+            // by two) compute through.
+            let resolved_input: std::borrow::Cow<'_, str> = {
+                let lower = input.to_lowercase();
+                let has_anaphor = lower.contains("алдыңғы есептеу")
+                    || lower.contains("алдыңғы нәтиже")
+                    || lower.contains("соңғы есептеу")
+                    || lower.contains("соңғы нәтиже");
+                if has_anaphor && let Some(prev) = self.session.get("last_math_result") {
+                    // **v4.51.5** — preserve case marker. The
+                    // word-math evaluator requires operands to be
+                    // case-marked (Acc «-ні»/«-ды», Dat «-ге»/«-ке»);
+                    // substituting the bare digit «10» loses that
+                    // signal. We append a case-suffix («10-ні»)
+                    // matching the anaphoric phrase's case so the
+                    // digit-prefix-Acc path (v4.41.7) parses
+                    // correctly. Most queries use Acc («нәтижесін»);
+                    // Dat is added defensively.
+                    let prev_acc = format!("{}-ні", prev);
+                    let prev_dat = format!("{}-ге", prev);
+                    let with_prev = lower
+                        .replace("алдыңғы есептеу нәтижесіне", &prev_dat)
+                        .replace("алдыңғы есептеу нәтижесін", &prev_acc)
+                        .replace("алдыңғы есептеу нәтижесі", &prev_acc)
+                        .replace("алдыңғы нәтижеге", &prev_dat)
+                        .replace("алдыңғы нәтижені", &prev_acc)
+                        .replace("алдыңғы нәтижесін", &prev_acc)
+                        .replace("алдыңғы нәтижесіне", &prev_dat)
+                        .replace("алдыңғы нәтижесі", &prev_acc)
+                        .replace("алдыңғы нәтиже", &prev_acc)
+                        .replace("соңғы есептеу нәтижесін", &prev_acc)
+                        .replace("соңғы есептеу нәтижесі", &prev_acc)
+                        .replace("соңғы нәтижеге", &prev_dat)
+                        .replace("соңғы нәтижесін", &prev_acc)
+                        .replace("соңғы нәтиже", &prev_acc);
+                    std::borrow::Cow::Owned(with_prev)
+                } else {
+                    std::borrow::Cow::Borrowed(input)
+                }
+            };
+            let computed = crate::discourse::try_evaluate_arithmetic(resolved_input.as_ref())
+                .or_else(|| {
+                    crate::discourse::try_evaluate_kazakh_word_math(resolved_input.as_ref())
+                });
             if let Some(value) = computed {
                 extra_slots.insert("__math_answer__".into(), value.to_string());
                 if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
                     extra_slots.insert("__math_words__".into(), words);
                 }
+                // **v4.51.5** — store the result in session for the
+                // NEXT turn's anaphora resolution. Overwrite any
+                // previous value (only the most-recent matters for
+                // «алдыңғы нәтиже»).
+                self.session
+                    .insert("last_math_result".into(), value.to_string());
             } else {
                 extra_slots.insert("__math_input__".into(), "1".into());
             }

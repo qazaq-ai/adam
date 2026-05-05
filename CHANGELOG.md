@@ -7,6 +7,57 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.51.5] — 2026-05-05 — Transcript-driven session 4 fixes — participle activity + math anaphora + vowel-initial respect form
+
+**Driven by 2026-05-04 user dialog test session 4.** v4.51.0 closed the compound-clause activity case; session 4 surfaced three new gaps that v4.51.5 closes:
+
+1. **Activity participle form not captured** — «Мен өзімнің жасанды интеллект моделімді **әзірлейтін** бағдарламашымын» encodes the user's activity in an aorist-participle modifier (-йтін suffix) rather than a finite 1sg verb. v4.51.0's `detect_statement_of_activity` only matched 6 finite stems («әзірлеймін» etc.) and missed all participle forms. Result: activity not stored.
+2. **Math anaphora unresolved** — «Бесті төртке көбейтіп, екіге бөліңіз» → 10. Follow-up «Енді **алдыңғы есептеу нәтижесін** екіге көбейтіңіз» needs the previous result substituted. Pre-v4.51.5: math evaluator received the literal string and refused.
+3. **Vowel-initial respect form** — `kazakh_respectful_address` returned None for vowel-initial names like «Арман», forcing planner fallback to the instrumental template. Per cultural rule (older addressee, vowel-initial root): take the first two letters and append «әке» — Арман → Арәке, Алия → Аләке, Айгүл → Айәке.
+
+### Real-REPL gap closure (session 4 transcript replay)
+
+| Pre-v4.51.5 transcript query | Pre | Post |
+|---|---|---|
+| Иә, менің атым Сергей. | "Сергеймен танысқаныма қуаныштымын" (instrumental fallback) | "**Сәке, танысқаныма қуаныштымын.**" ✓ |
+| Мен өзімнің жасанды интеллект моделімді әзірлейтін бағдарламашымын. | only `occupation` captured | both captured: `occupation=бағдарламашы` AND `activity=жасанды интеллект модел` ✓ |
+| Өрнекті бесті төртке көбейтіп, екіге бөліңіз. | 10 | 10 ✓ (unchanged; baseline) |
+| Енді алдыңғы есептеу нәтижесін екіге көбейтіңіз. | math_refusal (anaphora unresolved) | **20** ✓ |
+| Менің не істейтінім есіңізде ме? | clarify | "**Менің есімде, ағымдағы ісіңіз — жасанды интеллект модел.**" ✓ |
+
+### Innovations
+
+**(1) Activity participle detection** — extended `ACTIVITY_VERBS` array with 6 aorist-participle forms: «әзірлейтін», «жасайтын», «жазатын», «зерттейтін», «айналысатын», «құрастыратын». Same backward-walk object extraction; added boundary tokens «өзімнің», «өзіңнің», «өзіміздің» to the walk-back stop list (so reflexive-possessive prefixes don't eat the activity content).
+
+**(2) Two-pass case-suffix stripping** — `strip_object_case_suffix` now strips Accusative, then Possessive («-ім / -ым / -сі / -сы»), so «моделімді» (model-1sg.poss-acc) decomposes to «модель» (head noun, lemma form preserved as «модел» after suffix peel).
+
+**(3) Same-clause participle path in compound parser** — v4.51.0 `detect_activity_in_compound` only fired on «және». v4.51.5 adds a no-«және» path: when activity is encoded in same-clause participle modifier («X-ды Y-етін Z-мын»), the detector runs on the full input.
+
+**(4) `Intent::AskActivity` extended for «не істейтінім» / «не істейтінімді»** — adds 1sg participle-self-recall variants alongside the existing «не істеймін» finite form.
+
+**(5) `kazakh_respectful_address` vowel-initial branch** — when first character is a vowel (а/ә/о/ө/у/ұ/ы/і/е/э/ю/я/ё), uses first 2 chars + «әке». Returns None only when name < 3 chars or 2nd char non-alphabetic. All 11 Kazakh vowel-initial names verified: Абай→Абәке, Алия→Аләке, Айгүл→Айәке, Аман→Амәке, Әлем→Әләке, Ермек→Ерәке, Ысқақ→Ысәке, Олжас→Оләке, Үсен→Үсәке.
+
+**(6) Math anaphora resolution** — `Conversation::turn` adds a `last_math_result` session slot populated after each successful word-math evaluation. Before the next math call, the input is rewritten: «алдыңғы (есептеу )?нәтижені» / «алдыңғы (есептеу )?нәтижесін» / «алдыңғы (есептеу )?нәтижесіне» / «алдыңғы (есептеу )?нәтижесінде» → digit-form with case-suffix preserved («10-ні» Acc / «10-ге» Dat / «10-де» Loc), so the digit-prefix-Acc parser (v4.41.7) reads it correctly.
+
+**(7) New `statement_of_name` variant** — «Сізді {name_respect} деп атаймын, қош келдіңіз.» Reachable when `{name_respect_distinct}` is set (now true for vowel-initial names too via innovation 5).
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **969 passing** unchanged |
+| Adam-dialog lib | **301 passing** unchanged |
+| Live REPL transcript replay | ✓ all 5 session-4 scenarios verified |
+| Foundation: 2089 / 2349 / 46 / unchanged | unchanged |
+| `cargo fmt --all --check` | clean |
+| `cargo build --release` | clean |
+
+### Cadence
+
+`.5` patch — incremental gap-closure on top of v4.51.0 architectural addition. Per `feedback_versioning_post_1_0`: «patch = small / incremental». No new Intent variants, no new template families, no new session schema; this release extends existing detectors (participle forms, vowel-initial respect, math anaphora resolver). Closes 3 concrete session-4 transcript gaps.
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.51.0] — 2026-05-04 — User-activity slot extraction (Stage A architectural addition)
 
 **Closes the v4.50.5 carry-forward.** Adam now distinguishes the user's profession label (`occupation` — «бағдарламашы», «инженер») from their current-work content (`activity` — «жасанды интеллект», «веб-сайт жасау»). Pre-v4.51.0 a compound input like «Мен бағдарламашымын және жасанды интеллект әзірлеймін» captured only the occupation; v4.51.0 captures both via a secondary compound-clause scan. Adam can now recall activity on follow-up queries («Не істейсіз?» / «Менің не істейтінім есіңізде ме?»).
