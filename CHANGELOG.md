@@ -7,6 +7,44 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.53.0] — 2026-05-05 — Math gerund-clause parser (session 5 deferral closed)
+
+**Closes the v4.52.0 deferral.** Real-REPL session 5 surfaced a gap in the multi-clause word-math parser: gerund/converb-form chains like «Елуді екіге **көбейткенде** үшке **бөліп**, 7-ні **азайтқанда** не болады?» refused to evaluate, while the same operations in imperative form («... көбейтіңіз, ... бөліңіз, ... азайтыңыз») worked. v4.53.0 fixes the gap by injecting clause separators after gerund/converb math-verb forms, letting the v4.42.0 multi-clause evaluator chain operations across them.
+
+### Innovations
+
+**(1) `inject_gerund_clause_separators(input)`** — new pure helper in `discourse.rs`. Walks the input and inserts `__CLAUSE_SEP__` after each math-verb gerund/converb form. 8 surface forms covered: `көбейткенде` / `көбейтіп` / `бөлгенде` / `бөліп` / `қосқанда` / `қосып` / `азайтқанда` / `азайтып`. Token-boundary-safe (pads with leading/trailing spaces; only matches whole tokens).
+
+**(2) Multi-clause gerund support** — `try_evaluate_kazakh_word_math` calls the helper before the existing `,` / `және` / `содан кейін` / `соңында` clause splits. Once gerund/converb forms become explicit clause boundaries, the v4.42.0 accumulator path handles the chain unchanged.
+
+**(3) Vowel-harmony coverage** — gerund family `-ғанда / -генде / -қанда / -кенде` and converb family `-ып / -іп / -п` selected per stem according to standard Kazakh vowel harmony (көбейт + voiceless т → -кенде / -іп; қос + voiceless с back-vowel → -қанда / -ып; etc.).
+
+**(4) 5 new unit tests** — `word_math_gerund_chain_session5_first_line` (the canonical session-5 case → 26), `word_math_converb_only_chain` (pure -іп chain), `word_math_gerund_only_chain` (pure -ғанда chain), `word_math_qosqanda_qosyp_forms` (add-form coverage), `word_math_gerund_does_not_break_simple_imperative` (regression guard).
+
+### Real-REPL gap closure
+
+| Pre-v4.53.0 | Post-v4.53.0 |
+|---|---|
+| «Елуді екіге көбейткенде үшке бөліп, 7-ні азайтқанда не болады?» → math_refusal | **«Есептедім: 26 (жиырма алты)»** ✓ |
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **974 passing** (was 969; +5 new gerund tests) |
+| Adam-dialog lib | **306 passing** (was 301; +5) |
+| `bash scripts/verify_release_version.sh 4.53.0` | green |
+| Live REPL session-5 line 1 | ✓ returns 26 |
+| Foundation: 2089 / 2349 / 46 / 27175 | unchanged |
+| `cargo fmt --all --check` | clean |
+| `cargo build --release` | clean |
+
+### Cadence
+
+`.0` minor — adds new public function (effectively — `inject_gerund_clause_separators` is module-private but extends a public-API surface) and closes a concrete carry-forward deferral. Per `feedback_versioning_post_1_0`: «minor x.y.0 = significant capability or milestone». First arithmetic-grammar capability addition since v4.42.0.
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.52.5] — 2026-05-05 — Engineering hygiene + doc currency + weekly plan
 
 **Driven by external code review (Codex, 2026-05-05).** Fixes broken release gate and stale docs that had silently drifted across ~15 minor versions. No new product behaviour; no new tests; no foundation changes. Pure hygiene.

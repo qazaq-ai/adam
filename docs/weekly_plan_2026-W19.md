@@ -37,25 +37,27 @@ named release tag.
 
 ---
 
-## Day 2 — 2026-05-06 (Wednesday)
+## Day 2 — 2026-05-05 (pulled forward) ✓ shipped
 
-**v4.53.0 — math gerund-clause parser (session 5 deferral).**
+**v4.53.0 — math gerund-clause parser (session 5 deferral closed).**
 
-Closes session-5 gap: «Елуді екіге **көбейткенде** үшке **бөліп**, 7-ні
-**азайтқанда** не болады?» — gerund/conditional-form math clauses. Same
-operations expressed in imperative form already work; parser must
-normalise the two forms.
-
-- Tokenise on Kazakh gerund/converb forms: «-ғанда / -генде / -қанда /
-  -кенде», «-ып / -іп / -п» converbs.
-- Map gerund → imperative («көбейткенде» → «көбейтіңіз»;
-  «бөліп» → «бөліңіз»; «азайтқанда» → «азайтыңыз»).
-- Reuse existing `try_evaluate_kazakh_word_math` after normalisation.
-- Test: 4-5 new word-math test cases covering all three gerund stems
-  + the «не болады?» trailing question.
-
-Acceptance: live-REPL replay of session-5 first-line query returns
-the correct numeric answer.
+- [x] New `inject_gerund_clause_separators(input)` helper in
+      `discourse.rs` — inserts `__CLAUSE_SEP__` after each math-verb
+      gerund/converb form. 8 surface forms covered (көбейткенде /
+      көбейтіп / бөлгенде / бөліп / қосқанда / қосып / азайтқанда /
+      азайтып) per Kazakh vowel harmony.
+- [x] `try_evaluate_kazakh_word_math` calls the helper BEFORE the
+      existing `,` / `және` / `содан кейін` / `соңында` clause splits;
+      v4.42.0 accumulator path then handles the chain unchanged.
+- [x] 5 new unit tests in `discourse::math_tests`:
+      `word_math_gerund_chain_session5_first_line` (→ 26),
+      `word_math_converb_only_chain` (→ 13),
+      `word_math_gerund_only_chain` (→ 9),
+      `word_math_qosqanda_qosyp_forms` (→ 8 / → 9),
+      `word_math_gerund_does_not_break_simple_imperative` (regression).
+- [x] Live REPL: «Елуді екіге көбейткенде үшке бөліп, 7-ні
+      азайтқанда не болады?» → 26 (was math_refusal).
+- [x] Workspace 974 passing; verify_release_version.sh 4.53.0 green.
 
 ---
 

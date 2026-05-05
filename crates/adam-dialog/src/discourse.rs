@@ -617,6 +617,28 @@ pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
     //   - Any clause failing to satisfy this shape → return None
     //     and let the planner pick math_refusal.
     let lower = input.to_lowercase();
+    // **v4.53.0** — gerund/converb-form clause separation. Real-REPL
+    // session 5 surfaced «Елуді екіге **көбейткенде** үшке **бөліп**,
+    // 7-ні **азайтқанда** не болады?» — the same chain that works in
+    // imperative form («... көбейтіңіз, ... бөліңіз, ... азайтыңыз»)
+    // failed because the gerund/converb forms lack overt clause
+    // boundaries. Pre-v4.53.0 the parser saw 3 case-marked numerals
+    // + multiple verbs in one super-clause and refused.
+    //
+    // Fix: insert `__CLAUSE_SEP__` after each gerund/converb form
+    // of a math verb. The post-clause-split parser already handles
+    // chained operations against an accumulator, so once the
+    // gerund-form clauses are split, evaluation falls through to
+    // the existing v4.42.0 multi-clause path.
+    //
+    // Gerund forms covered: «-ғанда / -генде / -қанда / -кенде»
+    // (past-participle + Locative — "when I X-ed"). Converb forms:
+    // «-ып / -іп / -п» (sequential action — "having X-ed").
+    // Conditional «-се / -сек / -сем / -сеңіз» NOT added here —
+    // those forms (e.g., «көбейтсем») are already handled inside
+    // single_clause_kazakh_math via the existing detect_kazakh_math_op
+    // tests and don't typically appear in multi-clause chains.
+    let lower = inject_gerund_clause_separators(&lower);
     let normalized: String = lower
         .replace(',', " __CLAUSE_SEP__ ")
         .replace(" және ", " __CLAUSE_SEP__ ")
@@ -648,6 +670,55 @@ pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
         // No math verb → trailing rhetorical appendage; ignore.
     }
     Some(accumulator)
+}
+
+/// **v4.53.0** — Insert `__CLAUSE_SEP__` markers after gerund /
+/// converb forms of math verbs so the multi-clause evaluator
+/// (v4.42.0) can chain operations across them.
+///
+/// Gerund («when-I-X») suffix family: -ғанда / -генде / -қанда /
+/// -кенде. Converb («having-X-ed») suffix family: -ып / -іп / -п.
+/// Both forms attach to the four math-verb roots: көбейт, бөл, қос,
+/// азайт.
+///
+/// Conservative: only inserts AFTER a token that's recognisable as
+/// a math-verb gerund/converb, so non-math gerund forms in the
+/// input are left alone.
+fn inject_gerund_clause_separators(input: &str) -> String {
+    // 16 surface forms: 4 stems × 4 suffix variants (gerund "-ғанда/
+    // -генде/-қанда/-кенде" and converb "-ып/-іп/-п" composed with
+    // the appropriate vowel-harmony class for each root).
+    const GERUND_FORMS: &[&str] = &[
+        // көбейт (multiply): voiceless т-final → -кенде / -іп
+        "көбейткенде",
+        "көбейтіп",
+        // бөл (divide): sonorant л-final → -генде / -іп (front vowel)
+        "бөлгенде",
+        "бөліп",
+        // қос (add): voiceless с-final, back vowel → -қанда / -ып
+        "қосқанда",
+        "қосып",
+        // азайт (subtract): voiceless т-final, back vowel → -қанда / -ып
+        "азайтқанда",
+        "азайтып",
+    ];
+    // Pad with leading/trailing spaces so token-boundary matches
+    // are uniform (handles input-edge tokens without special-casing).
+    let padded = format!(" {} ", input);
+    let mut result = padded;
+    for form in GERUND_FORMS {
+        // Replace " <form> " with " <form> __CLAUSE_SEP__ " — only
+        // matches whole-token instances. The `__CLAUSE_SEP__` placement
+        // AFTER the gerund/converb means the gerund clause closes with
+        // the verb (consistent with how the comma path works).
+        let needle = format!(" {} ", form);
+        let replacement = format!(" {} __CLAUSE_SEP__ ", form);
+        result = result.replace(&needle, &replacement);
+    }
+    // Trim back to original padding. Outer whitespace doesn't matter
+    // downstream because the next step splits on __CLAUSE_SEP__ and
+    // trims clauses, but keep the function output predictable.
+    result.trim().to_string()
 }
 
 fn clause_has_math_verb(clause: &str) -> bool {
@@ -1604,6 +1675,73 @@ mod math_tests {
         assert_eq!(try_evaluate_kazakh_word_math("Жетіні екіге бөл"), Some(3));
         // 5 / 0 → None (division by zero stays invalid).
         assert_eq!(try_evaluate_kazakh_word_math("Бесті нөлге бөл"), None);
+    }
+
+    /// **v4.53.0** — gerund/converb-form math chains. Real-REPL
+    /// session 5 surfaced «Елуді екіге **көбейткенде** үшке **бөліп**,
+    /// 7-ні **азайтқанда** не болады?» — the same chain that worked
+    /// in imperative form failed because the gerund/converb forms
+    /// lacked overt clause boundaries.
+    #[test]
+    fn word_math_gerund_chain_session5_first_line() {
+        // 50 × 2 / 3 - 7 = 100 / 3 - 7 = 33 - 7 = 26
+        // (truncated integer division on intermediate, per v4.50.5).
+        assert_eq!(
+            try_evaluate_kazakh_word_math(
+                "Елуді екіге көбейткенде үшке бөліп, 7-ні азайтқанда не болады?"
+            ),
+            Some(26)
+        );
+    }
+
+    #[test]
+    fn word_math_converb_only_chain() {
+        // Pure converb chain (no gerund): «Бесті екіге көбейтіп, үшті
+        // қосыңыз» — should split on «көбейтіп» and chain.
+        // 5 × 2 + 3 = 13.
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Бесті екіге көбейтіп, үшті қосыңыз"),
+            Some(13)
+        );
+    }
+
+    #[test]
+    fn word_math_gerund_only_chain() {
+        // Pure gerund chain. «Алтыны екіге бөлгенде үшке көбейтіңіз» —
+        // 6 / 2 × 3 = 9.
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Алтыны екіге бөлгенде үшке көбейтіңіз"),
+            Some(9)
+        );
+    }
+
+    #[test]
+    fn word_math_qosqanda_qosyp_forms() {
+        // «қосқанда» (add-when) gerund. «Беске үшті қосқанда нәтиже
+        // қандай?» — 5 + 3 = 8.
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Беске үшті қосқанда нәтиже қандай?"),
+            Some(8)
+        );
+        // «қосып» (add-converb) sequel. «Бесті екіге көбейтіп, үшті
+        // қосып, төртті азайтыңыз» — 5×2 + 3 - 4 = 9.
+        assert_eq!(
+            try_evaluate_kazakh_word_math("Бесті екіге көбейтіп, үшті қосып, төртті азайтыңыз"),
+            Some(9)
+        );
+    }
+
+    #[test]
+    fn word_math_gerund_does_not_break_simple_imperative() {
+        // Regression: imperative-only chains (the v4.42.0 path)
+        // should still parse correctly with gerund-separator
+        // injection in place — no spurious clause splits.
+        assert_eq!(
+            try_evaluate_kazakh_word_math(
+                "Елуден екіге көбейтіңіз, үшке бөліңіз және 7-ні азайтыңыз"
+            ),
+            Some(26)
+        );
     }
 }
 
