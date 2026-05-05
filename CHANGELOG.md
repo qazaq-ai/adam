@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.54.0] — 2026-05-05 — Lexicon expansion + 10 bridge-facts (highest-ROI batch)
+
+**Per `project_bridge_fact_leverage`:** a single `{sub_hub} IsA {top_hub}` fact multiplies derivation leverage to +47–67/fact vs +15/fact without bridge. v4.54.0 lands the largest single-batch ROI in the v4.x line: **10 bridge facts → +934 derived facts (+93/fact)** — far above both the prior empirical bound and the spec's +300 acceptance threshold.
+
+### Innovations
+
+**(1) 5 new morpheme roots** in `data/tokenizer/segmentation_roots.json` (the canonical lexicon location for morpheme-coverage). Spec named 3 from `project_morpheme_coverage_baseline`:
+- **алғаш** (adverb, back, voiceless consonant) — covers 625 corpus occurrences (+ derivatives like алғашқы)
+- **млн** (numeral, back, nasal) — 1987 occurrences across cc100 + wikipedia
+- **іске** — initially added but reverted in this release: it broke the segmentation eval (`seg_183` expects `іс + ке`, not `іске` as a unit). The `іс` root (already in lexicon at 2 chars) is below the morpheme_coverage min-root-len filter; resolving that needs a separate lexicon-tooling change deferred to a later release.
+
+Plus 3 high-frequency bonus roots needed to clear the > 86.5 % acceptance threshold:
+- **дамыту** (verb, back, vowel) — develop; 1683 occurrences
+- **маңызды** (adjective, back, vowel) — important; 1605
+- **ашық** (adjective, back, voiceless consonant) — open; 1487
+
+**(2) 10 bridge facts** in `data/world_core/role_bridges.jsonl` (ids `bridge_role_054`…`bridge_role_063`), each linking a sub-hub noun to a top-tier IsA hub:
+- бала IsA адам, дос IsA адам (2 → human-hub)
+- жасанды интеллект IsA жүйе (1 → system-hub)
+- жад IsA ұғым (1 → concept-hub)
+- киім IsA зат, жиһаз IsA зат (2 → thing-hub)
+- бұлшықет IsA мүше, жүйке IsA мүше (2 → organ-hub)
+- бөлме IsA орын (1 → place-hub)
+- ел IsA мемлекет (1 → state-hub)
+
+Selection criterion: 122 world_core subjects currently lack any IsA edge (computed via `comm -23` of all-subjects vs has-isa-subjects). The 10 picked are the highest-frequency missing bridges — each subject already participates in many corpus / world_core relations, so the new IsA edge cascades through R1 (transitivity), R2 (Has inheritance), R5 (shared IsA target) rules.
+
+**(3) Re-ran the full pipeline** — `extract_facts` + `run_reasoner` + `morpheme_coverage` + `validate_foundation`. Every artefact regenerated; `verify_release_version.sh 4.54.0` green; foundation validation green.
+
+### Acceptance metrics
+
+| Gate | Pre-v4.54.0 | Post-v4.54.0 | Target | Status |
+|---|---|---|---|---|
+| world_core entries | 2089 | **2099** (+10) | n/a | ✓ |
+| world_core facts | 2349 | **2359** (+10) | n/a | ✓ |
+| Derived facts | 27175 | **28109** (+934) | +300 | ✓ +93/fact |
+| Morpheme coverage | 86.26 % | **86.51 %** | > 86.5 % | ✓ +0.25 pp |
+| `is_a` predicate | 1810 | **1820** (+10) | n/a | ✓ |
+| `R1_is_a_transitivity` derivations | (prior) | **2238** | n/a | ✓ |
+| `R5_shared_is_a_target` | (prior) | **1628** | n/a | ✓ |
+| Workspace tests | 976 | **976** | unchanged | ✓ |
+| `validate_foundation.sh` | green | green | green | ✓ |
+
+### Cadence
+
+`.0` minor — Lexicon + Knowledge expansion sized to a meaningful capability bump (10 bridges + 5 roots, full pipeline regen, derivation leverage measurably amplified). Per `feedback_versioning_post_1_0`: «minor x.y.0 = significant capability or milestone». First batch since v4.51.0 to materially shift world_core scale + derivation count.
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.53.5] — 2026-05-05 — Context-aware clarify (session 5 generic-fallback complaint closed)
 
 **Closes the user's session-5 complaint:** "ответы должны вытекать из контекста беседы, а не общий ответ на все, что не знает". When `Intent::Unknown` fires AND adam can't extract a noun-hint OR the topic is low-confidence, the v4.37.5 clarify path emitted a generic «Сұрағыңызды толық түсінбедім. Қандай тақырып туралы сұрап отырсыз?» — completely ignoring stored profile slots (name, occupation, activity, city). v4.53.5 routes those clarify cases to a new `unknown.with_session_diagnostic` family that cites the stored context and asks the user to pick a topic from what adam already knows.

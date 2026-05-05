@@ -1,7 +1,7 @@
 {
-  "version": "4.50.5",
+  "version": "4.53.5",
   "status": "completed",
-  "elapsed_s": 28,
+  "elapsed_s": 64,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2349,
+    "facts_total": 2359,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1810,
+      "is_a": 1820,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -80,7 +80,7 @@
       "world_core/programming_rust_advanced.jsonl": 35,
       "world_core/proverbs.jsonl": 43,
       "world_core/psychology_basic.jsonl": 22,
-      "world_core/role_bridges.jsonl": 53,
+      "world_core/role_bridges.jsonl": 63,
       "world_core/society.jsonl": 57,
       "world_core/sports.jsonl": 18,
       "world_core/time.jsonl": 44,
@@ -42729,6 +42729,206 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақстанда жеті мыңнан астам ауыл бар."
+    },
+    {
+      "subject": {
+        "surface": "бала",
+        "root": "бала",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_054"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бала — адам."
+    },
+    {
+      "subject": {
+        "surface": "дос",
+        "root": "дос",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_055"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дос — адам."
+    },
+    {
+      "subject": {
+        "surface": "жасанды интеллект",
+        "root": "жасанды интеллект",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жүйе",
+        "root": "жүйе",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_056"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жасанды интеллект — жүйе."
+    },
+    {
+      "subject": {
+        "surface": "жад",
+        "root": "жад",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_057"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жад — ұғым."
+    },
+    {
+      "subject": {
+        "surface": "киім",
+        "root": "киім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "зат",
+        "root": "зат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_058"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Киім — зат."
+    },
+    {
+      "subject": {
+        "surface": "жиһаз",
+        "root": "жиһаз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "зат",
+        "root": "зат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_059"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жиһаз — зат."
+    },
+    {
+      "subject": {
+        "surface": "бұлшықет",
+        "root": "бұлшықет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мүше",
+        "root": "мүше",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_060"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бұлшықет — мүше."
+    },
+    {
+      "subject": {
+        "surface": "жүйке",
+        "root": "жүйке",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мүше",
+        "root": "мүше",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_061"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жүйке — мүше."
+    },
+    {
+      "subject": {
+        "surface": "бөлме",
+        "root": "бөлме",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "орын",
+        "root": "орын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_062"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бөлме — орын."
+    },
+    {
+      "subject": {
+        "surface": "ел",
+        "root": "ел",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мемлекет",
+        "root": "мемлекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/role_bridges",
+      "source": {
+        "pack": "world_core/role_bridges.jsonl",
+        "sample_id": "bridge_role_063"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ел — мемлекет."
     },
     {
       "subject": {

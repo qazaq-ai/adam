@@ -1,5 +1,5 @@
 {
-  "version": "4.53.5",
+  "version": "4.54.0",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
@@ -34520,6 +34520,41 @@
       "part_of_speech": "noun",
       "vowel_harmony": "front",
       "final_sound_class": "voiced_consonant"
+    },
+    {
+      "id": "adv_alghash",
+      "root": "алғаш",
+      "part_of_speech": "adverb",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
+    },
+    {
+      "id": "num_mln",
+      "root": "млн",
+      "part_of_speech": "numeral",
+      "vowel_harmony": "back",
+      "final_sound_class": "nasal"
+    },
+    {
+      "id": "verb_damytu",
+      "root": "дамыту",
+      "part_of_speech": "verb",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_manyzdy",
+      "root": "маңызды",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "vowel"
+    },
+    {
+      "id": "adj_ashyq",
+      "root": "ашық",
+      "part_of_speech": "adjective",
+      "vowel_harmony": "back",
+      "final_sound_class": "voiceless_consonant"
     }
   ]
 }

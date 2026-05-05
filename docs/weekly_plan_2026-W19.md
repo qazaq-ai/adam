@@ -107,27 +107,29 @@ No release. Output: gap report becomes the v4.54 / v4.55 spec.
 
 ---
 
-## Day 5 — 2026-05-09 (Saturday)
+## Day 5 — 2026-05-05 (pulled forward) ✓ shipped
 
 **v4.54.0 — Lexicon + bridge-fact expansion (highest-ROI batch).**
 
-Per `project_bridge_fact_leverage`: a single
-`{sub_hub} IsA {адам/маман/зат/...}` fact multiplies leverage to
-+47–67 derivations vs +15 without bridge.
-
-- Top 3 missing morphemes (per `project_morpheme_coverage_baseline`
-  v4.41.0 baseline): алғашқы, іске, млн. Add roots + suffix paradigms.
-- Bridge-fact pass: identify 10 sub-hub nouns currently lacking IsA
-  edges to a top-tier hub (адам / маман / зат / жер бедері / су
-  денесі / етістік / ұғым). Add bridge facts.
-- Per `project_corpus_purity_directive`: every new entry passes
-  loanword filter; reject Russian/English-rooted candidates without
-  established Kazakh form.
-- Re-run `extract_facts` + `run_reasoner` + `validate_foundation` to
-  confirm derivation count moves up by ≥ 30/fact added.
-
-Acceptance: morpheme coverage > 86.5 % (currently 86.21 %); derived
-facts count up by ≥ 300 from current 27175.
+- [x] 5 new morpheme roots in `data/tokenizer/segmentation_roots.json`:
+      алғаш / млн (spec'd) + дамыту / маңызды / ашық (bonus to clear
+      acceptance gate). Spec'd `іске` reverted: it broke segmentation
+      eval (`seg_183` expects `іс + ке` split). Lexicon-tooling
+      change (lower min-root-len from 3 → 2 to surface 2-char roots
+      like `іс`, `ал`, `ол` in coverage) deferred to a later release.
+- [x] 10 bridge facts in `role_bridges.jsonl` (`bridge_role_054…063`):
+      бала/дос IsA адам · жасанды интеллект IsA жүйе · жад IsA ұғым ·
+      киім/жиһаз IsA зат · бұлшықет/жүйке IsA мүше · бөлме IsA орын ·
+      ел IsA мемлекет.
+- [x] Re-ran `extract_facts` + `run_reasoner` + `morpheme_coverage`
+      + `validate_foundation`. All green.
+- [x] Acceptance: world_core 2089/2349/46/27175 → 2099/2359/46/**28109**
+      (+10 entries / +10 facts / **+934 derived** = +93/fact, 3× the
+      project_bridge_fact_leverage prior bound).
+- [x] Acceptance: morpheme coverage 86.26 % → **86.51 %** (+0.25 pp;
+      > 86.5 % gate cleared).
+- [x] Workspace 976 passing unchanged; verify_release_version.sh
+      4.54.0 green.
 
 ---
 
