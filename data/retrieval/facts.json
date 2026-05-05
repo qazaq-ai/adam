@@ -1,5 +1,5 @@
 {
-  "version": "4.58.5",
+  "version": "4.59.0",
   "status": "completed",
   "elapsed_s": 64,
   "packs_completed": 9,
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2438,
+    "facts_total": 2451,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1899,
+      "is_a": 1912,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -77,6 +77,7 @@
       "world_core/preschool_alphabet.jsonl": 48,
       "world_core/preschool_numbers.jsonl": 16,
       "world_core/preschool_shapes.jsonl": 12,
+      "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
       "world_core/programming_rust.jsonl": 181,
@@ -35712,6 +35713,266 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Пішін — заттың кеңістіктегі сыртқы көрінісі. Әрбір зат өзіндік пішінге ие."
+    },
+    {
+      "subject": {
+        "surface": "үлкен",
+        "root": "үлкен",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлкен — заттың көлемінің жоғары шегін білдіретін өлшемдік сын есім. Қарама-қарсысы: кіші. Мысалдар: үлкен үй, үлкен қала, үлкен ағаш."
+    },
+    {
+      "subject": {
+        "surface": "кіші",
+        "root": "кіші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кіші — заттың көлемінің төменгі шегін білдіретін өлшемдік сын есім. Қарама-қарсысы: үлкен. Мысалдар: кіші бөлме, кіші бала, кіші ауыл."
+    },
+    {
+      "subject": {
+        "surface": "биік",
+        "root": "биік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Биік — заттың тік бойымен жоғары қарайғы өлшемін білдіретін өлшемдік сын есім. Қарама-қарсысы: аласа. Мысалдар: биік тау, биік ағаш, биік үй."
+    },
+    {
+      "subject": {
+        "surface": "аласа",
+        "root": "аласа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аласа — заттың тік бойымен қысқалығын білдіретін өлшемдік сын есім. Қарама-қарсысы: биік. Мысалдар: аласа орындық, аласа қоршау."
+    },
+    {
+      "subject": {
+        "surface": "ұзын",
+        "root": "ұзын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ұзын — заттың көлденеңінен немесе бойымен ұзындығын білдіретін өлшемдік сын есім. Қарама-қарсысы: қысқа. Мысалдар: ұзын жол, ұзын арқан, ұзын шаш."
+    },
+    {
+      "subject": {
+        "surface": "қысқа",
+        "root": "қысқа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қысқа — заттың ұзындығының аз екенін білдіретін өлшемдік сын есім. Қарама-қарсысы: ұзын. Мысалдар: қысқа сурет, қысқа әңгіме, қысқа жол."
+    },
+    {
+      "subject": {
+        "surface": "ауыр",
+        "root": "ауыр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ауыр — заттың салмағының жоғарылығын білдіретін өлшемдік сын есім. Қарама-қарсысы: жеңіл. Мысалдар: ауыр тас, ауыр жүк, ауыр сөмке."
+    },
+    {
+      "subject": {
+        "surface": "жеңіл",
+        "root": "жеңіл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жеңіл — заттың салмағының аздығын білдіретін өлшемдік сын есім. Қарама-қарсысы: ауыр. Мысалдар: жеңіл шар, жеңіл қауырсын, жеңіл сумке."
+    },
+    {
+      "subject": {
+        "surface": "кең",
+        "root": "кең",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кең — заттың көлденеңі жайылыңқы екенін білдіретін өлшемдік сын есім. Қарама-қарсысы: тар. Мысалдар: кең дала, кең көше, кең бөлме."
+    },
+    {
+      "subject": {
+        "surface": "тар",
+        "root": "тар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тар — заттың көлденеңі шектеулі екенін білдіретін өлшемдік сын есім. Қарама-қарсысы: кең. Мысалдар: тар көше, тар жол, тар ауыз."
+    },
+    {
+      "subject": {
+        "surface": "өлшемдік сын есім",
+        "root": "өлшемдік сын есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сын есім",
+        "root": "сын есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өлшемдік сын есім — заттың өлшемі (көлемі, ұзындығы, биіктігі, салмағы, ені) туралы белгі білдіретін сын есім түрі. Көбіне қарама-қарсы жұптарда келеді: үлкен ↔ кіші, биік ↔ аласа."
+    },
+    {
+      "subject": {
+        "surface": "сын есім",
+        "root": "сын есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сын есім — заттың сапалық, сандық немесе өлшемдік белгісін білдіретін сөз табы. Қандай? Қанша? деген сұраққа жауап береді."
+    },
+    {
+      "subject": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_sizes",
+      "source": {
+        "pack": "world_core/preschool_sizes.jsonl",
+        "sample_id": "size_bridge_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сөз табы — белгілі бір грамматикалық белгілері мен сөздік мағынасы ортақ сөздердің тобы. Зат есім, сын есім, етістік, сан есім — қазақ тілінің негізгі сөз таптары."
     },
     {
       "subject": {

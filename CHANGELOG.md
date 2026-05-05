@@ -7,6 +7,56 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.59.5] — 2026-05-06 — Educational portal Day 1 #8 — Pre-school sizes + adjective taxonomy
+
+**Day 1 release 8/10.** New 50th domain `preschool_sizes` covering 10 size-comparison adjectives + first formal adjective-class taxonomy (өлшемдік сын есім → сын есім → сөз табы → ұғым).
+
+### Innovations
+
+**(1) New 50th domain `preschool_sizes`** with 13 entries:
+- 10 size adjectives (`size_001…size_010`) in opposed pairs:
+  - үлкен ↔ кіші (big ↔ small)
+  - биік ↔ аласа (tall ↔ short)
+  - ұзын ↔ қысқа (long ↔ short-length)
+  - ауыр ↔ жеңіл (heavy ↔ light)
+  - кең ↔ тар (wide ↔ narrow)
+
+  Each entry: definition + opposed pair («қарама-қарсысы: <opposite>») + Kazakh usage examples.
+
+**(2) 3 classification bridges** establishing the first formal **adjective-class taxonomy** in world_core:
+- `size_bridge_001`: «**өлшемдік сын есім IsA сын есім**» (size adjective is a kind of adjective)
+- `size_bridge_002`: «**сын есім IsA сөз табы**» (adjective is a part-of-speech class)
+- `size_bridge_003`: «**сөз табы IsA ұғым**» (part-of-speech class is a concept)
+
+Resulting 4-hop cascade chain: `<adjective> → өлшемдік сын есім → сын есім → сөз табы → ұғым` — deepest chain to date.
+
+**(3) MULTIWORD_ENTITIES extended** with «өлшемдік сын есім», «сын есім», «сөз табы». The «сөз табы» (part of speech) hub will become the central pivot for future grammar releases (verbs, nouns, particles, etc.).
+
+**(4) 50-domain milestone** — adam's world_core now spans 50 distinct knowledge domains.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2198 | **2211** (+13) |
+| world_core facts | 2438 | **2451** (+13 — all new tuples) |
+| world_core domains | 49 | **50** (+1, milestone) |
+| Derived facts | 28318 | **28315** (-3 — new сөз табы hub re-routes some R5 shared-target pairs through fewer intermediate hubs; net dedup) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.59.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The minor derivation count drop (-3) reflects R5 (shared_is_a_target) deduplicating shared-hub pairs once the new сөз табы hub provides a more specific mediation layer than ұғым. Net knowledge gain is positive (+13 facts of higher specificity).
+
+**Cumulative Day 1:** 8 of 10 releases · +109 facts cumulative · +203 derived cumulative · 4 sub-domains complete · **50 total world_core domains**.
+
+### Cadence
+
+`.5` patch — new domain. First formal adjective-class taxonomy hub.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.59.0] — 2026-05-06 — Educational portal Day 1 #7 — Pre-school geometric shapes
 
 **Day 1 release 7/10.** New 49th domain `preschool_shapes`. 10 geometric shapes for pre-school comprehension level + 2 classification bridges establishing the shape taxonomy.
