@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.56.5-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.57.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -33,7 +33,7 @@
   <img src="https://img.shields.io/badge/RSS-~76--80%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
-  <img src="https://img.shields.io/badge/world%20core-2124%20curated%20/%202384%20facts-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/world%20core-2135%20curated%20/%202395%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/domains-46-9CCC65?style=flat-square" alt="domains">
   <img src="https://img.shields.io/badge/policy-Rust--only%20%2B%20Graph--first-1976D2?style=flat-square" alt="policies">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20on%20deterministic%20path-2EA44F?style=flat-square" alt="ungrounded generation">
@@ -58,6 +58,8 @@ Tiny ML lives, large ML doesn't: the trained perceptron is 24 bytes / 6 f32; suf
 ### Engineering thesis
 
 The project's core engineering claim — independent of any historical or philosophical thesis about Kazakh — is that **agglutinative morphology gives a clean algebra of meaning**: every Kazakh word decomposes into a root plus a sequence of typed suffixes, each contributing a known grammatical operator (case, number, tense, person, possessive, polarity, modality). Composition is rule-bound, not learned. That structure is exactly what we build the runtime on: FST morphology + typed suffix priors + root-pair PMI as deterministic prior layers, world_core as a curated graph of typed facts, and templates as the only path from fact to text. No probabilistic free generation. No retrained-from-scratch behaviour per release. The result is **predictable, traceable, low-energy** answer for Kazakh queries — not because the language has special metaphysical status, but because its structure is unusually friendly to formal modelling. The same engineering style would apply to other agglutinative-typology languages (Turkish, Kyrgyz, Tatar, Uzbek, …) without claims of universal grammar.
+
+**v4.57.0 — Educational portal Day 1 #3 — Pre-school alphabet letters 21-30.** Day 1 release 3/10. Letters Ө → Х (10 letters, positions 21-30 of 42). 30/42 letters covered cumulatively. **(1)** 10 new letter entries `alpha_021…alpha_030`. 4 Kazakh-specific letters (ө/ұ/ү — Kazakh-distinguishing vowels; «у» dual-function as vowel + consonant — explicitly noted as elementary-curriculum constraint). Phonetic descriptors include front-vs-back tongue, lip-rounding, special constraints («р сөз басында сирек кездеседі»). **(2)** New bridge fact `жазу IsA ұғым` — third hub alongside `әріп IsA ұғым` and `дыбыс IsA ұғым`. Triple-hub coverage of writing/letters/sounds for future literacy lessons (capitals, punctuation, syllabification). **Acceptance:** Foundation 2124/2384/47/28161 → **2135/2395/47/28186** (+11/+11/+25 = 2.3× cascade); workspace 976 passing unchanged; clippy `-D warnings` green; check_metrics_currency green; verify_release_version 4.57.0 green. **Cumulative Day 1:** 3/10 releases · +33 facts · +74 derived · alphabet 30/42. Cadence: `.0` minor — 30-letter milestone (3/4 of alphabet). **Stripe (12) — Kazakh educational portal.**
 
 **v4.56.5 — Educational portal Day 1 #2 — Pre-school alphabet letters 11-20.** Continues the alphabet build: З → О (10 letters, positions 11-20 of 42). **(1)** 10 new letter entries `alpha_011…alpha_020`. Same ordinal + phonetic class + example pattern. Қ/ң flagged as Kazakh-specific; ң carries linguistic constraint «сөз басында кездеспейді». **(2)** New bridge fact: `дыбыс IsA ұғым` (alongside v4.56.0's `әріп IsA ұғым`) — establishes sound-as-concept hub for future grammar releases that will cascade through it. **Acceptance:** Foundation 2113/2373/47/28135 → **2124/2384/47/28161** (+11/+11/+26 = 2.4× cascade per fact); workspace 976 passing unchanged; clippy `-D warnings` green; check_metrics_currency green; verify_release_version 4.56.5 green. Cadence: `.5` patch — Day 1 release 2/10. **Stripe (12) — Kazakh educational portal.**
 

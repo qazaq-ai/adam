@@ -7,6 +7,38 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.57.0] — 2026-05-06 — Educational portal Day 1 #3 — Pre-school alphabet letters 21-30
+
+**Day 1 release 3/10.** Continues the pre-school Kazakh alphabet build: letters Ө through Х (10 letters from positions 21-30 of 42). 30/42 letters covered cumulatively.
+
+### Innovations
+
+**(1) 10 new letter entries** in `data/world_core/preschool_alphabet.jsonl` (`alpha_021…alpha_030`): ө / п / р / с / т / у / ұ / ү / ф / х. 4 of these are Kazakh-specific (ө / ұ / ү — vowels that distinguish Kazakh from Russian; «у» is dual-function as both vowel and consonant). Phonetic descriptors include front-vs-back tongue, lip-rounding, and special constraints («сөз басында сирек кездеседі» for «р»).
+
+**(2) New bridge fact** `alpha_bridge_003`: «**жазу IsA ұғым**» — establishes writing-as-concept hub alongside the v4.56.0 `әріп IsA ұғым` and v4.56.5 `дыбыс IsA ұғым`. Three-hub coverage of writing/letters/sounds — future literacy lessons (capital letters, punctuation, syllabification) cascade through this triplet.
+
+**(3) Linguistic precision** — entry for «у» explicitly notes its dual function (vowel + consonant) as a Kazakh-specific phonological feature elementary curricula must teach distinctly.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2124 | **2135** (+11) |
+| world_core facts | 2384 | **2395** (+11) |
+| Derived facts | 28161 | **28186** (+25 = 2.3× per fact) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.57.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+**Cumulative Day 1:** 3 of 10 releases · +33 facts · +74 derived · alphabet 30/42 letters covered.
+
+### Cadence
+
+`.0` minor — Day 1 release 3/10 + 30-letter milestone (3/4 of alphabet covered).
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.56.5] — 2026-05-06 — Educational portal Day 1 #2 — Pre-school alphabet letters 11-20
 
 **Day 1 release 2/10.** Continues the pre-school Kazakh alphabet build: letters З through О (10 letters from positions 11-20 of 42). Adds 1 new bridge fact for sound-as-concept hub.
