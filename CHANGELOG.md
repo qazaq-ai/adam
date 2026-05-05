@@ -7,6 +7,58 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.60.0] — 2026-05-06 — Educational portal Day 1 #9 — Daily routine verbs + verb-class taxonomy
+
+**Day 1 release 9/10.** New 51st domain `preschool_routine`. 10 daily-routine action verbs (тұру / жуыну / тамақтану / ойнау / оқу / жазу / жүру / жүгіру / тыңдау / ұйықтау) + verb taxonomy bridge.
+
+### Innovations
+
+**(1) New 51st domain `preschool_routine`** with 13 entries:
+- 10 daily-routine action entries (`routine_001…routine_010`):
+  - **Wake/sleep:** тұру (wake up) / ұйықтау (sleep)
+  - **Hygiene:** жуыну (wash)
+  - **Eating:** тамақтану (eat)
+  - **Play:** ойнау (play)
+  - **Learning:** оқу (read/study) / жазу әрекеті (write)
+  - **Movement:** жүру (walk) / жүгіру (run)
+  - **Communication:** тыңдау (listen)
+
+  Each entry: action description + cultural/health context (e.g., «балаларға тәулігіне 9–11 сағат ұйқы қажет») + Kazakh usage examples.
+
+**(2) 3 classification bridges** establishing the action / verb taxonomy:
+- `routine_bridge_001`: «**күнделікті іс-әрекет IsA іс-әрекет**»
+- `routine_bridge_002`: «**іс-әрекет IsA ұғым**»
+- `routine_bridge_003`: «**етістік IsA сөз табы**» — adds the verb word-class to the part-of-speech taxonomy alongside v4.59.5's «сын есім IsA сөз табы»
+
+Resulting cascade chains:
+- `<verb> → күнделікті іс-әрекет → іс-әрекет → ұғым` (action chain)
+- `етістік → сөз табы → ұғым` (verb word-class chain)
+
+**(3) MULTIWORD_ENTITIES extended** with «күнделікті іс-әрекет», «жазу әрекеті».
+
+**(4) сөз табы pivot strengthens** — both adjectives (v4.59.5) and verbs (v4.60.0) now hub through the «сөз табы» (part of speech) class. Future grammar releases (nouns, particles, postpositions, etc.) will plug in as additional sibling word-class entries.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2211 | **2224** (+13) |
+| world_core facts | 2451 | **2464** (+13 — all new tuples) |
+| world_core domains | 50 | **51** (+1) |
+| Derived facts | 28315 | **28336** (+21 = 1.6× cascade) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.60.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+**Cumulative Day 1:** 9 of 10 releases · +122 facts cumulative · +224 derived cumulative · 5 sub-domains complete · **51 total world_core domains**.
+
+### Cadence
+
+`.0` minor — new domain. Establishes verb-class node in the part-of-speech taxonomy alongside the v4.59.5 adjective-class node.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.59.5] — 2026-05-06 — Educational portal Day 1 #8 — Pre-school sizes + adjective taxonomy
 
 **Day 1 release 8/10.** New 50th domain `preschool_sizes` covering 10 size-comparison adjectives + first formal adjective-class taxonomy (өлшемдік сын есім → сын есім → сөз табы → ұғым).

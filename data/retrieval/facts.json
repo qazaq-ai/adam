@@ -1,7 +1,7 @@
 {
-  "version": "4.59.0",
+  "version": "4.59.5",
   "status": "completed",
-  "elapsed_s": 64,
+  "elapsed_s": 73,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2451,
+    "facts_total": 2464,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1912,
+      "is_a": 1925,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -76,6 +76,7 @@
       "world_core/plants.jsonl": 35,
       "world_core/preschool_alphabet.jsonl": 48,
       "world_core/preschool_numbers.jsonl": 16,
+      "world_core/preschool_routine.jsonl": 13,
       "world_core/preschool_shapes.jsonl": 12,
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
@@ -35473,6 +35474,266 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Оныншы — реттің он санды білдіретін реттік сан есімі. Мысал: оныншы сынып, оныншы парақ."
+    },
+    {
+      "subject": {
+        "surface": "тұру",
+        "root": "тұру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұру — ұйқыдан оянып, төсектен көтерілу әрекеті. Күнделікті іс-әрекеттің ең басы. Әдетте таңертең орындалады. Мысалдар: ерте тұру, мезгілінде тұру."
+    },
+    {
+      "subject": {
+        "surface": "жуыну",
+        "root": "жуыну",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жуыну — суды немесе сабынды пайдаланып бет-қол тазалау әрекеті. Денсаулықты сақтаудың негізгі дағдысы. Мысалдар: таңертең жуыну, кешке жуыну."
+    },
+    {
+      "subject": {
+        "surface": "тамақтану",
+        "root": "тамақтану",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тамақтану — тамақ ішу, азық-түлікті қабылдау әрекеті. Күн ішінде үш мезгіл орындалады: таңертеңгі ас, түскі ас, кешкі ас. Денсаулық пен өсудің негізі."
+    },
+    {
+      "subject": {
+        "surface": "ойнау",
+        "root": "ойнау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ойнау — ойын-сауық арқылы көңіл көтеру және әлемді тану әрекеті. Балалардың дамуы мен үйренуінің ажырамас бөлігі. Мысалдар: доппен ойнау, тығылмақ ойнау."
+    },
+    {
+      "subject": {
+        "surface": "оқу",
+        "root": "оқу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Оқу — кітап, мәтін немесе жазылған сөздерді тануды үйрену және түсіну әрекеті. Білім алудың негізгі құралы. Мысалдар: ертегі оқу, оқулықтан оқу."
+    },
+    {
+      "subject": {
+        "surface": "жазу әрекеті",
+        "root": "жазу әрекеті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жазу — сөздерді әріптер арқылы қағазға немесе экранға түсіру әрекеті. Ой-пікірді сақтаудың және жеткізудің құралы. Мысалдар: дәптерге жазу, есім жазу, хат жазу."
+    },
+    {
+      "subject": {
+        "surface": "жүру",
+        "root": "жүру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жүру — аяқпен бір орыннан екінші орынға қозғалу әрекеті. Қозғалыстың негізгі түрі. Мысалдар: бақшаға жүру, мектепке жүру."
+    },
+    {
+      "subject": {
+        "surface": "жүгіру",
+        "root": "жүгіру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жүгіру — аяқпен жылдам қозғалу әрекеті. Жүруден жылдамырақ. Денсаулық пен спорттың маңызды бөлігі. Мысалдар: алаңда жүгіру, жарыста жүгіру."
+    },
+    {
+      "subject": {
+        "surface": "тыңдау",
+        "root": "тыңдау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тыңдау — құлақпен дыбысты қабылдау әрекеті. Сөйлесудің және үйренудің негізгі құралы. Мысалдар: ертегі тыңдау, ұстазды тыңдау, музыка тыңдау."
+    },
+    {
+      "subject": {
+        "surface": "ұйықтау",
+        "root": "ұйықтау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ұйықтау — денеге демалу беретін, ағзаны қалпына келтіретін әрекет. Күннің соңғы кезеңі. Балаларға тәулігіне 9–11 сағат ұйқы қажет. Мысалдар: ерте ұйықтау, тыныш ұйықтау."
+    },
+    {
+      "subject": {
+        "surface": "күнделікті іс-әрекет",
+        "root": "күнделікті іс-әрекет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "іс-әрекет",
+        "root": "іс-әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күнделікті іс-әрекет — әр күн бірнеше рет орындалатын әдетті іс-қимыл. Адамның күнтәртібін құрайды."
+    },
+    {
+      "subject": {
+        "surface": "іс-әрекет",
+        "root": "іс-әрекет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Іс-әрекет — нақты мақсатқа жетуге бағытталған, белгілі бір нәтиже беретін қимыл-қозғалыс. Қазақ тілінде етістіктер арқылы білдіріледі."
+    },
+    {
+      "subject": {
+        "surface": "етістік",
+        "root": "етістік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_routine",
+      "source": {
+        "pack": "world_core/preschool_routine.jsonl",
+        "sample_id": "routine_bridge_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Етістік — заттың іс-әрекетін, қимылын немесе күй-жайын білдіретін сөз табы. Не істеді? Не істейді? деген сұрақтарға жауап береді. Мысалдар: жүру, ойнау, оқу, жазу."
     },
     {
       "subject": {

@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "adam-corpus"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "adam-kernel",
  "adam-kernel-fst",
@@ -15,7 +15,7 @@ dependencies = [
 
 [[package]]
 name = "adam-dialog"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "adam-kernel",
  "adam-kernel-fst",
@@ -30,7 +30,7 @@ dependencies = [
 
 [[package]]
 name = "adam-eval"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "adam-corpus",
  "adam-tokenizer",
@@ -41,7 +41,7 @@ dependencies = [
 
 [[package]]
 name = "adam-kernel"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -50,7 +50,7 @@ dependencies = [
 
 [[package]]
 name = "adam-kernel-fst"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "adam-kernel",
  "serde",
@@ -60,7 +60,7 @@ dependencies = [
 
 [[package]]
 name = "adam-reasoning"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "adam-kernel-fst",
  "ctrlc",
@@ -73,7 +73,7 @@ dependencies = [
 
 [[package]]
 name = "adam-retrieval"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "adam-kernel-fst",
  "serde",
@@ -83,7 +83,7 @@ dependencies = [
 
 [[package]]
 name = "adam-scaling"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "adam-kernel-fst",
  "adam-reasoning",
@@ -95,7 +95,7 @@ dependencies = [
 
 [[package]]
 name = "adam-tokenizer"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "adam-kernel",
  "serde",
@@ -105,7 +105,7 @@ dependencies = [
 
 [[package]]
 name = "adam-train"
-version = "4.59.5"
+version = "4.60.0"
 dependencies = [
  "adam-corpus",
  "adam-eval",
