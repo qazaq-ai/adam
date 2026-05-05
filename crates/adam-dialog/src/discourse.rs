@@ -524,7 +524,17 @@ pub fn try_evaluate_arithmetic(input: &str) -> Option<i64> {
                 let result = if op == '*' {
                     l.checked_mul(r)?
                 } else {
-                    if r == 0 || l % r != 0 {
+                    // **v4.50.5** — truncated integer division for
+                    // user-friendly Kazakh math. Pre-v4.50.5 refused
+                    // non-integer results (returned None), forcing
+                    // adam into the math_refusal template even on
+                    // simple cases like «бесті жетіге көбейтіп,
+                    // екіге бөліңіз» (= 35/2). Truncating to 17 is
+                    // closer to user expectations and matches how
+                    // Kazakh-language math conversation typically
+                    // handles fractional results («жуықтап» —
+                    // approximately).
+                    if r == 0 {
                         return None;
                     }
                     l.checked_div(r)?
@@ -712,11 +722,13 @@ fn apply_kazakh_math_op(op: KazakhMathOp, a: i64, b: i64) -> Option<i64> {
         KazakhMathOp::Sub => a.checked_sub(b),
         KazakhMathOp::Mul => a.checked_mul(b),
         KazakhMathOp::Div => {
-            if b == 0 || a % b != 0 {
-                None
-            } else {
-                Some(a / b)
-            }
+            // **v4.50.5** — truncated integer division (mirrors
+            // try_evaluate_arithmetic). Pre-v4.50.5 refused non-
+            // integer results, forcing math_refusal on simple
+            // queries like «бесті жетіге көбейтіп, екіге бөліңіз»
+            // (= 35/2 = 17). Truncating to 17 is closer to user
+            // expectations.
+            if b == 0 { None } else { Some(a / b) }
         }
     }
 }
@@ -1466,7 +1478,13 @@ mod arithmetic_tests {
     #[test]
     fn handles_division_zero_and_remainder() {
         assert_eq!(try_evaluate_arithmetic("5/0"), None);
-        assert_eq!(try_evaluate_arithmetic("7/2"), None); // non-integer
+        // **v4.50.5** — truncated integer division. Pre-v4.50.5
+        // returned None for non-integer results; v4.50.5 truncates
+        // to match Kazakh-conversational expectations (бесті екіге
+        // бөлсем — answer is 2, not "refusal").
+        assert_eq!(try_evaluate_arithmetic("7/2"), Some(3));
+        assert_eq!(try_evaluate_arithmetic("10/4"), Some(2));
+        assert_eq!(try_evaluate_arithmetic("5*7/2"), Some(17));
     }
 
     #[test]
@@ -1579,10 +1597,12 @@ mod math_tests {
     }
 
     #[test]
-    fn word_math_division_non_integer_returns_none() {
-        // 7 / 2 has remainder → None (math_refusal fallback)
-        assert_eq!(try_evaluate_kazakh_word_math("Жетіні екіге бөл"), None);
-        // 5 / 0 → None
+    fn word_math_division_truncates_non_integer() {
+        // **v4.50.5** — truncated integer division. 7/2 → 3 (was None
+        // pre-v4.50.5). Closer to user expectations on Kazakh
+        // conversational math.
+        assert_eq!(try_evaluate_kazakh_word_math("Жетіні екіге бөл"), Some(3));
+        // 5 / 0 → None (division by zero stays invalid).
         assert_eq!(try_evaluate_kazakh_word_math("Бесті нөлге бөл"), None);
     }
 }

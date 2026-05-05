@@ -532,6 +532,8 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     ".net саласы",
     "меншік моделі",
     "қоқыс жинаушы",
+    // **v4.50.5** — transcript-driven math additions.
+    "квадрат үшмүше",
     // **v4.44.5** — economics_basic + materials/cooking/music depth.
     // Required by `world_core_multiword_coverage`.
     "экономикалық категория",

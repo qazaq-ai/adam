@@ -7,6 +7,70 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.50.5] — 2026-05-04 — Transcript-driven regression fixes — math truncation + respectful address + math vocabulary
+
+**Driven by 2026-05-04 user dialog test session 3.** Three concrete gaps surfaced in the transcript:
+1. Kazakh word-form math refused on simple non-integer cases («Бесті жетіге көбейтіп, екіге бөліңіз» = 35/2 — should answer 17, was math_refusal).
+2. Digit-form `:` operator handled but produced `None` on intermediate non-integer step («5+5*2:4-3» = 5+10/4-3 — fractional 2.5 caused refusal).
+3. Adam addressed the user by literal name «Дәулет» instead of Kazakh respectful form «Дәке» — culturally inconsistent with the user's training expectation.
+
+Plus one missing knowledge gap: «Квадрат үшмүше» (quadratic trinomial) had no curated fact.
+
+### Real-REPL gap closures
+
+| Pre-v4.50.5 transcript query | Pre | Post |
+|---|---|---|
+| Бесті жетіге көбейтіп, екіге бөліңіз. | math_refusal template | "**Нәтижесі: 17 (он жеті)**" ✓ |
+| 5+5*2:4-3 | math_refusal template | "**Есептедім: 4 (төрт)**" ✓ |
+| 5*7/2 | math_refusal template | "**Жауабы — 17 (он жеті)**" ✓ |
+| Менің атым Дәулет. | "Дәулет, танысқаныма қуаныштымын" (literal) | "**Дәулет деген атыңызды есте сақтап, сізді Дәке деп атаймын — қазақша.**" (respect-form by default) |
+| Квадрат үшмүше дегеніміз не? | clarify | "**Квадрат үшмүше — ax² + bx + c түріндегі екінші дәрежелі үш мүшеден тұратын математикалық өрнек.**" ✓ |
+
+### Innovations
+
+**(1) Truncated integer division** in `try_evaluate_arithmetic` — pre-v4.50.5 the digit-form evaluator returned `None` for non-integer divisions (e.g., `7/2`), forcing the math_refusal template. v4.50.5 truncates to integer (`7/2 → 3`, `5*7/2 → 17`) matching Kazakh-conversational expectations. Division by zero remains `None` (still invalid).
+
+**(2) Truncated integer division** in `try_evaluate_kazakh_word_math` — mirrors fix (1) for the word-form evaluator. «Жетіні екіге бөл» now returns `Some(3)` (was `None`). Multi-clause word-form queries that previously hit a non-integer intermediate step now compute through.
+
+**(3) Respect-form-by-default `statement_of_name` template family** — replaced the v4.18.0 4-template family (3 literal-name + 1 respect-aware) with a 4-template family where 3 of 4 variants gate on `{name_respect_distinct}`. For consonant-initial names (Дәулет → Дәке, Мұрат → Мәке, Сәкен → Сәке) all 4 are admissible and the planner cycles among them; ~75 % of seeds produce a respect-form acknowledgment. For vowel-initial names where the diminutive collapses (Абай, Алия), only the instrumental fallback («Абаймен танысқаныма…») remains fillable — preserving v4.18.0 behavior exactly for those cases.
+
+**(4) Math vocabulary depth** — 3 new facts in `mathematics_basic.jsonl`:
+- math_053: «Квадрат үшмүше — ax² + bx + c түріндегі екінші дәрежелі үш мүшеден тұратын математикалық өрнек.»
+- math_054: «Көпмүше — бірнеше мүшеден құралған математикалық өрнек.»
+- math_055: «Үшмүше — үш мүшеден құралған математикалық өрнек.»
+
+**(5) `MULTIWORD_ENTITIES` += 1** — «квадрат үшмүше» registered (required by `world_core_multiword_coverage`).
+
+**(6) Test updates**:
+- `discourse::math_tests::word_math_division_non_integer_returns_none` renamed to `word_math_division_truncates_non_integer` and updated to assert `Some(3)` for «Жетіні екіге бөл» and `None` only for division-by-zero.
+- `discourse::arithmetic_tests::handles_division_zero_and_remainder` updated: `7/2 → Some(3)`, `10/4 → Some(2)`, `5*7/2 → Some(17)` plus the existing `5/0 → None`.
+- `tests/end_to_end.rs::response_statement_of_name_substitutes_slot` updated to reflect the new 4-template family shape (instrumental fallback + 3 respect-form variants).
+
+**(7) NOT YET in v4.50.5** (separate carry-forward):
+- User-activity slot extraction («Мен X-мен айналысамын» / «X әзірлеймін») — currently adam captures `occupation=бағдарламашы` but loses the activity context («жасанды интеллект әзірлеймін»). Architectural addition (new Intent variant + session schema change + recall handler); deferred to v4.51.0+.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **969 passing** unchanged |
+| Adam-dialog lib | **301 passing** unchanged |
+| Live REPL probe (5 transcript queries) | ✓ all 5 fixed/improved |
+| Foundation: 2086 → **2089 entries** (+3 math facts), 2346 → **2349 facts** (+3) | minor delta |
+| `cargo fmt --all --check` | clean |
+
+### Cadence
+
+`.5` reflects: (1) digit-form division truncation + (2) word-form division truncation + (3) statement_of_name respect-form-by-default + (4) 3 math vocabulary facts + (5) MULTIWORD sync + (6) test refresh + (7) live REPL verification → **6 distinct innovations** + transcript-driven gap closure.
+
+Stage B status (post v4.50.5):
+- v4.45.0 → v4.50.0 — substrate complete + trained constant + audit baseline ✓
+- **v4.50.5 — transcript-driven regression closure** ← shipped
+- v4.51.0+ — user-activity slot extraction (deferred from this transcript)
+- v4.50.5+ (other) — production ranker replacement (still gated on eval validation)
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.50.0] — 2026-05-04 — Stage B completion — REPL-derived pairs + trained_v0 + audit baseline shift
 
 **Stage B completion milestone** — three carry-forward bundles consolidated into one minor:

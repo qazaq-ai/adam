@@ -1,7 +1,7 @@
 {
-  "version": "4.44.0",
+  "version": "4.50.5",
   "status": "completed",
-  "elapsed_s": 65,
+  "elapsed_s": 28,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2346,
+    "facts_total": 2349,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1807,
+      "is_a": 1810,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -66,7 +66,7 @@
       "world_core/kz_literature.jsonl": 96,
       "world_core/language_features.jsonl": 33,
       "world_core/materials.jsonl": 22,
-      "world_core/mathematics_basic.jsonl": 52,
+      "world_core/mathematics_basic.jsonl": 55,
       "world_core/measurements.jsonl": 18,
       "world_core/music_kz.jsonl": 24,
       "world_core/notable_kazakhstanis.jsonl": 51,
@@ -27929,6 +27929,66 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Интеграл — функцияның қисығы мен ось арасындағы ауданды есептейтін математикалық ұғым."
+    },
+    {
+      "subject": {
+        "surface": "квадрат үшмүше",
+        "root": "квадрат үшмүше",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық өрнек",
+        "root": "математикалық өрнек",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_053"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Квадрат үшмүше — ax² + bx + c түріндегі екінші дәрежелі үш мүшеден тұратын математикалық өрнек."
+    },
+    {
+      "subject": {
+        "surface": "көпмүше",
+        "root": "көпмүше",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық өрнек",
+        "root": "математикалық өрнек",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_054"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көпмүше — бірнеше мүшеден құралған математикалық өрнек."
+    },
+    {
+      "subject": {
+        "surface": "үшмүше",
+        "root": "үшмүше",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық өрнек",
+        "root": "математикалық өрнек",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_055"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үшмүше — үш мүшеден құралған математикалық өрнек."
     },
     {
       "subject": {

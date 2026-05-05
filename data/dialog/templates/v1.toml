@@ -573,28 +573,30 @@ templates = [
 [[families]]
 key = "statement_of_name"
 templates = [
-    # **v4.18.0** — first acknowledgement uses literal `{name}` so
-    # the user sees adam captured exactly what they said. Every
-    # downstream address template uses `{name_respect}` (Дәке /
-    # Мәке / Сәке) per Kazakh tradition. The split lets the user
-    # confirm they were heard correctly AND see adam shift to the
-    # respectful diminutive on subsequent turns.
-    "сәлем, {name}",
-    "{name}, танысқаныма қуаныштымын",
-    "{name|instrumental} танысқаныма қуаныштымын",
-    "{name} деген атыңызды есте сақтаймын",
-    # **v4.18.5** — warm-intro variant that introduces both the
-    # literal name AND the respectful Kazakh address form, with
-    # an explicit cultural note. Gated on `{name_respect_distinct}`
-    # which is present ONLY when the respect form differs from
-    # the literal — so this template auto-filters for vowel-
-    # initial names (Абай, Алия) where the diminutive collapses
-    # to the literal and the «Сізді X деп атаймын» phrasing would
-    # be redundant. For consonant-initial names the user sees
-    # they were heard verbatim AND learns adam's address style:
-    # «Танысқаныма қуаныштымын, Дәулет! Сізді Дәке деп атаймын —
-    # қазақ дәстүрі бойынша.»
+    # **v4.50.5** — Kazakh respectful address by default. The first
+    # three variants gate on `{name_respect_distinct}`, fillable
+    # ONLY when the respect form differs from the literal name
+    # (consonant-initial names like Дәулет → Дәке, Мұрат → Мәке).
+    # When fillable, all three are admissible and the planner picks
+    # one — adam consistently uses Дәке-form, matching the cultural
+    # norm of addressing peers/elders with the respectful diminutive
+    # rather than the bare name. When the diminutive collapses to
+    # the literal (vowel-initial names like Абай, Алия), these
+    # gate-fail and the planner falls through to the
+    # instrumental-form fallback below.
     "Танысқаныма қуаныштымын, {name}! Сізді {name_respect_distinct} деп атаймын — қазақ дәстүрі бойынша",
+    "{name_respect_distinct}, танысқаныма қуаныштымын",
+    "{name} деген атыңызды есте сақтап, сізді {name_respect_distinct} деп атаймын — қазақша",
+    # **v4.18.0** vowel-initial fallback. Always fillable when name
+    # is set; gets picked by the planner for vowel-initial names
+    # where the three name_respect_distinct templates above are
+    # unfillable. Note: still in the fillable pool for consonant-
+    # initial names too — the seed-mod cycles through all four,
+    # giving a ~25 % chance the literal-instrumental form surfaces
+    # vs ~75 % chance the respect form does. Acceptable since the
+    # instrumental form («Дәулетпен танысқаныма…») is also
+    # culturally polite (formal-acquaintance register).
+    "{name|instrumental} танысқаныма қуаныштымын",
 ]
 
 [[families]]

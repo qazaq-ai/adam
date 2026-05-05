@@ -542,18 +542,20 @@ fn intent_statement_of_name_lowercase_is_capitalised() {
 
 #[test]
 fn response_statement_of_name_substitutes_slot() {
-    // Plain and FST-backed instrumental variants.
-    // **v4.18.5** — also includes the warm-intro variant that
-    // introduces both literal + respectful Kazakh address with
-    // an explicit cultural note.
+    // **v4.50.5** — Kazakh respectful address by default. Three of
+    // the four template family variants gate on
+    // `{name_respect_distinct}` (fillable for consonant-initial
+    // names like Дәулет → Дәке) so adam consistently surfaces the
+    // Дәке-form. The instrumental fallback («Дәулетпен танысқаныма…»)
+    // remains as the v4.18.0 vowel-initial fallback (also reachable
+    // for consonant-initial names via seed rotation).
     assert_response_with_toml(
         "менің атым Дәулет",
         &[
-            "сәлем, Дәулет",
-            "Дәулет, танысқаныма қуаныштымын",
             "Дәулетпен танысқаныма қуаныштымын",
-            "Дәулет деген атыңызды есте сақтаймын",
             "Танысқаныма қуаныштымын, Дәулет! Сізді Дәке деп атаймын — қазақ дәстүрі бойынша",
+            "Дәке, танысқаныма қуаныштымын",
+            "Дәулет деген атыңызды есте сақтап, сізді Дәке деп атаймын — қазақша",
         ],
     );
 }
