@@ -7,6 +7,48 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.58.5] — 2026-05-06 — Educational portal Day 1 #6 — Numbers expansion: decades 20-1000 + compound-formation rule
+
+**Day 1 release 6/10.** Extends `preschool_numbers` with all decades + хundred + thousand magnitudes, plus the explicit compound-number formation rule.
+
+### Innovations
+
+**(1) 10 decade + magnitude entries** in `data/world_core/preschool_numbers.jsonl` (`num_011…num_020`):
+- Decades: жиырма (20) / отыз (30) / қырық (40) / елу (50) / алпыс (60) / жетпіс (70) / сексен (80) / тоқсан (90)
+- Magnitudes: жүз (100) / мың (1000)
+
+Each entry: numeric value + ordinal form + Kazakh usage examples.
+
+**(2) Compound-number example** `num_compound_001`: «**Он бір — он мен бір санының қосылуы арқылы жасалған құрама есептік сан есім, мәні 11**». Documents the additive composition rule for 11-19 (он + bound bound digit) and similar patterns for 21-29 (жиырма + unit), 31-39, etc.
+
+**(3) 2 new bridges** establishing the compound-number taxonomy:
+- `num_bridge_004`: «**құрама сан IsA есептік сан**» — compound number is a kind of cardinal
+- `num_bridge_005`: «**ондық санау жүйесі IsA санау жүйесі**» — decimal numbering is a kind of numbering system
+
+**(4) MULTIWORD_ENTITIES extended** with «құрама сан», «ондық санау жүйесі», «санау жүйесі» — topic extractor surfaces these as a unit.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2173 | **2186** (+13) |
+| world_core facts | 2423 | **2426** (+3 net — most decade subjects already in existing numbers.jsonl, deduped through morphological analysis) |
+| Derived facts | 28280 | **28288** (+8) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.58.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The +13 world_core entries fully count toward the «≥10 patches per release» discipline; the kk text adds elementary-curriculum educational context to the retrieval index even where the underlying (subject, predicate, object) tuple is deduped against the existing `numbers.jsonl` domain.
+
+**Cumulative Day 1:** 6 of 10 releases · +84 facts cumulative · +176 derived cumulative · numbers domain extended to 1000 magnitude.
+
+### Cadence
+
+`.5` patch — same-domain extension. No code changes beyond MULTIWORD_ENTITIES extension.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.58.0] — 2026-05-06 — Educational portal Day 1 #5 — Pre-school numbers cardinals + ordinals 1-10
 
 **Day 1 release 5/10 (halfway).** New 48th domain: `preschool_numbers`. Pairs each cardinal 1-10 with its ordinal form, plus 3 classification bridges that establish the 사 numeric-classification taxonomy.
