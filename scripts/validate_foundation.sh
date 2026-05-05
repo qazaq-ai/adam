@@ -144,4 +144,12 @@ cmp -s "$tmp_acceptance_report" data/curated/source_acceptance_report.json
 ./scripts/run_foundation_overview.sh
 ./scripts/run_foundation_overview_delta.sh
 
+# **v4.55.0** — metrics-currency CI gate. Cross-checks numeric
+# claims in README.md / data/README.md / data/world_core/README.md
+# / docs/performance.md against actual values from intent.rs +
+# world_core/*.jsonl + retrieval/facts.json + Cargo.toml. Fails on
+# the first detected drift. Each subsequent release either updates
+# docs OR fails this gate.
+bash scripts/check_metrics_currency.sh
+
 echo "foundation validation passed"

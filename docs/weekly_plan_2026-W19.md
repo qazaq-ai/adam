@@ -163,29 +163,26 @@ contradiction blocks math) deferred for UX policy debate.
 
 ---
 
-## Day 7 — 2026-05-11 (Monday)
+## Day 7 — 2026-05-05 (pulled forward) ✓ shipped as v4.55.0
 
-**v4.55.0 — single-source-of-truth metrics + CI gate.**
+**v4.55.0 — metrics-currency CI gate (closes Codex's last hygiene gap).**
 
-Codex's last engineering observation: docs and artifacts drift apart.
-Today's audit needed manual cross-checks (jq on facts.json, intent.rs
-grep, per-domain counts). Codify it.
-
-- New `scripts/check_metrics_currency.sh`:
-  - Asserts intent count in `crates/adam-dialog/src/intent.rs` matches
-    the `intents-NN` badge in README.md.
-  - Asserts world_core entry count (`cat data/world_core/*.jsonl | wc -l`)
-    matches the totals listed in data/README.md + world_core/README.md.
-  - Asserts test count (parsed from `cargo test --release --workspace`)
-    matches the README + foundation_scope claim.
-  - Asserts version refs in README, performance.md, every Cargo.toml
-    description match the workspace version.
-  - Exits non-zero on any drift.
-- Wire into `scripts/validate_foundation.sh` as a final post-test step.
-- Add a section to `CONTRIBUTING.md` documenting the checks.
-
-Acceptance: script runs green on a fresh tree; each subsequent release
-either updates the docs OR fails the gate.
+- [x] New `scripts/check_metrics_currency.sh` — POSIX shell with 9
+      cross-checks: intent count (intent.rs vs README badge),
+      world-core entries (jsonl line count vs 3 docs), total facts
+      (retrieval/facts.json vs 3 docs), workspace version (Cargo.toml
+      vs README + performance.md), informational reports
+      (world-core .jsonl raw facts + derived count). Fails on first
+      drift; error names file + claim + live value.
+- [x] Wired into `scripts/validate_foundation.sh` as final post-test
+      step — foundation validation now gates on docs currency.
+- [x] CONTRIBUTING.md pre-push checklist updated: replaces «manual
+      README audit» bullet with the automated gate. Adds clippy
+      -D warnings as separate bullet. Full pre-push contract:
+      cargo fmt → cargo test → verify_release_version →
+      check_metrics_currency → cargo clippy -D warnings.
+- [x] Acceptance: script runs green on a fresh tree (9/9 checks pass
+      at workspace v4.55.0).
 
 ---
 

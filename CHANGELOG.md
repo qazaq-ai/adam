@@ -7,6 +7,63 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.55.0] — 2026-05-05 — Metrics-currency CI gate (closes Codex's last hygiene gap)
+
+**Closes the Codex review's last hygiene observation.** v4.52.5 manually fixed ~15 numeric/version drifts that had silently accumulated across 15 minor versions. v4.55.0 codifies that audit as an automated CI gate so drift can't reaccumulate. Each subsequent release either updates the docs OR fails this gate.
+
+### Innovations
+
+**(1) New `scripts/check_metrics_currency.sh`** — POSIX shell, depends only on `jq` + `awk` + `grep` + `sed`. 9 cross-checks against canonical artefacts:
+
+| Check | Source-of-truth | Doc target |
+|---|---|---|
+| Intent count | `crates/adam-dialog/src/intent.rs` (top-level enum variants) | README badge `intents-NN` |
+| World-core entries | total lines across `data/world_core/*.jsonl` | README badge `world%20core-NN`, `data/README.md` row, `data/world_core/README.md` Live totals |
+| Total facts | `data/retrieval/facts.json .facts \| length` | README badge `NN%20facts`, `data/README.md` row, `data/world_core/README.md` Live totals |
+| Workspace version | `Cargo.toml [workspace.package] version` | README badge `version-x.y.z`, `docs/performance.md` header |
+| World-core .jsonl raw facts | sum of `.facts` arrays in jsonl | informational only (not gated; documents the world_core vs total-facts distinction) |
+| Derived facts | `data/retrieval/derived_facts.json .derived \| length` | informational only |
+
+Fails on the FIRST drift (no aggregation) — error message names the file, the claim, and the live value. Exit-non-zero contract for CI integration.
+
+**(2) Wired into `scripts/validate_foundation.sh`** as a final post-test step. Foundation validation now also gates on docs currency.
+
+**(3) `CONTRIBUTING.md` pre-push checklist updated** — replaces the previous «manual README audit» bullet with the automated gate. Adds `cargo clippy --workspace --all-targets -- -D warnings` (v4.54.6+) as a separate bullet for completeness. The full pre-push contract is now:
+
+1. `cargo fmt --all --check`
+2. `cargo test --workspace`
+3. `bash scripts/verify_release_version.sh <x.y.z>`
+4. `bash scripts/check_metrics_currency.sh` ← new
+5. `cargo clippy --workspace --all-targets -- -D warnings`
+
+### Acceptance
+
+| Gate | Result |
+|---|---|
+| `bash scripts/check_metrics_currency.sh` | green (9/9 checks pass at workspace v4.55.0) |
+| `bash scripts/validate_foundation.sh` | green (with new currency check wired in) |
+| Workspace tests | **976 passing** unchanged |
+| `cargo clippy --workspace --all-targets -- -D warnings` | green |
+| Foundation: 2099 / 2359 / 46 / 28109 | unchanged |
+| `cargo fmt --all --check` | clean |
+| `cargo build --release` | clean |
+
+### Codex review — closing punch list
+
+| Codex observation (2026-05-05) | Resolution |
+|---|---|
+| `verify_release_version.sh` failing on stale manifests | v4.52.5 — bumped 7 manifests v4.37.0 → v4.52.5 |
+| ~15 numeric/version drifts across docs | v4.52.5 — manually fixed |
+| Doc currency drift can reaccumulate | **v4.55.0 — automated gate** |
+| 293 unaddressed clippy warnings, no quality gate | v4.54.6 — workspace.lints policy + 73 auto-fix + 4 manual; clippy now clean with `-D warnings` |
+| External blind eval / wedge selection / fundraising | Out of scope per `project_v4_direction` (no investors) |
+
+### Cadence
+
+`.0` minor — new public CI script + new automated gate + CONTRIBUTING checklist update. Per `feedback_versioning_post_1_0`: «minor x.y.0 = significant capability or milestone». First release where doc currency is a self-checking invariant.
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.54.6] — 2026-05-05 — Clippy hygiene + workspace.lints policy
 
 **Driven by Codex review (2026-05-05) flag of 293 unaddressed clippy warnings.** Adopts an explicit `[workspace.lints.clippy]` policy: stylistic / refactor-risk classes are allowed with documented rationale; everything else passes `-D warnings`. CI / contributor experience now has a clean clippy gate.

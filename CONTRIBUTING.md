@@ -28,9 +28,18 @@ linked from individual decisions.
 3. `bash scripts/verify_release_version.sh <x.y.z>` — workspace
    `Cargo.toml` and the seven foundation manifests must agree on
    version. Bump them together or not at all.
-4. README numeric claims (test count, fact / derivation counts, corpus
-   size, version refs) must be current. The pre-push README audit is
-   a hard gate.
+4. `bash scripts/check_metrics_currency.sh` (v4.55.0+) — automated
+   cross-check that README badges, `data/README.md`,
+   `data/world_core/README.md`, and `docs/performance.md` cite the
+   live counts from `intent.rs` / `world_core/*.jsonl` /
+   `retrieval/facts.json` / workspace `Cargo.toml`. Wired into
+   `validate_foundation.sh` as a final post-test step. Replaces
+   the manual README audit gate.
+5. `cargo clippy --workspace --all-targets -- -D warnings`
+   (v4.54.6+) — zero warnings. The `[workspace.lints.clippy]`
+   policy in root Cargo.toml allows ~150 stylistic / refactor-
+   risk classes with documented rationale; everything else is a
+   hard error.
 
 ## Versioning
 
