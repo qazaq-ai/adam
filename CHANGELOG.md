@@ -7,6 +7,72 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.60.5] — 2026-05-06 — 🎯 Educational portal Day 1 #10 (FINAL) — Pre-school emotions + part-of-speech triangle CLOSED
+
+**Day 1 release 10/10 — DAY 1 COMPLETE.** New 52nd domain `preschool_emotions` covering 10 fundamental emotions split into positive/negative valence, plus the closing «зат есім IsA сөз табы» bridge that **closes the part-of-speech taxonomy triangle** (зат есім + сын есім + етістік) under the сөз табы hub.
+
+### Innovations
+
+**(1) New 52nd domain `preschool_emotions`** with 14 entries:
+- 5 positive emotions (`emo_001…emo_005`) — each `IsA жағымды сезім`:
+  - қуаныш (joy) / махаббат (love) / батылдық (courage) / мақтаныш (pride) / таңдану (wonder)
+- 5 negative emotions (`emo_006…emo_010`) — each `IsA жағымсыз сезім`:
+  - ренжу (sadness) / қорқыныш (fear) / жек көру (hatred) / қызғаныш (envy) / ұят (shame)
+
+Each entry: emotion definition + cultural / Kazakh-curriculum context (e.g., батырлардың basty қасиет for батылдық; «Ұят өлім» Kazakh proverb for ұят; psychology guidance for managing қызғаныш).
+
+**(2) 4 classification bridges** establishing the emotion taxonomy AND closing the part-of-speech triangle:
+- `emo_bridge_001`: «**жағымды сезім IsA сезім**» (positive emotion is emotion)
+- `emo_bridge_002`: «**жағымсыз сезім IsA сезім**» (negative emotion is emotion)
+- `emo_bridge_003`: «**сезім IsA ұғым**» (emotion is concept)
+- `emo_bridge_004`: «**зат есім IsA сөз табы**» — **closes the PoS triangle**: nouns + adjectives (v4.59.5) + verbs (v4.60.0) all hub through сөз табы
+
+**(3) MULTIWORD_ENTITIES extended** with «жағымды сезім», «жағымсыз сезім», «жек көру», «зат есім».
+
+**(4) сөз табы PoS hub COMPLETE** — three primary Kazakh word classes (зат есім / сын есім / етістік) all classified IsA сөз табы. Future grammar releases (particles, postpositions, conjunctions, etc.) extend this hub as siblings.
+
+**(5) Cumulative cascade record** — +14 facts → +64 derived = **4.6× cascade per fact**. The closing PoS bridge triggers massive R5 (shared_is_a_target) inferences across all PoS classes simultaneously.
+
+### 🎯 Day 1 Final Summary
+
+**10/10 releases shipped. 6 sub-domains complete:**
+
+| # | Domain | Coverage | Entries |
+|---|---|---|---|
+| 1 | `preschool_alphabet` | 42/42 letters | 48 |
+| 2 | `preschool_numbers` | cardinals 1-1000 + ordinals 1-10 | 36 |
+| 3 | `preschool_shapes` | 10 geometric shapes | 12 |
+| 4 | `preschool_sizes` | 10 size adjectives in opposed pairs | 13 |
+| 5 | `preschool_routine` | 10 daily-routine verbs | 13 |
+| 6 | `preschool_emotions` | 10 emotions (5 pos + 5 neg) | 14 |
+
+**Cumulative Day 1 deltas:** v4.55.5 → v4.60.5 (10 releases)
+- world_core entries: 2102 → **2238** (+136)
+- world_core facts: 2362 → **2478** (+116)
+- world_core domains: 46 → **52** (+6)
+- derived facts: 28112 → **28400** (+288)
+
+**Educational milestone:** adam now covers the full pre-school curriculum band (alphabet + numbers + shapes + sizes + routine + emotions) with established Kazakh academic vocabulary. The «сөз табы» hub formalizes the part-of-speech taxonomy, ready for elementary-grammar expansion in Day 2.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2224 | **2238** (+14) |
+| world_core facts | 2464 | **2478** (+14 — all new tuples) |
+| world_core domains | 51 | **52** (+1) |
+| Derived facts | 28336 | **28400** (+64 = 4.6× cascade — closes PoS triangle, R5 explosion) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.60.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+### Cadence
+
+`.5` patch — closes Day 1 of the 7-day educational program. Final pre-school release. Day 2 (Elementary 3-4 + Kazakh language depth) starts at v4.61.0.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.60.0] — 2026-05-06 — Educational portal Day 1 #9 — Daily routine verbs + verb-class taxonomy
 
 **Day 1 release 9/10.** New 51st domain `preschool_routine`. 10 daily-routine action verbs (тұру / жуыну / тамақтану / ойнау / оқу / жазу / жүру / жүгіру / тыңдау / ұйықтау) + verb taxonomy bridge.

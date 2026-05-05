@@ -595,6 +595,11 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // **v4.60.0** — added for preschool_routine + verb taxonomy.
     "күнделікті іс-әрекет",
     "жазу әрекеті",
+    // **v4.60.5** — added for preschool_emotions + closing PoS bridge.
+    "жағымды сезім",
+    "жағымсыз сезім",
+    "жек көру",
+    "зат есім",
     "жазушылар тізімі",
     "ақындар тізімі",
     "мезгілдер тізімі",

@@ -1,7 +1,7 @@
 {
-  "version": "4.59.5",
+  "version": "4.60.0",
   "status": "completed",
-  "elapsed_s": 73,
+  "elapsed_s": 30,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2464,
+    "facts_total": 2478,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1925,
+      "is_a": 1939,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -75,6 +75,7 @@
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/preschool_alphabet.jsonl": 48,
+      "world_core/preschool_emotions.jsonl": 14,
       "world_core/preschool_numbers.jsonl": 16,
       "world_core/preschool_routine.jsonl": 13,
       "world_core/preschool_shapes.jsonl": 12,
@@ -35154,6 +35155,286 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақ әліпбиі — қазақ тілінің әріптер жиынтығы. Қазіргі кириллица әліпбиінде 42 әріп бар."
+    },
+    {
+      "subject": {
+        "surface": "қуаныш",
+        "root": "қуаныш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қуаныш — қандай да бір жақсы оқиғадан немесе сыйдан адамның жан дүниесінде туындайтын жағымды сезім. Күлкі, көңілді көңіл-күй арқылы білінеді. Мысал: туған күн қуанышы, жеңіс қуанышы."
+    },
+    {
+      "subject": {
+        "surface": "махаббат",
+        "root": "махаббат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Махаббат — біреуге немесе бірдеңеге деген терең жанашырлық пен сүйіспеншілік сезімі. Ата-ана махаббаты, отан махаббаты, дос-жар арасындағы махаббат. Жағымды сезімдердің ең жоғары түрі."
+    },
+    {
+      "subject": {
+        "surface": "батылдық",
+        "root": "батылдық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Батылдық — қорқынышты жеңіп, қиындықтар алдында тайсалмай қимыл жасай алу қабілеті. Жақсылық пен әділдік үшін тұратын мінез белгісі. Қазақ батырларының басты қасиеті."
+    },
+    {
+      "subject": {
+        "surface": "мақтаныш",
+        "root": "мақтаныш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мақтаныш — жетістігіңізге, отбасыңызға, еліңізге деген ішкі қанағаттанушылық сезімі. Жасалған еңбектің лайықты бағасы. Мысал: ұл-қыздарының жетістігі үшін ата-ананың мақтанышы."
+    },
+    {
+      "subject": {
+        "surface": "таңдану",
+        "root": "таңдану",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Таңдану — күтпеген, ерекше нәрсені көргенде немесе естігенде туындайтын жағымды сезім. Балалардың әлемді танудағы маңызды эмоциясы. Мысал: ғажап табиғат көрінісіне таңдану."
+    },
+    {
+      "subject": {
+        "surface": "ренжу",
+        "root": "ренжу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ренжу — біреудің сөзіне немесе ісіне көңілі толмай, кейін кететін жағымсыз сезім. Әдетте қысқа уақытқа созылады. Балаларға ренжу — өз шегін білдірудің табиғи тәсілі."
+    },
+    {
+      "subject": {
+        "surface": "қорқыныш",
+        "root": "қорқыныш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорқыныш — қауіп-қатерден сақтанудан туындайтын жағымсыз сезім. Адамды қауіпті жағдайдан шегінуге итермелейді — пайдалы қорғаныш сезімі. Ұзақ қорқу денсаулыққа зиянды."
+    },
+    {
+      "subject": {
+        "surface": "жек көру",
+        "root": "жек көру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жек көру — біреуге немесе бірдеңеге деген терең жағымсыз сезім. Махаббаттың қарама-қарсысы. Ұзақ жек көру жанға да, денсаулыққа да зиянды; кешірім — жек көрудің ең жақсы дауасы."
+    },
+    {
+      "subject": {
+        "surface": "қызғаныш",
+        "root": "қызғаныш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қызғаныш — басқаның жетістігіне немесе қарым-қатынасына көңілі толмай, өзін шеттетілген сезінуден туатын жағымсыз сезім. Балаларда жиі кездеседі — оны түсіндіріп, өзіндік құндылықты сезіндіру маңызды."
+    },
+    {
+      "subject": {
+        "surface": "ұят",
+        "root": "ұят",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ұят — өзінің сөзі немесе іс-әрекеті үшін ыңғайсыздықтан туындайтын жағымсыз сезім. Адамгершілік пен әдептіліктің ішкі бағдары. Қазақ халқы «Ұят өлім» деп ұят сезімін мейлінше жоғары қоюды үйретеді."
+    },
+    {
+      "subject": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жағымды сезім — адамға рахат сыйлайтын, көңіл-күйді көтеретін эмоция түрі. Қуаныш, махаббат, мақтаныш, таңдану, батылдық — жағымды сезімдер."
+    },
+    {
+      "subject": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жағымсыз сезім — адамға қолайсыз көңіл-күй беретін эмоция түрі. Ренжу, қорқыныш, жек көру, қызғаныш, ұят — жағымсыз сезімдер. Олар да адамның табиғи бөлігі — оларды түсініп, басқару маңызды."
+    },
+    {
+      "subject": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_bridge_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сезім — адамның ішкі дүниесінде болып жатқан оқиғаларға, заттарға немесе адамдарға қатысты эмоционалдық жауабы. Жағымды және жағымсыз болып бөлінеді."
+    },
+    {
+      "subject": {
+        "surface": "зат есім",
+        "root": "зат есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_emotions",
+      "source": {
+        "pack": "world_core/preschool_emotions.jsonl",
+        "sample_id": "emo_bridge_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Зат есім — заттың, құбылыстың немесе ұғымның атын білдіретін сөз табы. Кім? Не? деген сұрақтарға жауап береді. Мысалдар: бала, кітап, қала, сезім."
     },
     {
       "subject": {

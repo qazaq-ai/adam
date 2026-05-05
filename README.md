@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.60.0-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.60.5-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -33,8 +33,8 @@
   <img src="https://img.shields.io/badge/RSS-~76--80%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
-  <img src="https://img.shields.io/badge/world%20core-2224%20curated%20/%202464%20facts-9CCC65?style=flat-square" alt="world core">
-  <img src="https://img.shields.io/badge/domains-46-9CCC65?style=flat-square" alt="domains">
+  <img src="https://img.shields.io/badge/world%20core-2238%20curated%20/%202478%20facts-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/domains-52-9CCC65?style=flat-square" alt="domains">
   <img src="https://img.shields.io/badge/policy-Rust--only%20%2B%20Graph--first-1976D2?style=flat-square" alt="policies">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20on%20deterministic%20path-2EA44F?style=flat-square" alt="ungrounded generation">
 </p>
@@ -58,6 +58,8 @@ Tiny ML lives, large ML doesn't: the trained perceptron is 24 bytes / 6 f32; suf
 ### Engineering thesis
 
 The project's core engineering claim — independent of any historical or philosophical thesis about Kazakh — is that **agglutinative morphology gives a clean algebra of meaning**: every Kazakh word decomposes into a root plus a sequence of typed suffixes, each contributing a known grammatical operator (case, number, tense, person, possessive, polarity, modality). Composition is rule-bound, not learned. That structure is exactly what we build the runtime on: FST morphology + typed suffix priors + root-pair PMI as deterministic prior layers, world_core as a curated graph of typed facts, and templates as the only path from fact to text. No probabilistic free generation. No retrained-from-scratch behaviour per release. The result is **predictable, traceable, low-energy** answer for Kazakh queries — not because the language has special metaphysical status, but because its structure is unusually friendly to formal modelling. The same engineering style would apply to other agglutinative-typology languages (Turkish, Kyrgyz, Tatar, Uzbek, …) without claims of universal grammar.
+
+**v4.60.5 — 🎯 Educational portal Day 1 #10 (FINAL) — Pre-school emotions + part-of-speech triangle CLOSED.** Day 1 release 10/10 — **DAY 1 COMPLETE**. New 52nd domain `preschool_emotions` covering 10 emotions (5 positive: қуаныш/махаббат/батылдық/мақтаныш/таңдану; 5 negative: ренжу/қорқыныш/жек көру/қызғаныш/ұят) + 4 bridges including the closing «зат есім IsA сөз табы» that **closes the part-of-speech taxonomy triangle** (зат есім + сын есім + етістік all under сөз табы). Each emotion entry: definition + Kazakh cultural context (батырлардың қасиеті for батылдық; «Ұят өлім» proverb for ұят). **Cumulative Day 1 deltas (v4.55.5 → v4.60.5):** world_core 2102 → **2238** (+136); facts 2362 → **2478** (+116); domains 46 → **52** (+6); derived 28112 → **28400** (+288). 6 sub-domains complete (alphabet 42/42 + numbers 1-1000 + shapes 10 + sizes 10 + routine 10 + emotions 10). PoS hub formalized — ready for elementary-grammar expansion in Day 2. **Acceptance v4.60.5:** Foundation 2224/2464/51/28336 → **2238/2478/52/28400** (+14/+14/+1/+64 = **4.6× cascade per fact** — closing PoS triangle triggers R5 explosion); workspace 976 passing unchanged; clippy `-D warnings` green; check_metrics_currency green; verify_release_version 4.60.5 green. Cadence: `.5` patch — closes Day 1. Day 2 starts at v4.61.0. **Stripe (12) — Kazakh educational portal.**
 
 **v4.60.0 — Educational portal Day 1 #9 — Daily routine verbs + verb-class taxonomy.** Day 1 release 9/10. New 51st domain `preschool_routine` with 10 daily-routine action verbs + verb taxonomy bridge. **(1)** 10 routine actions: тұру / ұйықтау (wake/sleep) · жуыну (hygiene) · тамақтану (eating) · ойнау (play) · оқу / жазу әрекеті (learning) · жүру / жүгіру (movement) · тыңдау (communication). Each entry: description + cultural/health context + examples. **(2)** 3 bridges: `күнделікті іс-әрекет IsA іс-әрекет`, `іс-әрекет IsA ұғым`, `етістік IsA сөз табы` — verb word-class added to PoS taxonomy alongside v4.59.5's adjective node. **(3)** MULTIWORD_ENTITIES extended (күнделікті іс-әрекет / жазу әрекеті). **(4)** сөз табы pivot strengthens — both adjectives и глаголы теперь hub through сөз табы. **Acceptance:** Foundation 2211/2451/50/28315 → **2224/2464/51/28336** (+13/+13/+1/+21 = 1.6× cascade); workspace 976 passing unchanged; clippy `-D warnings` green; check_metrics_currency green; verify_release_version 4.60.0 green. **Cumulative Day 1:** 9/10 releases · +122 facts · +224 derived · 5 sub-domains complete · 51 domains. Cadence: `.0` minor — verb-class taxonomy node. **Stripe (12) — Kazakh educational portal.**
 
