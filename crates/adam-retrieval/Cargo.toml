@@ -14,3 +14,6 @@ thiserror.workspace = true
 [[bin]]
 name = "build_morpheme_index"
 path = "src/bin/build_morpheme_index.rs"
+
+[lints]
+workspace = true

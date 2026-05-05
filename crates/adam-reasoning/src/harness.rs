@@ -242,11 +242,11 @@ impl ProgressMonitor {
                     .remaining_secs()
                     .map(|s| format!(" rem={s}s"))
                     .unwrap_or_default();
-                let interrupted = budget
-                    .interrupted
-                    .load(Ordering::Relaxed)
-                    .then_some(" INT")
-                    .unwrap_or("");
+                let interrupted = if budget.interrupted.load(Ordering::Relaxed) {
+                    " INT"
+                } else {
+                    ""
+                };
                 eprintln!(
                     "[{}] {label} samples={samples} items={items} extra={extra} elapsed={elapsed}s{rem}{interrupted}",
                     hhmmss(elapsed)
@@ -314,7 +314,7 @@ mod tests {
     fn budget_from_args_parses_seconds() {
         let args: Vec<String> = vec!["prog".into(), "--time-budget".into(), "42".into()];
         let b = IterationBudget::from_args(&args);
-        assert_eq!(b.remaining_secs().unwrap() <= 42, true);
+        assert!(b.remaining_secs().unwrap() <= 42);
         assert_eq!(b.stop_reason(), StopReason::Completed);
     }
 

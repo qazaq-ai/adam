@@ -14,3 +14,6 @@ thiserror.workspace = true
 [[bin]]
 name = "tokenizer_delta"
 path = "src/bin/delta.rs"
+
+[lints]
+workspace = true

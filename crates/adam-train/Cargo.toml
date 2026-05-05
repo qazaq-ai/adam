@@ -22,3 +22,6 @@ candle-nn = { version = "0.8", features = ["metal"] }
 [[bin]]
 name = "train_delta"
 path = "src/bin/delta.rs"
+
+[lints]
+workspace = true

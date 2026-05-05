@@ -14,9 +14,57 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "4.54.5"
+version = "4.54.6"
 edition = "2024"
 license = "BUSL-1.1"
+
+# **v4.54.6** — clippy hygiene policy. Codex flagged 293 warnings in
+# 2026-05-05 review; ~150 are stylistic / refactor-risk and not
+# load-bearing for the v4.x direction (deterministic kernel,
+# transcript-driven testing, watch-battery deployment). The classes
+# allowed below are explicitly accepted; everything else is denied
+# via `-D warnings` so future clippy runs surface real issues only.
+#
+# Each crate opts in via `lints.workspace = true` in its [lints]
+# section; without that, clippy doesn't apply the workspace policy.
+[workspace.lints.clippy]
+# Stylistic preference: nested `if let Some(...) { if cond { ... } }`
+# is clearer for the FST + planner layers than the collapsed `&&`
+# form. 99 occurrences across kernel-fst / dialog / corpus.
+collapsible_if = "allow"
+# Doc-comment list-item lazy continuation: rustfmt + rustdoc render
+# the existing `///` lists correctly; clippy's stricter indentation
+# preference is style-only.
+doc_lazy_continuation = "allow"
+doc_overindented_list_items = "allow"
+# Type complexity: the FST + planner expose typed signatures
+# (e.g., `Vec<(String, Analysis, f32)>`) where a type alias would
+# hide the structure. 7 occurrences; case-by-case judgement.
+type_complexity = "allow"
+# Too-many-arguments: Conversation::turn_with_trace and a few other
+# entry points have stable public arity (lexicon, repo, seed,
+# session, epistemic, extra_slots). Refactoring to a typed config
+# struct would churn every test fixture. 3 occurrences.
+too_many_arguments = "allow"
+# Items-after-test-module: minor ordering preference; not a bug.
+items_after_test_module = "allow"
+# `if` blocks that look identical but encode separate semantic
+# branches (e.g., epistemic-routing fallthrough). Merging them
+# would lose readability; the duplication is intentional.
+if_same_then_else = "allow"
+# Empty-line-after-doc-comment: rustfmt allows them; clippy's
+# stricter rule conflicts with our doc-style.
+empty_line_after_doc_comments = "allow"
+# field-reassign-with-default: tests + builders prefer sequential
+# field assignment for readability over `Foo { x, ..Default::default() }`.
+# 7 occurrences across test fixtures.
+field_reassign_with_default = "allow"
+# unnecessary `get(k).is_none()` vs `!contains_key(k)`: stylistic
+# preference; both compile to the same code.
+unnecessary_get_then_check = "allow"
+# Redundant guards in match arms: keeping explicit guards for
+# self-documenting branches; trace clarity > terseness.
+redundant_guards = "allow"
 
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }

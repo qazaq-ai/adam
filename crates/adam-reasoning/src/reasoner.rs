@@ -153,7 +153,7 @@ pub fn run_with_budget(
     let mut all_facts: Vec<Fact> = initial_facts.to_vec();
     let mut derived: Vec<DerivedFact> = Vec::new();
     let mut seen_triples: BTreeSet<(String, String, String)> =
-        initial_facts.iter().map(|f| fact_triple_key(f)).collect();
+        initial_facts.iter().map(fact_triple_key).collect();
     let mut iterations_completed = 0usize;
 
     for _iter in 0..MAX_ITER {

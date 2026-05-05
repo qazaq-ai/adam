@@ -146,7 +146,7 @@ fn main() -> ExitCode {
                 }
 
                 let word_count = text.split_whitespace().count();
-                if word_count < MIN_WORDS || word_count > MAX_WORDS {
+                if !(MIN_WORDS..=MAX_WORDS).contains(&word_count) {
                     skipped_length += 1;
                     continue;
                 }
@@ -223,9 +223,7 @@ fn main() -> ExitCode {
 
 fn split_sentences(paragraph: &str) -> Vec<&str> {
     // Same grain as abai_wikisource: naive period/exclaim/question splits.
-    paragraph
-        .split(|c: char| matches!(c, '.' | '!' | '?'))
-        .collect()
+    paragraph.split(['.', '!', '?']).collect()
 }
 
 fn strip_footnote_refs(text: &str) -> String {

@@ -795,7 +795,8 @@ fn detect_compositional_function_question(input: &str) -> bool {
     // (3) Function-asking phrase. Closed list — covers the common
     // ways Kazakh asks "what does Y do / what is Y for / what is
     // Y's role".
-    let has_function_query = lower.contains("не атқарады")
+
+    lower.contains("не атқарады")
         || lower.contains("не атқарад")
         || lower.contains("не істейді")
         || lower.contains("не істей")
@@ -807,8 +808,7 @@ fn detect_compositional_function_question(input: &str) -> bool {
         || lower.contains("қалай жұмыс іс")
         || lower.contains("рөлі қандай")
         || lower.contains("қызметі қандай")
-        || lower.contains("міндеті қандай");
-    has_function_query
+        || lower.contains("міндеті қандай")
 }
 
 /// **v4.17.5** — willingness / readiness-to-improve detector.
@@ -1461,8 +1461,7 @@ fn detect_statement_of_name(
 
 fn detect_ask_age(joined: &str) -> bool {
     let has_q = joined.contains("неше") || joined.contains("қанша");
-    (joined.contains("жасың") && has_q)
-        || (joined.contains("жасыңыз") && has_q)
+    ((joined.contains("жасың") || joined.contains("жасыңыз")) && has_q)
         || joined.contains("қанша жастасың")
         || joined.contains("қанша жастасыз")
         // **v4.6.12** — `неше` (alongside `қанша`) variant of the
@@ -2172,12 +2171,12 @@ fn detect_statement_of_activity(tokens: &[String], joined: &str) -> Option<Optio
     let mut verb_idx: Option<usize> = None;
     for (i, t) in tokens.iter().enumerate() {
         let t_clean = t.trim_end_matches('.').trim_end_matches('!');
-        if ACTIVITY_VERBS.iter().any(|v| t_clean == *v) {
+        if ACTIVITY_VERBS.contains(&t_clean) {
             verb_idx = Some(i);
             break;
         }
         // **v4.52.0** — continuous-form: converb + «жатыр*» auxiliary.
-        if CONTINUOUS_CONVERBS.iter().any(|v| t_clean == *v) {
+        if CONTINUOUS_CONVERBS.contains(&t_clean) {
             if let Some(next) = tokens.get(i + 1) {
                 let next_clean = next.trim_end_matches('.').trim_end_matches('!');
                 if next_clean.starts_with("жатыр") {

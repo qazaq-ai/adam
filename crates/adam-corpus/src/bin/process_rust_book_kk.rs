@@ -93,7 +93,7 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    chapters.sort_by_key(chapter_num);
+    chapters.sort_by_key(|p| chapter_num(p));
 
     if chapters.is_empty() {
         eprintln!("no chapter_*.md files in {}", raw_dir.display());
@@ -166,7 +166,7 @@ fn main() -> ExitCode {
     ExitCode::SUCCESS
 }
 
-fn chapter_num(path: &PathBuf) -> usize {
+fn chapter_num(path: &Path) -> usize {
     let name = path
         .file_stem()
         .map(|s| s.to_string_lossy().to_string())

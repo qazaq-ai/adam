@@ -51,3 +51,6 @@ path = "src/bin/eval_parse_disambiguation.rs"
 [[bin]]
 name = "train_root_affinity"
 path = "src/bin/train_root_affinity.rs"
+
+[lints]
+workspace = true

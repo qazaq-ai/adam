@@ -256,7 +256,7 @@ pub fn build_eval_benchmark_report(suite: &EvalSuite) -> Result<EvalBenchmarkRep
     let mut critical_breakdown = suite
         .tasks
         .iter()
-        .flat_map(|task| benchmark_guards_for_task(task))
+        .flat_map(benchmark_guards_for_task)
         .fold(
             std::collections::BTreeMap::<String, usize>::new(),
             |mut acc, guard| {

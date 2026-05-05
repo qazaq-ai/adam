@@ -394,7 +394,7 @@ fn transliterate(word: &str) -> String {
         out.push_str(m);
     }
     if out.is_empty() {
-        out.push_str("x");
+        out.push('x');
     }
     out
 }

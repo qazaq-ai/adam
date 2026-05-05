@@ -85,7 +85,7 @@ fn main() -> ExitCode {
 
     // Non-Kazakh warnings.
     let mut any_non_kazakh = false;
-    for (_domain, stats) in &per_domain {
+    for stats in per_domain.values() {
         for (id, reason) in &stats.non_kazakh {
             if !any_non_kazakh {
                 println!("\n## Kazakh-purity warnings\n");

@@ -31,3 +31,6 @@ path = "src/bin/run_reasoner.rs"
 [[bin]]
 name = "validate_world_core"
 path = "src/bin/validate_world_core.rs"
+
+[lints]
+workspace = true

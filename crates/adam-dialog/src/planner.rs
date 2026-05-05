@@ -169,10 +169,7 @@ pub fn plan_response_with_epistemic(
             trace.push(format!("planner: dismiss_contradiction override → {key}"));
             let applicable_all = repo.get(key);
             let idx = (rng_seed as usize) % applicable_all.len().max(1);
-            let chosen = applicable_all
-                .get(idx)
-                .map(|s| s.clone())
-                .unwrap_or_default();
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
             trace.push(format!(
                 "planner: applicable_total={} chosen_index={} text='{}'",
                 applicable_all.len(),
@@ -210,10 +207,7 @@ pub fn plan_response_with_epistemic(
             trace.push(format!("planner: check_contradiction override → {key}"));
             let applicable_all = repo.get(key);
             let idx = (rng_seed as usize) % applicable_all.len().max(1);
-            let chosen = applicable_all
-                .get(idx)
-                .map(|s| s.clone())
-                .unwrap_or_default();
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
             trace.push(format!(
                 "planner: applicable_total={} chosen_index={} text='{}'",
                 applicable_all.len(),
@@ -255,10 +249,7 @@ pub fn plan_response_with_epistemic(
             trace.push(format!("planner: math_answer override → {key}"));
             let applicable_all = repo.get(key);
             let idx = (rng_seed as usize) % applicable_all.len().max(1);
-            let chosen = applicable_all
-                .get(idx)
-                .map(|s| s.clone())
-                .unwrap_or_default();
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
             trace.push(format!(
                 "planner: applicable_total={} chosen_index={} text='{}'",
                 applicable_all.len(),
@@ -300,10 +291,7 @@ pub fn plan_response_with_epistemic(
             trace.push(format!("planner: math_refusal override → {key}"));
             let applicable_all = repo.get(key);
             let idx = (rng_seed as usize) % applicable_all.len().max(1);
-            let chosen = applicable_all
-                .get(idx)
-                .map(|s| s.clone())
-                .unwrap_or_default();
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
             trace.push(format!(
                 "planner: applicable_total={} chosen_index={} text='{}'",
                 applicable_all.len(),
@@ -329,10 +317,7 @@ pub fn plan_response_with_epistemic(
             trace.push(format!("planner: non_kazakh override → {key}"));
             let applicable_all = repo.get(key);
             let idx = (rng_seed as usize) % applicable_all.len().max(1);
-            let chosen = applicable_all
-                .get(idx)
-                .map(|s| s.clone())
-                .unwrap_or_default();
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
             trace.push(format!(
                 "planner: applicable_total={} chosen_index={} text='{}'",
                 applicable_all.len(),

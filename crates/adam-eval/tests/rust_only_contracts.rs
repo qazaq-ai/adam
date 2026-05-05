@@ -102,12 +102,7 @@ fn shell_script_invokes_foreign_runtime(contents: &str) -> bool {
         if trimmed.is_empty() || trimmed.starts_with('#') {
             return false;
         }
-        let normalized = trimmed
-            .replace('|', " ")
-            .replace(';', " ")
-            .replace('&', " ")
-            .replace('(', " ")
-            .replace(')', " ");
+        let normalized = trimmed.replace(['|', ';', '&', '(', ')'], " ");
         let tokens: Vec<&str> = normalized.split_whitespace().collect();
         if tokens.is_empty() {
             return false;

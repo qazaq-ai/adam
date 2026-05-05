@@ -238,14 +238,14 @@ fn main() -> ExitCode {
                 continue;
             }
         };
-        let pack: Pack =
-            match serde_json::from_str::<Value>(&raw).and_then(|v| serde_json::from_value(v)) {
-                Ok(p) => p,
-                Err(e) => {
-                    eprintln!("  skip (parse error: {e})");
-                    continue;
-                }
-            };
+        let pack: Pack = match serde_json::from_str::<Value>(&raw).and_then(serde_json::from_value)
+        {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("  skip (parse error: {e})");
+                continue;
+            }
+        };
         for sample in pack.samples {
             for word in split_words(&sample.text) {
                 total_words += 1;
@@ -260,7 +260,7 @@ fn main() -> ExitCode {
                     continue;
                 }
                 *root_freq.entry(root.clone()).or_insert(0) += 1;
-                let ex = root_examples.entry(root).or_insert_with(Vec::new);
+                let ex = root_examples.entry(root).or_default();
                 if ex.len() < 5 && !ex.contains(&word) {
                     ex.push(word);
                 }
@@ -328,10 +328,8 @@ fn split_words(text: &str) -> Vec<String> {
         let lower = ch.to_lowercase().next().unwrap_or(ch);
         if lower.is_alphabetic() || lower == '-' {
             cur.push(lower);
-        } else {
-            if !cur.is_empty() {
-                words.push(std::mem::take(&mut cur));
-            }
+        } else if !cur.is_empty() {
+            words.push(std::mem::take(&mut cur));
         }
     }
     if !cur.is_empty() {

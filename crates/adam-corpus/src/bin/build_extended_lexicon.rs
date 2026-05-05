@@ -505,7 +505,7 @@ fn transliterate(word: &str) -> String {
         out.push_str(mapped);
     }
     if out.is_empty() {
-        out.push_str("x");
+        out.push('x');
     }
     out
 }

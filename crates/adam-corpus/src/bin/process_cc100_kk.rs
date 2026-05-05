@@ -388,8 +388,7 @@ impl ShardState {
                 std::fs::create_dir_all(parent)?;
             }
         }
-        let json = serde_json::to_string_pretty(&pack)
-            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        let json = serde_json::to_string_pretty(&pack).map_err(std::io::Error::other)?;
         std::fs::write(&path, json)?;
         eprintln!(
             "shard {:02}: wrote {} samples to {path}",

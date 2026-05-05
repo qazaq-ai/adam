@@ -1785,7 +1785,7 @@ pub(crate) fn latin_subject_hint(input: &str) -> Option<String> {
         }
         let lower = raw.to_lowercase();
         if let Some(&hit) = LATIN_TECH_SUBJECTS.iter().find(|&&s| s == lower.as_str()) {
-            if best.map_or(true, |b| hit.len() > b.len()) {
+            if best.is_none_or(|b| hit.len() > b.len()) {
                 best = Some(hit);
             }
         }

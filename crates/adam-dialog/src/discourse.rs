@@ -925,7 +925,7 @@ fn extract_kazakh_number_operands(tokens: &[&str]) -> Vec<i64> {
     //   first operand.
     let case_marked_count = tokens
         .iter()
-        .filter(|t| parse_kazakh_number_token(t).map_or(false, |(_, has_case)| has_case))
+        .filter(|t| parse_kazakh_number_token(t).is_some_and(|(_, has_case)| has_case))
         .count();
     let pen_merges = case_marked_count >= 2;
 
@@ -1265,7 +1265,7 @@ pub fn strip_preamble(input: &str) -> &str {
             let after = &trimmed[p.len()..];
             if let Some(sep_pos) = after.find(|c: char| PREAMBLE_SEPARATORS.contains(&c)) {
                 let cut = p.len() + sep_pos + after[sep_pos..].chars().next().unwrap().len_utf8();
-                if best.map_or(true, |b| cut > b) {
+                if best.is_none_or(|b| cut > b) {
                     best = Some(cut);
                 }
             }
@@ -1339,7 +1339,7 @@ pub fn strip_addressee(input: &str) -> &str {
                 None
             };
         if let Some(c) = cut {
-            if best.map_or(true, |b| c > b) {
+            if best.is_none_or(|b| c > b) {
                 best = Some(c);
             }
         }
@@ -1530,7 +1530,7 @@ pub fn find_adj_noun_compound(input: &str) -> Option<&'static str> {
     let lower = input.to_lowercase();
     let mut best: Option<&'static str> = None;
     for &c in ADJ_NOUN_COMPOUND_HINTS {
-        if lower.contains(c) && best.map_or(true, |b| c.len() > b.len()) {
+        if lower.contains(c) && best.is_none_or(|b| c.len() > b.len()) {
             best = Some(c);
         }
     }

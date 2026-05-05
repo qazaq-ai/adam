@@ -7,6 +7,52 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.54.6] — 2026-05-05 — Clippy hygiene + workspace.lints policy
+
+**Driven by Codex review (2026-05-05) flag of 293 unaddressed clippy warnings.** Adopts an explicit `[workspace.lints.clippy]` policy: stylistic / refactor-risk classes are allowed with documented rationale; everything else passes `-D warnings`. CI / contributor experience now has a clean clippy gate.
+
+### Innovations
+
+**(1) `[workspace.lints.clippy]` policy** in root `Cargo.toml`. 10 lint classes explicitly allowed with one-line rationale each:
+- `collapsible_if` (99) — nested `if let Some(...) { if cond { ... } }` is clearer for FST + planner layers than collapsed `&&` form
+- `doc_lazy_continuation` + `doc_overindented_list_items` (40) — rustfmt + rustdoc render existing `///` lists correctly
+- `type_complexity` (7) — type aliases would hide structure of FST signatures
+- `too_many_arguments` (3) — Conversation::turn_with_trace public arity is stable; refactor-to-config-struct would churn every test fixture
+- `items_after_test_module` (3) — minor ordering preference
+- `if_same_then_else` (3) — separate semantic branches; merging would lose readability
+- `empty_line_after_doc_comments` (3) — rustfmt allows them
+- `field_reassign_with_default` (7) — sequential field assignment in tests + builders
+- `unnecessary_get_then_check` (3) — both compile to same code
+- `redundant_guards` (2) — explicit guards aid trace clarity
+
+**(2) `lints.workspace = true`** wired to all 10 crate `Cargo.toml` files (adam-kernel, adam-kernel-fst, adam-dialog, adam-tokenizer, adam-corpus, adam-eval, adam-reasoning, adam-retrieval, adam-scaling, adam-train) — without this, the workspace policy doesn't apply per crate.
+
+**(3) Auto-fixed via `cargo clippy --fix`** — 73 warnings cleaned automatically (mostly `redundant_closure` / `cloned_instead_of_copied` / `single_char_add_str` / `unnecessary_map_or` / `manual_range_contains` / etc.).
+
+**(4) Manual fixes for 4 remaining genuine code-quality issues:**
+- `crates/adam-dialog/src/semantics.rs:1463` — `nonminimal_bool` in `detect_ask_age`: factored common `has_q` conjunction.
+- `crates/adam-reasoning/src/patterns.rs:2084` — `vec_init_then_push` in test fixture: `let mut frames = Vec::new(); frames.push(...);` → `let frames = vec![...];`.
+- `crates/adam-corpus/src/bin/process_rust_book_kk.rs:169` — `ptr_arg` for `chapter_num`: `&PathBuf` → `&Path` (canonical Rust API). Required call-site update to closure form because of generic-fn / sort_by_key bound.
+- `crates/adam-tokenizer/src/bin/train_bpe.rs:267` — `format_in_format_args` in eprintln! merged the inner format into the outer macro.
+
+### Acceptance
+
+| Gate | Pre-v4.54.6 | Post-v4.54.6 |
+|---|---|---|
+| `cargo clippy --workspace --all-targets` | 293 warnings | **0 warnings** |
+| `cargo clippy --workspace --all-targets -- -D warnings` | failed | **green** |
+| Workspace tests | 976 passing | **976 passing** unchanged |
+| `cargo fmt --all --check` | clean | clean |
+| `cargo build --release` | clean | clean |
+| `bash scripts/verify_release_version.sh 4.54.6` | n/a | green |
+| Foundation: 2099 / 2359 / 46 / 28109 | unchanged | unchanged |
+
+### Cadence
+
+`.6` patch — pure hygiene policy; no behavioural changes, no new tests, no API surface changes. Per `feedback_versioning_post_1_0`: «patch = small / incremental (bug fixes, small Lexicon additions, docs, housekeeping)». Closes Codex's quality-gate observation; clippy is now a real CI gate.
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.54.5] — 2026-05-05 — Session 6 transcript-driven fixes + first autonomous crash-tests
 
 **Driven by user dialog test session 6 (2026-05-05) + autonomous crash-tests.** Per the user's directive, this is the first release where adam runs its own real-REPL crash-tests before shipping (autonomous-test cadence captured in `docs/weekly_plan_2026-W19.md`). Three concrete gaps from session 6 closed; one extra gap surfaced and fixed by autotest B; one architectural gap (G4) deferred with explicit trace.

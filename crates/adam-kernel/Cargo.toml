@@ -13,3 +13,6 @@ thiserror.workspace = true
 [[bin]]
 name = "coverage_report"
 path = "src/bin/coverage_report.rs"
+
+[lints]
+workspace = true

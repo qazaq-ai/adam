@@ -265,11 +265,11 @@ fn main() -> ExitCode {
     };
 
     eprintln!(
-        "trained {} merges; corpus compressed from {} to {} tokens ({}×)",
+        "trained {} merges; corpus compressed from {} to {} tokens ({:.2}×)",
         merges.len(),
         initial_tokens,
         final_corpus_tokens,
-        format!("{:.2}", compression_ratio)
+        compression_ratio
     );
 
     // Build final vocab: specials first, then base tokens, then merges in order.

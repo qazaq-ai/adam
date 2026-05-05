@@ -19,3 +19,6 @@ path = "src/bin/delta.rs"
 [[bin]]
 name = "eval_report"
 path = "src/bin/report.rs"
+
+[lints]
+workspace = true

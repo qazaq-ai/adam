@@ -2081,10 +2081,9 @@ mod tests {
         // For this synthetic test we just inject a Negated frame
         // directly — the sem_frames argument represents the post-
         // detector output, not the pre-detector input.
-        let mut frames: Vec<SemFrame> = Vec::new();
         // Mimic «X — Y емес» — the noun "Y" has been marked Negated
         // by populate_sentential_negation upstream.
-        frames.push(SemFrame {
+        let frames: Vec<SemFrame> = vec![SemFrame {
             root: "ғылым".into(),
             pos: adam_kernel_fst::PosTag::Noun,
             case: None,
@@ -2100,7 +2099,7 @@ mod tests {
             modality: None,
             evidence: None,
             relation: None,
-        });
+        }];
         let mut out = Vec::new();
         copula_is_a(
             "биология — ғылым емес",

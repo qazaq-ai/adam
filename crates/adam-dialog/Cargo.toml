@@ -21,3 +21,6 @@ criterion = { version = "0.5", default-features = false, features = ["cargo_benc
 [[bench]]
 name = "turn_latency"
 harness = false
+
+[lints]
+workspace = true

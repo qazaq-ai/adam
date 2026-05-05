@@ -226,7 +226,7 @@ fn live_holdout_2026_05_01() {
     for case in &dataset.cases {
         let entry = by_category.entry(case.category.clone()).or_insert((0, 0));
         entry.1 += 1; // total++
-        match run_case(&case, &lex, &repo, runtime.as_ref(), domain_idx.as_ref()) {
+        match run_case(case, &lex, &repo, runtime.as_ref(), domain_idx.as_ref()) {
             Ok(_) => {
                 entry.0 += 1; // passed++
                 passed += 1;

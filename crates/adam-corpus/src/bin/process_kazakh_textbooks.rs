@@ -269,7 +269,7 @@ fn main() -> ExitCode {
                     continue;
                 }
                 let word_count = s.split_whitespace().count();
-                if word_count < MIN_WORDS || word_count > MAX_WORDS {
+                if !(MIN_WORDS..=MAX_WORDS).contains(&word_count) {
                     skipped_length += 1;
                     continue;
                 }
@@ -396,9 +396,7 @@ fn normalise_ocr_text(raw: &str) -> String {
 }
 
 fn split_sentences(paragraph: &str) -> Vec<&str> {
-    paragraph
-        .split(|c: char| matches!(c, '.' | '!' | '?'))
-        .collect()
+    paragraph.split(['.', '!', '?']).collect()
 }
 
 fn has_latin(text: &str) -> bool {
