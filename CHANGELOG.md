@@ -7,6 +7,45 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.57.5] — 2026-05-06 — Educational portal Day 1 #4 — Alphabet completion (letters 31-42 + closing bridges)
+
+**Day 1 release 4/10.** Closes the pre-school Kazakh alphabet domain: letters Һ through Я (12 letters from positions 31-42 of 42). **42/42 = 100 % alphabet coverage.** Plus 3 closing classification bridges that unlock cross-domain cascading.
+
+### Innovations
+
+**(1) 12 final letter entries** in `data/world_core/preschool_alphabet.jsonl` (`alpha_031…alpha_042`): һ / ц / ч / ш / щ / ъ / ы / і / ь / э / ю / я. Includes 2 Kazakh-specific letters (һ — laryngeal, ~10-15 native words; і — front unrounded vowel) and 8 Russian-loanword letters explicitly flagged. The hard sign (ъ) and soft sign (ь) carry «өзіндік дыбысы жоқ» (no own sound) descriptors. Letters ю / я carry «йу» / «йа» digraph explanations.
+
+**(2) 3 closing classification bridges** that unlock cross-domain cascading:
+- `alpha_bridge_004`: «**дауысты дыбыс IsA дыбыс**» (vowel is a sound; «12 дауысты дыбыс бар» fact embedded in narration)
+- `alpha_bridge_005`: «**дауыссыз дыбыс IsA дыбыс**» (consonant is a sound; «25 дауыссыз дыбыс бар» fact embedded)
+- `alpha_bridge_006`: «**қазақ әліпбиі IsA жазу жүйесі**» (Kazakh alphabet is a writing system; «42 әріп бар» embedded)
+
+These chain through v4.56.0–v4.57.0's existing hubs: `дауысты дыбыс → дыбыс → ұғым`, `дауыссыз дыбыс → дыбыс → ұғым`, `қазақ әліпбиі → жазу жүйесі → … → ұғым`. Future grammar / phonetics releases will plug into this triple-layered hub structure.
+
+**(3) MULTIWORD_ENTITIES extended** in `crates/adam-dialog/src/topic_extraction.rs` — added 4 new compound nouns: «дауысты дыбыс», «дауыссыз дыбыс», «қазақ әліпбиі», «жазу жүйесі». Topic extractor now surfaces these as a unit when the user asks «Қазақ әліпбиі туралы айт» / «Дауысты дыбыс деген не?».
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2135 | **2150** (+15) |
+| world_core facts | 2395 | **2410** (+15) |
+| Derived facts | 28186 | **28227** (+41 = 2.7× per fact — best Day 1 cascade) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.57.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 2.7× per-fact cascade reflects the 3 closing bridges chaining through 3 existing hubs simultaneously — confirms `project_bridge_fact_leverage` thesis at compounded scale.
+
+**Day 1 milestone:** 4 of 10 releases · +48 facts cumulative · +115 derived cumulative · **alphabet 42/42 letters covered = 100 %**. The pre-school alphabet domain is now feature-complete.
+
+### Cadence
+
+`.5` patch — completes the alphabet sub-domain. No code changes beyond MULTIWORD_ENTITIES extension; pure content + classification.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.57.0] — 2026-05-06 — Educational portal Day 1 #3 — Pre-school alphabet letters 21-30
 
 **Day 1 release 3/10.** Continues the pre-school Kazakh alphabet build: letters Ө through Х (10 letters from positions 21-30 of 42). 30/42 letters covered cumulatively.

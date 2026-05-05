@@ -1,7 +1,7 @@
 {
-  "version": "4.56.5",
+  "version": "4.57.0",
   "status": "completed",
-  "elapsed_s": 62,
+  "elapsed_s": 71,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2395,
+    "facts_total": 2410,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1856,
+      "is_a": 1871,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -74,7 +74,7 @@
       "world_core/philosophy_basic.jsonl": 23,
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
-      "world_core/preschool_alphabet.jsonl": 33,
+      "world_core/preschool_alphabet.jsonl": 48,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
       "world_core/programming_rust.jsonl": 181,
@@ -34793,6 +34793,246 @@
     },
     {
       "subject": {
+        "surface": "һ",
+        "root": "һ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_031"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Һ — қазақ әліпбиінің отыз бірінші әрпі, тек қазақ тіліне тән дыбыс. Көмей дыбысы, өте сирек қолданылады. Мысал: гауһар, қаһарман, Аллаһ."
+    },
+    {
+      "subject": {
+        "surface": "ц",
+        "root": "ц",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_032"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ц — қазақ әліпбиінің отыз екінші әрпі. Тіл ұшы қатаң дауыссыз. Көбіне орыс тілінен енген сөздерде кездеседі. Мысал: цемент, цирк, цех."
+    },
+    {
+      "subject": {
+        "surface": "ч",
+        "root": "ч",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_033"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ч — қазақ әліпбиінің отыз үшінші әрпі. Тіл ортасы қатаң дауыссыз. Көбіне орыс тілінен енген сөздерде кездеседі. Мысал: Чехия, чек, Чили."
+    },
+    {
+      "subject": {
+        "surface": "ш",
+        "root": "ш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ш — қазақ әліпбиінің отыз төртінші әрпі. Тіл ортасы қатаң дауыссыз. Мысал: шай, шеше, шаш."
+    },
+    {
+      "subject": {
+        "surface": "щ",
+        "root": "щ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Щ — қазақ әліпбиінің отыз бесінші әрпі. Тіл ортасы қатаң дауыссыз. Тек орыс тілінен енген сөздерде ғана кездеседі. Мысал: ащы, тұщы."
+    },
+    {
+      "subject": {
+        "surface": "ъ",
+        "root": "ъ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_036"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ъ — қазақ әліпбиінің отыз алтыншы әрпі. Айырым белгісі, өзіндік дыбысы жоқ. Тек орыс тілінен енген сөздерде кездеседі. Мысал: объект, субъект."
+    },
+    {
+      "subject": {
+        "surface": "ы",
+        "root": "ы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_037"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ы — қазақ әліпбиінің отыз жетінші әрпі. Артқы тіл, езулік дауыстысы. Мысал: ыс, ырыс, қыз."
+    },
+    {
+      "subject": {
+        "surface": "і",
+        "root": "і",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "І — қазақ әліпбиінің отыз сегізінші әрпі, тек қазақ тіліне тән дыбыс. Алдыңғы тіл, езулік дауыстысы. Мысал: іс, іні, іш."
+    },
+    {
+      "subject": {
+        "surface": "ь",
+        "root": "ь",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_039"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ь — қазақ әліпбиінің отыз тоғызыншы әрпі. Жұмсарту белгісі, өзіндік дыбысы жоқ. Тек орыс тілінен енген сөздерде кездеседі. Мысал: альбом, фильм."
+    },
+    {
+      "subject": {
+        "surface": "э",
+        "root": "э",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Э — қазақ әліпбиінің қырқыншы әрпі. Алдыңғы тіл дауыстысы. Тек орыс тілінен енген сөздерде кездеседі. Мысал: экран, экономика, эра."
+    },
+    {
+      "subject": {
+        "surface": "ю",
+        "root": "ю",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ю — қазақ әліпбиінің қырық бірінші әрпі. «Йу» дыбыстарының қосарланған таңбасы. Тек орыс тілінен енген сөздерде кездеседі. Мысал: июль, юрта."
+    },
+    {
+      "subject": {
+        "surface": "я",
+        "root": "я",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Я — қазақ әліпбиінің қырық екінші, соңғы әрпі. «Йа» дыбыстарының қосарланған таңбасы. Тек орыс тілінен енген сөздерде кездеседі. Мысал: январь, ядро."
+    },
+    {
+      "subject": {
         "surface": "әріп",
         "root": "әріп",
         "pos": "noun"
@@ -34850,6 +35090,66 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Жазу — тілді әріптер арқылы белгілеу жүйесі. Жазудың ең кіші бірлігі — әріп."
+    },
+    {
+      "subject": {
+        "surface": "дауысты дыбыс",
+        "root": "дауысты дыбыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дыбыс",
+        "root": "дыбыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_bridge_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дауысты дыбыс — өкпеден шыққан ауа кедергісіз шығатын дыбыс. Қазақ тілінде 12 дауысты дыбыс бар."
+    },
+    {
+      "subject": {
+        "surface": "дауыссыз дыбыс",
+        "root": "дауыссыз дыбыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дыбыс",
+        "root": "дыбыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_bridge_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дауыссыз дыбыс — өкпеден шыққан ауа белгілі бір кедергіге ұшырап шығатын дыбыс. Қазақ тілінде 25 дауыссыз дыбыс бар."
+    },
+    {
+      "subject": {
+        "surface": "қазақ әліпбиі",
+        "root": "қазақ әліпбиі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жазу жүйесі",
+        "root": "жазу жүйесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_bridge_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақ әліпбиі — қазақ тілінің әріптер жиынтығы. Қазіргі кириллица әліпбиінде 42 әріп бар."
     },
     {
       "subject": {

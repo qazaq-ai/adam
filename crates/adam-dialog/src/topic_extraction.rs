@@ -570,6 +570,11 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // **v4.55.5** — added for ARK identity entries (adam_self_041/042).
     "архитектура атауы",
     "детерминирленген жүйе",
+    // **v4.57.5** — added for closing alphabet bridges (alpha_bridge_004..006).
+    "дауысты дыбыс",
+    "дауыссыз дыбыс",
+    "қазақ әліпбиі",
+    "жазу жүйесі",
     "жазушылар тізімі",
     "ақындар тізімі",
     "мезгілдер тізімі",
