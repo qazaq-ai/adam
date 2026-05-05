@@ -7,6 +7,70 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.51.0] — 2026-05-04 — User-activity slot extraction (Stage A architectural addition)
+
+**Closes the v4.50.5 carry-forward.** Adam now distinguishes the user's profession label (`occupation` — «бағдарламашы», «инженер») from their current-work content (`activity` — «жасанды интеллект», «веб-сайт жасау»). Pre-v4.51.0 a compound input like «Мен бағдарламашымын және жасанды интеллект әзірлеймін» captured only the occupation; v4.51.0 captures both via a secondary compound-clause scan. Adam can now recall activity on follow-up queries («Не істейсіз?» / «Менің не істейтінім есіңізде ме?»).
+
+### Real-REPL gap closure (user transcript replay)
+
+| Pre-v4.51.0 transcript query | Pre | Post |
+|---|---|---|
+| Мен бағдарламашымын және жасанды интеллект әзірлеймін. | "Бағдарламашы екен, түсіндім" (only occupation captured) | both captured: `occupation=бағдарламашы` AND `activity=жасанды интеллект` ✓ |
+| Менің не істейтінім есіңізде ме? | clarify ("сұрағыңызды нақтылап…") | "**Жасанды интеллект — сіздің қазіргі ісіңіз деп жадыма түсірдім.**" ✓ |
+| Не істейсіз? | (didn't engage) | "**Менің есімде, ағымдағы ісіңіз — жасанды интеллект.**" ✓ |
+
+### Innovations
+
+**(1) `Intent::StatementOfActivity { activity: Option<String> }`** — new variant. Distinct from `StatementOfOccupation` (profession label) in that activity captures the CURRENT-WORK-CONTENT.
+
+**(2) `Intent::AskActivity`** — companion. Detected by patterns «не істейсіз / не істейсің» («what are you doing?»), «не әзірлеп жатырсыз», «немен айналыс*», «менің ісім / менің не істейтінім» (1sg self-recall).
+
+**(3) `IntentKind::StatementOfActivity` + `IntentKind::AskActivity`** — companion enum variants for trace + history.
+
+**(4) `detect_statement_of_activity(tokens, joined)`** — pure-function detector in `semantics.rs`. Recognizes 6 activity-verb stems (1sg-conjugated): «әзірлеймін» / «жасаймын» / «жазамын» / «зерттеймін» / «айналысамын» / «құрастырамын». Object extraction: walks backwards from the verb position, stops at clause boundaries («және», «ал», «содан», «бірақ», «сондықтан», «мен», «менің») or commas, joins remaining tokens. Strips Accusative («-ды/-ді/-ны/-ні/-ты/-ті») / Comitative («-мен/-пен/-бен») case suffixes from the head noun. Falls back to «жұмыс істеймін» bare-verb pattern (returns `Some(None)`).
+
+**(5) `detect_ask_activity(joined)`** — pure-function ask-detector. Recognizes 2nd-person query forms («не істей*», «не әзірлеп», «не жасап», «немен айналыс*») gated against the «кәсіб» fragment (so «кәсібіңіз не?» stays in `AskOccupation`). Plus 1sg self-recall: «менің ісім» / «менің не істейтінім» / «не істеймін».
+
+**(6) Compound-input parser `detect_activity_in_compound(input)`** — public-crate scan called by `Conversation::turn` AFTER primary intent absorption. When input contains «және» token, splits on it and runs `detect_statement_of_activity` on the post-«және» clause. Captures activity into session even when the primary detector fired `StatementOfOccupation`. Closes the «бағдарламашы AND жасанды интеллект» compound case.
+
+**(7) Session slot `activity`** — populated in `absorb_entities` (direct `StatementOfActivity` path) AND in the secondary compound scan. Mirrors the `occupation` slot machinery.
+
+**(8) Belief-graph integration** — activity facts recorded via `belief.record_user_fact(USER_SELF_KEY, "activity", &activity, turn_id)`. Enables future audit-side queries.
+
+**(9) 2 new template families**:
+- `statement_of_activity` (5 variants) — acknowledges activity statements; includes `{name_respect}` for respect-form acks.
+- `ask_activity` + `ask_activity.with_known_user` (3 variants each) — ask-without-data and slot-aware-recall variants. Mirrors `ask_occupation` family pattern.
+
+**(10) Planner integration**:
+- `intent_key`: 2 new mappings (`AskActivity` → `"ask_activity"`, `StatementOfActivity { .. }` → `"statement_of_activity"`).
+- `extract_slots`: populates `{activity}` slot from `StatementOfActivity`.
+- `plan_response_with_epistemic`: known-user override `(Intent::AskActivity, _) if session.contains_key("activity") → "ask_activity.with_known_user"`. Mirrors v4.2.5 `AskOccupation` pattern.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **969 passing** unchanged |
+| Adam-dialog lib | **301 passing** unchanged |
+| Live REPL transcript replay | ✓ all 4 scenarios verified (compound capture + 2 recall paths + Дәке-form) |
+| Foundation: 2089 / 2349 / 46 / unchanged | unchanged |
+| `cargo fmt --all --check` | clean |
+| `cargo check --all-targets` | clean |
+
+### Cadence
+
+`.0` minor — Stage A architectural addition. Per `feedback_versioning_post_1_0`: «minor x.y.0 = significant capability or milestone». New Intent variant + new IntentKind + 2 detectors + compound parser + session-schema addition + 2 template families + planner overrides = kernel-signature dialog-memory expansion. Closes a concrete v4.50.5-transcript carry-forward.
+
+Stage A status (post v4.51.0):
+- v4.42.0–v4.43.6 — NLG foundation + production migration + introducer migration + 11/11 predicate coverage ✓
+- v4.43.7–v4.44.5 — knowledge breadth + matcher cleanup ✓
+- v4.50.5 — math truncation + respectful address + math vocabulary ✓
+- **v4.51.0 — user-activity slot extraction** ← shipped
+
+Stage B status: v4.45.0–v4.50.0 substrate complete + audit baseline shifted to trained_v0; production ranker replacement gated on eval validation (v4.50.5+ deferred).
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.50.5] — 2026-05-04 — Transcript-driven regression fixes — math truncation + respectful address + math vocabulary
 
 **Driven by 2026-05-04 user dialog test session 3.** Three concrete gaps surfaced in the transcript:

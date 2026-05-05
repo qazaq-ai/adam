@@ -445,6 +445,11 @@ pub fn plan_response_with_epistemic(
         (Intent::AskOccupation, _) if session.contains_key("occupation") => {
             Some("ask_occupation.with_known_user")
         }
+        // **v4.51.0** — companion known-user override for
+        // `Intent::AskActivity`. Surfaces the stored activity slot.
+        (Intent::AskActivity, _) if session.contains_key("activity") => {
+            Some("ask_activity.with_known_user")
+        }
         _ => None,
     };
 
@@ -627,6 +632,11 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
             occupation: Some(occupation),
         } => {
             slots.insert("occupation".into(), occupation.clone());
+        }
+        Intent::StatementOfActivity {
+            activity: Some(activity),
+        } => {
+            slots.insert("activity".into(), activity.clone());
         }
         Intent::Unknown {
             noun_hint,
@@ -859,6 +869,9 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::StatementOfLocation { .. } => "statement_of_location",
         Intent::AskOccupation => "ask_occupation",
         Intent::StatementOfOccupation { .. } => "statement_of_occupation",
+        // **v4.51.0** — user-activity slot.
+        Intent::AskActivity => "ask_activity",
+        Intent::StatementOfActivity { .. } => "statement_of_activity",
         Intent::AskFamily => "ask_family",
         Intent::StatementOfFamily => "statement_of_family",
         Intent::AskWeather => "ask_weather",

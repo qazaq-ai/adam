@@ -189,6 +189,18 @@ pub fn interpret_text_with_lexicon(
     if detect_ask_occupation(&joined) {
         return Intent::AskOccupation;
     }
+    // **v4.51.0** — activity statement: «X-ны әзірлеймін»,
+    // «X-мен айналысамын», «X жасаймын». Distinct from occupation
+    // statement (profession label); captures the CURRENT-WORK
+    // CONTENT. Runs AFTER occupation so cleaner forms like «мен
+    // дәрігермін» go to occupation; activity verbs are the
+    // discriminating signal.
+    if detect_ask_activity(&joined) {
+        return Intent::AskActivity;
+    }
+    if let Some(activity) = detect_statement_of_activity(&tokens, &joined) {
+        return Intent::StatementOfActivity { activity };
+    }
     if detect_statement_of_family(&joined) {
         return Intent::StatementOfFamily;
     }
@@ -2034,6 +2046,158 @@ fn detect_statement_of_occupation(
         return Some(None);
     }
     None
+}
+
+/// **v4.51.0** — Detect «what are you working on?» / «what do I do?»
+/// — companion to `detect_ask_occupation`. Distinct because activity
+/// queries ask about CURRENT-WORK-CONTENT, not the profession label.
+///
+/// Patterns:
+/// - «не істейсіз» / «не істейсің» («what are you doing/working on?»)
+/// - «не әзірлейсіз» / «не әзірлеп жатырсыз» («what are you developing?»)
+/// - «не жасап жатырсыз» («what are you making?»)
+/// - «менің ісім не» / «менің ісім қандай» (1sg self-recall)
+/// - «менің не істейтінім» (1sg self-recall, embedded clause)
+/// - «менің не істейтіні» / «істейтіні» (variants)
+fn detect_ask_activity(joined: &str) -> bool {
+    // 2nd-person query forms
+    let second_person = (joined.contains("не істей")
+        || joined.contains("не әзірлеп")
+        || joined.contains("не жасап")
+        || joined.contains("немен айналыс"))
+        && !joined.contains("кәсіб");
+    // 1sg self-recall: «менің ісім», «менің не істейтінім»
+    let self_recall = (joined.contains("менің")
+        && (joined.contains("ісім") || joined.contains("істейтін")))
+        || joined.contains("не істеймін");
+    second_person || self_recall
+}
+
+/// **v4.51.0** — Detect «I'm working on X» / «X жасаймын» activity
+/// statements. Returns `Some(Some(noun_phrase))` when an activity
+/// verb fires AND a noun-phrase object is identifiable; `Some(None)`
+/// when the verb fires but no object can be recovered («жұмыс
+/// істеймін» bare); `None` when no activity verb is present.
+///
+/// Activity-verb stems (1sg-conjugated form, present-future):
+/// - «әзірлеймін» / «әзірлеп жатырмын» — develop / am developing
+/// - «жасаймын» / «жасап жатырмын» — make / am making
+/// - «жазамын» — write (code / text)
+/// - «зерттеймін» — research
+/// - «айналысамын» — engage with (preceded by Comitative «-мен»)
+///
+/// Object extraction: the noun phrase preceding the activity verb,
+/// stripped of Accusative/Comitative case suffixes when possible.
+/// Multi-word phrases like «жасанды интеллект» are kept whole.
+fn detect_statement_of_activity(tokens: &[String], joined: &str) -> Option<Option<String>> {
+    const ACTIVITY_VERBS: &[&str] = &[
+        "әзірлеймін",
+        "жасаймын",
+        "жазамын",
+        "зерттеймін",
+        "айналысамын",
+        "құрастырамын",
+    ];
+    // Find the activity verb position in tokens (verb at end of clause).
+    let mut verb_idx: Option<usize> = None;
+    for (i, t) in tokens.iter().enumerate() {
+        let t_clean = t.trim_end_matches('.').trim_end_matches('!');
+        if ACTIVITY_VERBS.iter().any(|v| t_clean == *v) {
+            verb_idx = Some(i);
+            break;
+        }
+    }
+    let verb_idx = verb_idx?;
+    // Extract the noun phrase preceding the verb. Walk backwards
+    // from verb_idx, stopping at clause boundaries («және», «ал»,
+    // commas attached to tokens) or pronouns («мен», «менің»).
+    let mut object_tokens: Vec<&str> = Vec::new();
+    for i in (0..verb_idx).rev() {
+        let t = tokens[i].as_str();
+        // Stop on clause boundary tokens.
+        if matches!(
+            t,
+            "және" | "ал" | "содан" | "бірақ" | "сондықтан" | "мен" | "менің"
+        ) {
+            break;
+        }
+        // Strip trailing comma if present.
+        let t = t.trim_end_matches(',');
+        if t.is_empty() {
+            break;
+        }
+        object_tokens.push(t);
+    }
+    if object_tokens.is_empty() {
+        // «жұмыс істеймін» bare — verb fires but no object.
+        if joined.contains("жұмыс істеймін") || joined.contains("істеп жатырмын")
+        {
+            return Some(None);
+        }
+        return None;
+    }
+    // Reverse to natural order.
+    object_tokens.reverse();
+    // Strip Acc/Comitative case suffixes from the LAST token (head of
+    // the noun phrase) to surface the bare-form root. Conservative —
+    // only the most common 1-2 suffix variants.
+    let last = object_tokens.pop()?;
+    let bare = strip_object_case_suffix(last);
+    object_tokens.push(bare.as_str());
+    let activity = object_tokens.join(" ");
+    // Reject single-character / closed-class objects.
+    if activity.chars().count() < 3 {
+        return None;
+    }
+    Some(Some(activity))
+}
+
+/// **v4.51.0** — Secondary scan for compound «X және Y» inputs where
+/// X is an occupation statement and Y contains an activity verb.
+/// Called by `Conversation::turn` AFTER primary intent absorption to
+/// rescue the activity slot when the primary detector fired
+/// occupation. Returns the same `Option<Option<String>>` shape as
+/// `detect_statement_of_activity`.
+pub(crate) fn detect_activity_in_compound(input: &str) -> Option<Option<String>> {
+    if !input.contains("және") {
+        return None;
+    }
+    // Tokenize the post-«және» clause and run the activity detector
+    // on it. Tokenization mirrors the main pipeline (whitespace +
+    // lowercase).
+    let lower = input.to_lowercase();
+    let after = lower.split("және").nth(1)?.trim();
+    if after.is_empty() {
+        return None;
+    }
+    let tokens: Vec<String> = after
+        .split_whitespace()
+        .map(|t| {
+            t.trim_matches(|c: char| c == '.' || c == '!' || c == '?' || c == ',')
+                .to_string()
+        })
+        .filter(|t| !t.is_empty())
+        .collect();
+    if tokens.is_empty() {
+        return None;
+    }
+    detect_statement_of_activity(&tokens, after)
+}
+
+/// Strip Accusative («-ды/-ді/-ны/-ні/-ты/-ті»), Comitative («-мен»),
+/// or other case suffixes from a noun head. Returns the bare-form
+/// root string. Conservative — only strips when the token is long
+/// enough that the residue is at least 3 chars.
+fn strip_object_case_suffix(token: &str) -> String {
+    const ACC_SUFFIXES: &[&str] = &["ды", "ді", "ны", "ні", "ты", "ті", "мен", "пен", "бен"];
+    for suf in ACC_SUFFIXES {
+        if let Some(stripped) = token.strip_suffix(suf) {
+            if stripped.chars().count() >= 3 {
+                return stripped.to_string();
+            }
+        }
+    }
+    token.to_string()
 }
 
 /// For every token ending in a Kazakh 1sg-copula suffix, strip the

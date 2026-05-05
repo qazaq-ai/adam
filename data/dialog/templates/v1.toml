@@ -726,6 +726,40 @@ templates = [
     "{name_respect}, сіз {city|locative} {occupation} болып еңбек етіп жүрсіз",
 ]
 
+# **v4.51.0** — User states current activity / what they're working
+# on (distinct from occupation profession label). Acknowledgment
+# echoes the activity phrase back so the user sees adam captured it.
+[[families]]
+key = "statement_of_activity"
+templates = [
+    "{activity} жайлы білдім, есте сақтаймын",
+    "{activity} саласымен айналысатыныңызды түсіндім",
+    "{activity} — қызық бағыт екен",
+    "{activity} жасайтыныңыз есте сақталды",
+    "{name_respect}, {activity} саласындағы еңбегіңізге сәттілік",
+]
+
+# **v4.51.0** — "What are you working on?" — companion to
+# `ask_occupation`. Routes to `with_known_user` variant when
+# session.activity is populated.
+[[families]]
+key = "ask_activity"
+templates = [
+    "сіз қандай нәрсемен айналысатыныңызды әлі айта қоймадыңыз — қалаған кезде айта аласыз",
+    "ағымдағы ісіңіз туралы менде нақты дерек жоқ",
+    "немен айналысатыныңызды бөліссеңіз — есте сақтап жүремін",
+]
+
+# **v4.51.0** — slot-aware variant for AskActivity when
+# `session.activity` is populated.
+[[families]]
+key = "ask_activity.with_known_user"
+templates = [
+    "сіз {activity} саласымен айналысып жүрсіз",
+    "менің есімде, ағымдағы ісіңіз — {activity}",
+    "{activity} — сіздің қазіргі ісіңіз деп жадыма түсірдім",
+]
+
 [[families]]
 key = "ask_family"
 templates = [

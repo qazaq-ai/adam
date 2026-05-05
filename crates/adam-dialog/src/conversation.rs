@@ -303,6 +303,10 @@ pub enum IntentKind {
     StatementOfLocation,
     AskOccupation,
     StatementOfOccupation,
+    /// **v4.51.0** — companion to `Intent::StatementOfActivity`.
+    StatementOfActivity,
+    /// **v4.51.0** — companion to `Intent::AskActivity`.
+    AskActivity,
     AskFamily,
     StatementOfFamily,
     AskWeather,
@@ -341,6 +345,8 @@ impl From<&Intent> for IntentKind {
             Intent::StatementOfLocation { .. } => Self::StatementOfLocation,
             Intent::AskOccupation => Self::AskOccupation,
             Intent::StatementOfOccupation { .. } => Self::StatementOfOccupation,
+            Intent::StatementOfActivity { .. } => Self::StatementOfActivity,
+            Intent::AskActivity => Self::AskActivity,
             Intent::AskFamily => Self::AskFamily,
             Intent::StatementOfFamily => Self::StatementOfFamily,
             Intent::AskWeather => Self::AskWeather,
@@ -815,6 +821,27 @@ impl Conversation {
         };
         if !dismissed_contradiction && !resolved_contradiction {
             self.absorb_entities(&intent, turn_id);
+            // **v4.51.0** — secondary activity-slot scan. The primary
+            // intent detector picks one intent per turn (occupation
+            // OR activity, not both). For compound inputs like
+            // «Мен бағдарламашымын және жасанды интеллект әзірлеймін»
+            // the user states BOTH; we scan the raw input for
+            // activity-verb patterns AFTER the primary absorption
+            // and capture activity into session if found, regardless
+            // of which intent the primary detector fired.
+            if !matches!(intent, crate::intent::Intent::StatementOfActivity { .. }) {
+                if let Some(Some(activity)) = crate::semantics::detect_activity_in_compound(input) {
+                    if !activity.is_empty() {
+                        self.session.insert("activity".into(), activity.clone());
+                        self.belief.record_user_fact(
+                            crate::belief::USER_SELF_KEY,
+                            "activity",
+                            &activity,
+                            turn_id,
+                        );
+                    }
+                }
+            }
         }
         // v4.0.29 — roll task state forward AFTER belief absorption,
         // BEFORE record_intent so the turn id used by task matches
@@ -1612,6 +1639,17 @@ impl Conversation {
                 );
                 self.belief
                     .record_user_fact(USER_SELF_KEY, "occupation", occupation, turn_id);
+            }
+            // **v4.51.0** — capture user activity (current-work content)
+            // distinct from occupation (profession label). Stored in
+            // session slot `activity`; recalled by `Intent::AskActivity`
+            // routing.
+            Intent::StatementOfActivity {
+                activity: Some(activity),
+            } => {
+                self.session.insert("activity".into(), activity.clone());
+                self.belief
+                    .record_user_fact(USER_SELF_KEY, "activity", activity, turn_id);
             }
             _ => {}
         }

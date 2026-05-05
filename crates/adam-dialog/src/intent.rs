@@ -118,6 +118,25 @@ pub enum Intent {
     /// stripped) when possible.
     StatementOfOccupation { occupation: Option<String> },
 
+    /// **v4.51.0** — User states current activity / what they're
+    /// working on: «жасанды интеллект әзірлеймін», «веб-сайт
+    /// жасаймын», «ғылыммен айналысамын», «бағдарлама жазамын».
+    /// Distinct from `StatementOfOccupation` (the user's profession
+    /// title — «дәрігер», «инженер») in that activity captures the
+    /// CURRENT-WORK-CONTENT (what they're producing / engaged with),
+    /// not the profession label. `activity` is the extracted noun
+    /// phrase (typically the direct object preceding the verb) or
+    /// `None` if the verb came without a discoverable object
+    /// («жұмыс істеймін»).
+    StatementOfActivity { activity: Option<String> },
+
+    /// **v4.51.0** — "What are you working on?": «не істейсіз»,
+    /// «немен айналысасыз», «не әзірлеп жатырсыз», «менің ісім не»
+    /// (1sg self-recall). Companion to `AskOccupation`; routes to a
+    /// distinct template family that surfaces stored `activity`
+    /// when present.
+    AskActivity,
+
     /// "Are you married? / Do you have children?": үйлендің бе,
     /// балаларың бар ма, отбасың бар ма.
     AskFamily,
