@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.52.0] — 2026-05-05 — Transcript-driven session 5 fixes — continuous-form activity + compound occupation + demonstrative math anaphora
+
+**Driven by 2026-05-05 user dialog test session 5.** v4.51.5 closed the participle-form activity case; session 5 surfaced four new gaps that v4.52.0 closes:
+
+1. **Continuous-form activity not captured** — «...жасанды интеллект моделімді **жасап жатырмын**» encodes the user's activity in a converb + present-progressive auxiliary («жасап жатырмын» = "I am making"). v4.51.5's `ACTIVITY_VERBS` covered finite-1sg and aorist-participle forms but missed the continuous form. Result: activity not stored.
+2. **Compound occupation in non-occupation primary intent** — «Менің атым Дәулет, мен бағдарламашымын ...» fired `Intent::StatementOfName` (priority winner); the secondary scan rescued activity but never tried occupation. Result: `mamandığım qandai?` follow-up couldn't recall occupation.
+3. **AskActivity self-recall too narrow** — «Менің **нені дамытатыным** есіңізде ме?» ("what am I developing?") used the «дамыту» root + 1sg-poss participle form. Pre-v4.52.0 self-recall list only covered «істе*» stem; missed «дамытатын», «әзірлейтін», «жасайтын», «жазатын», «зерттейтін», «құрастыратын» variants.
+4. **Math anaphora limited to «алдыңғы»** — «Енді **бұл нәтижені** 4-ке бөліңіз» used the demonstrative «бұл» ("this result") instead of «алдыңғы» ("previous"). v4.51.5 anaphora resolver didn't handle it.
+
+### Real-REPL gap closure (session 5 transcript replay)
+
+| Pre-v4.52.0 transcript query | Pre | Post |
+|---|---|---|
+| Менің атым Дәулет, мен бағдарламашымын және өзімнің жасанды интеллект моделімді жасап жатырмын. | only `name` captured | name + occupation + activity all captured ✓ |
+| Менің нені дамытатыным есіңізде ме? | clarify | "**Жасанды интеллект модел — сіздің қазіргі ісіңіз деп жадыма түсірдім.**" ✓ |
+| Менің мамандығым қандай? | "Мен сөйлесуге жаралғанмын" (no slot, fallback) | "**Менің білуімше, мамандығыңыз бағдарламашы.**" ✓ |
+| Енді бұл нәтижені 4-ке бөліңіз. | math_refusal (anaphora unresolved) | **6** ✓ (26 ÷ 4 truncated) |
+
+### Innovations
+
+**(1) Continuous-form activity detection** — new `CONTINUOUS_CONVERBS` array (8 stems: әзірлеп / жасап / жазып / зерттеп / құрастырып / айналысып / дамытып / құрып). Bigram match: when a converb token is found AND the next token starts with «жатыр» (covers «жатырмын» 1sg / «жатырмыз» 1pl), treat the converb as the verb position; walk back to extract object.
+
+**(2) Two new activity-verb roots** — «дамыту» (develop) and «құру» (build/establish). 4 surface forms added to `ACTIVITY_VERBS`: дамытамын / құрамын (finite) + дамытатын / құратын (participle).
+
+**(3) `detect_occupation_in_compound(input, lexicon)`** — new pure function in `semantics.rs`. Mirrors `detect_activity_in_compound`. Tokenises the lowered input, calls `strip_copula_and_lookup_noun` against the lexicon for the priority path, falls back to a 15-entry fixed-table lookup when no lexicon is provided. Returns `Some(Some(root))` when a noun + 1sg-copula form is identifiable.
+
+**(4) `Conversation::turn` secondary occupation scan** — runs after the primary intent absorption + activity scan. When the primary intent is NOT `StatementOfOccupation` AND the session doesn't already have an `occupation` slot, calls `detect_occupation_in_compound`. Captures occupation into session + belief graph. Lets a single utterance like «Менің атым X, мен Y-мын» populate both `name` AND `occupation` slots.
+
+**(5) AskActivity self-recall extended** — `detect_ask_activity` now treats any «менің» + activity-participle stem as 1sg self-recall. New stems added: дамытатын / әзірлейтін / жасайтын / жазатын / зерттейтін / құрастыратын. Pre-v4.52.0 only «істейтін» was matched.
+
+**(6) Demonstrative math anaphora «бұл нәтиже»** — `Conversation::turn` math anaphora resolver gains a third anaphora family alongside «алдыңғы» / «соңғы»: «бұл (есептеу )?нәтиже» with full case-suffix preservation (Acc / Dat). Verified in transcript: «Енді бұл нәтижені 4-ке бөліңіз» now resolves to the prior result.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **969 passing** unchanged |
+| Adam-dialog lib | **301 passing** unchanged |
+| Live REPL transcript replay | ✓ all 4 session-5 scenarios verified end-to-end |
+| Foundation: 2089 / 2349 / 46 / 27175 | unchanged |
+| `cargo fmt --all --check` | clean |
+| `cargo build --release` | clean |
+
+### Cadence
+
+`.0` minor — adds new public function (`detect_occupation_in_compound`), new architectural primitive (compound-clause occupation rescue mirroring v4.51.0 activity rescue), and 4 distinct detector innovations. Per `feedback_versioning_post_1_0`: «minor x.y.0 = significant capability or milestone». Closes 4 concrete session-5 transcript gaps + materially improves dialog continuity (single-utterance multi-slot capture is the v4.x context-aware-dialog directive).
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.51.5] — 2026-05-05 — Transcript-driven session 4 fixes — participle activity + math anaphora + vowel-initial respect form
 
 **Driven by 2026-05-04 user dialog test session 4.** v4.51.0 closed the compound-clause activity case; session 4 surfaced three new gaps that v4.51.5 closes:

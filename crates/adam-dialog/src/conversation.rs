@@ -842,6 +842,27 @@ impl Conversation {
                     }
                 }
             }
+            // **v4.52.0** — secondary occupation-slot scan. Mirrors
+            // the activity scan above. When the primary intent is
+            // StatementOfName (or anything else), but the input
+            // also contains a copula-suffixed occupation noun
+            // («бағдарламашымын», «инженермін»), capture it. Lets
+            // the user say «Менің атым X, мен Y-мын» and have
+            // both name AND occupation stored from a single turn.
+            if !matches!(intent, crate::intent::Intent::StatementOfOccupation { .. })
+                && !self.session.contains_key("occupation")
+                && let Some(Some(occupation)) =
+                    crate::semantics::detect_occupation_in_compound(input, Some(lexicon))
+                && !occupation.is_empty()
+            {
+                self.session.insert("occupation".into(), occupation.clone());
+                self.belief.record_user_fact(
+                    crate::belief::USER_SELF_KEY,
+                    "occupation",
+                    &occupation,
+                    turn_id,
+                );
+            }
         }
         // v4.0.29 — roll task state forward AFTER belief absorption,
         // BEFORE record_intent so the turn id used by task matches
@@ -1037,7 +1058,13 @@ impl Conversation {
                 let has_anaphor = lower.contains("алдыңғы есептеу")
                     || lower.contains("алдыңғы нәтиже")
                     || lower.contains("соңғы есептеу")
-                    || lower.contains("соңғы нәтиже");
+                    || lower.contains("соңғы нәтиже")
+                    // **v4.52.0** — demonstrative «бұл (есептеу )?нәтиже»
+                    // ("this result"). Same anaphoric reference as
+                    // «алдыңғы»; user-transcript session 5 surfaced
+                    // it: «Енді бұл нәтижені 4-ке бөліңіз».
+                    || lower.contains("бұл есептеу")
+                    || lower.contains("бұл нәтиже");
                 if has_anaphor && let Some(prev) = self.session.get("last_math_result") {
                     // **v4.51.5** — preserve case marker. The
                     // word-math evaluator requires operands to be
@@ -1064,7 +1091,17 @@ impl Conversation {
                         .replace("соңғы есептеу нәтижесі", &prev_acc)
                         .replace("соңғы нәтижеге", &prev_dat)
                         .replace("соңғы нәтижесін", &prev_acc)
-                        .replace("соңғы нәтиже", &prev_acc);
+                        .replace("соңғы нәтиже", &prev_acc)
+                        // **v4.52.0** — demonstrative «бұл нәтиже».
+                        .replace("бұл есептеу нәтижесіне", &prev_dat)
+                        .replace("бұл есептеу нәтижесін", &prev_acc)
+                        .replace("бұл есептеу нәтижесі", &prev_acc)
+                        .replace("бұл нәтижесіне", &prev_dat)
+                        .replace("бұл нәтижесін", &prev_acc)
+                        .replace("бұл нәтижесі", &prev_acc)
+                        .replace("бұл нәтижеге", &prev_dat)
+                        .replace("бұл нәтижені", &prev_acc)
+                        .replace("бұл нәтиже", &prev_acc);
                     std::borrow::Cow::Owned(with_prev)
                 } else {
                     std::borrow::Cow::Borrowed(input)

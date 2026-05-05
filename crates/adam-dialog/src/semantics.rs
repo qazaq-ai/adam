@@ -2073,7 +2073,18 @@ fn detect_ask_activity(joined: &str) -> bool {
     // recall queries like «Менің атымды және не істейтінімді
     // есіңізде ме?».
     let self_recall = (joined.contains("менің")
-        && (joined.contains("ісім") || joined.contains("істейтін") || joined.contains("не істе")))
+        && (joined.contains("ісім")
+            || joined.contains("істейтін")
+            || joined.contains("не істе")
+            // **v4.52.0** — broader 1sg self-recall: any of the
+            // other activity-verb participle stems used in
+            // «менің нені [V]атыным/йтінім?» queries.
+            || joined.contains("дамытатын")
+            || joined.contains("әзірлейтін")
+            || joined.contains("жасайтын")
+            || joined.contains("жазатын")
+            || joined.contains("зерттейтін")
+            || joined.contains("құрастыратын")))
         || joined.contains("не істеймін")
         || joined.contains("не істейтінімді")
         || joined.contains("не істейтінім");
@@ -2105,6 +2116,9 @@ fn detect_statement_of_activity(tokens: &[String], joined: &str) -> Option<Optio
         "зерттеймін",
         "айналысамын",
         "құрастырамын",
+        // **v4.52.0** — additional roots: дамыту (develop), құру (build).
+        "дамытамын",
+        "құрамын",
         // **v4.51.5** — participle-form (Aorist Participle, -йтін /
         // -етін / -атын / -йтын) used in compound clauses like
         // «жасанды интеллект моделімді әзірлейтін бағдарламашымын» —
@@ -2117,6 +2131,24 @@ fn detect_statement_of_activity(tokens: &[String], joined: &str) -> Option<Optio
         "зерттейтін",
         "айналысатын",
         "құрастыратын",
+        // **v4.52.0** — participle for new roots.
+        "дамытатын",
+        "құратын",
+    ];
+    // **v4.52.0** — converb stems used in present-progressive
+    // «X-ды Y-іп жатырмын» = "I am Y-ing X". Bigram match: the
+    // converb is followed by the «жатырмын» (1sg) / «жатырмыз»
+    // (1pl) auxiliary. The converb itself sits in verb-position
+    // for the walk-back logic — the object precedes it.
+    const CONTINUOUS_CONVERBS: &[&str] = &[
+        "әзірлеп",
+        "жасап",
+        "жазып",
+        "зерттеп",
+        "құрастырып",
+        "айналысып",
+        "дамытып",
+        "құрып",
     ];
     // Find the activity verb position in tokens (verb at end of clause).
     let mut verb_idx: Option<usize> = None;
@@ -2125,6 +2157,16 @@ fn detect_statement_of_activity(tokens: &[String], joined: &str) -> Option<Optio
         if ACTIVITY_VERBS.iter().any(|v| t_clean == *v) {
             verb_idx = Some(i);
             break;
+        }
+        // **v4.52.0** — continuous-form: converb + «жатыр*» auxiliary.
+        if CONTINUOUS_CONVERBS.iter().any(|v| t_clean == *v) {
+            if let Some(next) = tokens.get(i + 1) {
+                let next_clean = next.trim_end_matches('.').trim_end_matches('!');
+                if next_clean.starts_with("жатыр") {
+                    verb_idx = Some(i);
+                    break;
+                }
+            }
         }
     }
     let verb_idx = verb_idx?;
@@ -2231,6 +2273,64 @@ pub(crate) fn detect_activity_in_compound(input: &str) -> Option<Option<String>>
         return None;
     }
     detect_statement_of_activity(&tokens, &lower)
+}
+
+/// **v4.52.0** — Secondary scan for compound inputs where the user
+/// states multiple things at once (name + occupation + activity)
+/// e.g. «Менің атым Дәулет, мен бағдарламашымын және ...». The
+/// primary intent detector picks ONE intent (StatementOfName wins
+/// priority); this scan rescues the `occupation` slot when it sits
+/// in a non-primary clause.
+///
+/// Mirrors `detect_activity_in_compound`. Returns `Some(Some(root))`
+/// when a noun + 1sg copula form is identifiable, `None` otherwise.
+pub(crate) fn detect_occupation_in_compound(
+    input: &str,
+    lexicon: Option<&LexiconV1>,
+) -> Option<Option<String>> {
+    let lower = input.to_lowercase();
+    let tokens: Vec<String> = lower
+        .split_whitespace()
+        .map(|t| {
+            t.trim_matches(|c: char| c == '.' || c == ',' || c == '!' || c == '?')
+                .to_string()
+        })
+        .filter(|t| !t.is_empty())
+        .collect();
+    if tokens.is_empty() {
+        return None;
+    }
+    if let Some(lex) = lexicon
+        && let Some(root) = strip_copula_and_lookup_noun(&tokens, lex)
+    {
+        return Some(Some(root));
+    }
+    // Fallback fixed table for callers without lexicon access.
+    const OCCUPATIONS: &[(&str, &str)] = &[
+        ("мұғаліммін", "мұғалім"),
+        ("дәрігермін", "дәрігер"),
+        ("студентпін", "студент"),
+        ("инженермін", "инженер"),
+        ("оқушымын", "оқушы"),
+        ("жұмысшымын", "жұмысшы"),
+        ("бағдарламашымын", "бағдарламашы"),
+        ("ғалыммын", "ғалым"),
+        ("аудармашымын", "аудармашы"),
+        ("суретшімін", "суретші"),
+        ("дизайнермін", "дизайнер"),
+        ("әншімін", "әнші"),
+        ("саудагермін", "саудагер"),
+        ("кәсіпкермін", "кәсіпкер"),
+        ("заңгермін", "заңгер"),
+    ];
+    for t in &tokens {
+        for (form, root) in OCCUPATIONS {
+            if t == form {
+                return Some(Some((*root).to_string()));
+            }
+        }
+    }
+    None
 }
 
 /// Strip Accusative («-ды/-ді/-ны/-ні/-ты/-ті»), Comitative («-мен»),
