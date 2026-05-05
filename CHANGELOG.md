@@ -7,6 +7,36 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.56.5] — 2026-05-06 — Educational portal Day 1 #2 — Pre-school alphabet letters 11-20
+
+**Day 1 release 2/10.** Continues the pre-school Kazakh alphabet build: letters З through О (10 letters from positions 11-20 of 42). Adds 1 new bridge fact for sound-as-concept hub.
+
+### Innovations
+
+**(1) 10 new letter entries** in `data/world_core/preschool_alphabet.jsonl` (`alpha_011…alpha_020`): з / и / й / к / қ / л / м / н / ң / о — same structure as v4.56.0: ordinal in alphabet + phonetic class + ≥2 example Kazakh words. Special letters (қ / ң) flagged as «тек қазақ тіліне тән». Sound-place descriptors: «тіл ұшы», «тіл арты», «қос ерінді», «мұрын жолды».
+
+**(2) New bridge fact** `alpha_bridge_002`: «**дыбыс IsA ұғым**» — establishes sound-as-concept hub alongside the v4.56.0 `әріп IsA ұғым`. Each letter's «дауысты дыбыс» / «дауыссыз дыбыс» phonetic descriptor will cascade through this hub in future grammar releases.
+
+**(3) Special note on «ң»** — entry includes the linguistic constraint «сөз басында кездеспейді» (does not appear word-initially) — a Kazakh-specific phonotactic that elementary curricula explicitly teach.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2113 | **2124** (+11) |
+| world_core facts | 2373 | **2384** (+11) |
+| Derived facts | 28135 | **28161** (+26 = 2.4× per fact) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.56.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+### Cadence
+
+`.5` patch — Day 1 release 2/10 of the educational program. Same-domain extension. No code changes.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.56.0] — 2026-05-06 — Educational portal Day 1 #1 — Pre-school alphabet letters 1-10
 
 **Day 1 of educational program** (`docs/educational_program_2026-W19+1.md`). Strategic priority: adam = #1 қазақ тілді білім порталы РК. v4.56.0 lays the first floor: pre-school Kazakh alphabet, letters А through Ж (10 letters of 42).

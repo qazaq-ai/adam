@@ -1,7 +1,7 @@
 {
-  "version": "4.55.5",
+  "version": "4.56.0",
   "status": "completed",
-  "elapsed_s": 66,
+  "elapsed_s": 67,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2373,
+    "facts_total": 2384,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1834,
+      "is_a": 1845,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -74,7 +74,7 @@
       "world_core/philosophy_basic.jsonl": 23,
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
-      "world_core/preschool_alphabet.jsonl": 11,
+      "world_core/preschool_alphabet.jsonl": 22,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
       "world_core/programming_rust.jsonl": 181,
@@ -34393,6 +34393,206 @@
     },
     {
       "subject": {
+        "surface": "з",
+        "root": "з",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "З — қазақ әліпбиінің он бірінші әрпі. Тіл ұшы ұяң дауыссыз. Мысал: заң, зейін, зат."
+    },
+    {
+      "subject": {
+        "surface": "и",
+        "root": "и",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "И — қазақ әліпбиінің он екінші әрпі. Жіңішке дауысты, көбіне «й» дыбысымен қосарланып айтылады. Мысал: иық, ине, иіс."
+    },
+    {
+      "subject": {
+        "surface": "й",
+        "root": "й",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Й — қазақ әліпбиінің он үшінші әрпі. Қысқа дауыссыз, дауысты дыбыспен қосарланып айтылады. Мысал: ой, ай, үй."
+    },
+    {
+      "subject": {
+        "surface": "к",
+        "root": "к",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "К — қазақ әліпбиінің он төртінші әрпі. Тіл арты қатаң дауыссыз, жіңішке дыбыс. Мысал: көз, кітап, көп."
+    },
+    {
+      "subject": {
+        "surface": "қ",
+        "root": "қ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қ — қазақ әліпбиінің он бесінші әрпі, тек қазақ тіліне тән дыбыс. Тіл арты қатаң, жуан дыбыс. Мысал: қала, қыз, қол."
+    },
+    {
+      "subject": {
+        "surface": "л",
+        "root": "л",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Л — қазақ әліпбиінің он алтыншы әрпі. Тіл ұшы үнді дауыссыз. Мысал: лақ, лебіз, лашық."
+    },
+    {
+      "subject": {
+        "surface": "м",
+        "root": "м",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "М — қазақ әліпбиінің он жетінші әрпі. Қос ерінді мұрын жолды үнді дауыссыз. Мысал: мал, мен, мектеп."
+    },
+    {
+      "subject": {
+        "surface": "н",
+        "root": "н",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Н — қазақ әліпбиінің он сегізінші әрпі. Тіл ұшы мұрын жолды үнді дауыссыз. Мысал: нан, нар, нөл."
+    },
+    {
+      "subject": {
+        "surface": "ң",
+        "root": "ң",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ң — қазақ әліпбиінің он тоғызыншы әрпі, тек қазақ тіліне тән дыбыс. Тіл арты мұрын жолды үнді дауыссыз. Сөз басында кездеспейді. Мысал: соң, таң, маңдай."
+    },
+    {
+      "subject": {
+        "surface": "о",
+        "root": "о",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әріп",
+        "root": "әріп",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "О — қазақ әліпбиінің жиырмасыншы әрпі. Артқы тіл, ерін дауыстысы. Мысал: оқу, от, орман."
+    },
+    {
+      "subject": {
         "surface": "әріп",
         "root": "әріп",
         "pos": "noun"
@@ -34410,6 +34610,26 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Әріп — жазудың ең кіші бірлігі, белгілі бір дыбысты белгілейді."
+    },
+    {
+      "subject": {
+        "surface": "дыбыс",
+        "root": "дыбыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_alphabet",
+      "source": {
+        "pack": "world_core/preschool_alphabet.jsonl",
+        "sample_id": "alpha_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дыбыс — естілетін, ажыратылатын акустикалық бірлік. Тіл білімінде әріптер дыбыстарды белгілейді."
     },
     {
       "subject": {
