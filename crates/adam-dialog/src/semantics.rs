@@ -1359,6 +1359,24 @@ fn detect_ask_name(joined: &str) -> bool {
             && (joined.contains("кім") || joined.contains("не")))
         || (joined.contains("есімім")
             && (joined.contains("кім") || joined.contains("не")))
+        // **v4.54.5** — recall-question variants:
+        // «менің атымды есіңізде ме?» / «атымды ұмытпадыңыз ба?» /
+        // «есімімді есіңізде ме?». The Acc form «атымды»/«есімімді»
+        // (1sg-poss + Acc) co-occurring with a memory-probe phrase
+        // («есіңізде ме» = "do you remember", «ұмытпадың» = "haven't
+        // forgotten") is unambiguous self-recall — pre-v4.54.5
+        // adam routed «менің атымды есіңізде ме» to Unknown with
+        // noun_hint=ат and surfaced a grounded fact about «ат» (horse).
+        // **session 6 transcript fix.**
+        // Also covers compound «аты-жөн» (name + family-name)
+        // surfaced by autotest B post-v4.54.5.
+        || ((joined.contains("атым")
+            || joined.contains("атымды")
+            || joined.contains("аты-жөнім")
+            || joined.contains("аты-жөнімді"))
+            && (joined.contains("есіңізде") || joined.contains("есіңде") || joined.contains("ұмытпа")))
+        || ((joined.contains("есімім") || joined.contains("есімімді"))
+            && (joined.contains("есіңізде") || joined.contains("есіңде") || joined.contains("ұмытпа")))
 }
 
 fn detect_statement_of_wellbeing(tokens: &[String], joined: &str) -> bool {

@@ -88,22 +88,29 @@ named release tag.
 
 ---
 
-## Day 4 — 2026-05-08 (Friday)
+## Day 4 — 2026-05-05 (pulled forward by user) ✓ session run
 
-**Live REPL session 6 — fresh transcript-driven gap report.**
+**Live REPL session 6 — gap report + v4.54.5 ship.**
 
-- Run a 10-15-turn novel Kazakh dialog covering: math chain (digit
-  + word + gerund), name + occupation + activity capture, recall
-  queries across all three slots, knowledge questions on world_core
-  (geography, science, programming), follow-up turns testing
-  context continuity.
-- Capture every adam response; flag every gap with a numbered ID.
-- Write findings into `docs/transcripts/session_06_2026-05-08.md`:
-  per gap, what input triggered it, what response came back, what
-  the desired response is, suggested fix scope.
-- Record p50 latency + max RSS per turn (per `feedback_unified_kpi`).
+User ran a 16-turn novel Kazakh dialog. 4 gaps surfaced; 3 closed
+in v4.54.5, 1 deferred:
 
-No release. Output: gap report becomes the v4.54 / v4.55 spec.
+- [x] **G1**: «Танысайық.» → «Қуана-қуана» tone fix → «иә, әрине».
+- [x] **G2**: «Менің атымды есіңізде ме?» → grounded-fact hijack →
+      AskName self-recall extended for `атым/атымды/аты-жөнім/
+      аты-жөнімді/есімім/есімімді` × `есіңізде/есіңде/ұмытпа*`.
+- [x] **G3**: «...қосқанда не болатынын есептеп, ...» math_refusal →
+      removed «есепте» from `clause_has_math_verb` failure list.
+- [ ] **G4** (deferred to v4.55.x): «Иә» after low-confidence
+      clarify produces confused «Қайсысы нақты — бағдарламашы ма,
+      сұрай ма?» from `check_contradiction` template. Phantom
+      belief conflict; needs belief-tracker investigation.
+
+**New cadence**: per user directive, adam runs its own autonomous
+real-REPL crash-tests before every release. Session A (12 turns)
++ Session B (12 turns) ran post-G1-G3 fixes. Session B surfaced
+B2 (compound «аты-жөнім») fixed in v4.54.5; B1 (pending
+contradiction blocks math) deferred for UX policy debate.
 
 ---
 

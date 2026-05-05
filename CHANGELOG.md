@@ -7,6 +7,58 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.54.5] — 2026-05-05 — Session 6 transcript-driven fixes + first autonomous crash-tests
+
+**Driven by user dialog test session 6 (2026-05-05) + autonomous crash-tests.** Per the user's directive, this is the first release where adam runs its own real-REPL crash-tests before shipping (autonomous-test cadence captured in `docs/weekly_plan_2026-W19.md`). Three concrete gaps from session 6 closed; one extra gap surfaced and fixed by autotest B; one architectural gap (G4) deferred with explicit trace.
+
+### Real-REPL gap closure
+
+| # | Pre-v4.54.5 | Post-v4.54.5 |
+|---|---|---|
+| **G1** | «Танысайық.» → «**Қуана-қуана.** Мен — қазақша сөйлесуге арналған NLM, атым адам.» (jarringly colloquial reduplication for an introductory turn) | «**Иә, әрине.** Мен — қазақша сөйлесуге арналған NLM, атым адам.» ✓ |
+| **G2** | «Менің **атымды** есіңізде ме?» → grounded fact about «ат» (horse) — Acc-form 1sg.poss + memory-probe was treated as Unknown with noun_hint=ат | «**Сіздің атыңыз Дәулет.**» ✓ (recall fired) |
+| **G3** | «...қосқанда **не болатынын есептеп**, 2-ге көбейтіп, 4-ке бөліңіз.» → math_refusal (the auxiliary verb «есептеп» between operations triggered clause-has-math-verb failure semantics) | «**Нәтижесі: 38**» ✓ |
+| **B2** (autotest) | «Менің **аты-жөнімді** ұмытпадың ба?» → check_contradiction template (compound «name + family-name» Acc form not in detector) | «**Сіздің атыңыз Олжас.**» ✓ |
+
+### Innovations
+
+**(1) Template fix for `greeting.intro_proposal`** — replaced «қуана-қуана. Мен — ...» with «иә, әрине. Мен — ...» (line 74, `data/dialog/templates/v1.toml`). Same conversational function, neutral tone appropriate for an introduction-acceptance turn.
+
+**(2) `detect_ask_name` extended** — handles 4 new self-recall variants combining 1sg-poss + Acc + memory-probe phrasings:
+- `атым` / `атымды` / `аты-жөнім` / `аты-жөнімді` × `есіңізде` / `есіңде` / `ұмытпа*`
+- `есімім` / `есімімді` × same probe set
+
+The compound-name «аты-жөн» ("name + family-name") variant was surfaced specifically by autonomous crash-test session B.
+
+**(3) `clause_has_math_verb` — «есепте» removed** (`discourse.rs`). The top-level `input_is_math_expression` gate still recognises «есепте-» (auxiliary "calculate") for math-mode entry, but inside the v4.42.0 multi-clause loop we no longer treat it as a real math operator. The four real operators (көбейт / бөл / қос / азайт) plus the closed `ал`-forms still gate failure semantics. With «есепте» off the failure list, auxiliary appendages like «не болатынын есептеп» fall through silently to the accumulator-carry path.
+
+**(4) First autonomous crash-test cadence** — adam's own REPL runs as a standard pre-release gate. Session A (Айгүл / дәрігер / зерттейтін activity + math chain + knowledge queries) ran clean across 12 turns. Session B (name correction + math + retrieval edges + apology) found 1 detector gap (B2, fixed) and 1 architectural concern (B1: pending name-contradiction blocks math detection — deferred to a separate release).
+
+### Deferred
+
+**G4** — «Иә» after `unknown.clarify_low_confidence` produced confused «Қайсысы нақты — бағдарламашы ма, сұрай ма?». Traced to `check_contradiction` template (line 564, v1.toml) firing with malformed `{old_value}=бағдарламашы / {new_value}=сұрай`. Phantom belief conflict appears to be created from prior turn's clarify response. Architectural fix needed in belief-tracker; deferred with full trace context.
+
+**B1** — bare arithmetic «17 + 25 қанша болады?» blocked by pending name-contradiction. Behaviour is technically correct (modal-dialog semantics for unresolved conflict) but UX-debatable. Defer with discussion needed about precedence policy.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **976 passing** unchanged |
+| `bash scripts/verify_release_version.sh 4.54.5` | green |
+| Live REPL session-6 replay (G1+G2+G3) | ✓ all 3 closed end-to-end |
+| Autotest A (12 turns, fresh user profile) | ✓ all clean |
+| Autotest B (12 turns, adversarial: name correction / math / retrieval) | ✓ 11 clean + 1 fix (B2) + 2 architectural deferrals (G4/B1) |
+| Foundation: 2099 / 2359 / 46 / 28109 | unchanged |
+| `cargo fmt --all --check` | clean |
+| `cargo build --release` | clean |
+
+### Cadence
+
+`.5` patch — pure detector + template fixes (no new code surface, no new public functions). Per `feedback_versioning_post_1_0`. Closes 4 transcript-driven gaps and establishes the autonomous-crash-test cadence as standard pre-release practice.
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.54.0] — 2026-05-05 — Lexicon expansion + 10 bridge-facts (highest-ROI batch)
 
 **Per `project_bridge_fact_leverage`:** a single `{sub_hub} IsA {top_hub}` fact multiplies derivation leverage to +47–67/fact vs +15/fact without bridge. v4.54.0 lands the largest single-batch ROI in the v4.x line: **10 bridge facts → +934 derived facts (+93/fact)** — far above both the prior empirical bound and the spec's +300 acceptance threshold.

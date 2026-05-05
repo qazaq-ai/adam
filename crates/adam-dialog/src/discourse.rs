@@ -722,13 +722,25 @@ fn inject_gerund_clause_separators(input: &str) -> String {
 }
 
 fn clause_has_math_verb(clause: &str) -> bool {
+    // **v4.54.5** — «есепте» REMOVED from real-math-verb list. The
+    // top-level `input_is_math_expression` gate still recognises
+    // «есепте-» (auxiliary "calculate"), but inside the multi-clause
+    // loop we no longer treat it as a real math operator.
+    //
+    // Reason: real-REPL session 6 surfaced «...қосқанда **не
+    // болатынын есептеп**, 2-ге көбейтіп, 4-ке бөліңіз». After
+    // gerund-separator injection, the «не болатынын есептеп» clause
+    // had no operands but was treated as a math-verb-bearing clause
+    // and failed the whole evaluation. With «есепте» off the list,
+    // such auxiliary appendages fall through silently to the
+    // accumulator-carry path. The four real operators (көбейт / бөл /
+    // қос / азайт) plus the closed `ал`-forms still gate failure.
     let lowered = clause.to_lowercase();
     lowered.split(|c: char| !c.is_alphabetic()).any(|w| {
         !w.is_empty()
             && (w.starts_with("көбейт")
                 || w.starts_with("бөл")
                 || w.starts_with("қос")
-                || w.starts_with("есепте")
                 || w.starts_with("азайт")
                 || matches!(
                     w,
