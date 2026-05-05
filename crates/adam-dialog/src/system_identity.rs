@@ -32,9 +32,11 @@ pub struct SystemIdentity {
     /// canonical form: `адам`.
     pub name: String,
     /// Full English technical name the user may also encounter:
-    /// `Nano Language Model`.
+    /// `Agglutinative Reasoning Kernel` (renamed from `Nano Language
+    /// Model` in v4.55.5).
     pub full_name: String,
-    /// Three-letter abbreviation: `NLM`.
+    /// Three-letter abbreviation: `ARK` (renamed from `NLM` in
+    /// v4.55.5).
     pub abbreviation: String,
     /// Kazakh kind label rendered in templates: `тілдік модель`.
     pub kind: String,
@@ -128,13 +130,21 @@ pub struct SystemIdentity {
 }
 
 impl SystemIdentity {
-    /// Canonical adam-NLM identity. Use this for production; tests
+    /// Canonical adam-ARK identity. Use this for production; tests
     /// may override individual fields via direct construction.
+    ///
+    /// **v4.55.5** — architecture renamed from NLM (Nano Language
+    /// Model) to **ARK** (Agglutinative Reasoning Kernel). Reason:
+    /// «Language Model» buckets adam with the LLM family; ARK names
+    /// the actual architecture — agglutinative morphology + curated
+    /// knowledge graph + forward-chaining reasoner + tiny trained
+    /// selection weights. «Kernel» (vs «Model») frames adam as a
+    /// system-runtime, not a probabilistic estimator.
     pub fn canonical() -> Self {
         Self {
             name: "адам".into(),
-            full_name: "Nano Language Model".into(),
-            abbreviation: "NLM".into(),
+            full_name: "Agglutinative Reasoning Kernel".into(),
+            abbreviation: "ARK".into(),
             kind: "тілдік модель".into(),
             creator: "Баймурзин Даулет Абузарович".into(),
             birthdate: "2026-04-07".into(),
@@ -436,8 +446,8 @@ mod tests {
     fn canonical_identity_carries_all_required_fields() {
         let id = SystemIdentity::canonical();
         assert_eq!(id.name, "адам");
-        assert_eq!(id.full_name, "Nano Language Model");
-        assert_eq!(id.abbreviation, "NLM");
+        assert_eq!(id.full_name, "Agglutinative Reasoning Kernel");
+        assert_eq!(id.abbreviation, "ARK");
         assert_eq!(id.creator, "Баймурзин Даулет Абузарович");
         assert_eq!(id.birthdate, "2026-04-07");
         assert!(id.kind.contains("модель"));

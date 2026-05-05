@@ -16,8 +16,10 @@ linked from individual decisions.
   `cargo run` / `cargo test` only.
 - **Kazakh-only surface.** User-facing reply text is Cyrillic Kazakh.
   English / Russian only appears as Latin technical tokens explicitly
-  whitelisted in the v4.3.4 quality gate (`adam`, `Nano`, `Language`,
-  `Model`, `NLM`).
+  whitelisted in the v4.3.4 quality gate (`adam`, `Agglutinative`,
+  `Reasoning`, `Kernel`, `ARK` — renamed from `Nano`/`Language`/`Model`/
+  `NLM` in v4.55.5; legacy tokens kept on the whitelist for historical
+  CHANGELOG / curated-fact compatibility).
 
 ## Pre-push checklist
 

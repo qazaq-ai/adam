@@ -7,6 +7,72 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.55.5] — 2026-05-05 — Architecture rename: NLM → ARK (Agglutinative Reasoning Kernel)
+
+**Driven by user decision (2026-05-05):** the architecture name «NLM» (Nano Language Model) was buckets adam with the LLM family. **ARK** = Agglutinative Reasoning Kernel names what adam actually is — agglutinative morphology + curated knowledge graph + forward-chaining reasoner + tiny trained selection weights, packaged as a system-runtime not a probabilistic estimator.
+
+### Naming choice
+
+User rejected two earlier proposals:
+- **AGM** (Agglutinative Grammar Model) — «Grammar» triggered school-grammar associations
+- **CALM** (Controlled Agglutinative Language Model) — «Controlled» was redundant («Agglutinative» already implies discipline by morphological nature)
+
+User-accepted: **ARK** — three deliberate choices:
+- **A**gglutinative — the morphological algebra (already carries determinism per nature)
+- **R**easoning — forward-chaining over typed facts (the actual differentiator vs LLM)
+- **K**ernel — system-runtime (vs «Model» = probabilistic estimator); aligns with the existing `adam-kernel` crate naming
+
+Tiny ML lives, large ML doesn't: the trained perceptron is 24 bytes / 6 f32; suffix priors and root affinity are statistical but auditable. Generation is template-based, never free-text. The «Kernel» naming captures that ML layers exist but sit inside the kernel as inspectable components, not at the centre.
+
+### Innovations
+
+**(1) `SystemIdentity::canonical()` updated** in `crates/adam-dialog/src/system_identity.rs` — `full_name: "Agglutinative Reasoning Kernel"`, `abbreviation: "ARK"`. Doc-comment on the struct fields explicitly references the v4.55.5 rename. Unit test `canonical_identity_carries_all_required_fields` updated to assert ARK.
+
+**(2) Latin-token whitelist extended** in `crates/adam-dialog/src/quality.rs::is_allowed_latin_token` — added `Agglutinative`, `Reasoning`, `Kernel`, `ARK`. Old tokens (`Nano`, `Language`, `Model`, `NLM`) kept on the whitelist for backwards compat with historical CHANGELOG entries + curated facts.
+
+**(3) Templates updated** in `data/dialog/templates/v1.toml`:
+- `greeting.intro_proposal` line 74: «иә, әрине. Мен — қазақша сөйлесуге арналған **ARK**, атым адам.»
+- `ask_about_system` line 206: «**ARK** — Agglutinative Reasoning Kernel, мен адам атты қазақша тілдік модельмін»
+
+**(4) 3 new world_core entries** in `data/world_core/adam_self.jsonl` (`adam_self_040…042`):
+- `adam IsA ARK` — establishes the identity bridge
+- `ARK IsA детерминирленген жүйе` — frames as deterministic system, not probabilistic LM
+- `ARK IsA архитектура атауы` — names this as an architecture-class label
+
+**(5) 2 new MULTIWORD_ENTITIES** in `crates/adam-dialog/src/topic_extraction.rs` — «архитектура атауы» and «детерминирленген жүйе» (so the topic extractor surfaces them as a unit).
+
+**(6) Eval data updated** — `data/eval/cognitive_dialog_dataset.json`, `data/eval/repl_dialogs.json`, and `data/eval/live_holdout_2026_05_01.json`: assertions now accept ARK / Agglutinative Reasoning Kernel.
+
+**(7) README — new «Architecture name — ARK» section** above the Engineering thesis. Documents the four-pillar definition + the rationale + the renaming context. CONTRIBUTING.md Latin-whitelist bullet updated.
+
+### Live REPL verification
+
+```
+> Сен кімсің?
+ARK — Agglutinative Reasoning Kernel, мен адам атты қазақша тілдік модельмін.
+
+> Танысайық.
+Иә, әрине. Мен — қазақша сөйлесуге арналған ARK, атым адам. Атыңызды айта аласыз ба?
+```
+
+### Acceptance
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **976 passing** unchanged |
+| `cargo clippy --workspace --all-targets -- -D warnings` | green |
+| `bash scripts/check_metrics_currency.sh` | green (9/9 checks at v4.55.5) |
+| `bash scripts/verify_release_version.sh 4.55.5` | green |
+| Live REPL «Сен кімсің?» | ✓ surfaces ARK + Agglutinative Reasoning Kernel |
+| Foundation: 2099/2359/46/28109 → **2102/2362/46/28112** | +3 entries / +3 facts / +3 derived |
+| `cargo fmt --all --check` + `cargo build --release` | clean |
+
+### Cadence
+
+`.5` patch — naming-only change with foundation +3/+3 from the new ARK identity facts. Per `feedback_versioning_post_1_0`. No code-architecture change; no API surface change. The architecture itself is unchanged — only its name.
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.55.0] — 2026-05-05 — Metrics-currency CI gate (closes Codex's last hygiene gap)
 
 **Closes the Codex review's last hygiene observation.** v4.52.5 manually fixed ~15 numeric/version drifts that had silently accumulated across 15 minor versions. v4.55.0 codifies that audit as an automated CI gate so drift can't reaccumulate. Each subsequent release either updates the docs OR fails this gate.

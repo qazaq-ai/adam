@@ -7,7 +7,7 @@
       "id": "identity_who_are_you",
       "category": "identity",
       "query": "Сен кімсің?",
-      "any_substring": ["nlm", "тілдік модель", "адам"],
+      "any_substring": ["ark", "agglutinative reasoning kernel", "тілдік модель", "адам"],
       "note": "Bare identity question. v4.x intro answer mentions name, full name, kind."
     },
     {

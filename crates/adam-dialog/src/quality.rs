@@ -498,15 +498,16 @@ fn latest_conflict_values(trace: &TurnTrace) -> Option<(String, String)> {
 /// **v4.3.4** — token-aware Latin check. Pre-v4.3.4 the predicate
 /// rejected ANY ASCII letter. That is too strict: legitimate
 /// Kazakh-dialog content can include the project name `adam`, the
-/// system's technical full name `Nano Language Model`, and the
-/// abbreviation `NLM`. The user-facing
+/// system's technical full name `Agglutinative Reasoning Kernel`
+/// (renamed from `Nano Language Model` in v4.55.5), and the
+/// abbreviation `ARK` (renamed from `NLM`). The user-facing
 /// `Intent::AskAboutSystem { aspect: General }` reply intentionally
 /// surfaces all three.
 ///
 /// Strategy: walk the string, collect consecutive ASCII-alphabetic
 /// runs into tokens, and only flag if a token is not on the
 /// whitelist. Cyrillic / digits / whitespace / punctuation reset
-/// the token boundary, so `NLM` (between `(` and `)`) or `adam`
+/// the token boundary, so `ARK` (between `(` and `)`) or `adam`
 /// (between spaces) are scanned as standalone tokens.
 fn contains_latin(value: &str) -> bool {
     // **v4.12.0** — backtick-quoted spans bypass the Latin-character
@@ -556,10 +557,26 @@ fn contains_latin(value: &str) -> bool {
 /// covers adam's project name and its technical full-name + abbreviation.
 /// Add new entries here only after a deliberate review — the default
 /// stance remains "no Latin in Kazakh output".
+///
+/// **v4.55.5** — architecture renamed NLM → ARK. Old tokens
+/// (`Nano`, `Language`, `Model`, `NLM`) remain in the whitelist
+/// because historical CHANGELOG entries + curated facts still
+/// surface them; the live `SystemIdentity::canonical` now emits
+/// `Agglutinative` / `Reasoning` / `Kernel` / `ARK`.
 fn is_allowed_latin_token(token: &str) -> bool {
     matches!(
         token,
-        "adam" | "Adam" | "ADAM" | "Nano" | "Language" | "Model" | "NLM"
+        "adam"
+            | "Adam"
+            | "ADAM"
+            | "Agglutinative"
+            | "Reasoning"
+            | "Kernel"
+            | "ARK"
+            | "Nano"
+            | "Language"
+            | "Model"
+            | "NLM"
     )
 }
 

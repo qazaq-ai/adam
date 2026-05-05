@@ -496,12 +496,12 @@
     {
       "id": "ask_about_system_general_aspect_surfaces_full_name",
       "category": "action_routing",
-      "description": "v4.3.4: `сен қандай моделсің?` routes to AskAboutSystem { aspect: General }. The `ask_about_system` family interpolates `system_full_name` and `system_abbreviation` so the reply mentions either `Nano Language Model` or `NLM` (along with the canonical name `адам`).",
+      "description": "v4.3.4 + v4.55.5: `сен қандай моделсің?` routes to AskAboutSystem { aspect: General }. The `ask_about_system` family interpolates `system_full_name` and `system_abbreviation` so the reply mentions either `Agglutinative Reasoning Kernel` or `ARK` (renamed in v4.55.5 from `Nano Language Model` / `NLM`), along with the canonical name `адам`.",
       "turns": ["сен қандай моделсің"],
       "expect": {
         "action": "AnswerDirect",
         "epistemic_status": "Certain",
-        "output_contains_lower_any": ["nano language model", "nlm"]
+        "output_contains_lower_any": ["agglutinative reasoning kernel", "ark"]
       }
     },
     {

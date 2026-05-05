@@ -149,7 +149,7 @@ pub struct Conversation {
     /// who/what adam is. Defaults to
     /// [`SystemIdentity::canonical`](crate::system_identity::SystemIdentity::canonical),
     /// which carries the build-time identity (`name = адам`,
-    /// `full_name = Nano Language Model`, `creator =
+    /// `full_name = Agglutinative Reasoning Kernel`, `creator =
     /// Баймурзин Даулет Абузарович`, `birthdate = 2026-04-07`,
     /// architecture summary of how adam differs from mainstream
     /// LLMs). Tests may override individual fields by direct

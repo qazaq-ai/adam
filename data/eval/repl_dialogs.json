@@ -102,9 +102,9 @@
     {
       "id": "ask_about_system_general",
       "category": "system_identity",
-      "description": "v4.3.4: `сен кімсің` must surface adam's identity, including either the abbreviation NLM or the full name Nano Language Model.",
+      "description": "v4.3.4 + v4.55.5: `сен кімсің` must surface adam's identity, including either the abbreviation ARK or the full name Agglutinative Reasoning Kernel (renamed v4.55.5 from NLM / Nano Language Model).",
       "turns": [
-        {"user": "сен кімсің?", "output_contains_lower_any": ["адам", "nlm", "nano language model"]}
+        {"user": "сен кімсің?", "output_contains_lower_any": ["адам", "ark", "agglutinative reasoning kernel"]}
       ]
     },
     {

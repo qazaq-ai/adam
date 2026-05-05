@@ -3875,7 +3875,7 @@ fn ask_about_system_general_includes_name_and_full_name() {
         "general AskAboutSystem reply must mention `адам` (got: {out:?})"
     );
     assert!(
-        out.contains("Nano Language Model") || out.contains("NLM"),
+        out.contains("Agglutinative Reasoning Kernel") || out.contains("ARK"),
         "general AskAboutSystem reply must mention either the full name or the abbreviation \
          (got: {out:?})"
     );

@@ -1,7 +1,7 @@
 {
-  "version": "4.53.5",
+  "version": "4.55.0",
   "status": "completed",
-  "elapsed_s": 64,
+  "elapsed_s": 61,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2359,
+    "facts_total": 2362,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1820,
+      "is_a": 1823,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -41,7 +41,7 @@
       "kazakh_textbooks_pack.json": 14,
       "tatoeba_kazakh_pack.json": 3,
       "wikipedia_kz_pack.json": 17,
-      "world_core/adam_self.jsonl": 39,
+      "world_core/adam_self.jsonl": 42,
       "world_core/animals.jsonl": 42,
       "world_core/astronomy.jsonl": 56,
       "world_core/biology_basic.jsonl": 40,
@@ -2449,6 +2449,66 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазіргі жасанды интеллект модельдерінің кемшіліктері: галлюцинация (ойдан шығару), мол есеп ресурсы мен энергия шығыны, шешімінің ашықсыздығы, бір сұрауға әр түрлі жауап (детерминирленбеуі), оқу деректерінің сапасыздығы."
+    },
+    {
+      "subject": {
+        "surface": "adam",
+        "root": "adam",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ARK",
+        "root": "ARK",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_040"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "ARK — Agglutinative Reasoning Kernel, adam-ның архитектуралық атауы. Үш тіреу: агглютинативті морфология (FST талдау) + білім графы (world_core) + алға тізбекті ой-қорытушы (10 ереже)."
+    },
+    {
+      "subject": {
+        "surface": "ARK",
+        "root": "ARK",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "детерминирленген жүйе",
+        "root": "детерминирленген жүйе",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "ARK — үлкен тілдік модельдерден өзгеше: ережелер мен таңбалық ой-тізбекке негізделген, статистикалық генерацияға арналмаған. Шағын оқытылған құрауыштары (24 байт перцептрон, суффикс приорлары, түбір-аффинитеті) бар, бірақ олар инспекцияға ашық қабаттар ретінде ядро ішінде орналасқан, негізгі моторы емес."
+    },
+    {
+      "subject": {
+        "surface": "ARK",
+        "root": "ARK",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "архитектура атауы",
+        "root": "архитектура атауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "ARK атауы 2026-05-05 күні NLM (Nano Language Model) орнына қабылданды — adam-ды LLM-дер шеңберінен тыс жеке архитектуралық сыныпқа орналастыру үшін."
     },
     {
       "subject": {
