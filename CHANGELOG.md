@@ -7,6 +7,50 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.58.0] — 2026-05-06 — Educational portal Day 1 #5 — Pre-school numbers cardinals + ordinals 1-10
+
+**Day 1 release 5/10 (halfway).** New 48th domain: `preschool_numbers`. Pairs each cardinal 1-10 with its ordinal form, plus 3 classification bridges that establish the 사 numeric-classification taxonomy.
+
+### Innovations
+
+**(1) New 48th domain `preschool_numbers`** with 23 entries:
+- 10 cardinal entries (`num_001…num_010`): бір / екі / үш / төрт / бес / алты / жеті / сегіз / тоғыз / он → each `IsA "есептік сан"` (counting/cardinal number); kk text pairs cardinal with its ordinal partner + Kazakh usage examples
+- 10 ordinal entries (`num_ord_001…num_ord_010`): бірінші / екінші / … / оныншы → each `IsA "реттік сан"` (ordinal number); kk text gives meaning + examples
+
+**(2) 3 classification bridges**:
+- `num_bridge_001`: «**сан есім IsA ұғым**» — numeric-class as concept (chains to ұғым hub)
+- `num_bridge_002`: «**есептік сан IsA сан есім**» — cardinal IsA numeric-class
+- `num_bridge_003`: «**реттік сан IsA сан есім**» — ordinal IsA numeric-class
+
+Resulting cascade chain: `<cardinal/ordinal> → <есептік/реттік сан> → сан есім → ұғым` (3-hop derivation per number).
+
+**(3) MULTIWORD_ENTITIES extended** with «сан есім», «есептік сан», «реттік сан» — topic extractor surfaces these as a unit.
+
+**(4) Kazakh ordinal-formation rule** documented in `num_bridge_003`: «-ыншы / -інші жұрнақтары арқылы жасалады» — explicit suffix rule for forming ordinals from cardinals (curriculum-essential elementary content).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2150 | **2173** (+23) |
+| world_core facts | 2410 | **2423** (+13 net — some cardinal subjects deduped through morphological analysis with existing numbers.jsonl) |
+| world_core domains | 47 | **48** (+1) |
+| Derived facts | 28227 | **28280** (+53 = 4× cascade per net new fact via the 3-hop chain) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.58.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 4× per-fact derivation cascade is the highest yet — confirms that 3-hop bridge chains (cardinal → есептік сан → сан есім → ұғым) compound transitive R1 inferences well beyond 2-hop bridges.
+
+**Cumulative Day 1 (halfway):** 5 of 10 releases · +71 facts cumulative · +168 derived cumulative · 2 sub-domains complete (alphabet 42/42 + numbers 1-10).
+
+### Cadence
+
+`.0` minor — new domain `preschool_numbers`. Same template as `preschool_alphabet` but with paired cardinal/ordinal entries and 3-hop bridge chain.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.57.5] — 2026-05-06 — Educational portal Day 1 #4 — Alphabet completion (letters 31-42 + closing bridges)
 
 **Day 1 release 4/10.** Closes the pre-school Kazakh alphabet domain: letters Һ through Я (12 letters from positions 31-42 of 42). **42/42 = 100 % alphabet coverage.** Plus 3 closing classification bridges that unlock cross-domain cascading.

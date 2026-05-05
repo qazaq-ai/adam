@@ -1,7 +1,7 @@
 {
-  "version": "4.57.0",
+  "version": "4.57.5",
   "status": "completed",
-  "elapsed_s": 71,
+  "elapsed_s": 62,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2410,
+    "facts_total": 2423,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1871,
+      "is_a": 1884,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -75,6 +75,7 @@
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/preschool_alphabet.jsonl": 48,
+      "world_core/preschool_numbers.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
       "world_core/programming_rust.jsonl": 181,
@@ -35150,6 +35151,266 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақ әліпбиі — қазақ тілінің әріптер жиынтығы. Қазіргі кириллица әліпбиінде 42 әріп бар."
+    },
+    {
+      "subject": {
+        "surface": "сан есім",
+        "root": "сан есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сан есім — заттың санын немесе ретін көрсететін сөз табы. Қазақ тілінде сан есімдердің екі түрі бар: есептік сан (бір, екі, үш) және реттік сан (бірінші, екінші, үшінші)."
+    },
+    {
+      "subject": {
+        "surface": "есептік сан",
+        "root": "есептік сан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сан есім",
+        "root": "сан есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Есептік сан — заттың санын білдіретін сан есім түрі. Мысалдар: бір, екі, үш, төрт, бес."
+    },
+    {
+      "subject": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сан есім",
+        "root": "сан есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_bridge_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Реттік сан — заттың ретін білдіретін сан есім түрі. Есептік саннан -ыншы / -інші жұрнақтары арқылы жасалады. Мысалдар: бірінші, екінші, үшінші."
+    },
+    {
+      "subject": {
+        "surface": "бірінші",
+        "root": "бірінші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірінші — реттің ең басын білдіретін реттік сан есім. Мысал: бірінші орын, бірінші сынып."
+    },
+    {
+      "subject": {
+        "surface": "екінші",
+        "root": "екінші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екінші — реттің екі санды білдіретін реттік сан есімі. Мысал: екінші сабақ, екінші орын."
+    },
+    {
+      "subject": {
+        "surface": "үшінші",
+        "root": "үшінші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үшінші — реттің үш санды білдіретін реттік сан есімі. Мысал: үшінші қабат, үшінші сынып."
+    },
+    {
+      "subject": {
+        "surface": "төртінші",
+        "root": "төртінші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Төртінші — реттің төрт санды білдіретін реттік сан есімі. Мысал: төртінші орын, төртінші тарау."
+    },
+    {
+      "subject": {
+        "surface": "бесінші",
+        "root": "бесінші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бесінші — реттің бес санды білдіретін реттік сан есімі. Мысал: бесінші сынып, бесінші парақ."
+    },
+    {
+      "subject": {
+        "surface": "алтыншы",
+        "root": "алтыншы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Алтыншы — реттің алты санды білдіретін реттік сан есімі. Мысал: алтыншы парақ, алтыншы тапсырма."
+    },
+    {
+      "subject": {
+        "surface": "жетінші",
+        "root": "жетінші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жетінші — реттің жеті санды білдіретін реттік сан есімі. Мысал: жетінші мектеп, жетінші орын."
+    },
+    {
+      "subject": {
+        "surface": "сегізінші",
+        "root": "сегізінші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сегізінші — реттің сегіз санды білдіретін реттік сан есімі. Мысал: сегізінші тапсырма, сегізінші сабақ."
+    },
+    {
+      "subject": {
+        "surface": "тоғызыншы",
+        "root": "тоғызыншы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тоғызыншы — реттің тоғыз санды білдіретін реттік сан есімі. Мысал: тоғызыншы сынып, тоғызыншы тарау."
+    },
+    {
+      "subject": {
+        "surface": "оныншы",
+        "root": "оныншы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "реттік сан",
+        "root": "реттік сан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_numbers",
+      "source": {
+        "pack": "world_core/preschool_numbers.jsonl",
+        "sample_id": "num_ord_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Оныншы — реттің он санды білдіретін реттік сан есімі. Мысал: оныншы сынып, оныншы парақ."
     },
     {
       "subject": {
