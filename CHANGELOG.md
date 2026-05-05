@@ -7,6 +7,51 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.59.0] — 2026-05-06 — Educational portal Day 1 #7 — Pre-school geometric shapes
+
+**Day 1 release 7/10.** New 49th domain `preschool_shapes`. 10 geometric shapes for pre-school comprehension level + 2 classification bridges establishing the shape taxonomy.
+
+### Innovations
+
+**(1) New 49th domain `preschool_shapes`** with 12 entries:
+- 10 shape entries (`shape_001…shape_010`):
+  - **Basic shapes:** дөңгелек (circle), шаршы (square), тіктөртбұрыш (rectangle), үшбұрыш (triangle), сопақша (oval), ромб (rhombus)
+  - **N-gons:** бесбұрыш (pentagon), алтыбұрыш (hexagon)
+  - **Themed shapes:** жұлдыз пішіні (star shape), жүрек пішіні (heart shape)
+
+  Each entry: shape definition + side/angle properties + real-world examples (нан табағы / шахмат тақтасы / Пентагон ғимараты / ара ұяшықтары / etc.)
+
+**(2) 2 classification bridges**:
+- `shape_bridge_001`: «**геометриялық пішін IsA пішін**» (geometric shape is a shape — middle layer)
+- `shape_bridge_002`: «**пішін IsA ұғым**» (shape is a concept — top hub)
+
+3-hop cascade chain: `<shape> → геометриялық пішін → пішін → ұғым`.
+
+**(3) MULTIWORD_ENTITIES extended** with «геометриялық пішін», «жұлдыз пішіні», «жүрек пішіні» — topic extractor surfaces these as a unit.
+
+**(4) Cultural / context-aware examples** — entries connect abstract shapes to recognizable objects (the heart shape entry references «махаббат пен сүйіспеншілік белгісі»; the hexagon entry references «ара ұяшықтары»; the pentagon entry references «АҚШ-тың әскери штаб ғимараты Пентагон»).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2186 | **2198** (+12) |
+| world_core facts | 2426 | **2438** (+12 — all new tuples, no dedup) |
+| world_core domains | 48 | **49** (+1) |
+| Derived facts | 28288 | **28318** (+30 = 2.5× cascade per fact) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.59.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+**Cumulative Day 1:** 7 of 10 releases · +96 facts cumulative · +206 derived cumulative · 3 sub-domains complete (alphabet 42/42 + numbers 1-1000 + shapes 10).
+
+### Cadence
+
+`.0` minor — new domain `preschool_shapes`. Same template as preschool_alphabet/preschool_numbers.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.58.5] — 2026-05-06 — Educational portal Day 1 #6 — Numbers expansion: decades 20-1000 + compound-formation rule
 
 **Day 1 release 6/10.** Extends `preschool_numbers` with all decades + хundred + thousand magnitudes, plus the explicit compound-number formation rule.

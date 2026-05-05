@@ -1,7 +1,7 @@
 {
-  "version": "4.58.0",
+  "version": "4.58.5",
   "status": "completed",
-  "elapsed_s": 65,
+  "elapsed_s": 64,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2426,
+    "facts_total": 2438,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1887,
+      "is_a": 1899,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -76,6 +76,7 @@
       "world_core/plants.jsonl": 35,
       "world_core/preschool_alphabet.jsonl": 48,
       "world_core/preschool_numbers.jsonl": 16,
+      "world_core/preschool_shapes.jsonl": 12,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
       "world_core/programming_rust.jsonl": 181,
@@ -35471,6 +35472,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Оныншы — реттің он санды білдіретін реттік сан есімі. Мысал: оныншы сынып, оныншы парақ."
+    },
+    {
+      "subject": {
+        "surface": "дөңгелек",
+        "root": "дөңгелек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дөңгелек — қыры жоқ, тегіс шеңбермен қоршалған геометриялық пішін. Күн, дөңгелек тарелка, теңге дөңгелек пішіндес келеді."
+    },
+    {
+      "subject": {
+        "surface": "шаршы",
+        "root": "шаршы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шаршы — төрт қабырғасы тең, төрт бұрышы тік болатын геометриялық пішін. Шахмат тақтасының әрбір ұясы — шаршы."
+    },
+    {
+      "subject": {
+        "surface": "тіктөртбұрыш",
+        "root": "тіктөртбұрыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тіктөртбұрыш — төрт бұрышы тік, қарама-қарсы қабырғалары тең болатын геометриялық пішін. Кітап мұқабасы, есік, терезе — тіктөртбұрыш пішіндес."
+    },
+    {
+      "subject": {
+        "surface": "үшбұрыш",
+        "root": "үшбұрыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үшбұрыш — үш қабырғасы мен үш бұрышы бар геометриялық пішін. Жол белгілері, шатыр шыңы, пирамида қыры — үшбұрыш пішіндес."
+    },
+    {
+      "subject": {
+        "surface": "сопақша",
+        "root": "сопақша",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сопақша — дөңгелек тәрізді, бірақ созылыңқы пішін. Эллипс деп те аталады. Жұмыртқа, бұршақ түйірі — сопақша пішіндес."
+    },
+    {
+      "subject": {
+        "surface": "жұлдыз пішіні",
+        "root": "жұлдыз пішіні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жұлдыз — әдетте бес немесе одан да көп қырлы, ұшы шошақ пішін. Аспандағы жұлдыздар, ту үстіндегі жұлдыз белгісі, жаңа жыл шыршасының басындағы жұлдыз — жұлдыз пішіндес."
+    },
+    {
+      "subject": {
+        "surface": "жүрек пішіні",
+        "root": "жүрек пішіні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жүрек пішіні — жоғары жағы екі дөңес, төмен жағы шошақ келген симметриялық пішін. Махаббат пен сүйіспеншілік белгісі ретінде қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "ромб",
+        "root": "ромб",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ромб — төрт қабырғасы өзара тең, бірақ бұрыштары тік болмайтын геометриялық пішін. Карта ойынындағы «бубна» белгісі — ромб пішіндес."
+    },
+    {
+      "subject": {
+        "surface": "бесбұрыш",
+        "root": "бесбұрыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бесбұрыш — бес қабырғасы мен бес бұрышы бар геометриялық пішін. АҚШ-тың әскери штаб ғимараты «Пентагон» бесбұрыш пішіндес."
+    },
+    {
+      "subject": {
+        "surface": "алтыбұрыш",
+        "root": "алтыбұрыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Алтыбұрыш — алты қабырғасы мен алты бұрышы бар геометриялық пішін. Ара ұяшықтары, кейбір кристалл құрылымдары — алтыбұрыш пішіндес."
+    },
+    {
+      "subject": {
+        "surface": "геометриялық пішін",
+        "root": "геометриялық пішін",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "пішін",
+        "root": "пішін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Геометриялық пішін — заттың кеңістіктегі сыртқы көрінісі мен формасын білдіретін математикалық ұғым. Жазық пішіндер мен кеңістік пішіндері болады."
+    },
+    {
+      "subject": {
+        "surface": "пішін",
+        "root": "пішін",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/preschool_shapes",
+      "source": {
+        "pack": "world_core/preschool_shapes.jsonl",
+        "sample_id": "shape_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Пішін — заттың кеңістіктегі сыртқы көрінісі. Әрбір зат өзіндік пішінге ие."
     },
     {
       "subject": {
