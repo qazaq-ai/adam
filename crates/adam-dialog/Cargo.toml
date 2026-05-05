@@ -3,7 +3,7 @@ name = "adam-dialog"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Predictable Kazakh dialog layer — 26-intent recogniser, multi-turn session, FST-backed slot expansion, session-aware retrieval composition, BeliefState with auditable contradiction resolution (v4.1.0)"
+description = "Predictable Kazakh dialog layer — 33-intent recogniser, multi-turn session, FST-backed slot expansion, session-aware retrieval composition, BeliefState with auditable contradiction resolution, transcript-driven detector extensions (continuous-form activity, compound occupation, math anaphora) (v4.52.5)"
 
 [dependencies]
 adam-kernel = { path = "../adam-kernel" }

@@ -3,6 +3,7 @@ name = "adam-kernel"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+description = "L0 foundation crate for adam — identity, deterministic FSM, typed-error scaffolding. No I/O, no morphology. See adam-kernel-fst for the FST stack (L1)."
 
 [dependencies]
 serde.workspace = true

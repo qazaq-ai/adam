@@ -3,6 +3,7 @@ name = "adam-eval"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+description = "Eval + benchmark harness for adam — coverage / contract benchmarks, tokenizer-experiment manifests, holdout datasets, Rust-only and graph-first stack-contract tests."
 
 [dependencies]
 adam-corpus = { path = "../adam-corpus" }

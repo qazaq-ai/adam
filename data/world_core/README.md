@@ -103,7 +103,16 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v4.3.0)
+## Current scale (v4.52.5)
+
+**Live totals: 2089 entries / 2349 facts across 46 domains**, all `approved`
+by `shaman`. Re-run `bash scripts/validate_foundation.sh` to refresh.
+Per-domain counts in the listing below are a **historical v4.11.7 snapshot**
+preserved for change-tracking; verify current counts via
+`find data/world_core -name '*.jsonl' | xargs cat | jq -s 'length'`.
+
+### Per-domain (v4.11.7 snapshot — see live totals above)
+
 
 - `astronomy.jsonl` — 30 entries / 41 facts
 - `time.jsonl` — 20 entries / 38 facts
@@ -142,7 +151,7 @@ Validator checks:
 - `biology_school.jsonl` — 120 entries / 120 facts  *(new in v4.10.0)*
 - `history_kazakhstan.jsonl` — 124 entries / 124 facts  *(new in v4.11.0)*
 - `adam_self.jsonl` — 33 entries / 33 facts  *(new in v4.11.5; +6 rich subject claims in v4.11.6)*
-- **Total: 1625 entries / 1791 facts across 38 domains** (v4.11.7), all `approved`
+- **Snapshot total: 1625 entries / 1791 facts across 38 domains** (v4.11.7 — preserved as a historical milestone; live totals at top of section), all `approved`
   at `high` or `medium` confidence by `shaman`. v4.3.5 added **kz_literature
   surname-keyed entries** (Әуезов / Сейфуллин / Мүсірепов / Жұмабаев / …) and a
   new **`notable_kazakhstanis.jsonl` domain** (presidents, khans, scientists,

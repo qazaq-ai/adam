@@ -7,6 +7,52 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.52.5] — 2026-05-05 — Engineering hygiene + doc currency + weekly plan
+
+**Driven by external code review (Codex, 2026-05-05).** Fixes broken release gate and stale docs that had silently drifted across ~15 minor versions. No new product behaviour; no new tests; no foundation changes. Pure hygiene.
+
+### What was broken
+
+- `bash scripts/verify_release_version.sh 4.52.0` failed: 7 data manifests pinned to v4.37.0 (stale since the v4.37.5 cadence). Release gate had been silently bypassed.
+- README badge claimed 31 intents; the `Intent` enum has 33 variants (v4.51.0 added `StatementOfActivity` + `AskActivity`, never reflected in README).
+- `data/README.md:18` listed world_core as «874 entries / 995 facts across 30 domains» (frozen at v4.4.7); actual counts: 2089 / 2349 / 46.
+- `data/README.md:19` listed retrieval as «15 521 facts / 21 415 derivations»; actual: 2349 / 27175.
+- `data/world_core/README.md:106,145` had «Current scale (v4.3.0)» and «1625 entries (v4.11.7)» as the canonical totals.
+- `docs/foundation_scope.md:90` claimed «822 workspace tests at v4.22.5»; actual: 969 at v4.52.5.
+- `docs/performance.md`, `docs/corpus_audit.md` headers stamped to old versions.
+- `docs/kazakh_grammar/07_dialog_architecture.md:133` listed 26-intent taxonomy.
+- `crates/adam-dialog/Cargo.toml` description said «26-intent recogniser (v4.1.0)».
+- `crates/adam-dialog/src/lib.rs` docstring said «Stage: v3.9.5 — 26-intent».
+- 5 crates had no `description` field in Cargo.toml: adam-kernel, adam-tokenizer, adam-corpus, adam-eval, adam-retrieval.
+
+### What this release does
+
+**(1)** Bumps 7 data manifests v4.37.0 → v4.52.5: `data/eval/benchmark_manifest.json`, `data/eval/kazakh_foundation_eval_dataset.json`, `data/eval/tokenizer_experiment_manifest.json`, `data/eval/tokenizer_segmentation_eval_dataset.json`, `data/tokenizer/segmentation_roots.json`, `data/tokenizer/segmentation_rules.json`, `data/training/baseline_training_manifest.json`.
+
+**(2)** Re-stamps every numeric claim to live ground truth: 969 tests, 33 intents, 2089/2349/46/27175 foundation totals, p50 1.07 ms.
+
+**(3)** Adds `description` to 5 missing crate Cargo.toml files (adam-kernel, adam-tokenizer, adam-corpus, adam-eval, adam-retrieval).
+
+**(4)** Updates `data/world_core/README.md` to surface live totals at the top of the «Current scale» section and explicitly mark the per-domain breakdown as a v4.11.7 historical snapshot.
+
+**(5)** New `docs/weekly_plan_2026-W19.md` — concrete day-by-day deliverables for the week (W19, 2026-05-05 → 2026-05-11): math gerund-clause parser → context-aware clarify → live REPL session 6 → Lexicon + bridge-fact expansion → clippy hygiene → metrics-currency CI gate. Aligned with `project_v4_direction` (no investors) and `feedback_real_human_testing_with_memory`.
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| `cargo test --release --workspace` | **969 passing** unchanged |
+| `bash scripts/verify_release_version.sh 4.52.5` | **green** (was failing) |
+| `cargo fmt --all --check` | clean |
+| `cargo build --release` | clean |
+| Foundation: 2089 / 2349 / 46 / 27175 | unchanged |
+
+### Cadence
+
+`.5` patch — pure hygiene. Per `feedback_versioning_post_1_0`: «patch = small / incremental (bug fixes, small Lexicon additions, docs, housekeeping)». No code-path changes; CI invariant restored; doc drift erased.
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.52.0] — 2026-05-05 — Transcript-driven session 5 fixes — continuous-form activity + compound occupation + demonstrative math anaphora
 
 **Driven by 2026-05-05 user dialog test session 5.** v4.51.5 closed the participle-form activity case; session 5 surfaced four new gaps that v4.52.0 closes:

@@ -1,9 +1,12 @@
 //! adam-dialog — predictable, auditable Kazakh dialog layer.
 //!
-//! **Stage: v3.9.5** — 26-intent recogniser + multi-turn session +
+//! **Stage: v4.52.5** — 33-intent recogniser + multi-turn session +
 //! FST-backed slot expansion + session-aware retrieval composition +
 //! rule-derived reasoning chains (v2.7+) + World Core integration
-//! (v3.9.0+). Every path is deterministic or samples from a finite,
+//! (v3.9.0+) + user-activity slot extraction (v4.51.0+) +
+//! transcript-driven detector extensions for continuous-form
+//! activity, compound occupation, and math anaphora (v4.52.0+).
+//! Every path is deterministic or samples from a finite,
 //! inspectable set.
 //!
 //! See [`docs/architecture_v3.md`](../../../docs/architecture_v3.md) for the

@@ -3,6 +3,7 @@ name = "adam-tokenizer"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+description = "Kazakh-aware tokenizer + segmentation for adam. Produces deterministic token streams + segmentation roots/rules used downstream by adam-kernel-fst and adam-corpus."
 
 [dependencies]
 adam-kernel = { path = "../adam-kernel" }

@@ -130,7 +130,7 @@ The dialog pipeline is the **L1 product of `adam-dialog`**. Its commitments:
 - There is no free generation, no "hallucinate a fact", no unbounded attention over arbitrary text.
 - If the parser doesn't recognise the input, we emit a clearly-tagged `Intent::Unknown` and respond with a fallback ("түсінбедім"), not with a confabulation.
 
-## 5. Intent taxonomy (v1.1.0 shipped set — 26 intents)
+## 5. Intent taxonomy (v1.1.0 shipped set — 26 intents; current count 33 at v4.52.5)
 
 Each intent is a variant of `adam_dialog::Intent`. Variants that carry a payload use `Option<T>` so the intent matches on keywords alone (`years = None`) even when the entity wasn't extractable.
 

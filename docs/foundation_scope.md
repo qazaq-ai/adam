@@ -87,7 +87,7 @@ Deliver a **predictable, auditable Kazakh reasoning engine** built entirely in R
 - **79.48 % morpheme coverage** of the committed pool (v1.5.5 audit baseline).
 
 ### Quality gates
-- **Full regression test suite — 822 workspace tests passing as of v4.22.5, 0 failing, 4 ignored**. (v4.19.0 → v4.21.5 added the parse-disambiguation eval framework + pronoun stem-alternation paradigm + closed-class root-prior boost; v4.22.0 wired chain_tiebreak_root into the runtime; v4.22.5 added 8 NOT_A_TOPIC entries from the 2026-05-01 live-dialog battery.)
+- **Full regression test suite — 969 workspace tests passing as of v4.52.5, 0 failing, 4 ignored**. (Cumulative growth from 822 at v4.22.5 → 969 at v4.52.5: +147 tests across the parse-disambig framework, the v4.45.0–v4.50.0 Stage B selection-weights substrate, the v4.51.0 user-activity slot extraction, and the v4.51.5–v4.52.0 transcript-driven detector extensions.)
 - `scripts/validate_foundation.sh` — foundation CI (lex / FST / corpus / world_core / reasoner end-to-end).
 - `scripts/verify_release_version.sh` — manifest-consistency gate (every committed JSON pinned to current crate version).
 - `scripts/run_slow_roundtrip.sh` (v4.1.6+) — runs the four `#[ignore]`d FST synthesis-analysis roundtrip tests on demand.

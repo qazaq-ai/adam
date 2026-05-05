@@ -3,6 +3,7 @@ name = "adam-retrieval"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+description = "Morpheme-indexed retrieval engine for adam — builds + queries the inverted morpheme index over the Kazakh corpus; produces typed search-graph candidates for the dialog planner. Pure Rust; graph-first."
 
 [dependencies]
 adam-kernel-fst = { path = "../adam-kernel-fst" }

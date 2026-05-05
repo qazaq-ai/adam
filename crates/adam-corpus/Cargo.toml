@@ -3,6 +3,7 @@ name = "adam-corpus"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+description = "Kazakh corpus pipeline for adam — source-pack ingestion (Tatoeba / Wikipedia KZ / Common Voice / CC-100 / Abai / proverbs / classics / textbooks), suffix-chain priors, root-affinity training, parse-disambiguation eval."
 
 [dependencies]
 adam-kernel = { path = "../adam-kernel" }
