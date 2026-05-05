@@ -465,6 +465,45 @@ pub fn plan_response_with_epistemic(
         }
         _ => base_key,
     };
+    // **v4.53.5** — Context-aware clarify. When the standard Unknown
+    // routing decided to clarify (`clarify_no_topic` / `clarify_low_confidence`)
+    // BUT the session has stored profile slots, surface a diagnostic
+    // that cites the stored context instead of a generic catch-all.
+    //
+    // Real-REPL session 5 surfaced the gap: after the user said
+    // «Менің атым Дәулет, мен бағдарламашымын ... жасанды интеллект
+    // моделімді жасап жатырмын» (storing name + occupation + activity),
+    // a follow-up vague query produced «Сұрағыңызды толық түсінбедім.
+    // Қандай тақырып туралы сұрап отырсыз?» — generic and ignores all
+    // three stored slots. The user's complaint: "ответы должны вытекать
+    // из контекста беседы, а не общий ответ на все, что не знает".
+    //
+    // Fix: when key is one of the clarify-* keys AND any of name /
+    // occupation / activity / city is set in the session, override to
+    // `unknown.with_session_diagnostic`. The new family's templates
+    // gate on slot subsets via `template_is_fillable`, so the variant
+    // chosen automatically reflects what's actually known.
+    let is_clarify_key =
+        key == "unknown.clarify_no_topic" || key == "unknown.clarify_low_confidence";
+    let has_session_context = session.contains_key("name")
+        || session.contains_key("occupation")
+        || session.contains_key("activity")
+        || session.contains_key("city");
+    let key = if is_clarify_key
+        && has_session_context
+        && !repo.get("unknown.with_session_diagnostic").is_empty()
+    {
+        trace.push(format!(
+            "planner: clarify_diagnostic override → unknown.with_session_diagnostic (was {key}; session_slots: name={} occupation={} activity={} city={})",
+            session.contains_key("name"),
+            session.contains_key("occupation"),
+            session.contains_key("activity"),
+            session.contains_key("city"),
+        ));
+        "unknown.with_session_diagnostic"
+    } else {
+        key
+    };
     trace.push(format!("planner: template_key={key}"));
 
     let mut slots = session.clone();
@@ -739,6 +778,109 @@ mod tests {
         assert!(!template_is_fillable("{city|locative} тұрамын", &slots));
         slots.insert("city".into(), "Алматы".into());
         assert!(template_is_fillable("{city|locative} тұрамын", &slots));
+    }
+
+    /// **v4.53.5** — context-aware clarify routing test. When the
+    /// standard Unknown routing produces `unknown.clarify_no_topic`
+    /// AND the session has stored profile slots, the planner
+    /// overrides to `unknown.with_session_diagnostic` whose
+    /// templates cite the stored context.
+    #[test]
+    fn clarify_no_topic_with_session_routes_to_diagnostic() {
+        let Ok(repo) = TemplateRepository::load_default() else {
+            return; // CI without TOML file — skip.
+        };
+        // Intent::Unknown with no noun_hint and no evidence — would
+        // route to clarify_no_topic in v4.53.0.
+        let intent = Intent::Unknown {
+            raw_tokens: vec!["иә".into()],
+            noun_hint: None,
+            example: None,
+            grounded_fact: None,
+            example_adapted: false,
+            reasoning_chain: None,
+            question_shape: None,
+            temporal_scope: false,
+            compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+            input_modality: None,
+            input_evidence: None,
+            input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
+        };
+        let mut session = HashMap::new();
+        session.insert("name".into(), "Дәулет".into());
+        session.insert("occupation".into(), "бағдарламашы".into());
+        let plan = plan_response_with_epistemic(
+            &intent,
+            0,
+            &repo,
+            &session,
+            crate::uncertainty::EpistemicStatus::Unknown,
+            &HashMap::new(),
+        );
+        // Trace must include the clarify-diagnostic override.
+        let trace_blob = plan.trace.join("\n");
+        assert!(
+            trace_blob.contains("clarify_diagnostic override"),
+            "expected diagnostic override in trace, got: {trace_blob}"
+        );
+        // Realised output (template + slot substitution) must cite
+        // at least one stored slot value.
+        let realised = crate::realiser::realise(&plan);
+        assert!(
+            realised.contains("Дәулет") || realised.contains("бағдарламашы"),
+            "diagnostic should cite stored slot; got: {realised}",
+        );
+        // Output must NOT be the bare clarify line.
+        assert!(
+            !realised.contains("Қандай тақырып туралы сұрап отырсыз?"),
+            "diagnostic must not fall through to bare clarify_no_topic; got: {realised}",
+        );
+    }
+
+    /// Regression: when session is empty, the Unknown clarify path
+    /// still routes to the bare `unknown.clarify_no_topic` family
+    /// (no spurious diagnostic override).
+    #[test]
+    fn clarify_no_topic_without_session_keeps_bare_family() {
+        let Ok(repo) = TemplateRepository::load_default() else {
+            return;
+        };
+        let intent = Intent::Unknown {
+            raw_tokens: vec!["иә".into()],
+            noun_hint: None,
+            example: None,
+            grounded_fact: None,
+            example_adapted: false,
+            reasoning_chain: None,
+            question_shape: None,
+            temporal_scope: false,
+            compositional_function: false,
+            noun_hint_polarity: adam_kernel_fst::Polarity::Affirmative,
+            input_modality: None,
+            input_evidence: None,
+            input_is_inversion_question: false,
+            noun_hint_confidence: crate::topic_extraction::TopicConfidence::High,
+        };
+        let session = HashMap::new();
+        let plan = plan_response_with_epistemic(
+            &intent,
+            0,
+            &repo,
+            &session,
+            crate::uncertainty::EpistemicStatus::Unknown,
+            &HashMap::new(),
+        );
+        let trace_blob = plan.trace.join("\n");
+        assert!(
+            !trace_blob.contains("clarify_diagnostic override"),
+            "no override should fire without session slots; trace: {trace_blob}"
+        );
+        assert!(
+            trace_blob.contains("template_key=unknown.clarify_no_topic"),
+            "expected bare clarify_no_topic; trace: {trace_blob}"
+        );
     }
 
     #[test]

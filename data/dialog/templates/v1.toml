@@ -1087,6 +1087,36 @@ templates = [
     "Сізді дұрыс түсіну үшін сұрағыңызды нақтылай түсіңізші — қандай тақырып туралы сұрап тұрсыз?",
 ]
 
+# **v4.53.5** — Context-aware clarify. Routes from the planner when
+# `unknown.clarify_no_topic` / `unknown.clarify_low_confidence` would
+# normally fire AND the session has stored slots
+# (name / occupation / activity / city). Surfaces the stored context
+# explicitly so the user sees WHAT the system already knows about
+# them and which slot the system is offering as a guess — replaces
+# the generic "сұрағыңызды нақтылай түсіңізші" catch-all that the
+# user's session 5 transcript flagged. Each variant gates on a
+# different slot subset; `template_is_fillable` filters to the
+# applicable subset.
+[[families]]
+key = "unknown.with_session_diagnostic"
+templates = [
+    # All three primary slots — full context-aware diagnostic.
+    "{name}, сұрағыңызды дәл түсінбедім. Менде сіздің мамандығыңыз ({occupation}) және ағымдағы ісіңіз ({activity}) сақталған. Қайсысы туралы сұрап отырсыз?",
+    # Name + occupation — no activity stored.
+    "{name}, сізді {occupation} деп білемін. Сұрағыңыз мамандығыңызға қатысты ма, әлде басқа тақырыпта ма? Аздап нақтылаңызшы.",
+    # Name + activity — no occupation stored.
+    "{name}, сіз {activity} жайлы айтқан болатынсыз. Сұрағыңыз сол ағымдағы ісіңіз туралы ма, әлде басқа нәрсе ме? Анығырақ айтсаңыз болады.",
+    # Activity only (no name) — recall the activity slot.
+    "Менде сіздің ағымдағы ісіңіз ({activity}) есте. Сұрағыңыз сол туралы ма, әлде басқа тақырыпты сұрап тұрсыз ба?",
+    # Occupation only (no name).
+    "Сіздің мамандығыңыз ({occupation}) деп жадымда. Сұрағыңыз мамандығыңызға қатысты ма, әлде басқа тақырыпта ма?",
+    # City only — fallback when only location is known.
+    "Кешіріңіз, сұрағыңыздың дәл мәнін аңғара алмадым. Әңгіме сіз тұратын {city} туралы ма, әлде басқа тақырыпта ма?",
+    # Name only — minimal context, but cite the name so the user
+    # sees that adam tracks who they are.
+    "{name}, қандай тақырып бойынша көмектесейін? Сұрағыңызды нақтылай түсіңізші — қажет болса аты-жөніңізді де қайта айтып шығармын.",
+]
+
 # v1.9.5: Unknown with *adapted* retrieval evidence — the retrieved
 # quote was rewritten by `compose_with_city` (ComposeMode::InSampleCitySwap)
 # so at least one city mention was swapped to the user's session city.

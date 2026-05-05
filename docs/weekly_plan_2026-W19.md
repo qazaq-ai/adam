@@ -61,27 +61,30 @@ named release tag.
 
 ---
 
-## Day 3 — 2026-05-07 (Thursday)
+## Day 3 — 2026-05-05 (pulled forward) ✓ shipped
 
-**v4.53.5 — context-aware clarify (replaces generic «сұрағыңызды
-нақтылай түсіңізші»).**
+**v4.53.5 — context-aware clarify (session 5 generic-fallback complaint closed).**
 
-User's session-5 complaint: "ответы должны вытекать из контекста
-беседы". When adam can't recognise an intent, the response should
-mention WHAT specifically wasn't understood, not a catch-all.
-
-- New planner branch: when intent = `Unknown` AND session has stored
-  slots (name / occupation / activity / location), surface the
-  diagnostic: «Сұрағыңыздағы X сөзін мен әлі түсінбедім — Y туралы
-  айтып жатырсыз ба?» where X = the unknown noun-hint, Y = the
-  best-matching stored slot.
-- New template family `unknown.with_session_diagnostic` (3-4 variants).
-- Trace addition: emit `clarify_diagnostic` line listing the
-  unrecognised tokens + which slot the planner offered as a guess.
-
-Acceptance: session-5 line «Сондай дерек естідіңіз бе, иә?» becomes
-something like «Контексттегі қандай мәліметті айтып отырсыз — атыңыз,
-мамандығыңыз, әлде ағымдағы ісіңіз бе?».
+- [x] New `unknown.with_session_diagnostic` template family (7 variants
+      gating on slot subsets: all 3 / name+occupation / name+activity /
+      activity-only / occupation-only / city-only / name-only).
+- [x] Planner override in `plan_response_with_epistemic` — when key is
+      `unknown.clarify_no_topic` / `unknown.clarify_low_confidence`
+      AND session has any of name/occupation/activity/city, override
+      to the new family. Standard `!repo.get(...).is_empty()` guard
+      protects against missing template-pack regression.
+- [x] Trace line `clarify_diagnostic override` — lists which slots
+      are present so `--trace` consumers see exactly which variant
+      fired and why.
+- [x] 2 new unit tests:
+      `clarify_no_topic_with_session_routes_to_diagnostic` (override
+      fires + cites stored slot in realised text);
+      `clarify_no_topic_without_session_keeps_bare_family`
+      (regression guard).
+- [x] Live REPL: vague follow-up after slot-filling →
+      "Дәулет, сізді бағдарламашы деп білемін. Сұрағыңыз мамандығыңызға
+      қатысты ма, әлде басқа тақырыпта ма?" (was generic clarify).
+- [x] Workspace 976 passing; verify_release_version.sh 4.53.5 green.
 
 ---
 

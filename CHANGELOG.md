@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.53.5] — 2026-05-05 — Context-aware clarify (session 5 generic-fallback complaint closed)
+
+**Closes the user's session-5 complaint:** "ответы должны вытекать из контекста беседы, а не общий ответ на все, что не знает". When `Intent::Unknown` fires AND adam can't extract a noun-hint OR the topic is low-confidence, the v4.37.5 clarify path emitted a generic «Сұрағыңызды толық түсінбедім. Қандай тақырып туралы сұрап отырсыз?» — completely ignoring stored profile slots (name, occupation, activity, city). v4.53.5 routes those clarify cases to a new `unknown.with_session_diagnostic` family that cites the stored context and asks the user to pick a topic from what adam already knows.
+
+### Innovations
+
+**(1) New `unknown.with_session_diagnostic` template family** in `data/dialog/templates/v1.toml` — 7 variants gating on different slot subsets:
+- All 3 primary slots (name + occupation + activity) — full context-aware diagnostic.
+- Name + occupation pair.
+- Name + activity pair.
+- Activity only (no name).
+- Occupation only (no name).
+- City only — fallback when only location is known.
+- Name only — minimal context, but cites the name so user sees that adam tracks who they are.
+
+`template_is_fillable` filters the variants to those whose slot requirements match the actual session contents; the seed picks among the eligible subset.
+
+**(2) Planner override in `plan_response_with_epistemic`** — runs AFTER the existing epistemic / known-user override block. When the chosen `key` is `unknown.clarify_no_topic` OR `unknown.clarify_low_confidence` AND the session contains any of `name` / `occupation` / `activity` / `city`, override to `unknown.with_session_diagnostic`. Defends against missing template family via the standard `!repo.get(...).is_empty()` guard (mirrors v4.0.34 epistemic-override pattern).
+
+**(3) Trace line `clarify_diagnostic override`** — emitted when the override fires; lists which slots are present (name=true/false occupation=true/false activity=true/false city=true/false). Lets `--trace` consumers see exactly which context-aware variant the planner chose and why.
+
+**(4) 2 new unit tests** in `planner::tests`:
+- `clarify_no_topic_with_session_routes_to_diagnostic` — Intent::Unknown with no noun_hint + session with name+occupation; asserts trace contains the override AND realised text cites a stored slot AND output is NOT the bare clarify line.
+- `clarify_no_topic_without_session_keeps_bare_family` — regression guard: empty session → no override → `unknown.clarify_no_topic` still wins.
+
+### Real-REPL gap closure
+
+| Pre-v4.53.5 | Post-v4.53.5 |
+|---|---|
+| Vague follow-up after «Менің атым Дәулет, мен бағдарламашымын ...» → «Сұрағыңызды толық түсінбедім. Қандай тақырып туралы сұрап отырсыз? Аздап нақтылап жіберіңізші.» (generic, ignores 3 stored slots) | «**Дәулет, сізді бағдарламашы деп білемін. Сұрағыңыз мамандығыңызға қатысты ма, әлде басқа тақырыпта ма? Аздап нақтылаңызшы.**» ✓ (cites name + occupation; offers concrete topic choice) |
+
+### Verification
+
+| Gate | Result |
+|---|---|
+| Workspace tests | **976 passing** (was 974; +2 new clarify tests) |
+| Adam-dialog lib | **308 passing** (was 306; +2) |
+| `bash scripts/verify_release_version.sh 4.53.5` | green |
+| Live REPL: vague query after slot-filling | ✓ surfaces stored slots |
+| Foundation: 2089 / 2349 / 46 / 27175 | unchanged |
+| `cargo fmt --all --check` | clean |
+| `cargo build --release` | clean |
+
+### Cadence
+
+`.5` patch — incremental gap-closure on v4.53.0. Per `feedback_versioning_post_1_0`: «patch = small / incremental». 1 new template family (no new code surface), 1 planner override branch (~25 lines), 2 unit tests. Closes a concrete user-facing complaint about generic responses.
+
+Stripe (11) — generative AI via agglutinative composition.
+
 ## [4.53.0] — 2026-05-05 — Math gerund-clause parser (session 5 deferral closed)
 
 **Closes the v4.52.0 deferral.** Real-REPL session 5 surfaced a gap in the multi-clause word-math parser: gerund/converb-form chains like «Елуді екіге **көбейткенде** үшке **бөліп**, 7-ні **азайтқанда** не болады?» refused to evaluate, while the same operations in imperative form («... көбейтіңіз, ... бөліңіз, ... азайтыңыз») worked. v4.53.0 fixes the gap by injecting clause separators after gerund/converb math-verb forms, letting the v4.42.0 multi-clause evaluator chain operations across them.
