@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.68.0] — 2026-05-06 — Educational portal — Physics: electricity + magnetism deepening (Coulomb + series/parallel + electric work/power + Joule-Lenz + capacitor + magnetic flux + DC/AC + EM-wave bridge)
+
+Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `physics_school.jsonl` confirmed dense E&M coverage (электродинамика / электр заряды / 2 заряд түрі / электр өрісі / тоғы / кернеу / кедергі / Ом заңы / тізбек / өткізгіш / диэлектрик / магнит / магнит өрісі / электромагнит / электромагниттік индукция / жиілік / жарық / 2 линза / ультракүлгін + инфрақызыл + гамма сәулесі). Coulomb's law, series/parallel circuit topology, electric work + power formulas, Joule-Lenz law, capacitor + capacitance, magnetic flux, DC/AC distinction, and the electromagnetic-wave taxonomy bridge were missing. Extends canonical `physics_school.jsonl`.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| электродинамика / электр заряды / тоғы / кернеу / кедергі / Ом заңы / тізбек / өткізгіш / диэлектрик / магнит + магнит өрісі / электромагнит / электромагниттік индукция | `physics_school.jsonl` (phys_004, 053..068) | ✓ skip — covered |
+| жарық / 2 линза / ультракүлгін / инфрақызыл / гамма сәулесі | `physics_school.jsonl` (phys_078..088, 098) | ✓ skip — covered |
+| Кулон заңы (F = k·\|q₁·q₂\|/r²) | not yet | + add |
+| Тізбекті + параллель қосылыс topology | not yet | + add |
+| Электр тогының жұмысы (A = U·I·t) + қуаты (P = U·I) | not yet | + add |
+| Джоуль-Ленц заңы (Q = I²·R·t) | not yet | + add |
+| Конденсатор + электр сыйымдылығы (C, фарад) | not yet | + add |
+| Магниттік ағын (Φ, вебер) | not yet | + add |
+| Тұрақты + айнымалы ток distinction | not yet | + add |
+| Bridge: электромагниттік толқын IsA физикалық ұғым | not yet | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/physics_school.jsonl` (`phys_127…138`):
+
+**Foundational law (1):**
+- phys_127: Кулон заңы IsA физика заңы — `F = k · |q₁ · q₂| / r²`, k ≈ 9·10⁹ Н·м²/Кл²
+
+**Circuit topology, all IsA электр тізбегі (2):**
+- phys_128: тізбекті қосылыс — `R = R₁ + R₂ + …`, current uniform
+- phys_129: параллель қосылыс — `1/R = 1/R₁ + 1/R₂ + …`, voltage uniform
+
+**Electric work + power (2):**
+- phys_130: электр тогының жұмысы IsA физикалық шама — `A = U · I · t` (Дж)
+- phys_131: электр тогының қуаты IsA физикалық шама — `P = U · I = I²·R = U²/R` (Вт)
+
+**Heat-from-current (1):**
+- phys_132: Джоуль-Ленц заңы IsA физика заңы — `Q = I² · R · t` — basis of heating elements
+
+**Capacitor (2):**
+- phys_133: конденсатор IsA электр құрылғысы — 2 plates + dielectric
+- phys_134: электр сыйымдылығы IsA физикалық шама — `C = q / U` (Ф)
+
+**Magnetic + currents (3):**
+- phys_135: магниттік ағын IsA физикалық шама — `Φ = B · S · cos α` (Вб)
+- phys_136: тұрақты ток IsA электр тоғы — DC, battery output
+- phys_137: айнымалы ток IsA электр тоғы — AC, sinusoidal, 50 Hz Kazakhstan/Europe
+
+**Cascade bridge (1):**
+- phys_138: электромагниттік толқын IsA физикалық ұғым — apex bridge over жарық (phys_078) / ультракүлгін (phys_087) / инфрақызыл (phys_088) сәуле
+
+**(2) Curriculum-grade formulas embedded** in 9 of 12 entries (Coulomb, both series/parallel R, both A and P, Joule-Lenz, capacitance, magnetic flux).
+
+**(3) MULTIWORD_ENTITIES extended** with 14 new compounds (электр құрылғысы / тоғы / тізбегі, электромагниттік толқын, кулон заңы, тізбекті/параллель қосылыс, электр тогының жұмысы / қуаты, джоуль-ленц заңы, электр сыйымдылығы, магниттік ағын, тұрақты/айнымалы ток).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2392 | **2404** (+12) |
+| world_core facts | 2573 | **2585** (+12) |
+| world_core domains | 51 | **51** unchanged |
+| Derived facts | 29513 | **29533** (+20 = **1.67× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+
+R1_is_a_transitivity 2851 → 2862 (+11, EM-wave bridge cascading жарық/ультракүлгін/инфрақызыл → физикалық ұғым); R5_shared_is_a_target 1891 → 1900 (+9, new circuit-topology and current-type clusters).
+
+### Cadence
+
+`.0` minor — same-domain extension; physics_school now at 138 entries (12 mechanics + 12 thermo + 12 E&M added across this stripe).
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.67.5] — 2026-05-06 — Educational portal — Physics: thermodynamics deepening (heat amount Q + ideal gas + Boyle/Charles/Gay-Lussac/Mendeleev-Clapeyron + absolute zero + Pascal + hydrostatic pressure + state-of-matter bridge)
 
 Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `physics_school.jsonl` confirmed dense existing thermodynamic coverage (термодинамика / температура / жылу / термометр / Цельсий + Кельвин шкаласы / 4 states of matter / 6 phase transitions / меншікті жылу сыйымдылық / жылу өткізгіштік / қысым / Архимед заңы). Heat amount formula, thermal equilibrium, ideal gas model, all 4 gas laws, Mendeleev-Clapeyron equation, absolute zero, hydrostatic pressure, Pascal's law, and 2 cascade bridges were missing. Atmospheric pressure already lives in `weather_phenomena.jsonl` (w_026) so was excluded; replaced with гидростатикалық қысым per single-canonical-home discipline.

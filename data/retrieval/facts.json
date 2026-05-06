@@ -1,7 +1,7 @@
 {
-  "version": "4.67.5",
+  "version": "4.68.0",
   "status": "completed",
-  "elapsed_s": 37,
+  "elapsed_s": 35,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2632,
+    "facts_total": 2644,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2080,
+      "is_a": 2092,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -72,7 +72,7 @@
       "world_core/notable_kazakhstanis.jsonl": 51,
       "world_core/numbers.jsonl": 54,
       "world_core/philosophy_basic.jsonl": 23,
-      "world_core/physics_school.jsonl": 126,
+      "world_core/physics_school.jsonl": 138,
       "world_core/plants.jsonl": 35,
       "world_core/preschool_alphabet.jsonl": 48,
       "world_core/preschool_numbers.jsonl": 16,
@@ -36614,6 +36614,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Температуралық шкала — температураны сан мәніне аударатын жүйе; әр шкала өзінің реттік нүктелері мен бөлік қадамымен анықталады (Цельсий, Кельвин, Фаренгейт)."
+    },
+    {
+      "subject": {
+        "surface": "кулон заңы",
+        "root": "кулон заңы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физика заңы",
+        "root": "физика заңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_127"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кулон заңы — вакуумдағы екі нүктелік зарядтың әсерлесу күші олардың модульдерінің көбейтіндісіне тура, ара қашықтығының квадратына кері пропорционал: F = k · |q₁ · q₂| / r², k ≈ 9 · 10⁹ Н·м²/Кл²."
+    },
+    {
+      "subject": {
+        "surface": "тізбекті қосылыс",
+        "root": "тізбекті қосылыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "электр тізбегі",
+        "root": "электр тізбегі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_128"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тізбекті қосылыс — өткізгіштер бір ғана жолмен бір-біріне жалғанатын қосылу түрі. Кедергісі: R = R₁ + R₂ + …; ток күші барлығында бірдей."
+    },
+    {
+      "subject": {
+        "surface": "параллель қосылыс",
+        "root": "параллель қосылыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "электр тізбегі",
+        "root": "электр тізбегі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_129"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Параллель қосылыс — өткізгіштер екі түйін арасында қатар жалғанатын қосылу түрі. Жалпы кедергі: 1/R = 1/R₁ + 1/R₂ + …; кернеу барлығында бірдей."
+    },
+    {
+      "subject": {
+        "surface": "электр тогының жұмысы",
+        "root": "электр тогының жұмысы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық шама",
+        "root": "физикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_130"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Электр тогының жұмысы — тізбек бөлігінен өткен зарядтар атқарған жұмыс: A = U · I · t, өлшем бірлігі — джоуль (Дж)."
+    },
+    {
+      "subject": {
+        "surface": "электр тогының қуаты",
+        "root": "электр тогының қуаты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық шама",
+        "root": "физикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_131"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Электр тогының қуаты — бірлік уақытта орындалған электрлік жұмыс: P = U · I = I² · R = U² / R, өлшем бірлігі — ватт (Вт)."
+    },
+    {
+      "subject": {
+        "surface": "джоуль-ленц заңы",
+        "root": "джоуль-ленц заңы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физика заңы",
+        "root": "физика заңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_132"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Джоуль-Ленц заңы — өткізгіштен өткен токтан бөлінетін жылу мөлшері: Q = I² · R · t. Электр пешімізі мен қыздыру элементтерінің жұмыс негізі."
+    },
+    {
+      "subject": {
+        "surface": "конденсатор",
+        "root": "конденсатор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "электр құрылғысы",
+        "root": "электр құрылғысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_133"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Конденсатор — электр зарядын жинау мен сақтауға арналған, екі өткізгіш пластинасы мен олардың арасындағы диэлектриктен тұратын электр құрылғысы."
+    },
+    {
+      "subject": {
+        "surface": "электр сыйымдылығы",
+        "root": "электр сыйымдылығы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық шама",
+        "root": "физикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_134"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Электр сыйымдылығы — конденсатордың зарядты сақтау қабілетін сипаттайтын шама: C = q / U, өлшем бірлігі — фарад (Ф)."
+    },
+    {
+      "subject": {
+        "surface": "магниттік ағын",
+        "root": "магниттік ағын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық шама",
+        "root": "физикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_135"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Магниттік ағын — берілген аудан арқылы өтетін магнит өрісінің мөлшерін сипаттайтын шама: Φ = B · S · cos α, өлшем бірлігі — вебер (Вб)."
+    },
+    {
+      "subject": {
+        "surface": "тұрақты ток",
+        "root": "тұрақты ток",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "электр тоғы",
+        "root": "электр тоғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_136"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұрақты ток — бағыты мен шамасы уақыт бойынша өзгермейтін электр тоғы (DC). Батарея, аккумулятор беретін ток."
+    },
+    {
+      "subject": {
+        "surface": "айнымалы ток",
+        "root": "айнымалы ток",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "электр тоғы",
+        "root": "электр тоғы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_137"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Айнымалы ток — шамасы мен бағыты уақыт бойынша синусоидалы заңмен өзгеретін электр тоғы (AC). Қалалық желінің жиілігі — 50 Гц (Қазақстан, Еуропа), 60 Гц (АҚШ)."
+    },
+    {
+      "subject": {
+        "surface": "электромагниттік толқын",
+        "root": "электромагниттік толқын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық ұғым",
+        "root": "физикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_138"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Электромагниттік толқын — кеңістікте таралатын өзара перпендикуляр электр және магнит өрістерінің тербелісі. Жарық, радио, рентген, гамма — барлығы осы құбылыстың түрлері."
     },
     {
       "subject": {
