@@ -7,6 +7,48 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.74.5] — 2026-05-06 — Procedural formula-applier — «F=m*a, m=2, a=3 болса F қанша?»
+
+Second procedural solver in the v4.74.x series. Closes Codex round-2 Bug 2 partial: «F=m*a, m=2, a=3 болса...» previously refused. v4.74.5 ships deterministic formula application — declare a formula + concrete substitutions + ask for the unknown, get the integer answer. Still no NN per `project_kazakh_tutor_positioning`.
+
+### Innovations
+
+**(1) New `discourse::try_apply_formula`** — handles the curriculum pattern «X=expr, var₁=N₁, var₂=N₂, … X қанша?». Parses comma-separated `var=expr` segments, categorises one as the formula (RHS contains alphabetic chars) and the rest as numeric substitutions, then character-by-character substitutes single-letter variables and re-uses `try_evaluate_arithmetic` on the substituted expression.
+
+**(2) Paren-rejection guard.** Current `try_evaluate_arithmetic` doesn't respect parens (filters them out, evaluates left-to-right with op precedence). Without this guard, «P=2*(a+b), a=5, b=3» would silently return 13 instead of 16 — wrong, not just degraded. Guard: if formula RHS contains `(` or `)`, return None → graceful refusal. Lift when paren-aware expression eval lands.
+
+**(3) `Conversation::turn` integration**: try formula-applier BEFORE linear-equation solver because formula inputs contain multiple `=` tokens (formula + substitutions); the equation solver would pick the first and fail.
+
+### Acceptance
+
+| Query | v4.74.0 | v4.74.5 |
+|---|---|---|
+| F=m*a, m=2, a=3 болса F қанша? | refusal | ✅ «Есептедім: 6 (алты)» |
+| v=S/t, S=100, t=20, v қанша? | refusal | ✅ «Есептедім: 5 (бес)» |
+| S=a*b, a=4, b=6, S қанша? | refusal | ✅ «Есептедім: 24 (жиырма төрт)» |
+| P=2*(a+b), a=5, b=3 болса P қанша? | refusal | ⚠️ honest refusal (paren guard — would mis-compute as 13 without it) |
+
+| Gate | Status |
+|---|---|
+| 100-query battery diff vs v4.74.0 | **0 differences** (zero regression) |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.74.5` | green |
+| Regressions on v4.74.0 cases | all preserved (5+7*2 → 19, x+2=5 → 3) |
+
+### Deferred
+
+- Paren-aware arithmetic evaluator (would unblock «P=2*(a+b)» case).
+- `check_answer` intent («Жауабымды тексер: x=4») — needs session state to track last solved equation.
+- `explain_steps` intent — narrate solution procedure.
+- Quadratic / multi-unknown / fractional solvers.
+
+### Cadence
+
+`.5` patch — additional procedural solver in same architectural family.
+
+Stripe — Kazakh school tutor.
+
 ## [4.74.0] — 2026-05-06 — First procedural solver — natural-Kazakh arithmetic wrapper + linear equation solver
 
 First step on the procedural-tutor roadmap (Codex round-2 Bug 2 family). Per saved memory `project_kazakh_tutor_positioning.md`, project is positioned as Kazakh school tutor; Codex's #1-priority gap was «no procedural tutor — solve_equation / check_answer / explain_steps refused». This release ships the simplest two solvers: arithmetic wrapped in natural Kazakh + 1-unknown linear equation. Both fully deterministic — no NN involved (per roadmap, NN integration scoped to v5+).

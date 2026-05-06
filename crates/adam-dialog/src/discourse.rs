@@ -744,6 +744,102 @@ pub fn try_solve_linear_equation(input: &str) -> Option<(String, i64)> {
     None
 }
 
+/// **v4.74.5** — Procedural formula-applier. Handles the
+/// physics/math curriculum pattern «F=m*a, m=2, a=3 болса F қанша?»:
+/// a formula declaration with one unknown plus concrete substitutions
+/// for the other variables. Returns `(unknown_var, value)` on success.
+///
+/// Single-character variables only (F, m, a, v, S, t, …). Formula RHS
+/// must use explicit `*` for multiplication («F=m*a», not «F=ma»).
+/// All substitutions must yield integer values; conservative —
+/// fractional or unresolved-variable cases return `None`.
+///
+/// Driven by Codex 2026-05-06 round-2 review: «F=m*a, m=2, a=3
+/// болса...» previously refused. This is the next procedural solver
+/// after `try_solve_linear_equation` (v4.74.0). Still fully
+/// deterministic — no NN.
+pub fn try_apply_formula(input: &str) -> Option<(String, i64)> {
+    use std::collections::HashMap;
+
+    // Split into segments by comma / semicolon. Within each segment,
+    // we look for `var = expr` pattern.
+    let lower = input.to_lowercase();
+    let segments: Vec<&str> = lower.split([',', ';']).collect();
+
+    let mut numeric: HashMap<String, i64> = HashMap::new();
+    let mut formula: Option<(String, String)> = None;
+
+    for seg in &segments {
+        // A segment may have multiple `=`; we only take the first
+        // `var = expr` token. Find first whitespace-separated token
+        // containing `=`.
+        let token = seg
+            .split_whitespace()
+            .find(|t| t.contains('='))
+            .unwrap_or("");
+        if !token.contains('=') {
+            continue;
+        }
+        let token = token.trim_end_matches(['?', '.', '!', ';', ',']);
+        let parts: Vec<&str> = token.splitn(2, '=').collect();
+        if parts.len() != 2 {
+            continue;
+        }
+        let lhs = parts[0].trim();
+        let rhs = parts[1].trim();
+        // LHS must be a single letter (variable name).
+        if lhs.chars().count() != 1 || !lhs.chars().next().unwrap().is_alphabetic() {
+            continue;
+        }
+        // Categorise RHS: pure integer → numeric assignment; else if
+        // it contains alphabetic chars → formula (only one allowed).
+        if let Ok(n) = rhs.parse::<i64>() {
+            numeric.insert(lhs.to_string(), n);
+        } else if rhs.chars().any(|c| c.is_alphabetic()) {
+            if formula.is_some() {
+                // Multiple formula declarations — reject (out of scope).
+                return None;
+            }
+            formula = Some((lhs.to_string(), rhs.to_string()));
+        }
+    }
+
+    let (unknown, expr) = formula?;
+    if numeric.is_empty() {
+        return None;
+    }
+
+    // **v4.74.5** — Reject formulas containing parens. The current
+    // `try_evaluate_arithmetic` doesn't respect parens (it filters
+    // them out and evaluates left-to-right with op precedence), so
+    // «P=2*(a+b)» would silently mis-compute. Returning None here
+    // routes the input to refusal — honest «I can't compute this»
+    // beats silently-wrong answer. Lift this guard when paren-aware
+    // expression eval lands.
+    if expr.contains('(') || expr.contains(')') {
+        return None;
+    }
+
+    // Substitute single-letter variables in expr with their numeric
+    // values. Non-alphabetic chars (operators, digits, parens,
+    // whitespace) pass through. Unknown variables → None.
+    let mut substituted = String::new();
+    for c in expr.chars() {
+        if c.is_alphabetic() {
+            let var_str = c.to_string();
+            match numeric.get(&var_str) {
+                Some(val) => substituted.push_str(&val.to_string()),
+                None => return None,
+            }
+        } else {
+            substituted.push(c);
+        }
+    }
+
+    let value = try_evaluate_arithmetic(&substituted)?;
+    Some((unknown, value))
+}
+
 pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
     // **v4.42.0** — multi-clause support. Split input by commas /
     // sequencing connectives («және» — "and", «содан кейін» — "then",

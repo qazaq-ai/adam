@@ -1123,6 +1123,21 @@ impl Conversation {
                 self.session
                     .insert("last_math_result".into(), value.to_string());
             } else if let Some((unknown, value)) =
+                crate::discourse::try_apply_formula(resolved_input.as_ref())
+            {
+                // **v4.74.5** — formula-applier. «F=m*a, m=2, a=3 болса
+                // F қанша?» → «F = 6». Try formula BEFORE linear-equation
+                // solver because formula inputs contain multiple `=` tokens
+                // (one for the formula, more for substitutions); the
+                // linear-equation solver would pick the first and fail.
+                extra_slots.insert("__math_answer__".into(), value.to_string());
+                extra_slots.insert("__math_unknown__".into(), unknown);
+                if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
+                    extra_slots.insert("__math_words__".into(), words);
+                }
+                self.session
+                    .insert("last_math_result".into(), value.to_string());
+            } else if let Some((unknown, value)) =
                 crate::discourse::try_solve_linear_equation(resolved_input.as_ref())
             {
                 // **v4.74.0** — linear-equation solver. «Егер x+2=5 болса,
