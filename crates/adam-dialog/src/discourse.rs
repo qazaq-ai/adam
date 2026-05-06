@@ -483,19 +483,23 @@ pub fn input_is_math_expression(input: &str) -> bool {
 ///   continue to refuse via `math_refusal`.
 /// - No variables / session-bound computation.
 pub fn try_evaluate_arithmetic(input: &str) -> Option<i64> {
-    // **v4.74.0** — strip natural-Kazakh wrapper first. Codex 2026-05-06
-    // round-2: «5+7*2 қанша?» refused because the pre-v4.74.0 cleaner
-    // ate Kazakh letters into the cleaned string («5+7*2қанша»),
-    // failing the arithmetic-only character check. Extract the longest
-    // contiguous arithmetic substring instead (digits + + - * / : =).
-    // Drops trailing «қанша / қанша болады / нешеге тең / есепте /
-    // есептеп бер / болады» natural-language tails.
+    // **v4.75.0** — paren-aware recursive-descent evaluator. Replaces
+    // the v4.74.0 token-based two-pass eval which silently stripped
+    // parens before evaluation, breaking «P=2*(a+b)» (computed 13
+    // instead of 16). Handles standard arithmetic grammar:
+    //   expr   = term (('+' | '-') term)*
+    //   term   = factor (('*' | '/') factor)*
+    //   factor = '-' factor | '(' expr ')' | number
+    //
+    // Kazakh-wrapper stripping kept from v4.74.0: extract longest
+    // arithmetic-character substring before parsing. Now includes
+    // `(` and `)` in the kept-char set.
     let arith_only: String = input
         .chars()
-        .filter(|c| c.is_ascii_digit() || matches!(*c, '+' | '-' | '*' | '/' | ':' | '=' | ' '))
+        .filter(|c| {
+            c.is_ascii_digit() || matches!(*c, '+' | '-' | '*' | '/' | ':' | '=' | '(' | ')' | ' ')
+        })
         .collect();
-    // Normalise: strip whitespace, drop trailing `=`, normalise
-    // Russian-style division `:` to `/`.
     let cleaned: String = arith_only
         .chars()
         .filter(|c| !c.is_whitespace())
@@ -505,119 +509,88 @@ pub fn try_evaluate_arithmetic(input: &str) -> Option<i64> {
     if cleaned.is_empty() {
         return None;
     }
-    // Reject if any non-arithmetic character is present (digit /
-    // operator / leading minus only).
-    if !cleaned
-        .chars()
-        .all(|c| c.is_ascii_digit() || matches!(c, '+' | '-' | '*' | '/'))
-    {
+
+    let chars: Vec<char> = cleaned.chars().collect();
+    let mut pos = 0;
+    let value = parse_expr(&chars, &mut pos)?;
+    if pos != chars.len() {
         return None;
-    }
-    // Tokenise into numbers and operators.
-    let mut tokens: Vec<ArithToken> = Vec::new();
-    let bytes = cleaned.as_bytes();
-    let mut i = 0;
-    while i < bytes.len() {
-        let b = bytes[i];
-        if b.is_ascii_digit() {
-            // Read full number.
-            let start = i;
-            while i < bytes.len() && bytes[i].is_ascii_digit() {
-                i += 1;
-            }
-            let n: i64 = cleaned[start..i].parse().ok()?;
-            tokens.push(ArithToken::Num(n));
-        } else if matches!(b, b'+' | b'-' | b'*' | b'/') {
-            // Leading `-` (start of expression) or `-` after another
-            // operator → unary minus on the next number.
-            let unary = b == b'-'
-                && (tokens.is_empty() || matches!(tokens.last(), Some(ArithToken::Op(_))));
-            if unary {
-                // Read the digits that follow as a negative number.
-                i += 1;
-                let start = i;
-                while i < bytes.len() && bytes[i].is_ascii_digit() {
-                    i += 1;
-                }
-                if start == i {
-                    return None;
-                }
-                let n: i64 = cleaned[start..i].parse().ok()?;
-                tokens.push(ArithToken::Num(-n));
-            } else {
-                tokens.push(ArithToken::Op(b as char));
-                i += 1;
-            }
-        } else {
-            return None;
-        }
-    }
-    // Two-pass evaluation: first pass collapses `*` `/` left-to-right,
-    // second pass collapses `+` `-`.
-    let mut acc: Vec<ArithToken> = Vec::new();
-    let mut iter = tokens.into_iter();
-    let first = iter.next()?;
-    acc.push(first);
-    while let Some(tok) = iter.next() {
-        match tok {
-            ArithToken::Op(op) if op == '*' || op == '/' => {
-                let right = iter.next()?;
-                let left = acc.pop()?;
-                let (l, r) = match (left, right) {
-                    (ArithToken::Num(l), ArithToken::Num(r)) => (l, r),
-                    _ => return None,
-                };
-                let result = if op == '*' {
-                    l.checked_mul(r)?
-                } else {
-                    // **v4.50.5** — truncated integer division for
-                    // user-friendly Kazakh math. Pre-v4.50.5 refused
-                    // non-integer results (returned None), forcing
-                    // adam into the math_refusal template even on
-                    // simple cases like «бесті жетіге көбейтіп,
-                    // екіге бөліңіз» (= 35/2). Truncating to 17 is
-                    // closer to user expectations and matches how
-                    // Kazakh-language math conversation typically
-                    // handles fractional results («жуықтап» —
-                    // approximately).
-                    if r == 0 {
-                        return None;
-                    }
-                    l.checked_div(r)?
-                };
-                acc.push(ArithToken::Num(result));
-            }
-            _ => acc.push(tok),
-        }
-    }
-    // Second pass: + / -.
-    let mut iter = acc.into_iter();
-    let mut value = match iter.next()? {
-        ArithToken::Num(n) => n,
-        ArithToken::Op(_) => return None,
-    };
-    while let Some(op_tok) = iter.next() {
-        let op = match op_tok {
-            ArithToken::Op(c) if c == '+' || c == '-' => c,
-            _ => return None,
-        };
-        let right = match iter.next()? {
-            ArithToken::Num(n) => n,
-            ArithToken::Op(_) => return None,
-        };
-        value = if op == '+' {
-            value.checked_add(right)?
-        } else {
-            value.checked_sub(right)?
-        };
     }
     Some(value)
 }
 
-#[derive(Debug, Clone, Copy)]
-enum ArithToken {
-    Num(i64),
-    Op(char),
+fn parse_expr(chars: &[char], pos: &mut usize) -> Option<i64> {
+    let mut left = parse_term(chars, pos)?;
+    while *pos < chars.len() {
+        let c = chars[*pos];
+        if c != '+' && c != '-' {
+            break;
+        }
+        *pos += 1;
+        let right = parse_term(chars, pos)?;
+        left = if c == '+' {
+            left.checked_add(right)?
+        } else {
+            left.checked_sub(right)?
+        };
+    }
+    Some(left)
+}
+
+fn parse_term(chars: &[char], pos: &mut usize) -> Option<i64> {
+    let mut left = parse_factor(chars, pos)?;
+    while *pos < chars.len() {
+        let c = chars[*pos];
+        if c != '*' && c != '/' {
+            break;
+        }
+        *pos += 1;
+        let right = parse_factor(chars, pos)?;
+        left = if c == '*' {
+            left.checked_mul(right)?
+        } else {
+            // v4.50.5 truncated integer division preserved.
+            if right == 0 {
+                return None;
+            }
+            left.checked_div(right)?
+        };
+    }
+    Some(left)
+}
+
+fn parse_factor(chars: &[char], pos: &mut usize) -> Option<i64> {
+    if *pos >= chars.len() {
+        return None;
+    }
+    let c = chars[*pos];
+    if c == '-' {
+        *pos += 1;
+        let inner = parse_factor(chars, pos)?;
+        return inner.checked_neg();
+    }
+    if c == '+' {
+        *pos += 1;
+        return parse_factor(chars, pos);
+    }
+    if c == '(' {
+        *pos += 1;
+        let inner = parse_expr(chars, pos)?;
+        if *pos >= chars.len() || chars[*pos] != ')' {
+            return None;
+        }
+        *pos += 1;
+        return Some(inner);
+    }
+    if c.is_ascii_digit() {
+        let start = *pos;
+        while *pos < chars.len() && chars[*pos].is_ascii_digit() {
+            *pos += 1;
+        }
+        let s: String = chars[start..*pos].iter().collect();
+        return s.parse().ok();
+    }
+    None
 }
 
 /// **v4.41.0** — Kazakh word-form math evaluator. Returns
@@ -809,17 +782,10 @@ pub fn try_apply_formula(input: &str) -> Option<(String, i64)> {
         return None;
     }
 
-    // **v4.74.5** — Reject formulas containing parens. The current
-    // `try_evaluate_arithmetic` doesn't respect parens (it filters
-    // them out and evaluates left-to-right with op precedence), so
-    // «P=2*(a+b)» would silently mis-compute. Returning None here
-    // routes the input to refusal — honest «I can't compute this»
-    // beats silently-wrong answer. Lift this guard when paren-aware
-    // expression eval lands.
-    if expr.contains('(') || expr.contains(')') {
-        return None;
-    }
-
+    // **v4.75.0** — paren guard lifted; `try_evaluate_arithmetic` is
+    // now a paren-aware recursive-descent parser, so «P=2*(a+b)»
+    // computes correctly. The v4.74.5 guard returned None for any
+    // expression containing `(` or `)`; that's no longer needed.
     // Substitute single-letter variables in expr with their numeric
     // values. Non-alphabetic chars (operators, digits, parens,
     // whitespace) pass through. Unknown variables → None.

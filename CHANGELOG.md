@@ -7,6 +7,65 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.75.0] — 2026-05-06 — Paren-aware arithmetic — recursive-descent parser; lifts v4.74.5 paren-rejection guard
+
+Replaces the v4.74.x flat token-based arithmetic evaluator with a proper recursive-descent parser that respects parentheses and operator precedence. Closes the v4.74.5 deferred case where «P=2*(a+b), a=5, b=3» honestly refused (paren guard) — now computes 16 correctly. Pure deterministic; no NN.
+
+### Bug closed
+
+«P=2*(a+b), a=5, b=3 болса P қанша?» — v4.74.5 returned `Қазақ тілінде өрнектелген математикалық есепті әлі шеше алмаймын` (paren-rejection guard fired). Without that guard, the v4.74.x evaluator would have silently filtered parens and returned 13 (wrong). Now returns **16** correctly.
+
+### Innovations
+
+**Recursive-descent parser** in `discourse::try_evaluate_arithmetic` replacing the v4.74.x flat-token two-pass eval. Standard grammar:
+
+```
+expr   = term (('+' | '-') term)*
+term   = factor (('*' | '/') factor)*
+factor = '-' factor | '+' factor | '(' expr ')' | number
+```
+
+Handles:
+- Operator precedence (×÷ before +−)
+- Arbitrarily nested parens
+- Leading unary minus / plus
+- Negative numbers via factor recursion: `-(-5)` parses as 5
+- Integer overflow checked via `checked_*` ops
+- Division by zero → None (graceful)
+
+Kazakh-wrapper stripping from v4.74.0 preserved (extracts longest arithmetic-character substring before parsing). The kept-char set now includes `(` and `)`.
+
+**Paren guard lifted in `try_apply_formula`** — formulas with parens now evaluate correctly. The v4.74.5 honest-refusal stub is replaced by direct evaluation.
+
+### Acceptance
+
+| Query | v4.74.5 | v4.75.0 |
+|---|---|---|
+| 2*(3+4) | (mis-computed via filter) — likely refused | ✅ «Есептедім: 14» |
+| (5-2)*3 | similar | ✅ «Есептедім: 9» |
+| P=2*(a+b), a=5, b=3 болса P қанша? | honest refusal (guard) | ✅ «Есептедім: 16» |
+| -10+(-5) | likely refused | ✅ «Есептедім: -15» |
+
+| Regression | Status |
+|---|---|
+| 5+7*2 → 19 | ✅ preserved |
+| Егер x+2=5 → x=3 | ✅ preserved |
+| F=m*a, m=2, a=3 → F=6 | ✅ preserved |
+| v=S/t, S=100, t=20 → v=5 | ✅ preserved |
+| 100-query battery diff vs v4.74.5 | **0 differences** |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+
+### Deferred to v4.75.5
+
+- `check_answer` intent («Жауабымды тексер: x=4») — needs new template family + session state for last solved equation. Scoped to v4.75.5 as smaller focused release with curated `check_answer.correct` / `check_answer.incorrect` template families.
+
+### Cadence
+
+`.0` minor — algorithmic upgrade (parser replaces flat eval). Changes the entire arithmetic engine, not just adds a feature.
+
+Stripe — Kazakh school tutor.
+
 ## [4.74.5] — 2026-05-06 — Procedural formula-applier — «F=m*a, m=2, a=3 болса F қанша?»
 
 Second procedural solver in the v4.74.x series. Closes Codex round-2 Bug 2 partial: «F=m*a, m=2, a=3 болса...» previously refused. v4.74.5 ships deterministic formula application — declare a formula + concrete substitutions + ask for the unknown, get the integer answer. Still no NN per `project_kazakh_tutor_positioning`.
