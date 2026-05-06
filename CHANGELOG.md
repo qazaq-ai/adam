@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.67.5] — 2026-05-06 — Educational portal — Physics: thermodynamics deepening (heat amount Q + ideal gas + Boyle/Charles/Gay-Lussac/Mendeleev-Clapeyron + absolute zero + Pascal + hydrostatic pressure + state-of-matter bridge)
+
+Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `physics_school.jsonl` confirmed dense existing thermodynamic coverage (термодинамика / температура / жылу / термометр / Цельсий + Кельвин шкаласы / 4 states of matter / 6 phase transitions / меншікті жылу сыйымдылық / жылу өткізгіштік / қысым / Архимед заңы). Heat amount formula, thermal equilibrium, ideal gas model, all 4 gas laws, Mendeleev-Clapeyron equation, absolute zero, hydrostatic pressure, Pascal's law, and 2 cascade bridges were missing. Atmospheric pressure already lives in `weather_phenomena.jsonl` (w_026) so was excluded; replaced with гидростатикалық қысым per single-canonical-home discipline.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| термодинамика / температура / жылу / термометр / 2 шкалалар / 4 states of matter / 6 phase transitions / меншікті жылу сыйымдылық / жылу өткізгіштік / қысым / Архимед заңы | `physics_school.jsonl` (phys_003, 034..052) | ✓ skip — covered |
+| атмосфералық қысым | `weather_phenomena.jsonl` (w_026 — single canonical home) | ✓ skip per directive |
+| Жылу мөлшері Q (Q = c·m·ΔT) | not yet | + add |
+| Жылулық тепе-теңдік | not yet | + add |
+| Идеал газ + 3 gas laws + Mendeleev-Clapeyron | not yet | + add |
+| Абсолюттік нөл (-273,15 °C = 0 K) | not yet | + add |
+| Гидростатикалық қысым (P = ρ·g·h) + Паскаль заңы | not yet | + add |
+| Bridges: зат күйі / температуралық шкала IsA физикалық ұғым | not yet | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/physics_school.jsonl` (`phys_115…126`):
+
+**Calorimetry (2):**
+- phys_115: жылу мөлшері IsA физикалық шама — `Q = c · m · ΔT`
+- phys_116: жылулық тепе-теңдік IsA физикалық күй — equilibrium ⇒ heat exchange stops
+
+**Ideal gas + gas laws (5):**
+- phys_117: идеал газ IsA физикалық модель — theoretical model where gas laws hold exactly
+- phys_118: Бойль-Мариотт заңы IsA физика заңы — `P · V = const, T = const` (изотерма)
+- phys_119: Гей-Люссак заңы IsA физика заңы — `P / T = const, V = const` (изохора)
+- phys_120: Шарль заңы IsA физика заңы — `V / T = const, P = const` (изобара)
+- phys_121: Менделеев-Клапейрон теңдеуі IsA физика заңы — `P · V = (m / M) · R · T`
+
+**Constants and pressure (3):**
+- phys_122: абсолюттік нөл IsA физикалық тұрақты — 0 K = -273,15 °C
+- phys_123: гидростатикалық қысым IsA қысым — `P = ρ · g · h`
+- phys_124: Паскаль заңы IsA физика заңы — гидравликалық машиналардың негізі
+
+**Cascade bridges (2):**
+- phys_125: зат күйі IsA физикалық ұғым — apex bridge over қатты дене / сұйық / газ / плазма (4 existing subjects)
+- phys_126: температуралық шкала IsA физикалық ұғым — apex bridge over Цельсий + Кельвин шкаласы
+
+**(2) Curriculum-grade formulas embedded** in 9 of 12 entries (calorimetry equation, all 3 gas-law constraints, Mendeleev-Clapeyron, hydrostatic pressure).
+
+**(3) MULTIWORD_ENTITIES extended** with 14 new compounds.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2380 | **2392** (+12) |
+| world_core facts | 2561 | **2573** (+12) |
+| world_core domains | 51 | **51** unchanged |
+| Derived facts | 29517 | **29513** (−4 — R5 cluster redistribution) |
+| Workspace tests | 976 | **976** unchanged |
+
+The −4 derived count is a **rule-semantic redistribution**, not a regression: R1_is_a_transitivity went 2696 → 2851 (+155) and R5_shared_is_a_target went 1827 → 1891 (+64) — the new bridges drive transitivity correctly. The drop comes from R11_in_domain_shared_target reorganising in-domain cluster boundaries when new typed parents appear (a single subject moving into a new shared-target group splits one big cluster into two smaller ones — each cluster's pair count is `n choose 2`, which is non-monotonic in cluster count). Net architectural value is graph closure of the gas-law family + state-of-matter taxonomy under the new physical-concept apex.
+
+### Cadence
+
+`.5` patch — same-domain canonical extension; physics_school now at 126 entries.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.67.0] — 2026-05-06 — Educational portal — Physics: mechanics deepening (kinematics + dynamics + statics + uniformly accelerated motion + Hooke + g + bridges)
 
 Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `physics_school.jsonl` confirmed dense existing coverage of механика / масса / тығыздық / қозғалыс / жылдамдық / үдеу / күш / 3 Newton laws / инерция / импульс / 4 force types / еркін түсу / жұмыс / энергия / 2 energy types / energy conservation / қуат. Sub-discipline taxonomy (кинематика / динамика / статика), formula-grade kinematic shamas (жол, уақыт, орташа жылдамдық), uniformly-accelerated motion, Hooke's law, free-fall constant g, normal force N, and high-leverage IsA bridges were missing. Extends canonical `physics_school.jsonl`.

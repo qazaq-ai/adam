@@ -1,7 +1,7 @@
 {
-  "version": "4.67.0",
+  "version": "4.67.5",
   "status": "completed",
-  "elapsed_s": 32,
+  "elapsed_s": 37,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2620,
+    "facts_total": 2632,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2068,
+      "is_a": 2080,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -72,7 +72,7 @@
       "world_core/notable_kazakhstanis.jsonl": 51,
       "world_core/numbers.jsonl": 54,
       "world_core/philosophy_basic.jsonl": 23,
-      "world_core/physics_school.jsonl": 114,
+      "world_core/physics_school.jsonl": 126,
       "world_core/plants.jsonl": 35,
       "world_core/preschool_alphabet.jsonl": 48,
       "world_core/preschool_numbers.jsonl": 16,
@@ -36374,6 +36374,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қозғалыс түрі — қозғалыстың жылдамдық пен үдеу сипаттамасы бойынша жіктелуі: бірқалыпты, бірқалыпты үдемелі, еркін түсу, шеңбер бойымен қозғалыс."
+    },
+    {
+      "subject": {
+        "surface": "жылу мөлшері",
+        "root": "жылу мөлшері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық шама",
+        "root": "физикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_115"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жылу мөлшері — денені қыздыру немесе суыту кезінде берілетін немесе бөлінетін энергия. Q әрпімен белгіленеді, джоульмен (Дж) өлшенеді. Формуласы: Q = c · m · ΔT (c — меншікті жылу сыйымдылық, m — масса, ΔT — температура өзгерісі)."
+    },
+    {
+      "subject": {
+        "surface": "жылулық тепе-теңдік",
+        "root": "жылулық тепе-теңдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық күй",
+        "root": "физикалық күй",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_116"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жылулық тепе-теңдік — әсерлесетін денелердің температуралары теңелген жылулық күйі; жылу алмасу осы күйге келгенде тоқтайды."
+    },
+    {
+      "subject": {
+        "surface": "идеал газ",
+        "root": "идеал газ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық модель",
+        "root": "физикалық модель",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_117"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Идеал газ — молекулалары арасында тартылыс күштері жоқ, тек серпімді соқтығыспен әсерлесетін теориялық газ моделі. Газ заңдары осы модель үшін дәл орындалады."
+    },
+    {
+      "subject": {
+        "surface": "бойль-мариотт заңы",
+        "root": "бойль-мариотт заңы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физика заңы",
+        "root": "физика заңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_118"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бойль-Мариотт заңы — тұрақты температурада идеал газдың қысымы оның көлеміне кері пропорционал: P · V = const, T = const (изотермиялық процесс)."
+    },
+    {
+      "subject": {
+        "surface": "гей-люссак заңы",
+        "root": "гей-люссак заңы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физика заңы",
+        "root": "физика заңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_119"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гей-Люссак заңы — тұрақты көлемде идеал газдың қысымы оның абсолюттік температурасына тура пропорционал: P / T = const, V = const (изохоралық процесс)."
+    },
+    {
+      "subject": {
+        "surface": "шарль заңы",
+        "root": "шарль заңы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физика заңы",
+        "root": "физика заңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_120"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шарль заңы — тұрақты қысымда идеал газдың көлемі оның абсолюттік температурасына тура пропорционал: V / T = const, P = const (изобаралық процесс)."
+    },
+    {
+      "subject": {
+        "surface": "менделеев-клапейрон теңдеуі",
+        "root": "менделеев-клапейрон теңдеуі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физика заңы",
+        "root": "физика заңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_121"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Менделеев-Клапейрон теңдеуі — идеал газдың күй теңдеуі: P · V = (m / M) · R · T, мұндағы R — әмбебап газ тұрақтысы (8,31 Дж/(моль·К)), M — мольдік масса."
+    },
+    {
+      "subject": {
+        "surface": "абсолюттік нөл",
+        "root": "абсолюттік нөл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық тұрақты",
+        "root": "физикалық тұрақты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_122"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Абсолюттік нөл — Кельвин шкаласындағы 0 K температура (-273,15 °C). Молекулалардың жылулық қозғалысы тоқтайтын шартты шектік температура."
+    },
+    {
+      "subject": {
+        "surface": "гидростатикалық қысым",
+        "root": "гидростатикалық қысым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қысым",
+        "root": "қысым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_123"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гидростатикалық қысым — тыныштықтағы сұйықтың тереңдікке байланысты әсер ететін қысымы: P = ρ · g · h (ρ — сұйық тығыздығы, g — еркін түсу үдеуі, h — тереңдік)."
+    },
+    {
+      "subject": {
+        "surface": "паскаль заңы",
+        "root": "паскаль заңы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физика заңы",
+        "root": "физика заңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_124"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Паскаль заңы — сұйық немесе газға түсірілген қысым барлық бағытта бірдей беріліп, ыдыс қабырғаларына өзгеріссіз жетеді. Гидравликалық машиналардың негізі."
+    },
+    {
+      "subject": {
+        "surface": "зат күйі",
+        "root": "зат күйі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық ұғым",
+        "root": "физикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_125"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Зат күйі — заттың молекулааралық байланыстары мен қозғалысының күйі бойынша жіктелуі: қатты, сұйық, газ тәрізді, плазма."
+    },
+    {
+      "subject": {
+        "surface": "температуралық шкала",
+        "root": "температуралық шкала",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық ұғым",
+        "root": "физикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_126"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Температуралық шкала — температураны сан мәніне аударатын жүйе; әр шкала өзінің реттік нүктелері мен бөлік қадамымен анықталады (Цельсий, Кельвин, Фаренгейт)."
     },
     {
       "subject": {
