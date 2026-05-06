@@ -1,7 +1,7 @@
 {
-  "version": "4.64.0",
+  "version": "4.64.5",
   "status": "completed",
-  "elapsed_s": 65,
+  "elapsed_s": 72,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2560,
+    "facts_total": 2572,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,9 +27,9 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2013,
+      "is_a": 2020,
       "lives_in": 8,
-      "part_of": 236,
+      "part_of": 241,
       "related_to": 115
     },
     "by_pack": {
@@ -63,7 +63,7 @@
       "world_core/house_parts.jsonl": 20,
       "world_core/informatics_basic.jsonl": 40,
       "world_core/kinship_extended.jsonl": 20,
-      "world_core/kz_literature.jsonl": 96,
+      "world_core/kz_literature.jsonl": 108,
       "world_core/language_features.jsonl": 78,
       "world_core/materials.jsonl": 22,
       "world_core/mathematics_basic.jsonl": 67,
@@ -26394,6 +26394,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақ ақындары: Абай, Шәкәрім, Махамбет Өтемісұлы, Мағжан Жұмабаев, Сәкен Сейфуллин, Қасым Аманжолов, Мұқағали Мақатаев, Олжас Сүлейменов, Қадыр Мырза Әли."
+    },
+    {
+      "subject": {
+        "surface": "абзац",
+        "root": "абзац",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "мәтін",
+        "root": "мәтін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_080"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Абзац — мәтіннің бір ойды білдіретін бөлігі. Әрбір абзац жаңа жолдан, шегініспен басталады. Мәтінде бірнеше абзац болады, әрқайсысы жеке ойды дамытады."
+    },
+    {
+      "subject": {
+        "surface": "тақырып",
+        "root": "тақырып",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "мәтін",
+        "root": "мәтін",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_081"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тақырып — мәтіннің мазмұнын қысқа да нұсқа білдіретін атау. Оқырманға не туралы оқитынын ескертіп тұрады. Тақырып негізгі ойды бір сөзбен немесе сөз тіркесімен айта алады."
+    },
+    {
+      "subject": {
+        "surface": "негізгі ой",
+        "root": "негізгі ой",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мәтін бөлігі",
+        "root": "мәтін бөлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_082"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Негізгі ой — мәтіннің ең маңызды хабары, автордың айтқысы келген басты идеясы. Кейде идея деп те аталады. Оқырман мәтіннен «не айтылды?» деген сұраққа жауап беріп, негізгі ойды табады."
+    },
+    {
+      "subject": {
+        "surface": "кейіпкер",
+        "root": "кейіпкер",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "көркем шығарма",
+        "root": "көркем шығарма",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_083"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кейіпкер — көркем шығармадағы оқиғаны бастан кешетін тұлға. Адам, жануар, тіпті заттар да кейіпкер болуы мүмкін. Бас кейіпкер мен қосалқы кейіпкерлер болады."
+    },
+    {
+      "subject": {
+        "surface": "автор",
+        "root": "автор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "маман",
+        "root": "маман",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_084"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Автор — мәтінді (өлеңді, әңгімені, романды, мақаланы) жазған адам. Шығарманың мазмұны мен идеясы үшін жауапты. Мысалы: «Абай жолы» романының авторы — Мұхтар Әуезов."
+    },
+    {
+      "subject": {
+        "surface": "сюжет",
+        "root": "сюжет",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "көркем шығарма",
+        "root": "көркем шығарма",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_085"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сюжет — көркем шығармадағы оқиғалардың өзара байланысты тізбегі. Әдетте үш бөлімнен тұрады: басталу (оқиғаның басы), шарықтау шегі (ең шиеленісті сәт), шешімі (оқиғаның аяқталуы)."
+    },
+    {
+      "subject": {
+        "surface": "оқиға",
+        "root": "оқиға",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "сюжет",
+        "root": "сюжет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_086"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Оқиға — шығармада суреттелген нақты бір жағдай немесе іс-әрекет. Сюжетті құрайтын кірпіш. Бір шығармада көптеген оқиға болуы мүмкін; олар хронологиялық немесе логикалық тәртіппен орналасады."
+    },
+    {
+      "subject": {
+        "surface": "проза",
+        "root": "проза",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әдебиет түрі",
+        "root": "әдебиет түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_087"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Проза — өлеңсіз, кәдімгі сөйлеу ырғағындағы жазылатын әдебиет түрі. Әңгіме, повесть, роман, очерк — проза жанрлары. Мысалы: М. Әуезовтің «Абай жолы» — проза."
+    },
+    {
+      "subject": {
+        "surface": "поэзия",
+        "root": "поэзия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әдебиет түрі",
+        "root": "әдебиет түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_088"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Поэзия — өлеңмен, ырғақпен, ұйқаспен жазылатын әдебиет түрі. Өлең, поэма, дастан, жыр — поэзия жанрлары. Мысалы: Абайдың өлеңдері — поэзия."
+    },
+    {
+      "subject": {
+        "surface": "баяндау",
+        "root": "баяндау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мәтін түрі",
+        "root": "мәтін түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_089"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Баяндау — оқиғалар тізбегін уақыт пен реті бойынша айтып беретін мәтін түрі. Не болды? Кейін не болды? деген сұрақтарға жауап береді. Көбіне әңгімеде, романда қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "сипаттау",
+        "root": "сипаттау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мәтін түрі",
+        "root": "мәтін түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_090"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сипаттау — заттың, адамның, табиғаттың, оқиғаның сыртқы көрінісі мен ерекшеліктерін суреттейтін мәтін түрі. Қандай? деген сұраққа жауап береді. Көркем шығармаларда жиі қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "кітап",
+        "root": "кітап",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "баспа басылымы",
+        "root": "баспа басылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kz_literature",
+      "source": {
+        "pack": "world_core/kz_literature.jsonl",
+        "sample_id": "lit_091"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кітап — мұқабамен бекітілген, бірнеше беттен тұратын баспа басылымы. Білімнің, әдебиеттің, ақпараттың сақталу мен таратылу формасы. Мектеп, кітапхана, үй — кітап оқу орындары."
     },
     {
       "subject": {

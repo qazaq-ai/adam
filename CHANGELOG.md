@@ -7,6 +7,82 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.65.0] — 2026-05-06 — Educational portal Day 2 #9 — Reading skills: text structure / characters / plot / genres of writing
+
+**Day 2 release 9/10.** Per memory directive — pre-flight audit revealed extensive coverage in `kz_literature.jsonl`: мәтін, шығарма, ақын/жазушы, 8 жанр types (өлең/поэма/роман/әңгіме/ертегі/дастан/жыр/мақал/мәтел). Skipped duplicates; added 12 reading-skills concepts that are NEW: text structure (абзац / тақырып / негізгі ой), narrative components (кейіпкер / автор / сюжет / оқиға), high-level types (проза / поэзия), text modes (баяндау / сипаттау), кітап.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| мәтін / шығарма | `kz_literature.jsonl` (lit_059, lit_060) + `language_features.jsonl` (lang_007/008) | ✓ skip — already in canonical |
+| ақын / жазушы | `kz_literature.jsonl` (lit_029, lit_030) | ✓ skip — covered |
+| Genres (өлең / поэма / роман / әңгіме / ертегі / дастан / жыр / мақал / мәтел) | `kz_literature.jsonl` (lit_019..027) | ✓ skip — covered |
+| абзац / тақырып / негізгі ой | not yet | + add |
+| кейіпкер / автор / сюжет / оқиға | not yet | + add |
+| проза / поэзия | not yet (only genres listed) | + add |
+| баяндау / сипаттау (text modes) | not yet | + add |
+| кітап | not yet (concept missing) | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/kz_literature.jsonl` (`lit_080…lit_091`):
+
+**Text structure (3):**
+- lit_080: абзац (paragraph — part of мәтін, indented new line)
+- lit_081: тақырып (title — short content marker)
+- lit_082: негізгі ой (main idea — author's central thesis)
+
+**Narrative components (4):**
+- lit_083: кейіпкер (character — story participant; main + supporting)
+- lit_084: автор (author — text creator; example: Әуезов = «Абай жолы» author)
+- lit_085: сюжет (plot — sequence with басталу / шарықтау шегі / шешімі structure)
+- lit_086: оқиға (event — sub-element of plot)
+
+**High-level types (2):**
+- lit_087: проза (prose — non-verse writing; novels, short stories)
+- lit_088: поэзия (poetry — verse with ырғақ + ұйқас)
+
+**Writing modes (2):**
+- lit_089: баяндау (narration — temporal sequence)
+- lit_090: сипаттау (description — visual/sensory detail)
+
+**Physical medium (1):**
+- lit_091: кітап (book — bound printed volume)
+
+**(2) Cascade chains:**
+- `<абзац / тақырып / негізгі ой> → мәтін → сөз → тіл` (4-hop reading)
+- `<кейіпкер / сюжет> → көркем шығарма` (with шығарма → мәтін chain)
+- `<проза / поэзия> → әдебиет түрі` (new sub-class)
+- `<баяндау / сипаттау> → мәтін түрі` (writing modes)
+
+**(3) MULTIWORD_ENTITIES extended** with 6 new compounds: негізгі ой, көркем шығарма, мәтін бөлігі, әдебиет түрі, мәтін түрі, баспа басылымы.
+
+**(4) Сюжет 3-part structure documented** — basталу / шарықтау шегі / шешімі. Curriculum-essential plot analysis pattern for grades 3-4.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2320 | **2332** (+12) |
+| world_core facts | 2560 | **2572** (+12) |
+| world_core domains | 51 | **51** unchanged (extended canonical) |
+| Derived facts | 29004 | **29243** (+239 = **20× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.65.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 20× cascade is the second-highest in the educational program (after v4.64.0 math at 27×) — reflects new entries plugging into deeply-connected hubs (мәтін / шығарма / маман) and cross-linking through the existing genre taxonomy.
+
+**Cumulative Day 2:** 9 of 10 releases · +94 facts · +843 derived · 5 sub-domain extensions complete (math, grammar, proverbs, biology, literature).
+
+### Cadence
+
+`.0` minor — same-domain extension. Audit-first saved ~9 redundant entries (мәтін, шығарма, ақын/жазушы, 8 genres). Discipline pays off in cascade ROI.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.64.5] — 2026-05-06 — Educational portal Day 2 #8 — Дүниетану foundations: living/non-living nature + habitats + season signs
 
 **Day 2 release 8/10.** Per memory directive `feedback_no_duplicate_domains.md` — pre-flight audit revealed seasons (көктем/жаз/күз/қыс) already in `time.jsonl` (time_014..017); seasons skipped. Extends existing canonical `biology_basic.jsonl` with foundational Дүниетану concepts that elementary curriculum (grades 1-3) teaches as the «жанды/жансыз табиғат» framework.
