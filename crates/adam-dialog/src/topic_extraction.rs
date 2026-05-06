@@ -978,6 +978,26 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // **v4.73.5** — astro_048 «Жер жалпақ емес» entry; new
     // sub-class object for the planet-priority fact.
     "шар тәрізді ғаламшар",
+    // **v4.77.5** — Codex round-3 cultural / political compounds.
+    // Surfaced by 2026-05-06 audit: «Қожа Ахмет Ясауи» / «Киіз үй»
+    // / «Әл-Фараби» / «Қорқыт ата» / «Жамбыл Жабаев» / «жұқпалы
+    // ауру» (already present) — multi-word entities that need
+    // longest-match registration.
+    "қожа ахмет ясауи",
+    "әл-фараби",
+    "жамбыл жабаев",
+    "қорқыт ата",
+    "киіз үй",
+    "наурыз көже",
+    "ораза айт",
+    "құрбан айт",
+    "дәстүрлі мереке",
+    "дәстүрлі тұрғын үй",
+    "дәстүрлі сусын",
+    "дәстүрлі бұйым",
+    "дәстүрлі рәсім",
+    "ұлттық мереке",
+    "діни мереке",
     // **v4.77.0** — code-switch / bilingual education compounds
     // (Codex round-2 Bug 8). Common Latin / English curriculum
     // terms that adam users naturally type bilingually:

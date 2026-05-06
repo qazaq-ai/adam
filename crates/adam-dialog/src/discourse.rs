@@ -1038,9 +1038,48 @@ pub fn try_extract_comparison_topics(input: &str) -> Option<(String, String)> {
                 x = stripped;
             }
         }
-        return Some((x.trim().to_string(), rhs));
+        // **v4.77.5** — Codex round-3 Bug 2: strip Kazakh case
+        // suffixes from Y (the head of the second NP). Pattern
+        // «X пен Y-нің айырмашылығы қандай?» / «Парламент пен
+        // Үкіметтің айырмашылығы» — Y has genitive «-тің» / «-нің»
+        // glued on. Stripping yields the bare lemma so the dual
+        // lookup in conversation.rs can find the world_core entry
+        // (which is keyed on bare «үкімет» / «парламент»).
+        let rhs_clean = strip_trailing_kazakh_case(rhs.trim());
+        let x_clean = strip_trailing_kazakh_case(x.trim());
+        return Some((x_clean.to_string(), rhs_clean.to_string()));
     }
     None
+}
+
+/// **v4.77.5** — Strip a trailing Kazakh case suffix from a noun
+/// phrase to recover the lemma. Used by `try_extract_comparison_topics`
+/// to normalize Y in «X пен Y-нің айырмашылығы» so the dual lookup
+/// can find the world_core entry. Conservative: only strips when the
+/// remaining stem is ≥ 2 chars; preserves short tokens that happen to
+/// end in a suffix-like sequence.
+fn strip_trailing_kazakh_case(s: &str) -> &str {
+    // Order matters: longest suffixes first to prevent over-stripping.
+    const SUFFIXES: &[&str] = &[
+        // Genitive (longest first)
+        "нің", "ның", "дің", "дың", "тің", "тың", // Locative
+        "нде", "нда", "дегі", "дағы", "тегі", "тағы", // Ablative
+        "нен", "нан", "ден", "дан", "тен", "тан", // Dative
+        "ге", "ға", "ке", "қа", "не", "на", // Accusative
+        "ні", "ны", "ді", "ды", "ті", "ты",
+        // Possessive (already stripped at FST level usually, but safety)
+        "сы", "сі",
+    ];
+    for suf in SUFFIXES {
+        if let Some(stem) = s.strip_suffix(suf) {
+            // Char-count guard: require ≥ 4-char stem (most Kazakh
+            // content words have ≥ 4 chars before any suffix).
+            if stem.chars().count() >= 4 {
+                return stem.trim_end();
+            }
+        }
+    }
+    s
 }
 
 /// **v4.76.0** — Explain-steps handler. Detects «қалай шештің / есепті

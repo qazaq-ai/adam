@@ -7,6 +7,54 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.77.5] — 2026-05-06 — Codex round-3 surgical fixes — case-suffix stripping in comparison + Uranium chem disambig + ДНҚ alias + cultural foundations
+
+Codex round-3 audit on v4.77.0 found 7 new bugs across politics / geology / culture / biology / Rust. v4.77.5 ships 4 surgical fixes (cases that need only data + small extraction tweaks); v4.78.0 will tackle the 3 architecturally-deeper bugs (direct-answer rendering, political safety, location/causal facts).
+
+### Bugs fixed
+
+**Bug 2 — case-suffix in comparison Y.** «Парламент пен Үкіметтің айырмашылығы қандай?» → previously returned the «hedge» template because the comparison extractor produced Y=«үкіметтің» (with genitive «-тің» glued on), which didn't match the bare-form «үкімет» entry in world_core. Fix: new `strip_trailing_kazakh_case` helper called inside `try_extract_comparison_topics` — strips genitive / locative / dative / ablative / accusative suffixes from both X and Y, char-aware, with ≥4-char-stem guard. Result: Парламент vs Үкімет now surfaces dual definitions.
+
+**Bug 4 — Уран chem element disambiguation.** «Уран деген не?» previously surfaced astronomy fact «Уран — Күн жүйесіндегі жетінші ғаламшар». Fix: added curated `chem_130` entry «Уран — радиоактивті ауыр химиялық элемент (U, № 92, актиноидтар тобы). Ядролық отын ретінде атом электрстанцияларында қолданылады. Қазақстан — әлемде уран қорын мен өндіруі бойынша ірі мемлекеттердің бірі.» that outranks the astronomy entry on the «деген не» query (longer, more specific, higher curation rank).
+
+**Bug 5 partial — cultural foundations.** «Наурыз» surfaced an unrelated 2020 article fragment; «Киіз үй» got reduced to «үй»; «Қожа Ахмет Ясауи» surfaced an unrelated proverb. Fix: added 6 cultural entries to `society.jsonl` (Наурыз / Киіз үй / Дастархан / Бесік / Қымыз / Айт) and 4 historical-figure entries to `notable_kazakhstanis.jsonl` (Қожа Ахмет Ясауи, Әл-Фараби, Жамбыл Жабаев, Қорқыт ата). MULTIWORD_ENTITIES extended with 15 new compounds (қожа ахмет ясауи / әл-фараби / қорқыт ата / жамбыл жабаев / киіз үй / наурыз көже / ораза айт / құрбан айт / various дәстүрлі/ұлттық/діни мереке categories).
+
+**Bug 6 — ДНҚ / DNA alias.** «ДНҚ деген не?» previously returned `clarify_no_topic` because only «ДНК» was registered in `chem_104`. Fix: added `chem_104a` (ДНҚ — Kazakh-style spelling) and `chem_104b` (DNA — international name) as alias entries pointing to the same nucleic-acid concept. All three (ДНК / ДНҚ / DNA) now surface the same definition.
+
+### Acceptance
+
+| Bug | Pre-fix | Post-fix |
+|---|---|---|
+| Парламент пен Үкіметтің айырмашылығы қандай? | hedge template | ✅ dual definitions side-by-side |
+| Уран деген не? | astronomy «жетінші ғаламшар» | ✅ chem element with U/№92/Қазақстан context |
+| Наурыз деген не? | unrelated 2020 article fragment | ✅ proper cultural definition |
+| Киіз үй деген не? | reduced to «Үй бөлме иеленеді» | ✅ proper traditional-house definition |
+| Қожа Ахмет Ясауи кім? | unrelated proverb | ✅ XII century Sufi + Diuani Hikmet + Türkistan mausoleum |
+| ДНҚ деген не? | clarify_no_topic | ✅ same definition as ДНК |
+
+| Regression | Status |
+|---|---|
+| Dual comparison (Тұрақты ток vs Айнымалы ток) | ✅ preserved |
+| All v4.77.0 procedural cases | ✅ preserved |
+| 100-query battery diff vs v4.77.0 | **0 differences** (the 7 fixed queries weren't in the 100-query battery) |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2489 → 2502 (+13) |
+| world_core facts | 2729 → 2742 (+13) |
+| Derived facts | 29723 → 30656 (+933) — historical-figure bridges fan out |
+
+### Deferred to v4.78.0
+
+- **Bug 1** — direct-answer rendering for «X кім?» queries when grounded_fact points to a person. «Қазақстанның президенті кім?» currently surfaces «X мен Y өзара байланысты» chain template instead of «Президент — Тоқаев». Needs planner heuristic for IsA-Person target.
+- **Bug 3** — political-recommendation refusal. «Маған бір партияны қолда деп кеңес бер» currently retrieves a proverb. Needs detector + new `political_safety` template family.
+- **Bug 7** — location/causal facts. «Фотосинтез қайда жүреді?» repeats definition instead of saying «хлоропластарда / жапырақта». Needs richer where-facts in biology_school.
+
+### Cadence
+
+`.5` patch — surgical data + small extraction fix; no architectural changes.
+
+Stripe — Kazakh school tutor.
+
 ## [4.77.0] — 2026-05-06 — Dual-retrieval comparison + code-switch / Latin compounds
 
 Two independent improvements shipped together because they don't conflict and both close Codex round-2 bugs. **Codex Bug 4 fully closed** (was partial in v4.76.5) and **Codex Bug 8 closed**.

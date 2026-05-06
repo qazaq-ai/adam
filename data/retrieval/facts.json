@@ -1,5 +1,5 @@
 {
-  "version": "4.73.5",
+  "version": "4.77.0",
   "status": "completed",
   "elapsed_s": 65,
   "packs_completed": 9,
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2729,
+    "facts_total": 2742,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2166,
+      "is_a": 2179,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 123
@@ -47,7 +47,7 @@
       "world_core/biology_basic.jsonl": 53,
       "world_core/biology_school.jsonl": 120,
       "world_core/body_parts.jsonl": 57,
-      "world_core/chemistry_school.jsonl": 129,
+      "world_core/chemistry_school.jsonl": 132,
       "world_core/clothing.jsonl": 35,
       "world_core/colors.jsonl": 38,
       "world_core/computer_science_basics.jsonl": 30,
@@ -70,7 +70,7 @@
       "world_core/measurements.jsonl": 18,
       "world_core/medicine_basic.jsonl": 12,
       "world_core/music_kz.jsonl": 24,
-      "world_core/notable_kazakhstanis.jsonl": 51,
+      "world_core/notable_kazakhstanis.jsonl": 55,
       "world_core/numbers.jsonl": 54,
       "world_core/philosophy_basic.jsonl": 23,
       "world_core/physics_school.jsonl": 138,
@@ -87,7 +87,7 @@
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
       "world_core/role_bridges.jsonl": 63,
-      "world_core/society.jsonl": 57,
+      "world_core/society.jsonl": 63,
       "world_core/sports.jsonl": 18,
       "world_core/time.jsonl": 44,
       "world_core/tools_household.jsonl": 30,
@@ -11480,6 +11480,46 @@
     },
     {
       "subject": {
+        "surface": "днқ",
+        "root": "днқ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "нуклеин қышқылы",
+        "root": "нуклеин қышқылы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_104a"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "ДНҚ — қазақ тіліндегі ДНК атауы; тұқым қуалаушылық ақпаратты сақтайтын нуклеин қышқылы."
+    },
+    {
+      "subject": {
+        "surface": "dna",
+        "root": "dna",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "нуклеин қышқылы",
+        "root": "нуклеин қышқылы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_104b"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "DNA — international atauı (English). Қазақ тілінде ДНК / ДНҚ деп қолданылады; тұқым қуалаушылық ақпаратты сақтайтын нуклеин қышқылы."
+    },
+    {
+      "subject": {
         "surface": "рнк",
         "root": "рнк",
         "pos": "noun"
@@ -11977,6 +12017,26 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Менделеев кестесі — химиялық элементтерді атом нөмірі мен қасиеттері бойынша жіктейтін кесте; Д. И. Менделеев 1869 жылы ұсынған. Періодтар (қатарлар) мен топтардан (бағаналардан) тұрады."
+    },
+    {
+      "subject": {
+        "surface": "уран",
+        "root": "уран",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "химиялық элемент",
+        "root": "химиялық элемент",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_130"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Уран — радиоактивті ауыр химиялық элемент (U, № 92, актиноидтар тобы). Ядролық отын ретінде атом электрстанцияларында қолданылады. Қазақстан — әлемде уран қорын мен өндіруі бойынша ірі мемлекеттердің бірі."
     },
     {
       "subject": {
@@ -33680,6 +33740,86 @@
     },
     {
       "subject": {
+        "surface": "қожа ахмет ясауи",
+        "root": "қожа ахмет ясауи",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи тұлға",
+        "root": "тарихи тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/notable_kazakhstanis",
+      "source": {
+        "pack": "world_core/notable_kazakhstanis.jsonl",
+        "sample_id": "notable_035"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қожа Ахмет Ясауи (1093–1166) — XII ғасырдағы түркі сопысы, ақыны мен ислам ағартушысы. «Диуани Хикмет» («Даналық кітабы») атты еңбегімен танымал. Кесенесі Түркістан қаласында, Тимур тұрғызған; UNESCO мұрасы."
+    },
+    {
+      "subject": {
+        "surface": "әл-фараби",
+        "root": "әл-фараби",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи тұлға",
+        "root": "тарихи тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/notable_kazakhstanis",
+      "source": {
+        "pack": "world_core/notable_kazakhstanis.jsonl",
+        "sample_id": "notable_036"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әл-Фараби (870–950) — Отырар қаласынан шыққан түркі ойшылы, философы, музыка теоретигі мен ғалымы. Аристотельден кейінгі «Екінші ұстаз» деген атаққа ие болған. Музыка туралы үлкен кітабы («Кітаб әл-мусиқа әл-кабир») атымен аталады."
+    },
+    {
+      "subject": {
+        "surface": "жамбыл жабаев",
+        "root": "жамбыл жабаев",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи тұлға",
+        "root": "тарихи тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/notable_kazakhstanis",
+      "source": {
+        "pack": "world_core/notable_kazakhstanis.jsonl",
+        "sample_id": "notable_037"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жамбыл Жабаев (1846–1945) — қазақтың ұлы ақын-жыршысы. Ұзақ ғұмыр кешіп, халық жадында «Жамбыл ата» деген атпен қалған. Алматы облысының Жамбыл ауданы оның құрметіне аталған."
+    },
+    {
+      "subject": {
+        "surface": "қорқыт ата",
+        "root": "қорқыт ата",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи тұлға",
+        "root": "тарихи тұлға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/notable_kazakhstanis",
+      "source": {
+        "pack": "world_core/notable_kazakhstanis.jsonl",
+        "sample_id": "notable_038"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорқыт ата (VIII–IX ғ.) — түркі халықтарының ортақ философы, музыка атасы. Қобыз аспабын алғаш ойлап тапты деп саналады. «Қорқыт ата кітабы» — түркі эпосының жинағы."
+    },
+    {
+      "subject": {
         "surface": "нөл",
         "root": "нөл",
         "pos": "noun"
@@ -50897,6 +51037,126 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Конституция — заң түрі ретінде ең жоғары күші бар құжат."
+    },
+    {
+      "subject": {
+        "surface": "наурыз",
+        "root": "наурыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұлттық мереке",
+        "root": "ұлттық мереке",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_054"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Наурыз — қазақ халқының ұлттық жаңа жыл мерекесі. Көктемнің күн мен түннің теңесуі күні (21–22 наурыз) тойланады. Дәстүрлі ас — наурыз көже (7 түрлі компоненттен)."
+    },
+    {
+      "subject": {
+        "surface": "киіз үй",
+        "root": "киіз үй",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі тұрғын үй",
+        "root": "дәстүрлі тұрғын үй",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_055"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Киіз үй — қазақ көшпенді халқының дәстүрлі тұрғын үйі. Ағаш қаңқасына (керегесі, уықтары, шаңырағы) киіз қапталған. Жыл бойы тасымалдауға бейімделген; шаңырақ — отбасының символы."
+    },
+    {
+      "subject": {
+        "surface": "дастархан",
+        "root": "дастархан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі рәсім",
+        "root": "дәстүрлі рәсім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_056"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дастархан — қазақ дәстүрі бойынша тойда, ас беруде жайылатын мәдени-әлеуметтік ас рәсімі; қонақжайлық пен бірлестіктің символы."
+    },
+    {
+      "subject": {
+        "surface": "бесік",
+        "root": "бесік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі бұйым",
+        "root": "дәстүрлі бұйым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_057"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бесік — қазақ халқының дәстүрлі ағаштан жасалған сәби төсеніші; «бесік той» — нәресте бесікке салынғанда өткізілетін рәсім."
+    },
+    {
+      "subject": {
+        "surface": "қымыз",
+        "root": "қымыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі сусын",
+        "root": "дәстүрлі сусын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_058"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қымыз — биенің сүтінен ашытылған дәстүрлі қазақ сусыны. Көшпенді халықтың негізгі ас-судың бірі болған; денсаулыққа пайдалы."
+    },
+    {
+      "subject": {
+        "surface": "айт",
+        "root": "айт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "діни мереке",
+        "root": "діни мереке",
+        "pos": "noun"
+      },
+      "pattern": "world_core/society",
+      "source": {
+        "pack": "world_core/society.jsonl",
+        "sample_id": "soc_059"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Айт — мұсылмандардың діни мерекесі. Қазақстанда екі айт тойланады: Ораза айт (Рамазан айының соңы) және Құрбан айт (Хадж кезіндегі құрбан шалу мерекесі)."
     },
     {
       "subject": {
