@@ -754,6 +754,12 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "магниттік ағын",
     "тұрақты ток",
     "айнымалы ток",
+    // **v4.68.5** — Educational portal: chemistry organics deepening.
+    "химия ұғымы",
+    "органикалық қосылыс",
+    "гомологтық қатар",
+    "карбон қышқылы",
+    "нуклеин қышқылы",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of

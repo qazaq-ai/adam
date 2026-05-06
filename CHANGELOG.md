@@ -7,6 +7,71 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.68.5] — 2026-05-06 — Educational portal — Chemistry: organic chemistry deepening (homologous series + isomerism + propane/butane/acetylene + methanol/glycerol + ketone/acetone + nucleotide + polysaccharide)
+
+Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `chemistry_school.jsonl` confirmed dense organic chemistry coverage: органикалық химия (chem_003) / көміртек (chem_027) / қышқыл + 3 acid types (chem_058..061) / тұз (chem_065) / көмірсутек hub (chem_079) / алкан + алкен + алкин classes (chem_080..082) / метан + этан + этилен + бензол (chem_083..086) / спирт + этанол (chem_087, 088) / альдегид + 2 carboxylic acid entries (chem_089..091) / эфир (chem_092) / көмірсу + глюкоза + сахароза + крахмал (chem_093..096) / май + ақуыз + амин қышқылы + фермент (chem_097..100) / полимер + мономер + пластмасса (chem_101..103) / ДНК + РНК (chem_104, 105). Concept-level taxonomy (homologous series, homolog, isomerism), specific simple alkanes (propane, butane), specific alkyne (acetylene), simplest alcohol (methanol) + polyhydric (glycerol), ketone class + acetone, nucleotide building block, and polysaccharide general class were missing.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| органикалық химия / көмірсутек / алкан/алкен/алкин / метан/этан/этилен/бензол / спирт+этанол / альдегид / карбон қышқылы+сірке / эфир / көмірсу+глюкоза+сахароза+крахмал / май / ақуыз+амин қышқылы+фермент / полимер+мономер+пластмасса / ДНК+РНК | `chemistry_school.jsonl` (chem_003, 027, 058..105) | ✓ skip — covered |
+| Гомологтық қатар / гомолог / изомерия | not yet (concept hubs) | + add |
+| Пропан / бутан (n=3, n=4 alkanes) | not yet | + add |
+| Ацетилен (specific alkyne, HC≡CH) | not yet | + add |
+| Метанол (simplest alcohol) / глицерин (polyhydric) | not yet | + add |
+| Кетон class + ацетон (specific) | not yet | + add |
+| Нуклеотид (DNA/RNA building block) | not yet | + add |
+| Полисахарид (general class for крахмал/целлюлоза/гликоген) | not yet | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/chemistry_school.jsonl` (`chem_106…117`):
+
+**Concept hubs (3):**
+- chem_106: гомологтық қатар IsA химия ұғымы — successive -CH₂- members, alkanes CnH2n+2
+- chem_107: гомолог IsA химия ұғымы — adjacent member differing by -CH₂-
+- chem_108: изомерия IsA химия ұғымы — same formula, different arrangement (бутан / изобутан)
+
+**Carbon chain hydrocarbons (3):**
+- chem_109: пропан IsA алкан — C₃H₈, household fuel
+- chem_110: бутан IsA алкан — C₄H₁₀, lighter gas, isomeric with isobutane
+- chem_111: ацетилен IsA алкин — HC≡CH (этин), oxy-acetylene welding ~3000°C
+
+**Alcohols (2):**
+- chem_112: метанол IsA спирт — CH₃OH, simplest, toxic
+- chem_113: глицерин IsA спирт — C₃H₈O₃, three -OH, fat component
+
+**Carbonyl compounds (2):**
+- chem_114: кетон IsA органикалық қосылыс — R-CO-R' general class
+- chem_115: ацетон IsA кетон — CH₃-CO-CH₃, propan-2-one, common solvent
+
+**Biomolecule deepening (2):**
+- chem_116: нуклеотид IsA органикалық қосылыс — base + 5C-sugar + phosphate (DNA/RNA building block)
+- chem_117: полисахарид IsA көмірсу — крахмал, целлюлоза, гликоген general class
+
+**(2) Curriculum-grade molecular formulas embedded** in 8 of 12 entries (CnH2n+2 alkanes, C₃H₈ propane, C₄H₁₀ butane, HC≡CH acetylene, CH₃OH methanol, C₃H₈O₃ glycerol, R-CO-R' ketone, CH₃-CO-CH₃ acetone).
+
+**(3) MULTIWORD_ENTITIES extended** with 5 new compounds (химия ұғымы, органикалық қосылыс, гомологтық қатар, карбон қышқылы, нуклеин қышқылы).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2404 | **2416** (+12) |
+| world_core facts | 2585 | **2597** (+12) |
+| world_core domains | 51 | **51** unchanged |
+| Derived facts | 29533 | **29575** (+42 = **3.5× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+
+R1_is_a_transitivity 2862 → 2872 (+10); R5_shared_is_a_target 1900 → 1932 (+32 — strong, new entries cluster densely with existing siblings: пропан/бутан with метан/этан, метанол with этанол, ацетон with кетон group, полисахарид with глюкоза/сахароза/крахмал).
+
+### Cadence
+
+`.5` patch — same-domain canonical extension; chemistry_school now at 117 entries.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.68.0] — 2026-05-06 — Educational portal — Physics: electricity + magnetism deepening (Coulomb + series/parallel + electric work/power + Joule-Lenz + capacitor + magnetic flux + DC/AC + EM-wave bridge)
 
 Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `physics_school.jsonl` confirmed dense E&M coverage (электродинамика / электр заряды / 2 заряд түрі / электр өрісі / тоғы / кернеу / кедергі / Ом заңы / тізбек / өткізгіш / диэлектрик / магнит / магнит өрісі / электромагнит / электромагниттік индукция / жиілік / жарық / 2 линза / ультракүлгін + инфрақызыл + гамма сәулесі). Coulomb's law, series/parallel circuit topology, electric work + power formulas, Joule-Lenz law, capacitor + capacitance, magnetic flux, DC/AC distinction, and the electromagnetic-wave taxonomy bridge were missing. Extends canonical `physics_school.jsonl`.

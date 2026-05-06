@@ -1,7 +1,7 @@
 {
-  "version": "4.68.0",
+  "version": "4.68.5",
   "status": "completed",
-  "elapsed_s": 35,
+  "elapsed_s": 34,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2644,
+    "facts_total": 2656,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2092,
+      "is_a": 2104,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -47,7 +47,7 @@
       "world_core/biology_basic.jsonl": 53,
       "world_core/biology_school.jsonl": 120,
       "world_core/body_parts.jsonl": 55,
-      "world_core/chemistry_school.jsonl": 105,
+      "world_core/chemistry_school.jsonl": 117,
       "world_core/clothing.jsonl": 35,
       "world_core/colors.jsonl": 38,
       "world_core/computer_science_basics.jsonl": 30,
@@ -11374,6 +11374,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "РНК — ақуыз синтезіне қатысатын нуклеин қышқылы."
+    },
+    {
+      "subject": {
+        "surface": "гомологтық қатар",
+        "root": "гомологтық қатар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "химия ұғымы",
+        "root": "химия ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_106"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гомологтық қатар — әрқайсысы алдыңғысынан -CH₂- буынына ерекшеленетін, бірдей жалпы формуламен сипатталатын органикалық қосылыстар тізбегі (мысал: алкандар СnH2n+2 — метан, этан, пропан, бутан, …)."
+    },
+    {
+      "subject": {
+        "surface": "гомолог",
+        "root": "гомолог",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "химия ұғымы",
+        "root": "химия ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_107"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гомолог — гомологтық қатардағы кез келген мүше; көрші мүшеден -CH₂- буынымен өзгешеленеді (метан мен этан өзара гомологтар)."
+    },
+    {
+      "subject": {
+        "surface": "изомерия",
+        "root": "изомерия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "химия ұғымы",
+        "root": "химия ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_108"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Изомерия — молекулалық формуласы бірдей, бірақ атомдардың орналасу реті немесе кеңістіктік құрылысы әртүрлі қосылыстар құбылысы (мысал: бутан — изобутан)."
+    },
+    {
+      "subject": {
+        "surface": "пропан",
+        "root": "пропан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "алкан",
+        "root": "алкан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_109"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Пропан — үш көміртек атомды қаныққан көмірсутек (C₃H₈), сұйытылған газ ретінде тұрмыстық жанармай ретінде қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "бутан",
+        "root": "бутан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "алкан",
+        "root": "алкан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_110"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бутан — төрт көміртек атомды қаныққан көмірсутек (C₄H₁₀), тұрмыстық жанармай мен зажигалкаларда қолданылады. Изобутанмен изомер құрайды."
+    },
+    {
+      "subject": {
+        "surface": "ацетилен",
+        "root": "ацетилен",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "алкин",
+        "root": "алкин",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_111"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ацетилен — үш байланысы бар қарапайым алкин (HC≡CH, этин). Дәнекерлеу мен газ алау пайдаланылады; жоғары жану температурасы (~3000 °C)."
+    },
+    {
+      "subject": {
+        "surface": "метанол",
+        "root": "метанол",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "спирт",
+        "root": "спирт",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_112"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Метанол — ең қарапайым спирт (CH₃OH); өндірісте еріткіш және отын ретінде қолданылады. Адамға улы — ішуге жарамайды."
+    },
+    {
+      "subject": {
+        "surface": "глицерин",
+        "root": "глицерин",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "спирт",
+        "root": "спирт",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_113"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Глицерин — үш гидроксил тобы бар көп атомды спирт (C₃H₈O₃, пропан-1,2,3-триол). Май молекулаларының құрамына кіреді; косметика мен фармацияда қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "кетон",
+        "root": "кетон",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "органикалық қосылыс",
+        "root": "органикалық қосылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_114"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кетон — қос байланысты карбонил тобы (C=O) көміртек тізбегінің ішінде орналасқан органикалық қосылыс класы (R-CO-R′)."
+    },
+    {
+      "subject": {
+        "surface": "ацетон",
+        "root": "ацетон",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кетон",
+        "root": "кетон",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_115"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ацетон — қарапайым кетон (CH₃-CO-CH₃, пропан-2-он); өткір иісті, ұшқыш сұйық; еріткіш ретінде кең қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "нуклеотид",
+        "root": "нуклеотид",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "органикалық қосылыс",
+        "root": "органикалық қосылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_116"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Нуклеотид — нуклеин қышқылдарының (ДНК, РНК) құрылыс блогы; үш бөліктен тұрады: азотты негіз + бес көміртекті қант + фосфат тобы."
+    },
+    {
+      "subject": {
+        "surface": "полисахарид",
+        "root": "полисахарид",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "көмірсу",
+        "root": "көмірсу",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_117"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Полисахарид — көптеген моносахарид буындарынан тұратын күрделі көмірсу (мысал: крахмал, целлюлоза, гликоген)."
     },
     {
       "subject": {
