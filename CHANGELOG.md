@@ -7,6 +7,63 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.71.0] — 2026-05-06 — Educational portal — Medicine foundations (health + disease + symptom + diagnosis + treatment + prevention + immunity + first aid + medicine substance + vaccine/antibiotic)
+
+Per memory directive — pre-flight grep across all `data/world_core/*.jsonl` confirmed sparse medicine coverage: only анатомия (in body_parts + biology_school) / бактерия + вирус (biology_school) / дәрігер (professions, society, role_bridges). Disease/diagnosis/treatment/medicine-substance taxonomy genuinely missing. Addresses user's explicit «education + medicine portal» strategic priority. Created new `medicine_basic.jsonl` domain.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| анатомия | body_parts (body_040) + biology_school (bio_s_005) | ✓ skip — covered |
+| бактерия / вирус | biology_school (bio_s_024, 025) | ✓ skip — covered |
+| дәрігер | professions / society / role_bridges | ✓ skip — covered |
+| Медицина subject + 9 medical concepts + medicine-substance hub + 2 sub-classes | not yet | + add (new domain) |
+
+### Innovations
+
+**(1) New domain `data/world_core/medicine_basic.jsonl`** with 12 entries (`med_001…012`):
+
+**Subject hub (1):**
+- med_001: медицина IsA оқу пәні — bridges to v4.65.5 master hub
+
+**9 medical concepts, all IsA медицина ұғымы (9):**
+- med_002: денсаулық — WHO definition (physical + mental + social wellbeing)
+- med_003: ауру — disease taxonomy (жұқпалы / жұқпайтын)
+- med_004: симптом — disease external sign (жөтел, бас ауыруы, температура)
+- med_005: диагноз — diagnosis from symptoms + test results
+- med_006: емдеу — treatment methods (drugs, surgery, physiotherapy, diet)
+- med_007: профилактика — prevention (vaccination, hygiene, nutrition, sport)
+- med_008: иммунитет — innate vs acquired (vaccine / past illness)
+- med_009: алғашқы көмек — first aid (bleeding, breathing, wounds, shock)
+- med_010: дәрі — medicine substance hub (tablet, ampoule, syrup, ointment)
+
+**Medicine subclasses, all IsA дәрі (2):**
+- med_011: вакцина — examples: polio, measles, flu, COVID-19
+- med_012: антибиотик — bacterial only; resistance warning
+
+**(2) Curriculum-grade public-health framing** — disease classification (infectious/non-infectious), WHO health definition, antibiotic resistance warning, first-aid sequence (stop bleeding → clear airway → artificial breathing → wound dressing → shock prevention).
+
+**(3) MULTIWORD_ENTITIES extended** with 4 new compounds (медицина ұғымы, алғашқы көмек, жұқпалы ауру, жұқпайтын ауру).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2464 | **2476** (+12) |
+| world_core facts | 2645 | **2657** (+12) |
+| world_core domains | 53 | **54** (+1 — new `medicine_basic`) |
+| Derived facts | 29723 | **29727** (+4 = **0.33× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+
+The 0.33× cascade is **expected for closed in-domain taxonomy** — 9 subjects IsA медицина ұғымы all sit in the same domain, so R11_in_domain_shared_target absorbs the 36 cluster pairs internally rather than firing R5_shared_is_a_target. R1 +3 reflects bridge transitivity (медицина → оқу пәні → ұғым). Future deepening (specific diseases, drug classes, body-system pathologies) will multiply against these new hubs.
+
+### Cadence
+
+`.0` minor — new domain (high strategic value: medicine portal priority).
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.70.5] — 2026-05-06 — Educational portal — World geography foundations (6 continents + 4 oceans + subject-portal bridge)
 
 Per memory directive — pre-flight grep of `geography_kz.jsonl` confirmed strictly Kazakhstan-scoped (oblasts, cities, rivers, lakes, mountains, deserts, all `part_of қазақстан`). Eurasia mentioned only as part_of object (geo_kz_027); no entries defining continents themselves. `bio_034` already has «мұхит IsA су» — so new ocean entries plug into existing мұхит as object rather than redefining. Genuinely new canonical scope mirroring v4.69.5's `world_history.jsonl` — created new `world_geography.jsonl` domain.

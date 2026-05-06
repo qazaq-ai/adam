@@ -1,7 +1,7 @@
 {
-  "version": "4.70.5",
+  "version": "4.71.0",
   "status": "completed",
-  "elapsed_s": 34,
+  "elapsed_s": 30,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2704,
+    "facts_total": 2716,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2152,
+      "is_a": 2164,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -68,6 +68,7 @@
       "world_core/materials.jsonl": 22,
       "world_core/mathematics_basic.jsonl": 91,
       "world_core/measurements.jsonl": 18,
+      "world_core/medicine_basic.jsonl": 12,
       "world_core/music_kz.jsonl": 24,
       "world_core/notable_kazakhstanis.jsonl": 51,
       "world_core/numbers.jsonl": 54,
@@ -31776,6 +31777,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Секунд — халықаралық жүйедегі уақыттың негізгі бірлігі."
+    },
+    {
+      "subject": {
+        "surface": "медицина",
+        "root": "медицина",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Медицина — адам ауруларын зерттеу, диагностикалау, емдеу мен алдын алумен айналысатын ғылым және оқу пәні. Анатомия, физиология, фармакология осы саланың негіздерін құрайды."
+    },
+    {
+      "subject": {
+        "surface": "денсаулық",
+        "root": "денсаулық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "медицина ұғымы",
+        "root": "медицина ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Денсаулық — адам ағзасының тек ауру жоқ күйі ғана емес, толық дене, психикалық және әлеуметтік әл-ауқаты (Дүниежүзілік денсаулық сақтау ұйымының — ДДҰ — анықтамасы)."
+    },
+    {
+      "subject": {
+        "surface": "ауру",
+        "root": "ауру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "медицина ұғымы",
+        "root": "медицина ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ауру — ағзаның қалыпты қызметінің бұзылуы, нақты симптомдармен білінетін патологиялық күй. Жұқпалы ауру (инфекция тудырады) және жұқпайтын ауру (қант диабеті, гипертония) болып бөлінеді."
+    },
+    {
+      "subject": {
+        "surface": "симптом",
+        "root": "симптом",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "медицина ұғымы",
+        "root": "медицина ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Симптом — аурудың сыртқы белгісі (мысалы: жөтел, бас ауыруы, жоғары температура, әлсіздік). Ауруды анықтау үшін дәрігер симптомдарды тіркейді."
+    },
+    {
+      "subject": {
+        "surface": "диагноз",
+        "root": "диагноз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "медицина ұғымы",
+        "root": "медицина ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Диагноз — пациенттің симптомдары мен зерттеу нәтижелеріне сүйеніп дәрігер қойған науқастың аты. Дұрыс диагноз — табысты емдеудің негізі."
+    },
+    {
+      "subject": {
+        "surface": "емдеу",
+        "root": "емдеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "медицина ұғымы",
+        "root": "медицина ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Емдеу — ауруды жою немесе симптомдарды жеңілдету мақсатында жасалатын медициналық әрекеттер жиынтығы. Дәрі-дәрмек, операция, физиотерапия, диета — емдеу әдістерінің мысалдары."
+    },
+    {
+      "subject": {
+        "surface": "профилактика",
+        "root": "профилактика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "медицина ұғымы",
+        "root": "медицина ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Профилактика — ауруды алдын алу мақсатындағы шаралар (вакцинация, гигиена, дұрыс тамақтану, спортпен айналысу, медициналық тексеру)."
+    },
+    {
+      "subject": {
+        "surface": "иммунитет",
+        "root": "иммунитет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "медицина ұғымы",
+        "root": "медицина ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Иммунитет — ағзаның бөгде микроағзалардан, инфекциядан, токсиннен қорғану қабілеті. Туа біткен иммунитет (universal) және орнатылған иммунитет (вакцина, бұрын болған ауру арқылы) болып бөлінеді."
+    },
+    {
+      "subject": {
+        "surface": "алғашқы көмек",
+        "root": "алғашқы көмек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "медицина ұғымы",
+        "root": "медицина ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Алғашқы көмек — медициналық маман келгенше зардап шегушіге жасалатын алғашқы көмек әрекеттері (қан тоқтату, тыныс жолын тазалау, жасанды тыныс беру, жараны таңу, шок алдын алу)."
+    },
+    {
+      "subject": {
+        "surface": "дәрі",
+        "root": "дәрі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "медицина ұғымы",
+        "root": "медицина ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дәрі — ауруды емдеу немесе алдын алу үшін қолданылатын химиялық немесе биологиялық зат. Таблетка, ампула, сироп, мазь — дәрі формалары. Тек дәрігер тағайындауымен қабылдау керек."
+    },
+    {
+      "subject": {
+        "surface": "вакцина",
+        "root": "вакцина",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәрі",
+        "root": "дәрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Вакцина — әлсіретілген немесе өлтірілген қоздырғыштан жасалған, ағзада иммунитет тудыратын дәрі. Полиомиелит, қызылша, грипп, COVID-19 — вакциналаудың мысалдары."
+    },
+    {
+      "subject": {
+        "surface": "антибиотик",
+        "root": "антибиотик",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәрі",
+        "root": "дәрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/medicine_basic",
+      "source": {
+        "pack": "world_core/medicine_basic.jsonl",
+        "sample_id": "med_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Антибиотик — бактериялық инфекцияны емдеуге арналған дәрі (мысалы: пенициллин, амоксициллин). Вирусқа қарсы әсер етпейді. Тек дәрігер тағайындауымен — өзбетімен қабылдау резистенттікке әкеледі."
     },
     {
       "subject": {

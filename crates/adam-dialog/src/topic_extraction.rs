@@ -796,6 +796,11 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "атлант мұхиты",
     "үнді мұхиты",
     "солтүстік мұзды мұхит",
+    // **v4.71.0** — Educational portal: medicine foundations.
+    "медицина ұғымы",
+    "алғашқы көмек",
+    "жұқпалы ауру",
+    "жұқпайтын ауру",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of
