@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.66.5] — 2026-05-06 — Educational portal Day 3 #2 — Middle-school advanced geometry: angle types + circle properties + Pythagoras + parallelogram family + sin
+
+**Day 3 release 2/10.** Per memory directive — pre-flight grep of `mathematics_basic.jsonl` confirmed existing coverage of геометрия / тригонометрия (as math саласы only) / фигура / бұрыш / шеңбер / дөңгелек / үшбұрыш / төртбұрыш / шаршы / тіктөртбұрыш / көпбұрыш. Detailed angle classification, circle properties (R, d, π), right-triangle theorems, and trig function definitions were missing. Extends canonical `mathematics_basic.jsonl` with 12 entries cementing the middle-school 7-9 geometry curriculum.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| геометрия / тригонометрия (as branches) / фигура / бұрыш / шеңбер / дөңгелек / үшбұрыш / төртбұрыш / шаршы / тіктөртбұрыш / көпбұрыш | `mathematics_basic.jsonl` (math_014..026) | ✓ skip — covered |
+| Angle types (тік / сүйір / доғал) | not yet | + add |
+| Circle properties (радиус / диаметр / π) | not yet | + add |
+| Right triangle (тік үшбұрыш) + Pythagoras | not yet | + add |
+| Parallelogram family (параллелограмм / ромб / трапеция) | not yet | + add |
+| Trig function (синус, baseline) | not yet | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/mathematics_basic.jsonl` (`math_080…091`):
+
+**Angle types, all IsA бұрыш (3):**
+- math_080: тік бұрыш — right angle (90°)
+- math_081: сүйір бұрыш — acute (0° < α < 90°)
+- math_082: доғал бұрыш — obtuse (90° < α < 180°)
+
+**Circle properties (3):**
+- math_083: радиус IsA математикалық шама — center-to-arc distance
+- math_084: диаметр IsA математикалық шама — `d = 2R`
+- math_085: пи саны IsA математикалық тұрақты — π ≈ 3,14159…, `C = 2πR`, `S = πR²`
+
+**Right triangle + Pythagoras (2):**
+- math_086: тік үшбұрыш IsA үшбұрыш — катеттер + гипотенуза
+- math_087: пифагор теоремасы — `a² + b² = c²`
+
+**Parallelogram family (3):**
+- math_088: параллелограмм IsA төртбұрыш — `S = a·h`
+- math_089: ромб IsA параллелограмм — `S = (d₁·d₂)/2`
+- math_090: трапеция IsA төртбұрыш — `S = ((a+b)/2)·h`
+
+**Trigonometry baseline (1):**
+- math_091: синус IsA тригонометриялық функция — `sin α = қарсы катет / гипотенуза`
+
+**(2) Curriculum-grade formulas embedded** in 8 of 12 entries.
+
+**(3) MULTIWORD_ENTITIES extended** with 8 new compounds: математикалық тұрақты, тригонометриялық функция, тік / сүйір / доғал бұрыш, пи саны, тік үшбұрыш, пифагор теоремасы.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2356 | **2368** (+12) |
+| world_core facts | 2537 | **2549** (+12) |
+| world_core domains | 51 | **51** unchanged |
+| Derived facts | 29336 | **29357** (+21 = **1.75× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+
+The 1.75× cascade reflects geometry sub-class deepening — angle types and parallelogram family chain through R5 against existing бұрыш / төртбұрыш hubs, but the new sub-types (тік үшбұрыш / тригонометриялық функция) are leaves with no children yet. Future Day 3 trig + physics releases (sin/cos/tan, force/velocity) will multiply against these new hubs.
+
+### Cadence
+
+`.5` patch — same-domain canonical extension.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.66.0] — 2026-05-06 — Educational portal Day 3 #1 — Middle-school algebra deepening: variables, expressions, inequalities, coordinate plane, discriminant, Vieta
 
 **Day 3 release 1/10.** Day 3 STARTS — middle school 5-9 grade deepening. Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `mathematics_basic.jsonl` confirmed existing coverage of теңдеу / алгебра / функция / сызықтық / квадраттық / көпмүше / туынды / интеграл / орташа мән / медиана / дисперсия / ықтималдық. The variable-and-coordinate algebra layer was missing. This release extends canonical `mathematics_basic.jsonl` with 12 entries that cement the middle-school algebra curriculum (grades 7-9).

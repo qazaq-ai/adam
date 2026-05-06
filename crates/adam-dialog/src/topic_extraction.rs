@@ -704,6 +704,15 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "функция графигі",
     "тура пропорционалдық",
     "виета теоремасы",
+    // **v4.66.5** — Day 3 #2: middle-school advanced geometry.
+    "математикалық тұрақты",
+    "тригонометриялық функция",
+    "тік бұрыш",
+    "сүйір бұрыш",
+    "доғал бұрыш",
+    "пи саны",
+    "тік үшбұрыш",
+    "пифагор теоремасы",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of

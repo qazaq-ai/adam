@@ -1,7 +1,7 @@
 {
-  "version": "4.66.0",
+  "version": "4.66.5",
   "status": "completed",
-  "elapsed_s": 66,
+  "elapsed_s": 58,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2596,
+    "facts_total": 2608,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2044,
+      "is_a": 2056,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -66,7 +66,7 @@
       "world_core/kz_literature.jsonl": 108,
       "world_core/language_features.jsonl": 78,
       "world_core/materials.jsonl": 22,
-      "world_core/mathematics_basic.jsonl": 79,
+      "world_core/mathematics_basic.jsonl": 91,
       "world_core/measurements.jsonl": 18,
       "world_core/music_kz.jsonl": 24,
       "world_core/notable_kazakhstanis.jsonl": 51,
@@ -30454,6 +30454,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Виета теоремасы — келтірілген квадраттық теңдеу x² + px + q = 0 үшін: x₁ + x₂ = −p, x₁ · x₂ = q. Түбірлерді тез табу мен тексеру үшін қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "тік бұрыш",
+        "root": "тік бұрыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бұрыш",
+        "root": "бұрыш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_080"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тік бұрыш — өлшемі дәл 90° тең бұрыш. «┐» белгісімен немесе шаршы белгісімен жазылады."
+    },
+    {
+      "subject": {
+        "surface": "сүйір бұрыш",
+        "root": "сүйір бұрыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бұрыш",
+        "root": "бұрыш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_081"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сүйір бұрыш — өлшемі 90°-тан кіші бұрыш (0° < α < 90°). Мысал: үшбұрыштағы екі қалған бұрыш тік үшбұрышта сүйір болады."
+    },
+    {
+      "subject": {
+        "surface": "доғал бұрыш",
+        "root": "доғал бұрыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бұрыш",
+        "root": "бұрыш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_082"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Доғал бұрыш — өлшемі 90°-тан үлкен, 180°-тан кіші бұрыш (90° < α < 180°)."
+    },
+    {
+      "subject": {
+        "surface": "радиус",
+        "root": "радиус",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық шама",
+        "root": "математикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_083"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Радиус — шеңбер немесе дөңгелек центрінен оның кез келген нүктесіне дейінгі қашықтық. R немесе r әрпімен белгіленеді."
+    },
+    {
+      "subject": {
+        "surface": "диаметр",
+        "root": "диаметр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық шама",
+        "root": "математикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_084"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Диаметр — шеңбердің центрі арқылы өтіп, оны екі нүктеде қиятын кесінді. d = 2R формуласымен есептеледі. Шеңбердің ең үлкен хордасы."
+    },
+    {
+      "subject": {
+        "surface": "пи саны",
+        "root": "пи саны",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық тұрақты",
+        "root": "математикалық тұрақты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_085"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Пи саны — шеңбердің ұзындығының оның диаметріне қатынасы. π ≈ 3,14159… — иррационал тұрақты. Шеңбер ұзындығы C = 2πR, дөңгелек ауданы S = πR²."
+    },
+    {
+      "subject": {
+        "surface": "тік үшбұрыш",
+        "root": "тік үшбұрыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "үшбұрыш",
+        "root": "үшбұрыш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_086"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тік үшбұрыш — бір бұрышы тік (90°) болатын үшбұрыш. Тік бұрыштың қасында жатқан қабырғалар — катеттер; қарама-қарсы ең ұзын қабырға — гипотенуза."
+    },
+    {
+      "subject": {
+        "surface": "пифагор теоремасы",
+        "root": "пифагор теоремасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық теорема",
+        "root": "математикалық теорема",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_087"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Пифагор теоремасы — тік үшбұрышта гипотенузаның квадраты екі катеттің квадраттарының қосындысына тең: a² + b² = c² (c — гипотенуза, a, b — катеттер)."
+    },
+    {
+      "subject": {
+        "surface": "параллелограмм",
+        "root": "параллелограмм",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "төртбұрыш",
+        "root": "төртбұрыш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_088"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Параллелограмм — қарама-қарсы қабырғалары параллель және тең болатын төртбұрыш. Ауданы: S = a·h (a — табан, h — биіктік)."
+    },
+    {
+      "subject": {
+        "surface": "ромб",
+        "root": "ромб",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "параллелограмм",
+        "root": "параллелограмм",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_089"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ромб — барлық қабырғалары тең болатын параллелограмм. Диагональдары өзара перпендикуляр және тең бөліктерге қияды. Ауданы: S = (d₁·d₂)/2."
+    },
+    {
+      "subject": {
+        "surface": "трапеция",
+        "root": "трапеция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "төртбұрыш",
+        "root": "төртбұрыш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_090"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Трапеция — тек екі қарама-қарсы қабырғасы параллель болатын төртбұрыш. Параллель қабырғалар — табандар, қалғандары — бүйір қабырғалар. Ауданы: S = ((a+b)/2)·h."
+    },
+    {
+      "subject": {
+        "surface": "синус",
+        "root": "синус",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тригонометриялық функция",
+        "root": "тригонометриялық функция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_091"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Синус — тік үшбұрыштағы сүйір α бұрышының қасындағы катеттің гипотенузаға қатынасының кері жағы: sin α = қарсы катет / гипотенуза. Тригонометриялық функция."
     },
     {
       "subject": {
