@@ -1,7 +1,7 @@
 {
-  "version": "4.78.5",
+  "version": "4.79.0",
   "status": "completed",
-  "elapsed_s": 67,
+  "elapsed_s": 33,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2786,
+    "facts_total": 2804,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2219,
+      "is_a": 2237,
       "lives_in": 8,
       "part_of": 245,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 217,
+      "world_core/programming_rust.jsonl": 235,
       "world_core/programming_rust_advanced.jsonl": 35,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -43380,26 +43380,6 @@
     },
     {
       "subject": {
-        "surface": "көлеңкелеу",
-        "root": "көлеңкелеу",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "бағдарлама әрекеті",
-        "root": "бағдарлама әрекеті",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust",
-      "source": {
-        "pack": "world_core/programming_rust.jsonl",
-        "sample_id": "rust_023"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Көлеңкелеу — `Rust-`та `let` арқылы бір атаудың жаңа айнымалымен жасырылуы."
-    },
-    {
-      "subject": {
         "surface": "функция",
         "root": "функция",
         "pos": "noun"
@@ -47277,6 +47257,386 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Rust стилі — кодтың сыртқы келбеті туралы шартты келісімдер: төрт бос орынмен шегініс жасалады (tabulation емес); атау snake_case-те (`my_variable`, `read_file`); тип CamelCase-те (`MyStruct`, `Result`); тұрақты SCREAMING_SNAKE_CASE-те (`MAX_SIZE`); файл атауы snake_case-те. Пішімдеу үшін `cargo fmt` (rustfmt-ті қолданады) шакыруға болады."
+    },
+    {
+      "subject": {
+        "surface": "string::new",
+        "root": "string::new",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "string конструкторы",
+        "root": "string конструкторы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_218"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`String::new()` — стандартты кітапханадағы `String` типінің жаңа, **бос** данасын қайтаратын байланысты функция. `String` — өсетін, өзгертілетін, UTF-8 кодталған иелік-жол түрі. Қолдану: `let mut guess = String::new();` — бос жол құрылады, кейін `guess.push_str(\"...\")` немесе `read_line(&mut guess)` арқылы толтырылады."
+    },
+    {
+      "subject": {
+        "surface": "let mut",
+        "root": "let mut",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "айнымалы жариялауы",
+        "root": "айнымалы жариялауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_219"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`let mut` — `Rust`-та өзгермелі айнымалы жариялау. Әдетте айнымалылар **тұрақты** (immutable) — `let x = 5;` мәнін қайта тағайындау мүмкін емес. Егер мәнді өзгерту керек болса, `mut` кілтсөзі қосылады: `let mut x = 5; x = 10;`. Тұрақтылық — `Rust`-тың әдепкі әдісі: компилятор сізге өзгеретін мәндерді ашық белгілеуді талап етеді."
+    },
+    {
+      "subject": {
+        "surface": "use std::io",
+        "root": "use std::io",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "use сөйлемі",
+        "root": "use сөйлемі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_220"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`use std::io;` — `Rust`-тың стандартты кітапханасының `io` модулін ағымдағы аумаққа енгізетін сөйлем. Стандартты кітапхана көптеген пайдалы заттарды ұсынады, бірақ олардың бәрі автоматты түрде қолжетімді емес: `io`, `cmp`, `collections` сияқты бөлектерді қолданғанда оларды нақты `use` арқылы шакыру керек. Ерекшелік — *prelude*: ең жиі қолданылатын нәрселер (`String`, `Vec`, `Option`, `Result`) автоматты түрде қолжетімді."
+    },
+    {
+      "subject": {
+        "surface": "io::stdin",
+        "root": "io::stdin",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib функциясы",
+        "root": "stdlib функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_221"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`io::stdin()` — стандартты енгізуді көрсететін `Stdin` данасын қайтаратын функция. Терминалдан пайдаланушы енгізген мәтінді оқу үшін қолданылады. Әдетте `.read_line(&mut buf)` әдісімен бірге шакырылады: `io::stdin().read_line(&mut guess)`. `use std::io;` алдын ала қажет."
+    },
+    {
+      "subject": {
+        "surface": "read_line",
+        "root": "read_line",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdin әдісі",
+        "root": "stdin әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_222"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`read_line(&mut guess)` — `Stdin` әдісі: стандартты енгізуден бір жолды (\\n-ға дейін) оқып, оны берілген өзгермелі `String` сілтемесіне жазады. `Result<usize, io::Error>` қайтарады — оқыған байт саны не қате. `&mut guess` — өзгермелі сілтеме арқылы береміз, өйткені әдіс `guess`-ке жазу үшін оған иелік алмай, бірақ оны өзгертуге рұқсат қажет."
+    },
+    {
+      "subject": {
+        "surface": "&mut",
+        "root": "&mut",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сілтеме түрі",
+        "root": "сілтеме түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_223"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`&mut` — өзгермелі сілтеме (mutable reference). `&` белгісі — сілтеме жасайды, иелікті ауыстырмастан мәнге қол жеткізуге мүмкіндік береді. `mut` — сілтеме арқылы мәнді өзгертуге рұқсат береді. Ереже: бір уақытта бір ғана өзгермелі сілтеме болуы мүмкін (немесе көп тұрақты сілтеме). Мысалы: `read_line(&mut guess)` — функцияға `guess`-ті өзгертуге уақытша рұқсат береді."
+    },
+    {
+      "subject": {
+        "surface": "result",
+        "root": "result",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib енамы",
+        "root": "stdlib енамы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_224"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Result<T, E>` — стандартты кітапхана ұсынатын енам, нұсқалары екеу: `Ok(T)` (сәтті — нәтиже мәні `T` түрінде) және `Err(E)` (қате — қате мәні `E` түрінде). Көптеген функциялар осы түрде жазылған: операцияның сәтті немесе сәтсіз болуы мүмкін, нәтиже соған сай қапталады. `match`, `expect`, `?` арқылы өңделеді."
+    },
+    {
+      "subject": {
+        "surface": "expect",
+        "root": "expect",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "result әдісі",
+        "root": "result әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_225"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`.expect(\"хабарлама\")` — `Result` пен `Option` түріндегі мәндерден ішкі мәнді шығарып алатын әдіс. Егер мән `Ok(x)` (немесе `Some(x)`) болса — `x` қайтарады; егер `Err`/`None` болса — бағдарламаны тоқтатып, берілген хабарламаны экранда көрсетеді (panic). Жылдам прототипке ыңғайлы, бірақ өндірісте `match` немесе `?` арқылы нақты өңдеу артық."
+    },
+    {
+      "subject": {
+        "surface": "форматтауыш орынтолтырғыш",
+        "root": "форматтауыш орынтолтырғыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "макрос синтаксисі",
+        "root": "макрос синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_226"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`{}` форматтауыш орынтолтырғыш — `println!`, `format!`, `write!` макростарында айнымалы мәнін жолдың тиісті жеріне қоятын белгі. Екі түрі бар: позициялық — `println!(\"{} {}\", a, b)`, аталған — `println!(\"{guess}\")` (ағымдағы аумақтағы атауды тікелей пайдаланады). Бірнеше орынтолтырғыш реттік бойынша аргументтерге сай келеді."
+    },
+    {
+      "subject": {
+        "surface": "[dependencies]",
+        "root": "[dependencies]",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo.toml бөлімі",
+        "root": "cargo.toml бөлімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_227"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`[dependencies]` — `Cargo.toml`-да жобаның сыртқы тәуелділіктерін тізбелейтін бөлім. Әр сөйлем `атауы = \"нұсқа\"` пішімінде: `rand = \"0.8.5\"` дегенмен `^0.8.5`-пен үйлесімді (yagni 0.8.5-тен жоғары, 0.9.0-ден төмен) кез келген нұсқа жарамды — semver шартты түрі. `cargo build` `crates.io`-дан тәуелділікті жүктеп алады."
+    },
+    {
+      "subject": {
+        "surface": "rand",
+        "root": "rand",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сыртқы сандық",
+        "root": "сыртқы сандық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_228"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`rand` — `Rust`-тың кездейсоқ сан генерациясының де-факто стандартты сандығы (`crates.io`-дан жүктеледі, `std`-да жоқ). Қолдану: `Cargo.toml`-да `rand = \"0.8.5\"` тіркеу + кодта `use rand::Rng;` + `rand::thread_rng().gen_range(1..=100)`. `Rng` трейті — кездейсоқ сан генераторларынан күтілетін әдістерді сипаттайды."
+    },
+    {
+      "subject": {
+        "surface": "thread_rng",
+        "root": "thread_rng",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rand функциясы",
+        "root": "rand функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_229"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`rand::thread_rng()` — ағынға тиесілі (thread-local) кездейсоқ сан генераторын қайтаратын функция. Тұқым (seed) операциялық жүйеден алынады — болжау қиын, әр ағында өз генераторы бар. `gen_range`, `gen`, `random` сияқты `Rng` трейтінің әдістерімен бірге шакырылады: `rand::thread_rng().gen_range(1..=100)`."
+    },
+    {
+      "subject": {
+        "surface": "gen_range",
+        "root": "gen_range",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rand әдісі",
+        "root": "rand әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_230"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`gen_range(start..=end)` — `Rng` трейтінің әдісі: берілген диапазондан кездейсоқ бүтін санды қайтарады. Мысалы: `rand::thread_rng().gen_range(1..=100)` — 1-ден 100-ге дейінгі (екі шеті де қосылған) сан. Эксклюзивті диапазон үшін `..` (мысалы, `0..n`)."
+    },
+    {
+      "subject": {
+        "surface": "диапазон өрнегі",
+        "root": "диапазон өрнегі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_231"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Диапазон өрнегі — `Rust`-та сан тізбегін сипаттайтын синтаксис. Екі түрі: эксклюзивті `start..end` — соңғы шеті кірмейді (`0..3` = 0,1,2); инклюзивті `start..=end` — соңғы шеті кіреді (`0..=3` = 0,1,2,3). Циклда (`for i in 0..10`), итераторда (`(1..=100).sum()`), тіліммен (`&v[1..3]`) және `gen_range`-да қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "ordering",
+        "root": "ordering",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib енамы",
+        "root": "stdlib енамы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_232"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Ordering` — `std::cmp::Ordering` модулінде орналасқан стандартты енам, үш нұсқасы бар: `Less` (кіші), `Greater` (үлкен), `Equal` (тең). Екі мәнді салыстырудың нәтижесі. `cmp`, `partial_cmp` сияқты әдістер осы енамды қайтарады. `match` арқылы тармақтап өңделеді."
+    },
+    {
+      "subject": {
+        "surface": "cmp әдісі",
+        "root": "cmp әдісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ord әдісі",
+        "root": "ord әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_233"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`.cmp(&other)` — `Ord` трейтінің әдісі: екі мәнді салыстырып, `Ordering` (Less / Greater / Equal) қайтарады. Мысалы: `guess.cmp(&secret_number)`. Тек бірдей типті мәндерді салыстыруға болады (`String` пен `u32`-ні қатар салыстыруға келмейді — алдын ала бірдей түрге айналдыру керек)."
+    },
+    {
+      "subject": {
+        "surface": "көлеңкелеу",
+        "root": "көлеңкелеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "айнымалы тәсілі",
+        "root": "айнымалы тәсілі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_234"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көлеңкелеу (shadowing) — `Rust`-та бір атпен жаңа айнымалы жариялау. Бұрынғы мәнді *жасырады* (тіл термині — shadow), бірақ оны өзгертпейді. Мысалы: `let guess = \"5\"; let guess: u32 = guess.trim().parse().unwrap();` — алғашқысы `String`, екіншісі `u32`. Көлеңкелеу `mut`-тан өзгеше: тип ауыса алады, ал `mut` бір типті ғана сақтайды."
+    },
+    {
+      "subject": {
+        "surface": "trim",
+        "root": "trim",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "string әдісі",
+        "root": "string әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_235"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`.trim()` — `String` пен `&str` әдісі: жолдың алды-артындағы бос орындар мен жол аяқталу символдарын (`\\n`, `\\r`, табуляция, бос орын) алып тастап, жаңа `&str` қайтарады. `read_line` соңында `\\n` қалдыратын болғандықтан, `parse` алдында жолды `trim()` арқылы тазалау керек: `guess.trim().parse::<u32>()`."
+    },
+    {
+      "subject": {
+        "surface": "parse",
+        "root": "parse",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "string әдісі",
+        "root": "string әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_236"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`.parse::<T>()` — `&str` әдісі: жолды берілген `T` түріне айналдырады. `Result<T, T::Err>` қайтарады — мәтін санға келмесе `Err`. Тип нақты белгіленеді — өрнектен (`let n: u32 = s.parse()...`) немесе турбофиш-арқылы (`s.parse::<u32>()`). Тіркесімі: `s.trim().parse::<u32>().expect(\"...\")` — типтік String-to-int идиома."
     },
     {
       "subject": {

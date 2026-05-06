@@ -7,6 +7,89 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.79.5] — 2026-05-06 — Rust Book chapter 2 deepening — guessing game
+
+Per-chapter pedagogical cadence continues. Chapter 2 («Санды табу ойыны») is the first complete program in the book; previously thin (~7 entries). Now deepened with full guessing-game walkthrough.
+
+### What's added
+
+**19 new curated entries `rust_218…236`** in `programming_rust.jsonl`:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_218 | string::new | Empty owned String constructor |
+| rust_219 | let mut | Mutable variable declaration (vs default immutable) |
+| rust_220 | use std::io | Bringing stdlib io module into scope |
+| rust_221 | io::stdin | Stdin handle |
+| rust_222 | read_line | Read input into mutable String |
+| rust_223 | &mut | Mutable reference (one-mutable-or-many-immutable rule) |
+| rust_224 | result | Result<T,E> enum (Ok / Err) |
+| rust_225 | expect | Panic-on-Err with message; return value on Ok |
+| rust_226 | форматтауыш орынтолтырғыш | `{}` placeholder (positional vs named) |
+| rust_227 | [dependencies] | Cargo.toml section + semver shorthand |
+| rust_228 | rand | External RNG crate from crates.io |
+| rust_229 | thread_rng | Thread-local RNG, OS-seeded |
+| rust_230 | gen_range | Inclusive-range random integer |
+| rust_231 | диапазон өрнегі | `..` exclusive vs `..=` inclusive |
+| rust_232 | ordering | std::cmp::Ordering enum (Less/Greater/Equal) |
+| rust_233 | cmp әдісі | `Ord::cmp` returning Ordering |
+| rust_234 | көлеңкелеу | Shadowing — same name, possibly different type |
+| rust_235 | trim | Whitespace + newline strip |
+| rust_236 | parse | String → typed number via Result |
+
+Each entry: Kazakh definition + concrete code example from the translated chapter (`io::stdin().read_line(&mut guess)`, `rand::thread_rng().gen_range(1..=100)`, `let guess: u32 = guess.trim().parse().expect(...)`).
+
+### Stub deleted
+
+- `rust_023` (1-line shadowing stub «Көлеңкелеу — `Rust-`та `let` арқылы бір атаудың жаңа айнымалымен жасырылуы») replaced by deeper `rust_234` covering shadowing-vs-mut distinction with example.
+
+### Bug fixed alongside
+
+`multiword_entity_hint` previously required exact whitespace-bounded token equality for compounds without spaces — surfaced when `string::new` MULTIWORD entry didn't fire on input «String::new() деген не?» (the token «string::new()» with parens didn't equal «string::new»). Now treats `::` as a compound separator like space (substring match):
+
+```rust
+if entity.contains(' ') || entity.contains("::") {
+    if lowered.contains(**entity) { return Some(...); }
+}
+```
+
+So Rust path names like `io::stdin`, `string::new`, `std::cmp::Ordering` resolve correctly.
+
+### Per-chapter test (continues v4.79.0 invariant)
+
+- `data/eval/rust_book_chapter_02_holdout.json` — 19 cases, 9 categories (`ch02_io`, `ch02_mutability`, `ch02_result`, `ch02_format`, `ch02_external_crate`, `ch02_range`, `ch02_match`, `ch02_shadowing`, `ch02_string_conv`).
+- `crates/adam-dialog/tests/rust_book_chapter_02.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `LATIN_TECH_SUBJECTS` += 7 bare tokens (`rand` / `ordering` / `trim` / `parse` / `thread_rng` / `gen_range` / `read_line`).
+- `MULTIWORD_ENTITIES` += 26 compounds (subjects: `string::new`, `let mut`, `use std::io`, `io::stdin`, `&mut`, `форматтауыш орынтолтырғыш`, `[dependencies]`, `cmp әдісі`, `диапазон өрнегі`; objects: `string конструкторы`, `айнымалы жариялауы`, `use сөйлемі`, `stdlib функциясы`, `stdin әдісі`, `сілтеме түрі`, `stdlib енамы`, `result әдісі`, `макрос синтаксисі`, `cargo.toml бөлімі`, `сыртқы сандық`, `rand функциясы`, `rand әдісі`, `rust синтаксисі`, `ord әдісі`, `айнымалы тәсілі`, `string әдісі`).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 19 / 19 chapter 2 holdout cases | ✅ 100 % |
+| Existing chapter 1 holdout | ✅ unchanged |
+| `rust_concepts_holdout` | ✅ unchanged |
+| Workspace tests | **978 passing** (was 977; +1 chapter-2 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2544 → **2562** (+18 net: +19 ch.2 − 1 stub deletion) |
+| world_core facts | 2786 → **2804** (+18 net) |
+| Derived facts | 30771 → **30770** (−1 from stub removal) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.79.5** | **ch. 2** | **Guessing game (this release)** |
+| v4.80.0 | ch. 3 | Common programming concepts deepening (variables / scalar+compound types / functions / control flow / shadowing details) |
+| v4.80.5 | ch. 4 | Ownership deepening (stack vs heap / move / Copy vs Clone / borrow rules) |
+| v4.81.0 | ch. 5 | Structs deepening |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.5` patch — same architectural family (curated curriculum data + per-chapter test pattern); 19 entries close a real curriculum gap and continue the chapter cadence.
+
 ## [4.79.0] — 2026-05-06 — Rust Book chapter 1 deepening + per-chapter test invariant — Bastau
 
 Per user pushback («Обучать надо с первой главы и постепенно усложняя»): pivot the Rust-curriculum roadmap from gap-density-driven jumps to strict pedagogical chapter-by-chapter order, starting with chapter 1. Plus new directive («каждую главу покрывай реальными тестами и сразу исправляй или корректируй обучение»): this release introduces the per-chapter holdout pattern that every future chapter release follows.

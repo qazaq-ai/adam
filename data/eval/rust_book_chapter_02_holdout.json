@@ -1,0 +1,123 @@
+{
+  "_comment": "v4.79.5 — Rust Book Chapter 2 (Санды табу ойыны / guessing game) holdout. 19 natural Kazakh queries against the curated rust_218…rust_236 entries that deepen chapter 2 coverage. Categories: ch02_io (input/output), ch02_mutability (let mut, &mut), ch02_result (Result enum + expect), ch02_format (println placeholder), ch02_external_crate (Cargo.toml [dependencies] + rand + thread_rng + gen_range), ch02_range (..=), ch02_match (Ordering + cmp), ch02_shadowing, ch02_string_conv (trim + parse).",
+  "version": "v4.79.5",
+  "captured_date": "2026-05-06",
+  "chapter": 2,
+  "chapter_title": "Санды табу ойыны (Guessing game / first complete program)",
+  "cases": [
+    {
+      "id": "ch02_string_new",
+      "category": "ch02_io",
+      "query": "String::new() деген не?",
+      "any_substring": ["бос", "құрылады", "string"]
+    },
+    {
+      "id": "ch02_let_mut",
+      "category": "ch02_mutability",
+      "query": "let mut деген не?",
+      "any_substring": ["өзгермелі", "тұрақты", "айнымалы"]
+    },
+    {
+      "id": "ch02_use_std_io",
+      "category": "ch02_io",
+      "query": "use std::io деген не?",
+      "any_substring": ["модул", "аумаққа", "стандартты кітапхана"]
+    },
+    {
+      "id": "ch02_io_stdin",
+      "category": "ch02_io",
+      "query": "io::stdin деген не?",
+      "any_substring": ["стандартты енгізу", "stdin", "терминал"]
+    },
+    {
+      "id": "ch02_read_line",
+      "category": "ch02_io",
+      "query": "read_line деген не?",
+      "any_substring": ["жолды", "оқып", "&mut"]
+    },
+    {
+      "id": "ch02_mutable_ref",
+      "category": "ch02_mutability",
+      "query": "&mut деген не?",
+      "any_substring": ["өзгермелі сілтеме", "иелік", "өзгертуге"]
+    },
+    {
+      "id": "ch02_result_enum",
+      "category": "ch02_result",
+      "query": "Result деген не?",
+      "any_substring": ["ok", "err", "енам"]
+    },
+    {
+      "id": "ch02_expect",
+      "category": "ch02_result",
+      "query": "expect деген не?",
+      "any_substring": ["panic", "тоқтат", "хабарлама"]
+    },
+    {
+      "id": "ch02_format_placeholder",
+      "category": "ch02_format",
+      "query": "форматтауыш орынтолтырғыш деген не?",
+      "any_substring": ["{}", "println", "макрос"]
+    },
+    {
+      "id": "ch02_dependencies_section",
+      "category": "ch02_external_crate",
+      "query": "[dependencies] деген не?",
+      "any_substring": ["cargo.toml", "тәуелділ", "сандық"]
+    },
+    {
+      "id": "ch02_rand_crate",
+      "category": "ch02_external_crate",
+      "query": "rand деген не?",
+      "any_substring": ["кездейсоқ", "сандыг", "crates.io"]
+    },
+    {
+      "id": "ch02_thread_rng",
+      "category": "ch02_external_crate",
+      "query": "thread_rng деген не?",
+      "any_substring": ["ағынға", "генератор", "кездейсоқ"]
+    },
+    {
+      "id": "ch02_gen_range",
+      "category": "ch02_external_crate",
+      "query": "gen_range деген не?",
+      "any_substring": ["диапазон", "кездейсоқ", "..="]
+    },
+    {
+      "id": "ch02_range_expression",
+      "category": "ch02_range",
+      "query": "Диапазон өрнегі деген не?",
+      "any_substring": ["..=", "эксклюзив", "тізбек"]
+    },
+    {
+      "id": "ch02_ordering",
+      "category": "ch02_match",
+      "query": "Ordering деген не?",
+      "any_substring": ["less", "greater", "equal"]
+    },
+    {
+      "id": "ch02_cmp_method",
+      "category": "ch02_match",
+      "query": "cmp әдісі деген не?",
+      "any_substring": ["ordering", "салыстыр", "ord"]
+    },
+    {
+      "id": "ch02_shadowing",
+      "category": "ch02_shadowing",
+      "query": "Көлеңкелеу деген не?",
+      "any_substring": ["жасырады", "тип", "let"]
+    },
+    {
+      "id": "ch02_trim",
+      "category": "ch02_string_conv",
+      "query": "trim деген не?",
+      "any_substring": ["бос орын", "\\n", "тазалау"]
+    },
+    {
+      "id": "ch02_parse",
+      "category": "ch02_string_conv",
+      "query": "parse деген не?",
+      "any_substring": ["айналдырад", "result", "тип"]
+    }
+  ]
+}

@@ -1924,6 +1924,35 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "rust басылым жүйесі",
     "конфигурация пішімі",
     "тіл шартты келісімдері",
+    // **v4.79.5** — Rust Book chapter 2 (guessing game) deepening.
+    // rust_218…236. Compound subjects (with spaces / `::` / `&` /
+    // `[`) and compound objects (Kazakh phrases that include space).
+    "string::new",
+    "let mut",
+    "use std::io",
+    "io::stdin",
+    "&mut",
+    "форматтауыш орынтолтырғыш",
+    "[dependencies]",
+    "cmp әдісі",
+    "диапазон өрнегі",
+    "string конструкторы",
+    "айнымалы жариялауы",
+    "use сөйлемі",
+    "stdlib функциясы",
+    "stdin әдісі",
+    "сілтеме түрі",
+    "stdlib енамы",
+    "result әдісі",
+    "макрос синтаксисі",
+    "cargo.toml бөлімі",
+    "сыртқы сандық",
+    "rand функциясы",
+    "rand әдісі",
+    "rust синтаксисі",
+    "ord әдісі",
+    "айнымалы тәсілі",
+    "string әдісі",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -1951,7 +1980,15 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
     // entries like «темір» (Fe element) would shadow the third-
     // pass genitive logic for «темір жол» on input «темірдің жолы».
     for entity in &sorted {
-        if entity.contains(' ') {
+        // **v4.79.5** — treat `::` as a compound separator like a
+        // space. Without this, Rust-path names like `io::stdin`,
+        // `string::new`, `std::cmp::Ordering` registered as
+        // MULTIWORD_ENTITIES never match: the single-token branch
+        // requires exact whitespace-bounded equality, and inputs
+        // typically have trailing parens (`io::stdin()`) or other
+        // punctuation that breaks token equality. Substring is the
+        // right semantic for `::`-paths.
+        if entity.contains(' ') || entity.contains("::") {
             if lowered.contains(**entity) {
                 return Some((**entity).to_string());
             }
@@ -2200,6 +2237,18 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     "println",
     "edition",
     "toml",
+    // **v4.79.5** — Rust Book chapter 2 (guessing game) deepening.
+    // rust_218…236. Single-word Latin tokens (underscores included
+    // but no spaces). Multi-word compounds («let mut», «io::stdin»,
+    // «string::new», «диапазон өрнегі», etc.) are in
+    // MULTIWORD_ENTITIES.
+    "rand",
+    "ordering",
+    "trim",
+    "parse",
+    "thread_rng",
+    "gen_range",
+    "read_line",
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word
