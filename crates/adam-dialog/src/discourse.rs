@@ -806,6 +806,47 @@ pub fn try_apply_formula(input: &str) -> Option<(String, i64)> {
     Some((unknown, value))
 }
 
+/// **v4.75.5** — Check-answer handler. Detects «жауабымды тексер: x=4»
+/// / «менің жауабым: x=4» / «x=4 дұрыс па?» pattern and verifies the
+/// user-supplied value against the previously stored answer for the
+/// same variable. Returns `(user_var, user_value, correct)` triple
+/// when input contains a check-phrase marker AND a `var=N` token AND
+/// the variable matches `last_unknown` from session.
+///
+/// Conservative: doesn't try to re-solve from scratch or guess the
+/// variable. Caller falls through to other handlers when None.
+pub fn try_check_answer(
+    input: &str,
+    last_unknown: &str,
+    last_value: i64,
+) -> Option<(String, i64, bool)> {
+    let lower = input.to_lowercase();
+    let has_check_phrase = lower.contains("тексер")
+        || lower.contains("дұрыс па")
+        || lower.contains("дұрыс ма")
+        || lower.contains("менің жауабым");
+    if !has_check_phrase {
+        return None;
+    }
+    let token = lower
+        .split([',', ' ', ';', ':'])
+        .filter(|s| !s.is_empty())
+        .find(|tok| tok.contains('='))?;
+    let token = token.trim_end_matches(['?', '.', '!']);
+    let parts: Vec<&str> = token.splitn(2, '=').collect();
+    if parts.len() != 2 {
+        return None;
+    }
+    let user_var = parts[0].trim().to_string();
+    let user_value: i64 = parts[1].trim().parse().ok()?;
+    let last_unknown_lower = last_unknown.to_lowercase();
+    if user_var != last_unknown_lower {
+        return None;
+    }
+    let correct = user_value == last_value;
+    Some((user_var, user_value, correct))
+}
+
 pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
     // **v4.42.0** — multi-clause support. Split input by commas /
     // sequencing connectives («және» — "and", «содан кейін» — "then",

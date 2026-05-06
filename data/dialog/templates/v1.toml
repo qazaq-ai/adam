@@ -528,6 +528,29 @@ templates = [
     "есептедім: {math_value}{math_words}",
 ]
 
+# **v4.75.5** — Check-answer template families. User submits their
+# answer for verification («Жауабымды тексер: x=4») after a prior
+# turn where adam solved an equation/formula. Conversation::turn
+# populates `__check_answer_correct__` (1 or 0),
+# `__check_answer_user_value__`, `__check_answer_correct_value__`,
+# `__check_answer_unknown__` and the planner routes here based on
+# the boolean slot.
+[[families]]
+key = "check_answer.correct"
+templates = [
+    "Дұрыс! {check_unknown} = {check_correct_value} — сіздің жауабыңыз дұрыс.",
+    "Иә, {check_unknown} = {check_correct_value} — дұрыс жауап. Жарайсыз!",
+    "Жауабыңыз дұрыс: {check_unknown} = {check_correct_value}.",
+]
+
+[[families]]
+key = "check_answer.incorrect"
+templates = [
+    "Жоқ, дұрыс жауап {check_unknown} = {check_correct_value}, ал сіз {check_unknown} = {check_user_value} деп жаздыңыз. Қайта тексеріп көріңіз.",
+    "Дұрыс емес: сіз {check_unknown} = {check_user_value} деп жаздыңыз, ал дұрысы {check_unknown} = {check_correct_value}.",
+    "{check_unknown} = {check_user_value} — дұрыс емес. Дұрыс жауап: {check_unknown} = {check_correct_value}.",
+]
+
 # v4.4.0 — User opted out of resolving a pending contradiction
 # (replied "neither / I don't know / skip" to a CheckContradiction
 # prompt). `Conversation::try_dismiss_pending_contradiction` has

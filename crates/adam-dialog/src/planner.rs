@@ -243,6 +243,52 @@ pub fn plan_response_with_epistemic(
     // «5+5» refused via `math_refusal` — adam now ANSWERS the
     // arithmetic deterministically (no novel-text generation;
     // `try_evaluate_arithmetic` is a pure function).
+    // **v4.75.5** — check_answer routing. Conversation::turn populates
+    // `__check_answer_correct__` (1/0) when user submitted an answer
+    // for verification («Жауабымды тексер: x=4»). Routes to
+    // `check_answer.correct` or `check_answer.incorrect` template
+    // family BEFORE the math_answer path, since the check_answer
+    // input may also have a `var=N` token that the linear-equation
+    // solver could mis-handle as a fresh equation.
+    if let Some(correct_flag) = extra_slots.get("__check_answer_correct__") {
+        let key = if correct_flag == "1" {
+            "check_answer.correct"
+        } else {
+            "check_answer.incorrect"
+        };
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: check_answer override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            if let Some(uv) = extra_slots.get("__check_answer_user_value__") {
+                slots.insert("check_user_value".into(), uv.clone());
+            }
+            if let Some(cv) = extra_slots.get("__check_answer_correct_value__") {
+                slots.insert("check_correct_value".into(), cv.clone());
+            }
+            if let Some(uk) = extra_slots.get("__check_answer_unknown__") {
+                slots.insert("check_unknown".into(), uk.clone());
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     if let Some(value) = extra_slots.get("__math_answer__") {
         let key = "math_answer";
         if !repo.get(key).is_empty() {

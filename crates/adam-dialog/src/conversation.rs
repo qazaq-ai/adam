@@ -1107,11 +1107,47 @@ impl Conversation {
                     std::borrow::Cow::Borrowed(input)
                 }
             };
-            let computed = crate::discourse::try_evaluate_arithmetic(resolved_input.as_ref())
-                .or_else(|| {
+            // **v4.75.5** — check_answer pre-check. Before running any
+            // math evaluator, see if input matches the «verify my
+            // answer» pattern AND session has stored prior solve
+            // (last_math_unknown + last_math_result). If so, skip math
+            // eval entirely and surface check_answer slots; the planner
+            // will pick `check_answer.correct` / `check_answer.incorrect`
+            // family. Without this gate, «Жауабымды тексер: x=3» would
+            // be re-solved as a fresh equation (x=3 → x is 3 trivially)
+            // and the math_answer template family would fire instead of
+            // the verification template.
+            let mut check_answer_fired = false;
+            if let (Some(last_unknown), Some(last_result_str)) = (
+                self.session.get("last_math_unknown").cloned(),
+                self.session.get("last_math_result").cloned(),
+            ) && let Ok(last_value) = last_result_str.parse::<i64>()
+                && let Some((user_var, user_value, correct)) =
+                    crate::discourse::try_check_answer(input, &last_unknown, last_value)
+            {
+                extra_slots.insert("__check_answer_user_value__".into(), user_value.to_string());
+                extra_slots.insert(
+                    "__check_answer_correct_value__".into(),
+                    last_value.to_string(),
+                );
+                extra_slots.insert("__check_answer_unknown__".into(), user_var);
+                extra_slots.insert(
+                    "__check_answer_correct__".into(),
+                    if correct { "1".into() } else { "0".into() },
+                );
+                check_answer_fired = true;
+            }
+            let computed = if check_answer_fired {
+                None
+            } else {
+                crate::discourse::try_evaluate_arithmetic(resolved_input.as_ref()).or_else(|| {
                     crate::discourse::try_evaluate_kazakh_word_math(resolved_input.as_ref())
-                });
-            if let Some(value) = computed {
+                })
+            };
+            if check_answer_fired {
+                // Skip the rest of the math eval cascade — the
+                // check_answer slots are populated.
+            } else if let Some(value) = computed {
                 extra_slots.insert("__math_answer__".into(), value.to_string());
                 if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
                     extra_slots.insert("__math_words__".into(), words);
@@ -1131,12 +1167,15 @@ impl Conversation {
                 // (one for the formula, more for substitutions); the
                 // linear-equation solver would pick the first and fail.
                 extra_slots.insert("__math_answer__".into(), value.to_string());
-                extra_slots.insert("__math_unknown__".into(), unknown);
+                extra_slots.insert("__math_unknown__".into(), unknown.clone());
                 if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
                     extra_slots.insert("__math_words__".into(), words);
                 }
                 self.session
                     .insert("last_math_result".into(), value.to_string());
+                // **v4.75.5** — store unknown variable name for next-turn
+                // check_answer flow.
+                self.session.insert("last_math_unknown".into(), unknown);
             } else if let Some((unknown, value)) =
                 crate::discourse::try_solve_linear_equation(resolved_input.as_ref())
             {
@@ -1147,12 +1186,15 @@ impl Conversation {
                 // `__math_unknown__` for templates that want to render
                 // «X = N» style.
                 extra_slots.insert("__math_answer__".into(), value.to_string());
-                extra_slots.insert("__math_unknown__".into(), unknown);
+                extra_slots.insert("__math_unknown__".into(), unknown.clone());
                 if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
                     extra_slots.insert("__math_words__".into(), words);
                 }
                 self.session
                     .insert("last_math_result".into(), value.to_string());
+                // **v4.75.5** — store unknown variable name for next-turn
+                // check_answer flow.
+                self.session.insert("last_math_unknown".into(), unknown);
             } else {
                 extra_slots.insert("__math_input__".into(), "1".into());
             }

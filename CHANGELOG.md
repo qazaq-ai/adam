@@ -7,6 +7,76 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.75.5] — 2026-05-06 — `check_answer` intent — verify user-submitted answer against last solved equation/formula
+
+Closes Codex round-2 Bug 2 fully (the «check the user's answer» half). Multi-turn pattern: «Егер x+2=5 болса, x қанша?» → «x=3» → «Жауабымды тексер: x=4» → system compares user's value against stored answer and surfaces correct/incorrect verdict with explanation.
+
+### Innovations
+
+**(1) New `discourse::try_check_answer`** — pattern detector. Returns `(user_var, user_value, correct)` triple when input contains:
+- A check-phrase marker: `тексер` / `дұрыс па` / `дұрыс ма` / `менің жауабым`
+- A `var=N` token where var matches the prior turn's `last_unknown` and N is parseable integer
+
+Conservative: doesn't try to re-solve from scratch or guess the variable. Returns None when no marker, or when variable mismatch.
+
+**(2) Session state extension** — `Conversation::turn` now stores `last_math_unknown` alongside `last_math_result` after every successful equation/formula solve. Persists across turns until overwritten by next solve.
+
+**(3) Pre-check gate in math eval block** — runs `try_check_answer` BEFORE any math evaluator. When it fires, sets `__check_answer_*` slots and skips arithmetic / linear / formula evaluators (preventing «x=3» being treated as a fresh trivial equation).
+
+**(4) Two new template families** in `data/dialog/templates/v1.toml`:
+
+```toml
+[[families]]
+key = "check_answer.correct"
+templates = [
+    "Дұрыс! {check_unknown} = {check_correct_value} — сіздің жауабыңыз дұрыс.",
+    "Иә, {check_unknown} = {check_correct_value} — дұрыс жауап. Жарайсыз!",
+    "Жауабыңыз дұрыс: {check_unknown} = {check_correct_value}.",
+]
+
+[[families]]
+key = "check_answer.incorrect"
+templates = [
+    "Жоқ, дұрыс жауап {check_unknown} = {check_correct_value}, ал сіз {check_unknown} = {check_user_value} деп жаздыңыз. Қайта тексеріп көріңіз.",
+    "Дұрыс емес: сіз {check_unknown} = {check_user_value} деп жаздыңыз, ал дұрысы {check_unknown} = {check_correct_value}.",
+    "{check_unknown} = {check_user_value} — дұрыс емес. Дұрыс жауап: {check_unknown} = {check_correct_value}.",
+]
+```
+
+**(5) Planner routing** — `plan_response_with_epistemic` now checks `__check_answer_correct__` slot BEFORE `__math_answer__` and routes to either `check_answer.correct` or `check_answer.incorrect` family based on the boolean. Slot fillers (`check_unknown`, `check_user_value`, `check_correct_value`) get hooked from the dedicated `__check_answer_*` slots.
+
+### Acceptance
+
+| Multi-turn flow | v4.75.0 | v4.75.5 |
+|---|---|---|
+| «Егер x+2=5 болса, x қанша?» → «Жауабымды тексер: x=3» | re-solves x=3 trivially → «Нәтижесі: 3» | ✅ «Дұрыс! x = 3 — сіздің жауабыңыз дұрыс.» |
+| Same → «Жауабымды тексер: x=4» | re-solves → «Нәтижесі: 4» | ✅ «Жоқ, дұрыс жауап x = 3, ал сіз x = 4 деп жаздыңыз.» |
+| Same → «x=3 дұрыс па?» | refuses or re-solves | ✅ «Дұрыс! x = 3 — сіздің жауабыңыз дұрыс.» |
+| «F=m*a, m=2, a=3 болса F қанша?» → «Жауабымды тексер: F=6» | re-solves | ✅ «Дұрыс! f = 6 — сіздің жауабыңыз дұрыс.» |
+
+| Regression | Status |
+|---|---|
+| 5+7*2 → 19 | ✅ preserved |
+| Егер x+2=5 → x=3 | ✅ preserved |
+| F=m*a (m=2, a=3) → F=6 | ✅ preserved |
+| P=2*(a+b) → 16 | ✅ preserved |
+| 100-query battery diff vs v4.75.0 | **0 differences** |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.75.5` | green |
+
+### Strategic note
+
+This is the **first procedural-tutor capability that requires session state**. Previously, all math handlers were stateless (each query self-contained). check_answer needs to remember the prior turn's solve. Same architectural pattern will apply to `explain_steps` (v4.75.5+1, deferred) — narrate the procedure that produced the prior answer.
+
+Codex round-2 Bug 2 family («no procedural tutor — solve_equation / check_answer / explain_steps») now has 2 of 3 slots filled. `explain_steps` is the remaining slot.
+
+### Cadence
+
+`.5` patch — additional procedural capability + new template families. Strictly extends v4.75.0; no architectural changes.
+
+Stripe — Kazakh school tutor.
+
 ## [4.75.0] — 2026-05-06 — Paren-aware arithmetic — recursive-descent parser; lifts v4.74.5 paren-rejection guard
 
 Replaces the v4.74.x flat token-based arithmetic evaluator with a proper recursive-descent parser that respects parentheses and operator precedence. Closes the v4.74.5 deferred case where «P=2*(a+b), a=5, b=3» honestly refused (paren guard) — now computes 16 correctly. Pure deterministic; no NN.
