@@ -1,5 +1,5 @@
 {
-  "version": "4.79.0",
+  "version": "4.79.5",
   "status": "completed",
   "elapsed_s": 33,
   "packs_completed": 9,
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2804,
+    "facts_total": 2820,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2237,
+      "is_a": 2253,
       "lives_in": 8,
       "part_of": 245,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 235,
+      "world_core/programming_rust.jsonl": 251,
       "world_core/programming_rust_advanced.jsonl": 35,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -43376,7 +43376,7 @@
         "sample_id": "rust_022"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Тұрақты — `Rust-`та `const` арқылы анықталатын, мәні өзгермейтін шама."
+      "raw_text": "Тұрақты (`const`) — `Rust`-та компиляция кезінде белгілі мәнге бекітілген, өзгермейтін шама. Айнымалымен (`let`) айырмашылықтары: (1) `mut` қолдануға болмайды — әрқашан өзгермейді; (2) типін **міндетті** көрсету керек — `const X: u32 = 100;` (компилятор қорытынды жасамайды); (3) кез келген аумақта, оның ішінде ғаламдық аумақта жариялауға болады; (4) мәні компиляция кезінде есептелетін өрнек болуы керек (орындалу-кезіндегі мәнді сақтай алмайды). Шарт бойынша SCREAMING_SNAKE_CASE-те жазылады: `const МАХ_SIZE: usize = 100;`."
     },
     {
       "subject": {
@@ -43676,7 +43676,7 @@
         "sample_id": "rust_038"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`bool` — `Rust-`та шын немесе жалған мәнін сақтайтын логикалық түр."
+      "raw_text": "`bool` — `Rust`-та `true` пен `false` екі мәнін ғана қабылдайтын логикалық тип. Жадта 1 байт алады. `if`, `while` сияқты басқару құрылымдарының шарты ретінде қолданылады. **Маңызды:** `Rust` басқа тілдерден өзгешелігі — нөл/нөлсіз / бос/бос-емес автоматты түрлендіру жасамайды. Шарт міндетті түрде `bool` болуы керек: `if x` жұмыс істемейді — `if x != 0` немесе `if x.is_some()` керек. Бұл ниетті ашық қылады."
     },
     {
       "subject": {
@@ -43696,7 +43696,7 @@
         "sample_id": "rust_039"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`char` — `Rust-`та бір `Unicode` таңбасын сақтайтын төрт байттық түр."
+      "raw_text": "`char` — `Rust`-та бір Unicode скаляр мәнін сақтайтын тип, **4 байт** алады. ASCII-ден көп: эмодзи (`'❤'`), грек әріптері, қазақ кириллицасы (`'ғ'`), кейіпиероглифтер — бәрі бір `char`. Литералы — **бір тырнақша** (`'z'`). Жол литералы (`\"...\"`, қос тырнақша) — `&str` түрінде, әртүрлі. Маңызды: `String` ішіндегі әр символ `char` емес, көпбайтты UTF-8 тізбек ретінде сақталады."
     },
     {
       "subject": {
@@ -44197,26 +44197,6 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "`Err` — `Rust` `Result` енамының қатені қамтитын нұсқасы."
-    },
-    {
-      "subject": {
-        "surface": "if өрнегі",
-        "root": "if өрнегі",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "басқару құрылымы",
-        "root": "басқару құрылымы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust",
-      "source": {
-        "pack": "world_core/programming_rust.jsonl",
-        "sample_id": "rust_065"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "`if` өрнегі — шартқа қарай тармақтарды таңдайтын `Rust` басқару құрылымы."
     },
     {
       "subject": {
@@ -47637,6 +47617,346 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "`.parse::<T>()` — `&str` әдісі: жолды берілген `T` түріне айналдырады. `Result<T, T::Err>` қайтарады — мәтін санға келмесе `Err`. Тип нақты белгіленеді — өрнектен (`let n: u32 = s.parse()...`) немесе турбофиш-арқылы (`s.parse::<u32>()`). Тіркесімі: `s.trim().parse::<u32>().expect(\"...\")` — типтік String-to-int идиома."
+    },
+    {
+      "subject": {
+        "surface": "тұрақтылық әдепкіше",
+        "root": "тұрақтылық әдепкіше",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust кепілдігі",
+        "root": "rust кепілдігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_237"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұрақтылық әдепкіше — `Rust`-тың кепілдіктерінің бірі: `let x = 5;` арқылы жарияланған айнымалы тұрақты, оған қайта тағайындау компиляция кезінде қатеге шығады («cannot assign twice to immutable variable»). Өзгерту керек болса, нақты `mut` қосылады: `let mut x = 5;`. Себебі — кодты оқыған адам атау тек бір мәнге байланғанын сеніммен біле алады; өзгеретін мәндер ашық белгіленеді."
+    },
+    {
+      "subject": {
+        "surface": "бүтін сан түрлері",
+        "root": "бүтін сан түрлері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сандық тип жүйесі",
+        "root": "сандық тип жүйесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_238"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бүтін сан түрлері — `Rust`-та 12 нұсқасы бар: ұзындығы (8/16/32/64/128 бит) × таңбасы (`i*` таңбалы / `u*` таңбасыз) + архитектураға тәуелді `isize`/`usize`. **Таңбалы:** `i8` (−128..127), `i16`, `i32`, `i64`, `i128`. **Таңбасыз:** `u8` (0..255), `u16`, `u32`, `u64`, `u128`. **Архитектураға тәуелді:** `isize`/`usize` — 64-битті жүйеде 64 бит, 32-битті жүйеде 32 бит, әдетте индекс пен ұзындықты сақтауға арналған. Әдепкі бойынша бүтін литерал — `i32`."
+    },
+    {
+      "subject": {
+        "surface": "бүтін санның асып кетуі",
+        "root": "бүтін санның асып кетуі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust қауіпсіздігі",
+        "root": "rust қауіпсіздігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_239"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бүтін санның асып кетуі (integer overflow) — типтің сыйғызатын диапазонынан тыс мән жазу. `Rust`-тың екі көзқарасы бар: **жөндеу режимінде** (`cargo run`) асып кету panic шығарады — қателерді ертерек табу үшін; **шығарылым режимінде** (`cargo run --release`) айналу (wrapping) семантикасына көшеді: `u8` 256 → 0, 257 → 1. Айналу үнсіздеу күтпеген нәтиже бере алады, сондықтан асып кетуді нақты ниетпен өңдеу керек — `wrapping_add`, `checked_add`, `overflowing_add`, `saturating_add` әдістері арқылы."
+    },
+    {
+      "subject": {
+        "surface": "қалқымалы үтірлі сан түрлері",
+        "root": "қалқымалы үтірлі сан түрлері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сандық тип жүйесі",
+        "root": "сандық тип жүйесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_240"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қалқымалы үтірлі сан түрлері — `Rust`-та екеу: `f32` (32 бит, IEEE 754 single precision) және `f64` (64 бит, double precision). **Әдепкі бойынша `f64`** — қазіргі CPU-ларда `f32`-мен бірдей жылдамдықпен есептеледі, бірақ дәлдігі екі есе жоғары. `f32` тек жадтың бар-жоғы өте маңызды болғанда (мысалы, GPU shader-да) қолданылады. Барлық арифметикалық амалдарды (`+ - * /`) қолдайды; бөлу нәтижесі әрқашан бөлшекті сақтайды."
+    },
+    {
+      "subject": {
+        "surface": "кортеж бөлшектеу",
+        "root": "кортеж бөлшектеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "tuple синтаксисі",
+        "root": "tuple синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_241"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кортеж бөлшектеу (tuple destructuring) — кортеждің әр элементін жеке атаулы айнымалыға бөліп алу синтаксисі: `let (x, y, z) = tup;`. `tup`-тың үш элементі сәйкесінше `x`, `y`, `z`-ке тағайындалады. Балама — нүкте-индекс арқылы қол жеткізу: `tup.0`, `tup.1`, `tup.2` (индекс 0-ден басталады). Бөлшектеу — `Rust`-тағы үлгіге сай келтіру (pattern matching) жүйесінің бір бөлігі."
+    },
+    {
+      "subject": {
+        "surface": "unit түрі",
+        "root": "unit түрі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_242"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Unit түрі `()` — ешбір элементі жоқ кортеж, «бос мән» немесе «мәні маңызды емес» дегенді білдіреді. Қолдану орындары: (1) функцияның жасырын қайтару типі — `fn foo() {}` шынында `fn foo() -> ()`; (2) өрнегі жоқ блоктың мәні; (3) `Result<(), Error>` — операцияның сәтті болғаны маңызды, нәтиже мәні жоқ. C-дағы `void`-қа жуық, бірақ `()` нақты бір тип, мәні де бар (бір ғана — `()`)."
+    },
+    {
+      "subject": {
+        "surface": "жиым қайталау синтаксисі",
+        "root": "жиым қайталау синтаксисі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "array синтаксисі",
+        "root": "array синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_243"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жиым қайталау синтаксисі — барлық элементі бір мәнмен толтырылған жиым жасау: `let a = [3; 5];` — `[3, 3, 3, 3, 3]` (бес элемент, бәрі 3). Толық пішімі — `[мән; саны]`. Үлкен буфер инициализациясында жиі қолданылады: `[0u8; 1024]` — мың байт, нөлдермен толтырылған. Жиымның түрі мен ұзындығы нақты белгіленуі мүмкін: `let a: [i32; 5] = [1, 2, 3, 4, 5];`."
+    },
+    {
+      "subject": {
+        "surface": "жиымның шектен шығу",
+        "root": "жиымның шектен шығу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust қауіпсіздігі",
+        "root": "rust қауіпсіздігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_244"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жиымның шектен шығу (out-of-bounds access) — жиымның ұзындығынан тыс индексті қолдану: `let a = [1, 2, 3]; a[10];`. `Rust` орындалу кезінде индексті тексереді — шектен шықса, бағдарлама panic шығарады («index out of bounds: the len is 3 but the index is 10»). Бұл — `Rust`-тың қауіпсіздік кепілдігі: тиісті емес жадқа жазу немесе оқу мүмкін емес (C-да буфер асып кету сияқты қатерлі қателіктер `Rust`-та орынсыз)."
+    },
+    {
+      "subject": {
+        "surface": "функцияның мән қайтаруы",
+        "root": "функцияның мән қайтаруы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "функция синтаксисі",
+        "root": "функция синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_245"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Функцияның мән қайтаруы — `fn` денесінен мәнді қайтару тәсілі. Қайтару типі `->` арқылы белгіленеді: `fn five() -> i32 { 5 }`. **Маңызды ереже:** соңғы өрнек **нүктелі үтірсіз** болса, ол функцияның қайтару мәніне айналады. Нүктелі үтір қойсаңыз — өрнек сөйлемге айналып, мән жоғалады, компилятор қате шығарады («expected `i32`, found `()`»). `return` кілтсөзі ертерек шығу үшін: `if x < 0 { return 0; }`."
+    },
+    {
+      "subject": {
+        "surface": "блок өрнегі",
+        "root": "блок өрнегі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust өрнегі",
+        "root": "rust өрнегі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_246"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Блок өрнегі (block expression) — фигуралы жақшалармен оралған код жинағы өрнек ретінде. Соңғы өрнек (нүктелі үтірсіз) — блоктың мәні. Мысалы: `let y = { let x = 3; x + 1 };` — блок 4-ке бағаланады. Блокты өрнек қажет жерде қолдануға болады: айнымалы инициализациясында, функция аргументі ретінде, `if` тармағында. Ішкі айнымалылар тек блок ішінде көрінеді — аумақтау (scoping)."
+    },
+    {
+      "subject": {
+        "surface": "if өрнегі",
+        "root": "if өрнегі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "басқару өрнегі",
+        "root": "басқару өрнегі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_247"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`if` өрнегі (if as expression) — `Rust`-та `if/else` блогы мән қайтарады, сондықтан `let` оң жағында қолдануға болады: `let number = if condition { 5 } else { 6 };`. **Маңызды:** `if` пен `else` тармақтарының түрлері бірдей болуы керек — компилятор айнымалының бір типін шеше алуы үшін. Бір тармақта сан, екіншісінде жол болса — қате. Көп тармақ үшін `else if`, бірақ `match` ыңғайлырақ."
+    },
+    {
+      "subject": {
+        "surface": "loop мән қайтаруы",
+        "root": "loop мән қайтаруы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "loop синтаксисі",
+        "root": "loop синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_248"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`loop` мән қайтаруы — `loop` шексіз цикл, бірақ `break`-тен кейін өрнек жазсаңыз — ол мән цикл өрнегінің мәніне айналады: `let result = loop { counter += 1; if counter == 10 { break counter * 2; } };` — `result` 20-ға тең болады. Бұл идиома есеп нәтижесін цикл аяқталғанда қайтару үшін ыңғайлы. `while` пен `for` мән қайтармайды (тек `()`)."
+    },
+    {
+      "subject": {
+        "surface": "цикл белгісі",
+        "root": "цикл белгісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "loop синтаксисі",
+        "root": "loop синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_249"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Цикл белгісі (loop label) — кірістірілген циклдер арасында `break`/`continue`-тың қай циклді көздегенін белгілеу үшін атау: `'counting_up: loop { ... break 'counting_up; ... }`. Атау апостроф (`'`) пен идентификатордан тұрады. Әдепкі бойынша `break` ең ішкі циклді ғана үзеді; белгімен шакыру арқылы сыртқы циклге де жетуге болады. Мысалы, нәтижесі табылған кезде бірнеше циклден бір секірумен шығу."
+    },
+    {
+      "subject": {
+        "surface": "for ұжым бойынша",
+        "root": "for ұжым бойынша",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "for синтаксисі",
+        "root": "for синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_250"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`for` ұжым бойынша — `Rust`-тың ең жиі қолданылатын цикл түрі: `for element in a { ... }` ұжымның (жиым, вектор, диапазон) әр элементін аралайды. **Қауіпсіздік артықшылығы:** индекс шегінен шығып кету мүмкіндігі жоқ — `while i < a.len()` арқылы жазсаңыз, осындай қате болуы мүмкін. Балама — диапазон бойынша: `for n in 1..=4 { ... }` (1-ден 4-ке дейін). Кері тәртіп: `(1..4).rev()`."
+    },
+    {
+      "subject": {
+        "surface": "сөйлем мен өрнек айырмашылығы",
+        "root": "сөйлем мен өрнек айырмашылығы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_251"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сөйлем мен өрнек айырмашылығы — `Rust` дизайнының іргетас ұғымы. **Сөйлем (statement)** — әрекет орындайтын бірлік, мән қайтармайды (мысалы, `let y = 6;`). **Өрнек (expression)** — мән өндіретін бірлік (мысалы, `5 + 6`, функция шакыруы, блок). `Rust` өрнекке негізделген тіл: блок (`{ ... }`), `if`, `match`, `loop` — бәрі мән қайтарады. Маңызды салдар: блоктың соңғы өрнегі нүктелі үтірсіз — ол блоктың мәні; нүктелі үтір қойсаңыз — сөйлемге айналады, мән жоғалады."
+    },
+    {
+      "subject": {
+        "surface": "түсініктеме",
+        "root": "түсініктеме",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "код элементі",
+        "root": "код элементі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_252"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Түсініктеме (comment) — `Rust`-та екі түрі бар. **Жолдық:** `//` арқылы басталады, жол соңына дейін: `// бұл түсініктеме`. Көп жолды әдетте әрбір жолды жеке `//` арқылы жазу қабылданған. **Блоктық:** `/* ... */` — бірақ `Rust`-та сирек қолданылады, жолдық стиль артық. **Құжаттама түсініктемесі:** `///` — функция/тип үстінде жазылады, `cargo doc` арқылы HTML құжаттамаға айналады. Ішінде Markdown қолдау бар."
+    },
+    {
+      "subject": {
+        "surface": "бүтін бөлу",
+        "root": "бүтін бөлу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сандық амал",
+        "root": "сандық амал",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_253"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бүтін бөлу (integer division) — бүтін санды бүтін санға бөлгенде нәтиже бүтін болады, бөлшегі **тастталады** (truncation toward zero). Мысалы: `let truncated = -5 / 3;` → `-1` (математикалық -1.667 емес). Қалдықты бөлек алу үшін `%` операторы: `43 % 5` → `3`. Қалқымалы үтірлі бөлгенде нәтиже толық бөлшекті сақтайды: `56.7 / 32.2` → `1.7608...`. Бүтін мен қалқымалыны қосып бөлуге болмайды — бірдей түрге айналдыру керек."
     },
     {
       "subject": {

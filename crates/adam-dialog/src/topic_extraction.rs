@@ -1953,6 +1953,39 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ord әдісі",
     "айнымалы тәсілі",
     "string әдісі",
+    // **v4.80.0** — Rust Book chapter 3 (common programming concepts).
+    // rust_237…253. Subjects.
+    "тұрақтылық әдепкіше",
+    "бүтін сан түрлері",
+    "бүтін санның асып кетуі",
+    "қалқымалы үтірлі сан түрлері",
+    "кортеж бөлшектеу",
+    "unit түрі",
+    "жиым қайталау синтаксисі",
+    "жиымның шектен шығу",
+    "функцияның мән қайтаруы",
+    "блок өрнегі",
+    "if өрнегі",
+    "loop мән қайтаруы",
+    "цикл белгісі",
+    "for ұжым бойынша",
+    "сөйлем мен өрнек айырмашылығы",
+    "бүтін бөлу",
+    // Objects.
+    "rust кепілдігі",
+    "сандық тип жүйесі",
+    "rust қауіпсіздігі",
+    "tuple синтаксисі",
+    "rust типі",
+    "array синтаксисі",
+    "функция синтаксисі",
+    "rust өрнегі",
+    "басқару өрнегі",
+    "loop синтаксисі",
+    "for синтаксисі",
+    "rust ұғымы",
+    "код элементі",
+    "сандық амал",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -2249,6 +2282,8 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     "thread_rng",
     "gen_range",
     "read_line",
+    // **v4.80.0** — Rust Book chapter 3 (common programming concepts)
+    // deepening. rust_237…253 + replaced rust_022/038/039.
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word

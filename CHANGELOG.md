@@ -7,6 +7,85 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.80.0] — 2026-05-06 — Rust Book chapter 3 deepening — common programming concepts
+
+Per-chapter pedagogical cadence continues. Chapter 3 («Жалпы бағдарламалау ұғымдары») was previously surface-level — many 1-line type stubs without the conceptual depth (rationale, distinctions, edge cases) the chapter teaches. Now deepened with full curriculum.
+
+### What's added
+
+**17 new curated entries `rust_237…253`** in `programming_rust.jsonl`:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_237 | тұрақтылық әдепкіше | Immutable-by-default rationale |
+| rust_238 | бүтін сан түрлері | Full integer-type table (i8…i128 + u8…u128 + isize/usize) |
+| rust_239 | бүтін санның асып кетуі | Overflow: panic in debug, wrap in release; checked methods |
+| rust_240 | қалқымалы үтірлі сан түрлері | f32 vs f64 (default f64) |
+| rust_241 | кортеж бөлшектеу | `let (x, y, z) = tup;` destructuring |
+| rust_242 | unit түрі | `()` empty tuple semantics |
+| rust_243 | жиым қайталау синтаксисі | `[v; n]` repeat syntax |
+| rust_244 | жиымның шектен шығу | OOB → panic (safety guarantee) |
+| rust_245 | функцияның мән қайтаруы | `->` + last-expression-no-semicolon rule |
+| rust_246 | блок өрнегі | Block as expression `{ stmts; expr }` |
+| rust_247 | if өрнегі | `if` as expression (branches must match) |
+| rust_248 | loop мән қайтаруы | `break value;` returns from loop |
+| rust_249 | цикл белгісі | `'label: loop { break 'label; }` |
+| rust_250 | for ұжым бойынша | `for x in collection` safety advantage |
+| rust_251 | сөйлем мен өрнек айырмашылығы | Statement vs expression conceptual distinction |
+| rust_252 | түсініктеме | Comments (`//` / `/* */` / `///`) |
+| rust_253 | бүтін бөлу | Integer division truncates toward zero |
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs replaced (deepened in-place)
+
+- `rust_022` (тұрақты — const) — was 1-liner; now covers const-vs-let distinction matrix (compile-time eval, mandatory type, scope, SCREAMING_SNAKE_CASE convention).
+- `rust_038` (bool) — was 1-liner; now covers no-truthy-coercion stance (`if x` doesn't compile in Rust, must be `if x != 0`).
+- `rust_039` (char) — was 1-liner; now covers 4-byte Unicode breadth (emoji, кириллица), single-quote vs string-literal distinction.
+
+### Stub deleted
+
+- `rust_065` («if өрнегі — шартқа қарай тармақтарды таңдайтын» 1-line) — replaced by deeper `rust_247` (if-as-expression with branches-must-match constraint).
+
+### Per-chapter test (continues v4.79.0 invariant)
+
+- `data/eval/rust_book_chapter_03_holdout.json` — 19 cases, 6 categories (`ch03_mutability`, `ch03_scalar_types`, `ch03_compound_types`, `ch03_functions`, `ch03_control_flow`, `ch03_lexical`).
+- `crates/adam-dialog/tests/rust_book_chapter_03.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 30 compounds (subjects: `тұрақтылық әдепкіше`, `бүтін сан түрлері`, `бүтін санның асып кетуі`, `қалқымалы үтірлі сан түрлері`, `кортеж бөлшектеу`, `unit түрі`, `жиым қайталау синтаксисі`, `жиымның шектен шығу`, `функцияның мән қайтаруы`, `блок өрнегі`, `if өрнегі`, `loop мән қайтаруы`, `цикл белгісі`, `for ұжым бойынша`, `сөйлем мен өрнек айырмашылығы`, `бүтін бөлу`; objects: `rust кепілдігі`, `сандық тип жүйесі`, `rust қауіпсіздігі`, `tuple синтаксисі`, `rust типі`, `array синтаксисі`, `функция синтаксисі`, `rust өрнегі`, `басқару өрнегі`, `loop синтаксисі`, `for синтаксисі`, `rust ұғымы`, `код элементі`, `сандық амал`).
+
+### Known limitation
+
+`Сөйлем мен өрнек айырмашылығы` query routes to comparison-shape detector which pulls a thin cross-domain `language_features` fact for «сөйлем» (linguistic «sentence» = «белгі») instead of the deeper `rust_029` programming-context statement definition. The deep `rust_251` entry is preserved for future domain-aware retrieval but isn't surfaced via comparison-shape today. Scoped to a future release.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 19 / 19 chapter 3 holdout cases | ✅ 100 % |
+| Existing chapter 1 + 2 holdouts | ✅ unchanged |
+| `rust_concepts_holdout` | ✅ unchanged |
+| Workspace tests | **979 passing** (was 978; +1 chapter-3 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2562 → **2578** (+16 net: +17 ch.3 − 1 stub deletion) |
+| world_core facts | 2804 → **2820** (+16 net) |
+| Derived facts | 30770 → **30768** (−2 from stub removals) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.80.0** | **ch. 3** | **Common programming concepts (this release)** |
+| v4.80.5 | ch. 4 | Ownership deepening (stack vs heap / move / Copy vs Clone / borrow rules / slices) |
+| v4.81.0 | ch. 5 | Structs deepening |
+| v4.81.5 | ch. 6 | Enums + pattern matching |
+| v4.82.0 | ch. 7 | Modules / packages / crates |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.0` minor — large data delta (17 new + 3 deepened + 1 deleted) covering all major chapter 3 concepts. Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.79.5] — 2026-05-06 — Rust Book chapter 2 deepening — guessing game
 
 Per-chapter pedagogical cadence continues. Chapter 2 («Санды табу ойыны») is the first complete program in the book; previously thin (~7 entries). Now deepened with full guessing-game walkthrough.

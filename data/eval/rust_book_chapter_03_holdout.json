@@ -1,0 +1,123 @@
+{
+  "_comment": "v4.80.0 — Rust Book Chapter 3 (Жалпы бағдарламалау ұғымдары / common programming concepts) holdout. 19 natural Kazakh queries against rust_237…253 + 3 replaced stubs (rust_022 const / rust_038 bool / rust_039 char). Categories: ch03_mutability (immutable-by-default, const), ch03_scalar_types (integer types, overflow, float, bool, char, division), ch03_compound_types (tuple destructuring, unit, array repeat, OOB), ch03_functions (return value, block expression), ch03_control_flow (if as expression, loop returning value, loop labels, for over collection), ch03_lexical (comments). Skipped intentionally: «Сөйлем мен өрнек айырмашылығы» — comparison shape detector intercepts and pulls cross-domain language-features fact for «сөйлем»; deeper rust_251 entry preserved for future domain-aware retrieval but not regression-tested here.",
+  "version": "v4.80.0",
+  "captured_date": "2026-05-06",
+  "chapter": 3,
+  "chapter_title": "Жалпы бағдарламалау ұғымдары (Variables / Types / Functions / Comments / Control flow)",
+  "cases": [
+    {
+      "id": "ch03_immutable_default",
+      "category": "ch03_mutability",
+      "query": "Тұрақтылық әдепкіше деген не?",
+      "any_substring": ["әдепкі", "let x = 5", "mut"]
+    },
+    {
+      "id": "ch03_const",
+      "category": "ch03_mutability",
+      "query": "Тұрақты деген не?",
+      "any_substring": ["const", "компиляция", "screaming_snake_case"]
+    },
+    {
+      "id": "ch03_integer_types",
+      "category": "ch03_scalar_types",
+      "query": "Бүтін сан түрлері деген не?",
+      "any_substring": ["i8", "u128", "isize"]
+    },
+    {
+      "id": "ch03_integer_overflow",
+      "category": "ch03_scalar_types",
+      "query": "Бүтін санның асып кетуі деген не?",
+      "any_substring": ["panic", "wrapping", "айналу"]
+    },
+    {
+      "id": "ch03_float_types",
+      "category": "ch03_scalar_types",
+      "query": "Қалқымалы үтірлі сан түрлері деген не?",
+      "any_substring": ["f32", "f64", "ieee 754"]
+    },
+    {
+      "id": "ch03_bool_no_truthy",
+      "category": "ch03_scalar_types",
+      "query": "bool деген не?",
+      "any_substring": ["true", "false", "автоматты түрлендіру жасамайды"]
+    },
+    {
+      "id": "ch03_char_unicode",
+      "category": "ch03_scalar_types",
+      "query": "char деген не?",
+      "any_substring": ["unicode", "4 байт", "бір тырнақша"]
+    },
+    {
+      "id": "ch03_integer_division",
+      "category": "ch03_scalar_types",
+      "query": "Бүтін бөлу деген не?",
+      "any_substring": ["truncation", "тастталады", "%"]
+    },
+    {
+      "id": "ch03_tuple_destructure",
+      "category": "ch03_compound_types",
+      "query": "Кортеж бөлшектеу деген не?",
+      "any_substring": ["let (x, y, z)", "destructuring", "айнымалы"]
+    },
+    {
+      "id": "ch03_unit_type",
+      "category": "ch03_compound_types",
+      "query": "Unit түрі деген не?",
+      "any_substring": ["()", "ешбір элемент", "void"]
+    },
+    {
+      "id": "ch03_array_repeat",
+      "category": "ch03_compound_types",
+      "query": "Жиым қайталау синтаксисі деген не?",
+      "any_substring": ["[3; 5]", "[0u8; 1024]", "толтырылған"]
+    },
+    {
+      "id": "ch03_array_oob",
+      "category": "ch03_compound_types",
+      "query": "Жиымның шектен шығу деген не?",
+      "any_substring": ["panic", "out of bounds", "қауіпсіздік"]
+    },
+    {
+      "id": "ch03_fn_return",
+      "category": "ch03_functions",
+      "query": "Функцияның мән қайтаруы деген не?",
+      "any_substring": ["->", "нүктелі үтір", "return"]
+    },
+    {
+      "id": "ch03_block_expression",
+      "category": "ch03_functions",
+      "query": "Блок өрнегі деген не?",
+      "any_substring": ["фигуралы", "соңғы өрнек", "{ let x"]
+    },
+    {
+      "id": "ch03_if_as_expression",
+      "category": "ch03_control_flow",
+      "query": "if өрнегі деген не?",
+      "any_substring": ["let number = if", "тармақ", "бірдей"]
+    },
+    {
+      "id": "ch03_loop_return_value",
+      "category": "ch03_control_flow",
+      "query": "loop мән қайтаруы деген не?",
+      "any_substring": ["break counter", "цикл өрнегінің", "20"]
+    },
+    {
+      "id": "ch03_loop_label",
+      "category": "ch03_control_flow",
+      "query": "Цикл белгісі деген не?",
+      "any_substring": ["'counting_up", "апостроф", "сыртқы"]
+    },
+    {
+      "id": "ch03_for_over_collection",
+      "category": "ch03_control_flow",
+      "query": "for ұжым бойынша деген не?",
+      "any_substring": ["for element in", "қауіпсіздік", "rev"]
+    },
+    {
+      "id": "ch03_comment",
+      "category": "ch03_lexical",
+      "query": "Түсініктеме деген не?",
+      "any_substring": ["//", "/// ", "cargo doc"]
+    }
+  ]
+}
