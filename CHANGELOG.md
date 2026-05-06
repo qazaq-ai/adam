@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.76.0] — 2026-05-06 — `explain_steps` intent — narrate the solution procedure («Қалай шештің?»)
+
+Closes Codex round-2 Bug 2 family **fully** (3 of 3): `solve_equation` (v4.74.0), `check_answer` (v4.75.5), and now `explain_steps`. After a successful equation/formula solve, user can ask «Қалай шештің?» / «Процесін көрсет» / «Қадам-қадаммен түсіндір» — system surfaces a step-by-step narrative built deterministically by the solver at solve time.
+
+### Innovations
+
+**(1) Solver signature refactor** — `try_solve_linear_equation` and `try_apply_formula` now return `(unknown, value, steps)` 3-tuples instead of `(unknown, value)` pairs. Step narratives are built at solve time, deterministically, in Kazakh:
+
+- **Linear x op a = b**:
+  - `+`: «Бастапқы теңдеу: x + 2 = 5. 2-ды екі жағынан да алып тастаймыз: x = 5 − 2 = 3.»
+  - `-`: «… 2-ды екі жағына да қосамыз: x = 5 + 2.»
+  - `*`: «… Екі жағын 3-ға бөлеміз: x = 15 / 3 = 5.»
+  - `/`: «… Екі жағын 3-ға көбейтеміз: x = 15 · 3.»
+- **Linear a op x = b** — symmetric narrative
+- **Formula** (e.g. F=m*a, m=2, a=3): «Формула: F = m*a. Берілген: a = 3, m = 2. Орнына қою: F = 2*3 = 6.»
+
+**(2) New `discourse::try_explain_steps`** detector — pattern: `қалай шеш` / `процесін` / `қадам` / `түсіндір` / `дәлелде` / `шешуін көрсет`. Returns stored steps when present; None otherwise.
+
+**(3) Session storage extension** — `last_math_steps` saved alongside `last_math_unknown` and `last_math_result` after every successful solve.
+
+**(4) Conversation::turn post-pass** — explain_steps runs AFTER math eval block (which doesn't fire on bare follow-ups like «Қалай шештің?» since they have no digits/operators). Surfaces `__explain_steps__` slot when session has stored narrative AND input contains explain phrase. Skipped when fresh solve fired this turn (priority).
+
+**(5) New template family** `explain_steps` (3 alternates):
+```toml
+"Шешу қадамдары: {explain_steps}",
+"Қалай шықты: {explain_steps}",
+"Процесі: {explain_steps}",
+```
+
+**(6) Planner routing** — `__explain_steps__` slot routes to `explain_steps` family BEFORE `check_answer.*` and `math_answer` (mutually exclusive in practice; explain has no `var=N` token).
+
+### Acceptance
+
+| Multi-turn flow | v4.75.5 | v4.76.0 |
+|---|---|---|
+| «Егер x+2=5 болса, x қанша?» → «Қалай шештің?» | refusal / clarify | ✅ «Шешу қадамдары: Бастапқы теңдеу: x + 2 = 5. 2-ды екі жағынан да алып тастаймыз: x = 5 − 2 = 3.» |
+| «x*3=15» → «Қадам-қадаммен түсіндір» | refusal | ✅ «Шешу қадамдары: Бастапқы теңдеу: x · 3 = 15. Екі жағын 3-ға бөлеміз: x = 15 / 3 = 5.» |
+| «F=m*a, m=2, a=3 болса F қанша?» → «Процесін көрсет» | refusal | ✅ «Шешу қадамдары: Формула: f = m*a. Берілген: a = 3, m = 2. Орнына қою: f = 2*3 = 6.» |
+
+| Regression | Status |
+|---|---|
+| 5+7*2 → 19 | ✅ preserved |
+| Егер x+2=5 → x=3 | ✅ preserved |
+| F=m*a → 6 | ✅ preserved |
+| P=2*(a+b) → 16 | ✅ preserved |
+| check_answer correct/incorrect | ✅ preserved |
+| 100-query battery diff vs v4.75.5 | **0 differences** |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.76.0` | green |
+
+### Strategic note
+
+**Codex round-2 Bug 2 family complete: 3/3.** v4.74.0 added solve_equation, v4.75.5 added check_answer, v4.76.0 adds explain_steps. The procedural-tutor loop is now functionally complete for single-unknown linear equations + multi-variable formulas: solve → verify user's answer → explain procedure. All deterministic; no NN.
+
+Per `project_kazakh_tutor_positioning` — this completes the core «can conduct a lesson» capability needed before procedural-intent expansion (comparison, where/why/why-important, code-switch). Next is Codex Bug 4 (comparison shape) in v4.76.5.
+
+### Cadence
+
+`.0` minor — closes a Codex bug family fully + adds new intent + new template family. Algorithmic upgrade to solver return type (added steps narrative).
+
+Stripe — Kazakh school tutor.
+
 ## [4.75.5] — 2026-05-06 — `check_answer` intent — verify user-submitted answer against last solved equation/formula
 
 Closes Codex round-2 Bug 2 fully (the «check the user's answer» half). Multi-turn pattern: «Егер x+2=5 болса, x қанша?» → «x=3» → «Жауабымды тексер: x=4» → system compares user's value against stored answer and surfaces correct/incorrect verdict with explanation.

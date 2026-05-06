@@ -1158,14 +1158,11 @@ impl Conversation {
                 // «алдыңғы нәтиже»).
                 self.session
                     .insert("last_math_result".into(), value.to_string());
-            } else if let Some((unknown, value)) =
+            } else if let Some((unknown, value, steps)) =
                 crate::discourse::try_apply_formula(resolved_input.as_ref())
             {
-                // **v4.74.5** — formula-applier. «F=m*a, m=2, a=3 болса
-                // F қанша?» → «F = 6». Try formula BEFORE linear-equation
-                // solver because formula inputs contain multiple `=` tokens
-                // (one for the formula, more for substitutions); the
-                // linear-equation solver would pick the first and fail.
+                // **v4.74.5** — formula-applier. **v4.76.0** — also
+                // receives step-narrative for explain_steps follow-up.
                 extra_slots.insert("__math_answer__".into(), value.to_string());
                 extra_slots.insert("__math_unknown__".into(), unknown.clone());
                 if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
@@ -1173,18 +1170,13 @@ impl Conversation {
                 }
                 self.session
                     .insert("last_math_result".into(), value.to_string());
-                // **v4.75.5** — store unknown variable name for next-turn
-                // check_answer flow.
                 self.session.insert("last_math_unknown".into(), unknown);
-            } else if let Some((unknown, value)) =
+                self.session.insert("last_math_steps".into(), steps);
+            } else if let Some((unknown, value, steps)) =
                 crate::discourse::try_solve_linear_equation(resolved_input.as_ref())
             {
-                // **v4.74.0** — linear-equation solver. «Егер x+2=5 болса,
-                // x қанша?» → «x = 3». Surfaces via the same
-                // `__math_answer__` slot path so the math_answer template
-                // family fires; the unknown variable name is stored in
-                // `__math_unknown__` for templates that want to render
-                // «X = N» style.
+                // **v4.74.0** — linear-equation solver. **v4.76.0** —
+                // also receives step-narrative for explain_steps.
                 extra_slots.insert("__math_answer__".into(), value.to_string());
                 extra_slots.insert("__math_unknown__".into(), unknown.clone());
                 if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
@@ -1192,12 +1184,27 @@ impl Conversation {
                 }
                 self.session
                     .insert("last_math_result".into(), value.to_string());
-                // **v4.75.5** — store unknown variable name for next-turn
-                // check_answer flow.
                 self.session.insert("last_math_unknown".into(), unknown);
+                self.session.insert("last_math_steps".into(), steps);
             } else {
                 extra_slots.insert("__math_input__".into(), "1".into());
             }
+        }
+        // **v4.76.0** — explain_steps post-pass. After the math-eval
+        // block above, check whether input is a bare follow-up like
+        // «Қалай шештің?» / «Процесін көрсет» / «Қадам-қадаммен
+        // түсіндір». These don't match `input_is_math_expression` (no
+        // digits/operators), so the math block above skips. Run
+        // explain_steps as a separate gate: if session has
+        // `last_math_steps` AND input contains an explain phrase,
+        // surface the stored narrative. Skip if math eval already
+        // produced an answer this turn (fresh solve takes priority).
+        if !extra_slots.contains_key("__math_answer__")
+            && !extra_slots.contains_key("__check_answer_correct__")
+            && let Some(last_steps) = self.session.get("last_math_steps").cloned()
+            && let Some(steps_text) = crate::discourse::try_explain_steps(input, &last_steps)
+        {
+            extra_slots.insert("__explain_steps__".into(), steps_text);
         }
         let plan = crate::planner::plan_response_with_epistemic(
             &intent_for_render,

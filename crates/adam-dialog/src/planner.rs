@@ -243,6 +243,38 @@ pub fn plan_response_with_epistemic(
     // «5+5» refused via `math_refusal` — adam now ANSWERS the
     // arithmetic deterministically (no novel-text generation;
     // `try_evaluate_arithmetic` is a pure function).
+    // **v4.76.0** — explain_steps routing. Surfaces stored step
+    // narrative when user asked «Қалай шештің?» / «Процесін көрсет»
+    // / «Қадам-қадаммен» after a prior solve. Routes BEFORE
+    // check_answer because explain_steps doesn't carry a `var=N`
+    // token; the two slots are mutually exclusive in practice.
+    if let Some(steps) = extra_slots.get("__explain_steps__") {
+        let key = "explain_steps";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: explain_steps override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            slots.insert("explain_steps".into(), steps.clone());
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v4.75.5** — check_answer routing. Conversation::turn populates
     // `__check_answer_correct__` (1/0) when user submitted an answer
     // for verification («Жауабымды тексер: x=4»). Routes to

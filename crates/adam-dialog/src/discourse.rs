@@ -634,7 +634,7 @@ fn parse_factor(chars: &[char], pos: &mut usize) -> Option<i64> {
 /// constants. Quadratic / multi-unknown / fraction-bearing equations
 /// stay refused. Procedural solvers are deterministic per
 /// `project_kazakh_tutor_positioning` — no NN involved.
-pub fn try_solve_linear_equation(input: &str) -> Option<(String, i64)> {
+pub fn try_solve_linear_equation(input: &str) -> Option<(String, i64, String)> {
     // Find the whitespace-separated token containing `=`. For
     // «Егер x+2=5 болса, x қанша?» that's «x+2=5». For «5+7*2 қанша?»
     // (no `=`), no token matches and we return None.
@@ -658,7 +658,12 @@ pub fn try_solve_linear_equation(input: &str) -> Option<(String, i64)> {
     //   2. Letter + op + digits, like «x+2», «x-3», «x*4», «x/5»
     //   3. Digits + op + letter, like «2+x», «10-x»
     if lhs.chars().all(|c| c.is_alphabetic()) && !lhs.is_empty() {
-        return Some((lhs.to_string(), rhs));
+        let steps = format!(
+            "Берілген: {x_var} = {rhs}. Бұл — тривиал теңдеу, жауап тікелей берілген.",
+            x_var = lhs,
+            rhs = rhs,
+        );
+        return Some((lhs.to_string(), rhs, steps));
     }
     // Find the operator (must be exactly one).
     let op_idx = lhs.chars().enumerate().find_map(|(i, c)| {
@@ -678,41 +683,113 @@ pub fn try_solve_linear_equation(input: &str) -> Option<(String, i64)> {
     if left_is_unknown && !right_is_unknown {
         // X op a = b
         let a: i64 = right_part.parse().ok()?;
-        let x = match op {
-            '+' => rhs - a,
-            '-' => rhs + a,
+        let (x, steps) = match op {
+            '+' => (
+                rhs - a,
+                format!(
+                    "Бастапқы теңдеу: {x_var} + {a} = {rhs}. {a}-ды екі жағынан да алып тастаймыз: {x_var} = {rhs} − {a} = {result}.",
+                    x_var = left_part,
+                    a = a,
+                    rhs = rhs,
+                    result = rhs - a,
+                ),
+            ),
+            '-' => (
+                rhs + a,
+                format!(
+                    "Бастапқы теңдеу: {x_var} − {a} = {rhs}. {a}-ды екі жағына да қосамыз: {x_var} = {rhs} + {a} = {result}.",
+                    x_var = left_part,
+                    a = a,
+                    rhs = rhs,
+                    result = rhs + a,
+                ),
+            ),
             '*' => {
                 if a == 0 || rhs % a != 0 {
                     return None;
                 }
-                rhs / a
+                (
+                    rhs / a,
+                    format!(
+                        "Бастапқы теңдеу: {x_var} · {a} = {rhs}. Екі жағын {a}-ға бөлеміз: {x_var} = {rhs} / {a} = {result}.",
+                        x_var = left_part,
+                        a = a,
+                        rhs = rhs,
+                        result = rhs / a,
+                    ),
+                )
             }
-            '/' => rhs * a,
+            '/' => (
+                rhs * a,
+                format!(
+                    "Бастапқы теңдеу: {x_var} / {a} = {rhs}. Екі жағын {a}-ға көбейтеміз: {x_var} = {rhs} · {a} = {result}.",
+                    x_var = left_part,
+                    a = a,
+                    rhs = rhs,
+                    result = rhs * a,
+                ),
+            ),
             _ => return None,
         };
-        return Some((left_part.to_string(), x));
+        return Some((left_part.to_string(), x, steps));
     }
     if right_is_unknown && !left_is_unknown {
         // a op X = b
         let a: i64 = left_part.parse().ok()?;
-        let x = match op {
-            '+' => rhs - a,
-            '-' => a - rhs,
+        let (x, steps) = match op {
+            '+' => (
+                rhs - a,
+                format!(
+                    "Бастапқы теңдеу: {a} + {x_var} = {rhs}. {a}-ды екі жағынан да алып тастаймыз: {x_var} = {rhs} − {a} = {result}.",
+                    x_var = right_part,
+                    a = a,
+                    rhs = rhs,
+                    result = rhs - a,
+                ),
+            ),
+            '-' => (
+                a - rhs,
+                format!(
+                    "Бастапқы теңдеу: {a} − {x_var} = {rhs}. {x_var} = {a} − {rhs} = {result}.",
+                    x_var = right_part,
+                    a = a,
+                    rhs = rhs,
+                    result = a - rhs,
+                ),
+            ),
             '*' => {
                 if a == 0 || rhs % a != 0 {
                     return None;
                 }
-                rhs / a
+                (
+                    rhs / a,
+                    format!(
+                        "Бастапқы теңдеу: {a} · {x_var} = {rhs}. Екі жағын {a}-ға бөлеміз: {x_var} = {rhs} / {a} = {result}.",
+                        x_var = right_part,
+                        a = a,
+                        rhs = rhs,
+                        result = rhs / a,
+                    ),
+                )
             }
             '/' => {
                 if rhs == 0 || a % rhs != 0 {
                     return None;
                 }
-                a / rhs
+                (
+                    a / rhs,
+                    format!(
+                        "Бастапқы теңдеу: {a} / {x_var} = {rhs}. {x_var} = {a} / {rhs} = {result}.",
+                        x_var = right_part,
+                        a = a,
+                        rhs = rhs,
+                        result = a / rhs,
+                    ),
+                )
             }
             _ => return None,
         };
-        return Some((right_part.to_string(), x));
+        return Some((right_part.to_string(), x, steps));
     }
     None
 }
@@ -731,7 +808,7 @@ pub fn try_solve_linear_equation(input: &str) -> Option<(String, i64)> {
 /// болса...» previously refused. This is the next procedural solver
 /// after `try_solve_linear_equation` (v4.74.0). Still fully
 /// deterministic — no NN.
-pub fn try_apply_formula(input: &str) -> Option<(String, i64)> {
+pub fn try_apply_formula(input: &str) -> Option<(String, i64, String)> {
     use std::collections::HashMap;
 
     // Split into segments by comma / semicolon. Within each segment,
@@ -803,7 +880,23 @@ pub fn try_apply_formula(input: &str) -> Option<(String, i64)> {
     }
 
     let value = try_evaluate_arithmetic(&substituted)?;
-    Some((unknown, value))
+    // Build step narrative: formula → substitutions → result
+    let mut subs_list: Vec<(String, i64)> = numeric.iter().map(|(k, v)| (k.clone(), *v)).collect();
+    subs_list.sort_by(|a, b| a.0.cmp(&b.0));
+    let subs_str: String = subs_list
+        .iter()
+        .map(|(k, v)| format!("{} = {}", k, v))
+        .collect::<Vec<_>>()
+        .join(", ");
+    let steps = format!(
+        "Формула: {unknown} = {expr}. Берілген: {subs}. Орнына қою: {unknown} = {substituted} = {value}.",
+        unknown = unknown,
+        expr = expr,
+        subs = subs_str,
+        substituted = substituted,
+        value = value,
+    );
+    Some((unknown, value, steps))
 }
 
 /// **v4.75.5** — Check-answer handler. Detects «жауабымды тексер: x=4»
@@ -845,6 +938,35 @@ pub fn try_check_answer(
     }
     let correct = user_value == last_value;
     Some((user_var, user_value, correct))
+}
+
+/// **v4.76.0** — Explain-steps handler. Detects «қалай шештің / есепті
+/// қалай шеш / процесін көрсет / қадам-қадаммен / түсіндір» pattern in
+/// a follow-up turn after a successful equation/formula solve. Returns
+/// `Some(steps_text)` — surfaces the stored step narrative for the
+/// last solved equation.
+///
+/// Requires session state (`last_math_steps`) populated by the prior
+/// solver call. Returns None when no marker present or when no stored
+/// steps available.
+///
+/// Closes Codex round-2 Bug 2 family fully (3/3 — alongside
+/// `try_solve_linear_equation`, `try_apply_formula`, `try_check_answer`).
+pub fn try_explain_steps(input: &str, last_steps: &str) -> Option<String> {
+    if last_steps.is_empty() {
+        return None;
+    }
+    let lower = input.to_lowercase();
+    let has_explain_phrase = lower.contains("қалай шеш")
+        || lower.contains("процесін")
+        || lower.contains("қадам")
+        || lower.contains("түсіндір")
+        || lower.contains("дәлелде")
+        || lower.contains("шешуін көрсет");
+    if !has_explain_phrase {
+        return None;
+    }
+    Some(last_steps.to_string())
 }
 
 pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {

@@ -551,6 +551,19 @@ templates = [
     "{check_unknown} = {check_user_value} — дұрыс емес. Дұрыс жауап: {check_unknown} = {check_correct_value}.",
 ]
 
+# **v4.76.0** — explain_steps. After a successful equation/formula
+# solve, user asks «Қалай шештің?» / «Процесін көрсет» / «Қадам-
+# қадаммен түсіндір» — surface the stored step narrative built by
+# the solver. Conversation::turn populates `__explain_steps__` slot;
+# planner routes here.
+[[families]]
+key = "explain_steps"
+templates = [
+    "Шешу қадамдары: {explain_steps}",
+    "Қалай шықты: {explain_steps}",
+    "Процесі: {explain_steps}",
+]
+
 # v4.4.0 — User opted out of resolving a pending contradiction
 # (replied "neither / I don't know / skip" to a CheckContradiction
 # prompt). `Conversation::try_dismiss_pending_contradiction` has
