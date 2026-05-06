@@ -7,6 +7,59 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.63.0] — 2026-05-06 — Educational portal Day 2 #5 — Kazakh proverbs expansion (+10 curriculum classics) + folk-wisdom taxonomy
+
+**Day 2 release 5/10 (halfway).** Extends `proverbs.jsonl` with 10 fundamental curriculum-grade Kazakh proverbs + 2 classification bridges establishing the folk-wisdom (халық даналығы) taxonomy.
+
+### Innovations
+
+**(1) 10 new curriculum proverbs** in `data/world_core/proverbs.jsonl` (`prov_041…prov_050`):
+
+| ID | Proverb | Predicate / Object |
+|---|---|---|
+| 041 | «Білекті бірді жығады, **білімді мыңды жығады**» — knowledge over strength | білім IsA күш |
+| 042 | «**Жеті рет өлше, бір рет кес**» — measure 7×, cut once | мұқият ой causes дұрыс нәтиже |
+| 043 | «**Туған жер — алтын бесік**» — homeland is golden cradle | туған жер IsA бесік |
+| 044 | «**Ат тұяғын тай басар**» — colt steps in stallion's hoofprint | тай related_to ат |
+| 045 | «**Көппен көрген — ұлы той**» — what's seen by many is great feast | бірлік causes той |
+| 046 | «**Көп жасаған білмейді, көп көрген біледі**» — experience over age | тәжірибе causes білім |
+| 047 | «**Ағаш — жемісімен, адам — ісімен**» — tree by fruit, person by deed | іс IsA адамның белгісі |
+| 048 | «**Бірлік болмай, тірлік болмас**» — without unity, no life | бірлік causes тірлік |
+| 049 | «Ананың сүті — бал, **баланың тілі — бал**» — mother's milk and child's speech are honey | ана related_to бала |
+| 050 | «**Білім — мәңгілік байлық**» — knowledge is eternal wealth | білім IsA байлық |
+
+These are foundational proverbs taught in 3-4 grade Kazakh-language and «Дүниетану» (life skills) curriculum.
+
+**(2) 2 classification bridges**:
+- `prov_bridge_001`: «**мақал IsA халық даналығы**» (proverb is folk wisdom)
+- `prov_bridge_002`: «**халық даналығы IsA ұғым**» (folk wisdom is concept)
+
+Establishes folk-wisdom taxonomy for future expansion (мәтел / нақыл сөз / әңгіме etc.).
+
+**(3) MULTIWORD_ENTITIES extended** with 5 new compounds: халық даналығы / мұқият ой / дұрыс нәтиже / туған жер / адамның белгісі.
+
+**(4) Predicate diversity** — entries use 4 different predicates (IsA, causes, related_to, has) reflecting the semantic richness of proverbs (definitions, causal claims, kinship relations, characterization). This drives R5 cascading across multiple R-rule sets.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2283 | **2295** (+12) |
+| world_core facts | 2523 | **2535** (+12) |
+| Derived facts | 28534 | **28577** (+43 = 3.6× cascade) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.63.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+**Cumulative Day 2 (halfway):** 5 of 10 releases · +57 facts · +177 derived · grammar 45 entries + proverbs at 52 entries (+12).
+
+### Cadence
+
+`.0` minor — same-domain extension; introduces халық даналығы as new top-level concept hub.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.62.5] — 2026-05-06 — Educational portal Day 2 #4 — Kazakh tenses (шақ) + moods (рай) + verb conjugation paradigm
 
 **Day 2 release 4/10.** Full Kazakh tense system (3 шақ × subtypes) + 4 mood (рай) classes + canonical «оқу» verb conjugation paradigm. Closes the major verb-grammar categories.

@@ -1,7 +1,7 @@
 {
-  "version": "4.62.0",
+  "version": "4.62.5",
   "status": "completed",
-  "elapsed_s": 64,
+  "elapsed_s": 75,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,19 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2523,
+    "facts_total": 2535,
     "by_predicate": {
       "after": 8,
-      "causes": 23,
+      "causes": 27,
       "does_to": 1,
       "goes_to": 26,
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1984,
+      "is_a": 1990,
       "lives_in": 8,
       "part_of": 236,
-      "related_to": 111
+      "related_to": 113
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -85,7 +85,7 @@
       "world_core/programming_languages.jsonl": 56,
       "world_core/programming_rust.jsonl": 181,
       "world_core/programming_rust_advanced.jsonl": 35,
-      "world_core/proverbs.jsonl": 43,
+      "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
       "world_core/role_bridges.jsonl": 63,
       "world_core/society.jsonl": 57,
@@ -44516,6 +44516,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Жақсы ат — мыңға, жаман ат — бірге."
+    },
+    {
+      "subject": {
+        "surface": "білім",
+        "root": "білім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күш",
+        "root": "күш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Білекті бірді жығады, білімді мыңды жығады."
+    },
+    {
+      "subject": {
+        "surface": "мұқият ой",
+        "root": "мұқият ой",
+        "pos": "noun"
+      },
+      "predicate": "Causes",
+      "object": {
+        "surface": "дұрыс нәтиже",
+        "root": "дұрыс нәтиже",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жеті рет өлше, бір рет кес."
+    },
+    {
+      "subject": {
+        "surface": "туған жер",
+        "root": "туған жер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бесік",
+        "root": "бесік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Туған жер — алтын бесік."
+    },
+    {
+      "subject": {
+        "surface": "тай",
+        "root": "тай",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ат",
+        "root": "ат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ат тұяғын тай басар."
+    },
+    {
+      "subject": {
+        "surface": "бірлік",
+        "root": "бірлік",
+        "pos": "noun"
+      },
+      "predicate": "Causes",
+      "object": {
+        "surface": "той",
+        "root": "той",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көппен көрген — ұлы той."
+    },
+    {
+      "subject": {
+        "surface": "тәжірибе",
+        "root": "тәжірибе",
+        "pos": "noun"
+      },
+      "predicate": "Causes",
+      "object": {
+        "surface": "білім",
+        "root": "білім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көп жасаған білмейді, көп көрген біледі."
+    },
+    {
+      "subject": {
+        "surface": "іс",
+        "root": "іс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адамның белгісі",
+        "root": "адамның белгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_047"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ағаш — жемісімен, адам — ісімен."
+    },
+    {
+      "subject": {
+        "surface": "бірлік",
+        "root": "бірлік",
+        "pos": "noun"
+      },
+      "predicate": "Causes",
+      "object": {
+        "surface": "тірлік",
+        "root": "тірлік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірлік болмай, тірлік болмас."
+    },
+    {
+      "subject": {
+        "surface": "ана",
+        "root": "ана",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "бала",
+        "root": "бала",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ананың сүті — бал, баланың тілі — бал."
+    },
+    {
+      "subject": {
+        "surface": "білім",
+        "root": "білім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "байлық",
+        "root": "байлық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Білім — мәңгілік байлық."
+    },
+    {
+      "subject": {
+        "surface": "мақал",
+        "root": "мақал",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "халық даналығы",
+        "root": "халық даналығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мақал — халықтың тәжірибе мен данышпандығынан туған, қысқа да нұсқа айтылған бейнелі сөз. Ұрпақтан-ұрпаққа жалғасатын халықтық даналықтың түрі."
+    },
+    {
+      "subject": {
+        "surface": "халық даналығы",
+        "root": "халық даналығы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/proverbs",
+      "source": {
+        "pack": "world_core/proverbs.jsonl",
+        "sample_id": "prov_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Халық даналығы — белгілі бір халықтың ұжымдық тәжірибесінен жинақталған, ауыздан-ауызға өтіп жалғасатын ой-пікірлер мен өмір тағылымдары жиынтығы."
     },
     {
       "subject": {
