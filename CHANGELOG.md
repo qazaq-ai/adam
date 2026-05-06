@@ -7,6 +7,74 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.78.5] — 2026-05-06 — Rust Book chapter 13 deepening — iterators + closures
+
+First Rust-training release of the v4.78.x cadence. Per user directive «начинай обучать модель программированию на Rust»: start chapter-by-chapter deepening of the Kazakh-translated Rust Book at `data/raw/rust_book_kk/`. Chapter 13 (484 lines, «Функционал тілдік мүмкіндіктер: итераторлар мен жабулар») was previously thin in `programming_rust.jsonl` — ~14 one-line stubs.
+
+### What's added
+
+**18 new curated entries `rust_182…199`** in `programming_rust.jsonl`:
+
+| ID | Concept | Subject | Object hub |
+|---|---|---|---|
+| rust_182 | `FnOnce` trait | fnonce | жабу трейті |
+| rust_183 | `FnMut` trait | fnmut | жабу трейті |
+| rust_184 | `Fn` trait | fn трейті | жабу трейті |
+| rust_185 | `move` in closures | move кілтсөзі | жабу модификаторы |
+| rust_186 | lazy evaluation | лазай есептеу | итератор қасиеті |
+| rust_187 | consuming adapter | тұтынатын бейімдеу | итератор әдісі |
+| rust_188 | iterator adapter | итератор бейімдеуі | итератор әдісі |
+| rust_189 | `iter()` | iter | итератор әдісі |
+| rust_190 | `iter_mut()` | iter_mut | итератор әдісі |
+| rust_191 | `into_iter()` | into_iter | итератор әдісі |
+| rust_192 | `enumerate` | enumerate | итератор бейімдеуі |
+| rust_193 | `zip` | zip | итератор бейімдеуі |
+| rust_194 | `take` / `skip` | take | итератор бейімдеуі |
+| rust_195 | `fold` | fold | тұтынатын бейімдеу |
+| rust_196 | `chain` | chain | итератор бейімдеуі |
+| rust_197 | `Iterator::next` | next | итератор әдісі |
+| rust_198 | closure trait umbrella | жабу трейті | трейт |
+| rust_199 | iterator-method umbrella | итератор әдісі | әдіс |
+
+Each entry has a Kazakh definition + concrete code example from the translated chapter (e.g. `(1..=5).fold(0, |acc, x| acc + x)` → `15` for `fold`).
+
+**Topic extraction extensions:**
+- `LATIN_TECH_SUBJECTS` += 12 bare tokens (`fnonce`, `fnmut`, `iter`, `iter_mut`, `into_iter`, `enumerate`, `zip`, `take`, `skip`, `fold`, `chain`, `next`).
+- `MULTIWORD_ENTITIES` += 9 Kazakh compound concepts (`fn трейті`, `жабу трейті`, `жабу модификаторы`, `move кілтсөзі`, `лазай есептеу`, `итератор қасиеті`, `итератор әдісі`, `итератор бейімдеуі`, `тұтынатын бейімдеу`).
+
+### Acceptance
+
+| Smoke query | Status |
+|---|---|
+| FnOnce деген не? | ✅ |
+| FnMut деген не? | ✅ |
+| Fn трейті деген не? | ✅ |
+| move кілтсөзі деген не? | ✅ |
+| Лазай есептеу деген не? | ✅ |
+| Тұтынатын бейімдеу деген не? | ✅ |
+| Итератор бейімдеуі деген не? | ✅ |
+| iter / iter_mut / into_iter | ✅ |
+| enumerate / zip / take / fold / chain / next | ✅ |
+| 100-query battery diff vs v4.78.0 | **0 differences** |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2508 → **2526** (+18) |
+| world_core facts | 2750 → **2768** (+18) |
+| Derived facts | 30661 → **30760** (+99) |
+
+### Roadmap (Rust curriculum deepening)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| v4.78.5 | ch. 13 | Iterators + closures (this release) |
+| v4.79.0 | ch. 15 | Smart pointers (Box / Rc / Arc / RefCell / Mutex / Weak / cycles / Drop) |
+| v4.79.5 | ch. 16 | Concurrency (threads / channels / scoped / Send+Sync / Arc<Mutex<T>>) |
+| v4.80.0 | ch. 9 | Error handling deepening (`?`-operator / propagation / custom errors) |
+| v4.80.5 | ch. 10 | Generics + traits + lifetimes deepening |
+| … | … | … |
+
+Cadence: `.5` patch — same architectural family (curated curriculum data); 18 entries closes a real curriculum gap and seeds the chapter-by-chapter cadence.
+
 ## [4.78.0] — 2026-05-06 — Codex round-3 deferred bugs closed — office-holder direct rendering + political-safety detector + biology location/causal facts
 
 Closes the 3 architecturally-deeper Codex round-3 bugs deferred from v4.77.5. After this release, all 7 round-3 bugs are addressed (4 in v4.77.5 + 3 in v4.78.0).

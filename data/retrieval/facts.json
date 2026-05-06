@@ -1,7 +1,7 @@
 {
-  "version": "4.77.5",
+  "version": "4.78.0",
   "status": "completed",
-  "elapsed_s": 63,
+  "elapsed_s": 74,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2750,
+    "facts_total": 2768,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2183,
+      "is_a": 2201,
       "lives_in": 8,
       "part_of": 245,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 181,
+      "world_core/programming_rust.jsonl": 199,
       "world_core/programming_rust_advanced.jsonl": 35,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -46557,6 +46557,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Адам білетін бағдарламалау тілдері: Rust (терең), Python, JavaScript, TypeScript, Java, Kotlin, C, C++, C#, Go, Swift, Ruby, PHP. Сонымен қатар деректер тілдерінен SQL (сұраныс тілі), HTML (белгілеу тілі), CSS (стиль тілі) туралы білемін — олар алгоритм жазбайды, сондықтан таза мағынада бағдарламалау тілдері емес."
+    },
+    {
+      "subject": {
+        "surface": "fnonce",
+        "root": "fnonce",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жабу трейті",
+        "root": "жабу трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_182"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`FnOnce` — `Rust`-тың үш жабу-трейтінің ең әлсізі: жабу бір рет қана шакырыла алады. Иелікті алып, «жұтып» жіберетін жабулар (мысалы, ішіндегі мәнді басқа функцияға иелік ретінде беретіндер) тек `FnOnce` бекітеді. `Option::unwrap_or_else` параметрі `FnOnce` — өйткені бір рет қана шакырылады."
+    },
+    {
+      "subject": {
+        "surface": "fnmut",
+        "root": "fnmut",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жабу трейті",
+        "root": "жабу трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_183"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`FnMut` — `Rust`-тың үш жабу-трейтінің ортасы: жабу бірнеше рет шакырылады, әрі ұсталған мәндерді өзгерте алады. Мысалы, `vec.push(7)` жасайтын жабу `FnMut` бекітеді. `Vec::sort_by_key` параметрі `FnMut`."
+    },
+    {
+      "subject": {
+        "surface": "fn трейті",
+        "root": "fn трейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жабу трейті",
+        "root": "жабу трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_184"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Fn` — `Rust`-тың үш жабу-трейтінің ең күштісі: жабу бірнеше рет шакырылады және ешбір ұсталған мәнді өзгертпейді. Тек оқу үшін. `Iterator::map` пен `Iterator::filter` параметрлері `Fn` (немесе `FnMut`) бекітетін жабу қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "move кілтсөзі",
+        "root": "move кілтсөзі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жабу модификаторы",
+        "root": "жабу модификаторы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_185"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`move` (жабуда) — жабудың қоршаған ортадан мәндерді сілтеме арқылы емес, **иелік арқылы** ұстауын мәжбүрлейтін кілтсөз: `move || println!(\"{:?}\", list)`. Жабу басқа ағынға (`thread::spawn`) берілгенде қажет — иелік ағынға өтеді, тіршілік мерзімі шатастырмайды."
+    },
+    {
+      "subject": {
+        "surface": "лазай есептеу",
+        "root": "лазай есептеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор қасиеті",
+        "root": "итератор қасиеті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_186"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Лазай есептеу — `Rust` итераторларының басты қасиеті: итератор жасалғанда ешбір элемент оқылмайды; есептеу тек тұтынатын әдіс (мысалы, `sum`, `collect`, `for`) шакырылғанда басталады. Сондықтан `iter().map(...).filter(...)` тізбегі бір өткізумен орындалады, аралық векторлар жасалмайды."
+    },
+    {
+      "subject": {
+        "surface": "тұтынатын бейімдеу",
+        "root": "тұтынатын бейімдеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор әдісі",
+        "root": "итератор әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_187"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұтынатын бейімдеу — итераторды соңына дейін аралап шығып, бір нәтиже қайтаратын әдіс. Мысалдары: `sum`, `count`, `collect`, `last`, `min`, `max`, `for_each`, `fold`. Шакырылғаннан соң итератор жоғалады — қайта пайдалану мүмкін емес."
+    },
+    {
+      "subject": {
+        "surface": "итератор бейімдеуі",
+        "root": "итератор бейімдеуі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор әдісі",
+        "root": "итератор әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_188"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Итератор бейімдеуі — бір итератордан жаңа итератор жасайтын әдіс. Лазай — нәтиже әлі есептелмейді. Мысалдары: `map`, `filter`, `take`, `skip`, `zip`, `enumerate`, `chain`, `flat_map`. Тізбекке қосуға болады: `iter().map(...).filter(...).take(5).collect()`."
+    },
+    {
+      "subject": {
+        "surface": "iter",
+        "root": "iter",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор әдісі",
+        "root": "итератор әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_189"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`iter()` — ұжымнан элементтерге **тұрақты сілтеме** беретін итератор жасайтын әдіс: `vec.iter()` → `Iterator<Item=&T>`. Ұжым иелігі қалады, элементтер тек оқылады. Ең жиі қолданылатын итератор."
+    },
+    {
+      "subject": {
+        "surface": "iter_mut",
+        "root": "iter_mut",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор әдісі",
+        "root": "итератор әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_190"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`iter_mut()` — ұжымнан элементтерге **өзгермелі сілтеме** беретін итератор жасайтын әдіс: `vec.iter_mut()` → `Iterator<Item=&mut T>`. Әр элементті орынында өзгертуге мүмкіндік береді: `for x in v.iter_mut() { *x += 1; }`."
+    },
+    {
+      "subject": {
+        "surface": "into_iter",
+        "root": "into_iter",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор әдісі",
+        "root": "итератор әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_191"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`into_iter()` — ұжымның **иелігін алатын** итератор жасайтын әдіс: `vec.into_iter()` → `Iterator<Item=T>`. Ұжым жоғалады, әр элемент иелік ретінде шығады. `for x in vec` синтаксисі іштей `into_iter()` шакырады."
+    },
+    {
+      "subject": {
+        "surface": "enumerate",
+        "root": "enumerate",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор бейімдеуі",
+        "root": "итератор бейімдеуі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_192"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`enumerate` — итератор бейімдеуі: әр элементті `(индекс, мән)` жұбымен қайтарады. Мысалы: `for (i, c) in s.chars().enumerate() { println!(\"{i}: {c}\"); }`. Циклда индекс керек болғанда негізгі құрал."
+    },
+    {
+      "subject": {
+        "surface": "zip",
+        "root": "zip",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор бейімдеуі",
+        "root": "итератор бейімдеуі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_193"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`zip` — итератор бейімдеуі: екі итератордың элементтерін жұптап, `(a, b)` қайтарады. Қысқарақ итератор бітсе тоқтайды. Мысалы: `names.iter().zip(ages.iter())` → `[(\"Әли\",18),(\"Мақпал\",25)]`."
+    },
+    {
+      "subject": {
+        "surface": "take",
+        "root": "take",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор бейімдеуі",
+        "root": "итератор бейімдеуі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_194"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`take` пен `skip` — итератор бейімдеулері: `take(n)` алғашқы `n` элементті ғана өткізеді; `skip(n)` алғашқы `n` элементті аттап, қалғанын өткізеді. `(0..).take(5)` → `[0,1,2,3,4]`; `(0..10).skip(7)` → `[7,8,9]`."
+    },
+    {
+      "subject": {
+        "surface": "fold",
+        "root": "fold",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тұтынатын бейімдеу",
+        "root": "тұтынатын бейімдеу",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_195"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`fold` — тұтынатын бейімдеу: бастапқы мәннен бастап жабу арқылы әр элементті аккумуляторға қосады. Мысалы: `(1..=5).fold(0, |acc, x| acc + x)` → `15`. Жалпы — `sum`, `product`, `min`, `max` `fold` арқылы жасалуы мүмкін."
+    },
+    {
+      "subject": {
+        "surface": "chain",
+        "root": "chain",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор бейімдеуі",
+        "root": "итератор бейімдеуі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_196"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`chain` — итератор бейімдеуі: екі итераторды бір тізбекке біріктіреді. Мысалы: `a.iter().chain(b.iter())` → `a` элементтерін, содан соң `b` элементтерін қайтарады. Бірнеше ұжымды бір өткізумен өңдеуге қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "next",
+        "root": "next",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "итератор әдісі",
+        "root": "итератор әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_197"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Iterator::next` — итератор трейтінің негізгі әдісі: `fn next(&mut self) -> Option<Self::Item>`. Әр шакыруда келесі элементті `Some(item)` түрінде қайтарады; элементтер бітсе `None`. Барлық цикл, бейімдеу, тұтынушы ішінен `next` шакырады."
+    },
+    {
+      "subject": {
+        "surface": "жабу трейті",
+        "root": "жабу трейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "трейт",
+        "root": "трейт",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_198"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жабу трейті — `Fn`, `FnMut`, `FnOnce` үш трейтінің ортақ атауы. Жабудың қоршаған ортамен жұмыс істеу тәсілін сипаттайды. `Fn` ⊂ `FnMut` ⊂ `FnOnce` (қатаңдан босқа): `Fn` бекіткен жабу автоматты түрде `FnMut` және `FnOnce` те бекітеді."
+    },
+    {
+      "subject": {
+        "surface": "итератор әдісі",
+        "root": "итератор әдісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әдіс",
+        "root": "әдіс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_199"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Итератор әдісі — `Iterator` трейтіне жататын кез келген әдіс. Екіге бөлінеді: тұтынатын бейімдеулер (итераторды бітіреді, нәтиже қайтарады) және итератор бейімдеулері (жаңа итератор жасайды, лазай). Тізбекке қосуға болады."
     },
     {
       "subject": {

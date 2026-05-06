@@ -1888,6 +1888,16 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "жасуша ядросы",
     "жүректен басталатын қан тасымалдау процесі",
     "грегор мендель ашқан генетика заңдары",
+    // **v4.78.5** — Rust Book chapter 13 (iterators + closures) deepening.
+    "fn трейті",
+    "жабу трейті",
+    "жабу модификаторы",
+    "move кілтсөзі",
+    "лазай есептеу",
+    "итератор қасиеті",
+    "итератор әдісі",
+    "итератор бейімдеуі",
+    "тұтынатын бейімдеу",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -2132,6 +2142,22 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     // **v4.27.0 follow-up** — additional aliases (rust_173…rust_175).
     "implicit",
     "explicit",
+    // **v4.78.5** — Rust Book chapter 13 (iterators + closures).
+    // rust_182…199. Single-word Latin tokens; multi-word compounds
+    // («fn трейті», «жабу трейті», «лазай есептеу», etc.) are
+    // registered in MULTIWORD_ENTITIES instead.
+    "fnonce",
+    "fnmut",
+    "iter",
+    "iter_mut",
+    "into_iter",
+    "enumerate",
+    "zip",
+    "take",
+    "skip",
+    "fold",
+    "chain",
+    "next",
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word
