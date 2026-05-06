@@ -760,6 +760,13 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "гомологтық қатар",
     "карбон қышқылы",
     "нуклеин қышқылы",
+    // **v4.69.0** — Educational portal: chemistry inorganics deepening.
+    "металл тобы",
+    "бейметалл тобы",
+    "сілтілік-жер металдар",
+    "қышқылдық оксид",
+    "негіздік оксид",
+    "менделеев кестесі",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of

@@ -1,7 +1,7 @@
 {
-  "version": "4.68.5",
+  "version": "4.69.0",
   "status": "completed",
-  "elapsed_s": 34,
+  "elapsed_s": 29,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2656,
+    "facts_total": 2668,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2104,
+      "is_a": 2116,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -47,7 +47,7 @@
       "world_core/biology_basic.jsonl": 53,
       "world_core/biology_school.jsonl": 120,
       "world_core/body_parts.jsonl": 55,
-      "world_core/chemistry_school.jsonl": 117,
+      "world_core/chemistry_school.jsonl": 129,
       "world_core/clothing.jsonl": 35,
       "world_core/colors.jsonl": 38,
       "world_core/computer_science_basics.jsonl": 30,
@@ -11614,6 +11614,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Полисахарид — көптеген моносахарид буындарынан тұратын күрделі көмірсу (мысал: крахмал, целлюлоза, гликоген)."
+    },
+    {
+      "subject": {
+        "surface": "сілтілік-жер металдар",
+        "root": "сілтілік-жер металдар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "металл тобы",
+        "root": "металл тобы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_118"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сілтілік-жер металдар — периодтық жүйенің II тобын құрайтын белсенді металдар (Be, Mg, Ca, Sr, Ba, Ra). Сілтілік металдардан кейін реакцияға түсу белсенділігі бойынша екінші орында."
+    },
+    {
+      "subject": {
+        "surface": "кальций",
+        "root": "кальций",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сілтілік-жер металдар",
+        "root": "сілтілік-жер металдар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_119"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кальций — сүйектердің, тістердің құрамына кіретін, жасуша белсенділігіне қажетті сілтілік-жер металл (Ca, № 20). Әктас, мрамор негізі."
+    },
+    {
+      "subject": {
+        "surface": "магний",
+        "root": "магний",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сілтілік-жер металдар",
+        "root": "сілтілік-жер металдар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_120"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Магний — жеңіл, күмістей ақ түсті сілтілік-жер металл (Mg, № 12). Хлорофилл құрамына кіреді; ауада жанғанда ақ жарық береді."
+    },
+    {
+      "subject": {
+        "surface": "фтор",
+        "root": "фтор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "галогендер",
+        "root": "галогендер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_121"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Фтор — ең белсенді бейметалл, ашық сары түсті улы газ галоген (F, № 9). Тіс эмалін нығайтуда қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "бром",
+        "root": "бром",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "галогендер",
+        "root": "галогендер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_122"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бром — бөлме температурасында сұйық күйде болатын жалғыз бейметалл, қызыл-қоңыр түсті улы галоген (Br, № 35)."
+    },
+    {
+      "subject": {
+        "surface": "йод",
+        "root": "йод",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "галогендер",
+        "root": "галогендер",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_123"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Йод — қара-күлгін түсті, металл жылтыры бар қатты галоген (I, № 53). Антисептик ретінде медицинада қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "аргон",
+        "root": "аргон",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "инертті газ",
+        "root": "инертті газ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_124"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Аргон — атмосферада ең көп кездесетін инертті газ (Ar, № 18, ауада ~0,93%). Дәнекерлеу мен лампаларда қорғаныш орта ретінде қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "күкірт",
+        "root": "күкірт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бейметалл",
+        "root": "бейметалл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_125"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күкірт — ашық сары түсті, қатты бейметалл (S, № 16). Күкірт қышқылы, резеңке вулканизациясы өндірісінде маңызды."
+    },
+    {
+      "subject": {
+        "surface": "фосфор",
+        "root": "фосфор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "бейметалл",
+        "root": "бейметалл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_126"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Фосфор — қызыл, ақ және қара модификациялары бар бейметалл (P, № 15). ДНК, ATФ, сүйек құрамына кіреді; тыңайтқыштарда қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "қышқылдық оксид",
+        "root": "қышқылдық оксид",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оксид",
+        "root": "оксид",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_127"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қышқылдық оксид — суда қышқыл түзетін, негіздермен әрекеттесетін оксид. Көбіне бейметалл оксидтері (CO₂, SO₃, P₂O₅)."
+    },
+    {
+      "subject": {
+        "surface": "негіздік оксид",
+        "root": "негіздік оксид",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оксид",
+        "root": "оксид",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_128"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Негіздік оксид — суда негіз түзетін, қышқылдармен әрекеттесетін оксид. Көбіне металл оксидтері (Na₂O, CaO, MgO)."
+    },
+    {
+      "subject": {
+        "surface": "менделеев кестесі",
+        "root": "менделеев кестесі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "химия ұғымы",
+        "root": "химия ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/chemistry_school",
+      "source": {
+        "pack": "world_core/chemistry_school.jsonl",
+        "sample_id": "chem_129"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Менделеев кестесі — химиялық элементтерді атом нөмірі мен қасиеттері бойынша жіктейтін кесте; Д. И. Менделеев 1869 жылы ұсынған. Періодтар (қатарлар) мен топтардан (бағаналардан) тұрады."
     },
     {
       "subject": {

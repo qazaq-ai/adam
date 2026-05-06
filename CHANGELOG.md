@@ -7,6 +7,72 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.69.0] — 2026-05-06 — Educational portal — Chemistry: inorganic chemistry deepening (alkaline-earth metals + Ca/Mg + halogens F/Br/I + Ar + S/P + acidic/basic oxides + Mendeleev's table)
+
+Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `chemistry_school.jsonl` confirmed dense inorganic chemistry coverage: бейорганикалық химия (chem_002) / металл / бейметалл / инертті газ + сілтілік металдар + галогендер as group hubs (chem_020..024) / 4 elements (сутек / оттек / көміртек / азот) (chem_025..028) / 5 metals (темір / алтын / күміс / мыс / алюминий) (chem_029..033) / 2 specific alkali metals (натрий / калий) (chem_034..035) / хлор + 2 noble gases (гелий / неон) (chem_036..038) / металдық байланыс (chem_042) / 3 redox reactions (chem_053..055) / қышқыл + 3 acids (chem_058..061) / негіз + сілті + натрий гидроксиді (chem_062..064) / тұз + натрий хлориді (chem_065..066) / оксид + 2 oxides (chem_067..069) / бейтараптану + ерітінді / еріткіш / pH / моль / молярлық масса / Авогадро / электролиз (chem_070..078). Alkaline-earth metal group + Ca/Mg, 3 missing halogens (F/Br/I), Ar, sulfur + phosphorus elements, acidic/basic oxide subclasses, and Mendeleev's table were missing.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| металл/бейметалл/инертті газ/сілтілік металдар/галогендер as groups | `chemistry_school.jsonl` (chem_020..024) | ✓ skip |
+| сутек/оттек/көміртек/азот / 5 transition+post-transition metals / натрий/калий/хлор/гелий/неон | `chemistry_school.jsonl` (chem_025..038) | ✓ skip |
+| Менделеев заңы (existing chem_014) ≠ Менделеев кестесі (table as artifact) | distinct concept | + add table |
+| Сілтілік-жер металдар as group hub | not yet | + add |
+| Кальций / магний (specific Group II metals) | not yet | + add |
+| Фтор / бром / йод (3 missing halogens) | not yet | + add |
+| Аргон (third noble gas) | not yet | + add |
+| Күкірт / фосфор (specific nonmetals) | not yet | + add |
+| Қышқылдық / негіздік оксид (oxide subclasses) | not yet | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/chemistry_school.jsonl` (`chem_118…129`):
+
+**Alkaline-earth group + Ca/Mg (3):**
+- chem_118: сілтілік-жер металдар IsA металл тобы — Group II hub (Be/Mg/Ca/Sr/Ba/Ra)
+- chem_119: кальций IsA сілтілік-жер металдар — Ca, № 20, bones/teeth, lime/marble
+- chem_120: магний IsA сілтілік-жер металдар — Mg, № 12, chlorophyll, white-light combustion
+
+**Halogens — 3 missing (3):**
+- chem_121: фтор IsA галогендер — F, № 9, most reactive nonmetal, dental enamel
+- chem_122: бром IsA галогендер — Br, № 35, only liquid nonmetal at room temp
+- chem_123: йод IsA галогендер — I, № 53, antiseptic
+
+**Noble gas + nonmetal elements (3):**
+- chem_124: аргон IsA инертті газ — Ar, № 18, ~0.93% of air, welding shield
+- chem_125: күкірт IsA бейметалл — S, № 16, sulfuric acid, rubber vulcanization
+- chem_126: фосфор IsA бейметалл — P, № 15, in DNA/ATP/bones, fertilizers
+
+**Oxide subclasses (2):**
+- chem_127: қышқылдық оксид IsA оксид — forms acid in water (CO₂, SO₃, P₂O₅)
+- chem_128: негіздік оксид IsA оксид — forms base in water (Na₂O, CaO, MgO)
+
+**Periodic table (1):**
+- chem_129: Менделеев кестесі IsA химия ұғымы — 1869, periods+groups classification
+
+**(2) Curriculum-grade element data embedded** — atomic numbers (№), physical properties, biological/industrial roles, periodic-table position.
+
+**(3) MULTIWORD_ENTITIES extended** with 6 new compounds (металл тобы, бейметалл тобы, сілтілік-жер металдар, қышқылдық оксид, негіздік оксид, менделеев кестесі).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2416 | **2428** (+12) |
+| world_core facts | 2597 | **2609** (+12) |
+| world_core domains | 51 | **51** unchanged |
+| Derived facts | 29575 | **29609** (+34 = **2.83× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+
+R1_is_a_transitivity 2872 → 2892 (+20, new alkaline-earth and oxide-subclass chains); R5_shared_is_a_target 1932 → 1946 (+14, new halogens cluster with хлор; Ca/Mg cluster with each other; sulfur/phosphorus cluster with existing carbon/nitrogen as IsA бейметалл).
+
+### Cadence
+
+`.0` minor — same-domain canonical extension; chemistry_school now at 129 entries (+24 across organics + inorganics this stripe).
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.68.5] — 2026-05-06 — Educational portal — Chemistry: organic chemistry deepening (homologous series + isomerism + propane/butane/acetylene + methanol/glycerol + ketone/acetone + nucleotide + polysaccharide)
 
 Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `chemistry_school.jsonl` confirmed dense organic chemistry coverage: органикалық химия (chem_003) / көміртек (chem_027) / қышқыл + 3 acid types (chem_058..061) / тұз (chem_065) / көмірсутек hub (chem_079) / алкан + алкен + алкин classes (chem_080..082) / метан + этан + этилен + бензол (chem_083..086) / спирт + этанол (chem_087, 088) / альдегид + 2 carboxylic acid entries (chem_089..091) / эфир (chem_092) / көмірсу + глюкоза + сахароза + крахмал (chem_093..096) / май + ақуыз + амин қышқылы + фермент (chem_097..100) / полимер + мономер + пластмасса (chem_101..103) / ДНК + РНК (chem_104, 105). Concept-level taxonomy (homologous series, homolog, isomerism), specific simple alkanes (propane, butane), specific alkyne (acetylene), simplest alcohol (methanol) + polyhydric (glycerol), ketone class + acetone, nucleotide building block, and polysaccharide general class were missing.
