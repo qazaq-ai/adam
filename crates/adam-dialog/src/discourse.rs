@@ -483,9 +483,20 @@ pub fn input_is_math_expression(input: &str) -> bool {
 ///   continue to refuse via `math_refusal`.
 /// - No variables / session-bound computation.
 pub fn try_evaluate_arithmetic(input: &str) -> Option<i64> {
+    // **v4.74.0** — strip natural-Kazakh wrapper first. Codex 2026-05-06
+    // round-2: «5+7*2 қанша?» refused because the pre-v4.74.0 cleaner
+    // ate Kazakh letters into the cleaned string («5+7*2қанша»),
+    // failing the arithmetic-only character check. Extract the longest
+    // contiguous arithmetic substring instead (digits + + - * / : =).
+    // Drops trailing «қанша / қанша болады / нешеге тең / есепте /
+    // есептеп бер / болады» natural-language tails.
+    let arith_only: String = input
+        .chars()
+        .filter(|c| c.is_ascii_digit() || matches!(*c, '+' | '-' | '*' | '/' | ':' | '=' | ' '))
+        .collect();
     // Normalise: strip whitespace, drop trailing `=`, normalise
     // Russian-style division `:` to `/`.
-    let cleaned: String = input
+    let cleaned: String = arith_only
         .chars()
         .filter(|c| !c.is_whitespace())
         .map(|c| if c == ':' { '/' } else { c })
@@ -634,6 +645,105 @@ enum ArithToken {
 /// arithmetic; the word-form version needs lexical recognition of
 /// number words AND verb stems with Kazakh case morphology. Sharing
 /// internals would mix two unrelated parse strategies.
+/// **v4.74.0** — Procedural linear-equation solver for the simplest
+/// 1-unknown form: `X + a = b`, `X - a = b`, `X * a = b`, `X / a = b`,
+/// `a + X = b`, `a - X = b`, `a * X = b`. Detects the equation in a
+/// natural-Kazakh wrapper («Егер X+2=5 болса, X қанша?») and returns
+/// the integer solution when one exists.
+///
+/// Returns `Some(value)` when a single linear equation matches and
+/// has an integer solution. Returns `None` otherwise — caller should
+/// fall through to other handlers or refusal.
+///
+/// Driven by Codex 2026-05-06 round-2 review: «Егер x+2=5 болса, x
+/// қанша?» previously refused. This is the smallest-scope procedural
+/// solver — handles only single-unknown linear equations with integer
+/// constants. Quadratic / multi-unknown / fraction-bearing equations
+/// stay refused. Procedural solvers are deterministic per
+/// `project_kazakh_tutor_positioning` — no NN involved.
+pub fn try_solve_linear_equation(input: &str) -> Option<(String, i64)> {
+    // Find the whitespace-separated token containing `=`. For
+    // «Егер x+2=5 болса, x қанша?» that's «x+2=5». For «5+7*2 қанша?»
+    // (no `=`), no token matches and we return None.
+    let lower = input.to_lowercase();
+    let eq_token = lower
+        .split(|c: char| c.is_whitespace() || c == ',' || c == ';')
+        .find(|tok| tok.contains('='))?;
+    // Strip trailing punctuation that might leak.
+    let eq_token = eq_token.trim_end_matches(['?', '.', '!']);
+    let parts: Vec<&str> = eq_token.split('=').collect();
+    if parts.len() != 2 {
+        return None;
+    }
+    let lhs = parts[0];
+    let rhs_str = parts[1];
+    // RHS must be a (possibly negative) integer.
+    let rhs: i64 = rhs_str.trim().parse().ok()?;
+
+    // Parse LHS — three forms:
+    //   1. Single letter (the unknown), like «x»
+    //   2. Letter + op + digits, like «x+2», «x-3», «x*4», «x/5»
+    //   3. Digits + op + letter, like «2+x», «10-x»
+    if lhs.chars().all(|c| c.is_alphabetic()) && !lhs.is_empty() {
+        return Some((lhs.to_string(), rhs));
+    }
+    // Find the operator (must be exactly one).
+    let op_idx = lhs.chars().enumerate().find_map(|(i, c)| {
+        if matches!(c, '+' | '-' | '*' | '/') && i > 0 {
+            Some(i)
+        } else {
+            None
+        }
+    })?;
+    let left_part = &lhs[..op_idx];
+    let op = lhs.chars().nth(op_idx)?;
+    let right_part = &lhs[op_idx + op.len_utf8()..];
+
+    let left_is_unknown = left_part.chars().all(|c| c.is_alphabetic()) && !left_part.is_empty();
+    let right_is_unknown = right_part.chars().all(|c| c.is_alphabetic()) && !right_part.is_empty();
+
+    if left_is_unknown && !right_is_unknown {
+        // X op a = b
+        let a: i64 = right_part.parse().ok()?;
+        let x = match op {
+            '+' => rhs - a,
+            '-' => rhs + a,
+            '*' => {
+                if a == 0 || rhs % a != 0 {
+                    return None;
+                }
+                rhs / a
+            }
+            '/' => rhs * a,
+            _ => return None,
+        };
+        return Some((left_part.to_string(), x));
+    }
+    if right_is_unknown && !left_is_unknown {
+        // a op X = b
+        let a: i64 = left_part.parse().ok()?;
+        let x = match op {
+            '+' => rhs - a,
+            '-' => a - rhs,
+            '*' => {
+                if a == 0 || rhs % a != 0 {
+                    return None;
+                }
+                rhs / a
+            }
+            '/' => {
+                if rhs == 0 || a % rhs != 0 {
+                    return None;
+                }
+                a / rhs
+            }
+            _ => return None,
+        };
+        return Some((right_part.to_string(), x));
+    }
+    None
+}
+
 pub fn try_evaluate_kazakh_word_math(input: &str) -> Option<i64> {
     // **v4.42.0** — multi-clause support. Split input by commas /
     // sequencing connectives («және» — "and", «содан кейін» — "then",

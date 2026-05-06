@@ -1122,6 +1122,22 @@ impl Conversation {
                 // «алдыңғы нәтиже»).
                 self.session
                     .insert("last_math_result".into(), value.to_string());
+            } else if let Some((unknown, value)) =
+                crate::discourse::try_solve_linear_equation(resolved_input.as_ref())
+            {
+                // **v4.74.0** — linear-equation solver. «Егер x+2=5 болса,
+                // x қанша?» → «x = 3». Surfaces via the same
+                // `__math_answer__` slot path so the math_answer template
+                // family fires; the unknown variable name is stored in
+                // `__math_unknown__` for templates that want to render
+                // «X = N» style.
+                extra_slots.insert("__math_answer__".into(), value.to_string());
+                extra_slots.insert("__math_unknown__".into(), unknown);
+                if let Some(words) = crate::discourse::render_kazakh_number_words(value) {
+                    extra_slots.insert("__math_words__".into(), words);
+                }
+                self.session
+                    .insert("last_math_result".into(), value.to_string());
             } else {
                 extra_slots.insert("__math_input__".into(), "1".into());
             }

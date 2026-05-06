@@ -7,6 +7,66 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.74.0] — 2026-05-06 — First procedural solver — natural-Kazakh arithmetic wrapper + linear equation solver
+
+First step on the procedural-tutor roadmap (Codex round-2 Bug 2 family). Per saved memory `project_kazakh_tutor_positioning.md`, project is positioned as Kazakh school tutor; Codex's #1-priority gap was «no procedural tutor — solve_equation / check_answer / explain_steps refused». This release ships the simplest two solvers: arithmetic wrapped in natural Kazakh + 1-unknown linear equation. Both fully deterministic — no NN involved (per roadmap, NN integration scoped to v5+).
+
+### Bugs identified by Codex round-2
+
+| Failing query | Pre-fix | Root cause |
+|---|---|---|
+| 5+7*2 қанша? | refusal | `try_evaluate_arithmetic` rejected because cleaned string contained Cyrillic letters from «қанша» |
+| 5+7*2 қанша болады? | refusal | same |
+| Егер x+2=5 болса, x қанша? | refusal | no equation solver existed |
+
+### Innovations
+
+**(1) `discourse::try_evaluate_arithmetic` strips natural-Kazakh wrapper**: pre-extracts the longest contiguous arithmetic substring (digits + ASCII operators) before evaluation. Drops trailing «қанша / қанша болады / нешеге тең / есепте / есептеп бер» natural-language tails. «5+7*2 қанша?» now evaluates to 19.
+
+**(2) New `discourse::try_solve_linear_equation`** — deterministic 1-unknown linear equation solver. Handles seven forms:
+- `x = b` (trivial)
+- `x + a = b`, `x - a = b`, `x * a = b`, `x / a = b`
+- `a + x = b`, `a - x = b`, `a * x = b`, `a / x = b`
+
+Detection: scans whitespace-separated tokens for one containing `=`; works inside any natural-Kazakh wrapper («Егер x+2=5 болса, x қанша?»). Returns `(unknown, value)` tuple. Conservative: rejects multi-unknown, fractional, or non-integer-solution forms. Caller falls through to refusal for those.
+
+**(3) `Conversation::turn` integration**: when `try_evaluate_arithmetic` and `try_evaluate_kazakh_word_math` both fail BUT `try_solve_linear_equation` succeeds, surface the value via `__math_answer__` slot path (so existing `math_answer` template family fires) plus `__math_unknown__` slot for the variable name.
+
+### Acceptance
+
+| Query | v4.73.5 | v4.74.0 |
+|---|---|---|
+| 5+7*2 қанша? | refusal | ✅ «Есептедім: 19 (он тоғыз)» |
+| 5+7*2 қанша болады? | refusal | ✅ «Есептедім: 19 (он тоғыз)» |
+| Егер x+2=5 болса, x қанша? | refusal | ✅ «Есептедім: 3 (үш)» |
+| x*3=15 | refusal | ✅ «Есептедім: 5 (бес)» |
+| 10-y=4 | refusal | ✅ «Есептедім: 6 (алты)» |
+
+| Gate | Status |
+|---|---|
+| 100-query battery diff vs v4.73.5 | **0 differences** (zero regression) |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.74.0` | green |
+
+### Deferred
+
+- Quadratic / multi-unknown equations (need symbolic algebra layer).
+- Formula-applier («F=ma, m=2, a=3 болса F қанша?») — needs formula library + variable-substitution intent.
+- `check_answer` intent — verify user-supplied solution against equation.
+- `explain_steps` intent — narrate solution procedure («алдымен 2-ні екі жағынан да алып тастаймыз...»).
+- All Codex round-2 Bug 3-8 categories.
+
+### Strategic note
+
+This is `v4.74.0` not `v4.74.5` because adding a **new procedural capability** (deterministic equation solver) is a meaningful feature increment per memory `feedback_versioning_post_1_0`. Per roadmap, v4.74.x will be pure deterministic procedural work (no NN); NN integration (disambiguator first) scoped to v5.0.0+.
+
+### Cadence
+
+`.0` minor — first procedural-solver capability, dialog-architecture progression.
+
+Stripe — Kazakh school tutor.
+
 ## [4.73.5] — 2026-05-06 — Codex round-2 bugs — factual-location routing fix + function-word topic blocklist + Earth-planet priority
 
 Driven by Codex 2026-05-06 round-2 review (after v4.73.0 ship). Codex confirmed v4.73.0 multi-turn fix worked, then identified 8 additional failure patterns. This release fixes the 4 with surgical scope (security/correctness); 4 deferred to procedural-intent / data-structure work.
