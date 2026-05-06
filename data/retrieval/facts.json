@@ -1,7 +1,7 @@
 {
-  "version": "4.62.5",
+  "version": "4.63.0",
   "status": "completed",
-  "elapsed_s": 75,
+  "elapsed_s": 63,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -55,17 +55,16 @@
       "world_core/cooking_methods.jsonl": 18,
       "world_core/directions.jsonl": 9,
       "world_core/economics_basic.jsonl": 22,
-      "world_core/emotions.jsonl": 30,
+      "world_core/emotions.jsonl": 44,
       "world_core/food.jsonl": 50,
       "world_core/geography_kz.jsonl": 178,
       "world_core/government_kazakhstan.jsonl": 32,
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
       "world_core/informatics_basic.jsonl": 40,
-      "world_core/kazakh_grammar.jsonl": 45,
       "world_core/kinship_extended.jsonl": 20,
       "world_core/kz_literature.jsonl": 96,
-      "world_core/language_features.jsonl": 33,
+      "world_core/language_features.jsonl": 78,
       "world_core/materials.jsonl": 22,
       "world_core/mathematics_basic.jsonl": 55,
       "world_core/measurements.jsonl": 18,
@@ -76,7 +75,6 @@
       "world_core/physics_school.jsonl": 102,
       "world_core/plants.jsonl": 35,
       "world_core/preschool_alphabet.jsonl": 48,
-      "world_core/preschool_emotions.jsonl": 14,
       "world_core/preschool_numbers.jsonl": 16,
       "world_core/preschool_routine.jsonl": 13,
       "world_core/preschool_shapes.jsonl": 12,
@@ -14639,6 +14637,286 @@
     },
     {
       "subject": {
+        "surface": "қуаныш",
+        "root": "қуаныш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қуаныш — қандай да бір жақсы оқиғадан немесе сыйдан адамның жан дүниесінде туындайтын жағымды сезім. Күлкі, көңілді көңіл-күй арқылы білінеді. Мысал: туған күн қуанышы, жеңіс қуанышы."
+    },
+    {
+      "subject": {
+        "surface": "махаббат",
+        "root": "махаббат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Махаббат — біреуге немесе бірдеңеге деген терең жанашырлық пен сүйіспеншілік сезімі. Ата-ана махаббаты, отан махаббаты, дос-жар арасындағы махаббат. Жағымды сезімдердің ең жоғары түрі."
+    },
+    {
+      "subject": {
+        "surface": "батылдық",
+        "root": "батылдық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Батылдық — қорқынышты жеңіп, қиындықтар алдында тайсалмай қимыл жасай алу қабілеті. Жақсылық пен әділдік үшін тұратын мінез белгісі. Қазақ батырларының басты қасиеті."
+    },
+    {
+      "subject": {
+        "surface": "мақтаныш",
+        "root": "мақтаныш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мақтаныш — жетістігіңізге, отбасыңызға, еліңізге деген ішкі қанағаттанушылық сезімі. Жасалған еңбектің лайықты бағасы. Мысал: ұл-қыздарының жетістігі үшін ата-ананың мақтанышы."
+    },
+    {
+      "subject": {
+        "surface": "таңдану",
+        "root": "таңдану",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Таңдану — күтпеген, ерекше нәрсені көргенде немесе естігенде туындайтын жағымды сезім. Балалардың әлемді танудағы маңызды эмоциясы. Мысал: ғажап табиғат көрінісіне таңдану."
+    },
+    {
+      "subject": {
+        "surface": "ренжу",
+        "root": "ренжу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ренжу — біреудің сөзіне немесе ісіне көңілі толмай, кейін кететін жағымсыз сезім. Әдетте қысқа уақытқа созылады. Балаларға ренжу — өз шегін білдірудің табиғи тәсілі."
+    },
+    {
+      "subject": {
+        "surface": "қорқыныш",
+        "root": "қорқыныш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорқыныш — қауіп-қатерден сақтанудан туындайтын жағымсыз сезім. Адамды қауіпті жағдайдан шегінуге итермелейді — пайдалы қорғаныш сезімі. Ұзақ қорқу денсаулыққа зиянды."
+    },
+    {
+      "subject": {
+        "surface": "жек көру",
+        "root": "жек көру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жек көру — біреуге немесе бірдеңеге деген терең жағымсыз сезім. Махаббаттың қарама-қарсысы. Ұзақ жек көру жанға да, денсаулыққа да зиянды; кешірім — жек көрудің ең жақсы дауасы."
+    },
+    {
+      "subject": {
+        "surface": "қызғаныш",
+        "root": "қызғаныш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қызғаныш — басқаның жетістігіне немесе қарым-қатынасына көңілі толмай, өзін шеттетілген сезінуден туатын жағымсыз сезім. Балаларда жиі кездеседі — оны түсіндіріп, өзіндік құндылықты сезіндіру маңызды."
+    },
+    {
+      "subject": {
+        "surface": "ұят",
+        "root": "ұят",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ұят — өзінің сөзі немесе іс-әрекеті үшін ыңғайсыздықтан туындайтын жағымсыз сезім. Адамгершілік пен әдептіліктің ішкі бағдары. Қазақ халқы «Ұят өлім» деп ұят сезімін мейлінше жоғары қоюды үйретеді."
+    },
+    {
+      "subject": {
+        "surface": "жағымды сезім",
+        "root": "жағымды сезім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жағымды сезім — адамға рахат сыйлайтын, көңіл-күйді көтеретін эмоция түрі. Қуаныш, махаббат, мақтаныш, таңдану, батылдық — жағымды сезімдер."
+    },
+    {
+      "subject": {
+        "surface": "жағымсыз сезім",
+        "root": "жағымсыз сезім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жағымсыз сезім — адамға қолайсыз көңіл-күй беретін эмоция түрі. Ренжу, қорқыныш, жек көру, қызғаныш, ұят — жағымсыз сезімдер. Олар да адамның табиғи бөлігі — оларды түсініп, басқару маңызды."
+    },
+    {
+      "subject": {
+        "surface": "сезім",
+        "root": "сезім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_bridge_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сезім — адамның ішкі дүниесінде болып жатқан оқиғаларға, заттарға немесе адамдарға қатысты эмоционалдық жауабы. Жағымды және жағымсыз болып бөлінеді."
+    },
+    {
+      "subject": {
+        "surface": "зат есім",
+        "root": "зат есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/emotions",
+      "source": {
+        "pack": "world_core/emotions.jsonl",
+        "sample_id": "emo_bridge_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Зат есім — заттың, құбылыстың немесе ұғымның атын білдіретін сөз табы. Кім? Не? деген сұрақтарға жауап береді. Мысалдар: бала, кітап, қала, сезім."
+    },
+    {
+      "subject": {
         "surface": "нан",
         "root": "нан",
         "pos": "noun"
@@ -23539,906 +23817,6 @@
     },
     {
       "subject": {
-        "surface": "атау септік",
-        "root": "атау септік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "септік",
-        "root": "септік",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Атау септік — заттың атауын білдіретін, негізгі түрі болатын септік. Жалғауы жоқ, негізгі форма. Кім? Не? деген сұрақтарға жауап береді. Мысал: бала ойнайды. Кім ойнайды? — Бала."
-    },
-    {
-      "subject": {
-        "surface": "ілік септік",
-        "root": "ілік септік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "септік",
-        "root": "септік",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_002"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Ілік септік — заттың кімге немесе неге тиесілі екенін білдіретін септік. Жалғаулары: -ның/-нің (дауыстыдан кейін), -дың/-дің (ұяң дауыссыздан кейін), -тың/-тің (қатаң дауыссыздан кейін). Кімнің? Ненің? деген сұрақтарға жауап береді. Мысал: баланың кітабы."
-    },
-    {
-      "subject": {
-        "surface": "барыс септік",
-        "root": "барыс септік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "септік",
-        "root": "септік",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_003"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Барыс септік — қозғалыстың бағытын немесе нысанын білдіретін септік. Жалғаулары: -ға/-ге (дауыстыдан кейін), -қа/-ке (қатаңнан кейін), -на/-не (тәуелдік -ы/-і-ден кейін). Кімге? Неге? Қайда? деген сұрақтарға жауап береді. Мысал: мектепке бару."
-    },
-    {
-      "subject": {
-        "surface": "табыс септік",
-        "root": "табыс септік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "септік",
-        "root": "септік",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_004"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Табыс септік — іс-әрекеттің тура объектісін білдіретін септік. Жалғаулары: -ды/-ді (ұяңнан кейін), -ны/-ні (дауыстыдан кейін), -ты/-ті (қатаңнан кейін). Кімді? Нені? деген сұрақтарға жауап береді. Мысал: кітапты оқу, баланы көру."
-    },
-    {
-      "subject": {
-        "surface": "жатыс септік",
-        "root": "жатыс септік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "септік",
-        "root": "септік",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_005"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Жатыс септік — іс-әрекеттің орнын немесе уақытын білдіретін септік. Жалғаулары: -да/-де (ұяңнан кейін), -та/-те (қатаңнан кейін), -нда/-нде (тәуелдіктен кейін). Кімде? Неде? Қайда? Қашан? деген сұрақтарға жауап береді. Мысал: үйде болу, түсте кездесу."
-    },
-    {
-      "subject": {
-        "surface": "шығыс септік",
-        "root": "шығыс септік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "септік",
-        "root": "септік",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_006"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Шығыс септік — қозғалыстың бастау нүктесін, шығу көзін немесе салыстыру негізін білдіретін септік. Жалғаулары: -дан/-ден, -тан/-тен, -нан/-нен. Кімнен? Неден? Қайдан? деген сұрақтарға жауап береді. Мысал: үйден шығу, баладан есту."
-    },
-    {
-      "subject": {
-        "surface": "көмектес септік",
-        "root": "көмектес септік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "септік",
-        "root": "септік",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_007"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Көмектес септік — іс-әрекет жасалу құралын, серіктесін немесе амалын білдіретін септік. Жалғаулары: -мен (дауыстыдан немесе ұяңнан кейін), -пен (қатаңнан кейін), -бен (м/н/ң-нан кейін). Кіммен? Немен? деген сұрақтарға жауап береді. Мысал: достармен ойнау, қаламмен жазу."
-    },
-    {
-      "subject": {
-        "surface": "бала септік парадигмасы",
-        "root": "бала септік парадигмасы",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "септік парадигмасы",
-        "root": "септік парадигмасы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_008"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "«Бала» сөзінің жеті септік арқылы өзгеруі: атау — бала; ілік — баланың; барыс — балаға; табыс — баланы; жатыс — балада; шығыс — баладан; көмектес — баламен. Қазақ тіліндегі септік парадигмасының классикалық үлгісі."
-    },
-    {
-      "subject": {
-        "surface": "септік",
-        "root": "септік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "грамматикалық категория",
-        "root": "грамматикалық категория",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_bridge_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Септік — зат есім, сын есім, есімдік, сан есім сияқты өзгермелі сөздердің сөйлемдегі басқа сөздерге қатынасын білдіретін грамматикалық категория. Қазақ тілінде жеті септік бар."
-    },
-    {
-      "subject": {
-        "surface": "грамматикалық категория",
-        "root": "грамматикалық категория",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "ұғым",
-        "root": "ұғым",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_bridge_002"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Грамматикалық категория — сөз табы ішіндегі мағыналық немесе формалық белгілерді топтастыратын тілдік ұғым. Септік, шақ, жақ, рай, шырай — бәрі грамматикалық категориялар."
-    },
-    {
-      "subject": {
-        "surface": "септік жалғауы",
-        "root": "септік жалғауы",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жалғау",
-        "root": "жалғау",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_case_bridge_003"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Септік жалғауы — септіктің грамматикалық белгісін көрсететін аффикс. Қазақ тілінде үндестік заңы бойынша жуан/жіңішке және ұяң/қатаң нұсқалары болады. Мысалы: -дың/-дің, -қа/-ке."
-    },
-    {
-      "subject": {
-        "surface": "оқу етістік парадигмасы",
-        "root": "оқу етістік парадигмасы",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "етістік парадигмасы",
-        "root": "етістік парадигмасы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_conj_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "«Оқу» етістігінің хабарлы рай парадигмасы. Жедел өткен: оқыдым / оқыдың / оқыдыңыз / оқыды / оқыдық / оқыдыңдар / оқыдыңыздар. Жалпы осы / ауыспалы келер: оқимын / оқисың / оқисыз / оқиды / оқимыз / оқисыңдар / оқисыздар. Қазақ етістігінің классикалық жіктелу үлгісі."
-    },
-    {
-      "subject": {
-        "surface": "жіктік жалғауы",
-        "root": "жіктік жалғауы",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жалғау",
-        "root": "жалғау",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_conj_bridge_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Жіктік жалғауы — етістіктің жақ пен сан категорияларын білдіретін аффикс. Әр шақ пен рай үшін өзіндік жіктік жалғауы бар: -мын/-мін (1жжс), -сың/-сің (2жжа), -сыз/-сіз (2жжс), нөл/-ы/-і (3ж), -мыз/-міз (1жк), -сыңдар (2жка), -сыздар (2жкс)."
-    },
-    {
-      "subject": {
-        "surface": "жақ категориясы",
-        "root": "жақ категориясы",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "грамматикалық категория",
-        "root": "грамматикалық категория",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_jak_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Жақ категориясы — етістіктің іс-әрекетке қатыстырылған тұлғаны (айтушы, тыңдаушы, үшінші тұлға) көрсететін грамматикалық категория. Қазақ тілінде үш жақ бар: 1-жақ (мен, біз), 2-жақ (сен/Сіз, сендер/Сіздер), 3-жақ (ол, олар). Сыпайы (Сіз) және анайы (сен) ажыратылады."
-    },
-    {
-      "subject": {
-        "surface": "хабарлы рай",
-        "root": "хабарлы рай",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "рай",
-        "root": "рай",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_mood_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Хабарлы рай — іс-әрекеттің болғанын, болып жатқанын немесе болатынын хабарлайтын рай. Барлық шақтармен қолданылады. Мысалдар: оқыдым (өткен), оқимын (осы/келер), келді, келеді."
-    },
-    {
-      "subject": {
-        "surface": "бұйрық рай",
-        "root": "бұйрық рай",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "рай",
-        "root": "рай",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_mood_002"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Бұйрық рай — тыңдаушыға бұйыруды, өтінуді, шақыруды білдіретін рай. Жекеше анайы 2-жақ — нөлдік: оқы, кел, жаз. Сыпайы 2-жақ: оқыңыз, келіңіз, жазыңыз. Көпше: оқыңдар (анайы), оқыңыздар (сыпайы). 3-жақ: оқысын, келсін."
-    },
-    {
-      "subject": {
-        "surface": "шартты рай",
-        "root": "шартты рай",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "рай",
-        "root": "рай",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_mood_003"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Шартты рай — іс-әрекеттің болуы шартқа байланысты екенін білдіретін рай. Жалғаулары: -са/-се + жіктік (оқысам, оқысаң, оқыса; келсем, келсең, келсе). «Егер мен оқысам, бірінші орынды аламын» сияқты сөйлемдерде қолданылады."
-    },
-    {
-      "subject": {
-        "surface": "қалау рай",
-        "root": "қалау рай",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "рай",
-        "root": "рай",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_mood_004"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Қалау рай — сөйлеушінің тілегін, ниетін немесе ұсынысын білдіретін рай. Жалғаулары: -айын/-ейін (1-жақ жекеше: барайын, келейін), -айық/-ейік (1-жақ көпше: барайық, келейік). Сыпайы түрі: -ғайсыз/-гейсіз."
-    },
-    {
-      "subject": {
-        "surface": "рай",
-        "root": "рай",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "грамматикалық категория",
-        "root": "грамматикалық категория",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_mood_bridge_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Рай — сөйлеушінің іс-әрекетке қатынасын (хабарлау, бұйыру, шарт қою, қалау) білдіретін грамматикалық категория. Қазақ тілінде төрт рай бар: хабарлы, бұйрық, шартты, қалау."
-    },
-    {
-      "subject": {
-        "surface": "зат есім",
-        "root": "зат есім",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Зат есім — заттың, құбылыстың, ұғымның атауын білдіретін сөз табы. Кім? Не? деген сұрақтарға жауап береді. Екі түрі бар: жалқы есім (Алматы, Абай) және жалпы есім (қала, бала). Зат есім тәуелдік, көптік, септік жалғаулары арқылы өзгереді."
-    },
-    {
-      "subject": {
-        "surface": "сын есім",
-        "root": "сын есім",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_002"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Сын есім — заттың сапасын, түрін, реңін немесе қатынасын білдіретін сөз табы. Қандай? Қай? деген сұрақтарға жауап береді. Екі түрі бар: сапалық сын есім (жақсы, көк, биік) және қатыстық сын есім (қалалық, ағаштан). Шырай категориясы (жай, салыстырмалы, күшейтпелі, асырмалы) арқылы дәреже білдіреді."
-    },
-    {
-      "subject": {
-        "surface": "етістік",
-        "root": "етістік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_003"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Етістік — заттың іс-әрекетін, қимылын, күй-жайын білдіретін сөз табы. Не істеді? Не істейді? Не қылды? деген сұрақтарға жауап береді. Екі түрі бар: салт етістік (жату, ұйықтау) және сабақты етістік (оқу, жазу). Шақ (өткен / осы / келер), жақ (1, 2, 3-жақ), рай (хабарлы, бұйрық, шартты, қалау), етіс (ортақ, өзгелік, ырықсыз, өздік) категориялары арқылы өзгереді."
-    },
-    {
-      "subject": {
-        "surface": "сан есім",
-        "root": "сан есім",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_004"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Сан есім — заттың санын немесе ретін білдіретін сөз табы. Неше? Қанша? Нешінші? деген сұрақтарға жауап береді. Алты түрі бар: есептік (бір, екі), реттік (бірінші, екінші), жинақтық (екеу, үшеу), болжалдық (бес-алты), бөлшектік (төрттен бір), топтау (бестен)."
-    },
-    {
-      "subject": {
-        "surface": "есімдік",
-        "root": "есімдік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_005"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Есімдік — заттың, белгінің, санның атын немесе атауын алмастыратын сөз табы. Кім? Не? Қандай? Неше? деген сұрақтарға жауап береді. Жеті түрі бар: жіктеу (мен, сен, ол), сілтеу (бұл, мынау, сол), сұрау (кім, не, қандай), белгісіздік (біреу, кейбір), жалпылау (бәрі, барлық), өздік (өзім, өзің), болымсыздық (ешкім, ештеңе)."
-    },
-    {
-      "subject": {
-        "surface": "үстеу",
-        "root": "үстеу",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_006"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Үстеу — іс-әрекеттің мекенін, мезгілін, мақсатын, себебін, мөлшерін немесе амалын білдіретін сөз табы. Қалай? Қашан? Қайда? Қанша? Не үшін? деген сұрақтарға жауап береді. Алты түрі бар: мекен үстеу (алға, артқа), мезгіл (бүгін, ертең), мақсат (әдейі), себеп (амалсыз), мөлшер (көп, аз), сын-қимыл (тез, баяу)."
-    },
-    {
-      "subject": {
-        "surface": "шылау",
-        "root": "шылау",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_007"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Шылау — өздігінен дербес мағынасы жоқ, басқа сөздермен байланысып, грамматикалық қатынас білдіретін сөз табы. Үш түрі бар: септеулік шылау (үшін, туралы, арқылы), жалғаулық шылау (және, бірақ, әрі), демеулік шылау (ма, ба, ғой, екен)."
-    },
-    {
-      "subject": {
-        "surface": "еліктеу сөз",
-        "root": "еліктеу сөз",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_008"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Еліктеу сөз — табиғаттағы дыбыстарды, көрініс пен қимылды дыбыстық еліктеу арқылы білдіретін сөз табы. Екі түрі бар: дыбыстық еліктеу (тырс-тырс, шу-шу) және бейнелеу (жалт-жұлт, ағыл-тегіл)."
-    },
-    {
-      "subject": {
-        "surface": "одағай",
-        "root": "одағай",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_009"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Одағай — адамның сезімін, көңіл-күйін, шақыруын, бұйырғанын білдіретін сөз табы. Сөйлемде басқа сөздермен грамматикалық байланысқа түспейді. Үш түрі бар: көңіл одағайы (ой, тфу), шақырыс одағайы (әй, кәне), бұйрық одағайы (тек, тыныш)."
-    },
-    {
-      "subject": {
-        "surface": "көмекші сөз",
-        "root": "көмекші сөз",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_010"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Көмекші сөз — өздігінен дербес мағынасы солғын, негізгі сөздерге грамматикалық мағына үстеп тұратын сөз табы. Көмекші етістіктер (бер, кел, кет, отыр, тұр) мен модаль сөздер (керек, тиіс, мүмкін) қатарына жатады."
-    },
-    {
-      "subject": {
-        "surface": "жалқы есім",
-        "root": "жалқы есім",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "зат есім",
-        "root": "зат есім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_pos_011"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Жалқы есім — нақты бір затты, адамды, жерді бөлек атау үшін қолданылатын зат есім түрі. Әрқашан бас әріппен жазылады. Мысалдар: Алматы, Абай, Қазақстан, Айгерім, Балхаш."
-    },
-    {
-      "subject": {
-        "surface": "бірінші жақ жекеше тәуелдік",
-        "root": "бірінші жақ жекеше тәуелдік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "тәуелдік жалғауы",
-        "root": "тәуелдік жалғауы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Бірінші жақ жекеше тәуелдік (P1Sg) — заттың меншікті айтушыға (мен) тиесілі екенін білдіреді. Жалғаулары: -ым (жуан, дауыссыздан кейін: кітабым), -ім (жіңішке, дауыссыздан кейін: інім), -м (дауыстыдан кейін: атам). Кімнің? Ненің? деген сұраққа: менің."
-    },
-    {
-      "subject": {
-        "surface": "екінші жақ жекеше анайы тәуелдік",
-        "root": "екінші жақ жекеше анайы тәуелдік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "тәуелдік жалғауы",
-        "root": "тәуелдік жалғауы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_002"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Екінші жақ жекеше анайы тәуелдік (P2Sg informal) — заттың тыңдаушыға (сен) тиесілі екенін бейресми түрде білдіреді. Жалғаулары: -ың (жуан: кітабың), -ің (жіңішке: інің), -ң (дауыстыдан кейін: атаң). Сенің кітабың, сенің інің."
-    },
-    {
-      "subject": {
-        "surface": "екінші жақ жекеше сыпайы тәуелдік",
-        "root": "екінші жақ жекеше сыпайы тәуелдік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "тәуелдік жалғауы",
-        "root": "тәуелдік жалғауы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_003"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Екінші жақ жекеше сыпайы тәуелдік (P2Sg formal) — заттың тыңдаушыға (Сіз) тиесілі екенін сыпайы түрде білдіреді. Жалғаулары: -ыңыз (жуан: кітабыңыз), -іңіз (жіңішке: інііңіз), -ңыз/-ңіз (дауыстыдан кейін: атаңыз). Қазақ дәстүрінде үлкен адамға, бейтаныс адамға қаратып айтылады."
-    },
-    {
-      "subject": {
-        "surface": "үшінші жақ тәуелдік",
-        "root": "үшінші жақ тәуелдік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "тәуелдік жалғауы",
-        "root": "тәуелдік жалғауы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_004"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Үшінші жақ тәуелдік (P3) — заттың үшінші тұлғаға (ол / олар) тиесілі екенін білдіреді. Жалғаулары: -ы (жуан, дауыссыздан кейін: кітабы), -і (жіңішке: іні), -сы (жуан, дауыстыдан кейін: атасы), -сі (жіңішке, дауыстыдан кейін: ағасы). Жекеше және көпше формасы бірдей: оның кітабы / олардың кітабы."
-    },
-    {
-      "subject": {
-        "surface": "бірінші жақ көпше тәуелдік",
-        "root": "бірінші жақ көпше тәуелдік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "тәуелдік жалғауы",
-        "root": "тәуелдік жалғауы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_005"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Бірінші жақ көпше тәуелдік (P1Pl) — заттың айтушы мен басқа адамдарға (біз) тиесілі екенін білдіреді. Жалғаулары: -ымыз (жуан: кітабымыз), -іміз (жіңішке: ініміз), -мыз/-міз (дауыстыдан кейін: атамыз). Біздің кітабымыз."
-    },
-    {
-      "subject": {
-        "surface": "екінші жақ көпше анайы тәуелдік",
-        "root": "екінші жақ көпше анайы тәуелдік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "тәуелдік жалғауы",
-        "root": "тәуелдік жалғауы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_006"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Екінші жақ көпше анайы тәуелдік (P2Pl informal) — заттың бірнеше тыңдаушыға (сендер) тиесілі екенін бейресми түрде білдіреді. -лар/-лер көптік жалғауы P2Sg-ке қосылады: кітаптарың, інілерің. Сендердің кітаптарың."
-    },
-    {
-      "subject": {
-        "surface": "екінші жақ көпше сыпайы тәуелдік",
-        "root": "екінші жақ көпше сыпайы тәуелдік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "тәуелдік жалғауы",
-        "root": "тәуелдік жалғауы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_007"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Екінші жақ көпше сыпайы тәуелдік (P2Pl formal) — заттың бірнеше тыңдаушыға (Сіздер) тиесілі екенін сыпайы түрде білдіреді. Жалғаулары: -ыңыздар/-іңіздер. Мысал: Сіздердің кітаптарыңыз, Сіздердің балаңыздар."
-    },
-    {
-      "subject": {
-        "surface": "кітап тәуелдік парадигмасы",
-        "root": "кітап тәуелдік парадигмасы",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "тәуелдік парадигмасы",
-        "root": "тәуелдік парадигмасы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_008"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "«Кітап» сөзінің тәуелдік парадигмасы: P1Sg — кітабым (менің), P2Sg анайы — кітабың (сенің), P2Sg сыпайы — кітабыңыз (Сіздің), P3 — кітабы (оның/олардың), P1Pl — кітабымыз (біздің), P2Pl анайы — кітаптарың (сендердің), P2Pl сыпайы — кітаптарыңыз (Сіздердің). «Кітап» сөзінде ұяң дауыссыз -б- айдалу заңы (қ→б)."
-    },
-    {
-      "subject": {
-        "surface": "тәуелдік жалғауы",
-        "root": "тәуелдік жалғауы",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жалғау",
-        "root": "жалғау",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_bridge_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Тәуелдік жалғауы — заттың тиесілілігін көрсететін грамматикалық аффикс. Қазақ тілінде жеті түрі бар: P1Sg, P2Sg анайы, P2Sg сыпайы, P3 (жекеше/көпше ортақ), P1Pl, P2Pl анайы, P2Pl сыпайы."
-    },
-    {
-      "subject": {
-        "surface": "тәуелдік",
-        "root": "тәуелдік",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "грамматикалық категория",
-        "root": "грамматикалық категория",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_bridge_002"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Тәуелдік — заттың айтушы (мен), тыңдаушы (сен / Сіз) немесе үшінші тұлғаға (ол / олар) тиесілі екенін көрсететін грамматикалық категория. Қазақ тілінің көрнекті ерекшеліктерінің бірі — сыпайы (Сіз) және анайы (сен) формаларды ажырату."
-    },
-    {
-      "subject": {
-        "surface": "сыпайылық категориясы",
-        "root": "сыпайылық категориясы",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "грамматикалық категория",
-        "root": "грамматикалық категория",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_poss_bridge_003"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Қазақ тіліндегі сыпайылық категориясы — қарым-қатынастағы құрмет дәрежесін грамматикалық тұрғыдан көрсетеді. Анайы (сен) — жақын адаммен, балаға, теңіне; сыпайы (Сіз) — үлкен адамға, бейтаныс кісіге, жоғары лауазым иесіне."
-    },
-    {
-      "subject": {
-        "surface": "өткен шақ",
-        "root": "өткен шақ",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "шақ",
-        "root": "шақ",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_tense_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Өткен шақ — іс-әрекеттің сөйлеу сәтінен бұрын болғанын білдіретін шақ. Қазақ тілінде үш түрі бар: жедел өткен (-ды/-ді/-ты/-ті: оқыды, келді, кетті), бұрынғы өткен (-ған/-ген/-қан/-кен: оқыған, келген, кеткен), ауыспалы өткен (-атын/-етін/-йтын/-йтін: оқитын, келетін)."
-    },
-    {
-      "subject": {
-        "surface": "осы шақ",
-        "root": "осы шақ",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "шақ",
-        "root": "шақ",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_tense_002"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Осы шақ — іс-әрекеттің сөйлеу сәтінде болып жатқанын білдіретін шақ. Екі түрі бар: нақ осы шақ (көмекші етістіктермен жасалады: оқып отыр, оқып жатыр, оқып тұр) және жалпы осы шақ (-а/-е/-й + жіктік: оқиды, кетеді, келеді — habitual / generic)."
-    },
-    {
-      "subject": {
-        "surface": "келер шақ",
-        "root": "келер шақ",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "шақ",
-        "root": "шақ",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_tense_003"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Келер шақ — іс-әрекеттің сөйлеу сәтінен кейін болатынын білдіретін шақ. Үш түрі бар: ауыспалы келер шақ (-а/-е/-й + жіктік: оқимын, келемін), мақсатты келер шақ (-мақ/-мек/-бақ/-бек/-пақ/-пек: оқымақ, келмек), болжалды келер шақ (-ар/-ер/-р: оқыр, келер)."
-    },
-    {
-      "subject": {
-        "surface": "шақ",
-        "root": "шақ",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "грамматикалық категория",
-        "root": "грамматикалық категория",
-        "pos": "noun"
-      },
-      "pattern": "world_core/kazakh_grammar",
-      "source": {
-        "pack": "world_core/kazakh_grammar.jsonl",
-        "sample_id": "gram_tense_bridge_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Шақ — етістіктің іс-әрекет уақытын білдіретін грамматикалық категория. Қазақ тілінде үш шақ бар: өткен, осы, келер. Әр шақтың ішінде бірнеше түрі болады."
-    },
-    {
-      "subject": {
         "surface": "туыс",
         "root": "туыс",
         "pos": "noun"
@@ -26756,6 +26134,906 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақ ақындары: Абай, Шәкәрім, Махамбет Өтемісұлы, Мағжан Жұмабаев, Сәкен Сейфуллин, Қасым Аманжолов, Мұқағали Мақатаев, Олжас Сүлейменов, Қадыр Мырза Әли."
+    },
+    {
+      "subject": {
+        "surface": "атау септік",
+        "root": "атау септік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "септік",
+        "root": "септік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Атау септік — заттың атауын білдіретін, негізгі түрі болатын септік. Жалғауы жоқ, негізгі форма. Кім? Не? деген сұрақтарға жауап береді. Мысал: бала ойнайды. Кім ойнайды? — Бала."
+    },
+    {
+      "subject": {
+        "surface": "ілік септік",
+        "root": "ілік септік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "септік",
+        "root": "септік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ілік септік — заттың кімге немесе неге тиесілі екенін білдіретін септік. Жалғаулары: -ның/-нің (дауыстыдан кейін), -дың/-дің (ұяң дауыссыздан кейін), -тың/-тің (қатаң дауыссыздан кейін). Кімнің? Ненің? деген сұрақтарға жауап береді. Мысал: баланың кітабы."
+    },
+    {
+      "subject": {
+        "surface": "барыс септік",
+        "root": "барыс септік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "септік",
+        "root": "септік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Барыс септік — қозғалыстың бағытын немесе нысанын білдіретін септік. Жалғаулары: -ға/-ге (дауыстыдан кейін), -қа/-ке (қатаңнан кейін), -на/-не (тәуелдік -ы/-і-ден кейін). Кімге? Неге? Қайда? деген сұрақтарға жауап береді. Мысал: мектепке бару."
+    },
+    {
+      "subject": {
+        "surface": "табыс септік",
+        "root": "табыс септік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "септік",
+        "root": "септік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Табыс септік — іс-әрекеттің тура объектісін білдіретін септік. Жалғаулары: -ды/-ді (ұяңнан кейін), -ны/-ні (дауыстыдан кейін), -ты/-ті (қатаңнан кейін). Кімді? Нені? деген сұрақтарға жауап береді. Мысал: кітапты оқу, баланы көру."
+    },
+    {
+      "subject": {
+        "surface": "жатыс септік",
+        "root": "жатыс септік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "септік",
+        "root": "септік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жатыс септік — іс-әрекеттің орнын немесе уақытын білдіретін септік. Жалғаулары: -да/-де (ұяңнан кейін), -та/-те (қатаңнан кейін), -нда/-нде (тәуелдіктен кейін). Кімде? Неде? Қайда? Қашан? деген сұрақтарға жауап береді. Мысал: үйде болу, түсте кездесу."
+    },
+    {
+      "subject": {
+        "surface": "шығыс септік",
+        "root": "шығыс септік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "септік",
+        "root": "септік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шығыс септік — қозғалыстың бастау нүктесін, шығу көзін немесе салыстыру негізін білдіретін септік. Жалғаулары: -дан/-ден, -тан/-тен, -нан/-нен. Кімнен? Неден? Қайдан? деген сұрақтарға жауап береді. Мысал: үйден шығу, баладан есту."
+    },
+    {
+      "subject": {
+        "surface": "көмектес септік",
+        "root": "көмектес септік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "септік",
+        "root": "септік",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көмектес септік — іс-әрекет жасалу құралын, серіктесін немесе амалын білдіретін септік. Жалғаулары: -мен (дауыстыдан немесе ұяңнан кейін), -пен (қатаңнан кейін), -бен (м/н/ң-нан кейін). Кіммен? Немен? деген сұрақтарға жауап береді. Мысал: достармен ойнау, қаламмен жазу."
+    },
+    {
+      "subject": {
+        "surface": "бала септік парадигмасы",
+        "root": "бала септік парадигмасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "септік парадигмасы",
+        "root": "септік парадигмасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "«Бала» сөзінің жеті септік арқылы өзгеруі: атау — бала; ілік — баланың; барыс — балаға; табыс — баланы; жатыс — балада; шығыс — баладан; көмектес — баламен. Қазақ тіліндегі септік парадигмасының классикалық үлгісі."
+    },
+    {
+      "subject": {
+        "surface": "септік",
+        "root": "септік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Септік — зат есім, сын есім, есімдік, сан есім сияқты өзгермелі сөздердің сөйлемдегі басқа сөздерге қатынасын білдіретін грамматикалық категория. Қазақ тілінде жеті септік бар."
+    },
+    {
+      "subject": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Грамматикалық категория — сөз табы ішіндегі мағыналық немесе формалық белгілерді топтастыратын тілдік ұғым. Септік, шақ, жақ, рай, шырай — бәрі грамматикалық категориялар."
+    },
+    {
+      "subject": {
+        "surface": "септік жалғауы",
+        "root": "септік жалғауы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жалғау",
+        "root": "жалғау",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_case_bridge_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Септік жалғауы — септіктің грамматикалық белгісін көрсететін аффикс. Қазақ тілінде үндестік заңы бойынша жуан/жіңішке және ұяң/қатаң нұсқалары болады. Мысалы: -дың/-дің, -қа/-ке."
+    },
+    {
+      "subject": {
+        "surface": "оқу етістік парадигмасы",
+        "root": "оқу етістік парадигмасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "етістік парадигмасы",
+        "root": "етістік парадигмасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_conj_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "«Оқу» етістігінің хабарлы рай парадигмасы. Жедел өткен: оқыдым / оқыдың / оқыдыңыз / оқыды / оқыдық / оқыдыңдар / оқыдыңыздар. Жалпы осы / ауыспалы келер: оқимын / оқисың / оқисыз / оқиды / оқимыз / оқисыңдар / оқисыздар. Қазақ етістігінің классикалық жіктелу үлгісі."
+    },
+    {
+      "subject": {
+        "surface": "жіктік жалғауы",
+        "root": "жіктік жалғауы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жалғау",
+        "root": "жалғау",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_conj_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жіктік жалғауы — етістіктің жақ пен сан категорияларын білдіретін аффикс. Әр шақ пен рай үшін өзіндік жіктік жалғауы бар: -мын/-мін (1жжс), -сың/-сің (2жжа), -сыз/-сіз (2жжс), нөл/-ы/-і (3ж), -мыз/-міз (1жк), -сыңдар (2жка), -сыздар (2жкс)."
+    },
+    {
+      "subject": {
+        "surface": "жақ категориясы",
+        "root": "жақ категориясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_jak_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жақ категориясы — етістіктің іс-әрекетке қатыстырылған тұлғаны (айтушы, тыңдаушы, үшінші тұлға) көрсететін грамматикалық категория. Қазақ тілінде үш жақ бар: 1-жақ (мен, біз), 2-жақ (сен/Сіз, сендер/Сіздер), 3-жақ (ол, олар). Сыпайы (Сіз) және анайы (сен) ажыратылады."
+    },
+    {
+      "subject": {
+        "surface": "хабарлы рай",
+        "root": "хабарлы рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_mood_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Хабарлы рай — іс-әрекеттің болғанын, болып жатқанын немесе болатынын хабарлайтын рай. Барлық шақтармен қолданылады. Мысалдар: оқыдым (өткен), оқимын (осы/келер), келді, келеді."
+    },
+    {
+      "subject": {
+        "surface": "бұйрық рай",
+        "root": "бұйрық рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_mood_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бұйрық рай — тыңдаушыға бұйыруды, өтінуді, шақыруды білдіретін рай. Жекеше анайы 2-жақ — нөлдік: оқы, кел, жаз. Сыпайы 2-жақ: оқыңыз, келіңіз, жазыңыз. Көпше: оқыңдар (анайы), оқыңыздар (сыпайы). 3-жақ: оқысын, келсін."
+    },
+    {
+      "subject": {
+        "surface": "шартты рай",
+        "root": "шартты рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_mood_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шартты рай — іс-әрекеттің болуы шартқа байланысты екенін білдіретін рай. Жалғаулары: -са/-се + жіктік (оқысам, оқысаң, оқыса; келсем, келсең, келсе). «Егер мен оқысам, бірінші орынды аламын» сияқты сөйлемдерде қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "қалау рай",
+        "root": "қалау рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_mood_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қалау рай — сөйлеушінің тілегін, ниетін немесе ұсынысын білдіретін рай. Жалғаулары: -айын/-ейін (1-жақ жекеше: барайын, келейін), -айық/-ейік (1-жақ көпше: барайық, келейік). Сыпайы түрі: -ғайсыз/-гейсіз."
+    },
+    {
+      "subject": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_mood_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Рай — сөйлеушінің іс-әрекетке қатынасын (хабарлау, бұйыру, шарт қою, қалау) білдіретін грамматикалық категория. Қазақ тілінде төрт рай бар: хабарлы, бұйрық, шартты, қалау."
+    },
+    {
+      "subject": {
+        "surface": "зат есім",
+        "root": "зат есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Зат есім — заттың, құбылыстың, ұғымның атауын білдіретін сөз табы. Кім? Не? деген сұрақтарға жауап береді. Екі түрі бар: жалқы есім (Алматы, Абай) және жалпы есім (қала, бала). Зат есім тәуелдік, көптік, септік жалғаулары арқылы өзгереді."
+    },
+    {
+      "subject": {
+        "surface": "сын есім",
+        "root": "сын есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сын есім — заттың сапасын, түрін, реңін немесе қатынасын білдіретін сөз табы. Қандай? Қай? деген сұрақтарға жауап береді. Екі түрі бар: сапалық сын есім (жақсы, көк, биік) және қатыстық сын есім (қалалық, ағаштан). Шырай категориясы (жай, салыстырмалы, күшейтпелі, асырмалы) арқылы дәреже білдіреді."
+    },
+    {
+      "subject": {
+        "surface": "етістік",
+        "root": "етістік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Етістік — заттың іс-әрекетін, қимылын, күй-жайын білдіретін сөз табы. Не істеді? Не істейді? Не қылды? деген сұрақтарға жауап береді. Екі түрі бар: салт етістік (жату, ұйықтау) және сабақты етістік (оқу, жазу). Шақ (өткен / осы / келер), жақ (1, 2, 3-жақ), рай (хабарлы, бұйрық, шартты, қалау), етіс (ортақ, өзгелік, ырықсыз, өздік) категориялары арқылы өзгереді."
+    },
+    {
+      "subject": {
+        "surface": "сан есім",
+        "root": "сан есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сан есім — заттың санын немесе ретін білдіретін сөз табы. Неше? Қанша? Нешінші? деген сұрақтарға жауап береді. Алты түрі бар: есептік (бір, екі), реттік (бірінші, екінші), жинақтық (екеу, үшеу), болжалдық (бес-алты), бөлшектік (төрттен бір), топтау (бестен)."
+    },
+    {
+      "subject": {
+        "surface": "есімдік",
+        "root": "есімдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Есімдік — заттың, белгінің, санның атын немесе атауын алмастыратын сөз табы. Кім? Не? Қандай? Неше? деген сұрақтарға жауап береді. Жеті түрі бар: жіктеу (мен, сен, ол), сілтеу (бұл, мынау, сол), сұрау (кім, не, қандай), белгісіздік (біреу, кейбір), жалпылау (бәрі, барлық), өздік (өзім, өзің), болымсыздық (ешкім, ештеңе)."
+    },
+    {
+      "subject": {
+        "surface": "үстеу",
+        "root": "үстеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үстеу — іс-әрекеттің мекенін, мезгілін, мақсатын, себебін, мөлшерін немесе амалын білдіретін сөз табы. Қалай? Қашан? Қайда? Қанша? Не үшін? деген сұрақтарға жауап береді. Алты түрі бар: мекен үстеу (алға, артқа), мезгіл (бүгін, ертең), мақсат (әдейі), себеп (амалсыз), мөлшер (көп, аз), сын-қимыл (тез, баяу)."
+    },
+    {
+      "subject": {
+        "surface": "шылау",
+        "root": "шылау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шылау — өздігінен дербес мағынасы жоқ, басқа сөздермен байланысып, грамматикалық қатынас білдіретін сөз табы. Үш түрі бар: септеулік шылау (үшін, туралы, арқылы), жалғаулық шылау (және, бірақ, әрі), демеулік шылау (ма, ба, ғой, екен)."
+    },
+    {
+      "subject": {
+        "surface": "еліктеу сөз",
+        "root": "еліктеу сөз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Еліктеу сөз — табиғаттағы дыбыстарды, көрініс пен қимылды дыбыстық еліктеу арқылы білдіретін сөз табы. Екі түрі бар: дыбыстық еліктеу (тырс-тырс, шу-шу) және бейнелеу (жалт-жұлт, ағыл-тегіл)."
+    },
+    {
+      "subject": {
+        "surface": "одағай",
+        "root": "одағай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Одағай — адамның сезімін, көңіл-күйін, шақыруын, бұйырғанын білдіретін сөз табы. Сөйлемде басқа сөздермен грамматикалық байланысқа түспейді. Үш түрі бар: көңіл одағайы (ой, тфу), шақырыс одағайы (әй, кәне), бұйрық одағайы (тек, тыныш)."
+    },
+    {
+      "subject": {
+        "surface": "көмекші сөз",
+        "root": "көмекші сөз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көмекші сөз — өздігінен дербес мағынасы солғын, негізгі сөздерге грамматикалық мағына үстеп тұратын сөз табы. Көмекші етістіктер (бер, кел, кет, отыр, тұр) мен модаль сөздер (керек, тиіс, мүмкін) қатарына жатады."
+    },
+    {
+      "subject": {
+        "surface": "жалқы есім",
+        "root": "жалқы есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "зат есім",
+        "root": "зат есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_pos_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жалқы есім — нақты бір затты, адамды, жерді бөлек атау үшін қолданылатын зат есім түрі. Әрқашан бас әріппен жазылады. Мысалдар: Алматы, Абай, Қазақстан, Айгерім, Балхаш."
+    },
+    {
+      "subject": {
+        "surface": "бірінші жақ жекеше тәуелдік",
+        "root": "бірінші жақ жекеше тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірінші жақ жекеше тәуелдік (P1Sg) — заттың меншікті айтушыға (мен) тиесілі екенін білдіреді. Жалғаулары: -ым (жуан, дауыссыздан кейін: кітабым), -ім (жіңішке, дауыссыздан кейін: інім), -м (дауыстыдан кейін: атам). Кімнің? Ненің? деген сұраққа: менің."
+    },
+    {
+      "subject": {
+        "surface": "екінші жақ жекеше анайы тәуелдік",
+        "root": "екінші жақ жекеше анайы тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екінші жақ жекеше анайы тәуелдік (P2Sg informal) — заттың тыңдаушыға (сен) тиесілі екенін бейресми түрде білдіреді. Жалғаулары: -ың (жуан: кітабың), -ің (жіңішке: інің), -ң (дауыстыдан кейін: атаң). Сенің кітабың, сенің інің."
+    },
+    {
+      "subject": {
+        "surface": "екінші жақ жекеше сыпайы тәуелдік",
+        "root": "екінші жақ жекеше сыпайы тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екінші жақ жекеше сыпайы тәуелдік (P2Sg formal) — заттың тыңдаушыға (Сіз) тиесілі екенін сыпайы түрде білдіреді. Жалғаулары: -ыңыз (жуан: кітабыңыз), -іңіз (жіңішке: інііңіз), -ңыз/-ңіз (дауыстыдан кейін: атаңыз). Қазақ дәстүрінде үлкен адамға, бейтаныс адамға қаратып айтылады."
+    },
+    {
+      "subject": {
+        "surface": "үшінші жақ тәуелдік",
+        "root": "үшінші жақ тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үшінші жақ тәуелдік (P3) — заттың үшінші тұлғаға (ол / олар) тиесілі екенін білдіреді. Жалғаулары: -ы (жуан, дауыссыздан кейін: кітабы), -і (жіңішке: іні), -сы (жуан, дауыстыдан кейін: атасы), -сі (жіңішке, дауыстыдан кейін: ағасы). Жекеше және көпше формасы бірдей: оның кітабы / олардың кітабы."
+    },
+    {
+      "subject": {
+        "surface": "бірінші жақ көпше тәуелдік",
+        "root": "бірінші жақ көпше тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірінші жақ көпше тәуелдік (P1Pl) — заттың айтушы мен басқа адамдарға (біз) тиесілі екенін білдіреді. Жалғаулары: -ымыз (жуан: кітабымыз), -іміз (жіңішке: ініміз), -мыз/-міз (дауыстыдан кейін: атамыз). Біздің кітабымыз."
+    },
+    {
+      "subject": {
+        "surface": "екінші жақ көпше анайы тәуелдік",
+        "root": "екінші жақ көпше анайы тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екінші жақ көпше анайы тәуелдік (P2Pl informal) — заттың бірнеше тыңдаушыға (сендер) тиесілі екенін бейресми түрде білдіреді. -лар/-лер көптік жалғауы P2Sg-ке қосылады: кітаптарың, інілерің. Сендердің кітаптарың."
+    },
+    {
+      "subject": {
+        "surface": "екінші жақ көпше сыпайы тәуелдік",
+        "root": "екінші жақ көпше сыпайы тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екінші жақ көпше сыпайы тәуелдік (P2Pl formal) — заттың бірнеше тыңдаушыға (Сіздер) тиесілі екенін сыпайы түрде білдіреді. Жалғаулары: -ыңыздар/-іңіздер. Мысал: Сіздердің кітаптарыңыз, Сіздердің балаңыздар."
+    },
+    {
+      "subject": {
+        "surface": "кітап тәуелдік парадигмасы",
+        "root": "кітап тәуелдік парадигмасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік парадигмасы",
+        "root": "тәуелдік парадигмасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "«Кітап» сөзінің тәуелдік парадигмасы: P1Sg — кітабым (менің), P2Sg анайы — кітабың (сенің), P2Sg сыпайы — кітабыңыз (Сіздің), P3 — кітабы (оның/олардың), P1Pl — кітабымыз (біздің), P2Pl анайы — кітаптарың (сендердің), P2Pl сыпайы — кітаптарыңыз (Сіздердің). «Кітап» сөзінде ұяң дауыссыз -б- айдалу заңы (қ→б)."
+    },
+    {
+      "subject": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жалғау",
+        "root": "жалғау",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәуелдік жалғауы — заттың тиесілілігін көрсететін грамматикалық аффикс. Қазақ тілінде жеті түрі бар: P1Sg, P2Sg анайы, P2Sg сыпайы, P3 (жекеше/көпше ортақ), P1Pl, P2Pl анайы, P2Pl сыпайы."
+    },
+    {
+      "subject": {
+        "surface": "тәуелдік",
+        "root": "тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәуелдік — заттың айтушы (мен), тыңдаушы (сен / Сіз) немесе үшінші тұлғаға (ол / олар) тиесілі екенін көрсететін грамматикалық категория. Қазақ тілінің көрнекті ерекшеліктерінің бірі — сыпайы (Сіз) және анайы (сен) формаларды ажырату."
+    },
+    {
+      "subject": {
+        "surface": "сыпайылық категориясы",
+        "root": "сыпайылық категориясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_poss_bridge_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақ тіліндегі сыпайылық категориясы — қарым-қатынастағы құрмет дәрежесін грамматикалық тұрғыдан көрсетеді. Анайы (сен) — жақын адаммен, балаға, теңіне; сыпайы (Сіз) — үлкен адамға, бейтаныс кісіге, жоғары лауазым иесіне."
+    },
+    {
+      "subject": {
+        "surface": "өткен шақ",
+        "root": "өткен шақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_tense_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өткен шақ — іс-әрекеттің сөйлеу сәтінен бұрын болғанын білдіретін шақ. Қазақ тілінде үш түрі бар: жедел өткен (-ды/-ді/-ты/-ті: оқыды, келді, кетті), бұрынғы өткен (-ған/-ген/-қан/-кен: оқыған, келген, кеткен), ауыспалы өткен (-атын/-етін/-йтын/-йтін: оқитын, келетін)."
+    },
+    {
+      "subject": {
+        "surface": "осы шақ",
+        "root": "осы шақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_tense_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Осы шақ — іс-әрекеттің сөйлеу сәтінде болып жатқанын білдіретін шақ. Екі түрі бар: нақ осы шақ (көмекші етістіктермен жасалады: оқып отыр, оқып жатыр, оқып тұр) және жалпы осы шақ (-а/-е/-й + жіктік: оқиды, кетеді, келеді — habitual / generic)."
+    },
+    {
+      "subject": {
+        "surface": "келер шақ",
+        "root": "келер шақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_tense_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Келер шақ — іс-әрекеттің сөйлеу сәтінен кейін болатынын білдіретін шақ. Үш түрі бар: ауыспалы келер шақ (-а/-е/-й + жіктік: оқимын, келемін), мақсатты келер шақ (-мақ/-мек/-бақ/-бек/-пақ/-пек: оқымақ, келмек), болжалды келер шақ (-ар/-ер/-р: оқыр, келер)."
+    },
+    {
+      "subject": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/language_features",
+      "source": {
+        "pack": "world_core/language_features.jsonl",
+        "sample_id": "gram_tense_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шақ — етістіктің іс-әрекет уақытын білдіретін грамматикалық категория. Қазақ тілінде үш шақ бар: өткен, осы, келер. Әр шақтың ішінде бірнеше түрі болады."
     },
     {
       "subject": {
@@ -36056,286 +36334,6 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақ әліпбиі — қазақ тілінің әріптер жиынтығы. Қазіргі кириллица әліпбиінде 42 әріп бар."
-    },
-    {
-      "subject": {
-        "surface": "қуаныш",
-        "root": "қуаныш",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымды сезім",
-        "root": "жағымды сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Қуаныш — қандай да бір жақсы оқиғадан немесе сыйдан адамның жан дүниесінде туындайтын жағымды сезім. Күлкі, көңілді көңіл-күй арқылы білінеді. Мысал: туған күн қуанышы, жеңіс қуанышы."
-    },
-    {
-      "subject": {
-        "surface": "махаббат",
-        "root": "махаббат",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымды сезім",
-        "root": "жағымды сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_002"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Махаббат — біреуге немесе бірдеңеге деген терең жанашырлық пен сүйіспеншілік сезімі. Ата-ана махаббаты, отан махаббаты, дос-жар арасындағы махаббат. Жағымды сезімдердің ең жоғары түрі."
-    },
-    {
-      "subject": {
-        "surface": "батылдық",
-        "root": "батылдық",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымды сезім",
-        "root": "жағымды сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_003"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Батылдық — қорқынышты жеңіп, қиындықтар алдында тайсалмай қимыл жасай алу қабілеті. Жақсылық пен әділдік үшін тұратын мінез белгісі. Қазақ батырларының басты қасиеті."
-    },
-    {
-      "subject": {
-        "surface": "мақтаныш",
-        "root": "мақтаныш",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымды сезім",
-        "root": "жағымды сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_004"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Мақтаныш — жетістігіңізге, отбасыңызға, еліңізге деген ішкі қанағаттанушылық сезімі. Жасалған еңбектің лайықты бағасы. Мысал: ұл-қыздарының жетістігі үшін ата-ананың мақтанышы."
-    },
-    {
-      "subject": {
-        "surface": "таңдану",
-        "root": "таңдану",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымды сезім",
-        "root": "жағымды сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_005"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Таңдану — күтпеген, ерекше нәрсені көргенде немесе естігенде туындайтын жағымды сезім. Балалардың әлемді танудағы маңызды эмоциясы. Мысал: ғажап табиғат көрінісіне таңдану."
-    },
-    {
-      "subject": {
-        "surface": "ренжу",
-        "root": "ренжу",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымсыз сезім",
-        "root": "жағымсыз сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_006"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Ренжу — біреудің сөзіне немесе ісіне көңілі толмай, кейін кететін жағымсыз сезім. Әдетте қысқа уақытқа созылады. Балаларға ренжу — өз шегін білдірудің табиғи тәсілі."
-    },
-    {
-      "subject": {
-        "surface": "қорқыныш",
-        "root": "қорқыныш",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымсыз сезім",
-        "root": "жағымсыз сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_007"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Қорқыныш — қауіп-қатерден сақтанудан туындайтын жағымсыз сезім. Адамды қауіпті жағдайдан шегінуге итермелейді — пайдалы қорғаныш сезімі. Ұзақ қорқу денсаулыққа зиянды."
-    },
-    {
-      "subject": {
-        "surface": "жек көру",
-        "root": "жек көру",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымсыз сезім",
-        "root": "жағымсыз сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_008"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Жек көру — біреуге немесе бірдеңеге деген терең жағымсыз сезім. Махаббаттың қарама-қарсысы. Ұзақ жек көру жанға да, денсаулыққа да зиянды; кешірім — жек көрудің ең жақсы дауасы."
-    },
-    {
-      "subject": {
-        "surface": "қызғаныш",
-        "root": "қызғаныш",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымсыз сезім",
-        "root": "жағымсыз сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_009"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Қызғаныш — басқаның жетістігіне немесе қарым-қатынасына көңілі толмай, өзін шеттетілген сезінуден туатын жағымсыз сезім. Балаларда жиі кездеседі — оны түсіндіріп, өзіндік құндылықты сезіндіру маңызды."
-    },
-    {
-      "subject": {
-        "surface": "ұят",
-        "root": "ұят",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "жағымсыз сезім",
-        "root": "жағымсыз сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_010"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Ұят — өзінің сөзі немесе іс-әрекеті үшін ыңғайсыздықтан туындайтын жағымсыз сезім. Адамгершілік пен әдептіліктің ішкі бағдары. Қазақ халқы «Ұят өлім» деп ұят сезімін мейлінше жоғары қоюды үйретеді."
-    },
-    {
-      "subject": {
-        "surface": "жағымды сезім",
-        "root": "жағымды сезім",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сезім",
-        "root": "сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_bridge_001"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Жағымды сезім — адамға рахат сыйлайтын, көңіл-күйді көтеретін эмоция түрі. Қуаныш, махаббат, мақтаныш, таңдану, батылдық — жағымды сезімдер."
-    },
-    {
-      "subject": {
-        "surface": "жағымсыз сезім",
-        "root": "жағымсыз сезім",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сезім",
-        "root": "сезім",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_bridge_002"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Жағымсыз сезім — адамға қолайсыз көңіл-күй беретін эмоция түрі. Ренжу, қорқыныш, жек көру, қызғаныш, ұят — жағымсыз сезімдер. Олар да адамның табиғи бөлігі — оларды түсініп, басқару маңызды."
-    },
-    {
-      "subject": {
-        "surface": "сезім",
-        "root": "сезім",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "ұғым",
-        "root": "ұғым",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_bridge_003"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Сезім — адамның ішкі дүниесінде болып жатқан оқиғаларға, заттарға немесе адамдарға қатысты эмоционалдық жауабы. Жағымды және жағымсыз болып бөлінеді."
-    },
-    {
-      "subject": {
-        "surface": "зат есім",
-        "root": "зат есім",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "сөз табы",
-        "root": "сөз табы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/preschool_emotions",
-      "source": {
-        "pack": "world_core/preschool_emotions.jsonl",
-        "sample_id": "emo_bridge_004"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Зат есім — заттың, құбылыстың немесе ұғымның атын білдіретін сөз табы. Кім? Не? деген сұрақтарға жауап береді. Мысалдар: бала, кітап, қала, сезім."
     },
     {
       "subject": {

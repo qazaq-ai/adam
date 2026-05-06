@@ -7,6 +7,60 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.63.5] — 2026-05-06 — Domain consolidation: merge duplicate-risk world_core files + memory directive
+
+**Driven by user audit (2026-05-06).** Pre-existing canonical world_core files (since 2026-04-24) already covered Kazakh grammar, emotions, and Abai/Shakarim literature. Recent v4.56–v4.61 releases inadvertently created parallel domains with overlapping subjects, causing silent fact dedup in `extract_facts` and bloating the domain count.
+
+v4.63.5 consolidates the duplicates and saves a project memory directive to prevent future occurrences.
+
+### Innovations
+
+**(1) Merged duplicate-risk files into canonical existing domains:**
+
+| Merged file (deleted) | Into canonical (extended) | Reason |
+|---|---|---|
+| `kazakh_grammar.jsonl` (45 entries, v4.61.0) | `language_features.jsonl` (33 → 78 entries) | Both held PoS / септік / шақ taxonomy facts (`зат есім IsA сөз табы`, `септік IsA грамматикалық категория`, etc.); existing file pre-dated by 12 days |
+| `preschool_emotions.jsonl` (14 entries, v4.60.5) | `emotions.jsonl` (30 → 44 entries) | Both held `қуаныш / махаббат / ашу` emotion facts; existing file pre-dated by 12 days |
+
+For each merged entry: `domain` field rewritten from old domain name to canonical domain name; entries appended verbatim to canonical file.
+
+**(2) Cancelled planned parallel files:**
+- `abai_canon.jsonl` (planned for v4.63.5) — cancelled. Абай material already in `kz_literature.jsonl` (lit_001, lit_002, lit_034 «Қара сөздер», lit_056, lit_078) + `notable_kazakhstanis.jsonl` (notable_031, notable_032).
+- `shakarim_canon.jsonl` (planned for v4.64.0) — cancelled. Шәкәрім already in same files.
+
+Future Abai/Shakarim deepening will extend `kz_literature.jsonl` directly.
+
+**(3) New project memory directive** `feedback_no_duplicate_domains.md`:
+- Always audit existing world_core/eval files before creating new domain JSONL.
+- Run `ls + grep` first; prefer extending existing canonical file over creating parallel domain.
+- Ship consolidation release when post-hoc duplication is found.
+- No proliferation. Structure beats sprawl.
+
+**(4) Pipeline regeneration confirms no fact loss** — extract_facts already deduplicated by (subject, predicate, object) tuple, so the merge has no effect on fact / derived counts. The cleanup is structural (-2 domain files) not semantic.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2295 | **2295** unchanged |
+| world_core facts | 2535 | **2535** unchanged |
+| world_core domains | 53 | **51** (-2 consolidation) |
+| Derived facts | 28577 | **28577** unchanged |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.63.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+### Cumulative Day 2
+
+5 of 10 releases shipped (halfway): 4 educational releases (v4.61.0 grammar / v4.61.5 cases / v4.62.0 possessive / v4.62.5 tenses+moods / v4.63.0 proverbs) + 1 consolidation (v4.63.5).
+
+### Cadence
+
+`.5` patch — pure structural hygiene. No new content; no API surface changes; no behavior changes. Domain count -2 reflects real-world canonical structure.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.63.0] — 2026-05-06 — Educational portal Day 2 #5 — Kazakh proverbs expansion (+10 curriculum classics) + folk-wisdom taxonomy
 
 **Day 2 release 5/10 (halfway).** Extends `proverbs.jsonl` with 10 fundamental curriculum-grade Kazakh proverbs + 2 classification bridges establishing the folk-wisdom (халық даналығы) taxonomy.
