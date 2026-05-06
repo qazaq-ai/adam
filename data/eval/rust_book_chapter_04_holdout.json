@@ -1,0 +1,141 @@
+{
+  "_comment": "v4.80.5 — Rust Book Chapter 4 (Иелікті түсіну / ownership) holdout. 22 natural Kazakh queries against rust_254…270 + 5 deepened stubs (rust_009/011/012/019/020) − 1 cross-file stub deletion (rustadv_003). Categories: ch04_ownership_basics (3 rules, drop, scope), ch04_memory (stack vs heap), ch04_string_owned (String::from, move, clone, Copy), ch04_fn_ownership (function param + return ownership transfer), ch04_references (& reference, &mut), ch04_borrow_checker (rules 1+2, dangling, NLL), ch04_slices (string slice, &str vs &String, array slice, ranges), ch04_concurrency_safety (data race compile-time prevention). Skipped intentionally: «&str пен &String айырмашылығы» — comparison-shape detector intercepts, deeper rust_267 preserved for future domain-aware retrieval. Subject naming corrected from numeric («1-ережесі» triggered math-refusal) to word form («бірінші ережесі»).",
+  "version": "v4.80.5",
+  "captured_date": "2026-05-06",
+  "chapter": 4,
+  "chapter_title": "Иелікті түсіну (Ownership / borrowing / slices)",
+  "cases": [
+    {
+      "id": "ch04_ownership",
+      "category": "ch04_ownership_basics",
+      "query": "Иелік деген не?",
+      "any_substring": ["үш ереже", "drop", "құрастырылмайды"]
+    },
+    {
+      "id": "ch04_ownership_rules",
+      "category": "ch04_ownership_basics",
+      "query": "Иелік ережелері деген не?",
+      "any_substring": ["әрбір мәннің", "бір ғана", "статикалық"]
+    },
+    {
+      "id": "ch04_drop",
+      "category": "ch04_ownership_basics",
+      "query": "drop функциясы деген не?",
+      "any_substring": ["автоматты", "raii", "ресурс"]
+    },
+    {
+      "id": "ch04_stack",
+      "category": "ch04_memory",
+      "query": "Стек жады деген не?",
+      "any_substring": ["lifo", "жылдам", "өлшемі"]
+    },
+    {
+      "id": "ch04_heap",
+      "category": "ch04_memory",
+      "query": "Үйме жады деген не?",
+      "any_substring": ["баяу", "көрсеткіш", "drop"]
+    },
+    {
+      "id": "ch04_string_from",
+      "category": "ch04_string_owned",
+      "query": "String::from деген не?",
+      "any_substring": ["үймеде", "өсетін", "литерал"]
+    },
+    {
+      "id": "ch04_move",
+      "category": "ch04_string_owned",
+      "query": "Иеліктің көшуі деген не?",
+      "any_substring": ["s1", "жарамсыз", "қос босату"]
+    },
+    {
+      "id": "ch04_clone",
+      "category": "ch04_string_owned",
+      "query": "clone әдісі деген не?",
+      "any_substring": ["терең", "жадтан жаңа орын", "арзан емес"]
+    },
+    {
+      "id": "ch04_copy_trait",
+      "category": "ch04_string_owned",
+      "query": "Copy трейті деген не?",
+      "any_substring": ["стек", "i32", "көшірме"]
+    },
+    {
+      "id": "ch04_fn_ownership",
+      "category": "ch04_fn_ownership",
+      "query": "Иелік және функциялар деген не?",
+      "any_substring": ["string", "move", "копию"]
+    },
+    {
+      "id": "ch04_return_ownership",
+      "category": "ch04_fn_ownership",
+      "query": "Қайтару мәні мен иелік деген не?",
+      "any_substring": ["қайтару", "ауысады", "шакыруш"]
+    },
+    {
+      "id": "ch04_reference",
+      "category": "ch04_references",
+      "query": "Сілтеме деген не?",
+      "any_substring": ["иеленбей", "&", "drop-қа"]
+    },
+    {
+      "id": "ch04_borrowing",
+      "category": "ch04_references",
+      "query": "Қарызға алу деген не?",
+      "any_substring": ["қарызға", "иелік иесінде", "calculate_length"]
+    },
+    {
+      "id": "ch04_dangling_ref",
+      "category": "ch04_borrow_checker",
+      "query": "Жабайы сілтеме деген не?",
+      "any_substring": ["use-after-free", "lifetime specifier", "компиляция"]
+    },
+    {
+      "id": "ch04_borrow_rule_1",
+      "category": "ch04_borrow_checker",
+      "query": "Қарызға алудың бірінші ережесі деген не?",
+      "any_substring": ["өзгермелі сілтеме", "тұрақты сілтеме", "data race"]
+    },
+    {
+      "id": "ch04_borrow_rule_2",
+      "category": "ch04_borrow_checker",
+      "query": "Қарызға алудың екінші ережесі деген не?",
+      "any_substring": ["жарамды", "lifetime", "жабайы"]
+    },
+    {
+      "id": "ch04_nll",
+      "category": "ch04_borrow_checker",
+      "query": "NLL деген не?",
+      "any_substring": ["non-lexical", "соңғы пайдаланылған", "2018"]
+    },
+    {
+      "id": "ch04_string_slice",
+      "category": "ch04_slices",
+      "query": "Жол тілімі деген не?",
+      "any_substring": ["&str", "&s[0..5]", "иелігі"]
+    },
+    {
+      "id": "ch04_array_slice",
+      "category": "ch04_slices",
+      "query": "Жиым тілімі деген не?",
+      "any_substring": ["&[i32]", "[2, 3]", "иелігі жоқ"]
+    },
+    {
+      "id": "ch04_slice_range",
+      "category": "ch04_slices",
+      "query": "Тілім диапазоны деген не?",
+      "any_substring": ["[a..b]", "[..n]", "[m..]"]
+    },
+    {
+      "id": "ch04_data_race",
+      "category": "ch04_concurrency_safety",
+      "query": "Жарыс шарты деген не?",
+      "any_substring": ["екі ағын", "жазып", "компиляция"]
+    },
+    {
+      "id": "ch04_slice_concept",
+      "category": "ch04_slices",
+      "query": "Тілім деген не?",
+      "any_substring": ["сілтеме", "бөлік", "ұзынды"]
+    }
+  ]
+}

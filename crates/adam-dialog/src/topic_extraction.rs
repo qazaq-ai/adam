@@ -1953,6 +1953,38 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ord әдісі",
     "айнымалы тәсілі",
     "string әдісі",
+    // **v4.80.5** — Rust Book chapter 4 (ownership) deepening.
+    // rust_254…270 + 5 stub replacements (009/011/012/019/020).
+    "иелік ережелері",
+    "drop функциясы",
+    "string::from",
+    "иеліктің көшуі",
+    "clone әдісі",
+    "copy трейті",
+    "иелік және функциялар",
+    "қайтару мәні мен иелік",
+    "жабайы сілтеме",
+    "қарызға алудың бірінші ережесі",
+    "қарызға алудың екінші ережесі",
+    "жол тілімі",
+    "&str пен &string айырмашылығы",
+    "жиым тілімі",
+    "тілім диапазоны",
+    "жарыс шарты",
+    "стек жады",
+    "үйме жады",
+    // Objects.
+    "rust ережесі",
+    "автоматты тазалау",
+    "rust семантикасы",
+    "терең көшіру",
+    "rust трейті",
+    "borrow checker ережесі",
+    "сілтеме жүйесі",
+    "тілім түрі",
+    "rust идиомасы",
+    "тілім синтаксисі",
+    "қатарластық қаупі",
     // **v4.80.0** — Rust Book chapter 3 (common programming concepts).
     // rust_237…253. Subjects.
     "тұрақтылық әдепкіше",
@@ -2284,6 +2316,8 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     "read_line",
     // **v4.80.0** — Rust Book chapter 3 (common programming concepts)
     // deepening. rust_237…253 + replaced rust_022/038/039.
+    // **v4.80.5** — Rust Book chapter 4 (ownership) deepening.
+    "nll",
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word

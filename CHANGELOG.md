@@ -7,6 +7,87 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.80.5] — 2026-05-06 — Rust Book chapter 4 deepening — ownership system
+
+Per-chapter pedagogical cadence continues. Chapter 4 is the most important chapter in the book — Rust's ownership system, the language's signature feature. Previously surface-level — many 1-line stubs without rationale, distinctions, or examples.
+
+### What's added
+
+**17 new curated entries `rust_254…270`** in `programming_rust.jsonl`:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_254 | иелік ережелері | 3 ownership rules (one owner, drop on scope exit) |
+| rust_255 | drop функциясы | Auto-called on scope exit + RAII |
+| rust_256 | string::from | Heap-allocated owned string |
+| rust_257 | иеліктің көшуі | Move semantics + double-free prevention |
+| rust_258 | clone әдісі | Explicit deep copy (expensive) |
+| rust_259 | copy трейті | Stack-only types, no move |
+| rust_260 | иелік және функциялар | Function param ownership transfer (String=move, i32=copy) |
+| rust_261 | қайтару мәні мен иелік | Return value ownership transfer |
+| rust_262 | жабайы сілтеме | Dangling reference — compile-time prevention |
+| rust_263 | қарызға алудың бірінші ережесі | One mutable XOR many immutable |
+| rust_264 | қарызға алудың екінші ережесі | References must always be valid |
+| rust_265 | nll | Non-lexical lifetimes (last-use scope) |
+| rust_266 | жол тілімі | String slice (`&str` view into String) |
+| rust_267 | &str пен &string айырмашылығы | Why `&str` is preferred for parameters |
+| rust_268 | жиым тілімі | Array slice `&[T]` |
+| rust_269 | тілім диапазоны | `[a..b]` / `[a..=b]` / `[..n]` / `[m..]` / `[..]` syntax |
+| rust_270 | жарыс шарты | Data race compile-time prevention via borrow rule 1 |
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs deepened in-place
+
+- `rust_009` (Иелік) — was 1-liner; now covers 3 ownership rules + GC vs manual vs Rust comparison + compile-time guarantee.
+- `rust_011` (Сілтеме) — was 1-liner; now covers `&` operator + immutable default + `&mut` requires `mut` chain.
+- `rust_012` (Қарызға алу) — was 1-liner; now covers borrow rules summary.
+- `rust_019` (Стек жады) — was 1-liner; now covers LIFO + fast + fixed-size constraint + function-frame lifecycle. Subject renamed from `стек` to `стек жады` to disambiguate from `cs_005` (general CS data structure).
+- `rust_020` (Үйме жады) — was 1-liner; now covers variable size + slower + heap pointer indirection + drop. Subject renamed from `үйме` to `үйме жады`.
+
+### Stubs deleted
+
+- `rustadv_003` (1-line «Қарызға алу» duplicate of deeper `rust_012`).
+
+### Subject naming corrections
+
+- `rust_263` / `rust_264` — renamed from `қарызға алудың 1-ережесі` / `2-ережесі` to `бірінші ережесі` / `екінші ережесі` because numeric subjects with digits triggered math-refusal.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_04_holdout.json` — 22 cases, 8 categories (`ch04_ownership_basics`, `ch04_memory`, `ch04_string_owned`, `ch04_fn_ownership`, `ch04_references`, `ch04_borrow_checker`, `ch04_slices`, `ch04_concurrency_safety`).
+- `crates/adam-dialog/tests/rust_book_chapter_04.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `LATIN_TECH_SUBJECTS` += 1 (`nll`).
+- `MULTIWORD_ENTITIES` += 29 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 22 / 22 chapter 4 holdout cases | ✅ 100 % |
+| Existing chapters 1-3 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **980 passing** (was 979; +1 chapter-4 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2578 → **2594** (+16 net: +17 ch.4 − 1 stub deletion) |
+| world_core facts | 2820 → **2836** (+16 net) |
+| Derived facts | 30768 → **30776** (+8) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.80.5** | **ch. 4** | **Ownership (this release)** |
+| v4.81.0 | ch. 5 | Structs (named-field / tuple-struct / unit-struct / impl blocks / methods / associated functions / debug-derive) |
+| v4.81.5 | ch. 6 | Enums + match (Option, exhaustive matching, if let, _) |
+| v4.82.0 | ch. 7 | Modules / packages / crates (mod / pub / use / lib.rs / bin.rs / paths) |
+| v4.82.5 | ch. 8 | Common collections (Vec, String, HashMap deepening) |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.5` patch — same architectural family (curated curriculum data); 17 new + 5 deepened stubs + 1 deletion. Chapter 4 (ownership) is the language's signature feature — this is the most pedagogically important release in the chapter sequence so far. Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.80.0] — 2026-05-06 — Rust Book chapter 3 deepening — common programming concepts
 
 Per-chapter pedagogical cadence continues. Chapter 3 («Жалпы бағдарламалау ұғымдары») was previously surface-level — many 1-line type stubs without the conceptual depth (rationale, distinctions, edge cases) the chapter teaches. Now deepened with full curriculum.
