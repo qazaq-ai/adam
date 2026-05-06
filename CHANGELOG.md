@@ -7,6 +7,54 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.61.0] — 2026-05-07 — Educational portal Day 2 #1 — Kazakh grammar: full 10-class part-of-speech taxonomy
+
+**Day 2 release 1/10. Day 2 STARTS** — Elementary 3-4 + Kazakh language depth. v4.61.0 establishes the full 10-class Kazakh part-of-speech taxonomy with curriculum-grade definitions for each class.
+
+### Innovations
+
+**(1) New 53rd domain `kazakh_grammar`** with 11 entries:
+
+10 part-of-speech classes (each `IsA сөз табы`) — first 4 already had base IsA bridges; v4.61.0 adds detailed curriculum definitions:
+- `gram_pos_001` **зат есім** (noun) — defines жалпы / жалқы subtypes; questions кім? не?
+- `gram_pos_002` **сын есім** (adjective) — defines сапалық / қатыстық subtypes; шырай категориясы (жай / салыстырмалы / күшейтпелі / асырмалы)
+- `gram_pos_003` **етістік** (verb) — defines салт / сабақты subtypes; шақ / жақ / рай / етіс categories
+- `gram_pos_004` **сан есім** (numeral) — 6 subtypes: есептік / реттік / жинақтық / болжалдық / бөлшектік / топтау
+- `gram_pos_005` **есімдік** (pronoun) — **NEW** — 7 subtypes: жіктеу / сілтеу / сұрау / белгісіздік / жалпылау / өздік / болымсыздық
+- `gram_pos_006` **үстеу** (adverb) — **NEW** — 6 subtypes: мекен / мезгіл / мақсат / себеп / мөлшер / сын-қимыл
+- `gram_pos_007` **шылау** (particle/conjunction) — **NEW** — 3 subtypes: септеулік / жалғаулық / демеулік
+- `gram_pos_008` **еліктеу сөз** (onomatopoeia) — **NEW** — 2 subtypes: дыбыстық / бейнелеу
+- `gram_pos_009` **одағай** (interjection) — **NEW** — 3 subtypes: көңіл / шақырыс / бұйрық
+- `gram_pos_010` **көмекші сөз** (auxiliary) — **NEW** — covers көмекші етістіктер + модаль сөздер
+
+**(2) 1 sub-class entry** (demonstrating sub-classification pattern):
+- `gram_pos_011` **жалқы есім IsA зат есім** — proper noun is a kind of noun. Sets pattern for future subtype additions (жалпы есім, сапалық сын есім, сабақты етістік, etc.).
+
+**(3) сөз табы PoS hub fully populated** — all 10 primary Kazakh word classes now classified `IsA сөз табы`. The hub structure mirrors curriculum-aligned taxonomy used in Kazakh schools.
+
+**(4) MULTIWORD_ENTITIES extended** with «көмекші сөз», «еліктеу сөз», «жалқы есім» — topic extractor surfaces these as units for future grammar queries.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2238 | **2249** (+11) |
+| world_core facts | 2478 | **2489** (+11) |
+| world_core domains | 52 | **53** (+1) |
+| Derived facts | 28400 | **28391** (-9 — R5 hub-rerouting; new сөз табы siblings let R5 dedupe shared-target pairs through more specific mediation) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.61.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The minor derivation drop (-9) reflects R5 (shared_is_a_target) deduplicating shared-hub pairs once new sibling word-classes provide alternative routing. Net knowledge gain is positive (+11 facts of higher specificity, including 7 entirely new word classes).
+
+### Cadence
+
+`.0` minor — Day 2 starts. New domain + full PoS taxonomy. Sets the pattern for the next 9 Day 2 releases (case system, possessive system, tenses, proverbs, etc.).
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.60.5] — 2026-05-06 — 🎯 Educational portal Day 1 #10 (FINAL) — Pre-school emotions + part-of-speech triangle CLOSED
 
 **Day 1 release 10/10 — DAY 1 COMPLETE.** New 52nd domain `preschool_emotions` covering 10 fundamental emotions split into positive/negative valence, plus the closing «зат есім IsA сөз табы» bridge that **closes the part-of-speech taxonomy triangle** (зат есім + сын есім + етістік) under the сөз табы hub.

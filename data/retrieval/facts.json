@@ -1,7 +1,7 @@
 {
-  "version": "4.60.0",
+  "version": "4.60.5",
   "status": "completed",
-  "elapsed_s": 30,
+  "elapsed_s": 65,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2478,
+    "facts_total": 2489,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1939,
+      "is_a": 1950,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -62,6 +62,7 @@
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
       "world_core/informatics_basic.jsonl": 40,
+      "world_core/kazakh_grammar.jsonl": 11,
       "world_core/kinship_extended.jsonl": 20,
       "world_core/kz_literature.jsonl": 96,
       "world_core/language_features.jsonl": 33,
@@ -23535,6 +23536,226 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Сканер — қағаздағы кескінді цифрлық түрге айналдыратын құрылғы."
+    },
+    {
+      "subject": {
+        "surface": "зат есім",
+        "root": "зат есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Зат есім — заттың, құбылыстың, ұғымның атауын білдіретін сөз табы. Кім? Не? деген сұрақтарға жауап береді. Екі түрі бар: жалқы есім (Алматы, Абай) және жалпы есім (қала, бала). Зат есім тәуелдік, көптік, септік жалғаулары арқылы өзгереді."
+    },
+    {
+      "subject": {
+        "surface": "сын есім",
+        "root": "сын есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сын есім — заттың сапасын, түрін, реңін немесе қатынасын білдіретін сөз табы. Қандай? Қай? деген сұрақтарға жауап береді. Екі түрі бар: сапалық сын есім (жақсы, көк, биік) және қатыстық сын есім (қалалық, ағаштан). Шырай категориясы (жай, салыстырмалы, күшейтпелі, асырмалы) арқылы дәреже білдіреді."
+    },
+    {
+      "subject": {
+        "surface": "етістік",
+        "root": "етістік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Етістік — заттың іс-әрекетін, қимылын, күй-жайын білдіретін сөз табы. Не істеді? Не істейді? Не қылды? деген сұрақтарға жауап береді. Екі түрі бар: салт етістік (жату, ұйықтау) және сабақты етістік (оқу, жазу). Шақ (өткен / осы / келер), жақ (1, 2, 3-жақ), рай (хабарлы, бұйрық, шартты, қалау), етіс (ортақ, өзгелік, ырықсыз, өздік) категориялары арқылы өзгереді."
+    },
+    {
+      "subject": {
+        "surface": "сан есім",
+        "root": "сан есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сан есім — заттың санын немесе ретін білдіретін сөз табы. Неше? Қанша? Нешінші? деген сұрақтарға жауап береді. Алты түрі бар: есептік (бір, екі), реттік (бірінші, екінші), жинақтық (екеу, үшеу), болжалдық (бес-алты), бөлшектік (төрттен бір), топтау (бестен)."
+    },
+    {
+      "subject": {
+        "surface": "есімдік",
+        "root": "есімдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Есімдік — заттың, белгінің, санның атын немесе атауын алмастыратын сөз табы. Кім? Не? Қандай? Неше? деген сұрақтарға жауап береді. Жеті түрі бар: жіктеу (мен, сен, ол), сілтеу (бұл, мынау, сол), сұрау (кім, не, қандай), белгісіздік (біреу, кейбір), жалпылау (бәрі, барлық), өздік (өзім, өзің), болымсыздық (ешкім, ештеңе)."
+    },
+    {
+      "subject": {
+        "surface": "үстеу",
+        "root": "үстеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үстеу — іс-әрекеттің мекенін, мезгілін, мақсатын, себебін, мөлшерін немесе амалын білдіретін сөз табы. Қалай? Қашан? Қайда? Қанша? Не үшін? деген сұрақтарға жауап береді. Алты түрі бар: мекен үстеу (алға, артқа), мезгіл (бүгін, ертең), мақсат (әдейі), себеп (амалсыз), мөлшер (көп, аз), сын-қимыл (тез, баяу)."
+    },
+    {
+      "subject": {
+        "surface": "шылау",
+        "root": "шылау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шылау — өздігінен дербес мағынасы жоқ, басқа сөздермен байланысып, грамматикалық қатынас білдіретін сөз табы. Үш түрі бар: септеулік шылау (үшін, туралы, арқылы), жалғаулық шылау (және, бірақ, әрі), демеулік шылау (ма, ба, ғой, екен)."
+    },
+    {
+      "subject": {
+        "surface": "еліктеу сөз",
+        "root": "еліктеу сөз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Еліктеу сөз — табиғаттағы дыбыстарды, көрініс пен қимылды дыбыстық еліктеу арқылы білдіретін сөз табы. Екі түрі бар: дыбыстық еліктеу (тырс-тырс, шу-шу) және бейнелеу (жалт-жұлт, ағыл-тегіл)."
+    },
+    {
+      "subject": {
+        "surface": "одағай",
+        "root": "одағай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Одағай — адамның сезімін, көңіл-күйін, шақыруын, бұйырғанын білдіретін сөз табы. Сөйлемде басқа сөздермен грамматикалық байланысқа түспейді. Үш түрі бар: көңіл одағайы (ой, тфу), шақырыс одағайы (әй, кәне), бұйрық одағайы (тек, тыныш)."
+    },
+    {
+      "subject": {
+        "surface": "көмекші сөз",
+        "root": "көмекші сөз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сөз табы",
+        "root": "сөз табы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көмекші сөз — өздігінен дербес мағынасы солғын, негізгі сөздерге грамматикалық мағына үстеп тұратын сөз табы. Көмекші етістіктер (бер, кел, кет, отыр, тұр) мен модаль сөздер (керек, тиіс, мүмкін) қатарына жатады."
+    },
+    {
+      "subject": {
+        "surface": "жалқы есім",
+        "root": "жалқы есім",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "зат есім",
+        "root": "зат есім",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_pos_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жалқы есім — нақты бір затты, адамды, жерді бөлек атау үшін қолданылатын зат есім түрі. Әрқашан бас әріппен жазылады. Мысалдар: Алматы, Абай, Қазақстан, Айгерім, Балхаш."
     },
     {
       "subject": {
