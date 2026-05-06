@@ -1,7 +1,7 @@
 {
-  "version": "4.72.0",
+  "version": "4.72.5",
   "status": "completed",
-  "elapsed_s": 75,
+  "elapsed_s": 65,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,14 +18,14 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2725,
+    "facts_total": 2727,
     "by_predicate": {
       "after": 8,
       "causes": 27,
       "does_to": 1,
       "goes_to": 26,
       "has": 68,
-      "has_quantity": 35,
+      "has_quantity": 37,
       "in_domain": 24,
       "is_a": 2164,
       "lives_in": 8,
@@ -93,7 +93,7 @@
       "world_core/tools_household.jsonl": 30,
       "world_core/transport.jsonl": 42,
       "world_core/weather_phenomena.jsonl": 26,
-      "world_core/world_geography.jsonl": 15,
+      "world_core/world_geography.jsonl": 17,
       "world_core/world_history.jsonl": 12
     }
   },
@@ -54357,6 +54357,46 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Алты материктің атаулары: Еуразия (~54 млн км²), Африка (~30), Солтүстік Америка (~24), Оңтүстік Америка (~18), Антарктида (~14), Австралия (~7,7)."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "алты материк",
+        "root": "алты материк",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер бетінде алты материк бар: Еуразия, Африка, Солтүстік Америка, Оңтүстік Америка, Австралия, Антарктида."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "HasQuantity",
+      "object": {
+        "surface": "төрт мұхит",
+        "root": "төрт мұхит",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер бетінде төрт мұхит бар: Тынық мұхит, Атлант мұхиты, Үнді мұхиты, Солтүстік Мұзды мұхит."
     },
     {
       "subject": {

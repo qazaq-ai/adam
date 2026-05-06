@@ -122,6 +122,22 @@ pub(crate) const NOT_A_TOPIC: &[&str] = &[
     // eclipse the genuine topic candidates.
     "байланыс",
     "байланысты",
+    // **v4.72.5** — passive «how is X computed?» verb forms picked
+    // as topic when X is a FST-unknown loanword. Surface
+    // `есептеледі` (passive of есептеу = to compute) as the noun
+    // hint for «Диаметр қалай есептеледі?» because диаметр isn't in
+    // FST lexicon and есептеледі parses to a noun-class form. These
+    // are predicate verbs, never the topic; the actual topic must
+    // come from MULTIWORD_ENTITIES (which now includes диаметр /
+    // радиус / etc.) or topic-marker hints.
+    "есептеле",
+    "есептеу",
+    "есептеледі",
+    "есептейді",
+    "есептелді",
+    "болады",
+    "жасалады",
+    "жасалды",
     // v3.9.5 — demonstrative qualifiers + quantifier forms.
     "мұндай",
     "сондай",
@@ -934,6 +950,35 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "мұхиттар тізімі",
     "теңдеу түрлері",
     "фигуралар тізімі",
+    // **v4.72.5** — has_quantity objects from wg_016 / wg_017
+    // alias entries that surface «Жер бетінде қанша X бар?»
+    // queries. These must be registered for the
+    // `world_core_multiword_coverage` invariant.
+    "алты материк",
+    "төрт мұхит",
+    // **v4.72.5** — single-word loanword shamas / quantities missed
+    // in v4.71.5. Surfaced by REPL battery «Диаметр қалай
+    // есептеледі?» / «Радиус қалай есептеледі?» — these queries
+    // had no topic marker, so the FST picked the verb form
+    // «есептеле» as topic instead of диаметр / радиус (loanwords
+    // not in lexicon). Adding them here lets the substring scan
+    // find them directly. жол / уақыт / көлем are native Kazakh
+    // but FST returns them as low-confidence (adjective/numeral
+    // class), routing valid queries to clarify_low_confidence even
+    // when grounded_fact is correctly populated.
+    "диаметр",
+    "радиус",
+    "периметр",
+    "аудан",
+    "көлем",
+    "жол",
+    "уақыт",
+    "масса",
+    "тығыздық",
+    "жылдамдық",
+    "үдеу",
+    "күш",
+    "жұмыс",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of

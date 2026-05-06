@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.72.5] — 2026-05-06 — Comprehensive 100-query battery audit + 4 fixes (passive-verb topic eclipse, low-confidence native nouns, «Жер бетінде» phrasing variant)
+
+Driven by user-mandated systematic battery test across all v4.66.0+ educational content. 100 natural-Kazakh queries spanning 12 sub-domains (algebra / advanced geometry / mechanics / thermodynamics / E&M / organic chem / inorganic chem / world history / literary devices / world geography / medicine). **Result: 94 PASS / 4 FAIL / 2 PARTIAL.** This release fixes the 4 hard failures; 2 partials (comparison shape) deferred to template-family work.
+
+### Bugs identified by battery
+
+| Failing query | Pre-fix | Root cause |
+|---|---|---|
+| Диаметр қалай есептеледі? | clarify «есептеле туралы…» | диаметр not in MULTIWORD; FST picks verb stem «есептеле» as topic |
+| Радиус қалай есептеледі? | (same as диаметр on retest) | радиус not in MULTIWORD |
+| Жол қалай есептеледі? | «Сіз жол жайында сұрап отырсыз ма?» | жол is FST noun but second-pass classification → Low confidence → clarify_low_confidence template, even with grounded_fact populated |
+| Жер бетінде қанша материк бар? | «Жердің бір серігі бар» | retrieval picks moon-count fact over wg_013 «Жер планетасында...» (phrasing mismatch — query says «бетінде», fact says «планетасында») |
+| Жер бетінде қанша мұхит бар? | «Жердің бір серігі бар» | same — wg_014 says «Жер бетіндегі төрт мұхит» but retrieval ranks moon fact higher |
+
+### Innovations
+
+**(1) `NOT_A_TOPIC` extended** with passive «how is X computed?» verb forms (есептеле / есептеу / есептеледі / есептейді / есептелді / болады / жасалады / жасалды). These are predicate verbs surfaced when the actual topic X is a FST-unknown loanword; they should never be picked as topic.
+
+**(2) `MULTIWORD_ENTITIES` extended** with 13 single-word native-Kazakh and loanword shamas missed in v4.71.5: диаметр / радиус / периметр / аудан / көлем / жол / уақыт / масса / тығыздық / жылдамдық / үдеу / күш / жұмыс. Loanwords (диаметр, радиус, периметр) need this because they're not in FST lexicon. Native words (жол, уақыт, масса, etc.) need it because their FST analyses route to second-pass (Low confidence) which fires `clarify_low_confidence` template instead of surfacing the grounded_fact.
+
+**(3) 2 alias entries added to `world_geography.jsonl`** with «Жер бетінде» phrasing matching common query forms:
+- wg_016: «Жер бетінде алты материк бар: Еуразия, Африка, Солтүстік Америка, Оңтүстік Америка, Австралия, Антарктида.»
+- wg_017: «Жер бетінде төрт мұхит бар: Тынық мұхит, Атлант мұхиты, Үнді мұхиты, Солтүстік Мұзды мұхит.»
+
+These use `has_quantity` predicate so they don't conflict with existing wg_013/wg_014 list facts; alias coverage for retrieval keyword overlap.
+
+**(4) MULTIWORD_ENTITIES** also registers «алты материк» / «төрт мұхит» — the new compound objects from wg_016/017 (required by `world_core_multiword_coverage` invariant).
+
+### Acceptance — 100-query battery diff vs v4.72.0
+
+| Query | v4.72.0 | v4.72.5 |
+|---|---|---|
+| Диаметр қалай есептеледі? | clarify | ✅ full diameter definition + d=2R |
+| Радиус қалай есептеледі? | (failed similarly) | ✅ full radius definition |
+| Жол қалай есептеледі? | clarify_low_confidence | ✅ full path/distance + S=v·t |
+| Жер бетінде қанша материк бар? | moon-count | ✅ lists 6 continents |
+| Жер бетінде қанша мұхит бар? | moon-count | ✅ lists 4 oceans |
+
+`diff` of full battery output between v4.72.0 and v4.72.5 shows **exactly 4 improvements, zero regressions** across 100 queries.
+
+### Deferred (still partial)
+
+- «Тұрақты ток пен айнымалы ток айырмашылығы қандай?» / «Қышқылдық оксид пен негіздік оксид айырмашылығы қандай?» — comparison-shape detected (`is_comparison` fires on «айырмашылығы») but no comparison template family exists; planner falls to Definition. Needs new `unknown.comparison_two_topics` template family with both X and Y definitions side-by-side.
+- Compositional possession queries («Адам жүрегі не істейді?»).
+- Math chain precision (35×5÷2−10 rounded 77.5 → 77).
+
+### Acceptance gates
+
+| Gate | Status |
+|---|---|
+| world_core entries | 2485 → **2487** (+2 from wg_016/017) |
+| world_core facts | 2666 → **2668** (+2) |
+| Derived facts | 29732 unchanged |
+| Workspace tests | **976 passing** (incl. world_core_multiword_coverage invariant) |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.72.5` | green |
+
+### Cadence
+
+`.5` patch — runtime fixes from systematic audit; no new domains.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.72.0] — 2026-05-06 — Listing-intent broadening + curated aggregator entries (planets / body parts / continents / oceans / equation types)
 
 Driven by user's second live REPL session against v4.71.5 — surfaced systemic gap where natural-Kazakh listing queries («X-тердің атаулары», «барлық X-терді атаңыз», «X-терді тізімдеңіз») fell through to Definition shape and surfaced singular-definition facts. Pattern audit: 6 of 12 transcript queries failed because aggregating list facts didn't exist for astro / body_parts / world_geography / math, while the matching Kazakhstan-specific lists in geography_kz did work (curated aggregator entries existed there).
