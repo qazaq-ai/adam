@@ -7,6 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.70.5] — 2026-05-06 — Educational portal — World geography foundations (6 continents + 4 oceans + subject-portal bridge)
+
+Per memory directive — pre-flight grep of `geography_kz.jsonl` confirmed strictly Kazakhstan-scoped (oblasts, cities, rivers, lakes, mountains, deserts, all `part_of қазақстан`). Eurasia mentioned only as part_of object (geo_kz_027); no entries defining continents themselves. `bio_034` already has «мұхит IsA су» — so new ocean entries plug into existing мұхит as object rather than redefining. Genuinely new canonical scope mirroring v4.69.5's `world_history.jsonl` — created new `world_geography.jsonl` domain.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| Kazakhstan oblasts/cities/rivers/lakes/mountains/deserts (all `part_of қазақстан`) | `geography_kz.jsonl` (116 entries) | ✓ skip — covered |
+| Мұхит as concept | `biology_basic.jsonl` (bio_034 — мұхит IsA су) | ✓ reuse as object — don't redefine |
+| 6 continents + 4 oceans + subject hub + continent concept hub | not yet | + add (new domain) |
+
+### Innovations
+
+**(1) New domain `data/world_core/world_geography.jsonl`** with 12 entries (`wg_001…012`):
+
+**Subject + concept hubs (2):**
+- wg_001: дүниежүзі географиясы IsA оқу пәні (bridge to v4.65.5 master hub)
+- wg_002: материк IsA жер бөлігі — continent concept (lists all 6)
+
+**6 continents IsA материк (6):**
+- wg_003: еуразия — largest (~54 mln km²), Kazakhstan resides here
+- wg_004: африка — second largest (~30 mln km²), crossed by equator, Sahara
+- wg_005: солтүстік америка — ~24 mln km², USA/Canada/Mexico
+- wg_006: оңтүстік америка — ~18 mln km², Amazon, Andes, rainforests
+- wg_007: австралия — both continent and country (~7.7 mln km²), endemic fauna
+- wg_008: антарктида — ~14 mln km², south polar, scientific stations only
+
+**4 oceans IsA мұхит (4):**
+- wg_009: тынық мұхит — largest (~165 mln km²), Mariana Trench (~11 km depth)
+- wg_010: атлант мұхиты — ~106 mln km², separates Eurasia/Africa from Americas
+- wg_011: үнді мұхиты — ~70 mln km², between Africa/Asia/Australia
+- wg_012: солтүстік мұзды мұхит — smallest + coldest (~14 mln km²), permanent ice
+
+**(2) Bridge into educational portal** — wg_001 connects дүниежүзі географиясы to «оқу пәні» master hub, completing geographic-subject pair alongside Қазақстан географиясы.
+
+**(3) MULTIWORD_ENTITIES extended** with 8 new compounds (дүниежүзі географиясы, жер бөлігі, солтүстік америка, оңтүстік америка, 4 ocean names).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2452 | **2464** (+12) |
+| world_core facts | 2633 | **2645** (+12) |
+| world_core domains | 52 | **53** (+1 — new `world_geography`) |
+| Derived facts | 29649 | **29723** (+74 = **6.17× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+
+R1_is_a_transitivity 2907 → 2954 (+47, transitivity through chains: 6 continents → материк → жер бөлігі; 4 oceans → мұхит → су via existing bio_034); R5_shared_is_a_target 1971 → 1998 (+27, 6-element continents cluster yields 15 R5 pairs + 4-element oceans cluster yields 6 R5 pairs + redistributions).
+
+### Cadence
+
+`.5` patch — new domain (justified scope expansion, mirrors v4.69.5 world_history pattern).
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.70.0] — 2026-05-06 — Educational portal — Literature: literary devices (metaphor + epithet + simile + hyperbole + personification + allegory + assonance + alliteration + 2 rhyme types)
 
 Per memory directive — pre-flight grep of `kz_literature.jsonl` confirmed coverage of өлең / шумақ / тармақ / ұйқас (as part_of өлең) / ақын / автор / проза / поэзия / 8 жанр types. Literary-device taxonomy (metaphor, epithet, simile, hyperbole, personification, allegory) and sound devices (assonance, alliteration), and rhyme-type subclasses were missing. Extends canonical `kz_literature.jsonl`.

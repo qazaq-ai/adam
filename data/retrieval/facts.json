@@ -1,7 +1,7 @@
 {
-  "version": "4.70.0",
+  "version": "4.70.5",
   "status": "completed",
-  "elapsed_s": 33,
+  "elapsed_s": 34,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2692,
+    "facts_total": 2704,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2140,
+      "is_a": 2152,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -92,6 +92,7 @@
       "world_core/tools_household.jsonl": 30,
       "world_core/transport.jsonl": 42,
       "world_core/weather_phenomena.jsonl": 26,
+      "world_core/world_geography.jsonl": 12,
       "world_core/world_history.jsonl": 12
     }
   },
@@ -53695,6 +53696,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Атмосфералық қысым — ауаның жер бетіне түсіретін салмағы."
+    },
+    {
+      "subject": {
+        "surface": "дүниежүзі географиясы",
+        "root": "дүниежүзі географиясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дүниежүзі географиясы — Жер шарының материктері, мұхиттары, климаты, табиғат аймақтары мен халықтарын зерттейтін оқу пәні."
+    },
+    {
+      "subject": {
+        "surface": "материк",
+        "root": "материк",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жер бөлігі",
+        "root": "жер бөлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Материк — мұхитпен қоршалған ірі құрлық массиві. Жер бетінде алты материк бар: Еуразия, Африка, Солтүстік Америка, Оңтүстік Америка, Австралия, Антарктида."
+    },
+    {
+      "subject": {
+        "surface": "еуразия",
+        "root": "еуразия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "материк",
+        "root": "материк",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Еуразия — Жер бетіндегі ең үлкен материк (~54 млн км²); Еуропа мен Азияны қамтиды; Қазақстан осы материкте орналасқан."
+    },
+    {
+      "subject": {
+        "surface": "африка",
+        "root": "африка",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "материк",
+        "root": "материк",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Африка — аумағы бойынша екінші материк (~30 млн км²); экватор арқылы қиылады; Сахара — әлемдегі ең үлкен ыстық шөл."
+    },
+    {
+      "subject": {
+        "surface": "солтүстік америка",
+        "root": "солтүстік америка",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "материк",
+        "root": "материк",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Солтүстік Америка — солтүстік жарты шарда орналасқан материк (~24 млн км²); АҚШ, Канада, Мексика осы материкте."
+    },
+    {
+      "subject": {
+        "surface": "оңтүстік америка",
+        "root": "оңтүстік америка",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "материк",
+        "root": "материк",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Оңтүстік Америка — оңтүстік жарты шарда орналасқан материк (~18 млн км²); Амазонка өзені, Анды таулары, әлемдегі ең үлкен жаңбыр ормандары осы материкте."
+    },
+    {
+      "subject": {
+        "surface": "австралия",
+        "root": "австралия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "материк",
+        "root": "материк",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Австралия — әрі материк, әрі мемлекет (~7,7 млн км²); ең кіші материк; эндемик жануарлары — кенгуру, коала, утконос."
+    },
+    {
+      "subject": {
+        "surface": "антарктида",
+        "root": "антарктида",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "материк",
+        "root": "материк",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Антарктида — Жер шарының оңтүстік полюсі айналасындағы мұзды материк (~14 млн км²); тұрақты тұрғыны жоқ, тек ғылыми станциялар."
+    },
+    {
+      "subject": {
+        "surface": "тынық мұхит",
+        "root": "тынық мұхит",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мұхит",
+        "root": "мұхит",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тынық мұхит — Жер шарындағы ең үлкен мұхит (~165 млн км²); Азия, Австралия, Америка материктерін бөліп тұрады; Мариана шұңғымасы — ең терең нүктесі (~11 км)."
+    },
+    {
+      "subject": {
+        "surface": "атлант мұхиты",
+        "root": "атлант мұхиты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мұхит",
+        "root": "мұхит",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Атлант мұхиты — екінші ірі мұхит (~106 млн км²); Еуразия мен Африканы Америкадан бөліп тұрады."
+    },
+    {
+      "subject": {
+        "surface": "үнді мұхиты",
+        "root": "үнді мұхиты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мұхит",
+        "root": "мұхит",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үнді мұхиты — үшінші ірі мұхит (~70 млн км²); Африка, Азия, Австралия материктері аралығында орналасқан."
+    },
+    {
+      "subject": {
+        "surface": "солтүстік мұзды мұхит",
+        "root": "солтүстік мұзды мұхит",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мұхит",
+        "root": "мұхит",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Солтүстік Мұзды мұхит — ең кіші және ең суық мұхит (~14 млн км²); жыл бойы мұзбен жабылған; Антарктида мен Солтүстік полюсті айнала орналасқан Антарктидалық бөлік ретінде жеке Оңтүстік мұхит деп бөлінеді."
     },
     {
       "subject": {

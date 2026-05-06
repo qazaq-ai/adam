@@ -787,6 +787,15 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ұйқас түрі",
     "шалыс ұйқас",
     "қара ұйқас",
+    // **v4.70.5** — Educational portal: world geography foundations.
+    "дүниежүзі географиясы",
+    "жер бөлігі",
+    "солтүстік америка",
+    "оңтүстік америка",
+    "тынық мұхит",
+    "атлант мұхиты",
+    "үнді мұхиты",
+    "солтүстік мұзды мұхит",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of
