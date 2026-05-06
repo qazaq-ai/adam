@@ -1597,6 +1597,26 @@ fn kazakh_units_value(token: &str) -> Option<u32> {
 }
 
 fn detect_ask_location(joined: &str) -> bool {
+    // **v4.73.5** — Codex 2026-05-06 review: «Қазақстанның астанасы
+    // қай қала?» previously hit AskLocation, producing system-
+    // identity «Мен Қазақстан елімде» — false claim. AskLocation
+    // is for asking the USER (or system) where they live; factual
+    // location questions about third-party subjects must stay
+    // Unknown so retrieval handles them. Gate on explicit user-
+    // addressing markers: 2nd-person pronoun «сіз / сен» as
+    // separate token, possessive «сіздің / сенің», or live-verb
+    // forms «тұрасыз / тұрасың / қайдансыз / қайдансың».
+    let tokens: Vec<&str> = joined.split_whitespace().collect();
+    let has_user_marker = tokens
+        .iter()
+        .any(|t| matches!(*t, "сіз" | "сен" | "сіздің" | "сенің"))
+        || joined.contains("тұрасыз")
+        || joined.contains("тұрасың")
+        || joined.contains("қайдансыз")
+        || joined.contains("қайдансың");
+    if !has_user_marker {
+        return false;
+    }
     joined.contains("қай жерден")
         || joined.contains("қайдан")
         || joined.contains("қайда тұра")

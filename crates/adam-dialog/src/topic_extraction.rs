@@ -138,6 +138,25 @@ pub(crate) const NOT_A_TOPIC: &[&str] = &[
     "болады",
     "жасалады",
     "жасалды",
+    // **v4.73.5** — Codex 2026-05-06 review: function-words /
+    // discourse particles getting picked as topic and surfacing
+    // unrelated retrieval hits. «Мысал келтіріңіз» surfaced a
+    // Шымкент quote; «Нәтижесі қанша?» surfaced a Kiev quote;
+    // «Маңызды ма?» fell to clarify; «Екеуінің айырмасы қандай?»
+    // surfaced a proverb about «екеуі». These tokens are never the
+    // topic of a question — they're discourse markers signalling
+    // что-то procedural happens around them. Without a real topic
+    // they should fall to clarify_no_topic, not produce noise.
+    "мысал",
+    "нәтиже",
+    "маңызды",
+    "қайсы",
+    "егер",
+    "егерде",
+    "екеуі",
+    "екеу",
+    "айырмасы",
+    "айырмашылығы",
     // v3.9.5 — demonstrative qualifiers + quantifier forms.
     "мұндай",
     "сондай",
@@ -956,6 +975,9 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // `world_core_multiword_coverage` invariant.
     "алты материк",
     "төрт мұхит",
+    // **v4.73.5** — astro_048 «Жер жалпақ емес» entry; new
+    // sub-class object for the planet-priority fact.
+    "шар тәрізді ғаламшар",
     // **v4.72.5** — single-word loanword shamas / quantities missed
     // in v4.71.5. Surfaced by REPL battery «Диаметр қалай
     // есептеледі?» / «Радиус қалай есептеледі?» — these queries

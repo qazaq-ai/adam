@@ -1,5 +1,5 @@
 {
-  "version": "4.72.5",
+  "version": "4.73.5",
   "status": "completed",
   "elapsed_s": 65,
   "packs_completed": 9,
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2727,
+    "facts_total": 2729,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2164,
+      "is_a": 2166,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 123
@@ -43,7 +43,7 @@
       "wikipedia_kz_pack.json": 17,
       "world_core/adam_self.jsonl": 54,
       "world_core/animals.jsonl": 42,
-      "world_core/astronomy.jsonl": 58,
+      "world_core/astronomy.jsonl": 60,
       "world_core/biology_basic.jsonl": 53,
       "world_core/biology_school.jsonl": 120,
       "world_core/body_parts.jsonl": 57,
@@ -4757,6 +4757,46 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Жердің табиғи серігі — Ай. Жер — Күн жүйесіндегі бір ғана серігі бар тас ғаламшар."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шар тәрізді ғаламшар",
+        "root": "шар тәрізді ғаламшар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер жалпақ емес — ол шар тәрізді (геоид) ғаламшар. Полюстерде сәл жалпайтылған, экватор бойымен сәл шығыңқы. Радиусы ~6371 км."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ғаламшар",
+        "root": "ғаламшар",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер — Күн жүйесіндегі үшінші ғаламшар; Меркурий мен Шолпаннан кейін тұрады. Күннен қашықтығы ~150 миллион км. Жалғыз тіршілік бар екендігі дәлелденген ғаламшар."
     },
     {
       "subject": {

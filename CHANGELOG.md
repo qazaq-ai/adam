@@ -7,6 +7,57 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.73.5] — 2026-05-06 — Codex round-2 bugs — factual-location routing fix + function-word topic blocklist + Earth-planet priority
+
+Driven by Codex 2026-05-06 round-2 review (after v4.73.0 ship). Codex confirmed v4.73.0 multi-turn fix worked, then identified 8 additional failure patterns. This release fixes the 4 with surgical scope (security/correctness); 4 deferred to procedural-intent / data-structure work.
+
+### Bugs fixed
+
+**Bug 6 — Critical factual-location routing.** «Қазақстанның астанасы қай қала?» previously hit `AskLocation`, producing system-identity «Мен Қазақстан елімде» — false claim. `detect_ask_location` was too broad: any input with «қай қала / қайдан / қай аудан» triggered it. Fix: gate on explicit user-addressing markers (2nd-person pronoun `сіз / сен` as separate token, possessive `сіздің / сенің`, or live-verb `тұрасыз / тұрасың / қайдансыз / қайдансың`). Without those markers, factual location queries about third-party subjects stay Unknown so retrieval handles them.
+
+**Bug 5 — Function-word retrieval noise.** «Мысал келтіріңіз» surfaced unrelated «Мысалы, Шымкент…» quote; «Нәтижесі қанша?» surfaced «Нәтижесінде Киев…» quote; «Маңызды ма?» fell to clarify; «Екеуінің айырмасы қандай?» surfaced proverb about «екеуі». Fix: extend NOT_A_TOPIC with discourse particles never appearing as topics — `мысал / нәтиже / маңызды / қайсы / егер / егерде / екеуі / екеу / айырмасы / айырмашылығы`. Now these queries fall to clarify_no_topic (graceful refuse) instead of producing nonsense quotes.
+
+**Bug 7 — Earth picks economic-resource fact over planet sense.** «Жер жалпақ па?» surfaced «Жер — өндіріске қатысатын табиғи ресурс» (economics_basic) instead of planet sense. Fix: 2 curated planet-priority entries in `astronomy.jsonl`: astro_048 «Жер жалпақ емес — шар тәрізді (геоид) ғаламшар, R~6371 км» (exact-matches «жалпақ» in query) + astro_049 «Жер — Күн жүйесіндегі үшінші ғаламшар; ~150 млн км Күннен; жалғыз тіршілік бар екендігі дәлелденген».
+
+**Bug 4 partial — Comparison topic eclipse.** «Екеуінің айырмасы қандай?» picked «екеуі» as topic. Now blocked via NOT_A_TOPIC; falls to clarify. Full comparison support (template family + comparison logic) still scoped to v4.74+.
+
+### Deferred per Codex round-2
+
+- Bug 1 (follow-up just repeats prior fact) — needs procedural intents + procedural answers, not just topic resolution. Scoped to v4.73.5+ procedural work.
+- Bug 2 (no procedural tutor) — `solve_equation` / `check_answer` / `explain_steps` solvers + intents. Major v4.74 scope.
+- Bug 3 (where/why/compare weak) — needs deeper world_core (specific where-facts, causal explanations, comparison templates).
+- Bug 8 (code-switch / Latin compounds) — separate localization release.
+
+### Acceptance
+
+| Bug | v4.73.0 | v4.73.5 |
+|---|---|---|
+| Қазақстанның астанасы қай қала? | «Мен Қазақстан елімде» (false self-identity) | ✅ surfaces geo_kz_115 «астанасы — Астана» |
+| Қара тесік Қазақстанда қай қалада орналасқан? | «Мен Қазақстан елімде» | ✅ honest «тексере алмаймын» (no false claim) |
+| Сіз қай қаладансыз? | (system identity) | ✅ still works (system identity preserved when user-marker present) |
+| Мысал келтіріңіз | unrelated Шымкент quote | ✅ clarify_no_topic |
+| Нәтижесі қанша? | unrelated Kiev quote | ✅ clarify_no_topic |
+| Жер жалпақ па? | «табиғи ресурс» | ✅ «шар тәрізді ғаламшар» |
+| Екеуінің айырмасы қандай? | proverb about «екеуі» | ✅ clarify_no_topic |
+
+| Gate | Status |
+|---|---|
+| 100-query battery diff vs v4.73.0 | **0 differences** (zero regression) |
+| Workspace tests | **976 passing** (incl. world_core_multiword_coverage) |
+| Multi-turn anaphora (v4.73.0 fix) | still works |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.73.5` | green |
+
+### Strategic note (Codex hybrid proposal)
+
+Codex's round-2 also raised a substantive architectural proposal: **agglutinative-tokenizer + neural network + FST decoder + retrieval/world-core + verifier hybrid**. Per saved memory `project_kazakh_tutor_positioning.md` the project is positioned as Kazakh school tutor (not LLM replacement), but the hybrid framing is consistent with that: NN for generation flexibility, FST for morphological correctness, world_core for facts, verifier for hallucination control. User signaled support. This is forward-looking architectural direction beyond the bug-fix scope of v4.73.5; analyzed in detail in commit message + chat response, not yet implemented.
+
+### Cadence
+
+`.5` patch — runtime + small data fixes from systematic review.
+
+Stripe — Kazakh school tutor.
+
 ## [4.73.0] — 2026-05-06 — Multi-turn anaphora fix — block StatementOfLocation false-positive on pronouns + extend bare-interrogative follow-up resolution
 
 Driven by Codex 2026-05-06 review (forwarded by user). Codex identified strategic positioning + 6 systemic gaps. This release closes the most critical: the multi-turn tutor loop. Strategic positioning memory saved as `project_kazakh_tutor_positioning.md` — project is a Kazakh school tutor, NOT an LLM replacement; 6 Codex recommendations sit on top of multi-turn working.
