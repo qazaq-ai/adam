@@ -781,6 +781,12 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ежелгі өркениет",
     "рим империясы",
     "өнеркәсіптік революция",
+    // **v4.70.0** — Educational portal: literary devices.
+    "әдебиет ұғымы",
+    "әдеби тәсіл",
+    "ұйқас түрі",
+    "шалыс ұйқас",
+    "қара ұйқас",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of

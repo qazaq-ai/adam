@@ -7,6 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.70.0] — 2026-05-06 — Educational portal — Literature: literary devices (metaphor + epithet + simile + hyperbole + personification + allegory + assonance + alliteration + 2 rhyme types)
+
+Per memory directive — pre-flight grep of `kz_literature.jsonl` confirmed coverage of өлең / шумақ / тармақ / ұйқас (as part_of өлең) / ақын / автор / проза / поэзия / 8 жанр types. Literary-device taxonomy (metaphor, epithet, simile, hyperbole, personification, allegory) and sound devices (assonance, alliteration), and rhyme-type subclasses were missing. Extends canonical `kz_literature.jsonl`.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| өлең / шумақ / тармақ / ұйқас (as part_of) / ақын / автор / 8 жанр / проза / поэзия / абзац / тақырып / негізгі ой / кейіпкер / автор / сюжет / оқиға / баяндау / сипаттау / кітап | `kz_literature.jsonl` (lit_019, 029, 043..046, 080..091) | ✓ skip — covered |
+| Әдеби тәсіл concept hub + 8 specific devices | not yet | + add |
+| Ұйқас түрі hub + 2 specific rhyme types (шалыс / қара) | not yet | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/kz_literature.jsonl` (`lit_092…103`):
+
+**Concept hub (1):**
+- lit_092: әдеби тәсіл IsA әдебиет ұғымы — figurative-language tools concept
+
+**Literary devices, all IsA әдеби тәсіл (8):**
+- lit_093: метафора — implicit similarity («уақыт алтын»)
+- lit_094: эпитет — descriptive («алтын күз», «жұмсақ жел»)
+- lit_095: теңеу — explicit comparison via «-дай / -дей / -тай / -тей / іспетті / тәрізді» («айдай сұлу»)
+- lit_096: гипербола — exaggeration («көзімнің жасы өзен болып ақты»)
+- lit_097: кейіптеу — personification («жел сыбырлайды»)
+- lit_098: аллегория — abstract through concrete (түлкі = қулық, кептер = бейбітшілік)
+- lit_099: ассонанс — vowel repetition for melodicity
+- lit_100: аллитерация — consonant repetition for rhythm
+
+**Rhyme types (3):**
+- lit_101: ұйқас түрі IsA әдебиет ұғымы — concept hub
+- lit_102: шалыс ұйқас IsA ұйқас түрі — abab pattern
+- lit_103: қара ұйқас IsA ұйқас түрі — aaaa pattern (Kazakh folk poetry)
+
+**(2) Curriculum-grade Kazakh examples embedded** in 6 of 12 entries — авторская literature uses (Абай, fairy tales, proverbs).
+
+**(3) MULTIWORD_ENTITIES extended** with 5 new compounds (әдебиет ұғымы, әдеби тәсіл, ұйқас түрі, шалыс ұйқас, қара ұйқас).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2440 | **2452** (+12) |
+| world_core facts | 2621 | **2633** (+12) |
+| world_core domains | 52 | **52** unchanged |
+| Derived facts | 29609 | **29649** (+40 = **3.33× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+
+R1_is_a_transitivity 2897 → 2907 (+10, devices cascade through әдеби тәсіл → әдебиет ұғымы); R5_shared_is_a_target 1941 → 1971 (+30 — strong, 8-element literary-devices cluster yields ~28 R5 pairs (8 choose 2) + 1 rhyme-types pair).
+
+### Cadence
+
+`.0` minor — same-domain canonical extension; kz_literature now at 103 entries.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.69.5] — 2026-05-06 — Educational portal — World history foundations (4 historical eras + 4 ancient civilizations + Renaissance + Industrial Revolution)
 
 Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of all `data/world_core/*.jsonl` confirmed `history_kazakhstan.jsonl` is strictly Kazakhstan-scoped (sak tribes, Genghis Khan, Russian protectorate, Soviet/independence eras). Zero coverage of world-historical periodization or non-Kazakh civilizations. Genuinely new canonical scope — created new `world_history.jsonl` domain rather than diluting `history_kazakhstan.jsonl`.
