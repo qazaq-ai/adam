@@ -7,7 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
-## [4.61.5] — 2026-05-07 — 🎯 Educational portal Day 2 #2 — Kazakh 7 cases (септік) + 2500-facts milestone
+## [4.62.0] — 2026-05-06 — Educational portal Day 2 #3 — Kazakh possessive system (тәуелдік) — 7 person/number forms + politeness register
+
+**Day 2 release 3/10.** Full Kazakh possessive system with 7 person/number forms, vowel-harmony suffix variants, and the canonical «кітап» possessive declension. Documents the сыпайылық (politeness register) категория — a hallmark feature of Kazakh grammar.
+
+### Innovations
+
+**(1) 7 possessive entries** in `kazakh_grammar.jsonl` (`gram_poss_001…gram_poss_007`), each `IsA тәуелдік жалғауы`:
+
+| # | Form | Suffixes | Example |
+|---|---|---|---|
+| 1 | **P1Sg** (бірінші жақ жекеше) | -ым / -ім / -м | менің кітабым |
+| 2 | **P2Sg анайы** (informal) | -ың / -ің / -ң | сенің кітабың |
+| 3 | **P2Sg сыпайы** (formal) | -ыңыз / -іңіз / -ңыз / -ңіз | Сіздің кітабыңыз |
+| 4 | **P3** (жекеше + көпше) | -ы / -і / -сы / -сі | оның / олардың кітабы |
+| 5 | **P1Pl** (бірінші жақ көпше) | -ымыз / -іміз / -мыз / -міз | біздің кітабымыз |
+| 6 | **P2Pl анайы** (informal) | -лар + P2Sg | сендердің кітаптарың |
+| 7 | **P2Pl сыпайы** (formal) | -ыңыздар / -іңіздер | Сіздердің кітаптарыңыз |
+
+Each entry: full suffix paradigm with vowel-harmony rules + question patterns + Kazakh usage examples + politeness-register guidance (when to use анайы vs сыпайы).
+
+**(2) Canonical «кітап» possessive declension** (`gram_poss_008`) — full 7-form paradigm in one entry: кітабым / кітабың / кітабыңыз / кітабы / кітабымыз / кітаптарың / кітаптарыңыз. Documents the consonant-voicing alternation (қ → б) under suffix attachment.
+
+**(3) 3 classification bridges**:
+- `gram_poss_bridge_001`: «**тәуелдік жалғауы IsA жалғау**»
+- `gram_poss_bridge_002`: «**тәуелдік IsA грамматикалық категория**»
+- `gram_poss_bridge_003`: «**сыпайылық категориясы IsA грамматикалық категория**» — politeness register as grammatical category
+
+Resulting cascade chain: `<7 possessive forms> → тәуелдік жалғауы → жалғау` + parallel `тәуелдік / сыпайылық категориясы → грамматикалық категория → ұғым`.
+
+**(4) MULTIWORD_ENTITIES extended** with 11 new compound entities: тәуелдік жалғауы, тәуелдік парадигмасы, сыпайылық категориясы, all 7 possessive form names, кітап тәуелдік парадигмасы.
+
+**(5) Curriculum-grade politeness-register documentation** — entry for сыпайылық категориясы explicitly describes when to use анайы (close family, children, peers) vs сыпайы (elders, strangers, professional contexts). This is a hallmark feature of Kazakh grammar that elementary schools teach as part of «тіл әдебі» (language etiquette).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2260 | **2271** (+11) |
+| world_core facts | 2500 | **2511** (+11) |
+| Derived facts | 28435 | **28491** (+56 = **5.1× cascade** — new high!) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.62.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 5.1× cascade reflects 7 possessive siblings under тәуелдік жалғауы hub generating new R5 (shared_is_a_target) pairs, plus the new сыпайылық категориясы node pulling the politeness register into the existing грамматикалық категория hub.
+
+**Cumulative Day 2:** 3 of 10 releases · +33 facts · +91 derived · grammar domain at 33 entries (10 PoS + 12 case + 11 possessive).
+
+### Cadence
+
+`.0` minor — same-domain extension; introduces сыпайылық категориясы as a new sibling of септік / тәуелдік under грамматикалық категория hub.
+
+Stripe (12) — Kazakh educational portal.
+
+## [4.61.5] — 2026-05-06 — 🎯 Educational portal Day 2 #2 — Kazakh 7 cases (септік) + 2500-facts milestone
 
 **Day 2 release 2/10.** Full Kazakh 7-case (септік) system with detailed suffix paradigms, vowel-harmony rules, and the canonical «бала» declension example. **🎯 2500-facts milestone reached.**
 
@@ -63,7 +118,7 @@ The 4× cascade reflects 7 case siblings under септік hub generating 7×6/
 
 Stripe (12) — Kazakh educational portal.
 
-## [4.61.0] — 2026-05-07 — Educational portal Day 2 #1 — Kazakh grammar: full 10-class part-of-speech taxonomy
+## [4.61.0] — 2026-05-06 — Educational portal Day 2 #1 — Kazakh grammar: full 10-class part-of-speech taxonomy
 
 **Day 2 release 1/10. Day 2 STARTS** — Elementary 3-4 + Kazakh language depth. v4.61.0 establishes the full 10-class Kazakh part-of-speech taxonomy with curriculum-grade definitions for each class.
 

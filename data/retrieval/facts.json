@@ -1,5 +1,5 @@
 {
-  "version": "4.61.0",
+  "version": "4.61.5",
   "status": "completed",
   "elapsed_s": 69,
   "packs_completed": 9,
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2500,
+    "facts_total": 2511,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1961,
+      "is_a": 1972,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -62,7 +62,7 @@
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
       "world_core/informatics_basic.jsonl": 40,
-      "world_core/kazakh_grammar.jsonl": 22,
+      "world_core/kazakh_grammar.jsonl": 33,
       "world_core/kinship_extended.jsonl": 20,
       "world_core/kz_literature.jsonl": 96,
       "world_core/language_features.jsonl": 33,
@@ -23976,6 +23976,226 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Жалқы есім — нақты бір затты, адамды, жерді бөлек атау үшін қолданылатын зат есім түрі. Әрқашан бас әріппен жазылады. Мысалдар: Алматы, Абай, Қазақстан, Айгерім, Балхаш."
+    },
+    {
+      "subject": {
+        "surface": "бірінші жақ жекеше тәуелдік",
+        "root": "бірінші жақ жекеше тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірінші жақ жекеше тәуелдік (P1Sg) — заттың меншікті айтушыға (мен) тиесілі екенін білдіреді. Жалғаулары: -ым (жуан, дауыссыздан кейін: кітабым), -ім (жіңішке, дауыссыздан кейін: інім), -м (дауыстыдан кейін: атам). Кімнің? Ненің? деген сұраққа: менің."
+    },
+    {
+      "subject": {
+        "surface": "екінші жақ жекеше анайы тәуелдік",
+        "root": "екінші жақ жекеше анайы тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екінші жақ жекеше анайы тәуелдік (P2Sg informal) — заттың тыңдаушыға (сен) тиесілі екенін бейресми түрде білдіреді. Жалғаулары: -ың (жуан: кітабың), -ің (жіңішке: інің), -ң (дауыстыдан кейін: атаң). Сенің кітабың, сенің інің."
+    },
+    {
+      "subject": {
+        "surface": "екінші жақ жекеше сыпайы тәуелдік",
+        "root": "екінші жақ жекеше сыпайы тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екінші жақ жекеше сыпайы тәуелдік (P2Sg formal) — заттың тыңдаушыға (Сіз) тиесілі екенін сыпайы түрде білдіреді. Жалғаулары: -ыңыз (жуан: кітабыңыз), -іңіз (жіңішке: інііңіз), -ңыз/-ңіз (дауыстыдан кейін: атаңыз). Қазақ дәстүрінде үлкен адамға, бейтаныс адамға қаратып айтылады."
+    },
+    {
+      "subject": {
+        "surface": "үшінші жақ тәуелдік",
+        "root": "үшінші жақ тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үшінші жақ тәуелдік (P3) — заттың үшінші тұлғаға (ол / олар) тиесілі екенін білдіреді. Жалғаулары: -ы (жуан, дауыссыздан кейін: кітабы), -і (жіңішке: іні), -сы (жуан, дауыстыдан кейін: атасы), -сі (жіңішке, дауыстыдан кейін: ағасы). Жекеше және көпше формасы бірдей: оның кітабы / олардың кітабы."
+    },
+    {
+      "subject": {
+        "surface": "бірінші жақ көпше тәуелдік",
+        "root": "бірінші жақ көпше тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірінші жақ көпше тәуелдік (P1Pl) — заттың айтушы мен басқа адамдарға (біз) тиесілі екенін білдіреді. Жалғаулары: -ымыз (жуан: кітабымыз), -іміз (жіңішке: ініміз), -мыз/-міз (дауыстыдан кейін: атамыз). Біздің кітабымыз."
+    },
+    {
+      "subject": {
+        "surface": "екінші жақ көпше анайы тәуелдік",
+        "root": "екінші жақ көпше анайы тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екінші жақ көпше анайы тәуелдік (P2Pl informal) — заттың бірнеше тыңдаушыға (сендер) тиесілі екенін бейресми түрде білдіреді. -лар/-лер көптік жалғауы P2Sg-ке қосылады: кітаптарың, інілерің. Сендердің кітаптарың."
+    },
+    {
+      "subject": {
+        "surface": "екінші жақ көпше сыпайы тәуелдік",
+        "root": "екінші жақ көпше сыпайы тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екінші жақ көпше сыпайы тәуелдік (P2Pl formal) — заттың бірнеше тыңдаушыға (Сіздер) тиесілі екенін сыпайы түрде білдіреді. Жалғаулары: -ыңыздар/-іңіздер. Мысал: Сіздердің кітаптарыңыз, Сіздердің балаңыздар."
+    },
+    {
+      "subject": {
+        "surface": "кітап тәуелдік парадигмасы",
+        "root": "кітап тәуелдік парадигмасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тәуелдік парадигмасы",
+        "root": "тәуелдік парадигмасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "«Кітап» сөзінің тәуелдік парадигмасы: P1Sg — кітабым (менің), P2Sg анайы — кітабың (сенің), P2Sg сыпайы — кітабыңыз (Сіздің), P3 — кітабы (оның/олардың), P1Pl — кітабымыз (біздің), P2Pl анайы — кітаптарың (сендердің), P2Pl сыпайы — кітаптарыңыз (Сіздердің). «Кітап» сөзінде ұяң дауыссыз -б- айдалу заңы (қ→б)."
+    },
+    {
+      "subject": {
+        "surface": "тәуелдік жалғауы",
+        "root": "тәуелдік жалғауы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жалғау",
+        "root": "жалғау",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәуелдік жалғауы — заттың тиесілілігін көрсететін грамматикалық аффикс. Қазақ тілінде жеті түрі бар: P1Sg, P2Sg анайы, P2Sg сыпайы, P3 (жекеше/көпше ортақ), P1Pl, P2Pl анайы, P2Pl сыпайы."
+    },
+    {
+      "subject": {
+        "surface": "тәуелдік",
+        "root": "тәуелдік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_bridge_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тәуелдік — заттың айтушы (мен), тыңдаушы (сен / Сіз) немесе үшінші тұлғаға (ол / олар) тиесілі екенін көрсететін грамматикалық категория. Қазақ тілінің көрнекті ерекшеліктерінің бірі — сыпайы (Сіз) және анайы (сен) формаларды ажырату."
+    },
+    {
+      "subject": {
+        "surface": "сыпайылық категориясы",
+        "root": "сыпайылық категориясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_poss_bridge_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақ тіліндегі сыпайылық категориясы — қарым-қатынастағы құрмет дәрежесін грамматикалық тұрғыдан көрсетеді. Анайы (сен) — жақын адаммен, балаға, теңіне; сыпайы (Сіз) — үлкен адамға, бейтаныс кісіге, жоғары лауазым иесіне."
     },
     {
       "subject": {
