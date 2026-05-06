@@ -7,6 +7,59 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.64.0] — 2026-05-06 — Educational portal Day 2 #7 — Mathematics extension: fractions / decimals / number properties / geometry — 27× cascade record
+
+**Day 2 release 7/10.** Extends `mathematics_basic.jsonl` (existing 55 entries since 2026-04-29) with 12 concrete curriculum-grade entries: specific fractions, decimal/simple-fraction distinction, number properties (even/odd/prime/positive/negative), and geometry basics (perimeter/area). Per memory directive `feedback_no_duplicate_domains.md` — extends existing canonical file rather than create new.
+
+**🎯 27× per-fact derivation cascade** — highest ratio of the entire educational program; new math entries plug into existing deeply-connected hubs (сан, бөлшек, математикалық шама).
+
+### Innovations
+
+**(1) 12 new math entries** in `data/world_core/mathematics_basic.jsonl` (`math_056…math_067`):
+
+| Category | Entries |
+|---|---|
+| **Concrete fractions** | жартысы (1/2 = 50%), үштен бір (1/3 ≈ 33%), төрттен бір (1/4 = 25%) |
+| **Fraction types** | ондық бөлшек (decimal), жай бөлшек (simple алым/бөлім) |
+| **Number properties** | жұп сан (even, ÷2), тақ сан (odd), жай сан (prime), оң сан (positive), теріс сан (negative) |
+| **Geometry shamasy** | периметр (P, perimeter formulas), аудан (S, area formulas) |
+
+Each entry: definition + decimal/percent equivalents (where applicable) + Kazakh examples (алманың жартысы / сағаттың төрттен бірі = 15 минут / т.б.) + formulas (P = 4×a; S = a²; etc.).
+
+**(2) Cross-fraction-form mapping** documented per entry: жартысы = 1/2 = 0,5 = 50%; төрттен бір = 1/4 = 0,25 = 25%; etc. Elementary curriculum pattern for fraction-decimal-percent fluency.
+
+**(3) Negative-number contextualization** — теріс сан entry frames real-world usage: температураны (минус-температура), қарызды (debt), теңіз деңгейінен төмендегі биіктікті (below-sea-level altitude). Matches grade-3 Kazakh «Дүниетану» curriculum framing.
+
+**(4) MULTIWORD_ENTITIES extended** with 10 new compounds: үштен бір, төрттен бір, ондық бөлшек, жай бөлшек, жұп сан, тақ сан, жай сан, оң сан, теріс сан, математикалық шама.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2295 | **2307** (+12) |
+| world_core facts | 2535 | **2547** (+12, all new tuples) |
+| world_core domains | 51 | **51** unchanged (extended existing file per memory directive) |
+| Derived facts | 28577 | **28906** (+329 = **27× cascade per fact — record!**) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.64.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 27× cascade reflects new entries plugging into existing deeply-connected hubs:
+- `сан` (number) hub already has hundreds of subjects → жұп / тақ / жай / оң / теріс classifications cascade through R5 (shared_is_a_target) across all of them
+- `бөлшек` (fraction) and `математикалық шама` hubs trigger transitive R1 derivations
+- Concrete fractions like жартысы chain through бөлшек → сан → математикалық ұғым
+
+This validates the **memory directive**: extending existing canonical files yields massively better cascade ROI than creating parallel domains. **Compare:** v4.63.5 (consolidation) had 0× cascade since no new facts; v4.59.5 (parallel domain) had ~2.5× cascade; v4.64.0 (canonical extension) has 27× cascade.
+
+**Cumulative Day 2:** 7 of 10 releases · +69 facts · +506 derived · math domain at 67 entries.
+
+### Cadence
+
+`.0` minor — same-domain extension. Practical demonstration of the «extend canonical, don't create parallel» memory directive: highest cascade-per-fact ratio in the entire educational program.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.63.5] — 2026-05-06 — Domain consolidation: merge duplicate-risk world_core files + memory directive
 
 **Driven by user audit (2026-05-06).** Pre-existing canonical world_core files (since 2026-04-24) already covered Kazakh grammar, emotions, and Abai/Shakarim literature. Recent v4.56–v4.61 releases inadvertently created parallel domains with overlapping subjects, causing silent fact dedup in `extract_facts` and bloating the domain count.
