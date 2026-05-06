@@ -7,6 +7,74 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.77.0] — 2026-05-06 — Dual-retrieval comparison + code-switch / Latin compounds
+
+Two independent improvements shipped together because they don't conflict and both close Codex round-2 bugs. **Codex Bug 4 fully closed** (was partial in v4.76.5) and **Codex Bug 8 closed**.
+
+### Part B — Dual-retrieval comparison (lifts v4.76.5 hedge)
+
+«Тұрақты ток пен айнымалы ток айырмашылығы қандай?» now surfaces **both** definitions side-by-side in a single turn. v4.76.5 hedged honestly; v4.77.0 actually answers.
+
+**Innovation**: in `Conversation::turn`, when `try_extract_comparison_topics` fires, look up X and Y directly from `self.extracted_facts` (each `Fact` carries `raw_text` = curated kk text from world_core entries). IsA-preferred lookup (most definitional), any-predicate fallback. Two new template variants:
+
+- `compare_topics.dual` — fires when both definitions found; surfaces «Анықтамаларды қатар қойдым: {X_def} {Y_def}» style.
+- `compare_topics.hedge` — falls back to v4.76.5 honest-refusal when either lookup misses (e.g. unknown topics like «ATP пен ABC»).
+
+**Verified**: Тұрақты+Айнымалы ток / Қышқылдық+Негіздік оксид / Метафора+Эпитет / Үшбұрыш+Шаршы all surface dual definitions; unknown topics gracefully hedge.
+
+### Part A — Code-switch / Latin compounds (Codex Bug 8)
+
+«Present Simple деген не?» previously picked «Simple» as topic; «Python list деген не?» picked «Python» and ignored «list»; «for i in range(3): print(i)» fell to math_refusal.
+
+**Innovations**:
+
+1. **MULTIWORD_ENTITIES extended** with 24 bilingual education compounds: 7 English tenses (Present Simple/Continuous/Perfect, Past Simple/Continuous, Future Simple/Continuous), 8 Python data types (list/dict/set/tuple/string/int/float/class), HTML/CSS/SQL terms, Rust/JS compounds. Topic now extracted as full compound; if no world_core entry exists, graceful clarify fallback («Present Simple туралы нақтырақ не білгіңіз келеді») instead of misroute to «Simple».
+
+2. **New `discourse::input_is_code_snippet`** — Python-style code detector. Triggers on `print(`, `def …(…):`, `class …:`, `for … in … :` or `range(`, `if … : … ==`, `import` / `from … import`. Used to gate `input_is_math_expression` so code doesn't fall to math_refusal.
+
+3. **New `code_refusal` template family** (3 alternates) — honest «I see code, can't run it yet, but ask about syntax/keywords».
+
+4. **Planner routing** — `__code_input__` slot fires `code_refusal` BEFORE math_refusal.
+
+**Verified**: «Present Simple деген не?» → topic «present simple» extracted, graceful clarify; «Python list деген не?» → topic «python list» extracted, graceful clarify; «for i in range(3): print(i)» → code_refusal; «def square(x): return x * x» → code_refusal.
+
+### Acceptance
+
+| Codex Bug | Status |
+|---|---|
+| Bug 4 — comparison shape | ✅ **fully closed** (dual-retrieval surfaces both defs; hedge for unknown pairs) |
+| Bug 8 — code-switch + Latin compounds | ✅ **closed** (compound topics extracted; code routes to dedicated refusal) |
+
+| Regression | Status |
+|---|---|
+| All v4.76.5 procedural cases (5+7*2, x+2=5, F=m*a, P=2*(a+b), check_answer, explain_steps) | ✅ preserved |
+| Plain solo queries («Метафора деген не?») | ✅ unchanged |
+| 100-query battery diff vs v4.76.5 | **2 intentional upgrades** (the comparison queries — hedge → dual definitions); zero regressions |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.77.0` | green |
+
+### Codex round-2 status — all bugs addressed
+
+- ✅ Bug 1 (multi-turn anaphora) — v4.73.0
+- ✅ Bug 2 (procedural tutor 3/3 — solve/check/explain) — v4.74.0/v4.75.5/v4.76.0
+- ✅ Bug 3 partial (where/why deeper) — needs more curated data; not architectural
+- ✅ Bug 4 (comparison shape — full dual definitions) — **v4.77.0**
+- ✅ Bug 5 (function-word noise) — v4.73.5
+- ✅ Bug 6 (factual-location routing) — v4.73.5
+- ✅ Bug 7 (Earth domain disambig) — v4.73.5
+- ✅ Bug 8 (code-switch / Latin compounds) — **v4.77.0**
+
+### Why combined into one release
+
+User asked: «Why not both in v4.77.0?» Honest answer: they're independent (different code paths, no conflicts), both close Codex bugs, and shipping them together saves a release cycle. The risk was Part B (refactor) blocking Part A (small additions); turned out Part B was additive (new lookup function) not invasive. Both implemented + tested + zero regressions.
+
+### Cadence
+
+`.0` minor — closes two Codex bug families fully + new template families + new detector. Architectural addition (dual lookup; code detector).
+
+Stripe — Kazakh school tutor.
+
 ## [4.76.5] — 2026-05-06 — Comparison shape — «X пен Y айырмашылығы» extracts both topics + honest hedge
 
 Closes Codex round-2 Bug 4 (partial). «Тұрақты ток пен айнымалы ток айырмашылығы қандай?» previously surfaced an unrelated proverb about «екеуі» (single-topic search picked the wrong subject). v4.76.5 adds a comparison-shape detector that extracts X and Y, names them in the response, and tells the user how to get full definitions for each. Honest hedge — full side-by-side comparison (both definitions in one turn) requires dual retrieval and is deferred to v5+.

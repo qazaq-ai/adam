@@ -757,7 +757,13 @@ impl Conversation {
         // requires a clear math shape (operator near digits OR
         // math verb + numeric tokens) — pure mentions of numbers
         // («Қазақстанда 17 облыс бар») don't trigger.
-        let math_input = crate::discourse::input_is_math_expression(input);
+        // **v4.77.0** — code-snippet detection (Codex round-2 Bug 8).
+        // Detect Python-style code BEFORE math classification so
+        // «for i in range(3): print(i)» doesn't fall to math_refusal.
+        // Routes to dedicated `code_refusal` template via
+        // `__code_input__` slot.
+        let code_input = crate::discourse::input_is_code_snippet(input);
+        let math_input = !code_input && crate::discourse::input_is_math_expression(input);
 
         // **v4.2.0** — tool-loop orchestration replaces the v4.0.37
         // `inject_*` helpers + audit block with a single uniform
@@ -1053,6 +1059,14 @@ impl Conversation {
         if russian_input {
             extra_slots.insert("__non_kazakh__".into(), "1".into());
         }
+        // **v4.77.0** — Code-snippet marker (Codex round-2 Bug 8).
+        // Routes to dedicated `code_refusal` template family explaining
+        // adam recognised code but doesn't execute it yet. Closes the
+        // false-positive where «for i in range(3): print(i)» fell to
+        // math_refusal.
+        if code_input {
+            extra_slots.insert("__code_input__".into(), "1".into());
+        }
         // v4.6.12 — Math-input marker (set above based on
         // `input_is_math_expression`). Carried into the planner
         // so the `math_refusal` template family fires.
@@ -1236,13 +1250,14 @@ impl Conversation {
         {
             extra_slots.insert("__explain_steps__".into(), steps_text);
         }
-        // **v4.76.5** — comparison-shape slot setup. When
-        // try_extract_comparison_topics fired earlier (at line ~575),
-        // surface both topics as slots so the comparison template
-        // family can render «X — definition. Сіз сонымен қатар Y
-        // туралы сұрадыңыз — оны жеке сұрап алыңыз». Skip if a math
-        // answer or check_answer/explain_steps already fired (those
-        // are stronger signals).
+        // **v4.76.5 / v4.77.0** — comparison-shape slot setup with
+        // **v4.77.0 dual retrieval**. When try_extract_comparison_topics
+        // fired earlier (line ~575), look up X's and Y's definitions
+        // directly from `self.extracted_facts` (each Fact carries the
+        // curated `raw_text` from world_core entries). Surface both
+        // definitions in the comparison template so the user gets a
+        // proper side-by-side answer instead of the v4.76.5 hedge.
+        // Skip if a stronger signal already fired (math/check/explain).
         if let Some((ref x_topic, ref y_topic)) = comparison_topics
             && !extra_slots.contains_key("__math_answer__")
             && !extra_slots.contains_key("__check_answer_correct__")
@@ -1250,6 +1265,32 @@ impl Conversation {
         {
             extra_slots.insert("__compare_x__".into(), x_topic.clone());
             extra_slots.insert("__compare_y__".into(), y_topic.clone());
+            // **v4.77.0** — dual lookup. Search extracted_facts for the
+            // first IsA fact about each topic; take raw_text as the
+            // definition. IsA preferred (most definitional); any
+            // predicate accepted as fallback. Lowercased root match.
+            let lookup = |needle: &str| -> Option<String> {
+                let needle_lower = needle.to_lowercase();
+                // Pass 1: prefer IsA facts (most definitional)
+                let by_isa = self.extracted_facts.iter().find(|f| {
+                    f.subject.root.to_lowercase() == needle_lower
+                        && matches!(f.predicate, adam_reasoning::Predicate::IsA)
+                });
+                if let Some(f) = by_isa {
+                    return Some(f.raw_text.clone());
+                }
+                // Pass 2: any predicate
+                self.extracted_facts
+                    .iter()
+                    .find(|f| f.subject.root.to_lowercase() == needle_lower)
+                    .map(|f| f.raw_text.clone())
+            };
+            if let Some(x_def) = lookup(x_topic) {
+                extra_slots.insert("__compare_x_def__".into(), x_def);
+            }
+            if let Some(y_def) = lookup(y_topic) {
+                extra_slots.insert("__compare_y_def__".into(), y_def);
+            }
         }
         let plan = crate::planner::plan_response_with_epistemic(
             &intent_for_render,

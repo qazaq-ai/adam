@@ -243,16 +243,26 @@ pub fn plan_response_with_epistemic(
     // «5+5» refused via `math_refusal` — adam now ANSWERS the
     // arithmetic deterministically (no novel-text generation;
     // `try_evaluate_arithmetic` is a pure function).
-    // **v4.76.5** — compare_topics routing. Conversation::turn
-    // populates `__compare_x__` and `__compare_y__` slots when the
-    // input matched the «X пен Y айырмашылығы» pattern. Routes to
-    // `compare_topics` template family. Mutually exclusive with
-    // math/check_answer/explain_steps in practice (gated upstream).
+    // **v4.76.5 / v4.77.0** — compare_topics routing. Conversation::turn
+    // populates `__compare_x__` + `__compare_y__` slots when the input
+    // matched «X пен Y айырмашылығы». **v4.77.0** — dual-retrieval
+    // also populates `__compare_x_def__` / `__compare_y_def__` when
+    // both definitions found in extracted_facts. Picks
+    // `compare_topics.dual` (full side-by-side) when both defs
+    // present, else falls back to `compare_topics.hedge` (honest
+    // refusal naming both topics). Mutually exclusive with
+    // math/check_answer/explain_steps (gated upstream).
     if let (Some(x), Some(y)) = (
         extra_slots.get("__compare_x__"),
         extra_slots.get("__compare_y__"),
     ) {
-        let key = "compare_topics";
+        let x_def = extra_slots.get("__compare_x_def__");
+        let y_def = extra_slots.get("__compare_y_def__");
+        let key = if x_def.is_some() && y_def.is_some() {
+            "compare_topics.dual"
+        } else {
+            "compare_topics.hedge"
+        };
         if !repo.get(key).is_empty() {
             trace.push(format!("planner: compare_topics override → {key}"));
             let applicable_all = repo.get(key);
@@ -272,6 +282,12 @@ pub fn plan_response_with_epistemic(
             }
             slots.insert("compare_x".into(), x.clone());
             slots.insert("compare_y".into(), y.clone());
+            if let Some(d) = x_def {
+                slots.insert("compare_x_def".into(), d.clone());
+            }
+            if let Some(d) = y_def {
+                slots.insert("compare_y_def".into(), d.clone());
+            }
             return ResponsePlan {
                 literal: chosen,
                 slots,
@@ -389,6 +405,36 @@ pub fn plan_response_with_epistemic(
                 .map(|w| format!(" ({w})"))
                 .unwrap_or_default();
             slots.insert("math_words".into(), math_words_slot);
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    // **v4.77.0** — code-snippet refusal. Routes to dedicated
+    // `code_refusal` family BEFORE math_refusal so Python-style
+    // code «for i in range(3): print(i)» doesn't fall to «can't
+    // compute arithmetic».
+    if extra_slots.contains_key("__code_input__") {
+        let key = "code_refusal";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: code_refusal override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
             return ResponsePlan {
                 literal: chosen,
                 slots,

@@ -338,6 +338,40 @@ mod russian_tests {
 /// numerics like «17» (e.g. asking about Kazakhstan's 17 oblasts)
 /// don't fire because they're not paired with operators or math
 /// verbs.
+/// **v4.77.0** — Code-snippet detector (Codex round-2 Bug 8). Returns
+/// true when input matches Python-style code: «for i in range(3):
+/// print(i)» / «def foo(x):» / «class Bar:» etc. Conservative —
+/// requires a clear code keyword + structural marker (parens or
+/// colon-EOL). Used to gate `input_is_math_expression` so code
+/// snippets don't fall to math_refusal («can't compute arithmetic»)
+/// — they get a dedicated `code_refusal` template family that
+/// honestly says adam doesn't run code yet.
+pub fn input_is_code_snippet(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    if lower.contains("print(") {
+        return true;
+    }
+    if lower.contains("def ") && lower.contains("(") && lower.contains(":") {
+        return true;
+    }
+    if lower.contains("class ") && lower.contains(":") {
+        return true;
+    }
+    if lower.contains("for ")
+        && lower.contains(" in ")
+        && (lower.contains(":") || lower.contains("range("))
+    {
+        return true;
+    }
+    if lower.contains("if ") && lower.contains(":") && lower.contains("==") {
+        return true;
+    }
+    if lower.contains("import ") || lower.contains("from ") && lower.contains(" import ") {
+        return true;
+    }
+    false
+}
+
 pub fn input_is_math_expression(input: &str) -> bool {
     let lower = input.to_lowercase();
     // Signal 1: arithmetic operator surrounded by digit context.

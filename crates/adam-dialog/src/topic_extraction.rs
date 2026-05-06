@@ -978,6 +978,47 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // **v4.73.5** — astro_048 «Жер жалпақ емес» entry; new
     // sub-class object for the planet-priority fact.
     "шар тәрізді ғаламшар",
+    // **v4.77.0** — code-switch / bilingual education compounds
+    // (Codex round-2 Bug 8). Common Latin / English curriculum
+    // terms that adam users naturally type bilingually:
+    // «Present Simple деген не?» pre-v4.77.0 picked «Simple» as
+    // topic and ignored «Present». «Python list деген не?» picked
+    // «Python» and ignored «list». Adding these multi-word entries
+    // lets the substring scan catch the full compound BEFORE the
+    // FST first-noun fallback.
+    //
+    // Note: world_core entries for these topics are not yet
+    // curated, so the topic is correctly extracted but retrieval
+    // surfaces no fact (graceful clarify fallback). Honest «I don't
+    // have full info on Present Simple yet» beats the prior
+    // «here's about Simple» misroute.
+    "present simple",
+    "present continuous",
+    "present perfect",
+    "past simple",
+    "past continuous",
+    "future simple",
+    "future continuous",
+    "python list",
+    "python dict",
+    "python set",
+    "python tuple",
+    "python string",
+    "python int",
+    "python float",
+    "python class",
+    "python function",
+    "html tag",
+    "html element",
+    "css rule",
+    "css selector",
+    "sql query",
+    "sql table",
+    "rust struct",
+    "rust enum",
+    "rust trait",
+    "javascript function",
+    "javascript array",
     // **v4.72.5** — single-word loanword shamas / quantities missed
     // in v4.71.5. Surfaced by REPL battery «Диаметр қалай
     // есептеледі?» / «Радиус қалай есептеледі?» — these queries
