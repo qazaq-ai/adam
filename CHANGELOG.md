@@ -7,6 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.61.5] — 2026-05-07 — 🎯 Educational portal Day 2 #2 — Kazakh 7 cases (септік) + 2500-facts milestone
+
+**Day 2 release 2/10.** Full Kazakh 7-case (септік) system with detailed suffix paradigms, vowel-harmony rules, and the canonical «бала» declension example. **🎯 2500-facts milestone reached.**
+
+### Innovations
+
+**(1) 7 case entries** in `kazakh_grammar.jsonl` (`gram_case_001…gram_case_007`), each `IsA септік`:
+
+| # | Case | Suffixes | Question |
+|---|---|---|---|
+| 1 | **атау септік** (Nominative) | — (zero) | кім? не? |
+| 2 | **ілік септік** (Genitive) | -ның/-нің / -дың/-дің / -тың/-тің | кімнің? ненің? |
+| 3 | **барыс септік** (Dative) | -ға/-ге / -қа/-ке / -на/-не | кімге? неге? қайда? |
+| 4 | **табыс септік** (Accusative) | -ды/-ді / -ны/-ні / -ты/-ті | кімді? нені? |
+| 5 | **жатыс септік** (Locative) | -да/-де / -та/-те / -нда/-нде | кімде? неде? қайда? қашан? |
+| 6 | **шығыс септік** (Ablative) | -дан/-ден / -тан/-тен / -нан/-нен | кімнен? неден? қайдан? |
+| 7 | **көмектес септік** (Instrumental) | -мен / -пен / -бен | кіммен? немен? |
+
+Each entry covers: definition + full suffix paradigm with vowel-harmony rules + question patterns + Kazakh usage example.
+
+**(2) Canonical «бала» declension** (`gram_case_008`) — full 7-case paradigm in one entry: бала / баланың / балаға / баланы / балада / баладан / баламен. Models the «classical Kazakh declension paradigm».
+
+**(3) 3 classification bridges**:
+- `gram_case_bridge_001`: «**септік IsA грамматикалық категория**» — case is grammatical category
+- `gram_case_bridge_002`: «**грамматикалық категория IsA ұғым**» — grammatical category is concept
+- `gram_case_bridge_003`: «**септік жалғауы IsA жалғау**» — case affix is affix
+
+Resulting cascade chain: `<7 cases> → септік → грамматикалық категория → ұғым` (3-hop chain) + «септік жалғауы → жалғау» (parallel branch for affix taxonomy).
+
+**(4) MULTIWORD_ENTITIES extended** with 11 new compound entities: 7 case names + септік жалғауы + септік парадигмасы + грамматикалық категория + бала септік парадигмасы.
+
+**(5) Curriculum-grade vowel-harmony rules** documented per case — describes when each suffix variant applies based on the preceding sound (vowel / soft consonant / hard consonant / nasal). This is the elementary-grade Kazakh-language curriculum content for grades 3-4.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2249 | **2260** (+11) |
+| world_core facts | 2489 | **2500** 🎯 (+11, milestone) |
+| world_core domains | 53 | **53** unchanged |
+| Derived facts | 28391 | **28435** (+44 = **4× cascade** — 7 case siblings under септік hub trigger R5 explosion) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.61.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 4× cascade reflects 7 case siblings under септік hub generating 7×6/2 = 21 new R5 (shared_is_a_target) pairs, plus transitive derivations through грамматикалық категория → ұғым.
+
+**Cumulative Day 2:** 2 of 10 releases · +22 facts · +35 derived · grammar domain at 22 entries (10 PoS + 12 case-related).
+
+### Cadence
+
+`.5` patch — same-domain extension. The 7-case system is the curriculum-aligned elementary-grade Kazakh language content; future releases extend with possessive system, tenses, etc.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.61.0] — 2026-05-07 — Educational portal Day 2 #1 — Kazakh grammar: full 10-class part-of-speech taxonomy
 
 **Day 2 release 1/10. Day 2 STARTS** — Elementary 3-4 + Kazakh language depth. v4.61.0 establishes the full 10-class Kazakh part-of-speech taxonomy with curriculum-grade definitions for each class.
