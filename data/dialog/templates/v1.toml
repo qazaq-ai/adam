@@ -564,6 +564,21 @@ templates = [
     "Процесі: {explain_steps}",
 ]
 
+# **v4.76.5** — comparison shape. User asks «X пен Y айырмашылығы
+# қандай?». Conversation::turn extracts X and Y, sets X as primary
+# topic (so retrieval surfaces X's grounded_fact via {fact}), and
+# names Y separately for follow-up. Honest hedge: full side-by-side
+# comparison (both definitions in one turn) requires dual retrieval
+# and is deferred to v5+. Templates surface X's definition via
+# {fact} and prompt the user to query Y separately.
+[[families]]
+key = "compare_topics"
+templates = [
+    "{compare_x} мен {compare_y} екеуі — жеке-жеке талдауға тұратын ұғымдар. Айырмашылықты толық көру үшін: алдымен «{compare_x} деген не?», содан кейін «{compare_y} деген не?» сұрап анықтамаларын салыстыруға болады.",
+    "{compare_x} пен {compare_y} анықтамаларын жеке сұрау арқылы салыстыру оңайырақ болады. «{compare_x} деген не?» және «{compare_y} деген не?» — әрқайсысы туралы дереу мәлімет беремін.",
+    "{compare_x} мен {compare_y} екеуі де танылады, бірақ оларды бір жауапта қатар салыстырып бере алмаймын. {compare_x} жайлы немесе {compare_y} жайлы жеке сұраңыз — толық анықтамасын беремін.",
+]
+
 # v4.4.0 — User opted out of resolving a pending contradiction
 # (replied "neither / I don't know / skip" to a CheckContradiction
 # prompt). `Conversation::try_dismiss_pending_contradiction` has

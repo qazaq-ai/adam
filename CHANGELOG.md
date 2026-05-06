@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.76.5] — 2026-05-06 — Comparison shape — «X пен Y айырмашылығы» extracts both topics + honest hedge
+
+Closes Codex round-2 Bug 4 (partial). «Тұрақты ток пен айнымалы ток айырмашылығы қандай?» previously surfaced an unrelated proverb about «екеуі» (single-topic search picked the wrong subject). v4.76.5 adds a comparison-shape detector that extracts X and Y, names them in the response, and tells the user how to get full definitions for each. Honest hedge — full side-by-side comparison (both definitions in one turn) requires dual retrieval and is deferred to v5+.
+
+### Innovations
+
+**(1) New `discourse::try_extract_comparison_topics`** — pattern detector. Returns `Some((x, y))` when input contains:
+- A comparison marker: `айырмашылығы` / `айырмашылық` / `ерекшелігі` / `несімен өзгеше` / `несімен ерекшеленеді` / `қалай ерекшеленеді` / `қандай айырма` / `салыстыр`
+- A « пен » or « мен » connector splitting the input into two topics
+
+Conservative: only the bare «X пен Y» / «X мен Y» connector pattern is supported; ablative «X-дан Y несімен өзгеше?» pattern requires FST analysis and is deferred.
+
+**(2) Topic override in Conversation::turn** — when comparison detector fires, X is set as the primary `noun_hint` (existing retrieval pipeline finds X's facts) and Y is carried in `__compare_y__` slot.
+
+**(3) New template family `compare_topics`** (3 alternates) — names both X and Y, suggests user query each separately for full definition. Honest about not being able to surface both definitions in one turn yet.
+
+**(4) Planner routing** — `__compare_x__` + `__compare_y__` slots route to `compare_topics` family BEFORE explain_steps / check_answer / math_answer. Mutually exclusive with those in practice (gated upstream).
+
+### Acceptance
+
+| Comparison query | v4.76.0 | v4.76.5 |
+|---|---|---|
+| Тұрақты ток пен айнымалы ток айырмашылығы қандай? | surfaces only «Тұрақты ток — DC» (partial) | ✅ «Тұрақты ток мен айнымалы ток екеуі де танылады, бірақ … тұрақты ток жайлы немесе айнымалы ток жайлы жеке сұраңыз» |
+| Қышқылдық оксид пен негіздік оксид айырмашылығы қандай? | surfaces only қышқылдық оксид (partial) | ✅ names both, suggests separate queries |
+| Метафора мен эпитет айырмашылығы неде? | refuses or partial | ✅ names both correctly |
+
+| Regression | Status |
+|---|---|
+| Plain solo queries («Тұрақты ток деген не?», «Метафора деген не?») | ✅ unchanged — return full definitions |
+| All v4.76.0 procedural cases (5+7*2, x+2=5, F=m*a, P=2*(a+b)) | ✅ preserved |
+| explain_steps multi-turn | ✅ preserved |
+| check_answer multi-turn | ✅ preserved |
+| 100-query battery diff vs v4.76.0 | **2 intentional changes** (the two «X пен Y айырмашылығы» queries — improvements, not regressions) |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.76.5` | green |
+
+### Deferred
+
+- **Full side-by-side comparison** — requires dual retrieval (lookup facts for X and Y in same turn, surface both definitions). Scoped to v5+ when retrieval refactor lands.
+- **Ablative comparison form** — «X-дан Y несімен өзгеше?» requires FST case analysis, not surface-string matching.
+- **Three-way comparisons** («X, Y и Z айырмашылықтары») — out of scope; vast majority of Kazakh school comparisons are pairwise.
+
+### Cadence
+
+`.5` patch — new intent + template family. No architectural changes; deterministic runtime addition.
+
+Stripe — Kazakh school tutor.
+
 ## [4.76.0] — 2026-05-06 — `explain_steps` intent — narrate the solution procedure («Қалай шештің?»)
 
 Closes Codex round-2 Bug 2 family **fully** (3 of 3): `solve_equation` (v4.74.0), `check_answer` (v4.75.5), and now `explain_steps`. After a successful equation/formula solve, user can ask «Қалай шештің?» / «Процесін көрсет» / «Қадам-қадаммен түсіндір» — system surfaces a step-by-step narrative built deterministically by the solver at solve time.

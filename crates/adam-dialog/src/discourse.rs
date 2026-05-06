@@ -940,6 +940,75 @@ pub fn try_check_answer(
     Some((user_var, user_value, correct))
 }
 
+/// **v4.76.5** — Comparison-topics extractor. Detects «X пен Y
+/// айырмашылығы қандай?» / «X-мен Y-нің айырмашылығы» and similar
+/// comparison patterns; extracts X and Y as topic strings. Returns
+/// `Some((x, y))` when a valid 2-topic comparison shape is found.
+///
+/// Conservative: only the bare «X пен Y» / «X мен Y» connector
+/// pattern is supported. Ablative «X-дан Y несімен өзгеше?» pattern
+/// is harder to parse without FST analysis and is deferred.
+///
+/// Closes Codex round-2 Bug 4 partial: «Тұрақты ток пен айнымалы ток
+/// айырмашылығы қандай?» previously surfaced an unrelated proverb
+/// about «екеуі» — now extracts the two topics correctly so the
+/// planner can route to a comparison template that surfaces X's
+/// definition and prompts the user to query Y separately for the
+/// full pair. Full side-by-side comparison (both definitions in one
+/// turn) is deferred to v5+ when dual retrieval lands.
+pub fn try_extract_comparison_topics(input: &str) -> Option<(String, String)> {
+    let lower = input.to_lowercase();
+    let has_comparison_marker = lower.contains("айырмашылығы")
+        || lower.contains("айырмашылық")
+        || lower.contains("ерекшелігі")
+        || lower.contains("несімен өзгеше")
+        || lower.contains("несімен ерекшеленеді")
+        || lower.contains("қалай ерекшеленеді")
+        || lower.contains("қандай айырма")
+        || lower.contains("салыстыр");
+    if !has_comparison_marker {
+        return None;
+    }
+    // Try «X пен Y» / «X мен Y» connector. Token-level match: the
+    // connector word must be a separate token, not a substring inside
+    // a longer word.
+    const COMPARISON_TAILS: &[&str] = &[
+        "айырмашылығы",
+        "айырмашылық",
+        "ерекшелігі",
+        "несімен",
+        "қалай",
+        "қандай",
+        "салыстыр",
+    ];
+    for connector in [" пен ", " мен "] {
+        let Some(pos) = lower.find(connector) else {
+            continue;
+        };
+        let lhs = lower[..pos].trim().to_string();
+        let after = &lower[pos + connector.len()..];
+        // Y ends at the first comparison-marker word.
+        let y_end = COMPARISON_TAILS
+            .iter()
+            .filter_map(|m| after.find(m))
+            .min()
+            .unwrap_or(after.len());
+        let rhs = after[..y_end].trim().to_string();
+        if lhs.is_empty() || rhs.is_empty() || lhs == rhs {
+            continue;
+        }
+        // Strip leading discourse particles from X if present.
+        let mut x = lhs.as_str();
+        for prefix in ["егер ", "бір "] {
+            if let Some(stripped) = x.strip_prefix(prefix) {
+                x = stripped;
+            }
+        }
+        return Some((x.trim().to_string(), rhs));
+    }
+    None
+}
+
 /// **v4.76.0** — Explain-steps handler. Detects «қалай шештің / есепті
 /// қалай шеш / процесін көрсет / қадам-қадаммен / түсіндір» pattern in
 /// a follow-up turn after a successful equation/formula solve. Returns

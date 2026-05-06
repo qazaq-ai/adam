@@ -243,6 +243,42 @@ pub fn plan_response_with_epistemic(
     // «5+5» refused via `math_refusal` — adam now ANSWERS the
     // arithmetic deterministically (no novel-text generation;
     // `try_evaluate_arithmetic` is a pure function).
+    // **v4.76.5** — compare_topics routing. Conversation::turn
+    // populates `__compare_x__` and `__compare_y__` slots when the
+    // input matched the «X пен Y айырмашылығы» pattern. Routes to
+    // `compare_topics` template family. Mutually exclusive with
+    // math/check_answer/explain_steps in practice (gated upstream).
+    if let (Some(x), Some(y)) = (
+        extra_slots.get("__compare_x__"),
+        extra_slots.get("__compare_y__"),
+    ) {
+        let key = "compare_topics";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: compare_topics override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            slots.insert("compare_x".into(), x.clone());
+            slots.insert("compare_y".into(), y.clone());
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v4.76.0** — explain_steps routing. Surfaces stored step
     // narrative when user asked «Қалай шештің?» / «Процесін көрсет»
     // / «Қадам-қадаммен» after a prior solve. Routes BEFORE

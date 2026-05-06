@@ -573,6 +573,36 @@ impl Conversation {
         // purposes (planner picks a response without asking back).
         let mut intent = resolve_follow_up(raw_intent, input, self.active_intent);
 
+        // **v4.76.5** — comparison shape detection. «X пен Y
+        // айырмашылығы қандай?» — extract X as primary topic so the
+        // existing retrieval pipeline finds X's definition; carry Y
+        // as a separate slot so the comparison template can suggest
+        // a follow-up query for Y. Honest hedge: full side-by-side
+        // comparison (both definitions in one turn) requires dual
+        // retrieval and is deferred to v5+.
+        let comparison_topics = crate::discourse::try_extract_comparison_topics(input);
+        if let Some((x_topic, _y_topic)) = comparison_topics.as_ref() {
+            // Override noun_hint with X if it would otherwise be empty
+            // or low-confidence. This routes the rest of the pipeline
+            // to retrieve X's facts.
+            if let crate::intent::Intent::Unknown {
+                ref mut noun_hint,
+                ref mut noun_hint_confidence,
+                ..
+            } = intent
+            {
+                if noun_hint.is_none()
+                    || matches!(
+                        noun_hint_confidence,
+                        crate::topic_extraction::TopicConfidence::Low
+                    )
+                {
+                    *noun_hint = Some(x_topic.clone());
+                    *noun_hint_confidence = crate::topic_extraction::TopicConfidence::High;
+                }
+            }
+        }
+
         // **v4.33.5** — first consumption of SemFrame fields by
         // intent: copy `Polarity::Negated` onto Intent::Unknown
         // when the noun_hint frame carries it. Looks up the SemFrame
@@ -1205,6 +1235,21 @@ impl Conversation {
             && let Some(steps_text) = crate::discourse::try_explain_steps(input, &last_steps)
         {
             extra_slots.insert("__explain_steps__".into(), steps_text);
+        }
+        // **v4.76.5** — comparison-shape slot setup. When
+        // try_extract_comparison_topics fired earlier (at line ~575),
+        // surface both topics as slots so the comparison template
+        // family can render «X — definition. Сіз сонымен қатар Y
+        // туралы сұрадыңыз — оны жеке сұрап алыңыз». Skip if a math
+        // answer or check_answer/explain_steps already fired (those
+        // are stronger signals).
+        if let Some((ref x_topic, ref y_topic)) = comparison_topics
+            && !extra_slots.contains_key("__math_answer__")
+            && !extra_slots.contains_key("__check_answer_correct__")
+            && !extra_slots.contains_key("__explain_steps__")
+        {
+            extra_slots.insert("__compare_x__".into(), x_topic.clone());
+            extra_slots.insert("__compare_y__".into(), y_topic.clone());
         }
         let plan = crate::planner::plan_response_with_epistemic(
             &intent_for_render,
