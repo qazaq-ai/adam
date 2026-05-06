@@ -924,6 +924,16 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "антибиотик",
     "вирус",
     "бактерия",
+    // **v4.72.0** — list-bearing aggregator objects from new
+    // curated list entries. Required by `world_core_multiword_coverage`
+    // invariant for compound objects in world_core.
+    "ғаламшарлар тізімі",
+    "мүшелер тізімі",
+    "ішкі мүшелер тізімі",
+    "материктер тізімі",
+    "мұхиттар тізімі",
+    "теңдеу түрлері",
+    "фигуралар тізімі",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of

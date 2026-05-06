@@ -171,10 +171,23 @@ fn is_comparison(lower: &str) -> bool {
 fn is_listing(lower: &str) -> bool {
     // "What X-es exist?" patterns. Distinct from "what is X?" which
     // is a Definition.
+    //
+    // **v4.72.0** — broadened from the original `қандай … бар` /
+    // тізім-only matches after the live REPL battery surfaced
+    // «X-тердің атаулары қандай?», «X-терді атаңыз», «барлық X-тер
+    // тізімдеңіз» as common natural-Kazakh listing forms that fell
+    // through to Definition shape. Each new marker is a closed-class
+    // listing imperative or a list-noun that never appears in
+    // singular-definition queries.
     (lower.contains("қандай") && (lower.contains(" бар") || lower.contains("тізім")))
         || lower.contains("атаулары")
+        || lower.contains("атаңыз")
+        || lower.contains("атап бер")
+        || lower.contains("атап беріңіз")
         || lower.contains("тізімі")
         || lower.contains("тізім")
+        || lower.contains("тізімдеңіз")
+        || lower.contains("барлық ")
 }
 
 fn is_yes_no_check(lower: &str) -> bool {

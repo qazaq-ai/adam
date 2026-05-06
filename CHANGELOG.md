@@ -7,6 +7,76 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.72.0] — 2026-05-06 — Listing-intent broadening + curated aggregator entries (planets / body parts / continents / oceans / equation types)
+
+Driven by user's second live REPL session against v4.71.5 — surfaced systemic gap where natural-Kazakh listing queries («X-тердің атаулары», «барлық X-терді атаңыз», «X-терді тізімдеңіз») fell through to Definition shape and surfaced singular-definition facts. Pattern audit: 6 of 12 transcript queries failed because aggregating list facts didn't exist for astro / body_parts / world_geography / math, while the matching Kazakhstan-specific lists in geography_kz did work (curated aggregator entries existed there).
+
+### Bugs identified
+
+| Failing query | Pre-fix response | Root cause |
+|---|---|---|
+| Күн жүйесіндегі планеталардың атаулары | «Күн жүйесі IsA галактика» | no list-bearing fact for «күн жүйесі related_to ғаламшарлар тізімі» |
+| Күн жүйесіндегі барлық планеталарды атаңыз | same | same |
+| Адамның барлық мүшелерін атаңыз | unrelated programming-languages list | `атаңыз` not in `is_listing` markers |
+| Адамның қандай мүшелері бар | «Адам — тіршілік иесі» | no aggregate body-parts fact |
+| Теңдеулер жұбын тізімдеңіз | теңдеу definition | `тізімдеңіз` not in `is_listing` markers |
+| Қандай математикалық теңдеулерді білесіз | теңдеу definition | «қандай … білесіз» pattern not detected (deferred — broader intent work) |
+
+### Innovations
+
+**(1) `question_shape::is_listing` broadened** — added 5 new surface markers:
+- `атаулары` (already there) / `атаңыз` (NEW — imperative «name them») / `атап бер` / `атап беріңіз`
+- `тізімі` (already) / `тізім` (already) / `тізімдеңіз` (NEW — imperative «list them»)
+- `барлық ` (NEW — quantifier «all»)
+
+**(2) 9 aggregating list-bearing entries added** to existing canonical files (per directive — no new domains):
+
+- `astronomy.jsonl` (+2): astro_046 «Күн жүйесінің ғаламшарлары: Меркурий, Шолпан, Жер, Марс, Юпитер, Сатурн, Уран, Нептун» + astro_047 «Жердің серігі — Ай»
+- `body_parts.jsonl` (+2): body_041 «Адамның негізгі мүшелері: бас/көз/құлақ/мұрын/ауыз/тіл/тіс/мойын/иық/кеуде/қол/саусақ/бел/асқазан/бауыр/бүйрек/өкпе/жүрек/ішек/аяқ/тізе/табан» + body_042 internal organs subset
+- `world_geography.jsonl` (+3): wg_013 «Жер планетасында алты материк бар» + wg_014 «Жер бетіндегі төрт мұхит» + wg_015 «Алты материктің атаулары + sizes»
+- `mathematics_basic.jsonl` (+2): math_092 «Теңдеу түрлері: сызықтық / квадраттық / теңсіздік / теңдеулер жүйесі» + math_093 «Геометриялық фигуралар: үшбұрыш / төртбұрыш family / көпбұрыш / шеңбер / дөңгелек»
+
+**(3) MULTIWORD_ENTITIES extended** with 7 list-aggregator compound objects (ғаламшарлар тізімі / мүшелер тізімі / ішкі мүшелер тізімі / материктер тізімі / мұхиттар тізімі / теңдеу түрлері / фигуралар тізімі) — required by `world_core_multiword_coverage` invariant.
+
+### Acceptance
+
+| Query | Pre-v4.72.0 | Post-v4.72.0 |
+|---|---|---|
+| Күн жүйесіндегі планеталардың атаулары | wrong galaxy fact | ✅ lists 8 planets |
+| Күн жүйесіндегі барлық планеталарды атаңыз | wrong galaxy fact | ✅ lists 8 planets |
+| Адамның барлық мүшелерін атаңыз | programming languages | ✅ lists internal organs |
+| Адамның қандай мүшелері бар | «Адам IsA тіршілік иесі» | ✅ lists internal organs |
+| Жер планетасында қанша құрлық бар | «Жердің бір серігі» | ⚠️ still picks moon-count fact (deferred — needs «қанша» listing detection) |
+| Жердің серігін атаңыз | resource fact | ⚠️ now picks continents list (topic-narrowing issue — deferred) |
+| Қандай математикалық теңдеулерді білесіз | теңдеу definition | ⚠️ still definition (needs broader «білесіз» intent detection — deferred) |
+| Теңдеулер жұбын тізімдеңіз | теңдеу definition | ⚠️ still definition — listing detector fires but retrieval picks definition over math_092 (relevance-ranking gap, deferred) |
+| Антарктида қандай материк? | (regression) | ✅ still works |
+| темірдің жолы туралы (regression) | (regression) | ✅ still works |
+
+| Gate | Status |
+|---|---|
+| world_core entries | 2476 → **2485** (+9) |
+| world_core facts | 2657 → **2666** (+9) |
+| world_core domains | 54 unchanged |
+| Derived facts | 29727 → **29732** (+5) |
+| Workspace tests | 976 passing |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.72.0` | green |
+
+### Cadence
+
+`.0` minor — runtime detector + curated data combined.
+
+### Deferred (need deeper architectural work)
+
+- Topic-narrowing across multi-list topics («Жердің серігін атаңыз» → should narrow «серік» list, not surface «материктер»).
+- «Қанша X бар» count-question listing routing.
+- «Қандай X-терді білесіз» heuristic detection of plural-object listing intent.
+- Relevance-ranking when both definition and list facts exist for the same topic.
+- Compositional possession queries («Адам жүрегі не істейді?»).
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.71.5] — 2026-05-06 — Live REPL audit fixes — loanword topic recognition + relation-predicate demotion
 
 Driven by the v4.71.0 live REPL battery: 12-query audit across the educational stripe surfaced two systemic gaps where new content was correctly stored but the dialog layer couldn't surface it. No new world_core data — pure runtime fix.

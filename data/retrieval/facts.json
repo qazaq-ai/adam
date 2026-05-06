@@ -1,7 +1,7 @@
 {
-  "version": "4.71.0",
+  "version": "4.72.0",
   "status": "completed",
-  "elapsed_s": 30,
+  "elapsed_s": 75,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,19 +18,19 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2716,
+    "facts_total": 2725,
     "by_predicate": {
       "after": 8,
       "causes": 27,
       "does_to": 1,
       "goes_to": 26,
-      "has": 67,
+      "has": 68,
       "has_quantity": 35,
       "in_domain": 24,
       "is_a": 2164,
       "lives_in": 8,
       "part_of": 241,
-      "related_to": 115
+      "related_to": 123
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -43,10 +43,10 @@
       "wikipedia_kz_pack.json": 17,
       "world_core/adam_self.jsonl": 54,
       "world_core/animals.jsonl": 42,
-      "world_core/astronomy.jsonl": 56,
+      "world_core/astronomy.jsonl": 58,
       "world_core/biology_basic.jsonl": 53,
       "world_core/biology_school.jsonl": 120,
-      "world_core/body_parts.jsonl": 55,
+      "world_core/body_parts.jsonl": 57,
       "world_core/chemistry_school.jsonl": 129,
       "world_core/clothing.jsonl": 35,
       "world_core/colors.jsonl": 38,
@@ -66,7 +66,7 @@
       "world_core/kz_literature.jsonl": 120,
       "world_core/language_features.jsonl": 78,
       "world_core/materials.jsonl": 22,
-      "world_core/mathematics_basic.jsonl": 91,
+      "world_core/mathematics_basic.jsonl": 93,
       "world_core/measurements.jsonl": 18,
       "world_core/medicine_basic.jsonl": 12,
       "world_core/music_kz.jsonl": 24,
@@ -93,7 +93,7 @@
       "world_core/tools_household.jsonl": 30,
       "world_core/transport.jsonl": 42,
       "world_core/weather_phenomena.jsonl": 26,
-      "world_core/world_geography.jsonl": 12,
+      "world_core/world_geography.jsonl": 15,
       "world_core/world_history.jsonl": 12
     }
   },
@@ -4720,6 +4720,46 @@
     },
     {
       "subject": {
+        "surface": "күн жүйесі",
+        "root": "күн жүйесі",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ғаламшарлар тізімі",
+        "root": "ғаламшарлар тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күн жүйесінің ғаламшарлары: Меркурий, Шолпан, Жер, Марс, Юпитер, Сатурн, Уран, Нептун."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "Has",
+      "object": {
+        "surface": "ай",
+        "root": "ай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/astronomy",
+      "source": {
+        "pack": "world_core/astronomy.jsonl",
+        "sample_id": "astro_047"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жердің табиғи серігі — Ай. Жер — Күн жүйесіндегі бір ғана серігі бар тас ғаламшар."
+    },
+    {
+      "subject": {
         "surface": "адам",
         "root": "адам",
         "pos": "noun"
@@ -9277,6 +9317,46 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Анатомия — дене құрылысын зерттейтін ғылым."
+    },
+    {
+      "subject": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "мүшелер тізімі",
+        "root": "мүшелер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/body_parts",
+      "source": {
+        "pack": "world_core/body_parts.jsonl",
+        "sample_id": "body_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Адамның негізгі мүшелері: бас, көз, құлақ, мұрын, ауыз, тіл, тіс, мойын, иық, кеуде, қол, саусақ, бел, асқазан, бауыр, бүйрек, өкпе, жүрек, ішек, аяқ, тізе, табан."
+    },
+    {
+      "subject": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "ішкі мүшелер тізімі",
+        "root": "ішкі мүшелер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/body_parts",
+      "source": {
+        "pack": "world_core/body_parts.jsonl",
+        "sample_id": "body_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Адамның ішкі мүшелері: жүрек, өкпе, бауыр, асқазан, ішек, бүйрек, ми. Бұлар тіршілікті қамтамасыз етеді."
     },
     {
       "subject": {
@@ -31417,6 +31497,46 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Синус — тік үшбұрыштағы сүйір α бұрышының қасындағы катеттің гипотенузаға қатынасының кері жағы: sin α = қарсы катет / гипотенуза. Тригонометриялық функция."
+    },
+    {
+      "subject": {
+        "surface": "теңдеу",
+        "root": "теңдеу",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "теңдеу түрлері",
+        "root": "теңдеу түрлері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_092"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Теңдеу түрлері: сызықтық теңдеу, квадраттық теңдеу, теңсіздік, теңдеулер жүйесі. Әрбір түрі белгісізді табудың әртүрлі әдістерін талап етеді."
+    },
+    {
+      "subject": {
+        "surface": "фигура",
+        "root": "фигура",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "фигуралар тізімі",
+        "root": "фигуралар тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_093"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Геометриялық фигуралар: үшбұрыш, төртбұрыш (шаршы, тіктөртбұрыш, параллелограмм, ромб, трапеция), көпбұрыш, шеңбер, дөңгелек."
     },
     {
       "subject": {
@@ -54177,6 +54297,66 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Солтүстік Мұзды мұхит — ең кіші және ең суық мұхит (~14 млн км²); жыл бойы мұзбен жабылған; Антарктида мен Солтүстік полюсті айнала орналасқан Антарктидалық бөлік ретінде жеке Оңтүстік мұхит деп бөлінеді."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "материктер тізімі",
+        "root": "материктер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер планетасында алты материк бар: Еуразия, Африка, Солтүстік Америка, Оңтүстік Америка, Австралия, Антарктида."
+    },
+    {
+      "subject": {
+        "surface": "жер",
+        "root": "жер",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "мұхиттар тізімі",
+        "root": "мұхиттар тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер бетіндегі төрт мұхит: Тынық мұхит, Атлант мұхиты, Үнді мұхиты, Солтүстік Мұзды мұхит. Кейбір классификация бойынша Антарктида айналасы Оңтүстік мұхит деп бөлініп, бесінші мұхит саналады."
+    },
+    {
+      "subject": {
+        "surface": "материк",
+        "root": "материк",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "материктер тізімі",
+        "root": "материктер тізімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_geography",
+      "source": {
+        "pack": "world_core/world_geography.jsonl",
+        "sample_id": "wg_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Алты материктің атаулары: Еуразия (~54 млн км²), Африка (~30), Солтүстік Америка (~24), Оңтүстік Америка (~18), Антарктида (~14), Австралия (~7,7)."
     },
     {
       "subject": {
