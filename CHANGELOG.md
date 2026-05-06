@@ -7,6 +7,64 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.62.5] — 2026-05-06 — Educational portal Day 2 #4 — Kazakh tenses (шақ) + moods (рай) + verb conjugation paradigm
+
+**Day 2 release 4/10.** Full Kazakh tense system (3 шақ × subtypes) + 4 mood (рай) classes + canonical «оқу» verb conjugation paradigm. Closes the major verb-grammar categories.
+
+### Innovations
+
+**(1) 3 tense entries** in `kazakh_grammar.jsonl` (`gram_tense_001…gram_tense_003`), each `IsA шақ`:
+
+| # | Tense | Sub-types |
+|---|---|---|
+| 1 | **өткен шақ** (past) | жедел (-ды/-ді), бұрынғы (-ған/-ген), ауыспалы (-атын/-етін) |
+| 2 | **осы шақ** (present) | нақ осы (auxiliary verbs: жатыр / отыр / тұр), жалпы (-а/-е/-й + жіктік) |
+| 3 | **келер шақ** (future) | ауыспалы (-а/-е/-й + жіктік), мақсатты (-мақ/-мек), болжалды (-ар/-ер/-р) |
+
+**(2) 4 mood entries** (`gram_mood_001…gram_mood_004`), each `IsA рай`:
+
+| # | Mood | Suffixes / Pattern |
+|---|---|---|
+| 1 | **хабарлы рай** (indicative) | works with all tenses; declarative |
+| 2 | **бұйрық рай** (imperative) | 2sg-anaiy: zero (оқы); 2sg-sypaiy: -ңыз; 2pl: -ңдар/-ңыздар; 3sg: -сын |
+| 3 | **шартты рай** (conditional) | -са/-се + жіктік (оқысам, оқысаң, оқыса) |
+| 4 | **қалау рай** (optative) | -айын/-ейін (1sg); -айық/-ейік (1pl); -ғайсыз (sypaiy) |
+
+**(3) Canonical «оқу» verb conjugation** (`gram_conj_001`) — full хабарлы рай paradigm across past + present/future, all 7 person/number forms: оқыдым / оқыдың / оқыдыңыз / оқыды / оқыдық / оқыдыңдар / оқыдыңыздар (past); оқимын / оқисың / оқисыз / оқиды / оқимыз / оқисыңдар / оқисыздар (present-future).
+
+**(4) New «жақ категориясы» entry** (`gram_jak_001`) — formalizes the person category (1sg/2sg/3sg/1pl/2pl) as a separate grammatical category, distinct from but related to сыпайылық категориясы (politeness register).
+
+**(5) 3 classification bridges**:
+- `gram_tense_bridge_001`: «**шақ IsA грамматикалық категория**»
+- `gram_mood_bridge_001`: «**рай IsA грамматикалық категория**»
+- `gram_conj_bridge_001`: «**жіктік жалғауы IsA жалғау**»
+
+Resulting cascade: `<3 tenses + 4 moods> → шақ/рай → грамматикалық категория → ұғым`. Plus parallel `жіктік жалғауы → жалғау` для conjugation suffixes.
+
+**(6) MULTIWORD_ENTITIES extended** with 11 new compounds: 3 tense names + 4 mood names + оқу етістік парадигмасы + етістік парадигмасы + жақ категориясы + жіктік жалғауы.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2271 | **2283** (+12) |
+| world_core facts | 2511 | **2523** (+12) |
+| Derived facts | 28491 | **28534** (+43 = 3.6× cascade) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.62.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 3.6× cascade reflects 7 new tense+mood siblings under шақ/рай hubs plus жақ/сыпайылық категориясы collected under грамматикалық категория. R5 (shared_is_a_target) generates pairs across all sibling sets.
+
+**Cumulative Day 2:** 4 of 10 releases · +45 facts · +134 derived · grammar domain at 45 entries (10 PoS + 12 case + 11 possessive + 12 tense/mood).
+
+### Cadence
+
+`.5` patch — same-domain extension; introduces шақ + рай + жақ категориясы as the third grammatical-category trio (after септік/тәуелдік + сыпайылық).
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.62.0] — 2026-05-06 — Educational portal Day 2 #3 — Kazakh possessive system (тәуелдік) — 7 person/number forms + politeness register
 
 **Day 2 release 3/10.** Full Kazakh possessive system with 7 person/number forms, vowel-harmony suffix variants, and the canonical «кітап» possessive declension. Documents the сыпайылық (politeness register) категория — a hallmark feature of Kazakh grammar.

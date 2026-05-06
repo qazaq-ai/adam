@@ -1,7 +1,7 @@
 {
-  "version": "4.61.5",
+  "version": "4.62.0",
   "status": "completed",
-  "elapsed_s": 69,
+  "elapsed_s": 64,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2511,
+    "facts_total": 2523,
     "by_predicate": {
       "after": 8,
       "causes": 23,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 1972,
+      "is_a": 1984,
       "lives_in": 8,
       "part_of": 236,
       "related_to": 111
@@ -62,7 +62,7 @@
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
       "world_core/informatics_basic.jsonl": 40,
-      "world_core/kazakh_grammar.jsonl": 33,
+      "world_core/kazakh_grammar.jsonl": 45,
       "world_core/kinship_extended.jsonl": 20,
       "world_core/kz_literature.jsonl": 96,
       "world_core/language_features.jsonl": 33,
@@ -23759,6 +23759,166 @@
     },
     {
       "subject": {
+        "surface": "оқу етістік парадигмасы",
+        "root": "оқу етістік парадигмасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "етістік парадигмасы",
+        "root": "етістік парадигмасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_conj_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "«Оқу» етістігінің хабарлы рай парадигмасы. Жедел өткен: оқыдым / оқыдың / оқыдыңыз / оқыды / оқыдық / оқыдыңдар / оқыдыңыздар. Жалпы осы / ауыспалы келер: оқимын / оқисың / оқисыз / оқиды / оқимыз / оқисыңдар / оқисыздар. Қазақ етістігінің классикалық жіктелу үлгісі."
+    },
+    {
+      "subject": {
+        "surface": "жіктік жалғауы",
+        "root": "жіктік жалғауы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жалғау",
+        "root": "жалғау",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_conj_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жіктік жалғауы — етістіктің жақ пен сан категорияларын білдіретін аффикс. Әр шақ пен рай үшін өзіндік жіктік жалғауы бар: -мын/-мін (1жжс), -сың/-сің (2жжа), -сыз/-сіз (2жжс), нөл/-ы/-і (3ж), -мыз/-міз (1жк), -сыңдар (2жка), -сыздар (2жкс)."
+    },
+    {
+      "subject": {
+        "surface": "жақ категориясы",
+        "root": "жақ категориясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_jak_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жақ категориясы — етістіктің іс-әрекетке қатыстырылған тұлғаны (айтушы, тыңдаушы, үшінші тұлға) көрсететін грамматикалық категория. Қазақ тілінде үш жақ бар: 1-жақ (мен, біз), 2-жақ (сен/Сіз, сендер/Сіздер), 3-жақ (ол, олар). Сыпайы (Сіз) және анайы (сен) ажыратылады."
+    },
+    {
+      "subject": {
+        "surface": "хабарлы рай",
+        "root": "хабарлы рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_mood_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Хабарлы рай — іс-әрекеттің болғанын, болып жатқанын немесе болатынын хабарлайтын рай. Барлық шақтармен қолданылады. Мысалдар: оқыдым (өткен), оқимын (осы/келер), келді, келеді."
+    },
+    {
+      "subject": {
+        "surface": "бұйрық рай",
+        "root": "бұйрық рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_mood_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бұйрық рай — тыңдаушыға бұйыруды, өтінуді, шақыруды білдіретін рай. Жекеше анайы 2-жақ — нөлдік: оқы, кел, жаз. Сыпайы 2-жақ: оқыңыз, келіңіз, жазыңыз. Көпше: оқыңдар (анайы), оқыңыздар (сыпайы). 3-жақ: оқысын, келсін."
+    },
+    {
+      "subject": {
+        "surface": "шартты рай",
+        "root": "шартты рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_mood_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шартты рай — іс-әрекеттің болуы шартқа байланысты екенін білдіретін рай. Жалғаулары: -са/-се + жіктік (оқысам, оқысаң, оқыса; келсем, келсең, келсе). «Егер мен оқысам, бірінші орынды аламын» сияқты сөйлемдерде қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "қалау рай",
+        "root": "қалау рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_mood_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қалау рай — сөйлеушінің тілегін, ниетін немесе ұсынысын білдіретін рай. Жалғаулары: -айын/-ейін (1-жақ жекеше: барайын, келейін), -айық/-ейік (1-жақ көпше: барайық, келейік). Сыпайы түрі: -ғайсыз/-гейсіз."
+    },
+    {
+      "subject": {
+        "surface": "рай",
+        "root": "рай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_mood_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Рай — сөйлеушінің іс-әрекетке қатынасын (хабарлау, бұйыру, шарт қою, қалау) білдіретін грамматикалық категория. Қазақ тілінде төрт рай бар: хабарлы, бұйрық, шартты, қалау."
+    },
+    {
+      "subject": {
         "surface": "зат есім",
         "root": "зат есім",
         "pos": "noun"
@@ -24196,6 +24356,86 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қазақ тіліндегі сыпайылық категориясы — қарым-қатынастағы құрмет дәрежесін грамматикалық тұрғыдан көрсетеді. Анайы (сен) — жақын адаммен, балаға, теңіне; сыпайы (Сіз) — үлкен адамға, бейтаныс кісіге, жоғары лауазым иесіне."
+    },
+    {
+      "subject": {
+        "surface": "өткен шақ",
+        "root": "өткен шақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_tense_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өткен шақ — іс-әрекеттің сөйлеу сәтінен бұрын болғанын білдіретін шақ. Қазақ тілінде үш түрі бар: жедел өткен (-ды/-ді/-ты/-ті: оқыды, келді, кетті), бұрынғы өткен (-ған/-ген/-қан/-кен: оқыған, келген, кеткен), ауыспалы өткен (-атын/-етін/-йтын/-йтін: оқитын, келетін)."
+    },
+    {
+      "subject": {
+        "surface": "осы шақ",
+        "root": "осы шақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_tense_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Осы шақ — іс-әрекеттің сөйлеу сәтінде болып жатқанын білдіретін шақ. Екі түрі бар: нақ осы шақ (көмекші етістіктермен жасалады: оқып отыр, оқып жатыр, оқып тұр) және жалпы осы шақ (-а/-е/-й + жіктік: оқиды, кетеді, келеді — habitual / generic)."
+    },
+    {
+      "subject": {
+        "surface": "келер шақ",
+        "root": "келер шақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_tense_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Келер шақ — іс-әрекеттің сөйлеу сәтінен кейін болатынын білдіретін шақ. Үш түрі бар: ауыспалы келер шақ (-а/-е/-й + жіктік: оқимын, келемін), мақсатты келер шақ (-мақ/-мек/-бақ/-бек/-пақ/-пек: оқымақ, келмек), болжалды келер шақ (-ар/-ер/-р: оқыр, келер)."
+    },
+    {
+      "subject": {
+        "surface": "шақ",
+        "root": "шақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грамматикалық категория",
+        "root": "грамматикалық категория",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_grammar",
+      "source": {
+        "pack": "world_core/kazakh_grammar.jsonl",
+        "sample_id": "gram_tense_bridge_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шақ — етістіктің іс-әрекет уақытын білдіретін грамматикалық категория. Қазақ тілінде үш шақ бар: өткен, осы, келер. Әр шақтың ішінде бірнеше түрі болады."
     },
     {
       "subject": {
