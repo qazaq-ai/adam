@@ -7,6 +7,73 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.67.0] — 2026-05-06 — Educational portal — Physics: mechanics deepening (kinematics + dynamics + statics + uniformly accelerated motion + Hooke + g + bridges)
+
+Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `physics_school.jsonl` confirmed dense existing coverage of механика / масса / тығыздық / қозғалыс / жылдамдық / үдеу / күш / 3 Newton laws / инерция / импульс / 4 force types / еркін түсу / жұмыс / энергия / 2 energy types / energy conservation / қуат. Sub-discipline taxonomy (кинематика / динамика / статика), formula-grade kinematic shamas (жол, уақыт, орташа жылдамдық), uniformly-accelerated motion, Hooke's law, free-fall constant g, normal force N, and high-leverage IsA bridges were missing. Extends canonical `physics_school.jsonl`.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| механика / масса / қозғалыс / жылдамдық / үдеу / күш / 3 Newton laws / инерция / импульс / 4 force types / еркін түсу / жұмыс / энергия / energy conservation / қуат | `physics_school.jsonl` (phys_002, 009, 011..033) | ✓ skip — covered |
+| Кинематика / динамика / статика as sub-disciplines of mechanics | not yet | + add |
+| Жол / уақыт as physical shamas; орташа жылдамдық | not yet | + add |
+| Бірқалыпты үдемелі қозғалыс (with v=v₀+at, S=v₀t+at²/2) | not yet | + add |
+| Гук заңы (F = k·\|Δx\|) | not yet | + add |
+| Еркін түсу үдеуі (g ≈ 9.8 м/с²) as constant | not yet | + add |
+| Тірек реакциясы күші (normal force N) | not yet | + add |
+| Bridges: физикалық шама / қозғалыс түрі IsA физикалық ұғым | not yet | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/physics_school.jsonl` (`phys_103…114`):
+
+**Mechanics sub-disciplines, all IsA механика (3):**
+- phys_103: кинематика — describes motion via S/v/a/t without causes
+- phys_104: динамика — studies forces and Newton laws
+- phys_105: статика — equilibrium of rest-state forces
+
+**Kinematic shamas (3):**
+- phys_106: жол IsA физикалық шама — `S = v · t` (uniform motion)
+- phys_107: уақыт IsA физикалық шама — t, секунд (s)
+- phys_108: орташа жылдамдық IsA жылдамдық — `v_орт = S / t`
+
+**Motion type with formulas (1):**
+- phys_109: бірқалыпты үдемелі қозғалыс IsA қозғалыс түрі — `v = v₀ + a·t`, `S = v₀·t + a·t²/2`
+
+**Laws and constants (2):**
+- phys_110: гук заңы IsA физика заңы — `F = k · |Δx|`
+- phys_111: еркін түсу үдеуі IsA физикалық тұрақты — `g ≈ 9,8 м/с²`
+
+**Force taxonomy (1):**
+- phys_112: тірек реакциясы күші IsA күш — N, perpendicular to surface, `N = m · g` on horizontal
+
+**Cascade bridges (2):**
+- phys_113: физикалық шама IsA физикалық ұғым — apex bridge over масса/тығыздық/жылдамдық/үдеу/күш/импульс/жұмыс/энергия/қуат + new жол/уақыт
+- phys_114: қозғалыс түрі IsA физикалық ұғым — apex bridge over бірқалыпты/үдемелі/еркін түсу + new бірқалыпты үдемелі
+
+**(2) Curriculum-grade formulas embedded** in 8 of 12 entries.
+
+**(3) MULTIWORD_ENTITIES extended** with 10 new compounds.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2368 | **2380** (+12) |
+| world_core facts | 2549 | **2561** (+12) |
+| world_core domains | 51 | **51** unchanged |
+| Derived facts | 29357 | **29517** (+160 = **13.3× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+
+The 13.3× cascade is driven by the two apex bridges: единая фраза `физикалық шама IsA физикалық ұғым` cascades through R1 transitivity against ~10 existing physics shamas, then through R5 shared-target clustering against the same set.
+
+### Cadence
+
+`.0` minor — multi-rule deepening + 2 high-leverage bridges. Same-domain canonical extension per directive.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.66.5] — 2026-05-06 — Educational portal Day 3 #2 — Middle-school advanced geometry: angle types + circle properties + Pythagoras + parallelogram family + sin
 
 **Day 3 release 2/10.** Per memory directive — pre-flight grep of `mathematics_basic.jsonl` confirmed existing coverage of геометрия / тригонометрия (as math саласы only) / фигура / бұрыш / шеңбер / дөңгелек / үшбұрыш / төртбұрыш / шаршы / тіктөртбұрыш / көпбұрыш. Detailed angle classification, circle properties (R, d, π), right-triangle theorems, and trig function definitions were missing. Extends canonical `mathematics_basic.jsonl` with 12 entries cementing the middle-school 7-9 geometry curriculum.

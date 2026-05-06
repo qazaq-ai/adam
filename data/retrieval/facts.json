@@ -1,7 +1,7 @@
 {
-  "version": "4.66.5",
+  "version": "4.67.0",
   "status": "completed",
-  "elapsed_s": 58,
+  "elapsed_s": 32,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2608,
+    "facts_total": 2620,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2056,
+      "is_a": 2068,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -72,7 +72,7 @@
       "world_core/notable_kazakhstanis.jsonl": 51,
       "world_core/numbers.jsonl": 54,
       "world_core/philosophy_basic.jsonl": 23,
-      "world_core/physics_school.jsonl": 102,
+      "world_core/physics_school.jsonl": 114,
       "world_core/plants.jsonl": 35,
       "world_core/preschool_alphabet.jsonl": 48,
       "world_core/preschool_numbers.jsonl": 16,
@@ -36134,6 +36134,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Молекула — заттың химиялық қасиетін сақтайтын, екі немесе одан көп атомнан тұратын бөлшек."
+    },
+    {
+      "subject": {
+        "surface": "кинематика",
+        "root": "кинематика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "механика",
+        "root": "механика",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_103"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кинематика — денелердің қозғалысын себептерін қарастырмай, тек жол, жылдамдық, үдеу мен уақыт арқылы сипаттайтын механика тарауы."
+    },
+    {
+      "subject": {
+        "surface": "динамика",
+        "root": "динамика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "механика",
+        "root": "механика",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_104"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Динамика — денелердің қозғалысын тудыратын күштер мен олардың салдарын зерттейтін механика тарауы. Ньютон заңдары осы тарауға кіреді."
+    },
+    {
+      "subject": {
+        "surface": "статика",
+        "root": "статика",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "механика",
+        "root": "механика",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_105"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Статика — тыныштық күйіндегі денелерге әсер ететін күштердің тепе-теңдігін зерттейтін механика тарауы."
+    },
+    {
+      "subject": {
+        "surface": "жол",
+        "root": "жол",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық шама",
+        "root": "физикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_106"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жол — дененің қозғалыс траекториясының ұзындығын көрсететін физикалық шама. S әрпімен белгіленеді, метрмен (м) өлшенеді. Бірқалыпты қозғалыста: S = v · t."
+    },
+    {
+      "subject": {
+        "surface": "уақыт",
+        "root": "уақыт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық шама",
+        "root": "физикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_107"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Уақыт — оқиғалардың тізбегі мен ұзақтығын өлшеуге арналған негізгі физикалық шама. t әрпімен белгіленеді, секундпен (с) өлшенеді."
+    },
+    {
+      "subject": {
+        "surface": "орташа жылдамдық",
+        "root": "орташа жылдамдық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жылдамдық",
+        "root": "жылдамдық",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_108"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орташа жылдамдық — жүрілген жолдың кеткен уақытқа қатынасы: v_орт = S / t. SI бірлігі — м/с. Денелердің барлық қозғалысын бір санмен сипаттайды."
+    },
+    {
+      "subject": {
+        "surface": "бірқалыпты үдемелі қозғалыс",
+        "root": "бірқалыпты үдемелі қозғалыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қозғалыс түрі",
+        "root": "қозғалыс түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_109"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірқалыпты үдемелі қозғалыс — үдеуі тұрақты болатын қозғалыс түрі. Жылдамдық: v = v₀ + a · t; жол: S = v₀ · t + a · t² / 2."
+    },
+    {
+      "subject": {
+        "surface": "гук заңы",
+        "root": "гук заңы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физика заңы",
+        "root": "физика заңы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_110"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Гук заңы — серпімді деформацияда серпімділік күші деформация шамасына тура пропорционал: F = k · |Δx|, мұндағы k — қаттылық коэффициенті."
+    },
+    {
+      "subject": {
+        "surface": "еркін түсу үдеуі",
+        "root": "еркін түсу үдеуі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық тұрақты",
+        "root": "физикалық тұрақты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_111"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Еркін түсу үдеуі — Жер бетіне жақын денелердің еркін түскенде ие болатын тұрақты үдеуі: g ≈ 9,8 м/с² (есептерде көбіне 10 м/с² деп алынады)."
+    },
+    {
+      "subject": {
+        "surface": "тірек реакциясы күші",
+        "root": "тірек реакциясы күші",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "күш",
+        "root": "күш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_112"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тірек реакциясы күші — дене жатқан тірек жағынан денеге перпендикуляр бағытта әсер ететін күш. N әрпімен белгіленеді. Көлденең бетте N = m · g."
+    },
+    {
+      "subject": {
+        "surface": "физикалық шама",
+        "root": "физикалық шама",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық ұғым",
+        "root": "физикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_113"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Физикалық шама — өлшеуге келетін, сан мәнімен және бірлігімен өрнектелетін физикалық қасиет (мысалы: масса, жылдамдық, уақыт, күш, энергия)."
+    },
+    {
+      "subject": {
+        "surface": "қозғалыс түрі",
+        "root": "қозғалыс түрі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "физикалық ұғым",
+        "root": "физикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/physics_school",
+      "source": {
+        "pack": "world_core/physics_school.jsonl",
+        "sample_id": "phys_114"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қозғалыс түрі — қозғалыстың жылдамдық пен үдеу сипаттамасы бойынша жіктелуі: бірқалыпты, бірқалыпты үдемелі, еркін түсу, шеңбер бойымен қозғалыс."
     },
     {
       "subject": {

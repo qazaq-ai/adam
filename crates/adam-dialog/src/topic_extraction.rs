@@ -713,6 +713,17 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "пи саны",
     "тік үшбұрыш",
     "пифагор теоремасы",
+    // **v4.67.0** — Educational portal: physics mechanics deepening.
+    "физикалық шама",
+    "физикалық ұғым",
+    "физикалық тұрақты",
+    "физика заңы",
+    "қозғалыс түрі",
+    "орташа жылдамдық",
+    "бірқалыпты үдемелі қозғалыс",
+    "гук заңы",
+    "еркін түсу үдеуі",
+    "тірек реакциясы күші",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of
