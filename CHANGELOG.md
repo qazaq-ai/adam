@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.66.0] — 2026-05-06 — Educational portal Day 3 #1 — Middle-school algebra deepening: variables, expressions, inequalities, coordinate plane, discriminant, Vieta
+
+**Day 3 release 1/10.** Day 3 STARTS — middle school 5-9 grade deepening. Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `mathematics_basic.jsonl` confirmed existing coverage of теңдеу / алгебра / функция / сызықтық / квадраттық / көпмүше / туынды / интеграл / орташа мән / медиана / дисперсия / ықтималдық. The variable-and-coordinate algebra layer was missing. This release extends canonical `mathematics_basic.jsonl` with 12 entries that cement the middle-school algebra curriculum (grades 7-9).
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| теңдеу / алгебра / функция / сызықтық / квадраттық / көпмүше | `mathematics_basic.jsonl` (math_010, 013, 037..041, 053..055) | ✓ skip — covered |
+| айнымалы / белгісіз / математикалық өрнек | not yet (concept hub missing) | + add |
+| теңсіздік / теңдеулер жүйесі | not yet | + add |
+| координаталық жазықтық / абсцисса / ордината / функция графигі | not yet | + add |
+| тура пропорционалдық / дискриминант / Виета теоремасы | not yet | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/mathematics_basic.jsonl` (`math_068…079`):
+
+**Variable & expression hubs (3):**
+- math_068: айнымалы — variable hub (x / y / z / a / b / c)
+- math_069: белгісіз IsA айнымалы (unknown — value to find)
+- math_070: математикалық өрнек — general expression hub (3x + 5, a² − b², (x + 1)(x − 1))
+
+**Equations & inequalities (2):**
+- math_071: теңсіздік — inequality (<, >, ≤, ≥, ≠) — counterpart of теңдік
+- math_072: теңдеулер жүйесі — system of equations with Kazakh-curriculum example
+
+**Coordinate plane (4):**
+- math_073: координаталық жазықтық — Cartesian plane definition
+- math_074: абсцисса IsA координата (x-coord)
+- math_075: ордината IsA координата (y-coord)
+- math_076: функция графигі — graph of function (line for linear, parabola for quadratic)
+
+**Advanced algebra (3):**
+- math_077: тура пропорционалдық IsA функция (y = kx, line through origin)
+- math_078: дискриминант — D = b² − 4ac with 3-case root analysis
+- math_079: Виета теоремасы — x₁ + x₂ = −p, x₁ · x₂ = q for reduced quadratic
+
+**(2) Curriculum-grade formulas embedded** — every entry includes either the canonical formula (`y = kx`, `D = b² − 4ac`, `x₁ + x₂ = −p`) or a worked example (3; 5 → абсцисса = 3, ордината = 5).
+
+**(3) MULTIWORD_ENTITIES extended** with 10 new compounds: математикалық өрнек / қатынас / ұғым / шама / теорема, теңдеулер жүйесі, координаталық жазықтық, функция графигі, тура пропорционалдық, виета теоремасы.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2344 | **2356** (+12) |
+| world_core facts | 2525 | **2537** (+12) |
+| world_core domains | 51 | **51** unchanged (extended canonical) |
+| Derived facts | 29294 | **29336** (+42 = **3.5× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.66.0` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 3.5× cascade reflects deep-tree extension: айнымалы / математикалық өрнек / координата are sub-class hubs that branch into existing math taxonomy rather than top-level apex bridges. Future Day 3 geometry/physics releases will multiply against these.
+
+### Cadence
+
+`.0` minor — Day 3 starts. Same-domain canonical extension per directive.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.65.5] — 2026-05-06 — Educational portal Day 2 #10 (FINAL) — «Оқу пәні» master hub: subject taxonomy capstone
 
 **Day 2 release 10/10 — capstone.** Day 2 closure release. Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep revealed `adam_self.jsonl` (adam_self_018…032) already classifies математика / физика / химия / биология / тарих / информатика as «мектеп пәні» and as `табиғат / жаратылыстану / гуманитарлық / абстракт / қолданбалы ғылым`. The «оқу пәні» master hub itself was not yet defined. This release adds 12 entries that **architecturally seal Day 2** by naming the master concept and connecting all program-of-study subjects to it.

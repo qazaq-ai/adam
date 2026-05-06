@@ -1,7 +1,7 @@
 {
-  "version": "4.65.5",
+  "version": "4.66.0",
   "status": "completed",
-  "elapsed_s": 73,
+  "elapsed_s": 66,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2584,
+    "facts_total": 2596,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2032,
+      "is_a": 2044,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -66,7 +66,7 @@
       "world_core/kz_literature.jsonl": 108,
       "world_core/language_features.jsonl": 78,
       "world_core/materials.jsonl": 22,
-      "world_core/mathematics_basic.jsonl": 67,
+      "world_core/mathematics_basic.jsonl": 79,
       "world_core/measurements.jsonl": 18,
       "world_core/music_kz.jsonl": 24,
       "world_core/notable_kazakhstanis.jsonl": 51,
@@ -30214,6 +30214,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Аудан — жазық фигура алып жатқан жер көлемі. S әрпімен белгіленеді, шаршы бірлігімен өлшенеді (см², м², т.б.). Шаршының ауданы: S = a². Тіктөртбұрыштың ауданы: S = a×b."
+    },
+    {
+      "subject": {
+        "surface": "айнымалы",
+        "root": "айнымалы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық ұғым",
+        "root": "математикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_068"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Айнымалы — мәні өзгеруі мүмкін шаманы белгілейтін әріп; алгебрада көбіне x, y, z, a, b, c әріптерімен жазылады."
+    },
+    {
+      "subject": {
+        "surface": "белгісіз",
+        "root": "белгісіз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "айнымалы",
+        "root": "айнымалы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_069"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Белгісіз — теңдеуде немесе теңсіздікте мәні әлі табылмаған, табу қажет айнымалы. Әдетте x әрпімен белгіленеді."
+    },
+    {
+      "subject": {
+        "surface": "математикалық өрнек",
+        "root": "математикалық өрнек",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық ұғым",
+        "root": "математикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_070"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Математикалық өрнек — сандар, айнымалылар мен амал таңбаларынан құрылған, есептеуге келетін жазба. Мысалдар: 3x + 5, a² − b², (x + 1)(x − 1)."
+    },
+    {
+      "subject": {
+        "surface": "теңсіздік",
+        "root": "теңсіздік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық қатынас",
+        "root": "математикалық қатынас",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_071"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Теңсіздік — екі өрнектің бір-бірінен үлкен, кіші немесе тең емес екенін көрсететін математикалық қатынас. Таңбалары: <, >, ≤, ≥, ≠. Мысал: 2x + 1 > 7."
+    },
+    {
+      "subject": {
+        "surface": "теңдеулер жүйесі",
+        "root": "теңдеулер жүйесі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық өрнек",
+        "root": "математикалық өрнек",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_072"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Теңдеулер жүйесі — ортақ шешімі ізделетін бірнеше теңдеуден тұратын жиынтық. Жазылуы — фигуралы жақшамен. Мысал: { x + y = 5; x − y = 1 } шешімі x = 3, y = 2."
+    },
+    {
+      "subject": {
+        "surface": "координаталық жазықтық",
+        "root": "координаталық жазықтық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық ұғым",
+        "root": "математикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_073"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Координаталық жазықтық — өзара перпендикуляр екі сан осінен (x — абсцисса осі, y — ордината осі) тұратын, нүктені (x; y) деп беретін жазық кеңістік. Декарттық координат жүйесі деп те аталады."
+    },
+    {
+      "subject": {
+        "surface": "абсцисса",
+        "root": "абсцисса",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "координата",
+        "root": "координата",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_074"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Абсцисса — координаталық жазықтықтағы нүктенің бірінші координатасы, x-осіндегі мәні. (3; 5) нүктесінде абсцисса = 3."
+    },
+    {
+      "subject": {
+        "surface": "ордината",
+        "root": "ордината",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "координата",
+        "root": "координата",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_075"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ордината — координаталық жазықтықтағы нүктенің екінші координатасы, y-осіндегі мәні. (3; 5) нүктесінде ордината = 5."
+    },
+    {
+      "subject": {
+        "surface": "функция графигі",
+        "root": "функция графигі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық ұғым",
+        "root": "математикалық ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_076"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Функция графигі — функцияның әрбір (x; f(x)) нүктесінен тұратын координаталық жазықтықтағы сызық. Сызықтық функцияның графигі — түзу; квадраттық функцияныкі — парабола."
+    },
+    {
+      "subject": {
+        "surface": "тура пропорционалдық",
+        "root": "тура пропорционалдық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "функция",
+        "root": "функция",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_077"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тура пропорционалдық — y = kx түріндегі тәуелділік (k — пропорционалдық коэффициенті, k ≠ 0). x-нің артуы y-тің сондай есе артуын тудырады. Графигі — координат басынан өтетін түзу."
+    },
+    {
+      "subject": {
+        "surface": "дискриминант",
+        "root": "дискриминант",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық шама",
+        "root": "математикалық шама",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_078"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дискриминант — ax² + bx + c = 0 квадраттық теңдеуінің түбірлерінің санын анықтайтын шама: D = b² − 4ac. D > 0 — екі түбір; D = 0 — бір түбір; D < 0 — нақты түбір жоқ."
+    },
+    {
+      "subject": {
+        "surface": "виета теоремасы",
+        "root": "виета теоремасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "математикалық теорема",
+        "root": "математикалық теорема",
+        "pos": "noun"
+      },
+      "pattern": "world_core/mathematics_basic",
+      "source": {
+        "pack": "world_core/mathematics_basic.jsonl",
+        "sample_id": "math_079"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Виета теоремасы — келтірілген квадраттық теңдеу x² + px + q = 0 үшін: x₁ + x₂ = −p, x₁ · x₂ = q. Түбірлерді тез табу мен тексеру үшін қолданылады."
     },
     {
       "subject": {

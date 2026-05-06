@@ -1,5 +1,5 @@
 {
-  "version": "4.65.5",
+  "version": "4.66.0",
   "name": "adam-tokenizer-deterministic",
   "target_language": "kazakh",
   "script": "cyrillic",
