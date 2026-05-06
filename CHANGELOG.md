@@ -7,6 +7,60 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.73.0] — 2026-05-06 — Multi-turn anaphora fix — block StatementOfLocation false-positive on pronouns + extend bare-interrogative follow-up resolution
+
+Driven by Codex 2026-05-06 review (forwarded by user). Codex identified strategic positioning + 6 systemic gaps. This release closes the most critical: the multi-turn tutor loop. Strategic positioning memory saved as `project_kazakh_tutor_positioning.md` — project is a Kazakh school tutor, NOT an LLM replacement; 6 Codex recommendations sit on top of multi-turn working.
+
+### Critical security bug closed
+
+«Теңдеу деген не?» → answered, then «Оны қалай шешеміз?» (anaphoric "how do we solve it?") was misclassified as `StatementOfLocation { city: "Оны" }` — the system saved «Оны» (accusative of pronoun «ол») as the user's city in session, a false biographical claim. Bug pattern:
+
+1. `шешеміз` is 1Pl verb → `has_first_person_location_context` returns true.
+2. FST analysed «Оны» (Acc of «ол») as a noun candidate.
+3. The case-scan / rule-based fallback picked it as a "city".
+4. `conversation.rs::Intent::StatementOfLocation` saved it to session: `"city" → "Оны"`.
+
+Same pattern affected «Ол қайда жүреді?» / «Кім құрды?» / «Бұл қалай істейді?» — pronouns + 1st-person verbs producing biographical false positives.
+
+### Innovations
+
+**(1) `semantics.rs::interpret_text_with_lexicon` gates `detect_statement_of_location`** on `!discourse::input_contains_discourse_anaphor(input)`. Discourse anaphors (оны / ол / бұл / сол / онда / etc.) are NEVER first-person location statements. When the input contains one, intent stays Unknown so the existing v4.13.0 anaphora-resolution path (lines 668-708 of conversation.rs) can substitute the prior turn's topic.
+
+**(2) `discourse::input_contains_discourse_anaphor` extended** with bare-interrogative follow-up detection (`is_short_interrogative_followup`):
+- triggers on input ≤ 4 tokens
+- AND containing wh-interrogative (`кім` / `қайда` / `қашан` / `неге` / `неліктен` / `қалай`)
+- AND no other content noun.
+
+This closes Codex's «Қазақ хандығы қашан құрылды?» → «Кім құрды?» / «Фотосинтез деген не?» → «Ол қайда жүреді?» follow-up patterns. The interrogative is treated anaphorically: implicit subject is `last_query_topic`.
+
+### Acceptance — multi-turn tests
+
+| Pre-fix flow | v4.72.5 behavior | v4.73.0 behavior |
+|---|---|---|
+| Теңдеу деген не? → Оны қалай шешеміз? | StatementOfLocation { city: "Оны" } saved as user's city ❌ | resolves to Теңдеу, surfaces equation definition ✅ |
+| Фотосинтез деген не? → Ол қайда жүреді? | "жүре" picked as topic, low-confidence clarify | resolves to Фотосинтез, surfaces photosynthesis fact ✅ |
+| Қазақ хандығы қашан құрылды? → Кім құрды? | "құр" verb stem picked, clarify | resolves to Қазақ хандығы, surfaces Khanate fact ✅ |
+| Single-shot «Оны қалай шешеміз?» (no prior) | StatementOfLocation { city: "Оны" } ❌ | unknown.clarify_no_topic (graceful refuse) ✅ |
+
+### Acceptance — gates
+
+| Gate | Status |
+|---|---|
+| 100-query battery diff vs v4.72.5 | **0 differences** (no regression) |
+| Workspace tests | **976 passing** unchanged |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.73.0` | green |
+
+### Strategic note
+
+Per Codex review and saved memory `project_kazakh_tutor_positioning.md`: the answer for «Оны қалай шешеміз?» now correctly resolves to «Теңдеу», but only surfaces the equation's DEFINITION fact, not a procedural «here's how to solve it» response. That's the intentional next-step boundary — procedural intents (`solve_equation` / `show_example` / `step_by_step`) are scoped to v4.73.5+. v4.73.0 closes only the security false-positive and the topic-resolution gap.
+
+### Cadence
+
+`.0` minor — multi-turn architecture fix; no data changes.
+
+Stripe — Kazakh school tutor (positioning shift from «educational portal»).
+
 ## [4.72.5] — 2026-05-06 — Comprehensive 100-query battery audit + 4 fixes (passive-verb topic eclipse, low-confidence native nouns, «Жер бетінде» phrasing variant)
 
 Driven by user-mandated systematic battery test across all v4.66.0+ educational content. 100 natural-Kazakh queries spanning 12 sub-domains (algebra / advanced geometry / mechanics / thermodynamics / E&M / organic chem / inorganic chem / world history / literary devices / world geography / medicine). **Result: 94 PASS / 4 FAIL / 2 PARTIAL.** This release fixes the 4 hard failures; 2 partials (comparison shape) deferred to template-family work.

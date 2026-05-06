@@ -175,7 +175,23 @@ pub fn interpret_text_with_lexicon(
     if let Some(years) = detect_statement_of_age(&tokens, &joined) {
         return Intent::StatementOfAge { years };
     }
-    if let Some(city) = detect_statement_of_location(&tokens, &raw_tokens, &joined, parses) {
+    // **v4.73.0** — gate `detect_statement_of_location` on input NOT
+    // containing a discourse anaphor (оны / ол / бұл / сол / etc.).
+    // Codex 2026-05-06 review surfaced critical security bug: «Оны
+    // қалай шешеміз?» (anaphoric "how do we solve it?", referring to
+    // a previously-discussed equation) hit StatementOfLocation
+    // because (a) `шешеміз` is a 1Pl verb that satisfies
+    // `has_first_person_location_context`, and (b) FST analysed
+    // «Оны» (Acc of pronoun «ол») as a noun candidate, recovering
+    // it as a "city" via the rule-based fallback. The system then
+    // saved «Оны» as the user's city in session — a false biographical
+    // claim. Discourse anaphors are NEVER first-person location
+    // statements; if input contains one, leave intent as Unknown so
+    // the existing v4.13.0 anaphora-resolution path (lines 668-708 of
+    // conversation.rs) can surface the prior topic.
+    if !crate::discourse::input_contains_discourse_anaphor(input)
+        && let Some(city) = detect_statement_of_location(&tokens, &raw_tokens, &joined, parses)
+    {
         return Intent::StatementOfLocation { city };
     }
     if detect_ask_location(&joined) {

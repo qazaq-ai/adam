@@ -110,6 +110,23 @@ pub fn input_contains_discourse_anaphor(input: &str) -> bool {
     {
         return true;
     }
+    // **v4.73.0** — bare-interrogative follow-up coreference. Codex
+    // 2026-05-06 review surfaced multi-turn gaps:
+    //   «Қазақ хандығы қашан құрылды?» → answered, then
+    //   «Кім құрды?» — interrogative-only follow-up; subject must
+    //   resolve to the prior topic «Қазақ хандығы».
+    //   «Фотосинтез деген не?» → answered, then
+    //   «Ол қайда жүреді?» — same.
+    // When the input is a short follow-up question (≤ 4 tokens)
+    // headed by a wh-interrogative («кім / қайда / қашан / неге /
+    // неліктен») and contains no other content noun, treat the
+    // interrogative as anaphoric — the implicit subject is the
+    // last_query_topic. The token-count gate prevents false-positives
+    // on «Кім [Х туралы кітап жазды]?» where X is supplied in the
+    // same turn.
+    if is_short_interrogative_followup(&lower) {
+        return true;
+    }
     // **v4.30.0** — adnominal-demonstrative coreference. Live REPL
     // 2026-05-02 turn 11: «Бұл тілдегі кілт сөздер қандай?» — the
     // intended referent is the language being discussed in prior
@@ -123,6 +140,24 @@ pub fn input_contains_discourse_anaphor(input: &str) -> bool {
     // `dialog_context.resolve_anaphor()` substitution path as the
     // bare-pronoun anaphors.
     input_contains_adnominal_demonstrative(input)
+}
+
+/// **v4.73.0** — Detects bare wh-interrogative follow-up questions
+/// like «Кім құрды?» / «Қайда жүреді?» / «Неге маңызды?». Returns
+/// true when the input is short (≤ 4 tokens) AND contains a
+/// wh-interrogative AND has no other content noun signal. The
+/// semantic effect: the interrogative is anaphoric, referring to
+/// the prior turn's topic.
+fn is_short_interrogative_followup(lower: &str) -> bool {
+    const WH_INTERROGATIVES: &[&str] = &["кім", "қайда", "қашан", "неге", "неліктен", "қалай"];
+    let tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if tokens.len() > 4 {
+        return false;
+    }
+    tokens.iter().any(|t| WH_INTERROGATIVES.contains(t))
 }
 
 /// **v4.30.0** — Detects the adnominal-demonstrative coreference
