@@ -1,0 +1,118 @@
+{
+  "_comment": "v4.79.0 — Rust Book Chapter 1 (Bastau / setup) holdout. First per-chapter holdout introduced under the user directive «каждую главу покрывай реальными тестами и сразу исправляй или корректируй обучение». Captures 18 natural Kazakh queries against the curated rust_200…rust_217 entries that deepen chapter 1 coverage (rustup / cargo new / cargo build / cargo run / cargo check / --release / dev-release profiles / target/ / println! / fn main / .rs naming / edition / TOML / style). Pattern repeats per chapter going forward (chapter_02_holdout.json, chapter_03_holdout.json, ...). Same blind-eval discipline as rust_concepts_holdout_2026_05_02.json: substring presence rules tolerate template variants; no template tuning to make any specific case pass.",
+  "version": "v4.79.0",
+  "captured_date": "2026-05-06",
+  "chapter": 1,
+  "chapter_title": "Бастау (Setup / Hello World / Cargo)",
+  "cases": [
+    {
+      "id": "ch01_rustup",
+      "category": "ch01_install",
+      "query": "rustup деген не?",
+      "any_substring": ["нұсқаларын басқар", "rustup", "ресми құрал"]
+    },
+    {
+      "id": "ch01_rustup_update",
+      "category": "ch01_install",
+      "query": "rustup update деген не?",
+      "any_substring": ["жаңарт", "соңғы"]
+    },
+    {
+      "id": "ch01_rustup_doc",
+      "category": "ch01_install",
+      "query": "rustup doc деген не?",
+      "any_substring": ["құжаттама", "стандартты кітапхана", "шолғыш"]
+    },
+    {
+      "id": "ch01_cargo_new",
+      "category": "ch01_cargo",
+      "query": "cargo new деген не?",
+      "any_substring": ["жаңа", "жоба", "cargo.toml"]
+    },
+    {
+      "id": "ch01_src_main_rs",
+      "category": "ch01_project_layout",
+      "query": "src/main.rs деген не?",
+      "any_substring": ["бастапқы", "орындалатын", "src"]
+    },
+    {
+      "id": "ch01_cargo_build",
+      "category": "ch01_cargo",
+      "query": "cargo build деген не?",
+      "any_substring": ["құрастыр", "target/debug", "dev"]
+    },
+    {
+      "id": "ch01_cargo_run",
+      "category": "ch01_cargo",
+      "query": "cargo run деген не?",
+      "any_substring": ["құрастыр", "орында", "жиі"]
+    },
+    {
+      "id": "ch01_cargo_check",
+      "category": "ch01_cargo",
+      "query": "cargo check деген не?",
+      "any_substring": ["тексер", "жылдам", "орындалатын файл жасамайтын"]
+    },
+    {
+      "id": "ch01_cargo_build_release",
+      "category": "ch01_cargo",
+      "query": "cargo build --release деген не?",
+      "any_substring": ["оптимизация", "target/release", "жылдамдыг"],
+      "none_substring": ["target/debug"]
+    },
+    {
+      "id": "ch01_dev_profile",
+      "category": "ch01_profile",
+      "query": "dev бейіні деген не?",
+      "any_substring": ["әдепкі", "жылдам", "оптимизациясыз"]
+    },
+    {
+      "id": "ch01_release_profile",
+      "category": "ch01_profile",
+      "query": "release бейіні деген не?",
+      "any_substring": ["оптимизация", "target/release"]
+    },
+    {
+      "id": "ch01_target_dir",
+      "category": "ch01_project_layout",
+      "query": "target қалтасы деген не?",
+      "any_substring": ["құрастыру", "debug", "release"]
+    },
+    {
+      "id": "ch01_println",
+      "category": "ch01_hello_world",
+      "query": "println деген не?",
+      "any_substring": ["макрос", "терминал", "леп белгісі"]
+    },
+    {
+      "id": "ch01_fn_main",
+      "category": "ch01_hello_world",
+      "query": "fn main деген не?",
+      "any_substring": ["кіру нүктесі", "ең бірінші", "main"]
+    },
+    {
+      "id": "ch01_rs_extension",
+      "category": "ch01_project_layout",
+      "query": ".rs кеңейтімі деген не?",
+      "any_substring": ["бастапқы", "snake_case", "файл"]
+    },
+    {
+      "id": "ch01_edition",
+      "category": "ch01_project_layout",
+      "query": "edition деген не?",
+      "any_substring": ["басылым", "cargo.toml", "2021"]
+    },
+    {
+      "id": "ch01_toml",
+      "category": "ch01_project_layout",
+      "query": "toml деген не?",
+      "any_substring": ["конфигурация", "пішім", "cargo.toml"]
+    },
+    {
+      "id": "ch01_rust_style",
+      "category": "ch01_style",
+      "query": "Rust стилі деген не?",
+      "any_substring": ["шартты келісім", "snake_case", "шегініс"]
+    }
+  ]
+}

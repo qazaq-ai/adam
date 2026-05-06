@@ -1,7 +1,7 @@
 {
-  "version": "4.78.0",
+  "version": "4.78.5",
   "status": "completed",
-  "elapsed_s": 74,
+  "elapsed_s": 67,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2768,
+    "facts_total": 2786,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2201,
+      "is_a": 2219,
       "lives_in": 8,
       "part_of": 245,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 199,
+      "world_core/programming_rust.jsonl": 217,
       "world_core/programming_rust_advanced.jsonl": 35,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -46917,6 +46917,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Итератор әдісі — `Iterator` трейтіне жататын кез келген әдіс. Екіге бөлінеді: тұтынатын бейімдеулер (итераторды бітіреді, нәтиже қайтарады) және итератор бейімдеулері (жаңа итератор жасайды, лазай). Тізбекке қосуға болады."
+    },
+    {
+      "subject": {
+        "surface": "rustup",
+        "root": "rustup",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust құралы",
+        "root": "rust құралы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_200"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`rustup` — `Rust` нұсқаларын басқаратын ресми құрал. Ол сізге қажетті нұсқаны орнатады, оны жаңартады және әртүрлі құрастыру мақсаттарына арналған құрал жинақтарын қосады. Орнату: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` (Linux/macOS). `rustup` арқылы орнатқанда машинаңызға бірнеше зат қатар келеді: `rustc` компиляторы, `cargo` құрылыс құралы, `rustfmt` пішімдеуші және Rust стандартты кітапханасы."
+    },
+    {
+      "subject": {
+        "surface": "rustup update",
+        "root": "rustup update",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rustup командасы",
+        "root": "rustup командасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_201"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`rustup update` — `Rust` нұсқасын ең соңғыға дейін жаңартатын команда. `Rust` ауымдастығы шамамен 6 апта сайын жаңа нұсқа шығарады; жаңарту қажет болғанда осы команданы терминалда енгізіңіз."
+    },
+    {
+      "subject": {
+        "surface": "rustup doc",
+        "root": "rustup doc",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rustup командасы",
+        "root": "rustup командасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_202"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`rustup doc` — `Rust` стандартты кітапхана құжаттамасының жергілікті көшірмесін шолғышта ашатын команда. Интернетке шықпай-ақ оқуға болады. Бұл құжаттама `rustup` орнатқан кезде автоматты түрде орнатылады."
+    },
+    {
+      "subject": {
+        "surface": "cargo new",
+        "root": "cargo new",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo командасы",
+        "root": "cargo командасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_203"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`cargo new <атау>` — Cargo арқылы жаңа `Rust` жобасын жасайтын команда. Көрсетілген атаумен қалта жасайды, ішінде үшеуін дайындайды: `Cargo.toml` файлы (метадеректер), `src/` қалтасы, `src/main.rs` бастапқы файлы. Сонымен қатар автоматты түрде `git` қоймасын бастайды. Кітапхана жобасы үшін `cargo new --lib` қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "src/main.rs",
+        "root": "src/main.rs",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust бастапқы файлы",
+        "root": "rust бастапқы файлы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_204"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`src/main.rs` — Cargo жобасының бастапқы орындалатын файлы. Cargo жобаның бүкіл `Rust` бастапқы кодын `src/` қалтасына сақтайтыны шартты келісім. Жобаның түбірлік қалтасы тек `Cargo.toml`, `README.md`, лицензия және басқа да конфигурация файлдарына арналған. Кітапхана үшін эквивалент — `src/lib.rs`."
+    },
+    {
+      "subject": {
+        "surface": "cargo build",
+        "root": "cargo build",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo командасы",
+        "root": "cargo командасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_205"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`cargo build` — Cargo арқылы жобаны құрастыратын команда. Әдепкі бойынша `dev` (даму) бейіні арқылы құрастырады — жылдам құрастыру, бірақ оптимизациясыз. Нәтиже `target/debug/<атау>` файлында пайда болады. Орындау: `./target/debug/<атау>`. Үлкен оптимизация үшін `cargo build --release`."
+    },
+    {
+      "subject": {
+        "surface": "cargo run",
+        "root": "cargo run",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo командасы",
+        "root": "cargo командасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_206"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`cargo run` — Cargo арқылы жобаны құрастырып, бірден орындайтын команда. Алдымен өзгеріс бар-жоғын тексереді (өзгеріс болса құрастырады), содан кейін орындалатын файлды іске қосады. Әзірлеуші ретінде ең жиі қолданылатын команда. Аргументтерді беру: `cargo run -- arg1 arg2`."
+    },
+    {
+      "subject": {
+        "surface": "cargo check",
+        "root": "cargo check",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo командасы",
+        "root": "cargo командасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_207"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`cargo check` — кодтың құрастырылатынын тексеретін, бірақ нақты орындалатын файл жасамайтын команда. Сондықтан `cargo build`-тен әлдеқайда жылдам жұмыс істейді. Әзірлеу барысында кодтың дұрыс жазылғанын жиі тексеріп отыруға ыңғайлы — қателер болса бірден көрсетеді."
+    },
+    {
+      "subject": {
+        "surface": "cargo build --release",
+        "root": "cargo build --release",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo командасы",
+        "root": "cargo командасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_208"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`cargo build --release` — оптимизациялары қосылған, орындалу жылдамдығы жоғары орындалатын файлды жасайтын команда. Нәтиже `target/release` қалтасына түседі. Оптимизация құрастыру уақытын ұзартады, бірақ бағдарламаның орындалу жылдамдығын едәуір арттырады. Бағдарламаны соңғы пайдаланушыға берерде немесе оның жылдамдығын өлшегенде осы режімде құрастыру керек."
+    },
+    {
+      "subject": {
+        "surface": "dev бейіні",
+        "root": "dev бейіні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo бейіні",
+        "root": "cargo бейіні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_209"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`dev` бейіні (даму) — Cargo-ның әдепкі құрастыру бейіні: жылдам құрастыру, оптимизациясыз, толық жөндеу ақпаратымен. Нәтиже `target/debug/`-қа түседі. Әзірлеуге арналған. `release` бейіні — оптимизациямен, баяуырақ құрастырылады, бірақ кодтың жылдамдығы жоғары; нәтиже `target/release/`-те."
+    },
+    {
+      "subject": {
+        "surface": "release бейіні",
+        "root": "release бейіні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo бейіні",
+        "root": "cargo бейіні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_210"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`release` бейіні (шығарылым) — Cargo-ның оптимизациямен құрастыратын бейіні. `cargo build --release` арқылы шакырылады. Нәтиже `target/release/`-те. Жөндеу ақпараты аз, оптимизация күшті — бағдарламаның орындалу жылдамдығы әлдеқайда жоғары. Соңғы пайдаланушыға беруге және өнімділік өлшеуге арналған."
+    },
+    {
+      "subject": {
+        "surface": "target қалтасы",
+        "root": "target қалтасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo артефакт қалтасы",
+        "root": "cargo артефакт қалтасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_211"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`target/` қалтасы — Cargo құрастыру нәтижелерін сақтайтын қалта. Үш қосалқы қалта: `target/debug/` (`cargo build` нәтижесі — жылдам, оптимизациясыз), `target/release/` (`cargo build --release` нәтижесі — оптимизирленген), `target/.rustc_info.json` және басқа метадеректер. Әдетте `.gitignore`-ге қосылады."
+    },
+    {
+      "subject": {
+        "surface": "println",
+        "root": "println",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust макросы",
+        "root": "rust макросы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_212"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`println!` — `Rust`-та терминалға жолды шығаратын макрос. Леп белгісі (`!`) — макросты функциядан ажырататын белгі. Қолдану: `println!(\"Hello, world!\");` немесе `println!(\"x = {}\", x);` (форматтауыш). Жол соңы автоматты түрде қосылады. Жол қоспай шығару керек болса — `print!`. Қателікке шығару — `eprintln!`."
+    },
+    {
+      "subject": {
+        "surface": "fn main",
+        "root": "fn main",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust кіру нүктесі",
+        "root": "rust кіру нүктесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_213"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`fn main()` — кез келген орындалатын `Rust` бағдарламасында ең бірінші іске қосылатын код. `Rust`-тың кіру нүктесі. Параметрлері әдетте жоқ (CLI аргументтерін `std::env::args()` арқылы алады). Денесі фигуралы жақшалармен (`{}`) оралады. Кітапхана жобаларында (`src/lib.rs`) `main` болмайды."
+    },
+    {
+      "subject": {
+        "surface": "rs кеңейтімі",
+        "root": "rs кеңейтімі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust файл кеңейтімі",
+        "root": "rust файл кеңейтімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_214"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`.rs` — `Rust` бастапқы файлдарының кеңейтімі. Файл атауы snake_case стилін ұстанады: бірнеше сөз болса астыңғы сызықпен бөлінеді (`hello_world.rs`, `config_loader.rs`); бір сөзден тұратын атау тек кіші әріптермен (`main.rs`, `lib.rs`). `helloworld.rs` сияқты бөлінбеген атаулар қабылданбайды."
+    },
+    {
+      "subject": {
+        "surface": "edition",
+        "root": "edition",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust басылым жүйесі",
+        "root": "rust басылым жүйесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_215"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`edition` — `Cargo.toml`-да жобаның қай `Rust` басылымын қолданатынын көрсететін параметр: `edition = \"2024\"`. Әр басылым (2015, 2018, 2021, 2024) синтаксис пен тіл қасиеттерінің жинағын тіркейді. Жаңа басылымдар бар синтаксисті бұзбайды — нақты жоба нақты басылымда қалады. `cargo new` әдепкі бойынша ең соңғы тұрақты басылымды қояды."
+    },
+    {
+      "subject": {
+        "surface": "toml",
+        "root": "toml",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "конфигурация пішімі",
+        "root": "конфигурация пішімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_216"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "TOML (Tom's Obvious, Minimal Language) — конфигурация үшін арналған пішім. `Cargo.toml` файлы осы пішімді қолданады. Құрылымы: `[бөлім]` тақырыптары (`[package]`, `[dependencies]`), әр бөлімнің ішінде `key = value` жұптары. JSON-ға қарағанда оқуы оңай, YAML-ға қарағанда нүзе емес. `Rust` экожүйесінде стандарт пішім."
+    },
+    {
+      "subject": {
+        "surface": "rust стилі",
+        "root": "rust стилі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіл шартты келісімдері",
+        "root": "тіл шартты келісімдері",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_217"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Rust стилі — кодтың сыртқы келбеті туралы шартты келісімдер: төрт бос орынмен шегініс жасалады (tabulation емес); атау snake_case-те (`my_variable`, `read_file`); тип CamelCase-те (`MyStruct`, `Result`); тұрақты SCREAMING_SNAKE_CASE-те (`MAX_SIZE`); файл атауы snake_case-те. Пішімдеу үшін `cargo fmt` (rustfmt-ті қолданады) шакыруға болады."
     },
     {
       "subject": {

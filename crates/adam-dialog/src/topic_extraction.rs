@@ -1898,6 +1898,32 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "итератор әдісі",
     "итератор бейімдеуі",
     "тұтынатын бейімдеу",
+    // **v4.79.0** — Rust Book chapter 1 (Bastau / setup) deepening.
+    // Subjects that contain spaces or `/` (compound forms): each
+    // appears as a `subject` or `object` of a curated rust_200…217
+    // entry.
+    "rustup update",
+    "rustup doc",
+    "cargo new",
+    "cargo build --release",
+    "src/main.rs",
+    "dev бейіні",
+    "release бейіні",
+    "target қалтасы",
+    "fn main",
+    "rs кеңейтімі",
+    "rust стилі",
+    "rust құралы",
+    "rustup командасы",
+    "rust бастапқы файлы",
+    "cargo бейіні",
+    "cargo артефакт қалтасы",
+    "rust макросы",
+    "rust кіру нүктесі",
+    "rust файл кеңейтімі",
+    "rust басылым жүйесі",
+    "конфигурация пішімі",
+    "тіл шартты келісімдері",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns
@@ -1908,6 +1934,14 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
 pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
     let lowered = input.to_lowercase();
     let lowered_tokens: Vec<&str> = lowered.split_whitespace().collect();
+    // **v4.79.0** — actually iterate longest-first so multi-token
+    // compounds containing shorter ones (e.g. «cargo build --release»
+    // vs «cargo build») resolve to the most specific match. Earlier
+    // versions claimed longest-first in the const docstring but the
+    // loop iterated in declaration order; surfaced when ch.1 deepening
+    // shipped «cargo build --release» as a separate canonical entry.
+    let mut sorted: Vec<&&str> = MULTIWORD_ENTITIES.iter().collect();
+    sorted.sort_by_key(|b| std::cmp::Reverse(b.len()));
     // First pass: exact substring (preserves all pre-v4.40.5
     // matches bit-for-bit when the input surface contains the
     // multiword in canonical bare form). **v4.71.5** — for
@@ -1916,13 +1950,13 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
     // instead of arbitrary substring; otherwise short single-word
     // entries like «темір» (Fe element) would shadow the third-
     // pass genitive logic for «темір жол» on input «темірдің жолы».
-    for entity in MULTIWORD_ENTITIES {
+    for entity in &sorted {
         if entity.contains(' ') {
-            if lowered.contains(entity) {
-                return Some((*entity).to_string());
+            if lowered.contains(**entity) {
+                return Some((**entity).to_string());
             }
-        } else if lowered_tokens.contains(entity) {
-            return Some((*entity).to_string());
+        } else if lowered_tokens.contains(*entity) {
+            return Some((**entity).to_string());
         }
     }
     // **v4.40.5** — second pass: inflected-second-word match. For
@@ -2158,6 +2192,14 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     "fold",
     "chain",
     "next",
+    // **v4.79.0** — Rust Book chapter 1 (Bastau / setup) deepening.
+    // rust_200…217. Single-word Latin tokens; multi-word compounds
+    // («cargo new», «cargo build --release», «target қалтасы», etc.)
+    // are in MULTIWORD_ENTITIES.
+    "rustup",
+    "println",
+    "edition",
+    "toml",
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word

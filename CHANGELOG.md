@@ -7,6 +7,78 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.79.0] — 2026-05-06 — Rust Book chapter 1 deepening + per-chapter test invariant — Bastau
+
+Per user pushback («Обучать надо с первой главы и постепенно усложняя»): pivot the Rust-curriculum roadmap from gap-density-driven jumps to strict pedagogical chapter-by-chapter order, starting with chapter 1. Plus new directive («каждую главу покрывай реальными тестами и сразу исправляй или корректируй обучение»): this release introduces the per-chapter holdout pattern that every future chapter release follows.
+
+### What's added
+
+**18 new curated entries `rust_200…217`** in `programming_rust.jsonl` covering chapter 1 («Бастау») in curriculum-grade depth:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_200 | rustup | Toolchain manager (install command, components) |
+| rust_201 | rustup update | Version refresh |
+| rust_202 | rustup doc | Local stdlib docs |
+| rust_203 | cargo new | Project scaffolding (Cargo.toml + src/ + git init) |
+| rust_204 | src/main.rs | Source-file convention |
+| rust_205 | cargo build | dev profile build to target/debug/ |
+| rust_206 | cargo run | Build + execute (most-used command) |
+| rust_207 | cargo check | Fast compile-check, no executable |
+| rust_208 | cargo build --release | Optimized build to target/release/ |
+| rust_209 | dev бейіні | dev profile (debug, fast compile, no opt) |
+| rust_210 | release бейіні | release profile (slow compile, fast execution) |
+| rust_211 | target қалтасы | Cargo artifact directory layout |
+| rust_212 | println | Macro vs function (! suffix), formatter syntax |
+| rust_213 | fn main | Entry-point semantics |
+| rust_214 | rs кеңейтімі | .rs extension + snake_case file naming |
+| rust_215 | edition | Rust edition system (2015/2018/2021/2024) |
+| rust_216 | toml | TOML configuration format |
+| rust_217 | rust стилі | Style umbrella (snake_case / CamelCase / SCREAMING_SNAKE_CASE / 4-space indent / cargo fmt) |
+
+Each entry: Kazakh definition + concrete code example pulled from the translated chapter (e.g. `cargo run -- arg1 arg2` for argument passing).
+
+### First per-chapter test invariant
+
+- `data/eval/rust_book_chapter_01_holdout.json` — 18 natural Kazakh queries against the new entries, 6 categories (`ch01_install`, `ch01_cargo`, `ch01_project_layout`, `ch01_profile`, `ch01_hello_world`, `ch01_style`).
+- `crates/adam-dialog/tests/rust_book_chapter_01.rs` — runs them with **100 % floor** (each case maps to a shipped entry). Cross-cutting `rust_holdout` keeps its 70 % floor.
+- Pattern repeats for `rust_book_chapter_02.rs`, `…03.rs`, … going forward.
+
+### Matcher bug fixed alongside
+
+`multiword_entity_hint` claimed longest-first matching in its docstring but actually iterated declaration order — surfaced when «cargo build --release» got shadowed by «cargo build» on the smoke test. Now sorts by length descending: `sorted.sort_by_key(|b| std::cmp::Reverse(b.len()))`. Zero regressions on the workspace 977-test suite.
+
+### Topic extraction extensions
+
+- `LATIN_TECH_SUBJECTS` += 4 bare tokens (`rustup`, `println`, `edition`, `toml`).
+- `MULTIWORD_ENTITIES` += 22 compounds (subjects: `rustup update`, `rustup doc`, `cargo new`, `cargo build --release`, `src/main.rs`, `dev бейіні`, `release бейіні`, `target қалтасы`, `fn main`, `rs кеңейтімі`, `rust стилі`; objects: `rust құралы`, `rustup командасы`, `rust бастапқы файлы`, `cargo бейіні`, `cargo артефакт қалтасы`, `rust макросы`, `rust кіру нүктесі`, `rust файл кеңейтімі`, `rust басылым жүйесі`, `конфигурация пішімі`, `тіл шартты келісімдері`).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 1 holdout cases | ✅ 100% |
+| Existing `rust_concepts_holdout` | ✅ unchanged (no regression from matcher fix) |
+| Workspace tests | **977 passing** (was 976; +1 chapter-1 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2526 → **2544** (+18) |
+| world_core facts | 2768 → **2786** (+18) |
+| Derived facts | 30760 → **30771** (+11) |
+
+### Roadmap (Rust curriculum deepening — strict pedagogical order)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| v4.78.5 | ch. 13 | Iterators + closures (out-of-order, kept) |
+| **v4.79.0** | **ch. 1** | **Bastau (this release)** |
+| v4.79.5 | ch. 2 | Guessing game (rand / stdin / parse / Ordering / loop continue / type conversion) |
+| v4.80.0 | ch. 3 | Common programming concepts (variables / types / control flow / function returns / shadowing) — deepening |
+| v4.80.5 | ch. 4 | Ownership deepening (stack vs heap / move semantics / Copy vs Clone / borrow rules) |
+| v4.81.0 | ch. 5 | Structs deepening |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.0` minor — first per-chapter test invariant + multiword matcher fix + 18 curated entries; architectural addition (per-chapter test pattern). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.78.5] — 2026-05-06 — Rust Book chapter 13 deepening — iterators + closures
 
 First Rust-training release of the v4.78.x cadence. Per user directive «начинай обучать модель программированию на Rust»: start chapter-by-chapter deepening of the Kazakh-translated Rust Book at `data/raw/rust_book_kk/`. Chapter 13 (484 lines, «Функционал тілдік мүмкіндіктер: итераторлар мен жабулар») was previously thin in `programming_rust.jsonl` — ~14 one-line stubs.
