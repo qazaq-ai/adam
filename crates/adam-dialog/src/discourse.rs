@@ -338,6 +338,46 @@ mod russian_tests {
 /// numerics like «17» (e.g. asking about Kazakhstan's 17 oblasts)
 /// don't fire because they're not paired with operators or math
 /// verbs.
+/// **v4.78.0** — Political-recommendation detector (Codex round-3
+/// Bug 3). Returns true when the user asks adam to recommend a
+/// political party / candidate / vote / position. Adam is a school
+/// tutor and must not give partisan recommendations; routes to
+/// dedicated `political_safety` refusal template.
+///
+/// Conservative: requires both a political topic marker AND a
+/// recommendation/preference verb. Generic factual queries
+/// («Партия деген не?» / «Қандай партиялар бар?») don't trigger.
+pub fn is_political_recommendation(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    const POLITICAL_TOPICS: &[&str] = &[
+        "партия",
+        "саясатшы",
+        "кандидат",
+        "сайлау",
+        "дауыс",
+        "идеолог",
+        "көшбасшы",
+        "оппозиция",
+    ];
+    const RECOMMENDATION_VERBS: &[&str] = &[
+        "қолда",
+        "дауыс бер",
+        "кеңес бер",
+        "ұсын",
+        "таңдау керек",
+        "жақсырақ",
+        "тиімдірек",
+        "қайсын таңда",
+        "қайсысын таңда",
+        "сен қалай ойлайсың",
+        "пікірің қандай",
+        "сенің пікірің",
+    ];
+    let has_political = POLITICAL_TOPICS.iter().any(|t| lower.contains(t));
+    let has_recommend = RECOMMENDATION_VERBS.iter().any(|v| lower.contains(v));
+    has_political && has_recommend
+}
+
 /// **v4.77.0** — Code-snippet detector (Codex round-2 Bug 8). Returns
 /// true when input matches Python-style code: «for i in range(3):
 /// print(i)» / «def foo(x):» / «class Bar:» etc. Conservative —

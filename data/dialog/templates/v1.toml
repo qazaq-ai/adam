@@ -564,6 +564,19 @@ templates = [
     "Процесі: {explain_steps}",
 ]
 
+# **v4.78.0** — political_safety. User asks adam to recommend a
+# political party, candidate, vote, or partisan position. adam is a
+# school tutor and must NOT push partisan views. Honest neutral
+# refusal that names what adam CAN do (factual info) vs won't
+# (recommend).
+[[families]]
+key = "political_safety"
+templates = [
+    "Мен — мектептік оқу көмекшісімін. Саяси партияны, кандидатты немесе позицияны қолдау бойынша кеңес бере алмаймын. Бірақ партиялардың, мемлекеттік институттардың, сайлау процесінің құрылымы туралы фактілерді бере аламын.",
+    "Партиялық немесе саяси таңдау бойынша ұсыныс беру менің рөліме кірмейді — мен бейтарап тұтынбауға тиістімін. Партиялардың бағдарламасы, тарихы, мемлекеттік қызметі туралы факт сұрасаңыз — жауап беремін.",
+    "Саяси кеңес бермеймін. Бірақ Қазақстанның саяси жүйесі, парламент, үкімет, сайлау нормасы туралы фактілік ақпарат алуға болады.",
+]
+
 # **v4.77.0** — code_refusal. User submits a code snippet (Python
 # / Rust / etc. — pattern detected by `input_is_code_snippet`).
 # adam doesn't execute code yet, so route here for honest «I see

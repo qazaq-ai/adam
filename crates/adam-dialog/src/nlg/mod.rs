@@ -162,12 +162,17 @@ mod rules;
 ///   order matching the existing `tool::render_grounded_fact`
 ///   behavior preserved bit-for-bit at the v4.42.5 NLG migration
 ///   point.
-fn all_rules() -> [&'static dyn NlgRule; 13] {
+fn all_rules() -> [&'static dyn NlgRule; 14] {
     [
         // Curated-raw-text rules first (special cases).
         &rules::HasQuantityDeclarative,
         &rules::RelatedToShectesDeclarative,
         &rules::RelatedToListDeclarative,
+        // **v4.78.0** — office→person direct rendering (Codex Bug 1).
+        // Must run BEFORE the generic RelatedTo «өзара байланысты»
+        // rule below so «Қазақстан Президенті — Тоқаев» wins over
+        // «X мен Y өзара байланысты» for office-holder facts.
+        &rules::RelatedToOfficeHolderDeclarative,
         // Composed rules (typed-primitives → surface).
         &rules::IsACopulaDeclarative,
         &rules::PartOfDeclarative,
@@ -182,7 +187,8 @@ fn all_rules() -> [&'static dyn NlgRule; 13] {
         &rules::AfterDeclarative,
         &rules::DoesToDeclarative,
         // General RelatedTo last (catches everything not caught
-        // by шектес / list-summary specialisations above).
+        // by шектес / list-summary / office-holder specialisations
+        // above).
         &rules::RelatedToOzaraDeclarative,
     ]
 }

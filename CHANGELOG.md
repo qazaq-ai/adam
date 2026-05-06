@@ -7,6 +7,46 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.78.0] — 2026-05-06 — Codex round-3 deferred bugs closed — office-holder direct rendering + political-safety detector + biology location/causal facts
+
+Closes the 3 architecturally-deeper Codex round-3 bugs deferred from v4.77.5. After this release, all 7 round-3 bugs are addressed (4 in v4.77.5 + 3 in v4.78.0).
+
+### Bugs fixed
+
+**Bug 1 — office-holder direct answer.** «Қазақстанның президенті кім?» / «Қазіргі президент кім?» / «Қазақстан премьер-министрі кім?» previously surfaced «X пен Y өзара байланысты» via the catch-all `RelatedToOzaraDeclarative` rule. Office→person facts (`gov_kz_006/016/017/020/022`) are stored as RelatedTo but should render definitionally. Fix: new `RelatedToOfficeHolderDeclarative` NLG rule registered before the catch-all. Detects subjects containing office markers (президент / премьер / премьер-министр / министр / әкім / хан / спикер / халифа / басшы / сұлтан / әкімші) and renders «X — Y».
+
+**Bug 3 — political-recommendation refusal.** «Маған бір партияны қолда деп кеңес бер» previously routed to generic templates. Fix: new `is_political_recommendation` detector in `discourse.rs` requiring AND of two markers — political topic (партия / саясатшы / кандидат / сайлау / дауыс / идеолог / көшбасшы / оппозиция) and recommendation verb (қолда / дауыс бер / кеңес бер / ұсын / таңдау керек / жақсырақ / тиімдірек / сен қалай ойлайсың / пікірің қандай / сенің пікірің). Sets `__political_safety__` slot. New `political_safety` template family (3 alternates) honestly refuses partisan advice while offering structural facts. Planner routes BEFORE `__code_input__`.
+
+**Bug 7 — location/causal facts.** 6 natural Kazakh queries previously returned unrelated proverbs/quotes:
+
+| Query | Pre-fix | Post-fix |
+|---|---|---|
+| Фотосинтез қайда жүреді? | unrelated quote | ✅ хлоропласт + жапырақ |
+| Тыныс алу қайда жүреді? | unrelated | ✅ өкпе + альвеолалар |
+| Ас қорыту қайда жүреді? | proverb «Асқа, тойға…» | ✅ асқазан + ішек + қышқыл/сілті орта |
+| Митоз қайда жүреді? | unrelated | ✅ жасуша ядросы |
+| Қанайналым жүйесі қайдан басталады? | «Олардың оңтүстігі мен шығысын таулар жүйесі…» | ✅ жүректен басталады + артериялар/капиллярлар |
+| Мендель заңдарын кім ашты? | «Банкноттарды қолдан жасау заңмен қудаланады» | ✅ Грегор Мендель + 1865 + 3 заң |
+
+Fix: added 6 curated entries `bio_s_121…126` to `biology_school.jsonl`. `bio_s_125` and `bio_s_126` carry dual-form subjects (`қанайналым жүйесі` AND `қанайналым`; `мендель заңдары` AND `мендель заңы`) so both natural phrasings retrieve. MULTIWORD_ENTITIES extended with 8 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| Bug 1 — Қазақстанның президенті кім? | ✅ «Қазақстанның президенті — қасым-жомарт тоқаев» |
+| Bug 1 — Қазақстан премьер-министрі кім? | ✅ «Қазақстан премьер-министрі — олжас бектенов» |
+| Bug 3 — Маған бір партияны қолда деп кеңес бер | ✅ political_safety honest refusal |
+| Bug 7 — all 6 queries | ✅ surface relevant content |
+| 100-query battery diff vs v4.77.5 | **0 differences** |
+| Workspace tests | **976 passing** |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2502 → **2508** (+6) |
+| world_core facts | 2742 → **2750** (+8) |
+| Derived facts | 30656 → **30661** (+5) |
+
+Cadence: `.0` minor — three new architectural pieces (NLG rule + safety detector + curated curriculum data).
+
 ## [4.77.5] — 2026-05-06 — Codex round-3 surgical fixes — case-suffix stripping in comparison + Uranium chem disambig + ДНҚ alias + cultural foundations
 
 Codex round-3 audit on v4.77.0 found 7 new bugs across politics / geology / culture / biology / Rust. v4.77.5 ships 4 surgical fixes (cases that need only data + small extraction tweaks); v4.78.0 will tackle the 3 architecturally-deeper bugs (direct-answer rendering, political safety, location/causal facts).

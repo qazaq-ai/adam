@@ -342,10 +342,76 @@ impl NlgRule for RelatedToShectesDeclarative {
 
 // ---------------------------------------------------------------------------
 
+/// **v4.78.0** — RelatedTo office-holder direct declarative:
+/// «Қазақстанның Президенті — Қасым-Жомарт Тоқаев». Codex round-3
+/// Bug 1 found that office→person facts (gov_kz_006/016/017/020/022)
+/// were rendered via the generic «X мен Y өзара байланысты» template
+/// — accurate but pedagogically wrong for «X кім?» questions, which
+/// expect a definitional pointer.
+///
+/// Fires when:
+/// - predicate = RelatedTo
+/// - subject root contains an office word («президенті» / «премьері»
+///   / «министрі» / «басшысы» / «спикері» / «акімі»)
+/// - mood = Declarative
+///
+/// Runs BEFORE `RelatedToOzaraDeclarative` (priority) so the
+/// office→person case gets the definitional rendering. Other
+/// RelatedTo facts continue to use the «өзара байланысты» phrasing.
+pub struct RelatedToOfficeHolderDeclarative;
+
+impl NlgRule for RelatedToOfficeHolderDeclarative {
+    fn matches(&self, frame: &SentenceFrame) -> bool {
+        if !matches!(frame.fact.predicate, ReasPredicate::RelatedTo) {
+            return false;
+        }
+        if !matches!(frame.mood, SentenceMood::Declarative) {
+            return false;
+        }
+        let subj = frame.fact.subject.root.to_lowercase();
+        // Office words match both bare and genitive forms. «президент»
+        // covers «қазіргі президент» / «президент кім»; «президенті»
+        // covers «Қазақстанның президенті» (the genitive 3sg form).
+        const OFFICE_MARKERS: &[&str] = &[
+            "президент",
+            "премьер-министр",
+            "премьер",
+            "министр",
+            "басшы",
+            "спикер",
+            "әкім",
+            "хан",
+            "сұлтан",
+            "халифа",
+            "әкімші",
+        ];
+        OFFICE_MARKERS.iter().any(|m| subj.contains(m))
+    }
+
+    fn render(&self, frame: &SentenceFrame) -> Option<String> {
+        let subject_cap = capitalize_first(preferred_surface(&frame.fact.subject));
+        let body = ensure_period(format!(
+            "{} — {}",
+            subject_cap,
+            preferred_surface(&frame.fact.object)
+        ));
+        Some(wrap_introducer(
+            frame.introducer,
+            &frame.fact.subject.root,
+            &body,
+        ))
+    }
+
+    fn name(&self) -> &'static str {
+        "RelatedToOfficeHolderDeclarative"
+    }
+}
+
 /// RelatedTo general declarative: «X мен Y өзара байланысты».
 ///
-/// Default RelatedTo phrasing. Runs AFTER list-summary and шектес
-/// special cases via priority order in `super::all_rules`.
+/// Default RelatedTo phrasing. Runs AFTER list-summary, шектес, and
+/// (v4.78.0) office-holder special cases via priority order in
+/// `super::all_rules`.
 pub struct RelatedToOzaraDeclarative;
 
 impl NlgRule for RelatedToOzaraDeclarative {

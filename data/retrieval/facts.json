@@ -1,7 +1,7 @@
 {
-  "version": "4.77.0",
+  "version": "4.77.5",
   "status": "completed",
-  "elapsed_s": 65,
+  "elapsed_s": 63,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2742,
+    "facts_total": 2750,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,9 +27,9 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2179,
+      "is_a": 2183,
       "lives_in": 8,
-      "part_of": 241,
+      "part_of": 245,
       "related_to": 123
     },
     "by_pack": {
@@ -45,7 +45,7 @@
       "world_core/animals.jsonl": 42,
       "world_core/astronomy.jsonl": 60,
       "world_core/biology_basic.jsonl": 53,
-      "world_core/biology_school.jsonl": 120,
+      "world_core/biology_school.jsonl": 128,
       "world_core/body_parts.jsonl": 57,
       "world_core/chemistry_school.jsonl": 132,
       "world_core/clothing.jsonl": 35,
@@ -8257,6 +8257,166 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Антитене — иммундық жүйе шығаратын, антигендерді бейтараптайтын ақуыз."
+    },
+    {
+      "subject": {
+        "surface": "фотосинтез",
+        "root": "фотосинтез",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "хлоропласт",
+        "root": "хлоропласт",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_school",
+      "source": {
+        "pack": "world_core/biology_school.jsonl",
+        "sample_id": "bio_s_121"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Фотосинтез өсімдік жасушаларының хлоропласттарында жүреді. Хлоропластардағы хлорофилл пигменті күн сәулесін сіңіреді. Жапырақ — фотосинтездің негізгі органы."
+    },
+    {
+      "subject": {
+        "surface": "тыныс алу",
+        "root": "тыныс алу",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "өкпе",
+        "root": "өкпе",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_school",
+      "source": {
+        "pack": "world_core/biology_school.jsonl",
+        "sample_id": "bio_s_122"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тыныс алу өкпеде жүреді: ауадан оттек қанға өтеді, көмірқышқыл газы қаннан ауаға бөлінеді (газ алмасу процесі альвеолаларда орындалады)."
+    },
+    {
+      "subject": {
+        "surface": "ас қорыту",
+        "root": "ас қорыту",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "асқазан",
+        "root": "асқазан",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_school",
+      "source": {
+        "pack": "world_core/biology_school.jsonl",
+        "sample_id": "bio_s_123"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ас қорыту негізінен асқазан мен ішекте жүреді. Асқазанда — қышқыл орта (НСl), ішекте — сілті ортасы; ас фермент әсерінен ыдырайды."
+    },
+    {
+      "subject": {
+        "surface": "митоз",
+        "root": "митоз",
+        "pos": "noun"
+      },
+      "predicate": "PartOf",
+      "object": {
+        "surface": "жасуша ядросы",
+        "root": "жасуша ядросы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_school",
+      "source": {
+        "pack": "world_core/biology_school.jsonl",
+        "sample_id": "bio_s_124"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Митоз жасушаның ядросында жүреді. Бір ананы жасушадан хромосомалардың саны бірдей екі ұл жасуша түзіледі."
+    },
+    {
+      "subject": {
+        "surface": "қанайналым жүйесі",
+        "root": "қанайналым жүйесі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жүректен басталатын қан тасымалдау процесі",
+        "root": "жүректен басталатын қан тасымалдау процесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_school",
+      "source": {
+        "pack": "world_core/biology_school.jsonl",
+        "sample_id": "bio_s_125"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қанайналым жүйесі — жүректен басталып, артериялар, капиллярлар, көктамырлар арқылы бүкіл денеге қанды тасымалдайтын процесс. Жүрек насос рөлін атқарады."
+    },
+    {
+      "subject": {
+        "surface": "қанайналым",
+        "root": "қанайналым",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жүректен басталатын қан тасымалдау процесі",
+        "root": "жүректен басталатын қан тасымалдау процесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_school",
+      "source": {
+        "pack": "world_core/biology_school.jsonl",
+        "sample_id": "bio_s_125"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қанайналым жүйесі — жүректен басталып, артериялар, капиллярлар, көктамырлар арқылы бүкіл денеге қанды тасымалдайтын процесс. Жүрек насос рөлін атқарады."
+    },
+    {
+      "subject": {
+        "surface": "мендель заңдары",
+        "root": "мендель заңдары",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грегор мендель ашқан генетика заңдары",
+        "root": "грегор мендель ашқан генетика заңдары",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_school",
+      "source": {
+        "pack": "world_core/biology_school.jsonl",
+        "sample_id": "bio_s_126"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мендель заңдары — генетикадағы тұқым қуалаушылықтың негізгі заңдары. 1865 жылы Грегор Мендель бұршақ өсімдігімен жасаған тәжірибелері негізінде ашты. Үш заң: біркелкілік, ажырау, тәуелсіз тарату."
+    },
+    {
+      "subject": {
+        "surface": "мендель заңы",
+        "root": "мендель заңы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "грегор мендель ашқан генетика заңдары",
+        "root": "грегор мендель ашқан генетика заңдары",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_school",
+      "source": {
+        "pack": "world_core/biology_school.jsonl",
+        "sample_id": "bio_s_126"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мендель заңдары — генетикадағы тұқым қуалаушылықтың негізгі заңдары. 1865 жылы Грегор Мендель бұршақ өсімдігімен жасаған тәжірибелері негізінде ашты. Үш заң: біркелкілік, ажырау, тәуелсіз тарату."
     },
     {
       "subject": {

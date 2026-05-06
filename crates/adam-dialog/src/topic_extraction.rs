@@ -1879,6 +1879,15 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "type inference",
     "тип шығару тәсілі",
     "автоматты тип анықтау",
+    // **v4.78.0** — biology_school location/causal facts (Codex round-3 Bug 7).
+    "ас қорыту",
+    "тыныс алу",
+    "қанайналым жүйесі",
+    "мендель заңы",
+    "мендель заңдары",
+    "жасуша ядросы",
+    "жүректен басталатын қан тасымалдау процесі",
+    "грегор мендель ашқан генетика заңдары",
 ];
 
 /// Longest-match scan of `input` against `MULTIWORD_ENTITIES`. Returns

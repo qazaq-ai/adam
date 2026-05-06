@@ -412,6 +412,35 @@ pub fn plan_response_with_epistemic(
             };
         }
     }
+    // **v4.78.0** — political-safety refusal (Codex round-3 Bug 3).
+    // Routes to dedicated `political_safety` family BEFORE all
+    // factual paths. adam doesn't give partisan recommendations.
+    if extra_slots.contains_key("__political_safety__") {
+        let key = "political_safety";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: political_safety override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                applicable_all.len(),
+                idx,
+                chosen,
+            ));
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v4.77.0** — code-snippet refusal. Routes to dedicated
     // `code_refusal` family BEFORE math_refusal so Python-style
     // code «for i in range(3): print(i)» doesn't fall to «can't

@@ -1067,6 +1067,16 @@ impl Conversation {
         if code_input {
             extra_slots.insert("__code_input__".into(), "1".into());
         }
+        // **v4.78.0** — political-recommendation safety (Codex Bug 3).
+        // adam is a school tutor and must not push partisan views.
+        // When user asks adam to recommend a party / candidate / vote
+        // / political opinion, route to dedicated political_safety
+        // refusal that names what adam CAN do (factual info on
+        // institutions / parties / candidates) vs what it won't do
+        // (give a recommendation).
+        if crate::discourse::is_political_recommendation(input) {
+            extra_slots.insert("__political_safety__".into(), "1".into());
+        }
         // v4.6.12 — Math-input marker (set above based on
         // `input_is_math_expression`). Carried into the planner
         // so the `math_refusal` template family fires.
