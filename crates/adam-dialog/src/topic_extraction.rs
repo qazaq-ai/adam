@@ -113,6 +113,15 @@ pub(crate) const NOT_A_TOPIC: &[&str] = &[
     // stripped stem `нелік` so the ablative-scan in
     // `detect_statement_of_location` also skips it.
     "нелік",
+    // **v4.71.5** — relational predicate forms surfaced as bogus
+    // topic on «X пен Y байланысты ма?» relation queries. The FST
+    // analyses «байланысты» as an adjective form of байланыс (noun
+    // = "connection"), which then wins the first_noun_root pass when
+    // the actual topics X, Y are loanwords missing from the lexicon.
+    // Demote both surface forms so the relation-predicate doesn't
+    // eclipse the genuine topic candidates.
+    "байланыс",
+    "байланысты",
     // v3.9.5 — demonstrative qualifiers + quantifier forms.
     "мұндай",
     "сондай",
@@ -801,6 +810,120 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "алғашқы көмек",
     "жұқпалы ауру",
     "жұқпайтын ауру",
+    // **v4.71.5** — Single-word loanword topics from v4.66.0+
+    // educational stripe surfaced by the live REPL audit. These
+    // are FST-unknown proper nouns / loanwords that would otherwise
+    // require a topic marker («туралы», «деген») to surface as
+    // topic. Registering them as MULTIWORD_ENTITIES (single-word
+    // entries are valid) lets the substring scan catch them
+    // directly even in bare «X қандай Y?» queries.
+    //
+    // World geography (continents + ocean roots).
+    "антарктида",
+    "еуразия",
+    "африка",
+    "австралия",
+    // World history (ancient civilizations).
+    "месопотамия",
+    "ренессанс",
+    // Mathematics (loanword math hubs).
+    "алгебра",
+    "геометрия",
+    "тригонометрия",
+    "айнымалы",
+    "координата",
+    "функция",
+    "теңдеу",
+    "теңсіздік",
+    "дискриминант",
+    // Physics (loanword shamas + units).
+    "механика",
+    "кинематика",
+    "динамика",
+    "статика",
+    "термодинамика",
+    "электродинамика",
+    "оптика",
+    "гравитация",
+    "температура",
+    "энергия",
+    "импульс",
+    "инерция",
+    "конденсатор",
+    // Chemistry (loanword elements + compounds).
+    "молекула",
+    "атом",
+    "электрон",
+    "протон",
+    "нейтрон",
+    "ион",
+    "оксид",
+    "галогендер",
+    "кальций",
+    "магний",
+    "натрий",
+    "калий",
+    "хлор",
+    "фтор",
+    "бром",
+    "йод",
+    "аргон",
+    "гелий",
+    "неон",
+    "сутек",
+    "оттек",
+    "көміртек",
+    "азот",
+    "темір",
+    "алюминий",
+    "мыс",
+    "алкан",
+    "алкен",
+    "алкин",
+    "метан",
+    "этан",
+    "пропан",
+    "бутан",
+    "ацетилен",
+    "этанол",
+    "метанол",
+    "глицерин",
+    "альдегид",
+    "кетон",
+    "ацетон",
+    "эфир",
+    "глюкоза",
+    "сахароза",
+    "крахмал",
+    "целлюлоза",
+    "ақуыз",
+    "гомолог",
+    "изомерия",
+    "нуклеотид",
+    "полисахарид",
+    "полимер",
+    "мономер",
+    // Literature (literary devices).
+    "метафора",
+    "эпитет",
+    "теңеу",
+    "гипербола",
+    "кейіптеу",
+    "аллегория",
+    "ассонанс",
+    "аллитерация",
+    // Medicine (loanword concepts).
+    "медицина",
+    "анатомия",
+    "физиология",
+    "симптом",
+    "диагноз",
+    "профилактика",
+    "иммунитет",
+    "вакцина",
+    "антибиотик",
+    "вирус",
+    "бактерия",
     // **v4.43.8** — direct office-holder bridges (closes carry-
     // forward where «Қазіргі Қазақстан президенті кім?» fell to
     // the abstract «Қазақстан президенттігі» fact instead of
@@ -1627,11 +1750,21 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
 /// of the inflected compound.
 pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
     let lowered = input.to_lowercase();
+    let lowered_tokens: Vec<&str> = lowered.split_whitespace().collect();
     // First pass: exact substring (preserves all pre-v4.40.5
     // matches bit-for-bit when the input surface contains the
-    // multiword in canonical bare form).
+    // multiword in canonical bare form). **v4.71.5** — for
+    // single-token entries (loanword / proper-noun additions for
+    // educational stripe), require word-boundary token equality
+    // instead of arbitrary substring; otherwise short single-word
+    // entries like «темір» (Fe element) would shadow the third-
+    // pass genitive logic for «темір жол» on input «темірдің жолы».
     for entity in MULTIWORD_ENTITIES {
-        if lowered.contains(entity) {
+        if entity.contains(' ') {
+            if lowered.contains(entity) {
+                return Some((*entity).to_string());
+            }
+        } else if lowered_tokens.contains(entity) {
             return Some((*entity).to_string());
         }
     }

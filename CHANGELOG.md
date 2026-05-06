@@ -7,6 +7,51 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.71.5] — 2026-05-06 — Live REPL audit fixes — loanword topic recognition + relation-predicate demotion
+
+Driven by the v4.71.0 live REPL battery: 12-query audit across the educational stripe surfaced two systemic gaps where new content was correctly stored but the dialog layer couldn't surface it. No new world_core data — pure runtime fix.
+
+### Bugs identified in REPL audit
+
+**Bug 1 — loanword proper-noun queries fall through topic extraction.**
+- Repro: «Антарктида қандай материк?» → `unknown.clarify_no_topic` fallback («сұрақ нақтыланбады»).
+- Root cause: `noun_hint = None`. Antarctic / Eurasia / methaphora / acetone / etc. are FST-unknown loanwords; no topic marker («туралы», «деген») present; topic extractor exhausted all strategies.
+
+**Bug 2 — relation-predicate eclipses the actual topics in «X пен Y байланысты ма?».**
+- Repro: «метафора мен эпитет байланысты ма?» → unrelated fact about халық тығыздығы.
+- Root cause: tokens = [метафора, мен, эпитет, байланысты, ма]. метафора + эпитет not in FST lexicon. FST analyses байланысты (predicate adjective) as a form of байланыс (noun = "connection") and `first_noun_root` returns it as the topic. Retrieval then surfaces an unrelated fact about a different "byaylanys" sentence.
+
+### Innovations
+
+**(1) `topic_extraction::NOT_A_TOPIC` extended** with `байланыс` / `байланысты`. These are relational predicates surfaced by `X пен Y байланысты ма?` queries, never the actual topic.
+
+**(2) `MULTIWORD_ENTITIES` extended with single-word loanword topics** from the v4.66.0+ educational stripe (~85 entries):
+- World geography: антарктида / еуразия / африка / австралия / месопотамия / ренессанс
+- Mathematics: алгебра / геометрия / тригонометрия / айнымалы / координата / функция / теңдеу / теңсіздік / дискриминант
+- Physics: механика / кинематика / динамика / статика / термодинамика / электродинамика / оптика / гравитация / температура / энергия / импульс / инерция / конденсатор
+- Chemistry: атоms (атом / молекула / электрон / протон / нейтрон / ион), elements (~20 named), organic (алкан/алкен/алкин + 6 hydrocarbons + 4 alcohols/carbonyls + 6 biomolecules), polymer/мономер
+- Literature: метафора / эпитет / теңеу / гипербола / кейіптеу / аллегория / ассонанс / аллитерация
+- Medicine: медицина / анатомия / физиология / симптом / диагноз / профилактика / иммунитет / вакцина / антибиотик / вирус / бактерия
+
+**(3) Word-boundary match for single-token entries** — `multiword_entity_hint` first-pass now checks `tokens.iter().any(|t| t == entity)` for single-word entries, preserving substring match for multi-word. Prevents new short single-word entries (e.g. «темір») from shadowing the third-pass genitive-handling logic for compounds (e.g. «темір жол» from input «темірдің жолы»).
+
+### Acceptance
+
+| Gate | Status |
+|---|---|
+| Workspace tests | **976 passing** (up from 308 dialog-crate; full workspace count) |
+| Bug 1 query «Антарктида қандай материк?» | ✅ surfaces wg_008 definition |
+| Bug 2 query «метафора мен эпитет байланысты ма?» | ✅ surfaces R5 link «метафора — әдебиет ұғымы» |
+| Regression: «темірдің жолы туралы» → «темір жол» | ✅ third-pass genitive still wins |
+| `cargo clippy -D warnings` | green |
+| `verify_release_version.sh 4.71.5` | green |
+
+### Cadence
+
+`.5` patch — runtime fix surfaced by audit, no data changes.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.71.0] — 2026-05-06 — Educational portal — Medicine foundations (health + disease + symptom + diagnosis + treatment + prevention + immunity + first aid + medicine substance + vaccine/antibiotic)
 
 Per memory directive — pre-flight grep across all `data/world_core/*.jsonl` confirmed sparse medicine coverage: only анатомия (in body_parts + biology_school) / бактерия + вирус (biology_school) / дәрігер (professions, society, role_bridges). Disease/diagnosis/treatment/medicine-substance taxonomy genuinely missing. Addresses user's explicit «education + medicine portal» strategic priority. Created new `medicine_basic.jsonl` domain.
