@@ -1,7 +1,7 @@
 {
-  "version": "4.64.5",
+  "version": "4.65.5",
   "status": "completed",
-  "elapsed_s": 72,
+  "elapsed_s": 73,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2572,
+    "facts_total": 2584,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2020,
+      "is_a": 2032,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -41,7 +41,7 @@
       "kazakh_textbooks_pack.json": 14,
       "tatoeba_kazakh_pack.json": 3,
       "wikipedia_kz_pack.json": 17,
-      "world_core/adam_self.jsonl": 42,
+      "world_core/adam_self.jsonl": 54,
       "world_core/animals.jsonl": 42,
       "world_core/astronomy.jsonl": 56,
       "world_core/biology_basic.jsonl": 53,
@@ -2514,6 +2514,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "ARK атауы 2026-05-05 күні NLM (Nano Language Model) орнына қабылданды — adam-ды LLM-дер шеңберінен тыс жеке архитектуралық сыныпқа орналастыру үшін."
+    },
+    {
+      "subject": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Оқу пәні — мектепте немесе университетте жеке курс ретінде оқытылатын білім саласы."
+    },
+    {
+      "subject": {
+        "surface": "мектеп пәні",
+        "root": "мектеп пәні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мектеп пәні — мектеп бағдарламасына енетін оқу пәні."
+    },
+    {
+      "subject": {
+        "surface": "қазақ тілі",
+        "root": "қазақ тілі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазақ тілі — Қазақстан мектептерінде оқытылатын негізгі оқу пәні; қазақ тілінің фонетикасы, лексикасы, морфологиясы мен синтаксисін қамтиды."
+    },
+    {
+      "subject": {
+        "surface": "әдебиет пәні",
+        "root": "әдебиет пәні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әдебиет — оқу пәні ретінде көркем шығармаларды, авторлар мен ағымдарды зерттейді; қазақ әдебиеті мен әлем әдебиетін қамтиды."
+    },
+    {
+      "subject": {
+        "surface": "дүниетану",
+        "root": "дүниетану",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_047"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дүниетану — бастауыш мектепте табиғат пен қоғам туралы алғашқы білім беретін біріктірілген оқу пәні."
+    },
+    {
+      "subject": {
+        "surface": "өзін-өзі тану",
+        "root": "өзін-өзі тану",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өзін-өзі тану — балаға өз ішкі дүниесін, адамгершілік қасиеттерін тануға бағытталған рухани-адамгершілік оқу пәні."
+    },
+    {
+      "subject": {
+        "surface": "музыка пәні",
+        "root": "музыка пәні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Музыка — әуен, ырғақ пен дауыс өнерін үйрететін оқу пәні; қазақ халық әндері мен әлем классикасын қамтиды."
+    },
+    {
+      "subject": {
+        "surface": "бейнелеу өнері",
+        "root": "бейнелеу өнері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бейнелеу өнері — сурет салу, түс, композиция мен өнер тарихын үйрететін оқу пәні."
+    },
+    {
+      "subject": {
+        "surface": "дене шынықтыру",
+        "root": "дене шынықтыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_051"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дене шынықтыру — дене белсенділігі, спорт пен салауатты өмір салтын үйрететін оқу пәні."
+    },
+    {
+      "subject": {
+        "surface": "бастауыш мектеп",
+        "root": "бастауыш мектеп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "білім беру деңгейі",
+        "root": "білім беру деңгейі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_052"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бастауыш мектеп — 1–4 сыныптарды қамтитын білім беру деңгейі; балаға оқу, жазу мен санаудың негізін береді."
+    },
+    {
+      "subject": {
+        "surface": "орта мектеп",
+        "root": "орта мектеп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "білім беру деңгейі",
+        "root": "білім беру деңгейі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_053"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орта мектеп — 5–9 сыныптарды қамтитын білім беру деңгейі; пәндік білім негіздері осы кезеңде қалыптасады."
+    },
+    {
+      "subject": {
+        "surface": "жоғары мектеп",
+        "root": "жоғары мектеп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "білім беру деңгейі",
+        "root": "білім беру деңгейі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/adam_self",
+      "source": {
+        "pack": "world_core/adam_self.jsonl",
+        "sample_id": "adam_self_054"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жоғары мектеп — 10–11 сыныптар мен университетті қамтитын білім беру деңгейі; таңдау пәндері мен мамандыққа дайындық осы кезеңде жүреді."
     },
     {
       "subject": {

@@ -7,6 +7,71 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.65.5] — 2026-05-06 — Educational portal Day 2 #10 (FINAL) — «Оқу пәні» master hub: subject taxonomy capstone
+
+**Day 2 release 10/10 — capstone.** Day 2 closure release. Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep revealed `adam_self.jsonl` (adam_self_018…032) already classifies математика / физика / химия / биология / тарих / информатика as «мектеп пәні» and as `табиғат / жаратылыстану / гуманитарлық / абстракт / қолданбалы ғылым`. The «оқу пәні» master hub itself was not yet defined. This release adds 12 entries that **architecturally seal Day 2** by naming the master concept and connecting all program-of-study subjects to it.
+
+### Pre-flight audit (per directive)
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| математика / физика / химия / биология / тарих / информатика — as `мектеп пәні` | `adam_self.jsonl` (adam_self_018..023) | ✓ skip — covered |
+| математика / физика / химия / биология / тарих as `табиғат/жаратылыстану/гуманитарлық/абстракт ғылым` | `adam_self.jsonl` (adam_self_028..032) | ✓ skip — covered |
+| Қазақ тілі / Әдебиет / Дүниетану / Өзін-өзі тану / Музыка / Бейнелеу / Дене шынықтыру | not yet (humanities + arts + PE were missing) | + add |
+| Master hub «оқу пәні» / bridge «мектеп пәні IsA оқу пәні» | not yet | + add |
+| Education levels (бастауыш / орта / жоғары мектеп) | not yet | + add |
+
+### Innovations
+
+**(1) 12 new entries** in `data/world_core/adam_self.jsonl` (`adam_self_043…054`):
+
+**Master hub + bridge (2):**
+- adam_self_043: оқу пәні — concept hub (school or university course area)
+- adam_self_044: мектеп пәні IsA оқу пәні (bridge connecting all existing subject entries to the new hub)
+
+**Humanities + arts subjects, all IsA оқу пәні (7):**
+- adam_self_045: Қазақ тілі (Kazakh language — subject)
+- adam_self_046: Әдебиет (Literature)
+- adam_self_047: Дүниетану (Natural studies — primary-school integrated subject)
+- adam_self_048: Өзін-өзі тану (Self-knowledge — moral-spiritual subject)
+- adam_self_049: Музыка
+- adam_self_050: Бейнелеу өнері (Fine arts)
+- adam_self_051: Дене шынықтыру (PE)
+
+**Education levels, all IsA білім беру деңгейі (3):**
+- adam_self_052: Бастауыш мектеп (1–4 grades)
+- adam_self_053: Орта мектеп (5–9 grades)
+- adam_self_054: Жоғары мектеп (10–11 + university)
+
+**(2) Cascade chains:**
+- `<математика / физика / … / Қазақ тілі / Әдебиет / Дүниетану / …> → оқу пәні → ұғым` (master hub closes the program-of-study graph)
+- `<бастауыш / орта / жоғары мектеп> → білім беру деңгейі` (new sub-taxonomy)
+
+**(3) MULTIWORD_ENTITIES extended** with 12 new compounds: оқу пәні, мектеп пәні, қазақ тілі, әдебиет пәні, өзін-өзі тану, музыка пәні, бейнелеу өнері, дене шынықтыру, білім беру деңгейі, бастауыш мектеп, орта мектеп, жоғары мектеп.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2332 | **2344** (+12) |
+| world_core facts | 2513 | **2525** (+12) |
+| world_core domains | 51 | **51** unchanged (extended canonical, per directive) |
+| Derived facts | 29243 | **29294** (+51 = **4.25× cascade**) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.65.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 4.25× cascade is **expected for capstone bridge releases** — the new «оқу пәні» hub itself has no children below it (it sits at the apex), so R5 shared-target clustering is the dominant rule firing. The architectural value is **graph closure** — every subject taught in the educational portal now has a single typed parent. Future R5 cascades when adding new subjects (e.g. Day 3 university disciplines) will multiply against this hub.
+
+**Day 2 closure totals:** 10/10 releases shipped · +106 facts net · +894 derived · 6 sub-domain extensions (math + grammar + proverbs + biology + literature + subject taxonomy). All consolidations performed via canonical-extension, zero duplicate domains created.
+
+### Cadence
+
+`.5` patch — capstone closure, single canonical extension. Day 2 thesis fully validated: extending canonical files (mean cascade 16.5×) dominated over creating parallel domains (Day 1 mean 2.7×) — empirical confirmation of the bridge-fact ROI memory.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.65.0] — 2026-05-06 — Educational portal Day 2 #9 — Reading skills: text structure / characters / plot / genres of writing
 
 **Day 2 release 9/10.** Per memory directive — pre-flight audit revealed extensive coverage in `kz_literature.jsonl`: мәтін, шығарма, ақын/жазушы, 8 жанр types (өлең/поэма/роман/әңгіме/ертегі/дастан/жыр/мақал/мәтел). Skipped duplicates; added 12 reading-skills concepts that are NEW: text structure (абзац / тақырып / негізгі ой), narrative components (кейіпкер / автор / сюжет / оқиға), high-level types (проза / поэзия), text modes (баяндау / сипаттау), кітап.
