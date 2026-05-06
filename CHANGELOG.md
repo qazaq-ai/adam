@@ -7,6 +7,65 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.69.5] — 2026-05-06 — Educational portal — World history foundations (4 historical eras + 4 ancient civilizations + Renaissance + Industrial Revolution)
+
+Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of all `data/world_core/*.jsonl` confirmed `history_kazakhstan.jsonl` is strictly Kazakhstan-scoped (sak tribes, Genghis Khan, Russian protectorate, Soviet/independence eras). Zero coverage of world-historical periodization or non-Kazakh civilizations. Genuinely new canonical scope — created new `world_history.jsonl` domain rather than diluting `history_kazakhstan.jsonl`.
+
+### Pre-flight audit
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| Kazakhstan-specific history (қола дәуірі / сақтар / ғұндар / Шыңғыс хан / Ресей бодандығы / 1916 көтеріліс / президенттіктер / Жібек жолы) | `history_kazakhstan.jsonl` (124 entries) | ✓ skip — covered |
+| World periodization (ежелгі / орта / жаңа / қазіргі заман) | not yet — new scope | + add (new domain) |
+| Ancient civilizations (Египет / Греция / Рим / Месопотамия) | not yet | + add |
+| Renaissance / Industrial Revolution as historical periods | not yet | + add |
+
+### Innovations
+
+**(1) New domain `data/world_core/world_history.jsonl`** with 12 entries (`wh_001…012`):
+
+**Subject + concept hubs (2):**
+- wh_001: дүниежүзі тарихы IsA оқу пәні — bridges to v4.65.5 «оқу пәні» master hub
+- wh_002: тарихи дәуір IsA тарих ұғымы — periodization concept
+
+**Historical eras IsA тарихи дәуір (4):**
+- wh_003: ежелгі дәуір — through 476 AD (Western Roman Empire fall); first civilizations, writing
+- wh_004: орта ғасырлар — 476 AD to 1453 (Constantinople fall); feudalism, knights
+- wh_005: жаңа заман — 1453 (Age of Discovery) to 1914 (WWI start)
+- wh_006: қазіргі заман — 1914 to present; world wars, S&T revolution, globalization
+
+**Ancient civilizations IsA ежелгі өркениет (4):**
+- wh_007: ежелгі египет — Nile valley, 3rd millennium BC, pyramids, pharaohs, hieroglyphs
+- wh_008: ежелгі греция — VIII–I centuries BC, Athenian democracy, philosophy, Olympics
+- wh_009: рим империясы — 27 BC to 476 AD, Roman law, Latin, engineering (aqueducts/roads)
+- wh_010: месопотамия — 4th millennium BC, Tigris/Euphrates, Sumerians/Akkadians/Babylonians, cuneiform, Hammurabi
+
+**Transformative epochs IsA тарихи кезең (2):**
+- wh_011: ренессанс — XIV–XVI centuries, Italy, da Vinci, Michelangelo, humanism
+- wh_012: өнеркәсіптік революция — XVIII century, England, steam engine, factories, railways
+
+**(2) Bridge into educational portal** — wh_001 connects дүниежүзі тарихы to the v4.65.5 «оқу пәні» master hub, completing the subject-taxonomy graph for history alongside Қазақстан тарихы (already in adam_self.jsonl as part of мектеп пәні).
+
+**(3) MULTIWORD_ENTITIES extended** with 13 new compounds (дүниежүзі тарихы, тарихи дәуір/кезең/ұғым, 4 era names, 4 civilization names + ежелгі өркениет, өнеркәсіптік революция).
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2428 | **2440** (+12) |
+| world_core facts | 2609 | **2621** (+12) |
+| world_core domains | 51 | **52** (+1 — new `world_history`) |
+| Derived facts | 29609 | **29609** (+0 — closed sub-taxonomy) |
+| Workspace tests | 976 | **976** unchanged |
+
+The 0 derived count reflects an **isolated sub-taxonomy** — 4 civilizations cluster only with each other, 4 eras cluster only among themselves, no existing entries overlap with the new objects (ежелгі өркениет / тарихи дәуір / тарихи кезең). R1 +5 (era-to-historical-period chains), R5 −5 (cluster boundary redistribution as new in-domain shared-target groups absorbed under R11). Future Day-3 deepening (specific historical figures, events, cross-references with Kazakhstan history) will multiply against these new hubs.
+
+### Cadence
+
+`.5` patch — new domain (justified scope expansion, not duplication per directive).
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.69.0] — 2026-05-06 — Educational portal — Chemistry: inorganic chemistry deepening (alkaline-earth metals + Ca/Mg + halogens F/Br/I + Ar + S/P + acidic/basic oxides + Mendeleev's table)
 
 Per memory directive `feedback_no_duplicate_domains.md` — pre-flight grep of `chemistry_school.jsonl` confirmed dense inorganic chemistry coverage: бейорганикалық химия (chem_002) / металл / бейметалл / инертті газ + сілтілік металдар + галогендер as group hubs (chem_020..024) / 4 elements (сутек / оттек / көміртек / азот) (chem_025..028) / 5 metals (темір / алтын / күміс / мыс / алюминий) (chem_029..033) / 2 specific alkali metals (натрий / калий) (chem_034..035) / хлор + 2 noble gases (гелий / неон) (chem_036..038) / металдық байланыс (chem_042) / 3 redox reactions (chem_053..055) / қышқыл + 3 acids (chem_058..061) / негіз + сілті + натрий гидроксиді (chem_062..064) / тұз + натрий хлориді (chem_065..066) / оксид + 2 oxides (chem_067..069) / бейтараптану + ерітінді / еріткіш / pH / моль / молярлық масса / Авогадро / электролиз (chem_070..078). Alkaline-earth metal group + Ca/Mg, 3 missing halogens (F/Br/I), Ar, sulfur + phosphorus elements, acidic/basic oxide subclasses, and Mendeleev's table were missing.

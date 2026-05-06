@@ -1,7 +1,7 @@
 {
-  "version": "4.69.0",
+  "version": "4.69.5",
   "status": "completed",
-  "elapsed_s": 29,
+  "elapsed_s": 32,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2668,
+    "facts_total": 2680,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2116,
+      "is_a": 2128,
       "lives_in": 8,
       "part_of": 241,
       "related_to": 115
@@ -91,7 +91,8 @@
       "world_core/time.jsonl": 44,
       "world_core/tools_household.jsonl": 30,
       "world_core/transport.jsonl": 42,
-      "world_core/weather_phenomena.jsonl": 26
+      "world_core/weather_phenomena.jsonl": 26,
+      "world_core/world_history.jsonl": 12
     }
   },
   "facts": [
@@ -53454,6 +53455,246 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Атмосфералық қысым — ауаның жер бетіне түсіретін салмағы."
+    },
+    {
+      "subject": {
+        "surface": "дүниежүзі тарихы",
+        "root": "дүниежүзі тарихы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу пәні",
+        "root": "оқу пәні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дүниежүзі тарихы — адамзаттың пайда болуынан бастап қазіргі заманға дейінгі барлық халықтар мен мемлекеттердің даму жолын зерттейтін оқу пәні."
+    },
+    {
+      "subject": {
+        "surface": "тарихи дәуір",
+        "root": "тарихи дәуір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарих ұғымы",
+        "root": "тарих ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тарихи дәуір — адамзат тарихының ірі бөліктерге жіктелетін уақыт кезеңі (ежелгі, орта, жаңа, қазіргі заман)."
+    },
+    {
+      "subject": {
+        "surface": "ежелгі дәуір",
+        "root": "ежелгі дәуір",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи дәуір",
+        "root": "тарихи дәуір",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ежелгі дәуір — адамзат пайда болуынан Батыс Рим империясының құлауына (476 ж.) дейінгі тарихи дәуір. Алғашқы өркениеттер, жазудың пайда болуы, ұлы империялар."
+    },
+    {
+      "subject": {
+        "surface": "орта ғасырлар",
+        "root": "орта ғасырлар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи дәуір",
+        "root": "тарихи дәуір",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орта ғасырлар — Батыс Рим империясының құлауынан (476 ж.) Константинопольдің құлауына (1453 ж.) дейінгі тарихи дәуір. Феодализм, рыцарьлар, шіркеу үстемдігі."
+    },
+    {
+      "subject": {
+        "surface": "жаңа заман",
+        "root": "жаңа заман",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи дәуір",
+        "root": "тарихи дәуір",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жаңа заман — XV ғасырдың аяғынан (1453 ж. — Ұлы географиялық ашылулар басталған кезең) ХХ ғасырдың басына (1914 ж. — Бірінші дүниежүзілік соғыс) дейінгі тарихи дәуір."
+    },
+    {
+      "subject": {
+        "surface": "қазіргі заман",
+        "root": "қазіргі заман",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи дәуір",
+        "root": "тарихи дәуір",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазіргі заман — Бірінші дүниежүзілік соғыстың басталуынан (1914 ж.) бүгінгі күнге дейінгі тарихи дәуір. Әлемдік соғыстар, ғылыми-техникалық төңкеріс, ғаламдану."
+    },
+    {
+      "subject": {
+        "surface": "ежелгі египет",
+        "root": "ежелгі египет",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ежелгі өркениет",
+        "root": "ежелгі өркениет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ежелгі Египет — Нил өзенінің бойындағы б.з.б. III мың жылдықтан б.з.б. I ғасырға дейін дамыған өркениет. Пирамидалар, фараондар, иероглифтер."
+    },
+    {
+      "subject": {
+        "surface": "ежелгі греция",
+        "root": "ежелгі греция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ежелгі өркениет",
+        "root": "ежелгі өркениет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ежелгі Греция — Балқан түбегі мен Эгей теңізі аралдарында б.з.б. VIII–I ғасырларда дамыған өркениет. Афина демократиясы, философия (Платон, Аристотель), Олимпиада ойындары."
+    },
+    {
+      "subject": {
+        "surface": "рим империясы",
+        "root": "рим империясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ежелгі өркениет",
+        "root": "ежелгі өркениет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Рим империясы — б.з.б. 27 жылдан б.з. 476 жылға дейін Жерорта теңізі айналасында үстемдік еткен ежелгі өркениет. Рим құқығы, латын тілі, инженерия (акведуктер, жолдар)."
+    },
+    {
+      "subject": {
+        "surface": "месопотамия",
+        "root": "месопотамия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ежелгі өркениет",
+        "root": "ежелгі өркениет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Месопотамия — Тигр мен Евфрат өзендері аралығында б.з.б. IV мың жылдықта пайда болған «өркениеттер бесігі». Шумерлер, аккадтар, вавилондықтар, сына жазуы, Хаммурапи заңдары."
+    },
+    {
+      "subject": {
+        "surface": "ренессанс",
+        "root": "ренессанс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи кезең",
+        "root": "тарихи кезең",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ренессанс — XIV–XVI ғасырларда Италиядан басталып бүкіл Еуропаға тараған мәдени-ғылыми қайта өрлеу кезеңі. Леонардо да Винчи, Микеланджело, гуманизм, кітап басу."
+    },
+    {
+      "subject": {
+        "surface": "өнеркәсіптік революция",
+        "root": "өнеркәсіптік революция",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тарихи кезең",
+        "root": "тарихи кезең",
+        "pos": "noun"
+      },
+      "pattern": "world_core/world_history",
+      "source": {
+        "pack": "world_core/world_history.jsonl",
+        "sample_id": "wh_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өнеркәсіптік революция — XVIII ғасырдың екінші жартысында Англиядан басталған өндірістік төңкеріс. Бу машинасы, фабрикалар, теміржол; қол еңбегінен машинамен өндіруге өту."
     }
   ]
 }
