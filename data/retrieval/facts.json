@@ -1,7 +1,7 @@
 {
-  "version": "4.63.5",
+  "version": "4.64.0",
   "status": "completed",
-  "elapsed_s": 63,
+  "elapsed_s": 65,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2547,
+    "facts_total": 2560,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,10 +27,10 @@
       "has": 67,
       "has_quantity": 35,
       "in_domain": 24,
-      "is_a": 2002,
+      "is_a": 2013,
       "lives_in": 8,
       "part_of": 236,
-      "related_to": 113
+      "related_to": 115
     },
     "by_pack": {
       "abai_wikisource_pack.json": 6,
@@ -44,7 +44,7 @@
       "world_core/adam_self.jsonl": 42,
       "world_core/animals.jsonl": 42,
       "world_core/astronomy.jsonl": 56,
-      "world_core/biology_basic.jsonl": 40,
+      "world_core/biology_basic.jsonl": 53,
       "world_core/biology_school.jsonl": 120,
       "world_core/body_parts.jsonl": 55,
       "world_core/chemistry_school.jsonl": 105,
@@ -5274,6 +5274,266 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Экология — қоршаған ортаны зерттейтін ғылым."
+    },
+    {
+      "subject": {
+        "surface": "табиғат",
+        "root": "табиғат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_041"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Табиғат — адам жасамаған, өздігінен пайда болған бүкіл әлем. Жанды табиғат пен жансыз табиғаттан тұрады. Қоршаған ортаны зерттеудің негізі."
+    },
+    {
+      "subject": {
+        "surface": "жанды табиғат",
+        "root": "жанды табиғат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғат",
+        "root": "табиғат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_042"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жанды табиғат — тіршілік ететін, қоректенетін, көбейетін, өсіп-өнетін организмдерден тұратын табиғат бөлігі. Адам, жануар, өсімдік, саңырауқұлақ, бактериялар жанды табиғатқа жатады."
+    },
+    {
+      "subject": {
+        "surface": "жансыз табиғат",
+        "root": "жансыз табиғат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғат",
+        "root": "табиғат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_043"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жансыз табиғат — тіршілік етпейтін, қоректенбейтін, көбеймейтін заттар мен құбылыстардан тұратын табиғат бөлігі. Су, ауа, топырақ, тас, минералдар, Күн, Ай, жұлдыздар жансыз табиғатқа жатады."
+    },
+    {
+      "subject": {
+        "surface": "су",
+        "root": "су",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жансыз табиғат",
+        "root": "жансыз табиғат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_044"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Су — өмірдің негізі болатын мөлдір сұйық зат. Жансыз табиғаттың маңызды бөлігі. Адам, жануар, өсімдік суы жоқ өмір сүре алмайды. Жер бетінің төрттен үш бөлігі сумен жабылған."
+    },
+    {
+      "subject": {
+        "surface": "ауа",
+        "root": "ауа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жансыз табиғат",
+        "root": "жансыз табиғат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_045"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ауа — Жерді қоршап тұрған газ тәрізді қоспа. Тыныс алуға қажет оттегі бар. Жансыз табиғаттың маңызды бөлігі. Көрінбейді, бірақ салмағы бар."
+    },
+    {
+      "subject": {
+        "surface": "топырақ",
+        "root": "топырақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жансыз табиғат",
+        "root": "жансыз табиғат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_046"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Топырақ — Жер бетінің құнарлы үстіңгі қабаты. Өсімдіктер өсуіне, жан-жануарлар өмір сүруіне қажет. Құм, саз, тас үгіндісі, өсімдік қалдықтары мен микроорганизмдерден құралған."
+    },
+    {
+      "subject": {
+        "surface": "тас",
+        "root": "тас",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жансыз табиғат",
+        "root": "жансыз табиғат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_047"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тас — табиғи түрде пайда болған қатты минералдық зат. Жер қыртысын құрайтын негізгі материал. Жансыз табиғат өкілі. Гранит, мрамор, әктас — тас түрлері."
+    },
+    {
+      "subject": {
+        "surface": "тіршілік ортасы",
+        "root": "тіршілік ортасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұғым",
+        "root": "ұғым",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_048"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тіршілік ортасы — тіршілік иесінің тұрақты өмір сүретін орны. Әр тіршілік ортасында белгілі бір климат, температура, өсімдіктер мен жануарлар бар. Әр организм өз тіршілік ортасына бейімделеді."
+    },
+    {
+      "subject": {
+        "surface": "су ортасы",
+        "root": "су ортасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіршілік ортасы",
+        "root": "тіршілік ортасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_049"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Су ортасы — өзен, көл, теңіз, мұхиттардағы тіршілік ортасы. Балық, су құстары, бақалар, шаянтәрізділер, су өсімдіктері су ортасында өмір сүреді."
+    },
+    {
+      "subject": {
+        "surface": "құрлық ортасы",
+        "root": "құрлық ортасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіршілік ортасы",
+        "root": "тіршілік ортасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_050"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Құрлық ортасы — Жер бетіндегі тіршілік ортасы. Орман, дала, тау, шөл, тундра — құрлық ортасының түрлері. Адам, жануарлардың көпшілігі, өсімдіктер құрлықта тіршілік етеді."
+    },
+    {
+      "subject": {
+        "surface": "ауа ортасы",
+        "root": "ауа ортасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіршілік ортасы",
+        "root": "тіршілік ортасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_051"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ауа ортасы — атмосферада, ауада тіршілік ететін орта. Құстар, жәндіктер, ұшатын сүтқоректілер (жарқанаттар) ауа ортасында ұша алады, бірақ көбеюге және демалуға құрлыққа отыруы керек."
+    },
+    {
+      "subject": {
+        "surface": "көктемнің белгілері",
+        "root": "көктемнің белгілері",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "көктем",
+        "root": "көктем",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_052"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көктемнің белгілері — күн жылынады, қар ериді, өзендер тасиды, ағаштарда жапырақ жарылады, шөп көктейді, құстар оралады, жануарлар оянады, бала туады."
+    },
+    {
+      "subject": {
+        "surface": "қыстың белгілері",
+        "root": "қыстың белгілері",
+        "pos": "noun"
+      },
+      "predicate": "RelatedTo",
+      "object": {
+        "surface": "қыс",
+        "root": "қыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/biology_basic",
+      "source": {
+        "pack": "world_core/biology_basic.jsonl",
+        "sample_id": "bio_053"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қыстың белгілері — күн суытады, қар жауады, су мұзға айналады, ағаштар жапырақсыз тұрады, көп жануар ұйықтайды (аю, борсық), құстардың кейбірі жылы жаққа ұшады."
     },
     {
       "subject": {

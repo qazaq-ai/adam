@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.64.5] — 2026-05-06 — Educational portal Day 2 #8 — Дүниетану foundations: living/non-living nature + habitats + season signs
+
+**Day 2 release 8/10.** Per memory directive `feedback_no_duplicate_domains.md` — pre-flight audit revealed seasons (көктем/жаз/күз/қыс) already in `time.jsonl` (time_014..017); seasons skipped. Extends existing canonical `biology_basic.jsonl` with foundational Дүниетану concepts that elementary curriculum (grades 1-3) teaches as the «жанды/жансыз табиғат» framework.
+
+### Pre-flight audit (per directive)
+
+| Concept | Existing canonical home | Action |
+|---|---|---|
+| Сезоны (көктем/жаз/күз/қыс) | `time.jsonl` (time_014..017 since 2026-04-23) | ✓ skip — already covered |
+| Жыл мезгілдері summary | `time.jsonl` (time_021/025) | ✓ skip — already covered |
+| Жанды табиғат / жансыз табиғат | not yet in world_core | + add |
+| Тіршілік ортасы (habitats) | not yet | + add |
+| Су / ауа / топырақ / тас as нature | not yet structured | + add |
+
+### Innovations
+
+**(1) 13 new entries** in `data/world_core/biology_basic.jsonl` (`bio_041…bio_053`):
+
+**Foundational nature taxonomy (4 entries):**
+- bio_041: «**табиғат**» — top-level concept (живая+неживая природа)
+- bio_042: «**жанды табиғат IsA табиғат**» — living nature (covers existing тіршілік иесі hub)
+- bio_043: «**жансыз табиғат IsA табиғат**» — non-living nature
+
+**Non-living nature elements (4):**
+- bio_044: су IsA жансыз табиғат (water — life basis, ¾ of Earth's surface)
+- bio_045: ауа IsA жансыз табиғат (air — atmosphere, breathing)
+- bio_046: топырақ IsA жансыз табиғат (soil — fertility layer)
+- bio_047: тас IsA жансыз табиғат (stone — Earth's crust material)
+
+**Habitat taxonomy (4):**
+- bio_048: «**тіршілік ортасы**» — habitat concept hub
+- bio_049: су ортасы IsA тіршілік ортасы (water habitat — fish, aquatic life)
+- bio_050: құрлық ортасы IsA тіршілік ортасы (land habitat — forests, steppes, deserts, tundra)
+- bio_051: ауа ортасы IsA тіршілік ортасы (air habitat — birds, insects, bats)
+
+**Season-characteristic signs (2):**
+- bio_052: көктемнің белгілері (signs of spring — snow melts, leaves emerge, birds return)
+- bio_053: қыстың белгілері (signs of winter — snow falls, water freezes, hibernation)
+
+**(2) Cascade chains established**:
+- `<su / ауа / топырақ / тас> → жансыз табиғат → табиғат → ұғым` (4-hop)
+- `<су / құрлық / ауа ортасы> → тіршілік ортасы → ұғым` (3-hop)
+- `<season signs> → көктем / қыс` (existing time.jsonl hubs)
+
+**(3) MULTIWORD_ENTITIES extended** with 8 new compounds: жанды табиғат, жансыз табиғат, тіршілік ортасы, су ортасы, құрлық ортасы, ауа ортасы, көктемнің белгілері, қыстың белгілері.
+
+**(4) Curriculum-grade framing** — entries match the «Дүниетану 1-3 сынып» textbook structure: classification before details, signs/effects before causes, habitat-organism mapping for ecological reasoning.
+
+### Acceptance
+
+| Gate | Pre | Post |
+|---|---|---|
+| world_core entries | 2307 | **2320** (+13) |
+| world_core facts | 2547 | **2560** (+13) |
+| world_core domains | 51 | **51** unchanged (extended canonical per directive) |
+| Derived facts | 28906 | **29004** (+98 = 7.5× cascade) |
+| Workspace tests | 976 | **976** unchanged |
+| `cargo clippy -D warnings` | green | green |
+| `verify_release_version.sh 4.64.5` | n/a | green |
+| `check_metrics_currency.sh` | green | green |
+
+The 7.5× cascade reflects new nature entries plugging into existing «тіршілік иесі» / «құбылыс» / «ғылым» hubs in biology_basic.jsonl, plus the new табиғат / тіршілік ортасы hubs creating cross-domain references.
+
+**Cumulative Day 2:** 8 of 10 releases · +82 facts · +604 derived · 4 sub-domain extensions complete (math, grammar, proverbs, biology).
+
+### Cadence
+
+`.5` patch — same-domain extension. Audit-first discipline saved 4 redundant entries (seasons already in time.jsonl). Practical demonstration of memory directive in action.
+
+Stripe (12) — Kazakh educational portal.
+
 ## [4.64.0] — 2026-05-06 — Educational portal Day 2 #7 — Mathematics extension: fractions / decimals / number properties / geometry — 27× cascade record
 
 **Day 2 release 7/10.** Extends `mathematics_basic.jsonl` (existing 55 entries since 2026-04-29) with 12 concrete curriculum-grade entries: specific fractions, decimal/simple-fraction distinction, number properties (even/odd/prime/positive/negative), and geometry basics (perimeter/area). Per memory directive `feedback_no_duplicate_domains.md` — extends existing canonical file rather than create new.
