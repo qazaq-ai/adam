@@ -1,0 +1,135 @@
+{
+  "_comment": "v4.82.0 — Rust Book Chapter 7 (Үлкейіп жатқан жобаларды бумалармен, сандықтармен және модульдермен басқару) holdout. 21 natural Kazakh queries against rust_300…317 + 4 deepened stubs (rust_004/005/101/102) − 1 cross-file stub deletion (rustadv_021). Categories: ch07_package_crate (package, binary crate, library crate, crate root, src/bin/), ch07_module (module, module tree), ch07_path (path, absolute path, relative path, super, self), ch07_privacy (default privacy, pub one-layer, pub struct vs enum), ch07_use (use, pub use, as, nested paths, glob). Subject naming: «жол» renamed to «модуль жолы» to disambiguate from physics phys_106 / transport tr_016 (cross-domain polysemy fix, same pattern as ch.4 «стек жады»/«үйме жады»).",
+  "version": "v4.82.0",
+  "captured_date": "2026-05-06",
+  "chapter": 7,
+  "chapter_title": "Бума / сандық / модуль / жол (Packages / crates / modules / paths)",
+  "cases": [
+    {
+      "id": "ch07_package",
+      "category": "ch07_package_crate",
+      "query": "Бума деген не?",
+      "any_substring": ["cargo.toml", "ең көп бір кітапхана", "cargo new"]
+    },
+    {
+      "id": "ch07_crate",
+      "category": "ch07_package_crate",
+      "query": "Сандық деген не?",
+      "any_substring": ["компиляция", "сандық түбірі", "crates.io"]
+    },
+    {
+      "id": "ch07_binary_crate",
+      "category": "ch07_package_crate",
+      "query": "Екілік сандық деген не?",
+      "any_substring": ["main", "src/main.rs", "target/debug"]
+    },
+    {
+      "id": "ch07_library_crate",
+      "category": "ch07_package_crate",
+      "query": "Кітапхана сандығы деген не?",
+      "any_substring": ["src/lib.rs", "rand", "--lib"]
+    },
+    {
+      "id": "ch07_crate_root",
+      "category": "ch07_package_crate",
+      "query": "Сандық түбірі деген не?",
+      "any_substring": ["src/main.rs", "src/lib.rs", "crate::"]
+    },
+    {
+      "id": "ch07_src_bin",
+      "category": "ch07_package_crate",
+      "query": "src/bin/ деген не?",
+      "any_substring": ["бірнеше екілік", "cargo run --bin", "adam_chat"]
+    },
+    {
+      "id": "ch07_module",
+      "category": "ch07_module",
+      "query": "Модуль деген не?",
+      "any_substring": ["mod hosting", "иерархиялық", "жекелікті басқару"]
+    },
+    {
+      "id": "ch07_module_tree",
+      "category": "ch07_module",
+      "query": "Модуль ағашы деген не?",
+      "any_substring": ["иерархиялық", "front_of_house", "карта"]
+    },
+    {
+      "id": "ch07_path",
+      "category": "ch07_path",
+      "query": "Модуль жолы деген не?",
+      "any_substring": ["абсолюттік", "салыстырмалы", "::"]
+    },
+    {
+      "id": "ch07_absolute_path",
+      "category": "ch07_path",
+      "query": "Абсолюттік жол деген не?",
+      "any_substring": ["crate", "түбір", "std::collections"]
+    },
+    {
+      "id": "ch07_relative_path",
+      "category": "ch07_path",
+      "query": "Салыстырмалы жол деген не?",
+      "any_substring": ["self", "super", "қазіргі модуль"]
+    },
+    {
+      "id": "ch07_super",
+      "category": "ch07_path",
+      "query": "super деген не?",
+      "any_substring": ["бір қабат жоғары", "back_of_house", "ата-модуль"]
+    },
+    {
+      "id": "ch07_self_keyword",
+      "category": "ch07_path",
+      "query": "self кілтсөзі деген не?",
+      "any_substring": ["қазіргі модуль", "self::", "тоғыспалы"]
+    },
+    {
+      "id": "ch07_default_privacy",
+      "category": "ch07_privacy",
+      "query": "Жекелік әдепкіше деген не?",
+      "any_substring": ["жекеше", "e0603", "сыртқы пайдаланушы"]
+    },
+    {
+      "id": "ch07_pub_one_layer",
+      "category": "ch07_privacy",
+      "query": "pub бір қабат деген не?",
+      "any_substring": ["тек модулді", "pub fn", "көрнектілік"]
+    },
+    {
+      "id": "ch07_pub",
+      "category": "ch07_privacy",
+      "query": "pub деген не?",
+      "any_substring": ["public", "көрнектілік", "pub enum"]
+    },
+    {
+      "id": "ch07_use",
+      "category": "ch07_use",
+      "query": "use деген не?",
+      "any_substring": ["қысқа атпен", "идиома", "ата-модуль"]
+    },
+    {
+      "id": "ch07_pub_use",
+      "category": "ch07_use",
+      "query": "pub use деген не?",
+      "any_substring": ["қайта экспорттау", "re-export", "prelude"]
+    },
+    {
+      "id": "ch07_as_import",
+      "category": "ch07_use",
+      "query": "as импортта деген не?",
+      "any_substring": ["ioresult", "соқтығыс", "қайта атау"]
+    },
+    {
+      "id": "ch07_nested_paths",
+      "category": "ch07_use",
+      "query": "Тоғыспалы жолдар деген не?",
+      "any_substring": ["use std::{", "io::{self, write}", "ықшамдайды"]
+    },
+    {
+      "id": "ch07_glob",
+      "category": "ch07_use",
+      "query": "glob операторы деген не?",
+      "any_substring": ["use std::collections::*", "сирек", "prelude"]
+    }
+  ]
+}

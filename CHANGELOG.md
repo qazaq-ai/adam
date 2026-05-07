@@ -7,6 +7,86 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.82.0] — 2026-05-06 — Rust Book chapter 7 deepening — modules / packages / crates
+
+Per-chapter pedagogical cadence continues. Chapter 7 introduces Rust's project-organization toolkit — the four-layer module system (package / crate / module / path). Previously surface-level — 4 one-line stubs (Сандық / Модуль / use / pub). Now deepened with full curriculum.
+
+### What's added
+
+**18 new curated entries `rust_300…317`** in `programming_rust.jsonl`:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_300 | бума | Package = Cargo.toml unit, max-1-lib + N-bin rule |
+| rust_301 | екілік сандық | Binary crate (`main` + `src/main.rs`) |
+| rust_302 | кітапхана сандығы | Library crate (`src/lib.rs`, no main) |
+| rust_303 | сандық түбірі | Crate root file convention |
+| rust_304 | src/bin/ | Multi-binary pattern |
+| rust_305 | модуль ағашы | Module tree visualization |
+| rust_306 | модуль жолы | Path concept (renamed from `жол` to disambiguate from physics) |
+| rust_307 | абсолюттік жол | `crate::...` from root |
+| rust_308 | салыстырмалы жол | bare / `self::` / `super::` |
+| rust_309 | super | One level up |
+| rust_310 | self кілтсөзі | Current module reference |
+| rust_311 | жекелік әдепкіше | Default-private rule |
+| rust_312 | pub бір қабат | One-layer public |
+| rust_313 | pub struct пен pub enum айырмашылығы | Struct fields private vs enum variants public |
+| rust_314 | pub use | Re-export pattern |
+| rust_315 | as импортта | Rename in import |
+| rust_316 | тоғыспалы жолдар | Nested paths `use std::{cmp, io}` |
+| rust_317 | glob операторы | `*` import all |
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs deepened in-place (4)
+
+- `rust_004` (Сандық) — bin vs lib + crate root + crates.io context.
+- `rust_005` (Модуль) — mod tree + privacy purpose. **Predicate fixed `part_of`→`is_a`** + new object `сандық бөлігі` so kk text surfaces (was returning bare «X құрамына кіреді» rendering — same fix as ch.5 rust_051).
+- `rust_101` (use) — bring path into scope + idiomatic placement (parent module, not direct function).
+- `rust_102` (pub) — privacy default + per-element semantics + struct/enum asymmetry.
+
+### Stub deleted
+
+- `rustadv_021` (Module 1-line) — duplicate of deeper `rust_005`.
+
+### Subject naming corrections
+
+- `rust_306` renamed from bare `жол` (path) to `модуль жолы` (module path) to disambiguate from physics `phys_106` (distance, S = v·t) and transport `tr_016` (road). Same cross-domain polysemy fix pattern as ch.4 `стек жады`/`үйме жады` (vs CS-domain `cs_005` data structure).
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_07_holdout.json` — 21 cases, 5 categories (`ch07_package_crate`, `ch07_module`, `ch07_path`, `ch07_privacy`, `ch07_use`).
+- `crates/adam-dialog/tests/rust_book_chapter_07.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 27 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 21 / 21 chapter 7 holdout cases | ✅ 100 % |
+| Existing chapters 1-6 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **983 passing** (was 982; +1 chapter-7 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2621 → **2638** (+17 net: +18 ch.7 − 1 stub deletion) |
+| world_core facts | 2863 → **2880** (+17 net) |
+| Derived facts | 30799 → **30809** (+10) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.82.0** | **ch. 7** | **Modules / packages / crates (this release)** |
+| v4.82.5 | ch. 8 | Common collections (Vec / String / HashMap deepening) |
+| v4.83.0 | ch. 9 | Error handling (`?`-operator / propagation / custom errors) |
+| v4.83.5 | ch. 10 | Generics + traits + lifetimes deepening |
+| v4.84.0 | ch. 11 | Tests (`#[test]` / assert / cargo test) |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.0` minor — 18 new + 4 deepened stubs + 1 deletion; chapter 7 enables real-project organization (the foundation for chapters 8-20). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.81.5] — 2026-05-06 — Rust Book chapter 6 deepening — enums + match
 
 Per-chapter pedagogical cadence continues. Chapter 6 introduces Rust's algebraic type system — enums with data + exhaustive pattern matching. Previously surface-level — 5 one-line stubs (Енам / Option / None / Some / Үлгі). Now deepened with full curriculum.

@@ -1,7 +1,7 @@
 {
-  "version": "4.81.0",
+  "version": "4.81.5",
   "status": "completed",
-  "elapsed_s": 61,
+  "elapsed_s": 68,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2863,
+    "facts_total": 2880,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,9 +27,9 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2297,
+      "is_a": 2315,
       "lives_in": 8,
-      "part_of": 244,
+      "part_of": 243,
       "related_to": 123
     },
     "by_pack": {
@@ -82,8 +82,8 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 297,
-      "world_core/programming_rust_advanced.jsonl": 32,
+      "world_core/programming_rust.jsonl": 315,
+      "world_core/programming_rust_advanced.jsonl": 31,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
       "world_core/role_bridges.jsonl": 63,
@@ -43016,7 +43016,7 @@
         "sample_id": "rust_004"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Сандық — `Rust-`та компиляция бірлігі болатын код жинағы."
+      "raw_text": "Сандық (crate) — `Rust` компиляторына бір уақытта берілетін код жинағы. Әр сандықта **сандық түбірі** (crate root) деп аталатын файл бар — компилятор сол файлдан бастап барлық кодты табады. Екі түрі: **екілік сандық** (`bin`) — `main` функциясы бар, орындалатын файл құрастырады (мысалы, `hello_world`); **кітапхана сандығы** (`lib`) — `main` жоқ, басқа сандықтар үшін пайдалы код ұсынады (мысалы, `rand`). «Сандық» термині `Rust` экожүйесінде стандартты — `crates.io` орталық қоймасы, `Cargo.toml`-дегі `[dependencies]` бөлімі — бәрі сандықтар туралы."
     },
     {
       "subject": {
@@ -43024,10 +43024,10 @@
         "root": "модуль",
         "pos": "noun"
       },
-      "predicate": "PartOf",
+      "predicate": "IsA",
       "object": {
-        "surface": "сандық",
-        "root": "сандық",
+        "surface": "сандық бөлігі",
+        "root": "сандық бөлігі",
         "pos": "noun"
       },
       "pattern": "world_core/programming_rust",
@@ -43036,7 +43036,7 @@
         "sample_id": "rust_005"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Модуль — `Rust` сандығының ішіндегі кодты топтастыруға арналған бөлік."
+      "raw_text": "Модуль (module) — сандық ішіндегі кодты топтастыратын құрылым: `mod hosting { ... }`. Екі мақсатқа қызмет етеді: (1) **аумақты ұйымдастыру** — байланысты функцияларды, типтерді бір атпен біріктіру; (2) **жекелікті басқару** — қандай элемент сыртқа ашық, қайсысы тек ішкі қолданысқа арналған. Модульдер иерархиялық — бір-бірінің ішіне ұя жасап, **модуль ағашын** құрайды (түбірі — `crate`). `pub` модификаторы сыртқа ашады; әдепкіше барлық элементтер жекеше."
     },
     {
       "subject": {
@@ -44916,7 +44916,7 @@
         "sample_id": "rust_101"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`use` — `Rust-`та сыртқы модуль немесе сандықтың элементтерін аумаққа енгізетін кілтсөз."
+      "raw_text": "`use` — модульдік жолды ағымдағы аумаққа қысқа атпен енгізетін кілтсөз: `use crate::front_of_house::hosting;` → енді `hosting::add_to_waitlist()` деп жазуға болады, толық жолдың керегі жоқ. **Идиома:** функцияны тікелей емес, оның **ата-модулін** енгізу — `hosting::add_to_waitlist()` оқылуы ыңғайлы; ал `use ::add_to_waitlist;` стилі идиоматиялық емес. **Ерекшелік:** структ, енам, тип үшін **тікелей импорттау** идиоматиялық — `use std::collections::HashMap;`. `use` әдепкіше жекеше — ағымдағы аумақта ғана көрінеді; `pub use` — қайта экспорттайды."
     },
     {
       "subject": {
@@ -44936,7 +44936,7 @@
         "sample_id": "rust_102"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`pub` — `Rust-`та модуль элементін сыртқа ашатын көрнектілік модификаторы."
+      "raw_text": "`pub` (public) — модуль элементін сыртқа ашатын көрнектілік модификаторы. **`Rust`-та әдепкіше барлық элементтер жекеше** (private) — компилятор «error[E0603]: module is private» қатесін шығарады. `pub fn`, `pub struct`, `pub enum`, `pub mod` арқылы бір қабат ашамыз. **Маңызды:** `pub` бір қабат қана ашады — модулді `pub` ету ішіндегі функцияларды автоматты ашпайды. `pub struct` өрістерді автоматты ашпайды. **Ерекшелік:** `pub enum` — нұсқалары автоматты ашық (өйткені енамның мақсаты — оларды ашу)."
     },
     {
       "subject": {
@@ -48880,6 +48880,366 @@
     },
     {
       "subject": {
+        "surface": "бума",
+        "root": "бума",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo бірлігі",
+        "root": "cargo бірлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_300"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бума (package) — бір немесе бірнеше сандықты бір жобаға біріктіретін бірлік. Бумада әрқашан `Cargo.toml` файлы бар. Ереже: бумада **ең көп бір кітапхана сандығы** + **қалаған көлемде екілік сандықтар** + **кем дегенде бір сандық**. `cargo new my_project` — жаңа екілік буманы жасайды. `cargo new my_lib --lib` — кітапхана буманы. Cargo бумаларды басқарады: тәуелділіктерді шешеді, құрастыру тәртібін орнатады, тестерді іске қосады."
+    },
+    {
+      "subject": {
+        "surface": "екілік сандық",
+        "root": "екілік сандық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сандық түрі",
+        "root": "сандық түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_301"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екілік сандық (binary crate) — `main` функциясы бар, орындалатын файлды құрастыруға арналған сандық. Сандық түбірі — `src/main.rs`. Cargo `cargo build` арқылы `target/debug/<атау>` орындалатын файлын жасайды; `cargo run` — құрастырып бірден орындайды. Бумада бірнеше екілік сандық болуы мүмкін: негізгісі — `src/main.rs`, қосымшалары — `src/bin/<атау>.rs`. Мысалдары: `hello_world`, `guessing_game`, бұл проектидегі `adam_chat`/`adam_demo`."
+    },
+    {
+      "subject": {
+        "surface": "кітапхана сандығы",
+        "root": "кітапхана сандығы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сандық түрі",
+        "root": "сандық түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_302"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кітапхана сандығы (library crate) — `main` функциясы жоқ, орындалатын файл құрастырмайтын сандық. Мақсаты — басқа сандықтарға пайдалы код ұсыну. Сандық түбірі — `src/lib.rs`. `cargo new <атау> --lib` арқылы жасалады. Басқа жобалардан `Cargo.toml`-да `[dependencies]` бөліміне қосылып, `use <crate_name>::...` арқылы импортталады. Мысалдары: `rand`, `serde`, `tokio`, `clap` — `crates.io`-дағы көп пайдаланылған кітапханалар."
+    },
+    {
+      "subject": {
+        "surface": "сандық түбірі",
+        "root": "сандық түбірі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "файл шартты келісімі",
+        "root": "файл шартты келісімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_303"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сандық түбірі (crate root) — компилятор сандықтың кодын іздеуді бастайтын файл. Шартты келісім: екілік сандық үшін — `src/main.rs`; кітапхана сандығы үшін — `src/lib.rs`. Сандық түбірі жасырын **`crate`** атты модулді құрайды — модуль ағашының басы. Барлық абсолюттік жолдар (`crate::...`) осы түбірден басталады. Файл атын өзгертсеңіз — `Cargo.toml`-да `[[bin]]` немесе `[lib]` секциясында жариялау керек."
+    },
+    {
+      "subject": {
+        "surface": "src/bin/",
+        "root": "src/bin/",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cargo шартты келісімі",
+        "root": "cargo шартты келісімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_304"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`src/bin/` қалтасы — бір бумада бірнеше екілік сандық қою тәсілі. Әр `.rs` файл — өзіндік екілік сандық. Мысалы: `src/bin/helper.rs` — `cargo run --bin helper` арқылы шакырылатын бағдарлама. Cargo бұл файлдарды автоматты тауып, әрқайсысын жеке құрастырады. `src/main.rs` — буманың негізгі екілік сандығы (бума атымен бірдей); `src/bin/<x>.rs` — `<x>` атты қосымша екілік. Adam жобасында: `src/bin/adam_chat.rs`, `src/bin/adam_demo.rs`."
+    },
+    {
+      "subject": {
+        "surface": "модуль ағашы",
+        "root": "модуль ағашы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "модуль құрылымы",
+        "root": "модуль құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_305"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Модуль ағашы (module tree) — сандық ішіндегі модульдер арасындағы иерархиялық қатынас. Түбірі — жасырын `crate` модулі (`src/lib.rs` немесе `src/main.rs`). Әр `mod foo { ... }` сөйлемі ағашқа жаңа тармақ қосады. Ағаш визуализациясы: `crate ├── front_of_house │   ├── hosting │   │   ├── add_to_waitlist │   │   └── seat_at_table │   └── serving └── ...`. Бұл — компилятордың модульдер мен олардың элементтерін табу картасы. Жолдар (`crate::front_of_house::hosting::add_to_waitlist`) осы ағаш бойымен жүреді."
+    },
+    {
+      "subject": {
+        "surface": "модуль жолы",
+        "root": "модуль жолы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "модуль атауы",
+        "root": "модуль атауы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_306"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Модуль жолы (path) — модуль ағашындағы белгілі элементті атау тәсілі. Екі түрі: **абсолюттік жол** — `crate` түбірінен басталады (`crate::front_of_house::hosting::add_to_waitlist`); **салыстырмалы жол** — қазіргі модульден басталады (`front_of_house::hosting::add_to_waitlist`, `self::...`, `super::...`). Жолдар `::` арқылы бөлінеді. Қашан қайсысын қолдану: код жылжытылса — абсолюттік сенімдірек; модульдік ағаш ішінде — салыстырмалы қысқарақ."
+    },
+    {
+      "subject": {
+        "surface": "абсолюттік жол",
+        "root": "абсолюттік жол",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жол түрі",
+        "root": "жол түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_307"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Абсолюттік жол (absolute path) — `crate` кілтсөзінен басталатын модуль жолы. Сандық түбірінен бастап толық жолды көрсетеді: `crate::front_of_house::hosting::add_to_waitlist()`. **Артықшылығы:** код кез келген модулге жылжытылса да жолдың дұрыстығы сақталады — түбірден тұрақты. **Кемшілігі:** ұзын. Стандартты кітапханаға арналған жолдар да абсолюттік: `std::collections::HashMap`, `std::io::Write`. Сыртқы сандыққа: `rand::Rng`, `tokio::spawn`."
+    },
+    {
+      "subject": {
+        "surface": "салыстырмалы жол",
+        "root": "салыстырмалы жол",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жол түрі",
+        "root": "жол түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_308"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Салыстырмалы жол (relative path) — қазіргі модульден басталатын модуль жолы. Үш бастау: модульдің тікелей атауы (`front_of_house::hosting::add_to_waitlist`), `self::...` (қазіргі модуль), `super::...` (бір қабат жоғары). **Артықшылығы:** қысқарақ, ішкі қатынастарды нығайтады. **Кемшілігі:** ішкі модуль жылжытылса жолдар үзілуі мүмкін. Бір ағаш қабатының ішінде — салыстырмалы жол ыңғайлы."
+    },
+    {
+      "subject": {
+        "surface": "super",
+        "root": "super",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жол кілтсөзі",
+        "root": "жол кілтсөзі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_309"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`super` кілтсөзі — салыстырмалы жолда «бір қабат жоғарыға» дегенді білдіреді. Мысалы: `mod back_of_house { fn fix_incorrect_order() { super::deliver_order(); } }` — `back_of_house` модулінен `super` арқылы оның ата-модуліне (сандық түбіріне) шығып, `deliver_order` функциясын шакырамыз. `super::super::...` — бірнеше қабат жоғарыға. Пайдалы: модуль ішкі қайта орналастырылған кезде көп жолды қайта жазудың керегі болмайды — `super` тәуелсіз ағаш қабатынан."
+    },
+    {
+      "subject": {
+        "surface": "self кілтсөзі",
+        "root": "self кілтсөзі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жол кілтсөзі",
+        "root": "жол кілтсөзі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_310"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`self` кілтсөзі (жолда) — салыстырмалы жолда қазіргі модульді білдіреді. Мысалы: `self::other_function()` — қазіргі модульдегі `other_function`-ды шакыру. `use self::foo;` — қазіргі модульден `foo`-ны енгізу. `use std::io::{self, Write};` — `io` модулін мен оның ішіндегі `Write`-ты бір сөйлемде енгізу (тоғыспалы жолдар идиомасы). **Маңызды:** `self` жолда ≠ `self` параметр — біріншісі модуль атауы, екіншісі әдістегі дана сілтемесі."
+    },
+    {
+      "subject": {
+        "surface": "жекелік әдепкіше",
+        "root": "жекелік әдепкіше",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_311"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жекелік әдепкіше — `Rust`-тың модуль жүйесінің ережесі: **барлық элементтер әдепкіше жекеше** (private). Сыртқы модуль ішкі модульдің элементтерін көре алмайды (`error[E0603]: module is private`). Ішкі модуль өзінің сыртқы модулін көре алады, бірақ керісінше жоқ. `pub` арқылы ашуға тура келеді. **Себебі:** қандай интерфейс сыртқы пайдаланушыға арналғанын саналы шешу — ішкі іске асырушы өзгеру мүмкіндігін сақтайды."
+    },
+    {
+      "subject": {
+        "surface": "pub бір қабат",
+        "root": "pub бір қабат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pub ережесі",
+        "root": "pub ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_312"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`pub` бір қабат — `pub mod foo { ... }` сөйлемі **тек модулді** ашады, ішіндегі функцияларды/структтарды автоматты ашпайды. Әрбір элементті жеке `pub fn`, `pub struct`, `pub enum` ету керек. Мысалы: `pub mod hosting { pub fn add_to_waitlist() {} }` — модуль + функция екеуі де ашық. `pub mod hosting { fn x() {} }` — модуль ашық, бірақ `x` жекеше. **Себебі:** программист әр элементтің көрнектілігін саналы шешуге мәжбүр."
+    },
+    {
+      "subject": {
+        "surface": "pub struct пен pub enum айырмашылығы",
+        "root": "pub struct пен pub enum айырмашылығы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pub ережесі",
+        "root": "pub ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_313"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`pub struct` пен `pub enum` айырмашылығы — структ пен енамға `pub` қойғанда жекелік ережесі әртүрлі. **`pub struct`:** өрістер автоматты ашпайды — әр өрісті жеке `pub` ету керек. `pub struct Breakfast { pub toast: String, seasonal_fruit: String }` — `toast` ашық, `seasonal_fruit` жасырын. Конструктор-функция (`pub fn summer(...)`) арқылы құрылады. **`pub enum`:** барлық нұсқалар автоматты ашық — `pub enum Appetizer { Soup, Salad }` — екеуіне де қол жеткізіледі. Себебі: енамның мақсаты — нұсқаларын ашу."
+    },
+    {
+      "subject": {
+        "surface": "pub use",
+        "root": "pub use",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "module ыңғайлылығы",
+        "root": "module ыңғайлылығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_314"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`pub use` (қайта экспорттау, re-export) — `use` сөйлеміне `pub` қосып, импортталған атауды сыртқа да ашу. `pub use crate::front_of_house::hosting;` — енді сыртқы код `restaurant::hosting::add_to_waitlist()` деп шакыра алады, `front_of_house` модулін көре алмаса да. **Артықшылығы:** кітапхананың сыртқы интерфейсін ішкі құрылымынан **бөлуге** мүмкіндік береді. Ішкі модуль қайта ұйымдастырылса, жария API өзгеріссіз қалады. `std::prelude` дәл осы үлгімен жасалған — `Vec`, `Option`, `Result` авто-импорты `pub use` арқылы."
+    },
+    {
+      "subject": {
+        "surface": "as импортта",
+        "root": "as импортта",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "import синтаксисі",
+        "root": "import синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_315"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`as` (импортта) — импорттаған атауды басқа атпен қайта атау. Мысалы: `use std::fmt::Result; use std::io::Result as IoResult;` — енді бір аумақта екі түрлі `Result` бар, біріншісі — `fmt::Result`, екіншісі — `IoResult`. Қашан қажет: екі модульден бірдей атаумен типтер импорттағанда соқтығыс шешу үшін; ұзын атауды қысқарту үшін; кодтың контекстіне сай атау беру үшін."
+    },
+    {
+      "subject": {
+        "surface": "тоғыспалы жолдар",
+        "root": "тоғыспалы жолдар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "import синтаксисі",
+        "root": "import синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_316"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тоғыспалы жолдар (nested paths) — бір модульден бірнеше элементті бір сөйлемде импорттау синтаксисі: `use std::{cmp::Ordering, io};` — тізбекті екі сөйлемге пара-пар (`use std::cmp::Ordering; use std::io;`). `self` арқылы ата-модульді де қосуға болады: `use std::io::{self, Write};` — `io` мен `io::Write` екеуін бірге импорттайды. Кодты ықшамдайды — әсіресе ұзын `use` блоктары."
+    },
+    {
+      "subject": {
+        "surface": "glob операторы",
+        "root": "glob операторы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "import синтаксисі",
+        "root": "import синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_317"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`*` glob операторы — модульдің **барлық ашық элементтерін** бір сөйлемде импорттау: `use std::collections::*;`. Жадыны үнемдемейді (Rust оптимизациямен оны жоюы мүмкін), бірақ кодты түсіндіруге қиындатады — оқыған адам қандай атаулар импортталғанын анық көре алмайды. **Сирек қолданылады.** Орынды жерлері: тестерде (`use super::*;` — ішкі модуль ұқсастарын қосу), `prelude` модулінде (`use my_lib::prelude::*;` — кітапхана ұсынған жалпы атаулар жинағы)."
+    },
+    {
+      "subject": {
         "surface": "меншік",
         "root": "меншік",
         "pos": "noun"
@@ -49217,26 +49577,6 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Crate — Rust бағдарламасының жинақталу бірлігі."
-    },
-    {
-      "subject": {
-        "surface": "модуль",
-        "root": "модуль",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "кеңістік",
-        "root": "кеңістік",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust_advanced",
-      "source": {
-        "pack": "world_core/programming_rust_advanced.jsonl",
-        "sample_id": "rustadv_021"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Module — кодты функционалды топтарға бөлуге арналған кеңістік."
     },
     {
       "subject": {
