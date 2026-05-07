@@ -7,6 +7,56 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.91.0] — 2026-05-07 — Rust Async Book chapter 6 deepening — Executing multiple futures (join! / try_join! / select! / FuturesUnordered)
+
+Per-chapter pedagogical cadence continues. Chapter 6 covers the **multi-future composition primitives** — how to wait for many concurrent operations efficiently. Walks from the join! family (and-semantics: wait-all + concurrent), through the select! macro (or-semantics: race for first), to the dynamic collection types (FuturesUnordered + FuturesOrdered), and finishes with cancellation patterns (timeout + race-vs-zip mental model + biased select!).
+
+### What's added
+
+**18 new curated entries `rust_622…639`** in `programming_rust.jsonl`:
+
+**join! family (5):** join! макросы шолуы (concurrent + tuple result + Rust 1.79 std::future::join), sequential .await vs join! (timing: ~2sec serial vs ~1sec parallel), try_join! (Result short-circuit on Err), futures::future::join (function form, 2 futures + join3/join4 variants), join_all (Vec input + concerns at high N + buffered alternative).
+
+**select! macro (4):** select! макросы шолуы (race + first-to-complete + .fuse() requirement), select! pattern matching (per-arm pat = future + arm body), default + complete branches (immediate-fall-through + all-finished signals), select! cancellation семантикасы (other futures dropped, cancellation safety considerations).
+
+**FuturesUnordered (3):** FuturesUnordered (dynamic Future collection + push at runtime), FuturesUnordered.next() (out-of-order completion + dynamic worker pool idiom), FuturesUnordered vs Vec<JoinHandle> (single-task concurrency vs multi-thread parallelism).
+
+**FuturesOrdered (2):** FuturesOrdered (preserves push order + slow-first holds back fast-second), FuturesOrdered vs Stream::buffered (collection vs stream-style + concurrency-limit differences).
+
+**Cancellation + race patterns (4):** Future cancellation (drop semantics + RAII cleanup + cancellation safety), timeout pattern (select! + sleep + tokio::time::timeout convenience), race vs zip mental model («біреуі ғана керек» = select! vs «бәрі керек» = join!), biased select! (priority polling vs random fairness + starvation risk).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_async_book_chapter_06_holdout.json` — 18 cases, 5 categories.
+- `crates/adam-dialog/tests/rust_async_book_chapter_06.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 18 compounds (subjects only).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 async-chapter-6 holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book ch.1-5 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **1001 passing** (was 1000; +1 async-chapter-6 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2929 → **2947** (+18) |
+| world_core facts | 3171 → **3189** (+18) |
+| Derived facts | 30881 → **30885** (+4) |
+
+### Roadmap (next — Async Book)
+
+| Release | Async Book Chapter | Topic |
+|---|---|---|
+| **v4.91.0** | **ch. 6** | **Executing multiple futures (this release)** |
+| v4.91.5 | ch. 7 | Workarounds (Send + recursion + traits) |
+| v4.92.0 | ch. 8 | The Async ecosystem (tokio vs async-std deep) |
+| v4.92.5 | ch. 9 | Final project — async HTTP server |
+
 ## [4.90.5] — 2026-05-07 — Rust Async Book chapter 5 deepening — Streams (Stream trait + StreamExt + async iteration) — workspace tests hit **1000** 🎉
 
 Per-chapter pedagogical cadence continues. Chapter 5 introduces **Stream** — the async-aware Iterator. Walks from the trait signature (poll_next + Pin + Context + Poll<Option<Item>>) to consumption patterns (.next().await + while let + for_each + laziness), the StreamExt combinator zoo (map/filter/then/fold/collect), the concurrent processing primitives (buffered + buffer_unordered + for_each_concurrent), and the common stream sources (stream::iter + mpsc::Receiver as Stream).

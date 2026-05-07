@@ -2194,6 +2194,29 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "for_each_concurrent",
     "stream::iter",
     "mpsc::receiver stream",
+    // **v4.91.0** — Rust Async Book chapter 6 (Executing multiple futures — join! / try_join! / select! / FuturesUnordered) deepening.
+    // rust_622…639 — 18 entries covering join! family (5),
+    // select! macro (4), FuturesUnordered (3), FuturesOrdered (2),
+    // cancellation + race patterns (4).
+    // Subjects.
+    "join! макросы",
+    "sequential vs join!",
+    "try_join!",
+    "futures::future::join",
+    "join_all",
+    "select! макросы",
+    "select! pattern",
+    "default complete branch",
+    "select! cancellation",
+    "futuresunordered",
+    "futuresunordered.next",
+    "futuresunordered vs vec",
+    "futuresordered",
+    "futuresordered vs buffered",
+    "future cancellation",
+    "timeout pattern",
+    "race vs zip",
+    "biased select!",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

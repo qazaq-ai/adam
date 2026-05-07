@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.91.0 — Rust Async Book Chapter 6 (Executing multiple futures — join! / try_join! / select! / FuturesUnordered) holdout. 18 natural Kazakh queries against rust_622…639. Categories: async6_join (join! macro + sequential vs concurrent + try_join! + futures::future::join + join_all), async6_select (select! macro + pattern matching + default/complete + cancellation), async6_futures_unordered (FuturesUnordered + .next + vs Vec<JoinHandle>), async6_futures_ordered (FuturesOrdered + vs Stream::buffered), async6_cancellation (Future cancellation + timeout + race-vs-zip mental model + biased select!).",
+  "version": "v4.91.0",
+  "captured_date": "2026-05-07",
+  "book": "Rust Async Book",
+  "chapter": 6,
+  "chapter_title": "Executing multiple futures — join! / try_join! / select! / FuturesUnordered",
+  "cases": [
+    {"id": "async6_join", "category": "async6_join", "query": "join! макросы деген не?", "any_substring": ["use futures::join", "concurrent", "rust 1.79"]},
+    {"id": "async6_seq_vs_join", "category": "async6_join", "query": "Sequential vs join! деген не?", "any_substring": ["sequential", "~1с", "lazy"]},
+    {"id": "async6_try_join", "category": "async6_join", "query": "try_join! деген не?", "any_substring": ["short-circuit", "одной error", "tokio::try_join"]},
+    {"id": "async6_join_fn", "category": "async6_join", "query": "futures::future::join деген не?", "any_substring": ["future1: f1, future2: f2", "join3", "макрос"]},
+    {"id": "async6_join_all", "category": "async6_join", "query": "join_all деген не?", "any_substring": ["vec<_>", "10000+", "buffered"]},
+    {"id": "async6_select", "category": "async6_select", "query": "select! макросы деген не?", "any_substring": ["алғашқы аяқталғанының", ".fuse()", "drop"]},
+    {"id": "async6_select_pat", "category": "async6_select", "query": "select! pattern деген не?", "any_substring": ["pat = future", "loop", "complete"]},
+    {"id": "async6_default", "category": "async6_select", "query": "Default complete branch деген не?", "any_substring": ["default =>", "complete =>", "receiver жабылса"]},
+    {"id": "async6_cancel", "category": "async6_select", "query": "select! cancellation деген не?", "any_substring": ["drop", "raii", "cancellation-safe"]},
+    {"id": "async6_unordered", "category": "async6_futures_unordered", "query": "FuturesUnordered деген не?", "any_substring": ["futuresunordered::new", "tasks.push", "joinset"]},
+    {"id": "async6_unordered_next", "category": "async6_futures_unordered", "query": "FuturesUnordered.next деген не?", "any_substring": ["out-of-order", "tasks.next", "dynamic worker pool"]},
+    {"id": "async6_unordered_vs_vec", "category": "async6_futures_unordered", "query": "FuturesUnordered vs Vec деген не?", "any_substring": ["joinhandle", "multi-thread", "single-task"]},
+    {"id": "async6_ordered", "category": "async6_futures_ordered", "query": "FuturesOrdered деген не?", "any_substring": ["push-ом ретімен", "stream::buffered", "хронологиялық"]},
+    {"id": "async6_ordered_vs_buf", "category": "async6_futures_ordered", "query": "FuturesOrdered vs buffered деген не?", "any_substring": ["шегі жоқ", "buffered(100)", "cache-population"]},
+    {"id": "async6_future_cancel", "category": "async6_cancellation", "query": "Future cancellation деген не?", "any_substring": ["drop", "cancellation safety", "read_exact"]},
+    {"id": "async6_timeout", "category": "async6_cancellation", "query": "Timeout pattern деген не?", "any_substring": ["tokio::time::sleep", "tokio::time::timeout", "elapsed"]},
+    {"id": "async6_race_zip", "category": "async6_cancellation", "query": "Race vs zip деген не?", "any_substring": ["race (`select!`)", "zip (`join!`)", "fastest-of"]},
+    {"id": "async6_biased", "category": "async6_cancellation", "query": "biased select! деген не?", "any_substring": ["кездейсоқ ретпен", "shutdown_rx", "starvation"]}
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "version": "4.90.5",
+  "version": "4.91.0",
   "name": "adam-kazakh-segmentation-roots",
   "target_language": "kazakh",
   "script": "cyrillic",
