@@ -1,7 +1,7 @@
 {
-  "version": "4.87.0",
+  "version": "4.87.5",
   "status": "completed",
-  "elapsed_s": 65,
+  "elapsed_s": 61,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3063,
+    "facts_total": 3081,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2498,
+      "is_a": 2516,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 504,
+      "world_core/programming_rust.jsonl": 522,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -53017,6 +53017,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Attribute-like + function-like macros — `derive`-тен басқа екі procedural macro форма. **Attribute-like:** `#[route(GET, \"/\")]` — қолданушы анықтаған атрибут. Жариялау: `#[proc_macro_attribute] pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream`. Веб-фреймворктерде көп қолданылады (Rocket, Actix). **Function-like:** `sql!(SELECT * FROM users)` — функция шакыруға ұқсас, бірақ ішінде кез-келген синтаксис болуы мүмкін. Жариялау: `#[proc_macro] pub fn sql(input: TokenStream) -> TokenStream`. DSL (domain-specific language) жасауға қолданылады. Үшеуі де — `proc-macro` крейтінде; `syn` + `quote` крейттері талдау + код-генерация үшін стандарт."
+    },
+    {
+      "subject": {
+        "surface": "tcp listener",
+        "root": "tcp listener",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_514"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "TcpListener — `std::net::TcpListener` стандартты кітапханалық тип; TCP қосылымдарды тыңдайтын сокет жасайды. Шакыру: `let listener = TcpListener::bind(\"127.0.0.1:7878\").unwrap();` — IP мекен-жайы + порт. Қайтарылатын `Result<TcpListener, io::Error>`: порт бос болмаса немесе түбірлік құқық керек болса, қате қайтарады. Кіріс қосылымдарды итератор арқылы алу: `for stream in listener.incoming() { let stream = stream.unwrap(); handle_connection(stream); }`. **Маңызды:** `incoming()` — жалпылама итератор, әрбір элемент `Result<TcpStream>` (қате — мысалы, шектен тыс файл-дескрипторлар таусылғанда). Сондықтан өндіріс кодында `.unwrap()` орнына дұрыс өңдеу қажет."
+    },
+    {
+      "subject": {
+        "surface": "tcp stream өңдеу",
+        "root": "tcp stream өңдеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_515"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "TcpStream өңдеу — әр кіріс қосылым `TcpStream` — оқу/жазу мүмкіндігі бар екі бағытты сокет. HTTP сұранысын оқу: `let buf_reader = BufReader::new(&mut stream); let http_request: Vec<_> = buf_reader.lines().map(|r| r.unwrap()).take_while(|l| !l.is_empty()).collect();`. **Логика:** `BufReader` буферленген оқуды береді → `.lines()` жолдар бойынша итератор → `.take_while(|l| !l.is_empty())` бос жолға дейін (бос жол = HTTP-дегі тақырып/дене бөлгіші). Шығу: `Vec<String>` ішінде сұраныс жолы + барлық тақырыптар. **Шектеу:** `BufReader` `&mut stream` алады, сондықтан кейін `stream.write_all(...)` шакыру керек болса, BufReader шеңбер аяқталу керек."
+    },
+    {
+      "subject": {
+        "surface": "http сұраныс құрылымы",
+        "root": "http сұраныс құрылымы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust тұжырымдамасы",
+        "root": "rust тұжырымдамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_516"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "HTTP сұраныс құрылымы — мәтіндік протокол, үш бөліктен тұрады: (1) **Сұраныс жолы** — әдіс + URI + версия: `GET / HTTP/1.1`; (2) **Тақырыптар** (headers) — `Key: Value` жұптары әр жолда: `Host: 127.0.0.1:7878`, `User-Agent: curl/7.79`, `Accept: */*`; (3) **Бос жол** (тек CRLF) — тақырыптарды денеден ажыратады; (4) **Дене** (body) — POST/PUT-та деректер. Әр жол `\\r\\n` (CRLF) арқылы аяқталады. Біздің мақсатымыз үшін тек бірінші жолды (сұраныс жолы) талдау жеткілікті — оны space-тен бөлсек: `let request_line = http_request.first().unwrap();` мысалы `\"GET / HTTP/1.1\"`."
+    },
+    {
+      "subject": {
+        "surface": "http жауап жазу",
+        "root": "http жауап жазу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_517"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "HTTP жауап жазу — клиентке қайтарылатын мәтін, мынадай форматта: `HTTP-Version Status-Code Reason-Phrase\\r\\n` + `Headers\\r\\n\\r\\n` + `Body`. Мысалы: `let status_line = \"HTTP/1.1 200 OK\"; let contents = fs::read_to_string(\"hello.html\").unwrap(); let length = contents.len(); let response = format!(\"{status_line}\\r\\nContent-Length: {length}\\r\\n\\r\\n{contents}\"); stream.write_all(response.as_bytes()).unwrap();`. **Маңызды:** `Content-Length` тақырыбы — клиентке қанша байт оқу керек екенін айтады; онсыз HTTP/1.1-де қосылым қайталама-жұмсалуы (keep-alive) бұзылады. `\\r\\n\\r\\n` — тақырыптар мен дене арасындағы шекара."
+    },
+    {
+      "subject": {
+        "surface": "request line routing",
+        "root": "request line routing",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_518"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сұраныс жолын бағыттау (request-line routing) — `match` арқылы әр URI-ге арналған әрекетті таңдау. Мысал: `let (status_line, filename) = match &request_line[..] { \"GET / HTTP/1.1\" => (\"HTTP/1.1 200 OK\", \"hello.html\"), \"GET /sleep HTTP/1.1\" => { thread::sleep(Duration::from_secs(5)); (\"HTTP/1.1 200 OK\", \"hello.html\") }, _ => (\"HTTP/1.1 404 NOT FOUND\", \"404.html\") };`. Содан кейін бір ортақ блок жауапты жазады. **Артықшылық:** жаңа маршрут қосу — бір тармақ қосу. Шектеу: дәл жол сәйкестігі (`startsWith` жоқ); шынайы өндіріс кодында regex немесе routing crate (axum, actix) керек."
+    },
+    {
+      "subject": {
+        "surface": "табылмады беті",
+        "root": "табылмады беті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "http статусы",
+        "root": "http статусы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_519"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Табылмады беті (404 Not Found) — егер сұраныс жолы белгілі маршрутқа сай келмесе, сервер `\"HTTP/1.1 404 NOT FOUND\"` статус-жолы + жеке `404.html` бетімен жауап береді. Толық жауап мысалы: `HTTP/1.1 404 NOT FOUND\\r\\nContent-Length: 167\\r\\n\\r\\n<!DOCTYPE html><html><head><title>Hello!</title></head><body><h1>Oops!</h1><p>Sorry, I don't know what you're asking for.</p></body></html>`. **Маңызды:** статус-жолы 404 болса да, жауаптың денесі (HTML) барлық клиентке қайтарылады — шолғыш оны көрсетеді. Status code семантикасы: 2xx — табысты, 3xx — қайта-бағыттау, 4xx — клиент қатесі, 5xx — сервер қатесі."
+    },
+    {
+      "subject": {
+        "surface": "жалғыз ағынды бөгеу",
+        "root": "жалғыз ағынды бөгеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "performance мәселесі",
+        "root": "performance мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_520"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жалғыз ағынды бөгеу (single-thread blocking) — біздің бастапқы серверіміз — synchronous + бір ағында: `for stream in listener.incoming() { handle_connection(stream); }` — әр сұранысты бір-бірлеп өңдейді. Демонстрация: `/sleep` маршруты `thread::sleep(5s)` істейді; екі браузер бірінші тар-да `/sleep`-ті, екіншіде `/`-ті ашсаңыз — екіншісі **5 секунд** күтеді, өйткені сервер бірінші сұранысты аяқтаймайынша екіншісіне жетпейді. Бұл — өндірісте жарамсыз: бір баяу клиент бүкіл серверді блоктайды. Шешім — әр сұранысты бөлек ағында өңдеу. Бірақ әр сұранысқа жаңа `thread::spawn` — ағын жасау құны жоғары, шектен тыс ағын → resource exhaustion."
+    },
+    {
+      "subject": {
+        "surface": "thread per request",
+        "root": "thread per request",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "performance мәселесі",
+        "root": "performance мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_521"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әр сұранысқа жаңа ағын (thread per request) проблемасы — қарапайым шешім: `for stream in listener.incoming() { thread::spawn(|| handle_connection(stream)); }`. **Бірақ:** клиент санының шегі жоқ → 10 000 параллель сұраныс келсе, 10 000 ағын жасалады. Ағын — ОС деңгейі ресурсы (~2 МБ стек әрқайсысы), 10 000 × 2 МБ = 20 ГБ жады. ОС ағын-таспалау кестесі шамадан тыс жұмыс жасайды → жүйе тоқырайды (DoS-қа осалдық). **Шешім** — Thread pool: бекітілген санды (мысалы 4) ағынды күні бұрын жасап, олардың арасында жұмысты бөлу. Кіріс кезек толса — артық сұраныстар күтеді (немесе rejected). Бұл — bounded concurrency."
+    },
+    {
+      "subject": {
+        "surface": "thread pool",
+        "root": "thread pool",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_522"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Thread pool — бекітілген санды жұмысшы ағын (worker thread) бар топ; жұмысты атқару үшін кіріс кезекке қойылады, бос ағын оны алады. **Артықшылық:** (1) ағын-жасау құны — алдын ала төленді; (2) ресурс шегі — ағын саны бекітілген, DoS жоқ; (3) бөлісу — бос ағын кезектегі жұмысты алады. **Дизайн:** `ThreadPool { workers: Vec<Worker>, sender: mpsc::Sender<Job> }` + `Worker { id: usize, thread: JoinHandle<()> }`. Жұмыс түрі: `type Job = Box<dyn FnOnce() + Send + 'static>;`. Жариялы API: `ThreadPool::new(size: usize)` + `execute<F>(&self, f: F)`. **Қолдану:** `let pool = ThreadPool::new(4); for stream in listener.incoming() { pool.execute(|| handle_connection(stream)); }`."
+    },
+    {
+      "subject": {
+        "surface": "threadpool::new",
+        "root": "threadpool::new",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_523"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "ThreadPool::new + execute API — пуляны қалай орнату және қалай жіберу. Конструктор: `pub fn new(size: usize) -> ThreadPool { assert!(size > 0); let (sender, receiver) = mpsc::channel(); let receiver = Arc::new(Mutex::new(receiver)); let mut workers = Vec::with_capacity(size); for id in 0..size { workers.push(Worker::new(id, Arc::clone(&receiver))); } ThreadPool { workers, sender: Some(sender) } }`. Жіберу: `pub fn execute<F>(&self, f: F) where F: FnOnce() + Send + 'static { let job = Box::new(f); self.sender.as_ref().unwrap().send(job).unwrap(); }`. **Маңызды:** `execute` тек `&self` алады (`&mut self` емес) — `mpsc::Sender::send` `&self`-пен жұмыс істейді (Sender ішкі мутацияны өзі басқарады)."
+    },
+    {
+      "subject": {
+        "surface": "worker структурасы",
+        "root": "worker структурасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_524"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Worker структурасы — пулдағы жеке ағынды білдіреді. `pub struct Worker { id: usize, thread: Option<thread::JoinHandle<()>> }`. Конструктор: `fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker { let thread = thread::spawn(move || loop { let message = receiver.lock().unwrap().recv(); match message { Ok(job) => { println!(\"Worker {id} got a job\"); job(); }, Err(_) => break } }); Worker { id, thread: Some(thread) } }`. **Логика:** ағын мәңгілік цикл құрады — `recv()` арқылы кезектен жұмыс күтеді; `Ok(job)` → орындайды; `Err` (sender drop болғанда) → break. `id` — диагностика мен журналдау үшін."
+    },
+    {
+      "subject": {
+        "surface": "arc mutex receiver",
+        "root": "arc mutex receiver",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_525"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Arc<Mutex<Receiver<Job>>>` идиомасы — неге керек: `mpsc::Receiver` тек **бір** иесін қабылдайды (single-consumer), бірақ біз барлық worker-ге **бір** receiver-ді бөлгіміз келеді. **Шешім:** `Arc<T>` ағын-арасында бөлісу үшін, `Mutex<T>` бір уақытта бір ғана worker-дің `recv()` шакыруын қамтамасыз ету үшін. `Arc::new(Mutex::new(receiver))` және барлық worker-ге `Arc::clone`-мен беру. **Маңызды дұрыс емес шешім:** `let job = receiver.lock().unwrap().recv().unwrap(); job();` — бұл lock-ті job орындалу бойы ұстайды (басқа worker-лер күтеді). **Дұрыс:** `let message = receiver.lock().unwrap().recv();` — лак-ті блок аяқталысымен босату; содан соң `job()` шакыру (lock-сыз)."
+    },
+    {
+      "subject": {
+        "surface": "job алиасы",
+        "root": "job алиасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_526"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`type Job = Box<dyn FnOnce() + Send + 'static>;` — пулдың кезегінде сақталатын жұмыс түрі. Әр компонентті ажыратып қарасақ: (1) `Box<dyn ...>` — жалғыз пайдаланушы үшін heap-те орналасқан trait object (өлшемі компиляцияда белгісіз — әр closure өз жазғандарын ұстайды); (2) `FnOnce` — closure тек **бір рет** шакырылады (closure ішінде ұстаған мәндерді жұтып кетуі мүмкін); (3) `Send` — closure ағыны арасында жіберілуге қауіпсіз; (4) `'static` — closure ішінде ешқандай қысқа өмір сүрулі сілтеме жоқ (барлығы өзіндік немесе static). Бұл өрнек — Rust-та generic жұмыстарды dynamic dispatch арқылы жинау идиомасы."
+    },
+    {
+      "subject": {
+        "surface": "execute pipeline",
+        "root": "execute pipeline",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_527"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Execute → channel → worker recv → run конвейері — `pool.execute(|| handle_connection(stream))` шакырудан бастап жұмыстың аяқталуына дейінгі толық ағын: (1) `execute` closure-ды `Box::new(f)` арқылы Job-қа орайды; (2) `Job`-ты `sender.send(job)` арқылы channel-ге салады; (3) бір бос worker-дің `receiver.lock().unwrap().recv()` шақыруы оны алады; (4) lock босатылады; (5) worker `job()` шакыру арқылы closure-ды орындайды; (6) closure аяқталғанда worker циклдің басына оралады, келесі recv() күтеді. **Параллелизм:** `size` worker бір уақытта `size` түрлі closure-ды орындай алады. Артық жұмыс — channel ішінде кезекте қалады, бос worker пайда болғанда алынады."
+    },
+    {
+      "subject": {
+        "surface": "drop for threadpool",
+        "root": "drop for threadpool",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_528"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Drop for ThreadPool — пул құлағанда барлық worker-лерді тиісті түрде тоқтату. `impl Drop for ThreadPool { fn drop(&mut self) { drop(self.sender.take()); for worker in &mut self.workers { println!(\"Shutting down worker {}\", worker.id); if let Some(thread) = worker.thread.take() { thread.join().unwrap(); } } } }`. **Логика:** (1) `self.sender.take()` — Option-нан `Sender`-ді алып, `drop`-қа береді; (2) `Sender` drop болса — channel жабылады, worker-лердің `recv()` `Err` қайтарады, цикл `break` арқылы аяқталады; (3) әр worker-дің `JoinHandle`-ін алып, `join()` шакырамыз — толық тоқтағанша күтеміз. **Маңызды:** алдымен барлық sender-лерді жабу, кейін join — әйтпесе deadlock."
+    },
+    {
+      "subject": {
+        "surface": "option joinhandle",
+        "root": "option joinhandle",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_529"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Option<JoinHandle>` + `.take()` идиомасы — неге керек: `JoinHandle` `join()` шакыру `self`-ті жұтады (move). Бірақ `Drop::drop(&mut self)` ішінде бізде тек `&mut self.workers[i].thread` бар — `Worker.thread`-ті көшіріп ала алмаймыз. **Шешім:** `thread: Option<JoinHandle<()>>` түрі. Drop ішінде `worker.thread.take()` — `Option`-ды `None`-ге қояды + ішіндегі `JoinHandle`-ды қайтарады (move). Содан кейін `if let Some(thread) = ... { thread.join().unwrap() }`. Бұл — Rust-тағы «move out of &mut self» шектеуінің жалпы шешімі: мәнді `Option`-ге орап, `take()` арқылы шығарып алу."
+    },
+    {
+      "subject": {
+        "surface": "sender drop shutdown",
+        "root": "sender drop shutdown",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_530"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Sender drop — таза shutdown — пулды дұрыс жабудың кілті. Бұрынғы (book-тың алғашқы нұсқасы) `Message::NewJob(Job)` + `Message::Terminate` enum + әр worker-ге Terminate жіберу — бірақ бұл аса күрделі. **Заманауи нұсқа:** `sender: Option<mpsc::Sender<Job>>` етіп, Drop ішінде `self.sender.take()` арқылы Sender-ді жою. Channel-да барлық sender drop болғанда, барлық `recv()` `Err(RecvError)` қайтарады (channel disconnected). Worker-дің mainloop: `match recv() { Ok(job) => job(), Err(_) => break }` — Err-ді көрген кезде шығады. **Артықшылық:** аз код, deadlock-сыз, ағын-арасында арнайы terminate-сигнал жіберудің қажеті жоқ."
+    },
+    {
+      "subject": {
+        "surface": "веб-сервер шолуы",
+        "root": "веб-сервер шолуы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust капстоны",
+        "root": "rust капстоны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_531"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Веб-сервер шолуы (chapter 20) — Rust Book-тың капстон жобасы. Біріктірілген тұжырымдамалар: (1) chapter 12 — CLI арг + Cargo binary + lib.rs/main.rs бөлу; (2) chapter 9 — `Result<T, E>` + `?` оператор; (3) chapter 13 — closure + `FnOnce` + `Box<dyn Fn>`; (4) chapter 16 — `thread::spawn` + `mpsc::channel` + `Arc<Mutex<T>>` + `Send`; (5) chapter 17 — trait objects (`Box<dyn FnOnce>`); (6) chapter 19 — type alias (`type Job = ...`). Соңғы өнім: 4-ағынды веб-сервер, `127.0.0.1:7878`-те тыңдайды, `GET /`, `GET /sleep`, басқалары — 404, тиісті drop арқылы жабылады. **Шектеу:** өндіріс үшін axum/actix/hyper crate керек — бұл — оқу мысалы, өндірістік сервер емес."
     },
     {
       "subject": {

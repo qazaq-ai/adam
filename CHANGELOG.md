@@ -7,6 +7,84 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.88.0] — 2026-05-07 — Rust Book chapter 20 deepening — Қорытынды жоба — көп ағынды веб-сервер (final project — multi-threaded web server)
+
+**The Rust Book is complete.** Chapter 20 — the capstone project — combines everything from chapters 12 (CLI / lib-vs-bin), 16 (concurrency), 17 (trait objects), and 19 (type aliases) into a working multi-threaded HTTP server with graceful shutdown. Per-chapter pedagogical cadence completes its first full pass: chapters 1-20 all have curriculum-grade Kazakh coverage + per-chapter holdout + 100 % floor test.
+
+### What's added
+
+**18 new curated entries `rust_514…531`** in `programming_rust.jsonl`:
+
+**TCP / HTTP basics (4):** TcpListener (`bind` + `incoming`), TcpStream өңдеу (`BufReader` + `lines` + `take_while`), HTTP сұраныс құрылымы (request line + headers + CRLF), HTTP жауап жазу (status line + `Content-Length` + body).
+
+**Routing (2):** request-line routing (`match` on URI + `/sleep` example), табылмады беті (`HTTP/1.1 404 NOT FOUND` + 4xx semantics).
+
+**Single-thread → multi-thread transition (2):** жалғыз ағынды бөгеу (5-second `/sleep` blocks all clients demonstration), thread-per-request anti-pattern (resource exhaustion + DoS).
+
+**Thread pool architecture (6):** thread pool тұжырымдамасы (bounded concurrency + queue), `ThreadPool::new` + `execute` API (assertion + channel + Arc::clone for workers), Worker структурасы (id + JoinHandle + recv loop), `Arc<Mutex<Receiver>>` (single-consumer channel + multi-consumer dispatch + lock-release timing), `type Job = Box<dyn FnOnce() + Send + 'static>` (4-component breakdown), execute → channel → worker recv → run pipeline.
+
+**Graceful shutdown (3):** Drop for ThreadPool (sender.take + join + ordering rule), `Option<JoinHandle>` + `.take()` (move-out-of-&mut-self idiom), Sender drop = clean shutdown (modern simplification over Message::Terminate enum).
+
+**Capstone retrospective (1):** веб-сервер шолуы (chapter 20 ↔ chapters 9 / 12 / 13 / 16 / 17 / 19 connections + production-vs-pedagogical scope note).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant; final chapter)
+
+- `data/eval/rust_book_chapter_20_holdout.json` — 18 cases, 6 categories (`ch20_tcp_http`, `ch20_routing`, `ch20_blocking`, `ch20_thread_pool`, `ch20_shutdown`, `ch20_capstone`).
+- `crates/adam-dialog/tests/rust_book_chapter_20.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 24 compounds (18 subjects + 6 object hubs `rust тұжырымдамасы`, `http статусы`, `performance мәселесі`, `concurrency үлгісі`, `rust api`, `rust капстоны`).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 20 holdout cases | ✅ 100 % |
+| Existing chapters 1-19 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **995 passing** (was 994; +1 chapter-20 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2821 → **2839** (+18) |
+| world_core facts | 3063 → **3081** (+18) |
+| Derived facts | 30876 → **30886** (+10) |
+
+### Rust Book status
+
+| Chapter | Topic | Release | Holdout |
+|---|---|---|---|
+| 1 | Bastau | v4.79.0 | ✅ |
+| 2 | Guessing game | v4.79.5 | ✅ |
+| 3 | Common programming concepts | v4.80.0 | ✅ |
+| 4 | Ownership | v4.80.5 | ✅ |
+| 5 | Structs | v4.81.0 | ✅ |
+| 6 | Enums + match | v4.81.5 | ✅ |
+| 7 | Modules + packages + crates | v4.82.0 | ✅ |
+| 8 | Common collections | v4.82.5 | ✅ |
+| 9 | Error handling | v4.83.0 | ✅ |
+| 10 | Generics + traits + lifetimes | v4.83.5 | ✅ |
+| 11 | Automated tests | v4.84.0 | ✅ |
+| 12 | CLI minigrep | v4.84.5 | ✅ |
+| 13 | Iterators + closures | v4.78.5 | ✅ |
+| 14 | Cargo + Crates.io deeper | v4.85.0 | ✅ |
+| 15 | Smart pointers | v4.85.5 | ✅ |
+| 16 | Fearless concurrency | v4.86.0 | ✅ |
+| 17 | OOP features | v4.86.5 | ✅ |
+| 18 | Patterns | v4.87.0 | ✅ |
+| 19 | Advanced features | v4.87.5 | ✅ |
+| **20** | **Multi-threaded web server** | **v4.88.0** | **✅** |
+
+### Roadmap (next)
+
+The Rust Book pass is complete. Future Rust direction is open:
+- **Async / await** (not in book; Rust Async Book separately)
+- **Error handling crates** (anyhow / thiserror / eyre)
+- **Web framework deep-dive** (axum / actix-web / rocket)
+- Or pivot to a different educational direction (algorithms, ML, systems programming).
+
+User direction will determine the next minor.
+
 ## [4.87.5] — 2026-05-07 — Rust Book chapter 19 deepening — Кеңейтілген мүмкіндіктер (unsafe / advanced traits / advanced types / function pointers / macros)
 
 Per-chapter pedagogical cadence continues. Chapter 19 — the most heterogeneous chapter — covers Rust's escape hatches and metaprogramming: **unsafe Rust** (5 superpowers + memory-safety contract delegation), **advanced traits** (associated types, operator overloading, fully qualified syntax, supertraits), **advanced types** (type aliases, never type `!`, DST + `Sized`), **advanced functions/closures** (`fn` pointers, returning closures), and **macros** (declarative `macro_rules!` + 3 procedural forms). Previously surface-level — only a handful of stubs across these areas. Now deepened with full curriculum.

@@ -2038,6 +2038,37 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "trait мүмкіндігі",
     "trait синтаксисі",
     "rust идиомасы",
+    // **v4.88.0** — Rust Book chapter 20 (final project — multi-threaded web server) deepening.
+    // rust_514…531 — 18 entries covering HTTP/TCP basics (4),
+    // routing (2), single-thread → multi-thread transition (2),
+    // thread pool architecture (6), graceful shutdown (3),
+    // and capstone retrospective (1).
+    // Subjects.
+    "tcp listener",
+    "tcp stream өңдеу",
+    "http сұраныс құрылымы",
+    "http жауап жазу",
+    "request line routing",
+    "табылмады беті",
+    "жалғыз ағынды бөгеу",
+    "thread per request",
+    "thread pool",
+    "threadpool::new",
+    "worker структурасы",
+    "arc mutex receiver",
+    "job алиасы",
+    "execute pipeline",
+    "drop for threadpool",
+    "option joinhandle",
+    "sender drop shutdown",
+    "веб-сервер шолуы",
+    // Objects.
+    "rust тұжырымдамасы",
+    "http статусы",
+    "performance мәселесі",
+    "concurrency үлгісі",
+    "rust api",
+    "rust капстоны",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

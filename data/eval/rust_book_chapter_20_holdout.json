@@ -1,0 +1,27 @@
+{
+  "_comment": "v4.88.0 — Rust Book Chapter 20 (Қорытынды жоба — көп ағынды веб-сервер) holdout. 18 natural Kazakh queries against rust_514…531. Categories: ch20_tcp_http (TCP listener + stream + HTTP request structure + response writing), ch20_routing (request-line routing + 404), ch20_blocking (single-thread blocking demo + thread-per-request anti-pattern), ch20_thread_pool (thread pool concept + ThreadPool::new + Worker + Arc<Mutex<Receiver>> + Job alias + execute pipeline), ch20_shutdown (Drop for ThreadPool + Option<JoinHandle> + Sender drop), ch20_capstone (chapter 20 retrospective).",
+  "version": "v4.88.0",
+  "captured_date": "2026-05-07",
+  "chapter": 20,
+  "chapter_title": "Қорытынды жоба — көп ағынды веб-сервер (final project — multi-threaded web server)",
+  "cases": [
+    {"id": "ch20_tcp_listener", "category": "ch20_tcp_http", "query": "TCP listener деген не?", "any_substring": ["bind", "127.0.0.1:7878", "incoming"]},
+    {"id": "ch20_tcp_stream", "category": "ch20_tcp_http", "query": "TCP stream өңдеу деген не?", "any_substring": ["bufreader", "lines()", "take_while"]},
+    {"id": "ch20_http_request", "category": "ch20_tcp_http", "query": "HTTP сұраныс құрылымы деген не?", "any_substring": ["get / http/1.1", "host:", "crlf"]},
+    {"id": "ch20_http_response", "category": "ch20_tcp_http", "query": "HTTP жауап жазу деген не?", "any_substring": ["status_line", "content-length", "write_all"]},
+    {"id": "ch20_routing", "category": "ch20_routing", "query": "Request line routing деген не?", "any_substring": ["match", "/sleep", "axum"]},
+    {"id": "ch20_404", "category": "ch20_routing", "query": "Табылмады беті деген не?", "any_substring": ["404 not found", "404.html", "4xx"]},
+    {"id": "ch20_blocking", "category": "ch20_blocking", "query": "Жалғыз ағынды бөгеу деген не?", "any_substring": ["thread::sleep", "5 секунд", "блоктайды"]},
+    {"id": "ch20_thread_per_req", "category": "ch20_blocking", "query": "Thread per request деген не?", "any_substring": ["thread::spawn", "10 000", "dos"]},
+    {"id": "ch20_threadpool", "category": "ch20_thread_pool", "query": "Thread pool деген не?", "any_substring": ["worker thread", "type job", "execute"]},
+    {"id": "ch20_threadpool_new", "category": "ch20_thread_pool", "query": "ThreadPool::new деген не?", "any_substring": ["assert!", "mpsc::channel", "arc::clone"]},
+    {"id": "ch20_worker", "category": "ch20_thread_pool", "query": "Worker структурасы деген не?", "any_substring": ["joinhandle", "loop", "recv"]},
+    {"id": "ch20_arc_mutex_recv", "category": "ch20_thread_pool", "query": "Arc Mutex receiver деген не?", "any_substring": ["single-consumer", "lock-ті блок", "арасында бөлісу"]},
+    {"id": "ch20_job_alias", "category": "ch20_thread_pool", "query": "Job алиасы деген не?", "any_substring": ["box<dyn fnonce", "send", "'static"]},
+    {"id": "ch20_execute", "category": "ch20_thread_pool", "query": "Execute pipeline деген не?", "any_substring": ["box::new(f)", "sender.send", "lock босатыл"]},
+    {"id": "ch20_drop", "category": "ch20_shutdown", "query": "Drop for ThreadPool деген не?", "any_substring": ["self.sender.take", "channel жабылады", "deadlock"]},
+    {"id": "ch20_option_join", "category": "ch20_shutdown", "query": "Option JoinHandle деген не?", "any_substring": ["take()", "move out", "drop(&mut self)"]},
+    {"id": "ch20_sender_drop", "category": "ch20_shutdown", "query": "Sender drop shutdown деген не?", "any_substring": ["recverror", "message::terminate", "disconnected"]},
+    {"id": "ch20_capstone", "category": "ch20_capstone", "query": "Веб-сервер шолуы деген не?", "any_substring": ["капстон", "chapter 16", "axum"]}
+  ]
+}
