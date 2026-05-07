@@ -1,7 +1,7 @@
 {
-  "version": "4.85.0",
+  "version": "4.85.5",
   "status": "completed",
-  "elapsed_s": 64,
+  "elapsed_s": 70,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2993,
+    "facts_total": 3009,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2428,
+      "is_a": 2444,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 434,
+      "world_core/programming_rust.jsonl": 450,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -44540,26 +44540,6 @@
     },
     {
       "subject": {
-        "surface": "arc",
-        "root": "arc",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "ақылды сілтеме",
-        "root": "ақылды сілтеме",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust",
-      "source": {
-        "pack": "world_core/programming_rust.jsonl",
-        "sample_id": "rust_087"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "`Arc` — `Rust-`та ағындар арасында қауіпсіз ортақ иеленуге арналған ақылды сілтеме."
-    },
-    {
-      "subject": {
         "surface": "mutex",
         "root": "mutex",
         "pos": "noun"
@@ -45497,26 +45477,6 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "`Rc` — `Rust`-та бір ағындағы ортақ иелік үшін есеп санағышы бар ақылды сілтеме: `Rc<T>`. Бір мәнге бірнеше иеленушіге рұқсат береді."
-    },
-    {
-      "subject": {
-        "surface": "arc",
-        "root": "arc",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "атомдық санағышты сілтеме",
-        "root": "атомдық санағышты сілтеме",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust",
-      "source": {
-        "pack": "world_core/programming_rust.jsonl",
-        "sample_id": "rust_136"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "`Arc` — `Rust`-та көп ағынды контекстегі ортақ иелік үшін атомдық санағыш бар ақылды сілтеме: `Arc<T>`. `Rc`-нің ағындар арасында қауіпсіз нұсқасы."
     },
     {
       "subject": {
@@ -51617,6 +51577,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Парент-бала ағаш паттерні (`Rc<Node>` + `Weak<Parent>`) — циклсіз ағаш құрылымын жасау идиомасы. **Ереже:** ата → балаларға **күшті** (`Rc<Node>`) — балалар атаға тәуелді өмір сүреді. Бала → атаға **әлсіз** (`Weak<Node>`) — цикл жоқ, ата кеткенде бала да жоғалады, бала кеткенде ата сақталады. Мысалы: `struct Node { value: i32, parent: RefCell<Weak<Node>>, children: RefCell<Vec<Rc<Node>>> }`. `Rc::downgrade(&parent)` — `Weak`. Орнатылған тестер: `node.parent.borrow().upgrade()` — ата тірі ме? `Some(Rc<Node>)` болса — иә."
+    },
+    {
+      "subject": {
+        "surface": "қорқынышсыз қатарластық",
+        "root": "қорқынышсыз қатарластық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust принципі",
+        "root": "rust принципі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_442"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қорқынышсыз қатарлас орындау (fearless concurrency) — `Rust`-тың дизайн тұжырымдамасы: тілдің типтік жүйесі мен қарыз тексергіш ағын-қауіпсіздіктің негізгі санатын **компиляция кезінде** ұстайды. Жарыс шарттары (data races), use-after-free ағын-арасы — `Rust` бағдарламасында **орындалу кезінде емес, компиляцияда** анықталады. **Тірек:** иелік ережелері + `Send`/`Sync` маркер трейттер. Көп тілдерден айырмашылық: `Rust`-та қатарлас орындау қателері «жоғары тарифті оқиға» емес — компилятор оларды қарапайым тип қателеріне айналдырады."
+    },
+    {
+      "subject": {
+        "surface": "thread::spawn",
+        "root": "thread::spawn",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib функциясы",
+        "root": "stdlib функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_443"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`thread::spawn` — жаңа ағынды бастайтын стандартты функция. Аргумент — жабу: `thread::spawn(|| { /* код */ });`. Жабу — жаңа ағында орындалатын код. **Маңызды:** `main` функциясы аяқталғанда барлық ағындар тоқтатылады — қосалқы ағындар бітпей қалуы мүмкін. Ағынның аяқталуын кепіл ету керек болса — `JoinHandle::join` шакыру керек. Сигнатура: `fn spawn<F, T>(f: F) -> JoinHandle<T> where F: FnOnce() -> T + Send + 'static, T: Send + 'static`. `Send + 'static` — типтік қатарластық кепілдігі."
+    },
+    {
+      "subject": {
+        "surface": "joinhandle",
+        "root": "joinhandle",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "thread құрылымы",
+        "root": "thread құрылымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_444"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`JoinHandle` + `.join()` — ағынды күту механизмі. `thread::spawn` `JoinHandle<T>` қайтарады; оның `.join()` әдісі ағынның аяқталуын **блок түрінде** күтеді. Қайтарады: `Result<T, Box<dyn Any>>` — ағынның қайтару мәні немесе panic. `unwrap()` арқылы panic-ке шығу қарапайым; `if let Ok(val) = handle.join()` — нақты өңдеу. **Маңызды:** `join` шакырылмаған ағын `main`-нен бұрын аяқталмаса, нәтижесі жоғалуы мүмкін. Идиома: барлық `JoinHandle`-ларды `Vec`-те жинап, циклмен `join` шакыру."
+    },
+    {
+      "subject": {
+        "surface": "move thread",
+        "root": "move thread",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "thread идиомасы",
+        "root": "thread идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_445"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`move` жабу + `thread::spawn` — иелікті ағынға беру идиомасы. Жабу қоршаған ортадан мән керек болса (мысалы, `Vec`), `Rust` оны қарызға алуға тырысады, бірақ ағынның қаншалықты ұзақ жұмыс істейтінін білмейді — қарыз қауіпсіз емес. Шешім: `move ||` — жабу мәннің **иелігін** алады. Мысалы: `let v = vec![1, 2, 3]; thread::spawn(move || println!(\"{:?}\", v));`. `v` сыртта жарамсыз, ағын ішінде толық тірі. **Жалпы ереже:** `thread::spawn` дерлік әрқашан `move` жабуымен жұмыс істейді."
+    },
+    {
+      "subject": {
+        "surface": "mpsc::channel",
+        "root": "mpsc::channel",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency механизмі",
+        "root": "concurrency механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_446"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`mpsc::channel` — ағындар арасында **хабарлама арқылы алмасу** механизмі. **MPSC** — *multiple producer, single consumer* (көп жіберуші, бір қабылдаушы). Жасау: `let (tx, rx) = mpsc::channel();` — `tx` (transmitter, жіберуші) және `rx` (receiver, қабылдаушы). Концепция: «Don't communicate by sharing memory; share memory by communicating» (Go-дан келген идея). **Артықшылық:** жіберілген мәннің иелігі ауысады — жарыс шартының жоқтығы автоматты. Альтернатива: `Arc<Mutex<T>>` shared state."
+    },
+    {
+      "subject": {
+        "surface": "tx.send rx.recv",
+        "root": "tx.send rx.recv",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "channel әдісі",
+        "root": "channel әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_447"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`tx.send` пен `rx.recv` — каналмен жұмыс. **`tx.send(val)`** — `val`-ды каналға жібереді, иелікті алады; `Result<(), SendError>` қайтарады (`Err` — қабылдаушы жоғалған). Жіберілген мәнді жіберуші өзгерте алмайды. **`rx.recv()`** — каналдан хабарлама күтеді, **блок түрінде** (ағын тоқтайды). `Result<T, RecvError>` қайтарады: `Ok(val)` — мән алынды; `Err` — канал жабылған. Альтернатива: **`rx.try_recv`** — блок жасамайды; жоқ болса — бірден `Err`. Polling pattern-да қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "rx итератор",
+        "root": "rx итератор",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "channel идиомасы",
+        "root": "channel идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_448"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`for received in rx` — `Receiver`-ды итератор ретінде қарастыру. Цикл блок түрінде келесі хабарламаны күтеді; жаңа хабар келгенде орындалады. **Канал жабылғанда** (барлық `tx`-тар аумақтан шыққанда) — цикл аяқталады. Мысалы: `for received in rx { println!(\"{}\", received); }` — барлық хабарламаларды реті бойынша өңдейді. Артықшылық: `recv().unwrap()` циклды жазудың керегі жоқ. Идиома: producer ағын `tx.send` шакыруларды бітіреді, `tx` drop-та канал автоматты жабылады, цикл табиғи түрде аяқталады."
+    },
+    {
+      "subject": {
+        "surface": "tx.clone",
+        "root": "tx.clone",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "channel идиомасы",
+        "root": "channel идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_449"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`tx.clone` — каналға бірнеше жіберуші қосу. `mpsc` атауында «multiple producer» — бір каналға бірнеше ағын жібере алады. Қолдану: `let tx1 = tx.clone(); thread::spawn(move || { tx1.send(...); }); thread::spawn(move || { tx.send(...); });` — екі ағын бір `rx`-ке жібереді. **Маңызды:** қабылдаушы біреу. Бірнеше қабылдаушы керек болса — `crossbeam-channel` сандығын немесе `tokio::sync::broadcast` қолдану. Канал автоматты жабылады: барлық `tx`-тар (тіпті клон-дары) drop-қа барғанда."
+    },
+    {
+      "subject": {
+        "surface": "mutex",
+        "root": "mutex",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency примитиві",
+        "root": "concurrency примитиві",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_450"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Mutex<T>` (Mutual Exclusion) — ортақ күйді қорғайтын синхронизация примитиві. **Ереже:** бір уақытта **бір ғана** ағынға мәнге қол жеткізуге рұқсат — қалғандары кезек күтеді. Жасау: `let m = Mutex::new(5);` — мәнді мутекс ішінде сақтау. **Артықшылық:** жарыс шарттары мүмкін емес — ережені компилятор + runtime бірге кепілдейді. **Қашан керек:** ортақ күй (counter, cache, configuration) — ағындар оны өзгерте алуы керек. Альтернатива: message-passing (`mpsc::channel`)."
+    },
+    {
+      "subject": {
+        "surface": "mutex::lock",
+        "root": "mutex::lock",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "mutex әдісі",
+        "root": "mutex әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_451"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Mutex::lock` + `MutexGuard` + auto-drop — мутекс қолдану үлгісі. **`m.lock()`** — мутекстіге блок түрінде иелік сұрайды; `LockResult<MutexGuard<'_, T>>` қайтарады. `unwrap()` — әдеттегі өңдеу. **`MutexGuard`** — `Deref`/`DerefMut` арқылы ішкі мәнге қол жеткізеді: `let mut num = m.lock().unwrap(); *num += 1;`. **Auto-drop:** `MutexGuard` аумақтан шыққанда `Drop` арқылы мутекс автоматты түрде босатылады — программист `unlock` шакырудың керегі жоқ. RAII принципі. **Қате:** `panic`-ке барған ағын мутекс ұстаса — мутекс «улы» (poisoned), кейінгі `lock` `Err` қайтарады."
+    },
+    {
+      "subject": {
+        "surface": "arc",
+        "root": "arc",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency примитиві",
+        "root": "concurrency примитиві",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_452"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Arc<T>` (Atomic Reference Counted) — ағындар-арасы reference counted ақылды сілтеме. `Rc<T>`-тың аналогы, бірақ есептеуіш **атомдық** — көп ағын arasında қауіпсіз. **Қашан керек:** ортақ deretemenu бірнеше ағын ұстауы керек (мысалы, ortaq cache, configuration). Қолдану: `let data = Arc::new(MyData { ... });` + `let data_clone = Arc::clone(&data); thread::spawn(move || { data_clone.do_something(); });`. **Шығын:** `Arc::clone` `Rc::clone`-нан бірнеше есе баяуырақ (атомдық CAS). Бір ағында болсаңыз — `Rc<T>`. **Идиома:** `Arc<Mutex<T>>` — shared mutable state across threads."
+    },
+    {
+      "subject": {
+        "surface": "arc<mutex>",
+        "root": "arc<mutex>",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency идиомасы",
+        "root": "concurrency идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_453"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Arc<Mutex<T>>` — shared mutable state across threads идиомасы. `Arc` бірнеше иеленуші береді (clone арзан); `Mutex` ағындар-арасы өзгертулерді синхрондайды. Канондық мысал: counter 10 ағыннан: `let counter = Arc::new(Mutex::new(0)); for _ in 0..10 { let counter = Arc::clone(&counter); thread::spawn(move || { let mut num = counter.lock().unwrap(); *num += 1; }); }`. Барлық ағындар аяқталғанда `counter` 10-ға тең. **Жоқ:** жарыс шарты, deadlock (тек бір mutex), data race. **Кемшіліктері:** үнемі lock — масштабталуға шектеу; бір deadlock тұтас жобаны кідіртеді (бір ғана дерек қорғалғанша)."
+    },
+    {
+      "subject": {
+        "surface": "mutex vs refcell",
+        "root": "mutex vs refcell",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency айырмашылығы",
+        "root": "concurrency айырмашылығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_454"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Mutex<T>` пен `RefCell<T>` ұқсастығы — interior mutability үлгісі. **Ұқсастық:** екеуі де сыртта тұрақты, ішінде өзгертуге келеді. **Айырмашылықтар:** `RefCell<T>` тек **бір ағында**, runtime borrow check (бұзылса panic); `Mutex<T>` — ағындар арасында, basқa ағын ұстаса блок жасайды. **Қос-нышан:** бір ағында → `Cell`/`RefCell` + `Rc`; ағындар арасында → `Mutex`/`RwLock` + `Arc`. **`RwLock<T>`** — `Mutex`-тың кеңейтілген нұсқасы: бір жазушы ХОР көп оқушы (read-write lock); жиі оқу + сирек жазу сценариіне жылдамырақ."
+    },
+    {
+      "subject": {
+        "surface": "send трейті",
+        "root": "send трейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency трейті",
+        "root": "concurrency трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_455"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Send` трейті — типтің мәнін **бір ағыннан екіншіге иелікпен ауыстыруға** болатынын білдіреді. **Маркер трейт:** әдіс-денесі жоқ, тек тип ағын-қауіпсіздікке сай ма деп білдіреді. Көп тип `Send` — компилятор автоматты бекітеді. **`Send` ЕМЕС:** `Rc<T>` (есептеуіші атомдық емес), шикі көрсеткіштер (`*const T`/`*mut T`) — оларды ағындар арасында қозғау қауіпсіз емес. **Талап:** `thread::spawn` жабудан `F: Send` талап етеді — жабу мен оның ұстайтын мәндері ағынға өтеді. Компилятор тексереді — Send емес тип жабуда болса, қате."
+    },
+    {
+      "subject": {
+        "surface": "sync трейті",
+        "root": "sync трейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency трейті",
+        "root": "concurrency трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_456"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Sync` трейті — типке **бірнеше ағын бір уақытта сілтеме арқылы** қол жеткізе алатынын білдіреді. Формальды: `T: Sync` ⟺ `&T: Send`. **Маркер трейт:** әдіс-денесі жоқ. **`Sync` ЕМЕС:** `Cell<T>`, `RefCell<T>` (runtime borrow check жалғыз ағын ғана). `Rc<T>` — `Sync` емес (есептеуіші атомдық емес). **`Sync` БАР:** `Mutex<T>` (`T: Send`), `Arc<T>` (`T: Send + Sync`), `RwLock<T>`, негізгі типтер (`i32`, `bool`, `String`, `Vec<T: Sync>`). **Қашан маңызды:** `Arc<T>`-та `T: Send + Sync` керек — әйтпесе `Arc::clone` ағынға өтпейді."
+    },
+    {
+      "subject": {
+        "surface": "send/sync auto-impl",
+        "root": "send/sync auto-impl",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "compiler ережесі",
+        "root": "compiler ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_457"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Send/Sync auto-implementation ережелері — компилятор барлық типке `Send`/`Sync`-ті автоматты бекітеді **ішкі типтері Send/Sync болса**. Мысалы: `struct MyData { x: i32, y: String }` — `i32` мен `String` Send+Sync, сондықтан `MyData` де Send+Sync. **Ерекшеліктер:** `Rc<T>` — `Send` емес, `Sync` емес (есептеуіш атомдық емес). `Arc<T>` — `T: Send + Sync` болса, Send+Sync. `RefCell<T>` — `Send` (бір ағында жылжуға келеді), бірақ **`Sync` емес** (бірнеше ағын борровка ұстаса runtime panic қаупі). `Mutex<T>` — `T: Send` болса, `Send + Sync`. Шикі көрсеткіштер — Send/Sync емес."
+    },
+    {
+      "subject": {
+        "surface": "thread::spawn сигнатура",
+        "root": "thread::spawn сигнатура",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "thread ережесі",
+        "root": "thread ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_458"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`thread::spawn` сигнатура шектеулері — `fn spawn<F, T>(f: F) -> JoinHandle<T> where F: FnOnce() -> T + Send + 'static, T: Send + 'static`. **`F: Send`** — жабу ағынға ауысатынын білдіреді. **`'static`** — жабу шакырушы аумақтан тыс өмір сүретінін білдіреді (`'static` лайфтайм + ие болу). **`T: Send`** — қайтару мәні де ағыннан шакырушыға ауысатынын. **Салдары:** жабу қарызы ішкі мәндердің `'static` болуын талап етеді — әйтпесе `move` жабу + иелік ауысуы керек. Сондықтан `thread::spawn` дерлік әрқашан `move ||` арқылы шакырылады."
+    },
+    {
+      "subject": {
+        "surface": "data race prevention",
+        "root": "data race prevention",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust кепілдігі",
+        "root": "rust кепілдігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_459"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Data race compile-time prevention — `Rust`-тың ең күшті концурентті кепілдігі. **Анықтама:** жарыс шарты — екі+ ағын бір жадқа бір сәтте, кем дегенде біреуі жазып жатады. C/C++/Java-да тек оқу мен жазу қашан болатынын тексеру қиын — runtime undefined behavior. **`Rust`-тың шешімі:** қарыз ережелері (бір өзгермелі XOR көп тұрақты) + `Send`/`Sync` маркер трейттер компиляция кезінде тексереді. Жарыс шартына апаратын код — компиляция қатесі. Қорқынышсыз қатарлас орындау деңгейі: «егер код құрастырылса — жарыс шарты жоқ» (deadlock-тарды толық алмайды, бірақ data race-ты ұстайды)."
     },
     {
       "subject": {

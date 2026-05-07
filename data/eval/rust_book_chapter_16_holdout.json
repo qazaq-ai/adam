@@ -1,0 +1,27 @@
+{
+  "_comment": "v4.86.0 — Rust Book Chapter 16 (Қорқынышсыз қатарлас орындау) holdout. 18 natural Kazakh queries against rust_442…459 + 2 stub deletions (rust_087 Arc duplicate, rust_136 Arc duplicate of deeper rust_452). Categories: ch16_threads (fearless concurrency, thread::spawn, JoinHandle, move thread, thread::spawn signature), ch16_channels (mpsc::channel, send/recv, rx iterator, tx.clone), ch16_shared (Mutex, Mutex::lock, Arc, Arc<Mutex>, Mutex vs RefCell), ch16_send_sync (Send trait, Sync trait, auto-impl rules, data race prevention).",
+  "version": "v4.86.0",
+  "captured_date": "2026-05-06",
+  "chapter": 16,
+  "chapter_title": "Қорқынышсыз қатарлас орындау (threads / channels / Mutex / Arc / Send+Sync)",
+  "cases": [
+    {"id": "ch16_fearless", "category": "ch16_threads", "query": "Қорқынышсыз қатарластық деген не?", "any_substring": ["компиляция кезінде", "use-after-free", "send`/`sync"]},
+    {"id": "ch16_spawn", "category": "ch16_threads", "query": "thread::spawn деген не?", "any_substring": ["жабу", "joinhandle", "send + 'static"]},
+    {"id": "ch16_joinhandle", "category": "ch16_threads", "query": "JoinHandle деген не?", "any_substring": ["блок түрінде", "result<t, box<dyn any>>", "vec"]},
+    {"id": "ch16_move_thread", "category": "ch16_threads", "query": "move thread деген не?", "any_substring": ["иелігін", "vec![1, 2, 3]", "сыртта жарамсыз"]},
+    {"id": "ch16_spawn_sig", "category": "ch16_threads", "query": "thread::spawn сигнатура деген не?", "any_substring": ["fnonce", "send + 'static", "move ||"]},
+    {"id": "ch16_channel", "category": "ch16_channels", "query": "mpsc::channel деген не?", "any_substring": ["multiple producer", "single consumer", "go-дан"]},
+    {"id": "ch16_send_recv", "category": "ch16_channels", "query": "tx.send rx.recv деген не?", "any_substring": ["иелікті алады", "блок түрінде", "try_recv"]},
+    {"id": "ch16_rx_iter", "category": "ch16_channels", "query": "rx итератор деген не?", "any_substring": ["канал жабылғанда", "for received in rx", "producer"]},
+    {"id": "ch16_tx_clone", "category": "ch16_channels", "query": "tx.clone деген не?", "any_substring": ["multiple producer", "crossbeam-channel", "tokio::sync::broadcast"]},
+    {"id": "ch16_mutex", "category": "ch16_shared", "query": "Mutex деген не?", "any_substring": ["mutual exclusion", "бір ғана", "кезек күтеді"]},
+    {"id": "ch16_lock", "category": "ch16_shared", "query": "Mutex::lock деген не?", "any_substring": ["mutexguard", "raii", "poisoned"]},
+    {"id": "ch16_arc", "category": "ch16_shared", "query": "Arc деген не?", "any_substring": ["atomic reference counted", "rc<t>-тың аналогы", "арзан"]},
+    {"id": "ch16_arc_mutex", "category": "ch16_shared", "query": "Arc<Mutex> деген не?", "any_substring": ["counter", "10 ағыннан", "deadlock"]},
+    {"id": "ch16_mutex_vs_refcell", "category": "ch16_shared", "query": "Mutex vs RefCell деген не?", "any_substring": ["interior mutability", "rwlock", "бір жазушы"]},
+    {"id": "ch16_send", "category": "ch16_send_sync", "query": "Send трейті деген не?", "any_substring": ["иелікпен ауыстыру", "rc<t>", "*const t"]},
+    {"id": "ch16_sync", "category": "ch16_send_sync", "query": "Sync трейті деген не?", "any_substring": ["&t: send", "refcell<t>", "rwlock"]},
+    {"id": "ch16_auto_impl", "category": "ch16_send_sync", "query": "Send/Sync auto-impl деген не?", "any_substring": ["mydata", "ішкі типтері", "шикі көрсеткіштер"]},
+    {"id": "ch16_data_race", "category": "ch16_send_sync", "query": "Data race prevention деген не?", "any_substring": ["undefined behavior", "deadlock", "құрастырылса"]}
+  ]
+}

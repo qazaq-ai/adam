@@ -7,6 +7,62 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.86.0] — 2026-05-06 — Rust Book chapter 16 deepening — fearless concurrency
+
+Per-chapter pedagogical cadence continues. Chapter 16 introduces Rust's "fearless concurrency" — type-system + borrow-checker enforced thread safety where data races and use-after-free are **compile errors**, not runtime bugs. Previously surface-level — 1 stub for Arc. Now deepened with full curriculum.
+
+### What's added
+
+**18 new curated entries `rust_442…459`** in `programming_rust.jsonl`:
+
+**Threads (5):** fearless concurrency philosophy, `thread::spawn`, `JoinHandle::join`, `move` closures with thread::spawn, `thread::spawn` signature constraints.
+
+**Channels — message passing (4):** `mpsc::channel` (multiple producer single consumer), `tx.send`/`rx.recv` with ownership transfer, `for received in rx` iterator pattern, `tx.clone` for fan-in.
+
+**Shared state (5):** `Mutex<T>` mutual exclusion, `Mutex::lock` + `MutexGuard` auto-drop (RAII + poisoning), `Arc<T>` atomic reference counted, `Arc<Mutex<T>>` shared mutable state idiom, `Mutex` vs `RefCell` parallel.
+
+**Send/Sync type system (4):** `Send` trait (move between threads), `Sync` trait (`&T: Send`), Send/Sync auto-implementation rules, data race compile-time prevention.
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs deleted (2)
+
+- `rust_087` (Arc 1-line) — duplicate of deeper `rust_452`.
+- `rust_136` (Arc shorter version) — duplicate of deeper `rust_452`.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_16_holdout.json` — 18 cases, 4 categories (`ch16_threads`, `ch16_channels`, `ch16_shared`, `ch16_send_sync`).
+- `crates/adam-dialog/tests/rust_book_chapter_16.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 30 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 16 holdout cases | ✅ 100 % |
+| Existing chapters 1-15 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **991 passing** (was 990; +1 chapter-16 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2751 → **2767** (+16 net: +18 ch.16 − 2 stub deletions) |
+| world_core facts | 2993 → **3009** (+16 net) |
+| Derived facts | 30871 → **30876** (+5) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.86.0** | **ch. 16** | **Concurrency (this release)** |
+| v4.86.5 | ch. 17 | OOP features (trait objects / inheritance via composition) |
+| v4.87.0 | ch. 18 | Patterns (advanced pattern matching) |
+| v4.87.5 | ch. 19 | Advanced features (unsafe / advanced traits / function pointers / macros) |
+| v4.88.0 | ch. 20 | Final project (multi-threaded web server) |
+
+Cadence: `.0` minor — 18 new + 2 stub deletions; chapter 16 closes the concurrency toolkit (preparing for chapter 20 web server which combines threads + channels + Mutex). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.85.5] — 2026-05-06 — Rust Book chapter 15 deepening — smart pointers
 
 Per-chapter pedagogical cadence continues. Chapter 15 introduces Rust's smart pointer toolkit — `Box`, `Rc`, `RefCell`, `Weak` — essential for shared ownership, interior mutability, and breaking ownership cycles. Previously surface-level — 3 one-line stubs (duplicates of deeper rust_133/135/137). Now deepened with full curriculum.
