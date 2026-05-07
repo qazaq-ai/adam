@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.89.0 — Rust Async Book Chapter 2 (Under the Hood: Executing Futures and Tasks) holdout. 18 natural Kazakh queries against rust_550…567. Categories: async2_future_trait (Future signature + Poll + Context + SimpleFuture pedagogy), async2_waker (Waker + RawWaker + wakeup pathway + spurious wakeups + wake_by_ref), async2_executor (executor overview + single-threaded design + task wrapping + block_on + multi-threaded), async2_timer (TimerFuture example + shared state + spawned thread + Waker hand-off).",
+  "version": "v4.89.0",
+  "captured_date": "2026-05-07",
+  "book": "Rust Async Book",
+  "chapter": 2,
+  "chapter_title": "Under the Hood — Future trait + Waker + executor architecture",
+  "cases": [
+    {"id": "async2_future_sig", "category": "async2_future_trait", "query": "Future трейт деректері деген не?", "any_substring": ["self: pin<&mut self>", "context", "poll<self::output>"]},
+    {"id": "async2_poll", "category": "async2_future_trait", "query": "Poll енам деген не?", "any_substring": ["ready(t)", "pending", "yield"]},
+    {"id": "async2_context", "category": "async2_future_trait", "query": "Context типі деген не?", "any_substring": ["cx.waker()", "localwaker", "rfc"]},
+    {"id": "async2_simple", "category": "async2_future_trait", "query": "SimpleFuture модель деген не?", "any_substring": ["pin-сіз", "fn()", "pedagogy"]},
+    {"id": "async2_waker_trait", "category": "async2_waker", "query": "Waker трейт деген не?", "any_substring": ["wake(self)", "wake_by_ref", "send + sync"]},
+    {"id": "async2_rawwaker", "category": "async2_waker", "query": "RawWaker mehanizmı деген не?", "any_substring": ["rawwakervtable", "*const ()", "arc::into_raw"]},
+    {"id": "async2_wakeup", "category": "async2_waker", "query": "Task wakeup жолы деген не?", "any_substring": ["pending → wake", "ready queue", "суспенсия"]},
+    {"id": "async2_spurious", "category": "async2_waker", "query": "Spurious wakeups деген не?", "any_substring": ["жалған оянту", "топтық", "болжамы дұрыс емес"]},
+    {"id": "async2_wake_ref", "category": "async2_waker", "query": "wake_by_ref деген не?", "any_substring": ["consume", "арқ::drop", "microbenchmark"]},
+    {"id": "async2_executor", "category": "async2_executor", "query": "Executor шолуы деген не?", "any_substring": ["spawn", "ready queue", "work-stealing"]},
+    {"id": "async2_single_exec", "category": "async2_executor", "query": "Single-threaded executor деген не?", "any_substring": ["receiver<arc<task>>", "syncsender", "pin"]},
+    {"id": "async2_task_wrap", "category": "async2_executor", "query": "Task wrapping деген не?", "any_substring": ["mutex<option<boxfuture", "task_sender", "send + sync"]},
+    {"id": "async2_block_on", "category": "async2_executor", "query": "block_on функциясы деген не?", "any_substring": ["thread::park", "thread::unpark", "tokio::runtime"]},
+    {"id": "async2_multi_exec", "category": "async2_executor", "query": "Multi-threaded executor деген не?", "any_substring": ["work-stealing", "rc<t>", "embedded"]},
+    {"id": "async2_timer", "category": "async2_timer", "query": "TimerFuture мысалы деген не?", "any_substring": ["sharedstate", "thread::sleep", "tokio::time"]},
+    {"id": "async2_shared", "category": "async2_timer", "query": "Shared state pattern деген не?", "any_substring": ["arc<mutex<", "option<waker>", "synchronisation"]},
+    {"id": "async2_park", "category": "async2_timer", "query": "Park sleep деген не?", "any_substring": ["timerfuture::new", "duration", "timer-wheel"]},
+    {"id": "async2_handoff", "category": "async2_timer", "query": "Waker hand-off деген не?", "any_substring": ["waker.take()", "waker.wake()", "race condition"]}
+  ]
+}

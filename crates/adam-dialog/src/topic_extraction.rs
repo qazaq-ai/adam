@@ -2096,6 +2096,32 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "rust тарихы",
     "rust крейті",
     "rust мүмкіндігі",
+    // **v4.89.0** — Rust Async Book chapter 2 (Under the Hood — Future trait + Waker + executor) deepening.
+    // rust_550…567 — 18 entries covering Future trait deep (4),
+    // Waker mechanics (5), executor architecture (5), and
+    // TimerFuture build-from-scratch (4).
+    // Subjects.
+    "future трейт деректері",
+    "poll енам",
+    "context типі",
+    "simplefuture модель",
+    "waker трейт",
+    "rawwaker mehanizmı",
+    "task wakeup жолы",
+    "spurious wakeups",
+    "wake_by_ref",
+    "executor шолуы",
+    "single-threaded executor",
+    "task wrapping",
+    "block_on функциясы",
+    "multi-threaded executor",
+    "timerfuture мысалы",
+    "shared state pattern",
+    "park sleep",
+    "waker hand-off",
+    // Objects.
+    "rust pedagogy",
+    "rust әдісі",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

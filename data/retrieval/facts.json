@@ -1,7 +1,7 @@
 {
-  "version": "4.88.0",
+  "version": "4.88.5",
   "status": "completed",
-  "elapsed_s": 65,
+  "elapsed_s": 58,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3099,
+    "facts_total": 3117,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2534,
+      "is_a": 2552,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 540,
+      "world_core/programming_rust.jsonl": 558,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -53737,6 +53737,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "async closures (Rust 2024) — `async |x| { ... }` синтаксисі — closure-дың async нұсқасы. **Әлі unstable** (2026 ж. жағдай), tracking issue #62290. Уақытша шешім: `move |x| async move { ... }` — қарапайым closure ішінде async block қайтару. Айырмашылық: «true async closure» captures-ді басқаша өңдейді (`AsyncFn`/`AsyncFnMut`/`AsyncFnOnce` трейттерімен), өмір сүру шектеулерін жақсартады. **Не үшін керек:** жоғары-деңгейдегі async API-лер (мысалы `vec.async_for_each(async |x| { db.save(x).await })`). Stable болғанда — Rust async кітапхана дизайны едәуір ыңғайлы болады."
+    },
+    {
+      "subject": {
+        "surface": "future трейт деректері",
+        "root": "future трейт деректері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_550"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Future трейт деректері (signature) — толық анықтамасы: `pub trait Future { type Output; fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output>; }`. Әр бөлік: (1) `type Output` — Future аяқталғанда қайтарылатын мән типі (мысалы, `String`, `()`); (2) `self: Pin<&mut Self>` — Future-ды жадтан жылжытпауды кепілдендіреді (self-referential structs үшін маңызды); (3) `&mut Context<'_>` — қазіргі шакыруда қажетті ағымдағы Waker-ге қол жеткізу; (4) `Poll<Self::Output>` — `Ready(value)` (аяқталды) немесе `Pending` (әлі дайын емес). **Маңызды:** Future-ды тікелей poll жасамайсыз — оны executor poll жасайды."
+    },
+    {
+      "subject": {
+        "surface": "poll енам",
+        "root": "poll енам",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_551"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Poll енам — Future қайтарған ағымдағы күй. `pub enum Poll<T> { Ready(T), Pending }`. **Ready(value):** Future аяқталды; `value` — нәтиже; қайта poll-дау тыйым салынған (panic болуы мүмкін). **Pending:** Future әлі жұмысын жалғастырып жатыр; орындалу өзге тапсырмаларға өтуі керек; Future Waker-ді `Context`-тен алып, кейін «дайын болғанда оян» сигналы үшін сақтайды. Executor-дың міндеті: `Pending` болғанда poll-ды тоқтату; `Waker::wake()` шакырылғанда қайта poll-дау. Poll-дың үшінші нұсқасы жоқ — Pending → Ready бір рет қана. Yield mechanism-нің семантикалық негізі."
+    },
+    {
+      "subject": {
+        "surface": "context типі",
+        "root": "context типі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_552"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Context типі — `pub struct Context<'a> { ... }` — Future::poll-ке берілетін екінші параметр. **Қазіргі рөлі (Rust 1.84):** тек `Waker`-ге сілтеме береді: `cx.waker()` → `&Waker`. Болашақта (RFC талқылануда) — `LocalWaker` (бір ағында тиімді), task-local data, custom poll info қосылуы мүмкін. **Үлгі:** `fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> { if self.ready { Poll::Ready(()) } else { self.waker = Some(cx.waker().clone()); Poll::Pending } }` — Pending қайтарардан бұрын Waker-ді сақтап қою. Context — Future-дың executor-мен қарым-қатынас көпірі."
+    },
+    {
+      "subject": {
+        "surface": "simplefuture модель",
+        "root": "simplefuture модель",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust pedagogy",
+        "root": "rust pedagogy",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_553"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "SimpleFuture (book pedagogy) — Pin-сіз қарапайымдатылған модель: `trait SimpleFuture { type Output; fn poll(&mut self, wake: fn()) -> Poll<Self::Output>; }`. Айырмашылықтар нағыз `Future`-тен: (1) `Pin<&mut Self>` орнына `&mut self` — self-referential қауіпсіздіктің жоқ; (2) `Context<'_>` орнына `fn()` callback — нақты Waker-сіз. **Мақсат:** «Future трейт қалай жұмыс істейтінін» оқуды жеңілдету — Pin сияқты Rust-нің күрделі бөліктерін кейінге қалдырып. Production кодында SimpleFuture **жоқ** — оқу мысалы ғана. Нағыз Future + Waker нюанстарын chapter-2 кейінгі бөлімдерінде үйренеміз."
+    },
+    {
+      "subject": {
+        "surface": "waker трейт",
+        "root": "waker трейт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_554"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Waker трейт-сияқты тип — Future-ге «дайын болдым, мені қайта тексер» деп executor-ға айту құралы. Әдістер: `wake(self)` — owned, бір рет қолданылады; `wake_by_ref(&self)` — қарызбен; `clone(&self)` — Future-лар арасында бөлісу үшін. `Waker` тип шынында `impl Send + Sync`, ағындар арасында жіберуге болады (мысалы, network reactor ағыны Waker-ді шакыра алады). **Жасау:** қарапайым жолы — executor өзі berreді (`block_on` ішкі); қолмен жасау — `RawWaker` + `RawWakerVTable` (келесі жазба). Future poll-да `Pending` қайтарардан бұрын Waker-дің клонын сақтайды."
+    },
+    {
+      "subject": {
+        "surface": "rawwaker mehanizmı",
+        "root": "rawwaker mehanizmı",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust механизмі",
+        "root": "rust механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_555"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "RawWaker + RawWakerVTable — Waker-ді қолмен жасау механизмі. `RawWaker` екі бөлік: (1) `*const ()` — тапсырма деректерге таза-сілтеме (executor-дікі); (2) `&'static RawWakerVTable` — функция көрсеткіштерінің кестесі — `clone`, `wake`, `wake_by_ref`, `drop`. Executor өз тапсырма құрылымын `Arc`-қа орап, оның `Arc::into_raw` көрсеткішін `*const ()`-ке кастпен сақтайды; vtable функциялары қайта `Arc::from_raw` арқылы тапсырмаға қол жеткізеді. **Қашан керек:** өзіндік executor жазғанда; өндіріс кодында `futures::task::ArcWake` трейтін іске асырып, `waker_ref(&Arc<Self>)` арқылы Waker алу — оңайырақ."
+    },
+    {
+      "subject": {
+        "surface": "task wakeup жолы",
+        "root": "task wakeup жолы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_556"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Task wakeup жолы (poll → Pending → wake → re-poll) — Future-дың толық өмірлік цикл. (1) Executor `future.poll(cx)` шакырады; (2) Future жұмыс істейді, нәтиже әлі жоқ; (3) Future `cx.waker()` арқылы Waker клонын алып, өз ішкі күйіне сақтайды; (4) Future `Poll::Pending` қайтарады; (5) Executor бұл Future-ды «оянуды күтуде» деп белгілейді, басқа тапсырмаларды orындайды; (6) Сыртқы оқиға (timer, network response, channel send) дайын болғанда — сақталған Waker `wake()` шакырылады; (7) Executor Future-ды қайта ready queue-ге қояды; (8) Executor оны қайта poll-дайды; (9) Бұл рет нәтиже бар → `Poll::Ready(value)`. Сторителинг: «суспенсия → нотификация → жалғасу»."
+    },
+    {
+      "subject": {
+        "surface": "spurious wakeups",
+        "root": "spurious wakeups",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_557"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Spurious wakeups — Waker негізсіз шакырылуы мүмкін: «жалған оянту». Стандарт: Future нақты дайын деп ойламай, жай тексеру керек — егер шынында дайын емес болса, тағы `Pending` қайтарып жаңа Waker-ді тіркеу. Себептер: (1) executor оптимизациясы — топтық оянулар; (2) cancellation қажет — әртүрлі тапсырмаларды бірлесіп тоқтату; (3) бірнеше source бір Future-ды күтсе, біреуі дайын → бәрі оянтылады. **Іс жүзіндегі әсер:** Future poll кодында «I was woken up — must be ready» деп болжамы дұрыс емес; әрқашан күйді тексеру керек. Бұл асинхронды кодтың сенімділігі үшін архитектуралық таңдау."
+    },
+    {
+      "subject": {
+        "surface": "wake_by_ref",
+        "root": "wake_by_ref",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust әдісі",
+        "root": "rust әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_558"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "wake_by_ref vs wake айырмашылығы — Waker-ді қолданудың екі жолы. **`wake(self)`:** Waker-ді жұтады (consume); ішкі рефкаунт-ты бір кеміту (Arc::drop), кейін шакырылмайды. Тиімді жалғыз-рет оянулар үшін. **`wake_by_ref(&self)`:** Waker-ді сақтайды; ішкі рефкаунт-ты қозғамайды; бірнеше рет шакыруға болады. Тиімді: реактивтік жүйелерде Waker-ді көп Future үшін қайталап оятамыз. **Іс жүзінде:** көптеген кодтарда екеуі бірдей әсер береді; performance айырмашылығы марш microbenchmark деңгейінде. **Идиома:** Waker-ді сақтап қойсаңыз — `wake_by_ref` ыңғайлы; бір рет қолдану — `wake` ыңғайлы."
+    },
+    {
+      "subject": {
+        "surface": "executor шолуы",
+        "root": "executor шолуы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_559"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Executor шолуы — async runtime-нің жүрегі. Жауапкершіліктер: (1) Future-ларды қабылдау (`spawn`/`block_on`); (2) оларды Task-қа орау + Waker құру; (3) Ready queue-ден task алу + `poll` шакыру; (4) `Pending` болса — task-ты «sleeping» жиынына қою; (5) `Waker::wake` келгенде — task-ты қайта Ready queue-ге қою; (6) `Ready(value)` болғанда — task-ты алып тастау, нәтижені қайтару. **Минималды executor** ~100 жол код жетеді. Production executor-ларда: work-stealing, priority scheduling, тапсырма-локал деректер, метрика, timer wheels. **Tokio executor:** multi-thread + work-stealing; Future-лар ағындар арасында migrate болады."
+    },
+    {
+      "subject": {
+        "surface": "single-threaded executor",
+        "root": "single-threaded executor",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_560"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бір ағынды executor дизайны — қарапайым құрылым: `struct Executor { ready_queue: Receiver<Arc<Task>>; }` + `struct Spawner { task_sender: SyncSender<Arc<Task>>; }`. Жұмыс циклі: `while let Ok(task) = self.ready_queue.recv() { let mut future = task.future.lock(); if let Some(mut fut) = future.take() { let waker = waker_ref(&task); let context = &mut Context::from_waker(&waker); if fut.as_mut().poll(context).is_pending() { *future = Some(fut); } } }`. **Логика:** task алу → lock арқылы Future-ды алу → Pin → poll → Pending болса қайта сақтап қою. Waker `wake` шакырғанда task-ты `task_sender.send(task.clone())` арқылы қайта queue-ге салады."
+    },
+    {
+      "subject": {
+        "surface": "task wrapping",
+        "root": "task wrapping",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_561"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Task орау (task wrapping) — әр spawned Future-ды Task құрылымына орау керек: `struct Task { future: Mutex<Option<BoxFuture<'static, ()>>>, task_sender: SyncSender<Arc<Task>>; }`. **Неге Mutex керек:** Task-қа `Arc` арқылы Waker сілтемесі бар; Waker `Send + Sync` талап етеді — бірақ Future `Send` болуы мүмкін (мутексіз қол жеткізе алмаймыз). Mutex-сіз compile error. **Неге `Option<BoxFuture>`:** poll кезінде Future-ды Mutex-тен `take` арқылы шығарып аламыз (lock қысқа болсын) → poll → қайта `*opt = Some(future)`. **Неге `BoxFuture`:** trait object қажет — әр түрлі Future-ларды бір queue-ге салу үшін. **Неге `task_sender` Task ішінде:** Waker `wake` шакырғанда task өзін қайта queue-ге сала алады."
+    },
+    {
+      "subject": {
+        "surface": "block_on функциясы",
+        "root": "block_on функциясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_562"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "block_on функциясы — `futures::executor::block_on(future)` — async кодты sync кодтан шакырудың стандартты жолы. Қалай жұмыс істейді: (1) ағымдағы ағынды парк-ға қояды; (2) Future-ды poll-дайды; (3) `Pending` болса — current ағынды `thread::park` арқылы ұйықтату; (4) Waker `wake` шакырғанда — `thread::unpark` арқылы оятады; (5) `Ready(value)` болғанда — `value`-ны қайтарады. **Қашан керек:** `main()` функциясынан async код шакыру (`#[tokio::main]` жоқ болса), unit-тестте async fn-ды тексеру. **Шектеу:** ағымдағы ағын блокталады — концерреллі тапсырмалар жоқ. Tokio-да эквивалент: `tokio::runtime::Runtime::new()?.block_on(...)`."
+    },
+    {
+      "subject": {
+        "surface": "multi-threaded executor",
+        "root": "multi-threaded executor",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_563"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Multi-threaded vs single-threaded executor — таңдау критерийлері. **Single-threaded** (`tokio::runtime::Builder::new_current_thread`): барлық тапсырмалар бір ағында, `Send` талабы азаяды (`Future`-та `!Send` мәндер болуы мүмкін), context switch жоқ. Қашан: бір клиент үшін event loop, embedded жүйелер, GUI бір ағынды модельдер. **Multi-threaded** (`tokio::runtime::Runtime` үнсіз): work-stealing scheduler N ағында (CPU саны бойынша), Future-лар ағындар арасында migrate болады. Қашан: HTTP server, көп-клиент жүйе. **Талап:** Future + ішіндегі мәндер `Send` болуы керек. Маңызды нюанс: `Rc<T>` `!Send` — single-thread-те жұмыс істейді, multi-thread-те compile қатесі."
+    },
+    {
+      "subject": {
+        "surface": "timerfuture мысалы",
+        "root": "timerfuture мысалы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust pedagogy",
+        "root": "rust pedagogy",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_564"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "TimerFuture мысалы (book classic) — async-book-тың канон оқу мысалы. Мақсат: `async-std::task::sleep`-ке ұқсас функционалды нөлден жасау. Құрылымы: `struct TimerFuture { shared_state: Arc<Mutex<SharedState>> }` + `struct SharedState { completed: bool, waker: Option<Waker> }`. Future импл-ы: `fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<()> { let mut state = self.shared_state.lock().unwrap(); if state.completed { Poll::Ready(()) } else { state.waker = Some(cx.waker().clone()); Poll::Pending } }`. Жасау: `TimerFuture::new(duration)` ағын spawn-дайды → `thread::sleep(duration)` → `state.completed = true; if let Some(w) = state.waker.take() { w.wake() }`. **Маңызды:** ағын жасау — өндіріс емес (timer wheel қолдану керек), оқу мысалы."
+    },
+    {
+      "subject": {
+        "surface": "shared state pattern",
+        "root": "shared state pattern",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_565"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Shared state pattern — Future + сыртқы оқиға арасында хабар алмасу үшін `Arc<Mutex<T>>` ішкі деректер. Канон форма: `struct SharedState { completed: bool, waker: Option<Waker> }`. **Future жағы:** `state.lock()` → `completed` тексеру → жаңа емес болса `waker = Some(cx.waker().clone())` сақтау + `Pending` қайтару. **Сыртқы оқиға жағы:** `state.lock()` → `completed = true` орнату → `if let Some(w) = waker.take() { w.wake() }`. **Неге `Option<Waker>`:** алғашқы poll кезінде Waker әлі жоқ; `take()` арқылы тек бір рет шакыру (`wake` consume жасайды). **Неге `Arc<Mutex<>>`:** Future poll-ы мен сыртқы ағын деректерге бір уақытта қол жеткізеді — Mutex synchronisation керек."
+    },
+    {
+      "subject": {
+        "surface": "park sleep",
+        "root": "park sleep",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_566"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Spawned thread + sleep тәсілі — TimerFuture-дың ішкі іске асыруы. `TimerFuture::new(duration: Duration) -> TimerFuture { let shared_state = Arc::new(Mutex::new(SharedState { completed: false, waker: None })); let thread_shared = shared_state.clone(); thread::spawn(move || { thread::sleep(duration); let mut state = thread_shared.lock().unwrap(); state.completed = true; if let Some(waker) = state.waker.take() { waker.wake() } }); TimerFuture { shared_state } }`. Логика: жаңа ОС ағын жасап, ол `sleep` арқылы күтеді → күтім аяқталғанда shared state-ке `completed = true` жазып, Waker-ді шакырады. **Кемшілік:** әр TimerFuture үшін бөлек ағын — миллион timer мүмкін емес. Production: timer-wheel алгоритмі (tokio::time)."
+    },
+    {
+      "subject": {
+        "surface": "waker hand-off",
+        "root": "waker hand-off",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_567"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Waker hand-off (Waker-ді тапсыру) — Future-нің поллі мен сыртқы оқиғаның арасындағы синхронизация механизмі. **Шынайы реттік:** (1) Future poll: `Waker = cx.waker().clone()`; (2) Future state-ке `waker = Some(Waker)` сақтайды; (3) Future `Poll::Pending` қайтарады; (4) Қандай-да-бір сыртқы кез-келген уақытта оқиға дайын болады; (5) Сыртқы кодтар state-тен `waker.take()` арқылы Waker-ді алады; (6) `waker.wake()` шакырылады; (7) Executor task-ты ready queue-ге қояды; (8) Future қайта poll-данады, енді нәтиже бар. **Кепілдемелер:** `take` + Mutex арқасында — `wake` екі рет шакырылмайды; deadlock жоқ; race condition жоқ."
     },
     {
       "subject": {

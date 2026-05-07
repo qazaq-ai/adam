@@ -7,6 +7,58 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.89.0] — 2026-05-07 — Rust Async Book chapter 2 deepening — Under the Hood: Future trait + Waker + executor architecture
+
+Per-chapter pedagogical cadence continues into the Async Book. Chapter 2 — the deepest mechanical chapter — explains exactly how async/await works: the full Future trait signature with Pin and Context, the Waker mechanism that drives task wakeups, executor architecture, and a from-scratch TimerFuture build. This is the chapter that demystifies «what does `.await` actually do».
+
+### What's added
+
+**18 new curated entries `rust_550…567`** in `programming_rust.jsonl`:
+
+**Future trait deep (4):** Future трейт деректері (full signature with `Pin<&mut Self>` + `Context<'_>` + `Poll<Self::Output>`), Poll енам (Ready / Pending semantics + cooperative yield), Context типі (currently only carries Waker; future RFC for LocalWaker), SimpleFuture model (book's pre-Pin pedagogical version).
+
+**Waker mechanics (5):** Waker трейт-сияқты тип (wake / wake_by_ref / clone + Send + Sync), RawWaker + RawWakerVTable (manual construction with `*const ()` + vtable function pointers), task wakeup жолы (poll → Pending → register Waker → external event → wake → re-poll → Ready), spurious wakeups (Waker can fire without state change — always re-check), wake_by_ref vs wake (consume vs reference + Arc::drop semantics).
+
+**Executor architecture (5):** executor шолуы (responsibilities: spawn / poll / handle Pending / handle wake / collect Ready), single-threaded executor дизайны (Receiver<Arc<Task>> + Spawner + work loop), task wrapping (`Mutex<Option<BoxFuture>>` + task_sender for self-respawn), block_on функциясы (futures::executor::block_on + thread::park / unpark), multi-threaded vs single-threaded (Send requirement + Rc<T> compile error).
+
+**TimerFuture build (4):** TimerFuture мысалы (book's classic example: shared_state + spawn_thread + sleep + wake), shared state pattern (`Arc<Mutex<SharedState{completed, waker}>>`), spawned thread + sleep approach (1 OS thread per timer = pedagogical only; production uses timer-wheel), Waker hand-off (poll stores Waker; sleeping thread wakes it; race-free via Mutex + take).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_async_book_chapter_02_holdout.json` — 18 cases, 4 categories (`async2_future_trait`, `async2_waker`, `async2_executor`, `async2_timer`).
+- `crates/adam-dialog/tests/rust_async_book_chapter_02.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 20 compounds (18 subjects + 2 object hubs `rust pedagogy`, `rust әдісі`).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 async-chapter-2 holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book chapter 1 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **997 passing** (was 996; +1 async-chapter-2 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2857 → **2875** (+18) |
+| world_core facts | 3099 → **3117** (+18) |
+| Derived facts | 30859 → **30861** (+2) |
+
+### Roadmap (next — Async Book)
+
+| Release | Async Book Chapter | Topic |
+|---|---|---|
+| **v4.89.0** | **ch. 2** | **Under the Hood (this release)** |
+| v4.89.5 | ch. 3 | async/await primer (deeper syntax + state machine + lifetime) |
+| v4.90.0 | ch. 4 | Pinning (Pin + Unpin + self-referential structs) |
+| v4.90.5 | ch. 5 | Streams (Stream trait + StreamExt) |
+| v4.91.0 | ch. 6 | Executing multiple futures — join! / try_join! / select! |
+| v4.91.5 | ch. 7 | Workarounds (Send + recursion + traits) |
+| v4.92.0 | ch. 8 | The Async ecosystem (tokio vs async-std deep) |
+| v4.92.5 | ch. 9 | Final project — async HTTP server |
+
 ## [4.88.5] — 2026-05-07 — Rust Async Book chapter 1 deepening — Async бастамасы (Why async? + concurrency models + Rust async overview)
 
 After completing the main Rust Book pass (chapters 1-20 in v4.79.0 → v4.88.0), the curriculum continues with the **Rust Async Book** — the official guide to async/await programming. Chapter 1 is the motivation + landscape: why async matters, how it compares to other concurrency models (OS threads, green threads, event loops, actors), the Rust-specific design choices (zero-cost, opt-in runtime, Pin), and the current ecosystem (futures, tokio, async-std).
