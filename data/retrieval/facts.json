@@ -1,7 +1,7 @@
 {
-  "version": "4.86.0",
+  "version": "4.86.5",
   "status": "completed",
-  "elapsed_s": 65,
+  "elapsed_s": 62,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3027,
+    "facts_total": 3045,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2462,
+      "is_a": 2480,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 468,
+      "world_core/programming_rust.jsonl": 486,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -52297,6 +52297,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "GUI кітапхана үлгісі — chapter 17-нің классикалық мысалы. Мақсат: түрлі компоненттерді (Button, SelectBox, TextField) бір ұжымда ұстау, әрқайсысында `draw()` әдісі. Шешім: `trait Draw { fn draw(&self); }` + әр компонент `impl Draw for X` + `Vec<Box<dyn Draw>>`. Цикл: `for c in &components { c.draw() }` — әр компоненттің өзінің іске асыруы шакырылады. **Балама:** энум `enum Component { Button(Button), SelectBox(SelectBox), ... }` + `match` — тип-жинағы бекітілген (closed-set), компиляцияда оптимизирленеді, бірақ үшінші тарап жаңа компонент қоса алмайды. Trait objects — open-set, кеңейтілмелі."
+    },
+    {
+      "subject": {
+        "surface": "үлгі қолданылатын орындар",
+        "root": "үлгі қолданылатын орындар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_478"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлгі қолданылатын орындар (where patterns can be used) — Rust-та үлгі алты контексте ұшырасады: (1) `match` тармақтарында (`match x { Pattern => ... }`); (2) `if let` өрнегінде (`if let Some(v) = opt { ... }`); (3) `while let` циклінде (`while let Some(top) = stack.pop() { ... }`); (4) `for` циклінде (`for (i, v) in vec.iter().enumerate() { ... }`); (5) `let` мәлімдемесінде (`let (x, y) = (1, 2)`); (6) функция параметрінде (`fn print((x, y): (i32, i32))`). Үлгі = айнымалы байланыстыру + құрылым тексеру. Әр контекстің **жоққа шығарылу** талаптары әртүрлі: `let` пен функция параметрі — тек жоққа шығарылмайтын; `if let`/`while let` — жоққа шығарылатын; `match` — кез-келген."
+    },
+    {
+      "subject": {
+        "surface": "while let",
+        "root": "while let",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_479"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`while let` шартты цикл — `if let`-тің циклдік нұсқасы. Үлгі сәйкес келгенше цикл айналады, сәйкес келмесе — циклден шығады. Классикалық мысал — стек жадыны босату: `let mut stack = vec![1, 2, 3]; while let Some(top) = stack.pop() { println!(\"{top}\"); }` — `pop()` `Option<T>` қайтарады; `Some(top)` сәйкес болғанша цикл айналады, тізім бос болғанда `None` қайтарып, цикл тоқтайды. **Артықшылық:** `loop { match stack.pop() { Some(t) => ..., None => break } }` ұзын жазбасынан ықшам."
+    },
+    {
+      "subject": {
+        "surface": "for үлгісі",
+        "root": "for үлгісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_480"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`for` циклінде үлгі — `for` көздейтін мәнге байланыстыру кезінде үлгі қолдануға болады. Ең көп таралған мысал — `enumerate()` арқылы индекс + мән жұбын бөлшектеу: `let v = vec!['a', 'b', 'c']; for (index, value) in v.iter().enumerate() { println!(\"{index}: {value}\"); }` — `(usize, &char)` кортежі әр итерацияда `(index, value)` үлгісімен бөлшектенеді. Бұл — жоққа шығарылмайтын үлгі (тип сәйкестігі компиляцияда тексеріледі). Hashmap-те де ыңғайлы: `for (key, value) in &map { ... }`."
+    },
+    {
+      "subject": {
+        "surface": "let үлгісі",
+        "root": "let үлгісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_481"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`let` мәлімдемесінде үлгі — `let x = 5;` жазғанда `x` шынында үлгі болады. Жалпы пішін: `let PATTERN = EXPRESSION;`. Қарапайым `x` үлгісі мәнді жаңа атқа байланыстырады. Ал кортеж бөлшектеу: `let (x, y, z) = (1, 2, 3);` — оң жақтағы үш-элементті кортежді сол жақтағы үш аталған айнымалыға бір қарай ажыратады. Тип сәйкеспесе — компиляция қатесі: `let (x, y) = (1, 2, 3);` 3-элементті 2-элементке сәйкестендіруге тырысқан үшін **E0308** береді. `let` тек **жоққа шығарылмайтын** үлгілерді қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "функция параметрі үлгісі",
+        "root": "функция параметрі үлгісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_482"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Функция параметрінде үлгі — функция параметрінің атын де үлгі етіп жазуға болады. Қарапайым `fn foo(x: i32)` — `x` үлгісі. Бөлшектейтін мысал: `fn print_coords(&(x, y): &(i32, i32)) { println!(\"({x}, {y})\"); }` — параметр `&(i32, i32)` түрінде, ал `&(x, y)` — оны бөлшектейтін үлгі: `&` сілтемені шешеді, `(x, y)` кортежді бөлшектейді. Шакыру: `print_coords(&(3, 5));`. Замыкание (closure) параметрлерінде де солай: `|&(x, y)| x + y`. Функция параметрі тек **жоққа шығарылмайтын** үлгілерді қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "үлгі қайтарымдылығы",
+        "root": "үлгі қайтарымдылығы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_483"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлгі қайтарымдылығы (refutability) — Rust үлгілердің екі түрін ажыратады. **Қайтарылмайтын (irrefutable):** кез-келген мүмкін мәнге сәйкес келеді — мысалы `let x = 5;` ішіндегі `x`, `let (a, b) = pair;` ішіндегі `(a, b)`. **Қайтарылатын (refutable):** кейбір мәндерге сәйкес келмеуі мүмкін — мысалы `Some(v)` (None-ға сәйкес келмейді), `0..=9` (10-ға сәйкес келмейді). Қолданылу: `let`, `for`, функция параметрі — тек қайтарылмайтын; `if let`/`while let` — тек қайтарылатын; `match` тармақтары — біреуі қайтарылмайтын болуы керек (немесе барлығы бірге толық қамтуы керек). Refutable = бас тартылатын, irrefutable = бас тартылмайтын деп те аударылады."
+    },
+    {
+      "subject": {
+        "surface": "үлгі түр қатесі",
+        "root": "үлгі түр қатесі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust қатесі",
+        "root": "rust қатесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_484"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлгінің refutable/irrefutable қателері — қолайсыз контексте дұрыс емес түрдегі үлгі қойсаңыз — компилятор қате береді. Мысал 1: `let Some(v) = opt;` — `let` шығарылмайтын күтеді, бірақ `Some(v)` шығарылатын → **E0005**: «refutable pattern in local binding». Шешім: `if let Some(v) = opt { ... }` немесе `let Some(v) = opt else { return; };` (Rust 1.65+). Мысал 2: `if let x = 5 { ... }` — `if let` шығарылатын күтеді, бірақ `x` шығарылмайтын → **E0162** ескертуі: «irrefutable if-let pattern». Цикл `loop` немесе тікелей `let` керек."
+    },
+    {
+      "subject": {
+        "surface": "литерал үлгісі",
+        "root": "литерал үлгісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_485"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Литерал үлгісі (matching literals) — `match` тармағында тура мәнді көрсетуге болады: `match x { 1 => println!(\"one\"), 2 => println!(\"two\"), 3 => println!(\"three\"), _ => println!(\"anything\"), }`. Литералдар: бүтін сандар (`1`, `42`), таңбалар (`'a'`, `'z'`), boolean (`true`, `false`), жолдар (`\"hello\"`). Барлығы — жоққа шығарылатын үлгілер. Пайдаланылу — нақты белгілі мәндерді жеке өңдеу қажет болғанда. Мысалы CLI команда атын өңдеу: `match cmd { \"start\" => start(), \"stop\" => stop(), _ => help() }`."
+    },
+    {
+      "subject": {
+        "surface": "match шадоулау",
+        "root": "match шадоулау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ереже-тұзағы",
+        "root": "rust ереже-тұзағы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_486"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`match`-те айнымалы көлеңкелеу (variable shadowing in match) — `match` ішіндегі үлгідегі айнымалы аты сыртқы скоптағы аты бар айнымалымен **көлеңкелейді**, оны салыстырмайды. Мысал: `let x = Some(5); let y = 10; match x { Some(50) => println!(\"50\"), Some(y) => println!(\"y = {y}\"), _ => println!(\"def\") }` — мұндағы `Some(y)` тармағы **жаңа `y`** жасайды (сыртқы `y = 10` емес), сондықтан кез-келген `Some(_)`-ге сәйкес болады, нәтиже: `y = 5`. Шешім — match guard: `Some(n) if n == y => ...`. Бұл — Rust-тың жаңадан келген қателерінің көзі."
+    },
+    {
+      "subject": {
+        "surface": "or-pattern",
+        "root": "or-pattern",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_487"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірнеше үлгі `|` (or-pattern) — бір тармақта бірнеше үлгіні «немесе» арқылы біріктіруге болады. Мысал: `match x { 1 | 2 => println!(\"one or two\"), 3 => println!(\"three\"), _ => println!(\"anything\") }` — `x` 1 болса да, 2 болса да, бірінші тармақ жанады. Енам нұсқаларында да: `match msg { Message::Quit | Message::Exit => break, ... }`. **Бір шектеу:** or-pattern ішіндегі барлық альтернативтер бірдей айнымалыларды бірдей типтермен байланыстыруы керек: `Some(x) | Ok(x)` жұмыс істейді (екеуі де `x`-ке байланыстырады), бірақ `Some(x) | None` істемейді (`None` `x`-ті байланыстырмайды)."
+    },
+    {
+      "subject": {
+        "surface": "диапазон үлгісі",
+        "root": "диапазон үлгісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_488"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Диапазон үлгісі `..=` (range pattern) — мәндер диапазонын бір үлгімен өрнектеу. **Тек инклюзивті** (`..=`) форма match-те қолдау табады; эксклюзивті `..` форма — тек тілдегі басқа орындарда. Мысалы санды диапазон: `match age { 0..=12 => \"child\", 13..=19 => \"teen\", 20..=64 => \"adult\", _ => \"elder\" }`. Таңба диапазоны: `match c { 'a'..='z' => \"lowercase\", 'A'..='Z' => \"uppercase\", _ => \"other\" }`. **Шектеу:** диапазон үлгісі тек сан мен `char` типтерінде істейді — олардың тәртібі компиляцияда белгілі. `String` диапазоны жоқ."
+    },
+    {
+      "subject": {
+        "surface": "структураны бөлшектеу",
+        "root": "структураны бөлшектеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_489"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Структураны бөлшектеу (destructuring structs) — `let` немесе `match` арқылы структураның өрістерін атау бойынша алуға болады. Мысал: `struct Point { x: i32, y: i32 } let p = Point { x: 0, y: 7 }; let Point { x: a, y: b } = p;` — енді `a == 0`, `b == 7`. Қысқа форма (өріс аты = айнымалы аты): `let Point { x, y } = p;` — `x == 0`, `y == 7`. `match`-те де жұмыс істейді: `match p { Point { x: 0, y } => println!(\"x-осінде, y={y}\"), Point { x, y: 0 } => println!(\"y-осінде\"), Point { x, y } => println!(\"({x}, {y})\") }`. Бұл — нысан-бағытталған тілдердегі деструктурлеудің Rust нұсқасы."
+    },
+    {
+      "subject": {
+        "surface": "енамды бөлшектеу",
+        "root": "енамды бөлшектеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_490"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Енамды бөлшектеу (destructuring enums) — енам нұсқалары құрамындағы деректерді үлгімен ашуға болады. Әр нұсқа өзінің үлгі формасын талап етеді. Мысал: `enum Message { Quit, Move { x: i32, y: i32 }, Write(String), ChangeColor(i32, i32, i32) }`. `match msg { Message::Quit => println!(\"quit\"), Message::Move { x, y } => println!(\"move ({x},{y})\"), Message::Write(text) => println!(\"write: {text}\"), Message::ChangeColor(r, g, b) => println!(\"rgb({r},{g},{b})\") }`. **Маңызды:** `Move` нұсқасы аталған өрістерде `{}` талап етеді, `Write` мен `ChangeColor` — кортеж нұсқаларында `()` талап етеді, `Quit` — деректер жоқ."
+    },
+    {
+      "subject": {
+        "surface": "ұя салынған бөлшектеу",
+        "root": "ұя салынған бөлшектеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_491"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ұя салынған бөлшектеу (nested destructuring) — структуралар, енамдар, кортеждер бір-бірінің ішінде орналасқанда үлгіні де солай ұя салуға болады. Мысал: `enum Color { Rgb(i32, i32, i32), Hsv(i32, i32, i32) } enum Message { ChangeColor(Color), ... }`. Тереңдетілген сәйкестік: `match msg { Message::ChangeColor(Color::Rgb(r, g, b)) => println!(\"rgb({r},{g},{b})\"), Message::ChangeColor(Color::Hsv(h, s, v)) => println!(\"hsv({h},{s},{v})\"), _ => () }`. Кортеж + структура қоспасы: `let ((feet, inches), Point { x, y }) = ((3, 10), Point { x: 3, y: -10 });` — бір өрнекте екі деңгей бөлшектенеді."
+    },
+    {
+      "subject": {
+        "surface": "үлгіде елемеу",
+        "root": "үлгіде елемеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_492"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлгіде `_` елемеу — `_` нышаны мәнге сәйкес келеді бірақ оны байланыстырмайды. Қолданылу: (1) match catch-all (`_ => ...`), (2) функция параметрін елемеу (`fn foo(_: i32, y: i32)` — бірінші параметр алынады, бірақ қолданылмайды), (3) кортежде кейбір элементтерді елемеу (`let (x, _, z) = (1, 2, 3);` — `x = 1, z = 3`, ортасы тасталынады), (4) енам бөлігіндегі деректі елемеу (`Some(_) => println!(\"бар\")` — мән барлығын білеміз, нақты не екенін білгіміз келмейді). **`_x` мен `_` айырмашылығы:** `_x` — иемденуді алады (move), бірақ ескертусіз; `_` — мүлдем байланыстырмайды (move да жоқ)."
+    },
+    {
+      "subject": {
+        "surface": ".. елемеу",
+        "root": ".. елемеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_493"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`..` қалғанын елемеу (rest in patterns) — структура немесе кортеждің бір немесе бірнеше керекті өрістерін алып, қалғандарын `..` нышанымен елемеу. Структура мысалы: `struct Point3 { x: i32, y: i32, z: i32 } let p = Point3 { x: 0, y: 0, z: 0 }; match p { Point3 { x, .. } => println!(\"x={x}\") }` — тек `x` алынады, `y` мен `z` елемеледі. Кортеж мысалы: `let nums = (2, 4, 8, 16, 32); match nums { (first, .., last) => println!(\"{first}, {last}\") }` — алғашқы мен соңғы алынады, ортасы өткізіледі. **Шектеу:** `..` бірмәнді болуы керек: `(.., second, ..)` — қандай элементті алу керек анық емес → компиляция қатесі."
+    },
+    {
+      "subject": {
+        "surface": "match guard",
+        "root": "match guard",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "match синтаксисі",
+        "root": "match синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_494"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Match guard `if` — match тармағынан кейін `if` шартын қою. Үлгі сәйкес келсе **және** шарт ақиқат болса ғана тармақ жанады. Мысал: `let num = Some(4); match num { Some(x) if x % 2 == 0 => println!(\"жұп: {x}\"), Some(x) => println!(\"тақ: {x}\"), None => () }` — `Some(x) if x % 2 == 0` тек жұп санды қамтиды. Match guard — үлгі тілінде өрнектелмейтін шарттарды қосады. Шадоулау мысалын шешеді: `let y = 10; match x { Some(n) if n == y => ..., _ => ... }` — сыртқы `y`-мен салыстыру. **Маңызды:** компилятор шартты бағалай алмайтындықтан, match guard толық қамту тексеруіне қатыспайды — `_` қамту тармағы әлі қажет."
+    },
+    {
+      "subject": {
+        "surface": "at байланыстыру",
+        "root": "at байланыстыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_495"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`@` байланыстыру (at-binding) — мәнді тексеретін үлгімен бірге сол мәнді **айнымалыға байланыстыру**. Синтаксис: `айнымалы @ үлгі`. Мысалсыз нәтиже: диапазонды тексеру + санды алу бір тармақта. `enum Message { Hello { id: i32 } } let msg = Message::Hello { id: 5 }; match msg { Message::Hello { id: id_var @ 3..=7 } => println!(\"3-7 диапазонында: {id_var}\"), Message::Hello { id: 10..=12 } => println!(\"10-12 диапазонында\"), Message::Hello { id } => println!(\"басқа: {id}\") }`. Біріншісі — диапазонды тексереді **және** мәнді алады; екіншісі — тек тексереді, мәнді жоғалтады. `@` бұл екеуін біріктіреді."
     },
     {
       "subject": {

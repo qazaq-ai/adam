@@ -1,0 +1,27 @@
+{
+  "_comment": "v4.87.0 — Rust Book Chapter 18 (Үлгілер мен сәйкестендіру / advanced pattern matching) holdout. 18 natural Kazakh queries against rust_478…495. Categories: ch18_pattern_contexts (where patterns appear: match arms / if let / while let / for / let / fn params), ch18_refutability (refutable vs irrefutable + compile errors), ch18_pattern_matching (literals, shadowing, or-patterns, ranges), ch18_destructuring (structs, enums, nested), ch18_ignoring (_ and ..), ch18_advanced (match guard, @ binding).",
+  "version": "v4.87.0",
+  "captured_date": "2026-05-07",
+  "chapter": 18,
+  "chapter_title": "Үлгілер мен сәйкестендіру (advanced pattern matching)",
+  "cases": [
+    {"id": "ch18_contexts", "category": "ch18_pattern_contexts", "query": "Үлгі қолданылатын орындар деген не?", "any_substring": ["алты контексте", "if let", "while let"]},
+    {"id": "ch18_while_let", "category": "ch18_pattern_contexts", "query": "while let деген не?", "any_substring": ["шартты цикл", "stack.pop", "ықшам"]},
+    {"id": "ch18_for_pat", "category": "ch18_pattern_contexts", "query": "for үлгісі деген не?", "any_substring": ["enumerate", "(index, value)", "hashmap"]},
+    {"id": "ch18_let_pat", "category": "ch18_pattern_contexts", "query": "let үлгісі деген не?", "any_substring": ["pattern = expression", "(x, y, z)", "e0308"]},
+    {"id": "ch18_fn_param", "category": "ch18_pattern_contexts", "query": "Функция параметрі үлгісі деген не?", "any_substring": ["print_coords", "&(x, y)", "closure"]},
+    {"id": "ch18_refutability", "category": "ch18_refutability", "query": "Үлгі қайтарымдылығы деген не?", "any_substring": ["қайтарылмайтын", "қайтарылатын", "if let"]},
+    {"id": "ch18_refute_err", "category": "ch18_refutability", "query": "Үлгі түр қатесі деген не?", "any_substring": ["e0005", "e0162", "let some"]},
+    {"id": "ch18_literal", "category": "ch18_pattern_matching", "query": "Литерал үлгісі деген не?", "any_substring": ["match x", "1 => println", "cli"]},
+    {"id": "ch18_shadow", "category": "ch18_pattern_matching", "query": "match шадоулау деген не?", "any_substring": ["көлеңкелейді", "y = 5", "match guard"]},
+    {"id": "ch18_or", "category": "ch18_pattern_matching", "query": "or-pattern деген не?", "any_substring": ["1 | 2", "message::quit", "альтернатив"]},
+    {"id": "ch18_range", "category": "ch18_pattern_matching", "query": "Диапазон үлгісі деген не?", "any_substring": ["..=", "0..=12", "char"]},
+    {"id": "ch18_destruct_struct", "category": "ch18_destructuring", "query": "Структураны бөлшектеу деген не?", "any_substring": ["point { x, y }", "өрістерін атау бойынша", "деструктур"]},
+    {"id": "ch18_destruct_enum", "category": "ch18_destructuring", "query": "Енамды бөлшектеу деген не?", "any_substring": ["message::move", "message::write", "changecolor"]},
+    {"id": "ch18_nested", "category": "ch18_destructuring", "query": "Ұя салынған бөлшектеу деген не?", "any_substring": ["color::rgb", "color::hsv", "feet, inches"]},
+    {"id": "ch18_ignore_us", "category": "ch18_ignoring", "query": "Үлгіде елемеу деген не?", "any_substring": ["catch-all", "let (x, _, z)", "_x"]},
+    {"id": "ch18_dotdot", "category": "ch18_ignoring", "query": ".. елемеу деген не?", "any_substring": ["point3", "first, .., last", "бірмәнді"]},
+    {"id": "ch18_guard", "category": "ch18_advanced", "query": "match guard деген не?", "any_substring": ["if шартын", "x % 2", "толық қамту"]},
+    {"id": "ch18_at", "category": "ch18_advanced", "query": "at байланыстыру деген не?", "any_substring": ["@", "id_var", "3..=7"]}
+  ]
+}

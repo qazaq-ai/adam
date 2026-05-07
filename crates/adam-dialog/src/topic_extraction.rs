@@ -1985,6 +1985,32 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "оо паттерні",
     "rust паттерні",
     "мұрагерлік алмасы",
+    // **v4.87.0** — Rust Book chapter 18 (advanced pattern matching) deepening.
+    // rust_478…495 — 18 entries covering pattern contexts (5),
+    // refutability (2), pattern syntax — matching (4), destructuring (3),
+    // ignoring (2), and advanced (2).
+    // Subjects.
+    "үлгі қолданылатын орындар",
+    "while let",
+    "for үлгісі",
+    "let үлгісі",
+    "функция параметрі үлгісі",
+    "үлгі қайтарымдылығы",
+    "үлгі түр қатесі",
+    "литерал үлгісі",
+    "match шадоулау",
+    "or-pattern",
+    "диапазон үлгісі",
+    "структураны бөлшектеу",
+    "енамды бөлшектеу",
+    "ұя салынған бөлшектеу",
+    "үлгіде елемеу",
+    ".. елемеу",
+    "match guard",
+    "at байланыстыру",
+    // Objects.
+    "rust ереже-тұзағы",
+    "rust қатесі",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

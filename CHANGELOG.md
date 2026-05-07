@@ -7,6 +7,61 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.87.0] — 2026-05-07 — Rust Book chapter 18 deepening — Үлгілер мен сәйкестендіру (advanced pattern matching)
+
+Per-chapter pedagogical cadence continues. Chapter 18 systematises Rust's pattern language — every place patterns can appear (six contexts), refutability rules, the full pattern grammar (literals, named variables, or-patterns, ranges, struct/enum/nested destructuring, ignoring with `_` and `..`, match guards, and `@` at-bindings). Previously coverage was scattered across chapters 6 (match basics) and 13 (closures); now there is a dedicated reference catalog.
+
+### What's added
+
+**18 new curated entries `rust_478…495`** in `programming_rust.jsonl`:
+
+**Pattern contexts (5):** үлгі қолданылатын орындар (six contexts: match arms / `if let` / `while let` / `for` / `let` / fn params), `while let` шартты цикл (stack-pop idiom), `for` циклінде үлгі (`for (i, v) in v.iter().enumerate()`), `let` мәлімдемесінде үлгі (tuple destructuring + E0308), функция параметрінде үлгі (`fn foo(&(x, y): &(i32, i32))` + closures).
+
+**Refutability (2):** үлгі қайтарымдылығы (refutable vs irrefutable + per-context rules), үлгі түр қатесі (E0005 «refutable in let», E0162 «irrefutable if-let» + `let-else` Rust 1.65+ workaround).
+
+**Pattern matching (4):** литерал үлгісі (`1 => ...`), match-те айнымалы көлеңкелеу (named variable shadowing trap), or-pattern `|` (multiple alternatives, same-binding constraint), диапазон үлгісі `..=` (only inclusive in match, only numeric/`char`).
+
+**Destructuring (3):** структураны бөлшектеу (`Point { x, y }` short form + match arms), енамды бөлшектеу (Quit / Move / Write / ChangeColor variant forms), ұя салынған бөлшектеу (struct-in-enum-in-tuple).
+
+**Ignoring (2):** үлгіде `_` елемеу (catch-all + fn param + tuple element + enum-data discard + `_x` vs `_` move semantics), `..` қалғанын елемеу (struct rest + tuple `(first, .., last)` + ambiguity error).
+
+**Advanced (2):** match guard `if` (compiler-opaque condition; doesn't participate in exhaustiveness check), `@` байланыстыру (test-and-bind in one arm).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_18_holdout.json` — 18 cases, 6 categories (`ch18_pattern_contexts`, `ch18_refutability`, `ch18_pattern_matching`, `ch18_destructuring`, `ch18_ignoring`, `ch18_advanced`).
+- `crates/adam-dialog/tests/rust_book_chapter_18.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 20 compounds (18 subjects + 2 object hubs `rust ереже-тұзағы`, `rust қатесі`).
+
+### Subject-naming correction
+
+- `rust_483` from «жоққа шығарылатын үлгі» to «үлгі қайтарымдылығы». **Reason:** the «Жоққа» / «жоққа» token at the start of a query was triggering negation-polarity routing → bare «Жоқ» response, blocking retrieval of the entry. Renamed using the Kazakh nominalisation «қайтарымдылығы» (refutability) which avoids the negation-marker collision. The body still mentions «бас тартылатын / бас тартылмайтын» as alternative translations.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 18 holdout cases | ✅ 100 % |
+| Existing chapters 1-17 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **993 passing** (was 992; +1 chapter-18 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2785 → **2803** (+18) |
+| world_core facts | 3027 → **3045** (+18) |
+| Derived facts | 30885 → **30886** (+1) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.87.0** | **ch. 18** | **Patterns / advanced pattern matching (this release)** |
+| v4.87.5 | ch. 19 | Advanced features (unsafe / advanced traits / function pointers / macros) |
+| v4.88.0 | ch. 20 | Final project — multi-threaded web server |
+
 ## [4.86.5] — 2026-05-07 — Rust Book chapter 17 deepening — Rust-тың объектілі-бағытталған мүмкіндіктері
 
 Per-chapter pedagogical cadence continues. Chapter 17 reframes OOP for Rust: the language **is not a class-based OO language** — there are no classes, no inheritance, no method overriding. Instead, Rust offers an *engineering kit* that covers the same problem space (encapsulation, polymorphism, dynamic dispatch, state machines) with **trait objects**, **trait composition**, and **typestate via the type system**. Previously surface-level — only `dyn` listed as a stub. Now deepened with full curriculum.
