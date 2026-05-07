@@ -1,0 +1,30 @@
+{
+  "_comment": "v4.82.5 — Rust Book Chapter 8 (Жалпы ұжымдар) holdout. 21 natural Kazakh queries against rust_318…335 + 3 deepened stubs (rust_041/045/046) − 3 cross-file stub deletions (rustadv_012/013/014). Categories: ch08_vec (Vec basics, constructors, push, indexing, iteration, dereference, heterogeneous types via enum), ch08_string (String constructors, push_str, + operator, format!, indexing forbidden, chars/bytes), ch08_hashmap (constructor + import, insert overwrites, entry/or_insert idiom, ownership rules, SipHash default).",
+  "version": "v4.82.5",
+  "captured_date": "2026-05-06",
+  "chapter": 8,
+  "chapter_title": "Жалпы ұжымдар (Vec / String / HashMap)",
+  "cases": [
+    {"id": "ch08_vec", "category": "ch08_vec", "query": "Vec деген не?", "any_substring": ["өсетін", "vec![1, 2, 3]", "panic on out-of-bounds"]},
+    {"id": "ch08_vec_new", "category": "ch08_vec", "query": "Vec::new деген не?", "any_substring": ["бос вектор", "vec<i32>", "2× қосалқы"]},
+    {"id": "ch08_vec_macro", "category": "ch08_vec", "query": "vec! макросы деген не?", "any_substring": ["алғашқы мәндер", "vec![0; 100]", "синтаксис қанты"]},
+    {"id": "ch08_vec_push", "category": "ch08_vec", "query": "Vec push әдісі деген не?", "any_substring": [".pop()", "амортизирленген", ".insert(i"]},
+    {"id": "ch08_vec_index", "category": "ch08_vec", "query": "Вектор индекстеу деген не?", "any_substring": ["&v[i]", "v.get(i)", "option<&t>"]},
+    {"id": "ch08_vec_iter", "category": "ch08_vec", "query": "Вектор бойынша жүру деген не?", "any_substring": ["for i in &v", "for i in &mut v", "цикл барысында"]},
+    {"id": "ch08_dereference", "category": "ch08_vec", "query": "Дереференс деген не?", "any_substring": ["*x", "сілтемені «ашады»", "автоматты сілтемелеу"]},
+    {"id": "ch08_vec_heterogeneous", "category": "ch08_vec", "query": "Вектордағы әртүрлі типтер деген не?", "any_substring": ["spreadsheetcell", "vec<box<dyn", "match арқылы"]},
+    {"id": "ch08_string", "category": "ch08_string", "query": "String деген не?", "any_substring": ["utf-8", "иелігі бар", "литерал"]},
+    {"id": "ch08_string_constructors", "category": "ch08_string", "query": "String конструкторлары деген не?", "any_substring": ["string::new()", "string::from", "to_string"]},
+    {"id": "ch08_push_str", "category": "ch08_string", "query": "push_str деген не?", "any_substring": ["жалғайтын", "иелікті алмайды", ".push('"]},
+    {"id": "ch08_string_plus", "category": "ch08_string", "query": "String + операторы деген не?", "any_substring": ["s1 + &s2", "иелігін", "add(self"]},
+    {"id": "ch08_format_macro", "category": "ch08_string", "query": "format! макросы деген не?", "any_substring": ["иелікті алмайды", "форматтауыш", "string қайтарады"]},
+    {"id": "ch08_string_indexing", "category": "ch08_string", "query": "String индекстеу деген не?", "any_substring": ["компиляция қатесі", "қазақ кириллицасы", "тыйым салады"]},
+    {"id": "ch08_chars_bytes", "category": "ch08_string", "query": "chars пен bytes деген не?", "any_substring": ["unicode скаляр", "графема кластер", "unicode-segmentation"]},
+    {"id": "ch08_hashmap", "category": "ch08_hashmap", "query": "HashMap деген не?", "any_substring": ["кілт пен мән", "siphash", "use std::collections"]},
+    {"id": "ch08_hashmap_new", "category": "ch08_hashmap", "query": "HashMap::new деген не?", "any_substring": ["use std::collections::hashmap", "prelude", "let mut scores"]},
+    {"id": "ch08_hashmap_insert", "category": "ch08_hashmap", "query": "HashMap insert деген не?", "any_substring": ["жаңалап жазады", "10", "option<v>"]},
+    {"id": "ch08_hashmap_entry", "category": "ch08_hashmap", "query": "HashMap entry деген не?", "any_substring": ["or_insert", "тек жоқ болғанда", "*count += 1"]},
+    {"id": "ch08_hashmap_ownership", "category": "ch08_hashmap", "query": "HashMap иелік деген не?", "any_substring": ["иелік ауыстырады", "copy типтер", "&str сілтеме"]},
+    {"id": "ch08_siphash", "category": "ch08_hashmap", "query": "SipHash деген не?", "any_substring": ["криптографиялық", "dos", "fxhash"]}
+  ]
+}

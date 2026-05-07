@@ -7,6 +7,86 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.82.5] — 2026-05-06 — Rust Book chapter 8 deepening — common collections
+
+Per-chapter pedagogical cadence continues. Chapter 8 introduces the three workhorses of Rust's standard collections — `Vec<T>`, `String`, `HashMap<K,V>` — that every Rust programmer uses daily. Previously surface-level — 3 one-line stubs. Now deepened with full curriculum.
+
+### What's added
+
+**18 new curated entries `rust_318…335`** in `programming_rust.jsonl`:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_318 | vec::new | Empty vector + type annotation |
+| rust_319 | vec! макросы | Initialize with values |
+| rust_320 | vec push әдісі | Append + amortized O(1) |
+| rust_321 | вектор индекстеу | `&v[i]` panic vs `v.get(i)` Option |
+| rust_322 | вектор бойынша жүру | for in &v / &mut v / consuming |
+| rust_323 | дереференс | `*` operator |
+| rust_324 | вектордағы әртүрлі типтер | Heterogeneous via enum |
+| rust_325 | string конструкторлары | 3 ways: new / from / to_string |
+| rust_326 | push_str | Append &str (no ownership) |
+| rust_327 | string + операторы | Move left, borrow right |
+| rust_328 | format! макросы | Multi-string concat without ownership transfer |
+| rust_329 | string индекстеу | Forbidden + UTF-8 reasoning |
+| rust_330 | chars пен bytes | Unicode scalar vs byte iteration |
+| rust_331 | hashmap::new | Constructor + use std::collections import |
+| rust_332 | hashmap insert | Overwrites if key exists |
+| rust_333 | hashmap entry | `entry().or_insert()` + word-count idiom |
+| rust_334 | hashmap иелік | Copy types copy; non-Copy move into map |
+| rust_335 | siphash | Default crypto-secure hasher (DoS protection) |
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs deepened in-place (3)
+
+- `rust_041` (String) — UTF-8 owned + heap + 3 constructors + index forbidden + chars/bytes
+- `rust_045` (Vec) — growable + push + index vs get + iteration + heterogeneous via enum
+- `rust_046` (HashMap) — key-value + insert + get + entry + ownership + SipHash
+
+### Stubs deleted (3)
+
+- `rustadv_012` (Vec 1-line)
+- `rustadv_013` (HashMap 1-line)
+- `rustadv_014` (String 1-line)
+
+All duplicates of deeper rust_041/045/046.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_08_holdout.json` — 21 cases, 3 categories (`ch08_vec`, `ch08_string`, `ch08_hashmap`).
+- `crates/adam-dialog/tests/rust_book_chapter_08.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `LATIN_TECH_SUBJECTS` += 3 (`push_str`, `дереференс`, `siphash`).
+- `MULTIWORD_ENTITIES` += 26 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 21 / 21 chapter 8 holdout cases | ✅ 100 % |
+| Existing chapters 1-7 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **984 passing** (was 983; +1 chapter-8 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2638 → **2653** (+15 net: +18 ch.8 − 3 stub deletions) |
+| world_core facts | 2880 → **2895** (+15 net) |
+| Derived facts | 30809 → **30827** (+18) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.82.5** | **ch. 8** | **Common collections (this release)** |
+| v4.83.0 | ch. 9 | Error handling (`?`-operator / propagation / custom errors) |
+| v4.83.5 | ch. 10 | Generics + traits + lifetimes |
+| v4.84.0 | ch. 11 | Tests (`#[test]` / assert / cargo test) |
+| v4.84.5 | ch. 12 | CLI minigrep project |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.5` patch — 18 new + 3 deepened stubs + 3 deletions; chapter 8 introduces daily collection types every Rust programmer uses (foundation for chapters 9-20). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.82.0] — 2026-05-06 — Rust Book chapter 7 deepening — modules / packages / crates
 
 Per-chapter pedagogical cadence continues. Chapter 7 introduces Rust's project-organization toolkit — the four-layer module system (package / crate / module / path). Previously surface-level — 4 one-line stubs (Сандық / Модуль / use / pub). Now deepened with full curriculum.

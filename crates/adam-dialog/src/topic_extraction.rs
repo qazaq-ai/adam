@@ -1953,6 +1953,35 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ord әдісі",
     "айнымалы тәсілі",
     "string әдісі",
+    // **v4.82.5** — Rust Book chapter 8 (collections) deepening.
+    // rust_318…335 + 3 stub replacements (041/045/046).
+    "vec::new",
+    "vec! макросы",
+    "vec push әдісі",
+    "вектор индекстеу",
+    "вектор бойынша жүру",
+    "вектордағы әртүрлі типтер",
+    "string конструкторлары",
+    "string + операторы",
+    "format! макросы",
+    "string индекстеу",
+    "chars пен bytes",
+    "hashmap::new",
+    "hashmap insert",
+    "hashmap entry",
+    "hashmap иелік",
+    // Objects.
+    "vec конструкторы",
+    "vec әдісі",
+    "vec мәселесі",
+    "vec идиомасы",
+    "rust операторы",
+    "string мәселесі",
+    "hashmap конструкторы",
+    "hashmap әдісі",
+    "hashmap идиомасы",
+    "hashmap ережесі",
+    "hash функциясы",
     // **v4.82.0** — Rust Book chapter 7 (modules / packages / crates) deepening.
     // rust_300…317 + 4 stub replacements (004/005/101/102).
     "модуль жолы",
@@ -2404,6 +2433,10 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     // deepening. rust_237…253 + replaced rust_022/038/039.
     // **v4.80.5** — Rust Book chapter 4 (ownership) deepening.
     "nll",
+    // **v4.82.5** — Rust Book chapter 8 (collections).
+    "push_str",
+    "дереференс",
+    "siphash",
 ];
 
 /// **v4.11.5** — scan input for any whitespace-separated word
