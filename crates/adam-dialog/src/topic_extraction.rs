@@ -2069,6 +2069,33 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "concurrency үлгісі",
     "rust api",
     "rust капстоны",
+    // **v4.88.5** — Rust Async Book chapter 1 (Why async? + concurrency models + Rust async overview) deepening.
+    // rust_532…549 — 18 entries covering motivation (3),
+    // concurrency models (5), async basics (5), ecosystem (3),
+    // and state of the world (2).
+    // Subjects.
+    "async программалау",
+    "concurrency vs parallelism",
+    "rust async тарихы",
+    "ос ағыны",
+    "green thread",
+    "event loop стилі",
+    "actor моделі",
+    "rust async ерекшелігі",
+    "future трейт",
+    "async fn",
+    ".await оператор",
+    "async block",
+    "async move closure",
+    "futures крейті",
+    "tokio runtime",
+    "async-std runtime",
+    "async fn in traits",
+    "async closures",
+    // Objects.
+    "rust тарихы",
+    "rust крейті",
+    "rust мүмкіндігі",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

@@ -7,6 +7,61 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.88.5] — 2026-05-07 — Rust Async Book chapter 1 deepening — Async бастамасы (Why async? + concurrency models + Rust async overview)
+
+After completing the main Rust Book pass (chapters 1-20 in v4.79.0 → v4.88.0), the curriculum continues with the **Rust Async Book** — the official guide to async/await programming. Chapter 1 is the motivation + landscape: why async matters, how it compares to other concurrency models (OS threads, green threads, event loops, actors), the Rust-specific design choices (zero-cost, opt-in runtime, Pin), and the current ecosystem (futures, tokio, async-std).
+
+### What's added
+
+**18 new curated entries `rust_532…549`** in `programming_rust.jsonl`:
+
+**Motivation (3):** async программалаудың мақсаты (I/O-bound: 100 000 connections, NOT CPU-bound), concurrency vs parallelism (Rob Pike: structure vs execution; tokio multi-thread executor), Rust async тарихы (Rust 1.0 → futures 0.1 → 1.39 stable async/await → 1.75 async fn in traits).
+
+**Concurrency models (5):** ОС ағыны (~2 MB stack, kernel scheduler), green thread (M:N, libgreen removed pre-1.0), event loop / callback (Node.js, callback hell), actor model (Erlang, Akka, Rust's `actix` + tokio+mpsc idiomatic equivalent), Rust async distinctiveness (zero-cost + opt-in runtime + Send/Sync checks + Pin).
+
+**Async basics (5):** Future трейт шолуы (`poll(self: Pin<&mut Self>, cx) -> Poll<Output>` + lazy semantics), async fn (state machine + `impl Future<Output=T>` + «do nothing unless awaited» warning), `.await` оператор (Pending + cooperative yield), async block (`async { }` + capture rules + `async move`), async move closure (`async move || { }` for tokio::spawn pattern).
+
+**Ecosystem (3):** futures крейті (Stream + StreamExt + join!/select! macros + BoxFuture aliases), tokio runtime (work-stealing + epoll/kqueue/IOCP reactor + #[tokio::main]), async-std runtime (std-mirror API + smol alternative).
+
+**State of the world (2):** async fn in traits (Rust 1.75 stable + GAT prerequisite + `Box<dyn Trait>` still needs `async-trait`), async closures (Rust 2024 unstable + `AsyncFn`/`AsyncFnMut`/`AsyncFnOnce` + workaround `move || async move {}`).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant; new book)
+
+- `data/eval/rust_async_book_chapter_01_holdout.json` — 18 cases, 5 categories (`async1_motivation`, `async1_models`, `async1_basics`, `async1_ecosystem`, `async1_state`).
+- `crates/adam-dialog/tests/rust_async_book_chapter_01.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 21 compounds (18 subjects + 3 object hubs `rust тарихы`, `rust крейті`, `rust мүмкіндігі`).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 1 holdout cases | ✅ 100 % |
+| All Rust Book chapters 1-20 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **996 passing** (was 995; +1 async-chapter-1 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2839 → **2857** (+18) |
+| world_core facts | 3081 → **3099** (+18) |
+| Derived facts | 30886 → **30859** (−27, expected — new concurrency-model subjects rebalanced R5 / R11 chains) |
+
+### Roadmap (next — Async Book)
+
+| Release | Async Book Chapter | Topic |
+|---|---|---|
+| **v4.88.5** | **ch. 1** | **Async бастамасы (this release)** |
+| v4.89.0 | ch. 2 | Under the Hood — Future trait deeper + Waker + executor architecture |
+| v4.89.5 | ch. 3 | async/await primer (deeper syntax + state machine + lifetime) |
+| v4.90.0 | ch. 4 | Pinning (Pin + Unpin + self-referential structs) |
+| v4.90.5 | ch. 5 | Streams (Stream trait + StreamExt) |
+| v4.91.0 | ch. 6 | Executing multiple futures — join! / try_join! / select! |
+| v4.91.5 | ch. 7 | Workarounds (Send + recursion + traits) |
+| v4.92.0 | ch. 8 | The Async ecosystem (tokio vs async-std deep) |
+| v4.92.5 | ch. 9 | Final project — async HTTP server |
+
 ## [4.88.0] — 2026-05-07 — Rust Book chapter 20 deepening — Қорытынды жоба — көп ағынды веб-сервер (final project — multi-threaded web server)
 
 **The Rust Book is complete.** Chapter 20 — the capstone project — combines everything from chapters 12 (CLI / lib-vs-bin), 16 (concurrency), 17 (trait objects), and 19 (type aliases) into a working multi-threaded HTTP server with graceful shutdown. Per-chapter pedagogical cadence completes its first full pass: chapters 1-20 all have curriculum-grade Kazakh coverage + per-chapter holdout + 100 % floor test.

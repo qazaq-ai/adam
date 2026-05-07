@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.88.5 — Rust Async Book Chapter 1 (Why async? + concurrency models + Rust async overview) holdout. 18 natural Kazakh queries against rust_532…549. Categories: async1_motivation (why async + concurrency-vs-parallelism + history), async1_models (OS thread + green thread + event loop + actor + Rust async distinctiveness), async1_basics (Future trait + async fn + .await + async block + async move closure), async1_ecosystem (futures crate + tokio + async-std), async1_state (async fn in traits + async closures).",
+  "version": "v4.88.5",
+  "captured_date": "2026-05-07",
+  "book": "Rust Async Book",
+  "chapter": 1,
+  "chapter_title": "Async бастамасы (Why async? + concurrency models + Rust async overview)",
+  "cases": [
+    {"id": "async1_motivation", "category": "async1_motivation", "query": "Async программалау деген не?", "any_substring": ["i/o-bound", "100 000", "босатады"]},
+    {"id": "async1_concur_vs_par", "category": "async1_motivation", "query": "Concurrency vs parallelism деген не?", "any_substring": ["rob pike", "work-stealing", "tokio::spawn"]},
+    {"id": "async1_history", "category": "async1_motivation", "query": "Rust async тарихы деген не?", "any_substring": ["rust 1.39", "futures 0.1", "rust 1.75"]},
+    {"id": "async1_os_thread", "category": "async1_models", "query": "ОС ағыны деген не?", "any_substring": ["~2 мб", "kernel scheduler", "context switch"]},
+    {"id": "async1_green", "category": "async1_models", "query": "Green thread деген не?", "any_substring": ["m:n", "goroutine", "libgreen"]},
+    {"id": "async1_event_loop", "category": "async1_models", "query": "Event loop стилі деген не?", "any_substring": ["node.js", "callback hell", "async/await"]},
+    {"id": "async1_actor", "category": "async1_models", "query": "Actor моделі деген не?", "any_substring": ["erlang", "akka", "actix"]},
+    {"id": "async1_rust_unique", "category": "async1_models", "query": "Rust async ерекшелігі деген не?", "any_substring": ["zero-cost", "опционалды", "pin"]},
+    {"id": "async1_future", "category": "async1_basics", "query": "Future трейт деген не?", "any_substring": ["poll", "poll::ready", "executor"]},
+    {"id": "async1_async_fn", "category": "async1_basics", "query": "async fn деген не?", "any_substring": ["state machine", "impl future", "do nothing"]},
+    {"id": "async1_await", "category": "async1_basics", "query": ".await оператор деген не?", "any_substring": ["poll::pending", "cooperative", "async fn"]},
+    {"id": "async1_block", "category": "async1_basics", "query": "async block деген не?", "any_substring": ["async {", "тікелей беру", "async move"]},
+    {"id": "async1_move_closure", "category": "async1_basics", "query": "async move closure деген не?", "any_substring": ["иемдеуге алу", "tokio::spawn", "async move {"]},
+    {"id": "async1_futures_crate", "category": "async1_ecosystem", "query": "futures крейті деген не?", "any_substring": ["streamext", "join!", "boxfuture"]},
+    {"id": "async1_tokio", "category": "async1_ecosystem", "query": "tokio runtime деген не?", "any_substring": ["work-stealing", "epoll", "carl lerche"]},
+    {"id": "async1_async_std", "category": "async1_ecosystem", "query": "async-std runtime деген не?", "any_substring": ["std-ні зеркало", "compat", "smol"]},
+    {"id": "async1_fn_traits", "category": "async1_state", "query": "async fn in traits деген не?", "any_substring": ["rust 1.75", "gat", "async-trait"]},
+    {"id": "async1_closures", "category": "async1_state", "query": "async closures деген не?", "any_substring": ["async |x|", "asyncfn", "unstable"]}
+  ]
+}
