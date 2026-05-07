@@ -7,6 +7,54 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.86.5] — 2026-05-07 — Rust Book chapter 17 deepening — Rust-тың объектілі-бағытталған мүмкіндіктері
+
+Per-chapter pedagogical cadence continues. Chapter 17 reframes OOP for Rust: the language **is not a class-based OO language** — there are no classes, no inheritance, no method overriding. Instead, Rust offers an *engineering kit* that covers the same problem space (encapsulation, polymorphism, dynamic dispatch, state machines) with **trait objects**, **trait composition**, and **typestate via the type system**. Previously surface-level — only `dyn` listed as a stub. Now deepened with full curriculum.
+
+### What's added
+
+**18 new curated entries `rust_460…477`** in `programming_rust.jsonl`:
+
+**OOP concepts (4):** OO парадигмасы Rust-та (sum types replace inheritance), тұсаулау via `pub` boundaries (AveragedCollection example), Rust-та мұрагерлік жоқ (no `class A extends B`; trait composition + sum types instead), көп пішінділік (static via generics + monomorphisation, dynamic via `dyn Trait`).
+
+**Trait objects (5):** трейт-нысан (`Box<dyn Trait>` + `Screen { components: Vec<Box<dyn Draw>> }`), `dyn` кілтсөзі (Rust 2018 explicit syntax), `Vec<Box<dyn Trait>>` гетерогенді контейнер pattern, статикалық vs динамикалық таратпа (monomorphisation vs vtable lookup), vtable (16-byte fat pointer = data ptr + vtable ptr).
+
+**Object safety (3):** нысан-қауіпсіз трейт rules (`&self`/`&mut self`, no generic type params, no `Self` return), Clone не object-safe (returns `Self`, E0038 error, dyn-clone workaround), generic vs trait object choice (zero-cost vs plugin extensibility — serde::Serialize as case study).
+
+**Patterns (6):** күй үлгісі дәстүрлі (Draft → PendingReview → Published with `Box<dyn State>`), күй үлгісі типтік жүйе арқылы (DraftPost / PendingReviewPost / Post — typestate compile-time enforced), default trait method идиомасы (Summary trait with overridable default body, NewsArticle example), trait composition (`T: A + B + C` mix-and-match, no diamond), newtype pattern (Wrapper around Vec<String> for orphan rule + `Deref` ergonomics), GUI кітапхана үлгісі (Draw trait + Button/SelectBox + open-set extensibility).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_17_holdout.json` — 18 cases, 4 categories (`ch17_oop_concepts`, `ch17_trait_objects`, `ch17_object_safe`, `ch17_patterns`).
+- `crates/adam-dialog/tests/rust_book_chapter_17.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 29 compounds (18 subjects + 11 object hubs).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 17 holdout cases | ✅ 100 % |
+| Existing chapters 1-16 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **992 passing** (was 991; +1 chapter-17 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2767 → **2785** (+18) |
+| world_core facts | 3009 → **3027** (+18) |
+| Derived facts | 30876 → **30885** (+9) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.86.5** | **ch. 17** | **OOP features (this release)** |
+| v4.87.0 | ch. 18 | Patterns (advanced pattern matching) |
+| v4.87.5 | ch. 19 | Advanced features (unsafe / advanced traits / function pointers / macros) |
+| v4.88.0 | ch. 20 | Final project — multi-threaded web server |
+
 ## [4.86.0] — 2026-05-06 — Rust Book chapter 16 deepening — fearless concurrency
 
 Per-chapter pedagogical cadence continues. Chapter 16 introduces Rust's "fearless concurrency" — type-system + borrow-checker enforced thread safety where data races and use-after-free are **compile errors**, not runtime bugs. Previously surface-level — 1 stub for Arc. Now deepened with full curriculum.

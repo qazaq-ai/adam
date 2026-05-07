@@ -1,7 +1,7 @@
 {
-  "version": "4.85.5",
+  "version": "4.86.0",
   "status": "completed",
-  "elapsed_s": 70,
+  "elapsed_s": 65,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3009,
+    "facts_total": 3027,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2444,
+      "is_a": 2462,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 450,
+      "world_core/programming_rust.jsonl": 468,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -51937,6 +51937,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Data race compile-time prevention — `Rust`-тың ең күшті концурентті кепілдігі. **Анықтама:** жарыс шарты — екі+ ағын бір жадқа бір сәтте, кем дегенде біреуі жазып жатады. C/C++/Java-да тек оқу мен жазу қашан болатынын тексеру қиын — runtime undefined behavior. **`Rust`-тың шешімі:** қарыз ережелері (бір өзгермелі XOR көп тұрақты) + `Send`/`Sync` маркер трейттер компиляция кезінде тексереді. Жарыс шартына апаратын код — компиляция қатесі. Қорқынышсыз қатарлас орындау деңгейі: «егер код құрастырылса — жарыс шарты жоқ» (deadlock-тарды толық алмайды, бірақ data race-ты ұстайды)."
+    },
+    {
+      "subject": {
+        "surface": "оо парадигмасы rust-та",
+        "root": "оо парадигмасы rust-та",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust философиясы",
+        "root": "rust философиясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_460"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "ОО парадигмасы Rust-та — `Rust` объектілі-бағытталған тіл **емес**, бірақ көп ОО-үлгіні басқа жолдармен жасай алады. **Бар:** тұсаулау (`pub` арқылы), көп пішінділік (generics + trait objects). **Жоқ:** дәстүрлі мұрагерлік (`class A extends B`). Ұстаным: «бар проблеманы шеш — нақты механизмді қолдан, парадигма емес». ОО-парадигмадан бір реттік өзгешелік: `Rust`-та класс жоқ — `struct` + `impl` бірге классқа ұқсас рөл атқарады, бірақ типтік жүйе әртүрлі (sum type / енам, лайфтайм, иелік ережелері)."
+    },
+    {
+      "subject": {
+        "surface": "тұсаулау rust-та",
+        "root": "тұсаулау rust-та",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оо тұжырымдамасы",
+        "root": "оо тұжырымдамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_461"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тұсаулау (encapsulation) Rust-та — нысанның ішкі мәліметтерін сыртқа жасырын ұстау. `Rust`-та `pub` модификаторы: жасырын өрістер `pub` емес, ашық интерфейс — `pub fn`. Мысалы: `pub struct AveragedCollection { list: Vec<i32>, average: f64 } impl AveragedCollection { pub fn add(...) { ... } pub fn average(&self) -> f64 { self.average } fn update_average(&mut self) { ... } }`. Сыртқы код `add` / `average` арқылы ғана жұмыс істейді; ішкі `update_average` — жасырын. Орташа мән үнемі дұрыс ұсталынуын — типке жауапкершілік. Толық ОО-парадигмаға сай."
+    },
+    {
+      "subject": {
+        "surface": "rust-та мұрагерлік жоқ",
+        "root": "rust-та мұрагерлік жоқ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust философиясы",
+        "root": "rust философиясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_462"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Rust-та мұрагерлік жоқ — `class A extends B` сияқты конструкция жоқ. **Себеп — саналы дизайн:** (1) мұрагерлік жиі шамадан көп бөлектерді біріктіреді (`A`-ға тек бір әдіс керек, бірақ бәрі келеді); (2) иерархиясы қатаюы — уақыт өте өзгерту қиын. **Rust альтернативалары:** (1) **trait + default методтар** — trait-те әдістерге әдепкі дене, тип оны қолданады немесе ауыстырады; (2) **trait composition** — `T: A + B` — бір тип бірнеше trait-ті бекітеді; (3) **trait objects** — әр түрлі типтерді бір интерфейс арқылы біріктіру. Бұлар бірге — мұрагерліктің пайдалы жақтарын береді, тіке иерархиясыз."
+    },
+    {
+      "subject": {
+        "surface": "көп пішінділік rust-та",
+        "root": "көп пішінділік rust-та",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оо тұжырымдамасы",
+        "root": "оо тұжырымдамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_463"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Көп пішінділік (polymorphism) Rust-та — бір интерфейспен әр түрлі типтерді ұстау. Көп ОО тілдерде ол тек мұрагерлікпен; `Rust`-та екеуі бөлек. **Екі түрі:** **(1) Статикалық полиморфизм** — generics (`<T: Trait>`), компиляцияда мономорфтау, шығынсыз; **(2) Динамикалық полиморфизм** — trait objects (`Box<dyn Trait>`), орындалу кезінде vtable арқылы таратпа, бірінде кідіріс бар. Қашан қайсысын: бір типтегі ұжым → generic (жылдамырақ); бірнеше типтерді біріктіру керек → trait object (икемдірек)."
+    },
+    {
+      "subject": {
+        "surface": "трейт-нысан",
+        "root": "трейт-нысан",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust механизмі",
+        "root": "rust механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_464"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Трейт-нысан (trait object) — әр түрлі типтегі мәндерді бір интерфейс арқылы біріктіру механизмі. Синтаксис: `Box<dyn Draw>` — «`Draw` трейтін бекітетін қандай да бір тип; нақты типі компиляцияда белгісіз». **Қолдану:** `pub struct Screen { pub components: Vec<Box<dyn Draw>> }`. `components` — `Button`, `SelectBox`, `TextField` — бәрін бір ұжымға жинай алады. `screen.run()` ішінде `component.draw()` шакырылғанда — vtable арқылы дұрыс іске асыру табылады. **Альтернативалары:** `&dyn Draw` (сілтеме), `Rc<dyn Draw>` (shared), `Arc<dyn Draw>` (thread-safe shared)."
+    },
+    {
+      "subject": {
+        "surface": "dyn кілтсөзі",
+        "root": "dyn кілтсөзі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust кілтсөзі",
+        "root": "rust кілтсөзі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_465"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`dyn` кілтсөзі — динамикалық таратпаны (dynamic dispatch) білдіретін Rust кілтсөзі. `Box<dyn Trait>`, `&dyn Trait`, `Rc<dyn Trait>` — барлығы trait object. **Семантика:** «компиляция кезінде нақты тип белгісіз; орындалу кезінде vtable арқылы таңдалады». **Қарама-қарсы:** `Box<T>` (T нақты тип, мономорфтау, vtable жоқ); `<T: Trait>` (generics, мономорфтау). **Тарих:** `dyn` кілтсөзі Rust 2018 басылымында ашыққа қойылды — бұрын `Box<Trait>` мен `Box<dyn Trait>` бір нәрсе еді (ескі стиль deprecated). Қазір `dyn` міндетті — оқуға анығырақ."
+    },
+    {
+      "subject": {
+        "surface": "vec<box<dyn trait>>",
+        "root": "vec<box<dyn trait>>",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait object идиомасы",
+        "root": "trait object идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_466"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Vec<Box<dyn Trait>>` гетерогенді ұжым — әр түрлі типтегі элементтерді бір ұжымға жинау идиомасы. Шектеу: барлық элементтер бір trait-ті бекіту керек. Мысалы, GUI кітапханада: `let components: Vec<Box<dyn Draw>> = vec![Box::new(Button { ... }), Box::new(SelectBox { ... }), Box::new(TextField { ... })];`. Әр элемент әртүрлі тип, бірақ бәрі `Draw` бекіткен. Цикл ішінде `for c in &components { c.draw() }` — vtable арқылы дұрыс іске асыру шакырылады. **Альтернатива:** энум — `enum Component { Button(Button), SelectBox(SelectBox), ... }` — компиляцияда бекітілген түрлер жинағы (open-closed айырмашылық)."
+    },
+    {
+      "subject": {
+        "surface": "статикалық vs динамикалық таратпа",
+        "root": "статикалық vs динамикалық таратпа",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust шешімі",
+        "root": "rust шешімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_467"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Статикалық vs динамикалық таратпа айырмашылығы. **Статикалық (generics, `<T: Trait>`):** компилятор әр нақты тип үшін бөлек код шығарады (мономорфтау); орындалу кезінде ешбір қосымша таратпа жоқ — қолмен жазылған код жылдамдығымен бірдей. **Кемшілік:** binary үлкейеді, бір ұжымға бірнеше тип сыйғызу мүмкін емес. **Динамикалық (trait objects, `Box<dyn Trait>`):** компиляцияда тек vtable айналасы, орындалу кезінде vtable арқылы дұрыс әдіс табылады. **Кемшілік:** vtable шакыруы кідірісі (бірнеше нс), компилятор оптимизация жасай алмайды (inlining мүмкін емес). **Идиома:** өнімділік критикалық — generics; икемділік критикалық — trait objects."
+    },
+    {
+      "subject": {
+        "surface": "vtable",
+        "root": "vtable",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust механизмі",
+        "root": "rust механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_468"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Vtable (виртуалды кесте) — динамикалық таратпаны жүзеге асыратын ішкі құрылым. Әр trait object жадта **екі көрсеткіштен** тұрады: (1) нақты деректерге; (2) **vtable**-ке. Vtable — функция көрсеткіштерінің кестесі, әр trait әдісі үшін бір slot. `component.draw()` шакырылғанда: компилятор vtable-дегі `draw` slot-нан функция көрсеткішін алып, оны шакырады. **Жадта:** `Box<dyn Draw>` — 16 байт (8 + 8 на 64-битте); `Box<Button>` — 8 байт. Сондықтан trait objects кейде «fat pointer» деп аталады. `dyn` шакыруларын CPU branch predictor оңай оптимизирлей алмайды."
+    },
+    {
+      "subject": {
+        "surface": "нысан-қауіпсіз трейт",
+        "root": "нысан-қауіпсіз трейт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait ережесі",
+        "root": "trait ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_469"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Нысан-қауіпсіз трейттер (object-safe traits) — trait-objects-та қолдануға келетін trait-тер. **Ережелер:** (1) барлық әдістер `&self` немесе `&mut self`-пен басталу керек; (2) әдістерде generic тип параметрлері болмауы керек (`fn foo<T>(&self, t: T)` — emes); (3) әдіс `Self`-ті қайтару керек емес (`fn clone(&self) -> Self` — emes). **Себеп:** vtable әр әдіс үшін бір slot ұстайды; generic әдіс мономорфтау керек, ол vtable-ге сыйғызылмайды. **Шешім нысан-қауіпсіз емес trait-ке:** trait-ті бөлектеу — бір нысан-қауіпсіз бөлік, бір — emes; немесе generics қолдану."
+    },
+    {
+      "subject": {
+        "surface": "clone нысан-қауіпсіз емес",
+        "root": "clone нысан-қауіпсіз емес",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait шектеуі",
+        "root": "trait шектеуі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_470"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Clone trait нысан-қауіпсіз емес — `Clone::clone(&self) -> Self` әдісі `Self`-ті қайтарады. `Box<dyn Clone>` мүмкін емес — компилятор қате шығарады: `error[E0038]: the trait `Clone` cannot be made into an object`. **Себеп:** `Self` нақты тип болуы керек, бірақ trait object-та нақты тип белгісіз. **Шешім:** жекелеген клон-trait жасау: `pub trait CloneBox { fn clone_box(&self) -> Box<dyn MyTrait>; }` — қайтару типі нақты (`Box<dyn MyTrait>`), `Self` емес. Содан кейін `MyTrait: CloneBox` етіп жариялау. Болмаса `dyn-clone` сандығын қолдану."
+    },
+    {
+      "subject": {
+        "surface": "generic vs trait object таңдау",
+        "root": "generic vs trait object таңдау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust шешімі",
+        "root": "rust шешімі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_471"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Generic vs trait object таңдау — Rust ОО-дизайнының басты сұрағы. **Generic (`<T: Trait>`)** қашан: (1) бір ұжым бір типте; (2) өнімділік критикалық; (3) inlining керек. **Trait object (`Box<dyn Trait>`)** қашан: (1) бірнеше типті біріктіру керек; (2) plugin-стиль архитектурасы (cargo-да subcommand-тар сияқты); (3) типтердің тізімі компиляция кезінде белгісіз. **Қос-нышан:** library код (мысалы, `serde::Serialize`) — generics, икемділік + zero-cost; runtime-да ашылатын архитектура — trait objects. Идиома: алдымен generics; trait object тек шынында әртүрлі типтер керек болғанда."
+    },
+    {
+      "subject": {
+        "surface": "күй үлгісі дәстүрлі",
+        "root": "күй үлгісі дәстүрлі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оо паттерні",
+        "root": "оо паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_472"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күй үлгісі (state pattern) дәстүрлі ОО-да — нысанның мінез-құлқы оның ішкі күйіне байланысты ауысуын білдіреді. Әр күй өз ережесін ұстайды; өту — басқа күй-нысанға ауысу. Мысалы, блог пост: **Draft** (жоба) → **PendingReview** (тексеруде) → **Published** (жарияланған). Әр күйде «жариялау» командасы әр түрлі әрекет жасайды. **Rust трад нұсқа:** `Post` структы `Option<Box<dyn State>>` ұстайды; әр әдіс күйге сұрайды, күй-нысан жаңа күй қайтарады. **Кемшілік:** runtime тексерулер; код өздігінен қателерден қорғалмайды."
+    },
+    {
+      "subject": {
+        "surface": "күй үлгісі типтік жүйе арқылы",
+        "root": "күй үлгісі типтік жүйе арқылы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust паттерні",
+        "root": "rust паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_473"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күй үлгісі типтік жүйе арқылы (Rust idiomatic) — әр күй жеке тип; ауысулар — конструкторлар. Мысалы: `struct DraftPost { content: String }`; `struct PendingReviewPost { content: String }`; `struct Post { content: String }`. `DraftPost::new()` → `DraftPost`. `draft.request_review()` → `PendingReviewPost`. `pending.approve()` → `Post`. **Күші:** компилятор кепілдендіреді — `Post` (жарияланған) ғана `content` көрсете алады; `DraftPost`-та `content` әдісі **жоқ**. Қателер компиляцияда ұсталады, runtime емес. Идиома: «зеттестіру» (typestate) — Rust-та танымал паттерн."
+    },
+    {
+      "subject": {
+        "surface": "default trait method идиомасы",
+        "root": "default trait method идиомасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мұрагерлік алмасы",
+        "root": "мұрагерлік алмасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_474"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Default trait method — мұрагерліктің балама механизмі. Trait ішінде әдіске **әдепкі дене** жазып, бекітіп алған тип оны қолданады немесе ауыстырады. Мысалы: `pub trait Summary { fn summarize(&self) -> String { String::from(\"(Толық емес...)\") } }`. `impl Summary for NewsArticle {}` — бос блок, әдепкіні алады. `impl Summary for Tweet { fn summarize(&self) -> String { format!(\"...\") } }` — ауыстырады. **Артықшылық:** «share code by default; override when needed» — мұрагерлікке ұқсас, бірақ типке тіркелмеген. Trait — interface + ішінара іске асыру; нақты тип — қалғанын бекітеді."
+    },
+    {
+      "subject": {
+        "surface": "trait composition",
+        "root": "trait composition",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мұрагерлік алмасы",
+        "root": "мұрагерлік алмасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_475"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Trait composition (трейттер композициясы) — `T: A + B + C` — бір тип бірнеше trait-ті бекіту. Мұрагерліктің тағы бір алмасы. Мысалы: `fn print_serialized<T: Serialize + Debug>(item: &T)`. **Артықшылық:** mix-and-match — әр функцияға тек керекті trait-терді тіркеу. Java-дан айырмашылық: Java-да тек **бір** ата-классы (single inheritance) — мысалы `extends LoggableBase` сияқты artificial супер-классқа ығыстырылу керек. Rust-та `T: Loggable + Cloneable + ...` — еркін композиция, иерархия қажет емес. **Идиома:** trait-терді кішкене ұстау — әрқайсысы бір ғана нәрсені істесін; үлкен функционалдық trait composition арқылы құрылады."
+    },
+    {
+      "subject": {
+        "surface": "newtype pattern",
+        "root": "newtype pattern",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust паттерні",
+        "root": "rust паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_476"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Newtype pattern (жаңа-тип паттерні) — бар типке өзіңіздің trait-ті бекіту үшін wrapper жасау. Орфан-ереже: трейтті типке тек өзіңіздің сандығыңыздағы trait болса немесе типтің өзі сіздікі болса ғана бекіте аласыз. Шешім — wrapper struct: `struct Wrapper(Vec<String>); impl Display for Wrapper { ... }`. Енді `Wrapper`-ге `Display` бекітіп, оны қолдана аласыз. **Қашан керек:** `Display` сияқты сыртқы trait-ті `Vec<T>` сияқты сыртқы типке бекіту керек. **Кемшілік:** wrapper-ге арналған бар әдістерді қолдану үшін `Deref` бекіту керек немесе ашық `inner.method()` шакыру."
+    },
+    {
+      "subject": {
+        "surface": "gui кітапхана үлгісі",
+        "root": "gui кітапхана үлгісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait object идиомасы",
+        "root": "trait object идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_477"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "GUI кітапхана үлгісі — chapter 17-нің классикалық мысалы. Мақсат: түрлі компоненттерді (Button, SelectBox, TextField) бір ұжымда ұстау, әрқайсысында `draw()` әдісі. Шешім: `trait Draw { fn draw(&self); }` + әр компонент `impl Draw for X` + `Vec<Box<dyn Draw>>`. Цикл: `for c in &components { c.draw() }` — әр компоненттің өзінің іске асыруы шакырылады. **Балама:** энум `enum Component { Button(Button), SelectBox(SelectBox), ... }` + `match` — тип-жинағы бекітілген (closed-set), компиляцияда оптимизирленеді, бірақ үшінші тарап жаңа компонент қоса алмайды. Trait objects — open-set, кеңейтілмелі."
     },
     {
       "subject": {

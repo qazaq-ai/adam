@@ -1,0 +1,27 @@
+{
+  "_comment": "v4.86.5 — Rust Book Chapter 17 (Rust-тың объектілі-бағытталған мүмкіндіктері) holdout. 18 natural Kazakh queries against rust_460…477. Categories: ch17_oop_concepts (OOP in Rust, encapsulation, no inheritance, polymorphism), ch17_trait_objects (trait object, dyn, Vec<Box<dyn>>, static vs dynamic dispatch, vtable), ch17_object_safe (object-safe rules, Clone counterexample, generic vs trait object choice), ch17_patterns (state pattern traditional, state pattern via type system, default trait method, trait composition, newtype pattern, GUI library example).",
+  "version": "v4.86.5",
+  "captured_date": "2026-05-06",
+  "chapter": 17,
+  "chapter_title": "Rust-тың объектілі-бағытталған мүмкіндіктері (OOP / trait objects / state pattern / typestate)",
+  "cases": [
+    {"id": "ch17_oop", "category": "ch17_oop_concepts", "query": "ОО парадигмасы Rust-та деген не?", "any_substring": ["объектілі-бағытталған тіл", "класс жоқ", "sum type"]},
+    {"id": "ch17_encapsulation", "category": "ch17_oop_concepts", "query": "Тұсаулау Rust-та деген не?", "any_substring": ["pub", "averagedcollection", "ішкі"]},
+    {"id": "ch17_no_inheritance", "category": "ch17_oop_concepts", "query": "Rust-та мұрагерлік жоқ деген не?", "any_substring": ["class a extends b", "иерархия", "trait composition"]},
+    {"id": "ch17_polymorphism", "category": "ch17_oop_concepts", "query": "Көп пішінділік Rust-та деген не?", "any_substring": ["статикалық", "динамикалық", "мономорфтау"]},
+    {"id": "ch17_trait_object", "category": "ch17_trait_objects", "query": "Трейт-нысан деген не?", "any_substring": ["box<dyn draw>", "screen", "vtable"]},
+    {"id": "ch17_dyn", "category": "ch17_trait_objects", "query": "dyn кілтсөзі деген не?", "any_substring": ["dynamic dispatch", "rust 2018", "deprecated"]},
+    {"id": "ch17_heterogeneous_vec", "category": "ch17_trait_objects", "query": "Vec<Box<dyn Trait>> деген не?", "any_substring": ["гетерогенді", "button", "open-closed"]},
+    {"id": "ch17_dispatch", "category": "ch17_trait_objects", "query": "Статикалық vs динамикалық таратпа деген не?", "any_substring": ["мономорфтау", "vtable", "inlining"]},
+    {"id": "ch17_vtable", "category": "ch17_trait_objects", "query": "vtable деген не?", "any_substring": ["fat pointer", "виртуалды кесте", "16 байт"]},
+    {"id": "ch17_object_safe", "category": "ch17_object_safe", "query": "Нысан-қауіпсіз трейт деген не?", "any_substring": ["&self", "generic тип параметрлері болмауы", "self"]},
+    {"id": "ch17_clone_not_safe", "category": "ch17_object_safe", "query": "Clone нысан-қауіпсіз емес деген не?", "any_substring": ["self-ті қайтарады", "e0038", "dyn-clone"]},
+    {"id": "ch17_choice", "category": "ch17_object_safe", "query": "Generic vs trait object таңдау деген не?", "any_substring": ["serde::serialize", "plugin", "zero-cost"]},
+    {"id": "ch17_state_traditional", "category": "ch17_patterns", "query": "Күй үлгісі дәстүрлі деген не?", "any_substring": ["draft", "pendingreview", "published"]},
+    {"id": "ch17_state_typestate", "category": "ch17_patterns", "query": "Күй үлгісі типтік жүйе арқылы деген не?", "any_substring": ["draftpost", "typestate", "компиляцияда"]},
+    {"id": "ch17_default_method", "category": "ch17_patterns", "query": "Default trait method идиомасы деген не?", "any_substring": ["әдепкі дене", "newsarticle", "share code by default"]},
+    {"id": "ch17_trait_composition", "category": "ch17_patterns", "query": "Trait composition деген не?", "any_substring": ["t: a + b + c", "single inheritance", "mix-and-match"]},
+    {"id": "ch17_newtype", "category": "ch17_patterns", "query": "Newtype pattern деген не?", "any_substring": ["wrapper", "орфан-ереже", "deref"]},
+    {"id": "ch17_gui", "category": "ch17_patterns", "query": "GUI кітапхана үлгісі деген не?", "any_substring": ["draw", "selectbox", "open-set"]}
+  ]
+}
