@@ -2145,6 +2145,32 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     ".await in expressions",
     "async fn return type",
     "opaque return type",
+    // **v4.90.0** — Rust Async Book chapter 4 (Pinning — Pin + Unpin + self-referential structs) deepening.
+    // rust_586…603 — 18 entries covering why-pin (4),
+    // Pin type basics (5), Pin storage (3), Pin projections (3),
+    // Pin in Future (3).
+    // Subjects.
+    "self-referential struct",
+    "move-and-corrupt",
+    "self-referential state machine",
+    "pin шешімі",
+    "pin<p> wrapper",
+    "unpin auto-trait",
+    "!unpin types",
+    "pin::new",
+    "pin::new_unchecked",
+    "box::pin",
+    "pin! macro",
+    "pin<&mut t>",
+    "field projection",
+    "structural pinning",
+    "pin::map_unchecked_mut",
+    "poll pin signature",
+    "get_mut get_unchecked_mut",
+    "pinning rules summary",
+    // Objects.
+    "rust мәселесі",
+    "rust трейті",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

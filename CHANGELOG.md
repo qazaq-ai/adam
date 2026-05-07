@@ -7,6 +7,58 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.90.0] — 2026-05-07 — Rust Async Book chapter 4 deepening — Pinning (Pin + Unpin + self-referential structs)
+
+Per-chapter pedagogical cadence continues. Chapter 4 — **the most subtle topic in Rust** — explains Pin: the safety mechanism that makes async fn state machines sound. The chapter walks from the underlying problem (self-referential structs + move-and-corrupt UB) to the wrapper type (`Pin<P>`), the `Unpin` auto-trait that lets most types ignore Pin entirely, the storage forms (Box::pin, pin!, Pin<&mut T>), the projection problem (and pin-project crate), and back to the Future::poll signature where Pin is mandatory.
+
+### What's added
+
+**18 new curated entries `rust_586…603`** in `programming_rust.jsonl`:
+
+**Why Pin (4):** self-referential struct проблемасы (Buffer with self-pointer + UB on move), move-and-corrupt сценарийі (`String`/`Vec` heap-pointer is OK; `*const u8`/`&self.field` is NOT), async fn → self-referential state machine (the actual reason Pin exists), Pin шешімі (move-prohibition wrapper).
+
+**Pin type basics (5):** `Pin<P>` wrapper (`P: Deref` + `Box`/`&mut`/`Rc`/`Arc` forms), Unpin auto-trait (most types are Unpin; primitives + std types + simple structs), !Unpin types (async fn state machine compiler-marked + PhantomPinned manual marker), `Pin::new` (safe constructor, requires Unpin), `Pin::new_unchecked` (unsafe, any T, caller upholds invariant).
+
+**Pin storage (3):** `Box::pin` (heap allocation + `Pin<Box<T>>` + tokio::spawn internal pattern), `pin!` macro (Rust 1.68+ stable + stack pinning + no-heap-cost), `Pin<&mut T>` (Future::poll's self type + get_mut/get_unchecked_mut).
+
+**Pin projections (3):** field projection problem (Pin<&mut Struct> → Pin<&mut Field> is non-trivial), structural pinning + pin-project crate (`#[pin_project]` + `#[pin]` per-field + `pinned.project()`), `Pin::map_unchecked_mut` (manual unsafe projection — pin-project does it correctly so don't write by hand).
+
+**Pin in Future (3):** `fn poll(self: Pin<&mut Self>, cx)` rationale (Pin in signature = «poll won't move me» contract), `get_mut()` vs `get_unchecked_mut()` (safe-Unpin vs unsafe-any-T), pinning rules summary (3-rule mental model: move sakhtau + drop must run + Unpin escape hatch).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_async_book_chapter_04_holdout.json` — 18 cases, 5 categories (`async4_motivation`, `async4_pin_basics`, `async4_storage`, `async4_projections`, `async4_in_future`).
+- `crates/adam-dialog/tests/rust_async_book_chapter_04.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 20 compounds (18 subjects + 2 object hubs `rust мәселесі`, `rust трейті`).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 async-chapter-4 holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book chapters 1-3 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **999 passing** (was 998; +1 async-chapter-4 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2893 → **2911** (+18) |
+| world_core facts | 3135 → **3153** (+18) |
+| Derived facts | 30863 → **30899** (+36) |
+
+### Roadmap (next — Async Book)
+
+| Release | Async Book Chapter | Topic |
+|---|---|---|
+| **v4.90.0** | **ch. 4** | **Pinning (this release)** |
+| v4.90.5 | ch. 5 | Streams (Stream trait + StreamExt) |
+| v4.91.0 | ch. 6 | Executing multiple futures — join! / try_join! / select! |
+| v4.91.5 | ch. 7 | Workarounds (Send + recursion + traits) |
+| v4.92.0 | ch. 8 | The Async ecosystem (tokio vs async-std deep) |
+| v4.92.5 | ch. 9 | Final project — async HTTP server |
+
 ## [4.89.5] — 2026-05-07 — Rust Async Book chapter 3 deepening — async/await primer (state machine + lifetimes + async move)
 
 Per-chapter pedagogical cadence continues. Chapter 3 — the async/await primer — was a short surface-overview chapter in the official book, but the underlying mechanics it touches are foundational. Deepened with full curriculum: state-machine code generation, async lifetime semantics (`'async` rule, elision, ref-returning, ref-parameter), async move ownership transfer, .await as syntax (not method), and async return-type semantics (opaque `impl Future`).

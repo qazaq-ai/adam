@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.90.0 — Rust Async Book Chapter 4 (Pinning — Pin + Unpin + self-referential structs) holdout. 18 natural Kazakh queries against rust_586…603. Categories: async4_motivation (self-referential struct + move-and-corrupt + async fn state machine self-ref + Pin solution), async4_pin_basics (Pin<P> wrapper + Unpin + !Unpin types + Pin::new + Pin::new_unchecked), async4_storage (Box::pin + pin! macro + Pin<&mut T>), async4_projections (field projection + pin-project + map_unchecked_mut), async4_in_future (poll signature + get_mut/get_unchecked_mut + 3-rule summary).",
+  "version": "v4.90.0",
+  "captured_date": "2026-05-07",
+  "book": "Rust Async Book",
+  "chapter": 4,
+  "chapter_title": "Pinning — Pin + Unpin + self-referential structs",
+  "cases": [
+    {"id": "async4_self_ref", "category": "async4_motivation", "query": "Self-referential struct деген не?", "any_substring": ["buf.current", "buf.data.as_ptr", "ub"]},
+    {"id": "async4_move_corrupt", "category": "async4_motivation", "query": "Move-and-corrupt деген не?", "any_substring": ["байт-көшіру", "ескі көрсеткіш", "pin типінің"]},
+    {"id": "async4_state_self_ref", "category": "async4_motivation", "query": "Self-referential state machine деген не?", "any_substring": ["sleep(1).await", "&'self s", "future poll-ы pin"]},
+    {"id": "async4_solution", "category": "async4_motivation", "query": "Pin шешімі деген не?", "any_substring": ["wrapper", "memory move", "!unpin"]},
+    {"id": "async4_wrapper", "category": "async4_pin_basics", "query": "Pin<P> wrapper деген не?", "any_substring": ["p: deref", "pin<box<t>>", "get_mut"]},
+    {"id": "async4_unpin", "category": "async4_pin_basics", "query": "Unpin auto-trait деген не?", "any_substring": ["marker трейт", "i32", "phantompinned"]},
+    {"id": "async4_not_unpin", "category": "async4_pin_basics", "query": "!Unpin types деген не?", "any_substring": ["async fn state machine", "phantompinned", "box::pin"]},
+    {"id": "async4_pin_new", "category": "async4_pin_basics", "query": "Pin::new деген не?", "any_substring": ["t: unpin", "тривиалды", "pin::new арқылы"]},
+    {"id": "async4_pin_new_unchk", "category": "async4_pin_basics", "query": "Pin::new_unchecked деген не?", "any_substring": ["unsafe", "ешқашан move", "mem::swap"]},
+    {"id": "async4_box_pin", "category": "async4_storage", "query": "Box::pin деген не?", "any_substring": ["heap аллокациялайды", "dyn future", "tokio::spawn"]},
+    {"id": "async4_pin_macro", "category": "async4_storage", "query": "pin! macro деген не?", "any_substring": ["std::pin::pin", "stack-те", "rust 1.68"]},
+    {"id": "async4_pin_mut", "category": "async4_storage", "query": "Pin<&mut T> деген не?", "any_substring": ["future::poll", "self.get_mut", "self.get_unchecked_mut"]},
+    {"id": "async4_field_proj", "category": "async4_projections", "query": "Field projection деген не?", "any_substring": ["pin<&mut struct>", "pin-project", "&mut pinned.a"]},
+    {"id": "async4_pin_project", "category": "async4_projections", "query": "Structural pinning деген не?", "any_substring": ["pin_project", "#[pin]", "pinned.project()"]},
+    {"id": "async4_map_unchk", "category": "async4_projections", "query": "Pin::map_unchecked_mut деген не?", "any_substring": ["fnonce", "&mut s.inner", "pin-project"]},
+    {"id": "async4_poll_pin", "category": "async4_in_future", "query": "Poll pin signature деген не?", "any_substring": ["self-referential өрістер", "executor", "тұрақты адресте"]},
+    {"id": "async4_get_mut", "category": "async4_in_future", "query": "get_mut get_unchecked_mut деген не?", "any_substring": ["t: unpin", "this.done", "field мутация"]},
+    {"id": "async4_rules", "category": "async4_in_future", "query": "Pinning rules summary деген не?", "any_substring": ["3-ереже", "drop must run", "pin-project"]}
+  ]
+}

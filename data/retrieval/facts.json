@@ -1,7 +1,7 @@
 {
-  "version": "4.89.0",
+  "version": "4.89.5",
   "status": "completed",
-  "elapsed_s": 71,
+  "elapsed_s": 31,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3135,
+    "facts_total": 3153,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2570,
+      "is_a": 2588,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 576,
+      "world_core/programming_rust.jsonl": 594,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -54457,6 +54457,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Opaque return type — `impl Trait` синтаксисі — қайтарылатын **нақты типті жасыру**, тек оның қолдайтын трейтерін көрсету. `fn make_iter() -> impl Iterator<Item = u32> { (0..10).map(|x| x * 2) }` — қалаушыда `make_iter()` нәтижесінің типі белгісіз, тек `Iterator<Item = u32>` екенін біледі. **async-та:** `async fn foo() -> u32` шынында `fn foo() -> impl Future<Output = u32>` — opaque return type. **Шектеу:** `impl Trait`-пен қайтарылатын тип бір функциядан тек **бір** болуы керек — шартты қайтару үшін `Box<dyn Trait>` керек. Әсер: монолитті state machine — әр async fn-нің state machine-і өзіндік, бөлек тип; tokio оларды dyn-арқылы жинайды (`BoxFuture`)."
+    },
+    {
+      "subject": {
+        "surface": "self-referential struct",
+        "root": "self-referential struct",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_586"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Self-referential struct проблемасы — структураның бір өрісі сол құрылымның басқа өрісіне сілтейді. Мысал: `struct Buffer { data: Vec<u8>, current: *const u8 } let mut buf = Buffer { data: vec![1,2,3], current: ptr::null() }; buf.current = buf.data.as_ptr();`. Енді `buf.current` `buf.data`-ның ішкі көрсеткішіне сілтейді. **Проблема:** `buf`-ты move қылсақ — мысалы `let buf2 = buf;` — `data` Vec-нің ішкі pointer-і де көшеді (Vec-ң heap аллокациясы — Cu, бірақ `current` ескі көрсеткіш-те қалады, дұрыс емес жадтан оқиды → UB). Стандартты Rust қарапайым типтерде self-referential struct жасауға тыйым салады; бірақ async fn state machine-да олар ішкі түрде пайда болады."
+    },
+    {
+      "subject": {
+        "surface": "move-and-corrupt",
+        "root": "move-and-corrupt",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_587"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Move-and-corrupt сценарийі — Rust-та `move` семантикасы: айнымалыны жаңа орынға тасу = байт-көшіру + ескі орын invalid. Қарапайым типтер үшін бұл қауіпсіз: `String`, `Vec<T>` — heap-ке сілтейді, heap pointer-і де көшіріледі — ішкі data орнында тұр. **Бірақ** self-referential struct: `struct S { a: u8, p: *const u8 }` мұнда `p = &self.a`. Move кезінде: жаңа орын `S2`; `S2.a` мен `S2.p` те көшірілді, бірақ `S2.p` әлі де ескі `S.a`-ға сілтейді (өшкен)! Деректер бұзылды (corrupt). Шешім — кей типтерді мүлдем move жасамау. Бұл — Pin типінің тірі мақсаты."
+    },
+    {
+      "subject": {
+        "surface": "self-referential state machine",
+        "root": "self-referential state machine",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust механизмі",
+        "root": "rust механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_588"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Async fn → self-referential state machine — `async fn` ішінде локалды айнымалы + сол айнымалыға сілтеме `.await` арасында тірі болса — компилятор state machine-де өрістер арасында сілтеме жасайды. Мысал: `async fn foo() { let s = String::from(\"hello\"); let r = &s; sleep(1).await; println!(\"{r}\"); }` — `s` мен `r = &s` екеуі де `sleep().await` арасында тірі. Компилятор state machine: `enum Foo { Start, AfterSleep { s: String, r: &'self s } }` — `r` өрісі дәл сол state-тағы `s`-ке сілтейді. **Қауіп:** state machine-ді move жасасақ → `r` ескі `s`-ке сілтейді → UB. Сондықтан Future poll-ы Pin талап етеді — Future-ды бекітіп, move-тан қорғау."
+    },
+    {
+      "subject": {
+        "surface": "pin шешімі",
+        "root": "pin шешімі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust механизмі",
+        "root": "rust механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_589"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Pin шешімі — мәнді жадтан жылжытуға тыйым салатын тип. `Pin<P>` — `P` (мысалы, `Box<T>` немесе `&mut T`) айналасындағы wrapper; ішіндегі `T`-ні move жасауға тыйым салады. Логика: «егер move мүмкін болмаса, ішкі pointer-лер дұрыс жұмыс істеп тұра береді». Pin **жадта орын ауыстыруды** (memory move) тыйым салады, бірақ value-ні модификациялауды (mutation) тыйым салмайды — тек address тұрақты болуы керек. **Қашан керек:** `!Unpin` типтерге (async fn state machine, генераторлар, кейбір кітапханалық типтер). **Қашан керек емес:** қарапайым типтер (барлығы дерлік `Unpin` — Pin олардың семантикасын өзгертпейді)."
+    },
+    {
+      "subject": {
+        "surface": "pin<p> wrapper",
+        "root": "pin<p> wrapper",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_590"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Pin<P>` wrapper — `P: Deref` шартын қанағаттандыратын кез-келген pointer типін орай алатын generic. Кең таралған формалар: `Pin<Box<T>>` (heap-те бекітілген), `Pin<&mut T>` (stack/heap-те бекітілген mutable ref), `Pin<Rc<T>>`, `Pin<Arc<T>>`. **Шектеулер:** Pin-нен `&mut T`-ні шығару тек `T: Unpin` болғанда қауіпсіз (`Pin::get_mut` арқылы). Әйтпесе тек `Pin::get_unchecked_mut` (unsafe) бар. **Маңызды:** Pin өзі тек pointer-ді орайды — egementі (data) move-дан қорғайды, оны шынайы deref етіп қана. Pin-ді тікелей жасау — `Pin::new(box)` (safe, Unpin) немесе `Pin::new_unchecked(box)` (unsafe, кез-келген T)."
+    },
+    {
+      "subject": {
+        "surface": "unpin auto-trait",
+        "root": "unpin auto-trait",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust трейті",
+        "root": "rust трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_591"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Unpin auto-trait — «менің жадтан жылжуыма қарсы емеспін» дегенді білдіретін marker трейт. Барлық примитивті типтер (`i32`, `bool`, `f64`), стандартты типтер (`String`, `Vec<T>`, `Box<T>`, `Rc<T>`), қарапайым structs (Unpin өрістерінен тұратын) — авто-Unpin. Compiler оны `Send` пен `Sync` сияқты автоматты іске асырады. **Әсер:** `T: Unpin` болса — `Pin<&mut T>` мен `&mut T` арасында ауысу қауіпсіз; `Pin::new()` де солай (Unpin талап етеді). Қашан `!Unpin`: ішінде self-referential өріс бар тип (мысалы, генератор, async fn state machine), немесе ашық `PhantomPinned` өріс — программист «мен Unpin емеспін» деп нақты белгіледі."
+    },
+    {
+      "subject": {
+        "surface": "!unpin types",
+        "root": "!unpin types",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_592"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "!Unpin types — Pin қажет ететін типтер. (1) **Async fn state machine** — компилятор `!Unpin` етеді (self-referential өрістер мүмкін); (2) **Generators** — әлі unstable, бірақ концепт сай; (3) **PhantomPinned өрісі бар struct** — қолмен `!Unpin` ету үшін: `struct Foo { _pin: PhantomPinned, data: ... }`. PhantomPinned — нөлдік-өлшем маркер, бірақ ол struct-қа `!Unpin` орнатады. **Қолданушы перспективасы:** `!Unpin` тип — оны Pin-ден тыс қолдану шектеулі. Әдетте `Box::pin(value)` арқылы heap-те бекітіп қолданасыз: `let f = Box::pin(my_future); f.as_mut().poll(cx);`. Stack-ке бекіту үшін `pin!` макросы."
+    },
+    {
+      "subject": {
+        "surface": "pin::new",
+        "root": "pin::new",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_593"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Pin::new()` — safe конструктор, бірақ тек `T: Unpin` талап етеді. Сигнатура: `pub fn new(pointer: P) -> Pin<P> where <P as Deref>::Target: Unpin`. Logic: егер `T` Unpin болса — оны Pin-ге салу тривиалды (move-дан қорғау маңызды емес, өйткені тип өзі қарсы емес). Мысал: `let pinned: Pin<&mut i32> = Pin::new(&mut 5);` — `i32` Unpin, qаусіздік қаупі жоқ. **Қашан Future poll-да keуек:** қарапайым `impl Future for MyType where MyType: Unpin` — `Pin<&mut Self>`-ге Pin::new арқылы оңай шығу. **Қашан мүмкін емес:** async fn state machine — `!Unpin`, сондықтан `Pin::new` жұмыс істемейді → `Box::pin` немесе `pin!` керек."
+    },
+    {
+      "subject": {
+        "surface": "pin::new_unchecked",
+        "root": "pin::new_unchecked",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_594"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Pin::new_unchecked()` — unsafe конструктор, кез-келген `T` үшін жұмыс істейді. Сигнатура: `pub unsafe fn new_unchecked(pointer: P) -> Pin<P>`. **Шарт (қолданушы кепіл береді):** `*pointer` Pin берілгеннен кейін ешқашан move жасалмайды (тіпті drop-қа дейін). **Дұрыс қолдану:** `let mut x = MyFuture::new(); let pinned = unsafe { Pin::new_unchecked(&mut x) }; pinned.as_mut().poll(cx);` — `x` өшкенше `pinned`-тан соң қозғалмайтыны кепіл. **Қате қолдану:** `let pinned = unsafe { Pin::new_unchecked(&mut x) }; mem::swap(&mut x, &mut other); pinned.poll(cx);` → UB. Әдетте бұл API-ны қолданбау керек — `Box::pin` немесе `pin!` сияқты қауіпсіз alternative бар."
+    },
+    {
+      "subject": {
+        "surface": "box::pin",
+        "root": "box::pin",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_595"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Box::pin()` — heap-те бекітілген мән. Сигнатура: `pub fn pin(x: T) -> Pin<Box<T>>`. Қалай жұмыс істейді: (1) `Box::new(x)` арқылы T-ні heap-ке аллокациялайды; (2) Pin-ге орайды (heap pointer тұрақты — Box-ты move жасасақ да, ішіндегі data орнында тұрады). **Қашан керек:** `!Unpin` тип қайтару (мысалы, dynamic Future): `fn make_fut() -> Pin<Box<dyn Future<Output = ()>>> { Box::pin(async { sleep().await }) }`. **Артықшылық:** ыңғайлы — қолданушы T-нің Unpin болуын ойламайды. **Кемшілік:** heap аллокация (тек performance бойынша; функционалды кемшілік емес). Производство-да: `tokio::spawn` ішкі түрде `Box::pin` жасайды."
+    },
+    {
+      "subject": {
+        "surface": "pin! macro",
+        "root": "pin! macro",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_596"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`pin!` макросы — stack-те бекіту. `std::pin::pin!` (Rust 1.68+ stable) макросы `T`-ні stack-те орнатып, оған `Pin<&mut T>` береді. Мысал: `use std::pin::pin; let mut fut = pin!(my_async_fn()); fut.as_mut().poll(cx);`. **Артықшылық:** heap аллокация жоқ (Box::pin-ге қарағанда performance тиімді). **Шектеу:** stack frame-нен шықпайды — function қайтарылғанда жойылады. Сондықтан `let f = pin!(fut); return f;` — мүмкін емес. **Альтернатив (старірек Rust):** `tokio::pin!` макросы `let pinned = pin!(future);` болса. **Эквивалент мысал қолмен:** `let mut fut_storage = my_async_fn(); let mut fut = unsafe { Pin::new_unchecked(&mut fut_storage) };` — бірақ unsafe-ті ашық жазу мехнатлы, `pin!` макросы оны жасырады."
+    },
+    {
+      "subject": {
+        "surface": "pin<&mut t>",
+        "root": "pin<&mut t>",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_597"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Pin<&mut T>` — Future::poll-дың `self` параметр түрі. Не үшін: poll шакыруы Future-дың ішкі күйін (state machine өрістерін) өзгерте алады, бірақ оны жадтан жылжыта алмайды. `&mut T` оны жылжытуға рұқсат береді (`*self = NewValue` сияқты), сондықтан Pin қажет. **Үлгі іске асыру:** `fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> { let this = self.get_mut(); ... }` — егер `Self: Unpin`. Әйтпесе: `let this = unsafe { self.get_unchecked_mut() };` (қауіпті — өрістерді move жасамауыңды кепілдендіруің керек). **Маңызды:** Pin<&mut T>-нен айырмашылық `&mut Pin<T>`-тен — біріншісі pointer-ді Pin-дейді; екіншісі құрылымды wrap-теп тұрған Pin-ге сілтейді (қолданысы аз)."
+    },
+    {
+      "subject": {
+        "surface": "field projection",
+        "root": "field projection",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_598"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Field projection проблемасы — `Pin<&mut Struct>`-тен `Pin<&mut Field>`-ке қалай шығу. Қарапайым жолы жоқ — Pin қалпында өрісті алу күрделі. Мысал: `struct Foo { a: ChildFut, b: i32 }` — `let pinned: Pin<&mut Foo> = ...;` — мен `Pin<&mut ChildFut>`-ке шыққым келеді (ChildFut-ты poll-дау үшін). **Тыйым:** қарапайым `&mut pinned.a` — Pin-нен бұзып шығу — Foo-ды жанама move жасап, `b`-ні қозғалтуы мүмкін. **Шешімдер:** (1) `pin-project` крейті — макроспен қауіпсіз projection жасайды; (2) `Pin::map_unchecked_mut` — қолмен unsafe; (3) Foo: Unpin болса — Pin-нен шығып, қайта Pin::new арқылы кіруге болады."
+    },
+    {
+      "subject": {
+        "surface": "structural pinning",
+        "root": "structural pinning",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_599"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Structural pinning + pin-project — `pin-project` (және `pin-project-lite`) крейті — қауіпсіз pin projection үшін. `#[pin_project]` атрибуті struct-қа қолданылады, әр өрісті `#[pin]` (struct pin-ді inherit етеді) немесе ондай белгісіз (қарапайым `&mut`) ретінде белгілейді. Мысал: `#[pin_project] struct MyFut<F1: Future, F2: Future> { #[pin] fut1: F1, #[pin] fut2: F2, state: u32 }`. Енді `pinned.project()` — арнайы projection struct қайтарады: `MyFutProj { fut1: Pin<&mut F1>, fut2: Pin<&mut F2>, state: &mut u32 }`. Барлығы безопасные. **Production-да:** tokio + futures крейттерінің көп ішкі бөліктері pin-project қолданады."
+    },
+    {
+      "subject": {
+        "surface": "pin::map_unchecked_mut",
+        "root": "pin::map_unchecked_mut",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_600"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Pin::map_unchecked_mut` — қолмен projection (unsafe). Сигнатура: `pub unsafe fn map_unchecked_mut<U, F>(self: Pin<&mut T>, f: F) -> Pin<&mut U> where F: FnOnce(&mut T) -> &mut U`. Қолданушы кепілдендіреді: callback қайтарған `&mut U` — pin-ді сақтайтын өрістен (немесе Pin семантикасын бұзбайтын структуралды pinning). Мысал: `impl<F: Future> Future for MyWrapper<F> { fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<F::Output> { let inner_pin: Pin<&mut F> = unsafe { self.map_unchecked_mut(|s| &mut s.inner) }; inner_pin.poll(cx) } }`. **Идиома:** `pin-project` оны автоматты түрде дұрыс жазып береді — қолмен жазудан аулақ болу керек."
+    },
+    {
+      "subject": {
+        "surface": "poll pin signature",
+        "root": "poll pin signature",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_601"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`fn poll(self: Pin<&mut Self>, cx)` — Future трейт-сигнатурасында неге Pin. Себеп: poll шакырушы (executor) Future ішінде self-referential өрістер бар-жоғын білмейді. Pin беру арқылы — «бұл Future-ды жылжытпаймын, тек ішін модификациялаймын» деген кепіл. Future жазушы: ішінде сілтеме болса — Pin кепілдемесіне сүйеніп жадын құра алады. **Альтернативті дизайн (мүмкін болмады):** `fn poll(&mut self, cx)` — қарапайым, бірақ self-referential async fn state machine-ы дұрыс жұмыс істемейді. Pin-нің бүкіл жасырын күшін поллда ғана мысалымен көреміз: poll-ды шакыру = «соdiv тұрақты адресте, өзгертуге рұқсат» уәдесі. Pin = «move-ке тыйым» түсінігінің тілдік деңгейдегі бекіті."
+    },
+    {
+      "subject": {
+        "surface": "get_mut get_unchecked_mut",
+        "root": "get_mut get_unchecked_mut",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_602"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`get_mut()` vs `get_unchecked_mut()` — Pin-нен `&mut T` алудың екі жолы. **`Pin::get_mut(self) -> &mut T`:** safe, бірақ `T: Unpin` талап етеді. Қарапайым типтерде ыңғайлы. **`Pin::get_unchecked_mut(self) -> &mut T`:** unsafe, кез-келген T-ге істейді; қолданушы кепілдендіреді: алынған `&mut T` арқылы `T`-ні move жасамайды (тек ішкі mutation). Мысал қолдану: `impl Future for MyAsyncFn { type Output = (); fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<()> { let this = unsafe { self.get_unchecked_mut() }; if this.done { Poll::Ready(()) } else { ... } } }` — `this.done = true` сияқты field мутация — қауіпсіз; `*this = OtherFut::new()` — UB."
+    },
+    {
+      "subject": {
+        "surface": "pinning rules summary",
+        "root": "pinning rules summary",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_603"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Pinning ережелері — қысқаша 3-ереже моделі: (1) **Move сақтау:** Pin берілген T ешқашан жадтан жылжытылмайды (drop-қа дейін); (2) **Drop must run:** T-нің `drop` шакырылуы керек — Pin-ден шықпай-ақ; (3) **Unpin қашықтығы:** `T: Unpin` болса — ереже #1 түспейді (тип move-ке қарсы емес). Тәжірибеде көп жерде pin-проблема жоқ — қарапайым типтер `Unpin`. Pin-ді ескере бастайтын кезде: (a) custom Future iскe asyru — poll signature-да Pin; (b) self-referential күй сақтайтын тип — `PhantomPinned` + `!Unpin`. **Идиома:** қолмен поллу қажет болмаса — `Box::pin()` немесе `pin!()` арқылы өту, projection керек болса — `pin-project` крейтін қолдану."
     },
     {
       "subject": {
