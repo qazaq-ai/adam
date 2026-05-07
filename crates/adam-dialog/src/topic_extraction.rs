@@ -1953,6 +1953,33 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ord әдісі",
     "айнымалы тәсілі",
     "string әдісі",
+    // **v4.81.5** — Rust Book chapter 6 (enums + match) deepening.
+    // rust_285…299 + 5 stub replacements (057/059/061/062/072).
+    "енам нұсқасы",
+    "нұсқа деректері",
+    "енамға әдіс",
+    "енам мен структ айырмашылығы",
+    "option жалпылама түрі",
+    "option пен t айырмашылығы",
+    "match толық қамту",
+    "match тармағы",
+    "үлгіге байланыстыру",
+    "_ орынтолтырғыш",
+    "айнымалы үлгісі",
+    "if let",
+    "if let else",
+    "null проблемасы",
+    "алгебралық тип жүйесі",
+    // Objects.
+    "енам элементі",
+    "енам бөлігі",
+    "тип теориясы",
+    "compiler кепілдігі",
+    "match синтаксисі",
+    "pattern matching",
+    "pattern түрі",
+    "match баламасы",
+    "тіл дизайн қатесі",
     // **v4.81.0** — Rust Book chapter 5 (structs) deepening.
     // rust_271…284 + 6 stub replacements (050…055).
     "өрісті қысқа жариялау",

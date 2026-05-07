@@ -7,6 +7,84 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.81.5] — 2026-05-06 — Rust Book chapter 6 deepening — enums + match
+
+Per-chapter pedagogical cadence continues. Chapter 6 introduces Rust's algebraic type system — enums with data + exhaustive pattern matching. Previously surface-level — 5 one-line stubs (Енам / Option / None / Some / Үлгі). Now deepened with full curriculum.
+
+### What's added
+
+**15 new curated entries `rust_285…299`** in `programming_rust.jsonl`:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_285 | енам нұсқасы | Variant concept (3 forms: unit / named-field / tuple) |
+| rust_286 | нұсқа деректері | Variant data (`V4(u8,u8,u8,u8)` / `V6(String)`) |
+| rust_287 | енамға әдіс | impl block for enum |
+| rust_288 | енам мен структ айырмашылығы | OR (sum) vs AND (product) |
+| rust_289 | option жалпылама түрі | `Option<T>` generic over T |
+| rust_290 | option пен t айырмашылығы | Type-system distinction prevents null misuse |
+| rust_291 | match толық қамту | Exhaustiveness compiler guarantee |
+| rust_292 | match тармағы | `pattern => expr,` syntax |
+| rust_293 | үлгіге байланыстыру | Pattern binding extracts variant data |
+| rust_294 | _ орынтолтырғыш | Wildcard pattern (no binding) |
+| rust_295 | айнымалы үлгісі | Catch-all variable pattern (binds + must be last) |
+| rust_296 | if let | Match shorthand for one variant |
+| rust_297 | if let else | Two-arm match equivalent |
+| rust_298 | null проблемасы | Tony Hoare's billion-dollar mistake |
+| rust_299 | алгебралық тип жүйесі | Sum + product type theory |
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs deepened in-place (5)
+
+- `rust_057` (Енам) — IpAddrKind + Message variant types example.
+- `rust_059` (Option) — null replacement + Hoare quote + auto-import.
+- `rust_061` (None) — type annotation requirement when standalone.
+- `rust_062` (Some) — wraps T + auto inference + extraction methods.
+- `rust_072` (Үлгі) — pattern forms catalog (literals, variables, wildcard, enum variants, tuples, structs).
+
+### Stubs deleted
+
+- `rustadv_008` (Result 1-line) + `rustadv_009` (Option 1-line) — duplicates of deeper rust_059 / rust_148.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_06_holdout.json` — 18 cases, 5 categories (`ch06_enum_basics`, `ch06_option`, `ch06_match`, `ch06_if_let`, `ch06_design`).
+- `crates/adam-dialog/tests/rust_book_chapter_06.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 24 compounds.
+
+### Known limitation (consistent with ch.3, ch.5)
+
+«Енам мен структ айырмашылығы» and «Option пен T айырмашылығы» queries route through comparison-shape detector which surfaces side-by-side definitions instead of the deeper `rust_288` / `rust_290` entries. Same architectural pattern as ch.3 «Сөйлем мен өрнек айырмашылығы» and ch.5 «Байланысты функция». Deeper entries preserved for future retrieval-priority refinement.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 6 holdout cases | ✅ 100 % |
+| Existing chapters 1-5 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **982 passing** (was 981; +1 chapter-6 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2608 → **2621** (+13 net: +15 ch.6 − 2 stub deletions) |
+| world_core facts | 2850 → **2863** (+13 net) |
+| Derived facts | 30785 → **30799** (+14) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.81.5** | **ch. 6** | **Enums + match (this release)** |
+| v4.82.0 | ch. 7 | Modules / packages / crates (mod / pub / use / lib.rs / paths) |
+| v4.82.5 | ch. 8 | Common collections (Vec / String / HashMap deepening) |
+| v4.83.0 | ch. 9 | Error handling (`?`-operator / propagation / custom errors) |
+| v4.83.5 | ch. 10 | Generics + traits + lifetimes deepening |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.5` patch — 15 new + 5 deepened stubs + 2 deletions; chapter 6 closes the type-system foundations (struct + enum + pattern matching are the holy trinity for the chapters ahead). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.81.0] — 2026-05-06 — Rust Book chapter 5 deepening — structs
 
 Per-chapter pedagogical cadence continues. Chapter 5 was previously surface-level — 6 one-line stubs (Структ / Өріс / Кортеж-структ / Бірлік структ / Әдіс / Байланысты функция). Now deepened with full curriculum.

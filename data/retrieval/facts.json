@@ -1,7 +1,7 @@
 {
-  "version": "4.80.5",
+  "version": "4.81.0",
   "status": "completed",
-  "elapsed_s": 70,
+  "elapsed_s": 61,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2850,
+    "facts_total": 2863,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2284,
+      "is_a": 2297,
       "lives_in": 8,
       "part_of": 244,
       "related_to": 123
@@ -82,8 +82,8 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 282,
-      "world_core/programming_rust_advanced.jsonl": 34,
+      "world_core/programming_rust.jsonl": 297,
+      "world_core/programming_rust_advanced.jsonl": 32,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
       "world_core/role_bridges.jsonl": 63,
@@ -44056,7 +44056,7 @@
         "sample_id": "rust_057"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Енам — `Rust-`та шектеулі нұсқалар жиынын сипаттайтын тип."
+      "raw_text": "Енам (enumeration, алгебралық тип) — типтің мүмкіндіктерін шектеулі нұсқалардың біріне дейін шектейтін тип. Структтан айырмашылығы — структ **бір уақытта барлық өрістерге** ие (конъюнкция, AND), ал енам тек **бір нұсқада** болады (дизъюнкция, OR). Мысалы: `enum IpAddrKind { V4, V6 }` — IP мекенжайы IPv4 не IPv6, екеуі бірге емес. Әр нұсқа `EnumName::Variant` арқылы шакырылады. Енам нұсқалары деректерді ішіне ала алады: `enum Message { Quit, Move {x:i32, y:i32}, Write(String), ChangeColor(i32,i32,i32) }` — бір типте 4 түрлі ішкі құрылым."
     },
     {
       "subject": {
@@ -44096,7 +44096,7 @@
         "sample_id": "rust_059"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`Option` — мәннің бар немесе жоқ екенін білдіретін `Rust` енамы; нұсқалары: `Some` және `None`."
+      "raw_text": "`Option<T>` — `Rust`-тың стандартты кітапханасындағы ең маңызды енамдарының бірі: «мән болуы мүмкін немесе мән болмауы мүмкін» дегенді типтік жүйеде сипаттайды. Анықтамасы: `enum Option<T> { None, Some(T) }`. **`Rust`-та `null` жоқ** — оның орнына `Option`. Tony Hoare (`null` ұғымын ойлап тапқан адам) оны өзінің «миллиард долларлық қатесі» деп сипаттады. `Option` стандартты кітапханада авто-импорттталған, импорттаудың керегі жоқ. `Some` мен `None` тікелей қолжетімді: `let x = Some(5); let y: Option<i32> = None;`."
     },
     {
       "subject": {
@@ -44136,7 +44136,7 @@
         "sample_id": "rust_061"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`None` — `Rust` `Option` енамының мән жоқ екенін көрсететін нұсқасы."
+      "raw_text": "`None` — `Option<T>` енамының «мән жоқ» нұсқасы. `null`-дың типтік жүйелі баламасы. **Маңызды:** `None` жалғыз тұрса, компилятор `T`-ні шеше алмайды — типті ашық белгілеу керек: `let absent: Option<i32> = None;`. Қолдану: оптималды нәтиже жоқ операцияны (мысалы, `find()` ештеңе таппағанда) өңдеу. `match` арқылы өңделеді: `match x { None => ..., Some(v) => ... }`. Тікелей `if x == None` жазудың керегі жоқ — `match` немесе `if let` қолданған дұрыс."
     },
     {
       "subject": {
@@ -44156,7 +44156,7 @@
         "sample_id": "rust_062"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`Some` — `Rust` `Option` енамының нақты мәнді қамтитын нұсқасы."
+      "raw_text": "`Some(T)` — `Option<T>` енамының «мән бар» нұсқасы: ішінде нақты `T` мәнін **орайды** (wraps). `let some_number = Some(5);` — `Option<i32>` (компилятор `T`-ні автоматты шешеді — `i32`). `let some_char = Some('e');` — `Option<char>`. Ішіндегі мәнді шығарып алу үшін: `match` (`Some(i) => i + 1`), `if let Some(i) = x { ... }`, немесе `.unwrap()` / `.expect()` (panic-pen қауіпсіз емес). `Option<T>` пен `T` бөлек типтер — `i8 + Option<i8>` істемейді, алдымен `Some` ішінен мәнді шығару керек."
     },
     {
       "subject": {
@@ -44336,7 +44336,7 @@
         "sample_id": "rust_072"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Үлгі — `match` өрнегінде мәнді ажырату үшін қолданылатын құрылым."
+      "raw_text": "Үлгі (pattern) — мәннің құрылымына сай келтіру арқылы оны ажырататын синтаксис. `match`, `if let`, `let`, функция параметрлерінде қолданылады. Үлгілер: литералдар (`3`, `'a'`), айнымалылар (`other`), орынтолтырғыш (`_`), енам нұсқалары (`Some(i)`, `None`, `Coin::Quarter(state)`), кортеждер (`(x, y, z)`), құрылымдар (`User { id, name, .. }`). Үлгі мәнді **деструктурлайды** (бөлшектейді) және ішкі бөліктерін атаулы айнымалыларға байланыстырады."
     },
     {
       "subject": {
@@ -48580,6 +48580,306 @@
     },
     {
       "subject": {
+        "surface": "енам нұсқасы",
+        "root": "енам нұсқасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "енам элементі",
+        "root": "енам элементі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_285"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Енам нұсқасы (variant) — енам типінің бір мүмкін мәні. Мысалы, `enum IpAddrKind { V4, V6 }` — `V4` пен `V6` нұсқалары. Шакыру: `IpAddrKind::V4`. Нұсқалардың үш түрі бар: (1) **деректі жоқ** (`Quit`), (2) **аталған өрістер** (`Move { x: i32, y: i32 }` — структ-ұқсас), (3) **кортеж** (`Write(String)`, `ChangeColor(i32, i32, i32)`). Бір енамда бұл түрлердің барлығы аралас болуы мүмкін. Барлық нұсқалар бір типке (`IpAddrKind`) жатады — енам осы типтік шатырды ұсынады."
+    },
+    {
+      "subject": {
+        "surface": "нұсқа деректері",
+        "root": "нұсқа деректері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "енам бөлігі",
+        "root": "енам бөлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_286"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Нұсқа деректері (variant data) — енам нұсқасының ішіндегі мән. Әр нұсқа өзіндік деректерін тікелей орай алады: `enum IpAddr { V4(u8, u8, u8, u8), V6(String) }`. `V4` 4 байт сақтайды, `V6` — жол. Бір типте әртүрлі ішкі құрылым. Стандартты кітапханадағы `std::net::IpAddr` дәл осындай. Структ + энам комбинациясын алмастырады — кодты ықшамдайды. Деректі шығарып алу үшін `match` + үлгіге байланыстыру: `IpAddr::V4(a, b, c, d) => ...`."
+    },
+    {
+      "subject": {
+        "surface": "енамға әдіс",
+        "root": "енамға әдіс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_287"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Енамға әдіс — структ сияқты, енамда да `impl` блогында әдістерді жариялауға болады: `impl Message { fn call(&self) { ... } }`. Әдіс ішінде `match self { ... }` арқылы қандай нұсқа екенін тексеріп, әр нұсқаға арналған әрекет жасалады. Шакыру да структ сияқты: `let m = Message::Write(String::from(\"x\")); m.call();`. Бұл — `Rust`-тың алгебралық типтер мен ОО-мен жалғасу әдісі: тип ережелері енамда, мінез-құлық `impl`-да."
+    },
+    {
+      "subject": {
+        "surface": "енам мен структ айырмашылығы",
+        "root": "енам мен структ айырмашылығы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тип теориясы",
+        "root": "тип теориясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_288"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Енам мен структ айырмашылығы — структ **бір уақытта барлық өрістерге** ие (конъюнкция, AND): `User { active, username, email, sign_in_count }` — төртеуі де бар. Енам **тек бір нұсқада** болады (дизъюнкция, OR): `IpAddrKind` — V4 НЕ V6, екеуі бірге емес. Структ — қосылу типі (product type); енам — қосынды типі (sum type). Бірге олар алгебралық типтер жүйесін құрайды — тип теориясының іргетас құралдары."
+    },
+    {
+      "subject": {
+        "surface": "option жалпылама түрі",
+        "root": "option жалпылама түрі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "параметрлік тип",
+        "root": "параметрлік тип",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_289"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Option<T>` жалпылама түрі — `T` кез келген тип болатын параметрлік тип: `Option<i32>` — бар не жоқ `i32`; `Option<String>` — бар не жоқ `String`. `<T>` жалпылама параметр — 10-тарауда толық қарастырылады. Әр түрі үшін `Option`-ды қайта жазудың керегі жоқ — бір рет жариялап, барлық типтерге қолдану. Стандартты кітапханада `Option<T>` бір рет анықталған, компилятор `Option<i32>`, `Option<String>` т.б. үшін мономорфизация жасайды."
+    },
+    {
+      "subject": {
+        "surface": "option пен t айырмашылығы",
+        "root": "option пен t айырмашылығы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_290"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Option<T>` пен `T` бөлек типтер — бірі екіншісімен тікелей операция жасай алмайды: `let x: i8 = 5; let y: Option<i8> = Some(5); let sum = x + y;` — қате (типтер сай емес). Алдымен `y` ішіндегі мәнді шығару керек — `match`, `if let`, `unwrap`, `?`. Бұл — `Rust`-тың `null`-ге тыйымы: компилятор сізге мәнді қолданбас бұрын оның бар-жоғын **ашық** тексеруді міндеттейді. C/Java-да «null pointer exception» орындалу қатесі; `Rust`-та компиляция қатесі."
+    },
+    {
+      "subject": {
+        "surface": "match толық қамту",
+        "root": "match толық қамту",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "compiler кепілдігі",
+        "root": "compiler кепілдігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_291"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "match толық қамту (exhaustive matching) — `Rust`-тың `match` өрнегінің **барлық мүмкін нұсқаларды** қамтуын талап ететін кепілдігі. Әйтпесе компилятор қатеге шығады: `error[E0004]: non-exhaustive patterns: 'None' not covered`. Артықшылығы: енамға жаңа нұсқа қосылса, компилятор сізге `match` блогын жаңартудың керек екенін айтады — ұмытпайсыз. Әр ықтимал жағдай ескерілген. Барлық қалғанды бір тармаққа жинау үшін `_` (wildcard) немесе айнымалы үлгі (`other`)."
+    },
+    {
+      "subject": {
+        "surface": "match тармағы",
+        "root": "match тармағы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "match синтаксисі",
+        "root": "match синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_292"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "match тармағы (match arm) — `match` өрнегінің бір бөлігі: `үлгі => өрнек,`. Стрелка (`=>`) үлгіні нәтижеге байланыстырады. Тармақтар үтірмен бөлінеді. Дене бір өрнек болуы мүмкін (`Coin::Penny => 1,`) немесе фигуралы жақшалармен оралған блок (`Coin::Penny => { println!(\"...\"); 1 },`). Үлгі енам нұсқасына сай болғанда — тармақ орындалады; нәтижесі бүкіл `match`-тың нәтижесі болады."
+    },
+    {
+      "subject": {
+        "surface": "үлгіге байланыстыру",
+        "root": "үлгіге байланыстыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern matching",
+        "root": "pattern matching",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_293"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үлгіге байланыстыру (pattern binding) — енам нұсқасының ішкі мәнін `match` арқылы шығару әдісі. Мысалы: `match coin { Coin::Quarter(state) => { println!(\"{:?}\", state); 25 }, ... }` — `state` атты айнымалыға `Quarter` ішіндегі `UsState` мәні автоматты түрде бекітіледі. Бұл — pattern matching-тің күшті жағы: бір қадаммен **нұсқаны таниды** әрі **ішкі мәнді шығарады**. `Option`-да: `Some(i) => i + 1` — `i` ішіндегі санға тең."
+    },
+    {
+      "subject": {
+        "surface": "_ орынтолтырғыш",
+        "root": "_ орынтолтырғыш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_294"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`_` орынтолтырғыш үлгісі (wildcard pattern) — кез келген мәнге сай келетін, бірақ оны еш жерде қолданбайтын үлгі. Мысалы: `match dice_roll { 3 => add_fancy_hat(), 7 => remove_fancy_hat(), _ => reroll() }` — 3 не 7 болмаса, мәннің өзі керек емес. Айнымалы үлгісінен (`other`) айырмашылығы: `_` мәнді **байланыстырмайды**, әрі қарай қолдануға болмайды. Идиома: «басқа бәріне қалай жауап беру керектігі бір ереже». `match dice_roll { ... _ => () }` — «ештеңе істеме»."
+    },
+    {
+      "subject": {
+        "surface": "айнымалы үлгісі",
+        "root": "айнымалы үлгісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "pattern түрі",
+        "root": "pattern түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_295"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Айнымалы үлгісі (catch-all variable pattern) — қалған барлық мәндерді бір атаулы айнымалыға байланыстыратын үлгі. Мысалы: `match dice_roll { 3 => ..., 7 => ..., other => move_player(other) }` — 3 не 7 болмаса, мән `other`-ге байланады және оны әрі қарай қолдануға болады. `_`-ден айырмашылығы: айнымалы үлгісі **мәнді сақтайды**. Шарт: айнымалы үлгісі тармақтың **ең соңында** болуы керек — болмаса одан кейінгі үлгілер ешқашан сай болмайды."
+    },
+    {
+      "subject": {
+        "surface": "if let",
+        "root": "if let",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "match баламасы",
+        "root": "match баламасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_296"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`if let` синтаксисі — бір ғана нұсқаны өңдеуге арналған `match`-тың қысқа баламасы. Мысалы: `match config_max { Some(max) => println!(\"{}\", max), _ => () }` орнына — `if let Some(max) = config_max { println!(\"{}\", max); }`. Үлгіні (`Some(max)`) және өрнекті (`config_max`) теңдікпен бөлеп жазады. Үлгі сай болса, ішіндегі айнымалы (`max`) бекітіледі және блок орындалады. Сай болмаса — өткізіледі. **Кемшілік:** толық қамту тексерілмейді — программист жауапты."
+    },
+    {
+      "subject": {
+        "surface": "if let else",
+        "root": "if let else",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "match баламасы",
+        "root": "match баламасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_297"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`if let else` — `if let`-ке `else` тармағын қосу: `if let Some(x) = opt { ... } else { ... }`. Үлгі сай болмаған жағдайда `else` блогы орындалады. `match opt { Some(x) => ..., _ => ... }` дегенге пара-пар. Қашан қолдану: тек бір нұсқаны өңдегіңіз келсе + қалғаны үшін бір ғана әрекет керек болса. Толық `match` тым ұзын болғанда. Стилдік таңдау: бірнеше нұсқа болғанда `match`, біреу болғанда `if let`."
+    },
+    {
+      "subject": {
+        "surface": "null проблемасы",
+        "root": "null проблемасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіл дизайн қатесі",
+        "root": "тіл дизайн қатесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_298"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "null миллиард долларлық қате — Tony Hoare 1965 жылы `null` ұғымын ALGOL W тілінде ойлап тапты, кейін оны өзінің «миллиард долларлық қатесі» деп сипаттады. `null` бағдарламашыларды күтпеген сәтте «нөлге сілтейтін мән» табуға итереді — `NullPointerException` (Java), `Segmentation fault` (C). Көп тілдер бұл проблемамен жұмыс істейді. `Rust` шешімі: `null` жоқ, оның орнына `Option<T>` — типтік жүйеге келтірілген. Компилятор сізге «бар-жоғын тексеруді» міндеттейді, орындалу қателері жоқ."
+    },
+    {
+      "subject": {
+        "surface": "алгебралық тип жүйесі",
+        "root": "алгебралық тип жүйесі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тип теориясы",
+        "root": "тип теориясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_299"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Алгебралық тип жүйесі (algebraic data types) — типтік жүйенің классы: типтерді композициялау арқылы құрады. Екі негізгі құрылыс: **қосынды типі** (sum type, OR) — енам, бір уақытта бір нұсқа; **қосылу типі** (product type, AND) — структ, барлық өрістер бірге. Қосылу — Cartesian product (декарт көбейтіндісі); қосынды — disjoint union (бөлек одақ). `Rust` екеуін де ұсынады: `enum` мен `struct`. Pattern matching — алгебралық типтерді жұмысқа қосудың табиғи тәсілі. Haskell, OCaml, F# тілдерінде де осындай."
+    },
+    {
+      "subject": {
         "surface": "меншік",
         "root": "меншік",
         "pos": "noun"
@@ -48697,46 +48997,6 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Generic — типке тәуелсіз кодты жазуға арналған параметрлік тип."
-    },
-    {
-      "subject": {
-        "surface": "result",
-        "root": "result",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "енумерация",
-        "root": "енумерация",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust_advanced",
-      "source": {
-        "pack": "world_core/programming_rust_advanced.jsonl",
-        "sample_id": "rustadv_008"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Result — операцияның сәтті немесе сәтсіз нәтижесін көрсететін енумерация."
-    },
-    {
-      "subject": {
-        "surface": "option",
-        "root": "option",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "енумерация",
-        "root": "енумерация",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust_advanced",
-      "source": {
-        "pack": "world_core/programming_rust_advanced.jsonl",
-        "sample_id": "rustadv_009"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Option — мәннің бар-жоғын білдіретін енумерация."
     },
     {
       "subject": {

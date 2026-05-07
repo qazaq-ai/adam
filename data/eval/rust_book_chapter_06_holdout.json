@@ -1,0 +1,117 @@
+{
+  "_comment": "v4.81.5 — Rust Book Chapter 6 (Енам мен үлгіге сай келтіру) holdout. 18 natural Kazakh queries against rust_285…299 + 5 deepened stubs (rust_057/059/061/062/072) − 2 cross-file stub deletions (rustadv_008/009). Categories: ch06_enum_basics (enum definition, variant types, methods), ch06_option (Option<T>, Some, None, generic, vs T), ch06_match (exhaustive matching, arms, pattern binding, wildcard, catch-all variable), ch06_if_let (if let, if let else), ch06_design (null problem, algebraic data types). Skipped intentionally: «Енам мен структ айырмашылығы» and «Option пен T айырмашылығы» — comparison-shape detector intercepts and surfaces side-by-side definitions instead of the deeper rust_288/rust_290 entries; same pattern as ch.3 «Сөйлем мен өрнек айырмашылығы» and ch.5 «Байланысты функция». Deeper entries preserved for future domain-aware retrieval.",
+  "version": "v4.81.5",
+  "captured_date": "2026-05-06",
+  "chapter": 6,
+  "chapter_title": "Енам мен үлгіге сай келтіру (Enums + match + Option + if let)",
+  "cases": [
+    {
+      "id": "ch06_enum",
+      "category": "ch06_enum_basics",
+      "query": "Енам деген не?",
+      "any_substring": ["алгебралық", "ipaddrkind", "дизъюнкция"]
+    },
+    {
+      "id": "ch06_variant",
+      "category": "ch06_enum_basics",
+      "query": "Енам нұсқасы деген не?",
+      "any_substring": ["v4", "квит", "кортеж"]
+    },
+    {
+      "id": "ch06_variant_data",
+      "category": "ch06_enum_basics",
+      "query": "Нұсқа деректері деген не?",
+      "any_substring": ["v4(u8", "v6(string)", "ipaddr"]
+    },
+    {
+      "id": "ch06_enum_method",
+      "category": "ch06_enum_basics",
+      "query": "Енамға әдіс деген не?",
+      "any_substring": ["impl message", "match self", "m.call"]
+    },
+    {
+      "id": "ch06_option",
+      "category": "ch06_option",
+      "query": "Option деген не?",
+      "any_substring": ["миллиард долларлық", "tony hoare", "стандартты кітапхана"]
+    },
+    {
+      "id": "ch06_some",
+      "category": "ch06_option",
+      "query": "Some деген не?",
+      "any_substring": ["орайды", "option<i32>", "unwrap"]
+    },
+    {
+      "id": "ch06_none",
+      "category": "ch06_option",
+      "query": "None деген не?",
+      "any_substring": ["мән жоқ", "ашық белгілеу", "if let"]
+    },
+    {
+      "id": "ch06_option_generic",
+      "category": "ch06_option",
+      "query": "Option жалпылама түрі деген не?",
+      "any_substring": ["t кез келген", "<t>", "мономорфизация"]
+    },
+    {
+      "id": "ch06_pattern",
+      "category": "ch06_match",
+      "query": "Үлгі деген не?",
+      "any_substring": ["литералдар", "деструктур", "match"]
+    },
+    {
+      "id": "ch06_match_exhaustive",
+      "category": "ch06_match",
+      "query": "match толық қамту деген не?",
+      "any_substring": ["non-exhaustive", "e0004", "жаңарту"]
+    },
+    {
+      "id": "ch06_match_arm",
+      "category": "ch06_match",
+      "query": "match тармағы деген не?",
+      "any_substring": ["=>", "стрелка", "coin::penny"]
+    },
+    {
+      "id": "ch06_pattern_binding",
+      "category": "ch06_match",
+      "query": "Үлгіге байланыстыру деген не?",
+      "any_substring": ["coin::quarter(state)", "ішкі мән", "some(i)"]
+    },
+    {
+      "id": "ch06_wildcard",
+      "category": "ch06_match",
+      "query": "_ орынтолтырғыш деген не?",
+      "any_substring": ["wildcard", "байланыстырмайды", "reroll"]
+    },
+    {
+      "id": "ch06_catch_all",
+      "category": "ch06_match",
+      "query": "Айнымалы үлгісі деген не?",
+      "any_substring": ["other", "move_player", "соңында"]
+    },
+    {
+      "id": "ch06_if_let",
+      "category": "ch06_if_let",
+      "query": "if let деген не?",
+      "any_substring": ["қысқа балама", "config_max", "толық қамту тексерілмейді"]
+    },
+    {
+      "id": "ch06_if_let_else",
+      "category": "ch06_if_let",
+      "query": "if let else деген не?",
+      "any_substring": ["else", "if let some", "пара-пар"]
+    },
+    {
+      "id": "ch06_null_problem",
+      "category": "ch06_design",
+      "query": "null проблемасы деген не?",
+      "any_substring": ["миллиард долларлық", "nullpointerexception", "segmentation fault"]
+    },
+    {
+      "id": "ch06_algebraic_types",
+      "category": "ch06_design",
+      "query": "Алгебралық тип жүйесі деген не?",
+      "any_substring": ["sum type", "product type", "haskell"]
+    }
+  ]
+}
