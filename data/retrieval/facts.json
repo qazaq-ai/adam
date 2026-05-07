@@ -1,7 +1,7 @@
 {
-  "version": "4.91.0",
+  "version": "4.91.5",
   "status": "completed",
-  "elapsed_s": 33,
+  "elapsed_s": 29,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3207,
+    "facts_total": 3225,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2642,
+      "is_a": 2660,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 648,
+      "world_core/programming_rust.jsonl": 666,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -55897,6 +55897,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Cancel-safety патерндерi — Future cancel болған кезде de inv invariant-тарды сақтау. **«Cancel-safe»** деп әр поинте drop болса да resource leak / corrupt state болмайтын Future айтылады. Tokio API-лер: cancel-safe — `tokio::sync::Mutex::lock`, `mpsc::recv`, `sleep`, `timeout`. Cancel-unsafe — `read_exact` (жартылай оқу мүмкін), `write_all` (жартылай жазу). **Tokio-нің ережесі:** select! тармағында cancel-unsafe Future қолданбау. **Шешім cancel-unsafe үшін:** `pin_mut!(fut); select! { res = &mut fut => ..., _ = timeout => { (&mut fut).await; ... } }` — timeout болса да fut-ты завершить, не drop. **Идиома:** документтен «cancel safety» бөлімін оқу — әр async API-нің кепілдігі жазылған."
+    },
+    {
+      "subject": {
+        "surface": "async runtime таңдау",
+        "root": "async runtime таңдау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_658"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Async runtime таңдау критерийлері — Rust async экожүйесінде runtime таңдау. Факторлар: (1) **Maturity:** tokio — most production-tested (cloudflare, discord, microsoft); async-std — мертв сияқты, кейінгі релиздер қысылды; smol — жаңа, аз қолданылған. (2) **Dependency size:** smol — minimal, embedded-friendly; tokio — толық-функционалды (HTTP/file/process/timer). (3) **API style:** tokio — tokio::-prefix әр модуль; async-std — std::-mirror; smol — function-based, no prefix. (4) **Ecosystem:** axum/hyper/sqlx/reqwest — tokio-only немесе tokio-first. **Жалпы кеңес 2026:** жаңа жоба — tokio (де факто стандарт); embedded — embassy; minimal smol тек арнайы жағдайда."
+    },
+    {
+      "subject": {
+        "surface": "tokio deep dive",
+        "root": "tokio deep dive",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_659"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Tokio deep dive — Rust async экожүйесінің **де факто** стандарт runtime. Архитектура: (1) **executor** — work-stealing scheduler N ағында (CPU-count бойынша); жұмыс stealing — бос ағын бос емес ағыннан task алу; (2) **reactor** — OS event-loop (epoll/kqueue/IOCP-те негізделген), I/O-readiness нотификациясы; (3) **timer wheels** — миллион тимер тиімді басқару; (4) **task** қалаушы — `tokio::spawn` task жасайды, multi-thread executor оны кез-келген ағында polls. **Production users:** Cloudflare workers, Discord, Microsoft Azure, Tower (gRPC), Hyper (HTTP). Карга: ~150 KB strip-after binary (тек async fn-rt)."
+    },
+    {
+      "subject": {
+        "surface": "async-std deep dive",
+        "root": "async-std deep dive",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_660"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "async-std deep dive — std-mirror әдістемесі. Идея: stdlib-тегі sync функцияларды (`std::fs::File::open`, `std::net::TcpStream`, ...) бір-біріне сай async нұсқаларымен (`async_std::fs::File::open`, ...) ауыстыру. Async-std-тың таныс API-сы Rust developer-ге өту жеңілдетеді: `use async_std::prelude::*; use async_std::fs::File; let mut file = File::open(\"x.txt\").await?;`. **Status 2026:** development бәсеңдеген — соңғы release ~2 жыл бұрын; tokio экожүйеcі көп өсті. Production-да тек алдыңғы async-std-да жазылған кодтың серверілеу. Жаңа жобаларға — tokio."
+    },
+    {
+      "subject": {
+        "surface": "smol крейті",
+        "root": "smol крейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_661"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "smol крейті — minimal асин runtime. Carl Lerche (tokio автор) архитектурасы — smol модулдік: `async-executor` (executor only), `async-io` (reactor only), `async-net` (networking only). Жобаға керек қана модулін таңдау керек. **Артықшылық:** толық tokio-дан 5x кіші binary; embedded/no_std-friendly. **Кемшілік:** ecosystem кішкене (tokio-арналған кітапханалар smol-да жұмыс істемейді); learning curve көбірек (модулдерді өзің біріктіру керек). **Қашан керек:** size-critical environments (embedded, WASM, CLI tool); minimal HTTP сервер; learning purposes."
+    },
+    {
+      "subject": {
+        "surface": "embassy крейті",
+        "root": "embassy крейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_662"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Embassy крейті — embedded async runtime. ARM Cortex-M, RISC-V микроконтроллерлерге арналған async/await. Архитектура: (1) **no_std** — heap allocation жоқ; (2) static task allocation — `embassy::main` макросы compile-time-да task slot-тары жасайды; (3) hardware-specific HAL (STM32, NRF52, ESP32). Мысал: `#[embassy_executor::main] async fn main(spawner: Spawner) { spawner.spawn(blink_task()).unwrap(); }`. **Артықшылық:** energy-efficient — async cooperative scheduling battery-powered devices-те ыңғайлы (сpu sleep-те түрып, interrupt-та оянады). **Production:** firmware (drone control, IoT sensors, smartwatches)."
+    },
+    {
+      "subject": {
+        "surface": "asyncread трейті",
+        "root": "asyncread трейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust трейті",
+        "root": "rust трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_663"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "AsyncRead трейті — `std::io::Read`-тің async нұсқасы. Сигнатура (futures crate): `pub trait AsyncRead { fn poll_read(self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &mut [u8]) -> Poll<io::Result<usize>>; }`. Tokio-да тура осыдай (бөлек крейтте, кейін біртұтаспен). Қолдану: tokio::fs::File, tokio::net::TcpStream, async-std::io::Stdin — бәрі AsyncRead іске асырушы. Read үшін: `let mut buf = vec![0u8; 1024]; let n = file.read(&mut buf).await?;` — `AsyncReadExt::read` + `.await`. **Маңызды нюанс:** futures::AsyncRead vs tokio::AsyncRead — әдетте бірдей қол ұсынады, бірақ нюанс әртүрлі — compat layers керек."
+    },
+    {
+      "subject": {
+        "surface": "asyncwrite трейті",
+        "root": "asyncwrite трейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust трейті",
+        "root": "rust трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_664"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "AsyncWrite трейті — `std::io::Write`-тің async нұсқасы. Сигнатура: `pub trait AsyncWrite { fn poll_write(self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &[u8]) -> Poll<io::Result<usize>>; fn poll_flush(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>>; fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>>; }`. Үш әдіс: write — write бытте; flush — buffer-ды OS-ке write; shutdown — write-side close (TCP/socket-те). Қолдану `AsyncWriteExt`-арқылы: `file.write_all(b\"hello\").await?; file.flush().await?;`. **Маңызды:** poll_shutdown — TCP-де FIN packet жіберу; HTTP/2-де stream-ді жабу; database-те disconnect."
+    },
+    {
+      "subject": {
+        "surface": "asyncbufread",
+        "root": "asyncbufread",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust трейті",
+        "root": "rust трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_665"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "AsyncBufRead + AsyncBufReadExt — буферленген async оқу. `AsyncBufRead` трейті (`AsyncRead`-тен extension): `poll_fill_buf` + `consume`. Идея: ішкі буфер ұстау, жолдар немесе bytes-санды оқудың тиімді жолы. `AsyncBufReadExt` extension трейті ыңғайлы әдістер береді: `read_line(&mut buf).await` (line-by-line); `lines()` (Stream<Item = io::Result<String>>); `read_until(byte, &mut buf)` (delimiter-ге дейін). Мысал: `use tokio::io::{AsyncBufReadExt, BufReader}; let reader = BufReader::new(file); let mut lines = reader.lines(); while let Some(line) = lines.next_line().await? { process(line); }`."
+    },
+    {
+      "subject": {
+        "surface": "tokio::sync примитивтері",
+        "root": "tokio::sync примитивтері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_666"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "tokio::sync примитивтері — async-aware synchronisation. **`Mutex<T>`:** lock async (futures-тан құтылады; std::sync::Mutex-тен айырмашылығы — across .await ұстай беру қауіпсіз — task-ты pause қылады, ағынды блокт жоқ). **`RwLock<T>`:** read/write async lock; көп оқу немесе бір жазу. **`Notify`:** flag-style notification, multiple waiters. **`OnceCell<T>`:** lazy initialization. **`Semaphore`:** N-resource bounded concurrency. **`Barrier`:** N task синхрондау. Барлығы `Arc`-пен ағылшын-арасында бөліседі. **Идиома:** state нөлдік жағдайда — std::sync::Mutex; уақытша lock-тер немесе async-aware керек жағдайда — tokio::sync::Mutex."
+    },
+    {
+      "subject": {
+        "surface": "tokio::sync::broadcast",
+        "root": "tokio::sync::broadcast",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_667"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "tokio::sync::broadcast vs mpsc — multi-consumer broadcast. **mpsc (multi-producer single-consumer):** көп жіберуші бір алушы — `let (tx, mut rx) = mpsc::channel(100); tx.send(msg).await?; let m = rx.recv().await;`. **broadcast (single/multi-producer multi-consumer):** көп жіберуші көп алушы — әр message **БАРЛЫҚ** subscriber-ге барады — `let (tx, _) = broadcast::channel(16); let mut rx1 = tx.subscribe(); let mut rx2 = tx.subscribe();`. Қашан керек: notification fan-out (мысалы, server status update — барлық клиент байларылмен қалу), pub/sub style. **Маңызды:** broadcast-та slow consumer бар болса — `RecvError::Lagged` (skip messages). Lossless керек болса — әр subscriber-ге жеке mpsc."
+    },
+    {
+      "subject": {
+        "surface": "tokio::sync::oneshot",
+        "root": "tokio::sync::oneshot",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_668"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "tokio::sync::oneshot — бір рет хабар жіберу. `let (tx, rx) = oneshot::channel(); spawn(async move { let result = compute().await; tx.send(result).unwrap(); }); let value = rx.await.unwrap();`. Мысалы request/response pattern: server task жұмыс істейді, нәтиже бар болғанда oneshot-пен қайтарады. **Артықшылық:** аса жеңіл (mpsc-тен жеңіл, тек бір message); зерттеуге арналған simple. **Кемшілік:** жоғары тек бір рет. **Идиома:** «callback нәтижесі» сценарий — async return value of spawned task; cancellation signal — sender drop арқылы receiver `Err(RecvError)` алады."
+    },
+    {
+      "subject": {
+        "surface": "tokio::time timeout",
+        "root": "tokio::time timeout",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_669"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "tokio::time + Timeout — async timer + timeout primitives. **`sleep(duration)`:** Future, дәл осы duration-да Ready болады (`tokio::time::sleep(Duration::from_secs(1)).await;`). **`interval(period)`:** Stream-сай тиктерді шығарады; `let mut t = interval(Duration::from_millis(500)); loop { t.tick().await; do_work(); }`. **`timeout(dur, fut)`:** future әлдеде `dur`-те аяқталмаса — Err(Elapsed). Жоғары қолдану: `let result = timeout(Duration::from_secs(5), fetch_url(url)).await??;` — двойной `?` (timeout error + fetch error). **Маңызды:** tokio::time компоненттері тек tokio runtime ішінде жұмыс істейді — runtime-сыз — panic."
+    },
+    {
+      "subject": {
+        "surface": "runtime incompatibility",
+        "root": "runtime incompatibility",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_670"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Runtime incompatibility — tokio мен async-std-ны бір процесс ішінде араластыру қаупті. Себеп: әр runtime өз reactor-ын қояды; тапсырма А-runtime-да жасалып, Б-runtime-нің I/O-сын `await` етсе — Б реактор `wake` жұмыс істемейді → Future мәңгі pending. **Симптом:** application іліп қалады, ешқандай қате жоқ. **Қалай тану:** `cargo tree` арқылы dependency-ді тексеру — кейбір крейттер async-std-pin болуы мүмкін. **Шешім:** (1) tokio-only crates таңдау — `reqwest`, `sqlx`, `axum`, ... — барлығы tokio. (2) Мүмкін болмаса — compat layer (`tokio-compat`, `async-compat`). **Идиома:** async runtime таңдалғаннан кейін «one-runtime rule» сақтау."
+    },
+    {
+      "subject": {
+        "surface": "futures runtime-agnostic",
+        "root": "futures runtime-agnostic",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_671"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "futures + runtime-agnostic кітапханалар — `futures` крейті Future трейтін шектеулерсіз ұсынады; runtime-ға тәуелді емес. `Stream`, `Sink`, `StreamExt`, `FutureExt`, `select!`, `join!` — барлығы futures-те, runtime таңдамайды. **Қалай runtime-agnostic кітапхана жазу:** (1) executor-specific API қолданбау (тек std + futures); (2) I/O абстракцияны параметризация: `pub async fn process<R: AsyncRead>(reader: R) -> ...`; (3) timer-ден қашу немесе абстракциялау. Мысалдар: `serde`, `nom`, `bytes` — runtime-agnostic; `reqwest`, `sqlx` — tokio-only. **Идиома:** кітапхана дизайнына — runtime-agnostic; binary дизайнына — tokio-specific."
+    },
+    {
+      "subject": {
+        "surface": "async-compat",
+        "root": "async-compat",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_672"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "async-compat / tokio-compat-02 layers — runtime араласу шешімдері. **`tokio-compat-02` (deprecated):** tokio 0.2 кодты tokio 1.0 runtime-да жұмыс істету. **`async-compat` крейті:** `Compat::new(tokio_future).await` — tokio-pinned Future-ды async-std runtime-да polls. Мысал: tokio-only `reqwest` крейтін async-std жобасында пайдалану — `async_compat::Compat::new(client.get(url).send()).await`. **Артықшылық:** mixed-runtime жоба incremental migration жеңілдетеді. **Кемшілік:** performance overhead (тегін емес); debugging қиынырақ. **Жалпы кеңес:** mixed runtime тек legacy жобада; жаңа жобаны bootstrap-тан tokio-да салу."
+    },
+    {
+      "subject": {
+        "surface": "tracing крейті",
+        "root": "tracing крейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_673"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "tracing крейті — async-aware structured logging. Стандартты `log` крейтінен айырмашылықтары: (1) **спан (span):** жұмыстың уақытша scope-ы — span-ге кіру/шығу — async-task-тар арасында дұрыс контекст беруге мүмкіндік; (2) **structured fields:** `tracing::info!(user_id = 42, query = %sql, \"executed query\")` — JSON-ге тиімді сериализация; (3) **subscriber-based:** logger-ді алмастыруға болады (console, OpenTelemetry, Jaeger, structured json). Мысал: `use tracing::{info, instrument}; info!(\"server started on {addr}\");`. **Production:** axum, tonic, sqlx — барлығы tracing арқылы logging."
+    },
+    {
+      "subject": {
+        "surface": "#[instrument]",
+        "root": "#[instrument]",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_674"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`#[instrument]` макросы — tracing крейтінің function-level автоматты span. Қолдану: `#[instrument] async fn handle_request(req: Request) -> Response { ... }` — функция шакырылғанда span ашылады, log message-дер — span context-ынде. Параметрлер: `#[instrument(skip(reqdy))]` — кейбір параметрлерді log-тан жасыру; `#[instrument(level = \"debug\")]` — log level; `#[instrument(fields(user_id = %req.user_id))]` — қосымша structured field-тер. **Артықшылық:** debug дәуірінде full trace — қандай endpoint, қанша уақыт, qатеге байланысты қандай ішкі функция. **Production:** Jaeger / OpenTelemetry-мен bilрге distributed tracing."
+    },
+    {
+      "subject": {
+        "surface": "console-subscriber",
+        "root": "console-subscriber",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_675"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "console-subscriber крейті — tokio runtime live debugging. Іске қосу: `tokio` крейтін `tracing` feature-мен қосу + `console_subscriber::init();` бағдарлама басында. Іске қосылған соң `tokio-console` CLI tool-ын run қылу — терминалда live дашборд: (1) live tasks list (қанша spawn болды, активты, idle); (2) per-task statistics (poll count, idle time, scheduled time); (3) busy-loop detection (бір ағында бөгеу task анықтау); (4) lock contention analysis (Mutex hold time). **Production-да маңызды:** Slack бойынша task мәңгі pending проблемасын тану өте қиын — console субscриber оны дереу көрсетеді. Аналог: Erlang observer, Java VisualVM."
     },
     {
       "subject": {

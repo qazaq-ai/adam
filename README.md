@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.91.5-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.92.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -23,7 +23,7 @@
   <img src="https://img.shields.io/badge/lexicon-16.9%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
   <img src="https://img.shields.io/badge/retrieval-morpheme%20index-8338EC?style=flat-square" alt="retrieval">
-  <img src="https://img.shields.io/badge/tests-1002%20passing-2EA44F?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/tests-1003%20passing-2EA44F?style=flat-square" alt="tests">
   <img src="https://img.shields.io/badge/cognitive%20eval-65%2F65%20canonical-2EA44F?style=flat-square" alt="cognitive eval">
   <img src="https://img.shields.io/badge/repl%20replay-97%2F97%20canonical-2EA44F?style=flat-square" alt="repl replay">
   <img src="https://img.shields.io/badge/parse--disambig%20eval-100%25%20%2823%2F23%29-2EA44F?style=flat-square" alt="parse-disambig eval">
@@ -33,7 +33,7 @@
   <img src="https://img.shields.io/badge/RSS-~76--80%20MB-2EA44F?style=flat-square" alt="rss">
   <img src="https://img.shields.io/badge/reasoning%20rules-10%20active-2EA44F?style=flat-square" alt="reasoning rules">
   <img src="https://img.shields.io/badge/predicate%20coverage-11%2F11-2EA44F?style=flat-square" alt="predicate coverage">
-  <img src="https://img.shields.io/badge/world%20core-2965%20curated%20/%203207%20facts-9CCC65?style=flat-square" alt="world core">
+  <img src="https://img.shields.io/badge/world%20core-2983%20curated%20/%203225%20facts-9CCC65?style=flat-square" alt="world core">
   <img src="https://img.shields.io/badge/domains-54-9CCC65?style=flat-square" alt="domains">
   <img src="https://img.shields.io/badge/policy-Rust--only%20%2B%20Graph--first-1976D2?style=flat-square" alt="policies">
   <img src="https://img.shields.io/badge/ungrounded%20generation-none%20on%20deterministic%20path-2EA44F?style=flat-square" alt="ungrounded generation">
@@ -58,6 +58,8 @@ Tiny ML lives, large ML doesn't: the trained perceptron is 24 bytes / 6 f32; suf
 ### Engineering thesis
 
 The project's core engineering claim — independent of any historical or philosophical thesis about Kazakh — is that **agglutinative morphology gives a clean algebra of meaning**: every Kazakh word decomposes into a root plus a sequence of typed suffixes, each contributing a known grammatical operator (case, number, tense, person, possessive, polarity, modality). Composition is rule-bound, not learned. That structure is exactly what we build the runtime on: FST morphology + typed suffix priors + root-pair PMI as deterministic prior layers, world_core as a curated graph of typed facts, and templates as the only path from fact to text. No probabilistic free generation. No retrained-from-scratch behaviour per release. The result is **predictable, traceable, low-energy** answer for Kazakh queries — not because the language has special metaphysical status, but because its structure is unusually friendly to formal modelling. The same engineering style would apply to other agglutinative-typology languages (Turkish, Kyrgyz, Tatar, Uzbek, …) without claims of universal grammar.
+
+**v4.92.0 — Rust Async Book chapter 8 deepening — Async ecosystem (tokio / async-std / smol + I/O traits + sync primitives + observability).** Per-chapter pedagogical cadence continues. Chapter 8 surveys the Rust async ecosystem — runtime comparison (tokio vs async-std vs smol vs embassy), the I/O abstraction layer (AsyncRead / AsyncWrite / AsyncBufRead), Tokio's sync + time primitives, runtime compatibility issues, and the observability stack (tracing + console-subscriber). This is the most production-oriented chapter — what a Rust async developer actually picks up day-to-day. **Added:** 18 new curated entries `rust_658…675` covering runtime comparison (5) + I/O traits (3) + Tokio sync (4) + compatibility (3) + observability (3). **Topic extraction:** `MULTIWORD_ENTITIES` += 18 compounds. **Per-chapter test:** `rust_async_book_chapter_08_holdout.json` (18 cases, 5 categories) + `tests/rust_async_book_chapter_08.rs` runs them with **100 % floor**. **Verified:** 18 / 18 async-chapter-8 holdout pass; Rust Book ch.1-20 + Async Book ch.1-7 + cross-cutting `rust_holdout` unchanged. Foundation: 2965/3207/30902 → **2983/3225/30889**. **Stripe — Kazakh school tutor + Rust curriculum (Async Book ch.8).**
 
 **v4.91.5 — Rust Async Book chapter 7 deepening — Workarounds (Send + recursion + traits + cancellation).** Per-chapter pedagogical cadence continues. Chapter 7 — the practical issues encountered when writing real async code. Walks from error handling (`?` + `Box<dyn Error+Send+Sync>` + anyhow/thiserror), through Send approximation problems (MutexGuard.await deadlock + Rc/RefCell across await), recursion (boxing for unbounded state machine size), async fn in traits (1.75 history + async-trait + RPITIT), to cancellation + drop issues (RAII in async + async drop problem + Future leak + cancel-safety patterns). **Added:** 18 new curated entries `rust_640…657` covering errors (3) + Send (4) + recursion (3) + traits (4) + cancellation/drop (4). **Topic extraction:** `MULTIWORD_ENTITIES` += 19 compounds. **Per-chapter test:** `rust_async_book_chapter_07_holdout.json` (18 cases, 5 categories) + `tests/rust_async_book_chapter_07.rs` runs them with **100 % floor**. **Verified:** 18 / 18 async-chapter-7 holdout pass; Rust Book ch.1-20 + Async Book ch.1-6 + cross-cutting `rust_holdout` unchanged. Foundation: 2947/3189/30885 → **2965/3207/30902**. **Stripe — Kazakh school tutor + Rust curriculum (Async Book ch.7).**
 

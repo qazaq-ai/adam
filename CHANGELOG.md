@@ -7,6 +7,54 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.92.0] — 2026-05-07 — Rust Async Book chapter 8 deepening — Async ecosystem (tokio / async-std / smol + I/O traits + sync primitives + observability)
+
+Per-chapter pedagogical cadence continues. Chapter 8 surveys the **Rust async ecosystem** — runtime comparison (tokio vs async-std vs smol vs embassy), the I/O abstraction layer (AsyncRead / AsyncWrite / AsyncBufRead), Tokio's sync + time primitives, runtime compatibility issues, and the observability stack (tracing + console-subscriber). This is the most production-oriented chapter — what a Rust async developer actually picks up day-to-day.
+
+### What's added
+
+**18 new curated entries `rust_658…675`** in `programming_rust.jsonl`:
+
+**Runtime ecosystem (5):** Async runtime таңдау критерийлері (maturity / dep size / API style / ecosystem fit), Tokio deep dive (work-stealing executor + reactor + timer wheels + production users), async-std deep dive (std-mirror + status: development slowed), smol крейті (modular: async-executor / async-io / async-net), Embassy крейті (no_std embedded async + static task allocation + battery-efficient cooperative scheduling).
+
+**I/O abstraction layer (3):** AsyncRead трейті (poll_read + AsyncReadExt + futures vs tokio variants), AsyncWrite трейті (poll_write + poll_flush + poll_shutdown), AsyncBufRead + AsyncBufReadExt (poll_fill_buf + lines() Stream + read_until).
+
+**Tokio sync + time (4):** tokio::sync примитивтері (Mutex/RwLock/Notify/OnceCell/Semaphore/Barrier — async-aware), tokio::sync::broadcast vs mpsc (multi-consumer pub/sub + Lagged), tokio::sync::oneshot (single-shot request/response), tokio::time + Timeout (sleep + interval + timeout(dur, fut)).
+
+**Compatibility (3):** Runtime incompatibility (don't mix tokio + async-std; Future hangs forever), futures + runtime-agnostic libraries (Stream/Sink/select! are runtime-neutral), async-compat / tokio-compat-02 layers (incremental migration helpers).
+
+**Observability (3):** tracing крейті (async-aware structured logging + spans + structured fields + subscriber-based), `#[instrument]` macro (function-level automatic span + skip/level/fields), console-subscriber (tokio-console live debugging dashboard).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_async_book_chapter_08_holdout.json` — 18 cases, 5 categories.
+- `crates/adam-dialog/tests/rust_async_book_chapter_08.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 18 compounds (subjects only — all object hubs already present).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 async-chapter-8 holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book ch.1-7 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **1003 passing** (was 1002; +1 async-chapter-8 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2965 → **2983** (+18) |
+| world_core facts | 3207 → **3225** (+18) |
+| Derived facts | 30902 → **30889** (−13, R5/R11 rebalancing) |
+
+### Roadmap (next — Async Book final)
+
+| Release | Async Book Chapter | Topic |
+|---|---|---|
+| **v4.92.0** | **ch. 8** | **Async ecosystem (this release)** |
+| v4.92.5 | ch. 9 | Final project — async HTTP server |
+
 ## [4.91.5] — 2026-05-07 — Rust Async Book chapter 7 deepening — Workarounds (Send + recursion + traits + cancellation)
 
 Per-chapter pedagogical cadence continues. Chapter 7 — the practical issues encountered when writing real async code. Walks from error handling (`?` operator + Box<dyn Error+Send+Sync> + anyhow/thiserror), through Send approximation problems (MutexGuard.await + Rc/RefCell across await), recursion (boxing for unbounded state machine size), async fn in traits (1.75 history + async-trait + RPITIT), to cancellation + drop issues (RAII in async + async drop problem + Future leak + cancel-safety patterns).

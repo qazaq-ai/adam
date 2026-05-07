@@ -2242,6 +2242,29 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "cancel-safety patterns",
     // Objects.
     "concurrency мәселесі",
+    // **v4.92.0** — Rust Async Book chapter 8 (Async ecosystem — tokio / async-std / smol + I/O traits + sync primitives + observability) deepening.
+    // rust_658…675 — 18 entries covering runtime comparison (5),
+    // I/O abstraction (3), Tokio sync (4), compatibility (3),
+    // tracing observability (3).
+    // Subjects.
+    "async runtime таңдау",
+    "tokio deep dive",
+    "async-std deep dive",
+    "smol крейті",
+    "embassy крейті",
+    "asyncread трейті",
+    "asyncwrite трейті",
+    "asyncbufread",
+    "tokio::sync примитивтері",
+    "tokio::sync::broadcast",
+    "tokio::sync::oneshot",
+    "tokio::time timeout",
+    "runtime incompatibility",
+    "futures runtime-agnostic",
+    "async-compat",
+    "tracing крейті",
+    "#[instrument]",
+    "console-subscriber",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

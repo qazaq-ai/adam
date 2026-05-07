@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.92.0 — Rust Async Book Chapter 8 (Async ecosystem — tokio / async-std / smol + I/O traits + sync primitives + observability) holdout. 18 natural Kazakh queries against rust_658…675. Categories: async8_runtime_choice (selection criteria + tokio + async-std + smol + embassy), async8_io_traits (AsyncRead + AsyncWrite + AsyncBufRead), async8_tokio_sync (sync primitives + broadcast + oneshot + time/timeout), async8_compatibility (runtime incompatibility + futures-agnostic + async-compat), async8_observability (tracing + #[instrument] + console-subscriber).",
+  "version": "v4.92.0",
+  "captured_date": "2026-05-07",
+  "book": "Rust Async Book",
+  "chapter": 8,
+  "chapter_title": "Async ecosystem — tokio / async-std / smol + I/O traits + sync primitives + observability",
+  "cases": [
+    {"id": "async8_choice", "category": "async8_runtime_choice", "query": "Async runtime таңдау деген не?", "any_substring": ["maturity", "axum/hyper/sqlx", "embedded"]},
+    {"id": "async8_tokio", "category": "async8_runtime_choice", "query": "Tokio deep dive деген не?", "any_substring": ["work-stealing", "epoll/kqueue/iocp", "cloudflare"]},
+    {"id": "async8_async_std", "category": "async8_runtime_choice", "query": "async-std deep dive деген не?", "any_substring": ["std-mirror", "async_std::fs::file", "development бәсеңдеген"]},
+    {"id": "async8_smol", "category": "async8_runtime_choice", "query": "smol крейті деген не?", "any_substring": ["async-executor", "carl lerche", "embedded/no_std"]},
+    {"id": "async8_embassy", "category": "async8_runtime_choice", "query": "Embassy крейті деген не?", "any_substring": ["arm cortex-m", "no_std", "battery-powered"]},
+    {"id": "async8_async_read", "category": "async8_io_traits", "query": "AsyncRead трейті деген не?", "any_substring": ["std::io::read", "poll_read", "asyncreadext"]},
+    {"id": "async8_async_write", "category": "async8_io_traits", "query": "AsyncWrite трейті деген не?", "any_substring": ["poll_write", "poll_flush", "poll_shutdown"]},
+    {"id": "async8_buf_read", "category": "async8_io_traits", "query": "AsyncBufRead деген не?", "any_substring": ["poll_fill_buf", "lines()", "next_line"]},
+    {"id": "async8_sync", "category": "async8_tokio_sync", "query": "tokio::sync примитивтері деген не?", "any_substring": ["mutex<t>", "rwlock<t>", "semaphore"]},
+    {"id": "async8_broadcast", "category": "async8_tokio_sync", "query": "tokio::sync::broadcast деген не?", "any_substring": ["multi-consumer", "subscribe()", "lagged"]},
+    {"id": "async8_oneshot", "category": "async8_tokio_sync", "query": "tokio::sync::oneshot деген не?", "any_substring": ["oneshot::channel", "request/response", "recverror"]},
+    {"id": "async8_time", "category": "async8_tokio_sync", "query": "tokio::time timeout деген не?", "any_substring": ["sleep(duration)", "interval(period)", "elapsed"]},
+    {"id": "async8_incompat", "category": "async8_compatibility", "query": "Runtime incompatibility деген не?", "any_substring": ["арасында", "cargo tree", "one-runtime rule"]},
+    {"id": "async8_agnostic", "category": "async8_compatibility", "query": "Futures runtime-agnostic деген не?", "any_substring": ["asyncread", "serde", "тәуелді емес"]},
+    {"id": "async8_compat", "category": "async8_compatibility", "query": "async-compat деген не?", "any_substring": ["compat::new", "tokio-compat-02", "performance overhead"]},
+    {"id": "async8_tracing", "category": "async8_observability", "query": "Tracing крейті деген не?", "any_substring": ["спан (span)", "structured fields", "subscriber-based"]},
+    {"id": "async8_instrument", "category": "async8_observability", "query": "#[instrument] деген не?", "any_substring": ["function-level", "skip", "jaeger"]},
+    {"id": "async8_console", "category": "async8_observability", "query": "console-subscriber деген не?", "any_substring": ["tokio-console", "busy-loop", "lock contention"]}
+  ]
+}
