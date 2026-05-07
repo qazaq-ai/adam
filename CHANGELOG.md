@@ -7,6 +7,59 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.90.5] — 2026-05-07 — Rust Async Book chapter 5 deepening — Streams (Stream trait + StreamExt + async iteration) — workspace tests hit **1000** 🎉
+
+Per-chapter pedagogical cadence continues. Chapter 5 introduces **Stream** — the async-aware Iterator. Walks from the trait signature (poll_next + Pin + Context + Poll<Option<Item>>) to consumption patterns (.next().await + while let + for_each + laziness), the StreamExt combinator zoo (map/filter/then/fold/collect), the concurrent processing primitives (buffered + buffer_unordered + for_each_concurrent), and the common stream sources (stream::iter + mpsc::Receiver as Stream).
+
+**Milestone:** workspace tests hit **1000** with this release.
+
+### What's added
+
+**18 new curated entries `rust_604…621`** in `programming_rust.jsonl`:
+
+**Stream trait basics (4):** Stream трейт сигнатурасы (poll_next + Pin + Context + Poll<Option<Item>>; note: still in `futures` crate, not std), Stream vs Iterator айырмашылығы (sync vs async-aware + when each is appropriate), Poll<Option<Item>> семантикасы (3 outcomes: Ready(Some) / Ready(None) / Pending; finality of None vs Iterator's free re-querying), Stream impl мысалы (Counter from-scratch).
+
+**Iteration patterns (4):** `.next().await` идиомасы (StreamExt::next + try_next for Result-streams + &mut self requirement), `while let Some(x) = stream.next().await` цикл (idiomatic until `for-loop-await` RFC stabilises), for_each async (functional consumption), Stream-нің лазылығы (no work without polling — drop-without-poll warning).
+
+**StreamExt combinators (5):** StreamExt трейт шолуы (futures::stream::StreamExt + 30+ combinators), `map`/`filter`/`take`/`skip` (sync-style transforms; filter is async-predicate), `then` (async-per-item; serial), `fold` (async accumulator + try_fold for Result-streams), `collect::<Vec<_>>()` (Future-returning + memory caveats).
+
+**Concurrent stream patterns (3):** `buffered(n)` (N-concurrent + stream-order results), `buffer_unordered(n)` (N-concurrent + completion-order results), `for_each_concurrent` (N-concurrent terminal consumption + DoS-guard via limit).
+
+**Stream sources (2):** `stream::iter` (Iterator → Stream + testing pattern + Pending-never source), `mpsc::Receiver` as Stream (tokio_stream::wrappers::ReceiverStream + futures::channel::mpsc native + concurrent message handling).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_async_book_chapter_05_holdout.json` — 18 cases, 5 categories.
+- `crates/adam-dialog/tests/rust_async_book_chapter_05.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 18 compounds (subjects only — all object hubs already present).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 async-chapter-5 holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book chapters 1-4 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **1000 passing** 🎉 (was 999; +1 async-chapter-5 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2911 → **2929** (+18) |
+| world_core facts | 3153 → **3171** (+18) |
+| Derived facts | 30899 → **30881** (−18, expected from R5/R11 rebalancing) |
+
+### Roadmap (next — Async Book)
+
+| Release | Async Book Chapter | Topic |
+|---|---|---|
+| **v4.90.5** | **ch. 5** | **Streams (this release)** |
+| v4.91.0 | ch. 6 | Executing multiple futures — join! / try_join! / select! |
+| v4.91.5 | ch. 7 | Workarounds (Send + recursion + traits) |
+| v4.92.0 | ch. 8 | The Async ecosystem (tokio vs async-std deep) |
+| v4.92.5 | ch. 9 | Final project — async HTTP server |
+
 ## [4.90.0] — 2026-05-07 — Rust Async Book chapter 4 deepening — Pinning (Pin + Unpin + self-referential structs)
 
 Per-chapter pedagogical cadence continues. Chapter 4 — **the most subtle topic in Rust** — explains Pin: the safety mechanism that makes async fn state machines sound. The chapter walks from the underlying problem (self-referential structs + move-and-corrupt UB) to the wrapper type (`Pin<P>`), the `Unpin` auto-trait that lets most types ignore Pin entirely, the storage forms (Box::pin, pin!, Pin<&mut T>), the projection problem (and pin-project crate), and back to the Future::poll signature where Pin is mandatory.

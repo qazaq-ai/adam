@@ -1,7 +1,7 @@
 {
-  "version": "4.89.5",
+  "version": "4.90.0",
   "status": "completed",
-  "elapsed_s": 31,
+  "elapsed_s": 34,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3153,
+    "facts_total": 3171,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2588,
+      "is_a": 2606,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 594,
+      "world_core/programming_rust.jsonl": 612,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -54817,6 +54817,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Pinning ережелері — қысқаша 3-ереже моделі: (1) **Move сақтау:** Pin берілген T ешқашан жадтан жылжытылмайды (drop-қа дейін); (2) **Drop must run:** T-нің `drop` шакырылуы керек — Pin-ден шықпай-ақ; (3) **Unpin қашықтығы:** `T: Unpin` болса — ереже #1 түспейді (тип move-ке қарсы емес). Тәжірибеде көп жерде pin-проблема жоқ — қарапайым типтер `Unpin`. Pin-ді ескере бастайтын кезде: (a) custom Future iскe asyru — poll signature-да Pin; (b) self-referential күй сақтайтын тип — `PhantomPinned` + `!Unpin`. **Идиома:** қолмен поллу қажет болмаса — `Box::pin()` немесе `pin!()` арқылы өту, projection керек болса — `pin-project` крейтін қолдану."
+    },
+    {
+      "subject": {
+        "surface": "stream трейт сигнатурасы",
+        "root": "stream трейт сигнатурасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_604"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Stream трейт сигнатурасы — async iterator. `pub trait Stream { type Item; fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>>; }`. Әр бөлік: (1) `type Item` — әр итерация қайтаратын мән типі; (2) `self: Pin<&mut Self>` — Future-дегідей, self-referential әлеуетке байланысты; (3) `Context<'_>` — Waker берілуі үшін; (4) `Poll<Option<Item>>` — үш мүмкін нәтиже: `Ready(Some(x))` (item бар), `Ready(None)` (stream аяқталды), `Pending` (item әлі дайын емес, қайта poll-дауды Waker арқылы күтеміз). **Маңызды:** Stream `std`-те жоқ — `futures` крейтінде орналасқан; стандартқа кіргізу әлі талқылануда (RFC)."
+    },
+    {
+      "subject": {
+        "surface": "stream vs iterator",
+        "root": "stream vs iterator",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust тұжырымдамасы",
+        "root": "rust тұжырымдамасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_605"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Stream vs Iterator айырмашылығы — синхронды vs асинхронды итерация. **Iterator:** `fn next(&mut self) -> Option<Item>` — әр шакыру бірден item немесе None қайтарады; **Stream:** `fn poll_next(self: Pin<&mut Self>, cx) -> Poll<Option<Item>>` — әр шакыру `Pending` болуы мүмкін, item кейін келеді. Семантикалық параллель: Iterator → Stream, Future → әдеттегі функция-нәтиже, but async. **Қашан Stream керек:** (1) network responses (бірнеше пакет); (2) database query results (page-by-page); (3) timer ticks; (4) channel receives. **Қашан Iterator жеткілікті:** in-memory деректер (Vec, HashMap), файл-бойынша блокталған I/O."
+    },
+    {
+      "subject": {
+        "surface": "poll<option<item>>",
+        "root": "poll<option<item>>",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_606"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Poll<Option<Item>>` семантикасы — Stream::poll_next-тің 3 түрлі қайтарымы. (1) **`Poll::Pending`:** stream бұрыннан жұмыс істеп жатыр, бірақ item әлі дайын емес — Future сияқты, Waker сақталу керек, кейін жоғарырақ poll-да тексеру; (2) **`Poll::Ready(Some(item))`:** item дайын — alıp, кейінгі poll-да next item-ді сұрау; (3) **`Poll::Ready(None)`:** stream аяқталды — бұдан кейін poll шакыруға тыйым (panic болуы мүмкін, fused stream-нен басқа). **Маңызды нюанс:** `Ready(None)` — финальды; ал Iterator-да `next()` бірнеше рет None қайтаруы мүмкін (немесе кейіннен Some). Stream — бір рет «қалмадым» дей алады."
+    },
+    {
+      "subject": {
+        "surface": "stream impl мысалы",
+        "root": "stream impl мысалы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust pedagogy",
+        "root": "rust pedagogy",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_607"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Stream impl мысалы — counter stream нөлден жүзге дейін санайды. `struct Counter { count: u32, max: u32 } impl Stream for Counter { type Item = u32; fn poll_next(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Option<u32>> { if self.count < self.max { self.count += 1; Poll::Ready(Some(self.count)) } else { Poll::Ready(None) } } }`. Qолдану: `let mut counter = Counter { count: 0, max: 5 }; while let Some(n) = counter.next().await { println!(\"{n}\"); }` → 1, 2, 3, 4, 5 басып шығарады. **Маңызды:** бұл Counter `Pending` ешқашан қайтармайды — бірақ нағыз stream-дер (network, channel) Pending-ді жиі қайтарады."
+    },
+    {
+      "subject": {
+        "surface": ".next().await идиомасы",
+        "root": ".next().await идиомасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_608"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`.next().await` идиомасы — Stream-нен бір item алу үшін. `StreamExt::next` әдісі stream-ге қолданылып, `Future<Output = Option<Item>>`-ті қайтарады; .await — оны соңғы нәтижеге жеткізеді. Мысал: `use futures::stream::StreamExt; let mut s = some_stream(); let first = s.next().await; match first { Some(x) => println!(\"item: {x}\"), None => println!(\"done\") }`. **Альтернатив:** `try_next().await` — `Result`-қайтаратын stream-дер үшін (`TryStreamExt::try_next`). **Маңызды:** `next()` `&mut self` алады, сондықтан stream **mutable** болуы керек; immutable variable-да жұмыс істемейді."
+    },
+    {
+      "subject": {
+        "surface": "while let stream цикл",
+        "root": "while let stream цикл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_609"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`while let Some(x) = stream.next().await` — Stream-ді бастан-аяқ айналу циклдік шаблон. Эквивалент Iterator-дың `for x in iter`-нен; for-цикл future-аналогы әлі stable емес (`for-loop-await` RFC жұмыста). Мысал: `while let Some(line) = lines_stream.next().await { process(line).await; }`. **Семантика:** (1) `next()` шакырылады, Future қайтарады; (2) `.await` Future-ды күтіп, `Option<Item>` алады; (3) `Some(line)` сай келсе — match жанады, тарту жалғасады; (4) `None` — циклден шығу. **Маңызды нюанс:** `.next().await` блоктары — Stream-ді ішке тасу (`pin_mut!` керек болуы мүмкін, ескі стиль — qаз `Pin::new_unchecked` керек)."
+    },
+    {
+      "subject": {
+        "surface": "for_each async",
+        "root": "for_each async",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_610"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`for_each` async — Stream-ді consume етіп, әр элементке async функцияны қолдану. Сигнатура: `fn for_each<F, Fut>(self, f: F) -> impl Future<Output = ()> where F: FnMut(Self::Item) -> Fut, Fut: Future<Output = ()>`. Мысал: `use futures::stream::StreamExt; lines_stream.for_each(|line| async move { process(line).await; }).await;`. **Айырмашылық `while let`-тен:** for_each — функционалды стиль (combinator), while let — императивты. **Маңызды:** for_each **сериалды** — әр item бірінен соң бір орындалады. Параллель консумация үшін: `for_each_concurrent`."
+    },
+    {
+      "subject": {
+        "surface": "stream лазылығы",
+        "root": "stream лазылығы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_611"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Stream-нің лазылығы (laziness) — Future сияқты, Stream де **полл-ға дейін жұмыс жасамайды**. `let s = some_stream();` — ешбір item жасалмайды; `let mut s = some_stream(); s.next().await;` — ғана бірінші polling басталады. **Әсер:** Stream-ді жасап қойсаңыз да, оны қолданбасаңыз — ешқандай side-effect жоқ (мысалы, network request жіберілмейді). Tokio runtime warning береді: «stream was dropped without being polled». **Идиома:** Stream жасадыңыз — оны `.await`/.consume бойынша қолдану; немесе `tokio::spawn` арқылы фонында тастау."
+    },
+    {
+      "subject": {
+        "surface": "streamext шолуы",
+        "root": "streamext шолуы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_612"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "StreamExt трейт шолуы — `futures::stream::StreamExt` — Stream-ге combinator-лар қосатын extension трейт. Импорт қажет: `use futures::stream::StreamExt;`. Іске асырылған әдістер: `next`, `map`, `filter`, `then`, `for_each`, `fold`, `take`, `skip`, `chain`, `zip`, `enumerate`, `collect`, `buffered`, `buffer_unordered`, `for_each_concurrent`, `merge`, ... — 30+ combinator. Tokio-да эквивалент: `tokio::stream::StreamExt`, бірақ көп бөлігі futures-тен кейін келді. **Жалпы ереже:** Stream трейтпен жұмыс істегенде — әрқашан StreamExt-ті импорт ету (Iterator-дың IteratorExt сияқты, бірақ Iterator өзі осы әдістерді ұстайды; Stream — модульдік таңдау)."
+    },
+    {
+      "subject": {
+        "surface": "map filter take skip",
+        "root": "map filter take skip",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_613"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`map` / `filter` / `take` / `skip` — sync-стиль трансформдар. **`map(f)`:** әр item-ге `f` қолданып, нәтижені шығару — `f` синхронды (`FnMut(T) -> U`). **`filter(p)`:** предикатке сай item-ді ғана өткізу — `p: FnMut(&T) -> Future<Output = bool>` (async!). **`take(n)`:** алғашқы N item-ді ғана. **`skip(n)`:** алғашқы N item-ді тастап, кейінгілерін қалдыру. Мысал: `numbers.map(|x| x * 2).filter(|x| async move { x > 10 }).take(5).collect::<Vec<_>>().await`. **Маңызды:** `filter` async — қарапайым sync функцияда жұмыс істегіңіз келсе — `filter(|x| async move { *x > 10 })` орай."
+    },
+    {
+      "subject": {
+        "surface": "stream then",
+        "root": "stream then",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_614"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`then` — Stream-нің әр item-ін async функциямен трансформдау. `map` -жен айырмашылығы: map синхронды функция қабылдайды; then async функция қабылдайды. Сигнатура: `fn then<F, Fut>(self, f: F) -> impl Stream<Item = Fut::Output> where F: FnMut(Self::Item) -> Fut, Fut: Future`. Мысал: `urls.then(|url| async move { fetch(url).await }).collect::<Vec<_>>().await;` — әр URL үшін `fetch().await` шакырылып, нәтижелер жиналады. **Маңызды:** then **сериалды** жұмыс істейді — бір fetch аяқталмайынша келесі басталмайды. Параллель fetch үшін: `buffered(n)` немесе `buffer_unordered(n)` — N fetch-ті бір уақытта ұстау."
+    },
+    {
+      "subject": {
+        "surface": "stream fold",
+        "root": "stream fold",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_615"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`fold` async аккумулятор — Stream-нің барлық item-дерін бір нәтижеге біріктіру. Сигнатура: `fn fold<T, F, Fut>(self, init: T, f: F) -> impl Future<Output = T> where F: FnMut(T, Self::Item) -> Fut, Fut: Future<Output = T>`. Мысал: `let total = numbers.fold(0u64, |acc, x| async move { acc + x as u64 }).await;` — барлық сандардың async қосындысы. **Идиома:** `try_fold` (`TryStreamExt`) — Result-стрим үшін, қате болса ерте тоқтайды. **Айырмашылық `collect`-тен:** collect Vec-қа жинайды; fold кез-келген типке reduce жасайды."
+    },
+    {
+      "subject": {
+        "surface": "collect vec",
+        "root": "collect vec",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_616"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`collect::<Vec<_>>()` — Stream-ні Vec-ке жинау. Iterator-дағы collect-тен айырмашылықтары: (1) **Future қайтарады** — стрим барлық item-дерін күту керек; (2) `.await` шакырылу қажет: `let v: Vec<u32> = stream.collect().await;`. Әртүрлі типтерге collect жасауға болады: `String`, `HashMap`, `HashSet`, custom type-тар (FromIterator іске асырушы). **Маңызды:** `collect` барлық item-дерді жадта ұстайды — миллион-item стрим үшін жадтан тыс шығу қаупі. Үлкен стрим үшін: `for_each` немесе `fold`-пен incremental processing."
+    },
+    {
+      "subject": {
+        "surface": "buffered concurrent",
+        "root": "buffered concurrent",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_617"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`buffered(n)` — концерреллі N item processing. `Stream<Item = Future<Output = T>>`-ті алып, бір уақытта N future-ды polls — нәтижелерді **stream order сақтап** қайтарады. Мысал: `urls.iter().map(|url| fetch(url)) // Stream of futures .collect::<FuturesOrdered<_>>() // alternative .buffered(10) // up to 10 in flight .collect::<Vec<_>>().await;` — 10 fetch паралльді жұмыс істеп, нәтижелер келген ретпен (URL ретімен) Vec-ке жиналады. **Артықшылық:** sequential `then` 10× баяу болады; buffered batch concurrency береді. **Шектеу:** N тым үлкен болса — server-ге шамадан тыс жүктеу."
+    },
+    {
+      "subject": {
+        "surface": "buffer_unordered",
+        "root": "buffer_unordered",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_618"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`buffer_unordered(n)` — N future, **out-of-order completion**. Сигнатура: `Stream<Item = Future>` → `Stream<Item = Future::Output>`. `buffered`-тен айырмашылығы: нәтижелер **future аяқталу ретімен** қайтарылады, бастапқы Stream ретімен емес. Мысал: 3 URL-ді fetch — біреуі тез келсе, басқалардан бұрын item болып шығады. **Қашан керек:** order маңызды емес болса (жұмыс — әр item-ге жеке-жеке) — buffer_unordered ыңғайлы; бірінші item-ге процесс басталу — өткен жұмысты толық күтпейді. **Қашан керек емес:** result order маңызды (мысалы, log жүйелі болуы керек) — buffered."
+    },
+    {
+      "subject": {
+        "surface": "for_each_concurrent",
+        "root": "for_each_concurrent",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_619"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`for_each_concurrent` — Stream-ді конкурренттi consumelyetin шаблон. Сигнатура: `fn for_each_concurrent<F, Fut>(self, limit: impl Into<Option<usize>>, f: F) -> impl Future<Output = ()>`. Мысал: `urls_stream.for_each_concurrent(10, |url| async move { let body = fetch(url).await; save(body).await; }).await;` — 10 fetch-save pipeline бір уақытта; біреуі аяқталса — келесі URL басталады. **Айырмашылық `for_each`-тен:** for_each — сериалды (1 уақытта 1 item); for_each_concurrent — N уақытта N item. **Limit семантикасы:** `Some(N)` — макс N concurrent; `None` — шексіз (барлық item-дер бір уақытта — DoS қаупі!)."
+    },
+    {
+      "subject": {
+        "surface": "stream::iter",
+        "root": "stream::iter",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust api",
+        "root": "rust api",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_620"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`stream::iter` — синхронды Iterator → Stream түрлендіруші. Сигнатура: `pub fn iter<I: IntoIterator>(i: I) -> Iter<I::IntoIter>`. Мысал: `use futures::stream; let s = stream::iter(vec![1, 2, 3, 4, 5]); s.for_each(|x| async move { println!(\"{x}\") }).await;`. **Шектеу:** қайтарылған stream `Pending` ешқашан қайтармайды (synchronous source — барлық item-дер бірден дайын); сондықтан async-та кешеу жоқ. **Қашан keуек:** (1) testing — async stream-ді синхронды test data-мен тексеру; (2) async pipeline-ге Vec-ден бастау; (3) `.then()`/`.buffered()`-пен ынтымақтасу — Vec-тің әр элементіне async функцияны параллель қолдану."
+    },
+    {
+      "subject": {
+        "surface": "mpsc::receiver stream",
+        "root": "mpsc::receiver stream",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_621"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`mpsc::Receiver` Stream ретінде — tokio + futures крейттері channel receiver-ді Stream түрінде ұсынады. **Tokio:** `tokio::sync::mpsc::Receiver` — `recv().await` арқылы алу немесе `ReceiverStream` арқылы Stream-ге айналдыру (`tokio_stream::wrappers::ReceiverStream`). **Futures:** `futures::channel::mpsc::Receiver` тікелей `Stream` трейтін іске асырады. Мысал: `let (tx, mut rx) = tokio::sync::mpsc::channel(100); tokio::spawn(async move { while let Some(msg) = rx.recv().await { handle(msg).await; } });`. Streamext арқылы: `let stream = ReceiverStream::new(rx); stream.for_each_concurrent(10, |msg| async move { handle(msg).await; }).await;` — 10 message paralelno."
     },
     {
       "subject": {

@@ -2171,6 +2171,29 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // Objects.
     "rust мәселесі",
     "rust трейті",
+    // **v4.90.5** — Rust Async Book chapter 5 (Streams — Stream trait + StreamExt + async iteration) deepening.
+    // rust_604…621 — 18 entries covering Stream trait basics (4),
+    // iteration patterns (4), StreamExt combinators (5),
+    // concurrent stream patterns (3), stream sources (2).
+    // Subjects.
+    "stream трейт сигнатурасы",
+    "stream vs iterator",
+    "poll<option<item>>",
+    "stream impl мысалы",
+    ".next().await идиомасы",
+    "while let stream цикл",
+    "for_each async",
+    "stream лазылығы",
+    "streamext шолуы",
+    "map filter take skip",
+    "stream then",
+    "stream fold",
+    "collect vec",
+    "buffered concurrent",
+    "buffer_unordered",
+    "for_each_concurrent",
+    "stream::iter",
+    "mpsc::receiver stream",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

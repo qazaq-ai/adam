@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.90.5 — Rust Async Book Chapter 5 (Streams — Stream trait + StreamExt + async iteration) holdout. 18 natural Kazakh queries against rust_604…621. Categories: async5_trait_basics (Stream signature + Iterator comparison + Poll<Option<Item>> + impl example), async5_iteration (.next().await + while let + for_each + laziness), async5_combinators (StreamExt + map/filter/take/skip + then + fold + collect), async5_concurrent (buffered + buffer_unordered + for_each_concurrent), async5_sources (stream::iter + mpsc::Receiver as Stream).",
+  "version": "v4.90.5",
+  "captured_date": "2026-05-07",
+  "book": "Rust Async Book",
+  "chapter": 5,
+  "chapter_title": "Streams — Stream trait + StreamExt + async iteration",
+  "cases": [
+    {"id": "async5_signature", "category": "async5_trait_basics", "query": "Stream трейт сигнатурасы деген не?", "any_substring": ["poll_next", "poll<option<self::item>>", "futures крейтінде"]},
+    {"id": "async5_vs_iter", "category": "async5_trait_basics", "query": "Stream vs Iterator деген не?", "any_substring": ["синхронды vs асинхронды", "page-by-page", "in-memory"]},
+    {"id": "async5_poll_option", "category": "async5_trait_basics", "query": "Poll<Option<Item>> деген не?", "any_substring": ["ready(some(item))", "ready(none)", "fused"]},
+    {"id": "async5_impl", "category": "async5_trait_basics", "query": "Stream impl мысалы деген не?", "any_substring": ["counter", "self.count", "poll::ready(none)"]},
+    {"id": "async5_next_await", "category": "async5_iteration", "query": ".next().await идиомасы деген не?", "any_substring": ["streamext::next", "try_next", "&mut self"]},
+    {"id": "async5_while_let", "category": "async5_iteration", "query": "While let stream цикл деген не?", "any_substring": ["lines_stream.next()", "for-loop-await", "pin_mut"]},
+    {"id": "async5_for_each", "category": "async5_iteration", "query": "for_each async деген не?", "any_substring": ["fnmut(self::item)", "сериалды", "for_each_concurrent"]},
+    {"id": "async5_lazy", "category": "async5_iteration", "query": "Stream лазылығы деген не?", "any_substring": ["полл-ға дейін", "side-effect", "tokio::spawn"]},
+    {"id": "async5_streamext", "category": "async5_combinators", "query": "StreamExt шолуы деген не?", "any_substring": ["futures::stream::streamext", "buffered", "merge"]},
+    {"id": "async5_map_filter", "category": "async5_combinators", "query": "Map filter take skip деген не?", "any_substring": ["fnmut(t) -> u", "fnmut(&t) -> future<output = bool>", "алғашқы n"]},
+    {"id": "async5_then", "category": "async5_combinators", "query": "Stream then деген не?", "any_substring": ["fnmut(self::item) -> fut", "сериалды", "buffer_unordered"]},
+    {"id": "async5_fold", "category": "async5_combinators", "query": "Stream fold деген не?", "any_substring": ["init: t", "try_fold", "reduce"]},
+    {"id": "async5_collect", "category": "async5_combinators", "query": "Collect vec деген не?", "any_substring": ["future қайтарады", "fromiterator", "incremental processing"]},
+    {"id": "async5_buffered", "category": "async5_concurrent", "query": "Buffered concurrent деген не?", "any_substring": ["stream of futures", "stream order", "10× баяу"]},
+    {"id": "async5_buffer_un", "category": "async5_concurrent", "query": "buffer_unordered деген не?", "any_substring": ["out-of-order", "future аяқталу ретімен", "log жүйелі"]},
+    {"id": "async5_for_each_conc", "category": "async5_concurrent", "query": "for_each_concurrent деген не?", "any_substring": ["limit", "fetch-save pipeline", "dos қаупі"]},
+    {"id": "async5_iter", "category": "async5_sources", "query": "stream::iter деген не?", "any_substring": ["intoiterator", "synchronous source", "vec-ден"]},
+    {"id": "async5_mpsc", "category": "async5_sources", "query": "mpsc::Receiver stream деген не?", "any_substring": ["receiverstream", "tokio_stream::wrappers", "futures::channel::mpsc"]}
+  ]
+}
