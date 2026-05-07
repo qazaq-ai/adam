@@ -1,7 +1,7 @@
 {
-  "version": "4.88.5",
+  "version": "4.89.0",
   "status": "completed",
-  "elapsed_s": 58,
+  "elapsed_s": 71,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3117,
+    "facts_total": 3135,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2552,
+      "is_a": 2570,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 558,
+      "world_core/programming_rust.jsonl": 576,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -54097,6 +54097,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Waker hand-off (Waker-ді тапсыру) — Future-нің поллі мен сыртқы оқиғаның арасындағы синхронизация механизмі. **Шынайы реттік:** (1) Future poll: `Waker = cx.waker().clone()`; (2) Future state-ке `waker = Some(Waker)` сақтайды; (3) Future `Poll::Pending` қайтарады; (4) Қандай-да-бір сыртқы кез-келген уақытта оқиға дайын болады; (5) Сыртқы кодтар state-тен `waker.take()` арқылы Waker-ді алады; (6) `waker.wake()` шакырылады; (7) Executor task-ты ready queue-ге қояды; (8) Future қайта poll-данады, енді нәтиже бар. **Кепілдемелер:** `take` + Mutex арқасында — `wake` екі рет шакырылмайды; deadlock жоқ; race condition жоқ."
+    },
+    {
+      "subject": {
+        "surface": "async fn state machine",
+        "root": "async fn state machine",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust механизмі",
+        "root": "rust механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_568"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "async fn → state machine трансформациясы — компилятор `async fn`-ді **анонимды enum**-ға айналдырады. Әр `.await` нүктесі — жеке state. Мысал: `async fn foo() { a().await; b().await }` → шамамен `enum FooState { Start, AfterA(FutA), AfterB(FutB), Done }` + `Future::poll` импл-ы — `match` бойынша қазіргі state-ке сай жұмысты жалғастырады. Бұл — Future-ң **lazy** болуының техникалық себебі: state machine ешкім poll-дамайынша Start-та тұрады. **Маңызды:** трансформация **бір рет** компиляцияда жасалады; runtime-да ешқандай қосымша құрылым жоқ. Бұл «zero-cost abstraction» қағидасының іс жүзіндегі көрінісі."
+    },
+    {
+      "subject": {
+        "surface": "async .await transition",
+        "root": "async .await transition",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust механизмі",
+        "root": "rust механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_569"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әр `.await` — state transition — `async fn` ішіндегі әр `.await` өрнегі компиляторға state transition нүктесін білдіреді. Поллдағы шынайы реттік: (1) Future::poll шакырылады; (2) match текущ state — мысалы `Start`; (3) `let x = a().await;` — ішкі future-ды poll; (4) Pending болса — state-ті `AfterA(future_a)` қойып, өзі де Pending қайтару; (5) Қайта poll-да — `AfterA` state, ішкі future қайта poll; (6) Ready(value) болса — `let x = value` орындау, келесі `.await`-ке көшу. Орта айнымалылар (мысалы `let x`) **state машинасының өрістеріне** сақталады. **Сондықтан** async fn локалдары — нағыз struct field-тер."
+    },
+    {
+      "subject": {
+        "surface": "captured locals state",
+        "root": "captured locals state",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust механизмі",
+        "root": "rust механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_570"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Locals state-те — `async fn` ішіндегі `.await`-тарарасында тірі болатын барлық локалды айнымалы state machine struct-тың өрісі болады. Мысал: `async fn foo() { let x = 5; let y = a().await; let z = x + y; b().await }` — `x` мен `y` екеуі де `b()` await-нан кейін де керек, сондықтан state ішінде сақталады. Тек `let z` соңғысы — соңғы state-те ғана; қалғандарға өту керек емес. **Әсер:** state machine size = sum of (live local sizes) per state + tag. Үлкен async fn — үлкен Future. **Идиома:** локалдарды кішкене блоктарға бөлу — Future size-ды азайтады; қажет болмаса — `.await` алдында `drop(local)` шакыру."
+    },
+    {
+      "subject": {
+        "surface": "state machine generated",
+        "root": "state machine generated",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust pedagogy",
+        "root": "rust pedagogy",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_571"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Generated code мысалы — `async fn double(n: u32) -> u32 { let half = compute_half(n).await; half * 2 }` — компилятор шамамен қалай ашады: `enum DoubleFut { Start { n: u32 }, AwaitHalf { n: u32, fut: ComputeHalfFut }, Done } impl Future for DoubleFut { type Output = u32; fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<u32> { let this = unsafe { self.get_unchecked_mut() }; loop { match this { DoubleFut::Start { n } => { *this = DoubleFut::AwaitHalf { n: *n, fut: compute_half(*n) }; } DoubleFut::AwaitHalf { n, fut } => { let half = ready!(unsafe { Pin::new_unchecked(fut) }.poll(cx)); return Poll::Ready(half * 2); } DoubleFut::Done => panic!() } } } }`. Шынайы код одан да күрделі (Pin projection, drop guard) — бірақ негізі осы."
+    },
+    {
+      "subject": {
+        "surface": "'async lifetime",
+        "root": "'async lifetime",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_572"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "'async lifetime ережесі — `async fn` шакыру қайтаратын Future барлық параметрлерді (мысалы `&str` сілтемелер) **қамтиды**. Сондықтан Future параметрлерден ұзақ өмір сүре алмайды. Мысал: `async fn echo(s: &str) -> String { s.to_string() }` — қайтарылатын `impl Future` — `'a` lifetime-та (десуктың `s`-тен): `impl Future<Output = String> + 'a`. Шакыру: `let f = echo(\"hello\"); drop(\"hello\"); f.await;` — қате (өйткені «hello» өшті). Мұның мағынасы: async fn-нен қайтарылған Future-ды басқа ағынға жіберіп, әртүрлі stack frame-де await істеу — параметр өмір сүру шектеулерімен қиыл болуы мүмкін."
+    },
+    {
+      "subject": {
+        "surface": "async fn lifetime elision",
+        "root": "async fn lifetime elision",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_573"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "async fn lifetime elision — қарапайым `fn`-ге арналған elision ережелері async fn-да да жұмыс істейді, бірақ бір ескертумен. `async fn foo(s: &str)` шынында `fn foo<'a>(s: &'a str) -> impl Future<Output = ...> + 'a`. **Маңызды:** қайтаратын Future типі `'a`-мен байланысты — параметрден алынған сілтемелерді ұстауы мүмкін. **Бірнеше параметр:** `async fn bar(a: &str, b: &str)` → `impl Future + 'static` емес; екеуі бір lifetime-та (мүмкін бөлек): elision сәтсіз болғанда — қолмен жазу керек: `async fn bar<'a>(a: &'a str, b: &'a str) -> ... { ... }`. **Идиома:** күрделі lifetime-тарды қажет етсе, async block ішінде async fn деректерді тазалау — `Future::boxed()` арқылы."
+    },
+    {
+      "subject": {
+        "surface": "async fn реф қайтару",
+        "root": "async fn реф қайтару",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_574"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Реф қайтаратын async fn — `async fn foo<'a>(s: &'a str) -> &'a str { s.trim() }` сияқты функция әртүрлі lifetime-тардан тұратын комплекс ережелерді талап етеді. Қайтарылған Future типі `impl Future<Output = &'a str> + 'a` — ал async fn ішінде `&'a str` қайтару, әсіресе `.await` арасында ұстау — қиындықтар тудырады. **Жиі қателер:** `async fn split<'a>(s: &'a str, sep: char) -> Vec<&'a str>` — параметр өмір сүру шектеулері Future-да тұрады, soundness үшін Pin-нің көмегі қажет. **Идиома:** `Vec<String>` сияқты owned типтерді қайтару — реф қайтарудан жеңілірек async-та. Мүмкін болмаса — `Box<dyn Future + 'a>` және lifetime-тарды explicit жазу."
+    },
+    {
+      "subject": {
+        "surface": "async fn ref параметр",
+        "root": "async fn ref параметр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_575"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`async fn foo(x: &i32) -> i32` семантикасы — мысал: `async fn double_ref(x: &i32) -> i32 { let val = *x; val * 2 }`. Компилятор: `fn double_ref<'a>(x: &'a i32) -> impl Future<Output = i32> + 'a`. **Қалай тұтыну:** (1) синхронды стилде: `let n = 5; double_ref(&n).await;` — Future жасалады, бірден awaited; `n` future барысы керек; (2) Future-ды сақтап қою: `let f = double_ref(&n); ... f.await;` — `n` `f.await` аяқталғанша тірі болуы керек. **Қате:** `let f = double_ref(&n); drop(n); f.await;` — `n` өшіп қалды, бірақ `f` оған сілтейді → борыш-тексергіш қателесе. **Шешім:** `&n` орнына `*x` копиялау немесе `n.clone()`."
+    },
+    {
+      "subject": {
+        "surface": "async fn vs async block lifetime",
+        "root": "async fn vs async block lifetime",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_576"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "async fn vs async block lifetime — екеуі де Future қайтарады, бірақ lifetime-тарды әртүрлі өңдейді. **`async fn foo(s: &str) -> ...`:** Future параметр lifetime-нан туындайды (`+ 'a`). **`async { ... }` блок:** captured айнымалылардың lifetime-тарынан туындайды (closure сияқты). Мысал: `let s = String::from(\"hi\"); let f = async { s.len() }; drop(s); f.await;` — `s` move немесе ref ете алады; қарапайым форма — ref → drop-тан кейінгі await қате. `async move { s.len() }` — `s`-ті ішке тасу → drop сыртта мағынасыз. **Идиома:** async block + `async move` — стандартты пара tokio::spawn-да; async fn — параметрлерден қайтарылатын Future generic кодта."
+    },
+    {
+      "subject": {
+        "surface": "async move ownership",
+        "root": "async move ownership",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_577"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "async move {} ownership transfer — `async move { ... }` блок ішіндегі айнымалыларды **иемденуге алады** (move). Қарапайым `async { ... }` — captured айнымалыларды реф арқылы алады. Мысал: `let v = vec![1, 2, 3]; let f = async move { for x in v { println!(\"{x}\"); } };` — `v` Future-ге ауысты; сыртта `v`-ні қолдану — компиляция қатесі. **Қашан керек:** `tokio::spawn(async move { ... })` — spawn-нан қайтарылған handle ағымдағы scope-ты жалғастыруы мүмкін; референс ұстау — соңғыдан асу қатесі. **Идиома:** «егер scope-тан кейін Future жұмыс істеу керек — `async move`»."
+    },
+    {
+      "subject": {
+        "surface": "closure capture async",
+        "root": "closure capture async",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_578"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Closure-сай capture rules in async block — async block captures-ді closure ережелері бойынша өңдейді. Тәртіп: (1) тек оқу керек болса — `&T` (shared ref); (2) өзгерту керек болса — `&mut T` (mutable ref); (3) иемдеу керек болса немесе `move` кілтсөзі бар болса — `T` (value). Мысалдар: `let s = String::new(); async { println!(\"{s}\"); }` — `&s` алады; `let mut s = ...; async { s.push('!'); }` — `&mut s` (қарапайым `async` блок). `async move { ... }` — мәжбүр түрде `T`. **Шектеу:** capture-дың түрі әсіресе spawn-да маңызды — async block `Send` болуы үшін captured-ы да `Send` болуы керек."
+    },
+    {
+      "subject": {
+        "surface": "send constraint propagation",
+        "root": "send constraint propagation",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_579"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Send constraint propagation — Future `Send` болуы үшін **барлық captured + барлық state** `Send` болуы керек. Бұл — multi-threaded executor үшін қажет. Tokio: `tokio::spawn(future)` талап етеді `future: Future + Send + 'static`. Мысал: `Rc<T>` — `!Send`, сондықтан `let x = Rc::new(...); tokio::spawn(async move { use(x).await; });` → compile қате. Шешім: `Arc::new(...)` — `Send`. **Маңызды:** `MutexGuard` `!Send` (барлығы lock-ті босатпай-ақ ағынға жіберсе, deadlock қаупі) — `.await` арасында `MutexGuard` ұстау — қателікке әкеледі. **Идиома:** `.await`-тан бұрын `drop(guard)` шакыру."
+    },
+    {
+      "subject": {
+        "surface": "!send future",
+        "root": "!send future",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_580"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "!Send Future-лар — кейбір Future-лар `!Send` (ағындарға жіберілмейді). Себеп: ішкі мәндер (Rc, MutexGuard, &mut self-refs, *const ptr-лар) `Send` емес. **Қашан кездеседі:** (1) single-thread бағдарламалары — GUI eventloop, embedded, тестер; (2) RC-негізделген графтар — ағылшын тілінің TLS-байланысты типтері. **Шешім:** `tokio::runtime::Builder::new_current_thread()` — single-threaded executor (Send талап етпейді) немесе `tokio::task::LocalSet` — мульти-threaded runtime ішіндегі single-thread «арнайы» аймағы. `LocalSet::spawn_local` — `!Send` future-ды бір ағынға бекітеді."
+    },
+    {
+      "subject": {
+        "surface": ".await syntax",
+        "root": ".await syntax",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_581"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": ".await is NOT a function call — `future.await` — синтаксис, әдіс шакыруы емес. (1) Қарапайым `.method()` функция шакырады; `.await` — компилятор-генерациялаған state transition; (2) `.await` тек `async` контексте істейді (sync `fn`-те — қате); (3) `.await` метаны Future-ды (Pin + Context) қажет етеді — қарапайым `fn` `.await`-ке ие емес. **Тарих:** Rust 2018-да синтаксистік шешім — Erlang/Elixir стилінен (postfix), JavaScript-тен айырмашылық (prefix `await x`). Себеп: chain ыңғайлы — `client.get(url).await?.text().await?` — `await ((client.get(url))?).text()?` оқу қиынырақ."
+    },
+    {
+      "subject": {
+        "surface": ".await chain",
+        "root": ".await chain",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_582"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": ".await chained — `a.await.b().await` — postfix синтаксисінің артықшылығы — table chain-ге қолдан салынады. Мысал: `let body = client.get(url).await?.bytes().await?;` Логика: (1) `client.get(url)` — Future қайтарады; (2) `.await?` — Future-ды күтіп `Result`-тен `?` арқылы шығу; (3) `.bytes()` — Response-тің Future-қайтарушы әдісі; (4) `.await?` — body Result-ке. **Артықшылық:** `let resp = client.get(url).await; let resp = resp?; let bytes = resp.bytes().await; let bytes = bytes?;` — қалпына — әлдеқайда ұзын. Postfix `.await` функциялардың табиғи поток-стилін бұзбайды."
+    },
+    {
+      "subject": {
+        "surface": ".await in expressions",
+        "root": ".await in expressions",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_583"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "await in expressions — `.await` кез-келген өрнек контекстінде қолданыла алады. (1) **`if`/`while` шарт:** `if check().await { ... }` — Future нәтижесі шартта; (2) **`let`:** `let x = compute().await;` — нәтижені айнымалыға бекіту; (3) **`match`:** `match get_status().await { Ok(x) => ..., Err(e) => ... }` — Future нәтижесін match-теу; (4) **бірнеше .await бір өрнекте:** `let sum = a().await + b().await;` — секвенциалды (a, кейін b); (5) **функция аргументі ретінде:** `process(fetch().await);` — алдымен `.await`, кейін `process`. **Маңызды нюанс:** `.await` сектенциальды — параллельді емес. Параллель үшін — `join!`/`select!`."
+    },
+    {
+      "subject": {
+        "surface": "async fn return type",
+        "root": "async fn return type",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_584"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "async fn return type — `async fn foo() -> u32 { ... }` қайтаратын типі шынында **анонимды** (компилятор атай алмайтын) `impl Future<Output = u32>`. Қолданушы тілден қарасаңыз: `foo()` — `impl Future<Output = u32>` типінде; нақты тип атауы жоқ. **Әсер:** `async fn`-ді трейттерде ұстау қиын болды (Rust 1.75-ке дейін) — компилятор Future типін атай алмайды. Шешім: `async fn`-ді трейтте ашық `-> impl Future<...>`-ке ауыстыру немесе `async-trait` крейті (`Box<dyn Future>` орай). Rust 1.75-те `async fn in traits` стабилизацияланды — компилятор GAT арқылы атай алады. Әлі шектеу: dyn Trait + async fn → әлі `async-trait` керек."
+    },
+    {
+      "subject": {
+        "surface": "opaque return type",
+        "root": "opaque return type",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_585"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Opaque return type — `impl Trait` синтаксисі — қайтарылатын **нақты типті жасыру**, тек оның қолдайтын трейтерін көрсету. `fn make_iter() -> impl Iterator<Item = u32> { (0..10).map(|x| x * 2) }` — қалаушыда `make_iter()` нәтижесінің типі белгісіз, тек `Iterator<Item = u32>` екенін біледі. **async-та:** `async fn foo() -> u32` шынында `fn foo() -> impl Future<Output = u32>` — opaque return type. **Шектеу:** `impl Trait`-пен қайтарылатын тип бір функциядан тек **бір** болуы керек — шартты қайтару үшін `Box<dyn Trait>` керек. Әсер: монолитті state machine — әр async fn-нің state machine-і өзіндік, бөлек тип; tokio оларды dyn-арқылы жинайды (`BoxFuture`)."
     },
     {
       "subject": {

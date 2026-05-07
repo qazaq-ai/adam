@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.89.5 — Rust Async Book Chapter 3 (async/await primer — state machine + lifetimes + async move) holdout. 18 natural Kazakh queries against rust_568…585. Categories: async3_state_machine (async fn → state machine + .await transitions + captured locals + generated code), async3_lifetimes ('async lifetime + lifetime elision + ref-returning async fn + ref-parameter async fn + async fn vs async block lifetime), async3_move (async move ownership + closure capture rules + Send constraint propagation + !Send futures), async3_await_syntax (.await is NOT a function + chain + expressions), async3_return_types (async fn return type + opaque impl Trait).",
+  "version": "v4.89.5",
+  "captured_date": "2026-05-07",
+  "book": "Rust Async Book",
+  "chapter": 3,
+  "chapter_title": "async/await primer — state machine + lifetimes + async move",
+  "cases": [
+    {"id": "async3_state_machine", "category": "async3_state_machine", "query": "async fn state machine деген не?", "any_substring": ["анонимды enum", "lazy", "zero-cost"]},
+    {"id": "async3_transition", "category": "async3_state_machine", "query": "async .await transition деген не?", "any_substring": ["state transition", "afterа", "локалдары"]},
+    {"id": "async3_locals", "category": "async3_state_machine", "query": "Captured locals state деген не?", "any_substring": ["state machine struct", "live local", "drop(local)"]},
+    {"id": "async3_generated", "category": "async3_state_machine", "query": "State machine generated деген не?", "any_substring": ["doublefut", "compute_half", "ready!"]},
+    {"id": "async3_async_lt", "category": "async3_lifetimes", "query": "'async lifetime деген не?", "any_substring": ["future параметрлерді", "impl future<output", "өмір сүру"]},
+    {"id": "async3_elision", "category": "async3_lifetimes", "query": "async fn lifetime elision деген не?", "any_substring": ["impl future<output = ...> + 'a", "async fn bar", "future::boxed"]},
+    {"id": "async3_ref_return", "category": "async3_lifetimes", "query": "async fn реф қайтару деген не?", "any_substring": ["s.trim()", "vec<string>", "box<dyn future"]},
+    {"id": "async3_ref_param", "category": "async3_lifetimes", "query": "async fn ref параметр деген не?", "any_substring": ["double_ref", "drop(n)", "n.clone()"]},
+    {"id": "async3_fn_vs_block", "category": "async3_lifetimes", "query": "async fn vs async block lifetime деген не?", "any_substring": ["параметр lifetime", "captured", "async move"]},
+    {"id": "async3_move", "category": "async3_move", "query": "async move ownership деген не?", "any_substring": ["иемденуге алады", "tokio::spawn", "scope-тан кейін"]},
+    {"id": "async3_capture", "category": "async3_move", "query": "Closure capture async деген не?", "any_substring": ["&t", "&mut t", "send"]},
+    {"id": "async3_send", "category": "async3_move", "query": "Send constraint propagation деген не?", "any_substring": ["rc<t>", "arc::new", "mutexguard"]},
+    {"id": "async3_not_send", "category": "async3_move", "query": "!Send future деген не?", "any_substring": ["new_current_thread", "localset", "spawn_local"]},
+    {"id": "async3_await_syntax", "category": "async3_await_syntax", "query": ".await syntax деген не?", "any_substring": ["синтаксис", "rust 2018", "postfix"]},
+    {"id": "async3_chain", "category": "async3_await_syntax", "query": ".await chain деген не?", "any_substring": ["client.get(url)", "bytes()", "поток-стилін"]},
+    {"id": "async3_expr", "category": "async3_await_syntax", "query": ".await in expressions деген не?", "any_substring": ["if check().await", "match get_status", "join!"]},
+    {"id": "async3_ret_type", "category": "async3_return_types", "query": "async fn return type деген не?", "any_substring": ["анонимды", "rust 1.75", "async-trait"]},
+    {"id": "async3_opaque", "category": "async3_return_types", "query": "Opaque return type деген не?", "any_substring": ["impl trait", "make_iter", "boxfuture"]}
+  ]
+}

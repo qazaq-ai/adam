@@ -7,6 +7,59 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.89.5] — 2026-05-07 — Rust Async Book chapter 3 deepening — async/await primer (state machine + lifetimes + async move)
+
+Per-chapter pedagogical cadence continues. Chapter 3 — the async/await primer — was a short surface-overview chapter in the official book, but the underlying mechanics it touches are foundational. Deepened with full curriculum: state-machine code generation, async lifetime semantics (`'async` rule, elision, ref-returning, ref-parameter), async move ownership transfer, .await as syntax (not method), and async return-type semantics (opaque `impl Future`).
+
+### What's added
+
+**18 new curated entries `rust_568…585`** in `programming_rust.jsonl`:
+
+**State machine (4):** async fn → state machine трансформациясы (anonymous enum + state-per-await + lazy/zero-cost), әр `.await` — state transition (poll → match state → ready/pending → re-poll), captured locals state-те (live local sizes determine Future size), generated code мысалы (DoubleFut hand-written equivalent).
+
+**Lifetimes (5):** `'async` lifetime ережесі (Future captures all parameter references; can't outlive them), async fn lifetime elision (`fn foo(s: &str)` → `impl Future + 'a`), реф қайтаратын async fn (Vec<String> over &'a str), async fn ref параметр семантикасы (drop-after-await is a borrow-checker error), async fn vs async block lifetime differences.
+
+**async move (4):** async move ownership transfer (vs ref-capturing async block), closure-сай capture rules (& / &mut / move), Send constraint propagation (Rc<T> / MutexGuard.await deadlock), !Send Future-лар (LocalSet + spawn_local).
+
+**.await syntax (3):** .await is NOT a function call (postfix syntax + Rust 2018 design choice), .await chained (`client.get(url).await?.bytes().await?` over JS-prefix-style), .await in expressions (if / while / let / match / fn-arg).
+
+**Return types (2):** async fn return type — anonymous `impl Future<Output = T>` (1.75 GAT-based stabilisation; dyn Trait still needs async-trait), opaque return type `impl Trait` (one concrete type per fn; Box<dyn Trait> for branching).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_async_book_chapter_03_holdout.json` — 18 cases, 5 categories (`async3_state_machine`, `async3_lifetimes`, `async3_move`, `async3_await_syntax`, `async3_return_types`).
+- `crates/adam-dialog/tests/rust_async_book_chapter_03.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 18 compounds (subjects only — all object hubs already present from ch.1/ch.2).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 async-chapter-3 holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book chapters 1-2 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **998 passing** (was 997; +1 async-chapter-3 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2875 → **2893** (+18) |
+| world_core facts | 3117 → **3135** (+18) |
+| Derived facts | 30861 → **30863** (+2) |
+
+### Roadmap (next — Async Book)
+
+| Release | Async Book Chapter | Topic |
+|---|---|---|
+| **v4.89.5** | **ch. 3** | **async/await primer (this release)** |
+| v4.90.0 | ch. 4 | Pinning (Pin + Unpin + self-referential structs) |
+| v4.90.5 | ch. 5 | Streams (Stream trait + StreamExt) |
+| v4.91.0 | ch. 6 | Executing multiple futures — join! / try_join! / select! |
+| v4.91.5 | ch. 7 | Workarounds (Send + recursion + traits) |
+| v4.92.0 | ch. 8 | The Async ecosystem (tokio vs async-std deep) |
+| v4.92.5 | ch. 9 | Final project — async HTTP server |
+
 ## [4.89.0] — 2026-05-07 — Rust Async Book chapter 2 deepening — Under the Hood: Future trait + Waker + executor architecture
 
 Per-chapter pedagogical cadence continues into the Async Book. Chapter 2 — the deepest mechanical chapter — explains exactly how async/await works: the full Future trait signature with Pin and Context, the Waker mechanism that drives task wakeups, executor architecture, and a from-scratch TimerFuture build. This is the chapter that demystifies «what does `.await` actually do».

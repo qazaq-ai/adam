@@ -2122,6 +2122,29 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // Objects.
     "rust pedagogy",
     "rust әдісі",
+    // **v4.89.5** — Rust Async Book chapter 3 (async/await primer — state machine + lifetimes + async move) deepening.
+    // rust_568…585 — 18 entries covering state machine generation (4),
+    // async lifetimes (5), async move semantics (4), .await deeper (3),
+    // async return types (2).
+    // Subjects.
+    "async fn state machine",
+    "async .await transition",
+    "captured locals state",
+    "state machine generated",
+    "'async lifetime",
+    "async fn lifetime elision",
+    "async fn реф қайтару",
+    "async fn ref параметр",
+    "async fn vs async block lifetime",
+    "async move ownership",
+    "closure capture async",
+    "send constraint propagation",
+    "!send future",
+    ".await syntax",
+    ".await chain",
+    ".await in expressions",
+    "async fn return type",
+    "opaque return type",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",
