@@ -2265,6 +2265,29 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "tracing крейті",
     "#[instrument]",
     "console-subscriber",
+    // **v4.92.5** — Rust Async Book chapter 9 (Final project — async HTTP server) deepening — Async Book pass complete.
+    // rust_676…693 — 18 entries covering async server architecture (4),
+    // connection handling (4), HTTP request reading (3), response
+    // writing (3), testing + production (4).
+    // Subjects.
+    "async http server",
+    "tokio::net::tcplistener",
+    "listener.accept().await",
+    "async vs threaded server",
+    "tokio::spawn task",
+    "concurrent connections",
+    "tokio reactor epoll",
+    "task 'static send",
+    "asyncreadext read_buf",
+    "http request parsing",
+    "content-length body",
+    "asyncwriteext write_all",
+    "/sleep routing async",
+    "graceful shutdown signal",
+    "#[tokio::test]",
+    "backpressure async",
+    "axum hyper production",
+    "async book пас аяқтау",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

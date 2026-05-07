@@ -7,6 +7,80 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.92.5] — 2026-05-07 — Rust Async Book chapter 9 deepening — Final project: async HTTP server (capstone) — **Async Book pass complete** 🎉
+
+**The Rust Async Book is complete (chapters 1-9).** Chapter 9 — the capstone project — is the async rewrite of the main Rust Book chapter 20 multi-threaded web server. Where chapter 20 used a thread pool (4 OS threads), chapter 9 uses Tokio's async/await + reactor — no thread pool needed; thousands of concurrent connections in a single process. This release closes the second full per-chapter pedagogical pass.
+
+### What's added
+
+**18 new curated entries `rust_676…693`** in `programming_rust.jsonl`:
+
+**Async server architecture (4):** Async HTTP server шолуы (no thread pool — tokio reactor handles 100 000+ connections), tokio::net::TcpListener (async bind + accept), listener.accept().await (single async accept; epoll/kqueue under the hood), Async vs threaded server (chapter 20 vs chapter 9: ~2 MB stack × 4 vs ~1 KB × 10 000).
+
+**Connection handling (4):** tokio::spawn(async move { handle(stream) }) (1-2 KB per task, 1 µs spawn vs 50 µs thread spawn), concurrent connections без thread pool (10 000+ concurrent + ulimit -n + Cloudflare scale), Tokio reactor + epoll механизмі (epoll/kqueue/IOCP wrap + EPOLLIN registration + Waker dispatch), Task `'static` + `Send` constraints (spawn requirements + `tokio::task::spawn_local` + LocalSet escape hatch).
+
+**HTTP request reading (3):** AsyncReadExt + read_buf (read_to_end / read_exact / BufReader::read_line), HTTP request parsing (request line split + header `: ` parsing + httparse production crate), Content-Length + body reading (read_exact for known length + Transfer-Encoding: chunked + hyper for production).
+
+**HTTP response writing (3):** AsyncWriteExt + write_all + flush (partial-write retry + BufWriter buffering), /sleep routing async (chapter-20 thread::sleep blocks pool vs tokio::time::sleep yields task), graceful shutdown signal (tokio::signal::ctrl_c + select! + CancellationToken).
+
+**Testing + production (4):** `#[tokio::test]` (async unit/integration tests + flavor flags), backpressure async server-да (Semaphore-based limit + Tower middleware), production HTTP frameworks (hyper / axum / actix-web — when each), Async Book пас аяқтау (chapters 1-9 retrospective + ~160 entries + ~700 total Rust+Async entries).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant; final chapter)
+
+- `data/eval/rust_async_book_chapter_09_holdout.json` — 18 cases, 5 categories.
+- `crates/adam-dialog/tests/rust_async_book_chapter_09.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 18 compounds (subjects only).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 async-chapter-9 holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book ch.1-8 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **1004 passing** (was 1003; +1 async-chapter-9 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2983 → **3001** (+18) |
+| world_core facts | 3225 → **3243** (+18) |
+| Derived facts | 30889 → **30892** (+3) |
+
+### Async Book status — **complete**
+
+| Chapter | Topic | Release | Holdout |
+|---|---|---|---|
+| 1 | Why async + concurrency models + ecosystem overview | v4.88.5 | ✅ |
+| 2 | Under the Hood — Future trait + Waker + executor | v4.89.0 | ✅ |
+| 3 | async/await primer — state machine + lifetimes + async move | v4.89.5 | ✅ |
+| 4 | Pinning — Pin + Unpin + self-referential structs | v4.90.0 | ✅ |
+| 5 | Streams — Stream trait + StreamExt + async iteration | v4.90.5 | ✅ |
+| 6 | Executing multiple futures — join! / try_join! / select! / FuturesUnordered | v4.91.0 | ✅ |
+| 7 | Workarounds — Send + recursion + traits + cancellation | v4.91.5 | ✅ |
+| 8 | Async ecosystem — tokio / async-std / smol + I/O traits + sync primitives + observability | v4.92.0 | ✅ |
+| **9** | **Final project — async HTTP server (capstone)** | **v4.92.5** | **✅** |
+
+### Cumulative — Rust Book + Async Book
+
+- 29 chapter releases (Rust Book ch.1-20 + Async Book ch.1-9)
+- ~702 curated Rust entries (rust_001…rust_693)
+- 29 per-chapter holdouts + 29 per-chapter test runners (each 100 % floor)
+- Workspace tests: 976 → **1004** (+28 chapter tests)
+
+### Roadmap (next)
+
+The official Rust + Async Book pass is complete. Future direction is open:
+
+- **Tokio Tutorial** (the official Tokio guided tutorial — channels / shared state / framing / select!)
+- **Rustonomicon** (unsafe Rust deep — UCG, layout, FFI, send/sync correctness)
+- **Embedded Rust Book** (no_std + bare-metal + HAL + RTIC)
+- **The Cargo Book** (Cargo features + workspaces + custom commands)
+- Or pivot to a different educational area.
+
+User direction will determine the next minor.
+
 ## [4.92.0] — 2026-05-07 — Rust Async Book chapter 8 deepening — Async ecosystem (tokio / async-std / smol + I/O traits + sync primitives + observability)
 
 Per-chapter pedagogical cadence continues. Chapter 8 surveys the **Rust async ecosystem** — runtime comparison (tokio vs async-std vs smol vs embassy), the I/O abstraction layer (AsyncRead / AsyncWrite / AsyncBufRead), Tokio's sync + time primitives, runtime compatibility issues, and the observability stack (tracing + console-subscriber). This is the most production-oriented chapter — what a Rust async developer actually picks up day-to-day.

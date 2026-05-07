@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.92.5 — Rust Async Book Chapter 9 (Final project — async HTTP server) holdout. 18 natural Kazakh queries against rust_676…693. Categories: async9_architecture (async HTTP server overview + TcpListener + accept + sync vs async comparison), async9_connections (tokio::spawn + concurrent connections + reactor/epoll + 'static/Send), async9_request (AsyncReadExt + HTTP parsing + Content-Length body), async9_response (AsyncWriteExt + /sleep routing + graceful shutdown), async9_production (#[tokio::test] + backpressure + axum/hyper + Async Book retrospective).",
+  "version": "v4.92.5",
+  "captured_date": "2026-05-07",
+  "book": "Rust Async Book",
+  "chapter": 9,
+  "chapter_title": "Final project — async HTTP server (capstone)",
+  "cases": [
+    {"id": "async9_overview", "category": "async9_architecture", "query": "Async http server деген не?", "any_substring": ["thread pool жоқ", "tokio::spawn", "100 000+"]},
+    {"id": "async9_listener", "category": "async9_architecture", "query": "tokio::net::TcpListener деген не?", "any_substring": ["bind", "accept async", "msec"]},
+    {"id": "async9_accept", "category": "async9_architecture", "query": "listener.accept().await деген не?", "any_substring": ["epoll/kqueue", "tcpstream", "spawned task"]},
+    {"id": "async9_compare", "category": "async9_architecture", "query": "Async vs threaded server деген не?", "any_substring": ["chapter 20", "10 000+", "8 mb stack"]},
+    {"id": "async9_spawn", "category": "async9_connections", "query": "tokio::spawn task деген не?", "any_substring": ["joinhandle", "1-2 kb", "1 миллион"]},
+    {"id": "async9_concurrent", "category": "async9_connections", "query": "Concurrent connections деген не?", "any_substring": ["10 000 client", "ulimit", "cloudflare"]},
+    {"id": "async9_reactor", "category": "async9_connections", "query": "Tokio reactor epoll деген не?", "any_substring": ["epoll_wait", "epollin", "100 000 fd"]},
+    {"id": "async9_static_send", "category": "async9_connections", "query": "Task 'static send деген не?", "any_substring": ["spawn_local", "&local", "ағынтын-арасында"]},
+    {"id": "async9_read", "category": "async9_request", "query": "AsyncReadExt read_buf деген не?", "any_substring": ["read_to_end", "bytesmut", "bufreader"]},
+    {"id": "async9_parse", "category": "async9_request", "query": "HTTP request parsing деген не?", "any_substring": ["read_line", "split_whitespace", "httparse"]},
+    {"id": "async9_body", "category": "async9_request", "query": "Content-length body деген не?", "any_substring": ["read_exact", "transfer-encoding: chunked", "hyper"]},
+    {"id": "async9_write", "category": "async9_response", "query": "AsyncWriteExt write_all деген не?", "any_substring": ["partial-write", "flush", "bufwriter"]},
+    {"id": "async9_sleep", "category": "async9_response", "query": "/sleep routing async деген не?", "any_substring": ["thread::sleep(5s)", "tokio::time::sleep", "cascading wait"]},
+    {"id": "async9_shutdown", "category": "async9_response", "query": "Graceful shutdown signal деген не?", "any_substring": ["tokio::signal::ctrl_c", "select!", "cancellationtoken"]},
+    {"id": "async9_test", "category": "async9_production", "query": "#[tokio::test] деген не?", "any_substring": ["mocktcpstream", "block_on", "flavor"]},
+    {"id": "async9_backpressure", "category": "async9_production", "query": "Backpressure async деген не?", "any_substring": ["semaphore", "1 миллион connection", "tower"]},
+    {"id": "async9_frameworks", "category": "async9_production", "query": "Axum hyper production деген не?", "any_substring": ["hyper", "axum", "actix-web"]},
+    {"id": "async9_finale", "category": "async9_production", "query": "Async book пас аяқтау деген не?", "any_substring": ["chapters 1-9", "rust_532", "келесі бағыт"]}
+  ]
+}
