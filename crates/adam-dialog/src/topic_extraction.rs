@@ -1953,6 +1953,27 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ord әдісі",
     "айнымалы тәсілі",
     "string әдісі",
+    // **v4.83.0** — Rust Book chapter 9 (error handling) deepening.
+    // rust_336…350 + 4 stub replacements (063/064/080/081) + 2 deletions (060/082).
+    "қате түрлері",
+    "стек айналдыру",
+    "rust_backtrace",
+    "errorkind",
+    "? операторы",
+    "? оператор option-да",
+    "? main-да",
+    "? from түрлендіруі",
+    "қатені тарату",
+    "panic vs result шешімі",
+    "unwrap_or",
+    "өзіндік қате типі",
+    "тип инварианты",
+    "box<dyn error>",
+    "thiserror anyhow",
+    // Objects.
+    "panic стратегиясы",
+    "қате түрі",
+    "rust сандығы",
     // **v4.82.5** — Rust Book chapter 8 (collections) deepening.
     // rust_318…335 + 3 stub replacements (041/045/046).
     "vec::new",

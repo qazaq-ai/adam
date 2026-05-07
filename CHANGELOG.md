@@ -7,6 +7,80 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.83.0] — 2026-05-06 — Rust Book chapter 9 deepening — error handling
+
+Per-chapter pedagogical cadence continues. Chapter 9 introduces Rust's distinctive approach to error handling — types over exceptions, compile-time-checked completeness, two-tier classification (recoverable via `Result<T,E>` vs unrecoverable via `panic!`). Previously surface-level — 6 one-line stubs. Now deepened with full curriculum.
+
+### What's added
+
+**15 new curated entries `rust_336…350`** in `programming_rust.jsonl`:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_336 | қате түрлері | Recoverable vs unrecoverable classification |
+| rust_337 | стек айналдыру | Stack unwinding vs abort strategies |
+| rust_338 | rust_backtrace | Stack trace env variable |
+| rust_339 | errorkind | `io::ErrorKind` enum |
+| rust_340 | ? операторы | `?` on Result |
+| rust_341 | ? оператор option-да | `?` on Option |
+| rust_342 | ? main-да | `?` in main with `Box<dyn Error>` |
+| rust_343 | ? from түрлендіруі | Auto-conversion via From trait |
+| rust_344 | қатені тарату | Error propagation idiom |
+| rust_345 | panic vs result шешімі | Decision rule |
+| rust_346 | unwrap_or | `unwrap_or`/`_else`/`_default` family |
+| rust_347 | өзіндік қате типі | Custom error type pattern |
+| rust_348 | тип инварианты | Type-level invariants via constructor |
+| rust_349 | box<dyn error> | Trait object error type |
+| rust_350 | thiserror anyhow | Library vs application error crates |
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs deepened in-place (4)
+
+- `rust_063` (Ok) — wraps `T` + extraction via match/if let/unwrap/expect/`?`
+- `rust_064` (Err) — wraps `E` + custom error types + match on variants
+- `rust_080` (panic!) — mechanics (stderr / unwinding / drop) + C distinction + when triggers
+- `rust_081` (unwrap) — panic on Err/None + unwrap_or family + production-vs-prototype guidance
+
+### Stubs deleted (2)
+
+- `rust_060` (Result 1-line) — duplicate of deeper rust_224 from ch.2
+- `rust_082` (expect 1-line) — duplicate of deeper rust_225 from ch.2
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_09_holdout.json` — 19 cases, 5 categories (`ch09_panic`, `ch09_result`, `ch09_question_op`, `ch09_propagation`, `ch09_design`).
+- `crates/adam-dialog/tests/rust_book_chapter_09.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 18 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 19 / 19 chapter 9 holdout cases | ✅ 100 % |
+| Existing chapters 1-8 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **985 passing** (was 984; +1 chapter-9 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2653 → **2666** (+13 net: +15 ch.9 − 2 stub deletions) |
+| world_core facts | 2895 → **2908** (+13 net) |
+| Derived facts | 30827 → **30837** (+10) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.83.0** | **ch. 9** | **Error handling (this release)** |
+| v4.83.5 | ch. 10 | Generics + traits + lifetimes |
+| v4.84.0 | ch. 11 | Tests (`#[test]` / assert / cargo test) |
+| v4.84.5 | ch. 12 | CLI minigrep project |
+| v4.85.0 | ch. 14 | Cargo + Crates.io deeper |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.0` minor — 15 new + 4 deepened stubs + 2 deletions; chapter 9 closes the foundational toolkit (chapters 1-9 cover everything needed before tackling generics/traits/lifetimes in chapter 10). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.82.5] — 2026-05-06 — Rust Book chapter 8 deepening — common collections
 
 Per-chapter pedagogical cadence continues. Chapter 8 introduces the three workhorses of Rust's standard collections — `Vec<T>`, `String`, `HashMap<K,V>` — that every Rust programmer uses daily. Previously surface-level — 3 one-line stubs. Now deepened with full curriculum.

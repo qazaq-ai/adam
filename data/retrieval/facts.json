@@ -1,7 +1,7 @@
 {
-  "version": "4.82.0",
+  "version": "4.82.5",
   "status": "completed",
-  "elapsed_s": 68,
+  "elapsed_s": 67,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2895,
+    "facts_total": 2908,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2330,
+      "is_a": 2343,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 333,
+      "world_core/programming_rust.jsonl": 346,
       "world_core/programming_rust_advanced.jsonl": 28,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -44100,26 +44100,6 @@
     },
     {
       "subject": {
-        "surface": "result",
-        "root": "result",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "енам",
-        "root": "енам",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust",
-      "source": {
-        "pack": "world_core/programming_rust.jsonl",
-        "sample_id": "rust_060"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "`Result` — операцияның сәтті немесе қателі аяқталғанын білдіретін `Rust` енамы; нұсқалары: `Ok` және `Err`."
-    },
-    {
-      "subject": {
         "surface": "none",
         "root": "none",
         "pos": "noun"
@@ -44176,7 +44156,7 @@
         "sample_id": "rust_063"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`Ok` — `Rust` `Result` енамының сәтті нәтижені қамтитын нұсқасы."
+      "raw_text": "`Ok(T)` — `Result<T, E>` енамының «сәтті» нұсқасы: ішінде нақты нәтиже мәні `T` орналасады. `let x: Result<i32, String> = Ok(5);` — `x` `i32` мәнді ұстайды. Шығарып алу: `match x { Ok(v) => ..., Err(e) => ... }`, `if let Ok(v) = x { ... }`, `.unwrap()` (panic on Err), `.expect(\"...\")` (panic with message), `?` (propagate error). Идиома: функция нәтижесінде `Ok(value)` қайтару — «бәрі сәтті аяқталды» деген сигнал."
     },
     {
       "subject": {
@@ -44196,7 +44176,7 @@
         "sample_id": "rust_064"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`Err` — `Rust` `Result` енамының қатені қамтитын нұсқасы."
+      "raw_text": "`Err(E)` — `Result<T, E>` енамының «қате» нұсқасы: ішінде қате мәні `E` орналасады. `E` түрі әртүрлі болуы мүмкін: `String` (қарапайым хабарлама), `io::Error` (стандартты IO қатесі), өзіндік `enum MyError { ... }` (домендік қателер). Қателі функциядан қайтару: `return Err(io::Error::new(...))`. Көп жағдайда `?` оператор арқылы шакырушыға таратылады. `match` арқылы қате түрін шешуге болады: `match err { MyError::NotFound => ..., MyError::Permission => ... }`."
     },
     {
       "subject": {
@@ -44496,7 +44476,7 @@
         "sample_id": "rust_080"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`panic` — `Rust-`та қалпына келтірілмейтін қатені тіркеп бағдарламаны тоқтататын механизм."
+      "raw_text": "`panic!` макросы — қалпына келтірілмейтін қатені тіркеп бағдарламаны тоқтататын механизм. `panic!(\"хабарлама\")` шакырғанда: (1) хабарлама stderr-ге басылады; (2) **стек кері айналдырылады** (unwinding) — функциядан-функцияға шығып, әр айнымалы `drop` арқылы тазартылады; (3) бағдарлама тоқтайды. **Қашан қолданылады:** жиым шегінен тыс индекстеу (`v[99]`), `unwrap` `None`/`Err`-ге тап болғанда, жаоарған инвариант. **C-дан айырмашылық:** `Rust`-та panic жадыны бұзбайды — қауіпсіз тоқтату. **Backtrace:** `RUST_BACKTRACE=1` арқылы стек ізі көрсетіледі."
     },
     {
       "subject": {
@@ -44506,8 +44486,8 @@
       },
       "predicate": "IsA",
       "object": {
-        "surface": "әдіс",
-        "root": "әдіс",
+        "surface": "result әдісі",
+        "root": "result әдісі",
         "pos": "noun"
       },
       "pattern": "world_core/programming_rust",
@@ -44516,27 +44496,7 @@
         "sample_id": "rust_081"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`unwrap` — `Option` немесе `Result-`тан мәнді алып шығып, қате болса `panic-`ке апаратын әдіс."
-    },
-    {
-      "subject": {
-        "surface": "expect",
-        "root": "expect",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "әдіс",
-        "root": "әдіс",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust",
-      "source": {
-        "pack": "world_core/programming_rust.jsonl",
-        "sample_id": "rust_082"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "`expect` — `unwrap-`қа ұқсас, бірақ қате жағдайында өзіндік хабарлама шығаратын әдіс."
+      "raw_text": "`.unwrap()` — `Option` немесе `Result`-тан ішкі мәнді шығарып алатын әдіс. `Some(x)` / `Ok(x)` болса — `x` қайтарады; `None` / `Err` болса — **panic!** хабарламасыз. Прототип, тест, мысалдарда ыңғайлы — қателерді өңдеу логикасына шектен тыс мән бермейді. **Прод-кодта тыйым** — `expect(\"...\")` арқылы хабарлама беру керек, болмаса `match` / `?` арқылы дұрыс өңдеу. Қосалқы әдістер: `unwrap_or(default)` — Err болса default қайтарады; `unwrap_or_else(closure)` — Err-де жабу шакырылады; `unwrap_or_default()` — Err болса `T::default()`."
     },
     {
       "subject": {
@@ -49597,6 +49557,306 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "SipHash hash функциясы — `HashMap`-тың әдепкі hash функциясы. **Криптографиялық қауіпсіз:** DoS шабуылдарына қарсы қорғаныс. Мысалы, веб-серверде көп пайдаланушыдан кілт қабылдайтын болсаңыз — олар арнайы кілттерді жасап, hash коллизиясын тудырып, бағдарламаны баяулатуы мүмкін. SipHash осыған қарсы тұрады — рандомизирленген seed-пен, әр процесте бөлек. **Кемшілігі:** ең жылдам hash алгоритмі емес. Жылдамдық маңызды болса — `BuildHasher` арқылы `fxhash`, `ahash` сияқты сандықтарды қолдану."
+    },
+    {
+      "subject": {
+        "surface": "қате түрлері",
+        "root": "қате түрлері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_336"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қалпына келтіру мүмкіндігі бойынша қателер екі топқа бөлінеді. **Қалпына келтірілмейтін** (unrecoverable) — бағдарламаның жалғаспауы керек жағдайлар: жиым шегінен тыс индекстеу, бөлу нөлге, бұзылған инвариант. Олар үшін `panic!`. **Қалпына келтіруге болатын** (recoverable) — күтілетін шарттар: файл табылмады, желі үзілді, пайдаланушы қате сан енгізді. Олар үшін `Result<T, E>`. Шешу ережесі: «Бұл қалпына келу мүмкін бе?» Иә → `Result`, шакырушы шешсін; жоқ → `panic!`."
+    },
+    {
+      "subject": {
+        "surface": "стек айналдыру",
+        "root": "стек айналдыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "panic стратегиясы",
+        "root": "panic стратегиясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_337"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Стек айналдыру (stack unwinding) vs abort — `panic!` болғанда екі стратегия. **Әдепкіше:** unwinding — функциядан-функцияға шығып, әр айнымалыны `drop` арқылы тазартады; қауіпсіз, бірақ бинарлық файлды үлкейтеді. **Альтернатива:** abort — стекті айналдырмайды, бірден тоқтайды; жадты ОЖ босатады. Қашан керек: бинарлық файл өте кішкентай болуы керек жағдайларда (ендірілген жүйелер, watch-battery deployment). Қосу тәсілі: `Cargo.toml`-да `[profile.release] panic = \"abort\"`."
+    },
+    {
+      "subject": {
+        "surface": "rust_backtrace",
+        "root": "rust_backtrace",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жөндеу құралы",
+        "root": "жөндеу құралы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_338"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`RUST_BACKTRACE` — `panic!` болғанда стек ізін көрсетуге арналған орта айнымалысы. Қолдану: `RUST_BACKTRACE=1 cargo run`. Шегініс ізі қайдан шыққанын анық көрсетеді — қандай функциядан, қандай кітапханадан, қандай жолда. Жөндеу барысында ең пайдалы құрал. `RUST_BACKTRACE=full` — толық ізді (стандартты кітапхана функцияларын қоса) береді. **Маңызды:** `release` режімінде символдар жоқ — `debug` режімінде қолдану артық."
+    },
+    {
+      "subject": {
+        "surface": "errorkind",
+        "root": "errorkind",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib енамы",
+        "root": "stdlib енамы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_339"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`io::ErrorKind` — `std::io::Error`-дың түрін сипаттайтын енам. `Err(e)` болғанда `e.kind()` арқылы алынады. Маңызды нұсқалары: `NotFound` (файл жоқ), `PermissionDenied` (рұқсат жоқ), `ConnectionRefused` (желі), `TimedOut`, `Interrupted`, `WouldBlock`, `InvalidData`, `UnexpectedEof`. Қолдану: `match err.kind() { ErrorKind::NotFound => ... }` арқылы әр түрлі қате жағдайға бөлек реакция жасау. **Альтернатива:** `?` оператор + `From` арқылы домендік қатеге айналдыру."
+    },
+    {
+      "subject": {
+        "surface": "? операторы",
+        "root": "? операторы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust операторы",
+        "root": "rust операторы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_340"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`?` операторы — `Result` мен `Option`-да қатені шакырушыға таратудың қысқа синтаксисі. **`Result`-та:** `Ok(value)` болса — `value`-ні шығарып, өрнектің мәніне айналады; `Err(error)` болса — функциядан **бірден `Err(error)` қайтарады**. Мысалы, `let f = File::open(\"x\")?;` — егер ашу қате болса, функция тоқтайды, шакырушы Err алады. **Бір жолда:** `File::open(\"x\")?.read_to_string(&mut s)?` — екі қате болуы мүмкін, екеуі де таратылады."
+    },
+    {
+      "subject": {
+        "surface": "? оператор option-да",
+        "root": "? оператор option-да",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust операторы",
+        "root": "rust операторы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_341"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`?` оператор `Option`-да — `Some(value)` болса мәнді шығарады, `None` болса функциядан **бірден `None` қайтарады**. Мысалы: `fn last_char_of_first_line(text: &str) -> Option<char> { text.lines().next()?.chars().last() }` — `next()` `Option<&str>` қайтарады; `?` `None` бірден шығарады, `Some(line)` болса жолды алады. Сондықтан функция `Option<T>` қайтаратын болуы керек — `?` түрі сай болуы талабы."
+    },
+    {
+      "subject": {
+        "surface": "? main-да",
+        "root": "? main-да",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ыңғайлылығы",
+        "root": "rust ыңғайлылығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_342"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`?` `main` функциясында — әдепкіше `main` `()` (unit) қайтарады, `?` ондай типке сай емес. Бірақ `main`-нің қайтару типін `Result<(), Box<dyn Error>>`-ке ауыстыруға болады: `fn main() -> Result<(), Box<dyn Error>> { let _f = File::open(\"x\")?; Ok(()) }`. **`Box<dyn Error>`** — кез келген қате типін қабылдайтын ұжымдық тип (trait object). Шакырушы — операциялық жүйе; қате болса бағдарлама код 1 қайтарады. CLI программаларда жиі қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "? from түрлендіруі",
+        "root": "? from түрлендіруі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ыңғайлылығы",
+        "root": "rust ыңғайлылығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_343"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`?` оператор + `From` трейті — қатені автоматты түрлендіру. `?` тек таратпайды — қате типін шакырушы күтетін типке **түрлендіреді**, егер `From<SourceError> for TargetError` бекітілсе. Мысалы: `fn parse_age() -> Result<u32, MyError> { let s = fs::read_to_string(\"age.txt\")?; let n: u32 = s.trim().parse()?; Ok(n) }` — `io::Error` мен `ParseIntError` екеуі де `MyError`-ге айналады, егер `MyError` үшін `From<io::Error>` мен `From<ParseIntError>` бекітілсе. `thiserror` сандығы осы шаблонды автоматтайды."
+    },
+    {
+      "subject": {
+        "surface": "қатені тарату",
+        "root": "қатені тарату",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_344"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қатені тарату (error propagation) — функция қатені өңдемей, оны шакырушыға қайтару идиомасы. **Көп қадамды форма:** `let f = match File::open(...) { Ok(f) => f, Err(e) => return Err(e) }; ...`. **`?`-операторымен:** `let f = File::open(...)?;` — бір символ. **Ең қысқа форма:** `fs::read_to_string(\"hello.txt\")` — стандартты кітапхана дайын ұсынады; қателерді өзіңіз тарытудың керегі жоқ. Идиома: жоғары деңгей функцияда қатені өңде, төменгілерде тарат."
+    },
+    {
+      "subject": {
+        "surface": "panic vs result шешімі",
+        "root": "panic vs result шешімі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_345"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "panic vs Result шешімі — қашан қайсысын қолдану ережесі. **`panic!`:** кодтың логикасында болмауы керек жағдайды кездестіргенде (бұзылған инвариант, типтік жүйе кепілдеген шарт орындалмады, тестпен тексеріле алмайтын постусловие). Стандартты кітапхана: `Vec` шегі, `unwrap` `None`-та, `divide_by_zero`. **`Result`:** күтілетін орындалу-кездегі шарт (файл жоқ, желі қолжетімсіз, пайдаланушы қате енгізді). Кітапхана жазғанда — әрқашан `Result`, шакырушыға таңдау бер. Прототиптерде, тестілерде — `unwrap`/`expect` ыңғайлы."
+    },
+    {
+      "subject": {
+        "surface": "unwrap_or",
+        "root": "unwrap_or",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "result әдісі",
+        "root": "result әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_346"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`unwrap_or` тобы — `Result`/`Option`-тан мәнді алудың panic-сіз нұсқалары. **`.unwrap_or(default)`** — Err/None болса `default` қайтарады: `let n = x.unwrap_or(0);`. **`.unwrap_or_else(closure)`** — Err/None жағдайында жабу шакырылады: `x.unwrap_or_else(|e| log_and_default(e))`. **`.unwrap_or_default()`** — Err/None болса `T::default()` қайтарады (`T: Default` керек). Артықшылығы: panic-ке бармайды, бағдарлама жалғасады. Идиома: «көрсетілмеген мәнді» өңдеу үшін `unwrap_or_else`; жай default үшін `unwrap_or` / `unwrap_or_default`."
+    },
+    {
+      "subject": {
+        "surface": "өзіндік қате типі",
+        "root": "өзіндік қате типі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_347"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өзіндік қате типі (custom error type) — үлкен жобаларда стандартты қателерді өзіңіздің домендік қатеңізге айналдыру идиомасы. Анықтамасы: `enum MyError { Io(io::Error), Parse(ParseIntError), Custom(String) }`. Содан кейін `From<io::Error> for MyError` мен `From<ParseIntError> for MyError` бекітіп, `?` оператордың автоматты түрлендіруін қосамыз. **Артықшылығы:** функция бір ғана `Result<T, MyError>` қайтарады, бірақ көп түрлі қателерді қамтиды. **`thiserror` сандығы** бұл шаблонды макрос арқылы автоматтайды."
+    },
+    {
+      "subject": {
+        "surface": "тип инварианты",
+        "root": "тип инварианты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_348"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тип арқылы инвариантты бекіту (type-level invariant) — `Rust`-тың қауіпсіздік паттерні. Мысалы, ойын болжамы 1-100 арасында болуы керек: `pub struct Guess { value: i32 }; impl Guess { pub fn new(value: i32) -> Guess { if value < 1 || value > 100 { panic!(\"...\") } Guess { value } } pub fn value(&self) -> i32 { self.value } }`. **Идея:** `value` өрісі **жасырын**, конструктор арқылы ғана жасалады; конструктор шектен тыс мәнге `panic!`. Содан кейін `Guess` алсаңыз — оның мәні әрқашан 1-100. Типтік жүйе инвариантты бекітеді. Пайдаланушы кірісі үшін `Result` қайтаратын `try_new` балама."
+    },
+    {
+      "subject": {
+        "surface": "box<dyn error>",
+        "root": "box<dyn error>",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қате түрі",
+        "root": "қате түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_349"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Box<dyn Error>` — кез келген қате типін қабылдайтын ұжымдық тип. **`dyn`** — динамикалық диспетчер (trait object); **`Box`** — үймеде сақтау. `Result<T, Box<dyn Error>>` сигнатурасы — функция әр түрлі қате типтерін қайтарып, шакырушыны нақты қайсысы екеніне бағытпай қою. Қашан қолдану: CLI программалары (`main` сигнатурасы), прототиптер, бір функцияда көп әр түрлі қателер. Кемшілік: статикалық шеше алмайтын — динамикалық диспетчер кішкене шығынды. Альтернатива: өзіндік `enum MyError { ... }` + `From` бекітулері."
+    },
+    {
+      "subject": {
+        "surface": "thiserror anyhow",
+        "root": "thiserror anyhow",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust сандығы",
+        "root": "rust сандығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_350"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`thiserror` мен `anyhow` — `Rust` экожүйесіндегі қателерді жеңілдететін екі негізгі сандық. **`thiserror`** — кітапхана авторларына: өзіндік қате типін `#[derive(Error)]` арқылы аз кодпен жасайды, `From` бекітулерін автоматтайды. **`anyhow`** — қолданбалы код авторларына: `anyhow::Result<T>` (`Result<T, anyhow::Error>`) арқылы кез келген қатені қабылдайды, `?` арқылы біркелкі тарату. Қашан қайсысын: кітапхана жазғанда — `thiserror` (нақты қате типтері); қолданба жазғанда — `anyhow` (жылдамдық пен ыңғайлылық)."
     },
     {
       "subject": {

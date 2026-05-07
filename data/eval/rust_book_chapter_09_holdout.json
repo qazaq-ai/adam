@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.83.0 — Rust Book Chapter 9 (Қатені өңдеу) holdout. 19 natural Kazakh queries against rust_336…350 + 4 deepened stubs (rust_063 Ok / rust_064 Err / rust_080 panic / rust_081 unwrap) − 2 stub deletions (rust_060 Result duplicate, rust_082 expect duplicate). Categories: ch09_panic (panic! macro, stack unwinding vs abort, RUST_BACKTRACE), ch09_result (Ok, Err, ErrorKind), ch09_question_op (? operator on Result, on Option, in main, with From conversion), ch09_propagation (error propagation idiom, unwrap_or family), ch09_design (panic vs Result decision, custom error type, type invariants, Box<dyn Error>, thiserror/anyhow ecosystem).",
+  "version": "v4.83.0",
+  "captured_date": "2026-05-06",
+  "chapter": 9,
+  "chapter_title": "Қатені өңдеу (panic / Result / ? / propagation / custom errors)",
+  "cases": [
+    {"id": "ch09_panic", "category": "ch09_panic", "query": "panic деген не?", "any_substring": ["қалпына келтірілмейтін", "stderr", "drop"]},
+    {"id": "ch09_unwinding", "category": "ch09_panic", "query": "Стек айналдыру деген не?", "any_substring": ["unwinding", "abort", "ендірілген жүйе"]},
+    {"id": "ch09_backtrace", "category": "ch09_panic", "query": "RUST_BACKTRACE деген не?", "any_substring": ["орта айнымалысы", "release режімінде", "rust_backtrace=full"]},
+    {"id": "ch09_unwrap", "category": "ch09_panic", "query": "unwrap деген не?", "any_substring": ["panic", "прототип", "unwrap_or"]},
+    {"id": "ch09_ok", "category": "ch09_result", "query": "Ok деген не?", "any_substring": ["сәтті", "result<i32, string>", "propagate error"]},
+    {"id": "ch09_err", "category": "ch09_result", "query": "Err деген не?", "any_substring": ["қате мәні", "io::error", "myerror"]},
+    {"id": "ch09_error_types", "category": "ch09_result", "query": "Қате түрлері деген не?", "any_substring": ["қалпына келтірілмейтін", "қалпына келтіруге болатын", "шешу ережесі"]},
+    {"id": "ch09_errorkind", "category": "ch09_result", "query": "ErrorKind деген не?", "any_substring": ["notfound", "permissiondenied", "e.kind()"]},
+    {"id": "ch09_question_op", "category": "ch09_question_op", "query": "? операторы деген не?", "any_substring": ["қатені шакырушыға", "ok(value)", "file::open"]},
+    {"id": "ch09_question_option", "category": "ch09_question_op", "query": "? оператор Option-да деген не?", "any_substring": ["some(value)", "none", "option<char>"]},
+    {"id": "ch09_question_main", "category": "ch09_question_op", "query": "? main-да деген не?", "any_substring": ["box<dyn error>", "result<(), box<dyn error>>", "cli"]},
+    {"id": "ch09_question_from", "category": "ch09_question_op", "query": "? From түрлендіруі деген не?", "any_substring": ["from<sourceerror>", "myerror", "thiserror"]},
+    {"id": "ch09_propagation", "category": "ch09_propagation", "query": "Қатені тарату деген не?", "any_substring": ["error propagation", "көп қадамды", "fs::read_to_string"]},
+    {"id": "ch09_unwrap_or", "category": "ch09_propagation", "query": "unwrap_or деген не?", "any_substring": ["panic-сіз", "unwrap_or_else", "t::default"]},
+    {"id": "ch09_panic_vs_result", "category": "ch09_design", "query": "panic vs Result шешімі деген не?", "any_substring": ["логикасында болмауы керек", "күтілетін орындалу", "кітапхана жазғанда"]},
+    {"id": "ch09_custom_error", "category": "ch09_design", "query": "Өзіндік қате типі деген не?", "any_substring": ["enum myerror", "from<io::error>", "thiserror"]},
+    {"id": "ch09_type_invariant", "category": "ch09_design", "query": "Тип инварианты деген не?", "any_substring": ["guess", "1-100", "try_new"]},
+    {"id": "ch09_box_dyn_error", "category": "ch09_design", "query": "Box<dyn Error> деген не?", "any_substring": ["dyn", "trait object", "result<t, box<dyn error>>"]},
+    {"id": "ch09_thiserror_anyhow", "category": "ch09_design", "query": "thiserror anyhow деген не?", "any_substring": ["#[derive(error)]", "anyhow::result", "кітапхана жазғанда"]}
+  ]
+}
