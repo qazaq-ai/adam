@@ -7,6 +7,58 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.84.5] — 2026-05-06 — Rust Book chapter 12 deepening — CLI minigrep project
+
+Per-chapter pedagogical cadence continues. Chapter 12 is the **first end-to-end real project** in the book — building a working CLI grep clone using everything from chapters 7-11 (modules, errors, traits, lifetimes, tests). Previously **0 entries**. Now deepened with full curriculum.
+
+### What's added
+
+**18 new curated entries `rust_388…405`** in `programming_rust.jsonl`:
+
+**I/O primitives (6):** `env::args`, `fs::read_to_string`, `eprintln!`, `process::exit`, stdout-vs-stderr Unix convention, `env::var`.
+
+**Design patterns (6):** TDD red-green-refactor cycle, Config struct (CLI grouping), `Config::build` validating constructor, `unwrap_or_else` with closure (error path), `run` function returning `Result<(), Box<dyn Error>>`, lib.rs/main.rs thin-layer pattern.
+
+**Search logic (4):** `search` function with lifetime, `lines()` iterator, `contains()` method, `to_lowercase()` for case-insensitive comparison.
+
+**Unix conventions (2):** shell redirection (`>`, `>>`, `2>`, `|`), minigrep architecture summary.
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_12_holdout.json` — 18 cases, 4 categories (`ch12_io`, `ch12_design`, `ch12_logic`, `ch12_unix`).
+- `crates/adam-dialog/tests/rust_book_chapter_12.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 24 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 12 holdout cases | ✅ 100 % |
+| Existing chapters 1-11 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **988 passing** (was 987; +1 chapter-12 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2700 → **2718** (+18) |
+| world_core facts | 2942 → **2960** (+18) |
+| Derived facts | 30846 → **30853** (+7) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.84.5** | **ch. 12** | **CLI minigrep project (this release)** |
+| v4.85.0 | ch. 14 | Cargo + Crates.io deeper (publishing / workspaces / docs / profiles) |
+| v4.85.5 | ch. 15 | Smart pointers (Box / Rc / Arc / RefCell / Mutex / Weak / cycles / Drop) |
+| v4.86.0 | ch. 16 | Concurrency (threads / channels / Send+Sync) |
+| v4.86.5 | ch. 17 | OOP features |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.5` patch — 18 new entries, 0 stub deepening; chapter 12 is purely additive (first real project, chapters 7-11 patterns combined). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.84.0] — 2026-05-06 — Rust Book chapter 11 deepening — automated tests
 
 Per-chapter pedagogical cadence continues. Chapter 11 introduces Rust's first-class testing infrastructure — tests are part of the language, every project ships with `cargo test`. Previously surface-level — only 1 stub (`cargo test`). Now deepened with full curriculum.

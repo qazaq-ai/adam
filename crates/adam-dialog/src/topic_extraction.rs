@@ -1953,6 +1953,33 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ord әдісі",
     "айнымалы тәсілі",
     "string әдісі",
+    // **v4.84.5** — Rust Book chapter 12 (CLI minigrep) deepening.
+    // rust_388…405.
+    "env::args",
+    "fs::read_to_string",
+    "eprintln!",
+    "process::exit",
+    "stdout vs stderr",
+    "env::var",
+    "tdd циклі",
+    "config структ",
+    "config::build",
+    "unwrap_or_else жабу",
+    "run функциясы",
+    "lib.rs + main.rs паттерні",
+    "search функциясы",
+    "lines әдісі",
+    "contains әдісі",
+    "to_lowercase",
+    "shell бағыттау",
+    "minigrep архитектурасы",
+    // Objects.
+    "unix дәстүрі",
+    "әзірлеу әдістемесі",
+    "cli паттерні",
+    "конструктор паттерні",
+    "minigrep функциясы",
+    "unix құралы",
     // **v4.84.0** — Rust Book chapter 11 (tests) deepening.
     // rust_369…387 + 1 stub replacement (107).
     "#[test] атрибуты",

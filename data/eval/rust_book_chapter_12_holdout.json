@@ -1,0 +1,27 @@
+{
+  "_comment": "v4.84.5 — Rust Book Chapter 12 (Кіріс-шығыс жобасы: minigrep CLI) holdout. 18 natural Kazakh queries against rust_388…405. Categories: ch12_io (env::args, fs::read_to_string, eprintln, process::exit, stdout vs stderr, env::var), ch12_design (TDD cycle, Config struct, Config::build constructor, unwrap_or_else closure, run function, lib.rs+main.rs split), ch12_logic (search function, lines, contains, to_lowercase), ch12_unix (shell redirection, minigrep architecture).",
+  "version": "v4.84.5",
+  "captured_date": "2026-05-06",
+  "chapter": 12,
+  "chapter_title": "Кіріс-шығыс жобасы: minigrep CLI (TDD-style end-to-end app)",
+  "cases": [
+    {"id": "ch12_env_args", "category": "ch12_io", "query": "env::args деген не?", "any_substring": ["командалық жол", "args[0]", "args_os"]},
+    {"id": "ch12_read_to_string", "category": "ch12_io", "query": "fs::read_to_string деген не?", "any_substring": ["string ретінде", "io::error", "bufreader"]},
+    {"id": "ch12_eprintln", "category": "ch12_io", "query": "eprintln! деген не?", "any_substring": ["stderr", "println!", "unix дәстүрі"]},
+    {"id": "ch12_process_exit", "category": "ch12_io", "query": "process::exit деген не?", "any_substring": ["шығу кодымен", "drop шакырылмайды", "shell скрипттер"]},
+    {"id": "ch12_stdout_stderr", "category": "ch12_io", "query": "stdout vs stderr деген не?", "any_substring": ["pipe", "файлға бағыт", "екі бөлек"]},
+    {"id": "ch12_env_var", "category": "ch12_io", "query": "env::var деген не?", "any_substring": ["орта айнымалысы", "is_ok()", "ignore_case=1"]},
+    {"id": "ch12_tdd", "category": "ch12_design", "query": "TDD циклі деген не?", "any_substring": ["red", "green", "refactor"]},
+    {"id": "ch12_config", "category": "ch12_design", "query": "Config структ деген не?", "any_substring": ["pub struct config", "ignore_case", "mock"]},
+    {"id": "ch12_config_build", "category": "ch12_design", "query": "Config::build деген не?", "any_substring": ["байланысты функция", "config::new", "result<config"]},
+    {"id": "ch12_unwrap_or_else", "category": "ch12_design", "query": "unwrap_or_else жабу деген не?", "any_substring": ["жабуды шакыратын", "process::exit", "never"]},
+    {"id": "ch12_run", "category": "ch12_design", "query": "run функциясы деген не?", "any_substring": ["box<dyn error>", "trait object", "тестелетін"]},
+    {"id": "ch12_lib_main_split", "category": "ch12_design", "query": "lib.rs + main.rs паттерні деген не?", "any_substring": ["кітапхана сандығы", "тонкый", "use minigrep"]},
+    {"id": "ch12_search", "category": "ch12_logic", "query": "search функциясы деген не?", "any_substring": ["query: &str", "vec<&'a str>", "тіршілік мерзімі"]},
+    {"id": "ch12_lines", "category": "ch12_logic", "query": "lines әдісі деген не?", "any_substring": ["жолға бөлетін", "\\\\n", "\"a\", \"b\""]},
+    {"id": "ch12_contains", "category": "ch12_logic", "query": "contains әдісі деген не?", "any_substring": ["bool", "fast", "starts_with"]},
+    {"id": "ch12_to_lowercase", "category": "ch12_logic", "query": "to_lowercase деген не?", "any_substring": ["кіші регистрге", "i̇stanbul", "циклдан тыс"]},
+    {"id": "ch12_redirection", "category": "ch12_unix", "query": "Shell бағыттау деген не?", "any_substring": ["> file.txt", "2> errors.txt", "pipe"]},
+    {"id": "ch12_architecture", "category": "ch12_unix", "query": "Minigrep архитектурасы деген не?", "any_substring": ["src/lib.rs", "src/main.rs", "clap"]}
+  ]
+}

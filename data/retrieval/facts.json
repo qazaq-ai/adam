@@ -1,7 +1,7 @@
 {
-  "version": "4.83.5",
+  "version": "4.84.0",
   "status": "completed",
-  "elapsed_s": 62,
+  "elapsed_s": 70,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2942,
+    "facts_total": 2960,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2377,
+      "is_a": 2395,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 383,
+      "world_core/programming_rust.jsonl": 401,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -50597,6 +50597,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Екілік сандыққа интеграциялық тест — паттерн. Жоба тек `src/main.rs`-те екілік сандық болса — `tests/` қалтасынан функциялар импорттай **алмайсыз** (екілік сандық кітапхана емес). **Шешім:** Rust қауымдастығы кодтың көп бөлігін `src/lib.rs`-ке шығарып, `src/main.rs`-те **тек оны шакыратын тонкый қабат** қалдырады: `fn main() { if let Err(e) = my_app::run() { eprintln!(\"{}\", e); std::process::exit(1); } }`. Бар басты логика `src/lib.rs`-та; интеграциялық тестер сол кітапхана сандығына қол жеткізе алады. **Артықшылықтары:** тестелетіндік + кітапхана ретінде басқа жобаларда қайта пайдалану + main код қарапайым."
+    },
+    {
+      "subject": {
+        "surface": "env::args",
+        "root": "env::args",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib функциясы",
+        "root": "stdlib функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_388"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`std::env::args()` — командалық жол аргументтерін **итератор** ретінде қайтаратын стандартты функция. Қолдану: `let args: Vec<String> = env::args().collect();`. `.collect()` итераторды векторға айналдырады. **Маңызды:** `args[0]` — бағдарламаның **өзінің атауы** (мысалы, `target/debug/minigrep`); пайдаланушы аргументтері `args[1]`-ден басталады. Шакыру: `cargo run -- needle haystack` (`--` cargo-дан кейін, аргументтер бағдарламаға өтеді). `env::args` Unicode-сай емес жолдарды қабылдамайды; `args_os()` баламасы кез келген байттарды қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "fs::read_to_string",
+        "root": "fs::read_to_string",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib функциясы",
+        "root": "stdlib функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_389"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`fs::read_to_string(path)` — файлды оқып, мазмұнын `String` ретінде қайтаратын стандартты функция. **Қарапайым:** `let contents = fs::read_to_string(\"poem.txt\")?;` — файлды ашу + оқу + жабу бір қадамда. **Қайтару типі:** `Result<String, io::Error>`. `?` оператормен үйлесімді. **Шектеу:** файлды толық RAM-ға жүктейді — үлкен файлдарға (>1GB) `BufReader` мен `read_line` циклі тиімдірек. `import std::fs;` керек."
+    },
+    {
+      "subject": {
+        "surface": "eprintln!",
+        "root": "eprintln!",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust макросы",
+        "root": "rust макросы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_390"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`eprintln!` макросы — стандартты **қатеге** (stderr) жазатын макрос. `println!`-ге ұқсас, бірақ ағыны бөлек: `println!` → stdout, `eprintln!` → stderr. **Unix дәстүрі:** қалыпты шығу — нәтиже (`stdout`); қателер мен жөндеу хабарламалары — бөлек ағында (`stderr`). Артықшылығы: пайдаланушы нәтижелерді файлға бағыттай алады (`> output.txt`), бірақ қателер экранда қалады. Идиома: `eprintln!(\"Қате: {}\", e); process::exit(1);` — қате жағдайында."
+    },
+    {
+      "subject": {
+        "surface": "process::exit",
+        "root": "process::exit",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib функциясы",
+        "root": "stdlib функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_391"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`std::process::exit(code)` — бағдарламаны берілген **шығу кодымен** тоқтататын функция. **Конвенция:** `0` — сәтті аяқталу; `1` және одан жоғары — қате. Мысалы: `eprintln!(\"Файл табылмады\"); process::exit(1);`. CLI программаларында жиі қолданылады — shell скрипттері шығу кодын `$?` арқылы тексереді. `panic!`-тан айырмашылық: `process::exit` ағытпа жоқ + drop шакырылмайды (барлық ресурстарды ОЖ-ге қайтару керек) + бағдарлама дереу аяқталады."
+    },
+    {
+      "subject": {
+        "surface": "stdout vs stderr",
+        "root": "stdout vs stderr",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "unix дәстүрі",
+        "root": "unix дәстүрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_392"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "stdout vs stderr — Unix дәстүрі бойынша екі бөлек шығу ағыны. **stdout** (стандартты шығу): бағдарламаның қалыпты нәтижесі, келесі команда қабылдай алады (pipe `|` арқылы), файлға бағытталуы мүмкін (`> file.txt`). **stderr** (стандартты қате): қате хабарламалары, жөндеу мәліметі — экранға қалады, бағытталмайды. Екі ағынды бөлек ұстау пайдалы: `cargo run > output.txt` — нәтижелер файлда, қателер экранда. Rust-та: `println!` → stdout; `eprintln!` → stderr."
+    },
+    {
+      "subject": {
+        "surface": "env::var",
+        "root": "env::var",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib функциясы",
+        "root": "stdlib функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_393"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`std::env::var(name)` — орта айнымалысын оқу функциясы. **Қайтару:** `Result<String, env::VarError>` — айнымалы бар болса `Ok(value)`, жоқ болса `Err`. Идиома: `let ignore_case = env::var(\"IGNORE_CASE\").is_ok();` — флаг ретінде қолдану (бар-жоқ). `env::var(\"PATH\")?` — мәнді алу. **Қашан керек:** конфигурацияны кодтан тыс беру (мысалы, `IGNORE_CASE=1 cargo run`); secrets (`DATABASE_URL`); deployment-specific параметрлер (`PORT`, `LOG_LEVEL`)."
+    },
+    {
+      "subject": {
+        "surface": "tdd циклі",
+        "root": "tdd циклі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әзірлеу әдістемесі",
+        "root": "әзірлеу әдістемесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_394"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "TDD циклі (test-driven development) — кодқа дейін **сынақты жазу** әдістемесі. Үш қадам: **(1) RED** — жобаланатын мінезге сай тестті жазу. Тест бастан кетеді (өйткені код әлі жоқ). **(2) GREEN** — сынақты өткізетін **минимум** кодты жазу. **(3) REFACTOR** — сынақ өткеннен соң, кодты жұмыс ұстатпай тазарту. Артықшылықтары: интерфейсті алдын ала ойлайсың (тест клиент көзімен жазылады); регрессиялардан қорғаныс; кодқа сенім — әр өзгертіс кейін `cargo test` жасайсың."
+    },
+    {
+      "subject": {
+        "surface": "config структ",
+        "root": "config структ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cli паттерні",
+        "root": "cli паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_395"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Config структ паттерні (CLI) — командалық жол аргументтерін бір **аталған структқа** жинау идиомасы. Кортежден (`(query, file_path)`) айырмашылығы — өрістердің атаулары бар, оқуға анық. Мысалы: `pub struct Config { pub query: String, pub file_path: String, pub ignore_case: bool }`. Артықшылығы: жаңа аргумент қосу — `Config`-қа өрісті қосу + `Config::build`-ты жаңарту; функция қолтаңбалары қарапайым (`run(config: Config)` бір параметр); тест-driven дизайнда — `Config` mock жасау оңай."
+    },
+    {
+      "subject": {
+        "surface": "config::build",
+        "root": "config::build",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "конструктор паттерні",
+        "root": "конструктор паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_396"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Config::build` конструктор паттерні — байланысты функция, аргументтерді талдап, `Result<Config, Error>` қайтаратын валидтеуші конструктор. Қарапайым `Config::new` балама — бірақ `new` Rust қауымдастығында «қателеспейтін» конструктор деп күтіледі; қателесуі мүмкін болса — `build` идиоматикалық. Мысалы: `impl Config { pub fn build(args: &[String]) -> Result<Config, &'static str> { if args.len() < 3 { return Err(\"...\"); } ... Ok(Config { ... }) } }`. Шакырушы `Result`-ты `unwrap_or_else` арқылы өңдейді."
+    },
+    {
+      "subject": {
+        "surface": "unwrap_or_else жабу",
+        "root": "unwrap_or_else жабу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "result әдісі",
+        "root": "result әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_397"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`unwrap_or_else` жабумен — `Result`-та қате жағдайында **ерікті жабуды шакыратын** әдіс. `Ok(value)` болса — мән қайтарылады; `Err(e)` болса — жабу шакырылады, оның нәтижесі қайтарылады. Идиоматикалық CLI үлгі: `let config = Config::build(&args).unwrap_or_else(|err| { eprintln!(\"Қате: {err}\"); process::exit(1); });` — қате болса хабарлама + 1-кодпен шығу. Жабу `!` (never) типін қайтарса (process::exit) — компилятор оны кез келген типке сай көреді."
+    },
+    {
+      "subject": {
+        "surface": "run функциясы",
+        "root": "run функциясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cli паттерні",
+        "root": "cli паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_398"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`run` функция паттерні — CLI бағдарламасының бар басты логикасын ұстайтын функция. Сигнатурасы: `pub fn run(config: Config) -> Result<(), Box<dyn Error>>`. **Box<dyn Error>** — кез келген қате типін қабылдайтын trait object — `?` оператор әртүрлі қате типтерін бір қалыпта тарытады. **Артықшылықтары:** (1) `main` өте қарапайым — тек аргумент талдау + `run` шакыру; (2) `run` тестелетін — параметр ретінде `Config` алады; (3) кітапхана ретінде басқа жобаларда қайта пайдалану."
+    },
+    {
+      "subject": {
+        "surface": "lib.rs + main.rs паттерні",
+        "root": "lib.rs + main.rs паттерні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cli паттерні",
+        "root": "cli паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_399"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "lib.rs + main.rs тонкий-қабат паттерні — CLI бағдарламасын **тестелетін** ету идиомасы. **`src/lib.rs`** — бар басты логика (`Config`, `run`, `search`, ...) — кітапхана сандығы, `tests/` қалтасынан импорттауға болады. **`src/main.rs`** — өте қысқа, тек аргумент талдау + `run` шакыру + қателерді өңдеу. `main.rs` ішінде: `use minigrep::{Config, run};`. Артықшылықтары: интеграциялық тестер `lib.rs`-ке толық қол жетімді; код кітапхана ретінде қайта пайдалануға келеді; `main` логикасы минималды."
+    },
+    {
+      "subject": {
+        "surface": "search функциясы",
+        "root": "search функциясы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "minigrep функциясы",
+        "root": "minigrep функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_400"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`search` функциясы (minigrep) — берілген сөзді ұстайтын жолдарды қайтаратын функция. Сигнатурасы: `pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>`. **Тіршілік мерзімі `'a`:** нәтиже векторы `contents`-ке сілтейтін тілімдерді ұстайды; нәтиженің тіршілігі — `contents`-тің тіршілігіне байлы. Іске асыру: `contents.lines().filter(|line| line.contains(query)).collect()` (functional) немесе `for line in contents.lines() { if line.contains(query) { results.push(line); } }` (imperative)."
+    },
+    {
+      "subject": {
+        "surface": "lines әдісі",
+        "root": "lines әдісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "string әдісі",
+        "root": "string әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_401"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`.lines()` әдісі — `&str`-ді **жолға бөлетін** итератор қайтаратын әдіс. Әр элемент — `&str`, жол соңы (`\\n` немесе `\\r\\n`) **алынып тасталған**. Мысалы: `\"a\\nb\\nc\".lines()` → `[\"a\", \"b\", \"c\"]`. **Қашан қолданылады:** мәтіндік файлды жолма-жол өңдеу — CLI программалары, парсерлер, лог-анализаторлар. `for line in s.lines() { ... }` идиомасы. Айырмашылық: `.split('\\n')` — соңғы бос жолды да қайтарады, `.lines()` — әдеттегі жол шегін ғана таниды."
+    },
+    {
+      "subject": {
+        "surface": "contains әдісі",
+        "root": "contains әдісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "string әдісі",
+        "root": "string әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_402"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`.contains()` әдісі (string) — берілген subтекст бар-жоғын тексеретін `&str` әдісі. Қайтару типі: `bool`. Мысалы: `\"safe, fast, productive.\".contains(\"fast\")` → `true`. `query` жайдақ `&str` болуы мүмкін: `line.contains(query)`. **Регистр-сезімтал:** `\"Rust\".contains(\"rust\")` → `false`; case-insensitive үшін екеуін де `to_lowercase()`-пен біркелкі ету керек. Кеңеймелер: `.starts_with()`, `.ends_with()`."
+    },
+    {
+      "subject": {
+        "surface": "to_lowercase",
+        "root": "to_lowercase",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "string әдісі",
+        "root": "string әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_403"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`.to_lowercase()` әдісі — `&str` немесе `String`-тің әріптерін **кіші регистрге** айналдырып, **жаңа `String`** қайтаратын әдіс. Регистрсіз салыстыруға қолданылады: `if line.to_lowercase().contains(&query.to_lowercase()) { ... }`. **Маңызды:** Unicode-сай — `\"İSTANBUL\".to_lowercase()` → `\"i̇stanbul\"` (Türkçe-сай). **Өнімділік:** жаңа жадты сұрайды, цикл ішінде жасау өнімділікке зиян. Қалыпқа келтіру (normalization) тек бір рет, циклдан тыс жасау артық."
+    },
+    {
+      "subject": {
+        "surface": "shell бағыттау",
+        "root": "shell бағыттау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "unix құралы",
+        "root": "unix құралы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_404"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Shell бағыттау (redirection) — `>` пен `>>` операторлары арқылы бағдарлама шығарын файлға жазу. **`> file.txt`** — stdout-ты файлға жазу (бар мазмұнды жояды); **`>> file.txt`** — stdout-ты файлға қосу (қосады). **`2> errors.txt`** — stderr-ді жеке файлға. Мысалы: `cargo run -- needle haystack > matches.txt 2> errors.txt` — нәтижелер `matches.txt`-те, қателер `errors.txt`-те. Бұл — stdout/stderr бөлектігінің тікелей пайдасы. Pipe (`|`): `cargo run -- needle haystack | sort` — нәтижелерді басқа командаға жіберу."
+    },
+    {
+      "subject": {
+        "surface": "minigrep архитектурасы",
+        "root": "minigrep архитектурасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "cli паттерні",
+        "root": "cli паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_405"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Minigrep архитектурасы — толық CLI программа құрылымы. **Файлдар:** `src/lib.rs` (Config + Config::build + run + search + search_case_insensitive + tests) — кітапхана; `src/main.rs` (env::args + Config::build шакыру + run шакыру + қателерді eprintln/exit арқылы өңдеу) — тонкый қабат; `tests/integration.rs` (опционалды) — кітапхана интерфейсін тексеретін интеграциялық тесттер; `Cargo.toml` (дайын). **Үлгі:** Rust қауымдастығының CLI идиомасы — clap, structopt сияқты сандықтар осы үлгіні автоматтайды."
     },
     {
       "subject": {
