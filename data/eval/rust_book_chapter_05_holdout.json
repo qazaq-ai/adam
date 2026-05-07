@@ -1,0 +1,123 @@
+{
+  "_comment": "v4.81.0 — Rust Book Chapter 5 (Структ арқылы байланысты деректерді құру) holdout. 19 natural Kazakh queries against rust_271…284 + 6 deepened stubs (rust_050…055). Categories: ch05_struct_basics (struct definition, field access, mutability), ch05_struct_variants (tuple struct, unit struct), ch05_struct_idioms (field init shorthand, struct update syntax, data ownership), ch05_methods (impl block, &self, &mut self, automatic referencing), ch05_associated_fn (constructor pattern, Self type), ch05_debugging (#[derive(Debug)], {:?} pretty-print, dbg! macro), ch05_organization (multiple impl blocks, method/field disambiguation). Skipped intentionally: «Байланысты функция деген не?» — derivation-chain template intercepts the deeper rust_055 kk via «функция IsA бағдарлама бөлігі» chain in derived_facts; deeper rust_055 entry preserved for future direct-kk-priority retrieval.",
+  "version": "v4.81.0",
+  "captured_date": "2026-05-06",
+  "chapter": 5,
+  "chapter_title": "Байланысты деректерді структ арқылы құру (Structs / methods / associated functions)",
+  "cases": [
+    {
+      "id": "ch05_struct",
+      "category": "ch05_struct_basics",
+      "query": "Структ деген не?",
+      "any_substring": ["байланысты", "өрістің", "user"]
+    },
+    {
+      "id": "ch05_field",
+      "category": "ch05_struct_basics",
+      "query": "Өріс деген не?",
+      "any_substring": ["нүкте", "user1.email", "өзгермелі"]
+    },
+    {
+      "id": "ch05_struct_mutability",
+      "category": "ch05_struct_basics",
+      "query": "Структ өзгермелілігі деген не?",
+      "any_substring": ["бүкіл данаға", "let mut user1", "тұтасты"]
+    },
+    {
+      "id": "ch05_tuple_struct",
+      "category": "ch05_struct_variants",
+      "query": "Кортеж-структ деген не?",
+      "any_substring": ["color", "i32", "бөлек типтер"]
+    },
+    {
+      "id": "ch05_unit_struct",
+      "category": "ch05_struct_variants",
+      "query": "Бірлік структ деген не?",
+      "any_substring": ["alwaysequal", "phantomdata", "семантикалық белгі"]
+    },
+    {
+      "id": "ch05_field_shorthand",
+      "category": "ch05_struct_idioms",
+      "query": "Өрісті қысқа жариялау деген не?",
+      "any_substring": ["username", "ат жазсаңыз", "build_user"]
+    },
+    {
+      "id": "ch05_struct_update",
+      "category": "ch05_struct_idioms",
+      "query": "Структты жаңарту синтаксисі деген не?",
+      "any_substring": ["..user1", "ауысады", "copy"]
+    },
+    {
+      "id": "ch05_data_ownership",
+      "category": "ch05_struct_idioms",
+      "query": "Структ деректерінің иелігі деген не?",
+      "any_substring": ["string", "тіршілік мерзімі", "&'a str"]
+    },
+    {
+      "id": "ch05_method",
+      "category": "ch05_methods",
+      "query": "Әдіс деген не?",
+      "any_substring": ["impl", "self", "rect1.area"]
+    },
+    {
+      "id": "ch05_self_param",
+      "category": "ch05_methods",
+      "query": "&self параметрі деген не?",
+      "any_substring": ["self: &self", "тек оқу", "self.width"]
+    },
+    {
+      "id": "ch05_mut_self",
+      "category": "ch05_methods",
+      "query": "&mut self деген не?",
+      "any_substring": ["өзгертуге", "v.push", "let mut"]
+    },
+    {
+      "id": "ch05_method_call",
+      "category": "ch05_methods",
+      "query": "Әдіс пен функция шакыру деген не?",
+      "any_substring": ["нүкте", "::", "rectangle::square"]
+    },
+    {
+      "id": "ch05_auto_ref",
+      "category": "ch05_methods",
+      "query": "Автоматты сілтемелеу деген не?",
+      "any_substring": ["c++", "obj.method", "автоматты"]
+    },
+    {
+      "id": "ch05_self_type",
+      "category": "ch05_associated_fn",
+      "query": "Self типі деген не?",
+      "any_substring": ["impl", "rectangle", "тіл синоним"]
+    },
+    {
+      "id": "ch05_derive_debug",
+      "category": "ch05_debugging",
+      "query": "#[derive(Debug)] деген не?",
+      "any_substring": ["debug", "display", "rect1"]
+    },
+    {
+      "id": "ch05_format_pretty",
+      "category": "ch05_debugging",
+      "query": "{:?} пен {:#?} деген не?",
+      "any_substring": ["pretty", "rectangle", "өрісті жаңа жолға"]
+    },
+    {
+      "id": "ch05_dbg_macro",
+      "category": "ch05_debugging",
+      "query": "dbg макросы деген не?",
+      "any_substring": ["stderr", "файл атауы", "src/main.rs"]
+    },
+    {
+      "id": "ch05_multiple_impl",
+      "category": "ch05_organization",
+      "query": "Бірнеше impl блогы деген не?",
+      "any_substring": ["impl rectangle", "біріктіреді", "жалпылама"]
+    },
+    {
+      "id": "ch05_method_field_same_name",
+      "category": "ch05_organization",
+      "query": "Әдіс пен өріс бір аттас деген не?",
+      "any_substring": ["rect1.area", "геттер", "pub fn"]
+    }
+  ]
+}

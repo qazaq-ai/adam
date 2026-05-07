@@ -1,7 +1,7 @@
 {
-  "version": "4.80.0",
+  "version": "4.80.5",
   "status": "completed",
-  "elapsed_s": 32,
+  "elapsed_s": 70,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2836,
+    "facts_total": 2850,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,9 +27,9 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2269,
+      "is_a": 2284,
       "lives_in": 8,
-      "part_of": 245,
+      "part_of": 244,
       "related_to": 123
     },
     "by_pack": {
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 268,
+      "world_core/programming_rust.jsonl": 282,
       "world_core/programming_rust_advanced.jsonl": 34,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -43916,7 +43916,7 @@
         "sample_id": "rust_050"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Структ — `Rust-`та аталған өрістер арқылы мәліметті топтастыратын тип."
+      "raw_text": "Структ (struct) — өзара байланысты бірнеше мәнді бір аталған типке біріктіру тәсілі. Объектілі-бағытталған тілдердегі объекттің **мәлімет** бөлігіне (өрістер) ұқсас. Кортежге біршама ұқсас (бірнеше мәнді бір топ ретінде сақтайды), бірақ айырмашылығы — әр өрістің **аты** бар, нөмір емес. Аттар коды оқырман үшін айқын етеді — `rectangle.width` пен `dimensions.0` арасындағы айырма. Жариялау: `struct User { active: bool, username: String, email: String, sign_in_count: u64 }`."
     },
     {
       "subject": {
@@ -43924,10 +43924,10 @@
         "root": "өріс",
         "pos": "noun"
       },
-      "predicate": "PartOf",
+      "predicate": "IsA",
       "object": {
-        "surface": "структ",
-        "root": "структ",
+        "surface": "структ құрамдас бөлігі",
+        "root": "структ құрамдас бөлігі",
         "pos": "noun"
       },
       "pattern": "world_core/programming_rust",
@@ -43936,7 +43936,7 @@
         "sample_id": "rust_051"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Өріс — структтың аталған құрамдас бөлігі."
+      "raw_text": "Өріс (field) — структтың аталған құрамдас бөлігі. Қол жеткізу — нүкте арқылы: `user1.email`. Дана өзгермелі болса (`let mut user1 = ...`), өрісті қайта тағайындай аламыз: `user1.email = String::from(\"new@x.com\")`. **Маңызды:** `Rust`-та тек жекелеген өрістерді ғана өзгермелі ете алмайсыз — мәннің бүкіл иесі өзгермелі немесе тұрақты. Өріс реті жариялаумен сай болмауы мүмкін — `Rust` атау бойынша табады."
     },
     {
       "subject": {
@@ -43956,7 +43956,7 @@
         "sample_id": "rust_052"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Кортеж-структ — өрістері аталмаған, тек ретіне қарап ажыратылатын структ түрі."
+      "raw_text": "Кортеж-структ (tuple struct) — өрістері аталмаған, тек ретіне қарап ажыратылатын структ түрі: `struct Color(i32, i32, i32);`. Дана жасау — функция шакыруы сияқты: `Color(0, 0, 0)`. Өрістерге нөмір арқылы қол жеткіземіз: `black.0`, `black.1`. **Артықшылығы — типтік қауіпсіздік:** `struct Color(i32,i32,i32)` мен `struct Point(i32,i32,i32)` бір кортеж пішіміне ие болғанымен, **бөлек типтер**. `Color`-ды күтетін функцияға `Point` беру мүмкін емес — компилятор семантикалық шатасуды тыйым салады."
     },
     {
       "subject": {
@@ -43976,7 +43976,7 @@
         "sample_id": "rust_053"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Бірлік структ — еш өрісі жоқ, тек типтік белгі ретінде қолданылатын структ."
+      "raw_text": "Бірлік структ (unit struct) — еш өрісі жоқ структ: `struct AlwaysEqual;`. Семантикалық белгі ретінде қолданылады — типтік жүйеде тег. Кейін трейттер мен жалпылама типтер арқылы оған тәртіп бекітуге болады. Дана жасау: `let subject = AlwaysEqual;` (фигуралы жақшасыз). Қолдану мысалдары: маркер трейттер (`PhantomData`-мен бірге), қолданылмайтын параметр-плейсхолдер, монада-стиль типтер."
     },
     {
       "subject": {
@@ -43996,7 +43996,7 @@
         "sample_id": "rust_054"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Әдіс — структ немесе енам үшін `impl` блогында анықталатын функция."
+      "raw_text": "Әдіс (method) — типке байланған функция: `impl` блогында анықталады, бірінші параметрі әрқашан `self` (мәннің өзі) болады. Шакыру нүкте арқылы: `rect1.area()`. **`&self`** — тек оқу үшін иелікті алмайтын сілтеме (әдеттегі қалып); **`&mut self`** — өзгертуге арналған; **`self`** (сілтемесіз) — иелікті алады. **Автоматты сілтемелеу:** `rect1.area()` шакырғанда, `Rust` `&rect1` / `&mut rect1` / `rect1`-ге автоматты түрде өзгертеді — әдістің `self` түріне сай. C++-тегі `obj.method()` пен `ptr->method()` ажыратудың керегі жоқ."
     },
     {
       "subject": {
@@ -44016,7 +44016,7 @@
         "sample_id": "rust_055"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Байланысты функция — типтің `Self` параметрсіз `impl` блогында анықталған функциясы."
+      "raw_text": "Байланысты функция (associated function) — типтің `impl` блогында `self` параметрсіз жарияланған функциясы. Типке тиесілі, бірақ нақты данасына емес. Әдетте **конструктор** ретінде қолданылады: `impl Rectangle { fn square(size: u32) -> Self { Self { width: size, height: size } } }`. Шакыру нүктемен емес, **`::`** арқылы: `Rectangle::square(3)`. `String::from`, `Vec::new`, `String::new` — стандартты кітапханадағы байланысты функциялар."
     },
     {
       "subject": {
@@ -48297,6 +48297,286 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Жарыс шарты (data race) — екі ағын (thread) бір жадқа бір уақытта **жазып** жатқан, кем дегенде біреуі жазуы — нәтижесі болжанбайтын мәселе. Көп тілдерде орындалу кезінде ғана көрінеді, табу қиын. `Rust` бұған **компиляция кезінде** тыйым салады — қарызға алудың 1-ережесі арқылы (бір mutable XOR көп immutable). Сонымен қатар көп ағынды бөлісу `Send` пен `Sync` трейттерімен реттеледі (16-тарау). Нәтиже: `Rust` бағдарламалары жарыс шартсыз жазылады — компилятор кепілдендіреді."
+    },
+    {
+      "subject": {
+        "surface": "өрісті қысқа жариялау",
+        "root": "өрісті қысқа жариялау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "структ синтаксисі",
+        "root": "структ синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_271"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Өрісті қысқа жариялау (field init shorthand) — параметр пен өрістің атаулары бірдей болғанда қайталауды тастау синтаксисі. `User { username: username, email: email, ... }` орнына — `User { username, email, ... }`. Тек ат жазсаңыз — `Rust` сол атты ағымдағы аумақтан алады. Кодты тазартады; `build_user(email: String, username: String)` сияқты конструктор функцияларында жиі қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "структты жаңарту синтаксисі",
+        "root": "структты жаңарту синтаксисі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "структ синтаксисі",
+        "root": "структ синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_272"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Структты жаңарту синтаксисі (struct update syntax) — бар данадан жаңа дана жасап, тек кейбір өрістерді ауыстыру: `let user2 = User { email: String::from(\"x@y.z\"), ..user1 };`. `..user1` — «қалған өрістерді `user1`-ден ал». **Маңызды:** иелік ережелеріне бағынады. `String` (Copy емес) өрістер `user1`-ден `user2`-ге **ауысады** — `user1.username` ары қарай жарамсыз; ал `Copy` өрістер (bool, u64) **көшіріледі** — `user1.active` әлі жарамды."
+    },
+    {
+      "subject": {
+        "surface": "структ өзгермелілігі",
+        "root": "структ өзгермелілігі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_273"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Структ өзгермелілігі — `Rust`-та өзгермелілік тек **бүкіл данаға** қолданылады, жекелеген өрістерге емес. `let mut user1 = User { ... };` — толық дана өзгермелі: кез келген өрісті қайта тағайындай аламыз; `let user1 = User { ... };` — толық дана тұрақты, ешбір өрісті өзгерте алмаймыз. Жекелеген өрісті ғана өзгермелі ету (мысалы, `Java`-дағы `final` емес өрістер) `Rust`-та жоқ. Стилдік себеп: иелік пен мутабельдікті тұтасты ұстайды."
+    },
+    {
+      "subject": {
+        "surface": "структ деректерінің иелігі",
+        "root": "структ деректерінің иелігі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_274"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Структ деректерінің иелігі — `User { username: String, email: String }` сияқты структ өрістерінде `String` (`&str` емес) қолдану — саналы шешім: структ **өз деректеріне иелік етеді**, олар басқа жерден қарызға алынбайды. Структтың аумағы бар болғанша, оның деректері де бар. Сілтеме өрістер (`username: &str`) сақтау мүмкін, бірақ ол үшін **тіршілік мерзімі белгісі** қажет (`struct User<'a> { username: &'a str }`). Әдетте бастапқы кезде иелікті ұстайтын типтер (String, Vec) қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "&self параметрі",
+        "root": "&self параметрі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әдіс синтаксисі",
+        "root": "әдіс синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_275"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`&self` параметрі — әдістің бірінші параметрі. `self: &Self` дегеннің қысқа жазылуы; `Self` — `impl` блогының типі. **Тек оқу үшін** иелікті алмайтын сілтеме — әдеттегі қалып. Әдіс мәнді өзгерткісі келсе `&mut self`, иелікті алғысы келсе `self` (сілтемесіз). `&self` арқылы әдіс `self.width`, `self.height` сияқты өрістерге қол жеткізеді, бірақ оларды өзгерте алмайды."
+    },
+    {
+      "subject": {
+        "surface": "&mut self",
+        "root": "&mut self",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әдіс синтаксисі",
+        "root": "әдіс синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_276"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`&mut self` — әдістің өзгермелі сілтеме түріндегі `self` параметрі: типтің данасын **өзгертуге** рұқсат береді. `self: &mut Self` дегеннің қысқа жазылуы. Мысалы: `fn push(&mut self, item: T) { self.items.push(item); }` — `Vec`-ке элемент қосады. Қарыз ережелеріне сай — бір уақытта бір ғана `&mut self` шакыруы болуы мүмкін. Шакыру: `let mut v = Vec::new(); v.push(5);` — `mut` айнымалысы керек."
+    },
+    {
+      "subject": {
+        "surface": "әдіс пен функция шакыру",
+        "root": "әдіс пен функция шакыру",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_277"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әдіс пен функция шакыру синтаксисі — әдістер **нүкте** арқылы шакырылады (`rect1.area()`), байланысты функциялар **`::`** арқылы (`Rectangle::square(3)`). Айырмашылық — әдіс данаға (`self`) бекітілген, байланысты функция типке тиесілі. `String::from(\"x\")` — байланысты функция (конструктор); `s.len()` — әдіс. Бұл ажырату — `Rust`-тағы әмбебап ереже: нүкте — данаға, `::` — типке."
+    },
+    {
+      "subject": {
+        "surface": "автоматты сілтемелеу",
+        "root": "автоматты сілтемелеу",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ыңғайлылығы",
+        "root": "rust ыңғайлылығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_278"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Автоматты сілтемелеу (automatic referencing) — `rect1.area()` шакырғанда, `Rust` `&rect1`, `&mut rect1` немесе `rect1`-ді әдістің `self` параметрінің түріне сай **автоматты түрде** өзгертеді. Сондықтан C/C++ тілдеріндегі `obj.method()` пен `ptr->method()` ажыратудың керегі жоқ. Программист жай ғана нүкте жазады, компилятор сілтемелеу/деференсирлеуді шешеді. Әдіс сигнатурасы білген, программист ол туралы ойламайды."
+    },
+    {
+      "subject": {
+        "surface": "#[derive(debug)]",
+        "root": "#[derive(debug)]",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "structуру атрибуты",
+        "root": "structуру атрибуты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_279"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`#[derive(Debug)]` — структ үстіне қойылған атрибут: `Debug` трейтін **автоматты түрде** жүзеге асырады, басып шығаруға мүмкіндік береді. `println!(\"{}\", rect1)` істемейді — `Display` трейті жоқ; ал `println!(\"{:?}\", rect1)` істейді — `Debug` бар. **Айырмашылық:** `Display` — соңғы пайдаланушыға арналған пішім (программист өзі жазады); `Debug` — жөндеуге арналған, derive автоматты түрде шығарады. Стандартты derive трейттер: `Debug`, `Clone`, `Copy`, `PartialEq`, `Eq`, `Hash`, `Default`."
+    },
+    {
+      "subject": {
+        "surface": "{:?} пен {:#?}",
+        "root": "{:?} пен {:#?}",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "пішімдеуіш",
+        "root": "пішімдеуіш",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_280"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`{:?}` пен `{:#?}` пішімдеуіш — `Debug` трейтінің екі режімі. `{:?}` — қарапайым: `Rectangle { width: 30, height: 50 }`. `{:#?}` (**әдемі басып шығару** / pretty-print) — әр өрісті жаңа жолға, шегініспен: `Rectangle {\\n    width: 30,\\n    height: 50,\\n}`. Күрделі құрылымдар үшін `{:#?}` оқу әлдеқайда жеңілірек. Екеуі де тек `Debug` бар типтерге жұмыс істейді."
+    },
+    {
+      "subject": {
+        "surface": "dbg макросы",
+        "root": "dbg макросы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жөндеу құралы",
+        "root": "жөндеу құралы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_281"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`dbg!` макросы — өрнектің мәнін экранға (stderr-ге) шығарып, мәнді **қайтаратын** жөндеу құралы. Мысалы: `let area = dbg!(width * height);` — есептеу нәтижесін көрсетіп, `area`-ға тағайындайды. Файл атауы мен жол нөмірін көрсетеді — `[src/main.rs:5] width * height = 1500`. `println!`-дан айырмашылығы: ағындағы өрнекке қойсаңыз, кодты бұзбайды. Жөндеу барысында ыңғайлы; өндірісте `log` сандығын қолдану ұсынылады."
+    },
+    {
+      "subject": {
+        "surface": "self типі",
+        "root": "self типі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тіл синонимі",
+        "root": "тіл синонимі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_282"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Self` типі — `impl` блогының ішінде сол блок жататын типке арналған тілдік синоним. Мысалы, `impl Rectangle { fn square(size: u32) -> Self { Self { width: size, height: size } } }` — `Self` мұнда `Rectangle`-мен пара-пар. **Артықшылығы:** тип атын өзгертсеңіз, `impl` блогының ішін өңдеудің керегі жоқ; ұзын аттарды (мысалы, `Result<MyType, MyError>`) қысқартады. `self` (кіші ә) айнымалы, `Self` (ылғи ат) — тип."
+    },
+    {
+      "subject": {
+        "surface": "бірнеше impl блогы",
+        "root": "бірнеше impl блогы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_283"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірнеше impl блогы — `Rust` бір типке бірнеше `impl Rectangle { ... }` блогын жазуға рұқсат береді. Бір блокта жазумен пара-пар: компилятор оларды біріктіреді. Мысалы: бір блокта `area`, екіншісінде `can_hold`. Әсіресе **жалпылама типтер** мен **трейттер** тұсында пайдалы — бір блокта `impl<T> Foo<T>`, екіншісінде `impl Foo<i32>` (тек белгілі бір параметр үшін мамандандырылған әдіс)."
+    },
+    {
+      "subject": {
+        "surface": "әдіс пен өріс бір аттас",
+        "root": "әдіс пен өріс бір аттас",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_284"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әдіс пен өріс бір аттас — `Rust` контекстен ажыратады. `rect1.area` — өрісті оқу (бар болса); `rect1.area()` — әдіс шакыруы (фигуралы жақшалармен ажыратылады). Идиома: егер «өріс мәнін қайтару» (геттер) керек болса, әдіс пен өрісті бір аттас атау — `width()` ↔ `width`. Әдіс жария, өріс жасырын болуы мүмкін: `pub fn width(&self) -> u32 { self.width }`."
     },
     {
       "subject": {

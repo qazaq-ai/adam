@@ -7,6 +7,80 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.81.0] — 2026-05-06 — Rust Book chapter 5 deepening — structs
+
+Per-chapter pedagogical cadence continues. Chapter 5 was previously surface-level — 6 one-line stubs (Структ / Өріс / Кортеж-структ / Бірлік структ / Әдіс / Байланысты функция). Now deepened with full curriculum.
+
+### What's added
+
+**14 new curated entries `rust_271…284`** in `programming_rust.jsonl`:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_271 | өрісті қысқа жариялау | Field init shorthand |
+| rust_272 | структты жаңарту синтаксисі | Struct update syntax (`..user1`) |
+| rust_273 | структ өзгермелілігі | Whole-instance mutability |
+| rust_274 | структ деректерінің иелігі | String vs &str rationale |
+| rust_275 | &self параметрі | `&self` semantics |
+| rust_276 | &mut self | `&mut self` for mutating methods |
+| rust_277 | әдіс пен функция шакыру | Dot vs `::` call syntax |
+| rust_278 | автоматты сілтемелеу | Automatic referencing (no `->`) |
+| rust_279 | #[derive(Debug)] | Derive macro for printing |
+| rust_280 | {:?} пен {:#?} | Debug vs pretty-print formatters |
+| rust_281 | dbg макросы | `dbg!` debug macro |
+| rust_282 | self типі | `Self` type alias in impl |
+| rust_283 | бірнеше impl блогы | Multiple impl blocks |
+| rust_284 | әдіс пен өріс бір аттас | Method/field same-name idiom |
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs deepened in-place (6)
+
+- `rust_050` (Структ) — definition + comparison to tuple + named clarity rationale.
+- `rust_051` (Өріс) — dot access + mutability scope. **Predicate fixed `part_of`→`is_a` + object renamed to `структ құрамдас бөлігі`** so the deeper kk text surfaces (was returning bare «X құрамына кіреді» rendering).
+- `rust_052` (Кортеж-структ) — type-level distinction `Color` vs `Point`.
+- `rust_053` (Бірлік структ) — semantic-tag use cases (`PhantomData`).
+- `rust_054` (Әдіс) — `&self` / `&mut self` / `self` distinction + automatic referencing.
+- `rust_055` (Байланысты функция) — constructor pattern + `Self` type + `::` syntax.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_05_holdout.json` — 19 cases, 7 categories (`ch05_struct_basics`, `ch05_struct_variants`, `ch05_struct_idioms`, `ch05_methods`, `ch05_associated_fn`, `ch05_debugging`, `ch05_organization`).
+- `crates/adam-dialog/tests/rust_book_chapter_05.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 25 compounds (subjects + objects).
+
+### Known limitation
+
+«Байланысты функция деген не?» query routes through derivation chain `байланысты функция IsA функция IsA бағдарлама бөлігі` (cs_021 / info_020 / rust_024) instead of surfacing the deeper `rust_055` kk directly. Same pattern as ch.3 «Сөйлем мен өрнек айырмашылығы» — derivation/comparison-shape templates can intercept direct-kk retrieval. Deeper `rust_055` entry preserved for future retrieval-priority refinement.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 19 / 19 chapter 5 holdout cases | ✅ 100 % |
+| Existing chapters 1-4 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **981 passing** (was 980; +1 chapter-5 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2594 → **2608** (+14) |
+| world_core facts | 2836 → **2850** (+14) |
+| Derived facts | 30776 → **30785** (+9) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.81.0** | **ch. 5** | **Structs (this release)** |
+| v4.81.5 | ch. 6 | Enums + match (Option, exhaustive matching, if let, _) |
+| v4.82.0 | ch. 7 | Modules / packages / crates (mod / pub / use / lib.rs / paths) |
+| v4.82.5 | ch. 8 | Common collections (Vec / String / HashMap deepening) |
+| v4.83.0 | ch. 9 | Error handling (`?`-operator / propagation / custom errors) |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.0` minor — 14 new + 6 deepened stubs = 20 entries; chapter 5 organizes how Rust programs structure data (the foundation for OOP-style code in later chapters). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.80.5] — 2026-05-06 — Rust Book chapter 4 deepening — ownership system
 
 Per-chapter pedagogical cadence continues. Chapter 4 is the most important chapter in the book — Rust's ownership system, the language's signature feature. Previously surface-level — many 1-line stubs without rationale, distinctions, or examples.
