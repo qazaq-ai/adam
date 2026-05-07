@@ -7,6 +7,70 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.93.5] — 2026-05-07 — Codex 2026-05-07 audit P2 — pedagogical intents (AskExercise / CodeRequest / ExplainCompilerError / AskPurpose)
+
+Continues the dialog-architecture pivot from v4.93.0. Codex 2026-05-07 audit P2: «просьба написать Rust-код не сгенерировала код», «просьба дать упражнение дала словарное определение «жаттығу»». Adds **4 pedagogical Intent variants** that surface curated tutor content (exercises, code snippets, error explanations, purpose statements) instead of falling through to generic dictionary definitions. Per Codex directive: **never free-generate code** — always surface vetted snippets, or honestly respond «I don't have a curated example for this topic yet».
+
+### What's added
+
+**4 new Intent variants** in [intent.rs](crates/adam-dialog/src/intent.rs):
+- `Intent::AskExercise { topic }` — exercise / practice-task requests
+- `Intent::CodeRequest { topic }` — code-snippet requests
+- `Intent::ExplainCompilerError { error_code, topic }` — Rust compiler error explanations
+- `Intent::AskPurpose { topic }` — "what is X for / purpose of X" questions
+
+**4 detectors** in [semantics.rs](crates/adam-dialog/src/semantics.rs):
+- `detect_ask_exercise`: practice-noun (жаттығу/тапсырма/есеп/практика) + give-verb (бер/ұсын/құрастыр/керек/қажет); rejects definitional («деген не») and acknowledgement («түсіндім») contexts.
+- `detect_code_request`: code-noun (код/snippet/программа/listing) + show-write-verb (жаз/көрсет/бер) OR example-request (мысал/үлгі + give-verb) OR code+modal-necessity.
+- `detect_explain_compiler_error`: extracts canonical `E0xxx` codes; maps common error texts to canonical codes (`cannot borrow as mutable` → E0596, `cannot move out` → E0507, `does not live long enough` → E0597, `use of moved value` → E0382).
+- `detect_ask_purpose`: requires explicit purpose markers (мақсаты / мақсат / міндеті / пайдасы / не үшін арналған / неге арналған / себебі қандай). Narrowly scoped — «мәні» rejected because it collides with «қайтару мәні» (= return value).
+
+**New module** [pedagogical.rs](crates/adam-dialog/src/pedagogical.rs) with 4 curated content maps:
+- `exercise_for(topic)` — 15 topics: ownership / borrow / lifetimes / trait / result / option / match / iterator / closure / future / async / tokio / stream / pin / hello world.
+- `code_snippet_for(topic)` — 15 snippets covering the same topics + vec / string / struct.
+- `explain_error_code(code)` — 9 most common Rust errors: E0382 / E0277 / E0308 / E0506 / E0596 / E0521 / E0499 / E0507 / E0597.
+- `purpose_for(topic)` — 6 fundamental concepts: ownership / borrow / lifetime / trait / future / pin.
+
+**4 template families** in [v1.toml](data/dialog/templates/v1.toml): `ask_exercise`, `code_request`, `explain_compiler_error`, `ask_purpose`. Each has topic/code-bearing variants AND topic-less clarification fallbacks.
+
+**Topic-extraction polish** for mixed-script tokens: «Ownership-тің мақсаты не?» / «Pin-нің мақсаты қандай?» — pre-fix the `latin_subject_hint` couldn't peel the Latin lemma from a Cyrillic genitive suffix (`-тің` / `-нің`). Fix in [topic_extraction.rs:3127](crates/adam-dialog/src/topic_extraction.rs#L3127): when a token fails the pure-ASCII guard, take its leading-ASCII run (≥3 chars) and check against `LATIN_TECH_SUBJECTS`.
+
+### Live holdout extended
+
+`data/eval/live_holdout_codex_2026_05_07.json` now has **24 cases** (was 11; +13 P2 cases across all 4 intents). 100 % floor maintained.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 24 / 24 Codex live-holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book ch.1-9 + cross-cutting `rust_holdout` | ✅ unchanged |
+| End-to-end + reasoning + retrieval suites | ✅ all 1005 passing |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 3003 (unchanged) |
+| world_core facts | 3245 (unchanged) |
+| Derived facts | 30892 (unchanged) |
+
+### Regression captured
+
+End-to-end test `user_acknowledgement_routes_to_dedicated_template` initially failed because «...көп жаттығу керек екенін түсіндім» (= "I understood a lot of practice is needed") matched my AskExercise detector via «жаттығу керек». Fix: refuse AskExercise when sentence contains acknowledgement markers (түсіндім / түсіндік / мақұл / келісемін / қабыл аламын). Codex's «жаттығу керек» request still routes correctly because acknowledgement contexts have these markers, plain requests don't.
+
+Chapter-04 holdout regression «Қайтару мәні мен иелік деген не?» — my AskPurpose detector matched on «мәні» (= "essence/value") which collides with «қайтару мәні» (= return value). Fix: removed «мәні» from the purpose-noun list. Detector now requires explicit мақсаты / мақсат / міндеті / пайдасы / не үшін арналған markers.
+
+### Strategic note
+
+Per memory `project_kazakh_tutor_positioning`: this release closes Codex P2 directive. Next on roadmap:
+- **P3** — split metrics in performance.md (fact_retrieval_pass / dialog_routing_pass / pedagogical_tutor_pass) + cargo-check loop scaffolding.
+- Coverage extension: more topics in pedagogical.rs (currently 15 exercises, 15 snippets, 9 errors, 6 purposes — still narrow).
+
+### Roadmap (next)
+
+| Release | Focus |
+|---|---|
+| **v4.93.5** | **Codex audit P2 — pedagogical intents (this release)** |
+| v4.94.0 | P3 — split metrics + cargo-check loop scaffolding |
+| v4.94.5 | Pedagogical content extension (more topics per intent) |
+
 ## [4.93.0] — 2026-05-07 — Codex 2026-05-07 audit fixes — memory poisoning + Rust routing
 
 Strategic course-correction release. After 29 chapter releases (Rust Book ch.1-20 + Async Book ch.1-9, ~702 entries), Codex's 2026-05-07 audit REPL session surfaced critical gaps the chapter-holdout suite missed: **memory poisoning** (system stored fake user names) and **Rust intent routing failures** (technical questions routed to wrong intents/topics). Pivoting from corpus expansion to dialog-quality fixes per memory note `project_kazakh_tutor_positioning`.

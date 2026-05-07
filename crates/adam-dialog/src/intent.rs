@@ -212,6 +212,44 @@ pub enum Intent {
     /// `Оқушы мектеп құрамына кіреді` greedy IsA fact).
     AskCurriculumContent,
 
+    /// **v4.93.5** — pedagogical intents for the Kazakh tutor stripe
+    /// (Codex 2026-05-07 audit P2). Four explicit intents for
+    /// teaching workflows that the existing fact-retrieval intents
+    /// don't address. Each carries an optional `topic` slot so the
+    /// planner can surface topic-specific content.
+    ///
+    /// User asks for an exercise / practice task. Surface forms:
+    /// «жаттығу бер», «тапсырма бер», «есеп бер», «жаттыққым келеді»,
+    /// «практика жасайын». `topic` carries the technical subject if
+    /// extractable («Rust-та ownership жаттығуы» → topic="ownership»).
+    AskExercise { topic: Option<String> },
+
+    /// User asks adam to write code / show code example. Surface
+    /// forms: «код жаз», «код көрсет», «код бер», «мысал бер»,
+    /// «программа жаз», «hello world көрсет», «код жазып бер».
+    /// `topic` carries the technical subject when present.
+    /// **Codex directive:** never free-generate; always surface a
+    /// curated snippet — no snippet → honest "I don't have a
+    /// curated example for this topic" response.
+    CodeRequest { topic: Option<String> },
+
+    /// User pastes a Rust compiler error or asks about an error
+    /// code. Surface forms: «E0382 қатесі», «cannot borrow as
+    /// mutable қатесі», «бұл қате не білдіреді?». `error_code`
+    /// extracts the canonical `E0xxx` form when present.
+    ExplainCompilerError {
+        error_code: Option<String>,
+        topic: Option<String>,
+    },
+
+    /// User asks "what is X for / what is the purpose of X".
+    /// Surface forms: «X-нің мақсаты не?», «X-тің мақсаты не?», «X
+    /// не үшін?», «X-нің пайдасы қандай?». Distinct from the
+    /// general `Unknown` path with function-asking phrase (v4.93.0
+    /// already routes «X не үшін керек?» correctly) — this one
+    /// surfaces an explicit purpose-framed answer.
+    AskPurpose { topic: Option<String> },
+
     /// Nothing matched. Fallback may carry a `noun_hint` extracted from
     /// the input by the FST parser so the response can at least
     /// acknowledge what the user is talking about, rather than blank

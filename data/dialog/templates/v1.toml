@@ -1283,3 +1283,60 @@ templates = [
     "{noun} жайында анық емес — көбірек айта аласыз ба",
     "{noun} туралы нақтырақ не білгіңіз келеді",
 ]
+
+# **v4.93.5** — Codex 2026-05-07 audit P2 pedagogical intents.
+# Surface curated tutor content via topic-specific slots populated
+# by `crate::pedagogical::*` lookups in planner.rs. Each family has
+# topic-bearing AND topic-less variants — `template_is_fillable`
+# filters to the applicable subset based on slot presence.
+
+# AskExercise — user asks for a practice task. Topic-bearing variant
+# surfaces the curated exercise body; topic-less variant requests
+# clarification.
+[[families]]
+key = "ask_exercise"
+templates = [
+    "{topic} тақырыбы бойынша жаттығу: {exercise_body}",
+    "Тапсырма ({topic}): {exercise_body}",
+    "Қазір {topic} жаттығуын беремін: {exercise_body}",
+    "Жаттығу қандай тақырып бойынша қалайсыз? Мысалы: ownership, lifetimes, traits, async, error handling, iterators.",
+    "Қандай тақырыпта жаттығайын деп тұрсыз? Айтыңызшы — нақты тапсырма беремін.",
+]
+
+# CodeRequest — user asks for a code example. Topic-bearing variant
+# surfaces the curated snippet; topic-less variant requests
+# clarification (per Codex directive: never free-generate).
+[[families]]
+key = "code_request"
+templates = [
+    "{topic} мысалы:\n{code_snippet}",
+    "Міне {topic} коды:\n{code_snippet}",
+    "{topic} үшін қарапайым snippet:\n{code_snippet}",
+    "Қандай тақырыпта код керек? Мысалы: hello world, ownership, borrow, struct, vec, async, future, stream.",
+    "Менде сол тақырыпта тексерілген snippet жоқ. Қандай нақты мысал ұсынғым келеді — айтыңызшы.",
+]
+
+# ExplainCompilerError — user pastes an error or asks about an
+# E-code. Code-bearing variant surfaces the curated explanation;
+# code-less variant requests the actual error text or code.
+[[families]]
+key = "explain_compiler_error"
+templates = [
+    "{error_explanation}",
+    "{error_code}: {error_explanation}",
+    "Бұл қате — Rust компиляторының {error_code} коды. {error_explanation}",
+    "Қателіктің нөмірін (E0xxx) немесе compiler хабарының бірінші жолын жіберіңізші — нақты түсіндіремін.",
+    "Менде нақты сол қатенің түсіндірмесі әлі жоқ. Қате толық хабарын немесе кодын жіберіңіз.",
+]
+
+# AskPurpose — user asks "what is X for / purpose of X". Topic-
+# bearing variant surfaces the curated purpose statement; topic-
+# less variant requests clarification.
+[[families]]
+key = "ask_purpose"
+templates = [
+    "{purpose_body}",
+    "{topic}-тің мақсаты: {purpose_body}",
+    "Қандай ұғымның мақсатын білгіңіз келеді? Мысалы: ownership, borrow, lifetimes, trait, future, pin.",
+    "Қай тақырыптың мақсаты туралы сұрап тұрсыз — нақтылап беріңізші.",
+]

@@ -851,6 +851,45 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
         } => {
             slots.insert("activity".into(), activity.clone());
         }
+        // **v4.93.5** — Codex 2026-05-07 audit P2 pedagogical intents.
+        // Each intent populates a `topic` slot when extractable, plus
+        // an intent-specific body slot keyed off curated content in
+        // `crate::pedagogical`. Templates in v1.toml use these slots;
+        // `template_is_fillable` filters to topic-bearing variants
+        // when topic is present, falls back to clarifying prompts
+        // when not.
+        Intent::AskExercise { topic: Some(t) } => {
+            slots.insert("topic".into(), t.clone());
+            if let Some(body) = crate::pedagogical::exercise_for(t) {
+                slots.insert("exercise_body".into(), body.into());
+            }
+        }
+        Intent::AskExercise { topic: None } => {}
+        Intent::CodeRequest { topic: Some(t) } => {
+            slots.insert("topic".into(), t.clone());
+            if let Some(snippet) = crate::pedagogical::code_snippet_for(t) {
+                slots.insert("code_snippet".into(), snippet.into());
+            }
+        }
+        Intent::CodeRequest { topic: None } => {}
+        Intent::ExplainCompilerError { error_code, topic } => {
+            if let Some(code) = error_code {
+                slots.insert("error_code".into(), code.clone());
+                if let Some(explanation) = crate::pedagogical::explain_error_code(code) {
+                    slots.insert("error_explanation".into(), explanation.into());
+                }
+            }
+            if let Some(t) = topic {
+                slots.insert("topic".into(), t.clone());
+            }
+        }
+        Intent::AskPurpose { topic: Some(t) } => {
+            slots.insert("topic".into(), t.clone());
+            if let Some(purpose) = crate::pedagogical::purpose_for(t) {
+                slots.insert("purpose_body".into(), purpose.into());
+            }
+        }
+        Intent::AskPurpose { topic: None } => {}
         Intent::Unknown {
             noun_hint,
             example,
@@ -1201,6 +1240,15 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         // v4.14.0 — curriculum-content honest fallback.
         Intent::AskCurriculumContent => "ask_curriculum_content",
         Intent::AskWillingness => "ask_willingness",
+        // **v4.93.5** — Codex 2026-05-07 audit P2 pedagogical intents.
+        // Each routes to a dedicated template family. `topic` carries
+        // the technical subject (extracted via pedagogical_topic_hint
+        // in semantics.rs) and is interpolated into templates; topic-
+        // less variants fall back to generic prompts.
+        Intent::AskExercise { .. } => "ask_exercise",
+        Intent::CodeRequest { .. } => "code_request",
+        Intent::ExplainCompilerError { .. } => "explain_compiler_error",
+        Intent::AskPurpose { .. } => "ask_purpose",
         Intent::Unknown {
             raw_tokens,
             noun_hint,

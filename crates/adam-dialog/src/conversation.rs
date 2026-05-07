@@ -321,6 +321,11 @@ pub enum IntentKind {
     AskCurriculumContent,
     /// **v4.17.5** — willingness / readiness-to-improve question.
     AskWillingness,
+    /// **v4.93.5** — pedagogical intents (Codex 2026-05-07 audit P2).
+    AskExercise,
+    CodeRequest,
+    ExplainCompilerError,
+    AskPurpose,
     Unknown,
 }
 
@@ -359,6 +364,10 @@ impl From<&Intent> for IntentKind {
             Intent::UserAcknowledgement => Self::UserAcknowledgement,
             Intent::AskCurriculumContent => Self::AskCurriculumContent,
             Intent::AskWillingness => Self::AskWillingness,
+            Intent::AskExercise { .. } => Self::AskExercise,
+            Intent::CodeRequest { .. } => Self::CodeRequest,
+            Intent::ExplainCompilerError { .. } => Self::ExplainCompilerError,
+            Intent::AskPurpose { .. } => Self::AskPurpose,
             Intent::Unknown { .. } => Self::Unknown,
         }
     }

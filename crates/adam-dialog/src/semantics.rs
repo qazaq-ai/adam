@@ -152,6 +152,30 @@ pub fn interpret_text_with_lexicon(
     if detect_ask_willingness(&joined) {
         return Intent::AskWillingness;
     }
+    // **v4.93.5** — pedagogical intents (Codex 2026-05-07 audit P2).
+    // Routed BEFORE ask-name so «жаттығу беріңіз» / «код жазып
+    // беріңіз» / «E0382 қатесін түсіндіріңіз» / «X-нің мақсаты не?»
+    // bypass the generic-noun fallback that surfaced unrelated
+    // dictionary definitions pre-v4.93.5.
+    if let Some(code) = detect_explain_compiler_error(&joined, &raw_tokens) {
+        let topic = pedagogical_topic_hint(input);
+        return Intent::ExplainCompilerError {
+            error_code: code,
+            topic,
+        };
+    }
+    if detect_code_request(&joined) {
+        let topic = pedagogical_topic_hint(input);
+        return Intent::CodeRequest { topic };
+    }
+    if detect_ask_exercise(&joined) {
+        let topic = pedagogical_topic_hint(input);
+        return Intent::AskExercise { topic };
+    }
+    if detect_ask_purpose(&joined) {
+        let topic = pedagogical_topic_hint(input);
+        return Intent::AskPurpose { topic };
+    }
     if detect_ask_name(&joined) {
         return Intent::AskName;
     }
@@ -833,6 +857,171 @@ fn detect_compositional_function_question(input: &str) -> bool {
 /// өсу / жетілдір`). Conservative — requires both the readiness
 /// marker AND a growth-verb so generic «дайын ба» doesn't
 /// accidentally fire.
+/// **v4.93.5** — Codex 2026-05-07 audit P2: detect "give me an
+/// exercise / task / problem" requests. Pre-fix queries like
+/// «жаттығу беріңіз» fell through to topic extraction on the noun
+/// `жаттығу` (= "exercise"), surfacing the dictionary definition
+/// instead of generating an exercise.
+fn detect_ask_exercise(joined: &str) -> bool {
+    // Trigger: noun «жаттығу/тапсырма/есеп/практика» + give-verb
+    // («бер»/«бер...»/«ұсын»/«құрастыр») or modal-necessity with the
+    // practice noun («жаттығу керек» = "I need an exercise").
+    // Conservative — requires both pieces so a bare «жаттығу деген
+    // не?» (definition request) doesn't fire here.
+    let has_practice_noun = joined.contains("жаттығу")
+        || joined.contains("тапсырма")
+        || joined.contains("есеп бер")
+        || joined.contains("практика")
+        || joined.contains("упражнение");
+    let has_give_verb = joined.contains("бер")
+        || joined.contains("ұсын")
+        || joined.contains("құрастыр")
+        || joined.contains("жасайын")
+        || joined.contains("жаттыққым")
+        || joined.contains("жаттығайын")
+        // **v4.93.5** — modal forms «X керек / қажет» also signal
+        // an exercise request when paired with a practice noun.
+        // Live test: «lifetime жаттығуы керек.» pre-fix routed to
+        // modal-Necessity hedge instead of the new ask_exercise path.
+        || joined.contains("керек")
+        || joined.contains("қажет");
+    // Refuse definitional requests like «жаттығу деген не?» / «жаттығу
+    // дегеніміз не?» — those should surface the dictionary entry.
+    let is_definitional = joined.contains("деген не")
+        || joined.contains("дегеніміз не")
+        || joined.contains("деген сөз")
+        || joined.contains("дегеніміз — не");
+    // **v4.93.5** — refuse when the sentence is an acknowledgement.
+    // «...көп жаттығу керек екенін түсіндім» (= "I understood a
+    // lot of practice is needed") is the user reflecting on adam's
+    // limits, not asking for an exercise. Existing `end_to_end`
+    // test caught this regression. Acknowledgement markers:
+    // түсіндім / түсіндік / мақұл / келісемін / қабыл аламын.
+    let is_acknowledgement = joined.contains("түсіндім")
+        || joined.contains("түсіндік")
+        || joined.contains("мақұл")
+        || joined.contains("келісемін")
+        || joined.contains("қабыл алам");
+    has_practice_noun && has_give_verb && !is_definitional && !is_acknowledgement
+}
+
+/// **v4.93.5** — Codex P2: detect "write code / show example" requests.
+fn detect_code_request(joined: &str) -> bool {
+    // Either explicit «код жаз/көрсет/бер» / «мысал бер» / «программа
+    // жаз», OR a "show me Hello World" style framed as imperative.
+    let has_code_noun = joined.contains("код")
+        || joined.contains("snippet")
+        || joined.contains("программа")
+        || joined.contains("listing");
+    let has_show_or_write_verb = joined.contains("жаз")
+        || joined.contains("көрсет")
+        || joined.contains("бер")
+        || joined.contains("ұсын");
+    let has_example_request = (joined.contains("мысал") || joined.contains("үлгі"))
+        && (joined.contains("бер") || joined.contains("көрсет") || joined.contains("жаз"));
+    // **v4.93.5** — modal forms «код керек / қажет» also signal a
+    // code request. Live test: «Маған ownership коды керек.» pre-fix
+    // routed to modal-Necessity hedge.
+    let has_code_modal = has_code_noun && (joined.contains("керек") || joined.contains("қажет"));
+    let is_definitional = joined.contains("деген не") || joined.contains("дегеніміз не");
+    if is_definitional {
+        return false;
+    }
+    (has_code_noun && has_show_or_write_verb) || has_example_request || has_code_modal
+}
+
+/// **v4.93.5** — Codex P2: detect "explain this compiler error / E0xxx".
+/// Returns Some(error_code_uppercase) when an `E0xxx` code is present;
+/// Some(None) coverage handled at call site as `error_code = None` for
+/// generic «бұл қате не білдіреді» framings without a numeric code.
+fn detect_explain_compiler_error(joined: &str, raw_tokens: &[String]) -> Option<Option<String>> {
+    // Numeric code E0xxx (case-insensitive). Pre-extract from raw
+    // tokens so we preserve the canonical uppercase form.
+    let code = raw_tokens.iter().find_map(|t| {
+        let lower = t.to_lowercase();
+        let lower = lower.trim_end_matches([',', '.', '?', '!', ':', ';', ')']);
+        let lower = lower.trim_start_matches('(');
+        if lower.starts_with('e')
+            && lower.len() >= 2
+            && lower[1..].chars().all(|c| c.is_ascii_digit())
+        {
+            Some(lower.to_uppercase())
+        } else {
+            None
+        }
+    });
+    if code.is_some() {
+        return Some(code);
+    }
+    // **v4.93.5** — map common Rust error TEXT patterns to canonical
+    // E-codes when the user pastes the error message rather than
+    // typing the code. Order: most-specific first (longer match).
+    let has_kz_error_marker = joined.contains("қате") || joined.contains("түсіндір");
+    if !has_kz_error_marker {
+        return None;
+    }
+    if joined.contains("cannot borrow as mutable more than once")
+        || joined.contains("more than one mutable borrow")
+    {
+        return Some(Some("E0499".to_string()));
+    }
+    if joined.contains("cannot borrow as mutable") {
+        return Some(Some("E0596".to_string()));
+    }
+    if joined.contains("cannot move out") {
+        return Some(Some("E0507".to_string()));
+    }
+    if joined.contains("does not live long enough") {
+        return Some(Some("E0597".to_string()));
+    }
+    if joined.contains("use of moved value") {
+        return Some(Some("E0382".to_string()));
+    }
+    // Generic Rust error markers — fire intent without specific code.
+    if joined.contains("cannot borrow")
+        || joined.contains("borrow checker")
+        || (joined.contains("expected") && joined.contains("found"))
+    {
+        return Some(None);
+    }
+    None
+}
+
+/// **v4.93.5** — Codex P2: detect "what is the purpose of X / why is
+/// X for". Distinct from the v4.93.0 function-asking-phrase fix
+/// (which catches «X не үшін керек?») — this one catches the
+/// possessive form «X-нің мақсаты не?» / «X-тің мақсаты не?» plus
+/// shorter «X не үшін?».
+fn detect_ask_purpose(joined: &str) -> bool {
+    // **v4.93.5** — keep this NARROW. «мәні» (essence/value) is too
+    // broad — it collides with «қайтару мәні» (= "return value")
+    // and other unrelated noun-phrases. Require explicit purpose
+    // markers only.
+    let has_purpose_noun = joined.contains("мақсаты")
+        || joined.contains("мақсат")
+        || joined.contains("міндеті")
+        || joined.contains("пайдасы");
+    let has_why_marker = joined.contains("не үшін арналған")
+        || joined.contains("неге арналған")
+        || joined.contains("себебі қандай");
+    has_purpose_noun || has_why_marker
+}
+
+/// **v4.93.5** — pedagogical-intent topic extractor. Scans the
+/// input for a Latin tech subject (`ownership`, `tokio`, ...) or
+/// the most-recent multiword Rust subject. Returns the topic in
+/// lowercase canonical form, or None if no topic is recoverable
+/// (the planner falls back to a generic prompt in that case).
+fn pedagogical_topic_hint(input: &str) -> Option<String> {
+    if let Some(latin) = crate::topic_extraction::latin_subject_hint(input) {
+        return Some(latin);
+    }
+    if let Some(mw) = crate::topic_extraction::multiword_entity_hint(input) {
+        return Some(mw);
+    }
+    None
+}
+
 fn detect_ask_willingness(joined: &str) -> bool {
     let has_readiness = joined.contains("дайынсыз ба")
         || joined.contains("дайынсың ба")

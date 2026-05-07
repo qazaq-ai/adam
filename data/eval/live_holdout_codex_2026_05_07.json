@@ -16,6 +16,23 @@
     {"id": "codex_p1_async_works", "category": "p1_rust_routing", "query": "async/await қалай жұмыс істейді?", "any_substring": ["асинхронды", "future", "async fn"]},
     {"id": "codex_p1_tokio_does", "category": "p1_rust_routing", "query": "Tokio runtime не істейді?", "any_substring": ["work-stealing", "executor", "reactor"]},
     {"id": "codex_p1_stream_def", "category": "p1_rust_routing", "query": "Stream деген не?", "any_substring": ["async-aware", "итератор", "next().await"]},
-    {"id": "codex_p1_tokio_bare", "category": "p1_rust_routing", "query": "tokio деген не?", "any_substring": ["work-stealing", "executor", "де факто"]}
+    {"id": "codex_p1_tokio_bare", "category": "p1_rust_routing", "query": "tokio деген не?", "any_substring": ["work-stealing", "executor", "де факто"]},
+
+    {"id": "codex_p2_exercise_ownership", "category": "p2_pedagogical", "query": "Маған Rust-та ownership жаттығуын беріңізші.", "any_substring": ["ownership тақырыбы", "let s = string::from", "иеленудің"]},
+    {"id": "codex_p2_exercise_clarify", "category": "p2_pedagogical", "query": "Жаттығу бер.", "any_substring": ["қандай тақырып", "ownership", "lifetimes"]},
+    {"id": "codex_p2_exercise_modal", "category": "p2_pedagogical", "query": "lifetime жаттығуы керек.", "any_substring": ["lifetime тақырыбы", "lifetime annotation", "longer"]},
+    {"id": "codex_p2_exercise_async", "category": "p2_pedagogical", "query": "async бойынша тапсырма ұсыныңыз.", "any_substring": ["async тақырыбы", "double(n: u32)", "tokio::main"]},
+
+    {"id": "codex_p2_code_ownership", "category": "p2_pedagogical", "query": "Маған ownership коды керек.", "any_substring": ["takes_ownership", "let x = 5", "copy"]},
+    {"id": "codex_p2_code_async", "category": "p2_pedagogical", "query": "async fn мысалын беріңіз.", "any_substring": ["async fn double", "tokio::main", "n * 2"]},
+    {"id": "codex_p2_code_clarify", "category": "p2_pedagogical", "query": "Маған код жазып беріңіз.", "any_substring": ["қандай тақырыпта", "hello world", "ownership"]},
+
+    {"id": "codex_p2_error_e0382", "category": "p2_pedagogical", "query": "E0382 қатесін түсіндіріңіз.", "any_substring": ["use of moved value", "иеленуі", "clone"]},
+    {"id": "codex_p2_error_text", "category": "p2_pedagogical", "query": "Cannot borrow as mutable қатесін түсіндіріңіз.", "any_substring": ["e0596", "let mut", "&mut"]},
+    {"id": "codex_p2_error_e0277", "category": "p2_pedagogical", "query": "E0277 деген қандай қате?", "any_substring": ["trait bound", "display", "derive(debug)"]},
+
+    {"id": "codex_p2_purpose_ownership", "category": "p2_pedagogical", "query": "Ownership-тің мақсаты не?", "any_substring": ["иеленудің мақсаты", "garbage collector", "use-after-free"]},
+    {"id": "codex_p2_purpose_pin", "category": "p2_pedagogical", "query": "Pin-нің мақсаты қандай?", "any_substring": ["жадтан жылжыту", "self-referential", "async fn state machine"]},
+    {"id": "codex_p2_purpose_trait", "category": "p2_pedagogical", "query": "Trait не үшін арналған?", "any_substring": ["ортақ мінез-құлық", "generic функциялар", "dyn trait"]}
   ]
 }

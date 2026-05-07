@@ -3176,6 +3176,26 @@ pub(crate) fn latin_subject_hint(input: &str) -> Option<String> {
         // digits / underscore; anything Cyrillic falls through to
         // the existing topic-extraction strategies.
         if !raw.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+            // **v4.93.5** — Codex 2026-05-07 audit P2 follow-up:
+            // mixed-script tokens like «ownership-тің» / «pin-нің»
+            // (Latin word + Kazakh genitive suffix). Pre-fix
+            // «Ownership-тің мақсаты не?» dropped to None because
+            // the FULL token failed the pure-ASCII guard and no
+            // second Latin token existed. Try to peel a leading
+            // ASCII run (the Latin lemma) and check it against
+            // LATIN_TECH_SUBJECTS.
+            let leading_ascii: String = raw
+                .chars()
+                .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
+                .collect();
+            if leading_ascii.len() >= 3 {
+                let lower = leading_ascii.to_lowercase();
+                if let Some(&hit) = LATIN_TECH_SUBJECTS.iter().find(|&&s| s == lower.as_str()) {
+                    if best.is_none_or(|b| hit.len() > b.len()) {
+                        best = Some(hit);
+                    }
+                }
+            }
             continue;
         }
         let lower = raw.to_lowercase();
