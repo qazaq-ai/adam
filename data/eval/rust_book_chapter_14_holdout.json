@@ -1,0 +1,27 @@
+{
+  "_comment": "v4.85.0 — Rust Book Chapter 14 (Cargo + Crates.io тереңірек) holdout. 18 natural Kazakh queries against rust_406…423. Categories: ch14_profiles (release profiles + opt-level + Cargo.toml metadata), ch14_docs (cargo doc + /// vs //! + doc sections + doc-tests), ch14_publishing (cargo login + SemVer + cargo publish + dry-run + cargo yank), ch14_workspace (workspace + path deps + cargo commands), ch14_install_extend (cargo install + subcommand extension + crates.io ecosystem).",
+  "version": "v4.85.0",
+  "captured_date": "2026-05-06",
+  "chapter": 14,
+  "chapter_title": "Cargo + Crates.io тереңірек (profiles / docs / publishing / workspaces / install)",
+  "cases": [
+    {"id": "ch14_profile_config", "category": "ch14_profiles", "query": "Cargo бейіндерін баптау деген не?", "any_substring": ["[profile.release]", "lto", "codegen-units"]},
+    {"id": "ch14_opt_level", "category": "ch14_profiles", "query": "opt-level деген не?", "any_substring": ["0-3", "dev", "size"]},
+    {"id": "ch14_metadata", "category": "ch14_profiles", "query": "Cargo.toml метамәліметтер деген не?", "any_substring": ["spdx", "mit or apache", "keywords"]},
+    {"id": "ch14_cargo_doc", "category": "ch14_docs", "query": "cargo doc деген не?", "any_substring": ["html құжаттама", "target/doc", "markdown"]},
+    {"id": "ch14_doc_comments", "category": "ch14_docs", "query": "/// vs //! деген не?", "any_substring": ["outer doc", "inner doc", "lib.rs басында"]},
+    {"id": "ch14_doc_sections", "category": "ch14_docs", "query": "Doc бөлімдері деген не?", "any_substring": ["# examples", "# panics", "# safety"]},
+    {"id": "ch14_doc_tests", "category": "ch14_docs", "query": "doc-tests деген не?", "any_substring": ["орындалатын тест", "ескірмейді", "cargo test --doc"]},
+    {"id": "ch14_cargo_login", "category": "ch14_publishing", "query": "cargo login деген не?", "any_substring": ["api токен", "credentials.toml", "github арқылы"]},
+    {"id": "ch14_semver", "category": "ch14_publishing", "query": "SemVer деген не?", "any_substring": ["major.minor.patch", "0.x", "backwards-compatible"]},
+    {"id": "ch14_cargo_publish", "category": "ch14_publishing", "query": "cargo publish деген не?", "any_substring": ["қайтымсыз", "пакеттеледі", "тәуелді жобалар"]},
+    {"id": "ch14_dry_run", "category": "ch14_publishing", "query": "cargo publish --dry-run деген не?", "any_substring": ["симуляция", "жібермейді", "exclude"]},
+    {"id": "ch14_yank", "category": "ch14_publishing", "query": "cargo yank деген не?", "any_substring": ["жойылған", "cargo yank --vers", "қауіпсіздік"]},
+    {"id": "ch14_workspace", "category": "ch14_workspace", "query": "Cargo workspace деген не?", "any_substring": ["[workspace]", "members", "adam жобасы"]},
+    {"id": "ch14_path_dep", "category": "ch14_workspace", "query": "Workspace path тәуелділігі деген не?", "any_substring": ["path = \"..", "core/api/cli", "жариялаудан бұрын"]},
+    {"id": "ch14_workspace_cmds", "category": "ch14_workspace", "query": "Workspace cargo командалары деген не?", "any_substring": ["cargo run -p", "--workspace", "--exclude"]},
+    {"id": "ch14_cargo_install", "category": "ch14_install_extend", "query": "cargo install деген не?", "any_substring": ["~/.cargo/bin/", "ripgrep", "бинарлы сандықтар"]},
+    {"id": "ch14_subcommand_ext", "category": "ch14_install_extend", "query": "Cargo subcommand кеңейтуі деген не?", "any_substring": ["cargo-foo", "cargo-edit", "cargo-watch"]},
+    {"id": "ch14_crates_io_ecosystem", "category": "ch14_install_extend", "query": "crates.io экожүйесі деген не?", "any_substring": ["serde", "tokio", "lib.rs"]}
+  ]
+}

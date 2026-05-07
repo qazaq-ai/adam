@@ -7,6 +7,61 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.85.0] — 2026-05-06 — Rust Book chapter 14 deepening — Cargo + Crates.io deeper
+
+Per-chapter pedagogical cadence continues. Chapter 14 covers Cargo's deeper capabilities essential for Rust ecosystem participation — releasing libraries, organizing large projects, extending the toolchain. Previously 0 entries for these specifics. Now deepened with full curriculum.
+
+### What's added
+
+**18 new curated entries `rust_406…423`** in `programming_rust.jsonl`:
+
+**Profile customization (3):** profile config (`[profile.dev]` + `[profile.release]` overrides), `opt-level` (0-3 + "s"), Cargo.toml metadata fields (name/version/edition/description/license + SPDX identifiers + recommended fields).
+
+**Documentation (4):** `cargo doc` HTML generation, `///` outer vs `//!` inner doc comments, idiomatic sections (`#Examples`/`#Panics`/`#Errors`/`#Safety`/`#Implementation Notes`), doc-tests (executable code in `///` blocks).
+
+**Publishing (5):** `cargo login` + crates.io API token + `~/.cargo/credentials.toml`, SemVer rules (MAJOR.MINOR.PATCH + 0.x special case), `cargo publish` irrevocability, `--dry-run` validation, `cargo yank` for security/bad releases.
+
+**Workspaces (3):** workspace concept (single root + multiple packages + shared `target/`), workspace path dependencies (`{ path = "../add_one" }`), workspace cargo commands (`-p`, `--workspace`, `--exclude`).
+
+**Install + extend (3):** `cargo install` for binary crates (~/.cargo/bin/), cargo subcommand extension mechanism (`cargo-foo` → `cargo foo`), crates.io ecosystem overview (popular libraries: serde, tokio, clap, reqwest, rand, regex, chrono, anyhow/thiserror, axum/actix-web).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_14_holdout.json` — 18 cases, 5 categories (`ch14_profiles`, `ch14_docs`, `ch14_publishing`, `ch14_workspace`, `ch14_install_extend`).
+- `crates/adam-dialog/tests/rust_book_chapter_14.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 27 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 14 holdout cases | ✅ 100 % |
+| Existing chapters 1-12 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **989 passing** (was 988; +1 chapter-14 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2718 → **2736** (+18) |
+| world_core facts | 2960 → **2978** (+18) |
+| Derived facts | 30853 → **30841** (−12 cluster restructure) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.85.0** | **ch. 14** | **Cargo + Crates.io deeper (this release)** |
+| v4.85.5 | ch. 15 | Smart pointers (Box / Rc / Arc / RefCell / Mutex / Weak / cycles / Drop / Deref) |
+| v4.86.0 | ch. 16 | Concurrency (threads / channels / Send+Sync / Arc<Mutex<T>>) |
+| v4.86.5 | ch. 17 | OOP features (trait objects / inheritance via composition) |
+| v4.87.0 | ch. 18 | Patterns (advanced pattern matching) |
+| v4.87.5 | ch. 19 | Advanced features (unsafe / advanced traits / function pointers / macros) |
+| v4.88.0 | ch. 20 | Final project (multi-threaded web server) |
+
+Cadence: `.0` minor — 18 new entries, no stub deepening; chapter 14 closes the practical Cargo toolkit (essential for any real Rust project past prototype). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.84.5] — 2026-05-06 — Rust Book chapter 12 deepening — CLI minigrep project
 
 Per-chapter pedagogical cadence continues. Chapter 12 is the **first end-to-end real project** in the book — building a working CLI grep clone using everything from chapters 7-11 (modules, errors, traits, lifetimes, tests). Previously **0 entries**. Now deepened with full curriculum.
