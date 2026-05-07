@@ -1,0 +1,27 @@
+{
+  "_comment": "v4.85.5 — Rust Book Chapter 15 (Ақылды сілтемелер) holdout. 18 natural Kazakh queries against rust_424…441 + 3 stub deletions (rust_085 Box, rust_086 Rc, rust_088 RefCell — duplicates of deeper rust_133/135/137). Categories: ch15_smart (smart pointer concept, Box recursive types, Deref trait, Deref coercion, Drop trait, mem::drop), ch15_rc (Rc::clone counter increment, strong_count, Rc vs Arc), ch15_refcell (interior mutability, borrow/borrow_mut, runtime panic, mock pattern, Rc<RefCell> combo), ch15_weak (reference cycles + leak, Weak non-owning, downgrade/upgrade, parent-child tree).",
+  "version": "v4.85.5",
+  "captured_date": "2026-05-06",
+  "chapter": 15,
+  "chapter_title": "Ақылды сілтемелер (Smart pointers: Box / Rc / RefCell / Weak / Deref / Drop)",
+  "cases": [
+    {"id": "ch15_smart_pointer", "category": "ch15_smart", "query": "Ақылды сілтеме деген не?", "any_substring": ["қосымша мінез-құлық", "weak<t>", "interior mutability"]},
+    {"id": "ch15_box_recursive", "category": "ch15_smart", "query": "Box рекурсивті типке деген не?", "any_substring": ["cons", "infinite size", "8 байт"]},
+    {"id": "ch15_deref", "category": "ch15_smart", "query": "Deref трейті деген не?", "any_substring": ["mybox", "type target", "derefmut"]},
+    {"id": "ch15_deref_coercion", "category": "ch15_smart", "query": "Deref coercion деген не?", "any_substring": ["автоматты түрлендіру", "&str", "тізбекті"]},
+    {"id": "ch15_drop", "category": "ch15_smart", "query": "Drop трейті деген не?", "any_substring": ["автоматты түрде", "lifo", "raii"]},
+    {"id": "ch15_mem_drop", "category": "ch15_smart", "query": "std::mem::drop деген не?", "any_substring": ["мерзімінен бұрын", "қос-тазалау", "mutex"]},
+    {"id": "ch15_rc_clone", "category": "ch15_rc", "query": "Rc::clone деген не?", "any_substring": ["есептеуішті бір көтереді", "string::clone", "арзан"]},
+    {"id": "ch15_strong_count", "category": "ch15_rc", "query": "Rc::strong_count деген не?", "any_substring": ["weak_count", "циклдер", "өмірін ұзартпайды"]},
+    {"id": "ch15_rc_vs_arc", "category": "ch15_rc", "query": "Rc vs Arc деген не?", "any_substring": ["атомдық емес", "race condition", "arc<mutex"]},
+    {"id": "ch15_interior_mut", "category": "ch15_refcell", "query": "Ішкі өзгермелілік деген не?", "any_substring": ["орындалу кезіне", "mock", "граф"]},
+    {"id": "ch15_borrow", "category": "ch15_refcell", "query": "RefCell::borrow деген не?", "any_substring": ["ref<t>", "refmut<t>", "runtime тексереді"]},
+    {"id": "ch15_runtime_panic", "category": "ch15_refcell", "query": "RefCell runtime panic деген не?", "any_substring": ["borrowmuterror", "late discovery", "&mut"]},
+    {"id": "ch15_mock_refcell", "category": "ch15_refcell", "query": "Mock-нысан RefCell деген не?", "any_substring": ["messenger", "mockmessenger", "borrow_mut().push"]},
+    {"id": "ch15_rc_refcell_combo", "category": "ch15_refcell", "query": "Rc<RefCell> тіркесімі деген не?", "any_substring": ["shared mutable state", "+= 10", "ast"]},
+    {"id": "ch15_cycles", "category": "ch15_weak", "query": "Сілтеме циклы деген не?", "any_substring": ["memory leak", "ешқашан нөлге", "use-after-free"]},
+    {"id": "ch15_weak", "category": "ch15_weak", "query": "Weak<T> деген не?", "any_substring": ["иеленуші емес", "weak_count", "upgrade"]},
+    {"id": "ch15_downgrade", "category": "ch15_weak", "query": "Rc::downgrade деген не?", "any_substring": ["option<rc<t>>", "if let some", "кэш"]},
+    {"id": "ch15_parent_child", "category": "ch15_weak", "query": "Парент-бала ағаш деген не?", "any_substring": ["refcell<weak<node>>", "children: refcell<vec<rc", "циклсіз"]}
+  ]
+}

@@ -1,7 +1,7 @@
 {
-  "version": "4.84.5",
+  "version": "4.85.0",
   "status": "completed",
-  "elapsed_s": 65,
+  "elapsed_s": 64,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2978,
+    "facts_total": 2993,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2413,
+      "is_a": 2428,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 419,
+      "world_core/programming_rust.jsonl": 434,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -44540,46 +44540,6 @@
     },
     {
       "subject": {
-        "surface": "box",
-        "root": "box",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "ақылды сілтеме",
-        "root": "ақылды сілтеме",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust",
-      "source": {
-        "pack": "world_core/programming_rust.jsonl",
-        "sample_id": "rust_085"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "`Box` — `Rust-`та мәнді үймеге орналастыратын ақылды сілтеме."
-    },
-    {
-      "subject": {
-        "surface": "rc",
-        "root": "rc",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "ақылды сілтеме",
-        "root": "ақылды сілтеме",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust",
-      "source": {
-        "pack": "world_core/programming_rust.jsonl",
-        "sample_id": "rust_086"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "`Rc` — `Rust-`та бір ағында бірнеше ие болуы мүмкін, есептеуішке негізделген ақылды сілтеме."
-    },
-    {
-      "subject": {
         "surface": "arc",
         "root": "arc",
         "pos": "noun"
@@ -44597,26 +44557,6 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "`Arc` — `Rust-`та ағындар арасында қауіпсіз ортақ иеленуге арналған ақылды сілтеме."
-    },
-    {
-      "subject": {
-        "surface": "refcell",
-        "root": "refcell",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "ақылды сілтеме",
-        "root": "ақылды сілтеме",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust",
-      "source": {
-        "pack": "world_core/programming_rust.jsonl",
-        "sample_id": "rust_088"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "`RefCell` — `Rust-`та орындалу кезінде қарызды тексеретін ішкі өзгерту контейнері."
     },
     {
       "subject": {
@@ -51317,6 +51257,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "crates.io экожүйесі — Rust сандықтарының **орталық қоймасы** (https://crates.io). 150,000+ сандық: `serde` (сериализация), `tokio` (async runtime), `clap` (CLI parsing), `reqwest` (HTTP клиент), `rand` (random), `regex` (regex), `chrono` (даталар), `anyhow`/`thiserror` (қателер), `axum`/`actix-web` (web фреймворктер). **Іздеу:** crates.io UI, lib.rs (альтернатива). **Танымал критерийлер:** жариялану күні (последнее), тәуелділік саны (қанша жоба қолданады), README сапасы. Идиома: ауыр функционалды өзіңіз жазудың орнына — алдымен crates.io-ны іздеу."
+    },
+    {
+      "subject": {
+        "surface": "ақылды сілтеме",
+        "root": "ақылды сілтеме",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_424"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ақылды сілтеме (smart pointer) — қосымша мінез-құлық бекітілген сілтеме. Қарапайым `&T` тек мән-сілтеу — ал ақылды сілтеме: автоматты тазалау (`Drop`), есептеуіш-есеп (`Rc`/`Arc`), бір мәнге бірнеше иеленуші, орындалу кезіндегі қарыз-тексеру (`RefCell`). Көп ақылды сілтемелер `Deref` мен `Drop` трейттерін бекітеді — `*` оператор жұмыс істейді, аумақтан шыққанда автоматты тазаланады. **Стандарт түрлері:** `Box<T>` (heap), `Rc<T>` (shared), `Arc<T>` (atomic shared, ағындар-арасы), `RefCell<T>` (interior mutability), `Mutex<T>` (атомдық қарыз), `Weak<T>` (циклдерді болдырмау)."
+    },
+    {
+      "subject": {
+        "surface": "box рекурсивті типке",
+        "root": "box рекурсивті типке",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "smart pointer паттерні",
+        "root": "smart pointer паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_425"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Box<T>` рекурсивті типке — `Box`-тың классикалық қолданысы. Рекурсивті типті жария көзделсе (cons-list, tree, графа): `enum List { Cons(i32, List), Nil }` — компиляция қатесі (`recursive type has infinite size`). Себеп: `List` мөлшерін есептеу `i32 + Cons + Cons + ...` — шексіз. **Шешім:** `Box<T>` — фиксацияланған мөлшерлі көрсеткіш (8 байт). `enum List { Cons(i32, Box<List>), Nil }` — енді мөлшері `i32 + 8 байт`. Тізім жасау: `Cons(1, Box::new(Cons(2, Box::new(Nil))))`. Pattern: тек тізім емес — кез келген рекурсивті құрылым (binary tree, AST)."
+    },
+    {
+      "subject": {
+        "surface": "deref трейті",
+        "root": "deref трейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust трейті",
+        "root": "rust трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_426"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Deref` трейті — ақылды сілтемені қарапайым `&T` сияқты пайдалану мүмкіндігі. `*` оператор `Deref::deref()` шакырады — ішкі мәнге сілтеме. Бекіту: `impl<T> Deref for MyBox<T> { type Target = T; fn deref(&self) -> &T { &self.0 } }`. Содан кейін `*y` (y — MyBox) — `*(y.deref())` дегенге пара-пар. **Күшті жақ:** өзіңіздің ақылды сілтемелеріңіз стандартты сілтемелер сияқты әрекет етеді. `Box`, `Rc`, `Arc`, `String`, `Vec` — бәрі `Deref` бекіткен. `DerefMut` — `*` мутабельді жазу үшін."
+    },
+    {
+      "subject": {
+        "surface": "deref coercion",
+        "root": "deref coercion",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "compiler ыңғайлылығы",
+        "root": "compiler ыңғайлылығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_427"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Deref coercion (деref-итеру) — `Rust`-тың автоматты түрлендіру: `&T` керек жерде `&Smart<T>` берсеңіз, компилятор `Deref`-ті қолданып **тізбекті** түрлендіреді. Мысалы, `fn hello(name: &str)` алады, ал сіз `let m = MyBox::new(String::from(\"x\")); hello(&m);` шакырасыз: `&MyBox<String>` → `&String` (MyBox::deref) → `&str` (String::deref). Екі қадамды компилятор автоматты жасайды. **Артықшылық:** `&String` алатын жерлерде `&Box<String>`, `&Rc<String>`, `&MyBox<String>` — бәрі сай. Кодыңыз қарапайым."
+    },
+    {
+      "subject": {
+        "surface": "drop трейті",
+        "root": "drop трейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust трейті",
+        "root": "rust трейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_428"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Drop` трейті — мән аумақтан шыққанда **автоматты түрде** орындалатын тазалау логикасын бекітетін трейт. `Box`, `String`, `Vec` — бәрі `Drop` арқылы өздерінің жадын тазартады. Бекіту: `impl Drop for CustomSmartPointer { fn drop(&mut self) { println!(\"тазаланды\"); } }`. **Тазалау тәртібі:** аумақтан шыққанда **кері** тәртіппен — соңғы жасалған бірінші тазаланады (LIFO). Идиома: ресурстарды (файл, мьютекс, желі сокеті) `Drop` арқылы автоматты тазалау — RAII (Resource Acquisition Is Initialization). C++/Java стиліндегі `try-finally` керек емес."
+    },
+    {
+      "subject": {
+        "surface": "std::mem::drop",
+        "root": "std::mem::drop",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "stdlib функциясы",
+        "root": "stdlib функциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_429"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`std::mem::drop` — мәнді **мерзімінен бұрын** тазалау функциясы. Қолдану: `drop(c);` — c-нің `Drop::drop` шакырылады, мән жоғалады. **Маңызды:** `Drop::drop` өзін **қолмен шакыруға тыйым** — өйткені сонда мән екі рет тазалану қаупі бар (`Drop::drop` аумақтан шыққанда тағы шакырылар еді — қос-тазалау). `std::mem::drop` иелікті алады — компилятор кейін аумақтан шыққанда `drop`-ты тағы шакырмайды. **Қашан керек:** mutex-тың lock-ын ертерек босату; үлкен `Vec`-ті қажетсіз болғанда тазалау; асинхронды операцияда state-ті аяқтау."
+    },
+    {
+      "subject": {
+        "surface": "rc::clone",
+        "root": "rc::clone",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rc әдісі",
+        "root": "rc әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_430"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rc::clone` — `Rc<T>`-ты «клондау» — нақты үймедегі мәнді **көшірмейді**, тек ішкі есептеуішті бір көтереді. Қолдану: `let b = Rc::clone(&a);` — `a` мен `b` бір мәнге сілтейді, есептеуіш 2 болады. **Маңызды айырмашылық:** `String::clone` — шынында жадты дублирлейді (қымбат); `Rc::clone` — тек атом-есептеуіш инкременті (арзан). Идиома: `Rc::clone(&value)` ашық — программистке «бұл арзан есептеуіш-клон, нәрсе-клон емес» деген сигнал. Тілдік синтаксис `value.clone()`-мен бірдей, бірақ оқу-түсіну үшін `Rc::clone` идиоматикалық."
+    },
+    {
+      "subject": {
+        "surface": "rc::strong_count",
+        "root": "rc::strong_count",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rc әдісі",
+        "root": "rc әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_431"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rc::strong_count` пен `weak_count` — `Rc<T>`-тың есептеуіштерін қарау. **`Rc::strong_count(&rc)`** — қанша **күшті** иеленуші бар. Әр `Rc::clone` көтереді, әр `drop` азайтады; нөлге жетсе мән тазаланады. **`Rc::weak_count(&rc)`** — қанша **әлсіз** иеленуші бар. Әлсіз сілтемелер мәннің өмірін ұзартпайды. Жөндеу барысында пайдалы — циклдерді анықтау, иелік ағынын тексеру. `println!(\"{}\", Rc::strong_count(&a));` арқылы шығарып көру."
+    },
+    {
+      "subject": {
+        "surface": "rc vs arc",
+        "root": "rc vs arc",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency айырмашылығы",
+        "root": "concurrency айырмашылығы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_432"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rc<T>` тек **бір ағында** қолдануға арналған. Ішкі есептеуіш **атомдық емес** — көп ағынды бағдарламада race condition. **Көпағынды балама:** `Arc<T>` (Atomic Reference Counted) — атомдық есептеуіш, ағындар-арасы шакыруға келеді. Сондықтан CPU-ыз қосымша шығын: `Arc::clone` `Rc::clone`-нан бірнеше есе баяуырақ. Идиома: бір ағында болсаңыз — `Rc<T>`; ағындар арасында — `Arc<T>`. Көбіне `Arc<Mutex<T>>` тіркесімі — shared mutable state across threads (16-тарау)."
+    },
+    {
+      "subject": {
+        "surface": "ішкі өзгермелілік",
+        "root": "ішкі өзгермелілік",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust паттерні",
+        "root": "rust паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_433"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ішкі өзгермелілік (interior mutability) — `Rust`-тың **қарыз ережесін айналып өту** үлгісі: тип сырттан **тұрақты** сияқты көрінсе де, ішінен мәнін өзгерте алады. Стандартты қарыз ережелер компиляция кезінде тексереді — қатаң. `RefCell<T>` тексеруді **орындалу кезіне** жылжытады. Қашан керек: (1) тестілеу барысында **mock-нысан** — нақты тип `&self` қабылдайды, бірақ ішкі есептегіш керек; (2) граф / цикл / двунаправленный связанный список — стандартты ережелер тым қатаң. Идиома: алдымен компиляция-кездік қарыз тексеруді қолдану; `RefCell` тек шынында қажет болғанда."
+    },
+    {
+      "subject": {
+        "surface": "refcell::borrow",
+        "root": "refcell::borrow",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "refcell әдісі",
+        "root": "refcell әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_434"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`RefCell::borrow` пен `borrow_mut` — `RefCell<T>`-тан сілтеме алу әдістері. **`borrow()`** — `Ref<T>` (тұрақты сілтеме) қайтарады. **`borrow_mut()`** — `RefMut<T>` (өзгермелі сілтеме) қайтарады. `RefCell` ішкі есептеуішті ұстайды — қанша белсенді сілтеме бар. Қарыз ережелері сақталатынын **жұмыс уақытында** тексереді: бір уақытта **бір** өзгермелі НЕМЕСЕ **көп** тұрақты, екеуі бірге емес. Бұзылса → `panic!`. Әдеттегі сілтемеден айырмашылық: `&` тұрақты, `&mut` өзгермелі — компиляция тексереді; `RefCell` — runtime тексереді."
+    },
+    {
+      "subject": {
+        "surface": "refcell runtime panic",
+        "root": "refcell runtime panic",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "refcell ережесі",
+        "root": "refcell ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_435"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "RefCell-дың runtime panic — қарыз ережелерін **жұмыс уақытында** бұзу салдары. Мысалы: `let cell = RefCell::new(5); let r1 = cell.borrow_mut(); let r2 = cell.borrow_mut();` — екі өзгермелі сілтеме → `panic!: already borrowed: BorrowMutError`. Компиляция өтеді (компилятор runtime-да тексеретінін біледі), бірақ программа crash болады. **Айырмашылық `&mut`-тан:** `&mut` екі рет жазу — компиляция қатесі, программа орындалмайды. `RefCell` орындалудан кейін «late discovery». Идиома: `RefCell` бар жерде логиканы жақсы тестілеу — қарыз циклдерін ертерек көру үшін."
+    },
+    {
+      "subject": {
+        "surface": "mock-нысан refcell",
+        "root": "mock-нысан refcell",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test паттерні",
+        "root": "test паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_436"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Mock-нысан паттерні `RefCell` арқылы — тестілеуде нақты тип-ке ұқсас, бірақ ішкі есептегі сақтайтын қашықтан. Мысалы: `Messenger` трейті `send(&self, msg)` — өзгермейтін интерфейс; бірақ `MockMessenger` тестілеу барысында хабарламаларды жинау керек. Шешім: `struct MockMessenger { sent_messages: RefCell<Vec<String>> }`; `fn send(&self, msg) { self.sent_messages.borrow_mut().push(msg.into()) }`. `&self` тұрақты, бірақ ішкі `RefCell` арқылы вектор өзгереді. Орнатылған тестер: `mock.sent_messages.borrow().len()` — қанша хабар жіберілді тексеру."
+    },
+    {
+      "subject": {
+        "surface": "rc<refcell> тіркесімі",
+        "root": "rc<refcell> тіркесімі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "smart pointer паттерні",
+        "root": "smart pointer паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_437"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rc<RefCell<T>>` тіркесімі — **бірнеше иеленуші** + **өзгертуге болатын** мән. Қашан керек: ортақ деректер құрылымы, әр иеленуші өзгерте алады. Мысалы: `let value = Rc::new(RefCell::new(5)); let a = Rc::clone(&value); let b = Rc::clone(&value); *value.borrow_mut() += 10;` — `a` мен `b` екеуі де жаңартылған 15-ті көреді. **Артықшылықтары:** shared mutable state. **Кемшіліктері:** runtime panic мүмкіндігі (RefCell ережесін бұзса), reference cycle қаупі (`Rc` есептеуіш ешқашан 0 болмауы мүмкін). Идиома: граф/AST жасауда жиі қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "сілтеме циклы",
+        "root": "сілтеме циклы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "memory leak паттерні",
+        "root": "memory leak паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_438"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сілтеме циклы (reference cycle) — `Rc<T>` мен `RefCell<T>` бірге қолданғанда **жадтың ағытпасы** (memory leak) болуы мүмкін паттерн. Мысалы: екі мән бір-біріне сілтейді, есептеуіштер **ешқашан нөлге** жетпейді. `Rc::strong_count` екеуінде 1+ — ешбір аумақ шықпайды, ешбір тазалау болмайды. **Маңызды:** `Rust`-тың иелік жүйесі қауіпсіз кодты кепілдейді (no use-after-free, no double-free), бірақ **memory leak-ті толық алып тастамайды**. **Шешім:** `Weak<T>` — әлсіз сілтеме, есептеуішке әсер етпейді, циклды үзеді."
+    },
+    {
+      "subject": {
+        "surface": "weak<t>",
+        "root": "weak<t>",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ақылды сілтеме",
+        "root": "ақылды сілтеме",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_439"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Weak<T>` — **иеленуші емес** әлсіз сілтеме. `Rc<T>`-тан айырмашылық: **есептеуішке әсер етпейді** (`weak_count` бөлек есептеуіш). Иелік ережесі: мәнді тек **күшті** сілтемелер ұстайды — `strong_count` нөлге жетсе мән тазаланады, `Weak` сілтемелер бос болады. Жасау: `Rc::downgrade(&rc)` — `Weak<T>` қайтарады. Қол жеткізу: `weak.upgrade()` — `Option<Rc<T>>`. Мән тірі болса `Some(Rc::clone)`; тазаланған болса `None`. Қолдану: парент → бала (Rc күшті), бала → парент (Weak әлсіз) — циклды болдырмайды."
+    },
+    {
+      "subject": {
+        "surface": "rc::downgrade",
+        "root": "rc::downgrade",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rc әдісі",
+        "root": "rc әдісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_440"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rc::downgrade` пен `Weak::upgrade` — `Rc<T>` мен `Weak<T>` арасындағы конверсия. **`Rc::downgrade(&rc)`** — `Rc<T>`-тан `Weak<T>` жасайды; `weak_count` көтеріледі, `strong_count` өзгермейді. **`weak.upgrade()`** — `Weak<T>`-тан `Option<Rc<T>>` алу. Мән әлі тірі (`strong_count > 0`) → `Some(Rc::clone)` (есептеуіш көтеріледі); мән тазаланған → `None`. Идиома: `if let Some(rc) = weak.upgrade() { ... }` — әлсіз сілтемеден кезеңімен пайдалану. Граф навигациясында, кэш құрылымдарында жиі қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "парент-бала ағаш",
+        "root": "парент-бала ағаш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "smart pointer паттерні",
+        "root": "smart pointer паттерні",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_441"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Парент-бала ағаш паттерні (`Rc<Node>` + `Weak<Parent>`) — циклсіз ағаш құрылымын жасау идиомасы. **Ереже:** ата → балаларға **күшті** (`Rc<Node>`) — балалар атаға тәуелді өмір сүреді. Бала → атаға **әлсіз** (`Weak<Node>`) — цикл жоқ, ата кеткенде бала да жоғалады, бала кеткенде ата сақталады. Мысалы: `struct Node { value: i32, parent: RefCell<Weak<Node>>, children: RefCell<Vec<Rc<Node>>> }`. `Rc::downgrade(&parent)` — `Weak`. Орнатылған тестер: `node.parent.borrow().upgrade()` — ата тірі ме? `Some(Rc<Node>)` болса — иә."
     },
     {
       "subject": {

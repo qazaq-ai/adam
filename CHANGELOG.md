@@ -7,6 +7,64 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.85.5] — 2026-05-06 — Rust Book chapter 15 deepening — smart pointers
+
+Per-chapter pedagogical cadence continues. Chapter 15 introduces Rust's smart pointer toolkit — `Box`, `Rc`, `RefCell`, `Weak` — essential for shared ownership, interior mutability, and breaking ownership cycles. Previously surface-level — 3 one-line stubs (duplicates of deeper rust_133/135/137). Now deepened with full curriculum.
+
+### What's added
+
+**18 new curated entries `rust_424…441`** in `programming_rust.jsonl`:
+
+**Smart pointer foundations (6):** smart pointer concept overview, `Box<T>` for recursive types (Cons-list pattern), `Deref` trait, `Deref` coercion auto-conversion, `Drop` trait + RAII, `std::mem::drop` for early cleanup.
+
+**Reference counting Rc (3):** `Rc::clone` counter increment (NOT data clone), `Rc::strong_count` / `weak_count`, `Rc<T>` vs `Arc<T>` thread-safety distinction.
+
+**Interior mutability RefCell (5):** `interior mutability` pattern, `RefCell::borrow` / `borrow_mut` methods, runtime panic on rule violation (`already borrowed: BorrowMutError`), mock-object testing pattern, `Rc<RefCell<T>>` combo for shared mutable state.
+
+**Cycles + Weak (4):** reference cycle memory leak pattern, `Weak<T>` non-owning reference, `Rc::downgrade` / `Weak::upgrade` conversion, parent-child tree pattern (`Rc<Node>` children + `Weak<Parent>` upward).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs deleted (3)
+
+- `rust_085` (Box 1-line) — duplicate of deeper `rust_133`.
+- `rust_086` (Rc 1-line) — duplicate of deeper `rust_135`.
+- `rust_088` (RefCell 1-line) — duplicate of deeper `rust_137`.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_15_holdout.json` — 18 cases, 4 categories (`ch15_smart`, `ch15_rc`, `ch15_refcell`, `ch15_weak`).
+- `crates/adam-dialog/tests/rust_book_chapter_15.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 27 compounds. **Bug caught + fixed during ship:** `world_core_multiword_coverage` regression test surfaced 2 missing object compounds (`rust паттерні`, `test паттерні`) — added before final ship.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 15 holdout cases | ✅ 100 % |
+| Existing chapters 1-14 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **990 passing** (was 989; +1 chapter-15 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2736 → **2751** (+15 net: +18 ch.15 − 3 stub deletions) |
+| world_core facts | 2978 → **2993** (+15 net) |
+| Derived facts | 30841 → **30871** (+30) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.85.5** | **ch. 15** | **Smart pointers (this release)** |
+| v4.86.0 | ch. 16 | Concurrency (threads / channels / Send+Sync / Arc<Mutex<T>>) |
+| v4.86.5 | ch. 17 | OOP features (trait objects / inheritance via composition) |
+| v4.87.0 | ch. 18 | Patterns (advanced pattern matching) |
+| v4.87.5 | ch. 19 | Advanced features (unsafe / advanced traits / function pointers / macros) |
+| v4.88.0 | ch. 20 | Final project (multi-threaded web server) |
+
+Cadence: `.5` patch — 18 new + 3 stub deletions; chapter 15 closes the smart pointer toolkit (preparing for chapter 16 concurrency where `Arc<Mutex<T>>` builds on these foundations). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.85.0] — 2026-05-06 — Rust Book chapter 14 deepening — Cargo + Crates.io deeper
 
 Per-chapter pedagogical cadence continues. Chapter 14 covers Cargo's deeper capabilities essential for Rust ecosystem participation — releasing libraries, organizing large projects, extending the toolchain. Previously 0 entries for these specifics. Now deepened with full curriculum.
