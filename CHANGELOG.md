@@ -7,6 +7,56 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.93.0] — 2026-05-07 — Codex 2026-05-07 audit fixes — memory poisoning + Rust routing
+
+Strategic course-correction release. After 29 chapter releases (Rust Book ch.1-20 + Async Book ch.1-9, ~702 entries), Codex's 2026-05-07 audit REPL session surfaced critical gaps the chapter-holdout suite missed: **memory poisoning** (system stored fake user names) and **Rust intent routing failures** (technical questions routed to wrong intents/topics). Pivoting from corpus expansion to dialog-quality fixes per memory note `project_kazakh_tutor_positioning`.
+
+### Fixes
+
+**P0 — Memory poisoning (3 cases):**
+
+- **«Менің атым есіңізде ме?»** was misclassified as `Intent::StatementOfName { name: "Есіңізде" }` — system stored the verb-phrase «есіңізде» as the user's name, then on next turn addressed user as «Есәке». Root cause: `detect_statement_of_name` ran before `detect_ask_name` and pattern 1 («атым X» → name = next token) had no question-particle guard, only an interrogative-pronoun guard. Fix in [semantics.rs:1417](crates/adam-dialog/src/semantics.rs#L1417): defer to `detect_ask_name` first — single source of truth for "this looks like a name question".
+- **«Сен менің атымды білесіз бе?»** / **«Атымды ұмыттыңыз ба?»** fell through to topic extraction on `ат` (= horse). Fix in `detect_ask_name` ([semantics.rs:1389](crates/adam-dialog/src/semantics.rs#L1389)): extended memory-probe markers from {есіңізде, есіңде, ұмытпа} to also include {ұмытты, ұмытқа, ұмыттың, білесіз, білесің, білесіздер, білдіңіз, білдің, естіді}.
+
+**P1 — Rust intent routing (8 cases):**
+
+- **«match өрнегі не істейді?»** / **«Tokio runtime не істейді?»** wrongly matched `detect_ask_activity` (user-activity intent). Root cause: `joined.contains("не істей")` matched 3sg `істейді` ("what does X do") just as readily as 2sg/pl `істейсің/сіз` ("what are you doing"). Fix in [semantics.rs:2115](crates/adam-dialog/src/semantics.rs#L2115): require explicit 2nd-person verb endings.
+- **«Rust-та ownership не үшін керек?»** / **«unsafe Rust қашан керек?»** routed to `unknown.with_modal_necessity` (= "иә, маңызды мәселе екен" generic hedge) because `керек` triggered Modality=Necessity. Fix in [planner.rs:1289](crates/adam-dialog/src/planner.rs#L1289): function-asking phrases (`не үшін керек`, `қашан керек`, `неге керек`, `неге қажет`, `не істейді`, `не атқарады`, `қалай жұмыс іс`) now override the modality routing — same skip class as the existing explain-teach skip.
+- **«Rust-та ownership X»** Latin-prefix-skip dropped the second Latin token. Root cause: `latin_subject_hint` short-circuited entirely when `has_language_qualifier_prefix` matched. Fix in [topic_extraction.rs:3107](crates/adam-dialog/src/topic_extraction.rs#L3107): when prefix is present, scan rest of input for Latin tech tokens (the prefix token has Cyrillic suffix attached so doesn't tokenise as pure-ASCII anyway).
+- **«X қалай жұмыс істейді?»** picked single-word «жұмыс» (registered as physics term in MULTIWORD_ENTITIES). Fix in [topic_extraction.rs:2700](crates/adam-dialog/src/topic_extraction.rs#L2700): `жұмыс істе...` verb-phrase guard — when «жұмыс» is followed by a token starting with «істе», it's a verbal collocation, skip and let other extractors win.
+- **«async/await»** didn't tokenise on `/`. Fix in [topic_extraction.rs:3120](crates/adam-dialog/src/topic_extraction.rs#L3120): `/` added to split chars.
+- **Bare «Stream» / «tokio»** had no curated subjects (deeper entries used multi-word forms). Fix: added `rust_694` (Stream bridge) + `rust_695` (Tokio bridge) + extended LATIN_TECH_SUBJECTS with stream / future / tokio / async / await / pin / tcp / http.
+
+### What's added
+
+- `data/eval/live_holdout_codex_2026_05_07.json` — 11 cases, 2 categories (`p0_memory_poisoning`, `p1_rust_routing`) — append-only live holdout for Codex REPL findings.
+- `crates/adam-dialog/tests/live_holdout_codex_2026_05_07.rs` — paired test runner with **100 % floor**.
+- 2 new bridge entries `rust_694…695` (stream / tokio bare-subject definitions).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 11 / 11 Codex live-holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book ch.1-9 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **1005 passing** (was 1004; +1 Codex live holdout) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 3001 → **3003** (+2 bridges) |
+| world_core facts | 3243 → **3245** (+2) |
+| Derived facts | 30892 → **30892** (unchanged) |
+
+### Strategic note
+
+Per updated memory `project_kazakh_tutor_positioning`: future releases prefer dialog-architecture work (anaphora, pedagogical intents, solvers) over data-batch growth UNTIL the tutor loop conducts a 5-turn lesson reliably. v4.93.0 closes routing P0+P1 from Codex; P2 (pedagogical intents — AskExercise / CodeRequest / ExplainCompilerError / AskPurpose) and P3 (split metrics: fact_retrieval / dialog_routing / pedagogical_tutor) are next on roadmap.
+
+### Roadmap (next)
+
+| Release | Focus |
+|---|---|
+| **v4.93.0** | **Codex audit P0+P1 (this release)** |
+| v4.93.5 | P2 — pedagogical intents (AskExercise / CodeRequest / ExplainCompilerError / AskPurpose) |
+| v4.94.0 | P3 — split metrics + cargo-check loop scaffolding |
+
 ## [4.92.5] — 2026-05-07 — Rust Async Book chapter 9 deepening — Final project: async HTTP server (capstone) — **Async Book pass complete** 🎉
 
 **The Rust Async Book is complete (chapters 1-9).** Chapter 9 — the capstone project — is the async rewrite of the main Rust Book chapter 20 multi-threaded web server. Where chapter 20 used a thread pool (4 OS threads), chapter 9 uses Tokio's async/await + reactor — no thread pool needed; thousands of concurrent connections in a single process. This release closes the second full per-chapter pedagogical pass.

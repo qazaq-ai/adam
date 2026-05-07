@@ -1,0 +1,21 @@
+{
+  "_comment": "v4.93.0 — Codex 2026-05-07 audit live holdout. Captures the failing queries from Codex's REPL session that exposed gaps the chapter-holdout suite missed. P0: memory poisoning fixes (Менің атым есіңізде ме? misclassified as StatementOfName + білесіз/ұмыттыңыз variants). P1: Rust intent routing fixes (Rust-та X не үшін керек / X қалай жұмыс істейді / unsafe X қашан керек / async/await routing / Stream / Tokio bare lookups). Append-only — future Codex findings extend this file, never edit captured cases.",
+  "version": "v4.93.0",
+  "captured_date": "2026-05-07",
+  "source": "Codex 2026-05-07 audit REPL session",
+  "chapter": "live_holdout_codex",
+  "chapter_title": "Codex 2026-05-07 audit fixes — memory poisoning + Rust routing",
+  "cases": [
+    {"id": "codex_p0_remember_name", "category": "p0_memory_poisoning", "query": "Менің атым есіңізде ме?", "any_substring": ["менің атым адам", "сіздің атыңыз", "атыңыз"]},
+    {"id": "codex_p0_know_name", "category": "p0_memory_poisoning", "query": "Сен менің атымды білесіз бе?", "any_substring": ["менің атым адам", "сіздің атыңыз", "атыңыз"]},
+    {"id": "codex_p0_forget_name", "category": "p0_memory_poisoning", "query": "Атымды ұмыттыңыз ба?", "any_substring": ["менің атым адам", "сіздің атыңыз", "атыңыз"]},
+    {"id": "codex_p1_ownership_purpose", "category": "p1_rust_routing", "query": "Rust-та ownership не үшін керек?", "any_substring": ["жадыны қауіпсіз", "иеленуші", "ownership"]},
+    {"id": "codex_p1_ownership_works", "category": "p1_rust_routing", "query": "Rust-та ownership қалай жұмыс істейді?", "any_substring": ["жадыны қауіпсіз", "иеленуші", "ownership"]},
+    {"id": "codex_p1_match_does", "category": "p1_rust_routing", "query": "match өрнегі не істейді?", "any_substring": ["мәннің үлгісіне", "тармақ", "rust"]},
+    {"id": "codex_p1_unsafe_when", "category": "p1_rust_routing", "query": "unsafe Rust қашан керек?", "any_substring": ["қауіпсіздік тексерулерін", "ffi", "шикі сілтеме"]},
+    {"id": "codex_p1_async_works", "category": "p1_rust_routing", "query": "async/await қалай жұмыс істейді?", "any_substring": ["асинхронды", "future", "async fn"]},
+    {"id": "codex_p1_tokio_does", "category": "p1_rust_routing", "query": "Tokio runtime не істейді?", "any_substring": ["work-stealing", "executor", "reactor"]},
+    {"id": "codex_p1_stream_def", "category": "p1_rust_routing", "query": "Stream деген не?", "any_substring": ["async-aware", "итератор", "next().await"]},
+    {"id": "codex_p1_tokio_bare", "category": "p1_rust_routing", "query": "tokio деген не?", "any_substring": ["work-stealing", "executor", "де факто"]}
+  ]
+}

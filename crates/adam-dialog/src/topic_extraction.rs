@@ -2711,6 +2711,24 @@ pub(crate) fn multiword_entity_hint(input: &str) -> Option<String> {
                 return Some((**entity).to_string());
             }
         } else if lowered_tokens.contains(*entity) {
+            // **v4.93.0** — Codex 2026-05-07 audit: verb-phrase guard.
+            // «жұмыс істе...» is a verbal collocation ("operate / how
+            // does X work"), not a topic. Pre-fix «X қалай жұмыс
+            // істейді?» picked single-word «жұмыс» (registered as a
+            // physics term) and surfaced the physics fact, ignoring
+            // the actual subject X. Same pattern can apply to other
+            // Kazakh function-noun-words but only «жұмыс» fired in
+            // the Codex audit; add others on demand.
+            if **entity == "жұмыс" {
+                let pos = lowered_tokens.iter().position(|t| *t == **entity);
+                if let Some(p) = pos {
+                    if let Some(next) = lowered_tokens.get(p + 1) {
+                        if next.starts_with("істе") {
+                            continue;
+                        }
+                    }
+                }
+            }
             return Some((**entity).to_string());
         }
     }
@@ -2893,6 +2911,20 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     "struct",
     "enum",
     "function",
+    // **v4.93.0** — Codex 2026-05-07 audit: bare async-related
+    // tokens that fell through to fuzzy-match. «Stream деген не?»
+    // pre-fix returned «Бәлкім, Stream туралы айтасыз ба.»
+    // because `Stream` wasn't in the latin pass-through list and
+    // chapter-5 entries used multi-word forms only («stream трейт
+    // сигнатурасы» etc.).
+    "stream",
+    "future",
+    "tokio",
+    "async",
+    "await",
+    "pin",
+    "tcp",
+    "http",
     "mutability",
     "shadowing",
     "reference",
@@ -3113,15 +3145,28 @@ pub(crate) fn latin_subject_hint(input: &str) -> Option<String> {
     // in the rendered response (templates use `{noun}` interp,
     // grounded fact about the X concept usually mentions Rust
     // anyway).
-    if has_language_qualifier_prefix(input) {
-        return None;
-    }
+    // **v4.93.0** — Codex 2026-05-07 audit: when the input opens
+    // with a language-qualifier prefix («Rust-та X», «Python тілінде
+    // X»), defer ONLY the prefix — but if there's a Latin tech
+    // token AFTER the prefix, return it as the topic. Pre-fix
+    // «Rust-та ownership не үшін керек?» dropped to «Сұрағыңызды
+    // түсінбедім» because the prefix-detection short-circuited and
+    // no later extractor could pick the Latin `ownership` token.
+    // Note: the prefix token itself («Rust-та») has a Cyrillic
+    // suffix attached, so it doesn't tokenise as a pure-ASCII token
+    // — we only need to skip it via prefix-presence detection.
+    let qualifier_prefix_present = has_language_qualifier_prefix(input);
     let mut best: Option<&'static str> = None;
     for raw in input.split(|c: char| {
         c.is_whitespace()
+            // **v4.93.0** — `/` added so «async/await» tokenises into
+            // [`async`, `await`] and either matches LATIN_TECH_SUBJECTS.
+            // Without it «async/await қалай жұмыс істейді?» kept the
+            // slash-bound token as a single unit, didn't match either
+            // entry, and fell through to first_noun_root → «жұмыс».
             || matches!(
                 c,
-                ',' | '.' | '?' | '!' | ';' | ':' | '`' | '"' | '(' | ')' | '\''
+                ',' | '.' | '?' | '!' | ';' | ':' | '`' | '"' | '(' | ')' | '\'' | '/'
             )
     }) {
         if raw.is_empty() {
@@ -3139,6 +3184,11 @@ pub(crate) fn latin_subject_hint(input: &str) -> Option<String> {
                 best = Some(hit);
             }
         }
+    }
+    // If prefix is present but no other Latin token, defer to
+    // downstream strategies (preserve v4.26.5 semantics).
+    if qualifier_prefix_present && best.is_none() {
+        return None;
     }
     best.map(|s| s.to_string())
 }

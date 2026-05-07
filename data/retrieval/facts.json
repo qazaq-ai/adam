@@ -1,7 +1,7 @@
 {
-  "version": "4.92.0",
+  "version": "4.92.5",
   "status": "completed",
-  "elapsed_s": 33,
+  "elapsed_s": 70,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3243,
+    "facts_total": 3245,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2678,
+      "is_a": 2680,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 684,
+      "world_core/programming_rust.jsonl": 686,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -56617,6 +56617,46 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Async Book пас аяқталды — chapters 1-9 (motivation → ecosystem → final project). Біріктірілген тұжырымдамалар: (1) ch.1 — concurrency models + Rust async ecosystem; (2) ch.2 — Future trait + Waker + executor; (3) ch.3 — async/await primer + state machine; (4) ch.4 — Pin + Unpin + self-referential; (5) ch.5 — Stream + StreamExt; (6) ch.6 — join!/select!/FuturesUnordered; (7) ch.7 — workarounds (Send + recursion + traits); (8) ch.8 — ecosystem (tokio/async-std/smol + I/O traits + tracing); (9) ch.9 — final HTTP server (this chapter). **Барлығы:** ~160 entries (rust_532...675); main Rust Book + Async Book = ~700 entries. **Келесі бағыт:** жаңа book немесе пайдаланушы бағыты бойынша."
+    },
+    {
+      "subject": {
+        "surface": "stream",
+        "root": "stream",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_694"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Stream — Rust-тағы async-aware итератор трейті. Әр элемент future-сай await-болады; элементтер бір-бірлеп `next().await` арқылы алынады. Тереңірек: `Stream` трейт сигнатурасы (poll_next + Poll<Option<Item>>), `StreamExt` крейті комбинаторлары (map / filter / then / fold / collect), концерреллі orындау (buffered / buffer_unordered / for_each_concurrent). Stream — std-те жоқ, futures крейтінде; стандарттық kepilдеме әлі талқылануда."
+    },
+    {
+      "subject": {
+        "surface": "tokio",
+        "root": "tokio",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_695"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Tokio — Rust async экожүйесінің **де факто** стандарт runtime. Архитектура: work-stealing executor (multi-thread) + reactor (epoll/kqueue/IOCP) + timer wheels + I/O драйверлер (TcpStream / File / process). Кіру нүктесі: `#[tokio::main] async fn main() { ... }`. Production users: Cloudflare workers, Discord, Microsoft Azure, hyper, axum. Кітапханалар: tokio::sync (Mutex/RwLock/oneshot/broadcast/Semaphore), tokio::time (sleep/interval/timeout), tokio::net, tokio::fs."
     },
     {
       "subject": {

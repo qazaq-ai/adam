@@ -1390,9 +1390,34 @@ fn detect_ask_name(joined: &str) -> bool {
             || joined.contains("атымды")
             || joined.contains("аты-жөнім")
             || joined.contains("аты-жөнімді"))
-            && (joined.contains("есіңізде") || joined.contains("есіңде") || joined.contains("ұмытпа")))
+            && (joined.contains("есіңізде")
+                || joined.contains("есіңде")
+                || joined.contains("ұмытпа")
+                // **v4.93.0** — Codex 2026-05-07 audit: extend
+                // recall-question markers to forgetting-verbs and
+                // knowledge-verbs in their full inflected forms.
+                // «Атымды ұмыттыңыз ба?» / «Сен менің атымды
+                // білесіз бе?» / «Атымды естідіңіз бе?» pre-v4.93.0
+                // fell through to topic extraction on `ат` (horse).
+                || joined.contains("ұмытты")
+                || joined.contains("ұмытқа")
+                || joined.contains("ұмыттың")
+                || joined.contains("білесіз")
+                || joined.contains("білесің")
+                || joined.contains("білесіздер")
+                || joined.contains("білдіңіз")
+                || joined.contains("білдің")
+                || joined.contains("естіді")
+                || joined.contains("естіді")))
         || ((joined.contains("есімім") || joined.contains("есімімді"))
-            && (joined.contains("есіңізде") || joined.contains("есіңде") || joined.contains("ұмытпа")))
+            && (joined.contains("есіңізде")
+                || joined.contains("есіңде")
+                || joined.contains("ұмытпа")
+                || joined.contains("ұмытты")
+                || joined.contains("білесіз")
+                || joined.contains("білесің")
+                || joined.contains("білдіңіз")
+                || joined.contains("білдің")))
 }
 
 fn detect_statement_of_wellbeing(tokens: &[String], joined: &str) -> bool {
@@ -1419,6 +1444,20 @@ fn detect_statement_of_name(
     raw_tokens: &[String],
     joined: &str,
 ) -> Option<String> {
+    // **v4.93.0** — Codex 2026-05-07 audit: memory poisoning fix.
+    // «Менің атым есіңізде ме?» (= "do you remember my name?") was
+    // misclassified as `Intent::StatementOfName { name: "Есіңізде" }`
+    // because pattern 1 below ("атым X") grabbed the verb-phrase
+    // `есіңізде` as the literal name. The interrogative-pronoun
+    // guard (v4.4.9) only blocked question-WORDS (кім / не / қандай);
+    // it didn't block question-PARTICLES (ме / бе / ма / ба / па / пе)
+    // or memory-probe verbal forms (есіңізде / есіңде / ұмытпа /
+    // білесіз / ұмыттыңыз). Defer to `detect_ask_name` first —
+    // single source of truth for "this looks like a name question".
+    if detect_ask_name(joined) {
+        return None;
+    }
+
     // v4.4.9 — interrogative-pronoun guard. The 1sg-possessive
     // forms `атым` / `есімім` collide with the user asking about
     // their OWN stored name: `менің атым кім?` lexes as
@@ -2113,11 +2152,30 @@ fn detect_statement_of_occupation(
 /// - «менің не істейтінім» (1sg self-recall, embedded clause)
 /// - «менің не істейтіні» / «істейтіні» (variants)
 fn detect_ask_activity(joined: &str) -> bool {
-    // 2nd-person query forms
-    let second_person = (joined.contains("не істей")
-        || joined.contains("не әзірлеп")
-        || joined.contains("не жасап")
-        || joined.contains("немен айналыс"))
+    // **v4.93.0** — Codex 2026-05-07 audit: tighten 2sg/pl matcher
+    // so 3sg verbs don't accidentally fire user-activity routing.
+    // Pre-fix `joined.contains("не істей")` matched `не істейді`
+    // (3sg "what does X do") just as readily as `не істейсіз`
+    // (2pl/polite "what are you doing"). Result: «match өрнегі не
+    // істейді?» / «Tokio runtime не істейді?» were routed to
+    // ask-about-user-activity instead of falling through to topic
+    // extraction → grounded fact. The same applied to `не жасап` —
+    // matches 3sg «не жасап жатыр» (what is X making). Tighten to
+    // explicit 2nd-person endings.
+    let second_person = (joined.contains("не істейсіз")
+        || joined.contains("не істейсің")
+        || joined.contains("не істейсіңдер")
+        || joined.contains("не істейміз")
+        || joined.contains("не әзірлейсіз")
+        || joined.contains("не әзірлейсің")
+        || joined.contains("не әзірлеп жатырсыз")
+        || joined.contains("не әзірлеп жатырсың")
+        || joined.contains("не жасайсыз")
+        || joined.contains("не жасайсың")
+        || joined.contains("не жасап жатырсыз")
+        || joined.contains("не жасап жатырсың")
+        || joined.contains("немен айналысасыз")
+        || joined.contains("немен айналысасың"))
         && !joined.contains("кәсіб");
     // 1sg self-recall: «менің ісім», «менің не істейтінім»,
     // «не істейтінімді» (Acc-marked embedded clause).

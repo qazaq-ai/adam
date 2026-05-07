@@ -1299,7 +1299,25 @@ pub fn intent_key(intent: &Intent) -> &'static str {
                         ..
                     }
                 );
-                if !(has_explain_teach && has_grounded_fact) {
+                // **v4.93.0** — Codex 2026-05-07 audit: function-asking
+                // phrases also override modal-necessity routing.
+                // «X не үшін керек?» / «X қашан керек?» / «X қалай
+                // жұмыс істейді?» / «X не істейді?» — these all
+                // include `керек` (Necessity modality) but ask about
+                // X's CONTENT, not whether X is needed in the
+                // abstract. Pre-fix: «Rust-та ownership не үшін
+                // керек?» returned the generic «Иә, маңызды мәселе
+                // екен» modal hedge instead of the curated ownership
+                // fact. Same pattern as the explain/teach skip above.
+                let lower_joined = raw_tokens.join(" ").to_lowercase();
+                let has_function_asking = lower_joined.contains("не үшін керек")
+                    || lower_joined.contains("қашан керек")
+                    || lower_joined.contains("неге керек")
+                    || lower_joined.contains("неге қажет")
+                    || lower_joined.contains("не істейді")
+                    || lower_joined.contains("не атқарады")
+                    || lower_joined.contains("қалай жұмыс іс");
+                if !(has_function_asking || has_explain_teach && has_grounded_fact) {
                     return match modality {
                         adam_kernel_fst::Modality::Necessity => "unknown.with_modal_necessity",
                         adam_kernel_fst::Modality::Possibility => "unknown.with_modal_possibility",
