@@ -2217,6 +2217,31 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "timeout pattern",
     "race vs zip",
     "biased select!",
+    // **v4.91.5** — Rust Async Book chapter 7 (Workarounds — Send + recursion + traits + cancellation) deepening.
+    // rust_640…657 — 18 entries covering error handling (3),
+    // Send approximation (4), recursion (3), async fn in traits (4),
+    // cancellation + drop issues (4).
+    // Subjects.
+    "? in async fn",
+    "result async box error",
+    "anyhow thiserror async",
+    "send approximation problem",
+    "mutexguard await",
+    "rc<t> async",
+    "refcell await",
+    "async fn рекурсия",
+    "box::pin рекурсия",
+    "async-recursion крейті",
+    "async fn in traits шектеуі",
+    "async-trait крейті",
+    "rust 1.75 async traits",
+    "rpitit lifetime",
+    "drop in async",
+    "async drop проблемасы",
+    "future leak forget",
+    "cancel-safety patterns",
+    // Objects.
+    "concurrency мәселесі",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

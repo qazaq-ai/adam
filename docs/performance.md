@@ -1,4 +1,4 @@
-# Performance — adam v4.91.0
+# Performance — adam v4.91.5
 
 ## Headline KPI: cost per correct answer
 
@@ -8,6 +8,7 @@ This is the unified efficiency metric. Latency and pass-rate moving in opposite 
 
 | Release | p50 turn latency (M2) | Holdout pass-rate | **ms / correct answer** |
 |---|---|---|---|
+| v4.91.5 | 1.07 ms | 1002 / 1002 = 100.0 % | **1.07 ms** |
 | v4.91.0 | 1.07 ms | 1001 / 1001 = 100.0 % | **1.07 ms** |
 | v4.90.5 | 1.07 ms | 1000 / 1000 = 100.0 % | **1.07 ms** |
 | v4.90.0 | 1.07 ms | 999 / 999 = 100.0 % | **1.07 ms** |

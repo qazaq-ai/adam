@@ -1,0 +1,28 @@
+{
+  "_comment": "v4.91.5 — Rust Async Book Chapter 7 (Workarounds — Send + recursion + traits + cancellation) holdout. 18 natural Kazakh queries against rust_640…657. Categories: async7_errors (? in async + Box<dyn Error+Send+Sync> + anyhow/thiserror), async7_send (Send approximation + MutexGuard.await + Rc<T> + RefCell.await), async7_recursion (recursion compile error + Box::pin + async-recursion crate), async7_traits (trait limitation + async-trait + 1.75 native + RPITIT), async7_cancellation (Drop in async + async drop problem + future leak + cancel-safety patterns).",
+  "version": "v4.91.5",
+  "captured_date": "2026-05-07",
+  "book": "Rust Async Book",
+  "chapter": 7,
+  "chapter_title": "Workarounds — Send + recursion + traits + cancellation",
+  "cases": [
+    {"id": "async7_q_op", "category": "async7_errors", "query": "? in async fn деген не?", "any_substring": ["fetch_data", "tarату", "from-арқылы"]},
+    {"id": "async7_box_error", "category": "async7_errors", "query": "Result async box error деген не?", "any_substring": ["send + sync", "type result<t>", "anyhow"]},
+    {"id": "async7_anyhow", "category": "async7_errors", "query": "Anyhow thiserror async деген не?", "any_substring": ["bail!", "context()", "thiserror::error"]},
+    {"id": "async7_send_problem", "category": "async7_send", "query": "Send approximation problem деген не?", "any_substring": ["future cannot be sent", "rc<t>", "refcell<t>"]},
+    {"id": "async7_mutex", "category": "async7_send", "query": "MutexGuard await деген не?", "any_substring": ["deadlock", "guard.value.clone()", "lock-ты release"]},
+    {"id": "async7_rc", "category": "async7_send", "query": "Rc<T> async деген не?", "any_substring": ["arc<t>", "atomic counter", "localset"]},
+    {"id": "async7_refcell", "category": "async7_send", "query": "RefCell await деген не?", "any_substring": ["block scope", "tokio::sync::mutex", "performance hazard"]},
+    {"id": "async7_recursion", "category": "async7_recursion", "query": "async fn рекурсия деген не?", "any_substring": ["factorial", "cannot determine future size", "boxing"]},
+    {"id": "async7_box_pin", "category": "async7_recursion", "query": "Box::pin рекурсия деген не?", "any_substring": ["pin<box<dyn future", "boxfuture", "heap allocation"]},
+    {"id": "async7_async_rec", "category": "async7_recursion", "query": "async-recursion крейті деген не?", "any_substring": ["#[async_recursion]", "tree traversal", "rust 1.85"]},
+    {"id": "async7_trait_limit", "category": "async7_traits", "query": "async fn in traits шектеуі деген не?", "any_substring": ["1.75-ке дейін", "gat", "async-trait крейті"]},
+    {"id": "async7_async_trait", "category": "async7_traits", "query": "async-trait крейті деген не?", "any_substring": ["#[async_trait]", "pin<box<dyn future", "heap allocation per call"]},
+    {"id": "async7_native", "category": "async7_traits", "query": "Rust 1.75 async traits деген не?", "any_substring": ["greeter", "rpitit", "dyn greeter"]},
+    {"id": "async7_rpitit", "category": "async7_traits", "query": "RPITIT lifetime деген не?", "any_substring": ["impl future<output", "+ send", "return type notation"]},
+    {"id": "async7_drop", "category": "async7_cancellation", "query": "Drop in async деген не?", "any_substring": ["raii", "_guard", "drop трейт"]},
+    {"id": "async7_async_drop", "category": "async7_cancellation", "query": "Async drop проблемасы деген не?", "any_substring": ["sync", "rfc 3046", "close().await"]},
+    {"id": "async7_leak", "category": "async7_cancellation", "query": "Future leak forget деген не?", "any_substring": ["mem::forget", "raii guards", "ffi"]},
+    {"id": "async7_cancel_safe", "category": "async7_cancellation", "query": "Cancel-safety patterns деген не?", "any_substring": ["read_exact", "pin_mut!", "cancel safety"]}
+  ]
+}

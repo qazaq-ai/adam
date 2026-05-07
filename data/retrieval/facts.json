@@ -1,7 +1,7 @@
 {
-  "version": "4.90.5",
+  "version": "4.91.0",
   "status": "completed",
-  "elapsed_s": 37,
+  "elapsed_s": 33,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3189,
+    "facts_total": 3207,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2624,
+      "is_a": 2642,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 630,
+      "world_core/programming_rust.jsonl": 648,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -55537,6 +55537,366 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Biased select! — арм-дарды реттілікпен polling. Әдетте `select!` арм-дарын **кездейсоқ ретпен** polls (fairness үшін). Tokio-да: `tokio::select! { biased; result_a = fut_a => ..., result_b = fut_b => ... }` — `biased` директивасымен арм-дар жариялау ретімен polled. **Қашан керек:** priority — мысалы shutdown signal-ды басқа жұмыстан бұрын тексеру; `biased; _ = shutdown_rx.recv() => break, msg = work_rx.recv() => process(msg)`. **Кемшілік:** unfair — әрқашан бірінші арм басып шығса, екіншісі ешқашан жетпейді (starvation). Production: тек priority шынында керек жерде; әйтпесе random ordering әділетті."
+    },
+    {
+      "subject": {
+        "surface": "? in async fn",
+        "root": "? in async fn",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust синтаксисі",
+        "root": "rust синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_640"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`?` оператор async fn-да — sync кодтағыдай Result-тарды тарату жолы. `async fn fetch_data() -> Result<String, MyError> { let resp = http_get(url).await?; let body = resp.text().await?; Ok(body) }`. Әр `?` — Future нәтижесін Result ретінде алып, Err болса бірден функциядан шығу. **Маңызды:** `?` тек Result/Option қайтаратын функцияларда жұмыс істейді — `async fn ... -> ()` ішінде `?` шакыру қате. **From конверсиясы:** `?` оператор қате типтерді From-арқылы автоматты түрлендіреді: `async fn a() -> Result<(), AppError> { let x: Result<u32, IoError> = ...; let y = x?; ... }` — `IoError` `From<IoError> for AppError`-мен жұмыс істесе ғана."
+    },
+    {
+      "subject": {
+        "surface": "result async box error",
+        "root": "result async box error",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust типі",
+        "root": "rust типі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_641"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Result<T, Box<dyn Error + Send + Sync>>` — async кодтағы кең тараған Result типі. Айырмашылық sync `Box<dyn Error>`-тен: async-та қате `Send + Sync` болуы керек, өйткені tokio multi-thread executor task-тарды ағындар арасында migrate жасайды. Қысқа форма: `type Result<T> = std::result::Result<T, Box<dyn Error + Send + Sync>>;` — модульдің басында бір рет жариялау. Қолдану: `async fn process() -> Result<u32> { ... }` — concise. Альтернатив: `anyhow::Result<T>` — `Box<dyn Error + Send + Sync>`-тен жинақы; кітапханалық кодта thiserror жиі (typed errors)."
+    },
+    {
+      "subject": {
+        "surface": "anyhow thiserror async",
+        "root": "anyhow thiserror async",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_642"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "anyhow / thiserror async-та — қате қызметшілерінің екі стандартты крейті. **`anyhow::Error`:** Send+Sync auto, кез-келген `std::error::Error`-ті орай алады; `bail!(\"custom error\")` + `context()` для добавления контекста. Қолдану: `async fn process() -> anyhow::Result<()> { let resp = http_get(url).await.context(\"failed to fetch\")?; ... }`. **`thiserror`:** typed errors жасайды — `#[derive(thiserror::Error)] enum AppError { #[error(\"io: {0}\")] Io(#[from] io::Error), ... }`. **Жалпы ереже:** binary (приложение) — anyhow; library (кітапхана) — thiserror. Async — екеуі де тікелей жұмыс істейді, no-special-handling."
+    },
+    {
+      "subject": {
+        "surface": "send approximation problem",
+        "root": "send approximation problem",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_643"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Send approximation проблемасы — компилятор Future `Send` бар жоғын анықтай алмауы. Tokio multi-thread executor `tokio::spawn(future)` талап етеді: `future: Future + Send + 'static`. Future `Send` болуы үшін: барлық captured + state machine-нің барлық state-тары `Send` болуы керек. **Жиі қате хабары:** «future cannot be sent between threads safely; the trait `Send` is not implemented for ...». Жұмбас: `Rc<T>`, `RefCell<T>::borrow_mut()` руntime-да Send емес. Шешімдер: (1) `Rc` → `Arc`; (2) RefCell → Mutex; (3) `.await`-тан бұрын lock-ты drop."
+    },
+    {
+      "subject": {
+        "surface": "mutexguard await",
+        "root": "mutexguard await",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency мәселесі",
+        "root": "concurrency мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_644"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "MutexGuard across `.await` deadlock — Mutex-тің lock-ын `.await` арасында ұстау — потенциалды deadlock + Send проблемасы. Қате үлгі: `let guard = mutex.lock().await; do_io(&guard).await; guard.release();` — `do_io().await` кезінде guard ұсталып, executor басқа task-ты polls — олар да lock сұраса → deadlock; және `MutexGuard !Send` (tokio-да) — multi-thread executor үшін task migrate болмауы керек. **Шешім:** lock-ті data алғанда ғана ұстау, кейін drop: `let value = { let guard = mutex.lock().await; guard.value.clone() }; do_io(&value).await;` — { } блок аяқталысымен guard drop болады. **Идиома:** `.await` бұрын lock-ты release ету."
+    },
+    {
+      "subject": {
+        "surface": "rc<t> async",
+        "root": "rc<t> async",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_645"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Rc<T>` async-тa — `Rc` `!Send` (counter atomic емес), сондықтан `tokio::spawn(async move { let x = rc.clone(); ... })` → compile қате. **Шешім:** `Arc<T>` (atomic counter, Send + Sync). `Arc::new(value)` + `Arc::clone(&arc)` — Rc-сай қолдану, бірақ multi-thread қауіпсіз. **Performance шектеу:** Arc-тың atomic operations Rc-нен сәл қымбат — single-thread кодта Rc артық. **Single-thread executor**: `tokio::runtime::Builder::new_current_thread()` + `LocalSet` — `Rc` ағылшын-арасында migrate болмайды → жұмыс істейді. **Идиома:** «multi-thread async = Arc; single-thread async = Rc OK»."
+    },
+    {
+      "subject": {
+        "surface": "refcell await",
+        "root": "refcell await",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_646"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "RefCell across `.await` issues — `RefCell::borrow()` мен `borrow_mut()` `Ref<T>`/`RefMut<T>` қайтарады; олар `!Send`. `let r = cell.borrow_mut(); modify(&mut *r); some_io().await; ...` — `r` `.await` арасында тірі болса → Future `!Send` болады → tokio::spawn-да compile қате. **Шешім 1:** Block scope: `{ let mut r = cell.borrow_mut(); *r = new_value; } // r drop here some_io().await;`. **Шешім 2 (multi-thread қажет):** `tokio::sync::Mutex<T>`-ке ауысу, lock-ты қысқа ұстау. **Маңызды:** sync `std::sync::Mutex` — locked across .await — performance hazard (executor блокталу мүмкін), tokio Mutex async-aware."
+    },
+    {
+      "subject": {
+        "surface": "async fn рекурсия",
+        "root": "async fn рекурсия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_647"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Async fn рекурсия проблемасы — `async fn factorial(n: u32) -> u32 { if n == 0 { 1 } else { n * factorial(n - 1).await } }` — компиляция қатесі: «cannot determine future size of recursive type». Себеп: `async fn` шынында state machine-ді қайтарады, рекурсия → unbounded size; компилятор размер есептей алмайды. **Қате толық:** «recursion in an `async fn` requires boxing». Шешімі — индирекция арқылы (heap-те): `Box::pin(future)` шакыру. Бұл — Rust-тың zero-cost design таңдауының салдары: `async fn` size-ы белгілі болуы керек."
+    },
+    {
+      "subject": {
+        "surface": "box::pin рекурсия",
+        "root": "box::pin рекурсия",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust идиомасы",
+        "root": "rust идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_648"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`Box::pin` рекурсия шешімі — рекурсивті async fn-ді heap-те орнату. Стандарт паттерн: `fn factorial(n: u32) -> Pin<Box<dyn Future<Output = u32>>> { Box::pin(async move { if n == 0 { 1 } else { n * factorial(n - 1).await } }) }`. **Маңызды:** «`async fn`» түрін «`fn` returning `Pin<Box<dyn Future>>`»-ке ауыстырамыз — compiler-ге size белгілі (Box pointer = 1 word). Performance: heap allocation — recursion әр шакырғанда. **Альтернатив:** `BoxFuture<'static, u32>` лақап ат — futures crate-нен; ыңғайлы. **Идиома:** рекурсия қажет болғанда — async fn-ден ауыстыру; әйтпесе stack overflow + size error."
+    },
+    {
+      "subject": {
+        "surface": "async-recursion крейті",
+        "root": "async-recursion крейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_649"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`async-recursion` крейті — рекурсивті async-ті ыңғайлы жазу. `#[async_recursion]` атрибут процедуралық макрос Box::pin-ді автоматты қосады: `#[async_recursion] async fn factorial(n: u32) -> u32 { if n == 0 { 1 } else { n * factorial(n - 1).await } }`. **Артықшылық:** қарапайым `async fn` синтаксисі сақталады; макрос bo­xing-ті жасайды. **Қашан керек:** tree traversal (file system, AST), graph traversal — recursion natural. **Альтернатив:** loops + explicit stack — performance тиімді (heap аллокация жоқ), бірақ кодты оқу қиынырақ. **Маңызды:** Rust 1.85+ рекурсивті async fn-ді ішкі түрде қолдайды (RFC 3668), бірақ `async-recursion` крейті production-да жиі қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "async fn in traits шектеуі",
+        "root": "async fn in traits шектеуі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_650"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Async fn in traits шектеуі — Rust 1.75-ке дейін трейттерде `async fn` жоқ еді. Себеп: `async fn` нақты Future типі — нақты тип трейтте expressing мүмкін емес болды (GAT тұрақтанбағанша). Қарапайым әдіс жұмыс істемеді: `trait Foo { async fn bar(&self); }` → compile error. **Уақытша шешімдер тарихы:** (1) async-trait крейті — Box<dyn Future> арқылы; (2) GAT-тардан кейін arbitrary self-types; (3) Rust 1.75 — нативті support. **Қазіргі шектеулер (1.75+):** (1) трейт-объектпен (`dyn Foo`) `async fn`-ді шакыру — әлі async-trait керек; (2) `Send` bound auto-emes — қажет болса `+ Send` ашық қою керек."
+    },
+    {
+      "subject": {
+        "surface": "async-trait крейті",
+        "root": "async-trait крейті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust крейті",
+        "root": "rust крейті",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_651"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`async-trait` крейті — Box<dyn Future> арқылы трейтте async fn. Қолдану: `use async_trait::async_trait; #[async_trait] trait MyTrait { async fn do_something(&self) -> u32; }`. Макрос астында iскe asyru: трейт-функцияны `fn do_something<'life0, 'async_trait>(&'life0 self) -> Pin<Box<dyn Future<Output = u32> + Send + 'async_trait>>` ге transform жасайды. **Артықшылықтар:** (1) trait object (`dyn MyTrait`) жұмыс істейді; (2) Send + Sync constraints автоматы; (3) Rust 1.75 алдындағы кодта стандарт болды. **Кемшіліктер:** (1) heap allocation per call; (2) extra dependency; (3) error message-дер күрделі."
+    },
+    {
+      "subject": {
+        "surface": "rust 1.75 async traits",
+        "root": "rust 1.75 async traits",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мүмкіндігі",
+        "root": "rust мүмкіндігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_652"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Rust 1.75 native async fn in traits — 2023 жыл соңы — async-trait крейтінсіз трейтте async fn жасау. `trait Greeter { async fn greet(&self) -> String; } impl Greeter for Hello { async fn greet(&self) -> String { format!(\"Hello\") } }`. Жұмыс істеу негіздері: GAT (generic associated types), RPITIT (return-position impl trait in traits). **Артықшылық async-trait-тен:** zero overhead, no heap allocation, no extra dependency. **Шектеу:** `dyn Greeter` (trait object) жұмыс істемейді — trait object Future типін ұстауға керек, бірақ нақты тип белгісіз. Шешім: `Box<dyn Greeter>` керек болса — `async-trait` крейтін қолдану керек."
+    },
+    {
+      "subject": {
+        "surface": "rpitit lifetime",
+        "root": "rpitit lifetime",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_653"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "RPITIT lifetime issues — Return-Position Impl Trait In Traits. `trait Foo { fn bar(&self) -> impl Future<Output = u32>; }` — Rust 1.75-те stable. **Lifetime nuance:** қайтарылатын Future параметрлердің lifetime-нан туындайды; auto-Send bound жоқ. **Жиі мәселе:** Future Send болу талап етілсе — қолмен `+ Send` қосу: `trait Foo { fn bar(&self) -> impl Future<Output = u32> + Send; }`. **Альтернатив (return type notation):** қажет болса traits-дегі Return Type Notation: `where T::bar(): Send` — әлі experimental. **Идиома:** қарапайым кодта 1.75 native жұмыс істейді; trait object немесе complex Send constraints керек болса — `async-trait`."
+    },
+    {
+      "subject": {
+        "surface": "drop in async",
+        "root": "drop in async",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_654"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Drop in async — RAII Future-ларда да жұмыс істейді. `let _guard = MyGuard::new(); some_io().await;` — `_guard` cleanup `some_io` аяқталғанда (немесе drop-та) автоматты түрде орындалады. **Маңызды:** Future drop болғанда (мысалы, select! тармағы жанбаған кезде) — барлық местные айнымалылар drop-талып, Drop iмплементациялары шакырылады. Стандартты RAII патерндерi сай: file close, lock release, allocation cleanup. **Шектеу:** Drop trait — sync; ішінде `.await` шакыру мүмкін емес → resource async cleanup талап еткен кезде проблема (мысалы, network connection — graceful close-ы async)."
+    },
+    {
+      "subject": {
+        "surface": "async drop проблемасы",
+        "root": "async drop проблемасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_655"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Async drop проблемасы — Drop трейт-импл sync, бірақ async cleanup қажет болатын ресурстар бар. Мысалы: database connection-ды graceful жабу, log buffer-ды flush ету — әдетте network I/O, sync контекстте мүмкін емес. **Уақытша шешімдер:** (1) `async fn close(self)` ашық шакыру (программист есінде ұстау керек); (2) `Drop`-та `tokio::spawn` арқылы async task іске қосу — but Drop тоқтамайды; (3) tokio-нің `tokio::runtime::Handle::try_current()` арқылы blocking executor-ді шакыру (риск). **Мерзім:** RFC 3046 (async drop) талқылануда; merge stable емес. Production-да: ашық `close().await` шакыру жиі қолданылады."
+    },
+    {
+      "subject": {
+        "surface": "future leak forget",
+        "root": "future leak forget",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust мәселесі",
+        "root": "rust мәселесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_656"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Future leak — `mem::forget(future)` арқылы Future-ды drop-сыз тірі ұстау. `std::mem::forget(my_future);` — Future жадтан тазаланбайды; ішкі state, captured locals, Waker references — барлығы leak. **Қашан керек:** өте сирек — әдетте FFI шектерінде. **Тұзақ:** `mem::forget` барлық RAII guards-ты skip жасайды — file descriptor leak, lock leak, memory leak мүмкін. Cancellation-нан айырмашылығы: cancellation = drop = cleanup; forget = skip cleanup. **Идиома:** «forget» нені істейтінін білмесең — қолданба; өндірісте 99 % жағдайда қажет емес."
+    },
+    {
+      "subject": {
+        "surface": "cancel-safety patterns",
+        "root": "cancel-safety patterns",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "concurrency үлгісі",
+        "root": "concurrency үлгісі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_657"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Cancel-safety патерндерi — Future cancel болған кезде de inv invariant-тарды сақтау. **«Cancel-safe»** деп әр поинте drop болса да resource leak / corrupt state болмайтын Future айтылады. Tokio API-лер: cancel-safe — `tokio::sync::Mutex::lock`, `mpsc::recv`, `sleep`, `timeout`. Cancel-unsafe — `read_exact` (жартылай оқу мүмкін), `write_all` (жартылай жазу). **Tokio-нің ережесі:** select! тармағында cancel-unsafe Future қолданбау. **Шешім cancel-unsafe үшін:** `pin_mut!(fut); select! { res = &mut fut => ..., _ = timeout => { (&mut fut).await; ... } }` — timeout болса да fut-ты завершить, не drop. **Идиома:** документтен «cancel safety» бөлімін оқу — әр async API-нің кепілдігі жазылған."
     },
     {
       "subject": {

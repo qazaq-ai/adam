@@ -7,6 +7,55 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.91.5] — 2026-05-07 — Rust Async Book chapter 7 deepening — Workarounds (Send + recursion + traits + cancellation)
+
+Per-chapter pedagogical cadence continues. Chapter 7 — the practical issues encountered when writing real async code. Walks from error handling (`?` operator + Box<dyn Error+Send+Sync> + anyhow/thiserror), through Send approximation problems (MutexGuard.await + Rc/RefCell across await), recursion (boxing for unbounded state machine size), async fn in traits (1.75 history + async-trait + RPITIT), to cancellation + drop issues (RAII in async + async drop problem + Future leak + cancel-safety patterns).
+
+### What's added
+
+**18 new curated entries `rust_640…657`** in `programming_rust.jsonl`:
+
+**Error handling in async (3):** `?` оператор async fn-да (Result propagation + From conversion), `Result<T, Box<dyn Error + Send + Sync>>` (multi-thread executor needs Send + Sync error), anyhow / thiserror async-та (binary vs library + bail/context + thiserror::Error derive).
+
+**Send approximation (4):** Send approximation проблемасы (compiler hint when Future is !Send), MutexGuard across `.await` deadlock (lock-release-before-await idiom), `Rc<T>` async-та (Arc + LocalSet single-thread escape), RefCell across `.await` issues (block scope or tokio::sync::Mutex).
+
+**Recursion (3):** async fn рекурсия проблемасы (cannot determine future size), `Box::pin` рекурсия шешімі (heap indirection + BoxFuture alias), `async-recursion` крейті (`#[async_recursion]` macro + Rust 1.85 native support).
+
+**Async fn in traits (4):** async fn in traits шектеуі (1.75-pre history), `async-trait` крейті (Box<dyn Future> approach + Send/Sync auto + heap allocation cost), Rust 1.75 native (zero-overhead + RPITIT + `dyn Greeter` limitation), RPITIT lifetime issues (auto-Send absence + `+ Send` workaround).
+
+**Cancellation + drop (4):** Drop in async (RAII still works in Future cleanup), async drop проблемасы (Drop is sync; RFC 3046 pending; ашық `close().await` workaround), Future leak (`mem::forget` skips RAII), cancel-safety patterns (cancel-safe API list + select!-arm cautions + pin_mut! pattern).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_async_book_chapter_07_holdout.json` — 18 cases, 5 categories.
+- `crates/adam-dialog/tests/rust_async_book_chapter_07.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 19 compounds (18 subjects + 1 object hub `concurrency мәселесі`).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 async-chapter-7 holdout cases | ✅ 100 % |
+| Rust Book chapters 1-20 + Async Book ch.1-6 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **1002 passing** (was 1001; +1 async-chapter-7 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2947 → **2965** (+18) |
+| world_core facts | 3189 → **3207** (+18) |
+| Derived facts | 30885 → **30902** (+17) |
+
+### Roadmap (next — Async Book)
+
+| Release | Async Book Chapter | Topic |
+|---|---|---|
+| **v4.91.5** | **ch. 7** | **Workarounds (this release)** |
+| v4.92.0 | ch. 8 | The Async ecosystem (tokio vs async-std deep) |
+| v4.92.5 | ch. 9 | Final project — async HTTP server |
+
 ## [4.91.0] — 2026-05-07 — Rust Async Book chapter 6 deepening — Executing multiple futures (join! / try_join! / select! / FuturesUnordered)
 
 Per-chapter pedagogical cadence continues. Chapter 6 covers the **multi-future composition primitives** — how to wait for many concurrent operations efficiently. Walks from the join! family (and-semantics: wait-all + concurrent), through the select! macro (or-semantics: race for first), to the dynamic collection types (FuturesUnordered + FuturesOrdered), and finishes with cancellation patterns (timeout + race-vs-zip mental model + biased select!).
