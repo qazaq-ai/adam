@@ -2011,6 +2011,33 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     // Objects.
     "rust ереже-тұзағы",
     "rust қатесі",
+    // **v4.87.5** — Rust Book chapter 19 (advanced features) deepening.
+    // rust_496…513 — 18 entries covering unsafe Rust (5),
+    // advanced traits (4), advanced types (3), advanced
+    // functions/closures (2), and macros (4).
+    // Subjects.
+    "unsafe rust шолуы",
+    "шикі сілтеме",
+    "unsafe fn",
+    "static mut",
+    "unsafe trait",
+    "associated type",
+    "операторды артық жүктеу",
+    "толық анықталған синтаксис",
+    "supertrait",
+    "типтік қосалқы атау",
+    "ешкім емес тип",
+    "dst sized",
+    "функция көрсеткіші",
+    "closure қайтару",
+    "макрос vs функция",
+    "declarative macros",
+    "procedural derive",
+    "attribute-like macros",
+    // Objects.
+    "trait мүмкіндігі",
+    "trait синтаксисі",
+    "rust идиомасы",
     // **v4.86.0** — Rust Book chapter 16 (concurrency) deepening.
     // rust_442…459.
     "қорқынышсыз қатарластық",

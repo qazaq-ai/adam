@@ -1,0 +1,27 @@
+{
+  "_comment": "v4.87.5 — Rust Book Chapter 19 (advanced features) holdout. 18 natural Kazakh queries against rust_496…513. Categories: ch19_unsafe (5 superpowers + raw pointers + unsafe fn + static mut + unsafe trait), ch19_advanced_traits (associated types + operator overloading + fully qualified syntax + supertrait), ch19_advanced_types (type alias + never type + DST + Sized), ch19_fn_closures (function pointer + closure return), ch19_macros (macro vs fn + declarative + procedural derive + attribute-like / function-like).",
+  "version": "v4.87.5",
+  "captured_date": "2026-05-07",
+  "chapter": 19,
+  "chapter_title": "Кеңейтілген мүмкіндіктер (advanced features: unsafe / advanced traits / advanced types / function pointers / macros)",
+  "cases": [
+    {"id": "ch19_unsafe_overview", "category": "ch19_unsafe", "query": "unsafe Rust шолуы деген не?", "any_substring": ["бес мүмкіндік", "суперкүш", "өзім кепілмін"]},
+    {"id": "ch19_raw_pointer", "category": "ch19_unsafe", "query": "Шикі сілтеме деген не?", "any_substring": ["*const t", "*mut t", "ffi"]},
+    {"id": "ch19_unsafe_fn", "category": "ch19_unsafe", "query": "unsafe fn деген не?", "any_substring": ["шакырушы", "split_at_mut", "extern"]},
+    {"id": "ch19_static_mut", "category": "ch19_unsafe", "query": "static mut деген не?", "any_substring": ["counter", "mutex", "atomic"]},
+    {"id": "ch19_unsafe_trait", "category": "ch19_unsafe", "query": "unsafe trait деген не?", "any_substring": ["send", "sync", "rc<t>"]},
+    {"id": "ch19_associated_type", "category": "ch19_advanced_traits", "query": "Associated type деген не?", "any_substring": ["iterator", "type item", "self::item"]},
+    {"id": "ch19_operator_overload", "category": "ch19_advanced_traits", "query": "Операторды артық жүктеу деген не?", "any_substring": ["std::ops", "add", "rhs = self"]},
+    {"id": "ch19_fully_qualified", "category": "ch19_advanced_traits", "query": "Толық анықталған синтаксис деген не?", "any_substring": ["<type as trait>", "pilot::fly", "baby_name"]},
+    {"id": "ch19_supertrait", "category": "ch19_advanced_traits", "query": "supertrait деген не?", "any_substring": ["outlineprint", "fmt::display", "to_string"]},
+    {"id": "ch19_type_alias", "category": "ch19_advanced_types", "query": "Типтік қосалқы атау деген не?", "any_substring": ["type kilometers", "лақап ат", "io::result"]},
+    {"id": "ch19_never_type", "category": "ch19_advanced_types", "query": "Ешкім емес тип деген не?", "any_substring": ["panic", "loop", "continue"]},
+    {"id": "ch19_dst", "category": "ch19_advanced_types", "query": "DST sized деген не?", "any_substring": ["str", "&[t]", "?sized"]},
+    {"id": "ch19_fn_pointer", "category": "ch19_fn_closures", "query": "Функция көрсеткіші деген не?", "any_substring": ["fn(i32)", "do_twice", "ffi"]},
+    {"id": "ch19_closure_return", "category": "ch19_fn_closures", "query": "closure қайтару деген не?", "any_substring": ["impl fn", "box<dyn fn", "sized емес"]},
+    {"id": "ch19_macro_vs_fn", "category": "ch19_macros", "query": "Макрос vs функция деген не?", "any_substring": ["println!", "айнымалы саны", "метапрограмма"]},
+    {"id": "ch19_declarative", "category": "ch19_macros", "query": "Declarative macros деген не?", "any_substring": ["macro_rules", "$x:expr", "vec!"]},
+    {"id": "ch19_proc_derive", "category": "ch19_macros", "query": "Procedural derive деген не?", "any_substring": ["#[derive", "syn", "quote"]},
+    {"id": "ch19_attribute_macros", "category": "ch19_macros", "query": "Attribute-like macros деген не?", "any_substring": ["#[route", "rocket", "sql!"]}
+  ]
+}

@@ -7,6 +7,58 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.87.5] — 2026-05-07 — Rust Book chapter 19 deepening — Кеңейтілген мүмкіндіктер (unsafe / advanced traits / advanced types / function pointers / macros)
+
+Per-chapter pedagogical cadence continues. Chapter 19 — the most heterogeneous chapter — covers Rust's escape hatches and metaprogramming: **unsafe Rust** (5 superpowers + memory-safety contract delegation), **advanced traits** (associated types, operator overloading, fully qualified syntax, supertraits), **advanced types** (type aliases, never type `!`, DST + `Sized`), **advanced functions/closures** (`fn` pointers, returning closures), and **macros** (declarative `macro_rules!` + 3 procedural forms). Previously surface-level — only a handful of stubs across these areas. Now deepened with full curriculum.
+
+### What's added
+
+**18 new curated entries `rust_496…513`** in `programming_rust.jsonl`:
+
+**Unsafe Rust (5):** unsafe Rust шолуы (5 superpowers + «I am responsible» semantics, not «compiler off»), шикі сілтеме (`*const T` / `*mut T` + dereference rule + FFI), `unsafe fn` (caller-uphold-invariants + `split_at_mut` example + `extern "C"`), `static mut` (race risks + `Mutex` / `OnceLock` / `Atomic` modern alternatives), `unsafe trait` (`Send` / `Sync` invariant contracts).
+
+**Advanced traits (4):** associated type (`Iterator`'s `type Item` + one-impl-one-type rule), операторды артық жүктеу (`Add` trait + default `Rhs = Self` + closed operator set), толық анықталған синтаксис (`<Type as Trait>::method` for ambiguous calls), supertrait (`OutlinePrint: Display` requirement vs inheritance).
+
+**Advanced types (3):** типтік қосалқы атау (`type Kilometers = i32` + `io::Result` example + alias-vs-newtype distinction), ешкім емес тип `!` (panic / loop / continue / never_type coercion + match unification), DST + `Sized` (str / [T] / dyn Trait + `?Sized` opt-out).
+
+**Advanced fn/closures (2):** функция көрсеткіші (`fn` type vs `Fn` traits + FFI), closure қайтару (3 paths: `impl Fn` / `Box<dyn Fn>` / `&dyn Fn`).
+
+**Macros (4):** макрос vs функция (variadic + compile-time codegen + trait-impl + `!` suffix), declarative macros (`macro_rules!` + meta-types + `vec!` example), procedural derive (`#[derive(MyTrait)]` + `proc-macro` crate + `syn` + `quote`), attribute-like + function-like macros (`#[route(...)]` + `sql!(...)`).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_19_holdout.json` — 18 cases, 5 categories (`ch19_unsafe`, `ch19_advanced_traits`, `ch19_advanced_types`, `ch19_fn_closures`, `ch19_macros`).
+- `crates/adam-dialog/tests/rust_book_chapter_19.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 21 compounds (18 subjects + 3 object hubs `trait мүмкіндігі`, `trait синтаксисі`, `rust идиомасы`).
+
+### Subject-naming correction
+
+- `rust_501` from «байланысты типтер» to «associated type». **Reason:** «байланысты» literally means «related / connected» in Kazakh; the topic extractor was routing the query through the relatedness reasoner (`R5_shared_is_a_target`) instead of surfacing the curated entry. Renamed using the Latin technical term, kept the «байланысты тип» translation in the body.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 18 / 18 chapter 19 holdout cases | ✅ 100 % |
+| Existing chapters 1-18 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **994 passing** (was 993; +1 chapter-19 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2803 → **2821** (+18) |
+| world_core facts | 3045 → **3063** (+18) |
+| Derived facts | 30886 → **30876** (−10, expected from associated-type subject rename breaking incidental chains) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.87.5** | **ch. 19** | **Advanced features (this release)** |
+| v4.88.0 | ch. 20 | Final project — multi-threaded web server |
+
 ## [4.87.0] — 2026-05-07 — Rust Book chapter 18 deepening — Үлгілер мен сәйкестендіру (advanced pattern matching)
 
 Per-chapter pedagogical cadence continues. Chapter 18 systematises Rust's pattern language — every place patterns can appear (six contexts), refutability rules, the full pattern grammar (literals, named variables, or-patterns, ranges, struct/enum/nested destructuring, ignoring with `_` and `..`, match guards, and `@` at-bindings). Previously coverage was scattered across chapters 6 (match basics) and 13 (closures); now there is a dedicated reference catalog.
