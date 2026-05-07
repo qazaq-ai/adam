@@ -1,7 +1,7 @@
 {
-  "version": "4.82.5",
+  "version": "4.83.0",
   "status": "completed",
-  "elapsed_s": 67,
+  "elapsed_s": 70,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2908,
+    "facts_total": 2923,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2343,
+      "is_a": 2358,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,8 +82,8 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 346,
-      "world_core/programming_rust_advanced.jsonl": 28,
+      "world_core/programming_rust.jsonl": 364,
+      "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
       "world_core/role_bridges.jsonl": 63,
@@ -43216,7 +43216,7 @@
         "sample_id": "rust_014"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Тіршілік мерзімі — `Rust-`тағы сілтеменің жарамды болып тұратын кезеңі."
+      "raw_text": "Тіршілік мерзімі (lifetime) — `Rust`-тағы сілтеменің жарамды болып тұратын кезеңі. Әр сілтеменің лайфтаймы бар; көп жағдайда компилятор автоматты шешеді (lifetime elision rules), бірақ функция параметрі әртүрлі мерзімдегі сілтемелерді қабылдағанда — `'a` параметрі арқылы ашық белгілеу қажет: `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`. Мақсаты — **жабайы сілтемелерді** (dangling references) болдырмау. Қарыз тексергіш әр сілтеменің мерзімін салыстырады; егер сілтеме өзінің мақсатынан ұзақ өмір сүргісі келсе — компиляция қатесі. `'static` — арнайы лайфтайм: бағдарламаның толық өмірі (барлық жол литералдары — `'static`)."
     },
     {
       "subject": {
@@ -44336,7 +44336,7 @@
         "sample_id": "rust_073"
       },
       "confidence": "HumanApproved",
-      "raw_text": "Трейт — `Rust-`та типке ортақ тәртіпті бекітетін абстракция."
+      "raw_text": "Трейт (trait) — әр түрлі типтерге **ортақ тәртіпті** бекітетін абстракция. Басқа тілдерде «интерфейс» немесе «протокол» деп аталады. Жариялау: `pub trait Summary { fn summarize(&self) -> String; }` — әдіс қолтаңбасы, денесі әр типте жеке іске асырылады. Бекіту: `impl Summary for NewsArticle { fn summarize(&self) -> String { ... } }`. **Орфан-ереже:** трейтті типке тек өзіңіздің сандығыңыздағы трейт болса немесе типтің өзі сіздікі болса ғана бекітуге болады. **Әдепкі әдіс:** трейт ішінде денесімен жариялауға болады — типтер оны қайта жаза алады. **Параметр ретінде:** `fn notify(item: &impl Summary)` немесе `<T: Summary>` (trait bound)."
     },
     {
       "subject": {
@@ -49860,6 +49860,366 @@
     },
     {
       "subject": {
+        "surface": "жалпылама тип параметрі",
+        "root": "жалпылама тип параметрі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ұғымы",
+        "root": "rust ұғымы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_351"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жалпылама тип параметрі (generic type parameter) — `<T>` синтаксисі. Функция, структ, енам немесе әдіс жариялауында типтің орнына **тип параметрі** қойылады. `T` — кез келген тип бола алады. Мысалы: `fn largest<T: PartialOrd>(list: &[T]) -> &T { ... }` — `i32`, `char`, `f64` т.б. кез келген салыстыруға келетін типпен жұмыс істейді. Бірнеше параметр: `<T, U>`. Аталу шартты: `T` (Type), `K` / `V` (Key / Value), `E` (Error), `'a` (lifetime), `R` (Return). `<T>` орналасуы: `fn name<T>(...)`, `struct Point<T>`, `enum Option<T>`, `impl<T> Point<T>`."
+    },
+    {
+      "subject": {
+        "surface": "структта жалпылама",
+        "root": "структта жалпылама",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "generic шаблоны",
+        "root": "generic шаблоны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_352"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Структта жалпылама — `struct Point<T> { x: T, y: T }`. `T` — өрістердің ортақ типі. `Point<i32>` мен `Point<f64>` — әртүрлі типтер, компилятор әрқайсысына бөлек код шығарады. **Бірнеше параметр** — әр өріс әртүрлі типте болуы мүмкін: `struct Point<T, U> { x: T, y: U }` — `Point { x: 5, y: 4.0 }` (T=i32, U=f64). Жалпылама структты пайдалану кезінде типтер немесе автоматты шығарылады, немесе ашық белгіленеді: `let p: Point<i32, f64> = Point { x: 5, y: 4.0 };`."
+    },
+    {
+      "subject": {
+        "surface": "енамда жалпылама",
+        "root": "енамда жалпылама",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "generic шаблоны",
+        "root": "generic шаблоны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_353"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Енамда жалпылама — стандартты кітапханада екі белгілі мысал. **`Option<T>`:** `enum Option<T> { Some(T), None }` — мүмкін мәннің типі. **`Result<T, E>`:** `enum Result<T, E> { Ok(T), Err(E) }` — сәтті нәтиже мен қате. Ескерту: бір типтің ішінде көп параметрлер болуы мүмкін. Сондықтан стандартты кітапханада `Option<u32>`, `Option<String>`, `Result<File, io::Error>` сияқты сансыз комбинациялар табылады. Енам жалпылама болған сайын — типтік қауіпсіздік сақталады, бірақ бір код әр түрлі мәнді сипаттайды."
+    },
+    {
+      "subject": {
+        "surface": "жалпылама әдіс",
+        "root": "жалпылама әдіс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "generic шаблоны",
+        "root": "generic шаблоны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_354"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жалпылама әдіс — `impl<T> Point<T> { fn x(&self) -> &T { &self.x } }`. `impl<T>` — `Point<T>`-нің тип параметрі. Кез келген `Point<X>` (мысалы, `Point<i32>`) `x()` әдісіне ие. **Нақты типке арналған әдіс:** `impl Point<f64> { fn distance_from_origin(&self) -> f64 { (self.x.powi(2) + self.y.powi(2)).sqrt() } }` — тек `Point<f64>`-та бар (өйткені `powi`/`sqrt` тек қалқымалы үтірлі типтерде). Идиома: ортақ функционалдық `impl<T>`, нақты типке арналған әдістер `impl Type<ConcreteT>`."
+    },
+    {
+      "subject": {
+        "surface": "мономорфтау",
+        "root": "мономорфтау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust оптимизациясы",
+        "root": "rust оптимизациясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_355"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мономорфтау (monomorphization) — компилятор жалпылама кодты әр нақты тип үшін **бөлек көшірмеге** айналдыру процесі. Мысалы, `largest<T>` функциясы `i32`-пен бір рет, `char`-мен екінші рет шакырылса — компилятор `largest_i32` мен `largest_char` сияқты екі бөлек функция жасайды. **Артықшылықтары:** орындалу кезінде ешбір динамикалық таңдау, ешбір қосымша көрсеткіш шакыруы жоқ — қолмен жазылған типтік код жылдамдығымен бірдей. Бұл — `Rust`-тың дизайн принципі: «**zero-cost abstraction**» (нөлдік құнды абстракция). **Шегі:** үлкен жалпылама код көп мономорфтау жасап, бинарлық файлды үлкейтуі мүмкін."
+    },
+    {
+      "subject": {
+        "surface": "орфан ереже",
+        "root": "орфан ереже",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust ережесі",
+        "root": "rust ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_356"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орфан-ереже (orphan rule) — `Rust`-тың трейт бекітуінің ережесі: трейтті типке **тек өзіңіздің сандығыңыздағы трейт болса немесе типтің өзі сіздікі болса** ғана бекіте аласыз. Мысалы, `Display`-ді `Vec<T>`-ке бекіте алмайсыз — екеуі де стандартты кітапханадан. Бірақ өзіңіздің `MyType`-ке `Display` бекіту — мүмкін; өзіңіздің `MyTrait`-ті `Vec<T>`-ке бекіту — де мүмкін. **Себебі:** сандықтар арасындағы дау-дамайды болдырмайды — егер бірнеше сандық бір типке бір трейт бекітсе, қайсысын таңдау керек белгісіз болар еді. Орфан ережесі — coherence (когерентность) — типтік жүйенің тұрақтылығын қамтамасыз етеді."
+    },
+    {
+      "subject": {
+        "surface": "әдепкі трейт әдісі",
+        "root": "әдепкі трейт әдісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait шаблоны",
+        "root": "trait шаблоны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_357"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Әдепкі трейт әдісі (default trait method) — трейт ішінде денесімен бірге жариялауға болатын әдіс. Тип бекітуінде ол қайта анықталмаса — әдепкі қолданылады: `pub trait Summary { fn summarize(&self) -> String { String::from(\"(Толық емес...)\") } }`. `impl Summary for NewsArticle {}` — бос блок, әдепкіні алады. **Күшті жағы:** әдепкі әдіс трейттің **басқа** әдістерін шакыра алады, тіпті олардың денесі болмаса да: `fn summarize(&self) -> String { format!(\"({} жазған толық емес мәтін)\", self.summarize_author()) }`. Тип тек `summarize_author`-ды жазса — `summarize` әдепкі бойынша келеді."
+    },
+    {
+      "subject": {
+        "surface": "trait параметр",
+        "root": "trait параметр",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait қолданысы",
+        "root": "trait қолданысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_358"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Trait параметр ретінде — `fn notify(item: &impl Summary) { println!(\"{}\", item.summarize()); }`. `&impl Summary` — «`Summary` трейтін бекітетін кез келген типке сілтеме». `notify(&article)` мен `notify(&tweet)` — екеуі де жұмыс істейді, `Summary`-ді бекітсе. Қысқа синтаксис; функция қолтаңбасында тип параметрін көрсету керек емес. **Эквивалент:** `fn notify<T: Summary>(item: &T)` (trait bound). Айырмашылық: trait bound бір типті бекітеді (`item1: &T, item2: &T` бір типте), `impl Trait` әртүрлі типтерді қабылдайды."
+    },
+    {
+      "subject": {
+        "surface": "трейт шектеуі",
+        "root": "трейт шектеуі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait қолданысы",
+        "root": "trait қолданысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_359"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Трейт шектеуі (trait bound) — `<T: Trait>` синтаксисі: «`T` `Trait` трейтін бекітеді». `fn notify<T: Summary>(item: &T)` — `T` `Summary`-ді бекіткен болуы керек. **Бірнеше шектеу:** `T: Summary + Display` — екеуін де бекітеді. **Маңызды:** `<T: Trait>` бір типті бекітеді — `notify(&article, &tweet)` екі түрлі тип беруге келмейді (екеуі де `T` болуы керек), бірақ `&impl Summary` екеуінде әртүрлі типтерді қабылдайды. **Қашан керек:** көп параметр бір типте болуы керек, шектеулі түрлер қажет болғанда."
+    },
+    {
+      "subject": {
+        "surface": "where клаузасы",
+        "root": "where клаузасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait синтаксисі",
+        "root": "trait синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_360"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`where` клаузасы — жалпылама шектеулердің кеңейтілген синтаксисі. Қарапайым: `fn name<T: Display + Clone>(t: T) { ... }`. Күрделі: `fn name<T, U>(t: &T, u: &U) -> i32 where T: Display + Clone, U: Clone + Debug, { ... }`. **Артықшылығы:** функция қолтаңбасынан кейінгі бөлек блокта жазылады — оқуға жеңіл. Көп параметр + көп шектеу болған кезде `where` клаузасы — Rust қауымдастығының идиомасы. Шектеулерді бөлек қою кодты тазартады."
+    },
+    {
+      "subject": {
+        "surface": "impl trait қайтарушы",
+        "root": "impl trait қайтарушы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait қолданысы",
+        "root": "trait қолданысы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_361"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`impl Trait` қайтарушы (returning impl Trait) — функция трейтті бекітетін типті қайтару синтаксисі: `fn returns_summarizable() -> impl Summary { Tweet { ... } }`. Шакырушы нақты қандай тип қайтарылғанын білмейді — тек `Summary` интерфейсіне сүйеніп жұмыс істейді. **Маңызды нюанс:** `impl Trait` тек **бір** нақты тип қайтаруға болады — функция шартқа қарап `Tweet` немесе `NewsArticle` қайтаратын болса, қате. **Альтернатива әртүрлі типтерге:** `Box<dyn Trait>` (динамикалық диспетчер, 17-тарауда)."
+    },
+    {
+      "subject": {
+        "surface": "шарт бойынша әдістер",
+        "root": "шарт бойынша әдістер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "trait шаблоны",
+        "root": "trait шаблоны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_362"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шарт бойынша әдістер (conditional methods) — трейт шектеуі арқылы әдісті тек қалаған типтерде жариялау. Мысалы: `impl<T: Display + PartialOrd> Pair<T> { fn cmp_display(&self) { ... } }` — `cmp_display` тек `T` екеу трейтті бекітсе ғана бар; қалғандарында жоқ. **Жалпы іске асыру (blanket implementation):** трейт басқа трейтті бекітетін барлық типтерге бекітіледі. Мысалы, `impl<T: Display> ToString for T { ... }` — кез келген `Display`-ді бекіткен тип автоматты түрде `ToString` бекітеді. Сондықтан `.to_string()` барлық `Display` типтерде шакырылады."
+    },
+    {
+      "subject": {
+        "surface": "тіршілік мерзімі функцияда",
+        "root": "тіршілік мерзімі функцияда",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "lifetime синтаксисі",
+        "root": "lifetime синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_363"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тіршілік мерзімі функцияда — `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str` — `'a` лайфтайм параметрі. «`x`, `y` мен нәтиже — үшеуінің тіршілік мерзімі бір — `'a`» дегенді білдіреді. Шакырушы кодқа шектеу: екі сілтеме шакырылғанда олардың кесінді мерзімі — нәтиженің жарамды болатын аумағы. **Атаулар:** `'a`, `'b`, `'c` (қысқа). Мақсаты: компилятор әртүрлі мерзімдегі сілтемелерді қабылдайтын функцияда қайтаратын сілтеменің мерзімін шеше алмайды — программист айтуы керек."
+    },
+    {
+      "subject": {
+        "surface": "тіршілік мерзімі структта",
+        "root": "тіршілік мерзімі структта",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "lifetime синтаксисі",
+        "root": "lifetime синтаксисі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_364"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тіршілік мерзімі структта — структ ішінде сілтеме болса, оған лайфтайм қажет: `struct ImportantExcerpt<'a> { part: &'a str }`. `'a` — `part` өрісінің сілтеме қандайда бір лайфтайммен байланғанын білдіреді. **Маңызды:** структ данасы өзі сілтеген мәннен **ұзақ өмір сүре алмайды**. Сондықтан `let i = ImportantExcerpt { part: first_sentence };` — `i` тек `first_sentence` (және оның бастапқы `novel`) бар болғанда ғана жарамды. Лайфтайм параметрі структ жариялауында `<'a>` арқылы көрсетіледі; әр өрісі үшін бөлек лайфтайм қажет болса — `<'a, 'b>`."
+    },
+    {
+      "subject": {
+        "surface": "lifetime elision",
+        "root": "lifetime elision",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "compiler ережесі",
+        "root": "compiler ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_365"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тіршілік мерзімін түсіріп жазу ережелері (lifetime elision rules) — `Rust`-тың үш ережесі: компилятор көп жағдайда лайфтаймды автоматты шеше алады. **1-ереже:** әр кіріс сілтеме параметрге өзіндік мерзімі беріледі. **2-ереже:** егер тек **бір** кіріс мерзімі бар болса — қайтару сілтеменің мерзімі сондай болады. **3-ереже:** әдістерде, бірінші параметр `&self` немесе `&mut self` болса — қайтару сілтеменің мерзімі — `self`-тікі. Мысалы, `fn first_word(s: &str) -> &str` — лайфтайм жазылмаған, бірақ компилятор шешеді: бір кіріс сілтеме → қайтару сондай мерзімде. Эквивалент: `fn first_word<'a>(s: &'a str) -> &'a str`."
+    },
+    {
+      "subject": {
+        "surface": "static лайфтайм",
+        "root": "static лайфтайм",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "lifetime түрі",
+        "root": "lifetime түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_366"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`'static` лайфтайм — арнайы тіршілік мерзімі: «бағдарламаның бүкіл өмірлік аумағы». Барлық **жол литералдары** — `'static`: `let s: &'static str = \"мәтін\";`. Жол литералы бағдарламаның бинарлық файлында тікелей жазылған, сондықтан ол әрдайым жарамды. **Шектеулі қолдану:** `'static`-ты шектеу ретінде жазудан абай болыңыз — кейде компилятор сізге `'static`-ты ұсынады, бірақ оған бару алдында шынында жабайы сілтеме жасамағанды тексеріңіз. Көбіне дұрыс шешім — сілтеме емес, **иелік типтерін** қолдану (`String` орнына `&str`)."
+    },
+    {
+      "subject": {
+        "surface": "generic трейт лайфтайм бірге",
+        "root": "generic трейт лайфтайм бірге",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "rust абстракциясы",
+        "root": "rust абстракциясы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_367"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жалпылама + трейттер + лайфтайм бір кодта — `Rust`-тағы абстракцияның толық суреті. Мысалы: `fn longest_with_announcement<'a, T>(x: &'a str, y: &'a str, ann: T) -> &'a str where T: Display { println!(\"{}\", ann); if x.len() > y.len() { x } else { y } }`. **Параметрлер:** `'a` — лайфтайм, `x` мен `y`-ке арналған; `T` — жалпылама тип, `ann` параметрі үшін; `T: Display` — трейт шектеуі (where клаузасы арқылы). Үшеуі бірге жұмыс істейді: типтер — нені сипаттаймыз; трейттер — қандай тәртіп қажет; лайфтайм — қанша уақытта жарамды."
+    },
+    {
+      "subject": {
+        "surface": "қарыз тексергіш",
+        "root": "қарыз тексергіш",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "compiler механизмі",
+        "root": "compiler механизмі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_368"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарыз тексергіш (borrow checker) және лайфтайм — компилятор сілтеменің тіршілік мерзімдерін **салыстырады**. Мысалы: `let r; { let x = 5; r = &x; } println!(\"{}\", r);` — `x` ішкі блокта жасалған, блок аяқталғанда `drop`-қа барады; `r` сыртта тұр, ол ішкі `x`-ке сілтейді. Жабайы сілтеме. Қарыз тексергіш `r`-дің мерзімін (`'a`, сыртқы блок) `x`-тің мерзімімен (`'b`, ішкі блок) салыстырады; `'b` `'a`-дан қысқа болғандықтан, `r = &x` сілтемесі қауіпсіз емес → компиляция қатесі. Бұл — `Rust`-тың статикалық жад қауіпсіздігінің іргетасы."
+    },
+    {
+      "subject": {
         "surface": "меншік",
         "root": "меншік",
         "pos": "noun"
@@ -49917,66 +50277,6 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Сілтеме (reference) — мәннің орналасу адресіне нұсқайтын мән."
-    },
-    {
-      "subject": {
-        "surface": "өмір сүру мерзімі",
-        "root": "өмір сүру мерзімі",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "Rust ұғымы",
-        "root": "Rust ұғымы",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust_advanced",
-      "source": {
-        "pack": "world_core/programming_rust_advanced.jsonl",
-        "sample_id": "rustadv_005"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Өмір сүру мерзімі (lifetime) — сілтеменің жарамды болатын кезеңі."
-    },
-    {
-      "subject": {
-        "surface": "трейт",
-        "root": "трейт",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "интерфейс",
-        "root": "интерфейс",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust_advanced",
-      "source": {
-        "pack": "world_core/programming_rust_advanced.jsonl",
-        "sample_id": "rustadv_006"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Трейт (trait) — типтердің ортақ мінез-құлқын анықтайтын интерфейс."
-    },
-    {
-      "subject": {
-        "surface": "generic",
-        "root": "generic",
-        "pos": "noun"
-      },
-      "predicate": "IsA",
-      "object": {
-        "surface": "параметрлік тип",
-        "root": "параметрлік тип",
-        "pos": "noun"
-      },
-      "pattern": "world_core/programming_rust_advanced",
-      "source": {
-        "pack": "world_core/programming_rust_advanced.jsonl",
-        "sample_id": "rustadv_007"
-      },
-      "confidence": "HumanApproved",
-      "raw_text": "Generic — типке тәуелсіз кодты жазуға арналған параметрлік тип."
     },
     {
       "subject": {

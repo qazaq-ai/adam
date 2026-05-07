@@ -1,0 +1,29 @@
+{
+  "_comment": "v4.83.5 — Rust Book Chapter 10 (Жалпылама типтер, трейттер мен тіршілік мерзімі) holdout. 20 natural Kazakh queries against rust_351…368 + 2 deepened stubs (rust_014/073) − 3 cross-file stub deletions (rustadv_005/006/007). Categories: ch10_generics (type parameters, struct/enum/method generics, monomorphization), ch10_traits (declaration, orphan rule, default methods, parameters, bounds, where clause, returning impl Trait, conditional methods + blanket impl), ch10_lifetimes (function lifetime, struct lifetime, elision rules, 'static, borrow checker, generic+trait+lifetime combo).",
+  "version": "v4.83.5",
+  "captured_date": "2026-05-06",
+  "chapter": 10,
+  "chapter_title": "Жалпылама типтер, трейттер мен тіршілік мерзімі (Generics / traits / lifetimes)",
+  "cases": [
+    {"id": "ch10_lifetime", "category": "ch10_lifetimes", "query": "Тіршілік мерзімі деген не?", "any_substring": ["lifetime", "'a", "жабайы сілтеме"]},
+    {"id": "ch10_trait", "category": "ch10_traits", "query": "Трейт деген не?", "any_substring": ["ортақ тәртіпті", "интерфейс", "impl summary"]},
+    {"id": "ch10_type_param", "category": "ch10_generics", "query": "Жалпылама тип параметрі деген не?", "any_substring": ["<t>", "partialord", "k / v"]},
+    {"id": "ch10_struct_generic", "category": "ch10_generics", "query": "Структта жалпылама деген не?", "any_substring": ["point<t>", "point<i32>", "<t, u>"]},
+    {"id": "ch10_enum_generic", "category": "ch10_generics", "query": "Енамда жалпылама деген не?", "any_substring": ["option<t>", "result<t, e>", "стандартты кітапхана"]},
+    {"id": "ch10_method_generic", "category": "ch10_generics", "query": "Жалпылама әдіс деген не?", "any_substring": ["impl<t> point<t>", "powi", "нақты типке"]},
+    {"id": "ch10_monomorphization", "category": "ch10_generics", "query": "Мономорфтау деген не?", "any_substring": ["zero-cost", "largest_i32", "бөлек көшірмеге"]},
+    {"id": "ch10_orphan", "category": "ch10_traits", "query": "Орфан ереже деген не?", "any_substring": ["coherence", "vec<t>", "сандықтар арасындағы"]},
+    {"id": "ch10_default_method", "category": "ch10_traits", "query": "Әдепкі трейт әдісі деген не?", "any_substring": ["денесімен", "summarize", "summarize_author"]},
+    {"id": "ch10_trait_param", "category": "ch10_traits", "query": "Trait параметр деген не?", "any_substring": ["&impl summary", "notify", "trait bound"]},
+    {"id": "ch10_trait_bound", "category": "ch10_traits", "query": "Трейт шектеуі деген не?", "any_substring": ["<t: trait>", "summary + display", "&impl"]},
+    {"id": "ch10_where_clause", "category": "ch10_traits", "query": "where клаузасы деген не?", "any_substring": ["display + clone", "оқуға жеңіл", "бөлек блокта"]},
+    {"id": "ch10_returning_impl", "category": "ch10_traits", "query": "impl Trait қайтарушы деген не?", "any_substring": ["returns_summarizable", "тек бір", "box<dyn"]},
+    {"id": "ch10_conditional", "category": "ch10_traits", "query": "Шарт бойынша әдістер деген не?", "any_substring": ["pair<t>", "blanket implementation", "tostring"]},
+    {"id": "ch10_lifetime_fn", "category": "ch10_lifetimes", "query": "Тіршілік мерзімі функцияда деген не?", "any_substring": ["longest", "'a, 'b, 'c", "кесінді мерзім"]},
+    {"id": "ch10_lifetime_struct", "category": "ch10_lifetimes", "query": "Тіршілік мерзімі структта деген не?", "any_substring": ["importantexcerpt", "<'a>", "ұзақ өмір сүре алмайды"]},
+    {"id": "ch10_elision", "category": "ch10_lifetimes", "query": "lifetime elision деген не?", "any_substring": ["1-ереже", "first_word", "&self"]},
+    {"id": "ch10_static", "category": "ch10_lifetimes", "query": "static лайфтайм деген не?", "any_substring": ["жол литералдары", "бинарлық файл", "иелік типтерін"]},
+    {"id": "ch10_combined", "category": "ch10_lifetimes", "query": "Generic трейт лайфтайм бірге деген не?", "any_substring": ["longest_with_announcement", "where t: display", "толық суреті"]},
+    {"id": "ch10_borrow_checker", "category": "ch10_lifetimes", "query": "Қарыз тексергіш деген не?", "any_substring": ["borrow checker", "'b' 'a", "жабайы сілтеме"]}
+  ]
+}

@@ -7,6 +7,84 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.83.5] — 2026-05-06 — Rust Book chapter 10 deepening — generics + traits + lifetimes
+
+Per-chapter pedagogical cadence continues. Chapter 10 is the most important chapter after ownership — Rust's three abstraction layers (types, behavior, lifetime) brought together. Previously surface-level — 2 one-line stubs (Тіршілік мерзімі / Трейт). Now deepened with full curriculum.
+
+### What's added
+
+**18 new curated entries `rust_351…368`** in `programming_rust.jsonl`:
+
+| ID | Subject | Topic |
+|---|---|---|
+| rust_351 | жалпылама тип параметрі | `<T>` syntax + naming conventions |
+| rust_352 | структта жалпылама | `Point<T>` + multiple parameters `<T, U>` |
+| rust_353 | енамда жалпылама | `Option<T>` / `Result<T, E>` |
+| rust_354 | жалпылама әдіс | `impl<T> Point<T>` + concrete impl `Point<f64>` |
+| rust_355 | мономорфтау | Zero-cost abstraction via per-type code generation |
+| rust_356 | орфан ереже | Trait/type ownership coherence rule |
+| rust_357 | әдепкі трейт әдісі | Default methods + calling other trait methods |
+| rust_358 | trait параметр | `&impl Trait` parameter syntax |
+| rust_359 | трейт шектеуі | `<T: Trait>` bound + multiple bounds via `+` |
+| rust_360 | where клаузасы | Cleaner syntax for complex bounds |
+| rust_361 | impl trait қайтарушы | Returning trait impls (single concrete type) |
+| rust_362 | шарт бойынша әдістер | Conditional methods + blanket impl (`ToString` for `Display`) |
+| rust_363 | тіршілік мерзімі функцияда | `fn longest<'a>(...) -> &'a str` |
+| rust_364 | тіршілік мерзімі структта | `struct Foo<'a> { part: &'a str }` |
+| rust_365 | lifetime elision | 3 elision rules |
+| rust_366 | static лайфтайм | `'static` for program-wide validity |
+| rust_367 | generic трейт лайфтайм бірге | Three abstraction layers combined |
+| rust_368 | қарыз тексергіш | Borrow checker mechanics with example |
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stubs deepened in-place (2)
+
+- `rust_014` (Тіршілік мерзімі) — full lifetime semantics + `'a` parameters + elision + `'static` + borrow checker.
+- `rust_073` (Трейт) — declaration + `impl Trait for Type` + orphan rule + default methods + parameters/bounds.
+
+### Stubs deleted (3)
+
+- `rustadv_005` (Өмір сүру мерзімі 1-line)
+- `rustadv_006` (Трейт 1-line)
+- `rustadv_007` (Generic 1-line)
+
+All duplicates of deeper rust_014 / rust_073 / rust_118.
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_10_holdout.json` — 20 cases, 3 categories (`ch10_generics`, `ch10_traits`, `ch10_lifetimes`).
+- `crates/adam-dialog/tests/rust_book_chapter_10.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 27 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 20 / 20 chapter 10 holdout cases | ✅ 100 % |
+| Existing chapters 1-9 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **986 passing** (was 985; +1 chapter-10 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2666 → **2681** (+15 net: +18 ch.10 − 3 stub deletions) |
+| world_core facts | 2908 → **2923** (+15 net) |
+| Derived facts | 30837 → **30830** (−7, expected from cluster restructure) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.83.5** | **ch. 10** | **Generics + traits + lifetimes (this release)** |
+| v4.84.0 | ch. 11 | Tests (`#[test]` / assert / cargo test / unit vs integration) |
+| v4.84.5 | ch. 12 | CLI minigrep project (args / env / stdin / TDD) |
+| v4.85.0 | ch. 14 | Cargo + Crates.io deeper (publishing / workspaces / docs) |
+| v4.85.5 | ch. 15 | Smart pointers (Box / Rc / Arc / RefCell / Mutex / Weak / cycles / Drop) |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.5` patch — 18 new + 2 deepened stubs + 3 deletions; chapter 10 is the abstraction-layer capstone (chapters 1-10 cover everything before testing/CLI/Cargo deeper). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.83.0] — 2026-05-06 — Rust Book chapter 9 deepening — error handling
 
 Per-chapter pedagogical cadence continues. Chapter 9 introduces Rust's distinctive approach to error handling — types over exceptions, compile-time-checked completeness, two-tier classification (recoverable via `Result<T,E>` vs unrecoverable via `panic!`). Previously surface-level — 6 one-line stubs. Now deepened with full curriculum.
