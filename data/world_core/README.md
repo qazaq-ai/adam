@@ -103,9 +103,9 @@ Validator checks:
   hits into distinct sections of its per-root report, so the user can
   tell at a glance where each fact came from.
 
-## Current scale (v4.83.5)
+## Current scale (v4.84.0)
 
-**Live totals: 2681 entries / 2923 facts across 54 domains**, all `approved`
+**Live totals: 2700 entries / 2942 facts across 54 domains**, all `approved`
 by `shaman`. Re-run `bash scripts/validate_foundation.sh` to refresh.
 Per-domain counts in the listing below are a **historical v4.11.7 snapshot**
 preserved for change-tracking; verify current counts via

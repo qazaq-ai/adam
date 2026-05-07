@@ -1,7 +1,7 @@
 {
-  "version": "4.83.0",
+  "version": "4.83.5",
   "status": "completed",
-  "elapsed_s": 70,
+  "elapsed_s": 62,
   "packs_completed": 9,
   "packs_total": 9,
   "built_from": [
@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 2923,
+    "facts_total": 2942,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2358,
+      "is_a": 2377,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -82,7 +82,7 @@
       "world_core/preschool_sizes.jsonl": 13,
       "world_core/professions.jsonl": 40,
       "world_core/programming_languages.jsonl": 56,
-      "world_core/programming_rust.jsonl": 364,
+      "world_core/programming_rust.jsonl": 383,
       "world_core/programming_rust_advanced.jsonl": 25,
       "world_core/proverbs.jsonl": 55,
       "world_core/psychology_basic.jsonl": 22,
@@ -44996,7 +44996,7 @@
         "sample_id": "rust_107"
       },
       "confidence": "HumanApproved",
-      "raw_text": "`cargo` `test` — `Rust` жобасының сынақтарын іске қосатын `Cargo` командасы."
+      "raw_text": "`cargo test` — жобаның сынақтарын іске қосатын Cargo командасы. `#[test]` атрибутымен белгіленген барлық функцияларды табады, әрқайсысын **бөлек ағында параллельді** жүгіртеді, қорытындысын шығарады. Әдепкі шығару: «running N tests / test ... ok / test result: ok. P passed; F failed; I ignored». Жалаушалары екі бөлек: `cargo test --help` (cargo үшін), `cargo test -- --help` (test runner үшін, `--` арқылы бөлінеді). Идиома: әр өзгертіс кейін `cargo test`; CI pipeline-да міндетті қадам."
     },
     {
       "subject": {
@@ -50217,6 +50217,386 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Қарыз тексергіш (borrow checker) және лайфтайм — компилятор сілтеменің тіршілік мерзімдерін **салыстырады**. Мысалы: `let r; { let x = 5; r = &x; } println!(\"{}\", r);` — `x` ішкі блокта жасалған, блок аяқталғанда `drop`-қа барады; `r` сыртта тұр, ол ішкі `x`-ке сілтейді. Жабайы сілтеме. Қарыз тексергіш `r`-дің мерзімін (`'a`, сыртқы блок) `x`-тің мерзімімен (`'b`, ішкі блок) салыстырады; `'b` `'a`-дан қысқа болғандықтан, `r = &x` сілтемесі қауіпсіз емес → компиляция қатесі. Бұл — `Rust`-тың статикалық жад қауіпсіздігінің іргетасы."
+    },
+    {
+      "subject": {
+        "surface": "#[test] атрибуты",
+        "root": "#[test] атрибуты",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test атрибуты",
+        "root": "test атрибуты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_369"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`#[test]` атрибуты — функцияны **сынақ ретінде белгілейтін** атрибут. `cargo test` командасы атрибутпен белгіленген барлық функцияларды табады, әрқайсысын бөлек жүгіртеді, сәтті өтуін / кетуін тіркейді. Қарапайым мысал: `#[test] fn it_works() { assert_eq!(2 + 2, 4); }`. Сынақ функциясы — әдеттегі функция, бірақ үстінде `#[test]` тұрады. Аргументі жоқ, әдетте `()` (немесе `Result<(), E>`) қайтарады. Panic-қа барса — сынақ кетеді; panic жасамаса — өтеді."
+    },
+    {
+      "subject": {
+        "surface": "#[cfg(test)]",
+        "root": "#[cfg(test)]",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test атрибуты",
+        "root": "test атрибуты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_370"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`#[cfg(test)]` атрибуты — модулді **тек `cargo test` ішінде** құрастыруды білдіретін атрибут. Әдеттегі құрастыруда (`cargo build`/`cargo run`) бұл модуль орындалатын файлға қосылмайды. **Артықшылықтары:** (1) тест коды оқырманға қол жетімді; (2) шығарылым бағдарламасын үлкейтпейді; (3) тест-only тәуелділіктерді тек `[dev-dependencies]`-да жариялауға болады. Идиоматикалық қолдану: `#[cfg(test)] mod tests { use super::*; #[test] fn ... }`."
+    },
+    {
+      "subject": {
+        "surface": "mod tests блогы",
+        "root": "mod tests блогы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test ұйымдастыруы",
+        "root": "test ұйымдастыруы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_371"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`mod tests` блогы — сынақтарды ұйымдастыратын модуль идиомасы. Әдетте файлдың соңында `#[cfg(test)] mod tests { use super::*; ... }` түрінде орналастырылады. **Шарт емес, бірақ идиоматикалық:** Rust қауымдастығы осы үлгіні ұстанады. `use super::*;` арқылы ата-модульдің барлық элементтерін (мысалы, `add` функциясы) сынақ модуліне енгіземіз. Бірлік тесттері тек өз модульдегі функцияларды тексереді; интеграциялық тесттер `tests/` қалтасында бөлек."
+    },
+    {
+      "subject": {
+        "surface": "assert! макросы",
+        "root": "assert! макросы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test макросы",
+        "root": "test макросы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_372"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`assert!` макросы — шарт `true` болуын тексеретін макрос. `false` болса — panic. Қолдану: `assert!(condition);` немесе `assert!(condition, \"хабарлама форматпен {}\", arg);`. Кез келген логикалық өрнекті тексеруге болады: `assert!(larger.can_hold(&smaller))`. **Қашан қолданылады:** қарапайым шарт қажет, екі мәнді салыстыру керек емес. Күрделі салыстыруға `assert_eq!`/`assert_ne!` ыңғайлы (қатесінде екі мәнді көрсетеді)."
+    },
+    {
+      "subject": {
+        "surface": "assert_eq",
+        "root": "assert_eq",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test макросы",
+        "root": "test макросы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_373"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`assert_eq!` пен `assert_ne!` макростары — мәндерді салыстырып, тең / тең емес болуын тексереді. **`assert_eq!(left, right)`** — тең болса өтеді; тең емес болса panic + **екі мәнді де экранға басады**: `assertion `left == right` failed / left: 4 / right: 5`. **`assert_ne!(left, right)`** — тең емес болса өтеді. `assert!(a == b)`-тан артықшылығы: қатесінде көрнектілік. Нақты vs күтілген — қатені жөндеуге өте ыңғайлы."
+    },
+    {
+      "subject": {
+        "surface": "partialeq debug талабы",
+        "root": "partialeq debug талабы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test ережесі",
+        "root": "test ережесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_374"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`PartialEq` + `Debug` талабы — `assert_eq!` / `assert_ne!` өзіңіздің құрылымдарыңызда жұмыс істеуі үшін екі трейтті бекіту керек. **`PartialEq`** — мәндерді теңдеу үшін; **`Debug`** — қате жағдайында мәндерді басып шығару үшін. Идиома: `#[derive(PartialEq, Debug)] struct MyStruct { ... }` — бір қатарда екеуін де автоматты бекіту. `derive` болмаса — компилятор қате шығарады: «`MyStruct` `PartialEq` бекітпеген» немесе «`MyStruct` `Debug` бекітпеген»."
+    },
+    {
+      "subject": {
+        "surface": "сынақ хабарламасы",
+        "root": "сынақ хабарламасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test идиомасы",
+        "root": "test идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_375"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сынақ хабарламасын форматтау — `assert!`, `assert_eq!`, `assert_ne!` макростары `format!`-қа ұқсас екінші аргументті қабылдайды. Мысалы: `assert!(result.contains(\"Айнұр\"), \"Хабарлама атпен басталмады. Нақты: `{}`\", result);` — қате болса осы хабарлама экранға шығады, нақты `result` мәні де көрсетіледі. **Артықшылығы:** қатені жөндеу әлдеқайда жеңіл — стандартты «assertion failed» хабарламасының орнына нақты контекст. Идиома: күрделі сынақтарда хабарлама қою — болашақ оқырманға (өзіңіз қоса) сыйлық."
+    },
+    {
+      "subject": {
+        "surface": "should_panic",
+        "root": "should_panic",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test атрибуты",
+        "root": "test атрибуты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_376"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`#[should_panic]` атрибуты — сынақтың **panic-қа баруын күтетін** атрибут. Сынақ panic-қа бармаса — кетеді; panic-қа барса — өтеді. Қолдану: қате жағдайын тексеру — мысалы, `Guess::new(200)` 1-100 диапазонынан тыс мәнге panic жасауы керек. Идиома: `#[test] #[should_panic] fn greater_than_100() { Guess::new(200); }`. **Кемшілік:** тым кең — кез келген panic сай келеді, тіпті сіз күтпеген қате (мысалы, `unwrap` `None`-та). Нақтырақ ету үшін `expected` параметрі бар."
+    },
+    {
+      "subject": {
+        "surface": "should_panic expected",
+        "root": "should_panic expected",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test атрибуты",
+        "root": "test атрибуты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_377"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`#[should_panic(expected = \"...\")]` — `should_panic`-тың нақты нұсқасы: panic хабарламасында берілген жол **бөлікше** ретінде болуы керек. Мысалы: `#[should_panic(expected = \"1 мен 100 арасында\")]`. Panic хабарламасында «1 мен 100 арасында» сөзі болғанда ғана сынақ өтеді. Басқа себептен panic болса (мысалы, `unwrap` басқа жерде) — сынақ кетеді. **Артықшылығы:** сынақ нақты қандай қатеге арналғанын құжаттайды; жалған сәтті жасырмайды."
+    },
+    {
+      "subject": {
+        "surface": "сынақта result",
+        "root": "сынақта result",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test шаблоны",
+        "root": "test шаблоны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_378"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сынақта `Result<T, E>` қайтару — сынақ функциясы `Result` қайтаратындай етіп жазуға болады: `#[test] fn it_works() -> Result<(), String> { if 2+2 == 4 { Ok(()) } else { Err(String::from(\"...\")) } }`. **Артықшылығы:** `?` операторын қолдануға болады — көп әрекетті тізбектегенде ыңғайлы (мысалы, файл оқу + парсу + тексеру). Қате болса `?` `Err` қайтарады, сынақ кетеді. **Шектеу:** `should_panic` атрибутын `Result` қайтаратын сынаққа қолдануға **болмайды** — себебі сынақ `Err` қайтаруы керек, panic-тан тыс шарт өзінде бар."
+    },
+    {
+      "subject": {
+        "surface": "параллельді сынақтар",
+        "root": "параллельді сынақтар",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test басқаруы",
+        "root": "test басқаруы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_379"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Параллельді vs дәйекті сынақтар — `cargo test` әдепкі бойынша сынақтарды **бөлек ағындарда параллельді** жүгіртеді (жылдам). **Кемшілік:** ортақ файлмен жұмыс істейтін сынақтар бір-бірін кедергі жасауы мүмкін; ортақ ортаға айнымалылар әсер етуі ықтимал; буфер шығармаларынан бөтен әсер шығып кетеді. **Параллельдікті өшіру:** `cargo test -- --test-threads=1` — барлық сынақтар бірден бір ағында дәйекті жүгіреді. Баяуырақ, бірақ бір-біріне әсер ету мүмкіндігі жоқ. Идиома: ортақ ресурсқа тәуелді сынақтарды әртүрлі файлдарға бөліп немесе `--test-threads=1` арқылы."
+    },
+    {
+      "subject": {
+        "surface": "show-output жалаушасы",
+        "root": "show-output жалаушасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test жалаушасы",
+        "root": "test жалаушасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_380"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`show-output` жалаушасы — өткен сынақтың `println!`-ден шыққан мәтінін көру. Әдепкі бойынша өткен сынақтың шығарулары **басылмайды** (тек өту/кету көрсетіледі); кеткен сынақтың шығарулары әрқашан көрінеді. Барлық шығаруды (өткендердікі де) көру: `cargo test -- --show-output`. **Қашан керек:** жөндеу барысында — `println!`-мен мәндерді тексеру; немесе сынақ дұрыс жүгіретінін, бірақ дұрыс мәнді басатынын тексеру. Идиома: тестті жазғанда `println!`-мен мәндерді басып шығарып, `--show-output` арқылы көріп, дұрыс болғанда `assert_eq!`-ке көшу."
+    },
+    {
+      "subject": {
+        "surface": "сынақ фильтрі",
+        "root": "сынақ фильтрі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test басқаруы",
+        "root": "test басқаруы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_381"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сынақ фильтрі (test name filter) — `cargo test` командасына атау аргумент ретінде беріп, тек белгілі бір сынақтарды жүгірту. **Substring-сай** — атының құрамына ұқсас барлық сынақтар жүгіреді. Мысалдары: `cargo test it_works` — тек `it_works` сынағы; `cargo test add` — аты `add`-пен басталатын барлығы (`add_two`, `adds_correctly`, т.б.); `cargo test tests::it` — модуль ішіндегі «it» сөзі бар сынақтар. Идиома: бір нақты сынақты жөндегенде — атын аргумент ретінде беру; жылдам итерация үшін."
+    },
+    {
+      "subject": {
+        "surface": "#[ignore]",
+        "root": "#[ignore]",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test атрибуты",
+        "root": "test атрибуты",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_382"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`#[ignore]` атрибуты — сынақты әдепкі бойынша **жүгіртпеу**. `cargo test` командасы оны өткізіп жібереді; қорытындыда «ignored» деп есептеледі. Қашан қолданылады: ұзақ сынақтар (30 секунд+, желілік қатынас, үлкен дерекқор) — әр өзгертіс кейін емес, тек CI-да жүгіреді. Идиома: `#[test] #[ignore] fn expensive_test() { ... }`. **Жүгірту:** `cargo test -- --ignored` (тек белгіленгендерді) немесе `cargo test -- --include-ignored` (барлығын, елемегендерді қоса)."
+    },
+    {
+      "subject": {
+        "surface": "ignored жалаушасы",
+        "root": "ignored жалаушасы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test жалаушасы",
+        "root": "test жалаушасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_383"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`ignored` жалаушасы — `#[ignore]` атрибутымен белгіленген сынақтарды жүгірту тәсілдері. **`--ignored`** — **тек** белгіленгендерді: `cargo test -- --ignored`. Қашан қолданылады: ұзақ сынақтарды арнайы жүгірткің келгенде. **`--include-ignored`** — барлығын (қарапайым + елемегендерді қоса): `cargo test -- --include-ignored`. Қашан керек: CI pipeline-да барлық сынақты жүгірту керек болса. Идиома: жылдам итерация үшін әдепкі `cargo test`; CI-да `--include-ignored`."
+    },
+    {
+      "subject": {
+        "surface": "бірлік тесттері",
+        "root": "бірлік тесттері",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test түрі",
+        "root": "test түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_384"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бірлік тесттері (unit tests) — бір модульге шектелген, ішкі логиканы тексеретін сынақтар. Сол модуль ішінде `#[cfg(test)] mod tests { use super::*; ... }` блогы арқылы орналастырылады. **Артықшылықтары:** (1) **жасырын функцияларды тексере алады** — `tests` модулі сол модульдің ішінде тұрғандықтан, `pub` емес функцияларға қол жеткізе алады; (2) ішкі логиканы сыртқа шығармай тексеру; (3) `cargo test` барысында бөлек блокта көрсетіледі. Мысалы: `pub fn add_two(a: i32) -> i32 { internal_adder(a, 2) }` — `internal_adder` жасырын, бірақ оны тестке қол жетімді."
+    },
+    {
+      "subject": {
+        "surface": "интеграциялық тесттер",
+        "root": "интеграциялық тесттер",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test түрі",
+        "root": "test түрі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_385"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Интеграциялық тесттер (integration tests) — кітапхана сандығын **сыртқы пайдаланушы сияқты** қолданатын жеке файлдар. Жобаның түбіріндегі **`tests/`** қалтасында тұрады. Cargo сол қалтаны автоматты түрде интеграциялық тесттер деп қарастырады. Әрбір `tests/X.rs` файлы — өзінің бөлек сандығы. Сондықтан кітапхананы `use mycrate::add_two` арқылы жариялаймыз — `super` арқылы емес. **Шектеу:** жасырын функцияларға кірудің мүмкіндігі жоқ — тек ашық интерфейс. Мақсаты: бөліктер бір-бірімен бірге жұмыс істейтінін, кітапхананың сыртқы интерфейсі дұрыс болатынын тексеру."
+    },
+    {
+      "subject": {
+        "surface": "tests/common/mod.rs",
+        "root": "tests/common/mod.rs",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test идиомасы",
+        "root": "test идиомасы",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_386"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "`tests/common/mod.rs` — интеграциялық тесттерде ортақ көмекші кодты ұстайтын файл идиомасы. Жай ғана `tests/common.rs` жасасаңыз — Cargo оны өздігінен тест ретінде жүгіртеді (қажетсіз). Сондықтан Rust шарты бойынша ортақ кодты `tests/common/mod.rs` файлында ұстайды — Cargo бұл файлды модуль деп қарап, тест ретінде жүгіртпейді. Қолдану: `tests/integration_test.rs` ішінде `mod common; ... common::setup();`. Идиома: бірнеше интеграциялық тестке ортақ дайындау логикасы (мысалы, фикстура, моки) `tests/common/`-да."
+    },
+    {
+      "subject": {
+        "surface": "екілік сандыққа тест",
+        "root": "екілік сандыққа тест",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "test шаблоны",
+        "root": "test шаблоны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/programming_rust",
+      "source": {
+        "pack": "world_core/programming_rust.jsonl",
+        "sample_id": "rust_387"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Екілік сандыққа интеграциялық тест — паттерн. Жоба тек `src/main.rs`-те екілік сандық болса — `tests/` қалтасынан функциялар импорттай **алмайсыз** (екілік сандық кітапхана емес). **Шешім:** Rust қауымдастығы кодтың көп бөлігін `src/lib.rs`-ке шығарып, `src/main.rs`-те **тек оны шакыратын тонкый қабат** қалдырады: `fn main() { if let Err(e) = my_app::run() { eprintln!(\"{}\", e); std::process::exit(1); } }`. Бар басты логика `src/lib.rs`-та; интеграциялық тестер сол кітапхана сандығына қол жеткізе алады. **Артықшылықтары:** тестелетіндік + кітапхана ретінде басқа жобаларда қайта пайдалану + main код қарапайым."
     },
     {
       "subject": {

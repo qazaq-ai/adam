@@ -7,6 +7,66 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.84.0] — 2026-05-06 — Rust Book chapter 11 deepening — automated tests
+
+Per-chapter pedagogical cadence continues. Chapter 11 introduces Rust's first-class testing infrastructure — tests are part of the language, every project ships with `cargo test`. Previously surface-level — only 1 stub (`cargo test`). Now deepened with full curriculum.
+
+### What's added
+
+**19 new curated entries `rust_369…387`** in `programming_rust.jsonl`:
+
+**Writing tests (10):** `#[test]` attribute, `#[cfg(test)]`, `mod tests` block, `assert!` macro, `assert_eq!`/`assert_ne!`, `PartialEq`+`Debug` derive requirement, custom test messages via format strings, `#[should_panic]`, `#[should_panic(expected = ...)]`, Result-returning tests with `?` operator.
+
+**Running tests (5):** parallel vs sequential (`--test-threads=1`), `--show-output`, name filtering (substring match), `#[ignore]` attribute, `--ignored`/`--include-ignored`.
+
+**Organizing tests (4):** unit tests (same-file, can test private), integration tests (`tests/` folder), `tests/common/mod.rs` shared helpers idiom, binary crate testing pattern (lib.rs + main.rs thin layer).
+
+Each entry: Kazakh definition + concrete code example.
+
+### Stub deepened in-place (1)
+
+- `rust_107` (cargo test) — full command semantics + flag separation `--`.
+
+### Subject naming corrections
+
+- `rust_380` from `--show-output` to `show-output жалаушасы` (FST `--` prefix interaction).
+- `rust_383` from `--ignored` to `ignored жалаушасы` (same).
+- `rust_381` from `сынақ атымен таңдау` to `сынақ фильтрі` (the «атымен» token triggered self-introduction intent «менің атым адам»).
+
+### Per-chapter test (continues invariant)
+
+- `data/eval/rust_book_chapter_11_holdout.json` — 20 cases, 3 categories (`ch11_writing`, `ch11_running`, `ch11_organizing`).
+- `crates/adam-dialog/tests/rust_book_chapter_11.rs` — **100 % floor**.
+
+### Topic extraction extensions
+
+- `MULTIWORD_ENTITIES` += 28 compounds.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 20 / 20 chapter 11 holdout cases | ✅ 100 % |
+| Existing chapters 1-10 + cross-cutting `rust_holdout` | ✅ unchanged |
+| Workspace tests | **987 passing** (was 986; +1 chapter-11 test) |
+| `cargo clippy -D warnings` | green |
+| world_core entries | 2681 → **2700** (+19) |
+| world_core facts | 2923 → **2942** (+19) |
+| Derived facts | 30830 → **30846** (+16) |
+
+### Roadmap (next)
+
+| Release | Chapter | Topic |
+|---|---|---|
+| **v4.84.0** | **ch. 11** | **Tests (this release)** |
+| v4.84.5 | ch. 12 | CLI minigrep project (TDD-style end-to-end app) |
+| v4.85.0 | ch. 14 | Cargo + Crates.io deeper (publishing / workspaces / docs / profiles) |
+| v4.85.5 | ch. 15 | Smart pointers (Box / Rc / Arc / RefCell / Mutex / Weak / cycles / Drop) |
+| v4.86.0 | ch. 16 | Concurrency (threads / channels / Send+Sync) |
+| … | … | … through ch. 20 (web server) |
+
+Cadence: `.0` minor — 19 new + 1 deepened stub + 3 subject renames; chapter 11 closes the testing toolkit (essential for every Rust project). Stripe — Kazakh school tutor + Rust curriculum.
+
 ## [4.83.5] — 2026-05-06 — Rust Book chapter 10 deepening — generics + traits + lifetimes
 
 Per-chapter pedagogical cadence continues. Chapter 10 is the most important chapter after ownership — Rust's three abstraction layers (types, behavior, lifetime) brought together. Previously surface-level — 2 one-line stubs (Тіршілік мерзімі / Трейт). Now deepened with full curriculum.

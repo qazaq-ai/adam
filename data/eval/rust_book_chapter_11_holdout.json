@@ -1,0 +1,29 @@
+{
+  "_comment": "v4.84.0 — Rust Book Chapter 11 (Автоматты сынақтар жазу) holdout. 20 natural Kazakh queries against rust_369…387 + 1 deepened stub (rust_107 cargo test). Categories: ch11_writing (#[test], #[cfg(test)], mod tests, assert!, assert_eq!, PartialEq+Debug, message format, should_panic, should_panic-expected, Result-returning), ch11_running (parallel/sequential, --show-output, name filter, #[ignore], --ignored), ch11_organizing (unit tests, integration tests, tests/common/mod.rs, binary crate testing pattern). Subject naming: '--show-output' / '--ignored' renamed to 'show-output жалаушасы' / 'ignored жалаушасы' to bypass `--` prefix issue in topic extraction.",
+  "version": "v4.84.0",
+  "captured_date": "2026-05-06",
+  "chapter": 11,
+  "chapter_title": "Автоматты сынақтар жазу (#[test] / assert! / cargo test / unit + integration)",
+  "cases": [
+    {"id": "ch11_cargo_test", "category": "ch11_writing", "query": "cargo test деген не?", "any_substring": ["#[test]", "параллельді", "ci pipeline"]},
+    {"id": "ch11_test_attr", "category": "ch11_writing", "query": "#[test] атрибуты деген не?", "any_substring": ["сынақ ретінде", "panic-қа барса", "result<()"]},
+    {"id": "ch11_cfg_test", "category": "ch11_writing", "query": "#[cfg(test)] деген не?", "any_substring": ["тек `cargo test`", "dev-dependencies", "шығарылым"]},
+    {"id": "ch11_mod_tests", "category": "ch11_writing", "query": "mod tests блогы деген не?", "any_substring": ["use super::*;", "идиоматикалық", "интеграциялық"]},
+    {"id": "ch11_assert", "category": "ch11_writing", "query": "assert! макросы деген не?", "any_substring": ["true", "panic", "can_hold"]},
+    {"id": "ch11_assert_eq", "category": "ch11_writing", "query": "assert_eq деген не?", "any_substring": ["assertion `left == right` failed", "екі мәнді де экранға", "left: 4"]},
+    {"id": "ch11_partialeq_debug", "category": "ch11_writing", "query": "PartialEq Debug талабы деген не?", "any_substring": ["#[derive(partialeq, debug)]", "теңдеу үшін", "басып шығару"]},
+    {"id": "ch11_test_message", "category": "ch11_writing", "query": "Сынақ хабарламасы деген не?", "any_substring": ["format!", "айнұр", "контекст"]},
+    {"id": "ch11_should_panic", "category": "ch11_writing", "query": "should_panic деген не?", "any_substring": ["panic-қа баруын күтетін", "guess::new(200)", "тым кең"]},
+    {"id": "ch11_should_panic_expected", "category": "ch11_writing", "query": "should_panic expected деген не?", "any_substring": ["1 мен 100 арасында", "бөлікше", "құжаттайды"]},
+    {"id": "ch11_test_result", "category": "ch11_writing", "query": "Сынақта Result деген не?", "any_substring": ["?", "result<(), string>", "should_panic-қа болмайды"]},
+    {"id": "ch11_parallel", "category": "ch11_running", "query": "Параллельді сынақтар деген не?", "any_substring": ["--test-threads=1", "ортақ файлмен", "дәйекті жүгіреді"]},
+    {"id": "ch11_show_output", "category": "ch11_running", "query": "show-output жалаушасы деген не?", "any_substring": ["println!", "өткен сынақтың", "жөндеу"]},
+    {"id": "ch11_name_filter", "category": "ch11_running", "query": "Сынақ фильтрі деген не?", "any_substring": ["substring", "cargo test it_works", "tests::it"]},
+    {"id": "ch11_ignore_attr", "category": "ch11_running", "query": "#[ignore] деген не?", "any_substring": ["әдепкі бойынша **жүгіртпеу**", "expensive_test", "30 секунд"]},
+    {"id": "ch11_ignored_flag", "category": "ch11_running", "query": "ignored жалаушасы деген не?", "any_substring": ["--ignored", "--include-ignored", "ci pipeline"]},
+    {"id": "ch11_unit_tests", "category": "ch11_organizing", "query": "Бірлік тесттері деген не?", "any_substring": ["жасырын функцияларды", "internal_adder", "сол модуль ішінде"]},
+    {"id": "ch11_integration_tests", "category": "ch11_organizing", "query": "Интеграциялық тесттер деген не?", "any_substring": ["tests/", "сыртқы пайдаланушы", "ашық интерфейс"]},
+    {"id": "ch11_common_mod", "category": "ch11_organizing", "query": "tests/common/mod.rs деген не?", "any_substring": ["ортақ көмекші", "өздігінен тест ретінде", "фикстура"]},
+    {"id": "ch11_binary_test", "category": "ch11_organizing", "query": "Екілік сандыққа тест деген не?", "any_substring": ["src/lib.rs", "тонкый қабат", "my_app::run"]}
+  ]
+}
