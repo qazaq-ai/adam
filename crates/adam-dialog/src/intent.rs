@@ -250,6 +250,21 @@ pub enum Intent {
     /// surfaces an explicit purpose-framed answer.
     AskPurpose { topic: Option<String> },
 
+    /// **v4.96.0** — Codex round-2 audit Bug 7. User asks whether a
+    /// Rust technical concept exists / behaves the same in another
+    /// language. Surface forms: «Python-да ownership бар ма?»,
+    /// «Java-да lifetime деген ұғым бар ма?», «JavaScript-те
+    /// async/await бар ма?». Pre-v4.96.0 these queries surfaced
+    /// the Rust definition without contrast — wrong answer for
+    /// students learning the cross-language distinction. Routes
+    /// to a dedicated `cross_language_contrast` template family
+    /// that explicitly contrasts Rust's behaviour vs the other
+    /// language, sourcing the contrast text from a curated map.
+    CrossLanguageContrast {
+        other_language: String,
+        rust_concept: String,
+    },
+
     /// **v4.95.0** — student submits a Rust solution for verification.
     /// Triggered when the input contains a triple-backtick code
     /// block (markdown convention) AND adam can extract a syntactic

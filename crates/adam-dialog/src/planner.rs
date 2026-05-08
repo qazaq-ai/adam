@@ -99,6 +99,47 @@ pub fn plan_response_with_session(
         };
         trace.push(format!("planner: SubmitSolution sub-key → {key}"));
     }
+    // **v4.96.0** — Codex round-2 audit Bug 2 fix. Pedagogical
+    // sub-routing (mirror of plan_response_with_epistemic block).
+    // Pre-fix `template_is_fillable` accepted both topic-bearing
+    // and clarification variants in one family, so 40 % of seeds
+    // routed wrong. Now route by slot presence.
+    if matches!(intent, Intent::AskExercise { .. }) {
+        key = if slots.contains_key("topic") && slots.contains_key("exercise_body") {
+            "ask_exercise.with_topic"
+        } else {
+            "ask_exercise.no_topic"
+        };
+        trace.push(format!("planner: AskExercise sub-key → {key}"));
+    } else if matches!(intent, Intent::CodeRequest { .. }) {
+        key = if slots.contains_key("topic") && slots.contains_key("code_snippet") {
+            "code_request.with_topic"
+        } else {
+            "code_request.no_topic"
+        };
+        trace.push(format!("planner: CodeRequest sub-key → {key}"));
+    } else if matches!(intent, Intent::ExplainCompilerError { .. }) {
+        key = if slots.contains_key("error_explanation") {
+            "explain_compiler_error.with_explanation"
+        } else {
+            "explain_compiler_error.no_explanation"
+        };
+        trace.push(format!("planner: ExplainCompilerError sub-key → {key}"));
+    } else if matches!(intent, Intent::AskPurpose { .. }) {
+        key = if slots.contains_key("topic") && slots.contains_key("purpose_body") {
+            "ask_purpose.with_topic"
+        } else {
+            "ask_purpose.no_topic"
+        };
+        trace.push(format!("planner: AskPurpose sub-key → {key}"));
+    } else if matches!(intent, Intent::CrossLanguageContrast { .. }) {
+        key = if slots.contains_key("contrast_body") {
+            "cross_language_contrast.with_body"
+        } else {
+            "cross_language_contrast.no_body"
+        };
+        trace.push(format!("planner: CrossLanguageContrast sub-key → {key}"));
+    }
     if !slots.is_empty() {
         trace.push(format!("planner: slots={slots:?}"));
     }
@@ -719,6 +760,14 @@ pub fn plan_response_with_epistemic(
     // key to the matching sub-family. Done here (after slot
     // extraction) because the sub-key depends on the verifier
     // outcome, which only materialises in extract_slots.
+    //
+    // **v4.96.0** — Codex round-2 audit Bug 2 fix: same sub-routing
+    // pattern for ask_exercise / code_request / explain_compiler_error
+    // / ask_purpose. Pre-fix `template_is_fillable` accepted both
+    // topic-bearing AND clarification variants in one family, so
+    // 40 % of seeds picked the clarification template even when a
+    // topic was set. Now each pedagogical family is split into
+    // `.with_*` / `.no_*` sub-families and routed by slot presence.
     let key: &str = if matches!(intent, Intent::SubmitSolution { .. }) {
         let new_key = match slots.get("cargo_status").map(String::as_str) {
             Some("passed") => "submit_solution.passed",
@@ -730,6 +779,48 @@ pub fn plan_response_with_epistemic(
             _ => "submit_solution.env_error",
         };
         trace.push(format!("planner: SubmitSolution sub-key → {new_key}"));
+        new_key
+    } else if matches!(intent, Intent::AskExercise { .. }) {
+        let new_key = if slots.contains_key("topic") && slots.contains_key("exercise_body") {
+            "ask_exercise.with_topic"
+        } else {
+            "ask_exercise.no_topic"
+        };
+        trace.push(format!("planner: AskExercise sub-key → {new_key}"));
+        new_key
+    } else if matches!(intent, Intent::CodeRequest { .. }) {
+        let new_key = if slots.contains_key("topic") && slots.contains_key("code_snippet") {
+            "code_request.with_topic"
+        } else {
+            "code_request.no_topic"
+        };
+        trace.push(format!("planner: CodeRequest sub-key → {new_key}"));
+        new_key
+    } else if matches!(intent, Intent::ExplainCompilerError { .. }) {
+        let new_key = if slots.contains_key("error_explanation") {
+            "explain_compiler_error.with_explanation"
+        } else {
+            "explain_compiler_error.no_explanation"
+        };
+        trace.push(format!("planner: ExplainCompilerError sub-key → {new_key}"));
+        new_key
+    } else if matches!(intent, Intent::AskPurpose { .. }) {
+        let new_key = if slots.contains_key("topic") && slots.contains_key("purpose_body") {
+            "ask_purpose.with_topic"
+        } else {
+            "ask_purpose.no_topic"
+        };
+        trace.push(format!("planner: AskPurpose sub-key → {new_key}"));
+        new_key
+    } else if matches!(intent, Intent::CrossLanguageContrast { .. }) {
+        let new_key = if slots.contains_key("contrast_body") {
+            "cross_language_contrast.with_body"
+        } else {
+            "cross_language_contrast.no_body"
+        };
+        trace.push(format!(
+            "planner: CrossLanguageContrast sub-key → {new_key}"
+        ));
         new_key
     } else {
         key
@@ -935,6 +1026,22 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
             }
         }
         Intent::AskPurpose { topic: None } => {}
+        // **v4.96.0** — Codex round-2 audit Bug 7. Cross-language
+        // contrast slots — populate `{other_language}` / `{rust_concept}`
+        // for the template, plus `{contrast_body}` when curated content
+        // exists.
+        Intent::CrossLanguageContrast {
+            other_language,
+            rust_concept,
+        } => {
+            slots.insert("other_language".into(), other_language.clone());
+            slots.insert("rust_concept".into(), rust_concept.clone());
+            if let Some(body) =
+                crate::pedagogical::cross_language_contrast(other_language, rust_concept)
+            {
+                slots.insert("contrast_body".into(), body.into());
+            }
+        }
         // **v4.95.0** — student submission. Run cargo_verify
         // synchronously and populate slots. cargo check is slow
         // (~1-2 s real-world) — there's no async boundary here, the
@@ -1352,6 +1459,12 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         // cargo_verify — passed / failed_known / failed_unknown /
         // env_error.
         Intent::SubmitSolution { .. } => "submit_solution",
+        // **v4.96.0** — Codex round-2 audit Bug 7. Sub-key remap
+        // happens later (in plan_response_with_session and
+        // plan_response_with_epistemic) based on whether a curated
+        // contrast text exists for the (other_language, rust_concept)
+        // pair.
+        Intent::CrossLanguageContrast { .. } => "cross_language_contrast",
         Intent::Unknown {
             raw_tokens,
             noun_hint,

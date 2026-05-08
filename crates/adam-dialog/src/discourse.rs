@@ -243,6 +243,42 @@ const RUSSIAN_MARKERS: &[&str] = &[
     "поэтому",
     "сейчас",
     "сегодня",
+    // **v4.96.0** — Codex round-2 audit Bug 6 fix. Real REPL test
+    // 2026-05-07: «Расскажи про Rust» passed through as Rust topic
+    // answer because the pre-fix marker list missed Russian
+    // imperative verbs and prepositions. Adding common request /
+    // explanation prefixes that students typically use to violate
+    // the Kazakh-only directive.
+    "расскажи",
+    "расскажите",
+    "скажи",
+    "скажите",
+    "объясни",
+    "объясните",
+    "покажи",
+    "покажите",
+    "помоги",
+    "помогите",
+    "напиши",
+    "напишите",
+    "дай",
+    "дайте",
+    "про",
+    "для",
+    "из",
+    "при",
+    "над",
+    "под",
+    "перед",
+    "между",
+    "через",
+    "хочу",
+    "могу",
+    "буду",
+    "был",
+    "были",
+    "есть",
+    "нет",
 ];
 
 /// **v4.6.12** — surface-level Russian-input detection. Real-REPL

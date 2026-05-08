@@ -328,6 +328,9 @@ pub enum IntentKind {
     AskPurpose,
     /// **v4.95.0** — student submits Rust code for verification via cargo_verify.
     SubmitSolution,
+    /// **v4.96.0** — Codex round-2 audit Bug 7. Cross-language
+    /// contrast: «Python-да ownership бар ма?».
+    CrossLanguageContrast,
     Unknown,
 }
 
@@ -371,6 +374,7 @@ impl From<&Intent> for IntentKind {
             Intent::ExplainCompilerError { .. } => Self::ExplainCompilerError,
             Intent::AskPurpose { .. } => Self::AskPurpose,
             Intent::SubmitSolution { .. } => Self::SubmitSolution,
+            Intent::CrossLanguageContrast { .. } => Self::CrossLanguageContrast,
             Intent::Unknown { .. } => Self::Unknown,
         }
     }
@@ -1787,6 +1791,30 @@ impl Conversation {
         for (subject, predicate) in pending {
             if self.belief.dismiss_contradiction(&subject, &predicate) {
                 any_dismissed = true;
+                // **v4.96.0** — Codex round-2 audit Bug 1 fix:
+                // sync session profile slots with belief after
+                // dismissal. Pre-fix `belief` correctly cleared
+                // the disputed value, but `session.{predicate}`
+                // stayed populated, so the next `Ask{Predicate}`
+                // turn surfaced the stale value. Belief is now
+                // single source of truth — clear matching session
+                // slot when the dismissal targets a profile field.
+                // (USER_SELF_KEY is the standard subject for user-
+                // profile facts; only sync session for those.)
+                if subject == crate::belief::USER_SELF_KEY {
+                    let slot_key = predicate.as_str();
+                    self.session.remove(slot_key);
+                    // Side slots that derive from the predicate.
+                    if predicate == "city" {
+                        self.session.remove("city_id");
+                        self.session.remove("geo_kind");
+                    }
+                    if predicate == "name" {
+                        self.session.remove("name_id");
+                        self.session.remove("name_respect");
+                        self.session.remove("name_respect_distinct");
+                    }
+                }
             }
         }
         any_dismissed

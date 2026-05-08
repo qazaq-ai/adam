@@ -259,6 +259,78 @@ pub fn code_snippet_for(topic: &str) -> Option<&'static str> {
     }
 }
 
+/// **v4.96.0** — Codex round-2 audit Bug 7: cross-language contrast
+/// content. Returns a curated explanation of how a Rust concept
+/// differs from / corresponds to its analogue in another language.
+/// Lookup key is `(other_language_lowercase, rust_concept_lowercase)`.
+/// None when the pair isn't curated — the planner falls back to a
+/// generic «менде нақты салыстыру жоқ» template.
+pub fn cross_language_contrast(other: &str, concept: &str) -> Option<&'static str> {
+    match (other, concept) {
+        ("python", "ownership") => Some(
+            "Python-да Rust-тағыдай ownership жоқ. Python — garbage-collected тіл: айнымалылар \
+            reference count + cycle detector арқылы тазаланады. Rust-тың иеленуі — статикалық, \
+            компиляцияда тексеріледі; Python-дікі — runtime-да. Performance / safety айырмашылығы: \
+            Rust-та use-after-free / data race компиляция қатесі, ал Python-да runtime-да жасырын.",
+        ),
+        ("python", "borrow") | ("python", "borrowing") => Some(
+            "Python-да Rust-тағы borrow checker жоқ. Python барлық айнымалыны reference түрінде \
+            ұстайды (immutable / mutable айырмашылығы тек тип бойынша); алу-беруге шек жоқ. \
+            Rust-тың `&T` / `&mut T` аралас-аяқ ережесі (бір mutable XOR көп immutable) Python-да \
+            жоқ — concurrent-mutation қаупі бар.",
+        ),
+        ("python", "lifetime") | ("python", "lifetimes") => Some(
+            "Python-да lifetime annotation жоқ. Refcounted object-тер scope-тан шыққанша «тірі»; \
+            scope аяқталысымен GC оларды босатады. Rust-тың lifetime — static type-system бөлігі, \
+            dangling pointer қаупін компиляцияда жояды.",
+        ),
+        ("java", "ownership") => Some(
+            "Java-да Rust-тағыдай ownership жоқ. Java — JVM garbage-collected: барлық object heap-те, \
+            тазалау runtime-да. Rust-тың ownership — статикалық, GC-сіз. Java-да тек «final» reference \
+            бар, ол тек қайта-байланыстыруды (rebinding) шектейді — иеленуді тасымайды.",
+        ),
+        ("java", "lifetime") | ("java", "lifetimes") => Some(
+            "Java-да lifetime annotation жоқ. JVM GC объектінің өмір сүруін runtime-да басқарады. \
+            Rust-тың lifetime — статика; «GC жоқ + dangling pointer-сіз» нәтижесін береді.",
+        ),
+        ("javascript", "async") | ("js", "async") => Some(
+            "JavaScript-те де `async` / `await` бар, бірақ механика айырықша. JS — single-threaded \
+            event loop; Promise-ты «hot» — жасалғанда жұмыс басталады. Rust Future — «cold» / lazy: \
+            тек poll-ден кейін жұмыс істейді. JS Promise execution VM-нің ішінде; Rust Future-ге \
+            executor (tokio) керек.",
+        ),
+        ("javascript", "future") | ("js", "future") => Some(
+            "JS-те `Future` емес, `Promise` — eager (жасалғанда жұмыс басталады), Rust Future — \
+            lazy (тек poll-ден кейін). JS Promise тек single-threaded event loop ішінде, Rust \
+            Future кез-келген executor-да (single немесе multi-thread) орындалады.",
+        ),
+        ("go", "ownership") | ("golang", "ownership") => Some(
+            "Go-да Rust-тағыдай ownership жоқ. Go — GC-language: айнымалылар heap-те, GC оларды \
+            тазалайды. Goroutine-дар бір mutex / channel арқылы синхрондалады, бірақ data race \
+            компиляцияда тексерілмейді (тек race detector runtime-да).",
+        ),
+        ("go", "async") | ("golang", "async") => Some(
+            "Go-да `async / await` синтаксисі жоқ — оның орнына goroutine + channel. `go func()` \
+            жаңа goroutine spawn-дайды (M:N scheduler), ал `chan T` арқылы хабар жіберіледі. \
+            Rust async/await — explicit Future + executor, Go-нікі — implicit goroutine + scheduler. \
+            Семантика жақын, синтаксис өзгеше.",
+        ),
+        ("c++", "ownership") | ("cpp", "ownership") => Some(
+            "C++-та `unique_ptr` / `shared_ptr` бар — Rust-тың `Box<T>` / `Rc<T>`-нің idiomic \
+            аналогтары. Бірақ C++-та compiler ownership-ті ENFORCE етпейді: `std::move` тыс \
+            көшірмелеу әлі мүмкін, dangling reference — runtime UB. Rust-та сондай қателер \
+            компиляцияда табылады.",
+        ),
+        ("c", "ownership") => Some(
+            "C-да ownership концепциясы тілде жоқ. Жадты қолмен `malloc` / `free` арқылы басқару \
+            керек, double-free / use-after-free қателері — runtime UB. Rust ownership дәл осы \
+            мәселелерді шешуге арналған.",
+        ),
+        // Default: empty match → falls back to generic template.
+        _ => None,
+    }
+}
+
 /// Return a curated explanation for a Rust compiler error code
 /// (canonical `E0xxx` uppercase form). None when the error isn't
 /// covered.

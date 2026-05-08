@@ -162,6 +162,16 @@ pub fn interpret_text_with_lexicon(
     if let Some((code, topic)) = detect_submit_solution(input) {
         return Intent::SubmitSolution { code, topic };
     }
+    // **v4.96.0** — Codex round-2 audit Bug 7: cross-language
+    // contrast. Routed BEFORE the other pedagogical detectors so
+    // «Python-да ownership бар ма?» doesn't accidentally match
+    // AskPurpose's «бар» / «ма» on the surrounding ownership token.
+    if let Some((other_language, rust_concept)) = detect_cross_language_contrast(input) {
+        return Intent::CrossLanguageContrast {
+            other_language,
+            rust_concept,
+        };
+    }
     // **v4.93.5** — pedagogical intents (Codex 2026-05-07 audit P2).
     // Routed BEFORE ask-name so «жаттығу беріңіз» / «код жазып
     // беріңіз» / «E0382 қатесін түсіндіріңіз» / «X-нің мақсаты не?»
@@ -1041,16 +1051,134 @@ fn detect_ask_purpose(joined: &str) -> bool {
 /// 5. Topic: re-uses `pedagogical_topic_hint` on the WHOLE input
 ///    (not just the code body) so the surrounding prose can carry
 ///    the topic ("Менің ownership шешімім: ```rust ... ```").
-pub(crate) fn detect_submit_solution(input: &str) -> Option<(String, Option<String>)> {
+/// **v4.96.0** — Codex round-2 audit Bug 7. Detect cross-language
+/// contrast questions: «Python-да ownership бар ма?», «Java-да
+/// lifetime деген ұғым бар ма?». The pattern is:
+///   {NON_RUST_LANGUAGE}-{Locative}? + {RUST_CONCEPT} + {existence/comparison-question}
+/// Returns Some((other_language_canonical, rust_concept_canonical))
+/// when matched.
+pub fn detect_cross_language_contrast(input: &str) -> Option<(String, String)> {
+    let lower = input.to_lowercase();
+    // Step 1: find a non-Rust language token (Latin word).
+    const NON_RUST_LANGS: &[&str] = &[
+        "python",
+        "java",
+        "javascript",
+        "js",
+        "typescript",
+        "ts",
+        "go",
+        "golang",
+        "kotlin",
+        "swift",
+        "ruby",
+        "php",
+        "c",
+        "cpp",
+        "c++",
+        "csharp",
+        "c#",
+        "haskell",
+        "ocaml",
+        "scala",
+        "elixir",
+        "erlang",
+        "clojure",
+    ];
+    let mut other_lang: Option<&'static str> = None;
+    for &lang in NON_RUST_LANGS {
+        // Match as standalone token; cover common Kazakh case
+        // suffixes attached via dash («Python-да» / «Java-да»).
+        let patterns = [
+            format!(" {lang} "),
+            format!(" {lang}-"),
+            format!("{lang}-да"),
+            format!("{lang}-та"),
+            format!("{lang}-де"),
+            format!("{lang}-те"),
+            format!(" {lang}?"),
+            format!(" {lang}."),
+        ];
+        let starts_with_lang = lower.starts_with(&format!("{lang} "))
+            || lower.starts_with(&format!("{lang}-"))
+            || lower == lang;
+        if starts_with_lang || patterns.iter().any(|p| lower.contains(p)) {
+            other_lang = Some(lang);
+            break;
+        }
+    }
+    let other_lang = other_lang?;
+    // Step 2: find a Rust concept word in the same input.
+    const RUST_CONCEPTS: &[&str] = &[
+        "ownership",
+        "borrow",
+        "borrowing",
+        "lifetime",
+        "lifetimes",
+        "trait",
+        "match",
+        "iterator",
+        "future",
+        "async",
+        "await",
+        "pin",
+        "tokio",
+        "stream",
+        "result",
+        "option",
+        "macro",
+        "pattern",
+        "closure",
+    ];
+    let mut concept: Option<&'static str> = None;
+    for &c in RUST_CONCEPTS {
+        if lower.contains(c) && Some(c) != Some(other_lang) {
+            concept = Some(c);
+            break;
+        }
+    }
+    let concept = concept?;
+    // Step 3: existence/comparison question marker.
+    let has_question = lower.contains("бар ма")
+        || lower.contains("бар ма?")
+        || lower.contains("ма?")
+        || lower.contains("ба?")
+        || lower.contains("деген ұғым")
+        || lower.contains("сияқты")
+        || lower.contains("сияқ");
+    if !has_question {
+        return None;
+    }
+    Some((other_lang.to_string(), concept.to_string()))
+}
+
+pub fn detect_submit_solution(input: &str) -> Option<(String, Option<String>)> {
     let start = input.find("```")?;
     let after_open = &input[start + 3..];
     let end_offset = after_open.find("```")?;
     let body_with_tag = &after_open[..end_offset];
     // Strip optional language tag on the first line.
+    //
+    // **v4.96.0** — Codex round-2 audit Bug 4 fix: the pre-fix
+    // logic stripped only when the language tag was followed by a
+    // newline (multi-line block). Single-line «```rust let x=5;```»
+    // kept «rust » as part of the body, which then failed the
+    // Rust-syntax heuristic because of the leading «rust » token
+    // before the actual code. Now strip on whitespace OR newline
+    // — whichever comes first — and treat the prefix tag as
+    // language identifier when it matches.
     let body = if let Some(nl) = body_with_tag.find('\n') {
         let first_line = body_with_tag[..nl].trim().to_lowercase();
         if first_line == "rust" || first_line == "rs" || first_line.is_empty() {
             &body_with_tag[nl + 1..]
+        } else {
+            body_with_tag
+        }
+    } else if let Some(sp) = body_with_tag.find(char::is_whitespace) {
+        // Single-line block with inline language tag.
+        let first_token = body_with_tag[..sp].trim().to_lowercase();
+        if first_token == "rust" || first_token == "rs" {
+            &body_with_tag[sp + 1..]
         } else {
             body_with_tag
         }

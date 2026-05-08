@@ -7,6 +7,86 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.96.0] — 2026-05-08 — Codex 2026-05-07 round-2 audit fixes — 5 bugs closed (seed-leak / inline tag / Russian detector / cross-language contrast / belief-session sync)
+
+Round-2 audit by Codex flagged 7 bugs in v4.95.5 (P0/P1/P2). This release closes the **5** addressable in a single sprint; Bug 3 (REPL multi-line code-block accumulator) and Bug 5 (anaphora resolution for list follow-ups) are deferred to medium-term per agreed roadmap.
+
+### Bug 2 — pedagogical seed-leak (P0)
+
+Pre-fix: 40 % of seeds picked the clarification template even when a topic was set (the template-selection RNG could land on the topic-less variant within the same family). Post-fix: 0 %.
+
+**Fix:** sub-key remap on slot presence — same pattern as `submit_solution.{passed,failed_known,failed_unknown,env_error}` from v4.95.0. Every pedagogical family now splits into `family.with_topic` / `family.no_topic` (or equivalent), so the planner literally cannot pick a clarification template once a topic slot has been bound.
+
+**Touches:**
+- `crates/adam-dialog/src/planner.rs` — sub-key remap added in BOTH `plan_response_with_session` AND `plan_response_with_epistemic` for `AskExercise`, `CodeRequest`, `ExplainCompilerError`, `AskPurpose`, `CrossLanguageContrast`.
+- `data/dialog/templates/v1.toml` — split families: `ask_exercise.{with_topic,no_topic}`, `code_request.{with_topic,no_topic}`, `explain_compiler_error.{with_explanation,no_explanation}`, `ask_purpose.{with_topic,no_topic}`, `cross_language_contrast.{with_body,no_body}`.
+
+### Bug 4 — inline language tag (P1)
+
+«` ```rust let x = 5; ``` `» on a single line was emitting a code body that started with the literal `rust ` token.
+
+**Fix:** `detect_submit_solution` whitespace-split fallback: if the body has no leading newline, peel the first whitespace-separated token when it matches a known language tag.
+
+### Bug 6 — Russian-only refusal (P0)
+
+«Расскажи про Rust» / «Объясните мне ownership» / «Покажи код» surfaced Rust topic answers instead of the non-Kazakh refusal.
+
+**Fix:** `crates/adam-dialog/src/discourse.rs` — `RUSSIAN_MARKERS` extended with imperative + cognate vocabulary: расскажи / расскажите / скажи / скажите / объясни / объясните / покажи / покажите / помоги / помогите / напиши / напишите / дай / дайте / про / для / из / при / над / под / перед / между / через / хочу / могу / буду / был / были / есть / нет.
+
+### Bug 7 — cross-language contrast intent (P1)
+
+«Python-да ownership бар ма?» surfaced the Rust ownership definition without contrast. New intent surfaces curated, language-aware comparisons.
+
+**Added:** `Intent::CrossLanguageContrast { other_language, rust_concept }` (intents 38 → **39**); `detect_cross_language_contrast` recogniser; `pedagogical::cross_language_contrast(other, concept)` curated content for {python, java, javascript, go, c++, c} × {ownership, borrow, lifetime, async, future}; `cross_language_contrast.{with_body,no_body}` template family.
+
+### Bug 1 — belief-session sync on dismissal (P0)
+
+After `try_dismiss_pending_contradiction` accepted a profile statement, the belief layer updated but `session` still held the stale slot value. Subsequent turns that read from `session` (e.g. greet-by-name) used the old value.
+
+**Fix:** `crates/adam-dialog/src/conversation.rs` — when the dismissed predicate targets `USER_SELF_KEY`, also clear the corresponding session slot (and its derived sidecars: `city_id` / `geo_kind` for `city`; `name_id` / `name_respect` / `name_respect_distinct` for `name`).
+
+### Regression tests
+
+[`crates/adam-dialog/tests/codex_round2_v4960.rs`](crates/adam-dialog/tests/codex_round2_v4960.rs) — 10 new tests:
+1. `ask_exercise_with_topic_never_routes_to_clarification` (50 seeds × 0 clarify hits)
+2. `code_request_with_topic_never_routes_to_clarification`
+3. `ask_purpose_with_topic_never_routes_to_clarification`
+4. `explain_compiler_error_with_code_never_clarify`
+5. `topicless_pedagogical_intents_route_to_clarification` (negative: when topic IS None, clarify is correct)
+6. `detect_submit_solution_strips_inline_rust_tag`
+7. `russian_imperative_routes_to_non_kazakh_refusal` (3 positive + 1 negative)
+8. `cross_language_contrast_detected_python_ownership`
+9. `cross_language_contrast_detected_java_lifetime`
+10. `cross_language_contrast_negative_pure_rust_query`
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 10 / 10 Codex round-2 regression tests | ✅ 100 % |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1018 passing** + 11 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Deferred to medium-term
+
+- **Bug 3** — REPL multi-line code-block accumulator (single-turn input doesn't carry across newlines yet).
+- **Bug 5** — anaphora resolution for list follow-ups («осы тізімнің біріншісі» / «сол жасатын жаттығу» refer to last-emitted list).
+
+Both require dialog-state extensions beyond a single sprint.
+
+### End-to-end demo (cross-language contrast)
+
+```
+[Student]  Python-да ownership бар ма?
+[adam]     Python-да ownership ұғымы жоқ — олардың орнына reference counting +
+           garbage collector қолданылады. Rust-та ownership: бір айнымалы =
+           бір иесі, иесі бітсе мән жойылады.
+```
+
+**Stripe — Kazakh school tutor (round-2 audit closed; tutor surface no longer leaks Rust answers to Russian prompts or topicless clarifications).**
+
 ## [4.95.5] — 2026-05-07 — Multi-turn lesson state — adam links exercise prompt to next solution
 
 Closes the «учебное состояние ученика» gap from Codex's 2026-05-07 audit: «тема → упражнение → ответ → диагностика → следующий шаг». When `AskExercise` (or `CodeRequest`) emits a topic-bearing prompt, adam remembers the topic in session. The next `SubmitSolution` turn — typically a bare code block with no topic in prose — falls back to the stored topic and the verdict is framed in lesson context.

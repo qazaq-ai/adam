@@ -1292,51 +1292,70 @@ templates = [
 
 # AskExercise — user asks for a practice task. Topic-bearing variant
 # surfaces the curated exercise body; topic-less variant requests
-# clarification.
+# **v4.96.0** — Codex round-2 audit Bug 2 fix. Pre-fix the
+# pedagogical families bundled topic-bearing AND clarification
+# variants in one key, so `template_is_fillable` accepted both
+# subsets and seed % len(applicable) routed 40 % of seeds to the
+# clarification variant even when a topic was set. Same pattern
+# as submit_solution.{passed,failed_known,...} from v4.95.0:
+# split into `.with_topic` / `.no_topic` sub-families and remap
+# the planner key based on slot presence.
+
 [[families]]
-key = "ask_exercise"
+key = "ask_exercise.with_topic"
 templates = [
     "{topic} тақырыбы бойынша жаттығу: {exercise_body}",
     "Тапсырма ({topic}): {exercise_body}",
     "Қазір {topic} жаттығуын беремін: {exercise_body}",
+]
+
+[[families]]
+key = "ask_exercise.no_topic"
+templates = [
     "Жаттығу қандай тақырып бойынша қалайсыз? Мысалы: ownership, lifetimes, traits, async, error handling, iterators.",
     "Қандай тақырыпта жаттығайын деп тұрсыз? Айтыңызшы — нақты тапсырма беремін.",
 ]
 
-# CodeRequest — user asks for a code example. Topic-bearing variant
-# surfaces the curated snippet; topic-less variant requests
-# clarification (per Codex directive: never free-generate).
 [[families]]
-key = "code_request"
+key = "code_request.with_topic"
 templates = [
     "{topic} мысалы:\n{code_snippet}",
     "Міне {topic} коды:\n{code_snippet}",
     "{topic} үшін қарапайым snippet:\n{code_snippet}",
+]
+
+[[families]]
+key = "code_request.no_topic"
+templates = [
     "Қандай тақырыпта код керек? Мысалы: hello world, ownership, borrow, struct, vec, async, future, stream.",
     "Менде сол тақырыпта тексерілген snippet жоқ. Қандай нақты мысал ұсынғым келеді — айтыңызшы.",
 ]
 
-# ExplainCompilerError — user pastes an error or asks about an
-# E-code. Code-bearing variant surfaces the curated explanation;
-# code-less variant requests the actual error text or code.
 [[families]]
-key = "explain_compiler_error"
+key = "explain_compiler_error.with_explanation"
 templates = [
     "{error_explanation}",
     "{error_code}: {error_explanation}",
     "Бұл қате — Rust компиляторының {error_code} коды. {error_explanation}",
+]
+
+[[families]]
+key = "explain_compiler_error.no_explanation"
+templates = [
     "Қателіктің нөмірін (E0xxx) немесе compiler хабарының бірінші жолын жіберіңізші — нақты түсіндіремін.",
     "Менде нақты сол қатенің түсіндірмесі әлі жоқ. Қате толық хабарын немесе кодын жіберіңіз.",
 ]
 
-# AskPurpose — user asks "what is X for / purpose of X". Topic-
-# bearing variant surfaces the curated purpose statement; topic-
-# less variant requests clarification.
 [[families]]
-key = "ask_purpose"
+key = "ask_purpose.with_topic"
 templates = [
     "{purpose_body}",
     "{topic}-тің мақсаты: {purpose_body}",
+]
+
+[[families]]
+key = "ask_purpose.no_topic"
+templates = [
     "Қандай ұғымның мақсатын білгіңіз келеді? Мысалы: ownership, borrow, lifetimes, trait, future, pin.",
     "Қай тақырыптың мақсаты туралы сұрап тұрсыз — нақтылап беріңізші.",
 ]
@@ -1387,4 +1406,23 @@ key = "submit_solution.env_error"
 templates = [
     "Cargo жоққа шығарылды (PATH-та табылмады?). Кодты жергілікте `cargo check` арқылы орындап, нәтижесін айтыңыз.",
     "Менде cargo шакыру мүмкіндігі әзірге жоқ. Кодыңызды жергілікте `cargo run` арқылы тексеріп көріңіз.",
+]
+
+# **v4.96.0** — Codex round-2 audit Bug 7. Cross-language contrast
+# templates. When the user asks «Python-да ownership бар ма?» or
+# similar, route here instead of surfacing the Rust ownership
+# definition without contrast. Sub-key on whether curated contrast
+# body exists (covers the most-frequent (lang, concept) pairs).
+[[families]]
+key = "cross_language_contrast.with_body"
+templates = [
+    "{contrast_body}",
+    "{other_language} мен Rust арасындағы {rust_concept} салыстыруы:\n\n{contrast_body}",
+]
+
+[[families]]
+key = "cross_language_contrast.no_body"
+templates = [
+    "{other_language}-да Rust-тағы {rust_concept} ұғымының тура аналогі менде нақты жазылмаған әлі. Жалпы тілдердің көбі бұл механизмді басқаша шешеді (GC, манual мемory, reference count). Қажет болса, нақты қандай аспект қызықтыратынын жазсаңыз — нақтылап беремін.",
+    "Менде {other_language} мен Rust-тағы {rust_concept}-тің салыстыруы әлі курсталмаған. Сұрақты нақтылыр аласыз ба — perfomance, safety, синтаксис қайсысы керек?",
 ]
