@@ -33,6 +33,26 @@
 
     {"id": "codex_p2_purpose_ownership", "category": "p2_pedagogical", "query": "Ownership-тің мақсаты не?", "any_substring": ["иеленудің мақсаты", "garbage collector", "use-after-free"]},
     {"id": "codex_p2_purpose_pin", "category": "p2_pedagogical", "query": "Pin-нің мақсаты қандай?", "any_substring": ["жадтан жылжыту", "self-referential", "async fn state machine"]},
-    {"id": "codex_p2_purpose_trait", "category": "p2_pedagogical", "query": "Trait не үшін арналған?", "any_substring": ["ортақ мінез-құлық", "generic функциялар", "dyn trait"]}
+    {"id": "codex_p2_purpose_trait", "category": "p2_pedagogical", "query": "Trait не үшін арналған?", "any_substring": ["ортақ мінез-құлық", "generic функциялар", "dyn trait"]},
+
+    {"id": "v4945_exercise_vec", "category": "p2_pedagogical_extension", "query": "vec жаттығу беріңіз.", "any_substring": ["vec![1, 2, 3", "квадратын", ".collect"]},
+    {"id": "v4945_exercise_struct", "category": "p2_pedagogical_extension", "query": "struct жаттығуы керек.", "any_substring": ["person", "constructor", "impl person"]},
+    {"id": "v4945_exercise_thread", "category": "p2_pedagogical_extension", "query": "thread бойынша тапсырма беріңіз.", "any_substring": ["thread::spawn", "1..=5", "join()"]},
+    {"id": "v4945_exercise_channel", "category": "p2_pedagogical_extension", "query": "channel жаттығу керек.", "any_substring": ["mpsc::channel", "for received in rx", "хабар жіберіңіз"]},
+
+    {"id": "v4945_code_struct", "category": "p2_pedagogical_extension", "query": "struct мысалын беріңіз.", "any_substring": ["struct person", "name: string", "p.age"]},
+    {"id": "v4945_code_thread", "category": "p2_pedagogical_extension", "query": "thread коды беріңіз.", "any_substring": ["thread::spawn", "h1.join", "thread1:"]},
+    {"id": "v4945_code_arc", "category": "p2_pedagogical_extension", "query": "arc коды керек.", "any_substring": ["arc::new", "arc::clone", "v.lock"]},
+    {"id": "v4945_code_lifetime", "category": "p2_pedagogical_extension", "query": "lifetime мысалы керек.", "any_substring": ["fn longer", "&'a str", "if a.len()"]},
+
+    {"id": "v4945_error_e0599", "category": "p2_pedagogical_extension", "query": "E0599 деген қандай қате?", "any_substring": ["no method named", "trait", "use std"]},
+    {"id": "v4945_error_e0432", "category": "p2_pedagogical_extension", "query": "E0432 қатесін түсіндіріңіз.", "any_substring": ["unresolved import", "cargo tree", "pub"]},
+    {"id": "v4945_error_e0061", "category": "p2_pedagogical_extension", "query": "E0061 деген не?", "any_substring": ["wrong number of arguments", "функция қолтаңбасын", "cargo doc"]},
+
+    {"id": "v4945_purpose_result", "category": "p2_pedagogical_extension", "query": "Result-тің мақсаты не?", "any_substring": ["қателерді тілдік типпен", "exception", "?  операторы"]},
+    {"id": "v4945_purpose_option", "category": "p2_pedagogical_extension", "query": "Option-ның мақсаты қандай?", "any_substring": ["null reference", "tony hoare", "миллиардтық қате"]},
+    {"id": "v4945_purpose_iterator", "category": "p2_pedagogical_extension", "query": "Iterator-дың мақсаты не?", "any_substring": ["лазылы", ".map", "zero-cost"]},
+    {"id": "v4945_purpose_async", "category": "p2_pedagogical_extension", "query": "async-ң мақсаты қандай?", "any_substring": ["i/o-bound concurrency", "1-2 kb", "100 000 connection"]},
+    {"id": "v4945_purpose_lifetime", "category": "p2_pedagogical_extension", "query": "lifetime-нің мақсаты не?", "any_substring": ["dangling pointer", "compile error", "статистикалық"]}
   ]
 }

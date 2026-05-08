@@ -918,7 +918,14 @@ fn detect_code_request(joined: &str) -> bool {
         || joined.contains("бер")
         || joined.contains("ұсын");
     let has_example_request = (joined.contains("мысал") || joined.contains("үлгі"))
-        && (joined.contains("бер") || joined.contains("көрсет") || joined.contains("жаз"));
+        && (joined.contains("бер")
+            || joined.contains("көрсет")
+            || joined.contains("жаз")
+            // **v4.94.5** — modal form «мысалы керек» also signals
+            // example request. Live test: «lifetime мысалы керек.»
+            // pre-fix routed to modal-Necessity hedge.
+            || joined.contains("керек")
+            || joined.contains("қажет"));
     // **v4.93.5** — modal forms «код керек / қажет» also signal a
     // code request. Live test: «Маған ownership коды керек.» pre-fix
     // routed to modal-Necessity hedge.

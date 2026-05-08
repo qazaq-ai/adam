@@ -2925,6 +2925,8 @@ pub(crate) const LATIN_TECH_SUBJECTS: &[&str] = &[
     "pin",
     "tcp",
     "http",
+    // **v4.94.5** — pedagogical-content extension batch.
+    "channel",
     "mutability",
     "shadowing",
     "reference",

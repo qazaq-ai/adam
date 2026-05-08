@@ -88,6 +88,75 @@ pub fn exercise_for(topic: &str) -> Option<&'static str> {
             "Cargo жобасы жасаңыз: `cargo new my_first` — кейін `src/main.rs`-те «Сәлем, әлем!» басып шығарыңыз. \
             `cargo run` арқылы орындау.",
         ),
+        // **v4.94.5** — extension batch: more Rust core topics.
+        "vec" | "vector" => Some(
+            "`Vec<i32>` жасаңыз: `vec![1, 2, 3, 4, 5]`. `iter()` арқылы әр элементтің квадратын есептеп жаңа Vec-қа жинаңыз. \
+            (Кеңес: `.map(|x| x * x).collect::<Vec<_>>()`.)",
+        ),
+        "string" => Some(
+            "`String::new()` арқылы бос жол жасап, `push_str` мен `push` арқылы «Сәлем, ` + ат + `!» құрастырыңыз. \
+            (Кеңес: `let mut s = String::new(); s.push_str(\"...\");`.)",
+        ),
+        "struct" => Some(
+            "`Person { name: String, age: u32 }` структурасын жариялаңыз. \
+            `new(name: &str, age: u32) -> Self` constructor-ын `impl Person {{ }}` блокта жазыңыз. \
+            Қалай шакырамыз?",
+        ),
+        "enum" => Some(
+            "`enum TrafficLight { Red, Yellow, Green }` жариялаңыз. \
+            `time_seconds(&self) -> u32` әдісі: Red=30, Yellow=5, Green=25. \
+            `match` арқылы іске асырыңыз.",
+        ),
+        "error handling" => Some(
+            "Файлды оқып, оның байт-санын қайтаратын функция жазыңыз: \
+            `fn count_bytes(path: &str) -> Result<usize, std::io::Error>`. \
+            Қате болса `?` арқылы тарату. Үлгі: `fs::read(path).map(|b| b.len())`.",
+        ),
+        "hashmap" => Some(
+            "Vec-тегі сөздер тізімінен `HashMap<String, u32>` жасаңыз — әр сөздің пайда болу санын есептейді. \
+            (Кеңес: `*counter.entry(word).or_insert(0) += 1`.)",
+        ),
+        "module" | "module жолы" => Some(
+            "`src/lib.rs` ішінде `mod math { pub fn add(a: i32, b: i32) -> i32 { a + b } }` модулін жазып, \
+            `tests/integration.rs`-тен `use mycrate::math; math::add(2, 3)` арқылы шакырыңыз.",
+        ),
+        "test" | "тест" => Some(
+            "`#[cfg(test)] mod tests { use super::*; #[test] fn it_works() { assert_eq!(add(2, 2), 4); } }` \
+            пайдаланып, `add` функциясын тексеретін тест жазыңыз. `cargo test` арқылы жүгірту.",
+        ),
+        "box" | "box<t>" => Some(
+            "Recursive enum жариялаңыз: `enum List { Cons(i32, Box<List>), Nil }`. \
+            Бір тізім құрастырыңыз: `Cons(1, Box::new(Cons(2, Box::new(Nil))))`. \
+            Box не үшін керек?",
+        ),
+        "rc" | "rc<t>" => Some(
+            "`Rc<String>` жасап, екі жерде clone-мен бөлісіңіз. \
+            `Rc::strong_count(&rc)` арқылы санды тексеріңіз. (Кеңес: `Rc::clone(&rc)`).",
+        ),
+        "arc" | "arc<t>" => Some(
+            "`Arc<Mutex<Vec<i32>>>` жасап, екі ағында оған push жасаңыз. \
+            `thread::spawn` + `Arc::clone` + `lock().unwrap().push(...)` пайдалану.",
+        ),
+        "thread" | "ос ағыны" => Some(
+            "`thread::spawn(|| { println!(\"hi from thread\"); })` arқылы екі ағын ашып, әрқайсысында 1..=5 басып шығарыңыз. \
+            Әр ағынды `join()` арқылы аяқтап күтіңіз.",
+        ),
+        "channel" | "mpsc::channel" => Some(
+            "`mpsc::channel()` жасап, бөлек ағыннан 5 хабар жіберіңіз. \
+            Негізгі ағында `for received in rx` арқылы оларды басып шығарыңыз.",
+        ),
+        "join!" | "join! макросы" => Some(
+            "Екі async функция параллель шакырыңыз: `let (a, b) = tokio::join!(fetch_a(), fetch_b());`. \
+            Sequential `.await`-пен айырмашылығы — қанша уақыт үнемдейді?",
+        ),
+        "select!" | "select! макросы" => Some(
+            "`tokio::select!` арқылы 5 секунд timeout мен фактілі жұмыс арасында race жасаңыз. \
+            Қайсысы тез келсе — соның нәтижесі. (Кеңес: `tokio::time::sleep` + `_ = sleep(Duration::from_secs(5)) => ...`).",
+        ),
+        "smart pointer" | "ақылды сілтеме" => Some(
+            "`Box<T>` / `Rc<T>` / `RefCell<T>` арасындағы айырмашылықты түсіндіріп, әрқайсысына бір қарапайым мысал жазыңыз. \
+            (Box — heap-те бекіту; Rc — shared ownership; RefCell — interior mutability.)",
+        ),
         _ => None,
     }
 }
@@ -142,6 +211,49 @@ pub fn code_snippet_for(topic: &str) -> Option<&'static str> {
         ),
         "struct" => Some(
             "```rust\nstruct Person { name: String, age: u32 }\nfn main() {\n    let p = Person { name: \"Дәулет\".into(), age: 30 };\n    println!(\"{} — {} жаста\", p.name, p.age);\n}\n```",
+        ),
+        // **v4.94.5** — extension batch.
+        "enum" => Some(
+            "```rust\nenum TrafficLight { Red, Yellow, Green }\n\nfn time_seconds(light: TrafficLight) -> u32 {\n    match light {\n        TrafficLight::Red => 30,\n        TrafficLight::Yellow => 5,\n        TrafficLight::Green => 25,\n    }\n}\n\nfn main() { println!(\"{}\", time_seconds(TrafficLight::Red)); }\n```",
+        ),
+        "error handling" => Some(
+            "```rust\nuse std::fs;\n\nfn count_bytes(path: &str) -> Result<usize, std::io::Error> {\n    let bytes = fs::read(path)?;\n    Ok(bytes.len())\n}\n\nfn main() {\n    match count_bytes(\"Cargo.toml\") {\n        Ok(n) => println!(\"{n} байт\"),\n        Err(e) => eprintln!(\"қате: {e}\"),\n    }\n}\n```",
+        ),
+        "hashmap" => Some(
+            "```rust\nuse std::collections::HashMap;\n\nfn main() {\n    let words = vec![\"бір\", \"екі\", \"бір\", \"үш\", \"екі\", \"бір\"];\n    let mut counts: HashMap<&str, u32> = HashMap::new();\n    for w in &words {\n        *counts.entry(w).or_insert(0) += 1;\n    }\n    println!(\"{counts:?}\"); // {\"бір\": 3, \"екі\": 2, \"үш\": 1}\n}\n```",
+        ),
+        "module" | "module жолы" => Some(
+            "```rust\n// src/lib.rs\npub mod math {\n    pub fn add(a: i32, b: i32) -> i32 { a + b }\n    pub fn mul(a: i32, b: i32) -> i32 { a * b }\n}\n\n// tests/integration.rs\nuse mycrate::math;\n#[test] fn it_adds() { assert_eq!(math::add(2, 3), 5); }\n```",
+        ),
+        "test" | "тест" => Some(
+            "```rust\nfn add(a: i32, b: i32) -> i32 { a + b }\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n    #[test] fn it_works() { assert_eq!(add(2, 2), 4); }\n    #[test] #[should_panic] fn overflow() { let _: i32 = i32::MAX + 1; }\n}\n```",
+        ),
+        "box" | "box<t>" => Some(
+            "```rust\nenum List { Cons(i32, Box<List>), Nil }\nuse List::*;\n\nfn main() {\n    let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));\n    fn print(l: &List) {\n        match l {\n            Cons(v, next) => { print!(\"{v} \"); print(next) }\n            Nil => println!(\"-\"),\n        }\n    }\n    print(&list); // 1 2 3 -\n}\n```",
+        ),
+        "rc" | "rc<t>" => Some(
+            "```rust\nuse std::rc::Rc;\n\nfn main() {\n    let a = Rc::new(String::from(\"shared\"));\n    let b = Rc::clone(&a);\n    let c = Rc::clone(&a);\n    println!(\"count: {}\", Rc::strong_count(&a)); // 3\n    println!(\"{a} / {b} / {c}\");\n}\n```",
+        ),
+        "arc" | "arc<t>" => Some(
+            "```rust\nuse std::sync::{Arc, Mutex};\nuse std::thread;\n\nfn main() {\n    let v = Arc::new(Mutex::new(Vec::new()));\n    let mut handles = vec![];\n    for i in 0..3 {\n        let v = Arc::clone(&v);\n        handles.push(thread::spawn(move || v.lock().unwrap().push(i)));\n    }\n    for h in handles { h.join().unwrap(); }\n    println!(\"{:?}\", v.lock().unwrap());\n}\n```",
+        ),
+        "thread" | "ос ағыны" => Some(
+            "```rust\nuse std::thread;\n\nfn main() {\n    let h1 = thread::spawn(|| {\n        for i in 1..=3 { println!(\"thread1: {i}\"); }\n    });\n    let h2 = thread::spawn(|| {\n        for i in 1..=3 { println!(\"thread2: {i}\"); }\n    });\n    h1.join().unwrap();\n    h2.join().unwrap();\n}\n```",
+        ),
+        "channel" | "mpsc::channel" => Some(
+            "```rust\nuse std::sync::mpsc;\nuse std::thread;\n\nfn main() {\n    let (tx, rx) = mpsc::channel();\n    thread::spawn(move || {\n        for msg in [\"бір\", \"екі\", \"үш\"] { tx.send(msg).unwrap(); }\n    });\n    for received in rx { println!(\"{received}\"); }\n}\n```",
+        ),
+        "join!" | "join! макросы" => Some(
+            "```rust\nuse tokio::time::{sleep, Duration};\n\nasync fn fetch_a() -> u32 { sleep(Duration::from_secs(1)).await; 1 }\nasync fn fetch_b() -> u32 { sleep(Duration::from_secs(1)).await; 2 }\n\n#[tokio::main]\nasync fn main() {\n    let (a, b) = tokio::join!(fetch_a(), fetch_b()); // ~1с, не 2с\n    println!(\"{a} {b}\");\n}\n```",
+        ),
+        "select!" | "select! макросы" => Some(
+            "```rust\nuse tokio::time::{sleep, Duration};\n\n#[tokio::main]\nasync fn main() {\n    tokio::select! {\n        result = work() => println!(\"done: {result}\"),\n        _ = sleep(Duration::from_secs(5)) => println!(\"timeout!\"),\n    }\n}\nasync fn work() -> u32 { sleep(Duration::from_secs(2)).await; 42 }\n```",
+        ),
+        "smart pointer" | "ақылды сілтеме" => Some(
+            "```rust\nuse std::rc::Rc;\nuse std::cell::RefCell;\n\nfn main() {\n    let shared: Rc<RefCell<Vec<i32>>> = Rc::new(RefCell::new(vec![1, 2, 3]));\n    let a = Rc::clone(&shared);\n    a.borrow_mut().push(4);\n    println!(\"{:?}\", shared.borrow()); // [1, 2, 3, 4]\n}\n```",
+        ),
+        "lifetime" | "lifetimes" => Some(
+            "```rust\nfn longer<'a>(a: &'a str, b: &'a str) -> &'a str {\n    if a.len() > b.len() { a } else { b }\n}\n\nfn main() {\n    let s1 = String::from(\"кіші\");\n    let s2 = String::from(\"үлкенірек\");\n    println!(\"{}\", longer(&s1, &s2));\n}\n```",
         ),
         _ => None,
     }
@@ -205,6 +317,34 @@ pub fn explain_error_code(code: &str) -> Option<&'static str> {
             пайдалану. Шешім: (1) owned тип қайтару; (2) lifetime annotation қосу; (3) мәнді `static` \
             өмір сүруі бар жерге жылжыту.",
         ),
+        // **v4.94.5** — extension batch.
+        "E0599" => Some(
+            "**E0599 — no method named X found for type Y.** Тип Y-да X деген әдіс жоқ. \
+            Себептері: (1) типтың дұрыс емес — `Vec<i32>` орнына `[i32; 5]` алып отырмыз; (2) trait \
+            импорт етілмеген — `use std::io::Read` керек; (3) generic constraint жетіспейді. \
+            Шешім: compiler хабарының «help: items from traits can only be used if the trait is in scope» \
+            бөліміне қарау — қандай `use` керек жазылған.",
+        ),
+        "E0432" => Some(
+            "**E0432 — unresolved import.** Импорт жасалған модуль / тип / функция жоқ. \
+            Себептері: (1) ат қате жазылған; (2) crate dependency Cargo.toml-да жоқ; (3) модуль `pub` емес. \
+            Шешім: `cargo tree` арқылы тәуелділікті тексеру; `cargo check --message-format=json` арқылы дұрыс жолды табу.",
+        ),
+        "E0658" => Some(
+            "**E0658 — use of unstable library feature.** Бұл функция тек nightly-да қолжетімді. \
+            Шешім: (1) stable Rust-та бар балама іздеу; (2) `rustup default nightly` арқылы nightly-ге өту \
+            + `#![feature(feature_name)]` атрибуті; (3) Rust release notes-те функция қашан тұрақтанатынын тексеру.",
+        ),
+        "E0463" => Some(
+            "**E0463 — can't find crate for X.** Cargo dependencies-те crate жоқ немесе атау қате. \
+            Шешім: `Cargo.toml`-дегі `[dependencies]` бөлімін тексеру; `cargo update` жүгірту; \
+            crate атауындағы дефис вертuс underscore айырмашылығы (`tokio_util` vs `tokio-util`).",
+        ),
+        "E0061" => Some(
+            "**E0061 — wrong number of arguments.** Функция X аргумент күтеді, бірақ Y берілді. \
+            Шешім: функция қолтаңбасын тексеру (`cargo doc --open` арқылы); тупл / array-ды бөлектеп беру \
+            мүмкін емес — әр аргументті жеке жазу керек.",
+        ),
         _ => None,
     }
 }
@@ -244,6 +384,74 @@ pub fn purpose_for(topic: &str) -> Option<&'static str> {
             move ескі pointer-лерді бұзады. Pin сол move-ке тыйым салып, async-ң қауіпсіз \
             жұмысын қамтамасыз етеді.",
         ),
+        // **v4.94.5** — extension batch.
+        "result" => Some(
+            "Result-тың мақсаты — қателерді тілдік типпен білдіру (exception емес). \
+            Compiler әр Result-ті өңдеуді мәжбүрлейді — қате жасырылмайды; \
+            `?` операторы дұрыс тарату жолын ыңғайлы жасайды.",
+        ),
+        "option" => Some(
+            "Option-ның мақсаты — null reference-тің орнына тілдік-типтік «бар/жоқ». \
+            Tony Hoare null-ды «миллиардтық қате» деп атаған; Option compiler-арқылы None жағдайды \
+            өңдеуді мәжбүрлейді — null pointer dereference Rust-та орын алмайды.",
+        ),
+        "match" | "match өрнегі" => Some(
+            "Match-тың мақсаты — толық қамту (exhaustiveness) кепілдігі. Compiler барлық enum нұсқалары \
+            өңделгенін статистикалық тексереді — жаңа нұсқа қосылса, сол кодты әртүрлі match-та қолданушы \
+            компиляция қатесі арқылы хабардар болады.",
+        ),
+        "iterator" => Some(
+            "Iterator-тың мақсаты — лазылы (lazy) элементтер тізбегі. `.map()`, `.filter()`, `.fold()` \
+            chain-нің алғашқы intermediate Vec-тер жасамайды — тек соңғы `.collect()` / `.sum()` \
+            болғанда жұмыс орындалады. Zero-cost абстракция: compiler барлығын бір циклге fuse жасайды.",
+        ),
+        "closure" => Some(
+            "Closure-дің мақсаты — функцияны мән ретінде беру + ішкі айнымалыларды captures жасау. \
+            Generic параметрлер (`F: Fn(i32) -> i32`) үшін zero-cost (compile-time monomorphisation); \
+            динамикалық қажет болса — `Box<dyn Fn>` heap-те.",
+        ),
+        "async" | "async fn" => Some(
+            "Async-тың мақсаты — I/O-bound concurrency бір ағында мыңдаған тапсырманы тиімді ұстау. \
+            Әрбір tokio task ~1-2 KB жадын алады, ал OS thread ~2 MB. 100 000 connection бір процеске \
+            негізделеді (LLM-сіз, GPU-сіз).",
+        ),
+        "tokio" | "tokio runtime" => Some(
+            "Tokio-нің мақсаты — async runtime: executor (work-stealing scheduler) + reactor (epoll/kqueue/IOCP) \
+            + I/O драйверлер + timer wheels біріктірілген пакет. Rust async/await тілдік синтаксис; tokio оны \
+            нақты production-ready environment-ке айналдырады.",
+        ),
+        "stream" => Some(
+            "Stream-нің мақсаты — async iterator. Element-тер бір-бірлеп, `next().await` арқылы алынады; \
+            network stream / channel receiver / file reader — барлығы Stream-сай modeled. \
+            StreamExt комбинаторлары `map / filter / fold / buffered` ыңғайлы chaining береді.",
+        ),
+        "vec" => Some(
+            "Vec-тің мақсаты — өсетін heap-allocated массив. Capacity автоматты екі есе өседі (amortized O(1) push); \
+            `iter()` / `iter_mut()` / `into_iter()` арқылы әр түрлі ownership стилінде итерация береді.",
+        ),
+        "hashmap" => Some(
+            "HashMap-тың мақсаты — кілт-мән жұптарын О(1) орташа қолжетімділікпен сақтау. \
+            Кілт `Hash + Eq` талап етеді; default hasher SipHash (HashDoS-тен қорғану) — performance \
+            маңызды кодта `FxHashMap` (rustc-дағыдай) тиімдірек.",
+        ),
+        "thread" | "ос ағыны" => Some(
+            "OS ағынының мақсаты — CPU-bound параллелизм: бірнеше CPU ядросын біруақытта пайдалану. \
+            I/O-bound үшін async тиімдірек (~1 KB / task vs ~2 MB / thread). Ереже: CPU-bound = thread, \
+            I/O-bound = async task.",
+        ),
+        "channel" | "mpsc::channel" => Some(
+            "Channel-дің мақсаты — ағындар арасындағы хабар жіберу (без shared memory). \
+            «Don't communicate by sharing memory; share memory by communicating» — Rob Pike. \
+            mpsc — multiple-producer-single-consumer; broadcast — multiple-consumer.",
+        ),
+        "mutex" => Some(
+            "Mutex-тің мақсаты — shared mutable state-ке бір уақытта тек бір ағынның қол жеткізуін қамтамасыз ету. \
+            `lock()` MutexGuard қайтарады (RAII): scope аяқталысымен автоматты unlock. \
+            Async-та tokio::sync::Mutex (yields task on lock conflict).",
+        ),
+        // (lifetime/lifetimes already covered above; v4.94.5 extension
+        // for these kept its body but the duplicate arm was removed
+        // to satisfy clippy's unreachable_patterns check.)
         _ => None,
     }
 }

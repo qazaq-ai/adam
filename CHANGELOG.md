@@ -7,6 +7,44 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.94.5] — 2026-05-07 — Pedagogical content extension (more topics per intent)
+
+Extends the curated pedagogical content from v4.93.5 with ~15 new topics across all 4 intents. Coverage doubles from narrow Rust basics to a broader concurrency + collections + tooling surface.
+
+### What's added
+
+**`pedagogical.rs` extension batch:**
+- **Exercises (+15):** vec / string / struct / enum / error handling / hashmap / module / test / box / rc / arc / thread / channel / join! / select! / smart pointer.
+- **Code snippets (+13):** enum / error handling / hashmap / module / test / box / rc / arc / thread / channel / join! / select! / smart pointer / lifetime.
+- **Error explanations (+5):** E0599 (no method) / E0432 (unresolved import) / E0658 (unstable feature) / E0463 (can't find crate) / E0061 (wrong arg count).
+- **Purpose statements (+12):** result / option / match / iterator / closure / async / tokio / stream / vec / hashmap / thread / channel / mutex / lifetime.
+
+### Detector polish
+
+- `detect_code_request` extended: «{X} мысалы керек» now matches (was only «{X} мысалын беріңіз» / «{X} мысалын жазыңыз»).
+- `LATIN_TECH_SUBJECTS` += `channel` (live-test confirmed bare «channel жаттығу беріңіз» now routes correctly).
+
+### Live holdout extended
+
+`data/eval/live_holdout_codex_2026_05_07.json` now has **40 cases** (was 24; +16 P2-extension cases). New category `p2_pedagogical_extension`. 100 % floor maintained.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 40 / 40 Codex live-holdout cases | ✅ 100 % (P0+P1+P2+P2-extension) |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1008 passing** (single live-holdout test contains all 40 cases internally) |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Roadmap (next)
+
+| Release | Focus |
+|---|---|
+| **v4.94.5** | **Pedagogical content extension (this release)** |
+| v4.95.0 | SubmitSolution intent — wire cargo_verify into dialog loop |
+
 ## [4.94.0] — 2026-05-07 — Codex P3 + user-directive resource instrumentation
 
 Three deliverables in one release.
