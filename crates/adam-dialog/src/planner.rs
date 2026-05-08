@@ -89,6 +89,16 @@ pub fn plan_response_with_session(
     // doesn't see the verifier outcome.
     if matches!(intent, Intent::SubmitSolution { .. }) {
         key = match slots.get("cargo_status").map(String::as_str) {
+            // **v4.98.5** — auto-advance routing (mirror of
+            // plan_response_with_epistemic). Fires only when the
+            // caller pre-stuffed curriculum-closure context.
+            Some("passed") if slots.contains_key("__stage_closes__") => {
+                if slots.contains_key("__curriculum_complete__") {
+                    "submit_solution.passed_curriculum_complete"
+                } else {
+                    "submit_solution.passed_stage_closed"
+                }
+            }
             Some("passed") => "submit_solution.passed",
             Some("failed") if slots.contains_key("error_explanation") => {
                 "submit_solution.failed_known"
@@ -770,6 +780,19 @@ pub fn plan_response_with_epistemic(
     // `.with_*` / `.no_*` sub-families and routed by slot presence.
     let key: &str = if matches!(intent, Intent::SubmitSolution { .. }) {
         let new_key = match slots.get("cargo_status").map(String::as_str) {
+            // **v4.98.5** — when a `passed` verdict closes the
+            // current curriculum stage, route to the auto-advance
+            // sub-family. Conversation pre-stuffs `__stage_closes__`
+            // and `next_stage_*` (or `__curriculum_complete__`)
+            // before planning, so this branch only fires when the
+            // session genuinely has curriculum context.
+            Some("passed") if slots.contains_key("__stage_closes__") => {
+                if slots.contains_key("__curriculum_complete__") {
+                    "submit_solution.passed_curriculum_complete"
+                } else {
+                    "submit_solution.passed_stage_closed"
+                }
+            }
             Some("passed") => "submit_solution.passed",
             Some("failed") if slots.contains_key("error_explanation") => {
                 "submit_solution.failed_known"

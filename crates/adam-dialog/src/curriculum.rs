@@ -93,6 +93,37 @@ impl StageProgress {
     }
 }
 
+/// **v4.98.5** — adaptive-difficulty hook. Coarse signal that future
+/// content-selection layers ([`crate::pedagogical`] in v4.99.0+) can
+/// consume to scale exercise difficulty per stage. v4.98.5 only ships
+/// the API surface — exercise selection itself is not yet adaptive.
+///
+/// Threshold logic (deliberately simple):
+/// - `Easy`     — student has failed ≥ 2 times → struggling, ease up.
+/// - `Hard`     — student has 0 failures AND ≥ 1 pass → confident,
+///                push harder.
+/// - `Normal`   — everything else (initial state, mixed performance).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DifficultyHint {
+    Easy,
+    Normal,
+    Hard,
+}
+
+impl StageProgress {
+    /// Coarse difficulty signal for adaptive content selection. See
+    /// [`DifficultyHint`] for the thresholds.
+    pub fn difficulty_hint(&self) -> DifficultyHint {
+        if self.failed >= 2 {
+            DifficultyHint::Easy
+        } else if self.failed == 0 && self.passed >= 1 {
+            DifficultyHint::Hard
+        } else {
+            DifficultyHint::Normal
+        }
+    }
+}
+
 impl Curriculum {
     /// Try to load `DEFAULT_CURRICULUM_PATH`. Returns `Ok(None)` when
     /// the file is absent (trimmed checkout) — callers treat this as
@@ -285,6 +316,49 @@ mod tests {
         }
         assert!(c.next_unlocked(&progress).is_none());
         assert!(c.is_complete(&progress));
+    }
+
+    #[test]
+    fn difficulty_hint_initial_state_is_normal() {
+        let p = StageProgress::default();
+        assert_eq!(p.difficulty_hint(), DifficultyHint::Normal);
+    }
+
+    #[test]
+    fn difficulty_hint_easy_when_two_failures() {
+        let p = StageProgress {
+            passed: 0,
+            failed: 2,
+        };
+        assert_eq!(p.difficulty_hint(), DifficultyHint::Easy);
+        let p = StageProgress {
+            passed: 1,
+            failed: 3,
+        };
+        assert_eq!(p.difficulty_hint(), DifficultyHint::Easy);
+    }
+
+    #[test]
+    fn difficulty_hint_hard_when_clean_passes() {
+        let p = StageProgress {
+            passed: 1,
+            failed: 0,
+        };
+        assert_eq!(p.difficulty_hint(), DifficultyHint::Hard);
+        let p = StageProgress {
+            passed: 5,
+            failed: 0,
+        };
+        assert_eq!(p.difficulty_hint(), DifficultyHint::Hard);
+    }
+
+    #[test]
+    fn difficulty_hint_normal_for_mixed_below_easy_threshold() {
+        let p = StageProgress {
+            passed: 1,
+            failed: 1,
+        };
+        assert_eq!(p.difficulty_hint(), DifficultyHint::Normal);
     }
 
     #[test]

@@ -1350,6 +1350,58 @@ impl Conversation {
                 extra_slots.insert("__compare_y_def__".into(), y_def);
             }
         }
+        // **v4.98.5** — curriculum slot pre-stuffing for the
+        // `submit_solution.passed_stage_closed` /
+        // `passed_curriculum_complete` planner sub-key remap. We
+        // pre-resolve "if THIS pass succeeds, would it close the
+        // stage?" and "what's the recommended next stage?" before the
+        // planner runs cargo_verify. The planner reads these slots via
+        // `extra_slots` and routes accordingly. If the verdict turns
+        // out to be `failed`, the planner ignores the closure slots
+        // (sub-key remap only fires on `passed`).
+        if let Intent::SubmitSolution {
+            topic: ss_topic, ..
+        } = &intent_for_render
+            && let Some(curriculum) = self.curriculum.as_ref()
+        {
+            let lesson_stage_id = ss_topic
+                .as_ref()
+                .and_then(|t| curriculum.stage(t).map(|s| s.id.clone()))
+                .or_else(|| {
+                    self.session
+                        .get("last_exercise_topic")
+                        .and_then(|t| curriculum.stage(t).map(|s| s.id.clone()))
+                });
+            if let Some(stage_id) = lesson_stage_id
+                && let Some(stage) = curriculum.stage(&stage_id)
+            {
+                let cur = self
+                    .curriculum_progress
+                    .get(&stage.id)
+                    .copied()
+                    .unwrap_or_default();
+                let would_close = (cur.passed + 1) >= stage.exercises_to_pass;
+                if would_close {
+                    extra_slots.insert("__stage_closes__".into(), "1".into());
+                    extra_slots.insert("stage_label_kk".into(), stage.label_kk.clone());
+                    extra_slots.insert("stage_passes".into(), stage.exercises_to_pass.to_string());
+                    // Build a hypothetical post-pass progress map and
+                    // ask the curriculum what the next unlocked
+                    // stage is.
+                    let mut hypo = self.curriculum_progress.clone();
+                    let hypo_entry = hypo.entry(stage.id.clone()).or_default();
+                    hypo_entry.record_pass();
+                    if let Some(next) = curriculum.next_unlocked(&hypo) {
+                        extra_slots.insert("next_stage_label_kk".into(), next.label_kk.clone());
+                        extra_slots.insert("next_stage_summary_kk".into(), next.summary_kk.clone());
+                        extra_slots.insert("next_stage_id".into(), next.id.clone());
+                    } else {
+                        // Curriculum complete after this pass.
+                        extra_slots.insert("__curriculum_complete__".into(), "1".into());
+                    }
+                }
+            }
+        }
         let plan = crate::planner::plan_response_with_epistemic(
             &intent_for_render,
             rng_seed,

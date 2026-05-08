@@ -7,6 +7,115 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.98.5] — 2026-05-08 — User-facing auto-advance + adaptive-difficulty hooks (long-term roadmap step 2)
+
+Step 2 of the long-term tutor arc. Builds on v4.98.0's curriculum tracking foundation by making the student's curriculum journey **visible**: when a `passed` `SubmitSolution` verdict closes a curriculum stage, adam auto-announces the achievement AND the next-step recommendation in the same response.
+
+### Why this matters
+
+Pre-v4.98.5 a student passing exercise 2/2 on `ownership` got the same "Жарайсыз! Кодыңыз `cargo check`-тен тазалап өтті" response as on exercise 1/2 — the tracking happened but stayed invisible. With v4.98.5 the second pass triggers a different response that names the closed stage AND the next one with its summary, so the tutor genuinely guides the journey rather than answering each turn in isolation.
+
+### What's added
+
+**Conversation pre-planning slot stuffing** ([conversation.rs](crates/adam-dialog/src/conversation.rs)):
+
+Before calling the planner on a `SubmitSolution` turn, `Conversation` resolves the lesson stage (planner topic → fallback `session.last_exercise_topic`), reads current progress, and pre-stuffs `extra_slots` IF this pass would close the stage:
+
+- `__stage_closes__` = `"1"` — sentinel
+- `stage_label_kk` — closing-stage Kazakh label
+- `stage_passes` — closure threshold (used as both numerator and denominator in templates: `{stage_passes}/{stage_passes}`)
+- `next_stage_label_kk` / `next_stage_summary_kk` / `next_stage_id` — next unlocked stage (computed via `Curriculum::next_unlocked` on a hypothetical post-pass progress map)
+- `__curriculum_complete__` = `"1"` — when the closing stage is the last one
+
+If the verdict turns out to be `failed`, the planner ignores these slots (sub-key remap only fires on `passed`).
+
+**Planner sub-key remap** ([planner.rs](crates/adam-dialog/src/planner.rs)):
+
+The `submit_solution.*` sub-key cascade gains two new branches **above** the legacy `passed`:
+
+- `Some("passed") if slots.contains_key("__stage_closes__") && slots.contains_key("__curriculum_complete__")` → `submit_solution.passed_curriculum_complete`
+- `Some("passed") if slots.contains_key("__stage_closes__")` → `submit_solution.passed_stage_closed`
+
+Both `plan_response_with_session` and `plan_response_with_epistemic` are updated in lockstep.
+
+**New template families** ([v1.toml](data/dialog/templates/v1.toml)):
+
+- `submit_solution.passed_stage_closed` — 3 variants. Example: «Жарайсыз! **{stage_label_kk}** тақырыбы аяқталды ({stage_passes}/{stage_passes}). Енді **{next_stage_label_kk}** тақырыбына кіруге болады.\n\n{next_stage_summary_kk}»
+- `submit_solution.passed_curriculum_complete` — 2 variants. Example: «Құттықтаймын! **{stage_label_kk}** тақырыбы да аяқталды — Rust бойынша негізгі курсты толық меңгеріп шықтыңыз. Енді нақты жоба жазып көрсеңіз болады.»
+
+**Adaptive-difficulty hook** ([curriculum.rs](crates/adam-dialog/src/curriculum.rs)):
+
+New `StageProgress::difficulty_hint() -> DifficultyHint` returning:
+
+- `Easy` — student has failed ≥ 2 times → struggling, ease up
+- `Hard` — 0 failures AND ≥ 1 pass → confident, push harder
+- `Normal` — everything else (initial state, mixed performance)
+
+API surface only — content selection in `pedagogical::exercise_for_topic` doesn't yet read this hint. v4.99.0+ wiring will plug it in.
+
+### End-to-end smoke test
+
+```
+[Student]  Маған Rust-та ownership жаттығуын беріңізші.
+[adam]     Қазір ownership жаттығуын беремін: Мына кодта қате бар: ...
+[Student]  ```rust
+           fn main() { let s = String::from("hi"); println!("{}", s); }
+           ```
+[adam]     Жарайсыз! println тапсырмаңыз шешілді — `cargo check` тазалап өтті. ...
+[Student]  Маған Rust-та ownership жаттығуын беріңізші.
+[adam]     Қазір ownership жаттығуын беремін: ...
+[Student]  ```rust
+           fn main() { let n = 42; println!("{}", n); }
+           ```
+[adam]     Тамаша! Сіз **Иелік** тақырыбын меңгердіңіз (2 жаттығу шешіліп қойды).
+           Келесі қадам — **Қарыз алу**: Иеленбей, тек қарызға алу: `&T` (read-only)
+           немесе `&mut T` (өзгерте алатын). Бір сәтте біреуі ғана болады.
+```
+
+The 4-turn loop demonstrates the foundation kicking in: turn 2 fires the standard `passed` template (1/2 — stage not closed); turn 4 fires `passed_stage_closed` (2/2) with the borrow stage announcement.
+
+### Regression tests
+
+**Module-level** ([curriculum.rs](crates/adam-dialog/src/curriculum.rs) — 4 new):
+
+1. `difficulty_hint_initial_state_is_normal`
+2. `difficulty_hint_easy_when_two_failures`
+3. `difficulty_hint_hard_when_clean_passes`
+4. `difficulty_hint_normal_for_mixed_below_easy_threshold`
+
+**Integration** ([`tests/curriculum_v4985_auto_advance.rs`](crates/adam-dialog/tests/curriculum_v4985_auto_advance.rs) — 7 new):
+
+1. `template_repo_has_passed_stage_closed_family`
+2. `template_repo_has_passed_curriculum_complete_family`
+3. `passed_stage_closed_templates_use_advance_slots` (every variant must reference the auto-advance slots)
+4. `difficulty_hint_at_thresholds`
+5. `next_unlocked_traverses_full_canonical_curriculum` (the real 5-stage curriculum visits every stage exactly once in dependency order)
+6. `end_to_end_two_passes_close_ownership_stage_and_announce_borrow` (`#[ignore]` — real cargo check, full lesson loop)
+7. `end_to_end_final_stage_pass_announces_curriculum_complete` (`#[ignore]` — synthetic preset progress on the last stage; closing pass surfaces `passed_curriculum_complete`)
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 4 / 4 new difficulty_hint module unit tests | ✅ 100 % |
+| 5 / 5 fast v4.98.5 integration tests | ✅ 100 % |
+| 2 / 2 #[ignore] end-to-end auto-advance tests (real `cargo check`) | ✅ 100 % |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator unit tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora regression tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 regression tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1055 passing** + 16 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Roadmap
+
+- **v4.99.0** — Student-side query intents: `AskNextTopic` («Келесі қандай тақырыпты үйренсем?»), `AskCurrentProgress` («Мен қай жерде тұрмын?»), recap template surfacing the full progress map. Intent count 39 → 41.
+- **v4.99.5+** — Adaptive difficulty wiring: `pedagogical::exercise_for_topic` consumes `difficulty_hint` to scale exercise selection within a stage; lesson-state dialog tree drives autonomous progression.
+
+**Stripe — Kazakh school tutor (curriculum auto-advance live; tutor now visibly guides the journey).**
+
 ## [4.98.0] — 2026-05-08 — Lesson-state curriculum tree (long-term roadmap step 1) — foundation for adaptive tutor progression
 
 First step of the long-term tutor arc, beginning after Codex's round-2 audit was fully closed in v4.97.0. Defines an ordered Rust pedagogical curriculum and adds per-conversation per-stage progress tracking. v4.98.0 ships **only the foundation** — user-facing response changes are deferred to v4.98.5 and student-side query intents to v4.99.0.

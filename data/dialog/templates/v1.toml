@@ -1408,6 +1408,29 @@ templates = [
     "Менде cargo шакыру мүмкіндігі әзірге жоқ. Кодыңызды жергілікте `cargo run` арқылы тексеріп көріңіз.",
 ]
 
+# **v4.98.5** — auto-advance template family. Fires when a `passed`
+# verdict closes the current curriculum stage (`stage_label_kk` ✓
+# `{stage_passes}/{stage_passes}`) AND there's a next stage unlocked.
+# Conversation pre-stuffs `stage_label_kk`, `stage_passes`,
+# `next_stage_label_kk`, `next_stage_summary_kk` before planning.
+[[families]]
+key = "submit_solution.passed_stage_closed"
+templates = [
+    "Жарайсыз! **{stage_label_kk}** тақырыбы аяқталды ({stage_passes}/{stage_passes}). Енді **{next_stage_label_kk}** тақырыбына кіруге болады.\n\n{next_stage_summary_kk}",
+    "Тамаша! Сіз **{stage_label_kk}** тақырыбын меңгердіңіз ({stage_passes} жаттығу шешіліп қойды). Келесі қадам — **{next_stage_label_kk}**: {next_stage_summary_kk}",
+    "Кодыңыз өтті — **{stage_label_kk}** тақырыбы жабылды. Енді {next_stage_label_kk} тақырыбына көшсек болады. {next_stage_summary_kk}",
+]
+
+# **v4.98.5** — final auto-advance template. Fires when a `passed`
+# verdict closes the LAST stage (curriculum complete — no next
+# stage to suggest).
+[[families]]
+key = "submit_solution.passed_curriculum_complete"
+templates = [
+    "Құттықтаймын! **{stage_label_kk}** тақырыбы да аяқталды — Rust бойынша негізгі курсты толық меңгеріп шықтыңыз. Енді нақты жоба жазып көрсеңіз болады.",
+    "Тамаша! Сіз барлық тақырыптарды бітірдіңіз ({stage_label_kk} соңғысы еді). Дайын — өз жобаңызды бастаңыз; қажет болса нақты сұрақтармен қайтып келіңіз.",
+]
+
 # **v4.96.0** — Codex round-2 audit Bug 7. Cross-language contrast
 # templates. When the user asks «Python-да ownership бар ма?» or
 # similar, route here instead of surfacing the Rust ownership
