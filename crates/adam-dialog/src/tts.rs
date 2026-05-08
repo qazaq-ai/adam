@@ -29,6 +29,8 @@
 //! prefers Kazakh; falls back to the system default voice if no
 //! Kazakh option is found (with a one-time warning to stderr).
 
+use std::io::Write;
+use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
 
@@ -216,6 +218,210 @@ impl Drop for OsTtsBackend {
             let _ = child.try_wait();
         }
     }
+}
+
+/// **v5.1.0** — neural TTS backend via [Piper](https://github.com/rhasspy/piper).
+///
+/// Piper is a fast, local neural TTS that produces noticeably more
+/// natural speech than OS-bundled synthesisers. The trade-off is a
+/// 50-100 MB ONNX model per voice and a `piper` CLI dependency. v5.1.0
+/// keeps the kernel binary small by NOT bundling Piper or any model;
+/// users who want richer voice install both manually and pass
+/// `--tts-backend piper --tts-model <path>`.
+///
+/// ## Usage
+///
+/// 1. Install piper: e.g. `brew install piper-tts` (macOS) or via
+///    the official release binaries.
+/// 2. Download a voice model (`.onnx` file) — see
+///    <https://github.com/rhasspy/piper/blob/master/VOICES.md>.
+///    Kazakh-specific models are not in the official catalogue at
+///    time of writing; users may train or use a multilingual
+///    fallback.
+/// 3. Run `adam_chat --tts --tts-backend piper --tts-model
+///    /path/to/model.onnx`.
+///
+/// ## Pipeline
+///
+/// `speak(text)` pipes `text` to `piper` via stdin; piper writes a
+/// WAV file; an OS-native audio player (`afplay` on macOS, `aplay`
+/// on Linux) plays the WAV. The audio player is spawned as a
+/// detached child so playback is non-blocking. The piper synthesis
+/// step itself is synchronous (~0.3-1 s per sentence on M2) — the
+/// blocking is contained to that step. Kill-previous semantics
+/// apply to the audio player child, mirroring `OsTtsBackend`.
+#[derive(Debug)]
+pub struct PiperTtsBackend {
+    piper: PathBuf,
+    audio_player: PathBuf,
+    model_path: PathBuf,
+    voice_label: Option<String>,
+    current: Mutex<Option<Child>>,
+}
+
+impl PiperTtsBackend {
+    /// Construct from explicit components. Tests + direct callers.
+    pub fn new(
+        piper: PathBuf,
+        audio_player: PathBuf,
+        model_path: PathBuf,
+        voice_label: Option<String>,
+    ) -> Self {
+        Self {
+            piper,
+            audio_player,
+            model_path,
+            voice_label,
+            current: Mutex::new(None),
+        }
+    }
+
+    /// Detect a usable Piper installation. Returns `None` when:
+    /// - `piper` CLI is not on `PATH`
+    /// - no usable audio player (`afplay` / `aplay`) is on `PATH`
+    /// - the supplied model path doesn't exist
+    pub fn detect(model_path: &std::path::Path) -> Option<Self> {
+        let piper = locate_command("piper")?;
+        let audio_player = locate_audio_player()?;
+        if !model_path.exists() {
+            return None;
+        }
+        let voice_label = model_path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .map(String::from);
+        Some(Self::new(
+            piper,
+            audio_player,
+            model_path.to_path_buf(),
+            voice_label,
+        ))
+    }
+
+    /// Path to the `piper` binary.
+    pub fn piper_path(&self) -> &std::path::Path {
+        &self.piper
+    }
+
+    /// Path to the OS audio player.
+    pub fn audio_player_path(&self) -> &std::path::Path {
+        &self.audio_player
+    }
+
+    /// Path to the ONNX model file.
+    pub fn model_path(&self) -> &std::path::Path {
+        &self.model_path
+    }
+
+    /// Voice label (derived from the model filename stem).
+    pub fn voice_label(&self) -> Option<&str> {
+        self.voice_label.as_deref()
+    }
+
+    /// Path to the temp WAV file used as the piper-to-player buffer.
+    fn temp_wav() -> PathBuf {
+        std::env::temp_dir().join(format!("adam_piper_{}.wav", std::process::id()))
+    }
+}
+
+impl TtsBackend for PiperTtsBackend {
+    fn speak(&self, text: &str) -> std::io::Result<()> {
+        let cleaned = strip_for_speech(text);
+        if cleaned.trim().is_empty() {
+            return Ok(());
+        }
+        let temp = Self::temp_wav();
+        // Step 1: synthesise via piper. This is synchronous — piper
+        // writes the WAV file before returning. Typical latency on
+        // M2 is ~0.3-1s for short sentences.
+        let mut piper_child = Command::new(&self.piper)
+            .arg("--model")
+            .arg(&self.model_path)
+            .arg("--output_file")
+            .arg(&temp)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()?;
+        if let Some(stdin) = piper_child.stdin.as_mut() {
+            stdin.write_all(cleaned.as_bytes())?;
+        }
+        let piper_status = piper_child.wait()?;
+        if !piper_status.success() {
+            return Err(std::io::Error::other(format!(
+                "piper exited with non-zero status {:?}",
+                piper_status.code()
+            )));
+        }
+        // Step 2: kill any in-flight playback, then spawn the new one
+        // (non-blocking — same kill-previous semantics as
+        // `OsTtsBackend`).
+        let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
+        if let Some(mut prev) = guard.take() {
+            let _ = prev.kill();
+            let _ = prev.wait();
+        }
+        let player = Command::new(&self.audio_player)
+            .arg(&temp)
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()?;
+        *guard = Some(player);
+        Ok(())
+    }
+
+    fn describe(&self) -> String {
+        match &self.voice_label {
+            Some(v) => format!(
+                "piper (model: {}, player: {})",
+                v,
+                self.audio_player.display()
+            ),
+            None => format!(
+                "piper (model: {}, player: {})",
+                self.model_path.display(),
+                self.audio_player.display()
+            ),
+        }
+    }
+}
+
+impl Drop for PiperTtsBackend {
+    fn drop(&mut self) {
+        if let Ok(mut guard) = self.current.lock()
+            && let Some(mut child) = guard.take()
+        {
+            let _ = child.try_wait();
+        }
+    }
+}
+
+/// Resolve a command on `PATH` to its absolute path, returning `None`
+/// when the command isn't installed. Mirrors `command_on_path` but
+/// returns the path rather than a bool — needed by `PiperTtsBackend`
+/// because piper / audio-player paths are stored on the struct.
+fn locate_command(name: &str) -> Option<PathBuf> {
+    let output = Command::new("which").arg(name).output().ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let path = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if path.is_empty() {
+        return None;
+    }
+    Some(PathBuf::from(path))
+}
+
+/// Locate an OS-native audio player suitable for playing piper's WAV
+/// output. macOS ships `afplay`; Linux distros typically have
+/// `aplay` (ALSA), `paplay` (PulseAudio), or `play` (sox).
+fn locate_audio_player() -> Option<PathBuf> {
+    for candidate in ["afplay", "aplay", "paplay", "play"] {
+        if let Some(p) = locate_command(candidate) {
+            return Some(p);
+        }
+    }
+    None
 }
 
 /// Prepare a text fragment for spoken output. Strips markdown code
@@ -457,5 +663,92 @@ mod tests {
         // No child was spawned.
         let guard = backend.current.lock().unwrap();
         assert!(guard.is_none());
+    }
+
+    // ─── v5.1.0 — Piper backend tests ────────────────────────────────
+
+    #[test]
+    fn piper_backend_describe_includes_model() {
+        let backend = PiperTtsBackend::new(
+            PathBuf::from("/usr/local/bin/piper"),
+            PathBuf::from("/usr/bin/afplay"),
+            PathBuf::from("/voices/en_US-lessac-medium.onnx"),
+            Some("en_US-lessac-medium".into()),
+        );
+        let description = backend.describe();
+        assert!(description.contains("piper"));
+        assert!(description.contains("en_US-lessac-medium"));
+    }
+
+    #[test]
+    fn piper_backend_accessors_work() {
+        let backend = PiperTtsBackend::new(
+            PathBuf::from("/p/piper"),
+            PathBuf::from("/p/afplay"),
+            PathBuf::from("/m/voice.onnx"),
+            Some("voice".into()),
+        );
+        assert_eq!(backend.piper_path(), std::path::Path::new("/p/piper"));
+        assert_eq!(
+            backend.audio_player_path(),
+            std::path::Path::new("/p/afplay")
+        );
+        assert_eq!(backend.model_path(), std::path::Path::new("/m/voice.onnx"));
+        assert_eq!(backend.voice_label(), Some("voice"));
+    }
+
+    #[test]
+    fn piper_detect_returns_none_when_model_missing() {
+        // Use a definitely-nonexistent model path.
+        let nonexistent = PathBuf::from("/tmp/adam_definitely_no_model_xyz_98765.onnx");
+        assert!(!nonexistent.exists());
+        let backend = PiperTtsBackend::detect(&nonexistent);
+        // Even if `piper` happens to be installed, the missing model
+        // file must short-circuit detection.
+        assert!(backend.is_none());
+    }
+
+    #[test]
+    fn piper_speak_empty_input_is_noop() {
+        // We can construct a backend without the binaries actually
+        // existing; speak() with empty input never reaches them.
+        let backend = PiperTtsBackend::new(
+            PathBuf::from("/nonexistent/piper"),
+            PathBuf::from("/nonexistent/afplay"),
+            PathBuf::from("/nonexistent/voice.onnx"),
+            None,
+        );
+        assert!(backend.speak("").is_ok());
+        assert!(backend.speak("   \n\n").is_ok());
+        let guard = backend.current.lock().unwrap();
+        assert!(guard.is_none());
+    }
+
+    #[test]
+    fn locate_command_finds_known_binary_on_unix() {
+        // `sh` is universal on Unix; should resolve.
+        if cfg!(unix) {
+            let resolved = locate_command("sh");
+            assert!(resolved.is_some(), "sh should be locatable");
+            let path = resolved.unwrap();
+            assert!(path.is_absolute());
+        }
+    }
+
+    #[test]
+    fn locate_command_returns_none_for_missing_binary() {
+        let resolved = locate_command("definitely_not_a_real_command_xyz_98765");
+        assert!(resolved.is_none());
+    }
+
+    #[test]
+    fn locate_audio_player_finds_afplay_on_macos() {
+        if !cfg!(target_os = "macos") {
+            return;
+        }
+        let player = locate_audio_player();
+        assert!(player.is_some(), "macOS should have afplay");
+        let path = player.unwrap();
+        assert!(path.to_string_lossy().contains("afplay"));
     }
 }

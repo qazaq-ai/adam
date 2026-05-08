@@ -7,6 +7,97 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [5.1.0] — 2026-05-08 — Optional Piper neural TTS backend — richer voice for users who want it
+
+Second `TtsBackend` implementation alongside the v5.0.0 OS-native default. Users who want noticeably more natural speech can install [Piper](https://github.com/rhasspy/piper) (~5 MB CLI binary) and download a voice model (~50-100 MB ONNX), then run `adam_chat --tts --tts-backend piper --tts-model <path>`. Architecturally fenced: Piper is bundled neither in adam's binary nor in the repo — purely opt-in, kernel determinism unchanged.
+
+### What's added
+
+**`PiperTtsBackend`** ([tts.rs](crates/adam-dialog/src/tts.rs)):
+
+```rust
+pub struct PiperTtsBackend {
+    piper: PathBuf,
+    audio_player: PathBuf,
+    model_path: PathBuf,
+    voice_label: Option<String>,
+    current: Mutex<Option<Child>>,
+}
+
+impl PiperTtsBackend {
+    pub fn detect(model_path: &Path) -> Option<Self>;
+    pub fn new(piper: PathBuf, audio_player: PathBuf,
+               model_path: PathBuf, voice_label: Option<String>) -> Self;
+}
+```
+
+`detect()` returns `None` when any of `piper` binary / audio player / ONNX model file is missing.
+
+**Pipeline:** `text → piper stdin → temp WAV → spawn audio player`. Audio player tracked in `Mutex<Option<Child>>` for the same kill-previous semantics as v5.0.5. The piper synthesis step itself is synchronous (~0.3-1s on M2); playback is non-blocking.
+
+**Helper functions** (private):
+
+- `locate_command(name)` — resolves binary's absolute path via `which`. Returns `None` if missing.
+- `locate_audio_player()` — probes `afplay → aplay → paplay → play` in order. macOS gets `afplay` for free.
+
+**REPL flags** ([adam_chat.rs](crates/adam-dialog/src/bin/adam_chat.rs)):
+
+- `--tts-backend piper` opts into Piper.
+- `--tts-model <path>` points at the ONNX voice file.
+- Graceful fallback to OS backend when Piper detection fails (rather than erroring out).
+
+### Smoke test (graceful fallback)
+
+```
+$ adam_chat --once 'Сәлем.' --tts --tts-backend piper --tts-model /nonexistent.onnx
+adam-chat: --tts-backend piper requested but `piper` binary, audio player,
+           or model not found; falling back to OS backend
+adam-chat: TTS on — say (voice: Aru)
+Сәлем
+[macOS Aru voice speaks]
+```
+
+### Regression tests
+
+7 new in `tts::tests`:
+
+1. `piper_backend_describe_includes_model`
+2. `piper_backend_accessors_work`
+3. `piper_detect_returns_none_when_model_missing`
+4. `piper_speak_empty_input_is_noop`
+5. `locate_command_finds_known_binary_on_unix`
+6. `locate_command_returns_none_for_missing_binary`
+7. `locate_audio_player_finds_afplay_on_macos`
+
+End-to-end speak via real Piper requires user to install both `piper` and a voice model; documented but not gated by tests (would require model in CI).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 20 / 20 tts module unit tests (13 from v5.0.5 + 7 new) | ✅ 100 % |
+| 9 / 9 v4.99.5 adaptive-difficulty tests | ✅ unchanged |
+| 18 / 18 v4.99.0 query-intent tests | ✅ unchanged |
+| 11 / 11 v4.98.5 auto-advance tests | ✅ unchanged |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1101 passing** + 17 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Strategic
+
+For current macOS users, the bundled `Aru` voice (v5.0.0 OS backend) is already excellent — Piper backend is for Linux users without quality TTS, or anyone wanting to experiment with different voice models. Kazakh-specific Piper models aren't in the official catalogue today, but the architecture is ready when one becomes available (or user trains one).
+
+### Roadmap
+
+- **v5.2.0** — concatenative phoneme bank for fully-deterministic Kazakh pronunciation aligned with kernel philosophy. Hand-recorded phoneme units stitched per-word at runtime — most kernel-pure option but biggest content-engineering investment.
+
+**Stripe — Kazakh school tutor (multi-backend voice infrastructure).**
+
 ## [5.0.5] — 2026-05-08 — Non-blocking TTS dispatch — REPL stays responsive while adam speaks
 
 Builds on v5.0.0 voice output. Pre-v5.0.5 `OsTtsBackend::speak` blocked the REPL until the synthesiser finished — student could only type next input *after* adam stopped speaking. Post-v5.0.5 the synthesiser runs as a detached child process; `speak()` returns in microseconds, REPL accepts the next prompt immediately.

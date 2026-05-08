@@ -86,10 +86,20 @@ fn main() -> ExitCode {
     // system-native voice synthesiser (macOS `say` / Linux
     // `espeak-ng`) so adam speaks every response in addition to
     // printing it. `--tts-voice <name>` overrides voice detection.
+    // **v5.1.0** — `--tts-backend piper --tts-model <path>` opts
+    // into the optional Piper neural backend.
     let tts_enabled = args.iter().any(|a| a == "--tts");
     let tts_voice = args
         .windows(2)
         .find(|w| w[0] == "--tts-voice")
+        .map(|w| w[1].clone());
+    let tts_backend_choice = args
+        .windows(2)
+        .find(|w| w[0] == "--tts-backend")
+        .map(|w| w[1].clone());
+    let tts_model = args
+        .windows(2)
+        .find(|w| w[0] == "--tts-model")
         .map(|w| w[1].clone());
 
     let lex = match LexiconV1::load_default() {
@@ -270,19 +280,46 @@ fn main() -> ExitCode {
     // system-native voice synthesiser (macOS `say` / Linux
     // `espeak-ng`); when not, use the no-op backend so the call
     // sites stay symmetric.
+    // **v5.1.0** — `--tts-backend piper` opts into the neural Piper
+    // backend (requires `--tts-model <path>` to point at an ONNX
+    // voice file). Falls back to the OS backend on detection
+    // failure to keep the experience consistent.
     let tts_box: Box<dyn adam_dialog::tts::TtsBackend> = if tts_enabled {
-        match adam_dialog::tts::OsTtsBackend::detect(tts_voice.as_deref()) {
-            Some(backend) => {
-                eprintln!("adam-chat: TTS on — {}", backend.describe());
-                Box::new(backend)
+        let chosen = match tts_backend_choice.as_deref() {
+            Some("piper") => {
+                let model = tts_model.as_ref().map(std::path::PathBuf::from);
+                match model
+                    .as_deref()
+                    .and_then(adam_dialog::tts::PiperTtsBackend::detect)
+                {
+                    Some(backend) => {
+                        eprintln!("adam-chat: TTS on — {}", backend.describe());
+                        Some(Box::new(backend) as Box<dyn adam_dialog::tts::TtsBackend>)
+                    }
+                    None => {
+                        eprintln!(
+                            "adam-chat: --tts-backend piper requested but `piper` binary, audio player, or model not found; falling back to OS backend"
+                        );
+                        None
+                    }
+                }
             }
-            None => {
-                eprintln!(
-                    "adam-chat: --tts requested but no system synthesiser found; falling back to silent text"
-                );
-                Box::new(adam_dialog::tts::NoOpTts)
+            _ => None,
+        };
+        chosen.unwrap_or_else(|| {
+            match adam_dialog::tts::OsTtsBackend::detect(tts_voice.as_deref()) {
+                Some(backend) => {
+                    eprintln!("adam-chat: TTS on — {}", backend.describe());
+                    Box::new(backend)
+                }
+                None => {
+                    eprintln!(
+                        "adam-chat: --tts requested but no system synthesiser found; falling back to silent text"
+                    );
+                    Box::new(adam_dialog::tts::NoOpTts)
+                }
             }
-        }
+        })
     } else {
         Box::new(adam_dialog::tts::NoOpTts)
     };
@@ -308,9 +345,9 @@ fn main() -> ExitCode {
     }
 
     eprintln!(
-        "adam-chat v5.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
+        "adam-chat v5.1 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
          Multi-line code blocks: open with ``` and close with ``` on its own line.\n\
-         Voice output: pass --tts to hear adam's responses (--tts-voice <name> to override)."
+         Voice output: pass --tts (default OS voice; or --tts-backend piper --tts-model <path>)."
     );
     let stdin = io::stdin();
     let stdout = io::stdout();
