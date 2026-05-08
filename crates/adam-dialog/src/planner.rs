@@ -271,6 +271,46 @@ pub fn plan_response_with_epistemic(
             };
         }
     }
+    // **v5.3.0** — sister sentinel for the "user picked one of the
+    // contested values" path (e.g. «Жоқ, Алматы дұрыс»). The belief
+    // layer already resolved (active=1=Алматы); we route through a
+    // resolution-acceptance template with the chosen profile slot.
+    if extra_slots.contains_key("__resolve_contradiction__") {
+        let key = "resolve_contradiction";
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: resolve_contradiction override → {key}"));
+            let applicable_all = repo.get(key);
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            // Prefer templates whose all-slot placeholders are filled.
+            let fillable: Vec<&String> = applicable_all
+                .iter()
+                .filter(|t| template_is_fillable(t, &slots))
+                .collect();
+            let effective: Vec<&String> = if fillable.is_empty() {
+                applicable_all.iter().collect()
+            } else {
+                fillable
+            };
+            let idx = (rng_seed as usize) % effective.len().max(1);
+            let chosen = effective.get(idx).map(|s| (*s).clone()).unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                effective.len(),
+                idx,
+                chosen,
+            ));
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v4.4.5** — when `extra_slots` carries the
     // `__check_contradiction__` marker, route through the
     // `check_contradiction` template family unconditionally. The

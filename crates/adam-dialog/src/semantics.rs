@@ -2128,7 +2128,15 @@ fn detect_ask_location(joined: &str) -> bool {
         || joined.contains("тұрасың")
         || joined.contains("қайдансыз")
         || joined.contains("қайдансың");
-    if !has_user_marker {
+    // **v5.3.0** — Codex round-3 audit Bug 2 (self-recall sub-fix).
+    // Also accept 1st-person reflexive «Қай қалада тұрамын?» / «Қайдамын?»
+    // — user asking adam to recall their own location from session.
+    // Without this branch the question fell through to a definitional
+    // surface ("Қала — елді мекен") instead of «Сіз Алматыда тұрасыз».
+    let has_self_recall_marker = tokens
+        .iter()
+        .any(|t| matches!(*t, "тұрамын" | "тұрамыз" | "қайдамын" | "қайдамыз"));
+    if !has_user_marker && !has_self_recall_marker {
         return false;
     }
     joined.contains("қай жерден")
@@ -2136,6 +2144,8 @@ fn detect_ask_location(joined: &str) -> bool {
         || joined.contains("қайда тұра")
         || joined.contains("қай қала")
         || joined.contains("қай аудан")
+        // self-recall variants: «Қай қалада тұрамын?»
+        || (has_self_recall_marker && joined.contains("қай"))
 }
 
 /// User states location: "мен Алматыданмын", "астанада тұрамын",
@@ -2156,6 +2166,25 @@ fn detect_statement_of_location(
     use adam_kernel_fst::morphotactics::Case;
 
     if !has_first_person_location_context(tokens, joined, parses) {
+        return None;
+    }
+
+    // **v5.3.0** — Codex round-3 audit Bug 2 (sub-fix). «Қай қалада
+    // тұрамын?» is a QUESTION about location («which city do I live
+    // in?»), not a statement. Pre-fix this detector matched on
+    // «тұрамын» (1sg present "I live") + locative noun «қалада»
+    // («in city») and routed to `StatementOfLocation { city: "Қала" }`
+    // — polluting the belief state with the noun "city" as if the
+    // user had asserted living there. Post-fix question markers
+    // («қай», «қашан», «неге», «қандай», «?») bail out so the turn
+    // falls through to AskLocation or other detectors.
+    let is_question = joined.contains('?')
+        || joined.contains("қай ")
+        || joined.contains(" қай ")
+        || joined.starts_with("қай ")
+        || joined.contains("қандай")
+        || joined.contains("қашан");
+    if is_question {
         return None;
     }
 

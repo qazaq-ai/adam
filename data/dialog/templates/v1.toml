@@ -637,6 +637,26 @@ templates = [
     "жарайды, екі нұсқаны да ұмытайын",
 ]
 
+# **v5.3.0** — Codex round-3 audit Bug 2 fix. When the user resolves a
+# pending contradiction by EXPLICITLY naming one of the contested
+# values («Жоқ, Алматы дұрыс»), this family fires (sister to
+# `dismiss_contradiction`). One value won, the other dropped. The
+# template confirms the chosen one so the user knows belief was
+# updated correctly.
+[[families]]
+key = "resolve_contradiction"
+templates = [
+    # Slot-bearing variants — one per common profile predicate.
+    "Түсіндім, мекеніңіз — {city} екен. Естімде ұстаймын.",
+    "Жарайды, {city} болсын — есепке алдым.",
+    "Ұқтым: атыңыз — {name}.",
+    "Түсіндім, мамандығыңыз — {occupation}.",
+    # Topic-less fallbacks — when the chosen value isn't a profile
+    # field, just acknowledge the resolution generically.
+    "Түсіндім, дұрыс нұсқаны естімде ұстаймын.",
+    "Жарайды, екі нұсқаның қайсысы дұрыс екенін есепке алдым.",
+]
+
 # v4.4.5 — `Action::CheckContradiction`. The planner's step 1
 # already routes here when the belief carries an unresolved
 # conflict; pre-v4.4.5 the renderer ignored the action and emitted

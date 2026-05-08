@@ -1094,6 +1094,31 @@ impl Conversation {
         if dismissed_contradiction {
             extra_slots.insert("__dismiss_contradiction__".into(), "1".into());
         }
+        // **v5.3.0** — Codex round-3 audit Bug 2 (sub-fix). When the
+        // user resolves a pending contradiction by EXPLICITLY naming
+        // one of the contested values («Жоқ, Алматы дұрыс» — Almaty
+        // wins, Astana drops), `try_resolve_pending_contradiction`
+        // already updated belief state correctly (active=1), but the
+        // intent stays `Negation` (because «Жоқ» fired the
+        // negation parser). Without this sentinel the planner would
+        // fall through to the generic negation template («Дұрыс
+        // емес.») — wrong response. The marker routes the planner
+        // to an explicit resolution-acceptance template that mirrors
+        // statement_of_location semantics with the chosen value.
+        if resolved_contradiction {
+            extra_slots.insert("__resolve_contradiction__".into(), "1".into());
+            // Surface the chosen value as a slot so the template can
+            // confirm: «Түсіндім, мекеніңіз — Алматы екен.»
+            if let Some(city) = self.session.get("city").cloned() {
+                extra_slots.insert("city".into(), city);
+            }
+            if let Some(name) = self.session.get("name").cloned() {
+                extra_slots.insert("name".into(), name);
+            }
+            if let Some(occupation) = self.session.get("occupation").cloned() {
+                extra_slots.insert("occupation".into(), occupation);
+            }
+        }
         // **v4.4.5** — symmetric marker for `Action::CheckContradiction`
         // routes the renderer to the new `check_contradiction`
         // template family. Pre-v4.4.5 the action layer correctly
@@ -1953,6 +1978,24 @@ impl Conversation {
                     .resolve_contradiction(&subject, &predicate, &value)
                 {
                     any_resolved = true;
+                    // **v5.3.0** — Codex round-3 audit Bug 2 fix.
+                    // Sync session profile slot to the chosen value
+                    // so subsequent Ask{Predicate} turns surface it
+                    // instead of the last-absorbed (now-Superseded)
+                    // contested value. Mirrors the v4.96.0 dismissal
+                    // sync logic.
+                    if subject == crate::belief::USER_SELF_KEY {
+                        self.session.insert(predicate.clone(), value.clone());
+                        if predicate == "city" {
+                            self.session.remove("city_id");
+                            self.session.remove("geo_kind");
+                        }
+                        if predicate == "name" {
+                            self.session.remove("name_id");
+                            self.session.remove("name_respect");
+                            self.session.remove("name_respect_distinct");
+                        }
+                    }
                 }
             }
         }

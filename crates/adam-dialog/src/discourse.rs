@@ -148,6 +148,16 @@ pub fn input_contains_discourse_anaphor(input: &str) -> bool {
 /// wh-interrogative AND has no other content noun signal. The
 /// semantic effect: the interrogative is anaphoric, referring to
 /// the prior turn's topic.
+///
+/// **v5.3.0** — Codex round-3 audit Bug 4 fix. Pre-fix this
+/// heuristic over-eagerly flagged «Аспан неге көк?» as anaphoric
+/// because 3 tokens ≤ 4 and «неге» is a wh-interrogative — but the
+/// input names its own subject «Аспан» (sky). The fix: when a
+/// wh-interrogative is **preceded** by another alphabetic token,
+/// the input names its own subject and is NOT anaphoric. The
+/// canonical anaphoric form is wh-word FIRST («Кім құрды? Қайда
+/// жүреді? Неге маңызды?»). When wh-word is in second / later
+/// position, the preceding content names the topic.
 fn is_short_interrogative_followup(lower: &str) -> bool {
     const WH_INTERROGATIVES: &[&str] = &["кім", "қайда", "қашан", "неге", "неліктен", "қалай"];
     let tokens: Vec<&str> = lower
@@ -157,7 +167,19 @@ fn is_short_interrogative_followup(lower: &str) -> bool {
     if tokens.len() > 4 {
         return false;
     }
-    tokens.iter().any(|t| WH_INTERROGATIVES.contains(t))
+    // Find the position of the first wh-word.
+    let wh_position = tokens.iter().position(|t| WH_INTERROGATIVES.contains(t));
+    let Some(wh_pos) = wh_position else {
+        return false;
+    };
+    // **v5.3.0** — wh-word must be at position 0 (or after only
+    // discourse particles like «ал»). Otherwise the preceding
+    // content names the topic and the question is NOT anaphoric.
+    const PRE_WH_PARTICLES: &[&str] = &["ал", "ал,", "сонда", "онда"];
+    let preceding_substantive = tokens[..wh_pos]
+        .iter()
+        .any(|t| !PRE_WH_PARTICLES.contains(t));
+    !preceding_substantive
 }
 
 /// **v4.30.0** — Detects the adnominal-demonstrative coreference

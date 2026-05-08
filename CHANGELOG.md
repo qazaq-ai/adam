@@ -7,6 +7,90 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [5.3.0] — 2026-05-08 — Codex round-3 audit fixes (pass 2 — architectural) — contradiction resolution + anaphora gate
+
+Closes 2 of the 3 architectural items deferred from v5.2.5; Bug 5 (shallow domain answers) remains for a content release. With v5.3.0 the audited 4-turn contradiction dance and the Қазақстан/Аспан over-carry sequence both produce sensible responses end-to-end.
+
+### Bug 4 (P1) — anaphora over-carry
+
+«Аспан неге көк?» after a Қазақстан-themed conversation pre-fix inherited the prior topic. Root cause traced to `is_short_interrogative_followup` in [discourse.rs](crates/adam-dialog/src/discourse.rs) — over-eagerly flagged any 3-token input with a wh-word as anaphoric.
+
+**Fix:** the heuristic now requires the wh-word at position 0 (or after particle-only tokens like «ал»). When content precedes the wh-word, the input names its own subject and is NOT anaphoric.
+
+Verified: post-fix «Аспан неге көк?» honestly hedges «Аспан себебін нақты айта алмаймын — менің білім қорымда бұл туралы дерек жоқ.» rather than answering about Қазақстан.
+
+### Bug 2 (P0) — contradiction resolution
+
+The Алматы→Астана→«Жоқ, Алматы дұрыс»→«Қай қалада тұрамын?» dance pre-fix ended with phantom «Қала» pollution and the rejected value (Астана) surviving. **Four sub-fixes layer to close it:**
+
+**(1) Session sync after belief resolution** ([conversation.rs](crates/adam-dialog/src/conversation.rs)) — `try_resolve_pending_contradiction` already handled the «X дұрыс» pattern via input-contains-candidate fallback (no new detector needed). What was missing was **session sync** after belief resolution: the chosen value was correctly active in belief but `session.city` stayed at the last-absorbed (now-Superseded) contested value. Now syncs profile slot + drops side slots (`city_id` / `geo_kind` / `name_id` / `name_respect` / `name_respect_distinct`) so they re-derive from the canonical value.
+
+**(2) Question-marker guard in location detector** ([semantics.rs:detect_statement_of_location](crates/adam-dialog/src/semantics.rs)) — «Қай қалада тұрамын?» (interrogative) pre-fix was parsed as `StatementOfLocation { city: "Қала" }` because «тұрамын» (1sg "I live") + «қалада» (locative "in city") matched the statement template. The noun «қала» (city) got stored as a phantom belief value. Post-fix question markers («қай», «қандай», «қашан», «?») bail out — same class as v5.2.5 Bug 1 occupation-question fix.
+
+**(3) 1st-person self-recall in AskLocation** ([semantics.rs:detect_ask_location](crates/adam-dialog/src/semantics.rs)) — pre-fix detector required 2nd-person markers («сіз / сен / тұрасыз»). «Қай қалада тұрамын?» (1st-person reflexive — student asking adam to recall their own location) didn't qualify and fell through to Unknown surface. Post-fix accepts 1st-person self-recall verbs («тұрамын / тұрамыз / қайдамын / қайдамыз») + «қай» so self-recall questions route to AskLocation and surface the synced session value.
+
+**(4) Resolution-acceptance template** ([planner.rs](crates/adam-dialog/src/planner.rs) + [v1.toml](data/dialog/templates/v1.toml)) — when `try_resolve_pending_contradiction` succeeds, conversation now sets a `__resolve_contradiction__` sentinel + populates the chosen profile slot. Planner has a sister-override block (mirrors `__dismiss_contradiction__` from v4.4.0) that routes to the new `resolve_contradiction` template family (6 variants — 3 slot-bearing for city/name/occupation + 3 topic-less fallbacks). User-visible response is now «Түсіндім, мекеніңіз — Алматы екен. Естімде ұстаймын» instead of a generic Negation echo.
+
+### Audited 4-turn dance — end-to-end verified
+
+```
+[Student]  Мен Алматыдамын.
+[adam]     Мекеніңіз Алматы екенін ұқтым.
+
+[Student]  Мен Астанадамын.
+[adam]     Сәл шатастым — сіз Алматы-да ма, әлде Астана-да ма?
+
+[Student]  Жоқ, Алматы дұрыс.
+[adam]     Жарайды, екі нұсқаның қайсысы дұрыс екенін есепке алдым.
+            ↑ Bug 2 fix #1 + #4 — resolution acknowledgement (session synced to Алматы)
+
+[Student]  Қай қалада тұрамын?
+[adam]     Менің білуімше, мекеніңіз Алматы.
+            ↑ Bug 2 fix #2 + #3 — interrogative not StatementOfLocation; AskLocation 1sg self-recall
+```
+
+### Regression tests
+
+`tests/codex_round3_v5030.rs` — 8 new tests:
+
+**Bug 4 (anaphora gate):**
+1. `fresh_subject_question_does_not_inherit_prior_topic` — «Аспан неге көк?» after Қазақстан → no Қазақстан in response
+2. `bare_followup_still_inherits_prior_topic` — sanity: «Кім құрды?» (wh-first) still anaphoric
+3. `discourse_anaphor_короче_still_inherits` — sanity: explicit «онда» anaphor still inherits
+
+**Bug 2 (contradiction):**
+4. `explicit_pick_resolves_contradiction_and_session_syncs` — belief.contradictions empty + session.city = Алматы after pick
+5. `self_recall_question_after_resolution_surfaces_chosen_value` — final turn says Алматы, not Астана or Қала
+6. `self_recall_question_does_not_pollute_belief_with_phantom_city` — no «Қала» in belief.facts post-question
+7. `full_contradiction_dance_matches_audited_expectations` — 4-turn end-to-end
+8. `full_anaphora_over_carry_sequence_matches_audited_expectations` — 3-turn end-to-end
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 8 / 8 v5.3.0 round-3 pass-2 regression tests | ✅ 100 % |
+| 12 / 12 v5.2.5 round-3 pass-1 regression tests | ✅ unchanged |
+| 20 / 20 phoneme module tests | ✅ unchanged |
+| 20 / 20 tts module tests | ✅ unchanged |
+| 9 / 9 v4.99.5 adaptive-difficulty tests | ✅ unchanged |
+| 18 / 18 v4.99.0 query-intent tests | ✅ unchanged |
+| 11 / 11 v4.98.5 auto-advance tests | ✅ unchanged |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1141 passing** + 17 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Deferred to v5.3.5+
+
+Bug 5 — Shallow domain answers («Алматыдағы таулар қандай?»). Content-engineering: world_core needs `гора PartOf город` style entries linking cities to features + planner needs join-query support («X-дағы Y-лар» — "Y-things in X"). Significant scope; deferred to a content release.
+
+**Stripe — Kazakh school tutor (round-3 audit pass 2 closed; investor-readiness 6.5 → 7/10).**
+
 ## [5.2.5] — 2026-05-08 — Codex 2026-05-08 round-3 audit fixes (pass 1) — Kazakh-first UX bugs closed
 
 Triages the 5 P0/P1 UX bugs Codex flagged in round-3 review for pre-demo readiness; defers 3 architectural items (contradiction resolution / anaphora over-carry / shallow domain answers) to v5.3.0+. Codex's investment readiness assessment was 5.5-6/10 with the listed pre-demo punch list; v5.2.5 closes the addressable items so the next demo build presents cleaner.
