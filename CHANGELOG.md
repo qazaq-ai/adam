@@ -7,6 +7,94 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.97.0] — 2026-05-08 — Codex 2026-05-07 round-2 audit Bug 3 (P1) — REPL multi-line code-block accumulator
+
+Closes the last open bug from Codex's round-2 audit. With v4.97.0 the entire 7-bug audit is closed — bugs 1, 2, 4, 6, 7 in v4.96.0 + bug 5 in v4.96.5 + bug 3 here.
+
+### Why this matters
+
+Pre-v4.97.0 the REPL (`adam_chat`) read one line per turn, so a multi-line Rust source like
+
+```rust
+fn main() {
+    println!("сәлем!");
+}
+```
+
+had to be entered with `\n` escapes — students couldn't paste real source. The v4.95.0 `Intent::SubmitSolution` integration was end-to-end functional in single-line form, but the basic developer ergonomic — paste a function — didn't work.
+
+### What's added
+
+**`absorb_line(raw_line, &mut block_buf) -> Option<String>`** ([adam_chat.rs](crates/adam-dialog/src/bin/adam_chat.rs)):
+
+State-machine helper that drives the multi-line accumulator. Returns `Some(turn_input)` when a complete utterance is ready, else `None` (line was empty or buffering continues). Parity rule: a buffer with **odd** ` ``` ` count is open; **even** closes it. Inline blocks (one line containing both opening and closing fences — the v4.96.0 Bug 4 case) always have even count and bypass the accumulator.
+
+**`count_fences(s) -> usize`** — parity counter underpinning the state machine.
+
+**REPL loop** rewritten to call `absorb_line` per stdin line; turn counter only increments when `absorb_line` returns `Some`.
+
+### Behaviour invariants
+
+- Plain text lines (no fences) flush as a single-line turn.
+- Inline ` ```rust X ``` ` (both fences on one line) flushes immediately.
+- Multi-line block: opening line buffers, body lines buffer, closing line flushes the assembled block (preserving the original ` ``` ` fences and indentation).
+- Empty / whitespace-only lines OUTSIDE a buffer are skipped.
+- Empty lines INSIDE a buffer are preserved (a Rust function can have blank separators).
+- Trailing whitespace on every line is trimmed; leading whitespace inside a block is significant (indentation) and preserved.
+
+### Regression tests
+
+10 new binary unit tests in [adam_chat.rs](crates/adam-dialog/src/bin/adam_chat.rs):
+1. `count_fences_zero_in_plain_text`
+2. `count_fences_one_in_opening_line`
+3. `count_fences_two_in_inline_block`
+4. `count_fences_two_for_full_multiline_block`
+5. `fence_parity_governs_block_state`
+6. `absorb_line_assembles_multiline_block` — full open→body→body→close→flush sequence
+7. `absorb_line_inline_block_no_buffering`
+8. `absorb_line_plain_text_passthrough`
+9. `absorb_line_empty_lines_skipped_outside_buffer`
+10. `absorb_line_empty_lines_inside_block_preserved`
+
+### Smoke test (end-to-end)
+
+```
+$ printf 'Сәлеметсіз бе.\n```rust\nfn main() { println!("сәлем!"); }\n```\nРақмет.\n' | adam_chat
+adam-chat v4.0 — пікірлесейік! ...
+Multi-line code blocks: open with ``` and close with ``` on its own line.
+Сәлеметсіз бе.
+Жарайсыз! println тапсырмаңыз шешілді — `cargo check` тазалап өтті. `cargo run` арқылы орындап көрсеңіз болады.
+Ризамын
+```
+
+3 turns observed: greeting → SubmitSolution verdict (multi-line block was assembled correctly) → thanks-acknowledgement.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 10 / 10 v4.97.0 REPL accumulator unit tests | ✅ 100 % |
+| 8 / 8 v4.96.5 anaphora regression tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 regression tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1036 passing** + 11 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Codex round-2 audit — closed
+
+| Bug | Severity | Closed in |
+|---|---|---|
+| 1 — belief-session sync on dismissal | P0 | v4.96.0 |
+| 2 — pedagogical seed-leak | P0 | v4.96.0 |
+| 3 — REPL multi-line accumulator | P1 | **v4.97.0** |
+| 4 — inline language tag | P1 | v4.96.0 |
+| 5 — multi-turn anaphora to pedagogical topic | P1 | v4.96.5 |
+| 6 — Russian-only refusal | P0 | v4.96.0 |
+| 7 — cross-language contrast intent | P1 | v4.96.0 |
+
+**Stripe — Kazakh school tutor (round-2 audit fully closed; tutor REPL now accepts paste-friendly multi-line solutions out of the box).**
+
 ## [4.96.5] — 2026-05-08 — Codex 2026-05-07 round-2 audit Bug 5 (P1) — multi-turn anaphora resolves to pedagogical topic
 
 Closes the gap where pedagogical intents emitted topic-bearing curated content but did **not** populate `Conversation.dialog_context`. Result pre-fix: after «Маған ownership жаттығуын беріңізші.» (which fires `AskExercise(ownership)`), the next turn «Оны қалай шешеміз?» found nothing in `dialog_context.resolve_anaphor()` and fell back to `Intent::Unknown`-only behaviour, surfacing a generic clarification.

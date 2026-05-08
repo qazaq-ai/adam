@@ -267,22 +267,81 @@ fn main() -> ExitCode {
         }
     }
 
-    eprintln!("adam-chat v4.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.");
+    eprintln!(
+        "adam-chat v4.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
+         Multi-line code blocks: open with ``` and close with ``` on its own line."
+    );
     let stdin = io::stdin();
     let stdout = io::stdout();
     let mut turn = 0u64;
+    // **v4.97.0** — multi-line code-block accumulator (Codex round-2
+    // Bug 3). Pre-v4.97.0 every newline ended the turn, so a Rust
+    // SubmitSolution like
+    //
+    //     ```rust
+    //     fn main() { println!("hi"); }
+    //     ```
+    //
+    // had to be entered as a single line with `\n` escapes. Now: when
+    // a line introduces an unclosed ``` fence, accumulate subsequent
+    // lines into a buffer and only fire the turn when the closing
+    // fence appears. The fence-count parity (odd → still inside a
+    // block; even → block closed) governs the flush.
+    let mut block_buf: Option<String> = None;
     for line in stdin.lock().lines() {
         let Ok(line) = line else { break };
-        let line = line.trim();
-        if line.is_empty() {
-            continue;
+        if let Some(assembled) = absorb_line(&line, &mut block_buf) {
+            turn += 1;
+            let seed = turn_seed(turn);
+            run_turn(&mut conv, &assembled, &lex, &repo, trace, seed);
+            stdout.lock().flush().ok();
         }
-        turn += 1;
-        let seed = turn_seed(turn);
-        run_turn(&mut conv, line, &lex, &repo, trace, seed);
-        stdout.lock().flush().ok();
     }
     ExitCode::SUCCESS
+}
+
+/// Drive the multi-line code-block accumulator state machine for one
+/// input line.
+///
+/// `block_buf` holds the in-progress code block (None when not inside
+/// one). Returns `Some(turn_input)` when a complete utterance is ready
+/// to send to `run_turn`, else `None` (line was empty or buffering
+/// continues).
+///
+/// Parity rule: a buffer with **odd** fence count is open; **even**
+/// closes it. Inline blocks (one line containing both opening and
+/// closing fences) always have even count and bypass the accumulator.
+fn absorb_line(raw_line: &str, block_buf: &mut Option<String>) -> Option<String> {
+    // Trim trailing whitespace only — leading whitespace inside a
+    // code block is significant (indentation).
+    let line = raw_line.trim_end();
+    if let Some(buf) = block_buf.as_mut() {
+        buf.push('\n');
+        buf.push_str(line);
+        if count_fences(buf) % 2 == 0 {
+            let assembled = std::mem::take(buf);
+            *block_buf = None;
+            return Some(assembled.trim().to_string());
+        }
+        return None;
+    }
+    let trimmed = line.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    if count_fences(trimmed) % 2 == 1 {
+        // Block opens but doesn't close on this line — start buffering.
+        *block_buf = Some(line.to_string());
+        return None;
+    }
+    Some(trimmed.to_string())
+}
+
+/// Count occurrences of the ` ``` ` markdown code-fence token. Used by
+/// the v4.97.0 multi-line accumulator to decide when a code block has
+/// closed (parity flips even).
+fn count_fences(s: &str) -> usize {
+    s.matches("```").count()
 }
 
 fn load_retrieval_index() -> Option<MorphemeIndex> {
@@ -495,4 +554,118 @@ fn turn_seed(turn: u64) -> u64 {
     s = s.wrapping_mul(0xFF51AFD7ED558CCD);
     s ^= s >> 33;
     s
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn count_fences_zero_in_plain_text() {
+        assert_eq!(count_fences("сәлем"), 0);
+        assert_eq!(count_fences(""), 0);
+    }
+
+    #[test]
+    fn count_fences_one_in_opening_line() {
+        assert_eq!(count_fences("```rust"), 1);
+        assert_eq!(count_fences("```"), 1);
+    }
+
+    #[test]
+    fn count_fences_two_in_inline_block() {
+        // Bug 4 / v4.96.0 single-line case: ```rust X```
+        assert_eq!(count_fences("```rust let x = 5; ```"), 2);
+    }
+
+    #[test]
+    fn count_fences_two_for_full_multiline_block() {
+        let buf = "```rust\nfn main() {}\n```";
+        assert_eq!(count_fences(buf), 2);
+    }
+
+    /// Parity invariant: an in-progress (still-open) block always has
+    /// odd fence count, a closed one always even. This is the contract
+    /// the REPL accumulator relies on.
+    #[test]
+    fn fence_parity_governs_block_state() {
+        // Just opened — odd → still buffering.
+        assert_eq!(count_fences("```rust") % 2, 1);
+        // After one body line — still odd.
+        let mut buf = String::from("```rust\nfn main() {}");
+        assert_eq!(count_fences(&buf) % 2, 1);
+        // Closing fence appended — even → ready to flush.
+        buf.push_str("\n```");
+        assert_eq!(count_fences(&buf) % 2, 0);
+    }
+
+    /// Drive the full multi-line state machine via `absorb_line` to
+    /// verify the open-→-buffer-→-close-→-flush sequence.
+    #[test]
+    fn absorb_line_assembles_multiline_block() {
+        let mut buf: Option<String> = None;
+        // Opening fence — buffers, no flush.
+        assert!(absorb_line("```rust", &mut buf).is_none());
+        assert!(buf.is_some());
+        // Body line — still buffering.
+        assert!(absorb_line("fn main() {", &mut buf).is_none());
+        assert!(absorb_line("    println!(\"hi\");", &mut buf).is_none());
+        assert!(absorb_line("}", &mut buf).is_none());
+        // Closing fence — flushes complete block.
+        let assembled = absorb_line("```", &mut buf).expect("block should flush");
+        assert!(buf.is_none(), "buffer must be empty after flush");
+        assert!(assembled.starts_with("```rust"), "got: {assembled:?}");
+        assert!(assembled.ends_with("```"), "got: {assembled:?}");
+        assert!(assembled.contains("println!"), "got: {assembled:?}");
+    }
+
+    /// A single line that contains BOTH fences (inline block, the
+    /// v4.96.0 Bug 4 case) bypasses the accumulator.
+    #[test]
+    fn absorb_line_inline_block_no_buffering() {
+        let mut buf: Option<String> = None;
+        let assembled = absorb_line("```rust let x = 5; ```", &mut buf)
+            .expect("inline block must flush immediately");
+        assert!(buf.is_none(), "no buffer for inline block");
+        assert_eq!(assembled, "```rust let x = 5; ```");
+    }
+
+    /// Non-code lines outside a buffer flush as-is.
+    #[test]
+    fn absorb_line_plain_text_passthrough() {
+        let mut buf: Option<String> = None;
+        let assembled =
+            absorb_line("Сәлеметсіз бе.", &mut buf).expect("plain text must flush immediately");
+        assert!(buf.is_none());
+        assert_eq!(assembled, "Сәлеметсіз бе.");
+    }
+
+    /// Empty / whitespace-only lines outside a buffer are skipped.
+    #[test]
+    fn absorb_line_empty_lines_skipped_outside_buffer() {
+        let mut buf: Option<String> = None;
+        assert!(absorb_line("", &mut buf).is_none());
+        assert!(absorb_line("   ", &mut buf).is_none());
+        assert!(buf.is_none());
+    }
+
+    /// Empty lines INSIDE a code block are preserved (a Rust function
+    /// can have blank separator lines).
+    #[test]
+    fn absorb_line_empty_lines_inside_block_preserved() {
+        let mut buf: Option<String> = None;
+        absorb_line("```rust", &mut buf);
+        absorb_line("fn a() {}", &mut buf);
+        absorb_line("", &mut buf); // blank separator
+        absorb_line("fn b() {}", &mut buf);
+        let assembled = absorb_line("```", &mut buf).expect("close fence flushes");
+        // Both functions and the blank separator must survive.
+        assert!(assembled.contains("fn a()"));
+        assert!(assembled.contains("fn b()"));
+        // A blank line should appear between them.
+        assert!(
+            assembled.contains("\n\n") || assembled.matches('\n').count() >= 4,
+            "expected blank-line separator preserved; got: {assembled:?}"
+        );
+    }
 }
