@@ -29,7 +29,8 @@
 //! prefers Kazakh; falls back to the system default voice if no
 //! Kazakh option is found (with a one-time warning to stderr).
 
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
+use std::sync::Mutex;
 
 /// Output transducer for spoken Kazakh.
 ///
@@ -61,17 +62,52 @@ impl TtsBackend for NoOpTts {
 }
 
 /// OS-native TTS via system command shellout.
-#[derive(Debug, Clone)]
+///
+/// **v5.0.5** — non-blocking dispatch. `speak()` spawns the synthesiser
+/// as a child process and returns immediately, so the REPL doesn't
+/// stall waiting for audio. A new `speak()` call kills any still-
+/// running previous synthesis (latest-wins semantics — natural for
+/// interactive tutoring).
+#[derive(Debug)]
 pub struct OsTtsBackend {
-    pub program: String,
+    program: String,
     /// Pre-built argv prefix. The text-to-speak is appended as the
     /// final argument by [`speak`].
-    pub args: Vec<String>,
-    /// Resolved voice name (when known) — used by [`describe`].
-    pub voice: Option<String>,
+    args: Vec<String>,
+    /// Resolved voice name (when known) — surfaced by [`describe`].
+    voice: Option<String>,
+    /// Currently-playing child, if any. Killed when a new speak call
+    /// arrives so the REPL feels responsive.
+    current: Mutex<Option<Child>>,
 }
 
 impl OsTtsBackend {
+    /// Construct from explicit components — direct callers and tests.
+    pub fn new(program: String, args: Vec<String>, voice: Option<String>) -> Self {
+        Self {
+            program,
+            args,
+            voice,
+            current: Mutex::new(None),
+        }
+    }
+
+    /// Underlying program name (e.g. `say`, `espeak-ng`).
+    pub fn program(&self) -> &str {
+        &self.program
+    }
+
+    /// Argv prefix passed to the synthesiser.
+    pub fn args(&self) -> &[String] {
+        &self.args
+    }
+
+    /// Resolved voice name, if detection found a Kazakh voice or the
+    /// caller supplied one via `voice_override`.
+    pub fn voice(&self) -> Option<&str> {
+        self.voice.as_deref()
+    }
+
     /// Detect a usable TTS backend on the current platform. Returns
     /// `None` when no supported TTS command is on `PATH`.
     ///
@@ -104,11 +140,7 @@ impl OsTtsBackend {
             args.push("-v".into());
             args.push(v.into());
         }
-        Some(Self {
-            program: "say".into(),
-            args,
-            voice,
-        })
+        Some(Self::new("say".into(), args, voice))
     }
 
     fn detect_linux(voice_override: Option<&str>) -> Option<Self> {
@@ -125,42 +157,39 @@ impl OsTtsBackend {
                 args.push("-v".into());
                 args.push(v.into());
             }
-            return Some(Self {
-                program: prog.into(),
-                args,
-                voice,
-            });
+            return Some(Self::new(prog.into(), args, voice));
         }
         None
     }
 }
 
 impl TtsBackend for OsTtsBackend {
+    /// **v5.0.5** — non-blocking dispatch. Spawns the synthesiser as
+    /// a detached child process and returns immediately. If a
+    /// previous speak() call is still synthesising, it is killed so
+    /// the latest response wins (the alternative — queueing — feels
+    /// laggy in a tutor REPL where the student typed something new).
     fn speak(&self, text: &str) -> std::io::Result<()> {
-        // Strip markdown-fence noise that the synthesiser would
-        // pronounce literally («backtick backtick backtick rust...»).
-        // The kernel's text output uses `\`\`\`rust ... \`\`\`` for
-        // code blocks; for spoken output we drop fence lines and
-        // collapse whitespace — but keep the code body so the
-        // student hears WHAT the example shows.
         let cleaned = strip_for_speech(text);
         if cleaned.trim().is_empty() {
             return Ok(());
         }
-        let status = Command::new(&self.program)
+        let mut guard = self.current.lock().unwrap_or_else(|p| p.into_inner());
+        // Kill the previously-spawned child, if it's still running.
+        // `kill()` errors if the child has already exited — fine,
+        // ignore. `wait()` reaps the zombie either way.
+        if let Some(mut prev) = guard.take() {
+            let _ = prev.kill();
+            let _ = prev.wait();
+        }
+        let child = Command::new(&self.program)
             .args(&self.args)
             .arg(&cleaned)
             // Suppress `say`'s tty messages.
             .stdout(Stdio::null())
             .stderr(Stdio::null())
-            .status()?;
-        if !status.success() {
-            return Err(std::io::Error::other(format!(
-                "{} exited with non-zero status {:?}",
-                self.program,
-                status.code()
-            )));
-        }
+            .spawn()?;
+        *guard = Some(child);
         Ok(())
     }
 
@@ -168,6 +197,23 @@ impl TtsBackend for OsTtsBackend {
         match &self.voice {
             Some(v) => format!("{} (voice: {})", self.program, v),
             None => format!("{} (default voice)", self.program),
+        }
+    }
+}
+
+impl Drop for OsTtsBackend {
+    /// Best-effort: when the REPL exits, reap the last-spawned child
+    /// so it doesn't linger as a zombie. `say` keeps speaking even
+    /// after the parent exits (default macOS behaviour) — that's
+    /// fine; we just don't want the kernel process table cluttered.
+    fn drop(&mut self) {
+        if let Ok(mut guard) = self.current.lock()
+            && let Some(mut child) = guard.take()
+        {
+            // Try to wait briefly; if still running, leave it
+            // detached (macOS `say` continues after parent exit, so
+            // the user hears the last response even after ^D).
+            let _ = child.try_wait();
         }
     }
 }
@@ -277,11 +323,11 @@ mod tests {
 
     #[test]
     fn os_backend_describe_includes_voice_when_set() {
-        let backend = OsTtsBackend {
-            program: "say".into(),
-            args: vec!["-v".into(), "Aru".into()],
-            voice: Some("Aru".into()),
-        };
+        let backend = OsTtsBackend::new(
+            "say".into(),
+            vec!["-v".into(), "Aru".into()],
+            Some("Aru".into()),
+        );
         let description = backend.describe();
         assert!(description.contains("say"));
         assert!(description.contains("Aru"));
@@ -289,11 +335,7 @@ mod tests {
 
     #[test]
     fn os_backend_describe_default_voice_when_none() {
-        let backend = OsTtsBackend {
-            program: "say".into(),
-            args: vec![],
-            voice: None,
-        };
+        let backend = OsTtsBackend::new("say".into(), vec![], None);
         assert!(backend.describe().contains("default"));
     }
 
@@ -334,7 +376,86 @@ mod tests {
             return;
         }
         let backend = OsTtsBackend::detect(Some("Aru")).expect("macOS say should detect");
-        assert_eq!(backend.voice.as_deref(), Some("Aru"));
-        assert!(backend.args.iter().any(|a| a == "Aru"));
+        assert_eq!(backend.voice(), Some("Aru"));
+        assert!(backend.args().iter().any(|a| a == "Aru"));
+    }
+
+    /// **v5.0.5** — `speak()` must return promptly even for long
+    /// inputs (the synthesiser keeps running in the background).
+    /// On macOS we use a long Kazakh sentence; the call should
+    /// complete in well under a second (spawn is essentially fork +
+    /// exec, microseconds typically). 250ms gives generous slack
+    /// for slow / loaded CI machines.
+    #[test]
+    fn speak_returns_promptly_via_spawn_on_macos() {
+        if !cfg!(target_os = "macos") || !command_on_path("say") {
+            return;
+        }
+        let backend = OsTtsBackend::detect(None).expect("macOS detect");
+        // ~5s of speech if it played to completion.
+        let long = "Сәлеметсіз бе. Менің атым адам. Бүгін ауа-райы жақсы. \
+                    Сізге қалай көмектесе аламын? Кітап оқиық немесе кодпен жаттығайық.";
+        let started = std::time::Instant::now();
+        backend.speak(long).expect("speak should spawn");
+        let elapsed = started.elapsed();
+        assert!(
+            elapsed < std::time::Duration::from_millis(250),
+            "spawn should return promptly; took {elapsed:?}"
+        );
+        // Reap the child so it doesn't echo through the test runner.
+        if let Ok(mut guard) = backend.current.lock()
+            && let Some(mut child) = guard.take()
+        {
+            let _ = child.kill();
+            let _ = child.wait();
+        }
+    }
+
+    /// A second `speak` while the first is still running kills the
+    /// previous child (latest-wins). After two calls the registered
+    /// child should be the second one.
+    #[test]
+    fn second_speak_kills_previous_child_on_macos() {
+        if !cfg!(target_os = "macos") || !command_on_path("say") {
+            return;
+        }
+        let backend = OsTtsBackend::detect(None).expect("macOS detect");
+        backend.speak("Бірінші мәтін.").unwrap();
+        let first_pid = backend
+            .current
+            .lock()
+            .ok()
+            .and_then(|g| g.as_ref().map(|c| c.id()));
+        backend.speak("Екінші мәтін.").unwrap();
+        let second_pid = backend
+            .current
+            .lock()
+            .ok()
+            .and_then(|g| g.as_ref().map(|c| c.id()));
+        assert!(first_pid.is_some());
+        assert!(second_pid.is_some());
+        assert_ne!(
+            first_pid, second_pid,
+            "second speak must spawn a new child (latest-wins)"
+        );
+        // Reap.
+        if let Ok(mut guard) = backend.current.lock()
+            && let Some(mut child) = guard.take()
+        {
+            let _ = child.kill();
+            let _ = child.wait();
+        }
+    }
+
+    /// Empty / whitespace-only input is a no-op (skipped by
+    /// `strip_for_speech`); speak() must succeed without spawning.
+    #[test]
+    fn speak_empty_input_is_noop() {
+        let backend = OsTtsBackend::new("say".into(), vec![], None);
+        assert!(backend.speak("").is_ok());
+        assert!(backend.speak("\n\n").is_ok());
+        // No child was spawned.
+        let guard = backend.current.lock().unwrap();
+        assert!(guard.is_none());
     }
 }

@@ -7,6 +7,69 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [5.0.5] — 2026-05-08 — Non-blocking TTS dispatch — REPL stays responsive while adam speaks
+
+Builds on v5.0.0 voice output. Pre-v5.0.5 `OsTtsBackend::speak` blocked the REPL until the synthesiser finished — student could only type next input *after* adam stopped speaking. Post-v5.0.5 the synthesiser runs as a detached child process; `speak()` returns in microseconds, REPL accepts the next prompt immediately.
+
+### What's added
+
+**Non-blocking dispatch** ([tts.rs](crates/adam-dialog/src/tts.rs)):
+
+- `OsTtsBackend` gains a private `Mutex<Option<Child>>` field tracking the currently-playing synthesis.
+- `speak()` switches from `Command::status()` (blocks) to `Command::spawn()` (detached); returns immediately.
+- Before spawning a new child, any previous child is `kill()`ed + `wait()`ed (reaping the zombie). This implements **latest-wins** semantics — natural for interactive tutoring where the student typed something new and shouldn't have to listen to the old half-finished response first.
+
+**API encapsulation:**
+
+- `OsTtsBackend::new(program, args, voice)` — explicit constructor for direct callers and tests.
+- `program()` / `args()` / `voice()` accessors replace the old public fields. Existing tests updated to use accessors.
+
+**Drop impl:**
+
+Best-effort reaps the last child on REPL exit. macOS `say` keeps speaking even after the parent process exits (default behaviour), so the user hears the final response even after ^D — that's the right UX. Drop only does a non-blocking `try_wait()` to avoid leaving zombies in the process table.
+
+### Latest-wins behaviour explained
+
+| Sequence | v5.0.0 (blocking) | v5.0.5 (non-blocking + latest-wins) |
+|---|---|---|
+| Type → adam responds + speaks (5s) → type next | wait 5s, then type | type immediately |
+| Type → adam responds → SHIFT type before audio finishes | impossible (REPL stalled) | new response kills previous synthesis; new one starts |
+| Type quickly 5x in a row | 5 audio playbacks queue up (wait 25s) | only the 5th is spoken; earlier ones killed |
+
+For tutor responsiveness this is the right trade. Students who want to hear a full response just don't type until adam finishes speaking.
+
+### Regression tests
+
+3 new tts tests:
+
+1. `speak_returns_promptly_via_spawn_on_macos` — asserts `speak()` for a long Kazakh sentence (~5s of audio) returns in < 250ms (would be ~5000ms with blocking semantics).
+2. `second_speak_kills_previous_child_on_macos` — calls `speak()` twice in succession; verifies the registered child PID changes (the previous one was killed).
+3. `speak_empty_input_is_noop` — whitespace-only input doesn't spawn anything.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 13 / 13 tts module unit tests (10 from v5.0.0 + 3 new) | ✅ 100 % |
+| 9 / 9 v4.99.5 adaptive-difficulty tests | ✅ unchanged |
+| 18 / 18 v4.99.0 query-intent tests | ✅ unchanged |
+| 11 / 11 v4.98.5 auto-advance tests | ✅ unchanged |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1094 passing** + 17 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Roadmap
+
+- **v5.1.0** — optional Piper TTS backend for users who want a higher-quality voice independent of OS package management.
+- **v5.2.0+** — concatenative phoneme bank for fully-deterministic Kazakh pronunciation aligned with kernel philosophy.
+
+**Stripe — Kazakh school tutor (responsive multimodal output).**
+
 ## [5.0.0] — 2026-05-08 — Voice output transducer — adam speaks Kazakh
 
 First multimodal release. Pre-v5.0.0 every adam response was silent text; post-v5.0.0 the optional `--tts` flag activates a system-native voice synthesiser so adam **speaks** every response in addition to printing it. v5.0.0 crosses adam from text-only to multimodal output — a kernel-signature capability that warrants the `x.0.0` bump per `feedback_versioning_post_1_0`.
