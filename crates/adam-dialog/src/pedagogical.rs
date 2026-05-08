@@ -161,6 +161,99 @@ pub fn exercise_for(topic: &str) -> Option<&'static str> {
     }
 }
 
+/// **v4.99.5** — adaptive-difficulty wrapper around [`exercise_for`].
+/// When the curriculum-stage progress signal is [`Easy`] or [`Hard`],
+/// returns a stage-tailored variant; falls back to the canonical
+/// [`exercise_for`] content when the signal is [`Normal`] or no
+/// difficulty-tuned variant exists for the topic.
+///
+/// Coverage: the 5 canonical curriculum stages — `ownership`,
+/// `borrow`, `lifetime`, `traits`, `async`. Other topics (closure,
+/// thread, etc.) ignore the hint and surface the existing
+/// `exercise_for` content.
+///
+/// [`Easy`]: crate::curriculum::DifficultyHint::Easy
+/// [`Hard`]: crate::curriculum::DifficultyHint::Hard
+/// [`Normal`]: crate::curriculum::DifficultyHint::Normal
+pub fn exercise_for_with_hint(
+    topic: &str,
+    hint: crate::curriculum::DifficultyHint,
+) -> Option<&'static str> {
+    use crate::curriculum::DifficultyHint;
+
+    // Canonicalise the topic to its curriculum-stage id (the stage
+    // tables in v1 are keyed off these short names).
+    let stage = match topic {
+        "ownership" => Some("ownership"),
+        "borrow" | "borrowing" | "қарызға алу" => Some("borrow"),
+        "lifetime" | "lifetimes" | "тіршілік мерзімі" => Some("lifetime"),
+        "trait" | "traits" | "trait composition" => Some("traits"),
+        "async" | "async fn" | "await" | ".await оператор" => Some("async"),
+        _ => None,
+    };
+
+    let tailored: Option<&'static str> = match (stage, hint) {
+        (Some("ownership"), DifficultyHint::Easy) => Some(
+            "Қарапайым иелік мысалы: `let s = String::from(\"hi\");` деп жариялаңыз да, \
+            `println!(\"{s}\");` арқылы экранға шығарыңыз. Бұл — иелік ережесін бұзбайтын ең қарапайым ағын. \
+            (Кеңес: `s` иесі осы блоктың соңына дейін.)",
+        ),
+        (Some("ownership"), DifficultyHint::Hard) => Some(
+            "Иелік пен функция тіркесімі. Мына кодты түзетіңіз:\n\
+            ```rust\nfn main() {{ let s = String::from(\"hi\"); take(s); take(s); }}\nfn take(s: String) {{ println!(\"{}\", s); }}\n```\n\
+            Қандай қателер шығады? `take` функциясы ішкі көшірмемен жұмыс істесе қалай түзу керек? \
+            Екі шешімді ұсыныңыз: біріншісі — `Clone`, екіншісі — reference.",
+        ),
+        (Some("borrow"), DifficultyHint::Easy) => Some(
+            "Reference арқылы оқу: бір функция жазыңыз — `print_len(s: &String)` — \
+            String-нің ұзындығын экранға шығарсын. Шакыру кезінде `print_len(&my_string)` беріңіз. \
+            (Кеңес: `&` тек оқу үшін, иелік алынбайды.)",
+        ),
+        (Some("borrow"), DifficultyHint::Hard) => Some(
+            "Бірнеше reference: мына функцияны жазыңыз:\n\
+            ```rust\nfn first_two_words(s: &String) -> (Option<&str>, Option<&str>) {{ /* ... */ }}\n```\n\
+            `&str` slices қайтарсын — alma бір рет, екінші рет; екеуі де `s`-тен қарызға алынады. \
+            Бір сәтте бір ғана `&mut` болатынын қалай тексересіз?",
+        ),
+        (Some("lifetime"), DifficultyHint::Easy) => Some(
+            "Static lifetime: `fn forever() -> &'static str` жазыңыз — \
+            кез келген литерал-жолды қайтарсын. `'static` нені білдіреді? \
+            (Кеңес: бағдарламаның бүкіл өмірі бойы жарамды.)",
+        ),
+        (Some("lifetime"), DifficultyHint::Hard) => Some(
+            "Struct + lifetime parameter:\n\
+            ```rust\nstruct Excerpt<'a> {{ part: &'a str }}\nimpl<'a> Excerpt<'a> {{ fn announce(&self) -> &str {{ /* ... */ }} }}\n```\n\
+            `announce` дұрыс жұмыс істеуі үшін қандай lifetime annotations қажет? \
+            Lifetime elision rule қашан жұмыс істейді?",
+        ),
+        (Some("traits"), DifficultyHint::Easy) => Some(
+            "Бір trait + бір impl: `trait Greet {{ fn hello(&self); }}` жариялаңыз. \
+            Кейін `struct Person {{ name: String }}` үшін `hello` әдісін іске асырыңыз — \
+            ол `Сәлем, {{name}}!` басып шығарсын.",
+        ),
+        (Some("traits"), DifficultyHint::Hard) => Some(
+            "Trait bounds + generic функция:\n\
+            ```rust\nfn longest<T: ???>(items: &[T]) -> &T {{ /* ең үлкенін қайтарсын */ }}\n```\n\
+            Қандай trait bound керек? `PartialOrd` мен `Ord` арасындағы айырмашылық не? \
+            `T: Display` тағы керек пе, әлде жоқ па — неге?",
+        ),
+        (Some("async"), DifficultyHint::Easy) => Some(
+            "Қарапайым async fn: `async fn greet() -> String { String::from(\"Сәлем!\") }` жазыңыз. \
+            `main`-да `#[tokio::main]` атрибутымен `let g = greet().await;` шакырыңыз. \
+            `.await` нені білдіреді?",
+        ),
+        (Some("async"), DifficultyHint::Hard) => Some(
+            "Tokio + spawn + select. Екі async фон-міндетін параллель іске қосыңыз: \
+            бірі — 1 секунд күтіп «А» басады, екіншісі — 2 секунд күтіп «Б». \
+            `tokio::select!` арқылы біреуі бітсе бірден шығыңыз. \
+            `tokio::spawn` мен `tokio::join!`-нің рөлі неде?",
+        ),
+        _ => None,
+    };
+
+    tailored.or_else(|| exercise_for(topic))
+}
+
 /// Return a curated code snippet for the given topic. Snippets are
 /// minimal-correct Rust that compiles + runs. None when the topic
 /// isn't covered.

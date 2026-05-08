@@ -1372,6 +1372,33 @@ impl Conversation {
         // AskCurrentProgress populates `progress_recap` with a
         // pre-rendered Kazakh prose recap (or `__progress_empty__` when
         // the student has no progress yet).
+        // **v4.99.5** — adaptive-difficulty wiring. When the intent is
+        // `AskExercise` with a topic that maps to a curriculum stage,
+        // compute the per-stage difficulty hint from progress and
+        // pre-stuff the corresponding tailored exercise body via
+        // `extra_slots["exercise_body"]`. Because `extra_slots` is
+        // merged into the planner's slots map AFTER `extract_slots`
+        // runs (v4.95.0 plumbing), this overrides the default content
+        // from `pedagogical::exercise_for` when a difficulty-tuned
+        // variant exists. Hint == Normal AND no tailored variant →
+        // no override; planner uses the canonical exercise. So
+        // students with no recorded progress get the same content as
+        // pre-v4.99.5.
+        if let (Some(curriculum), Intent::AskExercise { topic: Some(t) }) =
+            (self.curriculum.as_ref(), &intent_for_render)
+            && let Some(stage) = curriculum.stage(t)
+        {
+            let progress = self
+                .curriculum_progress
+                .get(&stage.id)
+                .copied()
+                .unwrap_or_default();
+            let hint = progress.difficulty_hint();
+            if let Some(body) = crate::pedagogical::exercise_for_with_hint(t, hint) {
+                extra_slots.insert("exercise_body".into(), body.into());
+                extra_slots.insert("difficulty_hint".into(), format!("{hint:?}"));
+            }
+        }
         if let Some(curriculum) = self.curriculum.as_ref() {
             match &intent_for_render {
                 Intent::AskNextTopic => {

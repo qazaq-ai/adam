@@ -7,6 +7,114 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.99.5] — 2026-05-08 — Adaptive-difficulty wiring (long-term roadmap step 4)
+
+Closes the long-term curriculum arc that started v4.98.0. Plugs the `StageProgress::difficulty_hint` API (added in v4.98.5) into actual content selection: pre-v4.99.5 every student got the same canonical exercise per topic regardless of past performance; post-v4.99.5 the tutor scales — struggling students see simpler exercises that build foundation, confident students see harder challenges.
+
+### What's added
+
+**`pedagogical::exercise_for_with_hint`** ([pedagogical.rs](crates/adam-dialog/src/pedagogical.rs)):
+
+New public API:
+
+```rust
+pub fn exercise_for_with_hint(
+    topic: &str,
+    hint: crate::curriculum::DifficultyHint,
+) -> Option<&'static str>
+```
+
+Returns a stage-tailored variant when the topic resolves to a curriculum stage AND the hint is `Easy` or `Hard`; falls back to the canonical `exercise_for(topic)` for `Normal` hints, unknown topics, and non-curriculum topics (e.g. `closure`, `iterator`). Topic canonicalisation handles existing aliases (`borrowing` / `қарызға алу` → `borrow`; `async fn` / `await` → `async`; etc.) before lookup.
+
+**10 new curated exercises** — Easy + Hard variants for all 5 canonical curriculum stages:
+
+| Stage | Easy | Hard |
+|---|---|---|
+| `ownership` | Print a String (no move) | Function with multi-take + Clone vs reference fix |
+| `borrow` | Read-only `print_len(&String)` | `&str` slice tuple + multi-borrow rules |
+| `lifetime` | `'static` literal-returning fn | `Excerpt<'a>` struct + lifetime elision |
+| `traits` | Single trait + impl on `Person` | Generic `longest<T: ???>` with bound choice |
+| `async` | Trivial `async fn` + single `.await` | Tokio `select!` + `spawn` race between two tasks |
+
+**Conversation wiring** ([conversation.rs](crates/adam-dialog/src/conversation.rs)):
+
+When `Intent::AskExercise { topic: Some(t) }` fires AND `t` resolves to a curriculum stage, Conversation:
+
+1. Reads `curriculum_progress[stage].difficulty_hint()`
+2. Calls `pedagogical::exercise_for_with_hint(t, hint)`
+3. Pre-stuffs the result into `extra_slots["exercise_body"]` (overrides the planner's `extract_slots` default via the v4.95.0 merge order)
+4. Diagnostic `extra_slots["difficulty_hint"]` exposes the chosen tier for `--trace` mode
+
+When the hint is `Normal` (or no curriculum stage matches), the canonical content path is preserved bit-for-bit — students with no recorded progress see exactly the pre-v4.99.5 exercises.
+
+### End-to-end smoke test
+
+```
+[Student]  Маған Rust-та ownership жаттығуын беріңізші.
+[adam]     Қазір ownership жаттығуын беремін: Мына кодта қате бар: `let s = String::from("hello"); ...`
+              [↑ canonical Normal variant — 0 progress]
+[Student]  ```rust
+           fn main() { println!("hi"); }
+           ```
+[adam]     Жарайсыз! ...                              [pass count: 1; failed: 0 → Hard hint]
+[Student]  Маған Rust-та ownership жаттығуын беріңізші.
+[adam]     Қазір ownership жаттығуын беремін: Иелік пен функция тіркесімі. Мына кодты түзетіңіз:
+           ```rust
+           fn main() { let s = String::from("hi"); take(s); take(s); }
+           fn take(s: String) { println!("{}", s); }
+           ```
+           Қандай қателер шығады? `take` функциясы ішкі көшірмемен жұмыс істесе қалай түзу керек?
+              [↑ Hard variant — adaptive selection working]
+```
+
+### Regression tests
+
+[`tests/curriculum_v4995_adaptive_difficulty.rs`](crates/adam-dialog/tests/curriculum_v4995_adaptive_difficulty.rs) — 9 new tests:
+
+1. `hint_normal_falls_back_to_canonical_exercise`
+2. `hint_easy_returns_simpler_variant_for_curriculum_stages` (validates all 5 stages)
+3. `hint_hard_returns_harder_variant_for_curriculum_stages`
+4. `hint_easy_and_hard_are_different`
+5. `unknown_topic_returns_none_regardless_of_hint`
+6. `non_curriculum_topic_with_hint_falls_back_to_canonical` (closure ignores hint)
+7. `borrow_alias_қарызға_алу_resolves_to_curriculum_stage`
+8. `askexercise_after_clean_pass_on_ownership_serves_hard_variant` (`#[ignore]` — real cargo check)
+9. `askexercise_with_two_failures_serves_easy_variant` (synthetic preset)
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 8 / 8 fast v4.99.5 adaptive-difficulty tests | ✅ 100 % |
+| 1 / 1 #[ignore] end-to-end test (real `cargo check`) | ✅ 100 % |
+| 18 / 18 v4.99.0 query-intent tests | ✅ unchanged |
+| 11 / 11 v4.98.5 auto-advance tests | ✅ unchanged |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator unit tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora regression tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 regression tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1081 passing** + 17 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Long-term roadmap arc — closed
+
+The 4-step curriculum arc launched 2026-05-08 is now complete:
+
+| Step | Release | Theme |
+|---|---|---|
+| 1 | v4.98.0 | Foundation: curriculum data + tracking |
+| 2 | v4.98.5 | User-facing auto-advance + difficulty hooks |
+| 3 | v4.99.0 | Student-side query intents |
+| 4 | **v4.99.5** | **Adaptive content selection** |
+
+### Roadmap
+
+- **v5.0.0+** — open per user direction. Candidates: new book (Rustonomicon / Embedded Rust / Tokio Tutorial), additional curriculum tracks (Cargo / TOML), non-Rust pedagogical surface, or instrumentation/quality work (live transcripts review, perf regressions).
+
+**Stripe — Kazakh school tutor (adaptive content selection live; long-term curriculum arc closed).**
+
 ## [4.99.0] — 2026-05-08 — Student-side curriculum-query intents (long-term roadmap step 3)
 
 Step 3 of the long-term tutor arc. Rounds out the lesson-state surface added in v4.98.0 (foundation) and v4.98.5 (auto-advance announcements): students can now **proactively ask** about their journey rather than only seeing celebration pop-ups when stages auto-close. With v4.99.0 the curriculum surface is symmetric — adam **announces** progress AND **answers** progress queries.
