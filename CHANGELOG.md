@@ -7,6 +7,96 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.98.0] — 2026-05-08 — Lesson-state curriculum tree (long-term roadmap step 1) — foundation for adaptive tutor progression
+
+First step of the long-term tutor arc, beginning after Codex's round-2 audit was fully closed in v4.97.0. Defines an ordered Rust pedagogical curriculum and adds per-conversation per-stage progress tracking. v4.98.0 ships **only the foundation** — user-facing response changes are deferred to v4.98.5 and student-side query intents to v4.99.0.
+
+### Why this matters
+
+Pre-v4.98.0 the tutor had per-turn lesson awareness (v4.95.5 multi-turn anaphora, v4.96.5 pedagogical-topic recording into DialogContext) but no notion of *curriculum journey*: each topic was an island, with no concept of "ownership is closed → borrow is the next step", no accumulation of "this student has passed 2/2 ownership exercises", no foundation for adaptive difficulty. v4.98.0 adds that journey memory.
+
+### What's added
+
+**External curriculum data** ([`data/dialog/curriculum/rust_progression.json`](data/dialog/curriculum/rust_progression.json)):
+
+Five canonical Rust stages with prereq edges:
+
+| ID | Label (KK) | Prereqs | Exercises to pass |
+|---|---|---|---|
+| `ownership` | Иелік | — | 2 |
+| `borrow` | Қарыз алу | `ownership` | 2 |
+| `lifetime` | Өмір кезеңі | `ownership`, `borrow` | 2 |
+| `traits` | Қасиеттер | `lifetime` | 2 |
+| `async` | Асинхронды | `traits` | 1 |
+
+Each stage carries a Kazakh summary intended for future `next_suggestion` templates.
+
+**New module** [`adam_dialog::curriculum`](crates/adam-dialog/src/curriculum.rs):
+
+- `Curriculum` — top-level schema (`load_default()`, `load_from_path()`, `stage()`, `next_unlocked()`, `is_complete()`)
+- `Stage` — per-stage metadata + prereqs + closure threshold
+- `StageProgress` — per-conversation per-stage counters (`passed` / `failed` + `record_pass()` / `record_fail()` / `is_closed()`)
+
+**Conversation integration** ([conversation.rs](crates/adam-dialog/src/conversation.rs)):
+
+- New fields: `curriculum: Option<Curriculum>`, `curriculum_progress: HashMap<String, StageProgress>`.
+- `Conversation::new()` autoloads the committed curriculum file (silent `None` if absent — back-compat for trimmed checkouts).
+- After every `SubmitSolution` turn, `cargo_status` slot drives a per-stage counter update with **two-tier topic resolution**:
+  1. Try `plan.slots["topic"]` against curriculum.
+  2. Else fall back to `session["last_exercise_topic"]` against curriculum.
+- `env_error` verdicts (local cargo broken) don't update either counter — failure is in the local setup, not the student's solution.
+
+The two-tier resolution is needed because `detect_submit_solution` may extract an incidental topic from the snippet (e.g. `println` from a `println!`-using snippet) instead of the lesson topic established by a prior `AskExercise(ownership)`. The fallback ensures the lesson topic wins when the auto-extracted topic isn't a curriculum stage.
+
+### What's deferred
+
+- **v4.98.5** — User-facing response changes: `submit_solution.passed_stage_closed` template variant fires when the pass closes a stage; surfaces "Иелік тақырыбы аяқталды (2/2). Енді borrow тақырыбына кіруге болады" auto-suggestion. Adaptive difficulty hooks (failure-rate per stage influences next exercise selection).
+- **v4.99.0** — Student-side query intents: `AskNextTopic` («Келесі қандай тақырыпты үйренсем?»), `AskCurrentProgress` («Мен қай жерде тұрмын?»), recap template surfacing the full progress map.
+
+### Regression tests
+
+**Module-level** ([curriculum.rs](crates/adam-dialog/src/curriculum.rs) — 7 new):
+
+1. `stage_lookup_is_case_insensitive`
+2. `stage_progress_closure_threshold`
+3. `next_unlocked_starts_with_zero_prereq_stage`
+4. `next_unlocked_advances_when_prereq_closes`
+5. `next_unlocked_skips_unmet_prereqs`
+6. `next_unlocked_returns_none_when_complete`
+7. `load_default_finds_committed_curriculum` (validates committed JSON conforms + every prereq ID resolves)
+
+**Integration** ([`tests/curriculum_v4980.rs`](crates/adam-dialog/tests/curriculum_v4980.rs) — 6 new):
+
+1. `fresh_conversation_autoloads_curriculum`
+2. `fresh_conversation_has_empty_progress`
+3. `stage_progress_record_pass_then_close`
+4. `submit_solution_pass_increments_curriculum_progress` (`#[ignore]` — real cargo check)
+5. `submit_solution_fail_increments_failed_not_passed` (`#[ignore]`)
+6. `submit_solution_with_unknown_topic_does_not_pollute_progress` (`#[ignore]`)
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 7 / 7 curriculum module unit tests | ✅ 100 % |
+| 3 / 3 fast curriculum integration tests | ✅ 100 % |
+| 3 / 3 #[ignore] end-to-end curriculum tests (real `cargo check`) | ✅ 100 % |
+| 10 / 10 v4.96.0 round-2 regression tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora regression tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator unit tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1046 passing** + 14 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Roadmap
+
+- **v4.98.5** — Auto-advance hint template + adaptive-difficulty foundation (failure-rate signal per stage)
+- **v4.99.0** — `AskNextTopic` / `AskCurrentProgress` student-side query intents
+- **v4.99.5+** — Lesson-state dialog tree wired into the planner so successive `AskExercise` turns within a stage scale difficulty
+
+**Stripe — Kazakh school tutor (curriculum tree foundation; first long-term roadmap step shipped).**
+
 ## [4.97.0] — 2026-05-08 — Codex 2026-05-07 round-2 audit Bug 3 (P1) — REPL multi-line code-block accumulator
 
 Closes the last open bug from Codex's round-2 audit. With v4.97.0 the entire 7-bug audit is closed — bugs 1, 2, 4, 6, 7 in v4.96.0 + bug 5 in v4.96.5 + bug 3 here.

@@ -1,0 +1,49 @@
+{
+  "version": "4.98.0",
+  "name": "rust_progression",
+  "description": "Ordered Kazakh-language Rust pedagogical curriculum. Each stage names a core Rust concept; advancement is gated by `exercises_to_pass` successful SubmitSolution verdicts (cargo_status == passed) on that stage's topic. Prereqs are stage IDs that must be closed before this one becomes the recommended next.",
+  "approved_by": "shaman",
+  "approved_at": "2026-05-08",
+  "stages": [
+    {
+      "id": "ownership",
+      "label_kk": "Иелік",
+      "label_ru": "Владение",
+      "prereqs": [],
+      "exercises_to_pass": 2,
+      "summary_kk": "Кодтағы әр мәннің бір ғана иесі болады. Иесі бітсе, мән жойылады. Бұл — Rust-тың ең негізгі ережесі."
+    },
+    {
+      "id": "borrow",
+      "label_kk": "Қарыз алу",
+      "label_ru": "Заимствование",
+      "prereqs": ["ownership"],
+      "exercises_to_pass": 2,
+      "summary_kk": "Иеленбей, тек қарызға алу: `&T` (read-only) немесе `&mut T` (өзгерте алатын). Бір сәтте біреуі ғана болады."
+    },
+    {
+      "id": "lifetime",
+      "label_kk": "Өмір кезеңі",
+      "label_ru": "Время жизни",
+      "prereqs": ["ownership", "borrow"],
+      "exercises_to_pass": 2,
+      "summary_kk": "Reference қанша уақыт жарамды болатынын компилятор тексереді. `'a` жазуы — өмір кезеңінің параметрі."
+    },
+    {
+      "id": "traits",
+      "label_kk": "Қасиеттер",
+      "label_ru": "Трейты",
+      "prereqs": ["lifetime"],
+      "exercises_to_pass": 2,
+      "summary_kk": "Тип-агностикалық мінез-құлық: бір интерфейс — көп тип. `impl Trait for Type` арқылы байланыстырамыз."
+    },
+    {
+      "id": "async",
+      "label_kk": "Асинхронды",
+      "label_ru": "Асинхронность",
+      "prereqs": ["traits"],
+      "exercises_to_pass": 1,
+      "summary_kk": "`async fn` Future қайтарады. `await` сол Future-ды күтеді. Tokio немесе async-std — runtime таңдау."
+    }
+  ]
+}

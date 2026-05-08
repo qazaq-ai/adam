@@ -202,6 +202,17 @@ pub struct Conversation {
     /// corpus; loaded from `data/retrieval/root_affinity.json`
     /// at conversation startup.
     pub root_affinity: Option<adam_kernel_fst::root_affinity::RootAffinity>,
+    /// **v4.98.0** — lesson-state curriculum tree. Loaded once from
+    /// `data/dialog/curriculum/rust_progression.json` at
+    /// `Conversation::new()` time; absent file leaves this `None`
+    /// and disables curriculum tracking (back-compat for trimmed
+    /// checkouts). See [`crate::curriculum`].
+    pub curriculum: Option<crate::curriculum::Curriculum>,
+    /// **v4.98.0** — per-conversation per-stage progress map.
+    /// Updated after every `Intent::SubmitSolution` turn whose
+    /// `cargo_status` slot resolves to `passed` or `failed`. Empty
+    /// when no lesson-state turns have happened yet.
+    pub curriculum_progress: HashMap<String, crate::curriculum::StageProgress>,
 }
 
 /// v4.0.25 — intermediate state captured by
@@ -383,7 +394,18 @@ impl From<&Intent> for IntentKind {
 impl Conversation {
     /// Start a fresh session — no remembered entities and no history.
     pub fn new() -> Self {
-        Self::default()
+        let mut conv = Self::default();
+        // **v4.98.0** — silently load the committed curriculum if
+        // present. Absent file (trimmed checkout) leaves
+        // `curriculum = None`, disabling progress tracking — same
+        // behaviour as if no curriculum file ever existed. Errors
+        // during load are also silenced; callers needing strict
+        // load semantics can call `Curriculum::load_from_path`
+        // directly and assign.
+        if let Ok(Some(c)) = crate::curriculum::Curriculum::load_default() {
+            conv.curriculum = Some(c);
+        }
+        conv
     }
 
     /// Attach a retrieval index so `Intent::Unknown` can quote a
@@ -1337,6 +1359,52 @@ impl Conversation {
             &extra_slots,
         );
         let output = realise(&plan);
+
+        // **v4.98.0** — lesson-state curriculum tracking. After a
+        // SubmitSolution turn, look at the planner-produced
+        // `cargo_status` slot and update per-stage progress on the
+        // **lesson topic**.
+        //
+        // Lesson-topic resolution is two-tier:
+        // 1. Prefer `plan.slots["topic"]` IF it matches a curriculum
+        //    stage (the planner's v4.95.5 fallback already picked the
+        //    most-specific topic available — student-named or
+        //    session-derived).
+        // 2. Else fall back to `session.last_exercise_topic` IF that
+        //    matches a curriculum stage. This handles the case where
+        //    the SubmitSolution detector extracted an incidental
+        //    topic from the code itself (e.g. `println` from a
+        //    snippet that happens to use that macro) instead of the
+        //    actual lesson topic established by the prior
+        //    AskExercise turn.
+        //
+        // Curriculum is `Option<_>` — when `None` (trimmed checkout)
+        // the block is a no-op.
+        if let Intent::SubmitSolution { .. } = &intent_for_render
+            && let Some(curriculum) = self.curriculum.as_ref()
+        {
+            let cargo_status = plan.slots.get("cargo_status").map(String::as_str);
+            let lesson_stage_id = plan
+                .slots
+                .get("topic")
+                .and_then(|t| curriculum.stage(t).map(|s| s.id.clone()))
+                .or_else(|| {
+                    self.session
+                        .get("last_exercise_topic")
+                        .and_then(|t| curriculum.stage(t).map(|s| s.id.clone()))
+                });
+            if let (Some(status), Some(stage_id)) = (cargo_status, lesson_stage_id) {
+                let entry = self.curriculum_progress.entry(stage_id).or_default();
+                match status {
+                    "passed" => entry.record_pass(),
+                    "failed" => entry.record_fail(),
+                    // env_error doesn't count either way — the
+                    // failure is in the local `cargo` setup, not in
+                    // the student's solution.
+                    _ => {}
+                }
+            }
+        }
 
         // **v4.6.0** — capture the topic noun this turn answered
         // about into `session["last_query_topic"]` so the next
