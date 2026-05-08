@@ -42,6 +42,7 @@ pub mod intent;
 pub mod language_core;
 pub mod nlg;
 pub mod pedagogical;
+pub mod phoneme;
 pub mod planner;
 pub mod quality;
 pub mod question_shape;

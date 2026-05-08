@@ -7,6 +7,115 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [5.2.0] — 2026-05-08 — Kazakh grapheme-to-phoneme (G2P) module — substrate for kernel-pure concatenative TTS
+
+First step toward fully-deterministic Kazakh pronunciation that doesn't depend on neural models or external TTS. v5.2.0 ships **only** the G2P module; the actual phoneme bank (audio WAV per phoneme) is a separate content-engineering investment deferred to v5.2.5+.
+
+### Why bother with G2P?
+
+Kazakh is heavily agglutinative with mostly-regular orthography — the grapheme-to-phoneme mapping is overwhelmingly 1:1 for the native 33-letter alphabet, with predictable handling of the few Russian-loan letters (ё / ю / я / э / ц / щ / ъ / ь). A rule-based G2P covers this without statistical training, fits the `project_retrieval_not_neural_v2` philosophy, and runs in microseconds.
+
+Even without the phoneme bank, the G2P module is useful in its own right:
+
+- Powers a future `PhonemeBankTtsBackend` (concatenative kernel-pure TTS)
+- Surfaces Kazakh phonemic transcription for educational tools
+- Substrate for phoneme-aware spell-checking / fuzzy match
+- Debugging aid for adam's existing morphological pipeline
+
+### What's added
+
+**`adam_dialog::phoneme` module** ([phoneme.rs](crates/adam-dialog/src/phoneme.rs)):
+
+- `Phoneme` enum with 33 native + foreign-decomposable variants:
+  - **10 vowels:** а æ е и ы і о ө ұ ү
+  - **23 consonants:** б п м у ф т д н с з л р к қ г ғ х һ ш ж ч й ң
+- `text_to_phonemes(text: &str) -> Vec<Phoneme>` — main G2P entry point.
+- `phonemes_to_ipa(stream: &[Phoneme]) -> String` — IPA-ish transcription for debugging.
+- `Phoneme::is_vowel()` — useful for stress placement / concat smoothing.
+- `Phoneme::bank_id() -> &'static str` — ASCII-safe filename for future phoneme bank (e.g. ң → `"ng"`, ш → `"sh"`).
+- `Phoneme::ipa() -> &'static str` — canonical IPA-ish symbol per phoneme.
+
+**Decomposition rules for Russian-loan compound letters:**
+
+- ё → `[J, O]`
+- ю → `[J, U]`
+- я → `[J, A]`
+- э → `[E]`
+- ц → `[T, S]`
+- щ → `[SH, CH]`
+- ъ, ь → silent (dropped). Trade-off: loses the /j/ glide in some Russian loanwords; v5.2.5+ may add the glide rule. Kazakh-native words don't use ъ/ь, so the simplification has zero impact for the target language.
+
+### Phoneme inventory examples
+
+| Word | Phonemes (IPA) | Bank IDs |
+|---|---|---|
+| `алма` (apple) | `a l m a` | `a l m a` |
+| `құс` (bird) | `q u s` | `q u s` |
+| `көйлек` (shirt) | `k œ j l e k` | `k oe j l e k` |
+| `таң` (dawn) | `t a ŋ` | `t a ng` |
+| `бағдарлама` (program) | `b a ɣ d a r l a m a` | `b a gh d a r l a m a` |
+| `бағдарламашылық` (programming) | `b a ɣ d a r l a m a ʃ ɯ l ɯ q` | `b a gh d a r l a m a sh y l y q` |
+
+### Regression tests
+
+20 new module unit tests:
+
+1. `vowels_classified_correctly` (all 10 vowels match `is_vowel()`)
+2. `ipa_symbols_unique_per_phoneme` (all 33 IPA symbols distinct)
+3. `bank_ids_are_ascii_unique` (all bank IDs ASCII + distinct)
+4. `simple_kazakh_word_алма`
+5. `kazakh_word_with_қ_and_ұ`
+6. `kazakh_word_with_front_vowels` (көйлек)
+7. `kazakh_word_with_ң` (таң)
+8. `kazakh_word_with_ғ` (бағдарлама)
+9. `russian_loan_ю_decomposes`
+10. `russian_loan_я_decomposes`
+11. `russian_loan_ё_decomposes`
+12. `russian_loan_ц_decomposes_to_ts`
+13. `russian_loan_щ_decomposes_to_sh_ch`
+14. `hard_and_soft_signs_silent`
+15. `whitespace_and_punctuation_dropped`
+16. `uppercase_normalises_to_lowercase_phonemes` (АДАМ → адам)
+17. `empty_input_yields_empty_stream`
+18. `mixed_kazakh_and_latin_drops_latin` (Latin chars not in inventory)
+19. `phonemes_to_ipa_renders_space_separated`
+20. `long_word_бағдарламашылық_decomposes_correctly`
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 20 / 20 phoneme module unit tests | ✅ 100 % |
+| 20 / 20 tts module unit tests | ✅ unchanged |
+| 9 / 9 v4.99.5 adaptive-difficulty tests | ✅ unchanged |
+| 18 / 18 v4.99.0 query-intent tests | ✅ unchanged |
+| 11 / 11 v4.98.5 auto-advance tests | ✅ unchanged |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1121 passing** + 17 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### TTS arc — current state
+
+| Release | Theme | Backend |
+|---|---|---|
+| v5.0.0 | Voice output transducer (kernel-signature) | `OsTtsBackend` (macOS `say`, Linux `espeak-ng`) |
+| v5.0.5 | Non-blocking dispatch | (same backends, spawn-and-forget) |
+| v5.1.0 | Optional neural backend | + `PiperTtsBackend` (opt-in, requires user install) |
+| **v5.2.0** | **Kernel-pure pronunciation substrate** | **+ G2P module (`adam_dialog::phoneme`)** |
+| v5.2.5+ | Phoneme bank recording | + `PhonemeBankTtsBackend` (concatenative, kernel-pure) |
+
+### Roadmap
+
+- **v5.2.5** — Phoneme bank recording: hand-recorded WAV per phoneme stored in `data/dialog/phoneme_bank/<bank_id>.wav`. New `PhonemeBankTtsBackend` loads them at startup, splices per `text_to_phonemes` output. Most kernel-pure TTS option but requires native-speaker audio engineering.
+- **v5.3.0+** — open per user direction.
+
+**Stripe — Kazakh school tutor (kernel-pure pronunciation substrate).**
+
 ## [5.1.0] — 2026-05-08 — Optional Piper neural TTS backend — richer voice for users who want it
 
 Second `TtsBackend` implementation alongside the v5.0.0 OS-native default. Users who want noticeably more natural speech can install [Piper](https://github.com/rhasspy/piper) (~5 MB CLI binary) and download a voice model (~50-100 MB ONNX), then run `adam_chat --tts --tts-backend piper --tts-model <path>`. Architecturally fenced: Piper is bundled neither in adam's binary nor in the repo — purely opt-in, kernel determinism unchanged.
