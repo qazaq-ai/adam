@@ -62,7 +62,7 @@ use std::{
     process::ExitCode,
 };
 
-use adam_dialog::{ComposeMode, Conversation, TemplateRepository};
+use adam_dialog::{ComposeMode, Conversation, TemplateRepository, tts::TtsBackend};
 use adam_kernel_fst::lexicon::LexiconV1;
 use adam_reasoning::{Fact as ReasFact, reasoner::DerivedFact};
 use adam_retrieval::MorphemeIndex;
@@ -82,6 +82,15 @@ fn main() -> ExitCode {
     // human-reviewed World Core entries. Mirrors the `adam_demo` Part 4
     // investor-safe default added in v4.0.2.
     let safe = args.iter().any(|a| a == "--safe" || a == "--curated-only");
+    // **v5.0.0** — TTS output transducer. `--tts` activates a
+    // system-native voice synthesiser (macOS `say` / Linux
+    // `espeak-ng`) so adam speaks every response in addition to
+    // printing it. `--tts-voice <name>` overrides voice detection.
+    let tts_enabled = args.iter().any(|a| a == "--tts");
+    let tts_voice = args
+        .windows(2)
+        .find(|w| w[0] == "--tts-voice")
+        .map(|w| w[1].clone());
 
     let lex = match LexiconV1::load_default() {
         Ok(l) => l,
@@ -257,9 +266,40 @@ fn main() -> ExitCode {
         }
     }
 
+    // **v5.0.0** — TTS backend init. When `--tts` is on, detect a
+    // system-native voice synthesiser (macOS `say` / Linux
+    // `espeak-ng`); when not, use the no-op backend so the call
+    // sites stay symmetric.
+    let tts_box: Box<dyn adam_dialog::tts::TtsBackend> = if tts_enabled {
+        match adam_dialog::tts::OsTtsBackend::detect(tts_voice.as_deref()) {
+            Some(backend) => {
+                eprintln!("adam-chat: TTS on — {}", backend.describe());
+                Box::new(backend)
+            }
+            None => {
+                eprintln!(
+                    "adam-chat: --tts requested but no system synthesiser found; falling back to silent text"
+                );
+                Box::new(adam_dialog::tts::NoOpTts)
+            }
+        }
+    } else {
+        Box::new(adam_dialog::tts::NoOpTts)
+    };
+    let tts_handle: Option<&dyn adam_dialog::tts::TtsBackend> =
+        if tts_enabled { Some(&*tts_box) } else { None };
+
     if let Some(pos) = args.iter().position(|a| a == "--once") {
         if let Some(input) = args.get(pos + 1) {
-            run_turn(&mut conv, input, &lex, &repo, trace, turn_seed(0));
+            run_turn(
+                &mut conv,
+                input,
+                &lex,
+                &repo,
+                trace,
+                turn_seed(0),
+                tts_handle,
+            );
             return ExitCode::SUCCESS;
         } else {
             eprintln!("--once requires an argument");
@@ -268,8 +308,9 @@ fn main() -> ExitCode {
     }
 
     eprintln!(
-        "adam-chat v4.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
-         Multi-line code blocks: open with ``` and close with ``` on its own line."
+        "adam-chat v5.0 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
+         Multi-line code blocks: open with ``` and close with ``` on its own line.\n\
+         Voice output: pass --tts to hear adam's responses (--tts-voice <name> to override)."
     );
     let stdin = io::stdin();
     let stdout = io::stdout();
@@ -293,7 +334,7 @@ fn main() -> ExitCode {
         if let Some(assembled) = absorb_line(&line, &mut block_buf) {
             turn += 1;
             let seed = turn_seed(turn);
-            run_turn(&mut conv, &assembled, &lex, &repo, trace, seed);
+            run_turn(&mut conv, &assembled, &lex, &repo, trace, seed, tts_handle);
             stdout.lock().flush().ok();
         }
     }
@@ -383,6 +424,7 @@ fn run_turn(
     repo: &TemplateRepository,
     trace: bool,
     seed: u64,
+    tts: Option<&dyn adam_dialog::tts::TtsBackend>,
 ) {
     if trace {
         // v4.0.25 — trace through the REAL runtime path via
@@ -542,9 +584,19 @@ fn run_turn(
             println!("├─ {t}");
         }
         println!("└─ output:   {out}");
+        if let Some(tts) = tts
+            && let Err(e) = tts.speak(&out)
+        {
+            eprintln!("[tts] speak failed: {e}");
+        }
     } else {
         let out = conv.turn(input, lex, repo, seed);
         println!("{out}");
+        if let Some(tts) = tts
+            && let Err(e) = tts.speak(&out)
+        {
+            eprintln!("[tts] speak failed: {e}");
+        }
     }
 }
 

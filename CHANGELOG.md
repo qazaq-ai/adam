@@ -7,6 +7,88 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [5.0.0] — 2026-05-08 — Voice output transducer — adam speaks Kazakh
+
+First multimodal release. Pre-v5.0.0 every adam response was silent text; post-v5.0.0 the optional `--tts` flag activates a system-native voice synthesiser so adam **speaks** every response in addition to printing it. v5.0.0 crosses adam from text-only to multimodal output — a kernel-signature capability that warrants the `x.0.0` bump per `feedback_versioning_post_1_0`.
+
+### Why this matters
+
+The Kazakh school tutor positioning (`project_kazakh_tutor_positioning`) is the strategic stripe. Voice output is a major UX upgrade for students: while they read code on screen, they hear correct Kazakh pronunciation of grammatical concepts. High-quality Kazakh TTS specifically is a market gap — most TTS focuses on EN/RU/ZH/...
+
+### Architectural framing
+
+Per `project_retrieval_not_neural_v2` and `project_v4_direction`, adam is a deterministic kernel with watch-battery deployment goals. A bundled neural TTS model (~50 MB+) would dilute that framing. The v5.0.0 design avoids the conflict by **shelling out to the OS-native voice synthesiser** — `say` on macOS, `espeak-ng` on Linux. Zero binary-size impact, zero new model dependency, kernel determinism preserved.
+
+The TTS layer is fenced as a **peripheral output transducer** — like a printer, not a kernel component. Dialog logic, intent recognition, planner, realiser produce the same Kazakh text as before; the TTS layer just speaks that text.
+
+### What's added
+
+**`adam_dialog::tts` module** ([tts.rs](crates/adam-dialog/src/tts.rs)):
+
+- `TtsBackend` trait with `speak(&str)` + `describe()` methods.
+- `OsTtsBackend` — shells out to `say` (macOS) or `espeak-ng` / `espeak` (Linux).
+- `NoOpTts` — fallback for tests and disabled-TTS callers.
+- `OsTtsBackend::detect(voice_override)` — platform-aware detection. Prefers Kazakh voice (`Aru` on macOS, `kk` locale on Linux); falls back to default voice with a one-time stderr warning.
+- `strip_for_speech(text)` — cleans markdown fences and inline backticks before synthesis. Code blocks are dropped entirely (synthesisers pronouncing `\`\`\`rust ... \`\`\`` as «backtick backtick backtick rust...» is noise; students read code on screen).
+
+**REPL flags** ([adam_chat.rs](crates/adam-dialog/src/bin/adam_chat.rs)):
+
+- `--tts` — activate voice output. After every response, `tts.speak(out)` runs synchronously (blocks until synthesis finishes).
+- `--tts-voice <name>` — override voice detection (e.g. `--tts-voice Aru`, `--tts-voice Yuri`).
+
+When `--tts` is on but no system synthesiser is found, adam falls back to silent text with a startup warning. CI / non-interactive flows that don't pass `--tts` are unaffected.
+
+### End-to-end smoke test
+
+```
+$ adam_chat --once 'Сәлеметсіз бе.' --tts
+adam-chat: loaded 111 template families ...
+adam-chat: retrieval on — 5543 morphemes ...
+adam-chat: TTS on — say (voice: Aru)
+Сәлеметсіз бе.
+[macOS Aru voice speaks: «Сәлеметсіз бе.»]
+```
+
+### Regression tests
+
+[`adam_dialog::tts::tests`](crates/adam-dialog/src/tts.rs) — 10 new tests:
+
+1. `no_op_backend_speak_succeeds`
+2. `strip_for_speech_drops_code_fence_blocks`
+3. `strip_for_speech_drops_inline_backticks`
+4. `strip_for_speech_collapses_whitespace`
+5. `strip_for_speech_empty_input_yields_empty`
+6. `os_backend_describe_includes_voice_when_set`
+7. `os_backend_describe_default_voice_when_none`
+8. `detect_picks_kazakh_voice_when_available_on_macos`
+9. `detect_returns_none_when_no_voice_override_and_unsupported_platform`
+10. `voice_override_propagates_to_args`
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 10 / 10 new tts module unit tests | ✅ 100 % |
+| 9 / 9 v4.99.5 adaptive-difficulty tests | ✅ unchanged |
+| 18 / 18 v4.99.0 query-intent tests | ✅ unchanged |
+| 11 / 11 v4.98.5 auto-advance tests | ✅ unchanged |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1091 passing** + 17 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Roadmap
+
+- **v5.0.5** — non-blocking TTS dispatch (speak() runs in a background thread so REPL responsiveness isn't capped by synthesis latency).
+- **v5.1.0** — optional Piper TTS backend for users who want a higher-quality voice independent of OS package management. Adds ~50-100 MB to repo if bundled, or fetched at runtime.
+- **v5.2.0+** — concatenative phoneme bank for fully-deterministic Kazakh pronunciation aligned with kernel philosophy.
+
+**Stripe — Kazakh school tutor (multimodal output live; voice as kernel-signature feature).**
+
 ## [4.99.5] — 2026-05-08 — Adaptive-difficulty wiring (long-term roadmap step 4)
 
 Closes the long-term curriculum arc that started v4.98.0. Plugs the `StageProgress::difficulty_hint` API (added in v4.98.5) into actual content selection: pre-v4.99.5 every student got the same canonical exercise per topic regardless of past performance; post-v4.99.5 the tutor scales — struggling students see simpler exercises that build foundation, confident students see harder challenges.

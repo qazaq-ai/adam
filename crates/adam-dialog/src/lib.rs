@@ -55,6 +55,7 @@ pub mod task;
 pub mod templates;
 pub mod tool;
 pub mod topic_extraction;
+pub mod tts;
 pub mod uncertainty;
 pub mod verifier;
 
