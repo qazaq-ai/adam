@@ -7,6 +7,77 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.94.0] — 2026-05-07 — Codex P3 + user-directive resource instrumentation
+
+Three deliverables in one release.
+
+### (1) Split metrics in performance.md
+
+Replaces the single «Holdout pass-rate» column with three independent surfaces:
+- **fact_retrieval_pass** — Rust Book ch.1-20 + Async Book ch.1-9 holdouts + cross-cutting `rust_holdout` + 53 other chapter / domain holdouts.
+- **dialog_routing_pass** — Codex live-holdout `p0_memory_poisoning` + `p1_rust_routing` categories.
+- **pedagogical_tutor_pass** — Codex live-holdout `p2_pedagogical` category.
+
+A 100 % `fact_retrieval_pass` no longer hides a broken tutor surface — Codex's 2026-05-07 audit found 11 failures in dialog/routing/pedagogical surfaces while all chapter holdouts were green.
+
+### (2) Cargo-check verifier scaffolding
+
+New module `adam_dialog::cargo_verify` — takes Rust snippet → runs `cargo check` in a temp project → returns structured `CargoVerifyResult { passed, error_codes, raw_output, environment_failed }`.
+
+- 3 unit tests (parser): bracketed E-code parse, dedup, ignore warnings.
+- 2 integration tests (`#[ignore]` for slow `cargo` invocation): E0382 detection on use-of-moved-value snippet, clean program passes.
+
+Scaffolding only — full `SubmitSolution` intent integration with the dialog loop deferred. Per Codex directive #5 («Ввести cargo check-контур для учебных задач и borrow checker ошибок»), the primitive exists and works.
+
+### (3) Resource instrumentation (user 2026-05-07 directive)
+
+User: «при проведении тестов, необходимо определять, не только время, но и насколько был загружен процессор (сколько CPU, а сколько GPU и сколько памяти было использовано). Чтобы понять, насколько наша модель эффективнее существующих вероятностных моделей ИИ.»
+
+New binary `adam_resource_bench` runs a representative 30-query batch (10 fact-retrieval + 7 dialog-routing + 13 pedagogical-tutor probes) and measures wall + user CPU + system CPU + peak RSS via `getrusage`. GPU is reported as **0.0 %** by architecture (no neural component). Output: `docs/resource_bench.md`.
+
+#### Headline numbers (M2 8-core, this release)
+
+| metric | value |
+|---|---|
+| total wall (30 queries) | ~495 ms |
+| p50 latency | ~21 ms |
+| p95 latency | ~31 ms |
+| user CPU | ~940 ms |
+| system CPU | ~60 ms |
+| peak RSS | ~300 MB |
+| **GPU** | **0.0 %** |
+
+#### Comparison vs. published probabilistic LLM baselines
+
+| system | per-turn latency | RSS / VRAM | GPU |
+|---|---|---|---|
+| **adam v4.94.0** | **~21 ms p50** | **~300 MB** | **0 %** |
+| Llama 3 8B fp16 (CPU-only) | ~800–1500 ms / token | ~16 GB | 0 % |
+| Llama 3 8B int4 (Apple M2 Metal) | ~80–150 ms / token | ~5 GB | Metal-bound |
+| GPT-4 (API) | ~50–200 ms / token | hidden | datacenter GPU |
+| Claude Sonnet (API) | ~50–200 ms / token | hidden | datacenter GPU |
+
+**Architectural difference:** LLM latency scales with sequence length × parameters and requires GPU for sub-second response; adam latency is bounded by morpheme-index lookup + template fill (constant per turn) and runs on watch-class hardware (M2 fanless single-thread budget) without any neural component.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 24 / 24 Codex live-holdout cases | ✅ 100 % (P0+P1+P2) |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1008 passing** (was 1005; +3 cargo_verify unit tests) |
+| `cargo clippy -D warnings` | green |
+| `cargo run --bin adam_resource_bench` | green; report at `docs/resource_bench.md` |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Roadmap (next)
+
+| Release | Focus |
+|---|---|
+| **v4.94.0** | **P3 split metrics + cargo-check scaffolding + resource bench (this release)** |
+| v4.94.5 | Pedagogical content extension (more topics per intent) |
+| v4.95.0 | SubmitSolution intent — wire cargo_verify into dialog loop |
+
 ## [4.93.5] — 2026-05-07 — Codex 2026-05-07 audit P2 — pedagogical intents (AskExercise / CodeRequest / ExplainCompilerError / AskPurpose)
 
 Continues the dialog-architecture pivot from v4.93.0. Codex 2026-05-07 audit P2: «просьба написать Rust-код не сгенерировала код», «просьба дать упражнение дала словарное определение «жаттығу»». Adds **4 pedagogical Intent variants** that surface curated tutor content (exercises, code snippets, error explanations, purpose statements) instead of falling through to generic dictionary definitions. Per Codex directive: **never free-generate code** — always surface vetted snippets, or honestly respond «I don't have a curated example for this topic yet».

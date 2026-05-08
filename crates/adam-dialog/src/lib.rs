@@ -32,6 +32,7 @@
 
 pub mod action;
 pub mod belief;
+pub mod cargo_verify;
 pub mod conversation;
 pub mod dialog_context;
 pub mod discourse;
