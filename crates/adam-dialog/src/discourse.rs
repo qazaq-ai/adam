@@ -388,6 +388,14 @@ pub fn is_political_recommendation(input: &str) -> bool {
 /// honestly says adam doesn't run code yet.
 pub fn input_is_code_snippet(input: &str) -> bool {
     let lower = input.to_lowercase();
+    // **v4.95.0** — markdown code block is the most reliable signal.
+    // Required for Rust submissions to skip math classification: a
+    // snippet like `let x = 5;` triggers `input_is_math_expression`
+    // on the bare numeral 5, but `\`\`\`rust ... \`\`\`` should
+    // unambiguously route through SubmitSolution.
+    if input.contains("```") {
+        return true;
+    }
     if lower.contains("print(") {
         return true;
     }
@@ -407,6 +415,19 @@ pub fn input_is_code_snippet(input: &str) -> bool {
         return true;
     }
     if lower.contains("import ") || lower.contains("from ") && lower.contains(" import ") {
+        return true;
+    }
+    // **v4.95.0** — Rust syntactic markers. Conservative — require
+    // multiple Rust-specific tokens to avoid false-positive on
+    // pure prose. `fn ` alone is too generic (matches Russian
+    // word fragments); pair it with `{ ` or `let `.
+    let has_fn = lower.contains("fn ") || lower.contains("fn(");
+    let has_let = lower.contains("let ") || lower.contains("let mut ");
+    let has_brace = input.contains('{') && input.contains('}');
+    if has_fn && has_brace {
+        return true;
+    }
+    if has_let && (input.contains(';') || lower.contains("println!")) {
         return true;
     }
     false

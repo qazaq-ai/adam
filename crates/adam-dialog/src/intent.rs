@@ -250,6 +250,19 @@ pub enum Intent {
     /// surfaces an explicit purpose-framed answer.
     AskPurpose { topic: Option<String> },
 
+    /// **v4.95.0** — student submits a Rust solution for verification.
+    /// Triggered when the input contains a triple-backtick code
+    /// block (markdown convention) AND adam can extract a syntactic
+    /// Rust source from it. The planner runs `crate::cargo_verify`
+    /// on the extracted code and surfaces a verdict (passed / failed
+    /// + E-code / environment failure).
+    ///
+    /// `code` carries the raw Rust source extracted from the block
+    /// (with the optional `rust` language tag stripped). `topic`
+    /// optionally carries the technical subject the student is
+    /// practising — useful for routing follow-up exercises.
+    SubmitSolution { code: String, topic: Option<String> },
+
     /// Nothing matched. Fallback may carry a `noun_hint` extracted from
     /// the input by the FST parser so the response can at least
     /// acknowledge what the user is talking about, rather than blank

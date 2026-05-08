@@ -71,7 +71,7 @@ pub fn plan_response_with_session(
     trace.push(format!("planner: seed={rng_seed}"));
     trace.push(format!("planner: intent={intent:?}"));
 
-    let key = intent_key(intent);
+    let mut key = intent_key(intent);
     trace.push(format!("planner: template_key={key}"));
 
     // Merge per-turn slots with persistent session entities. Per-turn
@@ -82,6 +82,23 @@ pub fn plan_response_with_session(
     }
     ensure_geo_kind_slot(&mut slots);
     ensure_name_respect_slot(&mut slots);
+    // **v4.95.0** — SubmitSolution sub-routing. After extract_slots
+    // ran cargo_verify and populated cargo_status, switch the
+    // template key to the matching sub-family. Done here (not in
+    // intent_key) because intent_key runs before extract_slots and
+    // doesn't see the verifier outcome.
+    if matches!(intent, Intent::SubmitSolution { .. }) {
+        key = match slots.get("cargo_status").map(String::as_str) {
+            Some("passed") => "submit_solution.passed",
+            Some("failed") if slots.contains_key("error_explanation") => {
+                "submit_solution.failed_known"
+            }
+            Some("failed") => "submit_solution.failed_unknown",
+            Some("env_error") => "submit_solution.env_error",
+            _ => "submit_solution.env_error",
+        };
+        trace.push(format!("planner: SubmitSolution sub-key → {key}"));
+    }
     if !slots.is_empty() {
         trace.push(format!("planner: slots={slots:?}"));
     }
@@ -445,7 +462,15 @@ pub fn plan_response_with_epistemic(
     // `code_refusal` family BEFORE math_refusal so Python-style
     // code «for i in range(3): print(i)» doesn't fall to «can't
     // compute arithmetic».
-    if extra_slots.contains_key("__code_input__") {
+    //
+    // **v4.95.0** — SubmitSolution overrides the refusal: when the
+    // intent is SubmitSolution we *can* run cargo_verify on the
+    // code, so the refusal no longer applies. Without this guard
+    // the dialog stays at «I recognise code but don't execute it»
+    // forever — the cargo-check loop never reaches the user.
+    if extra_slots.contains_key("__code_input__")
+        && !matches!(intent, Intent::SubmitSolution { .. })
+    {
         let key = "code_refusal";
         if !repo.get(key).is_empty() {
             trace.push(format!("planner: code_refusal override → {key}"));
@@ -678,7 +703,6 @@ pub fn plan_response_with_epistemic(
     } else {
         key
     };
-    trace.push(format!("planner: template_key={key}"));
 
     let mut slots = session.clone();
     for (k, v) in extract_slots(intent) {
@@ -690,6 +714,27 @@ pub fn plan_response_with_epistemic(
     for (k, v) in extra_slots {
         slots.insert(k.clone(), v.clone());
     }
+    // **v4.95.0** — SubmitSolution sub-routing. extract_slots ran
+    // cargo_verify and populated cargo_status; switch the template
+    // key to the matching sub-family. Done here (after slot
+    // extraction) because the sub-key depends on the verifier
+    // outcome, which only materialises in extract_slots.
+    let key: &str = if matches!(intent, Intent::SubmitSolution { .. }) {
+        let new_key = match slots.get("cargo_status").map(String::as_str) {
+            Some("passed") => "submit_solution.passed",
+            Some("failed") if slots.contains_key("error_explanation") => {
+                "submit_solution.failed_known"
+            }
+            Some("failed") => "submit_solution.failed_unknown",
+            Some("env_error") => "submit_solution.env_error",
+            _ => "submit_solution.env_error",
+        };
+        trace.push(format!("planner: SubmitSolution sub-key → {new_key}"));
+        new_key
+    } else {
+        key
+    };
+    trace.push(format!("planner: template_key={key}"));
     ensure_geo_kind_slot(&mut slots);
     ensure_name_respect_slot(&mut slots);
     if !slots.is_empty() {
@@ -890,6 +935,47 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
             }
         }
         Intent::AskPurpose { topic: None } => {}
+        // **v4.95.0** — student submission. Run cargo_verify
+        // synchronously and populate slots. cargo check is slow
+        // (~1-2 s real-world) — there's no async boundary here, the
+        // turn just blocks for the duration. Acceptable for an
+        // interactive tutor; production would push verification to
+        // a background task and surface a "checking..." reply first.
+        Intent::SubmitSolution { code, topic } => {
+            if let Some(t) = topic {
+                slots.insert("topic".into(), t.clone());
+            }
+            let result = crate::cargo_verify::verify_snippet(code);
+            if result.environment_failed {
+                slots.insert("cargo_status".into(), "env_error".into());
+            } else if result.passed {
+                slots.insert("cargo_status".into(), "passed".into());
+            } else {
+                slots.insert("cargo_status".into(), "failed".into());
+                if let Some(code) = result.error_codes.first() {
+                    slots.insert("error_code".into(), code.clone());
+                    if let Some(expl) = crate::pedagogical::explain_error_code(code) {
+                        slots.insert("error_explanation".into(), expl.into());
+                    }
+                }
+                // Truncate raw output to a sane size — 600 chars is
+                // typically enough for the first compiler error
+                // header + caret. Drop ANSI sequences if any.
+                let raw = result
+                    .raw_output
+                    .lines()
+                    .filter(|l| !l.trim().is_empty())
+                    .take(12)
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                let raw = if raw.len() > 600 {
+                    format!("{}…", &raw[..600])
+                } else {
+                    raw
+                };
+                slots.insert("raw_excerpt".into(), raw);
+            }
+        }
         Intent::Unknown {
             noun_hint,
             example,
@@ -1249,6 +1335,11 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         Intent::CodeRequest { .. } => "code_request",
         Intent::ExplainCompilerError { .. } => "explain_compiler_error",
         Intent::AskPurpose { .. } => "ask_purpose",
+        // **v4.95.0** — student submission. Sub-family routed in
+        // `intent_subkey_with_slots` after `extract_slots` runs
+        // cargo_verify — passed / failed_known / failed_unknown /
+        // env_error.
+        Intent::SubmitSolution { .. } => "submit_solution",
         Intent::Unknown {
             raw_tokens,
             noun_hint,

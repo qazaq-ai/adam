@@ -152,6 +152,16 @@ pub fn interpret_text_with_lexicon(
     if detect_ask_willingness(&joined) {
         return Intent::AskWillingness;
     }
+    // **v4.95.0** — student submission detection runs FIRST among
+    // pedagogical intents. The triple-backtick code block is a much
+    // stronger signal than the verb-noun heuristics used by the
+    // P2 detectors below, and a code submission shouldn't risk
+    // routing to AskExercise / CodeRequest / ExplainCompilerError
+    // just because it mentions «жаттығу» / «код» / «қате» in the
+    // surrounding prose.
+    if let Some((code, topic)) = detect_submit_solution(input) {
+        return Intent::SubmitSolution { code, topic };
+    }
     // **v4.93.5** — pedagogical intents (Codex 2026-05-07 audit P2).
     // Routed BEFORE ask-name so «жаттығу беріңіз» / «код жазып
     // беріңіз» / «E0382 қатесін түсіндіріңіз» / «X-нің мақсаты не?»
@@ -1012,6 +1022,57 @@ fn detect_ask_purpose(joined: &str) -> bool {
         || joined.contains("неге арналған")
         || joined.contains("себебі қандай");
     has_purpose_noun || has_why_marker
+}
+
+/// **v4.95.0** — Codex P3 follow-up: detect "student submits a
+/// solution" pattern. Returns `Some((code, topic))` when the input
+/// contains a triple-backtick code block whose body looks
+/// syntactically like Rust. Returns `None` otherwise.
+///
+/// **Detection logic:**
+/// 1. Locate the first ` ```...``` ` block in the input.
+/// 2. Strip the optional `rust` / `Rust` language tag on the
+///    opening fence.
+/// 3. Reject when the body is shorter than 3 chars (probably a
+///    snippet of inline code, not a solution).
+/// 4. Heuristic acceptance: body contains at least one of `fn `,
+///    `let `, `use `, `struct `, `enum ` — common Rust openers.
+///    Refuse otherwise (treats `\`\`\`bash` blocks as non-Rust).
+/// 5. Topic: re-uses `pedagogical_topic_hint` on the WHOLE input
+///    (not just the code body) so the surrounding prose can carry
+///    the topic ("Менің ownership шешімім: ```rust ... ```").
+pub(crate) fn detect_submit_solution(input: &str) -> Option<(String, Option<String>)> {
+    let start = input.find("```")?;
+    let after_open = &input[start + 3..];
+    let end_offset = after_open.find("```")?;
+    let body_with_tag = &after_open[..end_offset];
+    // Strip optional language tag on the first line.
+    let body = if let Some(nl) = body_with_tag.find('\n') {
+        let first_line = body_with_tag[..nl].trim().to_lowercase();
+        if first_line == "rust" || first_line == "rs" || first_line.is_empty() {
+            &body_with_tag[nl + 1..]
+        } else {
+            body_with_tag
+        }
+    } else {
+        body_with_tag
+    };
+    let trimmed = body.trim();
+    if trimmed.len() < 3 {
+        return None;
+    }
+    let looks_like_rust = trimmed.contains("fn ")
+        || trimmed.contains("let ")
+        || trimmed.contains("use ")
+        || trimmed.contains("struct ")
+        || trimmed.contains("enum ")
+        || trimmed.contains("impl ")
+        || trimmed.contains("trait ");
+    if !looks_like_rust {
+        return None;
+    }
+    let topic = pedagogical_topic_hint(input);
+    Some((trimmed.to_string(), topic))
 }
 
 /// **v4.93.5** — pedagogical-intent topic extractor. Scans the

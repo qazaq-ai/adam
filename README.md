@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.94.5-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-4.95.0-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/intents-37-2EA44F?style=flat-square" alt="intents">
+  <img src="https://img.shields.io/badge/intents-38-2EA44F?style=flat-square" alt="intents">
   <img src="https://img.shields.io/badge/surface-Kazakh--only-9CCC65?style=flat-square" alt="Kazakh only">
   <img src="https://img.shields.io/badge/lexicon-16.9%20k%20roots-FBC02D?style=flat-square" alt="lexicon">
   <img src="https://img.shields.io/badge/corpus-77.9%20M%20local%20/%204.57%20M%20committed-FBC02D?style=flat-square" alt="corpus">
@@ -58,6 +58,8 @@ Tiny ML lives, large ML doesn't: the trained perceptron is 24 bytes / 6 f32; suf
 ### Engineering thesis
 
 The project's core engineering claim — independent of any historical or philosophical thesis about Kazakh — is that **agglutinative morphology gives a clean algebra of meaning**: every Kazakh word decomposes into a root plus a sequence of typed suffixes, each contributing a known grammatical operator (case, number, tense, person, possessive, polarity, modality). Composition is rule-bound, not learned. That structure is exactly what we build the runtime on: FST morphology + typed suffix priors + root-pair PMI as deterministic prior layers, world_core as a curated graph of typed facts, and templates as the only path from fact to text. No probabilistic free generation. No retrained-from-scratch behaviour per release. The result is **predictable, traceable, low-energy** answer for Kazakh queries — not because the language has special metaphysical status, but because its structure is unusually friendly to formal modelling. The same engineering style would apply to other agglutinative-typology languages (Turkish, Kyrgyz, Tatar, Uzbek, …) without claims of universal grammar.
+
+**v4.95.0 — `Intent::SubmitSolution` — cargo_verify wired into the dialog loop.** Closes the cargo-check tutor loop introduced as scaffolding in v4.94.0. Student submits a Rust solution (markdown triple-backtick code block) → adam runs `cargo check` → student gets a verdict with E-code explanation. End-to-end working in `adam_chat`. **Added:** Intent::SubmitSolution { code, topic } (intents 37 → 38); detect_submit_solution extracts code from triple-backtick block + Rust-syntax heuristic; planner runs cargo_verify, populates cargo_status / error_code / error_explanation / raw_excerpt slots; sub-key remap routes to one of 4 new template families (passed / failed_known / failed_unknown / env_error); `__code_input__` refusal overridden when SubmitSolution intent matches; discourse `input_is_code_snippet` extended with triple-backtick + Rust-syntax markers. **Integration tests:** 3 #[ignore] end-to-end tests (clean code passes, E0382 surfaces ownership explanation, undefined var surfaces compiler msg) — run with `cargo test -- --ignored`. **Verified:** workspace **1008 passing** + 9 ignored; clippy `-D warnings` green; check_metrics_currency green; verify_release_version 4.95.0 green; fmt + build clean. **Strategic:** basic tutor loop now end-to-end — student asks for exercise (AskExercise) → adam returns prompt → student submits solution (SubmitSolution) → adam runs cargo check → student gets verdict + E-code explanation. **Stripe — Kazakh school tutor.**
 
 **v4.94.5 — Pedagogical content extension (more topics per intent).** Extends curated pedagogical content from v4.93.5 with ~15 new topics across all 4 intents. Coverage doubles from narrow Rust basics to a broader concurrency + collections + tooling surface. **Added:** 15 new exercises (vec / string / struct / enum / error handling / hashmap / module / test / box / rc / arc / thread / channel / join! / select! / smart pointer); 13 new code snippets; 5 new error explanations (E0599 / E0432 / E0658 / E0463 / E0061); 12 new purpose statements. **Detector polish:** «{X} мысалы керек» now matches CodeRequest; `LATIN_TECH_SUBJECTS` += `channel`. **Live holdout:** 24 → 40 cases (+16 extension cases in new category `p2_pedagogical_extension`). **Verified:** 40/40 Codex live-holdout pass; workspace **1008 passing** unchanged (single test contains all 40 cases internally); clippy `-D warnings` green; check_metrics_currency green; verify_release_version 4.94.5 green; fmt + build clean. world_core: 3003/3245/30892 unchanged. **Stripe — Kazakh school tutor.**
 

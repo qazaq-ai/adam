@@ -7,6 +7,65 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.95.0] — 2026-05-07 — `Intent::SubmitSolution` — cargo_verify wired into the dialog loop
+
+Closes the cargo-check tutor loop introduced as scaffolding in v4.94.0. Student submits a Rust solution (markdown triple-backtick code block) → adam runs `cargo check` → student gets a verdict with E-code explanation. End-to-end working in `adam_chat`.
+
+### What's added
+
+**`Intent::SubmitSolution { code, topic }`** in [intent.rs](crates/adam-dialog/src/intent.rs) — student submission for verification. Triggered when input contains a triple-backtick code block whose body looks syntactically Rust (`fn ` + `{ }` OR `let ` + `;`/`println!`).
+
+**`detect_submit_solution`** in [semantics.rs](crates/adam-dialog/src/semantics.rs) — extracts code from the block, strips the optional `rust` language tag, refuses bash / Python blocks via Rust-syntax heuristic, returns `(code, topic)` where topic is hinted from the surrounding prose.
+
+**Planner integration** in [planner.rs](crates/adam-dialog/src/planner.rs) — `extract_slots` runs `crate::cargo_verify::verify_snippet(code)` (real `cargo check` invocation, ~1-2 s wall time), populates `cargo_status` ("passed" / "failed" / "env_error") + (on failure) `error_code` / `error_explanation` (looked up in `pedagogical::explain_error_code`) / `raw_excerpt` (truncated compiler output). Sub-key remap routes to the matching template family.
+
+**4 new template families** in [v1.toml](data/dialog/templates/v1.toml):
+- `submit_solution.passed` — congratulatory + suggest `cargo run` / next-step.
+- `submit_solution.failed_known` — surface E-code + `pedagogical::explain_error_code` body + raw compiler excerpt.
+- `submit_solution.failed_unknown` — surface raw excerpt only when E-code isn't in the curated map.
+- `submit_solution.env_error` — friendly fallback when `cargo` isn't on PATH.
+
+**Code-input override** ([planner.rs](crates/adam-dialog/src/planner.rs)) — pre-v4.95.0 the `__code_input__` flag (set when input contains code-snippet markers) routed to `code_refusal`. SubmitSolution now overrides this so the cargo-check verdict reaches the user. Without the override, every Rust submission was met with «Код фрагментін көрдім, бірақ оны қазір орындай алмаймын».
+
+**Discourse polish** ([discourse.rs](crates/adam-dialog/src/discourse.rs)) — `input_is_code_snippet` extended with markdown triple-backtick detection (most reliable signal) + Rust-specific heuristics (`fn ` + `{ }`; `let ` + `;`/`println!`). Without this, a snippet like `let x = 5;` triggered math-input classification on the bare numeral `5` and surfaced the math-refusal template before SubmitSolution could fire.
+
+### Integration tests
+
+`crates/adam-dialog/tests/submit_solution_integration.rs` — 3 end-to-end tests (`#[ignore]` for slow real `cargo` invocation; run with `cargo test -- --ignored`):
+1. Clean code (`fn main() { let x = 5; println!("{x}"); }`) → passed response.
+2. E0382 use-of-moved-value snippet → response contains `E0382` + ownership explanation.
+3. Undefined variable → response surfaces compiler message.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 3 / 3 SubmitSolution integration tests | ✅ 100 % (with --ignored flag) |
+| 40 / 40 Codex live-holdout cases | ✅ 100 % (P0+P1+P2+P2-extension) |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1008 passing** + 9 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+| Intent count | 37 → **38** (+1 SubmitSolution) |
+
+### Strategic note
+
+The cargo-check loop closes a long-running gap from Codex's 2026-05-07 audit: «Не хватает... запуска / проверки `cargo check/test`, и учебного состояния ученика: тема → упражнение → ответ → диагностика → следующий шаг.» With v4.93.5's pedagogical intents (AskExercise/CodeRequest/ExplainCompilerError/AskPurpose) + v4.94.0's resource benchmark + v4.95.0's SubmitSolution, the basic tutor loop is now end-to-end:
+1. Student asks for an exercise on topic X (`AskExercise`).
+2. adam surfaces curated exercise prompt with code template.
+3. Student submits solution as triple-backtick code block (`SubmitSolution`).
+4. adam runs `cargo check`, diagnoses E-code, returns explanation + raw excerpt.
+
+Multi-turn lesson state (continuity between exercise and solution) remains future work.
+
+### Roadmap (next)
+
+| Release | Focus |
+|---|---|
+| **v4.95.0** | **SubmitSolution intent (this release)** |
+| v4.95.5 | Multi-turn lesson state — link AskExercise → SubmitSolution turns by topic |
+| v4.96.0 | Open per user direction |
+
 ## [4.94.5] — 2026-05-07 — Pedagogical content extension (more topics per intent)
 
 Extends the curated pedagogical content from v4.93.5 with ~15 new topics across all 4 intents. Coverage doubles from narrow Rust basics to a broader concurrency + collections + tooling surface.

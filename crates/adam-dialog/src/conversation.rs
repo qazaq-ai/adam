@@ -326,6 +326,8 @@ pub enum IntentKind {
     CodeRequest,
     ExplainCompilerError,
     AskPurpose,
+    /// **v4.95.0** — student submits Rust code for verification via cargo_verify.
+    SubmitSolution,
     Unknown,
 }
 
@@ -368,6 +370,7 @@ impl From<&Intent> for IntentKind {
             Intent::CodeRequest { .. } => Self::CodeRequest,
             Intent::ExplainCompilerError { .. } => Self::ExplainCompilerError,
             Intent::AskPurpose { .. } => Self::AskPurpose,
+            Intent::SubmitSolution { .. } => Self::SubmitSolution,
             Intent::Unknown { .. } => Self::Unknown,
         }
     }
