@@ -7,6 +7,118 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.99.0] — 2026-05-08 — Student-side curriculum-query intents (long-term roadmap step 3)
+
+Step 3 of the long-term tutor arc. Rounds out the lesson-state surface added in v4.98.0 (foundation) and v4.98.5 (auto-advance announcements): students can now **proactively ask** about their journey rather than only seeing celebration pop-ups when stages auto-close. With v4.99.0 the curriculum surface is symmetric — adam **announces** progress AND **answers** progress queries.
+
+### What's added
+
+**Two new intents** (39 → **41**):
+
+- `Intent::AskNextTopic` — student asks "what's next?".
+- `Intent::AskCurrentProgress` — student asks "where am I?".
+
+**Detectors** ([semantics.rs](crates/adam-dialog/src/semantics.rs)):
+
+- `detect_ask_next_topic` — conjunction of advance-marker × learn-marker × question-marker (handles «келесі / әрі қарай / кейін / енді» × «үйрен / тақырып / сабақ» × «? / қалай / не / қандай»).
+- `detect_ask_current_progress` — direct phrase match («қай жерде тұрмын», «прогресім қандай», «қанша тақырып», «қай тақырыпты бітір», «жалпы қалай тұр», «қандай жетістік») plus compositional progress-noun + question-marker fallback.
+
+Both are dispatched **before** the pedagogical detectors (`AskExercise`, `AskPurpose`, etc.) so «келесі тақырыпты үйренсем?» doesn't trip on the surrounding learning verb / topic noun.
+
+**Curriculum recap renderer** ([curriculum.rs](crates/adam-dialog/src/curriculum.rs)):
+
+New public method `Curriculum::render_progress_recap_kk(progress) -> String` produces multi-line Kazakh prose listing every stage's status:
+
+```text
+1. **Иелік** ✓ (2/2 — бітті)
+2. **Қарыз алу** (1/2 — қазір)
+3. **Өмір кезеңі** ⊘ (құлыпта)
+4. **Қасиеттер** ⊘ (құлыпта)
+5. **Асинхронды** ⊘ (құлыпта)
+```
+
+Status thresholds: `✓ ... — бітті` for closed; `... — қазір` for current with prereqs met; `⊘ ... — құлыпта` for locked (prereqs not yet closed).
+
+**Conversation slot population** ([conversation.rs](crates/adam-dialog/src/conversation.rs)):
+
+- `AskNextTopic` → reads `Curriculum::next_unlocked(progress)` → populates `next_stage_label_kk` / `next_stage_summary_kk` / `next_stage_id` (or `__curriculum_complete__` when all stages closed).
+- `AskCurrentProgress` → if progress is non-empty, pre-renders the recap into `progress_recap` slot; if empty, sets `__progress_empty__` plus the first-stage label as a starter hint.
+
+**Planner sub-key remap** ([planner.rs](crates/adam-dialog/src/planner.rs)):
+
+- `AskNextTopic` + `__curriculum_complete__` → `next_topic.complete`
+- `AskNextTopic` → `next_topic.suggestion`
+- `AskCurrentProgress` + `__progress_empty__` → `current_progress.empty`
+- `AskCurrentProgress` → `current_progress.recap`
+
+Both `plan_response_with_session` and `plan_response_with_epistemic` are updated in lockstep.
+
+**4 new template families** ([v1.toml](data/dialog/templates/v1.toml)):
+
+- `next_topic.suggestion` (3 variants) — "Сізге келесі **{next_stage_label_kk}** тақырыбын ұсынамын. {next_stage_summary_kk}"
+- `next_topic.complete` (2 variants) — "Сіз барлық тақырыптарды бітіріп қойдыңыз — Rust бойынша негізгі курс толық меңгерілді."
+- `current_progress.recap` (3 variants) — "Сіздің қазіргі прогресіңіз: {progress_recap}"
+- `current_progress.empty` (2 variants) — "Әзірге бір де жаттығу шешілмеген. Бастау үшін **{next_stage_label_kk}** тақырыбынан жаттығу сұраңыз."
+
+### End-to-end smoke test
+
+```
+[Student]  Менің прогресім қандай?
+[adam]     Әзірге бір де жаттығу шешілмеген. Бастау үшін **Иелік** тақырыбынан жаттығу сұраңыз.
+[Student]  Маған Rust-та ownership жаттығуын беріңізші.
+[adam]     Ownership тақырыбы бойынша жаттығу: ...
+[Student]  ```rust
+           fn main() { println!("hi"); }
+           ```
+[adam]     Жақсы! Кодыңыз type-checker-ді өтті. ...
+[Student]  Менің прогресім қандай?
+[adam]     Курс бойынша жағдайыңыз:
+           1. **Иелік** (1/2 — қазір)
+           2. **Қарыз алу** ⊘ (құлыпта)
+           3. **Өмір кезеңі** ⊘ (құлыпта)
+           4. **Қасиеттер** ⊘ (құлыпта)
+           5. **Асинхронды** ⊘ (құлыпта)
+[Student]  Келесі қандай тақырыпты үйренсем?
+[adam]     Сізге келесі **Иелік** тақырыбын ұсынамын. Кодтағы әр мәннің бір ғана иесі болады. ...
+```
+
+The 6-turn flow demonstrates symmetric query: empty-state recap → exercise + pass → partial recap with mixed statuses → next-topic recommendation that correctly identifies ownership as still-current (1/2 not yet closed).
+
+### Regression tests
+
+**Module-level** ([curriculum.rs](crates/adam-dialog/src/curriculum.rs) — 3 new):
+
+1. `recap_empty_progress_marks_first_stage_current_others_locked`
+2. `recap_partial_progress_shows_mixed_statuses`
+3. `recap_lists_every_stage_in_order`
+
+**Integration** ([`tests/curriculum_v4990_query_intents.rs`](crates/adam-dialog/tests/curriculum_v4990_query_intents.rs) — 15 new):
+
+Detector positives + negatives (4 tests), intent dispatch (2 tests), template-family presence + slot references (4 tests), end-to-end multi-turn flows (5 tests covering empty-state recap, fresh-state next-topic, partial-state mixed-status recap, post-ownership-closure advance to borrow, curriculum-complete celebration).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 3 / 3 new recap renderer module unit tests | ✅ 100 % |
+| 15 / 15 v4.99.0 query-intent integration tests | ✅ 100 % |
+| 11 / 11 v4.98.5 auto-advance tests | ✅ unchanged |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator unit tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora regression tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 regression tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1073 passing** + 16 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Roadmap
+
+- **v4.99.5** — Adaptive difficulty wiring: `pedagogical::exercise_for_topic` consumes `StageProgress::difficulty_hint` (added in v4.98.5) to scale exercise selection within a stage. Easy-hint students get the simpler exercise variant; Hard-hint students get a more involved one. Requires multiple curated exercises per topic — content investment.
+- **v5.0.0+** — open per user direction. Candidate arcs: new book (Rustonomicon / Embedded Rust / Tokio Tutorial), additional curriculum tracks (Cargo / TOML / cross-platform), or non-Rust pedagogical surface.
+
+**Stripe — Kazakh school tutor (curriculum query symmetry; tutor loop now feels guided in both directions — adam announces AND answers).**
+
 ## [4.98.5] — 2026-05-08 — User-facing auto-advance + adaptive-difficulty hooks (long-term roadmap step 2)
 
 Step 2 of the long-term tutor arc. Builds on v4.98.0's curriculum tracking foundation by making the student's curriculum journey **visible**: when a `passed` `SubmitSolution` verdict closes a curriculum stage, adam auto-announces the achievement AND the next-step recommendation in the same response.

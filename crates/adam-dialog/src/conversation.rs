@@ -342,6 +342,9 @@ pub enum IntentKind {
     /// **v4.96.0** — Codex round-2 audit Bug 7. Cross-language
     /// contrast: «Python-да ownership бар ма?».
     CrossLanguageContrast,
+    /// **v4.99.0** — student-side curriculum-query intents.
+    AskNextTopic,
+    AskCurrentProgress,
     Unknown,
 }
 
@@ -386,6 +389,8 @@ impl From<&Intent> for IntentKind {
             Intent::AskPurpose { .. } => Self::AskPurpose,
             Intent::SubmitSolution { .. } => Self::SubmitSolution,
             Intent::CrossLanguageContrast { .. } => Self::CrossLanguageContrast,
+            Intent::AskNextTopic => Self::AskNextTopic,
+            Intent::AskCurrentProgress => Self::AskCurrentProgress,
             Intent::Unknown { .. } => Self::Unknown,
         }
     }
@@ -1359,6 +1364,42 @@ impl Conversation {
         // `extra_slots` and routes accordingly. If the verdict turns
         // out to be `failed`, the planner ignores the closure slots
         // (sub-key remap only fires on `passed`).
+        // **v4.99.0** — student-side curriculum-query slot
+        // population. AskNextTopic + AskCurrentProgress need
+        // curriculum-derived slots so the realiser can fill the new
+        // template families. AskNextTopic populates `next_stage_*` (or
+        // `__curriculum_complete__` if all stages are closed);
+        // AskCurrentProgress populates `progress_recap` with a
+        // pre-rendered Kazakh prose recap (or `__progress_empty__` when
+        // the student has no progress yet).
+        if let Some(curriculum) = self.curriculum.as_ref() {
+            match &intent_for_render {
+                Intent::AskNextTopic => {
+                    if let Some(next) = curriculum.next_unlocked(&self.curriculum_progress) {
+                        extra_slots.insert("next_stage_label_kk".into(), next.label_kk.clone());
+                        extra_slots.insert("next_stage_summary_kk".into(), next.summary_kk.clone());
+                        extra_slots.insert("next_stage_id".into(), next.id.clone());
+                    } else {
+                        extra_slots.insert("__curriculum_complete__".into(), "1".into());
+                    }
+                }
+                Intent::AskCurrentProgress => {
+                    if self.curriculum_progress.is_empty() {
+                        extra_slots.insert("__progress_empty__".into(), "1".into());
+                        // Surface the first-stage label as a starting
+                        // hint inside `current_progress.empty`.
+                        if let Some(first) = curriculum.next_unlocked(&self.curriculum_progress) {
+                            extra_slots
+                                .insert("next_stage_label_kk".into(), first.label_kk.clone());
+                        }
+                    } else {
+                        let recap = curriculum.render_progress_recap_kk(&self.curriculum_progress);
+                        extra_slots.insert("progress_recap".into(), recap);
+                    }
+                }
+                _ => {}
+            }
+        }
         if let Intent::SubmitSolution {
             topic: ss_topic, ..
         } = &intent_for_render

@@ -149,6 +149,20 @@ pub fn plan_response_with_session(
             "cross_language_contrast.no_body"
         };
         trace.push(format!("planner: CrossLanguageContrast sub-key → {key}"));
+    } else if matches!(intent, Intent::AskNextTopic) {
+        key = if slots.contains_key("__curriculum_complete__") {
+            "next_topic.complete"
+        } else {
+            "next_topic.suggestion"
+        };
+        trace.push(format!("planner: AskNextTopic sub-key → {key}"));
+    } else if matches!(intent, Intent::AskCurrentProgress) {
+        key = if slots.contains_key("__progress_empty__") {
+            "current_progress.empty"
+        } else {
+            "current_progress.recap"
+        };
+        trace.push(format!("planner: AskCurrentProgress sub-key → {key}"));
     }
     if !slots.is_empty() {
         trace.push(format!("planner: slots={slots:?}"));
@@ -845,6 +859,22 @@ pub fn plan_response_with_epistemic(
             "planner: CrossLanguageContrast sub-key → {new_key}"
         ));
         new_key
+    } else if matches!(intent, Intent::AskNextTopic) {
+        let new_key = if slots.contains_key("__curriculum_complete__") {
+            "next_topic.complete"
+        } else {
+            "next_topic.suggestion"
+        };
+        trace.push(format!("planner: AskNextTopic sub-key → {new_key}"));
+        new_key
+    } else if matches!(intent, Intent::AskCurrentProgress) {
+        let new_key = if slots.contains_key("__progress_empty__") {
+            "current_progress.empty"
+        } else {
+            "current_progress.recap"
+        };
+        trace.push(format!("planner: AskCurrentProgress sub-key → {new_key}"));
+        new_key
     } else {
         key
     };
@@ -1488,6 +1518,13 @@ pub fn intent_key(intent: &Intent) -> &'static str {
         // contrast text exists for the (other_language, rust_concept)
         // pair.
         Intent::CrossLanguageContrast { .. } => "cross_language_contrast",
+        // **v4.99.0** — student-side curriculum-query intents.
+        // Sub-key remap (suggestion vs complete; recap vs empty)
+        // happens later in plan_response_with_session and
+        // plan_response_with_epistemic based on the pre-stuffed
+        // curriculum slots.
+        Intent::AskNextTopic => "next_topic",
+        Intent::AskCurrentProgress => "current_progress",
         Intent::Unknown {
             raw_tokens,
             noun_hint,

@@ -278,6 +278,20 @@ pub enum Intent {
     /// practising — useful for routing follow-up exercises.
     SubmitSolution { code: String, topic: Option<String> },
 
+    /// **v4.99.0** — student asks "what's next?" Surface forms:
+    /// «Келесі қандай тақырыпты үйренсем?», «Енді нені үйренсем
+    /// болады?», «Әрі қарай қалай?». Routes to the
+    /// `next_topic.{suggestion,complete}` template family populated
+    /// from `Curriculum::next_unlocked(progress)`.
+    AskNextTopic,
+
+    /// **v4.99.0** — student asks "where am I in the curriculum?"
+    /// Surface forms: «Мен қай жерде тұрмын?», «Менің прогресім
+    /// қандай?», «Қанша тақырыпты үйрендім?». Routes to the
+    /// `current_progress.{recap,empty}` template family with a
+    /// pre-rendered Kazakh prose recap of every stage's status.
+    AskCurrentProgress,
+
     /// Nothing matched. Fallback may carry a `noun_hint` extracted from
     /// the input by the FST parser so the response can at least
     /// acknowledge what the user is talking about, rather than blank

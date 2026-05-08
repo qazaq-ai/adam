@@ -162,6 +162,16 @@ pub fn interpret_text_with_lexicon(
     if let Some((code, topic)) = detect_submit_solution(input) {
         return Intent::SubmitSolution { code, topic };
     }
+    // **v4.99.0** — student-side curriculum-query intents. Routed
+    // BEFORE the pedagogical detectors so «келесі тақырыпты
+    // үйренсем?» doesn't trip AskExercise on the surrounding
+    // «үйренсем» (= "let me learn") + AskPurpose on «не».
+    if detect_ask_next_topic(input) {
+        return Intent::AskNextTopic;
+    }
+    if detect_ask_current_progress(input) {
+        return Intent::AskCurrentProgress;
+    }
     // **v4.96.0** — Codex round-2 audit Bug 7: cross-language
     // contrast. Routed BEFORE the other pedagogical detectors so
     // «Python-да ownership бар ма?» doesn't accidentally match
@@ -1032,6 +1042,62 @@ fn detect_ask_purpose(joined: &str) -> bool {
         || joined.contains("неге арналған")
         || joined.contains("себебі қандай");
     has_purpose_noun || has_why_marker
+}
+
+/// **v4.99.0** — student-side curriculum query: "what's next?".
+/// Surface forms: «Келесі қандай тақырыпты үйренсем?», «Енді нені
+/// үйренсем болады?», «Әрі қарай қалай?», «Келесі тақырып не?»,
+/// «Кейін не үйрену керек?».
+pub fn detect_ask_next_topic(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Two-token-conjunction patterns — needs both an "advance" marker
+    // AND a learning marker so generic «келесі сұрақ» doesn't match.
+    let has_advance = lower.contains("келесі")
+        || lower.contains("әрі қарай")
+        || lower.contains("әрі-қарай")
+        || lower.contains("кейін")
+        || lower.contains("енді");
+    let has_learn_or_topic =
+        lower.contains("үйрен") || lower.contains("тақырып") || lower.contains("сабақ");
+    if !(has_advance && has_learn_or_topic) {
+        return false;
+    }
+    // Reject reflective / past-tense uses: «келесі тақырыпты
+    // үйрендім» (= "I learned the next topic") is a statement, not
+    // a question. Crude check: must contain a question marker.
+    lower.contains("?")
+        || lower.contains("қалай")
+        || lower.contains("не")
+        || lower.contains("қандай")
+}
+
+/// **v4.99.0** — student-side curriculum query: "where am I?".
+/// Surface forms: «Мен қай жерде тұрмын?», «Менің прогресім қандай?»,
+/// «Қай тақырыпты бітірдім?», «Қанша тақырыпты үйрендім?», «Жалпы
+/// қалай тұр?».
+pub fn detect_ask_current_progress(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    // Direct phrases first — high-precision matches.
+    let direct_phrases = [
+        "қай жерде тұрмын",
+        "қай жердемін",
+        "прогресім қандай",
+        "прогресім қалай",
+        "менің прогресім",
+        "қанша тақырып",
+        "қай тақырыпты бітір",
+        "қай тақырыпты аяқта",
+        "қай тақырыптар",
+        "жалпы қалай тұр",
+        "қандай жетістік",
+    ];
+    if direct_phrases.iter().any(|p| lower.contains(p)) {
+        return true;
+    }
+    // Compositional: progress noun + question marker.
+    let has_progress_noun = lower.contains("прогрес") || lower.contains("жетістік");
+    let has_question = lower.contains("?") || lower.contains("қалай") || lower.contains("қандай");
+    has_progress_noun && has_question
 }
 
 /// **v4.95.0** — Codex P3 follow-up: detect "student submits a

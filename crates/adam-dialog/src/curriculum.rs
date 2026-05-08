@@ -182,6 +182,48 @@ impl Curriculum {
                 .is_closed(s)
         })
     }
+
+    /// **v4.99.0** — render a Kazakh-language progress recap suitable
+    /// for `current_progress.recap` template substitution. Lists every
+    /// stage in order with closure status and pass-count, e.g.
+    ///
+    /// ```text
+    /// 1. **Иелік** ✓ (2/2 — бітті)
+    /// 2. **Қарыз алу** (1/2 — қазір)
+    /// 3. **Өмір кезеңі** ⊘ (құлыпта)
+    /// ...
+    /// ```
+    ///
+    /// Stage status:
+    /// - `✓ ... — бітті` — closed (passed ≥ exercises_to_pass)
+    /// - `... — қазір` — currently in progress (some passes, prereqs met)
+    /// - `⊘ ... — құлыпта` — locked (prereqs not yet closed)
+    pub fn render_progress_recap_kk(&self, progress: &HashMap<String, StageProgress>) -> String {
+        let mut lines = Vec::with_capacity(self.stages.len());
+        for (i, stage) in self.stages.iter().enumerate() {
+            let p = progress.get(&stage.id).copied().unwrap_or_default();
+            let prereqs_met = stage.prereqs.iter().all(|prereq_id| {
+                self.stage(prereq_id)
+                    .map(|prereq| {
+                        progress
+                            .get(&prereq.id)
+                            .copied()
+                            .unwrap_or_default()
+                            .is_closed(prereq)
+                    })
+                    .unwrap_or(false)
+            });
+            let status = if p.is_closed(stage) {
+                format!("✓ ({}/{} — бітті)", p.passed, stage.exercises_to_pass)
+            } else if prereqs_met {
+                format!("({}/{} — қазір)", p.passed, stage.exercises_to_pass)
+            } else {
+                "⊘ (құлыпта)".to_string()
+            };
+            lines.push(format!("{}. **{}** {}", i + 1, stage.label_kk, status));
+        }
+        lines.join("\n")
+    }
 }
 
 /// Resolve a workspace-relative path. Prefers `CARGO_MANIFEST_DIR`
@@ -359,6 +401,60 @@ mod tests {
             failed: 1,
         };
         assert_eq!(p.difficulty_hint(), DifficultyHint::Normal);
+    }
+
+    #[test]
+    fn recap_empty_progress_marks_first_stage_current_others_locked() {
+        let c = fixture();
+        let progress = HashMap::new();
+        let recap = c.render_progress_recap_kk(&progress);
+        // ownership has no prereqs → "current" (not locked)
+        assert!(recap.contains("**Иелік** (0/2 — қазір)"), "got: {recap}");
+        // borrow / lifetime have unmet prereqs → locked
+        assert!(recap.contains("**Қарыз** ⊘ (құлыпта)"), "got: {recap}");
+        assert!(
+            recap.contains("**Өмір кезеңі** ⊘ (құлыпта)"),
+            "got: {recap}"
+        );
+    }
+
+    #[test]
+    fn recap_partial_progress_shows_mixed_statuses() {
+        let c = fixture();
+        let mut progress = HashMap::new();
+        progress.insert(
+            "ownership".into(),
+            StageProgress {
+                passed: 2,
+                failed: 0,
+            },
+        );
+        progress.insert(
+            "borrow".into(),
+            StageProgress {
+                passed: 1,
+                failed: 0,
+            },
+        );
+        let recap = c.render_progress_recap_kk(&progress);
+        assert!(recap.contains("**Иелік** ✓ (2/2 — бітті)"), "got: {recap}");
+        assert!(recap.contains("**Қарыз** (1/2 — қазір)"), "got: {recap}");
+        // lifetime needs both ownership AND borrow closed; borrow not yet → locked
+        assert!(
+            recap.contains("**Өмір кезеңі** ⊘ (құлыпта)"),
+            "got: {recap}"
+        );
+    }
+
+    #[test]
+    fn recap_lists_every_stage_in_order() {
+        let c = fixture();
+        let recap = c.render_progress_recap_kk(&HashMap::new());
+        let lines: Vec<&str> = recap.lines().collect();
+        assert_eq!(lines.len(), c.stages.len());
+        assert!(lines[0].starts_with("1."));
+        assert!(lines[1].starts_with("2."));
+        assert!(lines[2].starts_with("3."));
     }
 
     #[test]
