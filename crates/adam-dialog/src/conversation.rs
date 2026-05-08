@@ -488,6 +488,16 @@ impl Conversation {
         self
     }
 
+    /// **v4.95.5** — read-only session accessor. Surfaces a single
+    /// session slot (e.g. `last_exercise_topic`) for callers that
+    /// need to inspect the lesson state without copying the whole
+    /// session HashMap. Returns owned String to avoid lifetime
+    /// gymnastics across turns. Tests use this to verify the
+    /// multi-turn lesson-state contract without touching internals.
+    pub fn session_value(&self, key: &str) -> Option<String> {
+        self.session.get(key).cloned()
+    }
+
     /// Run one conversational turn. Parses the input, recognises the
     /// intent, folds any new entities into [`session`](Self::session),
     /// updates [`active_intent`](Self::active_intent) and
@@ -1928,6 +1938,26 @@ impl Conversation {
                 self.session.insert("activity".into(), activity.clone());
                 self.belief
                     .record_user_fact(USER_SELF_KEY, "activity", activity, turn_id);
+            }
+            // **v4.95.5** — multi-turn lesson state. When adam emits
+            // an exercise tied to a topic, remember the topic in
+            // session so a subsequent SubmitSolution turn (which may
+            // arrive with topic=None — the user types only the code
+            // block) can still attribute the verdict to the active
+            // exercise.
+            Intent::AskExercise { topic: Some(topic) } => {
+                self.session
+                    .insert("last_exercise_topic".into(), topic.clone());
+                self.session
+                    .insert("last_exercise_turn".into(), turn_id.to_string());
+            }
+            // **v4.95.5** — same: when the user explicitly states a
+            // topic in their CodeRequest, prime the lesson context.
+            Intent::CodeRequest { topic: Some(topic) } => {
+                self.session
+                    .insert("last_exercise_topic".into(), topic.clone());
+                self.session
+                    .insert("last_exercise_turn".into(), turn_id.to_string());
             }
             _ => {}
         }

@@ -7,6 +7,91 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.95.5] — 2026-05-07 — Multi-turn lesson state — adam links exercise prompt to next solution
+
+Closes the «учебное состояние ученика» gap from Codex's 2026-05-07 audit: «тема → упражнение → ответ → диагностика → следующий шаг». When `AskExercise` (or `CodeRequest`) emits a topic-bearing prompt, adam remembers the topic in session. The next `SubmitSolution` turn — typically a bare code block with no topic in prose — falls back to the stored topic and the verdict is framed in lesson context.
+
+### What's added
+
+**Session-state writes** ([conversation.rs](crates/adam-dialog/src/conversation.rs) — `absorb_entities`):
+- `Intent::AskExercise { topic: Some(t) }` → write `last_exercise_topic = t`, `last_exercise_turn = turn_id`.
+- `Intent::CodeRequest { topic: Some(t) }` → same (a code-request also primes the lesson — student often asks "show me the code" then submits a variation).
+
+**Topic fallback** ([planner.rs](crates/adam-dialog/src/planner.rs) — SubmitSolution slot extraction):
+- When `Intent::SubmitSolution { topic: None }`, look up `slots.last_exercise_topic` and use it as the verdict's `{topic}` slot.
+
+**Lesson-aware template variants** ([v1.toml](data/dialog/templates/v1.toml)):
+- `submit_solution.passed`: «{topic} тапсырмаңыз шешілді — `cargo check` тазалап өтті.»
+- `submit_solution.failed_known`: «{topic} жаттығуыңызда **{error_code}** қатесі шықты — иә, бұл осы тұжырымдамада ең жиі ұрсу.»
+- `submit_solution.failed_unknown`: «{topic} жаттығуыңыз компиляция кезінде қате берді.»
+- Topic-less fallback variants preserved bit-for-bit so submissions outside any lesson still get a clean verdict.
+
+**Public session accessor** ([conversation.rs](crates/adam-dialog/src/conversation.rs:489)):
+- `pub fn Conversation::session_value(&self, key: &str) -> Option<String>` — read-only inspect for tests / external callers. No write API exposed.
+
+### Integration tests
+
+[`crates/adam-dialog/tests/submit_solution_integration.rs`](crates/adam-dialog/tests/submit_solution_integration.rs) — 2 new `#[ignore]` tests:
+1. `multi_turn_lesson_links_exercise_to_solution` — `AskExercise(ownership)` → submission with E0382 → response mentions both `E0382` AND `ownership` (lesson context).
+2. `multi_turn_lesson_passes_clean_solution_with_topic` — `CodeRequest(hello world)` → clean submission → lesson-aware passed variant fires.
+
+Total integration test count: 5 (3 from v4.95.0 + 2 new).
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 5 / 5 SubmitSolution integration tests (with --ignored) | ✅ 100 % |
+| 40 / 40 Codex live-holdout cases | ✅ 100 % (P0+P1+P2+P2-extension) |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1008 passing** + 11 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### End-to-end demo (multi-turn)
+
+```
+[Student]  Маған Rust-та ownership жаттығуын беріңізші.
+[adam]     Ownership тақырыбы бойынша жаттығу: Мына кодта қате бар:
+           `let s = String::from("hello"); let s2 = s; println!("{s}");` —
+           компилятор не білдіреді? Қалай түзетесіз?
+           ...
+
+[Student]  ```rust
+           fn main() {
+               let s = String::from("hello");
+               let s2 = s;
+               println!("{}", s);
+           }
+           ```
+
+[adam]     Ownership жаттығуыңызда E0382 қатесі шықты — иә, бұл осы
+           тұжырымдамада ең жиі ұрсу.
+
+           E0382 — use of moved value. Сіз бір мәнді басқа функцияға
+           берген болсаңыз — оның иеленуі (ownership) ауысты, ескі
+           айнымалы енді жарамсыз. Шешім: (1) clone() жасау; (2) сілтеме
+           &value беру; (3) кодтың логикасын — мәнді алдымен пайдаланып,
+           кейін тасу.
+
+           Компилятор хабары:
+           error[E0382]: borrow of moved value: `s`
+           ...
+```
+
+Strategic: 4-turn tutor cycle now end-to-end:
+1. Student picks topic (`AskExercise`)
+2. adam returns curated exercise prompt
+3. Student submits solution as code block (`SubmitSolution`)
+4. adam runs `cargo check`, returns topic-aware verdict with E-code explanation
+
+### Roadmap (next)
+
+| Release | Focus |
+|---|---|
+| **v4.95.5** | **Multi-turn lesson state (this release)** |
+| v4.96.0 | Open per user direction — could be more advanced lesson features (progress tracking, adaptive difficulty), more topics, async / Rust deeper, or a different educational area |
+
 ## [4.95.0] — 2026-05-07 — `Intent::SubmitSolution` — cargo_verify wired into the dialog loop
 
 Closes the cargo-check tutor loop introduced as scaffolding in v4.94.0. Student submits a Rust solution (markdown triple-backtick code block) → adam runs `cargo check` → student gets a verdict with E-code explanation. End-to-end working in `adam_chat`.

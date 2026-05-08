@@ -942,7 +942,19 @@ fn extract_slots(intent: &Intent) -> HashMap<String, String> {
         // interactive tutor; production would push verification to
         // a background task and surface a "checking..." reply first.
         Intent::SubmitSolution { code, topic } => {
-            if let Some(t) = topic {
+            // **v4.95.5** — multi-turn lesson state. Fall back to
+            // the topic of the most-recent exercise / code-request
+            // when the submission itself doesn't name a topic. This
+            // lets the student answer with bare code (the natural
+            // pattern after `AskExercise` returns a prompt) while
+            // adam still frames the verdict in lesson context.
+            let resolved_topic = topic.clone().or_else(|| {
+                slots
+                    .get("last_exercise_topic")
+                    .filter(|t| !t.is_empty())
+                    .cloned()
+            });
+            if let Some(t) = resolved_topic.as_ref() {
                 slots.insert("topic".into(), t.clone());
             }
             let result = crate::cargo_verify::verify_snippet(code);

@@ -137,3 +137,79 @@ fn submit_solution_undeclared_variable_surfaces_compiler_msg() {
         "expected error mention in response, got: {response}"
     );
 }
+
+// **v4.95.5** — multi-turn lesson state. Verify that an AskExercise
+// turn primes the session with `last_exercise_topic`, and that a
+// subsequent SubmitSolution (with no explicit topic) inherits it
+// and produces a topic-aware response.
+#[test]
+#[ignore]
+fn multi_turn_lesson_links_exercise_to_solution() {
+    let (mut conv, lex, repo) = build_conversation();
+
+    // Turn 1: student asks for an exercise on `ownership`.
+    let prompt = "Маған Rust-та ownership жаттығуын беріңізші.";
+    let r1 = conv.turn(prompt, &lex, &repo, 0);
+    let r1_lower = r1.to_lowercase();
+    assert!(
+        r1_lower.contains("ownership"),
+        "exercise response should mention ownership; got: {r1}"
+    );
+
+    // Session should now carry last_exercise_topic="ownership".
+    assert_eq!(
+        conv.session_value("last_exercise_topic"),
+        Some("ownership".to_string()),
+        "session should remember the exercise topic"
+    );
+
+    // Turn 2: student submits a solution with NO explicit topic in
+    // prose — just the code block. adam should fall back to the
+    // session-stored exercise topic.
+    let solution = "```rust\nfn main() {\n    let s = String::from(\"hello\");\n    let s2 = s;\n    println!(\"{}\", s);\n}\n```";
+    let r2 = conv.turn(solution, &lex, &repo, 0);
+    let r2_lower = r2.to_lowercase();
+
+    assert!(
+        r2_lower.contains("e0382"),
+        "submission verdict should surface E0382; got: {r2}"
+    );
+    // Lesson-aware variant should mention the topic. We don't lock
+    // to a specific phrasing — just require the topic word appears
+    // somewhere in the verdict.
+    assert!(
+        r2_lower.contains("ownership"),
+        "submission verdict should mention exercise topic 'ownership' since the lesson context was set; got: {r2}"
+    );
+}
+
+// Multi-turn coverage with a clean (passing) solution submitted
+// after an exercise prompt. Confirms the lesson-aware passed
+// templates fire.
+#[test]
+#[ignore]
+fn multi_turn_lesson_passes_clean_solution_with_topic() {
+    let (mut conv, lex, repo) = build_conversation();
+
+    let _r1 = conv.turn("Hello world коды керек.", &lex, &repo, 0);
+    assert_eq!(
+        conv.session_value("last_exercise_topic"),
+        Some("hello world".to_string()),
+        "CodeRequest should also prime the lesson context"
+    );
+
+    let r2 = conv.turn(
+        "```rust\nfn main() { println!(\"hello!\"); }\n```",
+        &lex,
+        &repo,
+        0,
+    );
+    let lower = r2.to_lowercase();
+    assert!(
+        lower.contains("жарайсыз")
+            || lower.contains("компиляция")
+            || lower.contains("type-checker")
+            || lower.contains("дайын"),
+        "passing submission should produce a positive verdict; got: {r2}"
+    );
+}

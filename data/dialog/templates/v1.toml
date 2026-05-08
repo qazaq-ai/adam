@@ -1351,6 +1351,11 @@ templates = [
 [[families]]
 key = "submit_solution.passed"
 templates = [
+    # Topic-bearing (lesson-aware) variants — fired after AskExercise / CodeRequest set last_exercise_topic.
+    "Жарайсыз! {topic} тапсырмаңыз шешілді — `cargo check` тазалап өтті. `cargo run` арқылы орындап көрсеңіз болады.",
+    "Жақсы! Сіздің {topic} жаттығуыңыз дайын — компилятор қарсы шықпады.",
+    "{topic} тұжырымдамасын меңгеріп тұрсыз ба — кодыңыз type-checker-ді өтті.",
+    # Topic-less fallback — when there's no active lesson context.
     "Жарайсыз! Кодыңыз `cargo check`-тен тазалап өтті. `cargo run` арқылы орындап көріңіз.",
     "Код компиляцияланды. Мазмұны дұрыс — компилятор қарсы шықпады.",
     "Жақсы! Кодыңыз type-checker-ді өтті. Ендiгi қадам — тестi жазып, мінез-құлықты тексеру.",
@@ -1359,6 +1364,10 @@ templates = [
 [[families]]
 key = "submit_solution.failed_known"
 templates = [
+    # Topic-bearing (lesson-aware): «X жаттығуыңызда Eyyyy шықты ...»
+    "{topic} жаттығуыңызда **{error_code}** қатесі шықты — иә, бұл осы тұжырымдамада ең жиі ұрсу.\n\n{error_explanation}\n\nКомпилятор хабары:\n```\n{raw_excerpt}\n```",
+    "{topic} тапсырмаңызда **{error_code}** қатесі бар.\n\n{error_explanation}\n\nҚайта көріңіз — кеңесіме сай түзетіңіз.",
+    # Topic-less fallback.
     "Кодыңызда қате бар: **{error_code}**.\n\n{error_explanation}\n\nКомпилятор хабары:\n```\n{raw_excerpt}\n```",
     "**{error_code}** қатесі шықты.\n\n{error_explanation}",
 ]
@@ -1366,6 +1375,9 @@ templates = [
 [[families]]
 key = "submit_solution.failed_unknown"
 templates = [
+    # Topic-bearing.
+    "{topic} жаттығуыңыз компиляция кезінде қате берді. Менде осы нақты қатенің курсталған тегі жоқ. Компилятор хабары:\n```\n{raw_excerpt}\n```\n\nҚайталап қарап шығыңыз.",
+    # Topic-less fallback.
     "Кодыңыз компиляция кезінде қате береді. Менде осы нақты қатенің тегі жоқ. Compiler хабары:\n```\n{raw_excerpt}\n```\n\nҚайталап қарап шығыңыз — `cargo check` жергілікте де іске қосып көріңіз.",
     "Қате шықты — толық тегі менде жоқ. Компилятор хабары:\n```\n{raw_excerpt}\n```",
 ]
