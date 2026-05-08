@@ -1100,6 +1100,70 @@ pub fn detect_ask_current_progress(input: &str) -> bool {
     has_progress_noun && has_question
 }
 
+/// **v5.3.5** — compound-statement secondary fact extraction.
+///
+/// Pre-fix «Менің атым Дәулет, мамандығым бағдарламашы.» fired only
+/// `StatementOfName { name: "Дәулет" }` (the first clause); the
+/// occupation in the second clause was lost because `interpret_text`
+/// returns ONE primary `Intent`. This function scans the input for
+/// **additional** profile-fact patterns AFTER the primary intent
+/// fires, returning `(predicate, object)` tuples for the caller to
+/// absorb separately.
+///
+/// Patterns detected:
+/// - «мамандығым X» / «кәсібім X» / «менің мамандығым X» →
+///   `("occupation", X)`
+/// - «жасым N» where N is a numeric token (with optional «менің»)
+///   → `("age", N)`
+///
+/// The next non-particle token after the P1Sg-marked profile noun
+/// is taken as the value. Trailing punctuation is stripped.
+///
+/// Used by [`crate::Conversation::turn_with_trace`] post-`absorb_entities`
+/// to fill in compound profile statements that the single-Intent
+/// pipeline doesn't catch.
+pub fn extract_secondary_profile_facts(input: &str) -> Vec<(String, String)> {
+    let mut facts = Vec::new();
+    let tokens: Vec<&str> = input.split_whitespace().collect();
+
+    fn alpha_only(s: &str) -> String {
+        s.chars().filter(|c| c.is_alphabetic()).collect()
+    }
+    fn alpha_or_digit(s: &str) -> String {
+        s.chars()
+            .filter(|c| c.is_alphabetic() || c.is_ascii_digit())
+            .collect()
+    }
+
+    for (i, tok) in tokens.iter().enumerate() {
+        let tl = alpha_only(tok).to_lowercase();
+        // Occupation: «мамандығым X» / «кәсібім X»
+        if tl == "мамандығым" || tl == "кәсібім" {
+            if let Some(next) = tokens.get(i + 1) {
+                let value = alpha_only(next);
+                let value_lc = value.to_lowercase();
+                if !value.is_empty()
+                    && value_lc != "болып"
+                    && value_lc != "ретінде"
+                    && value_lc != "екен"
+                {
+                    facts.push(("occupation".into(), value));
+                }
+            }
+        }
+        // Age: «жасым 30» / «жасым отыз»
+        if tl == "жасым" {
+            if let Some(next) = tokens.get(i + 1) {
+                let value = alpha_or_digit(next);
+                if !value.is_empty() {
+                    facts.push(("age".into(), value));
+                }
+            }
+        }
+    }
+    facts
+}
+
 /// **v4.95.0** — Codex P3 follow-up: detect "student submits a
 /// solution" pattern. Returns `Some((code, topic))` when the input
 /// contains a triple-backtick code block whose body looks
@@ -2572,6 +2636,25 @@ fn detect_ask_occupation(joined: &str) -> bool {
         // (`не`/`қандай`) are an unambiguous self-recall signal.
         || ((joined.contains("мамандығым") || joined.contains("кәсібім"))
             && (joined.contains("не") || joined.contains("қандай")))
+        // **v5.3.5** — recall-question variants mirror the v4.54.5
+        // detect_ask_name fix: «менің мамандығым есіңізде ме?»,
+        // «мамандығымды ұмытпадыңыз ба?», «кәсібімді білесіз бе?».
+        // Pre-v5.3.5 «есіңізде ме» co-occurring with «мамандығым»
+        // / «кәсібім» fell through to Unknown and surfaced the
+        // generic definition «Мамандық — адамның кәсібі» — same
+        // class of bug as the original v4.54.5 ask_name fix.
+        || ((joined.contains("мамандығым")
+            || joined.contains("мамандығымды")
+            || joined.contains("кәсібім")
+            || joined.contains("кәсібімді"))
+            && (joined.contains("есіңізде")
+                || joined.contains("есіңде")
+                || joined.contains("ұмытпа")
+                || joined.contains("ұмытты")
+                || joined.contains("білесіз")
+                || joined.contains("білесің")
+                || joined.contains("білдіңіз")
+                || joined.contains("білдің")))
 }
 
 /// User states occupation.
@@ -2930,6 +3013,25 @@ pub(crate) fn detect_occupation_in_compound(
         .collect();
     if tokens.is_empty() {
         return None;
+    }
+    // **v5.3.5** — possessive-form pattern «мамандығым X» / «кәсібім X»
+    // (1sg-poss-marked profession noun + bare-noun complement).
+    // Pre-fix the user's compound «Менің атым Дәулет, мамандығым
+    // бағдарламашы» surfaced StatementOfName for the first clause
+    // and lost the occupation from the second — `strip_copula_and_lookup_noun`
+    // only handled copula-suffixed forms («бағдарламашымын»). The
+    // bare form needs an explicit possessive-anchor scan.
+    for (i, t) in tokens.iter().enumerate() {
+        let alpha: String = t.chars().filter(|c| c.is_alphabetic()).collect();
+        if alpha == "мамандығым" || alpha == "кәсібім" {
+            if let Some(next) = tokens.get(i + 1) {
+                let value: String = next.chars().filter(|c| c.is_alphabetic()).collect();
+                if !value.is_empty() && value != "болып" && value != "ретінде" && value != "екен"
+                {
+                    return Some(Some(value));
+                }
+            }
+        }
     }
     if let Some(lex) = lexicon
         && let Some(root) = strip_copula_and_lookup_noun(&tokens, lex)

@@ -7,6 +7,95 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [5.3.5] — 2026-05-08 — Compound-statement absorption + occupation self-recall (live REPL gap)
+
+Closes a user-reported gap from a 2026-05-08 live REPL session:
+
+```
+[Student]  Менің атым Дәулет, мамандығым бағдарламашы.
+[adam]     Дәке, танысқаныма қуаныштымын.
+              ← name absorbed; occupation LOST
+
+[Student]  Менің мамандығым есіңізде ме?
+[adam]     Мамандық туралы қысқаша айтсам: Мамандық — адамның кәсібі.
+              ← generic definition because session.occupation never set
+```
+
+### Architectural gap
+
+`interpret_text` returns ONE primary `Intent` per turn. For «Х, Y» compound profile statements joined by comma, only the first clause's intent fires; the second clause's information is dropped on the floor. The user's instinct in their feedback was correct: adam should parse compound sentences and fix EVERY fact, not just the first.
+
+### Fix #1 — extend compound-occupation detection
+
+`detect_occupation_in_compound` ([semantics.rs](crates/adam-dialog/src/semantics.rs)) gains a possessive-anchor pattern: when the input contains «мамандығым X» or «кәсібім X» (1sg-poss-marked profession noun + bare-noun complement), capture X as the occupation value. Pre-fix this function only matched copula-suffixed forms («бағдарламашымын», «инженермін») via `strip_copula_and_lookup_noun`; the bare-noun-after-possessive pattern fell through.
+
+Filler words («болып», «ретінде», «екен») between possessive and value are skipped — «мамандығым болып бағдарламашы істеймін» captures «бағдарламашы», not «болып».
+
+The existing v4.52.0 secondary-scan plumbing in `conversation.rs` already calls `detect_occupation_in_compound` post-`absorb_entities`, so no new plumbing is needed — just better detection.
+
+### Fix #2 — occupation self-recall pattern
+
+`detect_ask_occupation` extended with the v4.54.5-style recall pattern: «(менің )?мамандығым есіңізде ме?» / «мамандығымды ұмытпадыңыз ба?» / «кәсібімді білесіз бе?» now route to AskOccupation. Pre-fix «есіңізде ме» co-occurring with «мамандығым» fell through to Unknown surface and surfaced the generic «Мамандық — адамның кәсібі» definition.
+
+### Bonus: extract_secondary_profile_facts public API
+
+New `pub fn extract_secondary_profile_facts(input: &str) -> Vec<(String, String)>` exposes the secondary-extraction pattern for callers that want all profile facts at once. Currently emits `("occupation", X)` and `("age", N)` tuples; expandable to other profile predicates as needed.
+
+### End-to-end verified
+
+```
+$ printf 'Менің атым Дәулет, мамандығым бағдарламашы.\nМенің мамандығым есіңізде ме?\n' | adam_chat
+adam-chat v5.2 — пікірлесейік! ...
+
+[Student]  Менің атым Дәулет, мамандығым бағдарламашы.
+[adam]     Дәулетпен танысқаныма қуаныштымын.
+              ← session: name=Дәулет, occupation=бағдарламашы (BOTH absorbed)
+
+[Student]  Менің мамандығым есіңізде ме?
+[adam]     Сіз бағдарламашы болып еңбек етіп жүрсіз.
+              ← AskOccupation self-recall surfaces stored value
+```
+
+### Regression tests
+
+`tests/codex_round3_v5035.rs` — 9 new tests:
+
+**Unit (extract_secondary_profile_facts):**
+1. Finds occupation after name in compound input
+2. Finds кәсібім variant
+3. Finds age («жасым 30»)
+4. Skips filler words («болып»)
+5. Empty when no pattern
+
+**End-to-end:**
+6. Compound name+occupation absorbs both into session
+7. Occupation self-recall after compound surfaces stored value (no generic definition)
+8. Self-recall persists across multi-turn dialog with intermediate turns
+9. Name-only input does NOT extract phantom occupation
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 9 / 9 v5.3.5 compound + self-recall regression tests | ✅ 100 % |
+| 8 / 8 v5.3.0 round-3 pass-2 tests | ✅ unchanged |
+| 12 / 12 v5.2.5 round-3 pass-1 tests | ✅ unchanged |
+| 20 / 20 phoneme module tests | ✅ unchanged |
+| 20 / 20 tts module tests | ✅ unchanged |
+| 9 / 9 v4.99.5 adaptive-difficulty tests | ✅ unchanged |
+| 18 / 18 v4.99.0 query-intent tests | ✅ unchanged |
+| 11 / 11 v4.98.5 auto-advance tests | ✅ unchanged |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1150 passing** + 17 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+**Stripe — Kazakh school tutor (compound-statement attentiveness; user's REPL feedback closed).**
+
 ## [5.3.0] — 2026-05-08 — Codex round-3 audit fixes (pass 2 — architectural) — contradiction resolution + anaphora gate
 
 Closes 2 of the 3 architectural items deferred from v5.2.5; Bug 5 (shallow domain answers) remains for a content release. With v5.3.0 the audited 4-turn contradiction dance and the Қазақстан/Аспан over-carry sequence both produce sensible responses end-to-end.
