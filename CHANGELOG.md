@@ -7,6 +7,56 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [4.96.5] — 2026-05-08 — Codex 2026-05-07 round-2 audit Bug 5 (P1) — multi-turn anaphora resolves to pedagogical topic
+
+Closes the gap where pedagogical intents emitted topic-bearing curated content but did **not** populate `Conversation.dialog_context`. Result pre-fix: after «Маған ownership жаттығуын беріңізші.» (which fires `AskExercise(ownership)`), the next turn «Оны қалай шешеміз?» found nothing in `dialog_context.resolve_anaphor()` and fell back to `Intent::Unknown`-only behaviour, surfacing a generic clarification.
+
+### What's added
+
+**Topic recording for pedagogical intents** ([conversation.rs](crates/adam-dialog/src/conversation.rs)):
+- New match-arm in the post-render trace path extracts topic from every pedagogical intent variant:
+  - `Intent::AskExercise { topic: Some(t) }`
+  - `Intent::CodeRequest { topic: Some(t) }`
+  - `Intent::ExplainCompilerError { topic: Some(t), .. }`
+  - `Intent::AskPurpose { topic: Some(t) }`
+  - `Intent::SubmitSolution { topic: Some(t), .. }`
+  - `Intent::CrossLanguageContrast { rust_concept, .. }` — uses `rust_concept` as the recorded topic
+- For each, calls `dialog_context.record_turn(turn_id, topic, domain_hint, false)` AND `session["last_query_topic"] = topic` so both the v4.13.0 DialogContext-based resolver AND the v4.6.0 session-based legacy resolver pick up the lesson topic.
+- Topicless variants (e.g. «Жаттығу бер.» — `AskExercise(topic: None)`) deliberately do NOT record, preserving the «no anaphor pollution from clarification turns» invariant.
+
+### Why this matters
+
+Without v4.96.5 the tutor loop felt amnesic mid-lesson: the student would establish a topic, get a curated exercise, then have to re-state the topic for every follow-up question. With v4.96.5 the existing discourse-anaphora resolver at [conversation.rs:724](crates/adam-dialog/src/conversation.rs#L724) now finds the lesson topic on the next turn, so anaphoric «оны / бұл / сол / онда / сонда» substitute naturally.
+
+### Regression tests
+
+[`crates/adam-dialog/tests/codex_round2_v4965_anaphora.rs`](crates/adam-dialog/tests/codex_round2_v4965_anaphora.rs) — 8 new tests:
+1. `ask_exercise_records_topic_in_dialog_context` — AskExercise(ownership) sets last_topic, subject_under_discussion, and last_query_topic.
+2. `code_request_records_topic_in_dialog_context` — CodeRequest(hello world) records.
+3. `ask_purpose_records_topic_in_dialog_context` — AskPurpose(ownership) records.
+4. `cross_language_contrast_records_concept_in_dialog_context` — Python/ownership query records `ownership`.
+5. `explain_compiler_error_with_topic_records_topic` — guards the topic-bearing branch.
+6. `multi_turn_anaphora_after_ask_exercise_resolves_topic` — multi-turn integration: `resolve_anaphor()` returns the lesson topic after AskExercise; follow-up turn produces non-empty response.
+7. `topicless_pedagogical_intent_does_not_pollute_dialog_context` — negative inverse: topicless clarification turns leave `dialog_context.last_topic` at `None`.
+8. `submit_solution_with_topic_records_in_dialog_context` — SubmitSolution match-arm coverage.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 8 / 8 v4.96.5 anaphora regression tests | ✅ 100 % |
+| 10 / 10 v4.96.0 round-2 regression tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1026 passing** + 11 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Roadmap
+
+- **v4.97.0 — Bug 3 (REPL multi-line accumulator).** Currently `adam_chat` reads one line per turn; multi-line ` ```rust ... ``` ` blocks have to be entered with `\n` escapes. Fix lifts the closing-fence wait to the binary, not the dialog crate.
+
+**Stripe — Kazakh school tutor (multi-turn lesson coherence — student no longer needs to re-state the topic every turn).**
+
 ## [4.96.0] — 2026-05-08 — Codex 2026-05-07 round-2 audit fixes — 5 bugs closed (seed-leak / inline tag / Russian detector / cross-language contrast / belief-session sync)
 
 Round-2 audit by Codex flagged 7 bugs in v4.95.5 (P0/P1/P2). This release closes the **5** addressable in a single sprint; Bug 3 (REPL multi-line code-block accumulator) and Bug 5 (anaphora resolution for list follow-ups) are deferred to medium-term per agreed roadmap.

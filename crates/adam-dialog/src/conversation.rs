@@ -1403,6 +1403,34 @@ impl Conversation {
             self.dialog_context
                 .record_turn(self.turn_counter, topic, domain_hint, false);
         }
+        // **v4.96.5** — Codex round-2 audit Bug 5. Pedagogical
+        // intents (AskExercise / CodeRequest / ExplainCompilerError /
+        // AskPurpose / CrossLanguageContrast / SubmitSolution) used
+        // to NOT populate DialogContext — only `Intent::Unknown` did.
+        // Consequence: after «Ownership туралы жаттығу беріңізші»
+        // emitted a curated exercise, the next turn «оны қалай
+        // шешеміз?» (anaphoric «how do we solve it?») had no
+        // last_topic / subject_under_discussion to resolve against,
+        // so «оны» fell through to last_query_topic which was unset.
+        // Fix: record the topic from every topic-bearing pedagogical
+        // intent so anaphora resolution and domain inference work
+        // multi-turn within a lesson.
+        let pedagogical_topic: Option<String> = match &intent_for_render {
+            Intent::AskExercise { topic: Some(t) }
+            | Intent::CodeRequest { topic: Some(t) }
+            | Intent::ExplainCompilerError { topic: Some(t), .. }
+            | Intent::AskPurpose { topic: Some(t) }
+            | Intent::SubmitSolution { topic: Some(t), .. } => Some(t.clone()),
+            Intent::CrossLanguageContrast { rust_concept, .. } => Some(rust_concept.clone()),
+            _ => None,
+        };
+        if let Some(topic) = pedagogical_topic {
+            self.session
+                .insert("last_query_topic".into(), topic.clone());
+            let domain_hint = self.domain_index.lookup_domain(&topic);
+            self.dialog_context
+                .record_turn(self.turn_counter, &topic, domain_hint, false);
+        }
         // **v4.33.5** — sem_frames are now built earlier (right after
         // `parses`, before intent finalisation) so populated fields
         // can influence Intent / planner routing. The build below is
