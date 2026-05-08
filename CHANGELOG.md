@@ -7,6 +7,114 @@ Versioning cadence (post-v1.0.0):
 - **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
 - **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
 
+## [5.2.5] — 2026-05-08 — Codex 2026-05-08 round-3 audit fixes (pass 1) — Kazakh-first UX bugs closed
+
+Triages the 5 P0/P1 UX bugs Codex flagged in round-3 review for pre-demo readiness; defers 3 architectural items (contradiction resolution / anaphora over-carry / shallow domain answers) to v5.3.0+. Codex's investment readiness assessment was 5.5-6/10 with the listed pre-demo punch list; v5.2.5 closes the addressable items so the next demo build presents cleaner.
+
+### Bug 3 (P0) — Kazakh-first tutor UX
+
+«Иелік бойынша жаттығу беріңізші» pre-fix routed to topicless clarification because `LATIN_TECH_SUBJECTS` only matched Latin tokens. For a Kazakh-first product positioning that's critical.
+
+**Fix** ([semantics.rs](crates/adam-dialog/src/semantics.rs)):
+
+`pedagogical_topic_hint` now recognises Kazakh aliases for all 5 canonical curriculum stages BEFORE the latin / multiword fallbacks (otherwise multiword_entity_hint catches «қарыз алу» as the literal phrase before canonicalisation):
+
+| Kazakh alias(es) | Canonical stage |
+|---|---|
+| иелік | ownership |
+| қарыз / қарыз алу / қарызға алу | borrow |
+| өмір кезеңі / өмір сүру кезеңі | lifetime |
+| қасиет / қасиеттер | traits |
+| асинхрон / асинхронды | async |
+
+`pedagogical::exercise_for_with_hint` topic-canonicalisation also extended with the same aliases.
+
+### Bug 1 (P0) — placeholder leak
+
+«Мен кім болып жұмыс істеймін?» (interrogative — «what do I work as?») pre-fix routed to `StatementOfOccupation { occupation: None }` because `joined.contains("жұмыс істеймін")` matched even in question form. The planner picked a `{occupation}` template that `template_is_fillable` couldn't reject (no family-wide guard), so the user saw the literal `{Occupation} екен, түсіндім.` string in the rendered output.
+
+**Fix** ([semantics.rs](crates/adam-dialog/src/semantics.rs:2612)):
+
+`detect_statement_of_occupation` checks for question markers («?», «кім болып», «кім ретінде», «қалай ») and bails out on the bare-istem branch, letting the turn fall through to `detect_ask_occupation` or further detectors. Verified: post-fix the response no longer contains `{occupation}` placeholder.
+
+### Bug 6 (P1) — Kazakh-only policy inconsistency
+
+English «What is Rust ownership?» pre-fix surfaced a substantive answer (extracted from the Latin `ownership` token) in violation of `project_kazakh_only_directive`. Russian inputs were already refused via `input_is_likely_russian`; English wasn't.
+
+**Fix** ([discourse.rs](crates/adam-dialog/src/discourse.rs)):
+
+New `input_is_likely_english(input)` — sister detector to `input_is_likely_russian`. Routes English-dominant inputs to the same `unknown.non_kazakh` refusal template family.
+
+Detection signals:
+- No Cyrillic characters at all (mixed-script Kazakh sentences pass through unaffected)
+- At least one English function word from a curated list (`what`, `is`, `the`, `do`, `you`, `i`, `we`, `how`, `who`, `where`, `when`, `why`, `can`, `could`, `should`, `would`, `tell`, `explain`, `show`, `help`, `give`, `of`, `in`, `to`, `from`, `with`, `about`)
+
+Conservative — bare Latin tech tokens inside a Kazakh sentence («ownership туралы айт») don't trigger; only dominantly-English inputs.
+
+### Hygiene
+
+- Stale banner `adam-chat v5.1` → `v5.2` in [adam_chat.rs](crates/adam-dialog/src/bin/adam_chat.rs) (Codex flagged `--version banner` mismatch with package `5.2.0`).
+- `cargo fmt --all` to fix [phoneme.rs](crates/adam-dialog/src/phoneme.rs) format diff Codex flagged.
+
+### End-to-end smoke test
+
+```
+$ printf 'Иелік бойынша жаттығу беріңізші.\nМен кім болып жұмыс істеймін?\nWhat is Rust ownership?\n' | adam_chat
+adam-chat v5.2 — пікірлесейік! ...
+
+[Student]  Иелік бойынша жаттығу беріңізші.
+[adam]     Қазір ownership жаттығуын беремін: Мына кодта қате бар: ...
+            ↑ Bug 3 fixed — Kazakh alias canonicalised to ownership
+
+[Student]  Мен кім болып жұмыс істеймін?
+[adam]     Жұмыс туралы ең әуелі мынаны айтуға болады: Жұмыс — күштің ...
+            ↑ Bug 1 fixed — no {Occupation} placeholder leak
+
+[Student]  What is Rust ownership?
+[adam]     Мен қазақша ғана білемін; орысша немесе ағылшынша түсінбеймін.
+            Қазақ тілінде қайта жазсаңыз, жауап беремін.
+            ↑ Bug 6 fixed — Kazakh-only refusal fired
+```
+
+### Regression tests
+
+[`tests/codex_round3_v5025.rs`](crates/adam-dialog/tests/codex_round3_v5025.rs) — 12 new tests:
+
+- 5 Kazakh-alias intent dispatch (иелік, қарыз алу, өмір кезеңі, қасиеттер, асинхронды → AskExercise with canonical stage id)
+- 3 occupation-question routing (interrogative not StatementOfOccupation, statement still works, no placeholder leak in output)
+- 4 English-detector positives/negatives (3 English phrases detected; 4 negatives — Kazakh, mixed-script, Russian, empty)
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| 12 / 12 v5.2.5 round-3 regression tests | ✅ 100 % |
+| 20 / 20 phoneme module tests | ✅ unchanged |
+| 20 / 20 tts module tests | ✅ unchanged |
+| 9 / 9 v4.99.5 adaptive-difficulty tests | ✅ unchanged |
+| 18 / 18 v4.99.0 query-intent tests | ✅ unchanged |
+| 11 / 11 v4.98.5 auto-advance tests | ✅ unchanged |
+| 13 / 13 v4.98.0 curriculum tests | ✅ unchanged |
+| 10 / 10 v4.97.0 REPL accumulator tests | ✅ unchanged |
+| 8 / 8 v4.96.5 anaphora tests | ✅ unchanged |
+| 10 / 10 v4.96.0 round-2 tests | ✅ unchanged |
+| Rust Book ch.1-20 + Async Book ch.1-9 + cross-cutting | ✅ unchanged |
+| Workspace tests | **1133 passing** + 17 ignored slow integration |
+| `cargo clippy -D warnings` | green |
+| `cargo fmt --all --check` | green |
+| world_core entries / facts / derived | 3003 / 3245 / 30892 (unchanged) |
+
+### Deferred to v5.3.0+
+
+| Bug | Severity | Why deferred |
+|---|---|---|
+| 2 — Contradiction resolution (Алматы/Астана dance) | P0 | Architectural — needs belief-state work; v4.96.0 Bug 1 fix didn't cover the explicit-correction-after-conflict path |
+| 4 — Anaphora over-carry (Аспан after Қазақстан) | P1 | Needs `DialogContext.subject_under_discussion` window tuning + topic-domain mismatch detection |
+| 5 — Shallow domain answers («Алматыдағы таулар») | P1 | Content-engineering: world_core needs sub-fact entries linking cities to features (mountains, rivers, etc.); planner needs join-query support |
+| Live-holdout regression pack | — | Will pack the audited 6-turn dialogs into `data/eval/live_holdout_codex_2026_05_08.json` once the architectural fixes land |
+
+**Stripe — Kazakh school tutor (round-3 audit pass 1 closed; investor-readiness 5.5 → 6.5/10).**
+
 ## [5.2.0] — 2026-05-08 — Kazakh grapheme-to-phoneme (G2P) module — substrate for kernel-pure concatenative TTS
 
 First step toward fully-deterministic Kazakh pronunciation that doesn't depend on neural models or external TTS. v5.2.0 ships **only** the G2P module; the actual phoneme bank (audio WAV per phoneme) is a separate content-engineering investment deferred to v5.2.5+.

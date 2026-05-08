@@ -345,7 +345,7 @@ fn main() -> ExitCode {
     }
 
     eprintln!(
-        "adam-chat v5.1 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
+        "adam-chat v5.2 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
          Multi-line code blocks: open with ``` and close with ``` on its own line.\n\
          Voice output: pass --tts (default OS voice; or --tts-backend piper --tts-model <path>)."
     );

@@ -800,7 +800,12 @@ impl Conversation {
         // Russian inputs should refuse cleanly. Mark the intent so
         // the planner picks the dedicated `unknown.non_kazakh`
         // template family.
-        let russian_input = crate::discourse::input_is_likely_russian(input);
+        // **v5.2.5** — Codex round-3 audit Bug 6. English-input
+        // refusal joins the Russian-input refusal so adam stays
+        // Kazakh-only as advertised. Both flow into the same
+        // `unknown.non_kazakh` template family via `__non_kazakh__`.
+        let russian_input = crate::discourse::input_is_likely_russian(input)
+            || crate::discourse::input_is_likely_english(input);
 
         // **v4.6.12** — Math-expression detection. Real-REPL
         // 2026-04-29: «5+5» / «7 + 3 =» / «6:2=» / «5-ті 7-ге

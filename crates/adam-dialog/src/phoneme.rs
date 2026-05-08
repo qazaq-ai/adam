@@ -357,8 +357,8 @@ mod tests {
     #[test]
     fn ipa_symbols_unique_per_phoneme() {
         let all = [
-            A, AE, E, I, YBack, O, OE, U, UE, IFront, B, P, M, W, F, T, D, N, S, Z, L, R, K, Q,
-            G, GH, X, H, SH, ZH, CH, J, NG,
+            A, AE, E, I, YBack, O, OE, U, UE, IFront, B, P, M, W, F, T, D, N, S, Z, L, R, K, Q, G,
+            GH, X, H, SH, ZH, CH, J, NG,
         ];
         let mut seen = std::collections::HashSet::new();
         for p in all {
@@ -370,8 +370,8 @@ mod tests {
     #[test]
     fn bank_ids_are_ascii_unique() {
         let all = [
-            A, AE, E, I, YBack, O, OE, U, UE, IFront, B, P, M, W, F, T, D, N, S, Z, L, R, K, Q,
-            G, GH, X, H, SH, ZH, CH, J, NG,
+            A, AE, E, I, YBack, O, OE, U, UE, IFront, B, P, M, W, F, T, D, N, S, Z, L, R, K, Q, G,
+            GH, X, H, SH, ZH, CH, J, NG,
         ];
         let mut seen = std::collections::HashSet::new();
         for p in all {

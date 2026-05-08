@@ -317,6 +317,49 @@ pub fn input_is_likely_russian(input: &str) -> bool {
     !has_kazakh_specific
 }
 
+/// **v5.2.5** — Codex round-3 audit Bug 6. Sister to
+/// `input_is_likely_russian` for English inputs. Pre-fix
+/// «What is Rust ownership?» surfaced a substantive answer
+/// extracted from the Latin `ownership` token, in violation of the
+/// `project_kazakh_only_directive`. Post-fix English-dominant
+/// inputs route to the same `unknown.non_kazakh` refusal.
+///
+/// Detection: input contains **only** Latin / digit / punctuation
+/// characters (no Cyrillic at all) AND has at least one
+/// English function word (`what` / `is` / `the` / `do` / `you` /
+/// `how` / `who` / `where` / `when` / etc.).
+///
+/// Conservative — bare technical Latin tokens like `ownership` /
+/// `async/await` carried inside an otherwise-Kazakh sentence do
+/// NOT trigger (those are valid code references). Only when the
+/// input is dominantly English does this fire.
+pub fn input_is_likely_english(input: &str) -> bool {
+    let trimmed = input.trim();
+    if trimmed.is_empty() {
+        return false;
+    }
+    // Reject if there's any Cyrillic — that's a Kazakh / Russian
+    // input being handled by the other detectors.
+    if trimmed
+        .chars()
+        .any(|c| matches!(c, 'а'..='я' | 'А'..='Я' | 'ё' | 'Ё'))
+    {
+        return false;
+    }
+    // Also reject if there's any Kazakh-specific Latin-extended
+    // character (defensive — adam doesn't currently use Latin
+    // Kazakh, but Қазақ Латын кириллицасы exists).
+    let lower = trimmed.to_lowercase();
+    const ENGLISH_FUNCTION_WORDS: &[&str] = &[
+        "what", "is", "are", "the", "do", "does", "you", "i", "we", "how", "who", "where", "when",
+        "why", "can", "could", "should", "would", "tell", "explain", "show", "help", "give", "of",
+        "in", "to", "from", "with", "about",
+    ];
+    lower
+        .split(|c: char| !c.is_alphabetic())
+        .any(|w| ENGLISH_FUNCTION_WORDS.contains(&w))
+}
+
 #[cfg(test)]
 mod russian_tests {
     use super::input_is_likely_russian;

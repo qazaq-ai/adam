@@ -1275,6 +1275,30 @@ pub fn detect_submit_solution(input: &str) -> Option<(String, Option<String>)> {
 /// lowercase canonical form, or None if no topic is recoverable
 /// (the planner falls back to a generic prompt in that case).
 fn pedagogical_topic_hint(input: &str) -> Option<String> {
+    // **v5.2.5** — Codex round-3 audit Bug 3. Kazakh-first tutor UX.
+    // The 5 canonical curriculum stages have natural Kazakh names;
+    // canonicalise to the stage id BEFORE the generic latin /
+    // multiword hints fire (otherwise multiword_entity_hint catches
+    // «қарыз алу» as the literal phrase before we get a chance to
+    // map it to "borrow"). Order: kazakh_aliases > latin > multiword.
+    let lower = input.to_lowercase();
+    let kazakh_aliases: &[(&str, &str)] = &[
+        ("иелік", "ownership"),
+        ("қарызға алу", "borrow"),
+        ("қарыз алу", "borrow"),
+        ("қарыз", "borrow"),
+        ("өмір сүру кезеңі", "lifetime"),
+        ("өмір кезеңі", "lifetime"),
+        ("қасиеттер", "traits"),
+        ("қасиет", "traits"),
+        ("асинхронды", "async"),
+        ("асинхрон", "async"),
+    ];
+    for (alias, canonical) in kazakh_aliases {
+        if lower.contains(alias) {
+            return Some(canonical.to_string());
+        }
+    }
     if let Some(latin) = crate::topic_extraction::latin_subject_hint(input) {
         return Some(latin);
     }
@@ -2586,6 +2610,22 @@ fn detect_statement_of_occupation(
         }
     }
     if joined.contains("жұмыс істеймін") {
+        // **v5.2.5** — Codex round-3 audit Bug 1. «Мен кім болып
+        // жұмыс істеймін?» is a QUESTION («what do I work as?»),
+        // not a statement. Pre-fix this path returned
+        // `Some(None)` → `Intent::StatementOfOccupation { occupation:
+        // None }` → planner picked a template with `{occupation}`
+        // placeholder that template_is_fillable couldn't reject (no
+        // family-wide guard) → user saw the literal placeholder in
+        // the rendered output. Skip on interrogative markers so the
+        // turn falls through to `detect_ask_occupation` below.
+        let is_question = joined.contains("?")
+            || joined.contains("кім болып")
+            || joined.contains("кім ретінде")
+            || joined.contains("қалай ");
+        if is_question {
+            return None;
+        }
         return Some(None);
     }
     None

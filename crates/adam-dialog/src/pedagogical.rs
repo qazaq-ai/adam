@@ -183,12 +183,23 @@ pub fn exercise_for_with_hint(
 
     // Canonicalise the topic to its curriculum-stage id (the stage
     // tables in v1 are keyed off these short names).
+    // **v5.2.5** — Codex round-3 audit Bug 3. Kazakh aliases for all
+    // 5 canonical stages added so Kazakh-first input («иелік
+    // бойынша жаттығу беріңізші») resolves to the curriculum stage.
     let stage = match topic {
-        "ownership" => Some("ownership"),
-        "borrow" | "borrowing" | "қарызға алу" => Some("borrow"),
-        "lifetime" | "lifetimes" | "тіршілік мерзімі" => Some("lifetime"),
-        "trait" | "traits" | "trait composition" => Some("traits"),
-        "async" | "async fn" | "await" | ".await оператор" => Some("async"),
+        "ownership" | "иелік" => Some("ownership"),
+        "borrow" | "borrowing" | "қарыз алу" | "қарызға алу" | "қарыз" => {
+            Some("borrow")
+        }
+        "lifetime" | "lifetimes" | "тіршілік мерзімі" | "өмір кезеңі" | "өмір сүру кезеңі" => {
+            Some("lifetime")
+        }
+        "trait" | "traits" | "trait composition" | "қасиеттер" | "қасиет" => {
+            Some("traits")
+        }
+        "async" | "async fn" | "await" | ".await оператор" | "асинхронды" | "асинхрон" => {
+            Some("async")
+        }
         _ => None,
     };
 
