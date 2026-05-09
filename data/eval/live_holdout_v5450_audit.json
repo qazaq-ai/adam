@@ -1,0 +1,27 @@
+{
+  "_comment": "v5.4.5 — 64-turn live REPL audit holdout. Captures the IsA-gap fixes (ит → үй жануары / үй → баспана / мектеп → оқу орны / тас → жансыз нәрсе → зат / бағдарламашы → кәсіп иесі), the kazakh_cuisine domain (бесбармақ / қымыз / шұбат / айран / құрт), and the multiword topic extraction fix for natural_phenomena (жер сілкінісі / жанартау атқылауы / орман өрті / цунами / қар көшкіні / боран / найзағай). Each case is a real Kazakh phrasing exercising the post-v5.4.5 runtime. Excluded from this holdout: the 7 detector edge cases that require code-level fixes (em-dash StatementOfOccupation absorber, system identity polysemy on адам / сіздің атыңыз, possessive «X-нің Y-ы» topic extraction, curriculum-stage routing for өмір кезеңі / қасиеттер) — those land in v5.4.6+.",
+  "cases": [
+    {"id": "natph_001", "category": "natural_phenomena_definition", "query": "Жер сілкінісі деген не?", "any_substring": ["жер сілкінісі", "табиғи құбылыс"], "none_substring": ["сілкініс жайында", "сілкініс туралы"]},
+    {"id": "natph_002", "category": "natural_phenomena_yesno", "query": "Жер сілкінісі — табиғи апат па?", "any_substring": ["табиғи апат"], "none_substring": []},
+    {"id": "natph_003", "category": "natural_phenomena_yesno", "query": "Жер сілкінісі — құбылыс па?", "any_substring": ["құбылыс"], "none_substring": []},
+    {"id": "natph_004", "category": "natural_phenomena_definition", "query": "Орман өрті деген не?", "any_substring": ["орман өрті"], "none_substring": []},
+    {"id": "natph_005", "category": "natural_phenomena_yesno", "query": "Цунами — толқын ба?", "any_substring": ["толқын"], "none_substring": []},
+    {"id": "natph_006", "category": "natural_phenomena_yesno", "query": "Қар көшкіні — апат па?", "any_substring": ["апат"], "none_substring": []},
+    {"id": "natph_007", "category": "natural_phenomena_yesno", "query": "Боран — дауыл ма?", "any_substring": ["дауыл"], "none_substring": []},
+    {"id": "natph_008", "category": "natural_phenomena_yesno", "query": "Найзағай — табиғи құбылыс па?", "any_substring": ["табиғи құбылыс"], "none_substring": []},
+    {"id": "isa_gap_001", "category": "ит_үй_жануары", "query": "Ит — үй жануары ма?", "any_substring": ["үй жануары"], "none_substring": ["дерек жоқ", "табылмады"]},
+    {"id": "isa_gap_002", "category": "үй_баспана", "query": "Үй — баспана ма?", "any_substring": ["баспана"], "none_substring": ["дерек жоқ", "табылмады"]},
+    {"id": "isa_gap_003", "category": "мектеп_оқу_орны", "query": "Мектеп — оқу орны ма?", "any_substring": ["оқу орны"], "none_substring": ["дерек жоқ", "табылмады"]},
+    {"id": "isa_gap_004", "category": "тас_зат", "query": "Тас — зат па?", "any_substring": ["зат"], "none_substring": ["дерек жоқ", "табылмады"]},
+    {"id": "isa_gap_005", "category": "бас_дене_бөлігі", "query": "Бас — дене бөлігі ме?", "any_substring": ["дене бөлігі"], "none_substring": ["дерек жоқ", "табылмады"]},
+    {"id": "cuis_001", "category": "kazakh_cuisine_yesno", "query": "Бесбармақ — ұлттық тағам ба?", "any_substring": ["ұлттық тағам"], "none_substring": []},
+    {"id": "cuis_002", "category": "kazakh_cuisine_yesno", "query": "Қымыз — сусын ба?", "any_substring": ["сусын"], "none_substring": []},
+    {"id": "cuis_003", "category": "kazakh_cuisine_yesno", "query": "Шұбат — дәстүрлі сусын ба?", "any_substring": ["дәстүрлі сусын"], "none_substring": []},
+    {"id": "cuis_004", "category": "kazakh_cuisine_definition", "query": "Бесбармақ деген не?", "any_substring": ["бесбармақ"], "none_substring": ["табылмады", "дерек жоқ"]},
+    {"id": "cuis_005", "category": "kazakh_cuisine_yesno", "query": "Айран — сусын ба?", "any_substring": ["сусын"], "none_substring": []},
+    {"id": "cuis_006", "category": "kazakh_cuisine_yesno", "query": "Қазы — дәстүрлі тағам ба?", "any_substring": ["дәстүрлі тағам"], "none_substring": []},
+    {"id": "regress_001", "category": "regression_v540", "query": "Қасқыр — тірі ме?", "any_substring": ["тірі"], "none_substring": []},
+    {"id": "regress_002", "category": "regression_v540", "query": "Балта — зат па?", "any_substring": ["зат"], "none_substring": []},
+    {"id": "regress_003", "category": "regression_v540", "query": "Қазақ ханы — билеуші ме?", "any_substring": ["билеуші"], "none_substring": []}
+  ]
+}

@@ -520,6 +520,38 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "ағза бөлігі",
     "ғылым заңы",
     "ғылым саласы",
+    // **v5.4.5** — natural-phenomena multiword subjects + abstract
+    // hubs introduced in `data/world_core/natural_phenomena.jsonl`.
+    // Pre-v5.4.5 «Жер сілкінісі деген не?» picked single-word
+    // «сілкініс» as topic (a verb-derived noun) and surfaced a
+    // tangential proverb instead of the curated definition.
+    // Registering the compound subject here makes the multiword
+    // matcher fire BEFORE first_noun_root in `best_noun_hint_with_
+    // confidence`, so the right entry is retrieved.
+    "жер сілкінісі",
+    "жанартау атқылауы",
+    "сел тасқыны",
+    "қар көшкіні",
+    "су тасқыны",
+    "орман өрті",
+    "табиғи құбылыс",
+    "табиғи апат",
+    "астрономиялық жүйе",
+    "электр разряды",
+    "қауіпті оқиға",
+    // **v5.4.5** — concept-bridge extensions + kazakh_cuisine domain.
+    // The 64-turn live REPL audit at v5.4.0 surfaced 8 IsA-target
+    // dead-ends («Үй — баспана ма?» / «Мектеп — оқу орны ма?» /
+    // «Ит — үй жануары ма?» / «Бесбармақ — ұлттық тағам ба?» /
+    // …); these compounds appear as IsA objects on the new paths.
+    "үй жануары",
+    "оқу орны",
+    "дене бөлігі",
+    "кәсіп иесі",
+    "жансыз нәрсе",
+    "дәстүрлі тағам",
+    "ұлттық тағам",
+    "дәстүрлі сусын",
     "орталық азия",
     "жүк машинасы",
     "аспан денесі",

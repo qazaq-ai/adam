@@ -18,7 +18,7 @@
   "counts": {
     "samples_scanned": 3691,
     "samples_with_facts": 77,
-    "facts_total": 3265,
+    "facts_total": 3332,
     "by_predicate": {
       "after": 8,
       "causes": 27,
@@ -27,7 +27,7 @@
       "has": 68,
       "has_quantity": 37,
       "in_domain": 24,
-      "is_a": 2700,
+      "is_a": 2767,
       "lives_in": 8,
       "part_of": 243,
       "related_to": 123
@@ -42,7 +42,7 @@
       "tatoeba_kazakh_pack.json": 3,
       "wikipedia_kz_pack.json": 17,
       "world_core/adam_self.jsonl": 54,
-      "world_core/animals.jsonl": 42,
+      "world_core/animals.jsonl": 44,
       "world_core/astronomy.jsonl": 60,
       "world_core/biology_basic.jsonl": 53,
       "world_core/biology_school.jsonl": 128,
@@ -51,7 +51,7 @@
       "world_core/clothing.jsonl": 35,
       "world_core/colors.jsonl": 38,
       "world_core/computer_science_basics.jsonl": 30,
-      "world_core/concept_bridges.jsonl": 15,
+      "world_core/concept_bridges.jsonl": 26,
       "world_core/constellations_kz.jsonl": 6,
       "world_core/cooking_methods.jsonl": 18,
       "world_core/directions.jsonl": 9,
@@ -63,6 +63,7 @@
       "world_core/history_kazakhstan.jsonl": 125,
       "world_core/house_parts.jsonl": 20,
       "world_core/informatics_basic.jsonl": 40,
+      "world_core/kazakh_cuisine.jsonl": 26,
       "world_core/kinship_extended.jsonl": 20,
       "world_core/kz_literature.jsonl": 120,
       "world_core/language_features.jsonl": 78,
@@ -72,6 +73,7 @@
       "world_core/measurements.jsonl": 18,
       "world_core/medicine_basic.jsonl": 12,
       "world_core/music_kz.jsonl": 24,
+      "world_core/natural_phenomena.jsonl": 28,
       "world_core/notable_kazakhstanis.jsonl": 55,
       "world_core/numbers.jsonl": 54,
       "world_core/philosophy_basic.jsonl": 23,
@@ -3428,8 +3430,48 @@
       },
       "predicate": "IsA",
       "object": {
+        "surface": "үй жануары",
+        "root": "үй жануары",
+        "pos": "noun"
+      },
+      "pattern": "world_core/animals",
+      "source": {
+        "pack": "world_core/animals.jsonl",
+        "sample_id": "anm_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ит — үй жануары."
+    },
+    {
+      "subject": {
+        "surface": "ит",
+        "root": "ит",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
         "surface": "сүтқоректі",
         "root": "сүтқоректі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/animals",
+      "source": {
+        "pack": "world_core/animals.jsonl",
+        "sample_id": "anm_034"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ит — үй жануары."
+    },
+    {
+      "subject": {
+        "surface": "үй жануары",
+        "root": "үй жануары",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жануар",
+        "root": "жануар",
         "pos": "noun"
       },
       "pattern": "world_core/animals",
@@ -14562,6 +14604,226 @@
     },
     {
       "subject": {
+        "surface": "үй",
+        "root": "үй",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "баспана",
+        "root": "баспана",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Үй — баспана."
+    },
+    {
+      "subject": {
+        "surface": "баспана",
+        "root": "баспана",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құрылыс",
+        "root": "құрылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Баспана — құрылыс."
+    },
+    {
+      "subject": {
+        "surface": "мектеп",
+        "root": "мектеп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "оқу орны",
+        "root": "оқу орны",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Мектеп — оқу орны."
+    },
+    {
+      "subject": {
+        "surface": "оқу орны",
+        "root": "оқу орны",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "мекеме",
+        "root": "мекеме",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Оқу орны — мекеме."
+    },
+    {
+      "subject": {
+        "surface": "бас",
+        "root": "бас",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дене бөлігі",
+        "root": "дене бөлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бас — дене бөлігі."
+    },
+    {
+      "subject": {
+        "surface": "дене бөлігі",
+        "root": "дене бөлігі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ағза бөлігі",
+        "root": "ағза бөлігі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дене бөлігі — ағза бөлігі."
+    },
+    {
+      "subject": {
+        "surface": "бағдарламашы",
+        "root": "бағдарламашы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "кәсіп иесі",
+        "root": "кәсіп иесі",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бағдарламашы — кәсіп иесі."
+    },
+    {
+      "subject": {
+        "surface": "кәсіп иесі",
+        "root": "кәсіп иесі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "адам",
+        "root": "адам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кәсіп иесі — адам."
+    },
+    {
+      "subject": {
+        "surface": "тас",
+        "root": "тас",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жансыз нәрсе",
+        "root": "жансыз нәрсе",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Тас — жансыз нәрсе."
+    },
+    {
+      "subject": {
+        "surface": "жансыз нәрсе",
+        "root": "жансыз нәрсе",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "зат",
+        "root": "зат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жансыз нәрсе — зат."
+    },
+    {
+      "subject": {
+        "surface": "кәсіп",
+        "root": "кәсіп",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "әрекет",
+        "root": "әрекет",
+        "pos": "noun"
+      },
+      "pattern": "world_core/concept_bridges",
+      "source": {
+        "pack": "world_core/concept_bridges.jsonl",
+        "sample_id": "bridge_concept_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Кәсіп — әрекет."
+    },
+    {
+      "subject": {
         "surface": "шоқжұлдыз",
         "root": "шоқжұлдыз",
         "pos": "noun"
@@ -25442,6 +25704,526 @@
     },
     {
       "subject": {
+        "surface": "бесбармақ",
+        "root": "бесбармақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бесбармақ — қазақтың дәстүрлі тағамы."
+    },
+    {
+      "subject": {
+        "surface": "бесбармақ",
+        "root": "бесбармақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі тағам",
+        "root": "дәстүрлі тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бесбармақ — қазақтың дәстүрлі тағамы."
+    },
+    {
+      "subject": {
+        "surface": "бесбармақ",
+        "root": "бесбармақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұлттық тағам",
+        "root": "ұлттық тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Бесбармақ — еттен жасалатын ұлттық тағам."
+    },
+    {
+      "subject": {
+        "surface": "қазы",
+        "root": "қазы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазы — жылқы етінен жасалатын дәстүрлі тағам."
+    },
+    {
+      "subject": {
+        "surface": "қазы",
+        "root": "қазы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі тағам",
+        "root": "дәстүрлі тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қазы — жылқы етінен жасалатын дәстүрлі тағам."
+    },
+    {
+      "subject": {
+        "surface": "шұжық",
+        "root": "шұжық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шұжық — еттен жасалған тағам."
+    },
+    {
+      "subject": {
+        "surface": "қарта",
+        "root": "қарта",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарта — жылқы ішегінен жасалатын тағам."
+    },
+    {
+      "subject": {
+        "surface": "қарта",
+        "root": "қарта",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі тағам",
+        "root": "дәстүрлі тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қарта — жылқы ішегінен жасалатын тағам."
+    },
+    {
+      "subject": {
+        "surface": "жал",
+        "root": "жал",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі тағам",
+        "root": "дәстүрлі тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жал — жылқының жал майы; дәстүрлі қазақ тағамы."
+    },
+    {
+      "subject": {
+        "surface": "баурсақ",
+        "root": "баурсақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Баурсақ — қамырдан жасалған дәстүрлі тағам."
+    },
+    {
+      "subject": {
+        "surface": "баурсақ",
+        "root": "баурсақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі тағам",
+        "root": "дәстүрлі тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Баурсақ — қамырдан жасалған дәстүрлі тағам."
+    },
+    {
+      "subject": {
+        "surface": "куырдақ",
+        "root": "куырдақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Куырдақ — ет пен бауырдан пісірілетін тағам."
+    },
+    {
+      "subject": {
+        "surface": "палау",
+        "root": "палау",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Палау — күріш пен еттен пісірілетін тағам."
+    },
+    {
+      "subject": {
+        "surface": "қымыз",
+        "root": "қымыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сусын",
+        "root": "сусын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қымыз — биенің сүтінен ашытылатын дәстүрлі сусын."
+    },
+    {
+      "subject": {
+        "surface": "қымыз",
+        "root": "қымыз",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі сусын",
+        "root": "дәстүрлі сусын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қымыз — биенің сүтінен ашытылатын дәстүрлі сусын."
+    },
+    {
+      "subject": {
+        "surface": "шұбат",
+        "root": "шұбат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сусын",
+        "root": "сусын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шұбат — түйенің сүтінен ашытылатын дәстүрлі сусын."
+    },
+    {
+      "subject": {
+        "surface": "шұбат",
+        "root": "шұбат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дәстүрлі сусын",
+        "root": "дәстүрлі сусын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Шұбат — түйенің сүтінен ашытылатын дәстүрлі сусын."
+    },
+    {
+      "subject": {
+        "surface": "айран",
+        "root": "айран",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сусын",
+        "root": "сусын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Айран — ашытылған сүт сусыны."
+    },
+    {
+      "subject": {
+        "surface": "қаймақ",
+        "root": "қаймақ",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қаймақ — сүттен жасалатын тағам."
+    },
+    {
+      "subject": {
+        "surface": "құрт",
+        "root": "құрт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Құрт — кептірілген сүт өнімі; ұлттық тағам."
+    },
+    {
+      "subject": {
+        "surface": "құрт",
+        "root": "құрт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "ұлттық тағам",
+        "root": "ұлттық тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Құрт — кептірілген сүт өнімі; ұлттық тағам."
+    },
+    {
+      "subject": {
+        "surface": "іркіт",
+        "root": "іркіт",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сусын",
+        "root": "сусын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Іркіт — ашытылған сүттен жасалатын дәстүрлі сусын."
+    },
+    {
+      "subject": {
+        "surface": "дәстүрлі тағам",
+        "root": "дәстүрлі тағам",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дәстүрлі тағам — тағам."
+    },
+    {
+      "subject": {
+        "surface": "ұлттық тағам",
+        "root": "ұлттық тағам",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Ұлттық тағам — тағам."
+    },
+    {
+      "subject": {
+        "surface": "дәстүрлі сусын",
+        "root": "дәстүрлі сусын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "сусын",
+        "root": "сусын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дәстүрлі сусын — сусын."
+    },
+    {
+      "subject": {
+        "surface": "сусын",
+        "root": "сусын",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "тағам",
+        "root": "тағам",
+        "pos": "noun"
+      },
+      "pattern": "world_core/kazakh_cuisine",
+      "source": {
+        "pack": "world_core/kazakh_cuisine.jsonl",
+        "sample_id": "cuis_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сусын — тағам."
+    },
+    {
+      "subject": {
         "surface": "туыс",
         "root": "туыс",
         "pos": "noun"
@@ -33279,6 +34061,566 @@
       },
       "confidence": "HumanApproved",
       "raw_text": "Терме — өсиет, тәлім беретін қазақтың дидактикалық музыкалық жанры."
+    },
+    {
+      "subject": {
+        "surface": "жер сілкінісі",
+        "root": "жер сілкінісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи құбылыс",
+        "root": "табиғи құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_001"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер сілкінісі — табиғи құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "жер сілкінісі",
+        "root": "жер сілкінісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "діріл",
+        "root": "діріл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_002"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер сілкінісі — жер қыртысының қатты қозғалысынан болатын дірілдеу."
+    },
+    {
+      "subject": {
+        "surface": "жер сілкінісі",
+        "root": "жер сілкінісі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_003"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жер сілкінісі — қауіпті табиғи апат."
+    },
+    {
+      "subject": {
+        "surface": "жанартау атқылауы",
+        "root": "жанартау атқылауы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи құбылыс",
+        "root": "табиғи құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_004"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жанартау атқылауы — табиғи құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "жанартау атқылауы",
+        "root": "жанартау атқылауы",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_005"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Жанартау атқылауы — табиғи апат."
+    },
+    {
+      "subject": {
+        "surface": "сел тасқыны",
+        "root": "сел тасқыны",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_006"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сел тасқыны — табиғи апат."
+    },
+    {
+      "subject": {
+        "surface": "сел тасқыны",
+        "root": "сел тасқыны",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи құбылыс",
+        "root": "табиғи құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_007"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Сел тасқыны — табиғи құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "қар көшкіні",
+        "root": "қар көшкіні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_008"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қар көшкіні — табиғи апат."
+    },
+    {
+      "subject": {
+        "surface": "қар көшкіні",
+        "root": "қар көшкіні",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи құбылыс",
+        "root": "табиғи құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_009"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Қар көшкіні — табиғи құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "найзағай",
+        "root": "найзағай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи құбылыс",
+        "root": "табиғи құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_010"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Найзағай — табиғи құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "найзағай",
+        "root": "найзағай",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "электр разряды",
+        "root": "электр разряды",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_011"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Найзағай — атмосфералық электр разряды."
+    },
+    {
+      "subject": {
+        "surface": "цунами",
+        "root": "цунами",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_012"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Цунами — табиғи апат."
+    },
+    {
+      "subject": {
+        "surface": "цунами",
+        "root": "цунами",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "толқын",
+        "root": "толқын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_013"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Цунами — теңіздегі алып толқын."
+    },
+    {
+      "subject": {
+        "surface": "торнадо",
+        "root": "торнадо",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_014"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Торнадо — табиғи апат."
+    },
+    {
+      "subject": {
+        "surface": "торнадо",
+        "root": "торнадо",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құйын",
+        "root": "құйын",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_015"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Торнадо — қуатты ауа құйыны."
+    },
+    {
+      "subject": {
+        "surface": "құрғақшылық",
+        "root": "құрғақшылық",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_016"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Құрғақшылық — табиғи апат."
+    },
+    {
+      "subject": {
+        "surface": "су тасқыны",
+        "root": "су тасқыны",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_017"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Су тасқыны — табиғи апат."
+    },
+    {
+      "subject": {
+        "surface": "орман өрті",
+        "root": "орман өрті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_018"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орман өрті — табиғи апат."
+    },
+    {
+      "subject": {
+        "surface": "орман өрті",
+        "root": "орман өрті",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "өрт",
+        "root": "өрт",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_019"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Орман өрті — өрт түрі."
+    },
+    {
+      "subject": {
+        "surface": "боран",
+        "root": "боран",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи құбылыс",
+        "root": "табиғи құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_020"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Боран — табиғи құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "боран",
+        "root": "боран",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "дауыл",
+        "root": "дауыл",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_021"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Боран — қарлы дауыл."
+    },
+    {
+      "subject": {
+        "surface": "дауыл",
+        "root": "дауыл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жел",
+        "root": "жел",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_022"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дауыл — қатты жел."
+    },
+    {
+      "subject": {
+        "surface": "дауыл",
+        "root": "дауыл",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "табиғи құбылыс",
+        "root": "табиғи құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_023"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Дауыл — табиғи құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "табиғи құбылыс",
+        "root": "табиғи құбылыс",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "құбылыс",
+        "root": "құбылыс",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_024"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Табиғи құбылыс — құбылыс."
+    },
+    {
+      "subject": {
+        "surface": "табиғи апат",
+        "root": "табиғи апат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "апат",
+        "root": "апат",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_025"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Табиғи апат — апат."
+    },
+    {
+      "subject": {
+        "surface": "апат",
+        "root": "апат",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "қауіпті оқиға",
+        "root": "қауіпті оқиға",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_026"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Апат — қауіпті оқиға."
+    },
+    {
+      "subject": {
+        "surface": "күн жүйесі",
+        "root": "күн жүйесі",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "астрономиялық жүйе",
+        "root": "астрономиялық жүйе",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_027"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Күн жүйесі — астрономиялық жүйе."
+    },
+    {
+      "subject": {
+        "surface": "астрономиялық жүйе",
+        "root": "астрономиялық жүйе",
+        "pos": "noun"
+      },
+      "predicate": "IsA",
+      "object": {
+        "surface": "жүйе",
+        "root": "жүйе",
+        "pos": "noun"
+      },
+      "pattern": "world_core/natural_phenomena",
+      "source": {
+        "pack": "world_core/natural_phenomena.jsonl",
+        "sample_id": "natph_028"
+      },
+      "confidence": "HumanApproved",
+      "raw_text": "Астрономиялық жүйе — жүйе."
     },
     {
       "subject": {

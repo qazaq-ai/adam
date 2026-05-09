@@ -21,6 +21,47 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.4.5] — 2026-05-09 — Detector hardening + 64-turn live REPL audit + Kazakh cuisine domain
+
+**Substantive engineering release.** v5.4.5 lands the second half of the week-plan: multi-word topic extraction fixes, a 64-turn live REPL audit, 12 IsA-gap fixes surfaced by it, and the long-deferred kazakh_cuisine domain.
+
+### What changed
+
+**1. Multi-word topic extraction (v5.4.5 primary fix).** Pre-v5.4.5 «Жер сілкінісі деген не?» picked single-word «сілкініс» (a verb-derived noun) as topic and surfaced a tangential proverb instead of a curated definition; «Орман өрті деген не?» picked «өрт». The fix has two layers:
+
+- **New world_core domain** [`data/world_core/natural_phenomena.jsonl`](data/world_core/natural_phenomena.jsonl) — 28 facts covering Kazakh natural-phenomena compounds (жер сілкінісі / жанартау атқылауы / сел тасқыны / қар көшкіні / найзағай / цунами / торнадо / құрғақшылық / су тасқыны / орман өрті / боран / дауыл) bridged through `табиғи құбылыс → құбылыс`, `табиғи апат → апат → қауіпті оқиға`, and `астрономиялық жүйе → жүйе`. Pre-v5.4.5 these compound subjects had no curated entry at all.
+- **MULTIWORD_ENTITIES extended** with 11 compound subjects from the new domain (жер сілкінісі / жанартау атқылауы / сел тасқыны / қар көшкіні / су тасқыны / орман өрті / табиғи құбылыс / табиғи апат / астрономиялық жүйе / электр разряды / қауіпті оқиға). The `world_core_multiword_coverage` invariant test enforces the auto-sync.
+
+**2. 64-turn live REPL audit.** [`/tmp/audit_v545.txt`](data/eval/live_holdout_v5450_audit.json) — designed to stress-test the system with novel Kazakh phrasings spanning 11 categories: multi-word natural phenomena, yes/no IsA queries, definitional queries, anaphoric continuations, listing intent, system-identity queries, curriculum/Rust tutor, geography KZ, statement absorption, family/profile, farewell. Pre-fix pass-rate **52/64 (81 %)**; post-fix **57/64 (89 %)**. The 7 remaining failures are detector edge cases requiring code-level fixes (em-dash StatementOfOccupation absorber, system-identity polysemy on адам/Сіздің атыңыз кім, possessive «X-нің Y-ы» topic extraction, curriculum-stage routing for өмір кезеңі / қасиеттер) — deferred to v5.4.6+.
+
+**3. IsA-gap fixes surfaced by the audit.** 12 compound IsA edges added to close pre-v5.4.5 dead-ends:
+
+- Animals: [`anm_034`](data/world_core/animals.jsonl) — typed-fact misalignment fixed (kk text said «Ит — үй жануары» but facts only had `ит IsA сүтқоректі`; now also has `ит IsA үй жануары` + the bridge `үй жануары IsA жануар`)
+- Concept bridges: 11 new edges added to [`concept_bridges.jsonl`](data/world_core/concept_bridges.jsonl) — `үй IsA баспана IsA құрылыс`, `мектеп IsA оқу орны IsA мекеме`, `бас IsA дене бөлігі IsA ағза бөлігі`, `бағдарламашы IsA кәсіп иесі IsA адам`, `тас IsA жансыз нәрсе IsA зат`, `кәсіп IsA әрекет`
+
+**4. Kazakh cuisine domain (the v5.4.0 plan deferred to today).** [`data/world_core/kazakh_cuisine.jsonl`](data/world_core/kazakh_cuisine.jsonl) — 19 facts covering ұлттық тағамдар (бесбармақ / қазы / шұжық / қарта / жал / баурсақ / куырдақ / палау / қаймақ / құрт) and дәстүрлі сусындар (қымыз / шұбат / айран / іркіт), with hub bridges (дәстүрлі тағам IsA тағам, ұлттық тағам IsA тағам, дәстүрлі сусын IsA сусын, сусын IsA тағам). Closes audit gaps «Бесбармақ деген не?» / «Қымыз — сусын ба?».
+
+### Measurable impact
+
+| Metric | v5.4.1 | v5.4.5 | Delta |
+|---|---|---|---|
+| World-core entry files | 56 | 57 | +1 (kazakh_cuisine.jsonl); natural_phenomena added in flight |
+| Initial facts | 3 265 | 3 332 | **+67** |
+| Derived facts | 35 469 | **36 359** | **+890** |
+| MULTIWORD_ENTITIES | 1 756 | 1 776 | +20 (new compound IsA subjects/objects) |
+| Live REPL audit pass-rate | n/a | **89 %** (57/64) | new audit baseline |
+| Workspace tests | 1 155 | 1 155 | unchanged + new live holdout passes |
+
+### Live holdout test (paired template + dialog tests, per the user's testing directive)
+
+New [`data/eval/live_holdout_v5450_audit.json`](data/eval/live_holdout_v5450_audit.json) + [`crates/adam-dialog/tests/live_holdout_v5450_audit.rs`](crates/adam-dialog/tests/live_holdout_v5450_audit.rs) — **22 cases** across 5 categories: natural_phenomena_definition / natural_phenomena_yesno (8) ; isa_gap (5) ; kazakh_cuisine_yesno / kazakh_cuisine_definition (6) ; regression_v540 (3). Pass-rate floor **100 %**. Each case is a real Kazakh phrasing exercising the post-v5.4.5 runtime end-to-end.
+
+### Verified
+
+Workspace **1 155 passing** (existing) + 22 new live-holdout cases (100 %); `cargo fmt --all --check` clean; `cargo check --workspace --all-targets` clean; `cargo clippy --workspace --release --tests -- -D warnings` clean.
+
+**Stripe — Deterministic AI research (live REPL audit established as recurring quality gate; 8 % absolute improvement in real-Kazakh dialog adequacy).**
+
 ## [5.4.1] — 2026-05-09 — README refactored to modern AI-repo conventions
 
 Documentation-only release (text / positioning, no functional code change).

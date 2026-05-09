@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.4.1-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.4.5-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey?style=for-the-badge" alt="platform">
@@ -223,6 +223,10 @@ See [`data/README.md`](data/README.md) for a top-level map of `data/`, and per-s
 - **Probabilistic / LLM-style free generation** — every response is a template realisation, a verbatim corpus quote, or a rule derivation over typed facts with a full `source_chain`. Nothing invented.
 - **Trained neural LM components in the answer path** — small ML lives inside the kernel as inspectable layers (selection weights, suffix priors, PMI); no transformer, no embeddings.
 - **Cloud platform work** — adam runs as a single offline binary.
+
+### Graph-First Policy
+
+The graph layer of `adam` is **Rust-native and repository-native**. No external graph database as a required runtime; no Cypher / Gremlin / SPARQL query layer in the core pipeline; no Python graph stack hidden behind scripts. The canonical graph representation, traversal, and artifact builders live in Rust crates inside this repository. Shell scripts may orchestrate graph builds only as thin wrappers around `cargo run`.
 
 ## License
 
