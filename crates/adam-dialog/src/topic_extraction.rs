@@ -513,6 +513,13 @@ pub(crate) const MULTIWORD_ENTITIES: &[&str] = &[
     "қазақ әдебиеті",
     // length 12–13
     "тіршілік иесі",
+    // **v5.4.0** — concept-bridge multiword hubs introduced in
+    // `data/world_core/concept_bridges.jsonl` (15+ inbound IsA edges
+    // each, dead-end pre-v5.4.0). The world_core_multiword_coverage
+    // test enforces inclusion here.
+    "ағза бөлігі",
+    "ғылым заңы",
+    "ғылым саласы",
     "орталық азия",
     "жүк машинасы",
     "аспан денесі",

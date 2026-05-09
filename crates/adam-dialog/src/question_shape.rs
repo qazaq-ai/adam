@@ -191,15 +191,81 @@ fn is_listing(lower: &str) -> bool {
 }
 
 fn is_yes_no_check(lower: &str) -> bool {
-    // Explicit confirmation markers. The bare "X-Y, ма?" form is
-    // ambiguous — it could be a yes/no check or an Affirmation
-    // request — so we require an explicit auxiliary like `шынымен`
-    // ("really") or `дұрыс па` ("is it correct").
-    lower.contains("шынымен")
+    // Explicit confirmation markers fire first.
+    if lower.contains("шынымен")
         || lower.contains("дұрыс па")
         || lower.contains("дұрыс ма")
         || lower.contains("растайсыз")
         || lower.contains("растайсың")
+    {
+        return true;
+    }
+    // **v5.4.0** — bare «<Subject> — <Predicate> (ме|ма|ба|бе|па|пе)?»
+    // pattern. Pre-v5.4.0 these fell through to `Definition` and the
+    // planner surfaced the most-central IsA fact about the subject,
+    // ignoring the *predicate* the user asked about. The bridge-fact
+    // work in v5.4.0 made transitive IsA chains reachable
+    // (e.g. қасқыр → жыртқыш → жануар → тіршілік иесі → тірі); the
+    // detector now routes these to YesNoCheck so the planner can
+    // confirm or hedge per the chain query.
+    extract_yes_no_isa_pair(lower).is_some()
+}
+
+/// **v5.4.0** — extract `(subject, predicate)` from a bare yes/no IsA
+/// question.
+///
+/// Recognised surface forms (after lowercasing):
+///
+///   - `<X> — <Y> (ме|ма|ба|бе|па|пе)?`   (em-dash separator)
+///   - `<X> - <Y> (ме|ма|ба|бе|па|пе)?`   (hyphen used as dash)
+///
+/// Both subject and predicate may be multi-word. Returns `None` when
+/// either side fails to yield a non-empty token sequence.
+///
+/// Leaves the broader question-shape decision to `is_yes_no_check`;
+/// this helper only does the *structural* parse so the conversation
+/// layer can resolve the chain in `data/retrieval/{facts,derived_facts}.json`.
+pub fn extract_yes_no_isa_pair(input: &str) -> Option<(String, String)> {
+    let lower = input.trim().to_lowercase();
+    // Find a dash that separates two non-empty halves. Em-dash «—»
+    // is the canonical Kazakh predicative separator; ASCII hyphen
+    // also occurs in user input.
+    let split_at = lower
+        .find(" — ")
+        .map(|i| (i, " — ".len()))
+        .or_else(|| lower.find(" - ").map(|i| (i, " - ".len())))?;
+    let (left, rest) = lower.split_at(split_at.0);
+    let right = &rest[split_at.1..];
+    let subject = left.trim();
+    if subject.is_empty() {
+        return None;
+    }
+    // Right side may end with the question-tag particle (and `?`).
+    // Strip the particle so the predicate token doesn't include it.
+    let mut predicate = right.trim_end_matches('?').trim().to_string();
+    for tag in [
+        " ме", " ма", " ба", " бе", " па", " пе", " ма?", " ме?", " ба?", " бе?", " па?", " пе?",
+    ] {
+        if let Some(stripped) = predicate.strip_suffix(tag.trim()) {
+            let trimmed = stripped.trim_end();
+            if !trimmed.is_empty() {
+                predicate = trimmed.to_string();
+                break;
+            }
+        }
+    }
+    if predicate.is_empty() {
+        return None;
+    }
+    // Reject obviously non-noun-phrase predicates (a verb, an adjective
+    // with a copula, etc.). The closed-list heuristic is conservative —
+    // anything we don't recognise is allowed through and let the chain
+    // query be the truth source.
+    const NON_NP_PREDICATES: &[&str] = &["білесіз", "білесің", "білемін", "білдім", "бар", "жоқ"];
+    if NON_NP_PREDICATES.iter().any(|w| predicate == *w) {
+        return None;
+    }
+    Some((subject.to_string(), predicate))
 }
 
 #[cfg(test)]
@@ -265,6 +331,43 @@ mod tests {
         assert_eq!(detect("Сәлем"), None);
         assert_eq!(detect("Менің атым Дәулет."), None);
         assert_eq!(detect("Жақсы екен"), None);
+    }
+
+    #[test]
+    fn detects_bare_yes_no_isa_questions() {
+        // v5.4.0 — bare predicative pattern routes to YesNoCheck so
+        // the planner can query the IsA chain instead of surfacing a
+        // tangential definition.
+        assert_eq!(detect("Қасқыр — тірі ме?"), Some(QuestionShape::YesNoCheck));
+        assert_eq!(detect("Балта — зат па?"), Some(QuestionShape::YesNoCheck));
+        assert_eq!(detect("Ит — жануар ма?"), Some(QuestionShape::YesNoCheck));
+    }
+
+    #[test]
+    fn extracts_yes_no_isa_pair_with_em_dash() {
+        assert_eq!(
+            extract_yes_no_isa_pair("Қасқыр — тірі ме?"),
+            Some(("қасқыр".into(), "тірі".into()))
+        );
+        assert_eq!(
+            extract_yes_no_isa_pair("Жер сілкінісі — құбылыс па?"),
+            Some(("жер сілкінісі".into(), "құбылыс".into()))
+        );
+    }
+
+    #[test]
+    fn extracts_yes_no_isa_pair_with_hyphen() {
+        assert_eq!(
+            extract_yes_no_isa_pair("ит - үй жануары ма?"),
+            Some(("ит".into(), "үй жануары".into()))
+        );
+    }
+
+    #[test]
+    fn rejects_non_noun_phrase_predicates() {
+        // «X — білемін бе?» is a self-knowledge question, not an IsA
+        // query; should not extract a (subject, predicate) pair.
+        assert_eq!(extract_yes_no_isa_pair("Мен — білемін бе?"), None);
     }
 
     #[test]

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/shanraq.svg" alt="adam logo" width="128" height="128">
+</p>
+
 # Mission — Qazaq IR
 
 > **One-line thesis.** Modern AI's three structural problems —
@@ -161,7 +165,7 @@ What adam demonstrates:
   belief-state tracking, contradiction recovery, anaphora resolution,
   and curriculum progression.
 - The architecture **scales to a real codebase**: 30+ Rust crates,
-  1 150+ tests, 451+ versioned releases (each CI-verified).
+  1 155+ tests, 461+ versioned releases (each CI-verified).
 - The voice surface (macOS `Aru` / Linux `espeak-ng` / optional Piper)
   is a peripheral output transducer — it preserves the kernel's
   determinism guarantee.

@@ -245,6 +245,58 @@ pub fn plan_response_with_epistemic(
     // ("екеуі де жоқ" / "білмеймін" / etc.). Bypasses epistemic
     // overrides because dismissal is a deliberate state-transition
     // ack, not an evidence-shaped reply.
+    // **v5.4.0** — bare yes/no IsA short-circuit. When the input parses
+    // as «<X> — <Y> Q?» the conversation layer walks the IsA chain
+    // (`find_isa_chain` over extracted + derived facts) and writes the
+    // outcome to `__yes_no_isa__` / `__yes_no_outcome__`. Routing here
+    // makes the chain query the primary response shape — pre-v5.4.0
+    // these questions fell through to standard `Unknown` routing and
+    // surfaced the most-central IsA fact about <X>, ignoring <Y>. The
+    // bridge facts shipped in v5.4.0 (`data/world_core/{life,concept}_
+    // bridges.jsonl`) made transitive paths reachable for these
+    // queries; the wiring here is what surfaces them.
+    if extra_slots.contains_key("__yes_no_isa__") {
+        let outcome = extra_slots
+            .get("__yes_no_outcome__")
+            .map(String::as_str)
+            .unwrap_or("unknown");
+        let key = match outcome {
+            "confirm" => "unknown.yes_no_check.confirm",
+            _ => "unknown.yes_no_check.unknown",
+        };
+        if !repo.get(key).is_empty() {
+            trace.push(format!("planner: yes_no_isa override → {key}"));
+            let applicable_all = repo.get(key);
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            let fillable: Vec<&String> = applicable_all
+                .iter()
+                .filter(|t| template_is_fillable(t, &slots))
+                .collect();
+            let effective: Vec<&String> = if fillable.is_empty() {
+                applicable_all.iter().collect()
+            } else {
+                fillable
+            };
+            let idx = (rng_seed as usize) % effective.len().max(1);
+            let chosen = effective.get(idx).map(|s| (*s).clone()).unwrap_or_default();
+            trace.push(format!(
+                "planner: applicable_total={} chosen_index={} text='{}'",
+                effective.len(),
+                idx,
+                chosen,
+            ));
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     if extra_slots.contains_key("__dismiss_contradiction__") {
         let key = "dismiss_contradiction";
         if !repo.get(key).is_empty() {

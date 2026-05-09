@@ -1500,6 +1500,48 @@ impl Conversation {
                 }
             }
         }
+        // **v5.4.0** — bare-yes/no-IsA query wiring. When the question
+        // shape is YesNoCheck and the input parses as «<X> — <Y> Q?»,
+        // walk the IsA chain across extracted + derived facts. The
+        // outcome (`confirm` / `unknown`) and the rendered chain are
+        // pushed through `extra_slots`; the planner branches on
+        // `__yes_no_isa__` BEFORE the standard unknown-answer routing.
+        // The bridge facts shipped in v5.4.0 (life_bridges + concept_
+        // bridges) made transitive paths reachable for these queries.
+        if let Intent::Unknown {
+            question_shape: Some(crate::question_shape::QuestionShape::YesNoCheck),
+            ..
+        } = &intent_for_render
+        {
+            if let Some((subject, predicate)) =
+                crate::question_shape::extract_yes_no_isa_pair(input)
+            {
+                let chain = find_isa_chain(
+                    &self.extracted_facts,
+                    &self.derived_facts,
+                    &subject,
+                    &predicate,
+                );
+                extra_slots.insert("__yes_no_isa__".into(), "1".into());
+                extra_slots.insert("subject_term".into(), {
+                    let mut chars = subject.chars();
+                    match chars.next() {
+                        Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+                        None => String::new(),
+                    }
+                });
+                extra_slots.insert("predicate_term".into(), predicate.clone());
+                match chain {
+                    Some(path) if path.len() >= 2 => {
+                        extra_slots.insert("__yes_no_outcome__".into(), "confirm".into());
+                        extra_slots.insert("chain".into(), path.join(" → "));
+                    }
+                    _ => {
+                        extra_slots.insert("__yes_no_outcome__".into(), "unknown".into());
+                    }
+                }
+            }
+        }
         let plan = crate::planner::plan_response_with_epistemic(
             &intent_for_render,
             rng_seed,
@@ -2365,6 +2407,99 @@ fn graph_predicate_hint(intent: &Intent) -> Option<String> {
         return Some("has_quantity".into());
     }
     None
+}
+
+/// **v5.4.0** — find the shortest IsA chain from `subject` to `target`
+/// across both extracted (curated/world_core) and derived (rule-inferred)
+/// facts. Returns the chain of node roots `[subject, hop1, …, target]`
+/// when reachable, `None` otherwise.
+///
+/// Used by the bare-yes/no-IsA route («X — Y ме?») wired in v5.4.0:
+/// the planner needs the full path so the response can cite it
+/// («қасқыр → жыртқыш → жануар → тіршілік иесі → тірі»), not just a
+/// boolean. BFS so the cited path is the *shortest*; depth is capped at
+/// 8 (matching the reasoner's `MAX_ITER`) so cycles never deadlock.
+///
+/// Both `subject` and `target` are matched against `f.subject.root` /
+/// `f.object.root` after lower-casing on both sides; multi-word roots
+/// like `"тіршілік иесі"` are preserved as-is by the upstream loader.
+pub(crate) fn find_isa_chain(
+    extracted: &[ReasFact],
+    derived: &[DerivedFact],
+    subject: &str,
+    target: &str,
+) -> Option<Vec<String>> {
+    const MAX_DEPTH: usize = 8;
+    let subject = subject.to_lowercase();
+    let target = target.to_lowercase();
+    if subject == target {
+        return Some(vec![subject]);
+    }
+    let mut parent: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut frontier: Vec<String> = vec![subject.clone()];
+    parent.insert(subject.clone(), String::new());
+
+    for _ in 0..MAX_DEPTH {
+        let mut next: Vec<String> = Vec::new();
+        for node in &frontier {
+            // Direct extracted IsA edges out of `node`.
+            for f in extracted {
+                if matches!(f.predicate, ReasPredicate::IsA)
+                    && f.subject.root.to_lowercase() == *node
+                {
+                    let obj = f.object.root.to_lowercase();
+                    if !parent.contains_key(&obj) {
+                        parent.insert(obj.clone(), node.clone());
+                        if obj == target {
+                            return Some(reconstruct_chain(&parent, &target));
+                        }
+                        next.push(obj);
+                    }
+                }
+            }
+            // Rule-derived IsA edges (R1 transitivity) out of `node`.
+            // Treat them as one BFS hop — derivations already telescope
+            // across multiple original facts, so a chain through derived
+            // edges is shorter than the same chain through extracted
+            // ones; preserve that for the cited path.
+            for d in derived {
+                if matches!(d.predicate, adam_reasoning::Predicate::IsA)
+                    && d.subject.root.to_lowercase() == *node
+                {
+                    let obj = d.object.root.to_lowercase();
+                    if !parent.contains_key(&obj) {
+                        parent.insert(obj.clone(), node.clone());
+                        if obj == target {
+                            return Some(reconstruct_chain(&parent, &target));
+                        }
+                        next.push(obj);
+                    }
+                }
+            }
+        }
+        if next.is_empty() {
+            return None;
+        }
+        frontier = next;
+    }
+    None
+}
+
+fn reconstruct_chain(
+    parent: &std::collections::HashMap<String, String>,
+    target: &str,
+) -> Vec<String> {
+    let mut chain = vec![target.to_string()];
+    let mut cur = target.to_string();
+    while let Some(p) = parent.get(&cur) {
+        if p.is_empty() {
+            break;
+        }
+        chain.push(p.clone());
+        cur = p.clone();
+    }
+    chain.reverse();
+    chain
 }
 
 /// **v4.1.2** — extracted from `Conversation::isa_chain_depth` so the

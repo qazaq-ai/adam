@@ -21,6 +21,48 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.4.0] — 2026-05-09 — Bridge data + bare yes/no IsA route — first user-facing payoff of the v5.3.x repositioning
+
+**Substantive engineering release.** Every claim in this entry is measurable.
+
+### What changed
+
+**1. World-graph bridge data — closing dead-end abstract hubs.** The audit at the start of this release surfaced a class of hubs that had high inbound IsA edges but zero upstream connections: `тіршілік иесі` (4 inbound), `тірі ағза` (5), `омыртқалы жануарлар` (5), `құрал` (26), `тағам` (16), `физикалық құбылыс` (11), `ортағасырлық мемлекет` (16), `қазақ ханы` (10), and 15+ more. These hubs collected animals / plants / objects but the chain dead-ended before reaching predicates a user actually asks about (тірі / зат / билеуші / etc.). Two new world_core domains close them:
+
+- [`data/world_core/life_bridges.jsonl`](data/world_core/life_bridges.jsonl) — 5 facts wiring the biology chain (тіршілік иесі → тірі, тірі ағза → тірі, тіршілік иесі → тірі ағза, омыртқалы жануарлар → жануар, прокариот → тіршілік иесі)
+- [`data/world_core/concept_bridges.jsonl`](data/world_core/concept_bridges.jsonl) — 15 facts wiring abstract concept hubs (құрал → зат, тағам → зат, әрекет → процесс, физикалық құбылыс → құбылыс, физика заңы → ғылым заңы → заңдылық, ортағасырлық мемлекет → мемлекет, қазақ ханы → хан → билеуші → адам, биология саласы → ғылым саласы → сала, мүше → ағза бөлігі, ағза жүйесі → ағза бөлігі, белгі → сипат)
+
+**Measurable impact:** initial facts 3 245 → 3 265 (+20), derived facts 30 892 → **35 469 (+4 577)**. Per-rule contribution: R1 IsA-transitivity +811, R11 InDomain-shared-target +3 454, R2 Has-inheritance +259, R10 InDomain-inheritance +16, R5 shared-IsA +37 (no R5 explosion — bridge facts didn't tie disparate semantic clusters). Average leverage **228 derivations per bridge fact**, 4× higher than the pre-bridge baseline of ~50/fact (memory `project_bridge_fact_leverage`) because R1+R10+R11 cascaded simultaneously through the new hubs.
+
+**2. Bare yes/no IsA detector + planner route.** The bridge data was invisible without surfacing — pre-v5.4.0 «Қасқыр — тірі ме?» fell through `QuestionShape::YesNoCheck` to the standard `Definition` path, which surfaced the most-central IsA fact about қасқыр («жыртқыш») while ignoring the *predicate* the user asked about. Three additions close it:
+
+- [`crates/adam-dialog/src/question_shape.rs`](crates/adam-dialog/src/question_shape.rs) — extended `is_yes_no_check` + new `extract_yes_no_isa_pair` recogniser. Bare «<X> — <Y> (ме|ма|ба|бе|па|пе)?» pattern with em-dash or ASCII hyphen separator now routes to YesNoCheck. Conservative: a closed list of non-noun-phrase predicates (`білемін` / `бар` / `жоқ` / etc.) bails out so self-knowledge questions don't get misrouted.
+- [`crates/adam-dialog/src/conversation.rs`](crates/adam-dialog/src/conversation.rs) — new `find_isa_chain(extracted, derived, subject, target)` BFS over both extracted (curated) and derived (rule-inferred) IsA facts, depth capped at 8 (matching reasoner's `MAX_ITER`). Returns the shortest chain `[subject, hop1, …, target]` for citation, `None` otherwise. Wired into `turn_with_trace` right before `plan_response_with_epistemic`: when `QuestionShape::YesNoCheck` is detected and the (subject, predicate) pair extracts cleanly, the chain query writes outcome (`confirm` / `unknown`) and chain text into `extra_slots` for the planner.
+- [`crates/adam-dialog/src/planner.rs`](crates/adam-dialog/src/planner.rs) — new `__yes_no_isa__` short-circuit in `plan_response_with_epistemic`, sister to the existing `__dismiss_contradiction__` / `__resolve_contradiction__` overrides. Routes to `unknown.yes_no_check.confirm` (3 templates) / `unknown.yes_no_check.unknown` (3 templates) added in [`data/dialog/templates/v1.toml`](data/dialog/templates/v1.toml).
+
+**3. Live dialog test — paired with template tests, per the user's testing directive.** New live holdout [`data/eval/live_holdout_v5400_bridges.json`](data/eval/live_holdout_v5400_bridges.json) + [`crates/adam-dialog/tests/live_holdout_v5400_bridges.rs`](crates/adam-dialog/tests/live_holdout_v5400_bridges.rs) — 8 cases across 4 categories (life_chain / object_chain / ruler_chain / direct_isa / honest_unknown). Every case is a real Kazakh phrasing exercising the full pipeline against the v5.4.0 runtime artefacts. Pass-rate floor: **100 %**. The `none_substring` assertions catch regressions to the pre-v5.4.0 generic-fact behaviour.
+
+### Live REPL — before / after
+
+| Query | Pre-v5.4.0 | Post-v5.4.0 |
+|---|---|---|
+| Қасқыр — тірі ме? | «Қасқыр — жыртқыш.» (tangential) | «Қасқыр — тірі. Бұл қасқыр → тірі тізбегі арқылы расталады.» |
+| Балта — зат па? | «Балта — құрал.» (tangential) | «Иә, Балта — зат. Дәлел тізбегі: балта → зат.» |
+| Жыртқыш — тірі ме? | «Сұрағыңыз жыртқыш жайында ма?» (clarifier dead-end) | «Дұрыс, Жыртқыш шынында да тірі. Тізбек: жыртқыш → тірі.» |
+| Қазақ ханы — билеуші ме? | «Қазақ ханы — хан.» (one-step only) | «Иә, Қазақ ханы — билеуші. Дәлел тізбегі: қазақ ханы → билеуші.» |
+| Қызанақ — машина ма? | (would confirm or surface generic) | «Менің білім қорымда Қызанақ — машина екеніне дерек жоқ.» (honest unknown) |
+
+### Hygiene
+
+- [`crates/adam-dialog/src/topic_extraction.rs`](crates/adam-dialog/src/topic_extraction.rs) — added `ағза бөлігі`, `ғылым заңы`, `ғылым саласы` to `MULTIWORD_ENTITIES` (the `world_core_multiword_coverage` invariant test enforces this for every multi-word IsA target in world_core)
+- New `question_shape` unit tests cover bare detection + pair extraction + non-NP-predicate rejection (4 tests, all passing)
+
+### Verified
+
+Workspace **1 155 passing** (+5 from new v5.4.0 tests) + 17 ignored slow integration; `cargo fmt --all --check` clean; `cargo check --workspace --all-targets` clean; live REPL battery of 8 dialog cases — all pass.
+
+**Stripe — Deterministic AI research (first measurable user-facing payoff of the v5.3.x repositioning arc; +4 577 derivations + bare yes/no IsA route closing the v4.12.0 stub reserved at v4.12.5).**
+
 ## [5.3.10] — 2026-05-09 — Magnet for AI scouts — CITATION.cff + codemeta.json + AGENTS.md + README FAQ
 
 Documentation-only release (text / positioning, no functional code change).

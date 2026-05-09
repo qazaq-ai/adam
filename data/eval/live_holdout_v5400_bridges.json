@@ -1,0 +1,61 @@
+{
+  "_comment": "v5.4.0 bridge-reachability live holdout. Each case is a real Kazakh user phrasing exercised against the deterministic kernel with the v5.4.0 bridge data (life_bridges + concept_bridges) and the bare yes/no IsA detector. The any_substring assertion verifies the response engages with the asked predicate (тірі / зат / билеуші / etc.) — not just surfaces a tangential IsA fact about the subject (the pre-v5.4.0 failure mode). The none_substring assertion catches regressions to the old generic-fact behaviour.",
+  "cases": [
+    {
+      "id": "bridge_life_001",
+      "category": "life_chain",
+      "query": "Қасқыр — тірі ме?",
+      "any_substring": ["тірі"],
+      "none_substring": ["жыртқыш"]
+    },
+    {
+      "id": "bridge_life_002",
+      "category": "life_chain",
+      "query": "Өсімдік — тірі ме?",
+      "any_substring": ["тірі"],
+      "none_substring": []
+    },
+    {
+      "id": "bridge_life_003",
+      "category": "life_chain",
+      "query": "Жыртқыш — тірі ме?",
+      "any_substring": ["тірі"],
+      "none_substring": []
+    },
+    {
+      "id": "bridge_concept_001",
+      "category": "object_chain",
+      "query": "Балта — зат па?",
+      "any_substring": ["зат"],
+      "none_substring": []
+    },
+    {
+      "id": "bridge_concept_002",
+      "category": "ruler_chain",
+      "query": "Қазақ ханы — билеуші ме?",
+      "any_substring": ["билеуші"],
+      "none_substring": []
+    },
+    {
+      "id": "bridge_baseline_001",
+      "category": "direct_isa",
+      "query": "Ит — жануар ма?",
+      "any_substring": ["жануар"],
+      "none_substring": []
+    },
+    {
+      "id": "bridge_unknown_001",
+      "category": "honest_unknown",
+      "query": "Қызанақ — машина ма?",
+      "any_substring": ["дерек", "табыл", "толық"],
+      "none_substring": ["иә", "дұрыс"]
+    },
+    {
+      "id": "bridge_unknown_002",
+      "category": "honest_unknown",
+      "query": "Кітап — тағам ба?",
+      "any_substring": ["дерек", "табыл", "толық"],
+      "none_substring": ["иә, кітап", "дұрыс, кітап"]
+    }
+  ]
+}

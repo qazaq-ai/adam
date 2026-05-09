@@ -396,6 +396,37 @@ templates = [
 # - `unknown.causal.with_fact` — grounded_fact present (definition
 #    or related context for X)
 # - `unknown.causal.bare` — only noun_hint, no fact
+# v5.4.0 — bare yes/no IsA query: «<X> — <Y> (ме|ма|ба|бе|па|пе)?».
+# The detector in `question_shape::extract_yes_no_isa_pair` parses
+# (subject, predicate); `Conversation::turn` walks the IsA chain
+# across extracted + derived facts (`find_isa_chain`); the planner
+# branches on `__yes_no_outcome__` ∈ {confirm, unknown}. The bridge
+# facts shipped in v5.4.0 (data/world_core/{life,concept}_bridges.jsonl)
+# made transitive paths reachable for these queries — without those
+# bridges the chain dead-ends at abstract hubs like «тіршілік иесі»
+# and the response collapses to "unknown".
+#
+# Slots populated by the conversation layer:
+#   {subject_term}    capitalised X («Қасқыр»)
+#   {predicate_term}  Y («тірі»)
+#   {chain}           rendered path («қасқыр → жыртқыш → жануар →
+#                     тіршілік иесі → тірі»)
+[[families]]
+key = "unknown.yes_no_check.confirm"
+templates = [
+    "Иә, {subject_term} — {predicate_term}. Дәлел тізбегі: {chain}.",
+    "Дұрыс, {subject_term} шынында да {predicate_term}. Тізбек: {chain}.",
+    "{subject_term} — {predicate_term}. Бұл {chain} тізбегі арқылы расталады.",
+]
+
+[[families]]
+key = "unknown.yes_no_check.unknown"
+templates = [
+    "Менің білім қорымда {subject_term} — {predicate_term} екеніне дерек жоқ. Сұрағыңызды басқаша қойсаңыз болады.",
+    "{subject_term} — {predicate_term} деген тікелей дерек қорымда табылмады; нақтылай түсіңізші.",
+    "Бұл сұраққа сенімді жауап беру үшін {subject_term} мен {predicate_term} арасындағы байланыс деректерім жетпейді.",
+]
+
 [[families]]
 key = "unknown.causal.with_fact"
 templates = [
