@@ -5,12 +5,13 @@
 <h1 align="center">adam</h1>
 
 <p align="center">
-  <i>Predictable Kazakh-first dialog, built in pure Rust.</i><br>
+  <i>Deterministic AI research — predictable, cheap, safe.</i><br>
+  <i>Kazakh-first applied demonstrator (adam) of the Qazaq IR architecture.</i><br>
   <i>Қазақ тіліне арналған, толық болжамды диалог жүйесі — таза Rust тілінде.</i>
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.3.5-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.3.6-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -41,23 +42,49 @@
 
 ---
 
-## Why adam
+## Research mission
 
-adam is a **deterministic cognitive kernel for Kazakh** — rule-based dialog with auditable belief revision, morpheme-indexed retrieval, and a forward-chaining reasoner over typed facts, all running as a single tool-driven pipeline. It trades **generalisation for integrity**: every output is traceable, every belief revisable, every conclusion sourced. Every layer is **Rust-only** and **graph-first** by repository invariant — both enforced by contract tests.
+We are a research-stage company investigating **whether agglutinative-language morphology can serve as the substrate for a deterministic alternative to probabilistic large language models**.
 
-### Architecture name — ARK (Agglutinative Reasoning Kernel)
+Modern LLMs carry three structural problems we believe are not inevitable:
 
-**v4.55.5+** — adam's architecture is named **ARK** = Agglutinative Reasoning Kernel. Renamed from NLM (Nano Language Model) to mark adam's distinct architectural class: not a smaller LLM, but a different kind of system entirely. The four pillars:
+| The three diseases of probabilistic AI | Our target |
+|---|---|
+| **Black box** — opaque internals, no source attribution, no auditable explanation for any specific output | **Predictability** — every claim traceable to a curated source; every reasoning step inspectable |
+| **Resource cost** — billions of parameters, GPU clusters, datacenter inference, kilowatt-scale energy per query | **Cheapness** — single binary on M2 8GB, **0% GPU**, ~21 ms p50 latency, ~300 MB RSS |
+| **Hallucination risk** — confident generation of plausible-sounding but factually wrong content, with no internal mechanism to flag it | **Safety** — architectural impossibility: the runtime cannot emit a claim without a backing fact in `world_core` or a grounded reasoning chain |
+
+**Our hypothesis:** agglutinative languages — Kazakh in particular — exhibit unusually mathematical morphology. Every word decomposes into a root plus a predictable sequence of typed suffixes (case, number, tense, person, possessive, polarity, modality). Composition is **rule-bound, not learned**. That structure is exactly what we need to build a deterministic runtime: FST morphology + typed suffix priors + root-pair PMI as deterministic prior layers, a curated knowledge graph as the only fact source, and templates as the only path from fact to text. No probabilistic free generation. No retrained-from-scratch behaviour per release.
+
+The same approach generalises to other agglutinative-typology languages — Kyrgyz, Tatar, Uzbek, Turkish, Finnish, Hungarian, Japanese, Korean — giving the research a global frontier without claims of universal grammar.
+
+### Architecture — ARK (Agglutinative Reasoning Kernel)
+
+The architecture is named **ARK** = Agglutinative Reasoning Kernel. Three pillars:
 
 - **A**gglutinative — Kazakh morphology decomposes deterministically (root + typed suffixes); composition is rule-bound, not learned.
 - **R**easoning — a curated knowledge graph (`data/world_core/*.jsonl`) + a forward-chaining reasoner (10 active rules) produces every fact-bearing claim. Every output cites a source.
 - **K**ernel — system-runtime, not a probabilistic estimator. ARK has small trained components (selection-weights perceptron, suffix-chain priors, root-affinity PMI) but they sit inside the kernel as inspectable layers, not at the centre.
 
-Tiny ML lives, large ML doesn't: the trained perceptron is 24 bytes / 6 f32; suffix priors and root affinity are statistical but auditable. Generation is template-based, never free-text. Result: predictable, traceable, watch-battery-deployable Kazakh dialog.
+Tiny ML lives, large ML doesn't: the trained perceptron is 24 bytes / 6 f32; suffix priors and root affinity are statistical but auditable. Generation is template-based, never free-text.
 
-### Engineering thesis
+### adam — current applied demonstrator
 
-The project's core engineering claim — independent of any historical or philosophical thesis about Kazakh — is that **agglutinative morphology gives a clean algebra of meaning**: every Kazakh word decomposes into a root plus a sequence of typed suffixes, each contributing a known grammatical operator (case, number, tense, person, possessive, polarity, modality). Composition is rule-bound, not learned. That structure is exactly what we build the runtime on: FST morphology + typed suffix priors + root-pair PMI as deterministic prior layers, world_core as a curated graph of typed facts, and templates as the only path from fact to text. No probabilistic free generation. No retrained-from-scratch behaviour per release. The result is **predictable, traceable, low-energy** answer for Kazakh queries — not because the language has special metaphysical status, but because its structure is unusually friendly to formal modelling. The same engineering style would apply to other agglutinative-typology languages (Turkish, Kyrgyz, Tatar, Uzbek, …) without claims of universal grammar.
+[**adam**](https://github.com/qazaq-ai/adam) is the first applied proof-of-concept of ARK / Qazaq IR — a Kazakh-language conversational assistant currently deployed as a Rust-programming tutor. It demonstrates the architecture's viability across 41 intent variants, 1 150+ tests, 451+ versioned releases (every release CI-verified), and a working voice interface. **adam is not the goal — the architecture is the goal.** adam is what proves the architecture works.
+
+See [**MISSION.md**](MISSION.md) for the full research mission statement, measurable goals, and collaboration invitation.
+
+### Open to collaboration
+
+We are open to collaboration in every direction:
+
+- **Linguists** — agglutinative morphology, formal phonology, computational semantics
+- **AI researchers** — deterministic alternatives to neural inference, formal verification of language models
+- **Educational institutions** — pilot deployments with Kazakh-language students (current focus: Almaty / Astana schools)
+- **Government / defence** — offline-capable, auditable language AI for Kazakh and related languages
+- **Investors** — angel pre-seed / seed stage who share the thesis that probabilistic AI is not the only path forward
+
+Contact: **baimurza.daulet@gmail.com** · [LinkedIn](https://www.linkedin.com/in/daulet-baimurza-4b3506211)
 
 **v5.3.5 — Compound-statement absorption + occupation self-recall (live REPL gap).** Closes a user-reported gap from a 2026-05-08 live REPL session: «Менің атым Дәулет, мамандығым бағдарламашы.» → adam absorbed only the name, lost the occupation; later «Менің мамандығым есіңізде ме?» fell through to a generic «Мамандық — адамның кәсібі» definition because adam never had the occupation in session. Architectural gap: `interpret_text` returns ONE primary `Intent` per turn, so compound profile statements joined by comma had only the first clause absorbed. **Two surgical fixes:** (1) `detect_occupation_in_compound` extended with possessive-anchor pattern «(менің )?мамандығым X» / «кәсібім X» where X is a bare noun (not copula-suffixed). The existing v4.52.0 secondary scan in conversation.rs already wires `detect_occupation_in_compound` post-`absorb_entities`, so no new plumbing — just better detection. Filler words («болып», «ретінде», «екен») are skipped. (2) `detect_ask_occupation` extended with «есіңізде ме» / «ұмытпа» / «білесіз» recall patterns mirroring the v4.54.5 `detect_ask_name` fix — pre-fix «менің мамандығым есіңізде ме?» fell through to noun-definition surface. **Bonus public API:** new `extract_secondary_profile_facts(input) -> Vec<(predicate, object)>` exposes the pattern for callers that want all secondary facts at once (occupation + age — «жасым 30» also captured). **End-to-end verified:** «Менің атым Дәулет, мамандығым бағдарламашы.» → session has BOTH `name=Дәулет` AND `occupation=бағдарламашы`; later «Менің мамандығым есіңізде ме?» → «Сіз бағдарламашы болып еңбек етіп жүрсіз.» **Regression tests:** [`tests/codex_round3_v5035.rs`](crates/adam-dialog/tests/codex_round3_v5035.rs) — 9 new (5 secondary-extraction unit + 4 end-to-end multi-turn). **Verified:** workspace **1150 passing** (+9 from new v5.3.5 tests) + 17 ignored slow integration; clippy `-D warnings` green; check_metrics_currency green; verify_release_version 5.3.5 green; fmt + build clean. **Stripe — Kazakh school tutor (compound-statement attentiveness; user's REPL feedback closed).**
 

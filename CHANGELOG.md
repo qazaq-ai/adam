@@ -2,10 +2,64 @@
 
 All notable changes are tagged in git as `vX.Y.Z`.
 
-Versioning cadence (post-v1.0.0):
-- **Patch `x.y.5`** — small / incremental changes (bug fixes, small Lexicon additions, docs, housekeeping).
-- **Minor `x.y.0`** — significant changes (new corpus source, new intent family, new tooling, learned component).
-- **`v2.0.0`** is reserved for the "minimally thinking Kazakh LM" — a trained compact Kazakh model plugged in as `Intent::Unknown` fallback. Not more rules — actual learned generalisation.
+## Research direction
+
+We are a **research-stage company** investigating whether agglutinative-language morphology can serve as the substrate for a **deterministic alternative** to probabilistic large language models. Our goal is to address the three structural problems of modern LLMs — opacity (black-box reasoning), cost (GPU / energy / datacentre dependence), and hallucination (no architectural truth-grounding) — through a kernel built on Kazakh's mathematically-regular agglutinative structure.
+
+**adam** (this repository) is the first applied demonstrator of that architecture (Qazaq IR / ARK = Agglutinative Reasoning Kernel). It is **not the goal** — the architecture is the goal; adam is what proves the architecture works. Current applied form: a Kazakh-language Rust-programming tutor.
+
+We are open to collaboration with linguists, AI researchers, educational institutions, government / defence partners, and angel pre-seed / seed-stage investors. Contact: **baimurza.daulet@gmail.com**. Full mission statement: [`MISSION.md`](MISSION.md).
+
+## Versioning cadence
+
+Post-v1.0.0:
+
+- **Patch increments `x.y.{1, 2, 3, …}`** — text / documentation / positioning changes (no functional impact)
+- **Patch milestone `x.y.5`** — small / incremental functional changes (bug fixes, small Lexicon additions, housekeeping)
+- **Minor `x.y.0`** — significant capability changes (new corpus source, new intent family, new tooling, new learned component, kernel-signature features)
+- **`v2.0.0` line is conceptually reserved** for the "minimally thinking Kazakh LM" research milestone (trained compact Kazakh model as `Intent::Unknown` fallback) — actual learned generalisation, not just more rules
+
+Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
+
+## [5.3.6] — 2026-05-08 — Repositioning core — research-mission framing across primary documentation
+
+Documentation-only release (text / positioning, no functional code change).
+
+Repositions the project's primary surfaces from «predictable Kazakh dialog / Kazakh school tutor» to **«deterministic AI research with adam as applied demonstrator»**. The architecture, code, and tests are unchanged; the framing reflects the actual research thesis the project has been pursuing under the school-tutor surface.
+
+### What's added
+
+- **[MISSION.md](MISSION.md)** — new top-level mission statement covering: the three diseases of probabilistic AI (opacity, cost, hallucination), our hypothesis (agglutinative morphology as deterministic substrate), three measurable goals (predictability, cheapness, safety), why Kazakh specifically, adam's role as demonstrator (not goal), research roadmap as milestone arc, and explicit open-collaboration invitation across 5 partner classes (linguists / AI researchers / educational institutions / government-defence / investors).
+- **README top section** rewritten with research-first framing: tagline «Deterministic AI research — predictable, cheap, safe»; new «Research mission» section with the 3-diseases-vs-3-goals table; explicit «adam — current applied demonstrator» framing; collaboration links to mission doc + contact.
+- **CHANGELOG** prefaced with Research-direction explainer + revised versioning-cadence policy (patch increments `x.y.{1,2,3,…}` for text-only changes vs `x.y.5` for incremental functional).
+
+### What's preserved
+
+- Historical release entries (`v4.x` and earlier `v5.x`) remain unchanged — they describe what was actually built at each step.
+- All code, tests, data, and behaviour are bit-identical to v5.3.5.
+- The «Stripe — Kazakh school tutor» tagline remains in historical entries; from v5.3.6 forward, new entries use «Stripe — Deterministic AI research».
+
+### Why now
+
+The project's GitHub repo went public on 2026-05-08 (first commit 2026-04-07). Public visibility means investor scrutiny, which means the surface positioning must match the actual thesis. «Kazakh school tutor» understates the research arc the codebase represents; «deterministic AI research with applied demonstrator» is the accurate framing.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| README, MISSION.md, CHANGELOG preamble updated | ✅ |
+| All code unchanged from v5.3.5 | ✅ |
+| Workspace tests | **1150 passing** (unchanged) |
+| `cargo clippy -D warnings` | green |
+| `cargo fmt --all --check` | green |
+| `verify_release_version 5.3.6` | green |
+
+### Roadmap
+
+- **v5.3.7** — Documentation alignment pass: doc-comments in `lib.rs` of all crates + `data/README.md` + `docs/roadmap.md` headers + new `RESEARCH.md` (detailed research arc) + `COLLABORATION.md` (partner-class onboarding).
+- **v5.3.8** — Investor-pitch alignment: rewrite the MA7 Ventures angel-pre-seed letter with research framing; outline a 12-slide research deck.
+
+**Stripe — Deterministic AI research (Qazaq IR).**
 
 ## [5.3.5] — 2026-05-08 — Compound-statement absorption + occupation self-recall (live REPL gap)
 
