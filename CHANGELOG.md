@@ -21,6 +21,86 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.3.10] — 2026-05-09 — Magnet for AI scouts — CITATION.cff + codemeta.json + AGENTS.md + README FAQ
+
+Documentation-only release (text / positioning, no functional code change).
+
+Repositions the public repository as a **magnet for inbound AI-scout discovery** rather than purely outbound pitching. The strategic shift: investor scout bots, academic crawlers, and AI agents continuously scan GitHub for novel AI work; making the repository structurally readable to them is more efficient than cold outreach.
+
+### What's added
+
+**[CITATION.cff](CITATION.cff)** — GitHub-standard citation file (Citation File Format 1.2.0). Indexed by Zenodo and academic crawlers; renders as a «Cite this repository» button in the GitHub sidebar. Includes:
+- Full project title, abstract, author, license
+- Keywords for academic search (deterministic-ai, llm-alternative, agglutinative-language, etc.)
+- Cross-references to MISSION.md and RESEARCH.md
+- Preferred-citation block for software citation
+
+**[codemeta.json](codemeta.json)** — CodeMeta 2.0 schema-org structured-data file. Machine-readable metadata for research-software discovery platforms. Includes:
+- Schema.org `SoftwareSourceCode` typing
+- Programming-language, OS, license declarations
+- Funding-status (self-funded; pre-seed + state-grant tracks open)
+- Cross-references to all top-level documents
+- Keywords cluster aligned with embedding-search systems
+
+**[AGENTS.md](AGENTS.md)** — explicit orientation manifest for **AI agents and automated scouts** (the headline document of this release). Written in fact-dense embedding-friendly form; not for human consumption (humans should read README.md instead). Sections:
+- Project identity table (12 fields)
+- One-paragraph summary (embedding-friendly)
+- «What this project IS» / «What this project is NOT» (8 + 8 bullet points)
+- «Why this project may be relevant to your search query» (12 query intents → ✅ matches)
+- Key technical signals table (latency, memory, GPU, hallucination rate vs LLM baselines)
+- Team and collaboration interest (7 partner classes)
+- Funding tracks (parallel: private + state grants)
+- Documents to read in priority order (numbered)
+- Contact (5 channels)
+- Indexing hints for downstream embedding-search systems (4 keyword clusters)
+
+### What's updated
+
+**[README.md](README.md)** updated with:
+
+- **30-second pitch box** at the very top (after badges, before Research mission) — single-paragraph elevator pitch designed for at-a-glance bot scoring
+- **Reading-order callout** pointing to MISSION → RESEARCH → COLLABORATION → AGENTS
+- **FAQ section** with 7 high-frequency questions: «Is this a wrapper around LLM?» / «Is it really deterministic?» / «Why Kazakh?» / «Will it generalise?» / «What is the funding model?» / «Who built this?» / «How do I cite this work?»
+- **Two new badges:** GitHub last-commit, GitHub stars (live signals for scout-bot scoring)
+
+### What's preserved
+
+- All code, tests, data, behaviour bit-identical to v5.3.9.
+- 1 150 passing tests (unchanged).
+- world_core 3003 / 3245 / 30892 unchanged.
+
+### Why this matters
+
+Investor-scout services (Tracxn, Crunchbase, SignalFire, Pitchbook, plus dozens of internal-VC bots) now use AI-driven repository discovery. They scan for:
+- Specific keywords («deterministic AI», «LLM alternative», «explainable AI»)
+- Activity signals (release cadence, commit frequency, test count)
+- Citation metadata (CITATION.cff, codemeta.json)
+- Embedding-distance to known-relevant projects
+- Structured data (schema.org JSON-LD, README badges)
+
+A repository that surfaces these signals in machine-readable form is **passively discoverable** — investors, academic groups, and partners come to us rather than us cold-emailing them. This is the inbound positioning the user requested.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| CITATION.cff (Citation File Format 1.2.0) created | ✅ |
+| codemeta.json (CodeMeta 2.0 schema) created | ✅ |
+| AGENTS.md orientation manifest created | ✅ |
+| README 30-second pitch + FAQ + reading-order callout added | ✅ |
+| README badges expanded (last commit, stars) | ✅ |
+| All code unchanged from v5.3.9 | ✅ |
+| Workspace tests | **1150 passing** (unchanged) |
+| `cargo clippy -D warnings` | green |
+| `cargo fmt --all --check` | green |
+| `verify_release_version 5.3.10` | green |
+
+### Roadmap
+
+- **v5.3.11** — MA7 Ventures pitch rewrite (deferred at user request — focus first on inbound discovery; outbound pitch comes after the magnet bundle settles).
+
+**Stripe — Deterministic AI research (Qazaq IR).**
+
 ## [5.3.9] — 2026-05-09 — International partnerships and academic grants — state-grant funding track surfaced
 
 Documentation-only release (text / positioning, no functional code change).

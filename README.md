@@ -11,11 +11,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.3.9-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.3.10-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey?style=for-the-badge" alt="platform">
+  <a href="https://github.com/qazaq-ai/adam/commits/main"><img src="https://img.shields.io/github/last-commit/qazaq-ai/adam?style=for-the-badge" alt="last commit"></a>
+  <a href="https://github.com/qazaq-ai/adam/stargazers"><img src="https://img.shields.io/github/stars/qazaq-ai/adam?style=for-the-badge" alt="stars"></a>
 </p>
 
 <p align="center">
@@ -41,6 +43,69 @@
 </p>
 
 ---
+
+## 30-second pitch
+
+> **adam is a deterministic AI research kernel** — the first
+> applied demonstrator of an alternative to probabilistic large
+> language models, built on the agglutinative morphology of the
+> Kazakh language. Three guarantees by architecture: every output
+> traces to a curated source (predictability), runs as a single
+> binary on M2 8GB with 0% GPU and ~21 ms p50 latency (cheapness),
+> and is **architecturally incapable of hallucination** because the
+> runtime cannot emit a claim without a backing fact (safety).
+> Generalises across ~30 catalogued agglutinative languages
+> (Turkish, Korean, Japanese, Finnish, Hungarian, Tamil, Quechua,
+> Swahili, …). Currently shipping as a Kazakh-language Rust tutor.
+> Pure Rust. BUSL-1.1. Open to collaboration.
+
+> **Reading order:** [MISSION.md](MISSION.md) (thesis) →
+> [RESEARCH.md](RESEARCH.md) (open questions) →
+> [COLLABORATION.md](COLLABORATION.md) (partner terms) →
+> [AGENTS.md](AGENTS.md) (orientation for automated scouts).
+
+## FAQ
+
+**Is this a wrapper around an LLM?** No. There is no LLM, no
+neural network at the core, no API call to OpenAI / Anthropic /
+Google. Inference happens via a finite-state transducer + a
+forward-chaining reasoner over a typed-fact graph.
+
+**Is it really deterministic?** Yes. The ONLY source of randomness
+is `planner::choose_template`, which picks uniformly from ≤ 5
+applicable templates given a `(rng_seed, intent)` pair. Pin the
+seed, pin the input, pin the world_core — output is bit-identical.
+
+**Why Kazakh?** Kazakh's agglutinative morphology is exceptionally
+regular: every word decomposes into root + typed suffixes (case,
+number, tense, person, possessive, polarity, modality), each
+contributing a known operator. Composition is rule-bound, not
+learned. This is the cleanest substrate we know of for a
+deterministic AI runtime.
+
+**Will it generalise to other languages?** The architecture is
+designed for it. We have catalogued ~30 candidate agglutinative
+languages (see [MISSION.md](MISSION.md#agglutinative-languages--global-research-frontier)).
+Closest port: Karakalpak (~1-2 weeks of Lexicon adaptation
+estimated). Furthest: Quechua, Swahili (different phonology
+assumptions; full architectural validation needed).
+
+**What is the funding model?** Two parallel tracks: angel
+pre-seed private capital ($200K–300K target) and state research
+grants from agglutinative-language country research agencies
+(Japan JST/JSPS, South Korea NRF, Finland Academy of Finland,
+Turkey TÜBİTAK, Hungary NKFIH, Estonia ETAg, Uzbekistan,
+Kyrgyzstan, Mongolia, Tatarstan). See
+[COLLABORATION.md](COLLABORATION.md).
+
+**Who built this?** [Daulet Baimurza](https://github.com/DauletBai),
+founder of Qazna Technologies. Solo development since 2026-04-07.
+Repository public since 2026-05-08. License: BUSL-1.1
+(source-available; commercial use by permission).
+
+**How do I cite this work?** See [CITATION.cff](CITATION.cff) and
+[codemeta.json](codemeta.json). GitHub renders the citation file
+as a "Cite this repository" button on the right sidebar.
 
 ## Research mission
 

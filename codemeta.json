@@ -1,0 +1,101 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "adam",
+  "description": "Deterministic AI research kernel for agglutinative languages. Applied demonstrator of Qazaq IR — a deterministic alternative to probabilistic large language models, built on Kazakh agglutinative morphology. Three guarantees: predictability (every claim traceable to a curated source), cheapness (single binary, 0% GPU, ~21 ms p50 latency, ~300 MB RSS), safety (architectural impossibility of hallucination). Generalises across ~30 catalogued agglutinative languages.",
+  "license": "https://spdx.org/licenses/BUSL-1.1.html",
+  "codeRepository": "https://github.com/qazaq-ai/adam",
+  "version": "5.3.10",
+  "dateCreated": "2026-04-07",
+  "dateModified": "2026-05-09",
+  "datePublished": "2026-05-08",
+  "programmingLanguage": [
+    {
+      "@type": "ComputerLanguage",
+      "name": "Rust",
+      "version": "edition 2024"
+    }
+  ],
+  "operatingSystem": ["macOS", "Linux"],
+  "developmentStatus": "active",
+  "applicationCategory": "Artificial Intelligence Research",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Daulet",
+      "familyName": "Baimurza",
+      "email": "baimurza.daulet@gmail.com",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Qazna Technologies"
+      }
+    }
+  ],
+  "maintainer": {
+    "@type": "Person",
+    "givenName": "Daulet",
+    "familyName": "Baimurza",
+    "email": "baimurza.daulet@gmail.com"
+  },
+  "keywords": [
+    "deterministic AI",
+    "LLM alternative",
+    "agglutinative languages",
+    "Kazakh",
+    "Turkish",
+    "Korean",
+    "Japanese",
+    "Finnish",
+    "Hungarian",
+    "rule-based NLP",
+    "finite-state transducer",
+    "explainable AI",
+    "auditable AI",
+    "no hallucination",
+    "low-resource NLP",
+    "offline AI",
+    "educational AI",
+    "cognitive kernel",
+    "Qazaq IR",
+    "ARK",
+    "Agglutinative Reasoning Kernel",
+    "research-stage",
+    "open to collaboration"
+  ],
+  "softwareRequirements": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Rust toolchain",
+      "version": ">=1.85"
+    }
+  ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Piper TTS (optional voice backend)",
+      "url": "https://github.com/rhasspy/piper"
+    }
+  ],
+  "funding": {
+    "@type": "MonetaryGrant",
+    "description": "Self-funded research; angel pre-seed and state-research-grant tracks both open. See COLLABORATION.md.",
+    "funder": {
+      "@type": "Organization",
+      "name": "Self-funded (Qazna Technologies)"
+    }
+  },
+  "isPartOf": {
+    "@type": "ResearchProject",
+    "name": "Qazaq IR — Deterministic AI Research",
+    "url": "https://github.com/qazaq-ai/adam"
+  },
+  "readme": "https://github.com/qazaq-ai/adam/blob/main/README.md",
+  "issueTracker": "https://github.com/qazaq-ai/adam/issues",
+  "downloadUrl": "https://github.com/qazaq-ai/adam/releases",
+  "relatedLink": [
+    "https://github.com/qazaq-ai/adam/blob/main/MISSION.md",
+    "https://github.com/qazaq-ai/adam/blob/main/RESEARCH.md",
+    "https://github.com/qazaq-ai/adam/blob/main/COLLABORATION.md",
+    "https://github.com/qazaq-ai/adam/blob/main/AGENTS.md"
+  ]
+}

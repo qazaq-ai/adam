@@ -1,0 +1,74 @@
+cff-version: 1.2.0
+message: >
+  If you reference this work in academic publications, technical
+  reports, or comparative AI research, please cite as follows.
+title: >
+  adam — deterministic AI research kernel for agglutinative
+  languages (Qazaq IR)
+abstract: >
+  adam is the applied demonstrator of Qazaq IR — a deterministic
+  alternative to probabilistic large language models, built on the
+  agglutinative-morphology algebra of the Kazakh language. The
+  research investigates whether agglutinative languages can serve
+  as the substrate for AI systems with three architectural
+  guarantees: predictability (every output traceable to a curated
+  source), cheapness (single-binary deployment, 0% GPU,
+  ~21 ms p50 latency, ~300 MB RSS), and safety (architectural
+  impossibility of hallucination — the runtime cannot emit a claim
+  without backing fact in the curated knowledge graph). The
+  approach generalises across the ~30 catalogued agglutinative
+  languages (Turkish, Korean, Japanese, Finnish, Hungarian, Tamil,
+  Quechua, Swahili, …). adam currently demonstrates the
+  architecture as a Kazakh-language Rust-programming tutor.
+authors:
+  - given-names: Daulet
+    family-names: Baimurza
+    email: baimurza.daulet@gmail.com
+    affiliation: Qazna Technologies
+    orcid: ""  # to be added when assigned
+type: software
+license: BUSL-1.1
+repository-code: "https://github.com/qazaq-ai/adam"
+url: "https://github.com/qazaq-ai/adam"
+date-released: 2026-04-07
+keywords:
+  - deterministic-ai
+  - llm-alternative
+  - agglutinative-language
+  - kazakh
+  - rust
+  - finite-state-transducer
+  - rule-based-nlp
+  - explainable-ai
+  - low-resource-nlp
+  - offline-ai
+  - educational-ai
+  - cognitive-kernel
+identifiers:
+  - type: url
+    value: "https://github.com/qazaq-ai/adam"
+    description: Source code repository
+  - type: url
+    value: "https://github.com/qazaq-ai/adam/blob/main/MISSION.md"
+    description: Research mission statement
+  - type: url
+    value: "https://github.com/qazaq-ai/adam/blob/main/RESEARCH.md"
+    description: Detailed research arc
+references:
+  - type: software
+    title: "Piper TTS — neural text-to-speech (optional backend)"
+    url: "https://github.com/rhasspy/piper"
+  - type: software
+    title: "Tatoeba — multilingual sentence corpus (Kazakh subset)"
+    url: "https://tatoeba.org/"
+preferred-citation:
+  type: software
+  title: "adam — deterministic AI research kernel for agglutinative languages"
+  authors:
+    - given-names: Daulet
+      family-names: Baimurza
+      email: baimurza.daulet@gmail.com
+  year: 2026
+  url: "https://github.com/qazaq-ai/adam"
+  version: 5.3.10
+  license: BUSL-1.1
