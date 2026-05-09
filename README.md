@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.3.7-2EA44F?style=for-the-badge" alt="version"></a>
+  <a href="https://github.com/qazaq-ai/adam/releases"><img src="https://img.shields.io/badge/version-5.3.8-2EA44F?style=for-the-badge" alt="version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-BUSL%201.1-orange?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/language-Rust-CE412B?style=for-the-badge&logo=rust&logoColor=white" alt="rust">
   <img src="https://img.shields.io/badge/script-Cyrillic-8338EC?style=for-the-badge" alt="cyrillic">
@@ -72,7 +72,7 @@ Tiny ML lives, large ML doesn't: the trained perceptron is 24 bytes / 6 f32; suf
 
 [**adam**](https://github.com/qazaq-ai/adam) is the first applied proof-of-concept of ARK / Qazaq IR — a Kazakh-language conversational assistant currently deployed as a Rust-programming tutor. It demonstrates the architecture's viability across 41 intent variants, 1 150+ tests, 451+ versioned releases (every release CI-verified), and a working voice interface. **adam is not the goal — the architecture is the goal.** adam is what proves the architecture works.
 
-See [**MISSION.md**](MISSION.md) for the full research mission statement, measurable goals, and collaboration invitation.
+See [**MISSION.md**](MISSION.md) for the full research mission statement and measurable goals; [**RESEARCH.md**](RESEARCH.md) for the detailed research arc (open questions, milestones, methodology); [**COLLABORATION.md**](COLLABORATION.md) for partner-class onboarding (linguists / AI researchers / educational institutions / government-defence / investors / engineers).
 
 ### Open to collaboration
 

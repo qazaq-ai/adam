@@ -1,34 +1,49 @@
-//! adam-dialog — predictable, auditable Kazakh dialog layer.
+//! `adam-dialog` — deterministic dialog layer of the Qazaq IR
+//! research kernel.
 //!
-//! **Stage: v4.52.5** — 33-intent recogniser + multi-turn session +
-//! FST-backed slot expansion + session-aware retrieval composition +
-//! rule-derived reasoning chains (v2.7+) + World Core integration
-//! (v3.9.0+) + user-activity slot extraction (v4.51.0+) +
-//! transcript-driven detector extensions for continuous-form
-//! activity, compound occupation, and math anaphora (v4.52.0+).
-//! Every path is deterministic or samples from a finite,
-//! inspectable set.
+//! Part of the [adam](https://github.com/qazaq-ai/adam) research
+//! project investigating whether agglutinative-language morphology
+//! can serve as the substrate for a deterministic alternative to
+//! probabilistic large language models. See [`MISSION.md`](../../../MISSION.md)
+//! for the full research thesis.
 //!
-//! See [`docs/architecture_v3.md`](../../../docs/architecture_v3.md) for the
-//! current canonical architecture; [`docs/kazakh_grammar/07_dialog_architecture.md`](../../../docs/kazakh_grammar/07_dialog_architecture.md)
-//! is the original v1.0 MVP reference kept as a historical snapshot.
+//! Every path in this crate is **deterministic** or samples from a
+//! finite, inspectable set. There is exactly one source of
+//! randomness in the system — [`planner::choose_template`], which
+//! picks uniformly from ≤ 5 applicable templates for the recognised
+//! intent. This makes every response reproducible from
+//! `(input, seed, facts)`.
 //!
-//! Five-layer pipeline:
+//! ## Five-layer pipeline
 //!
 //! 1. Morphological parser (`adam_kernel_fst::parser`)
 //! 2. Semantic interpreter ([`semantics`]) — intent recognition +
-//!    entity extraction + `NOT_A_TOPIC` closed-class filter (v3.9.5
-//!    synced with `adam_reasoning::patterns::is_closed_class`)
-//! 3. Dialog planner ([`planner`]) — template selection (v2.7+
-//!    routes `Intent::Unknown` with `reasoning_chain: Some(...)` to
-//!    the `unknown.with_derived_chain` family for «байланыс-» marked
-//!    responses)
+//!    entity extraction + closed-class filter
+//! 3. Dialog planner ([`planner`]) — template selection
 //! 4. Response realiser ([`realiser`])
 //! 5. Morphological synthesiser (`adam_kernel_fst::morphotactics::synthesise_*`)
 //!
-//! The whole chain is pure-function except for [`planner::choose_template`],
-//! which picks uniformly from ≤ 5 applicable templates for the recognised
-//! intent. That is the ONLY source of randomness in the system.
+//! ## Capabilities (current)
+//!
+//! - **41 intent variants** — covering social dialog, knowledge
+//!   queries, pedagogical intents, and curriculum-aware self-recall
+//! - **Multi-turn session** — `name`, `age`, `city`, `occupation`,
+//!   `last_query_topic`, plus a typed [`belief::BeliefState`] with
+//!   auditable contradiction detection and resolution
+//! - **Curated knowledge integration** — World Core (`data/world_core/*.jsonl`)
+//!   merged into facts.json by `adam-reasoning`; every fact-bearing
+//!   claim cites its source
+//! - **Voice output transducer** — [`tts::OsTtsBackend`] (macOS
+//!   `say` / Linux `espeak-ng`) and optional Piper backend; framed
+//!   as peripheral output, not kernel
+//! - **Curriculum tracker** — per-stage progress with adaptive
+//!   difficulty; cargo-check verifier loop for code-tutor flows
+//! - **Phoneme G2P** — Kazakh grapheme-to-phoneme module ([`phoneme`])
+//!   as substrate for future kernel-pure concatenative TTS
+//!
+//! Architecture reference: [`docs/architecture_v3.md`](../../../docs/architecture_v3.md);
+//! [`docs/kazakh_grammar/07_dialog_architecture.md`](../../../docs/kazakh_grammar/07_dialog_architecture.md)
+//! is the original v1.0 MVP reference kept as a historical snapshot.
 
 pub mod action;
 pub mod belief;

@@ -1,10 +1,9 @@
-//! adam-retrieval — morpheme-indexed retrieval over a committed Kazakh corpus.
+//! `adam-retrieval` — morpheme-indexed retrieval over a committed
+//! Kazakh corpus. Part of the [adam](https://github.com/qazaq-ai/adam)
+//! research project on agglutinative-language deterministic AI; see
+//! [`MISSION.md`](../../../MISSION.md) for the research thesis.
 //!
-//! Stage: **v3.9.5** — inverted morpheme index (v1.6.0) + composite
-//! deterministic ranking (v1.7.0) + opt-in in-sample city swap with
-//! year guard and «бейімд-» marker (v1.9.0 → v1.9.5).
-//!
-//! This crate is the retrieval engine for the adam architecture. Unlike
+//! This crate is the retrieval engine for the Qazaq IR kernel. Unlike
 //! a probabilistic LM, retrieval is:
 //!
 //!   - **deterministic** — given a morpheme bag and an index file, the top-k

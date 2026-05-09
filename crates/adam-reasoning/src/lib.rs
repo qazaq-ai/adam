@@ -1,14 +1,14 @@
-//! adam-reasoning — Intelligent Lexical-Morphemic Retrieval & Reasoning (ILMRR).
+//! `adam-reasoning` — typed-fact extraction, lexical graph, and
+//! deterministic forward-chaining reasoner. Part of the [adam](https://github.com/qazaq-ai/adam)
+//! research project on agglutinative-language deterministic AI; see
+//! [`MISSION.md`](../../../MISSION.md) for the research thesis.
 //!
-//! Stage: **v3.9.5** — fact extraction + lexical graph + forward-chaining
-//! reasoner + human-authored World Core knowledge packs.
-//!
-//! This crate is the reasoning layer of the adam architecture. It takes
+//! This crate is the reasoning layer of the Qazaq IR kernel. It takes
 //! FST-parsed corpus samples, extracts **typed facts** with full
 //! provenance, projects them into a node-edge graph, and runs a
-//! deterministic forward-chaining reasoner over the result. In v3.9.0
-//! it also started merging a second, orthogonal source of facts:
-//! human-authored [`world_core`] entries.
+//! deterministic forward-chaining reasoner over the result. The
+//! reasoner also merges human-authored [`world_core`] entries, giving
+//! every fact-bearing claim emitted by adam an auditable source path.
 //!
 //! Capabilities shipped:
 //!

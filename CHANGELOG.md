@@ -21,6 +21,75 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.3.8] — 2026-05-09 — Documentation alignment — RESEARCH.md + COLLABORATION.md + lib.rs doc-comments
+
+Documentation-only release (text / positioning, no functional code change).
+
+Aligns the per-crate documentation and adds two new top-level documents that complete the research-positioning surface started in v5.3.6 / v5.3.7.
+
+### What's added
+
+**[RESEARCH.md](RESEARCH.md)** — detailed research arc:
+
+- 5 open research questions (Q1: deterministic vs LLM coherence; Q2: kernel/trainable boundary; Q3: cross-language generalisation; Q4: voice cost-quality frontier; Q5: curriculum architecture)
+- Methodology (hypothesis → implementation → live testing → audit → regression test → release loop)
+- Milestones by quarter (Q2 2026 ✅ shipping; Q3 2026 phoneme bank + first port; Q4 2026 multi-language; 2027 formal verification; 2027+ vertical applications)
+- 3 Codex audit rounds completed (2026-04-29 / 2026-05-07 / 2026-05-08); investor-readiness self-assessment 7/10
+
+**[COLLABORATION.md](COLLABORATION.md)** — partner-class onboarding framework:
+
+- TL;DR matrix: 6 partner classes × «what we're looking for» × «first step»
+- Detailed per-class engagement docs (linguists / AI researchers / educational institutions / government-defence / investors / software engineers)
+- Investor terms: angel pre-seed $200K-300K for 12 months; use of funds; available materials on request
+- Licence and IP framework (BUSL-1.1; first commit 2026-04-07; no patents; no trade secrets)
+- «What we will not do» section — no white-labelling, no LLM pivot, no BUSL-compromising terms
+
+### What's updated
+
+- [`adam-dialog/Cargo.toml`](crates/adam-dialog/Cargo.toml) description: removed stale `(v4.52.5)` reference; reframed «Predictable Kazakh dialog layer» → «Deterministic dialog layer of the Qazaq IR research kernel».
+- [`adam-dialog/src/lib.rs`](crates/adam-dialog/src/lib.rs) module-level doc-comment: updated capabilities list (41 intents, BeliefState, voice, curriculum, phoneme G2P), linked to `MISSION.md`, removed stale `Stage: v4.52.5` line.
+- [`adam-reasoning/src/lib.rs`](crates/adam-reasoning/src/lib.rs) header: removed stale `Stage: v3.9.5`; linked to `MISSION.md`.
+- [`adam-retrieval/src/lib.rs`](crates/adam-retrieval/src/lib.rs) header: removed stale `Stage: v3.9.5`; linked to `MISSION.md`.
+- [README.md](README.md) collaboration link expanded to point at `MISSION.md` + `RESEARCH.md` + `COLLABORATION.md`.
+
+Other crate docs (adam-corpus, adam-eval, adam-kernel, adam-kernel-fst, adam-scaling, adam-tokenizer, adam-train) left untouched — their existing descriptions are technical scope (FST, retrieval engine, eval harness, etc.) without product-positioning language that would conflict with the research framing.
+
+### What's preserved
+
+- All code, tests, data, behaviour bit-identical to v5.3.7.
+- 1 150 passing tests (unchanged).
+- world_core 3003 / 3245 / 30892 unchanged.
+
+### Why this matters
+
+A reader landing on the public repository finds three layers of orientation now:
+
+1. **README** → quick research-mission summary + entry points to deeper docs
+2. **MISSION.md** → full thesis (3 diseases / 3 goals / 30-language frontier / adam as demonstrator)
+3. **RESEARCH.md + COLLABORATION.md** → operational depth (research questions, milestones, partner onboarding terms)
+
+This depth-on-demand structure is investor-friendly (read just MISSION.md for the pitch) and academically credible (read RESEARCH.md for open questions). Without it, the research positioning was visible only in the README's top section — too thin for serious due diligence.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| RESEARCH.md created with 5 open questions + milestones | ✅ |
+| COLLABORATION.md created with 6 partner-class flows | ✅ |
+| adam-dialog Cargo.toml description reframed | ✅ |
+| adam-dialog / adam-reasoning / adam-retrieval lib.rs headers updated | ✅ |
+| All code unchanged from v5.3.7 | ✅ |
+| Workspace tests | **1150 passing** (unchanged) |
+| `cargo clippy -D warnings` | green |
+| `cargo fmt --all --check` | green |
+| `verify_release_version 5.3.8` | green |
+
+### Roadmap
+
+- **v5.3.9** — Investor-pitch alignment: rewrite the MA7 Ventures angel-pre-seed letter with research framing (currently still in v5.3.0-style educational-positioning); outline a 12-slide research deck.
+
+**Stripe — Deterministic AI research (Qazaq IR).**
+
 ## [5.3.7] — 2026-05-09 — Comparative agglutinative-language table — global research frontier visible
 
 Documentation-only release (text / positioning, no functional code change).
