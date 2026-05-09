@@ -1,5 +1,5 @@
 {
-  "version": "5.3.8",
+  "version": "5.3.9",
   "name": "rust_progression",
   "description": "Ordered Kazakh-language Rust pedagogical curriculum. Each stage names a core Rust concept; advancement is gated by `exercises_to_pass` successful SubmitSolution verdicts (cargo_status == passed) on that stage's topic. Prereqs are stage IDs that must be closed before this one becomes the recommended next.",
   "approved_by": "shaman",

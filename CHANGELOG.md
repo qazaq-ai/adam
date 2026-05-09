@@ -21,6 +21,82 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.3.9] — 2026-05-09 — International partnerships and academic grants — state-grant funding track surfaced
+
+Documentation-only release (text / positioning, no functional code change).
+
+Surfaces a **second funding track** that was implicit in the architecture but not previously documented: **state research grants and academic joint-research partnerships from countries whose national language is agglutinative**. This is a more natural funding path than private VC alone, because every named partner has a direct strategic interest in deterministic AI for its own language.
+
+### What's added
+
+**[COLLABORATION.md](COLLABORATION.md) — new section «International — agglutinative-language alignment»** with a country-by-country breakdown of priority partners:
+
+| Country | Agglutinative language | Research-grant mechanism |
+|---|---|---|
+| Japan | Japanese | JST / JSPS / NEDO |
+| South Korea | Korean | NRF / IITP |
+| Finland | Finnish | Academy of Finland / Business Finland |
+| Hungary | Hungarian | NKFIH |
+| Estonia | Estonian | Estonian Research Council (ETAg) |
+| Turkey | Turkish | TÜBİTAK |
+| Uzbekistan | Uzbek | Ministry of Innovative Development |
+| Kyrgyzstan | Kyrgyz | Kyrgyz Academy of Sciences |
+| Mongolia | Mongolian | Mongolian Academy of Sciences |
+| Tatarstan (Russia) | Tatar | Tatarstan Academy of Sciences / Kazan Federal University |
+
+…plus open invitation to other agglutinative-language states from the 30-language catalogue.
+
+Each entry includes:
+- The agglutinative national language (research-relevance anchor)
+- The specific research-grant mechanism (so partners know which agency to engage)
+- Strategic alignment context (why this country specifically)
+
+**What we offer / what we ask** sub-section spelling out the bilateral terms: open-source kernel, co-authorship, native-speaker collaboration, against grant funding + academic affiliation + scope agreements.
+
+**TL;DR matrix** updated with a new row for «National research agency» partner class with named priority agencies.
+
+### What's updated
+
+- [`MISSION.md`](MISSION.md) → new sub-section «National research agencies and academic grants» under «Open to collaboration»; explicit framing that state-grant funding is a more natural path than private VC; roadmap line for Q3-Q4 2026 international grant applications.
+- [`MISSION.md`](MISSION.md) → «Investors» sub-section clarifies that academic / state-grant funding is parallel, not exclusive.
+- [`RESEARCH.md`](RESEARCH.md) → «How this is funded» section restructured to document both tracks (private capital + state grants); state-grant track now has explicit priority-partner list.
+
+### What's preserved
+
+- All code, tests, data, behaviour bit-identical to v5.3.8.
+- 1 150 passing tests (unchanged).
+- world_core 3003 / 3245 / 30892 unchanged.
+
+### Why this matters
+
+Pre-v5.3.9 the documentation surfaced only private-VC funding (angel pre-seed via MA7 framing). For a research-stage company with deeptech positioning, this **understates** the strategic surface — every national research agency in an agglutinative-language country has a direct interest in our work. State-grant tracks typically have:
+
+- **Larger time horizons** (3-5 year programmes vs 12-month VC runway)
+- **Mission alignment** (research milestones, not revenue milestones)
+- **Lower equity dilution** (grants are non-equity)
+- **Academic credibility** (publication-friendly)
+
+Surfacing this track explicitly is a clear positive signal for everyone reading the docs — investors see less concentration risk, academics see a serious research operation, and state agencies see they were named as priority partners.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| COLLABORATION.md «International — agglutinative-language alignment» section added with 10-country table | ✅ |
+| MISSION.md «National research agencies» sub-section + funding-track parallelism note | ✅ |
+| RESEARCH.md «How this is funded» restructured into two parallel tracks | ✅ |
+| All code unchanged from v5.3.8 | ✅ |
+| Workspace tests | **1150 passing** (unchanged) |
+| `cargo clippy -D warnings` | green |
+| `cargo fmt --all --check` | green |
+| `verify_release_version 5.3.9` | green |
+
+### Roadmap
+
+- **v5.3.10** — Investor-pitch alignment: rewrite the MA7 Ventures angel-pre-seed letter with research framing + state-grant-track parallelism (private capital is one of two tracks); outline a 12-slide research deck.
+
+**Stripe — Deterministic AI research (Qazaq IR).**
+
 ## [5.3.8] — 2026-05-09 — Documentation alignment — RESEARCH.md + COLLABORATION.md + lib.rs doc-comments
 
 Documentation-only release (text / positioning, no functional code change).

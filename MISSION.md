@@ -183,6 +183,10 @@ releases:
 - **Q3 2026 — Kernel-pure phoneme bank**: replace external TTS with
   hand-recorded native-speaker phoneme units, splicing per the v5.2.0
   G2P module. Removes the last neural dependency from the voice path.
+- **Q3–Q4 2026 — International grant applications**: file with priority
+  partners (Japan JST/JSPS, South Korea NRF, Finland Academy of
+  Finland, Turkey TÜBİTAK, Uzbekistan Innovation Ministry, Hungary
+  NKFIH); seek academic affiliations for joint research.
 - **Q4 2026 — Multi-language extension**: validate the architecture
   on a second agglutinative language (Kyrgyz or Turkish candidate).
 - **2027 — Formal verification**: write down ARK's deterministic
@@ -217,6 +221,33 @@ We are interested in:
 We are running pilot deployments of adam with Kazakh-language students
 learning Rust. Current focus: Almaty / Astana schools.
 
+### National research agencies and academic grants
+
+Each of the 30 agglutinative-language states catalogued above has a
+**direct strategic interest** in deterministic AI for its own
+national language. We are actively seeking joint-research grants and
+academic partnerships from any of them. Priority partners include:
+
+- **Japan** — JST / JSPS / NEDO (Japanese is agglutinative; strong
+  computational-linguistics tradition)
+- **South Korea** — NRF / IITP (Korean is agglutinative; major
+  industrial R&D investment)
+- **Finland** — Academy of Finland / Business Finland (Finnish; small-
+  state digital-sovereignty model)
+- **Turkey** — TÜBİTAK (Turkish has the strongest existing NLP base
+  for any agglutinative language)
+- **Uzbekistan** — closely-related Turkic; bilateral programmes with
+  Kazakhstan
+- **Hungary**, **Estonia**, **Mongolia**, **Kyrgyzstan**, **Tatarstan**
+  — see [`COLLABORATION.md`](COLLABORATION.md#international--agglutinative-language-alignment)
+  for the full list and engagement terms
+
+State-grant funding is a **more natural path** for this research than
+private VC: every named partner has its own agglutinative national
+language, making our architecture directly applicable to local AI
+sovereignty interests rather than just an external technology
+purchase.
+
 ### Government / defence
 
 Offline-capable, auditable language AI for Kazakh and related
@@ -229,6 +260,10 @@ We are at angel pre-seed / seed stage. We are looking for partners
 who share the thesis that probabilistic AI is not the only path
 forward, and who are willing to back research with measurable
 applied milestones.
+
+We are not exclusively dependent on private capital — academic and
+state-grant funding from the partners listed above is a parallel
+track. We pursue both.
 
 ## Contact
 

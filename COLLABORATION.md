@@ -11,10 +11,11 @@ the detailed research roadmap, see [`RESEARCH.md`](RESEARCH.md).
 
 | You are a... | We're looking for... | First step |
 |---|---|---|
-| **Linguist** | Native-speaker validation of Kazakh G2P / morphology; computational semantics insight; Karakalpak / Kyrgyz contributors | Open an Issue tagged `linguistics` describing your area |
+| **Linguist** | Native-speaker validation of Kazakh G2P / morphology; computational semantics insight; contributors for any of the 30 catalogued agglutinative languages | Open an Issue tagged `linguistics` describing your area |
 | **AI researcher** | Deterministic-AI methodology; formal verification co-authors; comparative typology partners | Open an Issue tagged `research-collab` or email |
 | **Educational institution** | Pilot deployment of adam in Kazakh-language classrooms (2-3 classrooms / 10-50 students) | Email `baimurza.daulet@gmail.com` |
-| **Government / defence** | Use-case scoping for offline-capable, auditable Kazakh-language AI | Email (private channel preferred) |
+| **National research agency** | Joint-research grants — Japan (JST/JSPS), South Korea (NRF), Finland (Academy of Finland), Turkey (TÜBİTAK), Hungary (NKFIH), Estonia (ETAg), Uzbekistan, Kyrgyzstan, Mongolia, Tatarstan, others | Email with subject «Grant inquiry — [country/agency]» |
+| **Government / defence** | Use-case scoping for offline-capable, auditable Kazakh / Turkic / agglutinative-language AI | Email (private channel preferred) |
 | **Investor** | Angel pre-seed / seed-stage capital | Email + pitch deck on request |
 | **Software engineer** | Rust contributors; tooling; CI / infrastructure | Open a Pull Request |
 
@@ -108,28 +109,77 @@ Rust-programming tutor in Kazakhstani schools.
 context (city / age range / current curriculum). We respond within
 48 hours.
 
-### 4. Government / defence
+### 4. Governments and academic research grants
 
-The research direction speaks directly to several state-aligned
-priorities:
+The research direction speaks directly to **state-level priorities
+in every country whose national language is agglutinative**. We are
+actively seeking both state grants and academic joint-research
+partnerships — this is a more natural funding path than private VC
+because each state has a **direct strategic interest** in
+deterministic AI for its own language.
+
+#### Kazakhstan — home base
 
 - **Digital sovereignty.** A Kazakhstan-built deterministic AI that
   does not depend on external LLM providers (OpenAI, Anthropic,
   Google) for inference. Works offline; no data egress.
 - **Kazakh-language preservation and modernisation.** State-supported
   Kazakhization in IT meets a serious gap on the AI-tooling side.
-  adam's deterministic kernel is the substrate for compliance,
-  documentation, education, and operator-support tools.
 - **Auditable AI for high-stakes domains.** No hallucination by
   architecture; every claim traceable to a source. Matches regulatory
   expectations for defence / healthcare / legal use.
 
-**Use-case scoping is welcome.** We prefer private channels for
-initial discussions.
+Mechanism: Astana Hub, Ministry of Digital Development, Nazarbayev
+University, NIS schools.
 
-**How to engage:** email **baimurza.daulet@gmail.com**. Specify the
-use case and any constraints (security clearance, deployment
-environment, language requirements).
+#### International — agglutinative-language alignment
+
+Each country listed below has (a) a national language that is
+agglutinative, (b) a research-grant ecosystem that funds
+deterministic / formal AI work, and (c) strategic interest in
+alternatives to American / Chinese LLMs. Our research is directly
+applicable to their own language stack.
+
+| Country | Agglutinative language | Research-grant mechanism | Strategic alignment |
+|---|---|---|---|
+| **Japan** | Japanese | JST (Japan Science and Technology Agency), JSPS (Japan Society for the Promotion of Science) | Strong existing computational-linguistics tradition; NEDO funds non-American AI alternatives |
+| **South Korea** | Korean | NRF (National Research Foundation), IITP (Institute for Information & Communications Technology Planning) | Major industrial R&D investment (Samsung, LG, Naver); LLM-skeptic research direction |
+| **Finland** | Finnish | Academy of Finland, Business Finland | Strong tradition of formal-methods AI; small-state digital-sovereignty model |
+| **Hungary** | Hungarian | National Research, Development and Innovation Office (NKFIH) | EU-aligned research funding; Uralic computational linguistics base |
+| **Estonia** | Estonian | Estonian Research Council (ETAg) | Digital-state pioneer; auditable-AI deployment in e-government context |
+| **Turkey** | Turkish | TÜBİTAK (Scientific and Technological Research Council) | Strongest existing NLP base for any agglutinative language; natural research-collaboration substrate |
+| **Uzbekistan** | Uzbek | Ministry of Innovative Development; cultural alignment with Kazakhstan | Closely-related Turkic; joint-Turkic research agenda; bilateral programmes with Kazakhstan |
+| **Kyrgyzstan** | Kyrgyz | Kyrgyz Academy of Sciences | Closest neighbour; closely-related Turkic; rapid-port substrate |
+| **Mongolia** | Mongolian | Mongolian Academy of Sciences | Mongolic-language research collaborator; offline-AI strategic interest |
+| **Tatarstan (Russia)** | Tatar | Tatarstan Academy of Sciences; Kazan Federal University | Regional-level research; Tatar-language preservation programmes |
+
+…and other agglutinative-language states from the 30-language
+catalogue in [`MISSION.md`](MISSION.md#agglutinative-languages-global-research-frontier).
+We are open to engagement with any of them.
+
+#### What we offer state / academic partners
+
+- **Open-source kernel** (BUSL-1.1) as substrate for joint research
+- **Co-authorship** on resulting publications (we don't require
+  single-author claims)
+- **Direct technical collaboration** — founder is responsive and the
+  codebase is auditable end-to-end
+- **Native-speaker validation channel** for any agglutinative-language
+  port (we connect language experts on both sides)
+
+#### What we ask
+
+- **Grant funding** for engineer hires, phoneme-bank recording, pilot
+  deployments
+- **Academic affiliation** for credibility and access to graduate
+  students / native-speaker linguists
+- **Joint-research scope agreements** with clear publication and IP
+  terms (BUSL-1.1 compatible)
+
+**How to engage:** email **baimurza.daulet@gmail.com** with subject
+line «Grant inquiry — [country / agency name]». Specify the funding
+mechanism you have in mind and the language(s) of interest. We
+respond within 48 hours and can prepare country-specific proposals.
 
 ### 5. Investors
 

@@ -176,9 +176,27 @@ deterministic kernel:
 ## How this is funded
 
 The research is currently self-funded (founder time + minimal
-infrastructure costs — 0% GPU). Angel pre-seed funding is being
-sought to accelerate Q3 2026 milestones (phoneme bank recording,
-first port, school pilots).
+infrastructure costs — 0% GPU).
+
+We are pursuing **two parallel funding tracks**:
+
+1. **Angel pre-seed / seed-stage private capital** — to accelerate
+   Q3 2026 milestones (phoneme bank recording, first port, school
+   pilots). Target: $200K–300K for 12 months.
+
+2. **State research grants and academic joint-research partnerships**
+   — every state in the 30-language agglutinative catalogue has a
+   direct strategic interest in deterministic AI for its own national
+   language. Priority partners: Japan (JST/JSPS), South Korea (NRF),
+   Finland (Academy of Finland), Turkey (TÜBİTAK), Uzbekistan,
+   Hungary (NKFIH), Estonia (ETAg), Mongolia, Kyrgyzstan, Tatarstan.
+   See [`COLLABORATION.md`](COLLABORATION.md#international--agglutinative-language-alignment)
+   for engagement terms.
+
+These tracks are complementary, not competing: state grants fund
+research milestones (ports to new languages, formal verification,
+phoneme-bank recording with native speakers), while private capital
+funds applied product / pilot deployment. We pursue both.
 
 See [`COLLABORATION.md`](COLLABORATION.md) for the full collaboration
 framework, including investor-engagement terms.
