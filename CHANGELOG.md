@@ -21,6 +21,57 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.3.7] — 2026-05-09 — Comparative agglutinative-language table — global research frontier visible
+
+Documentation-only release (text / positioning, no functional code change).
+
+Adds a representative catalogue of agglutinative-typology languages worldwide to [`MISSION.md`](MISSION.md) — making the architecture's global research frontier visible to readers. The list is **partial by design**: the architecture's morpheme-decomposition core applies anywhere root-plus-typed-suffix concatenation is the dominant compositional pattern, regardless of the language family.
+
+### What's added
+
+**New section in MISSION.md:** «Agglutinative languages — global research frontier» with a 30-language table covering:
+
+- Closely related to Kazakh: Karakalpak, Kyrgyz, Nogai
+- Other widely-spoken agglutinative languages: Tatar, Bashkir, Crimean Tatar, Kumyk, Karachay-Balkar
+- Larger-corpus targets: Uzbek, Uyghur, Turkmen, Azerbaijani, Turkish, Gagauz
+- Siberian and divergent: Yakut (Sakha), Tuvan, Chuvash
+- Mongolic-area: Mongolian, Buryat
+- East Asian: Japanese, Korean
+- European with maximal morphology: Finnish, Hungarian, Estonian
+- Non-Eurasian: Tamil, Swahili, Quechua, Aymara, Basque
+
+Per row: agglutinative profile + research notes (port difficulty, script handling, stress test category).
+
+### What's preserved
+
+- All code, tests, data, behaviour bit-identical to v5.3.6.
+- 1150 passing tests (unchanged).
+- world_core 3003 / 3245 / 30892 unchanged.
+- The Family-classification column is **deliberately omitted** to keep the table focused on the agglutinative-typology criterion that matters for our research, rather than implying clustering or origin claims.
+
+### Why this matters
+
+Pre-fix the «Why Kazakh» section listed only a handful of related languages (Kyrgyz, Tatar, Uzbek, Turkish, Finnish, Hungarian, Japanese, Korean) as «wider applicability». Investors and researchers reading the document had no concrete sense of how broadly the architecture generalises. The expanded table makes the **global research frontier** visible: ~30 languages where the same morpheme-decomposition core applies, many of which currently have no comparable NLP infrastructure — making each one an open research target.
+
+### Acceptance
+
+| Check | Status |
+|---|---|
+| MISSION.md updated with 30-row agglutinative-language table | ✅ |
+| Family column omitted; family-name data removed from neighbouring text | ✅ |
+| All code unchanged from v5.3.6 | ✅ |
+| Workspace tests | **1150 passing** (unchanged) |
+| `cargo clippy -D warnings` | green |
+| `cargo fmt --all --check` | green |
+| `verify_release_version 5.3.7` | green |
+
+### Roadmap
+
+- **v5.3.8** — Documentation alignment pass: doc-comments in `lib.rs` of all crates + `docs/roadmap.md` headers + new `RESEARCH.md` (detailed research arc) + `COLLABORATION.md` (partner-class onboarding).
+- **v5.3.9** — Investor-pitch alignment: rewrite the MA7 Ventures angel-pre-seed letter with research framing; outline a 12-slide research deck.
+
+**Stripe — Deterministic AI research (Qazaq IR).**
+
 ## [5.3.6] — 2026-05-08 — Repositioning core — research-mission framing across primary documentation
 
 Documentation-only release (text / positioning, no functional code change).

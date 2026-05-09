@@ -95,15 +95,59 @@ Three reasons:
 
 2. **No incumbent.** Anglo-centric and Sino-centric AI giants have
    no strategic reason to investigate non-fusional languages as paths
-   to determinism. The space is open. Kazakhstan-local builders have
-   the substrate advantage (native intuition for the morphology) plus
-   the geographic alignment with the strongest agglutinative-language
-   research traditions (Turkic, Finno-Ugric, Mongolic, Korean).
+   to determinism. The space is open.
 
 3. **Real users.** Kazakhstan's education and government sectors have
    genuine demand for Kazakh-first AI, providing a real testbed for
    the theoretical work. Research cannot proceed on synthetic
    datasets alone — we need live deployment to surface edge cases.
+
+## Agglutinative languages — global research frontier
+
+The same architecture generalises across agglutinative-typology
+languages worldwide. Below is a representative (not exhaustive)
+catalogue of languages where the morpheme-decomposition approach
+applies. Many of these languages have **no comparable NLP
+infrastructure today**, making them open frontiers for the same
+research method.
+
+| Language | Agglutinative profile | Notes for our research |
+|---|---|---|
+| **Kazakh** | Strongly agglutinative; 7 cases, vowel harmony | Native authorship; substrate of choice |
+| Karakalpak | Almost mutually intelligible with Kazakh | Easiest port (~1–2 weeks of Lexicon adaptation) |
+| Kyrgyz | Closely related to Kazakh | Easy port |
+| Nogai | Close to Kazakh historically | Small-corpus testbed |
+| Tatar | Strongly agglutinative; Russian contact gradient | Validates approach with mixed-script realities |
+| Bashkir | Sister to Tatar; minor phonological differences | Sister-port to Tatar |
+| Crimean Tatar | Mixed phonological features; multi-script | Edge case for vowel harmony |
+| Kumyk | North Caucasus region | Regional substrate testbed |
+| Karachay-Balkar | Caucasus mountains | Geographic edge |
+| Uzbek | Strongly agglutinative; Persian lexicon overlay | Lexicon-substitution stress test |
+| Uyghur | Strongly agglutinative; modified Arabic script | Different orthography, same morphology |
+| Turkmen | Strong vowel harmony | Western variant |
+| Azerbaijani | Arabic + Latin + Cyrillic script transitions | Multi-script handling |
+| Turkish | Most-studied agglutinative language in NLP | Reference benchmark |
+| Gagauz | Cyrillic + Latin scripts | Small-language testbed |
+| Yakut (Sakha) | Extended vowel system; Siberian | Geographic extreme |
+| Tuvan | Siberian | Cultural breadth |
+| Chuvash | Highly divergent from typical patterns | Validates non-mainstream generality |
+| Mongolian | Strongly agglutinative; vertical-script tradition | Different writing system, same morphology |
+| Buryat | Spoken in the Baikal region | Sibling to Mongolian |
+| Japanese | Agglutinative; topic-prominent syntax | Strong NLP precedents |
+| Korean | Agglutinative; honorific morphology | Strong NLP precedents |
+| Finnish | Strongly agglutinative; 15 cases | Comparable morphological depth |
+| Hungarian | Strongly agglutinative; 18 cases; vowel harmony | Maximal-case-system stress test |
+| Estonian | Agglutinative-fusional | Some case fusion |
+| Tamil | Agglutinative; polypersonal verbs | Indian subcontinent substrate |
+| Swahili | Agglutinative; noun classes | African substrate |
+| Quechua | Strongly agglutinative; evidential marking | Indigenous American |
+| Aymara | Strongly agglutinative | Andean |
+| Basque | Strongly agglutinative; ergative case | European linguistic isolate |
+
+This list is partial. The architecture's morpheme-decomposition core
+applies anywhere root-plus-typed-suffix concatenation is the
+dominant compositional pattern — including languages we have not
+yet investigated.
 
 ## adam — the current applied demonstrator
 
