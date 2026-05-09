@@ -21,6 +21,49 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.4.1] — 2026-05-09 — README refactored to modern AI-repo conventions
+
+Documentation-only release (text / positioning, no functional code change).
+
+### What changed
+
+The top-level [README.md](README.md) was **1 146 lines** with the entire release history (v5.4.0 down through v0.x.x) duplicated inline — a pattern that hurts discoverability and creates churn (every release had to be edited in two places: README and CHANGELOG).
+
+**Before:** 1 146 lines, 239 inline release entries, ~617 lines of release-history block, deeply repetitive Capabilities section with version-by-version narrative.
+
+**After:** 247 lines (-79 %), 3 high-level release-bullet pointers under a "Recent releases" section linking to CHANGELOG.md for the full log. Modern AI-repo structure (matches LangChain / vLLM / transformers / Llama README conventions):
+
+1. Hero (logo, title, tagline, badges)
+2. 30-second pitch (kept)
+3. Why deterministic (3-disease / 3-goal table — distilled from MISSION.md)
+4. Quick start (code block, fold-of-screen)
+5. Architecture — ARK (compact crate table + pipeline diagram)
+6. Demo (one canonical REPL transcript including v5.4.0's bridge query)
+7. What's measurable (10-row metrics table)
+8. FAQ (kept — high-signal for AI-scout discovery)
+9. Recent releases (3 short bullets + link to CHANGELOG)
+10. Open to collaboration (compact partner-class list + link to COLLABORATION.md)
+11. Repository layout
+12. Foundation policies (one-line link bar)
+13. Out of scope (4 bullets)
+14. License
+15. Documentation footer (MISSION · RESEARCH · COLLABORATION · AGENTS · CHANGELOG · roadmap · cite)
+
+### Why this matters
+
+The previous README format was a project-log style, not a front-door style. The release history was a 100 % duplicate of CHANGELOG.md. Modern AI-repo convention treats README as the front door (what is this, why, how do I run it, where do I go for depth) and keeps the log in CHANGELOG. This refactor:
+
+- Aligns with community expectations for AI / ML research repos
+- Eliminates the dual-source-of-truth problem (every release had to update both README narrative AND CHANGELOG entry)
+- Makes the repository scan-friendly for AI scouts and human first-time visitors
+- Preserves all release history — nothing is lost; CHANGELOG.md is canonical and unchanged
+
+### Verified
+
+Workspace **1 155 passing** (unchanged — text-only release); cargo fmt clean; cargo check clean; all 36 internal links validated; CITATION.cff + codemeta.json + AGENTS.md + Cargo.toml version refs synced to 5.4.1.
+
+**Stripe — Deterministic AI research (README magnet hardened — modern AI-repo conventions adopted).**
+
 ## [5.4.0] — 2026-05-09 — Bridge data + bare yes/no IsA route — first user-facing payoff of the v5.3.x repositioning
 
 **Substantive engineering release.** Every claim in this entry is measurable.
