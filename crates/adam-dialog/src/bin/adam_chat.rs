@@ -105,6 +105,29 @@ fn main() -> ExitCode {
         .find(|w| w[0] == "--tts-model")
         .map(|w| w[1].clone());
 
+    // **v5.14.0 (V0).** Voice-input transducer flag. Push-to-talk
+    // capture + whisper.cpp shell-out → STT → text → kernel. The
+    // flag is recognised regardless of `--features voice`; without
+    // the feature flag set at build time the binary prints a
+    // build-help line and exits cleanly so the architectural
+    // boundary stays visible. Companion flags:
+    //   --whisper-bin <path>     override env ADAM_WHISPER_BIN
+    //   --whisper-model <path>   GGML model file
+    //   --whisper-language <kk>  Whisper language code (defaults to kk)
+    let voice_input = args.iter().any(|a| a == "--voice-input");
+    let whisper_bin_arg = args
+        .windows(2)
+        .find(|w| w[0] == "--whisper-bin")
+        .map(|w| w[1].clone());
+    let whisper_model_arg = args
+        .windows(2)
+        .find(|w| w[0] == "--whisper-model")
+        .map(|w| w[1].clone());
+    let whisper_language_arg = args
+        .windows(2)
+        .find(|w| w[0] == "--whisper-language")
+        .map(|w| w[1].clone());
+
     // **v5.6.0** — parallel cold-start load. Heavy I/O resources
     // (retrieval index ~18 MB, derived facts ~22 MB, root affinity
     // ~27 MB, suffix priors ~2.4 MB, world_core directory) are
@@ -356,7 +379,8 @@ fn main() -> ExitCode {
         // investor / demo session.
         "adam-chat v{} — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
          Multi-line code blocks: open with ``` and close with ``` on its own line.\n\
-         Voice output: pass --tts (default OS voice; or --tts-backend piper --tts-model <path>).",
+         Voice output: pass --tts (default OS voice; or --tts-backend piper --tts-model <path>).\n\
+         Voice input (build with --features voice): pass --voice-input (push-to-talk + whisper.cpp shell-out).",
         env!("CARGO_PKG_VERSION")
     );
     let stdin = io::stdin();
@@ -375,6 +399,25 @@ fn main() -> ExitCode {
     // lines into a buffer and only fire the turn when the closing
     // fence appears. The fence-count parity (odd → still inside a
     // block; even → block closed) governs the flush.
+    // **v5.14.0 (V0).** Voice-input REPL branch. Push-to-talk: user
+    // hits Enter, mic records up to 30 s (or until the next Enter
+    // closes the cpal stream cleanly), whisper.cpp transcribes, the
+    // text path takes over from here. The text REPL below is the
+    // default fall-through.
+    if voice_input {
+        return run_voice_repl(
+            &mut conv,
+            &lex,
+            &repo,
+            trace,
+            &mut turn,
+            tts_handle,
+            whisper_bin_arg.as_deref(),
+            whisper_model_arg.as_deref(),
+            whisper_language_arg.as_deref(),
+        );
+    }
+
     let mut block_buf: Option<String> = None;
     for line in stdin.lock().lines() {
         let Ok(line) = line else { break };
@@ -386,6 +429,132 @@ fn main() -> ExitCode {
         }
     }
     ExitCode::SUCCESS
+}
+
+/// **v5.14.0 (V0).** Voice-input REPL — push-to-talk capture +
+/// whisper.cpp shell-out + standard kernel turn. Without
+/// `--features voice` this prints a build-help line and exits so the
+/// boundary stays visible (no silent fall-through to the text path —
+/// the user explicitly asked for voice).
+#[cfg(feature = "voice")]
+#[allow(clippy::too_many_arguments)]
+fn run_voice_repl(
+    conv: &mut Conversation,
+    lex: &LexiconV1,
+    repo: &TemplateRepository,
+    trace: bool,
+    turn: &mut u64,
+    tts_handle: Option<&dyn adam_dialog::tts::TtsBackend>,
+    whisper_bin_arg: Option<&str>,
+    whisper_model_arg: Option<&str>,
+    whisper_language_arg: Option<&str>,
+) -> ExitCode {
+    use adam_voice::{MicCapture, MicConfig, WhisperCli, write_wav};
+
+    let bin: std::path::PathBuf = match whisper_bin_arg
+        .map(std::path::PathBuf::from)
+        .or_else(|| std::env::var_os(adam_voice::stt::ADAM_WHISPER_BIN_ENV).map(Into::into))
+    {
+        Some(p) => p,
+        None => {
+            eprintln!(
+                "adam-chat --voice-input: whisper binary not configured. \
+                 Set ADAM_WHISPER_BIN env var or pass --whisper-bin <path>."
+            );
+            return ExitCode::FAILURE;
+        }
+    };
+    if !bin.exists() {
+        eprintln!(
+            "adam-chat --voice-input: whisper binary not found at {bin:?} — \
+             install whisper.cpp (e.g. `brew install whisper-cpp`) and re-run."
+        );
+        return ExitCode::FAILURE;
+    }
+    let mut cli = WhisperCli::new(&bin);
+    if let Some(m) = whisper_model_arg {
+        cli = cli.with_model(m);
+    }
+    if let Some(lang) = whisper_language_arg {
+        cli = cli.with_language(lang);
+    }
+
+    eprintln!(
+        "adam-chat --voice-input: push-to-talk active. Press Enter to record \
+         (up to 30 s), then Enter again to stop. ^D to quit."
+    );
+    let stdin = io::stdin();
+    let mut prompt_line = String::new();
+    loop {
+        prompt_line.clear();
+        eprint!("[voice] press Enter to record … ");
+        io::stderr().lock().flush().ok();
+        if stdin.lock().read_line(&mut prompt_line).is_err() || prompt_line.is_empty() {
+            return ExitCode::SUCCESS;
+        }
+        let cap = match MicCapture::start(MicConfig::default()) {
+            Ok(c) => c,
+            Err(e) => {
+                eprintln!("[voice] mic start failed: {e}");
+                continue;
+            }
+        };
+        eprint!("[voice] recording … press Enter to stop");
+        io::stderr().lock().flush().ok();
+        let mut stop_line = String::new();
+        let _ = stdin.lock().read_line(&mut stop_line);
+        let samples = match cap.stop() {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("[voice] mic stop failed: {e}");
+                continue;
+            }
+        };
+        let tmp_dir = std::env::temp_dir();
+        let wav_path = tmp_dir.join(format!("adam_voice_turn_{}.wav", *turn + 1));
+        if let Err(e) = write_wav(&samples, &wav_path) {
+            eprintln!("[voice] wav write failed: {e}");
+            continue;
+        }
+        let transcript = match cli.transcribe(&wav_path) {
+            Ok(t) => t,
+            Err(e) => {
+                eprintln!("[voice] whisper transcribe failed: {e}");
+                continue;
+            }
+        };
+        let _ = std::fs::remove_file(&wav_path);
+        let _ = std::fs::remove_file(format!("{}.txt", wav_path.display()));
+        if transcript.text.trim().is_empty() {
+            eprintln!("[voice] empty transcript — try again.");
+            continue;
+        }
+        eprintln!("[voice] heard: «{}»", transcript.text);
+        *turn += 1;
+        let seed = turn_seed(*turn);
+        run_turn(conv, &transcript.text, lex, repo, trace, seed, tts_handle);
+        io::stdout().lock().flush().ok();
+    }
+}
+
+#[cfg(not(feature = "voice"))]
+#[allow(clippy::too_many_arguments)]
+fn run_voice_repl(
+    _conv: &mut Conversation,
+    _lex: &LexiconV1,
+    _repo: &TemplateRepository,
+    _trace: bool,
+    _turn: &mut u64,
+    _tts_handle: Option<&dyn adam_dialog::tts::TtsBackend>,
+    _whisper_bin_arg: Option<&str>,
+    _whisper_model_arg: Option<&str>,
+    _whisper_language_arg: Option<&str>,
+) -> ExitCode {
+    eprintln!(
+        "adam-chat --voice-input requires the `voice` feature. \
+         Rebuild with `cargo build --features voice -p adam-dialog --bin adam_chat`."
+    );
+    ExitCode::FAILURE
 }
 
 /// Drive the multi-line code-block accumulator state machine for one

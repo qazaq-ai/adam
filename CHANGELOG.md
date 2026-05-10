@@ -21,6 +21,74 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.14.0] — 2026-05-10 — V0 — Voice-input transducer (push-to-talk + whisper.cpp shell-out)
+
+**Minor-version release.** First milestone of the **voice arc** (V0 → V5, v5.14.0–v5.19.0). Codex's post-v5.11.0 audit asked for full voice dialogue; this release ships the foundational input transducer behind the architectural boundary that keeps the kernel deterministic.
+
+### Architectural commitment
+
+Voice input is **probabilistic**: STT engines produce the most-likely transcription with confidence metadata. That fundamentally differs from the deterministic, source-grounded kernel that consumes the result. v5.14.0 enforces the boundary by putting **every** probabilistic step into a separate crate (`adam-voice`) and feeding the dialog kernel exactly one normalised string per turn:
+
+```text
+mic capture (cpal) → audio buffer (WAV, 16 kHz mono)
+  → STT (whisper.cpp shell-out) → (text, confidence)
+  → Conversation::turn(text, ...)   ← deterministic kernel from here
+```
+
+The kernel's proof / verifier path is unchanged — every emitted claim still traces to a curated source or a grounded reasoning chain.
+
+### What changed
+
+**1. New crate [`adam-voice`](crates/adam-voice).** Three modules:
+- **`error`** — `VoiceError` + `Result` distinct from dialog-layer errors (probabilistic-input failures: mic disconnect, whisper missing, empty transcript).
+- **`mic`** — `MicCapture` / `MicConfig` push-to-talk capture via `cpal`. Negotiates whatever the OS audio device offers (any format / sample rate / channel count), downmixes multi-channel input to mono, resamples linearly to 16 kHz (whisper's preferred input). `write_wav` emits a 16-bit PCM WAV the STT engine consumes.
+- **`stt`** — `WhisperCli` shell-out runner. Builder API (`with_model` / `with_language` / `with_threads`); reads `ADAM_WHISPER_BIN` env var; default language `kk`; produces a `Transcript { text, language, confidence: Option<f32>, stderr }`. `confidence` is `None` in v5.14.0 (text-mode output) and lands in v5.16.0 once we switch to JSON-mode invocation.
+
+**2. Why shell-out, not FFI.** Zero `unsafe` in adam-voice; whisper.cpp's C API churns across versions (binary stays user-managed); build complexity stays low (`cargo build` on a fresh checkout doesn't need a model file or a compiled whisper); transducer boundary is text — adam doesn't care whether STT is whisper, vosk, or a remote service.
+
+**3. New cargo feature `voice` in adam-dialog.** Opt-in: `cargo build --features voice -p adam-dialog --bin adam_chat`. Without the feature, the binary builds unchanged (no cpal / hound dependencies pulled in); with the feature, `--voice-input` activates the push-to-talk loop.
+
+**4. New `--voice-input` flag in adam_chat.** Push-to-talk REPL: user presses Enter to start recording (max 30 s), Enter again to stop, mic samples are written to a temp WAV, whisper.cpp transcribes, the transcript flows into `Conversation::turn` like any text input. Companion flags `--whisper-bin` / `--whisper-model` / `--whisper-language` for explicit configuration; without `--features voice`, the flag prints a build-help line and exits cleanly so the boundary stays visible.
+
+**5. Banner refresh.** `adam-chat` startup banner now mentions both voice paths (output via `--tts` from v5.0.0, input via `--voice-input` from v5.14.0).
+
+### Scope at V0
+
+- **Push-to-talk:** user-driven start/stop. No VAD / continuous listening — that's V1 (v5.15.0).
+- **No confidence gate:** raw transcript surfaced directly. Low-confidence routing through clarification template family lands in V2 (v5.16.0).
+- **No barge-in / TTS interruption** — V4 (v5.18.0).
+- **No transcript normalizer** — V3 (v5.17.0) handles числа («бес жүз отыз» → «530»), Rust terms, шумовые слова strip.
+- **No golden audio corpus** — V5 (v5.19.0) ships voice replay harness + noise variants.
+
+### Why `x.y.0`
+
+Per cadence policy: new public crate (`adam-voice`) + new public APIs (`MicCapture` / `MicConfig` / `WhisperCli` / `Transcript` / `write_wav`) + new cargo feature + new CLI flag + new architectural surface (voice transducer boundary). Closes the voice-arc opening milestone.
+
+### Tests
+
+- 10 unit tests in `adam-voice`:
+  - `mic::tests` — downmix correctness (mono passthrough / stereo averaging) / resample identity / resample-to-target-length / empty-input safety
+  - `stt::tests` — argv construction (minimal / with model + threads / language override) / missing-binary error path / `from_env` returns None when unset
+- Workspace tests still 1 272 passing (voice tests are in the new crate, additive)
+- `cargo build --features voice -p adam-dialog --bin adam_chat` succeeds locally
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets -- -D warnings` clean (default features); voice feature builds cleanly with cpal 0.15 + hound 3.5; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+### Voice arc roadmap
+
+| Release | Milestone |
+|---|---|
+| **v5.14.0 (this)** | **V0 — push-to-talk + whisper shell-out** |
+| v5.15.0 | V1 — WebRTC VAD + auto-end-of-utterance |
+| v5.16.0 | V2 — confidence gate + clarification template family |
+| v5.17.0 | V3 — Kazakh transcript normalizer |
+| v5.18.0 | V4 — barge-in (TTS interruption) |
+| v5.19.0 | V5 — golden audio corpus + replay harness |
+
+**Stripe — Deterministic AI research (V0 — voice-input transducer; opens the voice arc atop the architectural boundary that keeps the kernel deterministic).**
+
 ## [5.13.0] — 2026-05-10 — B5.4 — Proof-chain longest path (find_longest_isa_chain)
 
 **Minor-version release.** Closes the fifth and final issue from the post-v5.11.0 Codex audit. Pre-v5.13.0 «Қасқырдың тірі екенін дәлелде» surfaced a 2-element direct edge `қасқыр → тірі` instead of the richer derivation `қасқыр → жыртқыш → жануар → тіршілік иесі → тірі` that the world_core hierarchy actually supports. The proof was *correct* but visually degenerate — the user couldn't see the chain of reasoning, only its endpoints.

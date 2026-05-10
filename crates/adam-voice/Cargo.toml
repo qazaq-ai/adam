@@ -1,0 +1,17 @@
+[package]
+name = "adam-voice"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Voice I/O transducer for the Qazaq IR research kernel — peripheral mic capture (cpal) + STT shell-out (whisper.cpp). Probabilistic on the input side, but only the normalised text + confidence metadata reaches the deterministic dialog kernel. v5.14.0 (V0): push-to-talk capture + WhisperCli shell-out. VAD / barge-in / confidence gate land in v5.15.0+ on the same architectural boundary."
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+cpal = "0.15"
+hound = "3.5"
+
+[dev-dependencies]
+
+[lints]
+workspace = true

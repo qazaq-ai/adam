@@ -10,11 +10,12 @@ members = [
   "crates/adam-retrieval",
   "crates/adam-scaling",
   "crates/adam-train",
+  "crates/adam-voice",
 ]
 resolver = "2"
 
 [workspace.package]
-version = "5.13.0"
+version = "5.14.0"
 edition = "2024"
 license = "BUSL-1.1"
 
