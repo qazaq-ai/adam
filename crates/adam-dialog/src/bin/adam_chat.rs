@@ -348,9 +348,16 @@ fn main() -> ExitCode {
     }
 
     eprintln!(
-        "adam-chat v5.2 — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
+        // **v5.11.5 — Codex follow-up review (B5.5).** Banner version
+        // pulled from `CARGO_PKG_VERSION` so the printed line tracks
+        // the workspace version automatically. Pre-v5.11.5 the banner
+        // was hard-coded as "v5.2" and drifted from the workspace
+        // (5.11.0 at the time of the audit) — bad signal for an
+        // investor / demo session.
+        "adam-chat v{} — пікірлесейік! Қазақ тілінде сөйлесейік; ^D to quit.\n\
          Multi-line code blocks: open with ``` and close with ``` on its own line.\n\
-         Voice output: pass --tts (default OS voice; or --tts-backend piper --tts-model <path>)."
+         Voice output: pass --tts (default OS voice; or --tts-backend piper --tts-model <path>).",
+        env!("CARGO_PKG_VERSION")
     );
     let stdin = io::stdin();
     let stdout = io::stdout();

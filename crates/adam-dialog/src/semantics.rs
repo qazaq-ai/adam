@@ -2054,7 +2054,56 @@ fn detect_statement_of_wellbeing(tokens: &[String], joined: &str) -> bool {
             "жақсымын" | "жаманмын" | "жақсы" | "жаман" | "дұрысмын"
         )
     });
-    wellbeing_token || joined.contains("жаман емес")
+    let matches_wellbeing = wellbeing_token || joined.contains("жаман емес");
+    if !matches_wellbeing {
+        return false;
+    }
+    // **v5.11.5 — Codex follow-up review (B5.1).** Gate on absence of
+    // political subjects. Pre-v5.11.5 «Тоқаев жақсы президент пе?» /
+    // «Үкімет жақсы жұмыс істеп жатыр ма?» / «Қай партия жаман?»
+    // matched the `жақсы / жаман` token and were classified as
+    // `StatementOfWellbeing` — adam answered «Жақсы екен.» / «Қуанып
+    // қалдым.», a categorical misroute. Wellbeing is about the user's
+    // own state («Мен жақсымын») or asked of adam («Сіз жақсысыз
+    // ба?»); evaluative questions about political institutions/figures
+    // belong to the political-recommendation refusal path
+    // (`is_political_recommendation`).
+    const POLITICAL_SUBJECTS: &[&str] = &[
+        "тоқаев",
+        "назарбаев",
+        "президент",
+        "президентті",
+        "партия",
+        "партияны",
+        "үкімет",
+        "үкіметті",
+        "министр",
+        "министрді",
+        "депутат",
+        "депутатты",
+        "парламент",
+        "парламентті",
+        "мәжіліс",
+        "сенат",
+        "премьер",
+        "билік",
+        "билікті",
+        "әкім",
+        "әкімді",
+        "губернатор",
+        "оппозиция",
+        "сайлау",
+        "кандидат",
+        "саясатшы",
+        "саясат",
+    ];
+    let has_political_subject = tokens
+        .iter()
+        .any(|t| POLITICAL_SUBJECTS.contains(&t.as_str()));
+    if has_political_subject {
+        return false;
+    }
+    true
 }
 
 // --- v0.8.0 new recognisers ------------------------------------------------

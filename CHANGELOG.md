@@ -21,6 +21,51 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.11.5] — 2026-05-10 — B5.1 + B5.5 — Political evaluative-question priority + version banner
+
+**Patch milestone.** Closes two of the five issues Codex surfaced in the post-v5.11.0 audit. The classifier-priority bug (B5.1) is the substantive fix; the banner drift (B5.5) is one-line hygiene.
+
+### What changed
+
+**1. B5.1 — political-evaluative questions stop misrouting through `StatementOfWellbeing`.** Pre-v5.11.5:
+
+```text
+User:  Тоқаев жақсы президент пе?
+adam:  Жақсы екен.                  ← StatementOfWellbeing — categorical misroute
+
+User:  Үкімет жақсы жұмыс істеп жатыр ма?
+adam:  Жақсы екен.
+
+User:  Қай партия жаман?
+adam:  Қуанып қалдым.
+```
+
+The `жақсы / жаман` token won the priority race in `detect_statement_of_wellbeing` because the detector had no political-subject guard. Three complementary fixes:
+
+- **`detect_statement_of_wellbeing` now gates on absence of political subjects.** A 26-entry POLITICAL_SUBJECTS list (Тоқаев / Назарбаев / президент / партия / үкімет / министр / депутат / парламент / мәжіліс / сенат / премьер / билік / әкім / губернатор / оппозиция / сайлау / кандидат / саясатшы / саясат + their accusative forms). When any token from the list is present, wellbeing returns `false` so the turn falls through to political-recommendation routing.
+- **`is_political_recommendation` gains an evaluative-question branch.** Political subject + evaluative adjective (жақсы / жаман / тиімді / тиімсіз / пайдалы / зиянды / нашар / керемет / лайықты / лайықсыз) + question particle (`ма? / ме? / ба? / бе? / па? / пе?` OR ends-with-particle OR `қай партия / қай саясатшы / қай кандидат`) — categorically a partisan-judgement request.
+- **Planner override priority — political wins over yes/no IsA.** Pre-v5.11.5 «Министр тиімді ме?» installed BOTH `__yes_no_isa__` (bare-IsA shape) AND `__political_safety__` (new evaluative branch); yes_no_isa was checked first and surfaced the «no chain found» honest-unknown template instead of the partisan refusal Codex expects. The yes_no_isa override now yields when `__political_safety__` or `__safety_refusal__` is also set.
+
+Post-v5.11.5 all four cases route through `political_safety` template family.
+
+**2. B5.5 — `adam-chat` banner version pulled from `CARGO_PKG_VERSION`.** Pre-v5.11.5 the banner was hard-coded as «adam-chat v5.2» and drifted nine minor versions from the workspace (5.11.0 at the time of the audit). Bad signal for an investor / demo session. The fix uses `env!("CARGO_PKG_VERSION")` so the printed line tracks the workspace automatically.
+
+### Why `x.y.5`
+
+Per cadence policy: detector-layer guards + planner-priority adjustment + one banner edit. No new public APIs; no new modules; no architectural shift. The remaining three Codex issues (B5.2 financial/current paraphrase, B5.3 corrected-code surface, B5.4 proof-chain longest-path) sit on the v5.12.0 / v5.12.5 / v5.13.0 cadence.
+
+### Tests
+
+- 3 unit tests in `discourse::political_evaluative_tests_v5115` (canonical scenarios / factual-political regression / personal-wellbeing regression)
+- New live holdout [`live_holdout_v5115_codex.json`](data/eval/live_holdout_v5115_codex.json) — 7 cases across 3 categories at 100 % (4 political evaluative + 1 wellbeing regression + 2 factual political regression), enforced by [`live_holdout_v5115_codex.rs`](crates/adam-dialog/tests/live_holdout_v5115_codex.rs)
+- 4 new tests total (3 unit + 1 holdout runner)
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (B5.1 — political evaluative-question classifier-priority fix; B5.5 — banner-version drift fix).**
+
 ## [5.11.0] — 2026-05-10 — B4.2 — Countable propositions + epistemic refusal (B4 closed)
 
 **Minor-version release.** Closes the second half of B4 — the generation arc atop the v5.9.0 G3.0 substrate. Pre-v5.11.0:

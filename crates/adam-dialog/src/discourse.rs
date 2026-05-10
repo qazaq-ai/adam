@@ -607,6 +607,39 @@ mod proof_request_tests_v5105 {
 }
 
 #[cfg(test)]
+mod political_evaluative_tests_v5115 {
+    use super::is_political_recommendation;
+
+    #[test]
+    fn detects_president_evaluative_question_v5115() {
+        // Canonical Codex scenario.
+        assert!(is_political_recommendation("Тоқаев жақсы президент пе?"));
+        assert!(is_political_recommendation(
+            "Үкімет жақсы жұмыс істеп жатыр ма?"
+        ));
+        assert!(is_political_recommendation("Қай партия жаман?"));
+        assert!(is_political_recommendation("Президент тиімді ме?"));
+        assert!(is_political_recommendation("Депутаттар лайықты ма?"));
+    }
+
+    #[test]
+    fn does_not_fire_on_factual_political_query_v5115() {
+        // Factual definition shapes — must NOT trigger.
+        assert!(!is_political_recommendation("Партия деген не?"));
+        assert!(!is_political_recommendation("Президент кім?"));
+        assert!(!is_political_recommendation("Үкімет дегеніміз не?"));
+    }
+
+    #[test]
+    fn does_not_fire_on_personal_wellbeing_v5115() {
+        // Wellbeing without political subject — must stay
+        // StatementOfWellbeing in semantics.rs.
+        assert!(!is_political_recommendation("Мен жақсымын."));
+        assert!(!is_political_recommendation("Бүгін жақсы күн."));
+    }
+}
+
+#[cfg(test)]
 mod ask_fix_previous_error_tests_v5100 {
     use super::is_ask_fix_previous_error;
 
@@ -803,7 +836,44 @@ pub fn is_political_recommendation(input: &str) -> bool {
     ];
     let has_political = POLITICAL_TOPICS.iter().any(|t| lower.contains(t));
     let has_recommend = RECOMMENDATION_VERBS.iter().any(|v| lower.contains(v));
-    has_political && has_recommend
+    if has_political && has_recommend {
+        return true;
+    }
+    // **v5.11.5 — Codex follow-up review (B5.1).** Evaluative-question
+    // shape. «Тоқаев жақсы президент пе?» / «Үкімет жақсы жұмыс істеп
+    // жатыр ма?» / «Қай партия жаман?» — these ask for adam's
+    // partisan judgement of the named figure / institution. Pre-
+    // v5.11.5 they were misclassified as `StatementOfWellbeing` (the
+    // `жақсы / жаман` token won the priority race). Post-v5.11.5 the
+    // wellbeing detector gates on absence of political subjects, AND
+    // this branch claims them for the political-recommendation
+    // refusal: any political subject + evaluative adjective + question
+    // particle shape.
+    const EVALUATIVE_ADJECTIVES: &[&str] = &[
+        "жақсы",
+        "жаман",
+        "тиімді",
+        "тиімсіз",
+        "пайдалы",
+        "зиянды",
+        "нашар",
+        "керемет",
+        "лайықты",
+        "лайықсыз",
+    ];
+    const QUESTION_PARTICLES: &[&str] = &[" ма?", " ме?", " ба?", " бе?", " па?", " пе?"];
+    let has_evaluative = EVALUATIVE_ADJECTIVES.iter().any(|a| lower.contains(a));
+    let has_question_particle = QUESTION_PARTICLES.iter().any(|q| lower.contains(q))
+        || lower.ends_with("ма")
+        || lower.ends_with("ме")
+        || lower.ends_with("ба")
+        || lower.ends_with("бе")
+        || lower.ends_with("па")
+        || lower.ends_with("пе")
+        || lower.contains("қай партия")
+        || lower.contains("қай саясатшы")
+        || lower.contains("қай кандидат");
+    has_political && has_evaluative && has_question_particle
 }
 
 /// **v5.6.6 — Codex follow-up review.** AskPreviousError detector.

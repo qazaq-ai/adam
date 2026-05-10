@@ -274,7 +274,18 @@ pub fn plan_response_with_epistemic(
     // bridge facts shipped in v5.4.0 (`data/world_core/{life,concept}_
     // bridges.jsonl`) made transitive paths reachable for these
     // queries; the wiring here is what surfaces them.
-    if extra_slots.contains_key("__yes_no_isa__") {
+    // **v5.11.5 — Codex follow-up review (B5.1).** Yield to political-
+    // safety / safety-refusal overrides when both sentinels are set.
+    // Pre-v5.11.5 «Министр тиімді ме?» (1) installed `__yes_no_isa__`
+    // because the question matches the bare-IsA shape AND (2) installed
+    // `__political_safety__` via the new evaluative-question detector —
+    // but yes_no_isa was checked first and won, surfacing «no chain
+    // found» honest unknown instead of the political refusal Codex
+    // expects. Yielding lets the political route claim the turn.
+    if extra_slots.contains_key("__yes_no_isa__")
+        && !extra_slots.contains_key("__political_safety__")
+        && !extra_slots.contains_key("__safety_refusal__")
+    {
         let outcome = extra_slots
             .get("__yes_no_outcome__")
             .map(String::as_str)
