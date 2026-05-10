@@ -640,6 +640,51 @@ pub fn plan_response_with_epistemic(
             };
         }
     }
+    // **v5.10.0 — Codex follow-up review (B3).** AskFixPreviousError
+    // override. Routes to `ask_fix_previous_error.<error_code>` if a
+    // per-code specialised family exists in the repo (E0382 / E0277 /
+    // E0308 / E0596 / etc.); otherwise falls through to
+    // `ask_fix_previous_error.with_data` (generic carry of cached
+    // explanation + Rust error-index pointer); on `empty` mode
+    // routes to `ask_fix_previous_error.empty` for the no-context
+    // honest refusal.
+    if let Some(mode) = extra_slots.get("__ask_fix_previous_error__") {
+        let mut candidates: Vec<String> = Vec::new();
+        if mode != "empty" {
+            candidates.push(format!("ask_fix_previous_error.{mode}"));
+            candidates.push("ask_fix_previous_error.with_data".to_string());
+        } else {
+            candidates.push("ask_fix_previous_error.empty".to_string());
+        }
+        for key in &candidates {
+            if repo.has_key(key) {
+                trace.push(format!("planner: ask_fix_previous_error override → {key}"));
+                let applicable_all = repo.get(key);
+                let mut slots = session.clone();
+                for (k, v) in extra_slots {
+                    if !k.starts_with("__") {
+                        slots.insert(k.clone(), v.clone());
+                    }
+                }
+                let fillable: Vec<&String> = applicable_all
+                    .iter()
+                    .filter(|t| template_is_fillable(t, &slots))
+                    .collect();
+                let effective: Vec<&String> = if fillable.is_empty() {
+                    applicable_all.iter().collect()
+                } else {
+                    fillable
+                };
+                let idx = (rng_seed as usize) % effective.len().max(1);
+                let chosen = effective.get(idx).map(|s| (*s).clone()).unwrap_or_default();
+                return ResponsePlan {
+                    literal: chosen,
+                    slots,
+                    trace,
+                };
+            }
+        }
+    }
     // **v5.6.5 — Codex 2026-05-09 review.** High-stakes-topic safety
     // refusal (medical / legal / financial / current-data). Routes to
     // dedicated `safety_refusal.<category>` family BEFORE all factual

@@ -21,6 +21,64 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.10.0] — 2026-05-10 — B3 — Persistent active_error + AskFixPreviousError follow-up route
+
+**Minor-version release.** Closes the third Codex follow-up issue (B3): the second follow-up after a compiler error fell to retrieval on the literal token «болд» / «оны» — adam lost the cached error context across multi-turn dialog. Pre-v5.10.0:
+
+```text
+[user submits Rust code that fails E0382]
+User: Ал алдыңғы қате неде болды?
+adam: Алдыңғы қате — E0382. ...                ← v5.6.6 recall route works
+User: Оны қалай түзетемін?
+adam: <random retrieval surface on «болд»>     ← context lost
+```
+
+### What changed
+
+**1. New detector [`discourse::is_ask_fix_previous_error`](crates/adam-dialog/src/discourse.rs).** Token-set membership across non-alphabetic boundaries. Fires on:
+- **Fix-verb shapes** + question marker — «Қалай түзетемін?» / «Оны қалай шешемін?» / «Бұны қалай жөндеймін?» / «Қалай дұрыстаймын?». Verb stems matched: `түзет- / шеш- / жөнде- / дұрыста-`.
+- **Worked-example shapes** — «Түзетілген кодты бер.» / «Дұрыс кодты бер.» / «Мысал бер.» / «Түзетілген нұсқа қандай?». No question marker required.
+
+Conservative gating: requires an explicit fix verb OR worked-example shape. Generic «Маған көмектесіңіз» / «Бұл не?» / «Оны айт» do NOT trigger.
+
+**2. Conversation handler in [`turn_with_trace`](crates/adam-dialog/src/conversation.rs).** Sets new `__ask_fix_previous_error__` sentinel when the detector fires AND `is_ask_previous_error` did NOT (mutual exclusion — recall and fix routes are different intents). Mode = `<ERROR_CODE>` when session has `last_cargo_error_code`, `empty` otherwise. Carries `error_code` / `error_explanation` / `topic` slots.
+
+**3. Planner override** routes to per-error-code specialised template family first, falls back to generic `with_data`, finally to `empty`:
+
+| Error code | Template family | Repair hint |
+|---|---|---|
+| E0382 | `ask_fix_previous_error.E0382` | move semantics — `clone()` или `&` reference |
+| E0596 | `ask_fix_previous_error.E0596` | `let mut` или `&mut` |
+| E0277 | `ask_fix_previous_error.E0277` | `#[derive(Debug)]` + `{:?}` или `impl Trait for Type` |
+| E0308 | `ask_fix_previous_error.E0308` | прочитать `expected X, found Y`; `as` cast / `String::from(...)` / `&str` ↔ `String` |
+| Other  | `ask_fix_previous_error.with_data` | cached explanation + Rust error-index pointer |
+| (no session) | `ask_fix_previous_error.empty` | honest "нет сохранённой ошибки" refusal |
+
+**4. New [`TemplateRepository::has_key`](crates/adam-dialog/src/templates.rs).** Direct presence check that bypasses the `unknown`-family fallback in `get`. **Critical for the per-error-code candidates loop** — without this, the override would render the `unknown` clarification family («Түсінбедім.») when the specialised E0107 / E0123 family is absent, instead of cleanly falling back to `with_data`. The bug existed in the base `repo.get(key).is_empty()` pattern across the planner; the new `has_key` makes the contract explicit.
+
+**5. Persistence is unchanged.** `last_cargo_error_code` / `last_error_explanation` / `last_submission_topic` were already kept across turns (set on failed SubmitSolution; cleared only on a passing submission). The B3 bug was at the **dialog routing layer**, not the state-tracking layer — `Оны қалай түзетемін?` had no detector and fell through to retrieval.
+
+### Why `x.y.0`
+
+Per cadence policy:
+1. **New public API** (`TemplateRepository::has_key`) — a corrective primitive that future override branches will adopt
+2. **New public detector** (`discourse::is_ask_fix_previous_error`) + new conversation sentinel
+3. **6 new template families** wired through a multi-candidate planner override
+4. **New intent-shape capability** (per-error-code repair routing) — the user can now ask for a fix and adam carries the cached compiler context across multiple turns, opening the «multi-turn diagnostic dialog» surface
+
+### Tests
+
+- 3 unit tests in `discourse::ask_fix_previous_error_tests_v5100` (fix-verb + question / worked-example / regression)
+- 4 integration tests in [`ask_fix_previous_error_v5100`](crates/adam-dialog/tests/ask_fix_previous_error_v5100.rs) — E0382 specialised hint / generic E0107 fallback / empty session refusal / two-consecutive-followup persistence
+- New live holdout [`live_holdout_v5100_codex.json`](data/eval/live_holdout_v5100_codex.json) — 8 cases across 2 categories at 100 % (5 per-error-code specialisations + generic fallback + empty refusal + regression case proving generic «Маған көмектесіңіз» does NOT misroute even with cached error in session), enforced by [`live_holdout_v5100_codex.rs`](crates/adam-dialog/tests/live_holdout_v5100_codex.rs)
+- 16 new tests total (3 unit + 4 integration + 1 holdout runner + 8 holdout cases counted via runner); workspace test count grows by 8 runner-level results
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (B3 — multi-turn compiler-error context preservation; per-error-code specialised repair hints + honest no-context refusal).**
+
 ## [5.9.5] — 2026-05-10 — Codex follow-up review fixes (B1 + B2) — AskLocation user-self disambiguation + safety-paraphrase extensions
 
 **Patch milestone.** Closes 4 dialog defects Codex surfaced in the post-v5.9.0 live REPL audit. All fixes are detector-layer; no kernel-architecture changes.

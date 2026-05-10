@@ -630,6 +630,57 @@ templates = [
     "Алдыңғы қате жайлы дерек жоқ: бұл сессияда сәтсіз тапсырыс жоқ.",
 ]
 
+# **v5.10.0 — Codex follow-up review (B3).** AskFixPreviousError
+# families. Pre-v5.10.0 the second follow-up «Оны қалай түзетемін?»
+# after a compiler-error recall fell to retrieval on «болд» / «оны»
+# — the conversation lost the cached error context. Detector:
+# `discourse::is_ask_fix_previous_error`; planner sentinel:
+# `__ask_fix_previous_error__ = <ERROR_CODE> | empty`. Per-code
+# specialised families carry concrete repair hints (Rust error-index
+# anchored); the generic `with_data` fallback covers other codes;
+# `empty` is the honest no-context refusal.
+[[families]]
+key = "ask_fix_previous_error.E0382"
+templates = [
+    "**E0382** — moved value қайта пайдаланылды. Rust меншік ережесі: `let s = String::from(\"hi\"); let t = s; println!(\"{{}}\", s);` сияқты кодта `s` `t`-ге move болғаннан кейін қолдануға болмайды. Шешімдер: (1) `clone()` — `let t = s.clone();` (бөлек көшірме); (2) reference қолдану — `let t = &s;` (тек оқу үшін). Толығырақ: https://doc.rust-lang.org/error-index.html#E0382",
+    "**E0382** moved-value қателігі — мән move болған соң бастапқы айнымалыны қолдандыңыз. Иелікті сақтау үшін `s.clone()` көшірмесін немесе `&s` сілтемесін пайдаланыңыз. Қандай жағдайда болғанын білу үшін кодыңызда `let t = s;` сияқты тұста `s`-ті кейін пайдалангыңыз келе ме қараңыз.",
+]
+
+[[families]]
+key = "ask_fix_previous_error.E0596"
+templates = [
+    "**E0596** — өзгертуге болмайтын меншік (immutable borrow) — мән `let` арқылы беріліпті, ал кодта оны өзгертіп тұрсыз. Шешімі: айнымалыны `let mut x = ...` ретінде жариялаңыз немесе `&mut self` / `&mut variable` арқылы mutable reference алыңыз. Толығырақ: https://doc.rust-lang.org/error-index.html#E0596",
+    "**E0596** mutable-borrow қателігі — `let` (immutable) айнымалыны өзгертуге тырысып тұрсыз. `let mut` деп жазыңыз немесе функцияға `&mut` ретінде беріңіз.",
+]
+
+[[families]]
+key = "ask_fix_previous_error.E0277"
+templates = [
+    "**E0277** — қажетті trait типке іске асырылмаған. Мысалы, `Display` trait жоқ типті `println!(\"{{}}\", x)` арқылы шығаруға болмайды. Шешімдер: (1) керек trait-ті `impl Trait for Type {{ ... }}` арқылы қосу; (2) `#[derive(Debug)]` + `{{:?}}` форматын пайдалану. Толығырақ: https://doc.rust-lang.org/error-index.html#E0277",
+    "**E0277** trait-bound қателігі — типке керекті trait жоқ. `#[derive(Debug)]` қосып `{{:?}}` форматтаушысын қолданып көріңіз немесе керек trait-ті өзіңіз imple iceriniz.",
+]
+
+[[families]]
+key = "ask_fix_previous_error.E0308"
+templates = [
+    "**E0308** — типтер сәйкеспейді. Compiler күткен типті hash хабарламада көрсетеді: `expected ..., found ...`. Жиі кездесетін шешімдер: (1) `as` арқылы caster — `let x: i64 = small as i64;`; (2) `String::from(...)` / `.to_string()` — `&str`-тен `String`-ке; (3) функция қайтаратын типті жариялауды тексеру. Толығырақ: https://doc.rust-lang.org/error-index.html#E0308",
+    "**E0308** mismatched-types — тип күтілгеннен өзгеше. `expected X, found Y` жолын мұқият оқыңыз; жиі `&str` ↔ `String` немесе `i32` ↔ `i64` шатастырылады.",
+]
+
+[[families]]
+key = "ask_fix_previous_error.with_data"
+templates = [
+    "Алдыңғы қате — **{error_code}**. {error_explanation} Толық сипаттаманы Rust қателер индексінен қараңыз: https://doc.rust-lang.org/error-index.html",
+    "Сіздің кодыңыздағы соңғы қате **{error_code}** болатын. {error_explanation} Түзетілген нұсқасын жазып көріп, тағы тапсырыс беріңіз.",
+]
+
+[[families]]
+key = "ask_fix_previous_error.empty"
+templates = [
+    "Ағымдағы сессияда түзетуге сақтаулы қате жоқ. Алдымен кодты ұсынсаңыз, қателерін талдап беремін.",
+    "Қандай қатені түзетуді сұрап жатқаныңыз нақты белгісіз — менде осы сұхбатта тіркелген сәтсіз тапсырыс жоқ. Кодты бере салыңыз, қарап шығамын.",
+]
+
 # **v5.6.5 — Codex 2026-05-09 review.** Safety-refusal families for
 # high-stakes topics (medical / legal / financial / current-data).
 # Pre-v5.6.5 a query like «Басым ауырып тұр, қандай дәрі ішейін?»

@@ -1246,6 +1246,36 @@ impl Conversation {
                 extra_slots.insert("__ask_previous_error__".into(), "empty".into());
             }
         }
+        // **v5.10.0 — Codex follow-up review (B3).** AskFixPreviousError
+        // route. Pre-v5.10.0 the second follow-up after a compiler
+        // error («Оны қалай түзетемін?» / «Қалай шешемін?» /
+        // «Түзетілген кодты бер») fell to retrieval on the literal
+        // tokens — anaphor «Оны» offered no surface noun, and the
+        // fix verb «түзет-» didn't match any prior intent. Now we
+        // consult the same session state as AskPreviousError and
+        // route to the new `ask_fix_previous_error.{<code>,with_data,
+        // empty}` template family. Per-error-code specialisations
+        // (E0382 / E0277 / E0308 / E0596) carry concrete repair
+        // hints; the generic `with_data` family covers other codes
+        // by surfacing the cached explanation + Rust error-index
+        // pointer; `empty` is the honest no-context refusal.
+        if crate::discourse::is_ask_fix_previous_error(input)
+            && !extra_slots.contains_key("__ask_previous_error__")
+        {
+            if let Some(code) = self.session.get("last_cargo_error_code") {
+                let code_upper = code.to_uppercase();
+                extra_slots.insert("__ask_fix_previous_error__".into(), code_upper.clone());
+                extra_slots.insert("error_code".into(), code_upper);
+                if let Some(expl) = self.session.get("last_error_explanation") {
+                    extra_slots.insert("error_explanation".into(), expl.clone());
+                }
+                if let Some(topic) = self.session.get("last_submission_topic") {
+                    extra_slots.insert("topic".into(), topic.clone());
+                }
+            } else {
+                extra_slots.insert("__ask_fix_previous_error__".into(), "empty".into());
+            }
+        }
         // v4.6.12 — Math-input marker (set above based on
         // `input_is_math_expression`). Carried into the planner
         // so the `math_refusal` template family fires.

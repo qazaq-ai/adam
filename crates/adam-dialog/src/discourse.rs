@@ -502,6 +502,40 @@ mod user_self_location_tests {
 }
 
 #[cfg(test)]
+mod ask_fix_previous_error_tests_v5100 {
+    use super::is_ask_fix_previous_error;
+
+    #[test]
+    fn detects_fix_verb_with_question_v5100() {
+        // Canonical Codex scenario.
+        assert!(is_ask_fix_previous_error("Оны қалай түзетемін?"));
+        assert!(is_ask_fix_previous_error("Қалай түзетемін?"));
+        assert!(is_ask_fix_previous_error("Қалай шешемін?"));
+        assert!(is_ask_fix_previous_error("Бұны қалай жөндеймін?"));
+        assert!(is_ask_fix_previous_error("Қалай дұрыстаймын?"));
+    }
+
+    #[test]
+    fn detects_worked_example_request_v5100() {
+        // Worked-example shape — user wants concrete repaired code.
+        assert!(is_ask_fix_previous_error("Түзетілген кодты бер."));
+        assert!(is_ask_fix_previous_error("Дұрыс кодты бер."));
+        assert!(is_ask_fix_previous_error("Мысал бер."));
+        assert!(is_ask_fix_previous_error("Түзетілген нұсқа қандай?"));
+    }
+
+    #[test]
+    fn does_not_fire_on_unrelated_help_request_v5100() {
+        // No fix verb / no example shape → must fall through to
+        // standard routing. Conservative gating keeps the detector
+        // from grabbing every help-style turn.
+        assert!(!is_ask_fix_previous_error("Маған көмектесіңіз."));
+        assert!(!is_ask_fix_previous_error("Бұл не?"));
+        assert!(!is_ask_fix_previous_error("Оны айт."));
+    }
+}
+
+#[cfg(test)]
 mod political_recommendation_tests_v595 {
     use super::is_political_recommendation;
 
@@ -698,6 +732,61 @@ pub fn is_ask_previous_error(input: &str) -> bool {
         || lower.contains("тағы айт")
         || lower.contains("қайталап");
     has_recall_marker && mentions_error && asks_about_it
+}
+
+/// **v5.10.0 — Codex follow-up review (B3).** AskFixPreviousError
+/// detector. Pre-v5.10.0 the second follow-up after a compiler error
+/// surfaced retrieval on the literal token «болд» — the user asked
+/// «Оны қалай түзетемін?» («how do I fix it?») after the «Ал алдыңғы
+/// қате неде болды?» reply, and adam lost the error context. Detector
+/// fires on **fix-verb shapes** («түзет / түзете / шеш / қалай шешемін /
+/// мысал бер / түзетілген код»), with discourse-anaphor friendly:
+/// «Оны қалай түзетемін?» qualifies even though the noun «қате» is
+/// elided — the caller (`Conversation::turn`) gates routing on
+/// `last_cargo_error_code` being present in session, so a stray fix-
+/// verb without recent compiler-error context falls through to the
+/// regular curriculum / Unknown path. Conservative: requires an
+/// explicit fix verb; generic «Оны айт» / «Көмектесіңіз» do NOT
+/// trigger.
+pub fn is_ask_fix_previous_error(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let tokens: std::collections::HashSet<&str> = lower
+        .split(|c: char| !c.is_alphabetic())
+        .filter(|t| !t.is_empty())
+        .collect();
+    // Fix-verb root cluster: «түзет-», «шеш-», «жөнде-», «дұрыста-».
+    // We accept the bare verb stem AND common 1sg/2sg/imperative
+    // surfaces seen in real REPL traces.
+    let fix_verb_substrings = [
+        "түзет",
+        "түзете",
+        "түзетем",
+        "түзетсем",
+        "түзетіл",
+        "шешем",
+        "шешсем",
+        "шешу",
+        "жөнде",
+        "дұрыста",
+    ];
+    let has_fix_verb = fix_verb_substrings.iter().any(|s| lower.contains(s));
+    // Worked-example shapes: «мысал бер», «түзетілген кодты бер»,
+    // «дұрыс жауап қандай» — the user wants a concrete repaired
+    // version, still keyed off the implicit prior error.
+    let asks_for_example = lower.contains("мысал бер")
+        || lower.contains("түзетілген код")
+        || lower.contains("түзетілген нұсқа")
+        || lower.contains("дұрыс кодты бер")
+        || lower.contains("дұрыс жауап");
+    // Anaphor + question shape: pure «Қалай түзетемін?» qualifies
+    // when the referent is implied from the previous turn (no noun
+    // required); the conversation layer's session-state gate stops
+    // false fires on standalone unrelated turns.
+    let has_question_marker = lower.contains("қалай")
+        || lower.contains("қандай")
+        || lower.contains('?')
+        || tokens.contains("қалайша");
+    has_fix_verb && has_question_marker || asks_for_example
 }
 
 /// **v5.9.5 — Codex follow-up review (B1).** Distinguishes a user-

@@ -164,6 +164,17 @@ impl TemplateRepository {
         self.by_key.len()
     }
 
+    /// **v5.10.0 — Codex follow-up review (B3).** Direct key-presence
+    /// check that bypasses the `unknown`-family fallback in `get`.
+    /// Required by override branches that try a per-error-code
+    /// specialised family first (e.g. `ask_fix_previous_error.E0107`)
+    /// and need to know whether to fall back to a generic family
+    /// without accidentally rendering the `unknown` clarification
+    /// templates.
+    pub fn has_key(&self, key: &str) -> bool {
+        self.by_key.contains_key(key)
+    }
+
     pub fn is_empty(&self) -> bool {
         self.by_key.is_empty()
     }
