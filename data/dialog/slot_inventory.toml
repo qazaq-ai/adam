@@ -145,6 +145,28 @@ description = "Rendered IsA chain from find_isa_chain — pretty-printed as 'sub
 example = "қасқыр → жыртқыш → жануар → тіршілік иесі → тірі"
 variants = ["literal"]
 
+# ── v5.11.0 — Codex follow-up review (B4.2). Countable propositions.
+[[slots]]
+name = "requested_count"
+kind = "numeric"
+description = "User-requested number of propositions in «<X> туралы <N> сөйлем құрастыр». Surface form is the bare digit (1-8)."
+example = "3"
+variants = ["literal"]
+
+[[slots]]
+name = "provable_count"
+kind = "numeric"
+description = "Number of distinct IsA-objects the kernel could prove for the requested subject (BFS over extracted + derived facts, capped at the user-requested count). Used by the honest variant when it's less than {requested_count}."
+example = "2"
+variants = ["literal"]
+
+[[slots]]
+name = "rendered_sentences"
+kind = "chain"
+description = "Pre-rendered sequence of `{subject_term} — {object}.` propositions, joined by single spaces. Built by the conversation handler from `collect_provable_isa_objects`; the planner template surface uses it verbatim."
+example = "Қасқыр — жыртқыш. Қасқыр — жануар. Қасқыр — тіршілік иесі."
+variants = ["literal"]
+
 # ── Reasoning + retrieval slots ────────────────────────────────────
 [[slots]]
 name = "fact"

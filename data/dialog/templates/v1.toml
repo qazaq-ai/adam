@@ -705,6 +705,50 @@ templates = [
     "Бұл тұжырымды дәлелдейтін тізбекті таба алмадым: {subject_term} мен {predicate_term} арасында белгілі дерек жоқ.",
 ]
 
+# **v5.11.0 — Codex follow-up review (B4.2).** Countable propositions.
+# The user asked «<X> туралы <N> сөйлем құрастыр». Detector:
+# `discourse::extract_propositions_request`. Planner sentinels:
+# `__propositions__ = with_data | honest | empty`. Slots:
+# {subject_term} / {requested_count} / {provable_count} /
+# {rendered_sentences}.
+[[families]]
+key = "propositions.with_data"
+templates = [
+    "{rendered_sentences}",
+    "Менде {subject_term} туралы {provable_count} дәлелденген дерек бар. {rendered_sentences}",
+]
+
+[[families]]
+key = "propositions.honest"
+templates = [
+    "Менде {subject_term} туралы дәлелденген {provable_count} ғана дерек бар (сұрағаныңыз — {requested_count}). {rendered_sentences}",
+    "{requested_count} сөйлемнің орнына, дәлелденген {provable_count} ғана берейін: {rendered_sentences}",
+]
+
+[[families]]
+key = "propositions.empty"
+templates = [
+    "{subject_term} туралы менің білім қорымда дәлелденген сөйлем жоқ.",
+    "Кешіріңіз, {subject_term} туралы дәлелдеуге келетін деректі таба алмадым.",
+]
+
+# **v5.11.0 — Codex follow-up review (B4.2).** Epistemic refusal.
+# Detector: `discourse::is_unprovable_assertion_request`. Sentinel:
+# `__epistemic_refusal__ = 1`. The user explicitly asks adam to
+# fabricate an unsupported claim («Дәлелсіз тұжырым жаса.» / «Болжам
+# жаса.» / «Жалпы пікір айт.»). adam is a deterministic, source-
+# grounded kernel — producing an explicitly unsupported claim
+# contradicts the architectural guarantee. Honest refusal naming
+# *why* the request can't be honoured + invitation to ask a
+# verifiable form.
+[[families]]
+key = "epistemic_refusal"
+templates = [
+    "Дәлелсіз тұжырым жасай алмаймын — менің әрбір жауабым қандай да бір дерекке немесе тізбекке негізделуі тиіс. Сұрағыңызды нақтылап қойсаңыз, дәлелдеп жауап беруге дайынмын.",
+    "Болжам, ойдан құрастырылған тұжырым менің архитектурама қайшы келеді: мен тек дәлелденетін фактіні ұсына аламын. Қандай да бір нақты сұрақ қойсаңыз, көмектесемін.",
+    "Дәлелсіз пікір беру менің рөліме кірмейді — мен әрбір жауапты сақталған дерекпен растай аламын. Сондықтан жалпы немесе негізсіз пікір айтудан бас тартамын.",
+]
+
 # **v5.6.5 — Codex 2026-05-09 review.** Safety-refusal families for
 # high-stakes topics (medical / legal / financial / current-data).
 # Pre-v5.6.5 a query like «Басым ауырып тұр, қандай дәрі ішейін?»

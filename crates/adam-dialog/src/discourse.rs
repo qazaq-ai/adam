@@ -502,6 +502,84 @@ mod user_self_location_tests {
 }
 
 #[cfg(test)]
+mod propositions_request_tests_v5110 {
+    use super::extract_propositions_request;
+
+    #[test]
+    fn extracts_subject_and_kazakh_count_v5110() {
+        assert_eq!(
+            extract_propositions_request("Қасқыр туралы үш сөйлем құрастыр."),
+            Some(("қасқыр".to_string(), 3))
+        );
+        assert_eq!(
+            extract_propositions_request("Жер туралы екі факт айт."),
+            Some(("жер".to_string(), 2))
+        );
+    }
+
+    #[test]
+    fn extracts_subject_and_digit_count_v5110() {
+        assert_eq!(
+            extract_propositions_request("Алматы туралы 4 сөйлем жаз."),
+            Some(("алматы".to_string(), 4))
+        );
+    }
+
+    #[test]
+    fn caps_count_at_eight_v5110() {
+        // 100 → clamps to 8.
+        assert_eq!(
+            extract_propositions_request("Қасқыр жайлы 100 сөйлем айт."),
+            Some(("қасқыр".to_string(), 8))
+        );
+    }
+
+    #[test]
+    fn defaults_birneshe_to_three_v5110() {
+        assert_eq!(
+            extract_propositions_request("Жер туралы бірнеше сөйлем айт."),
+            Some(("жер".to_string(), 3))
+        );
+    }
+
+    #[test]
+    fn does_not_fire_without_compose_verb_v5110() {
+        // Bare «X туралы N сөйлем» without imperative verb — not a
+        // composition request. Could be a definitional context.
+        assert_eq!(
+            extract_propositions_request("Қасқыр туралы үш сөйлем барма?"),
+            None
+        );
+    }
+
+    #[test]
+    fn does_not_fire_on_unrelated_query_v5110() {
+        assert_eq!(extract_propositions_request("Қасқыр — тірі ме?"), None);
+        assert_eq!(extract_propositions_request("Қасқыр деген не?"), None);
+    }
+}
+
+#[cfg(test)]
+mod unprovable_assertion_tests_v5110 {
+    use super::is_unprovable_assertion_request;
+
+    #[test]
+    fn detects_explicit_unprovable_request_v5110() {
+        assert!(is_unprovable_assertion_request("Дәлелсіз тұжырым жаса."));
+        assert!(is_unprovable_assertion_request("Болжам жаса."));
+        assert!(is_unprovable_assertion_request("Жалпы пікір айт."));
+        assert!(is_unprovable_assertion_request("Ойдан құрастырып айт."));
+    }
+
+    #[test]
+    fn does_not_fire_on_factual_query_v5110() {
+        assert!(!is_unprovable_assertion_request("Қасқыр — тірі ме?"));
+        assert!(!is_unprovable_assertion_request("Не білесің?"));
+        assert!(!is_unprovable_assertion_request("Қасқыр деген не?"));
+    }
+}
+
+#[cfg(test)]
 mod proof_request_tests_v5105 {
     use super::extract_proof_request;
 
@@ -759,6 +837,131 @@ pub fn is_ask_previous_error(input: &str) -> bool {
         || lower.contains("тағы айт")
         || lower.contains("қайталап");
     has_recall_marker && mentions_error && asks_about_it
+}
+
+/// **v5.11.0 — Codex follow-up review (B4.2).** Countable
+/// propositions detector. Pre-v5.11.0 the user request «Қасқыр
+/// туралы үш сөйлем құрастыр» / «Жер жайлы 3 сөйлем айт» fell to
+/// retrieval and surfaced one tangential fact regardless of the
+/// requested count. Post-v5.11.0 this detector parses (subject, n)
+/// from the request shape; the conversation handler queries
+/// `find_isa_chain` over multiple supported predicates and renders
+/// `min(n, M)` provable propositions, where M is the count of
+/// curated/derived facts the kernel can support. Honest if M < n:
+/// «Менде дәлелденген X дерек қана бар.»
+///
+/// Recognised shapes:
+/// - «<X> туралы <N> сөйлем құрастыр» / «<X> туралы <N> сөйлем айт»
+/// - «<X> жайлы <N> сөйлем құрастыр»
+/// - «<N> сөйлем <X> туралы айт»
+///
+/// `N` accepts both Cyrillic numerals («бір / екі / үш / төрт / бес»)
+/// and ASCII digits («1 / 2 / 3»). Caps at 8 to keep the response
+/// length bounded; higher requests clamp to 8 and the honest count
+/// surface still applies.
+pub fn extract_propositions_request(input: &str) -> Option<(String, u32)> {
+    let lower = input.to_lowercase();
+    let cleaned = lower.trim().trim_end_matches(['.', '?', '!']);
+    let tokens: Vec<&str> = cleaned.split_whitespace().collect();
+    // Find the «сөйлем» anchor token; the count token is the one
+    // immediately before it; the subject phrase is everything before
+    // «туралы» / «жайлы».
+    let sentences_idx = tokens.iter().position(|t| {
+        *t == "сөйлем" || *t == "сөйлемдер" || *t == "факт" || *t == "факті" || *t == "дерек"
+    })?;
+    if sentences_idx == 0 {
+        return None;
+    }
+    // Imperative verb after «сөйлем»: «құрастыр / айт / жаз / бер».
+    let has_compose_verb = tokens.iter().skip(sentences_idx).any(|t| {
+        matches!(
+            *t,
+            "құрастыр"
+                | "құрастырып"
+                | "құрастырыңыз"
+                | "айт"
+                | "айтып"
+                | "айтыңыз"
+                | "жаз"
+                | "жазып"
+                | "жазыңыз"
+                | "бер"
+                | "беріңіз"
+        )
+    });
+    if !has_compose_verb {
+        return None;
+    }
+    // Parse the count token at sentences_idx - 1.
+    let count_token = tokens[sentences_idx - 1];
+    let n_raw = parse_count_token(count_token)?;
+    let n = n_raw.clamp(1, 8);
+    // Subject phrase: everything before «туралы» / «жайлы».
+    let topic_marker = tokens
+        .iter()
+        .position(|t| *t == "туралы" || *t == "жайлы" || *t == "жөнінде")?;
+    if topic_marker == 0 {
+        return None;
+    }
+    let subject_tokens: Vec<&str> = tokens[..topic_marker].to_vec();
+    if subject_tokens.is_empty() {
+        return None;
+    }
+    let subject = subject_tokens.join(" ").trim_matches(',').to_string();
+    if subject.is_empty() {
+        return None;
+    }
+    Some((subject, n))
+}
+
+fn parse_count_token(token: &str) -> Option<u32> {
+    // Bare ASCII digit.
+    if let Ok(n) = token.parse::<u32>() {
+        if n > 0 {
+            return Some(n);
+        }
+    }
+    // Kazakh numerals.
+    if let Some(v) = bare_kazakh_number(token) {
+        if v > 0 && v <= 100 {
+            return Some(v as u32);
+        }
+    }
+    // Quantifier «бірнеше» (several) defaults to 3.
+    if token == "бірнеше" {
+        return Some(3);
+    }
+    None
+}
+
+/// **v5.11.0 — Codex follow-up review (B4.2).** Detector for
+/// explicit unprovable-assertion requests: «Дәлелсіз тұжырым жаса.»
+/// / «Болжам жаса.» / «Жалпы пікір айт.» / «Күмәнді ой айт.». adam
+/// is a deterministic, source-grounded kernel; producing an
+/// explicitly unsupported claim contradicts the architectural
+/// guarantee. The detector fires on this shape so the planner can
+/// route to a dedicated `epistemic_refusal` template family with a
+/// honest "I cannot fabricate" reply — distinct from the safety
+/// refusal layer (which is high-stakes-domain advice gating; this
+/// is epistemic-honesty gating).
+///
+/// Conservative: requires explicit «дәлелсіз / болжам / күмәнді /
+/// жалпы пікір» plus an imperative verb. Generic «не білесің» does
+/// NOT trigger.
+pub fn is_unprovable_assertion_request(input: &str) -> bool {
+    let lower = input.to_lowercase();
+    let unprovable_marker = lower.contains("дәлелсіз")
+        || lower.contains("болжам")
+        || lower.contains("күмәнді ой")
+        || lower.contains("жалпы пікір")
+        || lower.contains("кез келген ой")
+        || lower.contains("ойдан құрастыр")
+        || lower.contains("ойдан шығар");
+    let has_compose_verb = lower.contains("жаса")
+        || lower.contains("құрастыр")
+        || lower.contains("айт")
+        || lower.contains("шығар");
+    unprovable_marker && has_compose_verb
 }
 
 /// **v5.10.5 — Codex follow-up review (B4.1).** AskProofChain

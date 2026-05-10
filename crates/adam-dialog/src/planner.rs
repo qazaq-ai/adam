@@ -648,6 +648,67 @@ pub fn plan_response_with_epistemic(
     // explanation + Rust error-index pointer); on `empty` mode
     // routes to `ask_fix_previous_error.empty` for the no-context
     // honest refusal.
+    // **v5.11.0 — Codex follow-up review (B4.2).** Epistemic refusal.
+    // Routes BEFORE every factual path so the user's explicit
+    // request to fabricate an unsupported claim is met with an
+    // honest "I cannot do this" rather than a retrieval-flavoured
+    // surface.
+    if extra_slots.contains_key("__epistemic_refusal__") {
+        let key = "epistemic_refusal";
+        if repo.has_key(key) {
+            trace.push(format!("planner: epistemic_refusal override → {key}"));
+            let applicable_all = repo.get(key);
+            let idx = (rng_seed as usize) % applicable_all.len().max(1);
+            let chosen = applicable_all.get(idx).cloned().unwrap_or_default();
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
+    // **v5.11.0 — Codex follow-up review (B4.2).** Countable
+    // propositions override. Routes to one of three variants:
+    // - `propositions.with_data` — N provable facts found, surface
+    //   the rendered sentence sequence
+    // - `propositions.honest` — only M < N provable; honest about
+    //   the count gap, then surface what's available
+    // - `propositions.empty` — nothing provable for the subject
+    if let Some(mode) = extra_slots.get("__propositions__") {
+        let key = format!("propositions.{mode}");
+        if repo.has_key(&key) {
+            trace.push(format!("planner: propositions override → {key}"));
+            let applicable_all = repo.get(&key);
+            let mut slots = session.clone();
+            for (k, v) in extra_slots {
+                if !k.starts_with("__") {
+                    slots.insert(k.clone(), v.clone());
+                }
+            }
+            let fillable: Vec<&String> = applicable_all
+                .iter()
+                .filter(|t| template_is_fillable(t, &slots))
+                .collect();
+            let effective: Vec<&String> = if fillable.is_empty() {
+                applicable_all.iter().collect()
+            } else {
+                fillable
+            };
+            let idx = (rng_seed as usize) % effective.len().max(1);
+            let chosen = effective.get(idx).map(|s| (*s).clone()).unwrap_or_default();
+            return ResponsePlan {
+                literal: chosen,
+                slots,
+                trace,
+            };
+        }
+    }
     // **v5.10.5 — Codex follow-up review (B4.1).** Proof-chain
     // override. Routes to `proof_chain.with_data` when the chain was
     // resolved (slots `subject_term` / `predicate_term` / `chain` set

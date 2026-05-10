@@ -1,0 +1,14 @@
+{
+  "_comment": "v5.11.0 — Codex follow-up review (B4.2). Closes the second half of B4: countable propositions «<X> туралы <N> сөйлем құрастыр» + explicit epistemic refusal «Дәлелсіз тұжырым жаса». Pre-v5.11.0: «Қасқыр туралы үш сөйлем құрастыр» surfaced one tangential fact regardless of N; «Дәлелсіз тұжырым жаса» fell to retrieval. Post-v5.11.0: detectors `discourse::extract_propositions_request` (returns subject + count, accepts Cyrillic numerals OR ASCII digits OR «бірнеше» quantifier; clamps to 8) and `discourse::is_unprovable_assertion_request`. Handler builds N provable «X — Y» sentences via new `collect_provable_isa_objects` BFS over extracted + derived facts; honest variant fires when M < N. Epistemic refusal routes to dedicated template family naming WHY the request can't be honoured (architectural commitment to source-grounded answers) — distinct from safety refusal (high-stakes-domain advice gating). Closes B4 — the generation arc atop the v5.9.0 G3.0 substrate.",
+  "cases": [
+    {"id": "propositions_qasqyr_three", "category": "propositions_v5110", "query": "Қасқыр туралы үш сөйлем құрастыр.", "any_substring": ["қасқыр —"], "none_substring": ["түсінбедім", "сақталмаған"]},
+    {"id": "propositions_qasqyr_digit_two", "category": "propositions_v5110", "query": "Қасқыр туралы 2 сөйлем айт.", "any_substring": ["қасқыр —"], "none_substring": ["түсінбедім"]},
+    {"id": "propositions_birneshe_default", "category": "propositions_v5110", "query": "Қасқыр жайлы бірнеше сөйлем айт.", "any_substring": ["қасқыр —"], "none_substring": ["түсінбедім"]},
+    {"id": "propositions_empty_subject", "category": "propositions_v5110", "query": "Тоғыз планета туралы үш сөйлем құрастыр.", "any_substring": ["сөйлем жоқ", "таба алмадым", "білім қорымда"], "none_substring": ["түсінбедім"]},
+    {"id": "epistemic_refusal_dalelsiz", "category": "epistemic_refusal_v5110", "query": "Дәлелсіз тұжырым жаса.", "any_substring": ["дәлелсіз тұжырым жасай алмаймын", "архитектурама қайшы", "рөліме кірмейді"], "none_substring": ["түсінбедім"]},
+    {"id": "epistemic_refusal_bolzham", "category": "epistemic_refusal_v5110", "query": "Болжам жаса.", "any_substring": ["дәлелсіз тұжырым жасай алмаймын", "архитектурама қайшы", "рөліме кірмейді"], "none_substring": ["түсінбедім"]},
+    {"id": "epistemic_refusal_zhalpy_pikir", "category": "epistemic_refusal_v5110", "query": "Жалпы пікір айт.", "any_substring": ["дәлелсіз тұжырым жасай алмаймын", "архитектурама қайшы", "рөліме кірмейді"], "none_substring": ["түсінбедім"]},
+    {"id": "regression_yesno_unaffected", "category": "regression_yesno", "query": "Қасқыр — тірі ме?", "any_substring": ["иә", "дұрыс", "тірі"], "none_substring": ["дәлелсіз тұжырым жасай алмаймын"]},
+    {"id": "regression_definition_unaffected", "category": "regression_definition", "query": "Қасқыр деген не?", "any_substring": ["қасқыр"], "none_substring": ["дәлелсіз тұжырым жасай алмаймын", "сөйлем жоқ"]}
+  ]
+}

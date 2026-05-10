@@ -21,6 +21,65 @@ Post-v1.0.0:
 
 Historical release entries below describe the work done at each step. Earlier entries use the «Stripe — Kazakh school tutor» tagline reflecting the applied focus at the time; from v5.3.6 onward entries use the **«Stripe — Deterministic AI research»** tagline reflecting the architectural goal these applications serve.
 
+## [5.11.0] — 2026-05-10 — B4.2 — Countable propositions + epistemic refusal (B4 closed)
+
+**Minor-version release.** Closes the second half of B4 — the generation arc atop the v5.9.0 G3.0 substrate. Pre-v5.11.0:
+
+- «Қасқыр туралы үш сөйлем құрастыр.» surfaced one tangential fact regardless of the requested count.
+- «Дәлелсіз тұжырым жаса.» fell to retrieval and returned a context-shaped surface — the user explicitly asked for an unsupported claim and got one.
+
+### What changed
+
+**1. New detector [`discourse::extract_propositions_request`](crates/adam-dialog/src/discourse.rs).** Returns `Option<(subject, n)>`. Recognised shapes:
+- «<X> туралы <N> сөйлем құрастыр» / «<X> туралы <N> сөйлем айт»
+- «<X> жайлы <N> сөйлем құрастыр» / «<X> жөнінде <N> факт айт»
+- Imperative verbs covered: `құрастыр / құрастырып / құрастырыңыз / айт / айтып / айтыңыз / жаз / жазып / жазыңыз / бер / беріңіз`
+- Anchor tokens: `сөйлем / сөйлемдер / факт / факті / дерек`
+- Counts: ASCII digits OR Cyrillic numerals (1-100 via `bare_kazakh_number`); `бірнеше` defaults to 3
+- Cap at 8 to bound response length
+
+**2. New detector [`discourse::is_unprovable_assertion_request`](crates/adam-dialog/src/discourse.rs).** Conservative: requires explicit «дәлелсіз / болжам / күмәнді ой / жалпы пікір / кез келген ой / ойдан құрастыр / ойдан шығар» + an imperative verb. Generic «не білесің» / «бұл не?» does NOT trigger.
+
+**3. New public API [`conversation::collect_provable_isa_objects`](crates/adam-dialog/src/conversation.rs).** BFS over extracted + derived facts (depth 8), deduplicated by lowercased object root, returns the first `n` items in shortest-distance order. Used by the propositions handler to render `min(n, M)` provable «<X> — <Y>.» sentences.
+
+**4. Conversation handler.** When `extract_propositions_request` returns `Some((subject, n))`:
+- Builds the full sentence sequence via `collect_provable_isa_objects` + plain string formatting.
+- Sets `__propositions__ = with_data | honest | empty` based on M-vs-N comparison.
+- Surfaces `subject_term` / `requested_count` / `provable_count` / `rendered_sentences` slots for the planner.
+
+When `is_unprovable_assertion_request` fires: sets `__epistemic_refusal__ = 1` for the dedicated planner override.
+
+**5. Planner overrides.** Both new sentinels route BEFORE every factual path. `__epistemic_refusal__` precedes safety_refusal so the user's explicit fabrication request gets the architectural-honesty surface. `__propositions__` reuses the multi-candidate fallback pattern (per-mode key first, then verbose fallback) with `TemplateRepository::has_key`.
+
+**6. Four new template families.**
+- `propositions.with_data` — N provable facts, two variants (verbatim sequence / sequence with count preamble)
+- `propositions.honest` — only M < N provable, two variants both naming the gap explicitly («Менде дәлелденген {provable_count} ғана дерек бар»)
+- `propositions.empty` — no provable facts at all, two variants
+- `epistemic_refusal` — three variants naming WHY adam declines («архитектурама қайшы келеді» / «рөліме кірмейді» / «дәлелсіз тұжырым жасай алмаймын»)
+
+**7. Slot inventory + invariant tests.** Three new slots registered in `data/dialog/slot_inventory.toml` (`requested_count` / `provable_count` / `rendered_sentences`); `slot_inventory_coverage_v570` invariant test confirms every slot referenced by templates is registered.
+
+### Why `x.y.0`
+
+Per cadence policy:
+1. **Two new public detectors** + one new public API (`collect_provable_isa_objects`)
+2. **Four new template families** + three new registered slots
+3. **New intent-shape capability:** counted multi-sentence proof composition + first-class architectural-honesty refusal
+4. **Closes the B4 generation arc** opened by v5.10.5 — v5.11.0 is the second half
+
+### Tests
+
+- 6 unit tests in `discourse::propositions_request_tests_v5110` (Cyrillic count / digit count / cap-at-8 / бірнеше=3 / no-compose-verb regression / unrelated query regression)
+- 2 unit tests in `discourse::unprovable_assertion_tests_v5110` (detect-explicit / regression-factual)
+- New live holdout [`live_holdout_v5110_codex.json`](data/eval/live_holdout_v5110_codex.json) — 9 cases across 4 categories at 100 % (4 propositions variants + 3 epistemic refusal + 2 regressions), enforced by [`live_holdout_v5110_codex.rs`](crates/adam-dialog/tests/live_holdout_v5110_codex.rs)
+- 9 new tests total (8 unit + 1 holdout runner); workspace test suite grows accordingly
+
+### Verified
+
+`cargo fmt --all --check` clean; `cargo clippy --all-targets -- -D warnings` clean; `cargo test --workspace` 0 failures; `bash scripts/check_metrics_currency.sh` clean.
+
+**Stripe — Deterministic AI research (B4.2 — countable propositions + epistemic refusal; B4 generation arc closed atop the G3.0 substrate).**
+
 ## [5.10.5] — 2026-05-10 — B4.1 — Proof-chain mode (AnswerShape::IsAProofChain)
 
 **Patch milestone.** First half of B4 (the generation arc that builds atop the v5.9.0 G3.0 substrate). Pre-v5.10.5 the user request «Қасқырдың тірі екенін дәлелде.» / «Дәлелде Қасқыр — тірі.» fell to the standard yes/no IsA path or to retrieval — the user got the answer but never the proof performance.

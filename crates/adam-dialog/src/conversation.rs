@@ -1285,6 +1285,56 @@ impl Conversation {
         // formal spec for this surface; the dialog layer wires it
         // through the slot/template path for now (composer-driven
         // routing is held for the broader G3.0-integration arc).
+        // **v5.11.0 — Codex follow-up review (B4.2).** Countable
+        // propositions handler. When the user asks «<X> туралы <N>
+        // сөйлем құрастыр» / «<X> жайлы <N> факт айт», collect up to
+        // N provable IsA-objects for the subject and surface them
+        // as N «<X> — <Y>.» sentences. If only M < N are provable
+        // the planner routes to the honest variant carrying both N
+        // and M.
+        if let Some((subject, n)) = crate::discourse::extract_propositions_request(input) {
+            let objects = collect_provable_isa_objects(
+                &self.extracted_facts,
+                &self.derived_facts,
+                &subject,
+                n as usize,
+            );
+            let subject_cap = {
+                let mut c = subject.chars();
+                match c.next() {
+                    Some(ch) => ch.to_uppercase().collect::<String>() + c.as_str(),
+                    None => String::new(),
+                }
+            };
+            extra_slots.insert("subject_term".into(), subject_cap.clone());
+            extra_slots.insert("requested_count".into(), n.to_string());
+            extra_slots.insert("provable_count".into(), objects.len().to_string());
+            if objects.is_empty() {
+                extra_slots.insert("__propositions__".into(), "empty".into());
+            } else {
+                let sentences = objects
+                    .iter()
+                    .map(|obj| format!("{subject_cap} — {obj}."))
+                    .collect::<Vec<_>>()
+                    .join(" ");
+                extra_slots.insert("rendered_sentences".into(), sentences);
+                if (objects.len() as u32) < n {
+                    extra_slots.insert("__propositions__".into(), "honest".into());
+                } else {
+                    extra_slots.insert("__propositions__".into(), "with_data".into());
+                }
+            }
+        }
+        // **v5.11.0 — Codex follow-up review (B4.2).** Epistemic
+        // refusal — the user explicitly asks adam to fabricate an
+        // unsupported claim («Дәлелсіз тұжырым жаса.» / «Болжам жаса.»
+        // / «Жалпы пікір айт.»). adam is a deterministic, source-
+        // grounded kernel; producing an explicitly unsupported claim
+        // contradicts the architectural guarantee. Route to
+        // dedicated `epistemic_refusal` template family.
+        if crate::discourse::is_unprovable_assertion_request(input) {
+            extra_slots.insert("__epistemic_refusal__".into(), "1".into());
+        }
         if let Some((subject, predicate)) = crate::discourse::extract_proof_request(input) {
             let chain = find_isa_chain(
                 &self.extracted_facts,
@@ -2819,6 +2869,73 @@ pub fn find_isa_proof(
         chain,
         vec!["R1_is_a_transitivity".to_string()],
     ))
+}
+
+/// **v5.11.0 — Codex follow-up review (B4.2).** Collect the set of
+/// distinct IsA-objects that are reachable from `subject` through
+/// either curated or rule-derived facts. Used by the propositions-
+/// request handler to render `min(n, M)` provable «X — Y» sentences.
+///
+/// **Determinism.** Order is stable: we walk the same BFS frontier
+/// the chain query uses, deduplicate by lowercased object root, and
+/// preserve insertion order. The first `n` items returned are the
+/// shortest-distance objects from `subject`.
+///
+/// **Capped depth.** Same as `find_isa_chain_inner` (depth 8) — far
+/// beyond what any current world_core chain reaches.
+pub fn collect_provable_isa_objects(
+    extracted: &[ReasFact],
+    derived: &[DerivedFact],
+    subject: &str,
+    limit: usize,
+) -> Vec<String> {
+    const MAX_DEPTH: usize = 8;
+    let subject_lc = subject.to_lowercase();
+    let mut seen: std::collections::HashSet<String> = std::collections::HashSet::new();
+    seen.insert(subject_lc.clone());
+    let mut out: Vec<String> = Vec::new();
+    let mut frontier: Vec<String> = vec![subject_lc];
+    for _ in 0..MAX_DEPTH {
+        if out.len() >= limit {
+            break;
+        }
+        let mut next: Vec<String> = Vec::new();
+        for node in &frontier {
+            for f in extracted {
+                if matches!(f.predicate, ReasPredicate::IsA)
+                    && f.subject.root.to_lowercase() == *node
+                {
+                    let obj = f.object.root.to_lowercase();
+                    if seen.insert(obj.clone()) {
+                        out.push(obj.clone());
+                        next.push(obj);
+                        if out.len() >= limit {
+                            return out;
+                        }
+                    }
+                }
+            }
+            for d in derived {
+                if matches!(d.predicate, adam_reasoning::Predicate::IsA)
+                    && d.subject.root.to_lowercase() == *node
+                {
+                    let obj = d.object.root.to_lowercase();
+                    if seen.insert(obj.clone()) {
+                        out.push(obj.clone());
+                        next.push(obj);
+                        if out.len() >= limit {
+                            return out;
+                        }
+                    }
+                }
+            }
+        }
+        if next.is_empty() {
+            break;
+        }
+        frontier = next;
+    }
+    out
 }
 
 /// **v5.4.7** — strip the genitive marker from a two-word
